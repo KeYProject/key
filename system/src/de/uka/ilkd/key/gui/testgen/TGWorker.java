@@ -33,6 +33,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.testgen.ModelGenerator;
 import de.uka.ilkd.key.util.Debug;
 
 public class TGWorker extends SwingWorker<Void, Void> implements InterruptListener {
@@ -137,6 +138,8 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 			return null;
 		}
 		launcher.launch(solvers, problems, proof.getServices());
+//		ModelGenerator mg = new ModelGenerator(proofs.get(0).root().sequent(), 3, getMediator());
+//		mg.launch();
 		return null;
 	}
 
@@ -224,7 +227,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 					return null;
 				}
 			}
-		}
+		}		
 		final Proof proof = new Proof("Test Case for NodeNr: "
 				+ node.serialNr(), newSequent, "", oldProof.env()
 				.getInitConfig().createTacletIndex(), oldProof.env()
