@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.smt;
 
@@ -281,79 +280,79 @@ public interface SolverType  {
 	 */
 	static public final SolverType CVC3_SOLVER = new AbstractSolverType() {
 
-		@Override
-		public String getName() {
-			return "CVC3";
-		}
+	    @Override
+	    public String getName() {
+	        return "CVC3";
+	    }
 
-		@Override
-		public SMTSolver createSolver(SMTProblem problem,
-				SolverListener listener, Services services) {
-			return new SMTSolverImplementation(problem, listener,
-					services, this);
-		}
+	    @Override
+	    public SMTSolver createSolver(SMTProblem problem,
+	                    SolverListener listener, Services services) {
+	        return new SMTSolverImplementation(problem, listener,
+	                        services, this);
+	    }
 
-		public String getDefaultSolverCommand() {
-			return "cvc3";
-                }
+	    public String getDefaultSolverCommand() {
+	        return "cvc3";
+	    }
 
-            private boolean useNewVersion () {
-                    final String solverVersion = getRawVersion();
-                    return "version 2.4.1".equals(solverVersion);
-                }
+	    private boolean useNewVersion () {
+	        final String solverVersion = getRawVersion();
+	        return "version 2.4.1".equals(solverVersion);
+	    }
 
-                @Override
-                public String getRawVersion () {
-                    final String tmp = super.getRawVersion();
-                    if (tmp==null) return null;
-                    return tmp.substring(tmp.indexOf("version"));
-                }
+	    @Override
+	    public String getRawVersion () {
+	        final String tmp = super.getRawVersion();
+	        if (tmp==null) return null;
+	        return tmp.substring(tmp.indexOf("version"));
+	    }
 
-		@Override
-		public String getDefaultSolverParameters() {
-                    // version 2.4.1 uses different parameters
-                    if (useNewVersion())
-                        return "-lang smt -interactive";
-//                      return "-lang smt2 -interactive";
-                    else
-			return "+lang smt +model +int";
-		}
+	    @Override
+	    public String getDefaultSolverParameters() {
+	        // version 2.4.1 uses different parameters
+	        if (useNewVersion())
+	            return "-lang smt +model +interactive";
+	        //                      return "-lang smt2 +model +interactive";
+	        else
+	            return "+lang smt +model +int";
+	    }
 
-		public String[] getDelimiters() {
-                    if (useNewVersion())
-                        return new String[]{"\n","\r"};
-                    else
-			return new String [] {"CVC>","C>"};
-                }
+	    public String[] getDelimiters() {
+	        if (useNewVersion())
+	            return new String[]{"\n","\r"};
+	        else
+	            return new String [] {"CVC>","C>"};
+	    }
 
-		public String[] getSupportedVersions() {
-                	return new String[] {"version 2.2", "version 2.4.1"};
-                }
+	    public String[] getSupportedVersions() {
+	        return new String[] {"version 2.2", "version 2.4.1"};
+	    }
 
-		public String getVersionParameter() {
-			return "-version";
-                }
+	    public String getVersionParameter() {
+	        return "-version";
+	    }
 
-		@Override
-		public SMTTranslator createTranslator(Services services) {
-                    final Configuration conf = new Configuration(false, true);
-//                    if (useNewParameterSchema())
-//                        return new SmtLib2Translator(services, conf);
-//                    else
-                        return new SmtLibTranslator(services,conf);
-		}
+	    @Override
+	    public SMTTranslator createTranslator(Services services) {
+	        final Configuration conf = new Configuration(false, true);
+	        //                    if (useNewVersion())
+	        //                        return new SmtLib2Translator(services, conf);
+	        //                    else
+	        return new SmtLibTranslator(services,conf);
+	    }
 
-		public boolean supportsIfThenElse() {
-			return true;
-                }
+	    public boolean supportsIfThenElse() {
+	        return true;
+	    }
 
-		@Override
-		public String getInfo() {
-			return null;
-		}
+	    @Override
+	    public String getInfo() {
+	        return null;
+	    }
 
 
-		
+
 
 	};
 

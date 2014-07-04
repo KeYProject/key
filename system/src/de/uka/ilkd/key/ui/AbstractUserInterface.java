@@ -1,23 +1,30 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
 package de.uka.ilkd.key.ui;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.TaskFinishedInfo;
+import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
@@ -30,29 +37,84 @@ import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.util.Debug;
 
 public abstract class AbstractUserInterface implements UserInterface {
+   private boolean autoMode;
 
-	public void loadProblem(File file, List<File> classPath,
-	        File bootClassPath, KeYMediator mediator) {
-		final ProblemLoader pl = new ProblemLoader(file, classPath,
-		        bootClassPath, AbstractProfile.getDefaultProfile(), mediator);
-		pl.addTaskListener(this);
-		pl.run();
-	}
+   /**
+    * The used {@link PropertyChangeSupport}.
+    */
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+
+    private ProofMacro autoMacro = new SkipMacro();
+
+    protected ProblemLoader getProblemLoader(File file, List<File> classPath,
+                                             File bootClassPath, KeYMediator mediator) {
+        final ProblemLoader pl =
+                new ProblemLoader(file, classPath, bootClassPath,
+                                  AbstractProfile.getDefaultProfile(), mediator);
+        pl.addTaskListener(this);
+        return pl;
+    }
 
     @Override
-	public  IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
-	app = forced? app.forceInstantiate(goal): app.tryToInstantiate(goal);
-		// cannot complete that app
-		return app.complete() ? app : null;
-	}
+    public  IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
+        app = forced? app.forceInstantiate(goal): app.tryToInstantiate(goal);
+        // cannot complete that app
+        return app.complete() ? app : null;
+    }
+
+    public void setMacro(ProofMacro macro) {
+        assert macro != null;
+        this.autoMacro = macro;
+    }
+
+    public ProofMacro getMacro() {
+        return this.autoMacro;
+    }
+
+    protected abstract String getMacroConsoleOutput();
+
+    public boolean macroChosen() {
+        return !(getMacro() instanceof SkipMacro);
+    }
+
+    public boolean applyMacro() {
+        assert macroChosen();
+        if (getMacro().canApplyTo(getMediator(), null)) {
+            System.out.println(getMacroConsoleOutput());
+            try {
+                getMediator().stopInterface(true);
+                getMediator().setInteractive(false);
+                getMacro().applyTo(getMediator(), null, this);
+                getMediator().setInteractive(true);
+                getMediator().startInterface(true);
+            } catch(InterruptedException ex) {
+                Debug.out("Proof macro has been interrupted:");
+                Debug.out(ex);
+            } finally {
+                Proof proof = getMediator().getSelectedProof();
+                TaskFinishedInfo info =
+                        new DefaultTaskFinishedInfo(getMacro(), null, proof, proof.getAutoModeTime(),
+                                                    proof.countNodes(), proof.openGoals().size());
+                taskFinished(info);
+            }
+            return true;
+        } else {
+            System.out.println(getMacro().getClass().getSimpleName() + " not applicable!");
+        }
+        return false;
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public DefaultProblemLoader load(Profile profile, File file, List<File> classPath, File bootClassPath) throws ProblemLoaderException {
+    public DefaultProblemLoader load(Profile profile,
+                                     File file,
+                                     List<File> classPath,
+                                     File bootClassPath) throws ProblemLoaderException {
        DefaultProblemLoader loader = null;
        try {
           getMediator().stopInterface(true);
@@ -129,5 +191,127 @@ public abstract class AbstractUserInterface implements UserInterface {
           catch (InterruptedException e) {
           }
        }
+    }
+
+    @Override
+    public boolean isAutoMode() {
+        return autoMode;
+    }
+
+    @Override
+    public void notifyAutoModeBeingStarted() {
+       boolean oldValue = isAutoMode();
+       autoMode = true;
+       firePropertyChange(PROP_AUTO_MODE, oldValue, isAutoMode());
+    }
+
+    @Override
+    public void notifyAutomodeStopped() {
+       boolean oldValue = isAutoMode();
+       autoMode = false;
+       firePropertyChange(PROP_AUTO_MODE, oldValue, isAutoMode());
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        pcs.addPropertyChangeListener(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        pcs.addPropertyChangeListener(propertyName, listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        pcs.removePropertyChangeListener(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        pcs.removePropertyChangeListener(propertyName, listener);
+    }
+
+    /**
+     * Fires the event to all available listeners.
+     * @param propertyName The property name.
+     * @param index The changed index.
+     * @param oldValue The old value.
+     * @param newValue The new value.
+     */
+    protected void fireIndexedPropertyChange(String propertyName, int index, boolean oldValue, boolean newValue) {
+        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+    }
+
+    /**
+     * Fires the event to all available listeners.
+     * @param propertyName The property name.
+     * @param index The changed index.
+     * @param oldValue The old value.
+     * @param newValue The new value.
+     */
+    protected void fireIndexedPropertyChange(String propertyName, int index, int oldValue, int newValue) {
+        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+    }
+
+    /**
+     * Fires the event to all available listeners.
+     * @param propertyName The property name.
+     * @param index The changed index.
+     * @param oldValue The old value.
+     * @param newValue The new value.
+     */
+    protected void fireIndexedPropertyChange(String propertyName, int index, Object oldValue, Object newValue) {
+        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
+    }
+
+    /**
+     * Fires the event to all listeners.
+     * @param evt The event to fire.
+     */
+    protected void firePropertyChange(PropertyChangeEvent evt) {
+        pcs.firePropertyChange(evt);
+    }
+
+    /**
+     * Fires the event to all listeners.
+     * @param propertyName The changed property.
+     * @param oldValue The old value.
+     * @param newValue The new value.
+     */
+    protected void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
+        pcs.firePropertyChange(propertyName, oldValue, newValue);
+    }
+
+    /**
+     * Fires the event to all listeners.
+     * @param propertyName The changed property.
+     * @param oldValue The old value.
+     * @param newValue The new value.
+     */
+    protected void firePropertyChange(String propertyName, int oldValue, int newValue) {
+        pcs.firePropertyChange(propertyName, oldValue, newValue);
+    }
+
+    /**
+     * Fires the event to all listeners.
+     * @param propertyName The changed property.
+     * @param oldValue The old value.
+     * @param newValue The new value.
+     */
+    protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+        pcs.firePropertyChange(propertyName, oldValue, newValue);
     }
 }

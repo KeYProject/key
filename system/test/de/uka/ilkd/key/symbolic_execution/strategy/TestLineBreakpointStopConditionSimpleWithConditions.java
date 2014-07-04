@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.io.IOException;
@@ -11,14 +24,15 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
+import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.LineBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 public class TestLineBreakpointStopConditionSimpleWithConditions extends AbstractSymbolicExecutionTestCase {
    public void testBreakpointStopCondition() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      SymbolicExecutionEnvironment<CustomConsoleUserInterface> envMain=null;
-      SymbolicExecutionEnvironment<CustomConsoleUserInterface> envSomethingMain=null;
-      SymbolicExecutionEnvironment<CustomConsoleUserInterface> envSomethingLocalMain=null;
+      SymbolicExecutionEnvironment<CustomUserInterface> envMain=null;
+      SymbolicExecutionEnvironment<CustomUserInterface> envSomethingMain=null;
+      SymbolicExecutionEnvironment<CustomUserInterface> envSomethingLocalMain=null;
       HashMap<String, String> originalTacletOptions = null;
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try{
@@ -39,10 +53,11 @@ public class TestLineBreakpointStopConditionSimpleWithConditions extends Abstrac
          IProgramMethod main = searchProgramMethod(envMain.getServices(), containerTypeName, "main");
          // Test  method main()
          CompoundStopCondition allBreakpoints = new CompoundStopCondition();
-         LineBreakpointStopCondition mainBreakpoint = new LineBreakpointStopCondition(main.getPositionInfo().getFileName(), 9, -1, main, envMain.getBuilder().getProof(), "z==1", true, true,6,11);
+         LineBreakpoint mainBreakpoint = new LineBreakpoint(main.getPositionInfo().getFileName(), 9, -1, main, envMain.getBuilder().getProof(), "z==1", true, true,6,11);
          
-         allBreakpoints.addChildren(mainBreakpoint);
-         envMain.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(allBreakpoints));
+         SymbolicExecutionBreakpointStopCondition bc = new SymbolicExecutionBreakpointStopCondition(mainBreakpoint);
+         allBreakpoints.addChildren(bc);
+         envMain.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(bc));
          
          stepReturnWithBreakpoints(envMain.getUi(), envMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);
          stepReturnWithBreakpoints(envMain.getUi(), envMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints); 
@@ -53,10 +68,11 @@ public class TestLineBreakpointStopConditionSimpleWithConditions extends Abstrac
          IProgramMethod something = searchProgramMethod(envSomethingMain.getServices(), containerTypeName, "something");
          IProgramMethod somethingMain = searchProgramMethod(envSomethingMain.getServices(), containerTypeName, "somethingMain");
          allBreakpoints = new CompoundStopCondition();
-         LineBreakpointStopCondition somethingMainBreakpoint = new LineBreakpointStopCondition(somethingMain.getPositionInfo().getFileName(), 15, -1, somethingMain, envSomethingMain.getBuilder().getProof(),"a==2", true, true,13,17);
-         LineBreakpointStopCondition somethingBreakpoint = new LineBreakpointStopCondition(something.getPositionInfo().getFileName(), 20, -1, something, envSomethingMain.getBuilder().getProof(),"b==3", true, true,19,21);
-         allBreakpoints.addChildren(somethingBreakpoint, somethingMainBreakpoint);
-         envSomethingMain.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(allBreakpoints));
+         LineBreakpoint somethingMainBreakpoint = new LineBreakpoint(somethingMain.getPositionInfo().getFileName(), 15, -1, somethingMain, envSomethingMain.getBuilder().getProof(),"a==2", true, true,13,17);
+         LineBreakpoint somethingBreakpoint = new LineBreakpoint(something.getPositionInfo().getFileName(), 20, -1, something, envSomethingMain.getBuilder().getProof(),"b==3", true, true,19,21);
+         bc = new SymbolicExecutionBreakpointStopCondition(somethingBreakpoint, somethingMainBreakpoint);
+         allBreakpoints.addChildren(bc);
+         envSomethingMain.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(bc));
          assertSetTreeAfterStep(envSomethingMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory);
          stepReturnWithBreakpoints(envSomethingMain.getUi(), envSomethingMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);
          stepReturnWithBreakpoints(envSomethingMain.getUi(), envSomethingMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints); 
@@ -68,10 +84,11 @@ public class TestLineBreakpointStopConditionSimpleWithConditions extends Abstrac
          IProgramMethod somethingLocal = searchProgramMethod(envSomethingLocalMain.getServices(), containerTypeName, "somethingLocal");
          IProgramMethod somethingLocalMain = searchProgramMethod(envSomethingLocalMain.getServices(), containerTypeName, "somethingLocalMain");
          allBreakpoints = new CompoundStopCondition();
-         LineBreakpointStopCondition somethingLocalBreakpoint = new LineBreakpointStopCondition(somethingLocal.getPositionInfo().getFileName(), 31, -1, somethingLocal, envSomethingLocalMain.getBuilder().getProof(),"y==42*42&&x==42", true, true,29,32);
-         LineBreakpointStopCondition somethingLocalMainBreakpoint = new LineBreakpointStopCondition(somethingLocalMain.getPositionInfo().getFileName(), 26, -1, somethingLocalMain, envSomethingLocalMain.getBuilder().getProof(),"x==42*42&&y==42", true, true,23,27);
-         allBreakpoints.addChildren(somethingLocalBreakpoint, somethingLocalMainBreakpoint);
-         envSomethingLocalMain.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(allBreakpoints));
+         LineBreakpoint somethingLocalBreakpoint = new LineBreakpoint(somethingLocal.getPositionInfo().getFileName(), 31, -1, somethingLocal, envSomethingLocalMain.getBuilder().getProof(),"y==42*42&&x==42", true, true,29,32);
+         LineBreakpoint somethingLocalMainBreakpoint = new LineBreakpoint(somethingLocalMain.getPositionInfo().getFileName(), 26, -1, somethingLocalMain, envSomethingLocalMain.getBuilder().getProof(),"x==42*42&&y==42", true, true,23,27);
+         bc = new SymbolicExecutionBreakpointStopCondition(somethingLocalBreakpoint, somethingLocalMainBreakpoint);
+         allBreakpoints.addChildren(bc);
+         envSomethingLocalMain.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(bc));
          
          assertSetTreeAfterStep(envSomethingLocalMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory);
          stepReturnWithBreakpoints(envSomethingLocalMain.getUi(), envSomethingLocalMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);

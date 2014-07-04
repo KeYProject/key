@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -75,7 +75,6 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
 
 /**
@@ -590,7 +589,6 @@ public class MonKeYComposite extends Composite implements IProofProvider {
     * Opens the selected {@link Proof}s via 
     * {@link StarterUtil#openProofStarter(org.eclipse.swt.widgets.Shell, Proof, KeYEnvironment, org.eclipse.jdt.core.IMethod, boolean, boolean, boolean, boolean)}.
     */
-   @SuppressWarnings("unchecked")
    protected void openSelectedProofs() {
       try {
          if (!MonKeYUtil.isMainWindowEnvironment(getEnvironment())) {
@@ -599,7 +597,7 @@ public class MonKeYComposite extends Composite implements IProofProvider {
                if (obj instanceof MonKeYProof) {
                   MonKeYProof proof = (MonKeYProof)obj;
                   if (proof.getProof() != null) {
-                     StarterUtil.openProofStarter(getShell(), proof.getProof(), (KeYEnvironment<CustomConsoleUserInterface>)proof.getEnvironment(), null, true, true, true, true);
+                     StarterUtil.openProofStarter(getShell(), proof.getProof(), proof.getEnvironment(), null, true, true, true, true);
                   }
                }
             }

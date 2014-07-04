@@ -7,14 +7,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import javax.swing.SwingWorker;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.InterruptListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.SwingWorker3;
-import de.uka.ilkd.key.gui.actions.TestGenerationAction;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
@@ -24,6 +23,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -33,20 +33,22 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.testgen.ModelGenerator;
 import de.uka.ilkd.key.util.Debug;
 
-public class TGWorker extends SwingWorker3 implements InterruptListener {
+public class TGWorker extends SwingWorker<Void, Void> implements InterruptListener {
 	private TGInfoDialog tgInfoDialog;
 	private boolean stop;
 	private SolverLauncher launcher;
 	private Vector<Proof> proofs;
+	private Proof originalProof;
 	
 	public TGWorker(TGInfoDialog tgInfoDialog){
 		this.tgInfoDialog = tgInfoDialog;
 	}
 
 	@Override
-	public Object construct() {
+	public Void doInBackground() {
 
 		TestGenerationSettings settings = ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings();
 
@@ -76,6 +78,7 @@ public class TGWorker extends SwingWorker3 implements InterruptListener {
 			.writeln("No test data constraints were extracted.");
 		}
 		final KeYMediator mediator = getMediator();
+		originalProof = mediator.getSelectedProof();
 		final Collection<SMTProblem> problems = new LinkedList<SMTProblem>();
 		tgInfoDialog
 		.writeln("Test data generation: appling semantic blasting macro on proofs");
@@ -107,7 +110,7 @@ public class TGWorker extends SwingWorker3 implements InterruptListener {
 			}
 		}
 		tgInfoDialog.writeln("\nDone applying semantic blasting.");
-		mediator.setProof(TestGenerationAction.originalProof);
+		mediator.setProof(originalProof);
 		// getMediator().setInteractive(true);
 		// getMediator().startInterface(true);
 		final Proof proof = mediator.getSelectedProof();
@@ -135,6 +138,8 @@ public class TGWorker extends SwingWorker3 implements InterruptListener {
 			return null;
 		}
 		launcher.launch(solvers, problems, proof.getServices());
+//		ModelGenerator mg = new ModelGenerator(proofs.get(0).root().sequent(), 3, getMediator());
+//		mg.launch();
 		return null;
 	}
 
@@ -142,17 +147,17 @@ public class TGWorker extends SwingWorker3 implements InterruptListener {
 	 * finalise the GUI stuff
 	 */
 	@Override
-	public void finished() {
+	public void done() {
 		removeGeneratedProofs();
 		getMediator().setInteractive(true);
 		getMediator().startInterface(true);
 		getMediator().removeInterruptedListener(this);
-		TestGenerationAction.originalProof = null;
+		originalProof = null;
 	}
 
 	@Override
 	public void interruptionPerformed() {
-		interrupt();
+		cancel(true);
 		tgInfoDialog.writeln("\nStopping test case generation.");
 		stop = true;
 		if (launcher != null) {
@@ -173,20 +178,10 @@ public class TGWorker extends SwingWorker3 implements InterruptListener {
 				p.dispose();
 			}
 		}
-		getMediator().setProof(TestGenerationAction.originalProof);
+		getMediator().setProof(originalProof);
 	}
 
-	/*
-	 * initiate the GUI stuff and relay to superclass
-	 */
-	@Override
-	public void start() {
-		//tgInfoDialog = new TGInfoDialog();
-		getMediator().stopInterface(true);
-		getMediator().setInteractive(false);
-		getMediator().addInterruptedListener(this);
-		super.start();
-	}
+	
 
 	private KeYMediator getMediator(){
 		return MainWindow.getInstance().getMediator();
@@ -232,7 +227,7 @@ public class TGWorker extends SwingWorker3 implements InterruptListener {
 					return null;
 				}
 			}
-		}
+		}		
 		final Proof proof = new Proof("Test Case for NodeNr: "
 				+ node.serialNr(), newSequent, "", oldProof.env()
 				.getInitConfig().createTacletIndex(), oldProof.env()
@@ -257,12 +252,12 @@ public class TGWorker extends SwingWorker3 implements InterruptListener {
 			boolean removeDuplicatePathConditions) {
 		final Vector<Proof> res = new Vector<Proof>();
 		final Proof oldProof = mediator.getSelectedProof();
-		TestGenerationAction.originalProof = oldProof;
+		originalProof = oldProof;
 		final List<Node> nodes = new LinkedList<Node>();
 		final ImmutableList<Goal> oldGoals = oldProof.openGoals();
-		if (TestGenerationAction.originalProof.closed()) {
+		if (originalProof.closed()) {
 			getNodesWithEmptyModalities(
-					TestGenerationAction.originalProof.root(), nodes);
+					originalProof.root(), nodes);
 		} else {
 			for (final Goal goal : oldGoals) {
 				nodes.add(goal.node());
@@ -322,5 +317,9 @@ public class TGWorker extends SwingWorker3 implements InterruptListener {
 			res |= hasModalities(t.sub(i), checkUpdates);
 		}
 		return res;
+	}
+	
+	public Proof getOriginalProof(){
+		return originalProof;
 	}
 }

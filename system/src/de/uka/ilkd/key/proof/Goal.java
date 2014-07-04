@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.proof;
 
@@ -195,7 +195,7 @@ public final class Goal  {
      * @param l the GoalListener to be removed
      */
     public void removeGoalListener(GoalListener l) {
-	listeners.remove(l);
+       listeners.remove(l);
     }
 
     /**
@@ -206,16 +206,16 @@ public final class Goal  {
     protected void fireSequentChanged(SequentChangeInfo sci) {
 	getFormulaTagManager().sequentChanged(this, sci);
 	ruleAppIndex()        .sequentChanged(this, sci);
-	for (int i = 0, sz = listeners.size(); i<sz; i++) {
-	    listeners.get(i).sequentChanged(this, sci);
+   for (GoalListener listener : listeners) {
+	    listener.sequentChanged(this, sci);
 	}
     }
 
     protected void fireGoalReplaced(Goal       goal,
 				    Node       parent,
 				    ImmutableList<Goal> newGoals) {
-	for (int i = 0, sz = listeners.size(); i<sz; i++) {
-	    listeners.get(i).goalReplaced(goal, parent, newGoals);
+	for (GoalListener listener : listeners) {
+	    listener.goalReplaced(goal, parent, newGoals);
 	}
     }
 

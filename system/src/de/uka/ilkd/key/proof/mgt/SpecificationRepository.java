@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -1109,8 +1109,8 @@ public final class SpecificationRepository {
     private ImmutableSet<ClassAxiom> getModelMethodAxioms() {
         ImmutableSet<ClassAxiom> result  = DefaultImmutableSet.<ClassAxiom>nil();
         for(KeYJavaType kjt : services.getJavaInfo().getAllKeYJavaTypes()) {
-            final ProgramVariable selfVar = tb.selfVar(kjt, false);
             for(IProgramMethod pm : services.getJavaInfo().getAllProgramMethods(kjt)) {
+                final ProgramVariable selfVar = pm.isStatic() ? null : tb.selfVar(kjt, false);
                 if(!pm.isVoid() && pm.isModel()) {
                     pm = services.getJavaInfo().getToplevelPM(kjt, pm);
                     ImmutableList<ProgramVariable> paramVars = tb.paramVars(pm, false);
@@ -1148,7 +1148,6 @@ public final class SpecificationRepository {
                             // TODO Wojtek: I do not understand the visibility issues of model fields/methods.
                             // VisibilityModifier visibility = pm.isPrivate() ? new Private() :
                             //    (pm.isProtected() ? new Protected() : (pm.isPublic() ? new Public() : null));
-
                             final ClassAxiom modelMethodRepresentsAxiom
                                 = new RepresentsAxiom("Definition axiom for " + pm.getName() +
                                                         " in " + kjt.getFullName(),
@@ -1161,6 +1160,7 @@ public final class SpecificationRepository {
                         }
                     }
                     for(FunctionalOperationContract fop : getOperationContracts(kjt,pm)) {
+                    	if(!fop.getSpecifiedIn().equals(kjt)) continue;
                     	Term preFromContract =
                     	        fop.getPre(heaps, selfVar, paramVars, atPreVars, services);
                     	Term postFromContract =
@@ -1346,6 +1346,15 @@ public final class SpecificationRepository {
             }
         }
         return null;
+    }
+
+    public ContractPO getContractPOForProof(Proof proof) {
+        ProofOblInput po = getProofOblInput(proof);
+        if (po != null && po instanceof ContractPO) {
+            return (ContractPO)po;
+        } else {
+            return null;
+        }
     }
 
     /**

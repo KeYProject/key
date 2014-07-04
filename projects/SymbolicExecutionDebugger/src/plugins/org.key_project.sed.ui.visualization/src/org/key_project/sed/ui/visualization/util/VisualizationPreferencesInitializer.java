@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -15,6 +15,7 @@ package org.key_project.sed.ui.visualization.util;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
+import org.eclipse.swt.graphics.RGB;
 
 /**
  * Initializes the preferences of {@link VisualizationPreferences} when they are
@@ -30,5 +31,11 @@ public class VisualizationPreferencesInitializer extends AbstractPreferenceIniti
    @Override
    public void initializeDefaultPreferences() {
       VisualizationPreferences.setDefaultSwitchToStateVisualizationPerspective(MessageDialogWithToggle.PROMPT);
+      VisualizationPreferences.setDefaultExecutionTreeNodeFirstBackgroundColor(new RGB(212, 231, 248));
+      VisualizationPreferences.setDefaultExecutionTreeNodeSecondBackgroundColor(new RGB(250, 251, 252));
+      VisualizationPreferences.setDefaultExecutionTreeNodeDirectionHorizontal(true);
+      VisualizationPreferences.setDefaultExecutionTreeNodeForegroundColor(new RGB(67, 106, 149));
+      VisualizationPreferences.setDefaultExecutionTreeNodeTextColor(new RGB(0, 0, 0));
+      VisualizationPreferences.setDefaultExecutionTreeNodeConnectionColor(new RGB(0, 0, 0));
    }
 }

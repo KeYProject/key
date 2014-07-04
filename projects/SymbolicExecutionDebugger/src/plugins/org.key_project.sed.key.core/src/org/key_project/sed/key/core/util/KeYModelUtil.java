@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -23,7 +23,6 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.sed.key.core.model.KeYBranchCondition;
 import org.key_project.sed.key.core.model.KeYBranchStatement;
@@ -38,6 +37,7 @@ import org.key_project.sed.key.core.model.KeYMethodContract;
 import org.key_project.sed.key.core.model.KeYMethodReturn;
 import org.key_project.sed.key.core.model.KeYStatement;
 import org.key_project.sed.key.core.model.KeYTermination;
+import org.key_project.sed.key.core.model.KeYThread;
 import org.key_project.sed.key.core.model.KeYVariable;
 import org.key_project.util.jdt.JDTUtil;
 
@@ -132,7 +132,7 @@ public final class KeYModelUtil {
     */
    protected static IKeYSEDDebugNode<?> createChild(IKeYSEDDebugNode<?> parent, IExecutionNode executionNode) throws DebugException {
       KeYDebugTarget target = parent.getDebugTarget();
-      ISEDThread thread = parent.getThread();
+      KeYThread thread = parent.getThread();
       IKeYSEDDebugNode<?> result;
       if (executionNode instanceof IExecutionBranchCondition) {
          result = new KeYBranchCondition(target, parent, thread, (IExecutionBranchCondition)executionNode);

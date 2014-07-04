@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,12 +11,12 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-
 package de.uka.ilkd.key.gui;
 
 import java.io.File;
 import java.io.PrintStream;
 import java.util.List;
+import java.util.ServiceLoader;
 
 import de.uka.ilkd.key.gui.RecentFileMenu.RecentFileEntry;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
@@ -24,6 +24,8 @@ import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
+import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.ui.BatchMode;
@@ -46,12 +48,14 @@ public final class Main {
  * Command line options
  */
     private static final String HELP = "--help";
+    private static final String SHOW_PROPERTIES = "--show-properties";
     private static final String AUTO = "--auto";
     private static final String LAST = "--last";
     private static final String AUTO_LOADONLY = "--auto-loadonly";
     private static final String AUTOSAVE = "--autosave";
     private static final String EXPERIMENTAL = "--experimental";
     private static final String DEBUG = "--debug";
+    private static final String MACRO = "--macro";
     private static final String NO_DEBUG = "--no_debug";
     private static final String ASSERTION = "--assertion";
     private static final String NO_ASSERTION = "--no-assertion";
@@ -99,9 +103,10 @@ public final class Main {
             " (internal: "+INTERNAL_VERSION+")";
 
     public static final String COPYRIGHT=UnicodeHelper.COPYRIGHT
-            +" Copyright 2001"+UnicodeHelper.ENDASH+"2013 "
+            +" Copyright 2001"+UnicodeHelper.ENDASH+"2014 "
             +"Karlsruhe Institute of Technology, "
             +"Chalmers University of Technology, and Technische Universit\u00e4t Darmstadt";
+    
 
     /** Level of verbosity for command line outputs. */
     private static byte verbosity = Verbosity.NORMAL;
@@ -128,6 +133,7 @@ public final class Main {
     private static boolean loadOnly = false;
 
     private static String fileNameOnStartUp = null;
+    
     /**
      * Object handling the parsing of commandline options
      */
@@ -144,6 +150,7 @@ public final class Main {
     private static final ExperimentalFeature[] EXPERIMENTAL_FEATURES =
         {de.uka.ilkd.key.proof.delayedcut.DelayedCut.FEATURE};
 
+    private static ProofMacro autoMacro = new SkipMacro();
 
     /**
      * <p>
@@ -190,12 +197,14 @@ public final class Main {
 
     public static void loadCommandLineFile(UserInterface ui) {
         if (Main.getFileNameOnStartUp() != null) {
-            ui.loadProblem(new File(Main.getFileNameOnStartUp()));
-
+            final File fnos = new File(Main.getFileNameOnStartUp());
+            ui.setMacro(autoMacro);
+            ui.loadProblem(fnos);
         } else if(Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined) {
             ui.openExamples();
         }
     }
+    
 
     /**
      * Register commandline options with command line object
@@ -209,6 +218,7 @@ public final class Main {
         cl.addSection("Options for the KeY-Prover");
         cl.addOption(HELP, null, "display this text");
         cl.addTextPart("--K-help", "display help for technical/debug parameters\n", true);
+        cl.addOption(SHOW_PROPERTIES, null, "list all Java properties and exit");
         cl.addOption(LAST, null, "start prover with last loaded problem (only possible with GUI)");
         cl.addOption(AUTOSAVE, "<number>", "save intermediate proof states each n proof steps to a temporary location (default: 0 = off)");
         cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
@@ -234,6 +244,7 @@ public final class Main {
         cl.addOption(JSAVE_RESULTS_TO_FILE, "<true/false>", "save or drop proofs (then stored to path given by "+ JPATH_OF_RESULT + ")");
         cl.addOption(JFILE_FOR_AXIOMS, "<filename>", "read axioms from given file");
         cl.addOption(JFILE_FOR_DEFINITION, "<filename>", "read definitions from given file");
+        cl.addOption(MACRO, "<proofMacro>", "apply automatic proof macro");
         return cl;
     }
     /**
@@ -256,6 +267,17 @@ public final class Main {
         if (verbosity > Verbosity.SILENT) {
             printHeader();
         }
+        
+        if (cl.isSet(SHOW_PROPERTIES)) {
+            try {
+                java.util.Properties props = System.getProperties();
+                for (Object o: props.keySet()) {
+                    System.out.println(""+o+"=\""+props.get(o)+"\"");
+                }
+            } finally {
+                System.exit(0);
+            }
+        }
 
         if(cl.isSet(AUTO)){
         	uiMode = UiMode.AUTO;
@@ -271,7 +293,7 @@ public final class Main {
                 if (eachSteps < 0) {
                     printUsageAndExit(false, "Illegal autosave period (must be a number >= 0)", -5);
                 }
-                AutoSaver.init(eachSteps, uiMode == UiMode.INTERACTIVE);
+                AutoSaver.setDefaultValues(eachSteps, uiMode == UiMode.INTERACTIVE);
             } catch (CommandLineException e) {
                 if(Debug.ENABLE_DEBUG) {
                     e.printStackTrace();
@@ -352,6 +374,28 @@ public final class Main {
             Debug.ENABLE_DEBUG = true;
         }
 
+        if (cl.isSet(MACRO)) {
+            String macro = cl.getString(MACRO, "");
+            for (ProofMacro m: ServiceLoader.load(ProofMacro.class)) {
+                if (macro.equals(m.getClass().getSimpleName())) {
+                    // memorize macro for later
+                    try {
+                        autoMacro = m.getClass().newInstance();
+                    } catch (InstantiationException e) {
+                        System.err.println("Automatic proof macro can not be instantiated!");
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        System.err.println("Automatic proof macro can not be accessed!");
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+            }
+            if (macro.equals("") || autoMacro instanceof SkipMacro) {
+                System.err.println("No automatic proof macro specified.");
+            }
+        }
+
         //arguments not assigned to a command line option may be files
 
         if(!fileArguments.isEmpty()){
@@ -397,7 +441,8 @@ public final class Main {
                 @Override
                 public void uncaughtException(Thread t, Throwable e) {
                     if (verbosity > Verbosity.SILENT) {
-                        System.out.println("Auto mode was terminated by an exception:"+e.getClass().toString().substring(5));
+                        System.out.println("Auto mode was terminated by an exception:"
+                                            + e.getClass().toString().substring(5));
                         if (verbosity >= Verbosity.DEBUG) e.printStackTrace();
                         final String msg = e.getMessage();
                         if (msg!=null) System.out.println(msg);
@@ -409,7 +454,7 @@ public final class Main {
                 printUsageAndExit(true, "Error: No file to load from.", -4);
             BatchMode batch = new BatchMode(fileNameOnStartUp, loadOnly);
 
-            ui = new ConsoleUserInterface(batch, true, verbosity);
+            ui = new ConsoleUserInterface(batch, verbosity);
         } else {
             updateSplashScreen();
             MainWindow mainWindow = MainWindow.getInstance();

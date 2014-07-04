@@ -3,14 +3,13 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 
 package de.uka.ilkd.key.speclang;
 
@@ -353,7 +352,7 @@ public final class DependencyContractImpl implements DependencyContract {
         for(LocationVariable h : originalPres.keySet()) {
             Term originalPre = originalPres.get(h);
             if(originalPre != null) {
-                pres = pres + "<b>pre</b>["+h+"] "+LogicPrinter.escapeHTML(LogicPrinter.quickPrintTerm(originalPre, services),false)+"<br>";
+                pres = pres + "<b>pre["+h+"]</b> "+LogicPrinter.escapeHTML(LogicPrinter.quickPrintTerm(originalPre, services),false)+"<br>";
             }
         }
         String deps = "";
@@ -363,7 +362,7 @@ public final class DependencyContractImpl implements DependencyContract {
             }
             Term originalDep = originalDeps.get(h);
             if(originalDep != null) {
-                deps = deps + "<b>dep</b>["+h+"] "+LogicPrinter.escapeHTML(LogicPrinter.quickPrintTerm(originalDep, services),false)+"<br>";
+                deps = deps + "<b>dep["+h+"]</b> "+LogicPrinter.escapeHTML(LogicPrinter.quickPrintTerm(originalDep, services),false)+"<br>";
             }
         }
         final String mby = hasMby()

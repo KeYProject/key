@@ -1,21 +1,20 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.proof.init;
 
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -25,10 +24,8 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
@@ -85,8 +82,9 @@ public class InitConfig {
     	= DefaultImmutableSet.<Choice>nil();
 
     /** HashMap for quick lookups taclet name->taclet */
-    private HashMap<Name, Named> quickTacletMap;
-
+    private Map<Name, Taclet> activatedTacletCache = null;
+    
+    
     private String originalKeYFileName;
     
     private ProofSettings settings;    
@@ -98,15 +96,12 @@ public class InitConfig {
     //-------------------------------------------------------------------------
 
     public InitConfig(Services services) {
-	this.services  = services;
-	this.env       = new ProofEnvironment(this);
-		
-        category2DefaultChoice = ProofSettings.DEFAULT_SETTINGS
-                                              .getChoiceSettings()
-        	                              .getDefaultChoices();
-  	    for(LDT ldt : getServices().getTypeConverter().getModels()) {
-  		  ldt.proofSettingsUpdated(ProofSettings.DEFAULT_SETTINGS);
-  	    }
+       this.services  = services;
+       this.env       = new ProofEnvironment(this);       
+       
+       category2DefaultChoice = ProofSettings.DEFAULT_SETTINGS
+             .getChoiceSettings()
+             .getDefaultChoices();
     }
 
            
@@ -161,9 +156,10 @@ public class InitConfig {
         }
         if(changed) {
             @SuppressWarnings("unchecked")
-            HashMap<String, String> clone = (HashMap<String, String>)category2DefaultChoice.clone();
-            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().
-                setDefaultChoices(clone);
+            HashMap<String, String> clone = (HashMap<String, String>)category2DefaultChoice.clone();            
+            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
+            // invalidate active taclet cache
+            activatedTacletCache = null;
         }
     }
 
@@ -196,6 +192,7 @@ public class InitConfig {
 	    getDefaultChoices();
 
         @SuppressWarnings("unchecked")
+        
         HashMap<String, String> c2DC = (HashMap<String,String>)category2DefaultChoice.clone();
         for (final Choice c : activatedChoices) {
             c2DC.remove(c.category());
@@ -209,8 +206,8 @@ public class InitConfig {
         }
         this.activatedChoices = activatedChoices;
 
-        // invalidate quick taclet cache
-        quickTacletMap = null;
+        // invalidate active taclet cache
+        activatedTacletCache = null;
     }
 
 
@@ -226,6 +223,8 @@ public class InitConfig {
 
     public void setTaclets(ImmutableSet<Taclet> taclets){
         this.taclets = taclets;
+        // invalidate active taclet cache
+        this.activatedTacletCache = null;
     }
 
 
@@ -235,39 +234,45 @@ public class InitConfig {
 
 
     public Taclet lookupActiveTaclet(Name name) {
-	if (quickTacletMap == null) {
-            quickTacletMap = new LinkedHashMap<Name, Named>();
-            Iterator<Taclet> it = activatedTaclets().iterator();
-            while (it.hasNext())  {
-                Taclet t = it.next();
-                quickTacletMap.put(t.name(), t);
-            }
-        }
-
-        return (Taclet) quickTacletMap.get(name);
+       if (activatedTacletCache == null) {
+          fillActiveTacletCache();
+       }       
+       return activatedTacletCache.get(name);
     }
-
 
     /**
      * returns the activated taclets of this initial configuration
      */
-    public ImmutableSet<Taclet> activatedTaclets() {
-        ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
-        TacletBuilder b;
+    public Iterable<Taclet> activatedTaclets() {
+       if (activatedTacletCache == null) {
+          fillActiveTacletCache();
+       }
+       return activatedTacletCache.values();
+    }
 
-        for (Taclet t : taclets) {
-            b = taclet2Builder.get(t);
-            if(t.getChoices().subset(activatedChoices)){
-                if(b!=null && b.getGoal2Choices()!=null){
-                    t = b.getTacletWithoutInactiveGoalTemplates(
-                            activatedChoices);
-                }
-                if(t!=null){
-                    result = result.add(t);
-                }
-            }
-        }
-        return result;
+
+    /**
+     * fills the active taclet cache
+     */
+    private void fillActiveTacletCache() {
+       if (activatedTacletCache != null) {
+          return;
+       }
+       final LinkedHashMap<Name,Taclet> tacletCache = new LinkedHashMap<Name, Taclet>();
+       for (Taclet t : taclets) {
+          TacletBuilder b = taclet2Builder.get(t);
+          
+          if(t.getChoices().subset(activatedChoices)){
+             if (b != null && b.getGoal2Choices() != null){
+                t = b.getTacletWithoutInactiveGoalTemplates(activatedChoices);
+             }
+
+             if (t != null) {
+                tacletCache.put(t.name(), t);
+             }
+          }
+       }
+       activatedTacletCache = Collections.unmodifiableMap(tacletCache);
     }
 
 
@@ -350,16 +355,13 @@ public class InitConfig {
     
     public void setSettings(ProofSettings settings) {
 	  this.settings = settings;
-	  for(LDT ldt : getServices().getTypeConverter().getModels()) {
-		ldt.proofSettingsUpdated(settings);
-	  }
 	  // replace the <inv> symbol as it may have changed arity
 	  namespaces().functions().add(services.getJavaInfo().getInv());
 	}
     
     
     public ProofSettings getSettings() {
-	return settings;
+       return settings;
     }
 
 

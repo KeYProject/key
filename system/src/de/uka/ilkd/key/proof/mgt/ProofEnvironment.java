@@ -1,20 +1,18 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.proof.mgt;
 
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -41,7 +39,6 @@ import de.uka.ilkd.key.rule.Taclet;
 public class ProofEnvironment {
 
     private JavaModel jModel;
-    private RuleConfig ruleConfig;
     private RuleJustificationInfo justifInfo = new RuleJustificationInfo();
     private final InitConfig initConfig; 
     private Set<ProofAggregate> proofs = new LinkedHashSet<ProofAggregate>(); //of ProofList
@@ -61,19 +58,14 @@ public class ProofEnvironment {
 	return jModel;
     }
 
-    public RuleConfig getRuleConfig() {
-	return ruleConfig;
-    }
-
     /** sets the java model underlying this environment. Only to be
      * called by the {@link de.uka.ilkd.key.proof.init.ProblemInitializer}.
      */
     public void setJavaModel(JavaModel m) {
-	jModel=m;
-    }
-
-    public void setRuleConfig(RuleConfig rc) {
-	ruleConfig=rc;
+       if (jModel != null) {
+          throw new IllegalStateException("Java model already set.");
+       }
+       jModel=m;
     }
         
     public Services getInitialServices() {
@@ -132,10 +124,9 @@ public class ProofEnvironment {
      * justification. 
      */
     public void registerRules(ImmutableSet<Taclet> s, RuleJustification j) {
-	Iterator<Taclet> it = s.iterator();
-	while (it.hasNext()) {
-	    registerRule(it.next(), j);
-	}
+       for (Taclet r : s) {
+          registerRule(r, j);          
+       }
     }
 
     /** registers a list of rules with the given justification at the
@@ -144,17 +135,15 @@ public class ProofEnvironment {
      * justification. 
      */
     public void registerRules(ImmutableList<BuiltInRule> s, RuleJustification j) {
-	Iterator<BuiltInRule> it = s.iterator();
-	while (it.hasNext()) {
-	    Rule r=it.next();
-	    registerRule(r, j);
-	}
+       for (BuiltInRule r : s) {
+          registerRule(r, j);          
+       }
     }
 
     /** retrieves all proofs registered at this environment 
      */
     public Set<ProofAggregate> getProofs() {
-	return proofs;
+       return proofs;
     }
 
     public void removeProofList(ProofAggregate pl) {
@@ -175,14 +164,14 @@ public class ProofEnvironment {
  	}
  	ProofEnvironment pe = (ProofEnvironment) cmp;
  	return pe.getJavaModel().equals(getJavaModel()) &&
-	    pe.getRuleConfig().equals(getRuleConfig()) &&
-	    pe.getNumber() == (getNumber());
+ 	      pe.initConfig.getActivatedChoices().equals(initConfig.getActivatedChoices()) &&
+ 	      pe.getNumber() == getNumber();
     }
 
     public int hashCode() {
 	int result = 5;
 	result = result*17+ getJavaModel().hashCode();
-	result = result*17+ getRuleConfig().hashCode();
+	result = result*17+ initConfig.getActivatedChoices().hashCode();
 	result = result*17+ getNumber();
 	return result;
     }

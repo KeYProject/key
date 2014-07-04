@@ -1,6 +1,18 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -8,7 +20,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
 import java.awt.Font;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -30,7 +42,7 @@ public class TermLabelMenu extends JMenu {
     private final Map<Name, TermLabelCheckBox> checkBoxMap;
     private final MainWindow mainWindow;
     private final VisibleTermLabels visibleTermLabels;
-    private final HideAllCheckBox hideAllCheckBox;
+    private final DisplayLabelsCheckBox displayLabelsCheckBox;
 
     public TermLabelMenu(final MainWindow mainWindow) {
 
@@ -39,12 +51,12 @@ public class TermLabelMenu extends JMenu {
         checkBoxMap = new TreeMap<Name, TermLabelCheckBox>();
         this.mainWindow = mainWindow;
 
-        hideAllCheckBox = new HideAllCheckBox(mainWindow);
+        displayLabelsCheckBox = new DisplayLabelsCheckBox(mainWindow);
 
         visibleTermLabels = new VisibleTermLabels() {
             @Override
             public boolean contains(Name name) {
-                return !hideAllCheckBox.isSelected() && checkBoxMap.get(name).isSelected();
+                return displayLabelsCheckBox.isSelected() && checkBoxMap.get(name).isSelected();
             }
         };
 
@@ -84,34 +96,30 @@ public class TermLabelMenu extends JMenu {
 
     private void rebuildMenu() {
         removeAll();
-        add(hideAllCheckBox);
+        add(displayLabelsCheckBox);
         addSeparator();
 
-        /* 
-         * Get list of labels from profile. This list is not always identical,
-         * since the used Profile may change during execution.
+        /*
+         * Get sorted list of term label names.
          */
-        ImmutableList<Name> labelNamesFromProfile = mainWindow.getMediator()
-                .getProfile().getTermLabelManager().getSupportedTermLabelNames();
+        List<Name> labelNames = mainWindow.getSortedTermLabelNames();
 
         /* 
-         * Add labels from Profile to checkBoxMap and checkBoxList.
+         * Create list of {@link TermLabelCheckBox} instances.
          */
         ArrayList<TermLabelCheckBox> checkBoxList = new ArrayList<TermLabelCheckBox>();
-        for (Name labelName : labelNamesFromProfile) {
+        for (Name labelName : labelNames) {
             TermLabelCheckBox checkBox = checkBoxMap.get(labelName);
             if (checkBox == null) {
                 checkBox = new TermLabelCheckBox(labelName);
                 checkBoxMap.put(labelName, checkBox);
             }
-            checkBox.setEnabled(!hideAllCheckBox.isSelected());
             checkBoxList.add(checkBox);
         }
 
         /*
-         * Sort checkBoxList and add remaining menu entries.
+         * Add the checkboxes to the menu.
          */
-        Collections.sort(checkBoxList);
         for (TermLabelCheckBox c : checkBoxList) {
             add(c);
         }
@@ -121,38 +129,43 @@ public class TermLabelMenu extends JMenu {
         return visibleTermLabels;
     }
 
-    private class HideAllCheckBox extends KeYMenuCheckBox {
+    private class DisplayLabelsCheckBox extends KeYMenuCheckBox {
 
-        public HideAllCheckBox(MainWindow mainWindow) {
-            super(mainWindow, "Hide all term labels");
+        public DisplayLabelsCheckBox(MainWindow mainWindow) {
+            super(mainWindow, "Display term labels in formulas", true);
             setTooltip("Use this checkbox to toggle visibility for all term labels.");
-            setName("hideAllCheckBox");
+            setName("DisplayLabelsCheckBox");
         }
 
         @Override
         public void handleClickEvent() {
             for (JCheckBoxMenuItem checkBox : checkBoxMap.values()) {
-                checkBox.setEnabled(!isSelected());
+                checkBox.setEnabled(isSelected());
             }
             mainWindow.makePrettyView();
         }
 
         @Override
-        public void setSelected(boolean b) {
+        public final void setSelected(boolean b) {
             super.setSelected(b);
             handleClickEvent();
         }
     }
 
-    private class TermLabelCheckBox extends KeYMenuCheckBox implements Comparable<TermLabelCheckBox> {
+    private class TermLabelCheckBox extends KeYMenuCheckBox {
 
-        Name labelName;
+        // The name of the label, which belongs to this checkbox.
+        private final Name labelName;
+
+        // This String is used as ToolTipText in case the CheckBox is enabled.
+        private String enabledToolTipText;
 
         TermLabelCheckBox(Name labelName) {
-            super(mainWindow, labelName.toString());
+            super(mainWindow, labelName.toString(), true);
             this.labelName = labelName;
             setName(labelName.toString());
             setSelected(true);
+            setEnabled(displayLabelsCheckBox.isSelected());
             mainWindow.loadPreferences(this);
             setItalicFont();
         }
@@ -163,36 +176,40 @@ public class TermLabelMenu extends JMenu {
         }
 
         @Override
-        public int compareTo(TermLabelCheckBox t) {
-            return mainWindowAction.getName().toLowerCase().
-                    compareTo(t.mainWindowAction.getName().toLowerCase());
-        }
-
-        @Override
-        public void setEnabled(boolean b) {
-            if (!b) {
-                setToolTipText("You turned off visibility for all term labels, "
-                        + "which disables this checkbox.");
-            }
+        public final void setEnabled(boolean b) {
             super.setEnabled(b);
+            updateToolTipText();
+
         }
 
         private void setItalicFont() {
             setFont(getFont().deriveFont(Font.ITALIC));
-            boolean enabled = !hideAllCheckBox.isSelected();
-            if (enabled) {
-                setToolTipText("Term label " + labelName + " does not occur in the current sequent.");
-            }
-            setEnabled(enabled);
+            setEnabledToolTipText("Term label " + labelName + " does not occur in the current sequent.");
         }
 
         private void setBoldFont() {
             setFont(getFont().deriveFont(Font.BOLD));
-            boolean enabled = !hideAllCheckBox.isSelected();
-            if (enabled) {
-                setToolTipText("Click to toggle visibility for term label " + labelName + ".");
+            setEnabledToolTipText("Click to toggle visibility for term label " + labelName + ".");
+        }
+
+        /*
+         * Define the text which is used in case this CheckBox is enabled.
+         */
+        private void setEnabledToolTipText(String s) {
+            enabledToolTipText = s;
+            updateToolTipText();
+        }
+
+        /*
+         * Call this method in case ToolTipText needs to be updated.
+         */
+        private void updateToolTipText() {
+            if (isEnabled()) {
+                setToolTipText(enabledToolTipText);
+            } else {
+                setToolTipText("You turned off visibility for all term labels. "
+                        + "This checkbox is disabled.");
             }
-            setEnabled(enabled);
         }
 
     }

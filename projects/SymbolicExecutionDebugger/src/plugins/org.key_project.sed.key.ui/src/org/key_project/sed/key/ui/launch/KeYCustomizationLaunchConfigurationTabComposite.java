@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -61,6 +61,11 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
    private Button usePrettyPrintingButton;
    
    /**
+    * Defines to show signatures on method return nodes.
+    */
+   private Button showSignatureOnMethodReturnNodes;
+   
+   /**
     * Constructor.
     * @param parent The parent {@link Composite}.
     * @param style The style.
@@ -115,6 +120,14 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
             updateLaunchConfigurationDialog();
          }
       });
+      showSignatureOnMethodReturnNodes = widgetFactory.createButton(symbolicExecutionTreeGroup, "Show signature instead of only the name on method &return nodes", SWT.CHECK);
+      showSignatureOnMethodReturnNodes.setEnabled(isEditable());
+      showSignatureOnMethodReturnNodes.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            updateLaunchConfigurationDialog();
+         }
+      });
       // KeY
       Group keyGroup = widgetFactory.createGroup(composite, "KeY");
       keyGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -148,6 +161,7 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
          showKeYMainWindowButton.setSelection(KeySEDUtil.isShowKeYMainWindow(configuration));
          mergeBranchConditionsButton.setSelection(KeySEDUtil.isMergeBranchConditions(configuration));
          usePrettyPrintingButton.setSelection(KeySEDUtil.isUsePrettyPrinting(configuration));
+         showSignatureOnMethodReturnNodes.setSelection(KeySEDUtil.isShowSignatureOnMethodReturnNodes(configuration));
       } 
       catch (CoreException e) {
          LogUtil.getLogger().logError(e);
@@ -164,6 +178,7 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       showKeYMainWindowButton.setSelection(launchSettings.isShowKeYMainWindow());
       mergeBranchConditionsButton.setSelection(launchSettings.isMergeBranchConditions());
       usePrettyPrintingButton.setSelection(launchSettings.isUsePrettyPrinting());
+      showSignatureOnMethodReturnNodes.setSelection(launchSettings.isShowSignatureOnMethodReturnNodes());
    }
 
    /**
@@ -176,5 +191,6 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW, showKeYMainWindowButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, mergeBranchConditionsButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING, usePrettyPrintingButton.getSelection());
+      configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_SIGNATURE_ON_MEHTOD_RETURN_NODES, showSignatureOnMethodReturnNodes.getSelection());
    }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -25,12 +25,12 @@ import org.key_project.sed.ui.visualization.launch.SETFileLaunchShortcut;
  */
 public class SWTBotSetFileLaunchTest extends AbstractSWTBotSetFileTest {
    /**
-    * Launches "data/Number/src/Number.set".
+    * Launches "data/Number/test/Number.set".
     */
    @Test
    public void testSetFile() throws Exception {
       doSetFileTest("SWTBotSetFileLaunchTest_testSetFile", 
-                    "data/Number/src", 
+                    "data/Number/test", 
                     "Number.set",
                     null);
    }

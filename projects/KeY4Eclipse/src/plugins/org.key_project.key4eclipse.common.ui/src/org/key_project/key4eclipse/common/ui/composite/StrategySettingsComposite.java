@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -443,7 +443,7 @@ public class StrategySettingsComposite extends Composite {
     * Updates the enabled state of the restore default values {@link Button}.
     */
    protected void updateRestoreDefaultEnabled() {
-      if (proof != null && data != null && data.getDefaultButton() != null) {
+      if (proof != null && !proof.isDisposed() && data != null && data.getDefaultButton() != null) {
          boolean defaultMaxRules = data.getMaxStepText() == null ||
                                    getStepsFromText(data.getMaxStepText()) == data.getModel().getDefaultMaxRuleApplications();
          boolean defaultProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties().equals(data.getModel().getDefaultPropertiesFactory().createDefaultStrategyProperties());

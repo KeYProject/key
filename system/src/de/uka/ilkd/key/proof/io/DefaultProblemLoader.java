@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -142,7 +142,11 @@ public class DefaultProblemLoader {
            LoadedPOContainer poContainer = createProofObligationContainer();
            try {
                if (poContainer == null) {
-                   return selectProofObligation();
+                   if (mediator.getUI().selectProofObligation(initConfig)) {
+                      return null;
+                   } else {
+                      return new ProblemLoaderException(this, "Aborted.");
+                   }
                }
                // Create proof and apply rules again if possible
                proof = createProof(poContainer);
@@ -304,16 +308,6 @@ public class DefaultProblemLoader {
       else {
          return null;
       }
-   }
-
-   /**
-    * This method is called if no {@link LoadedPOContainer} was created
-    * via {@link #createProofObligationContainer()} and can be overwritten
-    * for instance to open the proof management dialog as done by {@link ProblemLoader}.
-    * @return An error message or {@code null} if everything is fine.
-    */
-   protected ProblemLoaderException selectProofObligation() {
-      return null; // Do nothing
    }
 
    /**

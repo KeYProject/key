@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -162,7 +162,7 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
          if (ObjectUtil.equals(getDiagram(), diagram)) {
             OutputStream out = ExecutionTreeUtil.writeDomainFile(diagram);
             SEDXMLWriter writer = new SEDXMLWriter();
-            writer.write(getDebugTargets(), SEDXMLWriter.DEFAULT_ENCODING, out, true, true);
+            writer.write(getDebugTargets(), SEDXMLWriter.DEFAULT_ENCODING, out, true, true, null);
          }
       }
       catch (Exception e) {

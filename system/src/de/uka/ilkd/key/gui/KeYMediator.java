@@ -3,14 +3,13 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 
 package de.uka.ilkd.key.gui;
 
@@ -68,7 +67,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 public class KeYMediator {
 
-	/** The user interface */
+    /** The user interface */
     private UserInterface ui;
 
     private InteractiveProver interactiveProver;
@@ -112,11 +111,9 @@ public class KeYMediator {
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
      */
-    public KeYMediator(UserInterface ui, boolean useAutoSaver) {
+    public KeYMediator(UserInterface ui) {
 	this.ui             = ui;
-	if (useAutoSaver) {
-		autoSaver = new AutoSaver();
-	}
+	this.autoSaver = AutoSaver.getDefaultInstance();
 
 	notationInfo        = new NotationInfo();
 	proofListener       = new KeYMediatorProofListener();
@@ -275,18 +272,17 @@ public class KeYMediator {
 
 
     private void finishSetBack(final Proof proof){
-        this.ui.taskFinished(
-                        new DefaultTaskFinishedInfo(this, null,
-                                        proof, 0,
-                                        0, getNrGoalsClosedByAutoMode()){
-                                @Override
-                                public String toString() {
-
-                                        return "Proof has been pruned: "+(proof.openGoals().size() == 1?
-                                                        "one open goal remains." :
-                                                        (proof.openGoals().size()+" open goals remain."));
-                                }
-                        });
+        TaskFinishedInfo info =
+                new DefaultTaskFinishedInfo(this, null, proof, 0, 0,
+                                            getNrGoalsClosedByAutoMode()) {
+            @Override
+            public String toString() {
+                return "Proof has been pruned: "+(proof.openGoals().size() == 1 ?
+                        "one open goal remains." :
+                            (proof.openGoals().size()+" open goals remain."));
+            }
+        };
+        this.ui.taskFinished(info);
         if (!proof.isDisposed()) {
            ServiceCaches caches = proof.getServices().getCaches();
            caches.getTermTacletAppIndexCache().clear();
@@ -313,33 +309,33 @@ public class KeYMediator {
 
 
     private void setProofHelper(Proof newProof) {
-      Proof oldProof = getSelectedProof();
-      if (oldProof != null) {
-         oldProof.removeProofTreeListener(proofTreeListener);
-         oldProof.removeRuleAppListener(proofListener);
-      }
-      if (newProof != null) {
-         notationInfo.setAbbrevMap(newProof.abbreviations());
-      }
-      if (newProof != null) {
-         newProof.addProofTreeListener(proofTreeListener);
-         newProof.addRuleAppListener(proofListener);
-      }
-      
-      // moved from layout main here; but does not actually belong here at all;
-      // we should get that rule to behave like a normal built-in rule
-      OneStepSimplifier newSimplifier = MiscTools.findOneStepSimplifier(newProof);
-      if (currentOneStepSimplifier != newSimplifier) {
-         if (currentOneStepSimplifier != null) {
-            removeKeYSelectionListener(currentOneStepSimplifier);
-         }
-         currentOneStepSimplifier = newSimplifier;
-         if (currentOneStepSimplifier != null) {
-            addKeYSelectionListener(currentOneStepSimplifier);
-         }
-      }
-      
-      keySelectionModel.setSelectedProof(newProof);
+        Proof oldProof = getSelectedProof();
+        if (oldProof != null) {
+            oldProof.removeProofTreeListener(proofTreeListener);
+            oldProof.removeRuleAppListener(proofListener);
+        }
+        if (newProof != null) {
+            notationInfo.setAbbrevMap(newProof.abbreviations());
+        }
+        if (newProof != null) {
+            newProof.addProofTreeListener(proofTreeListener);
+            newProof.addRuleAppListener(proofListener);
+        }
+
+        // moved from layout main here; but does not actually belong here at all;
+        // we should get that rule to behave like a normal built-in rule
+        OneStepSimplifier newSimplifier = MiscTools.findOneStepSimplifier(newProof);
+        if (currentOneStepSimplifier != newSimplifier) {
+            if (currentOneStepSimplifier != null) {
+                removeKeYSelectionListener(currentOneStepSimplifier);
+            }
+            currentOneStepSimplifier = newSimplifier;
+            if (currentOneStepSimplifier != null) {
+                addKeYSelectionListener(currentOneStepSimplifier);
+            }
+        }
+
+        keySelectionModel.setSelectedProof(newProof);
     }
 
 
@@ -894,7 +890,6 @@ public class KeYMediator {
         });
     }
 
-
     /**
      * takes a notification event and informs the notification
      * manager
@@ -940,8 +935,6 @@ public class KeYMediator {
        }
        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
     }
-
-
 
 //    /**
 //     * returns the prover task listener of the main frame

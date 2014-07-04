@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.io.IOException;
@@ -12,12 +25,13 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
+import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.KeYWatchpoint;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 public class TestKeYWatchpointMethodsOnSatisfiable extends AbstractSymbolicExecutionTestCase {
    public void testBreakpointStopCondition() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env=null;
+      SymbolicExecutionEnvironment<CustomUserInterface> env=null;
       HashMap<String, String> originalTacletOptions = null;
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try{
@@ -39,10 +53,11 @@ public class TestKeYWatchpointMethodsOnSatisfiable extends AbstractSymbolicExecu
          JavaInfo javaInfo = env.getServices().getJavaInfo();
          KeYJavaType containerType = javaInfo.getTypeByClassName(containerTypeName);
          
-         KeYWatchpointStopCondition globalVariableCondition = new KeYWatchpointStopCondition(-1, env.getBuilder().getProof(),"main(x_global)==42", true, true, containerType, false);
+         KeYWatchpoint globalVariableCondition = new KeYWatchpoint(-1, env.getBuilder().getProof(),"main(x_global)==42", true, true, containerType, false);
          
-         allBreakpoints.addChildren(globalVariableCondition);
-         env.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(allBreakpoints));
+         SymbolicExecutionBreakpointStopCondition bc = new SymbolicExecutionBreakpointStopCondition(globalVariableCondition);
+         allBreakpoints.addChildren(bc);
+         env.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(bc));
          // Do steps
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);

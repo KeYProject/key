@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -49,9 +49,10 @@ import org.eclipse.ui.views.properties.IPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
+import org.key_project.key4eclipse.common.ui.util.EclipseUserInterfaceCustomization;
+import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
-import org.key_project.key4eclipse.starter.core.util.ProofUserManager;
 import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
 import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
 import org.key_project.keyide.ui.breakpoints.KeYBreakpointManager;
@@ -79,8 +80,8 @@ import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.symbolic_execution.util.ProofUserManager;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
 
 /**
@@ -132,7 +133,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    /**
     * The used {@link KeYEnvironment}
     */
-   private KeYEnvironment<CustomConsoleUserInterface> environment;
+   private KeYEnvironment<?> environment;
    
    /**
     * The current {@link Proof}.
@@ -344,16 +345,19 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
             }
             else if (input instanceof FileEditorInput) {
                FileEditorInput fileInput = (FileEditorInput) input;
-               File file = ResourceUtil.getLocation(fileInput.getFile());
+               IFile eclipseFile = fileInput.getFile();
+               File file = ResourceUtil.getLocation(eclipseFile);
                Assert.isTrue(file != null, "File \"" + fileInput.getFile() + "\" is not local.");
-               this.environment = KeYEnvironment.load(file, null, null);
+               File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(eclipseFile.getProject());
+               List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(eclipseFile.getProject());
+               this.environment = KeYEnvironment.load(file, classPaths, bootClassPath, EclipseUserInterfaceCustomization.getInstance());
                Assert.isTrue(getEnvironment().getLoadedProof() != null, "No proof loaded.");
                this.currentProof = getEnvironment().getLoadedProof();
             }
             else {
                throw new CoreException(LogUtil.getLogger().createErrorStatus("Unsupported editor input \"" + input + "\"."));
             }
-            breakpointManager = new KeYBreakpointManager(environment, currentProof);
+            breakpointManager = new KeYBreakpointManager(currentProof);
             DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(breakpointManager);
             ProofUserManager.getInstance().addUser(currentProof, environment, this);
             this.environment.getMediator().setProof(currentProof);
@@ -664,7 +668,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     * {@inheritDoc}
     */
    @Override
-   public KeYEnvironment<CustomConsoleUserInterface> getEnvironment() {
+   public KeYEnvironment<?> getEnvironment() {
       return environment;
    }
 
@@ -672,8 +676,8 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     * {@inheritDoc}
     */
    @Override
-   public CustomConsoleUserInterface getUI() {
-      KeYEnvironment<CustomConsoleUserInterface> environment = getEnvironment();
+   public UserInterface getUI() {
+      KeYEnvironment<?> environment = getEnvironment();
       return environment != null ? environment.getUi() : null;
    }
 
@@ -682,7 +686,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    @Override
    public KeYMediator getMediator() {
-      KeYEnvironment<CustomConsoleUserInterface> environment = getEnvironment();
+      KeYEnvironment<?> environment = getEnvironment();
       return environment != null ? environment.getMediator() : null;
    }
    
@@ -758,8 +762,8 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    protected void configureProofForBreakpoints() {
       if (isBreakpointsActivated()) {
-         currentProof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(breakpointManager.getBreakpointStopConditions());
-         currentProof.getServices().setFactory(KeYBreakpointManager.createNewFactory(breakpointManager.getBreakpointStopConditions()));
+         currentProof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(breakpointManager.getBreakpointStopCondition());
+         currentProof.getServices().setFactory(KeYBreakpointManager.createNewFactory(breakpointManager.getBreakpointStopCondition()));
          StrategyProperties strategyProperties = currentProof.getSettings().getStrategySettings().getActiveStrategyProperties();
          currentProof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(currentProof, strategyProperties));
       }
