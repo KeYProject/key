@@ -448,7 +448,15 @@ options {
 
     public ImmutableSet<Taclet> getTaclets(){
 	ImmutableSet<Taclet> tacletSet = DefaultImmutableSet.<Taclet>nil(); 
+	
+	/** maintain correct order for taclet lemma proofs */
+	final List<Taclet> l = new LinkedList<Taclet>();	
 	for (Taclet t : taclets.values()) {
+		l.add(0,t);
+	}
+	
+	
+	for (Taclet t : l) {
 		tacletSet = tacletSet.add(t);
 	}
         return tacletSet;
