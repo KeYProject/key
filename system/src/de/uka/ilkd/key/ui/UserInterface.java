@@ -42,7 +42,7 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 public interface UserInterface extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor {
     public static final String PROP_AUTO_MODE = "autoMode";
 
-    public ProofMacroListener addListener(ProofMacro macro, int numberGoals);
+    public ProofMacroListener addProgressBarListener(ProofMacro macro, int numberGoals);
 
     public ProofMacroListener removeListener(ProofMacro macro);
 

@@ -23,6 +23,7 @@ class TestGenOptionsPanel extends TablePanel{
 	private JCheckBox useJUnit;
 	private JCheckBox invariantForAll;
 	private JCheckBox removeDuplicates;
+	private JCheckBox checkboxRFL;
 
 	private int minWidthOfTitle;
 	
@@ -32,6 +33,9 @@ class TestGenOptionsPanel extends TablePanel{
 	private static final String infoInvariantForAll = "Require the invariant of all created objects to be true.";
 	private static final String infoMaxUnwinds = "Maximal number of loop unwinds or method calls on a branch.";
 	private static final String infoRemoveDuplicates = "Generate a single testcase for two ore more identical nodes.";
+	private static final String infoRFLSelection = "Enables initialization of protected, private, and ghost fields with test data" +
+			                                       "as well as creation of objects from classes which have no default constructor." +
+			                                       "This functionality is enabled by RFL.java which is generated along the test suite.";
 	private static final String infoOpenJMLPath = "Set location of openjml.jar";
 	
 	public TestGenOptionsPanel(TestGenerationSettings settings){
@@ -53,6 +57,7 @@ class TestGenOptionsPanel extends TablePanel{
 	   getMaxUnwinds();
 	   getInvariantForall();
 	   getRemoveDuplicatesPanel();
+	   getRFLSelectionPanel();
 	   getJUnitPanel();	   
 	    
     }
@@ -159,7 +164,19 @@ class TestGenOptionsPanel extends TablePanel{
 		}
 		return removeDuplicates;
 	}
-	
+
+	public JCheckBox getRFLSelectionPanel(){
+		if(checkboxRFL == null){
+			checkboxRFL = addCheckBox("Use reflection framework", infoRFLSelection, settings.removeDuplicates(), new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					settings.setRemoveDuplicates(checkboxRFL.isSelected());
+				}
+			});
+		}
+		return checkboxRFL;
+	}
+
 	public JCheckBox getInvariantForall(){
 		
 		if(invariantForAll == null){

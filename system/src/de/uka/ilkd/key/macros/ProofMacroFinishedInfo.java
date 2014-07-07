@@ -31,7 +31,7 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
     }
 
     ProofMacroFinishedInfo(ProofMacro macro, Goal goal, Proof proof,
-            Statistics statistics) {
+                           Statistics statistics) {
         this(macro, goal, proof,
              statistics == null ? 0 : statistics.time,
              statistics == null ? 0 : statistics.totalRuleApps,
@@ -59,10 +59,22 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
     }
 
     ProofMacroFinishedInfo(ProofMacroFinishedInfo info, ApplyStrategyInfo stratInfo) {
-        this(info.getMacro(), stratInfo.nonCloseableGoal(), stratInfo.getProof(),
+        this(info.getMacro(), info.getGoals(), stratInfo.getProof(),
              info.getTime() + stratInfo.getTime(),
              info.getAppliedRules() + stratInfo.getAppliedRuleApps(),
              info.getClosedGoals() + stratInfo.getClosedGoals());
+    }
+
+    ProofMacroFinishedInfo setModClosedGoals(ImmutableList<Goal> goals) {
+        ImmutableList<Goal> newGoals = ImmutableSLList.<Goal>nil();
+        for (Goal g: goals) {
+            g = getProof().getGoal(g.node());
+            if (g != null) {
+                newGoals = newGoals.append(g);
+            }
+        }
+        return new ProofMacroFinishedInfo(getMacro(), newGoals, getProof(), getTime(),
+                                          getAppliedRules(), getClosedGoals());
     }
 
     public ProofMacro getMacro() {

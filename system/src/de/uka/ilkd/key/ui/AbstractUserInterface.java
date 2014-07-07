@@ -63,7 +63,7 @@ public abstract class AbstractUserInterface implements UserInterface {
         return pl;
     }
 
-    public ProofMacroListener addListener(ProofMacro macro, int numberGoals) {
+    public ProofMacroListener addProgressBarListener(ProofMacro macro, int numberGoals) {
         final ProgressBarListener pml =
                 new ProgressBarListener(macro, numberGoals, macro.getNumberSteps());
         listeners = listeners.prepend(pml);
@@ -371,7 +371,7 @@ public abstract class AbstractUserInterface implements UserInterface {
      *
      * fixes #1356
      */
-    class ProgressBarListener extends ProofMacroListener {
+    private class ProgressBarListener extends ProofMacroListener {
         private int numberGoals;
         private int numberSteps;
         private int completedGoals;

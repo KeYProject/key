@@ -111,7 +111,7 @@ public class TryCloseMacro extends AbstractProofMacro {
         }
         //
         // The observer to handle the progress bar
-        final ProverTaskListener pbl = ui.addListener(this, goals.size());
+        final ProverTaskListener pbl = ui.addProgressBarListener(this, goals.size());
         applyStrategy.addProverTaskObserver(pbl);
 
         //
@@ -142,11 +142,10 @@ public class TryCloseMacro extends AbstractProofMacro {
                 appliedRules += result.getAppliedRuleApps();
                 info = new ProofMacroFinishedInfo(info, result);
 
-                // only now reraise the interruption exception
-                if(applyStrategy.hasBeenInterrupted()) {
-                    synchronized(applyStrategy) { // wait for applyStrategy to finish its last rule application
-                        throw new InterruptedException();
-                    }
+                synchronized(applyStrategy) { // wait for applyStrategy to finish its last rule application
+                   if(applyStrategy.hasBeenInterrupted()) { // only now reraise the interruption exception
+                      throw new InterruptedException();
+                   }
                 }
             }
         } finally {
@@ -155,6 +154,7 @@ public class TryCloseMacro extends AbstractProofMacro {
             setNumberSteps(oldNumberOfSteps);
             applyStrategy.removeProverTaskObserver(pbl);
             ui.removeListener(this);
+            info = info.setModClosedGoals(goals);
         }
         return info;
     }

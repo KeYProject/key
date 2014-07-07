@@ -735,6 +735,10 @@ public class Proof implements Named {
 
                                 if (Proof.this.env() != null && visitedNode.parent() != null) {
                                         	Proof.this.mgt().ruleUnApplied(visitedNode.parent().getAppliedRuleApp());
+                                          for (final NoPosTacletApp app :  visitedNode.parent().getLocalIntroducedRules()){
+                                             env().getJustifInfo().removeJustificationFor(app.taclet());
+                                         }
+
                                 }
 
                         }
@@ -751,15 +755,16 @@ public class Proof implements Named {
                         public void visit(Proof proof, Node visitedNode) {
                             for (final NoPosTacletApp app :  visitedNode.getLocalIntroducedRules()){
                                 firstGoal.ruleAppIndex().removeNoPosTacletApp(app);
+                                env().getJustifInfo().removeJustificationFor(app.taclet());
                             }
 
-                                firstGoal.pruneToParent();
+                            firstGoal.pruneToParent();
 
-                                final List<StrategyInfoUndoMethod> undoMethods =
-                                        visitedNode.getStrategyInfoUndoMethods();
-                                for (StrategyInfoUndoMethod undoMethod : undoMethods) {
-                                    firstGoal.undoStrategyInfoAdd(undoMethod);
-                                }
+                            final List<StrategyInfoUndoMethod> undoMethods =
+                                    visitedNode.getStrategyInfoUndoMethods();
+                            for (StrategyInfoUndoMethod undoMethod : undoMethods) {
+                                firstGoal.undoStrategyInfoAdd(undoMethod);
+                            }
                         }
                   });
 

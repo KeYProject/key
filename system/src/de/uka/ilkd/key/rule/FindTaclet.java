@@ -304,9 +304,10 @@ public abstract class FindTaclet extends Taclet {
 	    find ().execPostOrder ( svc );
 	    
 	    ifFindVariables             = getIfVariables ();
-	    Iterator<SchemaVariable> it = svc.varIterator ();
-	    while ( it.hasNext () )
-		ifFindVariables = ifFindVariables.add ( it.next () );
+	    
+	    for (final SchemaVariable sv : svc.vars ()) {
+	       ifFindVariables = ifFindVariables.add ( sv );
+	    }
 	}
 
 	return ifFindVariables;
@@ -314,9 +315,21 @@ public abstract class FindTaclet extends Taclet {
 
 
     protected Taclet setName(String s, FindTacletBuilder b) {
-	return super.setName(s, b); 
+       return super.setName(s, b); 
     }
 
+    @Override
+    public boolean equals(Object o) {
+       if (!super.equals(o)) {
+          return false;
+       }
+       return find.equals(((FindTaclet)o).find);       
+    }
+      
+    
+    public int hashCode() {
+       return 13* super.hashCode() + find.hashCode(); 
+    }
 
     /**
      * returns the variables that occur bound in the find part

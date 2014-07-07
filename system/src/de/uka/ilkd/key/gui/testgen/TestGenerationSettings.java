@@ -17,6 +17,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	private static final String DEFAULT_OUTPUTPATH = System
 	        .getProperty("user.home") + File.separator + "testFiles";
 	private static final boolean DEFAULT_REMOVEDUPLICATES = true;
+	private static final boolean DEFAULT_USERFL = false;
 	private static final boolean DEFAULT_USEJUNIT = false;
 	private static final boolean DEFAULT_INVARIANTFORALL = true;
 	private static final String DEFAULT_OPENJMLPATH = "openjml";
@@ -25,6 +26,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	private String outputPath;
 	private String openjmlPath;
 	private boolean removeDuplicates;
+	private boolean useRFL;
 	private boolean useJunit;
 	private int concurrentProcesses;
 	private boolean invariantForAll;
@@ -33,6 +35,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	private static final String propMaxUwinds = "[TestGenSettings]maxUnwinds";
 	private static final String propOutputPath = "[TestGenSettings]OutputPath";
 	private static final String propRemoveDuplicates = "[TestGenSettings]RemoveDuplicates";
+	private static final String propUseRFL = "[TestGenSettings]UseRFL";
 	private static final String propUseJUnit = "[TestGenSettings]UseJUnit";
 	private static final String propConcurrentProcesses = "[TestGenSettings]ConcurrentProcesses";
 	private static final String propInvariantForAll = "[TestGenSettings]InvariantForAll";
@@ -42,6 +45,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		maxUnwinds = TestGenerationSettings.DEFAULT_MAXUNWINDS;
 		outputPath = TestGenerationSettings.DEFAULT_OUTPUTPATH;
 		removeDuplicates = TestGenerationSettings.DEFAULT_REMOVEDUPLICATES;
+		useRFL = TestGenerationSettings.DEFAULT_USERFL;
 		useJunit = TestGenerationSettings.DEFAULT_USEJUNIT;
 		concurrentProcesses = TestGenerationSettings.DEFAULT_CONCURRENTPROCESSES;
 		invariantForAll = TestGenerationSettings.DEFAULT_INVARIANTFORALL;
@@ -57,6 +61,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		outputPath = data.outputPath;
 		removeDuplicates = data.removeDuplicates;
 		useJunit = data.useJunit;
+		useRFL = data.useRFL;
 		concurrentProcesses = data.concurrentProcesses;
 		invariantForAll = data.invariantForAll;
 		openjmlPath = data.openjmlPath;
@@ -104,6 +109,9 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		removeDuplicates = SettingsConverter.read(props,
 		        TestGenerationSettings.propRemoveDuplicates,
 		        TestGenerationSettings.DEFAULT_REMOVEDUPLICATES);
+		useRFL  = SettingsConverter.read(props,
+		        TestGenerationSettings.propUseRFL,
+		        TestGenerationSettings.DEFAULT_USERFL);
 		useJunit = SettingsConverter.read(props,
 		        TestGenerationSettings.propUseJUnit,
 		        TestGenerationSettings.DEFAULT_USEJUNIT);
@@ -142,6 +150,10 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		this.removeDuplicates = removeDuplicates;
 	}
 
+	public void setRFL(boolean useRFL) {
+		this.useRFL = useRFL;
+	}
+
 	public void setUseJunit(boolean useJunit) {
 		this.useJunit = useJunit;
 	}
@@ -156,9 +168,14 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		this.openjmlPath = openjmlPath;
 	}
 
+	public boolean useRFL() {
+		return useJunit;
+	}
+
 	public boolean useJunit() {
 		return useJunit;
 	}
+
 
 	@Override
 	public void writeSettings(Object sender, Properties props) {
@@ -176,6 +193,9 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		SettingsConverter.store(props,
 		        TestGenerationSettings.propRemoveDuplicates,
 		        removeDuplicates);
+		SettingsConverter.store(props,
+		        TestGenerationSettings.propUseRFL,
+		        useRFL);
 		SettingsConverter.store(props, TestGenerationSettings.propUseJUnit,
 		        useJunit);
 		SettingsConverter.store(props, TestGenerationSettings.propOpenjmlPath,

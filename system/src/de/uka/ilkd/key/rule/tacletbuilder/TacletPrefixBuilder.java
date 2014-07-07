@@ -187,20 +187,17 @@ public class TacletPrefixBuilder {
     
 
     private boolean atMostOneRepl() {
-	RewriteTacletBuilder rwtacletBuilder=(RewriteTacletBuilder)tacletBuilder;
-	Iterator<TacletGoalTemplate> it
-	    =rwtacletBuilder.goalTemplates().iterator();
-	int count=0;
-	while (it.hasNext()) {
-	    TacletGoalTemplate tmpl = it.next();
-	    if (tmpl instanceof RewriteTacletGoalTemplate) {
-		if (((RewriteTacletGoalTemplate)tmpl).replaceWith()!=null) {
-		    count++;
-		}
-	    }
-	    if (count>1) return false;
-	}
-	return true;
+       RewriteTacletBuilder rwtacletBuilder=(RewriteTacletBuilder)tacletBuilder;
+       int count=0;
+       for (TacletGoalTemplate tmpl : rwtacletBuilder.goalTemplates()) {
+          if (tmpl instanceof RewriteTacletGoalTemplate) {
+             if (((RewriteTacletGoalTemplate)tmpl).replaceWith()!=null) {
+                count++;
+             }
+          }
+          if (count>1) return false;
+       }
+       return true;
     }
 
     private boolean occurrsOnlyInFindOrRepl(SchemaVariable sv) {

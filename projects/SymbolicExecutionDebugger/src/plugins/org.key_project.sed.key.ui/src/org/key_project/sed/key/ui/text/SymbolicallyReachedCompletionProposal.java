@@ -1,70 +1,46 @@
 package org.key_project.sed.key.ui.text;
 
+import java.util.Collections;
+
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IDebugView;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.ui.text.SymbolicallyReachedAnnotation;
-import org.key_project.sed.ui.util.SEDUIUtil;
-import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
  * An proposal for {@link SymbolicallyReachedAnnotation}s which selects an
  * {@link ISEDDebugNode} as solution.
  * @author Martin Hentschel
  */
-public class SymbolicallyReachedCompletionProposal implements ICompletionProposal {
+public class SymbolicallyReachedCompletionProposal extends AbstractSymbolicallyReachedCompletionProposal {
    /**
-    * The parent {@link Shell} which provides the {@link IDebugView}.
+    * The shown text.
     */
-   private final Shell shell;
+   private final String displayString;
    
    /**
-    * The {@link ISEDDebugNode} to select.
+    * The shown {@link Image}.
     */
-   private final ISEDDebugNode debugNode;
-
+   private final Image image;
+   
    /**
     * Constructor.
     * @param shell The parent {@link Shell} which provides the {@link IDebugView}.
     * @param debugNode The {@link ISEDDebugNode} to select.
     */
    public SymbolicallyReachedCompletionProposal(Shell shell, ISEDDebugNode debugNode) {
-      this.shell = shell;
-      this.debugNode = debugNode;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void apply(IDocument document) {
-      IDebugView debugView = SEDUIUtil.getDebugView(shell);
-      if (debugView != null) {
-         SEDUIUtil.selectInDebugView(debugView.getSite().getPart(), debugView, SWTUtil.createSelection(debugNode));
+      super(shell, Collections.singletonList(debugNode));
+      IDebugModelPresentation debugModelPresentation = DebugUITools.newDebugModelPresentation();
+      try {
+         displayString = "Select " + debugModelPresentation.getText(debugNode);
+         image = debugModelPresentation.getImage(debugNode);;
       }
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public Point getSelection(IDocument document) {
-      return null;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public String getAdditionalProposalInfo() {
-      return null;
+      finally {
+         debugModelPresentation.dispose();
+      }
    }
 
    /**
@@ -72,13 +48,7 @@ public class SymbolicallyReachedCompletionProposal implements ICompletionProposa
     */
    @Override
    public String getDisplayString() {
-      IDebugModelPresentation debugModelPresentation = DebugUITools.newDebugModelPresentation();
-      try {
-         return debugModelPresentation.getText(debugNode);
-      }
-      finally {
-         debugModelPresentation.dispose();
-      }
+      return displayString;
    }
 
    /**
@@ -86,20 +56,6 @@ public class SymbolicallyReachedCompletionProposal implements ICompletionProposa
     */
    @Override
    public Image getImage() {
-      IDebugModelPresentation debugModelPresentation = DebugUITools.newDebugModelPresentation();
-      try {
-         return debugModelPresentation.getImage(debugNode);
-      }
-      finally {
-         debugModelPresentation.dispose();
-      }
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public IContextInformation getContextInformation() {
-      return null;
+      return image;
    }
 }

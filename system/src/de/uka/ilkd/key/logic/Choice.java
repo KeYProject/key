@@ -34,12 +34,6 @@ public class Choice implements Named {
     }
 
     
-    public Choice(Name name){
-	this.name = name;
-	category  = null;
-    }
-
-    
     @Override
     public Name name(){
 	return name;
@@ -63,8 +57,7 @@ public class Choice implements Named {
     
     @Override
     public int hashCode() {
-	return name.hashCode()*37 + 
-	    (category == null ? 13 : category.hashCode()*1369);
+	return name.hashCode()*37;
     }
 
 

@@ -75,6 +75,21 @@ public final class QueryAxiom extends ClassAxiom {
 	this.target = target;
 	this.kjt = kjt;
     }
+
+    
+    @Override
+    public boolean equals(Object o) {       
+       if (o == null || o.getClass() != getClass()) {
+          return false;
+       }
+       final QueryAxiom other = (QueryAxiom) o;
+       return name.equals(other.name) && target.equals(other.target) && kjt.equals(other.kjt);  
+    }
+    
+    @Override
+    public int hashCode() {
+       return name.hashCode() * 7 + target.hashCode() * 49 + kjt.hashCode() * 17;
+    }
     
 
     @Override

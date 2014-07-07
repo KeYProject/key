@@ -43,9 +43,11 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.ClassAxiom;
+import de.uka.ilkd.key.speclang.ClassAxiomImpl;
 import de.uka.ilkd.key.speclang.ClassWellDefinedness;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
+import de.uka.ilkd.key.speclang.QueryAxiom;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.Pair;
 
@@ -208,10 +210,10 @@ public abstract class AbstractPO implements IPersistablePO {
         for (ClassAxiom axiom : axioms) {
             final ImmutableSet<Pair<Sort, IObserverFunction>> scc =
                     getSCC(axiom, axioms);
+            
             for (Taclet axiomTaclet : axiom.getTaclets(scc, services)) {
                 assert axiomTaclet != null : "class axiom returned null taclet: "
                         + axiom.getName();
-
                 // only include if choices are appropriate
                 if (choicesApply(axiomTaclet, initConfig.getActivatedChoices())) {
                     register(axiomTaclet);
