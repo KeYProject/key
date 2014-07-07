@@ -67,8 +67,8 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
                     @Override
                     protected ProofMacro[] createProofMacroArray() {
                         return new ProofMacro[]{
-                            new FinishSymbolicExecutionMacro() {},
-                            new TryCloseMacro(NUMBER_OF_TRY_STEPS) {}
+                            new FinishSymbolicExecutionMacro(),
+                            new TryCloseMacro(NUMBER_OF_TRY_STEPS)
                         };
                     }
 
@@ -83,7 +83,7 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
                     }
                 };
                 return new ProofMacro[]{
-                    new StartAuxiliaryComputationMacro() {},
+                    new StartAuxiliaryComputationMacro(),
                     finishSymbExecAndTryToClose};
             }
         };

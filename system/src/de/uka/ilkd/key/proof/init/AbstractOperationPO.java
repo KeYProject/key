@@ -46,6 +46,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -55,6 +56,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
 /**
@@ -197,23 +199,42 @@ public abstract class AbstractOperationPO extends AbstractPO {
               postTerm = tb.and(postTerm,
                       buildUninterpretedPredicate(paramVars, null, getUninterpretedPredicateName()));
           }
-          final Term[] updateSubs = new Term[target.arity()];
-          int i = 0;
-          for (LocationVariable heap : modHeaps) {
-              if(target.getStateCount() >= 1) {
-                  updateSubs[i++] = tb.var(heap);
-                  if(target.getStateCount() == 2) {
-                      updateSubs[i++] = tb.var(atPreVars.get(heap));
-                  }
+          ImmutableList<FunctionalOperationContract> lookupContracts = ImmutableSLList.<FunctionalOperationContract>nil();
+          ImmutableSet<FunctionalOperationContract> cs = services.getSpecificationRepository().getOperationContracts(getCalleeKeYJavaType(), pm);
+          for(KeYJavaType superType : services.getJavaInfo().getAllSupertypes(getCalleeKeYJavaType())) {
+              for(FunctionalOperationContract fop : cs) {
+                  if(fop.getSpecifiedIn().equals(superType)) { lookupContracts = lookupContracts.append(fop); }
               }
           }
-          if(!target.isStatic()) {
-              updateSubs[i++] = tb.var(selfVar);
+          Term representsFromContract = null;
+          for(FunctionalOperationContract fop : lookupContracts) {
+              representsFromContract = fop.getRepresentsAxiom(heaps.get(0), selfVar, paramVars, resultVar, atPreVars, services);
+              if(representsFromContract != null) break;
           }
-          for(ProgramVariable paramVar : paramVars) {
-              updateSubs[i++] = tb.var(paramVar);
+          final Term progPost;
+          if(representsFromContract == null) {
+              final Term[] updateSubs = new Term[target.arity()];
+              int i = 0;
+              for (LocationVariable heap : modHeaps) {
+                  if(target.getStateCount() >= 1) {
+                      updateSubs[i++] = tb.var(heap);
+                      if(target.getStateCount() == 2) {
+                          updateSubs[i++] = tb.var(atPreVars.get(heap));
+                      }
+                  }
+              }
+              if(!target.isStatic()) {
+                  updateSubs[i++] = tb.var(selfVar);
+              }
+              for(ProgramVariable paramVar : paramVars) {
+                  updateSubs[i++] = tb.var(paramVar);
+              }
+              progPost = tb.apply(tb.elementary(tb.var(resultVar), tb.func(target, updateSubs)), postTerm);
+          } else {
+              final Term body = representsFromContract;
+              assert body.op() == Equality.EQUALS : "Only fully functional represents clauses for model methods are supported!";
+              progPost = tb.apply(tb.elementary(tb.var(resultVar), body.sub(1)), postTerm);
           }
-          final Term progPost = tb.apply(tb.elementary(tb.var(resultVar), tb.func(target, updateSubs)), postTerm);
           termPOs.add(tb.imp(pre, progPost));
       } else {
       // This should be indented, but for now I want to make diffing a bit easier
