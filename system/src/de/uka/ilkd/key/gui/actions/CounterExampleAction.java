@@ -16,13 +16,17 @@ import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.util.Debug;
+
 import java.awt.event.ActionEvent;
 import java.util.*;
+
 import javax.swing.*;
 
 @SuppressWarnings("serial")
@@ -107,6 +111,11 @@ public class CounterExampleAction extends MainWindowAction {
         MainWindow mw = MainWindow.getInstance();
         mw.addProblem(pa);
 
+        
+        Services services = mw.getMediator().getServices();
+        SpecificationRepository spec = services.getSpecificationRepository();
+        spec.registerProof(spec.getProofOblInput(oldProof), proof);
+        
         mediator.goalChosen(proof.getGoal(proof.root()));
 
         return proof;

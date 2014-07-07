@@ -17,6 +17,7 @@ import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -29,6 +30,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.SingleProof;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
@@ -42,7 +44,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 	private SolverLauncher launcher;
 	private Vector<Proof> proofs;
 	private Proof originalProof;
-	
+
 	public TGWorker(TGInfoDialog tgInfoDialog){
 		this.tgInfoDialog = tgInfoDialog;
 	}
@@ -138,8 +140,8 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 			return null;
 		}
 		launcher.launch(solvers, problems, proof.getServices());
-//		ModelGenerator mg = new ModelGenerator(proofs.get(0).root().sequent(), 3, getMediator());
-//		mg.launch();
+		//		ModelGenerator mg = new ModelGenerator(proofs.get(0).root().sequent(), 3, getMediator());
+		//		mg.launch();
 		return null;
 	}
 
@@ -181,7 +183,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 		getMediator().setProof(originalProof);
 	}
 
-	
+
 
 	private KeYMediator getMediator(){
 		return MainWindow.getInstance().getMediator();
@@ -235,6 +237,11 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 				oldProof.getServices(), oldProof.getSettings());
 		proof.setProofEnv(oldProof.env());
 		proof.setNamespaces(oldProof.getNamespaces());
+
+		Services services = getMediator().getServices();
+		SpecificationRepository spec = services.getSpecificationRepository();
+		spec.registerProof(spec.getProofOblInput(oldProof), proof);
+
 		return proof;
 	}
 
@@ -318,7 +325,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 		}
 		return res;
 	}
-	
+
 	public Proof getOriginalProof(){
 		return originalProof;
 	}

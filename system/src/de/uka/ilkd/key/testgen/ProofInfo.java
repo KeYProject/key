@@ -38,6 +38,7 @@ public class ProofInfo {
 			return (IProgramMethod) f;
 		}
 		else{
+			System.out.println(getMUT().getFullName());
 			return null;
 		}		
 	}
