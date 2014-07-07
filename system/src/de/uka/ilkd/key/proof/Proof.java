@@ -654,9 +654,10 @@ public class Proof implements Named {
                         public void visit(Proof proof, Node visitedNode) {
                             for (final NoPosTacletApp app :  visitedNode.getLocalIntroducedRules()){
                                 firstGoal.ruleAppIndex().removeNoPosTacletApp(app);
+                                env().getJustifInfo().removeJustificationFor(app.taclet());
                             }
 
-                                firstGoal.pruneToParent();
+                            firstGoal.pruneToParent();
                         }
                   });
 

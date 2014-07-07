@@ -591,9 +591,6 @@ public final class Goal  {
     void pruneToParent(){
             setNode(node().parent());
             removeLastAppliedRuleApp();
-            for (NoPosTacletApp r: node().getLocalIntroducedRules()) {
-               ruleAppIndex.removeNoPosTacletApp(r);
-            }
     }
 
     public ImmutableList<Goal> apply(final RuleApp ruleApp ) {

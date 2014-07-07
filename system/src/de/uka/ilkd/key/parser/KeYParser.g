@@ -292,7 +292,7 @@ options {
         	for (Taclet t : taclets) {
 	  		this.taclets.put(new RuleKey(t), t);        	
         	}
-        }        
+        }
         
         if (normalConfig != null){
             this.keh = normalConfig.services().getExceptionHandler();
