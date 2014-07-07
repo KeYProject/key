@@ -37,6 +37,12 @@ import de.uka.ilkd.key.proof.Node;
 public abstract class AbstractProofMacro implements ProofMacro {
 
     private ImmutableList<Goal> goals = ImmutableSLList.<Goal>nil();
+
+    /**
+     * The max number of steps to be applied.
+     * A value of -1 means no changes.
+     */
+    private int numberSteps = -1;
     private ProofMacroListener pml = null;
 
     private static ImmutableList<Goal> getGoals(Node node) {
@@ -58,6 +64,16 @@ public abstract class AbstractProofMacro implements ProofMacro {
     }
 
     @Override
+    public void setNumberSteps(int numberSteps) {
+        this.numberSteps = numberSteps;
+    }
+
+    @Override
+    public int getNumberSteps() {
+        return this.numberSteps;
+    }
+
+    @Override
     public ImmutableList<Goal> getGoals() {
         return this.goals;
     }
@@ -73,7 +89,8 @@ public abstract class AbstractProofMacro implements ProofMacro {
             Object result = info.getResult();
             if (result instanceof ImmutableList<?> &&
                     isGoalList((ImmutableList<?>) result)) {
-                this.goals = (ImmutableList<Goal>) result;
+                final ImmutableList<Goal> newGoals = (ImmutableList<Goal>) result;
+                this.goals = newGoals;
             }
         }
     }

@@ -38,7 +38,6 @@ import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -547,6 +546,9 @@ public class ApplyStrategy {
         fireTaskStarted (stopCondition.getMaximalWork(maxSteps, timeout, newProof, goalChooser));
     }
 
+    public synchronized ApplyStrategyInfo start(Proof proof, Goal goal) {
+        return start(proof, ImmutableSLList.<Goal>nil().prepend(goal));
+    }
 
     public synchronized ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals) {
 
@@ -591,8 +593,8 @@ public class ApplyStrategy {
     }
 
 
-    private ProofTreeListener prepareStrategy(Proof proof, ImmutableList<Goal> goals, int maxSteps,
-            long timeout) {
+    private ProofTreeListener prepareStrategy(Proof proof, ImmutableList<Goal> goals,
+                                              int maxSteps, long timeout) {
         ProofTreeListener treeListener = new ProofTreeAdapter() {
             @Override
             public void proofGoalsAdded(ProofTreeEvent e) {

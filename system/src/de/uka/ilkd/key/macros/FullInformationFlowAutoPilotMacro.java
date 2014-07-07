@@ -5,6 +5,7 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.ui.CompositePTListener;
 
 import javax.swing.KeyStroke;
 
@@ -101,7 +102,7 @@ public class FullInformationFlowAutoPilotMacro extends AbstractProofMacro {
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
         final ProverTaskListener cptl =
-                new CompositePTListener(listener, getListener());
+                new CompositePTListener(getListener(), listener);
         cptl.taskStarted(wrappedMacro.getName(), 0);
         ProofMacroFinishedInfo info = wrappedMacro.applyTo(mediator, goals,
                                                            posInOcc, cptl);

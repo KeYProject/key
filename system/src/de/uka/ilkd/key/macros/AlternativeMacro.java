@@ -24,6 +24,7 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.ui.CompositePTListener;
 
 /**
  * The abstract class AlternativeMacro can be used to create compound macros
@@ -89,7 +90,7 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
         for (ProofMacro macro : getProofMacros()) {
             if(macro.canApplyTo(mediator, goals, posInOcc)) {
                 final ProverTaskListener cptl =
-                        new CompositePTListener(listener, getListener());
+                        new CompositePTListener(getListener(), listener);
                 cptl.taskStarted(macro.getName(), 0);
                 info = macro.applyTo(mediator, goals, posInOcc, cptl);
                 cptl.taskFinished(info);

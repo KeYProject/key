@@ -8,6 +8,7 @@ import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.ui.CompositePTListener;
 
 /**
  * The abstract class DoWhileFinallyMacro can be used to create compound macros
@@ -59,7 +60,7 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
         int steps = getMaxSteps(mediator);
         while (steps > 0 && getCondition() && canApplyTo(mediator, goals, posInOcc)) {
             final ProverTaskListener cptl =
-                    new CompositePTListener(listener, getListener());
+                    new CompositePTListener(getListener(), listener);
             cptl.taskStarted(getProofMacro().getName(), 0);
             info = getProofMacro().applyTo(mediator, goals, posInOcc, cptl);
             cptl.taskFinished(info);
