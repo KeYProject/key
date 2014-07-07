@@ -56,25 +56,27 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
-        int steps = getMaxSteps(mediator);
-        while (steps > 0 && getCondition() && canApplyTo(mediator, goals, posInOcc)) {
+        setMaxSteps(mediator);
+        int steps = getNumberSteps();
+        while (getNumberSteps() > 0 && getCondition() && canApplyTo(mediator, goals, posInOcc)) {
             final ProverTaskListener cptl =
                     new CompositePTListener(listener, getListener());
             cptl.taskStarted(getProofMacro().getName(), 0);
             info = getProofMacro().applyTo(mediator, goals, posInOcc, cptl);
-            cptl.taskFinished(info);
+            steps -= info.getAppliedRules();
+            setNumberSteps(steps);
             info = new ProofMacroFinishedInfo(this, info);
+            cptl.taskFinished(info);
             goals = getGoals();
             posInOcc = null;
-            steps--;
         }
         if (steps > 0 && getAltProofMacro().canApplyTo(mediator, goals, posInOcc)) {
             final ProverTaskListener cptl =
                     new CompositePTListener(listener, getListener());
             cptl.taskStarted(getAltProofMacro().getName(), 0);
             info = getAltProofMacro().applyTo(mediator, goals, posInOcc, cptl);
-            cptl.taskFinished(info);
             info = new ProofMacroFinishedInfo(this, info);
+            cptl.taskFinished(info);
         }
         return info;
     }
@@ -102,13 +104,17 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
      * @return the maximum number of rule applications allowed for
      * this macro
      */
-    static int getMaxSteps(KeYMediator mediator) {
-		if (mediator.getSelectedProof() != null) {
-			return mediator.getSelectedProof().getSettings().getStrategySettings().getMaxSteps();
-		} else {
-			return ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getMaxSteps();
-		}
-	}
+    void setMaxSteps(KeYMediator mediator) {
+        final int steps;
+        if (mediator.getSelectedProof() != null) {
+            steps = mediator.getSelectedProof().getSettings()
+                         .getStrategySettings().getMaxSteps();
+        } else {
+            steps = ProofSettings.DEFAULT_SETTINGS
+                    .getStrategySettings().getMaxSteps();
+        }
+        setNumberSteps(steps);
+    }
 
     @Override
     public KeyStroke getKeyStroke() {
