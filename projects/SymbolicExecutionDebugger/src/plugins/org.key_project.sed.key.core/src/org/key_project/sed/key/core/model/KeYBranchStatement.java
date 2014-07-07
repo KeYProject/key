@@ -16,12 +16,16 @@ package org.key_project.sed.key.core.model;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.IfStatement;
+import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEDBranchStatement;
 import org.key_project.sed.core.model.impl.AbstractSEDBranchStatement;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.java.CollectionUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
@@ -195,7 +199,31 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     */
    protected SourceLocation computeSourceLocation() throws DebugException {
       SourceLocation location = KeYUtil.convertToSourceLocation(executionNode.getActivePositionInfo());
-      return KeYModelUtil.updateLocationFromAST(this, location);
+      ASTNode statementNode = KeYModelUtil.findASTNode(this, location);
+      if (statementNode != null) {
+         if (statementNode instanceof IfStatement) {
+            IfStatement ifStatement = (IfStatement)statementNode;
+            return new SourceLocation(-1, ifStatement.getStartPosition(), ifStatement.getThenStatement().getStartPosition());
+         }
+         else if (statementNode instanceof SwitchStatement) {
+            SwitchStatement switchStatement = (SwitchStatement)statementNode;
+            @SuppressWarnings("unchecked")
+            Object firstCase = CollectionUtil.getFirst(switchStatement.statements());
+            if (firstCase != null) {
+               Assert.isTrue(firstCase instanceof ASTNode);
+               return new SourceLocation(-1, switchStatement.getStartPosition(), ((ASTNode)firstCase).getStartPosition());
+            }
+            else {
+               return KeYModelUtil.updateLocationFromAST(location, statementNode);
+            }
+         }
+         else {
+            return KeYModelUtil.updateLocationFromAST(location, statementNode);
+         }
+      }
+      else {
+         return location;
+      }
    }
 
    /**

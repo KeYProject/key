@@ -40,7 +40,7 @@ public abstract class MainWindowAction extends AbstractAction {
         this.mainWindow = mainWindow;
         putValue(ACCELERATOR_KEY, KeyStrokeManager.get(this));
     }
-
+    
     protected KeYMediator getMediator() {
         return mainWindow.getMediator();
     }

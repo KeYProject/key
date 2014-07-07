@@ -68,7 +68,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                           }
                        },
                        25, // x of false in text control of editor
-                       7, // y of false in text control of editor
+                       124, // y of false in text control of editor
                        "closeFalse",
                        true);
    }

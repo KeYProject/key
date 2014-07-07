@@ -99,9 +99,7 @@ public abstract class TacletLoader {
             ImmutableSet<Taclet> tacletsToAdd,
             ImmutableSet<Taclet> tacletsToProve) {
         List<Taclet> sysTaclets = toList(initConfig.getTaclets());
-        Collections.reverse(sysTaclets);
         List<Taclet> addedList = toList(tacletsToAdd);
-        Collections.reverse(addedList);
         sysTaclets.addAll(addedList);
 
         ImmutableSet<Taclet> newTaclets = DefaultImmutableSet.nil();

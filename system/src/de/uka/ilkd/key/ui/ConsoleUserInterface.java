@@ -33,6 +33,7 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -303,4 +304,12 @@ public class ConsoleUserInterface extends AbstractUserInterface {
             proof.dispose();
         }
     }
+
+   @Override
+   public boolean selectProofObligation(InitConfig initConfig) {
+      if(verbosity >= DEBUG) {
+         System.out.println("Proof Obligation selection not supported by console.");
+        }
+      return false;
+   }
 }

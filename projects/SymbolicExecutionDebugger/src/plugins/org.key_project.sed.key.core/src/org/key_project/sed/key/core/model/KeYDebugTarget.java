@@ -252,10 +252,12 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
    /**
     * Registers the given {@link IKeYSEDDebugNode} as child of this {@link KeYDebugTarget}.
     * @param node The {@link IKeYSEDDebugNode} to register as child.
+    * @throws DebugException Occurred Exception
     */
-   public void registerDebugNode(IKeYSEDDebugNode<?> node) {
+   public void registerDebugNode(IKeYSEDDebugNode<?> node) throws DebugException {
       if (node != null) {
          executionToDebugMapping.put(node.getExecutionNode(), node);
+         addToSourceModel(node);
       }
    }
    

@@ -29,7 +29,7 @@ public class ShowUsedContractsAction extends MainWindowAction {
 
     public ShowUsedContractsAction(MainWindow mainWindow) {
 	super(mainWindow);
-	setName("Show Used Contracts...");
+	setName("Show Used Contracts");
 	
 	getMediator().enableWhenProofLoaded(this);
 
