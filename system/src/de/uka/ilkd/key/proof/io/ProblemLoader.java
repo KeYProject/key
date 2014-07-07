@@ -34,8 +34,8 @@ public final class ProblemLoader extends DefaultProblemLoader {
 
     private ProverTaskListener ptl;
 
-    public ProblemLoader(File file, List<File> classPath, File bootClassPath, Profile profileOfNewProofs, KeYMediator mediator) {
-        super(file, classPath, bootClassPath, profileOfNewProofs, mediator);
+    public ProblemLoader(File file, List<File> classPath, File bootClassPath, Profile profileOfNewProofs, KeYMediator mediator, boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
+        super(file, classPath, bootClassPath, profileOfNewProofs, mediator, askUiToSelectAProofObligationIfNotDefinedByLoadedFile);
     }
 
     public void addTaskListener(final ProverTaskListener ptl) {

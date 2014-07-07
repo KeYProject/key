@@ -642,4 +642,14 @@
             </enabledWhen>
          </page>
       </extension>
+      <extension
+            point="org.eclipse.jdt.ui.javaEditorTextHovers">
+         <hover
+               activate="true"
+               class="org.key_project.sed.key.ui.text.SymbolicallyReachedJavaEditorTextHover"
+               description="The highlighted code was reached during symbolic execution."
+               id="org.key_project.sed.ui.textannotation.ExecutedSEDNodeJavaEditorTextHover"
+               label="Symbolically Reached Text Hover">
+         </hover>
+      </extension>
 </plugin>

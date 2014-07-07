@@ -214,7 +214,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
     */
    @Override
    protected Term buildFrameClause(List<LocationVariable> modHeaps,
-                                   Map<LocationVariable, Map<Term, Term>> heapToAtPre,
+                                   Map<Term, Term> heapToAtPre,
                                    ProgramVariable selfVar,
                                    ImmutableList<ProgramVariable> paramVars) {
       return tb.tt();
