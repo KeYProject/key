@@ -126,10 +126,10 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
             proof.setActiveStrategy(oldStrategy);
         }
         
-        if(applyStrategy.hasBeenInterrupted()) {
-            synchronized(applyStrategy) { // wait for applyStrategy to finish it last rule application
-                throw new InterruptedException();
-            }
+        synchronized(applyStrategy) { // wait for applyStrategy to finish it last rule application
+           if(applyStrategy.hasBeenInterrupted()) { // reraise interrupted exception if necessary
+              throw new InterruptedException();
+           }
         }
     }
 
