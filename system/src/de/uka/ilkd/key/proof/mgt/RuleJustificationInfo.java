@@ -20,7 +20,6 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleKey;
-import de.uka.ilkd.key.rule.Taclet;
 
 public class RuleJustificationInfo {
    private Map<RuleKey, RuleJustification> rule2justif = new LinkedHashMap<RuleKey, RuleJustification>();
@@ -57,7 +56,7 @@ public class RuleJustificationInfo {
       }
    }
 
-   public void removeJustificationFor(Taclet taclet) {
-      rule2justif.remove(new RuleKey(taclet));
+   public void removeJustificationFor(Rule rule) {
+      rule2justif.remove(new RuleKey(rule));
    }
 }

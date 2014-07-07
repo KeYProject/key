@@ -412,7 +412,7 @@ public final class Goal  {
      * @param p PosInOccurrence encodes the position
      */
     public void removeFormula(PosInOccurrence p) {
-	setSequent(sequent().removeFormula(p));
+       setSequent(sequent().removeFormula(p));
     }
 
     /**

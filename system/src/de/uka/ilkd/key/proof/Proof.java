@@ -638,6 +638,10 @@ public class Proof implements Named {
 
                                 if (Proof.this.env() != null && visitedNode.parent() != null) {
                                         	Proof.this.mgt().ruleUnApplied(visitedNode.parent().getAppliedRuleApp());
+                                          for (final NoPosTacletApp app :  visitedNode.parent().getLocalIntroducedRules()){
+                                             env().getJustifInfo().removeJustificationFor(app.taclet());
+                                         }
+
                                 }
 
                         }
