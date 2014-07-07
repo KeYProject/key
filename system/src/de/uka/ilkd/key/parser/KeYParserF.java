@@ -21,13 +21,41 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaReader;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.Taclet;
+import org.antlr.runtime.RecognitionException;
 
 /*
  * Extends generated class {@link KeYParser} with custom constructors.
  */
 public class KeYParserF extends KeYParser {
+
+    @Override
+    protected Term heapSelectionSuffix(Term term, Term heap) throws RecognitionException {
+        Term result;
+
+        if (!isHeapTerm(heap)) {
+            semanticError("Heap term expected, not sort + " + heap.sort());
+        }
+        if (term.arity() == 0 || !isHeapTerm(term.sub(0))) {
+            semanticError("select or an observer expected before '@', not " + term);
+        }
+        /////// WORK TO BE DONE! ///// REPLACE THE HEAP
+        result = term;
+        {
+            System.out.println(term.subs().size());
+            for (Term t : term.subs()) {
+                System.out.println(t);
+            }
+            System.out.println("\nX\n" + result + "\nX\n");
+        }
+
+        // reset globalImplicitHeapSuffixCounter
+        globalImplicitHeapSuffixCounter = 0;
+
+        return result;
+    }
 
     public KeYParserF(ParserMode mode, KeYLexerF keYLexerF,
             ParserConfig schemaConfig, ParserConfig normalConfig,

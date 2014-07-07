@@ -158,9 +158,16 @@ options {
     
    private int savedGuessing = -1;
    
-   // for parser rule accessterm:
-   // store nesting depth of select terms created via pretty syntax	
-   private int globalImplicitHeapSuffixCounter = 0;
+   /*
+    counter variables for parser rules accessterm and heap_selection suffix:
+    - rule accessterm increases the counter
+    - rule heap_selection_suffix calls method heapSelectionSuffix(), which resets
+      the counter
+   */
+   // store nesting depth of alpha::select(h,o,f)-terms created via pretty syntax	
+   protected int globalImplicitHeapSuffixCounter = 0;
+   // store number of implicit heaps that will be replaced in case a heap_selection_suffix occurs
+   protected int globalImplicitHeapSuffixCounterReplacementDepth = 0;
 
    private int lineOffset=0;
    private int colOffset=0;
@@ -915,7 +922,7 @@ options {
         } 
     }
     
-    private boolean isHeapTerm(Term term) {
+    protected boolean isHeapTerm(Term term) {
         return term != null && term.sort() == 
             getServices().getTypeConverter().getHeapLDT().targetSort();
     }
@@ -1367,7 +1374,10 @@ options {
     public void addFunction(Function f) {
         functions().add(f);
     }
-
+    
+    protected Term heapSelectionSuffix(Term term, Term heap) throws RecognitionException {
+        throw new UnsupportedOperationException();
+    }
     
     private ImmutableSet<Modality> lookupOperatorSV(String opName, ImmutableSet<Modality> modalities) 
     		throws RecognitionException/*KeYSemanticException*/ {
@@ -1396,7 +1406,7 @@ options {
        return modalities;
     }
 
-    private void semanticError(String message) throws RecognitionException {
+    protected void semanticError(String message) throws RecognitionException {
       throw new KeYSemanticException(input, getSourceName(), message);
     }
 
@@ -2817,26 +2827,7 @@ catch [TermCreationException ex] {
 heap_selection_suffix [Term term] returns [Term result]
     :
     AT heap=accessterm
-    {
-        if(!isHeapTerm(heap)) {
-            semanticError("Heap term expected, not sort + " + heap.sort());
-        }
-        if(term.arity() == 0 || !isHeapTerm(term.sub(0))) {
-            semanticError("select or an observer expected before '@', not " + term);
-        }
-        /////// WORK TO BE DONE! ///// REPLACE THE HEAP
-        result = term;
-        {
-            System.out.println(term.subs().size());
-            for(Term t:term.subs()){
-            System.out.println(t);
-        }
-        System.out.println("\nX\n"+result+"\nX\n");
-        }
-        
-        // reset globalImplicitHeapSuffixCounter
-        globalImplicitHeapSuffixCounter = 0;
-    }
+    { result = heapSelectionSuffix(term, heap); }
     ;
 
 accessterm_bracket_suffix[Term reference] returns [Term resultAtAfter]

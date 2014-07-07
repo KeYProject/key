@@ -61,7 +61,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         assertEquals(t1, t2);
     }
 
-    public void DISABLEDtestFieldAtHeapSyntax() {
+    public void testFieldAtHeapSyntax() {
         Term t1, t2;
 
         parseTerm("h");
