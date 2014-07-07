@@ -26,6 +26,7 @@ import org.key_project.sed.core.annotation.ISEDAnnotationType;
 import org.key_project.sed.core.model.event.ISEDAnnotationListener;
 import org.key_project.sed.core.model.impl.AbstractSEDDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
+import org.key_project.sed.core.sourcesummary.ISEDSourceModel;
 
 /**
  * A debug target is a symbolic debuggable execution context. For example, a debug target
@@ -167,4 +168,10 @@ public interface ISEDDebugTarget extends ISEDDebugElement, IDebugTarget {
     * @return The fulfilled {@link IBreakpoint}s in the given {@link ISEDDebugNode}.
     */
    public IBreakpoint[] computeHitBreakpoints(ISEDDebugNode node) throws DebugException;
+   
+   /**
+    * Returns the {@link ISEDSourceModel} which manages the visited source parts
+    * @return The {@link ISEDSourceModel} or {@code null} if not available.
+    */
+   public ISEDSourceModel getSourceModel();
 }

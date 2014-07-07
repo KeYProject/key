@@ -78,5 +78,12 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
       public IBuiltInRuleApp finish() {
          return null;
       }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void dispose() {
+      }
    }
 }

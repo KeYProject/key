@@ -126,7 +126,7 @@ public class InformationWindow extends JDialog {
 
 	   CETree tree = new CETree(model);
 	   JScrollPane pane = new JScrollPane();
-	   pane.getViewport().add(tree);
+           pane.getViewport().add(tree.getTreeComponent());
 	   pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 	   
 	   return pane;

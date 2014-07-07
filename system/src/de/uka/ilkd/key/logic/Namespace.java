@@ -253,13 +253,13 @@ public class Namespace implements java.io.Serializable {
 	
     }
 
-    public void add(ImmutableList<Named> l) {
+    public void add(Iterable<? extends Named> l) {
         for (Named aL : l) {
             add(aL);
         }
     }
 
-    public <T extends Named> void addSafely(ImmutableSet<T> names) {
+    public <T extends Named> void addSafely(Iterable<T> names) {
         for (Named name : names) {
             addSafely(name);
         }

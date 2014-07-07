@@ -36,7 +36,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
 
     public ShowActiveSettingsAction(MainWindow mainWindow) {
 	super(mainWindow);
-	setName("Show All Active Settings...");
+	setName("Show All Active Settings");
         setIcon(IconFactory.properties(16));
     }
 

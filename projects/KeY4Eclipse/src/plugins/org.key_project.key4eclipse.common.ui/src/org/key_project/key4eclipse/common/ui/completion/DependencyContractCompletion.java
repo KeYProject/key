@@ -86,5 +86,12 @@ public class DependencyContractCompletion extends AbstractInteractiveRuleApplica
       public IBuiltInRuleApp finish() {
          return null;
       }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void dispose() {
+      }
    }
 }

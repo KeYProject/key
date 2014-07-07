@@ -328,12 +328,12 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
 
         @Override
         protected String getTitle() {
-                 return "Load User-Defined Taclets...";
+                 return "Load User-Defined Taclets";
         }
 
         @Override
         protected String getDescription() {
-                return "Loads additional taclets and creates the corresponding proof...";
+                return "Loads additional taclets and creates the corresponding proof.";
         }
 
         @Override
