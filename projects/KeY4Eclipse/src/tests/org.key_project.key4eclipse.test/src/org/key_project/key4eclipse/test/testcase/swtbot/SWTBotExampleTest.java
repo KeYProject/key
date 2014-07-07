@@ -52,7 +52,7 @@ public class SWTBotExampleTest extends AbstractSetupTestCase {
             SwingBotJFrame frame = TestUtilsUtil.keyGetMainWindow();
             // Open example dialog.
             SwingBotJMenu fileMenu = frame.bot().jMenuBar().menu("File");
-            fileMenu.item("Load Example...").click();
+            fileMenu.item("Load Example").click();
             SwingBotJDialog dialog = frame.bot().jDialog("Load Example");
             SwingBotJList list = dialog.bot().jList();
             // Select example

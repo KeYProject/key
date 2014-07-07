@@ -24,6 +24,7 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -45,6 +46,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -53,6 +55,8 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
 /**
@@ -177,10 +181,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
           }
           // build precondition
           final List<LocationVariable> heaps = new ArrayList<LocationVariable>();
-          if(target.getStateCount() >= 1) {
-              heaps.addAll(modHeaps);
-              if(target.getStateCount() == 2) {
-                  for(LocationVariable heap : modHeaps) {
+          for(LocationVariable heap : modHeaps) {
+        	  if(target.getStateCount() >= 1) {
+        		  heaps.add(heap);
+        		  if(target.getStateCount() == 2) {
                       heaps.add(atPreVars.get(heap));
                   }
               }
@@ -195,23 +199,42 @@ public abstract class AbstractOperationPO extends AbstractPO {
               postTerm = tb.and(postTerm,
                       buildUninterpretedPredicate(paramVars, null, getUninterpretedPredicateName()));
           }
-          final Term[] updateSubs = new Term[target.arity()];
-          int i = 0;
-          for (LocationVariable heap : modHeaps) {
-              if(target.getStateCount() >= 1) {
-                  updateSubs[i++] = tb.var(heap);
-                  if(target.getStateCount() == 2) {
-                      updateSubs[i++] = tb.var(atPreVars.get(heap));
-                  }
+          ImmutableList<FunctionalOperationContract> lookupContracts = ImmutableSLList.<FunctionalOperationContract>nil();
+          ImmutableSet<FunctionalOperationContract> cs = services.getSpecificationRepository().getOperationContracts(getCalleeKeYJavaType(), pm);
+          for(KeYJavaType superType : services.getJavaInfo().getAllSupertypes(getCalleeKeYJavaType())) {
+              for(FunctionalOperationContract fop : cs) {
+                  if(fop.getSpecifiedIn().equals(superType)) { lookupContracts = lookupContracts.append(fop); }
               }
           }
-          if(!target.isStatic()) {
-              updateSubs[i++] = tb.var(selfVar);
+          Term representsFromContract = null;
+          for(FunctionalOperationContract fop : lookupContracts) {
+              representsFromContract = fop.getRepresentsAxiom(heaps.get(0), selfVar, paramVars, resultVar, atPreVars, services);
+              if(representsFromContract != null) break;
           }
-          for(ProgramVariable paramVar : paramVars) {
-              updateSubs[i++] = tb.var(paramVar);
+          final Term progPost;
+          if(representsFromContract == null) {
+        	  final Term[] updateSubs = new Term[target.arity()];
+        	  int i = 0;
+        	  for (LocationVariable heap : modHeaps) {
+        		  if(target.getStateCount() >= 1) {
+        			  updateSubs[i++] = tb.var(heap);
+        			  if(target.getStateCount() == 2) {
+        				  updateSubs[i++] = tb.var(atPreVars.get(heap));
+        			  }
+        		  }
+        	  }
+        	  if(!target.isStatic()) {
+        		  updateSubs[i++] = tb.var(selfVar);
+        	  }
+        	  for(ProgramVariable paramVar : paramVars) {
+        		  updateSubs[i++] = tb.var(paramVar);
+        	  }
+        	  progPost = tb.apply(tb.elementary(tb.var(resultVar), tb.func(target, updateSubs)), postTerm);
+          }else{
+        	  final Term body = representsFromContract;
+        	  assert body.op() == Equality.EQUALS : "Only fully functional represents clauses for model methods are supported!";
+        	  progPost = tb.apply(tb.elementary(tb.var(resultVar), body.sub(1)), postTerm);        	  
           }
-          final Term progPost = tb.apply(tb.elementary(tb.var(resultVar), tb.func(target, updateSubs)), postTerm);
           termPOs.add(tb.imp(pre, progPost));
       } else {
       // This should be indented, but for now I want to make diffing a bit easier
@@ -240,19 +263,21 @@ public abstract class AbstractOperationPO extends AbstractPO {
          final Map<LocationVariable, LocationVariable> atPreVars =
                  HeapContext.getBeforeAtPreVars(modHeaps, services, "AtPre");
 
-         final Map<LocationVariable, Map<Term, Term>> heapToAtPre =
-                 new LinkedHashMap<LocationVariable, Map<Term, Term>>();
+//         final Map<LocationVariable, Map<Term, Term>> heapToAtPre =
+//                 new LinkedHashMap<LocationVariable, Map<Term, Term>>();
+         final Map<Term, Term> heapToAtPre = new LinkedHashMap<Term, Term>();
 
          for (LocationVariable heap : modHeaps) {
-            heapToAtPre.put(heap, new LinkedHashMap<Term, Term>());
-            heapToAtPre.get(heap).put(tb.var(heap), tb.var(atPreVars.get(heap)));
+           	heapToAtPre.put(tb.var(heap), tb.var(atPreVars.get(heap)));
          }
 
          // FIXME Wojtek: This is a fiddly bit that needs to be rechecked eventually
+/*
          if (modHeaps.contains(getSavedHeap())) {
             heapToAtPre.get(getSavedHeap())
                 .put(tb.getBaseHeap(), tb.var(atPreVars.get(getSavedHeap())));
          }
+*/
 
          // register the variables so they are declared in proof header if the proof is saved to a file
          register(paramVars);
@@ -607,8 +632,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @return The created {@link Term} representing the frame clause.
     */
    protected abstract Term buildFrameClause(List<LocationVariable> modHeaps,
-                                            Map<LocationVariable,
-                                            Map<Term, Term>> heapToAtPre,
+                                            Map<Term, Term> heapToAtPre,
                                             ProgramVariable selfVar,
                                             ImmutableList<ProgramVariable> paramVars);
 

@@ -13,9 +13,6 @@
 
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.actions.TermLabelMenu;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -31,17 +28,20 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
@@ -67,15 +67,58 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
 
-import de.uka.ilkd.key.gui.actions.*;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.gui.actions.AbandonTaskAction;
+import de.uka.ilkd.key.gui.actions.AboutAction;
+import de.uka.ilkd.key.gui.actions.AutoModeAction;
+import de.uka.ilkd.key.gui.actions.CounterExampleAction;
+import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
+import de.uka.ilkd.key.gui.actions.ExitMainAction;
+import de.uka.ilkd.key.gui.actions.FontSizeAction;
+import de.uka.ilkd.key.gui.actions.GoalBackAction;
+import de.uka.ilkd.key.gui.actions.HidePackagePrefixToggleAction;
+import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
+import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
+import de.uka.ilkd.key.gui.actions.LicenseAction;
+import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
+import de.uka.ilkd.key.gui.actions.OneStepSimplificationToggleAction;
+import de.uka.ilkd.key.gui.actions.OpenExampleAction;
+import de.uka.ilkd.key.gui.actions.OpenFileAction;
+import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
+import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
+import de.uka.ilkd.key.gui.actions.ProofManagementAction;
+import de.uka.ilkd.key.gui.actions.PruneProofAction;
+import de.uka.ilkd.key.gui.actions.QuickLoadAction;
+import de.uka.ilkd.key.gui.actions.QuickSaveAction;
+import de.uka.ilkd.key.gui.actions.RightMouseClickToggleAction;
+import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
+import de.uka.ilkd.key.gui.actions.SaveFileAction;
+import de.uka.ilkd.key.gui.actions.SearchInProofTreeAction;
+import de.uka.ilkd.key.gui.actions.SearchInSequentAction;
+import de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction;
+import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
+import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
+import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
+import de.uka.ilkd.key.gui.actions.ShowUsedContractsAction;
+import de.uka.ilkd.key.gui.actions.SystemInfoAction;
+import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
+import de.uka.ilkd.key.gui.actions.TermLabelMenu;
+import de.uka.ilkd.key.gui.actions.TestGenerationAction;
+import de.uka.ilkd.key.gui.actions.ToggleConfirmExitAction;
+import de.uka.ilkd.key.gui.actions.ToolTipOptionsAction;
+import de.uka.ilkd.key.gui.actions.UndoLastStepAction;
+import de.uka.ilkd.key.gui.actions.UnicodeToggleAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
+import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
 import de.uka.ilkd.key.gui.nodeviews.EmptySequent;
 import de.uka.ilkd.key.gui.nodeviews.InnerNodeView;
-import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
 import de.uka.ilkd.key.gui.nodeviews.MainFrame;
+import de.uka.ilkd.key.gui.nodeviews.SequentView;
+import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
@@ -85,6 +128,8 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -97,13 +142,6 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
-import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
-import de.uka.ilkd.key.gui.nodeviews.SequentView;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.pp.VisibleTermLabels;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
 
 @SuppressWarnings("serial")
 public final class MainWindow extends JFrame  {
@@ -634,7 +672,7 @@ public final class MainWindow extends JFrame  {
 
 
         fileMenu.add(loadUserDefinedTacletsAction);
-        JMenu submenu = new JMenu("Prove...");
+        JMenu submenu = new JMenu("Prove");
         fileMenu.add(submenu);
 
         submenu.add(loadUserDefinedTacletsForProvingAction);
@@ -1109,6 +1147,25 @@ public final class MainWindow extends JFrame  {
             listener = new GlassPaneListener(this, contentPane);
             addMouseListener(listener);
             addMouseMotionListener(listener);
+            addKeyListener(new KeyListener() {
+
+               @Override
+               public void keyPressed(KeyEvent e) {
+                  e.consume();
+               }
+
+               @Override
+               public void keyReleased(KeyEvent e) {
+                  e.consume();
+                  
+               }
+
+               @Override
+               public void keyTyped(KeyEvent e) {
+                  e.consume();                  
+               }
+               
+            });
         }
     }
 
@@ -1255,11 +1312,12 @@ public final class MainWindow extends JFrame  {
      * This action is responsible for the invocation of an SMT solver For
      * example the toolbar button is paramtrized with an instance of this action
      */
-    private final class SMTInvokeAction extends AbstractAction {
+    private final class SMTInvokeAction extends MainWindowAction {
 
         SolverTypeCollection solverUnion;
 
         public SMTInvokeAction(SolverTypeCollection solverUnion) {
+            super(MainWindow.this);
             this.solverUnion = solverUnion;
             if (solverUnion != SolverTypeCollection.EMPTY_COLLECTION) {
                 putValue(SHORT_DESCRIPTION, "Invokes " + solverUnion.toString());

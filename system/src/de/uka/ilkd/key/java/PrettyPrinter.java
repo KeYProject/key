@@ -183,7 +183,7 @@ public class PrettyPrinter {
     protected StringBuffer outBuf;
     protected boolean noLinefeed=false;
     protected boolean noSemicolons=false;
-    /**Enforces the output of real Java syntax that can be compiled. See also {@link de.uka.ilkd.key.unittest.ppAndJavaASTExtension.CompilableJavaCardPP}*/
+    /**Enforces the output of real Java syntax that can be compiled. See also {@link de.uka.ilkd.key.testgen.pp.unittest.ppAndJavaASTExtension.CompilableJavaCardPP}*/
      
     protected Type classToPrint = null;
 

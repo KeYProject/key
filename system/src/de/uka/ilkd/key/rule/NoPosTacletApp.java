@@ -434,17 +434,4 @@ public class NoPosTacletApp extends TacletApp {
 	    .equals ( p_mc.getInstantiations ().getUpdateContext () );
     }
 
-    
-    @Override
-    public boolean equals(Object o) {
-    	if (o == this) return true;
-    	if (!(o instanceof NoPosTacletApp)) return false;
-    	return super.equals(o);
-    }
-    
-    
-    @Override
-    public int hashCode() {
-    	return super.hashCode();
-    }    
-}
+ }

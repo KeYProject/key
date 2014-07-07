@@ -138,6 +138,10 @@ public class TacletSchemaVariableCollector extends DefaultVisitor {
         return result;
     }
     
+    /** @return list of found Variables */
+    public Iterable<SchemaVariable> vars() {
+   return varList;
+    }
     
     /** @return iterator of the found Variables */
     public Iterator<SchemaVariable> varIterator() {

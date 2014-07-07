@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.ldt;
 
-
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -137,13 +135,6 @@ public abstract class LDT implements Named {
      */
     public final Sort targetSort() {
 	return sort;
-    }
-
-    /**
-     *  Called each time proof settings are updated in case the LDT
-     *  wants to change its behaviour based on new settings
-     */
-    public void proofSettingsUpdated(ProofSettings settings) {    	
     }
     
     public boolean containsFunction(Function op) {

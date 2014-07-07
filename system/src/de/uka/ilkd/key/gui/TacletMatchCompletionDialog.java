@@ -36,6 +36,7 @@ import javax.swing.table.TableCellRenderer;
 
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.utilities.BracketMatchingTextArea;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.Taclet;
@@ -139,14 +140,17 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
     public static ApplyTacletDialogModel createModel(TacletApp app, Goal goal, 
                                                      KeYMediator medi) {
-        return new ApplyTacletDialogModel(
+       final Namespace progVars = new Namespace(); 
+       progVars.add(goal.getGlobalProgVars());
+       
+       return new ApplyTacletDialogModel(
             app, goal.sequent(), medi.getServices(),
 	    new NamespaceSet(medi.var_ns(),
 			     medi.func_ns(),
 			     medi.sort_ns(),
 			     medi.heur_ns(),
 			     medi.choice_ns(),
-			     goal.createGlobalProgVarNamespace()),
+			     progVars),
 	    medi.getNotationInfo().getAbbrevMap(),
 	    goal);
     }

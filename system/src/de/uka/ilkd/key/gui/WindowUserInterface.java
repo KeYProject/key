@@ -25,6 +25,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -148,6 +149,7 @@ public class WindowUserInterface extends AbstractUserInterface {
             }
             mainWindow.displayResults(info.toString());
         } else if (info.getSource() instanceof ProblemLoader) {
+            resetStatus(this);
             if (info.getResult() != null) {
                 final KeYExceptionHandler exceptionHandler = ((ProblemLoader) info
                         .getSource()).getExceptionHandler();
@@ -155,7 +157,6 @@ public class WindowUserInterface extends AbstractUserInterface {
                         mainWindow, exceptionHandler.getExceptions());
                 exceptionHandler.clear();
             } else {
-                resetStatus(this);
                 KeYMediator mediator = mainWindow.getMediator();
                 mediator.getNotationInfo().refresh(
                         mediator.getServices());
@@ -201,12 +202,13 @@ public class WindowUserInterface extends AbstractUserInterface {
     @Override
     public void notifyAutoModeBeingStarted() {
         mainWindow.setCursor(new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));
+        super.notifyAutoModeBeingStarted();
     }
 
     @Override
     public void notifyAutomodeStopped() {
-        mainWindow
-        .setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        mainWindow.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        super.notifyAutomodeStopped();
     }
 
     @Override
@@ -311,5 +313,11 @@ public class WindowUserInterface extends AbstractUserInterface {
            Runtime r = Runtime.getRuntime();
            r.gc();
        }
+   }
+
+   @Override
+   public boolean selectProofObligation(InitConfig initConfig) {
+      ProofManagementDialog.showInstance(initConfig);
+      return ProofManagementDialog.startedProof();
    }
 }
