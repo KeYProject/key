@@ -28,7 +28,7 @@ public class ProofInfo {
 	public ProofInfo(Proof proof) {
 		this.proof = proof;
 		this.services = proof.getServices();
-		getCode();
+		//getCode();
 	}
 
 	public IProgramMethod getMUT(){		
