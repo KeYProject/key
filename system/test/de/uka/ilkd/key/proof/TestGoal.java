@@ -158,9 +158,9 @@ public class TestGoal extends TestCase {
                  assertNotNull
                  (proof.openGoals().tail().head().indexOfTaclets().lookup("imp_left"));
                  } else {
-                 assertNotNull
+                 assertNull
                  (proof.openGoals().head().indexOfTaclets().lookup("imp_left"));
-                 assertNotNull
+                 assertNull
                  (proof.openGoals().tail().head().indexOfTaclets().lookup("imp_right"));
                  }
                  assertNull(proof.openGoals().head().indexOfTaclets().lookup("or_left"));

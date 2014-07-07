@@ -47,6 +47,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -240,6 +241,7 @@ public abstract class Taclet implements Rule, Named {
 	}	
     }
 
+    
     /** 
      * computes and returns all variables that occur bound in the taclet
      * including the taclets defined in <tt>addrules</tt> sections. The result
@@ -801,34 +803,37 @@ public abstract class Taclet implements Rule, Named {
      */
     public boolean equals(Object o) {
         if (o == this) return true;
+        
+        if (o == null || o.getClass() != this.getClass() ){
+           return false;
+        }	
 
-        if ( ! ( o instanceof Taclet ) ){
-	    return false;
-	}	
-	      
-	final Taclet t2 = (Taclet)o;
+        final Taclet t2 = (Taclet)o;
+        if (!name.equals(t2.name)) { 
+           return false;
+        }
 
-	if (!name.equals(t2.name)) return false;
+        if ((ifSequent == null && t2.ifSequent != null) || 
+              (ifSequent != null && t2.ifSequent == null)) {
+           return false;
+        } else if (ifSequent != null && !ifSequent.equals(t2.ifSequent)) {
+           return false;
+        }
+         
+        if (!choices.equals(t2.choices)) {
+           return false;
+        }
 
-        final Iterator<Choice> it1 = choices.iterator();
-	        
-	while (it1.hasNext()) {
-            final Choice c1 = it1.next(); 
-            final Iterator<Choice> it2 = t2.getChoices().iterator();
-	    while (it2.hasNext()){
-                final Choice c2 = it2.next();
-		if(c1 != c2 && c1.category().equals(c2.category())){
-		    return false;
-		}
-	    }
-	}
-
+       if (!goalTemplates.equals(t2.goalTemplates)) {
+          return false;
+       }
+        
         return true;
     }
 
     public int hashCode() {
         if (hashcode == 0) {
-	    hashcode = 37 * name.hashCode() + 17;
+           hashcode = 37 * name.hashCode() + 17;
             if (hashcode == 0) {
                 hashcode = -1;
             }
@@ -1062,63 +1067,52 @@ public abstract class Taclet implements Rule, Named {
      * the instantiations of the schemavariables
      */
     protected void applyAddrule(ImmutableList<Taclet> rules, Goal goal, 
-				Services services,
-				MatchConditions matchCond) {
-                                
-	final Iterator<Taclet> it = rules.iterator();
-	while (it.hasNext()) {
-	    Taclet tacletToAdd = it.next(); 
-	    String uniqueTail=""; // we need to name the new taclet uniquely
-            if ("".equals(uniqueTail)) { // otherwise just number it
-               de.uka.ilkd.key.proof.Node n = goal.node();
-               uniqueTail = AUTONAME+n.getUniqueTacletNr()+"_"+n.parent().siblingNr();
-            }
+          Services services,
+          MatchConditions matchCond) {
 
-            tacletToAdd=tacletToAdd.setName(tacletToAdd.name()+uniqueTail);
+       for (Taclet tacletToAdd : rules) { 
+          final Node n = goal.node();
+          final StringBuilder uniqueTail = new StringBuilder(tacletToAdd.name().toString());                   
+          uniqueTail.append(AUTONAME).append(n.getUniqueTacletId());
+          tacletToAdd = tacletToAdd.setName(uniqueTail.toString());
 
 
-	    // the new Taclet may contain variables with a known
-	    // instantiation. These must be used by the new Taclet and all
-	    // further rules it contains in the addrules-sections. Therefore all
-	    // appearing (including the addrules) SchemaVariables have to be
-	    // collected, then it is looked if an instantiation is known and if
-	    // positive the instantiation is memorized. At last the Taclet with
-	    // its required instantiations is handed over to the goal, where a
-	    // new TacletApp should be built including the necessary instantiation
-	    // information
+          // the new Taclet may contain variables with a known
+          // instantiation. These must be used by the new Taclet and all
+          // further rules it contains in the addrules-sections. Therefore all
+          // appearing (including the addrules) SchemaVariables have to be
+          // collected, then it is looked if an instantiation is known and if
+          // positive the instantiation is memorized. At last the Taclet with
+          // its required instantiations is handed over to the goal, where a
+          // new TacletApp should be built including the necessary instantiation
+          // information
 
-	    SVInstantiations neededInstances = SVInstantiations.
-		EMPTY_SVINSTANTIATIONS.addUpdateList
-		(matchCond.getInstantiations ().getUpdateContext());
-	    final TacletSchemaVariableCollector collector = new
-		TacletSchemaVariableCollector(); 
-	    collector.visit(tacletToAdd, true);// true, because
-	                                     // descend into
-					     // addrules
-	    final Iterator<SchemaVariable> svIt = collector.varIterator();
-	    while (svIt.hasNext()) {
-		SchemaVariable sv = svIt.next();
-		if (matchCond.getInstantiations ().isInstantiated(sv)) {
-		    neededInstances = neededInstances.add(
-			    	sv, 
-			    	matchCond.getInstantiations ().getInstantiationEntry(sv), 
-				services);
-		} 
-	    }
+          SVInstantiations neededInstances = SVInstantiations.
+                EMPTY_SVINSTANTIATIONS.addUpdateList
+                (matchCond.getInstantiations ().getUpdateContext());
+          final TacletSchemaVariableCollector collector = new
+                TacletSchemaVariableCollector(); 
+          collector.visit(tacletToAdd, true);// true, because
+          // descend into addrules
+          for (SchemaVariable sv : collector.vars()) {
+             if (matchCond.getInstantiations ().isInstantiated(sv)) {
+                neededInstances = neededInstances.add(
+                      sv, 
+                      matchCond.getInstantiations ().getInstantiationEntry(sv), 
+                      services);
+             } 
+          }
 
-	    {
-		final ImmutableList<GenericSortCondition>     cs  =
-		    matchCond.getInstantiations ()
-		    .getGenericSortInstantiations ().toConditions ();
-		final Iterator<GenericSortCondition> cit = cs.iterator ();
+          final ImmutableList<GenericSortCondition>     cs  =
+                matchCond.getInstantiations ()
+                .getGenericSortInstantiations ().toConditions ();
 
-		while ( cit.hasNext () )
-		    neededInstances = neededInstances.add(cit.next (), 
-			    				  services );
-	    }
+          for (final GenericSortCondition gsc : cs) {
+             neededInstances = neededInstances.add(gsc, services );
+          }
 
-	    goal.addTaclet(tacletToAdd, neededInstances, true);
-	}
+          goal.addTaclet(tacletToAdd, neededInstances, true);
+       }
     }
 
 
@@ -1128,33 +1122,33 @@ public abstract class Taclet implements Rule, Named {
                                     PosInOccurrence posOfFind,
                                     Services services, 
                                     MatchConditions matchCond) {
-        ImmutableList<RenamingTable> renamings = ImmutableSLList.<RenamingTable>nil();
-	for (final SchemaVariable sv : pvs) {
-	    ProgramVariable inst
-		= (ProgramVariable)matchCond.getInstantiations ().getInstantiation(sv);
-	    //if the goal already contains the variable to be added 
-	    //(not just a variable with the same name), then there is nothing to do
-	    if(goal.getGlobalProgVars().contains(inst)) {
-		continue;
-	    }
-	    
-	    final VariableNamer vn = services.getVariableNamer();
-	    ProgramVariable renamedInst = vn.rename(inst, goal, posOfFind);
-	    goal.addProgramVariable(renamedInst);
-	    goal.proof().getServices().addNameProposal(renamedInst.name());
-            
-            HashMap<ProgramVariable, ProgramVariable> renamingMap =
-                    vn.getRenamingMap();
-            if (!renamingMap.isEmpty()) {        
-                //execute renaming
-                ProgVarReplacer pvr = new ProgVarReplacer(vn.getRenamingMap(), services);
-                pvr.replace(goal);
-                final RenamingTable rt = 
-                RenamingTable.getRenamingTable(vn.getRenamingMap());
-                renamings = renamings.append(rt);
-            }
-	}
-	goal.node().setRenamings(renamings);
+       ImmutableList<RenamingTable> renamings = ImmutableSLList.<RenamingTable>nil();
+       for (final SchemaVariable sv : pvs) {
+          final ProgramVariable inst 
+          = (ProgramVariable)matchCond.getInstantiations ().getInstantiation(sv);
+          //if the goal already contains the variable to be added 
+          //(not just a variable with the same name), then there is nothing to do
+          if(goal.getGlobalProgVars().contains(inst)) {
+             continue;
+          }
+
+          final VariableNamer vn = services.getVariableNamer();
+          final ProgramVariable renamedInst = vn.rename(inst, goal, posOfFind);
+          goal.addProgramVariable(renamedInst);
+          goal.proof().getServices().addNameProposal(renamedInst.name());
+
+          HashMap<ProgramVariable, ProgramVariable> renamingMap =
+                vn.getRenamingMap();
+          if (!renamingMap.isEmpty()) {        
+             //execute renaming
+             final ProgVarReplacer pvr = new ProgVarReplacer(vn.getRenamingMap(), services);
+             pvr.replace(goal);
+             final RenamingTable rt = 
+                   RenamingTable.getRenamingTable(vn.getRenamingMap());
+             renamings = renamings.append(rt);
+          }
+       }
+       goal.node().setRenamings(renamings);
     }
 
 
@@ -1263,9 +1257,9 @@ public abstract class Taclet implements Rule, Named {
 	    svc.visit( ifSequent () );
 	    
 	    ifVariables                 = DefaultImmutableSet.<SchemaVariable>nil();
-	    Iterator<SchemaVariable> it = svc.varIterator ();
-	    while ( it.hasNext () )
-		ifVariables = ifVariables.add ( it.next () );
+	    for (final SchemaVariable sv : svc.vars()) {
+		  ifVariables = ifVariables.add ( sv );
+	    }
 	}
 
 	return ifVariables;
@@ -1366,6 +1360,7 @@ public abstract class Taclet implements Rule, Named {
 
     StringBuffer toStringAttribs(StringBuffer sb) {
 //	if (noninteractive()) sb = sb.append(" \\noninteractive");
+       sb.append("\nChoices: ").append(choices);
 	return sb;
     }
     

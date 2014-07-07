@@ -29,6 +29,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -159,6 +160,20 @@ public final class SpecificationRepository {
     // internal methods
     // -------------------------------------------------------------------------
 
+    private static String getUniqueNameForObserver(IObserverFunction obs) {
+       StringBuffer sb = new StringBuffer(obs.name().toString());
+       
+       if (obs.isStatic()) {
+          sb.append("_static_");
+       }
+       
+       for (KeYJavaType pType : obs.getParamTypes()) {
+          sb.append(pType.getFullName());
+       }
+       
+       return sb.toString();
+    }
+    
     private static Taclet getLimitedToUnlimitedTaclet(IObserverFunction limited,
                                                       IObserverFunction unlimited, 
                                                       TermServices services) {
@@ -182,8 +197,7 @@ public final class SpecificationRepository {
                 Sequent.EMPTY_SEQUENT, ImmutableSLList.<Taclet> nil(),
                 unlimitedTerm));
         tacletBuilder.setName(MiscTools.toValidTacletName("unlimit "
-                + unlimited.name()));
-
+                + getUniqueNameForObserver(unlimited)));
         return tacletBuilder.getTaclet();
     }
 
@@ -215,7 +229,7 @@ public final class SpecificationRepository {
                         subs)));
         tacletBuilder.setApplicationRestriction(RewriteTaclet.IN_SEQUENT_STATE);
         tacletBuilder.setName(MiscTools.toValidTacletName("limit "
-                + unlimited.name()));
+                + getUniqueNameForObserver(unlimited)));
         tacletBuilder.addRuleSet(new RuleSet(new Name("limitObserver")));
 
         return tacletBuilder.getTaclet();
@@ -365,7 +379,7 @@ public final class SpecificationRepository {
             }
             for (ClassAxiom ax : e.getValue()) {
                 if (JavaInfo.isVisibleTo(ax, visibleTo)) {
-                    result = result.add(ax);
+                   result = result.add(ax);
                 }
             }
         }
@@ -1035,6 +1049,7 @@ public final class SpecificationRepository {
         }
     }
 
+    
     /**
      * Returns all class axioms visible in the passed class, including the
      * axioms induced by invariant declarations.
@@ -1044,7 +1059,6 @@ public final class SpecificationRepository {
         if (result == null) {
             // get visible registered axioms of other classes
             result = getVisibleAxiomsOfOtherClasses(selfKjt);
-
             // add registered axioms of own class
             ImmutableSet<ClassAxiom> ownAxioms = axioms.get(selfKjt);
             if (ownAxioms != null) {
@@ -1052,6 +1066,7 @@ public final class SpecificationRepository {
                     result = result.add(ax);
                 }
             }
+
             final JavaInfo ji = services.getJavaInfo();
 
             // add invariant axiom for own class and other final classes
@@ -1067,6 +1082,7 @@ public final class SpecificationRepository {
                 invDef = tb.tf().createTerm(Equality.EQV,
                         tb.inv(tb.var(selfVar)), invDef);
                 final IObserverFunction invSymbol = services.getJavaInfo().getInv();
+                
                 final ClassAxiom invRepresentsAxiom
                 = new RepresentsAxiom("Class invariant axiom for " + kjt.getFullName(),
                                       invSymbol,
@@ -1079,14 +1095,21 @@ public final class SpecificationRepository {
                                       null);
                 result = result.add(invRepresentsAxiom);
             }
-
             // add query axioms for own class
             for (IProgramMethod pm : services.getJavaInfo()
                     .getAllProgramMethods(selfKjt)) {
                 if (!pm.isVoid() && !pm.isConstructor() && !pm.isImplicit() && !pm.isModel()) {
                     pm = services.getJavaInfo().getToplevelPM(selfKjt, pm);
+
+                    StringBuffer sb = new StringBuffer();
+                    for (KeYJavaType pd : pm.getParamTypes()) {
+                       sb.append(pd.getJavaType().getFullName());
+                       sb.append("_");
+                    }
+                
+                    
                     final ClassAxiom queryAxiom
-                    = new QueryAxiom("Query axiom for " + pm.getName() +
+                    = new QueryAxiom("Query axiom for " + pm.getName() + "_" + sb +
                                          " in " + selfKjt.getFullName(),
                                      pm,
                                      selfKjt);
