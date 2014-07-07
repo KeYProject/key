@@ -31,25 +31,43 @@ import org.antlr.runtime.RecognitionException;
  */
 public class KeYParserF extends KeYParser {
 
+    private static boolean isSelectTerm(Term term) {
+        return term.op().name().toString().endsWith("::select") && term.arity() == 3;
+    }
+
+    private static boolean isImplicitHeap(Term t) {
+        // there is probably something better than using String comparison here
+        return t.toString().equals("heap");
+    }
+
+    private Term replaceHeap(Term term, Term heap, int depth) throws RecognitionException {
+        if (depth > 0) {
+
+            if (!isSelectTerm(term)) {
+                semanticError("Expecting select term of arity 3 before '@', not: " + term);
+            }
+
+            if (!isImplicitHeap(term.sub(0))) {
+                semanticError("Expecting implicit heap as first argument of: " + term);
+            }
+
+            Term[] params = new Term[]{heap, replaceHeap(term.sub(1), heap, depth - 1), term.sub(2)};
+            return (getServices().getTermFactory().createTerm(term.op(), params));
+
+        } else {
+            return term;
+        }
+    }
+
     @Override
     protected Term heapSelectionSuffix(Term term, Term heap) throws RecognitionException {
-        Term result;
 
         if (!isHeapTerm(heap)) {
-            semanticError("Heap term expected, not sort + " + heap.sort());
+            semanticError("Expecting term of type Heap but sort is " + heap.sort()
+                    + "for term: " + term);
         }
-        if (term.arity() == 0 || !isHeapTerm(term.sub(0))) {
-            semanticError("select or an observer expected before '@', not " + term);
-        }
-        /////// WORK TO BE DONE! ///// REPLACE THE HEAP
-        result = term;
-        {
-            System.out.println(term.subs().size());
-            for (Term t : term.subs()) {
-                System.out.println(t);
-            }
-            System.out.println("\nX\n" + result + "\nX\n");
-        }
+
+        Term result = replaceHeap(term, heap, globalImplicitHeapSuffixCounter);
 
         // reset globalImplicitHeapSuffixCounter
         globalImplicitHeapSuffixCounter = 0;
