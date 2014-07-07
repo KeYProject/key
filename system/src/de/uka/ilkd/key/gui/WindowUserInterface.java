@@ -202,12 +202,13 @@ public class WindowUserInterface extends AbstractUserInterface {
     @Override
     public void notifyAutoModeBeingStarted() {
         mainWindow.setCursor(new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));
+        super.notifyAutoModeBeingStarted();
     }
 
     @Override
     public void notifyAutomodeStopped() {
-        mainWindow
-        .setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        mainWindow.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        super.notifyAutomodeStopped();
     }
 
     @Override
