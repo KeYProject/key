@@ -169,7 +169,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	}
 
 	public boolean useRFL() {
-		return useJunit;
+		return useRFL;
 	}
 
 	public boolean useJunit() {
