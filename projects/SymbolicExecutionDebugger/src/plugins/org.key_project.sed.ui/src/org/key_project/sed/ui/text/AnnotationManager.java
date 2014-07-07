@@ -19,6 +19,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -219,12 +220,24 @@ public class AnnotationManager implements IDisposable {
                Object next = iter.next();
                if (next instanceof SymbolicallyReachedAnnotation) {
                   SymbolicallyReachedAnnotation annotation = (SymbolicallyReachedAnnotation)next;
-                  if (target == annotation.getTarget()) {
-                     model.removeAnnotation(annotation);
-                  }
+                  removeTarget(model, annotation, target);
                }
             }
          }
+      }
+   }
+
+   /**
+    * Removes the given {@link ISEDDebugTarget} from the {@link SymbolicallyReachedAnnotation}
+    * and the {@link SymbolicallyReachedAnnotation} if empty from the {@link IAnnotationModel}.
+    * @param model The {@link IAnnotationModel}.
+    * @param annotation The {@link SymbolicallyReachedAnnotation} to {@link ISEDDebugTarget} in.
+    * @param target The {@link ISEDDebugTarget} to remove.
+    */
+   protected void removeTarget(IAnnotationModel model, SymbolicallyReachedAnnotation annotation, ISEDDebugTarget target) {
+      annotation.removeTarget(target);
+      if (!annotation.hasTargets()) {
+         model.removeAnnotation(annotation);
       }
    }
 
@@ -236,62 +249,34 @@ public class AnnotationManager implements IDisposable {
       IEditorReference[] editorReferences = debugView.getSite().getPage().getEditorReferences();
       for (IEditorReference reference : editorReferences) {
          IEditorPart editor = reference.getEditor(false);
-         showAnnotations(editor, target);
+         updateAnnotations(editor, target);
       }
    }
    
    /**
-    * Shows all annotations in the given {@link IEditorPart} of the given {@link ISEDDebugTarget}.
-    * @param editor The {@link IEditorPart} to highlight text ranges in.
-    * @param target The {@link ISEDDebugTarget} which provides the reached source code.
+    * Computes the {@link Position} of the given {@link ISEDSourceRange} in the given {@link IDocument}.
+    * @param document The {@link IDocument} to compute the {@link Position} in.
+    * @param range The {@link ISEDSourceRange}.
+    * @return The computed {@link Position} or {@code null} if not available.
     */
-   protected void showAnnotations(IEditorPart editor, ISEDDebugTarget target) {
-      if (editor instanceof ITextEditor) {
-         ITextEditor te = (ITextEditor)editor;
-         IDocumentProvider provider = te.getDocumentProvider();
-         IAnnotationModel model = provider.getAnnotationModel(editor.getEditorInput());
-         IDocument document = provider.getDocument(editor.getEditorInput());
-         Object editorSource = getEditorSource(editor);
-         if (editorSource != null) {
-            ISEDSourceModel sourceModel = target.getSourceModel();
-            ISEDSourceSummary summary = sourceModel.getSourceSummary(editorSource);
-            if (summary != null) {
-               for (ISEDSourceRange range : summary.getSourceRanges()) {
-                  createAndAddAnnotation(target, range, provider, document, model);
+   protected Position computePosition(IDocument document, ISEDSourceRange range) {
+      if (range.getCharStart() >= 0 && range.getCharEnd() >= range.getCharStart()) {
+         return new Position(range.getCharStart(), range.getCharEnd() - range.getCharStart());
+      }
+      else if (range.getLineNumber() >= 0) {
+         try {
+            if (document != null) {
+               IRegion line = document.getLineInformation(range.getLineNumber());
+               if (line != null) {
+                  return new Position(line.getOffset(), line.getLength());
                }
             }
          }
-      }
-   }
-   
-   /**
-    * Creates a new {@link SymbolicallyReachedAnnotation} for the given {@link ISEDSourceRange}.
-    * @param target The {@link ISEDDebugTarget} which provides the reached source code.
-    * @param range The {@link ISEDSourceRange} to highlight.
-    * @param provider The {@link IDocumentProvider} to use.
-    * @param document The {@link IDocument} to highlight text in.
-    * @param model The {@link IAnnotationModel} to use.
-    */
-   protected void createAndAddAnnotation(ISEDDebugTarget target, 
-                                         ISEDSourceRange range, 
-                                         IDocumentProvider provider, 
-                                         IDocument document, 
-                                         IAnnotationModel model) {
-      try {
-         SymbolicallyReachedAnnotation annotation = new SymbolicallyReachedAnnotation(target, range);
-         if (range.getCharStart() >= 0 && range.getCharEnd() >= range.getCharStart()) {
-            model.addAnnotation(annotation, new Position(range.getCharStart(), range.getCharEnd() - range.getCharStart()));
-         }
-         else if (range.getLineNumber() >= 0) {
-            if (document != null) {
-               IRegion line = document.getLineInformation(17);
-               model.addAnnotation(annotation, new Position(line.getOffset(), line.getLength()));
-            }
+         catch (BadLocationException e) {
+            LogUtil.getLogger().logError(e);
          }
       }
-      catch (BadLocationException e) {
-         LogUtil.getLogger().logError(e);
-      }
+      return null;
    }
 
    /**
@@ -331,31 +316,48 @@ public class AnnotationManager implements IDisposable {
     * @param target The {@link ISEDDebugTarget} to update its annotations.
     */
    protected void updateAnnotations(ISEDDebugTarget target) {
-      ISEDSourceModel sourceModel = target.getSourceModel();
       IEditorReference[] editorReferences = debugView.getSite().getPage().getEditorReferences();
       for (IEditorReference reference : editorReferences) {
          IEditorPart editor = reference.getEditor(false);
-         if (editor instanceof ITextEditor) {
+         updateAnnotations(editor, target);
+      }
+   }
+   
+   /**
+    * Updates the {@link Annotation}s in the given {@link IEditorPart} for the given {@link ISEDDebugTarget}.
+    * @param editor The {@link IEditorPart} to update its {@link Annotation}s.
+    * @param target The {@link ISEDDebugTarget} to handle.
+    */
+   protected void updateAnnotations(IEditorPart editor, ISEDDebugTarget target) {
+      if (editor instanceof ITextEditor) {
+         Object editorSource = getEditorSource(editor);
+         ISEDSourceModel sourceModel = target.getSourceModel();
+         ISEDSourceSummary summary = sourceModel.getSourceSummary(editorSource);
+         if (summary != null) {
             ITextEditor te = (ITextEditor)editor;
             IDocumentProvider provider = te.getDocumentProvider();
             IAnnotationModel model = provider.getAnnotationModel(editor.getEditorInput());
             IDocument document = provider.getDocument(editor.getEditorInput());
-            Object editorSource = getEditorSource(editor);
             if (editorSource != null) {
-               Map<ISEDSourceRange, SymbolicallyReachedAnnotation> existingAnnotations = createAnnotationRangeMap(model);
-               // Add new annotations.
-               ISEDSourceSummary summary = sourceModel.getSourceSummary(editorSource);
-               if (summary != null) {
-                  for (ISEDSourceRange range : summary.getSourceRanges()) {
-                     SymbolicallyReachedAnnotation annotation = existingAnnotations.remove(range);
+               Map<Position, SymbolicallyReachedAnnotation> existingAnnotations = createAnnotationRangeMap(model);
+               // Update existing annotations and add new annotations if not already present.
+               for (ISEDSourceRange range : summary.getSourceRanges()) {
+                  Position position = computePosition(document, range);
+                  if (position != null) {
+                     SymbolicallyReachedAnnotation annotation = existingAnnotations.remove(position);
                      if (annotation == null) {
-                        createAndAddAnnotation(target, range, provider, document, model);
+                        annotation = new SymbolicallyReachedAnnotation(position);
+                        annotation.setRange(target, range);
+                        model.addAnnotation(annotation, position);
+                     }
+                     else {
+                        annotation.setRange(target, range);
                      }
                   }
                }
                // Remove no longer needed annotations.
                for (SymbolicallyReachedAnnotation annotation : existingAnnotations.values()) {
-                  model.removeAnnotation(annotation);
+                  removeTarget(model, annotation, target);
                }
             }
          }
@@ -365,16 +367,16 @@ public class AnnotationManager implements IDisposable {
    /**
     * Lists all {@link SymbolicallyReachedAnnotation} in the given {@link IAnnotationModel}.
     * @param model The {@link IAnnotationModel} to analyze.
-    * @return The found {@link SymbolicallyReachedAnnotation}.
+    * @return The found {@link SymbolicallyReachedAnnotation}s.
     */
-   protected Map<ISEDSourceRange, SymbolicallyReachedAnnotation> createAnnotationRangeMap(IAnnotationModel model) {
-      Map<ISEDSourceRange, SymbolicallyReachedAnnotation> result = new HashMap<ISEDSourceRange, SymbolicallyReachedAnnotation>();
+   protected Map<Position, SymbolicallyReachedAnnotation> createAnnotationRangeMap(IAnnotationModel model) {
+      Map<Position, SymbolicallyReachedAnnotation> result = new HashMap<Position, SymbolicallyReachedAnnotation>();
       Iterator<?> iter = model.getAnnotationIterator();
       while (iter.hasNext()) {
          Object next = iter.next();
          if (next instanceof SymbolicallyReachedAnnotation) {
             SymbolicallyReachedAnnotation annotation = (SymbolicallyReachedAnnotation)next;
-            result.put(annotation.getRange(), annotation);
+            result.put(annotation.getPosition(), annotation);
          }
       }
       return result;
@@ -387,7 +389,7 @@ public class AnnotationManager implements IDisposable {
    protected void handlePartOpened(IWorkbenchPart part) {
       if (annotatedDebugTargets != null && part instanceof IEditorPart) {
          for (ISEDDebugTarget target : annotatedDebugTargets) {
-            showAnnotations((IEditorPart)part, target);
+            updateAnnotations((IEditorPart)part, target);
          }
       }
    }
