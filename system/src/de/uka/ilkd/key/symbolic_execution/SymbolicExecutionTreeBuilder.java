@@ -38,9 +38,9 @@ import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -62,14 +62,14 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopCondition;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopStatement;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionTermination;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopInvariant;
-import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.impl.TreeSettings;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.DefaultEntry;
@@ -207,16 +207,20 @@ public class SymbolicExecutionTreeBuilder {
     * Constructor.
     * @param mediator The used {@link KeYMediator} during proof.
     * @param proof The {@link Proof} to extract the symbolic execution tree from.
+    * @param mergeBranchConditions {@code true} merge branch conditions which means that a branch condition never contains another branch condition or {@code false} allow that branch conditions contains branch conditions.
+    * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
+    * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
     */
    public SymbolicExecutionTreeBuilder(KeYMediator mediator, 
                                        Proof proof,
                                        boolean mergeBranchConditions,
+                                       boolean useUnicode,
                                        boolean usePrettyPrinting) {
       assert mediator != null;
       assert proof != null;
       this.mediator = mediator;
       this.proof = proof;
-      this.settings = new TreeSettings(mergeBranchConditions, usePrettyPrinting);
+      this.settings = new TreeSettings(mergeBranchConditions, useUnicode, usePrettyPrinting);
       this.exceptionVariable = SymbolicExecutionUtil.extractExceptionVariable(proof);
       this.startNode = new ExecutionStart(settings, mediator, proof.root());
       this.keyNodeMapping.put(proof.root(), this.startNode);

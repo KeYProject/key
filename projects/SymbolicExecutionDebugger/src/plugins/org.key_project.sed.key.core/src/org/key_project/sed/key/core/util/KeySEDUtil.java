@@ -149,6 +149,11 @@ public final class KeySEDUtil {
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS = "org.key_project.sed.key.core.launch.sed.key.attribute.mergeBranchConditions";
 
     /**
+     * The key of the attribute "use unicode" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_UNICODE = "org.key_project.sed.key.core.launch.sed.key.attribute.useUnicode";
+
+    /**
      * The key of the attribute "use pretty printing" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
      */
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING = "org.key_project.sed.key.core.launch.sed.key.attribute.usePrettyPrinting";
@@ -323,6 +328,16 @@ public final class KeySEDUtil {
      */
     public static boolean isMergeBranchConditions(ILaunchConfiguration configuration) throws CoreException {
         return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, KeYSEDPreferences.isMergeBranchConditions()) : KeYSEDPreferences.isMergeBranchConditions();
+    }
+    
+    /**
+     * Checks if unicode characters should be used.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return {@code true} use unicode characters, {@code false} do not use unicode characters.
+     * @throws CoreException Occurred Exception.
+     */
+    public static boolean isUseUnicode(ILaunchConfiguration configuration) throws CoreException {
+        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_UNICODE, KeYSEDPreferences.isUseUnicode()) : KeYSEDPreferences.isUseUnicode();
     }
     
     /**

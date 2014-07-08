@@ -15,11 +15,15 @@ package de.uka.ilkd.key.proof;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 /** class tests the goal, especially the split and set back mechanism. */
@@ -34,8 +38,7 @@ public class TestGoal extends TestCase {
 
         public void setUp() {
                 TacletForTests.parse();
-                proof = new Proof(new Services(AbstractProfile.getDefaultProfile()));
-
+                proof = new Proof("", new Services(AbstractProfile.getDefaultProfile()));     
         }
 
         public void tearDown() {
@@ -50,9 +53,17 @@ public class TestGoal extends TestCase {
                                                                                 TacletForTests.parseTerm("A")))
                                                 .semisequent());
 
-                Node root = new Node(proof, seq);
-                proof.setRoot(root);
-                Goal g = new Goal(root, new RuleAppIndex(new TacletAppIndex(new TacletIndex(), proof.getServices()), new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices()));
+                proof = new Proof("", 
+                                  seq,
+                                  "",
+                                  new TacletIndex(),
+                                  new BuiltInRuleIndex(),                      
+                      new Services(AbstractProfile.getDefaultProfile()), new ProofSettings(ProofSettings.DEFAULT_SETTINGS));     
+                
+                
+                proof.setProofEnv(new ProofEnvironment(new InitConfig(proof.getServices())));
+                
+                Goal g = proof.openGoals().head();//new Goal(proof.root(), new RuleAppIndex(new TacletAppIndex(new TacletIndex(), proof.getServices()), new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices()));
                 ImmutableList<Goal> lg = g.split(3);
                 lg.head().addNoPosTacletApp(
                                 TacletForTests.getRules().lookup("imp_right"));

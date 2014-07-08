@@ -120,6 +120,11 @@ public class KeYLaunchSettings {
     * The used boot class path.
     */
    private final File bootClassPath;
+
+   /**
+    * {@code true} use unicode characters, {@code false} do not use unicode characters.
+    */
+   private final boolean useUnicode;
    
    /**
     * Use pretty printing?
@@ -169,6 +174,7 @@ public class KeYLaunchSettings {
                             File location,
                             List<File> classPaths,
                             File bootClassPath,
+                            boolean useUnicode,
                             boolean usePrettyPrinting,
                             boolean showSignatureOnMethodReturnNodes) throws JavaModelException {
       this.newDebugSession = newDebugSession;
@@ -188,6 +194,7 @@ public class KeYLaunchSettings {
       this.location = location;
       this.classPaths = classPaths;
       this.bootClassPath = bootClassPath;
+      this.useUnicode = useUnicode;
       this.usePrettyPrinting = usePrettyPrinting;
       this.showSignatureOnMethodReturnNodes = showSignatureOnMethodReturnNodes;
    }
@@ -326,6 +333,14 @@ public class KeYLaunchSettings {
     */
    public File getBootClassPath() {
       return bootClassPath;
+   }
+
+   /**
+    * Checks if unicode characters are used.
+    * @return {@code true} use unicode characters, {@code false} do not use unicode characters.
+    */
+   public boolean isUseUnicode() {
+      return useUnicode;
    }
 
    /**
