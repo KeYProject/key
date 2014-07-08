@@ -254,11 +254,15 @@ public class SymbolicLayoutExtractor {
    /**
     * Constructor.
     * @param node The {@link Node} of KeY's proof tree to compute memory layouts for.
+    * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
+    * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
     */
-   public SymbolicLayoutExtractor(Node node, boolean usePrettyPrinting) {
+   public SymbolicLayoutExtractor(Node node, 
+                                  boolean useUnicode,
+                                  boolean usePrettyPrinting) {
       assert node != null;
       this.node = node;
-      this.settings = new ModelSettings(usePrettyPrinting);
+      this.settings = new ModelSettings(useUnicode, usePrettyPrinting);
    }
 
    /**

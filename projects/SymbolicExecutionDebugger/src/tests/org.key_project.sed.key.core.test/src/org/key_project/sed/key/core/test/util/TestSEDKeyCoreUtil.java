@@ -135,6 +135,7 @@ public final class TestSEDKeyCoreUtil {
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node? Use {@code null} to use default value.
     * @param showKeYMainWindow Show KeY's main window? Use {@code null} to use default value.
     * @param mergeBranchConditions Merge branch conditions?
+    * @param useUnicode Use unicode characters?
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @throws Exception Occurred Exception.
@@ -146,6 +147,7 @@ public final class TestSEDKeyCoreUtil {
                                 final Boolean showVariablesOfSelectedDebugNode,
                                 final Boolean showKeYMainWindow,
                                 final Boolean mergeBranchConditions,
+                                final Boolean useUnicode,
                                 final Boolean usePrettyPrinting,
                                 final Boolean showSignatureOnMethodReturnNodes) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
@@ -181,6 +183,9 @@ public final class TestSEDKeyCoreUtil {
                }
                if (mergeBranchConditions != null) {
                   wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, mergeBranchConditions);
+               }
+               if (useUnicode != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_UNICODE, useUnicode);
                }
                if (usePrettyPrinting != null) {
                   wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING, usePrettyPrinting);

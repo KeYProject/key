@@ -1181,6 +1181,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.FALSE,
+                           Boolean.FALSE,
                            Boolean.TRUE, 
                            6, executor);
    }
@@ -1345,6 +1346,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.valueOf(showKeYMainWindow),
                            Boolean.valueOf(mergeBranchConditions),
                            Boolean.FALSE,
+                           Boolean.FALSE,
                            Boolean.TRUE, 
                            timeoutFactor, executor);
    }
@@ -1466,6 +1468,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.TRUE,
                            Boolean.FALSE,
                            Boolean.FALSE,
+                           Boolean.FALSE,
                            Boolean.TRUE, 
                            8, executor);
    }
@@ -1563,6 +1566,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE,
+                           Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE, 
