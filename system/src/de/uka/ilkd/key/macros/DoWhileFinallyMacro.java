@@ -64,10 +64,10 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
                     new CompositePTListener(getListener(), listener);
             cptl.taskStarted(getProofMacro().getName(), 0);
             info = getProofMacro().applyTo(mediator, goals, posInOcc, cptl);
+            cptl.taskFinished(info);
             steps -= info.getAppliedRules();
             setNumberSteps(steps);
             info = new ProofMacroFinishedInfo(this, info);
-            cptl.taskFinished(info);
             goals = getGoals();
             posInOcc = null;
         }
