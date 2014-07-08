@@ -12,24 +12,40 @@
 //
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
-import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
-import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.strategy.*;
-import de.uka.ilkd.key.util.Debug;
-
 import java.util.Iterator;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
+import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.RuleAppIndex;
+import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.IfFormulaInstSeq;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
+import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
+import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.util.Debug;
 
 public class InteractiveProver implements InterruptListener {
 
@@ -61,8 +77,6 @@ public class InteractiveProver implements InterruptListener {
      * the mediator
      */
     private final KeYMediator mediator;
-
-    private boolean resumeAutoMode = false;
 
     private AutoModeWorker worker;
 
@@ -132,14 +146,6 @@ public class InteractiveProver implements InterruptListener {
         for (AutoModeListener aListenerList : listenerList) {
             aListenerList.autoModeStopped(e);
         }
-    }
-
-    void setResumeAutoMode(boolean b) {
-        resumeAutoMode = b;
-    }
-
-    public boolean resumeAutoMode() {
-        return resumeAutoMode;
     }
 
     /**
