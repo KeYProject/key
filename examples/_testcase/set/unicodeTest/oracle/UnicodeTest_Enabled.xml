@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="UnicodeTest.magic(x,y);" pathCondition="true" pathConditionChanged="false">
+      <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+         </value>
+      </variable>
+      <branchStatement name="if (x&amp;y)" pathCondition="true" pathConditionChanged="false">
+         <variable name="x" arrayIndex="-1" isArrayIndex="false">
+            <value name="x {true}" typeString="boolean" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            </value>
+         </variable>
+         <variable name="y" arrayIndex="-1" isArrayIndex="false">
+            <value name="y {true}" typeString="boolean" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            </value>
+         </variable>
+         <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            </value>
+         </variable>
+         <callStackEntry path="/0"/>
+         <branchCondition name="x = TRUE ∧ y = TRUE" pathCondition="x = TRUE ∧ y = TRUE" pathConditionChanged="true" branchCondition="x = TRUE ∧ y = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <callStackEntry path="/0"/>
+            <statement name="return 1;" pathCondition="x = TRUE ∧ y = TRUE" pathConditionChanged="false">
+               <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                  <value name="x {true}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="y" arrayIndex="-1" isArrayIndex="false">
+                  <value name="y {true}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <callStackEntry path="/0"/>
+               <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of UnicodeTest.magic(x,y);&gt;" pathCondition="x = TRUE ∧ y = TRUE" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 1 as result of magic&gt;" signatureIncludingReturnValue="&lt;return 1 as result of UnicodeTest.magic(x,y);&gt;" isReturnValueComputed="true">
+                  <methodReturnValue name="1" returnValueString="1" hasCondition="false">
+                  </methodReturnValue>
+                  <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                     <value name="x {true}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="y" arrayIndex="-1" isArrayIndex="false">
+                     <value name="y {true}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <callStackEntry path="/0"/>
+                  <termination name="&lt;end&gt;" pathCondition="x = TRUE ∧ y = TRUE" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                  </termination>
+               </methodReturn>
+            </statement>
+         </branchCondition>
+         <branchCondition name="¬x = TRUE ∨ ¬y = TRUE" pathCondition="¬(y = TRUE ∧ x = TRUE)" pathConditionChanged="true" branchCondition="¬x = TRUE ∨ ¬y = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <callStackEntry path="/0"/>
+            <statement name="return -1;" pathCondition="¬(y = TRUE ∧ x = TRUE)" pathConditionChanged="false">
+               <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                  <value name="x {x = TRUE}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="x = TRUE">
+                  </value>
+                  <value name="x {¬x = TRUE}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="¬x = TRUE">
+                  </value>
+               </variable>
+               <variable name="y" arrayIndex="-1" isArrayIndex="false">
+                  <value name="y {x = TRUE}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="x = TRUE">
+                  </value>
+                  <value name="y {¬x = TRUE}" typeString="boolean" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="¬x = TRUE">
+                  </value>
+               </variable>
+               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <callStackEntry path="/0"/>
+               <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of UnicodeTest.magic(x,y);&gt;" pathCondition="¬(y = TRUE ∧ x = TRUE)" pathConditionChanged="false" nameIncludingReturnValue="&lt;return -1 as result of magic&gt;" signatureIncludingReturnValue="&lt;return -1 as result of UnicodeTest.magic(x,y);&gt;" isReturnValueComputed="true">
+                  <methodReturnValue name="-1" returnValueString="-1" hasCondition="false">
+                  </methodReturnValue>
+                  <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                     <value name="x {x = TRUE}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="x = TRUE">
+                     </value>
+                     <value name="x {¬x = TRUE}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="¬x = TRUE">
+                     </value>
+                  </variable>
+                  <variable name="y" arrayIndex="-1" isArrayIndex="false">
+                     <value name="y {x = TRUE}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="x = TRUE">
+                     </value>
+                     <value name="y {¬x = TRUE}" typeString="boolean" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="¬x = TRUE">
+                     </value>
+                  </variable>
+                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <callStackEntry path="/0"/>
+                  <termination name="&lt;end&gt;" pathCondition="¬(y = TRUE ∧ x = TRUE)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                  </termination>
+               </methodReturn>
+            </statement>
+         </branchCondition>
+      </branchStatement>
+   </methodCall>
+</start>
