@@ -157,6 +157,7 @@ public class Proof implements Named {
                     }
                 };
 
+                
         setSettings(settings);
         pis = ProofIndependentSettings.DEFAULT_INSTANCE;
     }
