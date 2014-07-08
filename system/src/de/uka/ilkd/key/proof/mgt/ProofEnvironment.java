@@ -42,7 +42,6 @@ public class ProofEnvironment {
     private RuleJustificationInfo justifInfo = new RuleJustificationInfo();
     private final InitConfig initConfig; 
     private Set<ProofAggregate> proofs = new LinkedHashSet<ProofAggregate>(); //of ProofList
-    private int number = 0;
 
     /** constructs a proof environment with the given initial
      * configuration of the proofs contained in the environment.
@@ -164,36 +163,20 @@ public class ProofEnvironment {
  	}
  	ProofEnvironment pe = (ProofEnvironment) cmp;
  	return pe.getJavaModel().equals(getJavaModel()) &&
- 	      pe.initConfig.getActivatedChoices().equals(initConfig.getActivatedChoices()) &&
- 	      pe.getNumber() == getNumber();
+ 	      pe.initConfig.getActivatedChoices().equals(initConfig.getActivatedChoices());
     }
 
     public int hashCode() {
 	int result = 5;
 	result = result*17+ getJavaModel().hashCode();
 	result = result*17+ initConfig.getActivatedChoices().hashCode();
-	result = result*17+ getNumber();
 	return result;
     }
 
     /** returns a short String description of the environment.
      */
     public String description() {
-	return "Env. with "+getJavaModel().description()+" #"+getNumber();
-    }
-
-    /** sets a number that distinguishes two proof environments
-     * with equal java model and rule config from the user perspective
-     */
-    public void setNumber(int number) {
-	this.number = number;
-    }
-
-    /** returns a number that distinguishes two proof environments
-     * with equal java model and rule config from the user perspective
-     */
-    public int getNumber() {
-	return number;
+	return "Env. with "+getJavaModel().description();
     }
 
     public String toString() {

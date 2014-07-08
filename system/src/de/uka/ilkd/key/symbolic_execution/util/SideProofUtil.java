@@ -770,7 +770,6 @@ public final class SideProofUtil {
       // Create new ProofEnvironment and initialize it with values from initial one.
       ProofEnvironment env = new ProofEnvironment(initConfig);
       env.setJavaModel(sourceEnv.getJavaModel());
-      env.setNumber(sourceEnv.getNumber());
       for (Taclet taclet : initConfig.activatedTaclets()) {
          env.getJustifInfo().addJustification(taclet, sourceJustiInfo.getJustification(taclet));
       }
