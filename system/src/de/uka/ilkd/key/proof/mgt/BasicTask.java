@@ -37,7 +37,6 @@ public class BasicTask extends DefaultMutableTreeNode implements TaskTreeNode{
     public BasicTask(ProofAggregate pl) {
 	super(pl);
 	proof=pl;
-	proof().setBasicTask(this);
     }
 
     public String shortDescr() {
@@ -49,7 +48,7 @@ public class BasicTask extends DefaultMutableTreeNode implements TaskTreeNode{
     }
 
     public ProofEnvironment getProofEnv() {
-	return proof().env();
+	return proof().getEnv();
     }
 
     /* returns the single proof of this task */

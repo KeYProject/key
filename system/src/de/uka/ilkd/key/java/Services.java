@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.proof.Counter;
+import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -89,6 +90,10 @@ public class Services implements TermServices {
      */
     private SpecificationRepository specRepos;
     
+    /*
+     * the Java model (with all paths)
+     */
+    private JavaModel javaModel;
 
     private NameRecorder nameRecorder;
     
@@ -142,8 +147,8 @@ public class Services implements TermServices {
     }    
     
 
-    private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc, 
-		     KeYRecoderMapping rec2key, HashMap<String, Counter> counters, ServiceCaches caches) {
+    private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc, KeYRecoderMapping rec2key, 
+		     HashMap<String, Counter> counters, ServiceCaches caches) {
    assert profile != null;
    assert counters != null;
    assert caches != null;
@@ -251,13 +256,14 @@ public class Services implements TermServices {
 	     "services: tried to copy schema cross reference service config.");
 	ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
 	Services s = new Services
-	    (profile, getJavaInfo().getKeYProgModelInfo().getServConf(),
-	     getJavaInfo().getKeYProgModelInfo().rec2key().copy(), copyCounters(), newCaches);
+	    (profile, getJavaInfo().getKeYProgModelInfo().getServConf(), getJavaInfo().getKeYProgModelInfo().rec2key().copy(),
+	     copyCounters(), newCaches);
         s.specRepos = specRepos;
 	s.setTypeConverter(getTypeConverter().copy(s));
 	s.setExceptionHandler(getExceptionHandler());
 	s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
+        s.setJavaModel(getJavaModel());
 	return s;
     }
     
@@ -287,20 +293,24 @@ public class Services implements TermServices {
 	s.setTypeConverter(getTypeConverter().copy(s));
 	s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
+        s.setJavaModel(getJavaModel());
+
 	return s;
     }
     
     
     public Services copyProofSpecific(Proof p_proof, boolean shareCaches) {
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
-        final Services s = new Services(getProfile(), getJavaInfo().getKeYProgModelInfo().getServConf(),
-                getJavaInfo().getKeYProgModelInfo().rec2key(), copyCounters(), newCaches);
+        final Services s = new Services(getProfile(), getJavaInfo().getKeYProgModelInfo().getServConf(), getJavaInfo().getKeYProgModelInfo().rec2key(),
+                copyCounters(), newCaches);
         s.proof = p_proof;
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setExceptionHandler(getExceptionHandler());
         s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
+        s.setJavaModel(getJavaModel());
+
         return s;
     }
 
@@ -380,4 +390,19 @@ public class Services implements TermServices {
     public TermFactory getTermFactory() {
         return termBuilder.tf();
     }
+
+
+    /**
+     * returns the {@link JavaModel} with all path information
+     * @return the {@link JavaModel} on which this services is based on
+     */
+   public JavaModel getJavaModel() {
+      return javaModel;
+   }
+
+
+   public void setJavaModel(JavaModel javaModel) {
+      assert this.javaModel == null;
+      this.javaModel = javaModel;
+   }
 }

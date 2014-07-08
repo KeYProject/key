@@ -45,11 +45,11 @@ public class TestSideProofStore extends TestCase {
          Services services = new Services(AbstractProfile.getDefaultProfile());
          InitConfig ic = new InitConfig(services);
          ProofEnvironment pe = new ProofEnvironment(ic);
-         Proof p1 = new Proof(services);
+         Proof p1 = new Proof(ic);
          p1.setProofEnv(pe);
-         Proof p2 = new Proof(services);
+         Proof p2 = new Proof(ic);
          p2.setProofEnv(pe);
-         Proof p3 = new Proof(services);
+         Proof p3 = new Proof(ic);
          p3.setProofEnv(pe);
          Proof[] allProofs = new Proof[] {p1, p2, p3};
          // Test initial state

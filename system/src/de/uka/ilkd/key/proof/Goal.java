@@ -440,9 +440,9 @@ public final class Goal  {
 		    				     proof().getServices());
 	if (tacletApp != null) {
 	    addNoPosTacletApp(tacletApp);
- 	    if (proof().env() != null) { // do not break everything
+ 	    if (proof().getInitConfig() != null) { // do not break everything
                                        // because of ProofMgt
-		proof().env().registerRuleIntroducedAtNode(
+		proof().getInitConfig().registerRuleIntroducedAtNode(
 		        tacletApp,
 		        node.parent() != null ? node.parent() : node,
 		        isAxiom);

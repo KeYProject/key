@@ -35,10 +35,11 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironmentListener;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-public interface UserInterface extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor {
+public interface UserInterface extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor, ProofEnvironmentListener {
     public static final String PROP_AUTO_MODE = "autoMode";
     
     /**
@@ -156,7 +157,7 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * uses KeY.
      * </p>
      * @param profile The {@link Profile} to use.
-     * @return The instantiated {@link ProblemInitializer}.
+    * @return The instantiated {@link ProblemInitializer}.
      */
     ProblemInitializer createProblemInitializer(Profile profile);
     

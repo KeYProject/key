@@ -240,7 +240,8 @@ public class DefaultProblemLoader {
    protected ProblemInitializer createProblemInitializer() {
       UserInterface ui = mediator.getUI();
       return new ProblemInitializer(ui,
-                                    new Services(envInput.getProfile(), mediator.getExceptionHandler()),
+                                    new Services(envInput.getProfile(), 
+                                          mediator.getExceptionHandler()),
                                     ui);
    }
 
@@ -333,7 +334,7 @@ public class DefaultProblemLoader {
     * @throws ProofInputException Occurred Exception.
     */
    protected Proof createProof(LoadedPOContainer poContainer) throws ProofInputException {
-      return problemInitializer.startProver(initConfig, poContainer.getProofOblInput(), poContainer.getProofNum());
+      return problemInitializer.startProver(initConfig, poContainer.getProofOblInput()).getProof(poContainer.getProofNum());
    }
 
    protected void replayProof(Proof proof) throws ProofInputException {

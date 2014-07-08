@@ -181,7 +181,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
                           problemHeader,
                           initConfig.createTacletIndex(), 
                           initConfig.createBuiltInRuleIndex(),
-                          initConfig.getServices(), 
+                          initConfig, 
                           settings), 
                 name);
     }

@@ -41,11 +41,9 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassAxiomImpl;
 import de.uka.ilkd.key.speclang.ClassWellDefinedness;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
-import de.uka.ilkd.key.speclang.QueryAxiom;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.Pair;
 
@@ -57,8 +55,8 @@ import de.uka.ilkd.key.util.Pair;
 public abstract class AbstractPO implements IPersistablePO {
 
     protected final TermBuilder tb; 
-    protected final InitConfig initConfig;
-    protected final Services services;
+    protected final InitConfig environmentConfig;
+    protected final Services environmentServices;
     protected final JavaInfo javaInfo;
     protected final HeapLDT heapLDT;
     protected final SpecificationRepository specRepos;
@@ -75,9 +73,9 @@ public abstract class AbstractPO implements IPersistablePO {
     //-------------------------------------------------------------------------
     public AbstractPO(InitConfig initConfig,
                       String name) {
-        this.initConfig = initConfig;
-        this.services = initConfig.getServices();
-        this.tb = services.getTermBuilder();
+        this.environmentConfig = initConfig;
+        this.environmentServices = initConfig.getServices();
+        this.tb = environmentServices.getTermBuilder();
         this.javaInfo = initConfig.getServices().getJavaInfo();
         this.heapLDT = initConfig.getServices().getTypeConverter().getHeapLDT();
         this.specRepos = initConfig.getServices().getSpecificationRepository();
@@ -233,7 +231,7 @@ public abstract class AbstractPO implements IPersistablePO {
     private void register(Taclet t) {
         assert t != null;
         taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(t));
-        initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
+        initConfig.registerRule(t, AxiomJustification.INSTANCE);
     }
 
 
@@ -324,7 +322,7 @@ public abstract class AbstractPO implements IPersistablePO {
      */
     private Proof createProof(String proofName,
                               Term poTerm) {
-        final JavaModel javaModel = initConfig.getProofEnv().getJavaModel();
+        final JavaModel javaModel = initConfig.getServices().getJavaModel();
         createProofHeader(javaModel.getModelDir(),
                           javaModel.getClassPath(),
                           javaModel.getBootClassPath());
@@ -333,7 +331,7 @@ public abstract class AbstractPO implements IPersistablePO {
                                 header,
                                 initConfig.createTacletIndex(),
                                 initConfig.createBuiltInRuleIndex(),
-                                initConfig.getServices(),
+                                initConfig,
                                 initConfig.getSettings() != null
                                 ? initConfig.getSettings()
                                 : new ProofSettings(ProofSettings.DEFAULT_SETTINGS));

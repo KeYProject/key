@@ -160,7 +160,7 @@ public class ProofObligationCreator {
                 Proof proof = new Proof(name, formula, "" /*header*/,
                                 initConfig.createTacletIndex(),
                                 initConfig.createBuiltInRuleIndex(),
-                                initConfig.getServices());
+                                initConfig);
          
                      
                 userDefinedSymbols.addSymbolsToNamespaces(proof.getNamespaces());

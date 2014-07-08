@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,6 +21,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -70,7 +70,7 @@ public final class DependencyContractPO extends AbstractPO
     		              ProgramVariable selfVar,
 	                      KeYJavaType selfKJT,
 	                      ImmutableList<ProgramVariable> paramVars,
-	                      Term wellFormedHeaps) 
+	                      Term wellFormedHeaps, Services services) 
     		throws ProofInputException {
         //"self != null"
 	final Term selfNotNull 
@@ -141,7 +141,7 @@ public final class DependencyContractPO extends AbstractPO
     //-------------------------------------------------------------------------        
     
     @Override
-    public void readProblem() throws ProofInputException {
+    public void readProblem(InitConfig proofConfig) throws ProofInputException {
         IObserverFunction target = contract.getTarget();
         if(target instanceof IProgramMethod) {
             target = javaInfo.getToplevelPM(contract.getKJT(),
@@ -149,6 +149,7 @@ public final class DependencyContractPO extends AbstractPO
 	    // FIXME: for some reason the above method call returns null now and then, the following line (hopefully) is a work-around
 	    if (target == null) target = contract.getTarget();
 	}
+   final Services proofServices = proofConfig.getServices();
 
 	//prepare variables
 	final ProgramVariable selfVar
@@ -158,7 +159,7 @@ public final class DependencyContractPO extends AbstractPO
 		= tb.paramVars(target, true);
 
 	final boolean twoState = (contract.getTarget().getStateCount() == 2);
-	final int heapCount = contract.getTarget().getHeapCount(services);
+	final int heapCount = contract.getTarget().getHeapCount(proofServices);
 	
 	final Map<LocationVariable,LocationVariable> preHeapVars =
 	        new LinkedHashMap<LocationVariable, LocationVariable>();
@@ -166,7 +167,7 @@ public final class DependencyContractPO extends AbstractPO
 	        new LinkedHashMap<LocationVariable, LocationVariable>();
 	List<LocationVariable> heaps = new LinkedList<LocationVariable>();
 	int hc = 0;
-	for(LocationVariable h : HeapContext.getModHeaps(services, false)) {
+	for(LocationVariable h : HeapContext.getModHeaps(proofServices, false)) {
 	    if(hc >= heapCount) {
 	        break;
 	    }
@@ -209,7 +210,7 @@ public final class DependencyContractPO extends AbstractPO
             //prepare update
             final boolean atPre = preHeapVars.values().contains(h);
             final Term dep = getContract().getDep(atPre ?
-                    preHeapVarsReverse.get(h) : h, atPre, selfVar, paramVars, preHeapVars, services);
+                    preHeapVarsReverse.get(h) : h, atPre, selfVar, paramVars, preHeapVars, proofServices);
             final Term changedHeap =
                     tb.anon(tb.var(h), tb.setMinus(tb.allLocs(), dep),
                             anonHeap);
@@ -224,9 +225,9 @@ public final class DependencyContractPO extends AbstractPO
 	//translate contract
 	final Term pre = tb.and(
 	   buildFreePre(heaps, selfVar,
-	                contract.getKJT(), paramVars, wellFormedHeaps),
+	                contract.getKJT(), paramVars, wellFormedHeaps, proofServices),
 	                contract.getPre(heapLDT.getHeap(), selfVar, paramVars,
-	                                null, services));
+	                                null, proofServices));
 
 	assert heaps.size() == heapCount * contract.getTarget().getStateCount();
 	//prepare target term

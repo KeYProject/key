@@ -97,7 +97,7 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
                              return taclets;
                      }
                      
-                     for(Taclet taclet : proof.env().getInitConfig().activatedTaclets()){
+                     for(Taclet taclet : proof.getInitConfig().activatedTaclets()){
                              if(pdSettings.supportedTaclets.contains(taclet.name().toString(),true)){
                                      taclets.add(taclet);
                              }

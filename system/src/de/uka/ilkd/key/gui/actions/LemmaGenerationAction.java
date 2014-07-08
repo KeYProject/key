@@ -278,7 +278,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                                                       fileForDefinitions ,
                                                       fileForLemmata,
                                                       filesForAxioms,
-                                                      proof.env());
+                                                      proof.getEnv());
                
 
                 
@@ -301,10 +301,10 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                             // add only the taclets to the goals if
                             // the proof obligations were added successfully.
                             ImmutableSet<Taclet> base =
-                                                        proof.env().getInitConfig()
+                                                        proof.getInitConfig()
                                                                 .getTaclets();
                             base = base.union(taclets);
-                            proof.env().getInitConfig().setTaclets(base);
+                            proof.getInitConfig().setTaclets(base);
                             for (Taclet taclet : taclets) {
                                 for (Goal goal : proof.openGoals()) {
                                     goal
@@ -321,7 +321,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 
                 TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
                             listener,
-                            new LemmaSelectionDialog(),loadAsLemmata,tacletLoader,proof.env().getInitConfig());
+                            new LemmaSelectionDialog(),loadAsLemmata,tacletLoader,proof.getInitConfig());
                 loader.start();
 
             }

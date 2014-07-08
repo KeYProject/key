@@ -75,7 +75,6 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -337,18 +336,17 @@ public class ProofManager {
       initConfig.setTaclet2Builder(sourceInitConfig.getTaclet2Builder());
       initConfig.setTaclets(sourceInitConfig.getTaclets());
       // Create new ProofEnvironment and initialize it with values from initial one.
-      ProofEnvironment env = initConfig.getProofEnv();
-      env.setJavaModel(sourceInitConfig.getProofEnv().getJavaModel());
+      initConfig.getServices().setJavaModel(sourceInitConfig.getServices().getJavaModel());
       for (Taclet taclet : sourceInitConfig.activatedTaclets()) {
-         env.getJustifInfo().addJustification(taclet, sourceInitConfig.getProofEnv().getJustifInfo().getJustification(taclet));
+         initConfig.registerRule(taclet, sourceInitConfig.getJustifInfo().getJustification(taclet));
       }
       for (BuiltInRule rule : initConfig.builtInRules()) {
-         RuleJustification origJusti = sourceInitConfig.getProofEnv().getJustifInfo().getJustification(rule);
+         RuleJustification origJusti = sourceInitConfig.getJustifInfo().getJustification(rule);
          if (origJusti == null) {
             assert rule instanceof OneStepSimplifier;
             origJusti = AxiomJustification.INSTANCE;
          }
-         env.getJustifInfo().addJustification(rule, origJusti);
+         initConfig.registerRule(rule, origJusti);
       }
       KeYEnvironment<CustomUserInterface> keyEnv = new KeYEnvironment<CustomUserInterface>(new CustomUserInterface(false), initConfig);
       return keyEnv;

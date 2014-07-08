@@ -139,7 +139,8 @@ public abstract class AbstractUserInterface implements UserInterface {
     @Override
     public Proof createProof(InitConfig initConfig, ProofOblInput input) throws ProofInputException {
        ProblemInitializer init = createProblemInitializer(initConfig.getProfile());
-       return init.startProver(initConfig, input, 0);
+       
+       return init.startProver(initConfig, input).getFirstProof();
     }
     
     /**

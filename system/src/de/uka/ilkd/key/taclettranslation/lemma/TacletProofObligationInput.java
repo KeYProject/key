@@ -48,7 +48,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
 
     private String tacletName;
     private ProofAggregate proofObligation;
-    private final InitConfig initConfig;
+    private final InitConfig environmentConfig;
 
     // The following may all possibly be null
     private String definitionFile;
@@ -117,7 +117,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
      */
     public TacletProofObligationInput(String tacletName, InitConfig initConfig) {
         this.tacletName = tacletName;
-        this.initConfig = initConfig;
+        this.environmentConfig = initConfig;
     }
 
     /*
@@ -154,18 +154,18 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
      * use the TacletLoader and TacletSoundlessPOLoader to generate the PO.
      */
     @Override 
-    public void readProblem() throws ProofInputException {
+    public void readProblem(InitConfig proofConfig) throws ProofInputException {
         TacletLoader loader = null;
         if (tacletFile == null) {
             // prove a KeY taclet
-            loader = new TacletLoader.KeYsTacletsLoader(null, null, getProfile());
+            loader = new TacletLoader.KeYsTacletsLoader(null, null, proofConfig.getProfile());
         } else {
             final ProblemInitializer problemInitializer =
-                    new ProblemInitializer(getProfile());
+                    new ProblemInitializer( proofConfig.getProfile());
             // bugfix: All files are loaded relative to the basedir of the loaded file
             loader = new TacletLoader.TacletFromFileLoader(null, null, problemInitializer,
                     new File(baseDir, definitionFile), new File(baseDir, tacletFile), 
-                    fileCollection(axiomFiles), initConfig.getProofEnv());
+                    fileCollection(axiomFiles), proofConfig.getProofEnv());
         }
 
         TacletSoundnessPOLoader poloader =
@@ -178,9 +178,6 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
             }
     }
 
-    public Profile getProfile() {
-        return initConfig.getProfile();
-    }
 
     private Collection<File> fileCollection(String[] strings) {
         ArrayList<File> result = new ArrayList<File>();

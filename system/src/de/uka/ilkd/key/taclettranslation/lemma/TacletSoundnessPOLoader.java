@@ -341,12 +341,12 @@ public class TacletSoundnessPOLoader {
                                 proofEnvForTaclets.getInitConfig(), axioms,
                                 listeners);
                 
-                proofEnvForTaclets.registerRules(tacletsToProve,
+                proofEnvForTaclets.getInitConfig().registerRules(tacletsToProve,
                                 AxiomJustification.INSTANCE);
 
                 if(isUsedOnlyForProvingTaclets()){
                         for(Taclet taclet : proofEnvForTaclets.getInitConfig().getTaclets()){
-                                proofEnvForTaclets.getJustifInfo().addJustification(taclet, AxiomJustification.INSTANCE);
+                           proofEnvForTaclets.getInitConfig().getJustifInfo().addJustification(taclet, AxiomJustification.INSTANCE);
                         }
                 }
 

@@ -60,14 +60,14 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Pair;
@@ -93,6 +93,7 @@ public final class ProofManagementDialog extends JDialog {
     private JButton cancelButton;
     private KeYMediator mediator;
     private final InitConfig initConfig;
+    private ProofEnvironment env;
     
     //-------------------------------------------------------------------------
     //constructors
@@ -114,6 +115,8 @@ public final class ProofManagementDialog extends JDialog {
         //create proof list
         proofList = new JList();
         proofList.setCellRenderer(new DefaultListCellRenderer() {
+         private static final long serialVersionUID = -7810888250050777877L;
+
             @Override
             public Component getListCellRendererComponent(JList list,
                     Object value, int index,
@@ -390,7 +393,8 @@ public final class ProofManagementDialog extends JDialog {
        
        if (selectedProof != null) {
           instance.select(selectedProof);
-       }
+          instance.env = selectedProof.getEnv();
+       } 
        
        instance.setVisible(true);
        
@@ -425,7 +429,7 @@ public final class ProofManagementDialog extends JDialog {
         
         return contract == null
                 ? null
-                : contract.createProofObl(initConfig, contract);
+                : contract.createProofObl(initConfig.copyWithServices(initConfig.getServices()), contract);
     }
 
     private Proof findPreferablyClosedProof(ProofOblInput po) {
@@ -455,7 +459,14 @@ public final class ProofManagementDialog extends JDialog {
             ProblemInitializer pi =
                     new ProblemInitializer(ui, initConfig.getServices(), ui);
             try {
-                pi.startProver(initConfig, po, 0);
+                final ProofAggregate pl = pi.startProver(initConfig, po);
+                
+                if (env == null) {
+                   env = new ProofEnvironment(initConfig); 
+                   env.addProofEnvironmentListener(ui);
+                }                
+                
+                env.registerProof(po, pl);
             } catch (ProofInputException exc) {
                 ExceptionDialog.showDialog(MainWindow.getInstance(), exc);
             }

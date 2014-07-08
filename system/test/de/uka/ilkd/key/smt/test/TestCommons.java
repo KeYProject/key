@@ -204,7 +204,7 @@ public abstract class TestCommons extends TestCase {
 				initializer = new ProblemInitializer(po.getProfile());
 			}
 			initConfig = initializer.prepare(po);
-			initializer.startProver(initConfig, po, 0);
+			initializer.startProver(initConfig, po).getFirstProof();
 			result = po.getPO();
 			services = initConfig.getServices();
 			// po.close();
