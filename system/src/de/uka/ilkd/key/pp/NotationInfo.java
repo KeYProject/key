@@ -345,15 +345,18 @@ public final class NotationInfo {
     //-------------------------------------------------------------------------
     
     public void refresh(Services services) {
-	createDefaultNotationTable();
-	assert defaultNotationCache != null;
-	if(PRETTY_SYNTAX && services != null) {
-	    addFancyNotations(services);
-	    if (UNICODE_ENABLED)
-	        addVeryFancyNotations(services);
-	}
-    }    
-        
+       refresh(services, PRETTY_SYNTAX, UNICODE_ENABLED);
+    }
+
+    public void refresh(Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+   createDefaultNotationTable();
+   assert defaultNotationCache != null;
+   if(usePrettyPrinting && services != null) {
+       addFancyNotations(services);
+       if (useUnicodeSymbols)
+           addVeryFancyNotations(services);
+   }
+    }
     
     public AbbrevMap getAbbrevMap(){
 	return scm;

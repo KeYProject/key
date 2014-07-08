@@ -46,7 +46,7 @@ public class TestLineBreakpointStopConditionSimpleWithConditions extends Abstrac
          originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
          setOneStepSimplificationEnabled(null, true);
          // Create proof environment for symbolic execution
-         envMain = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false);
+         envMain = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false, false);
          // Make sure that initial tree is valid
          int oracleIndex = 0;
          assertSetTreeAfterStep(envMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory);
@@ -64,7 +64,7 @@ public class TestLineBreakpointStopConditionSimpleWithConditions extends Abstrac
          
          
          //Test method somethingMain()
-         envSomethingMain = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, "somethingMain", null, false, false, false, false, false, false);
+         envSomethingMain = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, "somethingMain", null, false, false, false, false, false, false, false);
          IProgramMethod something = searchProgramMethod(envSomethingMain.getServices(), containerTypeName, "something");
          IProgramMethod somethingMain = searchProgramMethod(envSomethingMain.getServices(), containerTypeName, "somethingMain");
          allBreakpoints = new CompoundStopCondition();
@@ -80,7 +80,7 @@ public class TestLineBreakpointStopConditionSimpleWithConditions extends Abstrac
          stepReturnWithBreakpoints(envSomethingMain.getUi(), envSomethingMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);
          
          //Test method somethingLocalMain()
-         envSomethingLocalMain = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, "somethingLocalMain", null, false, false, false, false, false, false);
+         envSomethingLocalMain = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, "somethingLocalMain", null, false, false, false, false, false, false, false);
          IProgramMethod somethingLocal = searchProgramMethod(envSomethingLocalMain.getServices(), containerTypeName, "somethingLocal");
          IProgramMethod somethingLocalMain = searchProgramMethod(envSomethingLocalMain.getServices(), containerTypeName, "somethingLocalMain");
          allBreakpoints = new CompoundStopCondition();
