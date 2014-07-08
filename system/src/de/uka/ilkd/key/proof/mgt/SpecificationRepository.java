@@ -780,8 +780,7 @@ public final class SpecificationRepository {
         for (FunctionalOperationContract contract : result) {
             if (!contract.getModality().equals(matchModality)
                     || (transactionModality
-                            && !contract.transactionApplicableContract() && !contract
-                                .isReadOnlyContract(services))) {
+                            && !contract.transactionApplicableContract())) {
                 result = result.remove(contract);
             }
         }
