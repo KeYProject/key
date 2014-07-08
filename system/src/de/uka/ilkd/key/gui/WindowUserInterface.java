@@ -317,7 +317,6 @@ public class WindowUserInterface extends AbstractUserInterface {
 
    @Override
    public boolean selectProofObligation(InitConfig initConfig) {
-      ProofManagementDialog.showInstance(initConfig);
-      return ProofManagementDialog.startedProof();
+      return ProofManagementDialog.showInstance(initConfig);
    }
 }
