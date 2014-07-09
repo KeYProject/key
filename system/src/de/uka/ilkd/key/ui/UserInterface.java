@@ -23,6 +23,7 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.ProofMacroListener;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -40,7 +41,11 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 
 public interface UserInterface extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor {
     public static final String PROP_AUTO_MODE = "autoMode";
-    
+
+    public ProofMacroListener addListener(ProofMacro macro, int numberGoals);
+
+    public ProofMacroListener removeListener(ProofMacro macro);
+
     /**
      * Checks if the auto mode is running which is the case between
      * {@link #notifyAutoModeBeingStarted()} and {@link #notifyAutomodeStopped()}.

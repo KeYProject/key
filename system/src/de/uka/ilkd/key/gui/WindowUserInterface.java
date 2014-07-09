@@ -22,6 +22,8 @@ import javax.swing.JOptionPane;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -149,6 +151,24 @@ public class WindowUserInterface extends AbstractUserInterface {
                 }
             }
             mainWindow.displayResults(info.toString());
+        } else if (info.getSource() instanceof ProofMacro) {
+            if (numOfInvokedMacros == 0) {
+                resetStatus(this);
+                assert info instanceof ProofMacroFinishedInfo;
+                Proof proof = info.getProof();
+                if (!proof.closed()) {
+                    Goal g = proof.openGoals().head();
+                    mainWindow.getMediator().goalChosen(g);
+                    if (inStopAtFirstUncloseableGoalMode(info.getProof())) {
+                        // iff Stop on non-closeable Goal is selected a little
+                        // popup is generated and proof is stopped
+                        AutoDismissDialog dialog = new AutoDismissDialog(
+                                "Couldn't close Goal Nr. " + g.node().serialNr()
+                                + " automatically");
+                        dialog.show();
+                    }
+                }
+            }
         } else if (info.getSource() instanceof ProblemLoader) {
             resetStatus(this);
             if (info.getResult() != null) {

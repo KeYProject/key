@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.ui.CompositePTListener;
 
 import java.util.ArrayList;
 
@@ -107,7 +108,7 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
             // reverse to original nodes
             for (Node initNode : initNodes) {
                 final ProverTaskListener cptl =
-                        new CompositePTListener(listener, getListener());
+                        new CompositePTListener(getListener(), listener);
                 cptl.taskStarted(macro.getName(), 0);
                 info = macro.applyTo(mediator, initNode, posInOcc, cptl);
                 cptl.taskFinished(info);

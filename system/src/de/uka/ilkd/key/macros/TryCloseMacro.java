@@ -16,19 +16,16 @@ package de.uka.ilkd.key.macros;
 import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
-import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * The Class TryCloseMacro tries to close goals. Goals are either closed or left
@@ -43,18 +40,13 @@ import de.uka.ilkd.key.proof.Proof;
  */
 public class TryCloseMacro extends AbstractProofMacro {
 
-    /**
-     * The max number of steps to be applied.
-     * A value of -1 means no changes.
-     */
-    private final int numberSteps;
+    ProofMacroListener pml;
 
     /**
      * Instantiates a new try close macro.
      * No changes to the max number of steps.
      */
     public TryCloseMacro() {
-        this.numberSteps = -1;
     }
 
     /**
@@ -64,7 +56,7 @@ public class TryCloseMacro extends AbstractProofMacro {
      *            the max number of steps. -1 means no change.
      */
     public TryCloseMacro(int numberSteps) {
-        this.numberSteps = numberSteps;
+        setNumberSteps(numberSteps);
     }
 
     /* (non-Javadoc)
@@ -88,7 +80,9 @@ public class TryCloseMacro extends AbstractProofMacro {
      * This macro is always applicable.
      */
     @Override
-    public boolean canApplyTo(KeYMediator mediator, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
+    public boolean canApplyTo(KeYMediator mediator,
+                              ImmutableList<Goal> goals,
+                              PosInOccurrence posInOcc) {
         return true;
     }
 
@@ -102,42 +96,39 @@ public class TryCloseMacro extends AbstractProofMacro {
                                           ProverTaskListener listener) throws InterruptedException {
         //
         // create the rule application engine
-        final IGoalChooser chooser =
-                mediator.getProfile().getSelectedGoalChooserBuilder().create();
         final ApplyStrategy applyStrategy =
-                new ApplyStrategy(chooser);
+                new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
         final Proof proof = mediator.getInteractiveProver().getProof();
-
-        //
-        // The observer to handle the progress bar
-        TaskObserver taskObserver = new TaskObserver(mediator.getUI());
-        taskObserver.setNumberGoals(goals.size());
+        final UserInterface ui = mediator.getUI();
 
         //
         // set the max number of steps if given
         int oldNumberOfSteps = mediator.getMaxAutomaticSteps();
-        if(numberSteps > 0) {
-            mediator.setMaxAutomaticSteps(numberSteps);
-            taskObserver.setNumberSteps(numberSteps);
+        if(getNumberSteps() > 0) {
+            mediator.setMaxAutomaticSteps(getNumberSteps());
         } else {
-            taskObserver.setNumberSteps(oldNumberOfSteps);
+            setNumberSteps(oldNumberOfSteps);
         }
-
-        applyStrategy.addProverTaskObserver(taskObserver);
+        //
+        // The observer to handle the progress bar
+        final ProverTaskListener pbl = ui.addListener(this, goals.size());
+        applyStrategy.addProverTaskObserver(pbl);
 
         //
         // inform the listener
         int goalsClosed = 0;
         long time = 0;
         int appliedRules = 0;
+        ProofMacroFinishedInfo info =
+                new ProofMacroFinishedInfo(this, goals, proof, time,
+                                           appliedRules, goalsClosed);
 
         //
         // start actual autoprove
         try {
             for (Goal goal : goals) {
                 Node node = goal.node();
-                ApplyStrategyInfo result =
-                        applyStrategy.start(proof, ImmutableSLList.<Goal>nil().prepend(goal));
+                ApplyStrategyInfo result = applyStrategy.start(proof, goal);
 
                 // retreat if not closed
                 if(!node.isClosed()) {
@@ -149,8 +140,9 @@ public class TryCloseMacro extends AbstractProofMacro {
                 // update statistics
                 time += result.getTime();
                 appliedRules += result.getAppliedRuleApps();
+                info = new ProofMacroFinishedInfo(info, result);
 
-                synchronized(applyStrategy) { // wait for applyStrategy to finish it last rule application
+                synchronized(applyStrategy) { // wait for applyStrategy to finish its last rule application
                    if(applyStrategy.hasBeenInterrupted()) { // only now reraise the interruption exception
                       throw new InterruptedException();
                    }
@@ -159,73 +151,15 @@ public class TryCloseMacro extends AbstractProofMacro {
         } finally {
             // reset the old number of steps
             mediator.setMaxAutomaticSteps(oldNumberOfSteps);
-            // inform the listener
-            taskObserver.allTasksFinished(proof, time, appliedRules, goalsClosed);
+            setNumberSteps(oldNumberOfSteps);
+            applyStrategy.removeProverTaskObserver(pbl);
+            ui.removeListener(this);
         }
-        return new ProofMacroFinishedInfo(this, proof.openEnabledGoals(), proof);
-                                          //time, appliedRules, goalsClosed);
+        return info;
     }
 
     @Override
     public KeyStroke getKeyStroke () {
         return KeyStrokeManager.get(this);
-    }
-
-    /**
-     * This observer acts as intermediate instance between the reports by the
-     * strategy and the UI reporting progress.
-     *
-     * The number of total steps is computed and all local reports are
-     * translated in termini of the total number of steps such that a continuous
-     * progress is reported.
-     *
-     * fixes #1356
-     */
-    private static class TaskObserver implements ProverTaskListener {
-
-        private int numberGoals;
-        private int numberSteps;
-        private final ProverTaskListener backListener;
-        private int completedGoals;
-
-        public TaskObserver(ProverTaskListener backListener) {
-            this.backListener = backListener;
-        }
-
-        @Override
-        public void taskStarted(String message, int size) {
-            assert size == numberSteps;
-            String suffix = " [" + (completedGoals + 1) + "/" + numberGoals + "]";
-            backListener.taskStarted(message + suffix, numberGoals * numberSteps);
-            backListener.taskProgress(completedGoals * numberSteps);
-        }
-
-        @Override
-        public void taskProgress(int position) {
-            backListener.taskProgress(completedGoals * numberSteps + position);
-        }
-
-        @Override
-        public void taskFinished(TaskFinishedInfo info) {
-            completedGoals ++;
-        }
-
-        public void setNumberGoals(int numberGoals) {
-            this.numberGoals = numberGoals;
-        }
-
-        public void setNumberSteps(int numberSteps) {
-            this.numberSteps = numberSteps;
-        }
-
-        private void allTasksFinished(Proof proof,
-                                      long time,
-                                      int appliedRules,
-                                      int closedGoals) {
-            TaskFinishedInfo info =
-                    new DefaultTaskFinishedInfo(this, null, proof, time,
-                                                appliedRules, closedGoals);
-            backListener.taskFinished(info);
-        }
     }
 }

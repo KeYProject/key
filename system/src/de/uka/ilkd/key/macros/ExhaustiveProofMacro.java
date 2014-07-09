@@ -24,6 +24,8 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.ui.CompositePTListener;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -126,7 +128,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
             PosInOccurrence applicableAt = applicableOnNodeAtPos.get(goal.node());
             if (applicableAt != null) {
                 final ProverTaskListener cptl =
-                        new CompositePTListener(listener, getListener());
+                        new CompositePTListener(getListener(), listener);
                 cptl.taskStarted(getName(), 0);
                 info = macro.applyTo(mediator, ImmutableSLList.<Goal>nil().prepend(goal),
                                     applicableAt, cptl);

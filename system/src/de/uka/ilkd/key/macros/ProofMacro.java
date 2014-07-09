@@ -14,16 +14,12 @@
 package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.Proof.Statistics;
 
 /**
  * The interface ProofMacro is the entry point to a general strategy extension
@@ -70,6 +66,10 @@ import de.uka.ilkd.key.proof.Proof.Statistics;
  * @author mattias ulbrich
  */
 public interface ProofMacro {
+
+    public void setNumberSteps(int numberSteps);
+
+    public int getNumberSteps();
 
     /**
      * Gets the name of this macro.
@@ -253,135 +253,4 @@ public interface ProofMacro {
     void innerMacroFinished(TaskFinishedInfo info);
 
     ProofMacroListener getListener();
-
-    static class CompositePTListener implements ProverTaskListener {
-        private ProverTaskListener[] listeners;
-
-        public CompositePTListener(ProverTaskListener[] l) {
-            this.listeners = l;
-        }
-
-        public CompositePTListener(ProverTaskListener ptl1,
-                                   ProverTaskListener ptl2) {
-            this(new ProverTaskListener[]{ptl1, ptl2});
-        }
-
-        @Override
-        public void taskStarted(String message, int size) {
-            for (ProverTaskListener l: listeners) {
-                if (l != null) {
-                    l.taskStarted(message, size);
-                }
-            }
-        }
-
-        @Override
-        public void taskProgress(int position) {
-            for (ProverTaskListener l: listeners) {
-                if (l != null) {
-                    l.taskProgress(position);
-                }
-            }
-        }
-
-        @Override
-        public void taskFinished(TaskFinishedInfo info) {
-            for (ProverTaskListener l: listeners) {
-                if (l != null) {
-                    l.taskFinished(info);
-                }
-            }
-        }
-    }
-
-    static class ProofMacroListener implements ProverTaskListener {
-        private ProofMacro macro;
-        private int numOfInvokedMacros;
-
-        ProofMacroListener(ProofMacro macro) {
-            this.macro = macro;
-            this.numOfInvokedMacros = 0;
-        }
-
-        @Override
-        public void taskStarted(String message, int size) {
-            assert message != null;
-            numOfInvokedMacros++;
-        }
-
-        @Override
-        public void taskProgress(int position) {
-        }
-
-        @Override
-        public void taskFinished(TaskFinishedInfo info) {
-            macro.innerMacroFinished(info);
-            numOfInvokedMacros--;
-        }
-    }
-
-    static class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
-
-        ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals,
-                               Proof proof, long time, int appliedRules,
-                               int closedGoals) {
-            super(macro, goals, proof, time, appliedRules, closedGoals);
-        }
-
-        ProofMacroFinishedInfo(ProofMacro macro, Goal goal, Proof proof,
-                long time, int appliedRules, int closedGoals) {
-            this(macro, ImmutableSLList.<Goal>nil().prepend(goal), proof,
-                 time, appliedRules, closedGoals);
-        }
-
-        ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals,
-                               Proof proof, Statistics statistics) {
-            this(macro, goals, proof,
-                 statistics == null ? 0 : statistics.time,
-                 statistics == null ? 0 : statistics.totalRuleApps,
-                 proof == null ? 0 : (proof.countBranches() - proof.openGoals().size()));
-        }
-
-        ProofMacroFinishedInfo(ProofMacro macro, Goal goal, Proof proof,
-                               Statistics statistics) {
-            this(macro, goal, proof,
-                 statistics == null ? 0 : statistics.time,
-                 statistics == null ? 0 : statistics.totalRuleApps,
-                 proof == null ? 0 : (proof.countBranches() - proof.openGoals().size()));
-        }
-
-        ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals, Proof proof) {
-            this(macro, goals, proof, proof == null ? null : proof.statistics());
-        }
-
-        ProofMacroFinishedInfo(ProofMacro macro, Goal goal, Proof proof) {
-            this(macro, goal, proof, proof == null ? null : proof.statistics());
-        }
-
-        ProofMacroFinishedInfo(ProofMacro macro, Goal goal) {
-            this(macro, goal, goal.proof());
-        }
-
-        ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals) {
-            this(macro, goals, goals.isEmpty() ? null : goals.head().proof());
-        }
-
-        ProofMacroFinishedInfo(ProofMacro macro, ProofMacroFinishedInfo info) {
-            this(macro, info.getGoals(), info.getProof());
-        }
-
-        ProofMacro getMacro() {
-            return (ProofMacro)getSource();
-        }
-
-        @SuppressWarnings("unchecked")
-        ImmutableList<Goal> getGoals() {
-            final Object result = getResult();
-            if (result == null) {
-                return ImmutableSLList.<Goal>nil();
-            } else {
-                return (ImmutableList<Goal>)result;
-            }
-        }
-    }
 }
