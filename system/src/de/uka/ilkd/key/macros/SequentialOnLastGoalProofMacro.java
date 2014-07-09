@@ -36,16 +36,24 @@ public abstract class SequentialOnLastGoalProofMacro extends SequentialProofMacr
      *             if one of the wrapped macros is interrupted.
      */
     @Override
-    public void applyTo(KeYMediator mediator,
-                        ImmutableList<Goal> goals,
-                        PosInOccurrence posInOcc,
-            ProverTaskListener listener) throws InterruptedException {
+    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+                                          ImmutableList<Goal> goals,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) throws InterruptedException {
+        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         for (ProofMacro macro : getProofMacros()) {
             // (here we do not reverse to original node)
-            macro.applyTo(mediator, goals, posInOcc, listener);
+            final ProverTaskListener pml = getListener();
+            pml.taskStarted(macro.getName(), 0);
+            info = macro.applyTo(mediator, goals, posInOcc,
+                                new CompositePTListener(listener, pml));
+            pml.taskFinished(info);
+            info = new ProofMacroFinishedInfo(this, info);
+            goals = getGoals();
             // after the first macro the posInOcc does not match any more,
             // because we changed the goal / node
             posInOcc = null;
         }
+        return info;
     }
 }

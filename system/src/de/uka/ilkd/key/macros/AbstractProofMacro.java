@@ -17,6 +17,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
+import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -25,8 +26,8 @@ import de.uka.ilkd.key.proof.Node;
  * Takes care of providing the whole ProofMacro interface by only making it
  * necessary to implement to most general application methods for a given
  * list of goals and translating the less general versions (firstly for a
- * given node and secondly having neither any goals nor a node. Although all
- * these methods can be redefined by inheritance, this is usually not
+ * given node and secondly having neither any goals nor a node). Although
+ * all these methods can be redefined by inheritance, this is usually not
  * necessary, unless you know <tt>exactly</tt> what you are doing.
  * The exception is {@link #finishAfterMacro()} for compound macros
  * (see description in {@link ProofMacro#finishAfterMacro()}).
@@ -35,12 +36,45 @@ import de.uka.ilkd.key.proof.Node;
  */
 public abstract class AbstractProofMacro implements ProofMacro {
 
+    private ImmutableList<Goal> goals = ImmutableSLList.<Goal>nil();
+    private ProofMacroListener pml = null;
+
     private static ImmutableList<Goal> getGoals(Node node) {
         if (node == null) {
             // can happen during initialisation
             return ImmutableSLList.<Goal>nil();
         } else {
             return node.proof().getSubtreeEnabledGoals(node);
+        }
+    }
+
+    private static boolean isGoalList(ImmutableList<?> list) {
+        for (Object entry : list) {
+            if (!(entry instanceof Goal)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public ImmutableList<Goal> getGoals() {
+        return this.goals;
+    }
+
+    public final ProofMacroListener getListener() {
+        return pml == null ? new ProofMacroListener(this) : pml;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void innerMacroFinished(TaskFinishedInfo info) {
+        if (info != null) {
+            Object result = info.getResult();
+            if (result instanceof ImmutableList<?> &&
+                    isGoalList((ImmutableList<?>) result)) {
+                this.goals = (ImmutableList<Goal>) result;
+            }
         }
     }
 
@@ -62,16 +96,17 @@ public abstract class AbstractProofMacro implements ProofMacro {
     }
 
     @Override
-    public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc,
-                        ProverTaskListener listener) throws InterruptedException {
-        applyTo(mediator, getGoals(mediator.getSelectedNode()), posInOcc, listener);
+    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) throws InterruptedException {
+        return applyTo(mediator, getGoals(mediator.getSelectedNode()), posInOcc, listener);
     }
 
     @Override
-    public void applyTo(KeYMediator mediator,
-                        Node node,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) throws InterruptedException {
-        applyTo(mediator, getGoals(node), posInOcc, listener);
+    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+                                          Node node,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) throws InterruptedException {
+        return applyTo(mediator, getGoals(node), posInOcc, listener);
     }
 }

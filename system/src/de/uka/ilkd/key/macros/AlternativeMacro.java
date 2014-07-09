@@ -81,16 +81,23 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
      *             if the macro is interrupted.
      */
     @Override
-    public void applyTo(KeYMediator mediator,
-                        ImmutableList<Goal> goals,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) throws InterruptedException {
+    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+                                    ImmutableList<Goal> goals,
+                                    PosInOccurrence posInOcc,
+                                    ProverTaskListener listener) throws InterruptedException {
+        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         for (ProofMacro macro : getProofMacros()) {
             if(macro.canApplyTo(mediator, goals, posInOcc)) {
-                macro.applyTo(mediator, goals, posInOcc, listener);
-                return;
+                final ProverTaskListener pml = getListener();
+                pml.taskStarted(macro.getName(), 0);
+                info = macro.applyTo(mediator, goals, posInOcc,
+                                    new CompositePTListener(listener, pml));
+                pml.taskFinished(info);
+                info = new ProofMacroFinishedInfo(this, info);
+                return info;
             }
         }
+        return info;
     }
 
     /**

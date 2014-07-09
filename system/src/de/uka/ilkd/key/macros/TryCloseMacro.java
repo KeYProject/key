@@ -97,8 +97,10 @@ public class TryCloseMacro extends AbstractProofMacro {
      * Run the automation on the goal. Retreat if not successful.
      */
     @Override
-    public void applyTo(KeYMediator mediator, ImmutableList<Goal> goals, PosInOccurrence posInOcc,
-                        ProverTaskListener listener) throws InterruptedException {
+    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+                                          ImmutableList<Goal> goals,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) throws InterruptedException {
         //
         // create the rule application engine
         final IGoalChooser chooser =
@@ -161,6 +163,8 @@ public class TryCloseMacro extends AbstractProofMacro {
             // inform the listener
             taskObserver.allTasksFinished(proof, time, appliedRules, goalsClosed);
         }
+        return new ProofMacroFinishedInfo(this, proof.openEnabledGoals(), proof);
+                                          //time, appliedRules, goalsClosed);
     }
 
     @Override
@@ -221,11 +225,11 @@ public class TryCloseMacro extends AbstractProofMacro {
         private void allTasksFinished(Proof proof, long time, int appliedRules, int closedGoals) {
 			TaskFinishedInfo info =
 					new DefaultTaskFinishedInfo(this, null, proof, time,
-                                                appliedRules, closedGoals);
-			assert backListener instanceof UserInterface;
-			final UserInterface ui = (UserInterface)backListener;
-			if (finishAfterMacro) {
-				backListener.taskFinished(info);
+                                                                    appliedRules, closedGoals);
+            assert backListener instanceof UserInterface;
+            final UserInterface ui = (UserInterface)backListener;
+            if (finishAfterMacro) {
+                backListener.taskFinished(info);
             } else if (!ui.macroChosen()) {
                 ui.finish(proof);
             }
