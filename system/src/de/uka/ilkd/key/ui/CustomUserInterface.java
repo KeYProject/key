@@ -21,6 +21,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
 /**
@@ -77,6 +78,14 @@ public class CustomUserInterface extends ConsoleUserInterface {
    @Override
    public void proofCreated(ProblemInitializer sender, ProofAggregate proofAggregate) {
       // Nothing to do
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void proofRegistered(ProofEnvironmentEvent event) {
+      // Nothing to do  
    }
 
    /**

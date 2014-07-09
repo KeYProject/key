@@ -119,6 +119,8 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
 
                 TacletLoader tacletLoader = new TacletLoader.KeYsTacletsLoader(mainWindow.getUserInterface(),mainWindow.getUserInterface(),
                                 mainWindow.getMediator().getProfile());
+                
+                
                 LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                         @Override
                         public void stopped(Throwable exception) {
@@ -140,7 +142,9 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                     
                     TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
                                  listener,
-                                new LemmaSelectionDialog(),true,tacletLoader);
+                                new LemmaSelectionDialog(),true, tacletLoader, 
+                                tacletLoader.getProofEnvForTaclets().getInitConfig(), 
+                                true);
                     loader.start();
 
             }
@@ -225,7 +229,9 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 
                 TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
                              listener,
-                            new LemmaSelectionDialog(),loadAsLemmata,tacletLoader);
+                            new LemmaSelectionDialog(),loadAsLemmata,tacletLoader,
+                            tacletLoader.getProofEnvForTaclets().getInitConfig(),
+                            true);
                 loader.start();
 
             }
@@ -278,7 +284,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                                                       fileForDefinitions ,
                                                       fileForLemmata,
                                                       filesForAxioms,
-                                                      proof.getEnv());
+                                                      proof.getInitConfig());
                
 
                 
@@ -321,7 +327,9 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 
                 TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
                             listener,
-                            new LemmaSelectionDialog(),loadAsLemmata,tacletLoader,proof.getInitConfig());
+                            new LemmaSelectionDialog(),
+                            loadAsLemmata,tacletLoader,
+                            proof.getInitConfig(), false);
                 loader.start();
 
             }

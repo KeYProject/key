@@ -27,7 +27,6 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.Taclet;
@@ -48,7 +47,6 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
 
     private String tacletName;
     private ProofAggregate proofObligation;
-    private final InitConfig environmentConfig;
 
     // The following may all possibly be null
     private String definitionFile;
@@ -105,6 +103,8 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         public void progressStarted(Object sender) {
         }
     };
+   
+    private final InitConfig environmentConfig;
  
 
     /**
@@ -154,22 +154,23 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
      * use the TacletLoader and TacletSoundlessPOLoader to generate the PO.
      */
     @Override 
-    public void readProblem(InitConfig proofConfig) throws ProofInputException {
+    public void readProblem() throws ProofInputException {
         TacletLoader loader = null;
+        
         if (tacletFile == null) {
             // prove a KeY taclet
-            loader = new TacletLoader.KeYsTacletsLoader(null, null, proofConfig.getProfile());
+            loader = new TacletLoader.KeYsTacletsLoader(null, null, environmentConfig.getProfile());
         } else {
             final ProblemInitializer problemInitializer =
-                    new ProblemInitializer( proofConfig.getProfile());
+                    new ProblemInitializer( environmentConfig.getProfile());
             // bugfix: All files are loaded relative to the basedir of the loaded file
             loader = new TacletLoader.TacletFromFileLoader(null, null, problemInitializer,
                     new File(baseDir, definitionFile), new File(baseDir, tacletFile), 
-                    fileCollection(axiomFiles), proofConfig.getProofEnv());
+                    fileCollection(axiomFiles), environmentConfig);
         }
 
         TacletSoundnessPOLoader poloader =
-                new TacletSoundnessPOLoader(listener, filter, true, loader);
+                new TacletSoundnessPOLoader(listener, filter, true, loader, loader.getProofEnvForTaclets().getInitConfig(), true);
 
         poloader.startSynchronously();
         if(proofObligation == null) {

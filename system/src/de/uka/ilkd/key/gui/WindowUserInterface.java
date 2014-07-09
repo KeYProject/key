@@ -291,14 +291,9 @@ public class WindowUserInterface extends AbstractUserInterface {
    @Override
    public void removeProof(Proof proof) {
        if (!proof.isDisposed()) {
-           // The following was copied from AbandonTaskAction when I redirected
-           // the abandon method there to this method.
-           // The code seems to do more than the original code of this method...
-           mainWindow.getProofList().removeTask(proof);
-           proof.dispose();
-
-           // The original code of this method. Neccessary?
+          // The original code of this method. Neccessary?
            mainWindow.getProofList().removeProof(proof);
+
 
            // Run the garbage collector.
            Runtime r = Runtime.getRuntime();
@@ -317,10 +312,5 @@ public class WindowUserInterface extends AbstractUserInterface {
       mainWindow.setStandardStatusLine();
    }
 
-   @Override
-   public void proofUnregistered(ProofEnvironmentEvent event) {
-      if (event.getSource().getProofs().isEmpty()) {
-         event.getSource().removeProofEnvironmentListener(this);
-      }
-   }
+  
 }

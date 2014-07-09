@@ -113,6 +113,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
     */
    private Term uninterpretedPredicate;
 
+   private InitConfig proofConfig;
+
    /**
     * Constructor.
     * @param initConfig The {@link InitConfig} to use.
@@ -138,11 +140,18 @@ public abstract class AbstractOperationPO extends AbstractPO {
       this.addSymbolicExecutionLabel = addSymbolicExecutionLabel;
    }
 
+   @Override
+   protected InitConfig getCreatedInitConfigForSingleProof() {
+      return proofConfig;
+   }
+
    /**
     * {@inheritDoc}
     */
    @Override
-   public void readProblem(InitConfig proofConfig) throws ProofInputException {
+   public void readProblem() throws ProofInputException {
+      assert proofConfig == null;
+      proofConfig = environmentConfig.deepCopy();
       final Services proofServices = proofConfig.getServices();
       final IProgramMethod pm = getProgramMethod();
       final boolean[] transactionFlags;
@@ -162,11 +171,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
               heapToAtPre.put(heap, new LinkedHashMap<Term, Term>());
               heapToAtPre.get(heap).put(tb.var(heap), tb.var(atPreVars.get(heap)));
           }
-          register(paramVars);
-          register(selfVar);
-          register(resultVar);
+          register(paramVars, proofServices);
+          register(selfVar, proofServices);
+          register(resultVar, proofServices);
           for (LocationVariable lv : atPreVars.values()) {
-              register(lv);
+              register(lv, proofServices);
           }
           ImmutableList<LocationVariable> formalParamVars = ImmutableSLList.<LocationVariable> nil();
           for (ProgramVariable paramVar : paramVars) {
@@ -174,7 +183,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                   ProgramElementName pen = new ProgramElementName("_" + paramVar.name());
                   LocationVariable formalParamVar = new LocationVariable(pen, paramVar.getKeYJavaType());
                   formalParamVars = formalParamVars.append(formalParamVar);
-                  register(formalParamVar);
+                  register(formalParamVar, proofServices);
               } else {
                   formalParamVars = formalParamVars.append((LocationVariable)paramVar);
               }
@@ -280,12 +289,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
 */
 
          // register the variables so they are declared in proof header if the proof is saved to a file
-         register(paramVars);
-         register(selfVar);
-         register(resultVar);
-         register(exceptionVar);
+         register(paramVars, proofServices);
+         register(selfVar, proofServices);
+         register(resultVar, proofServices);
+         register(exceptionVar, proofServices);
          for (LocationVariable lv : atPreVars.values()) {
-            register(lv);
+            register(lv, proofServices);
          }
 
          // create arguments from formal parameters for method call
@@ -295,7 +304,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                ProgramElementName pen = new ProgramElementName("_" + paramVar.name());
                LocationVariable formalParamVar = new LocationVariable(pen, paramVar.getKeYJavaType());
                formalParamVars = formalParamVars.append(formalParamVar);
-               register(formalParamVar);
+               register(formalParamVar, proofServices);
             }
             else {
                formalParamVars = formalParamVars.append((LocationVariable)paramVar); // The cast is ugly but legal. It is a bigger task to refactor TB.paramVars to return a list of LocationVariabe instead of ProgramVariable.
@@ -355,10 +364,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
       assignPOTerms(termPOs.toArray(new Term[termPOs.size()]));
 
       // add axioms
-      collectClassAxioms(getCalleeKeYJavaType());
+      collectClassAxioms(getCalleeKeYJavaType(), proofConfig);
 
       // for JML annotation statements
-      generateWdTaclets();
+      generateWdTaclets(proofConfig);
    }
 
    /**

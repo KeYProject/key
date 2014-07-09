@@ -85,6 +85,6 @@ public class BasicTask extends DefaultMutableTreeNode implements TaskTreeNode{
 
     /** removes the associated proof from their environment*/
     public void decoupleFromEnv() {
-	getProofEnv().removeProofList(proof);
+       getProofEnv().removeProofList(proof);
     }
 }

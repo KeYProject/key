@@ -36,6 +36,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.Debug;
 
@@ -314,5 +315,12 @@ public abstract class AbstractUserInterface implements UserInterface {
      */
     protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
         pcs.firePropertyChange(propertyName, oldValue, newValue);
+    }
+    
+    @Override
+    public void proofUnregistered(ProofEnvironmentEvent event) {
+       if (event.getSource().getProofs().isEmpty()) {
+          event.getSource().removeProofEnvironmentListener(this);
+       }
     }
 }

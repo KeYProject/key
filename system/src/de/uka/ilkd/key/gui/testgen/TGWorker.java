@@ -232,7 +232,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 				+ node.serialNr(), newSequent, "", oldProof.getInitConfig().createTacletIndex(), 
 				oldProof.getInitConfig().createBuiltInRuleIndex(),
 				oldProof.getInitConfig(), oldProof.getSettings());
-		proof.setProofEnv(oldProof.getEnv());
+		proof.setEnv(oldProof.getEnv());
 		proof.setNamespaces(oldProof.getNamespaces());
 		return proof;
 	}

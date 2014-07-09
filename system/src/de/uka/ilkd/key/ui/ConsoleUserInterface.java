@@ -38,6 +38,7 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.util.Debug;
 
 public class ConsoleUserInterface extends AbstractUserInterface {
@@ -143,10 +144,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     @Override
     public void proofCreated(ProblemInitializer sender,
             ProofAggregate proofAggregate) {
-        // TODO Implement ProblemInitializerListener.proofCreated
-        // XXX WHY AT THE MAINWINDOW?!?!
-        mediator.setProof(proofAggregate.getFirstProof());
-        proofStack = proofStack.prepend(proofAggregate.getFirstProof());
     }
 
     @Override
@@ -312,4 +309,11 @@ public class ConsoleUserInterface extends AbstractUserInterface {
         }
       return false;
    }
+
+   @Override
+   public void proofRegistered(ProofEnvironmentEvent event) {
+      mediator.setProof(event.getProofList().getFirstProof());
+      proofStack = proofStack.prepend(event.getProofList().getFirstProof());
+   }
+
 }

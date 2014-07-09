@@ -110,7 +110,6 @@ public class TaskTree extends JPanel {
        for (int i=0; i<tn.allProofs().length; i++) {
           tn.allProofs()[i].removeProofTreeListener(proofTreeListener);
           tn.allProofs()[i].mgt().removeProofListener();
-          tn.allProofs()[i].dispose();
        }
        MainWindow.getInstance().getProofTreeView().
        removeProofs(tn.allProofs());
@@ -120,11 +119,15 @@ public class TaskTree extends JPanel {
        if(mediator.getInteractiveProver()!=null){
           mediator.getInteractiveProver().clear();
        }
+
        if (path!=null) {
           TaskTreeNode tn0 = (TaskTreeNode) path.getLastPathComponent();
           mediator.setProof(tn0.proof());
        } else {
           mediator.setProof(null);
+       }
+       for (int i=0; i<tn.allProofs().length; i++) {
+          tn.allProofs()[i].dispose();
        }
     }
     

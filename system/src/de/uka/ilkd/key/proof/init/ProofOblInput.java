@@ -28,7 +28,7 @@ public interface ProofOblInput {
      */
     String name();
         
-    void readProblem(InitConfig proofConfig) throws ProofInputException;
+    void readProblem() throws ProofInputException;
 
     /**
      * Returns the proof obligation term as result of the proof obligation

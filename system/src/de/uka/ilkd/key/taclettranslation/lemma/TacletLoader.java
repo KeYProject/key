@@ -16,7 +16,6 @@ package de.uka.ilkd.key.taclettranslation.lemma;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -46,7 +45,7 @@ public abstract class TacletLoader {
     protected final ProgressMonitor monitor;
     protected final ProblemInitializerListener listener;
     protected final Profile profile;
-    protected ProofEnvironment envForTaclets;
+    private ProofEnvironment envForTaclets;
 
     public TacletLoader(ProgressMonitor monitor,
             ProblemInitializerListener listener,
@@ -137,9 +136,9 @@ public abstract class TacletLoader {
     }
 
 
-//    public void setProofEnvForTaclets(ProofEnvironment proofEnv) {
-//        this.envForTaclets = proofEnv;
-//    }
+    public void setProofEnvForTaclets(ProofEnvironment proofEnv) {
+        this.envForTaclets = proofEnv;
+    }
 
 
     /* 
@@ -165,14 +164,13 @@ public abstract class TacletLoader {
                 ProblemInitializer problemInitializer,
                 File fileForDefinitions, File fileForTaclets,
                 Collection<File> filesForAxioms,
-                ProofEnvironment env) {
-            super(pm,listener, env.getInitConfig().getProfile());
+                InitConfig initConfig) {
+            super(pm,listener, initConfig.getProfile());
             this.fileForDefinitions = fileForDefinitions;
             this.fileForTaclets = fileForTaclets;
             this.filesForAxioms = filesForAxioms;
             this.problemInitializer = problemInitializer;
-            this.envForTaclets = env;
-            this.initConfig = env.getInitConfig();
+            this.initConfig = initConfig;
         }
 
         public TacletFromFileLoader(ProgressMonitor pm,
@@ -195,7 +193,6 @@ public abstract class TacletLoader {
             this.fileForDefinitions = loader.fileForDefinitions;
             this.fileForTaclets = loader.fileForTaclets;
             this.filesForAxioms = loader.filesForAxioms;
-            this.envForTaclets = loader.envForTaclets;
             this.initConfig = initConfig;
         }
         
@@ -279,7 +276,7 @@ public abstract class TacletLoader {
 
         @Override
         public ImmutableSet<Taclet> getTacletsAlreadyInUse() {
-            return getProofEnvForTaclets().getInitConfig().getTaclets();
+            return initConfig.getTaclets();
         }
 
     }

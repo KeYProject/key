@@ -46,11 +46,11 @@ public class TestSideProofStore extends TestCase {
          InitConfig ic = new InitConfig(services);
          ProofEnvironment pe = new ProofEnvironment(ic);
          Proof p1 = new Proof(ic);
-         p1.setProofEnv(pe);
+         p1.setEnv(pe);
          Proof p2 = new Proof(ic);
-         p2.setProofEnv(pe);
+         p2.setEnv(pe);
          Proof p3 = new Proof(ic);
-         p3.setProofEnv(pe);
+         p3.setEnv(pe);
          Proof[] allProofs = new Proof[] {p1, p2, p3};
          // Test initial state
          assertEntries(allProofs, new Proof[0]);
