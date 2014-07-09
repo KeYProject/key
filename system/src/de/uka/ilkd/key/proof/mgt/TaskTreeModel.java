@@ -68,7 +68,7 @@ public class TaskTreeModel extends DefaultTreeModel {
          removeNodeFromParent(p);
       }
 
-      if(env != null) {
+      if(env != null && !env.getProofs().isEmpty()) {
          env.getProofs()
          .iterator()
          .next()
