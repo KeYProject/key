@@ -13,9 +13,6 @@
 
 package org.key_project.sed.key.core.model;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.key_project.sed.core.model.ISEDDebugNode;
@@ -27,11 +24,13 @@ import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.sed.key.core.util.LogUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.proof.TermProgramVariableCollectorKeepUpdatesForBreakpointconditions;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -76,12 +75,17 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    private IKeYSEDDebugNode<?> lastResumedKeyNode;
    
    /**
-    * Listens for changes on {@link #getUi()}.
+    * Listens for auto mode start and stop events.
     */
-   private final PropertyChangeListener uiListener = new PropertyChangeListener() {
+   private final AutoModeListener autoModeListener = new AutoModeListener() {
       @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-         handlePropertyChange(evt);
+      public void autoModeStarted(ProofEvent e) {
+         handleAutoModeStarted(e);
+      }
+      
+      @Override
+      public void autoModeStopped(ProofEvent e) {
+         handleAutoModeStopped(e);
       }
    };
 
@@ -94,7 +98,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
       super(target, true);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
-      getUi().addPropertyChangeListener(UserInterface.PROP_AUTO_MODE, uiListener);
+      getMediator().addAutoModeListener(autoModeListener);
       initializeAnnotations();
    }
 
@@ -213,40 +217,45 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    public KeYBreakpointManager getBreakpointManager() {
       return getDebugTarget().getBreakpointManager();
    }
-   
+
    /**
-    * When {@link UserInterface#isAutoMode()} on {@link #getUi()} has changed.
-    * @param evt The event.
+    * When the auto mode is started.
+    * @param e The {@link ProofEvent}.
     */
-   protected void handlePropertyChange(PropertyChangeEvent evt) {
-      if (getMediator().getSelectedProof() == getProof()) {
-         if (getUi().isAutoMode()) {
-            try {
-               // Inform UI that the process is resumed
-               super.resume();
-               getDebugTarget().threadResumed(this);
-            }
-            catch (DebugException exception) {
-               LogUtil.getLogger().logError(exception);
-            }
+   protected void handleAutoModeStarted(ProofEvent e) {
+      if (e.getSource() == getProof() && getMediator().autoMode()) { // Sadly auto mode started events are misused and do not really indicate that a auto mode is running
+         try {
+            // Inform UI that the process is resumed
+            super.resume();
+            getDebugTarget().threadResumed(this);
          }
-         else {
+         catch (DebugException exception) {
+            LogUtil.getLogger().logError(exception);
+         }
+      }
+   }
+
+   /**
+    * When the auto mode has finished.
+    * @param e The {@link ProofEvent}.
+    */
+   protected void handleAutoModeStopped(ProofEvent e) {
+      if (e.getSource() == getProof() && !getMediator().autoMode()) { // Sadly auto mode stopped events are misused and do not really indicate that a auto mode has stopped
+         try {
+            updateExecutionTree(getBuilder());
+         }
+         catch (Exception exception) {
+            LogUtil.getLogger().logError(exception);
+            LogUtil.getLogger().openErrorDialog(null, exception);
+         }
+         finally {
             try {
-               updateExecutionTree(getBuilder());
+               super.suspend();
+               getDebugTarget().threadSuspended(this);
             }
-            catch (Exception exception) {
-               LogUtil.getLogger().logError(exception);
-               LogUtil.getLogger().openErrorDialog(null, exception);
-            }
-            finally {
-               try {
-                  super.suspend();
-                  getDebugTarget().threadSuspended(this);
-               }
-               catch (DebugException e1) {
-                  LogUtil.getLogger().logError(e1);
-                  LogUtil.getLogger().openErrorDialog(null, e1);
-               }
+            catch (DebugException e1) {
+               LogUtil.getLogger().logError(e1);
+               LogUtil.getLogger().openErrorDialog(null, e1);
             }
          }
       }
@@ -271,7 +280,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * @throws DebugException Occurred Exception
     */
    public void disconnect() throws DebugException {
-      getUi().removePropertyChangeListener(UserInterface.PROP_AUTO_MODE, uiListener);
+      getMediator().removeAutoModeListener(autoModeListener);
    }
    
    /**
@@ -279,7 +288,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     */
    @Override
    public void terminate() throws DebugException {
-      getUi().removePropertyChangeListener(UserInterface.PROP_AUTO_MODE, uiListener);
+      getMediator().removeAutoModeListener(autoModeListener);
       super.terminate();
    }
    
@@ -289,7 +298,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    @Override
    public boolean canResume() {
       return super.canResume() && 
-             !getMediator().autoMode() && // Only one proof completion per time is possible
+             !getMediator().getInteractiveProver().isAutoMode() && // Only one proof completion per time is possible
              getUi().isAutoModeSupported(getProof()); // Otherwise Auto Mode is not available.
    }
    
@@ -385,7 +394,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    @Override
    public boolean canSuspend() {
       return super.canSuspend() && 
-             getMediator().autoMode() && // Only if the auto mode is in progress
+             getMediator().getInteractiveProver().isAutoMode() && // Only if the auto mode is in progress
              getMediator().getSelectedProof() == getProof(); // And the auto mode handles this proof
    }
    
