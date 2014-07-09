@@ -27,7 +27,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
     @Override
     public void setUp() {
-        parseDecls("\\programVariables {Heap h;}");
+        parseDecls("\\programVariables {Heap h, h2;}");
         parseDecls("\\programVariables {testTermParserHeap.A a;}");
         parseDecls("\\programVariables {testTermParserHeap.A1 a1;}");
     }

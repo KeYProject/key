@@ -35,9 +35,8 @@ public class KeYParserF extends KeYParser {
         return term.op().name().toString().endsWith("::select") && term.arity() == 3;
     }
 
-    private static boolean isImplicitHeap(Term t) {
-        // is there a more accurate check than this?
-        return t.toString().equals("heap");
+    private boolean isImplicitHeap(Term t) {
+        return getServices().getTermBuilder().getBaseHeap().equals(t);
     }
 
     private Term replaceHeap(Term term, Term heap, int depth) throws RecognitionException {
