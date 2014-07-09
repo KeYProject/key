@@ -64,11 +64,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     public void testFieldAtHeapSyntax() {
         Term t1, t2;
 
-        parseTerm("h");
-
-        // test new syntax
         t1 = parseTerm("a.f@h");
-//        System.out.println("Y: " + t1);
         t2 = parseTerm("int::select(h, a, testTermParserHeap.A::$f)");
         assertEquals(t1, t2);
 
@@ -79,6 +75,10 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         t1 = parseTerm("a1.(testTermParserHeap.A::f)@h");
         t2 = parseTerm("int::select(h, a1, testTermParserHeap.A::$f)");
         assertEquals(t1, t2);
+        
+        t1 = parseTerm("a.next.next.next.f@h");
+//        System.out.println(t1);
+//        assertEquals(t1, t2);
     }
 
     public void testStoreSyntax() {

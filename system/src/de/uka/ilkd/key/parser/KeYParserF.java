@@ -36,7 +36,7 @@ public class KeYParserF extends KeYParser {
     }
 
     private static boolean isImplicitHeap(Term t) {
-        // there is probably something better than using String comparison here
+        // is there a more accurate check than this?
         return t.toString().equals("heap");
     }
 
@@ -48,7 +48,7 @@ public class KeYParserF extends KeYParser {
             }
 
             if (!isImplicitHeap(term.sub(0))) {
-                semanticError("Expecting implicit heap as first argument of: " + term);
+                semanticError("Expecting program variable heap as first argument of: " + term);
             }
 
             Term[] params = new Term[]{heap, replaceHeap(term.sub(1), heap, depth - 1), term.sub(2)};
@@ -64,7 +64,7 @@ public class KeYParserF extends KeYParser {
 
         if (!isHeapTerm(heap)) {
             semanticError("Expecting term of type Heap but sort is " + heap.sort()
-                    + "for term: " + term);
+                    + " for term: " + term);
         }
 
         Term result = replaceHeap(term, heap, globalImplicitHeapSuffixCounter);
