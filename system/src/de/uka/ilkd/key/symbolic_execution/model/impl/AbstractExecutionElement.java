@@ -133,7 +133,10 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
     * @return The {@link String} representation of the given {@link Term}.
     */
    protected String formatTerm(Term term) {
-      return SymbolicExecutionUtil.formatTerm(term, getServices(), settings.isUsePrettyPrinting());
+      return SymbolicExecutionUtil.formatTerm(term, 
+                                              getServices(), 
+                                              settings.isUseUnicode(),
+                                              settings.isUsePrettyPrinting());
    }
 
    /**

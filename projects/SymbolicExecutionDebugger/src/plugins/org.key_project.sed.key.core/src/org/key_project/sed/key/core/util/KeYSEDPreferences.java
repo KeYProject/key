@@ -53,6 +53,11 @@ public class KeYSEDPreferences {
    public static final String MERGE_BRANCH_CONDITIONS = "org.key_project.sed.key.core.preference.mergeBranchConditions";
 
    /**
+    * Preference key to define that unicode characters are used or not.
+    */
+   public static final String USE_UNICODE = "org.key_project.sed.key.core.preference.useUnicode";
+
+   /**
     * Preference key to define that pretty printing is used or not.
     */
    public static final String USE_PRETTY_PRINTING = "org.key_project.sed.key.core.preference.usePrettyPrinting";
@@ -228,6 +233,38 @@ public class KeYSEDPreferences {
     */
    public static void setDefaultMergeBranchConditions(boolean defaultValue) {
       getStore().setDefault(MERGE_BRANCH_CONDITIONS, defaultValue);
+   }
+   
+   /**
+    * Checks if pretty printing is used or not.
+    * @return Use pretty printing?
+    */
+   public static boolean isUseUnicode() {
+      return getStore().getBoolean(USE_UNICODE);
+   }
+   
+   /**
+    * Checks if pretty printing is used or not by default.
+    * @return Use pretty printing?
+    */
+   public static boolean isDefaultUseUnicode() {
+      return getStore().getDefaultBoolean(USE_UNICODE);
+   }
+   
+   /**
+    * Sets if pretty printing is used or not.
+    * @param value Use pretty printing?
+    */
+   public static void setUseUnicode(boolean value) {
+      getStore().setValue(USE_UNICODE, value);
+   }
+   
+   /**
+    * Sets if pretty printing is used or not by default.
+    * @param defaultValue Use pretty printing?
+    */
+   public static void setDefaultUseUnicode(boolean defaultValue) {
+      getStore().setDefault(USE_UNICODE, defaultValue);
    }
    
    /**

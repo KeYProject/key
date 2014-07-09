@@ -92,6 +92,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           boolean showVariablesOfSelectedDebugNode = KeySEDUtil.isShowVariablesOfSelectedDebugNode(configuration);
           boolean executeMethodRange = KeySEDUtil.isExecuteMethodRange(configuration);
           boolean usePrettyPrinting = KeySEDUtil.isUsePrettyPrinting(configuration);
+          boolean useUnicode = usePrettyPrinting && KeySEDUtil.isUseUnicode(configuration);
           boolean showSignatureOnMethodReturnNodes = KeySEDUtil.isShowSignatureOnMethodReturnNodes(configuration);
           Position methodRangeStart = new KeYUtil.CursorPosition(KeySEDUtil.getMethodRangeStartLine(configuration), KeySEDUtil.getMethodRangeStartColumn(configuration));
           Position methodRangeEnd = new KeYUtil.CursorPosition(KeySEDUtil.getMethodRangeEndLine(configuration), KeySEDUtil.getMethodRangeEndColumn(configuration));
@@ -139,6 +140,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                                              location, 
                                                              classPaths, 
                                                              bootClassPath, 
+                                                             useUnicode,
                                                              usePrettyPrinting,
                                                              showSignatureOnMethodReturnNodes); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
           // Validate proof settings
@@ -250,7 +252,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           proof = ui.createProof(initConfig, input);
        }
        // Create symbolic execution tree builder
-       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof, settings.isMergeBranchConditions(), settings.isUsePrettyPrinting());
+       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof, settings.isMergeBranchConditions(), settings.isUseUnicode(), settings.isUsePrettyPrinting());
        builder.analyse();
        // Create environment used for symbolic execution
        return new SymbolicExecutionEnvironment<UserInterface>(ui, initConfig, builder);
