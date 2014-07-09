@@ -26,6 +26,7 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.ProofMacroListener;
 import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.Goal;
@@ -63,26 +64,6 @@ public abstract class AbstractUserInterface implements UserInterface {
         return pl;
     }
 
-    public ProofMacroListener addProgressBarListener(ProofMacro macro, int numberGoals) {
-        final ProgressBarListener pml =
-                new ProgressBarListener(macro, numberGoals, macro.getNumberSteps());
-        listeners = listeners.prepend(pml);
-        return pml;
-    }
-
-    public ProofMacroListener removeListener(ProofMacro macro) {
-        if (macro == null) {
-            return null;
-        }
-        for (ProofMacroListener pml: this.listeners) {
-            if (macro.equals(pml.getMacro())) {
-                this.listeners = this.listeners.removeFirst(pml);
-                return pml;
-            }
-        }
-        return null;
-    }
-
     @Override
     public  IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
         app = forced? app.forceInstantiate(goal): app.tryToInstantiate(goal);
@@ -117,12 +98,16 @@ public abstract class AbstractUserInterface implements UserInterface {
         assert macroChosen();
         if (getMacro().canApplyTo(getMediator(), null)) {
             System.out.println(getMacroConsoleOutput());
+            Proof proof = getMediator().getSelectedProof();
+            TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(getMacro(), proof);
             try {
                 getMediator().stopInterface(true);
                 getMediator().setInteractive(false);
                 final ProverTaskListener ptl = new ProofMacroListenerAdapter();
+                taskStarted(getMacro().getName(), 0);
                 ptl.taskStarted(getMacro().getName(), 0);
-                getMacro().applyTo(getMediator(), null, new ProofMacroListenerAdapter());
+                info = getMacro().applyTo(getMediator(), null, ptl);
+                ptl.taskFinished(info);
                 synchronized(getMacro()) {
                     // wait for macro to terminate
                     getMediator().setInteractive(true);
@@ -132,10 +117,6 @@ public abstract class AbstractUserInterface implements UserInterface {
                 Debug.out("Proof macro has been interrupted:");
                 Debug.out(ex);
             } finally {
-                Proof proof = getMediator().getSelectedProof();
-                TaskFinishedInfo info =
-                        new DefaultTaskFinishedInfo(getMacro(), null, proof, proof.getAutoModeTime(),
-                                                    proof.countNodes(), proof.openGoals().size());
                 taskFinished(info);
             }
             return true;
@@ -360,49 +341,6 @@ public abstract class AbstractUserInterface implements UserInterface {
     abstract protected void macroStarted(String message, int size);
     abstract protected void macroFinished(TaskFinishedInfo info);
 
-
-    /**
-     * This observer acts as intermediate instance between the reports by the
-     * strategy and the UI reporting progress.
-     *
-     * The number of total steps is computed and all local reports are
-     * translated in termini of the total number of steps such that a continuous
-     * progress is reported.
-     *
-     * fixes #1356
-     */
-    private class ProgressBarListener extends ProofMacroListener {
-        private int numberGoals;
-        private int numberSteps;
-        private int completedGoals;
-
-        ProgressBarListener(ProofMacro macro, int numberGoals, int numberSteps) {
-            super(macro);
-            this.numberGoals = numberGoals;
-            this.numberSteps = numberSteps;
-        }
-
-        @Override
-        public void taskStarted(String message, int size) {
-            super.taskStarted(message, size);
-            assert size == numberSteps;
-            String suffix = " [" + (completedGoals + 1) + "/" + numberGoals + "]";
-            AbstractUserInterface.this.taskStarted(message + suffix, numberGoals * numberSteps);
-            AbstractUserInterface.this.taskProgress(completedGoals * numberSteps);
-        }
-
-        @Override
-        public void taskProgress(int position) {
-            super.taskProgress(position);
-            AbstractUserInterface.this.taskProgress(completedGoals * numberSteps + position);
-        }
-
-        @Override
-        public void taskFinished(TaskFinishedInfo info) {
-            super.taskFinished(info);
-            completedGoals ++;
-        }
-    }
 
     private class ProofMacroListenerAdapter implements ProverTaskListener {
 

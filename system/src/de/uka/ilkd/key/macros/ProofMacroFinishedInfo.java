@@ -81,6 +81,10 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
         return (ProofMacro)getSource();
     }
 
+    public static ProofMacroFinishedInfo getDefaultInfo(ProofMacro macro, Proof proof) {
+        return new ProofMacroFinishedInfo(macro, ImmutableSLList.<Goal>nil(), proof);
+    }
+
     @SuppressWarnings("unchecked")
     public ImmutableList<Goal> getGoals() {
         final Object result = getResult();

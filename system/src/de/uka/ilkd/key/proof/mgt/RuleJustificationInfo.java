@@ -37,9 +37,9 @@ public class RuleJustificationInfo {
                 if (key.equals(ruleKey) && r != key.r) {
                     throw new IllegalArgumentException("Rule " + r.name()
                             + " already in registered.");
-                  
+
                }
-            }         
+            }
          } else {
              rule2justif.put(ruleKey, j);
          }

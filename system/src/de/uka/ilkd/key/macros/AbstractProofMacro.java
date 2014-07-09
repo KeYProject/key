@@ -78,10 +78,6 @@ public abstract class AbstractProofMacro implements ProofMacro {
         return this.goals;
     }
 
-    public final ProofMacroListener getListener() {
-        return pml == null ? new ProofMacroListener(this) : pml;
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public void innerMacroFinished(TaskFinishedInfo info) {
