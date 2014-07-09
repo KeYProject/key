@@ -36,13 +36,16 @@ import org.eclipse.graphiti.features.context.impl.LayoutContext;
 import org.eclipse.graphiti.features.impl.AbstractUpdateFeature;
 import org.eclipse.graphiti.features.impl.Reason;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
+import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
+import org.eclipse.graphiti.services.Graphiti;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.util.ISEDIterator;
 import org.key_project.sed.core.util.SEDPreorderIterator;
@@ -121,6 +124,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     * {@link ISEDDebugTarget} in {@link #updateChildren(PictogramElement, IProgressMonitor)}.
     */
    private int maxX;
+   private int maxY;
    
    /**
     * Constructor.
@@ -272,7 +276,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       if (pictogramElement.getGraphicsAlgorithm() instanceof Text) {
          result = (Text)pictogramElement.getGraphicsAlgorithm();
       }
-      else if (pictogramElement instanceof ContainerShape) {
+      else if (pictogramElement instanceof ContainerShape && pictogramElement.getGraphicsAlgorithm() instanceof  RoundedRectangle) {
          ContainerShape cs = (ContainerShape)pictogramElement;
          for (Shape shape : cs.getChildren()) {
             result = findNameText(shape);
@@ -292,20 +296,25 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
          // Update name
          PictogramElement pictogramElement = context.getPictogramElement();
          monitor.beginTask("Update element: " + pictogramElement, 3);
-         boolean success = updateName(pictogramElement, new SubProgressMonitor(monitor, 1));
-         monitor.worked(1);
          
-         Object bo = getBusinessObjectForPictogramElement(pictogramElement);
-         System.out.println("Node: " + bo + ", Picto: " + pictogramElement.getGraphicsAlgorithm());
+         // NEW
+         Object bo = getFeatureProvider().getBusinessObjectForPictogramElement(pictogramElement);
+         boolean success = updateName(pictogramElement, new SubProgressMonitor(monitor, 1));
+         
+         
+         
+         monitor.worked(1);
          
          // Update children, they have the correct layout after this step
          final int OFFSET = getDiagram().getGridUnit() * 2;
          if (success) {
+//            System.out.println("Node: " + bo + ", Picto: " + pictogramElement);
             success = updateChildren(pictogramElement, OFFSET, new SubProgressMonitor(monitor, 1));
          }
          monitor.worked(1);
          // Update parents, because children maybe have now a bigger width and overlap with other branches
          if (success) {
+//            System.out.println("Node: " + bo);
             success = updateParents(pictogramElement, OFFSET, new SubProgressMonitor(monitor, 1));
          }
          monitor.worked(1);
@@ -340,7 +349,9 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                LayoutContext layoutContext = new LayoutContext(pictogramElement);
                layoutContext.putProperty(AbstractDebugNodeLayoutFeature.WIDTH_TO_SET, AbstractDebugNodeAddFeature.computeInitialWidth(getDiagram(), businessName, text.getFont()));
                layoutContext.putProperty(AbstractDebugNodeLayoutFeature.HEIGHT_TO_SET, AbstractDebugNodeAddFeature.computeInitialHeight(getDiagram(), businessName, text.getFont()));
-               getFeatureProvider().layoutIfPossible(layoutContext);
+               
+               // Does not work with collapse yet (why?)
+//               getFeatureProvider().layoutIfPossible(layoutContext);
                // Add children
                return true;
             }
@@ -372,6 +383,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                                     IProgressMonitor monitor) throws DebugException {
       monitor.beginTask("Update children", IProgressMonitor.UNKNOWN);
       maxX = 0;
+      maxY = 0;
       try {
          if (!monitor.isCanceled()) {
             Object[] bos = getAllBusinessObjectsForPictogramElement(pictogramElement);
@@ -381,6 +393,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                   // Add all children left aligned
                   Set<ISEDDebugNode> leafs = updateChildrenLeftAligned((ISEDDebugElement)bos[i], monitor, offsetBetweenPictogramElements, maxX);
                   maxX += offsetBetweenPictogramElements;
+//                  maxY += offsetBetweenPictogramElements;
                   monitor.worked(1);
                   // Center sub tree
                   centerChildren(leafs, monitor);
@@ -413,19 +426,103 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       Set<ISEDDebugNode> leafs = new LinkedHashSet<ISEDDebugNode>();
       ISEDIterator iter = new SEDPreorderIterator(businessObject);
       PictogramElement parentPE = null;
+      boolean visible = true;
       while (iter.hasNext() && !monitor.isCanceled()) {
          ISEDDebugElement next = iter.next();
          PictogramElement nextPE = getPictogramElementForBusinessObject(next);
          if (nextPE == null) {
             if (next instanceof ISEDDebugNode) { // Ignore ISEDDebugTarget which has no graphical representation
                ISEDDebugNode nextNode = (ISEDDebugNode)next;
-               createGraphicalRepresentationForNode(parentPE, nextNode, offsetBetweenPictogramElements, initialX);
+//               nextPE = getPictogramElementForBusinessObject(next);
+//               
+//               boolean isInMethod = Boolean.parseBoolean(Graphiti.getPeService().getPropertyValue(nextPE, "isInMethod"));
+//               
+//               if(nextNode instanceof ISEDMethodCall)
+//               {
+//                  boolean isCollapsed = Boolean.parseBoolean(Graphiti.getPeService().getPropertyValue(nextPE, "collapsed"));
+//                  if(isCollapsed)
+//                     visible = false;
+//               }
+               
+//               if(visible)
+                  createGraphicalRepresentationForNode(parentPE, nextNode, offsetBetweenPictogramElements, initialX);
                nextPE = getPictogramElementForBusinessObject(next);
                if (nextPE != null) {
                   // Update maxX to make sure that ISEDDebugTargets don't overlap each other.
                   GraphicsAlgorithm nextGA = nextPE.getGraphicsAlgorithm();
-                  if (nextGA.getX() + nextGA.getWidth() > maxX) {
+                  
+                  if(nextGA.getX() + nextGA.getWidth() > maxX)
                      maxX = nextGA.getX() + nextGA.getWidth();
+                  
+                  if(nextGA.getY() + nextGA.getHeight() > maxY)
+                     maxY = nextGA.getY() + nextGA.getHeight();
+                  
+                  
+                  ISEDDebugNode node = nextNode;
+                  boolean isInMethod = Boolean.parseBoolean(Graphiti.getPeService().getPropertyValue(nextPE, "isInMethod"));
+
+                  if(node instanceof ISEDMethodCall && isInMethod)
+                  {
+                     System.out.println("hallo");
+                     do {
+                        node = node.getParent();
+                     } while(!(node instanceof ISEDMethodCall));
+                     
+                     System.out.println(node.getParent().getNodeType());
+                  }
+                  
+//                  if(node instanceof ISEDMethodCall)
+//                  {
+//                     boolean isCollapsed = Boolean.parseBoolean(Graphiti.getPeService().getPropertyValue(nextPE, "collapsed"));
+//                     if(isCollapsed)
+//                     {
+//                        return leafs;
+//                     }
+//                  }
+                  
+                  if(node.getParent() instanceof ISEDMethodCall)
+                  {
+                     PictogramElement pe = getPictogramElementForBusinessObject(node.getParent());
+                     boolean isCollapsed = Boolean.parseBoolean(Graphiti.getPeService().getPropertyValue(pe, "collapsed"));
+                     if(isCollapsed)
+                     {
+                        nextPE.setVisible(false);
+                        int methodHeight = Integer.parseInt(Graphiti.getPeService().getPropertyValue(pe, "height"));
+                        if(methodHeight > 2 * nextGA.getHeight() + offsetBetweenPictogramElements){
+                           updateMethodHeight(pe, 2 * nextGA.getHeight() + offsetBetweenPictogramElements, nextGA.getHeight());
+                           System.out.println("hallO");
+                        }
+                     }
+                  }
+                  else if(isInMethod)
+                  {
+                     PictogramElement pe = getPictogramElementForBusinessObject(node.getParent());
+                     if(!pe.isVisible())
+                        nextPE.setVisible(false);
+                  }
+                  
+                  if(isInMethod || node instanceof ISEDMethodCall)
+                  {
+                     while(!(node instanceof ISEDMethodCall))
+                        node = node.getParent();
+                     
+                     PictogramElement pe = getPictogramElementForBusinessObject(node);
+                     int methodWidth = Integer.parseInt(Graphiti.getPeService().getPropertyValue(pe, "width"));
+                     int methodHeight = Integer.parseInt(Graphiti.getPeService().getPropertyValue(pe, "height"));
+
+                     if(maxX > methodWidth)
+                     {
+                        Graphiti.getPeService().setPropertyValue(pe, "width", Integer.toString(maxX));
+                        updateMethodWidth(pe, maxX);
+                     }
+                     
+                     if(maxY > methodHeight)
+                     {
+                        Graphiti.getPeService().setPropertyValue(pe, "height", Integer.toString(maxY));
+                        boolean isCollapsed = Boolean.parseBoolean(Graphiti.getPeService().getPropertyValue(pe, "collapsed"));
+                        if(!isCollapsed)
+                           updateMethodHeight(pe, maxY, nextGA.getHeight());
+                     }
                   }
                }
                if (ArrayUtil.isEmpty(nextNode.getChildren())) {
@@ -452,41 +549,60 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                                                        int offsetBetweenPictogramElements,
                                                        int initialX) throws DebugException { 
       AreaContext areaContext = new AreaContext();
+      
       if (parentPE != null) {
          ISEDDebugNode parent = node.getParent();
-         if (parent != null) {
+         
+         GraphicsAlgorithm parentGA = parentPE.getGraphicsAlgorithm();
+         
+         int areaX = -1;
+         int areaY = parentGA.getY() + parentGA.getHeight() + offsetBetweenPictogramElements;
+         
+         if(parent != null)
+         {
             ISEDDebugNode previousSibling = ArrayUtil.getPrevious(parent.getChildren(), node);
+            boolean isInMethod = Boolean.parseBoolean(Graphiti.getPeService().getPropertyValue(parentPE, "isInMethod"));
+            int methodOffset = 0;
+            
+            if(isInMethod)
+            {
+               ISEDDebugNode pe = parent;
+               while(!(pe instanceof ISEDMethodCall))
+                  pe = pe.getParent();
+
+               methodOffset = getPictogramElementForBusinessObject(pe).getGraphicsAlgorithm().getY(); 
+               areaY += methodOffset;
+            }
+            else if(parent instanceof ISEDMethodCall)
+            {               
+               areaY = parentGA.getY() + offsetBetweenPictogramElements;
+               parentGA = ((ContainerShape)parentPE).getChildren().get(1).getGraphicsAlgorithm();
+               areaY += parentGA.getY() + parentGA.getHeight();
+            }
+            
             if (previousSibling != null) {
                // Compute bounds of the sub tree starting by the previous sibling.
                Rectangle previousBounds = computeSubTreeBounds(previousSibling);
                if (previousBounds != null) {
                   // Add right to the previous sibling directly under parent
-                  areaContext.setX(previousBounds.width() + offsetBetweenPictogramElements); 
-                  areaContext.setY(previousBounds.y());
-               }
-               else {
-                  // Add directly under parent
-                  // Add directly under parent, but use x of most left pe in branch
-                  int x = findMostLeftXOfBranchInParents(parent);
-                  GraphicsAlgorithm parentGA = parentPE.getGraphicsAlgorithm();
-                  areaContext.setX(x); 
-                  areaContext.setY(parentGA.getY() + parentGA.getHeight() + offsetBetweenPictogramElements);
+                  areaX = previousBounds.width() + offsetBetweenPictogramElements;
+                  areaY = previousBounds.y() + methodOffset;
                }
             }
-            else {
+            
+            // If we dont have any previous sibling or we dont have a subtree at the previous sibling
+            if(areaX == -1) {
                // Add directly under parent, but use x of most left pe in branch
-               int x = findMostLeftXOfBranchInParents(parent);
-               GraphicsAlgorithm parentGA = parentPE.getGraphicsAlgorithm();
-               areaContext.setX(x); 
-               areaContext.setY(parentGA.getY() + parentGA.getHeight() + offsetBetweenPictogramElements);
+               areaX = findMostLeftXOfBranchInParents(parent);
             }
          }
          else {
             // Add directly under parent
-            GraphicsAlgorithm parentGA = parentPE.getGraphicsAlgorithm();
-            areaContext.setX(parentGA.getX()); 
-            areaContext.setY(parentGA.getY() + parentGA.getHeight() + offsetBetweenPictogramElements);
+            areaX = parentGA.getX();
          }
+         
+         areaContext.setX(areaX);
+         areaContext.setY(areaY);         
       }
       else {
          areaContext.setLocation(initialX, getDiagram().getGridUnit());
@@ -600,7 +716,16 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                return allChildrenDone;
             }
          });
-         final PictogramElement nextPE = getPictogramElementForBusinessObject(next);
+         
+         final PictogramElement nextPE;
+         if(next instanceof ISEDMethodCall)
+         {
+            ContainerShape parentContainer = (ContainerShape) getPictogramElementForBusinessObject(next);
+            nextPE = (ContainerShape) parentContainer.getChildren().get(1);
+         }
+         else
+            nextPE = getPictogramElementForBusinessObject(next);
+
          // Compute new x margin to center current branch under his children 
          int xMargin;
          int xStart;
@@ -635,8 +760,16 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
          ISEDDebugNode current = next;
          PictogramElement currentPE = nextPE;
          do {
-            doneNodes.add(current); // Mark element as centered because it will be done before the next leaf node will be treated in outer most loop 
-            currentPE = getPictogramElementForBusinessObject(current);
+            doneNodes.add(current); // Mark element as centered because it will be done before the next leaf node will be treated in outer most loop
+            
+            if(current instanceof ISEDMethodCall)
+            {
+               ContainerShape parentContainer = (ContainerShape) getPictogramElementForBusinessObject(current);
+               currentPE = (ContainerShape) parentContainer.getChildren().get(1);
+            }
+            else
+               currentPE = getPictogramElementForBusinessObject(current);
+            
             descendantsPE.add(currentPE);
             int currentWidth = currentPE.getGraphicsAlgorithm().getWidth();
             if (maxInitialised) {
@@ -713,6 +846,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                   if (parent != null) {
                      // Find most left node in righter nodes
                      PictogramElement mostLeftSiblingPE = findMostLeftSiblingPE(node);
+                     
                      if (mostLeftSiblingPE != null) {
                         // Compute maximal branch x and width
                         int maxXOnParents = findMostRightXOfBranchInParents(node);
@@ -723,6 +857,20 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                         if (distance != 0) {
                            // Move righter nodes by the given distance
                            moveRighterNodes(node, distance, monitor);
+
+                           PictogramElement pe = getPictogramElementForBusinessObject(node);
+                           boolean isInMethod = Boolean.parseBoolean(Graphiti.getPeService().getPropertyValue(pe, "isInMethod"));
+                           if(isInMethod)
+                           {
+                              while(!(node instanceof ISEDMethodCall))
+                                 node = node.getParent();
+                              
+//                              PictogramElement pe = getPictogramElementForBusinessObject(node);
+                              pe = getPictogramElementForBusinessObject(node);
+                              int methodWidth = Integer.parseInt(Graphiti.getPeService().getPropertyValue(pe, "width"));                              
+                              Graphiti.getPeService().setPropertyValue(pe, "width", Integer.toString(methodWidth + distance));
+                              updateMethodWidth(pe, methodWidth + distance);
+                           }  
                         }
                      }
                   }
@@ -735,6 +883,29 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       finally {
          monitor.done();
       }
+   }
+   
+   /**
+    * TODO
+    */
+   protected void updateMethodWidth(PictogramElement pe, int width) {
+      org.eclipse.graphiti.mm.algorithms.Rectangle r = (org.eclipse.graphiti.mm.algorithms.Rectangle) pe.getGraphicsAlgorithm();
+      ContainerShape parentContainer = (ContainerShape) r.eContainer();
+      ContainerShape methodContainer = (ContainerShape) parentContainer.getChildren().get(0);
+      org.eclipse.graphiti.mm.algorithms.Rectangle rect = (org.eclipse.graphiti.mm.algorithms.Rectangle) methodContainer.getGraphicsAlgorithm();
+
+      r.setWidth(width);
+      rect.setWidth(r.getWidth());
+   }
+   
+   protected void updateMethodHeight(PictogramElement pe, int height, int nodeHeight) {
+      org.eclipse.graphiti.mm.algorithms.Rectangle r = (org.eclipse.graphiti.mm.algorithms.Rectangle) pe.getGraphicsAlgorithm();
+      ContainerShape parentContainer = (ContainerShape) r.eContainer();
+      ContainerShape methodContainer = (ContainerShape) parentContainer.getChildren().get(0);
+      org.eclipse.graphiti.mm.algorithms.Rectangle rect = (org.eclipse.graphiti.mm.algorithms.Rectangle) methodContainer.getGraphicsAlgorithm();
+
+      r.setHeight(height);
+      rect.setHeight(r.getHeight() - nodeHeight);
    }
 
    /**
@@ -886,7 +1057,18 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             // Re-center parent
             ISEDDebugNode firstChild = ArrayUtil.getFirst(siblings);
             ISEDDebugNode lastChild = ArrayUtil.getLast(siblings);
-            PictogramElement parentPE = getPictogramElementForBusinessObject(parent);
+            
+            PictogramElement parentPE;
+            if(parent instanceof ISEDMethodCall)
+            {
+               ContainerShape parentContainer = (ContainerShape) getPictogramElementForBusinessObject(parent);
+               parentPE = (ContainerShape) parentContainer.getChildren().get(1);
+            }
+            else
+               parentPE = getPictogramElementForBusinessObject(parent);
+            
+            
+//            PictogramElement parentPE = getPictogramElementForBusinessObject(parent);
             PictogramElement firstChildPE = getPictogramElementForBusinessObject(firstChild);
             PictogramElement lastChildPE = getPictogramElementForBusinessObject(lastChild);
             int childWidth = lastChildPE.getGraphicsAlgorithm().getX() + lastChildPE.getGraphicsAlgorithm().getWidth() - 

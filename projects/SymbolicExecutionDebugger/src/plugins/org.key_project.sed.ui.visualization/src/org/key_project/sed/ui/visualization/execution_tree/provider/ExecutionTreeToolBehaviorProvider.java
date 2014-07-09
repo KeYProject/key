@@ -95,14 +95,16 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
       IContextButtonPadData data = super.getContextButtonPad(context);
       if (isReadOnly()) {
          data.getGenericContextButtons().clear();
+         
          // collapse
-         if (getFeatureProvider().getBusinessObjectForPictogramElement(context.getPictogramElement()) instanceof ISEDMethodCall) {
+         if(getFeatureProvider().getBusinessObjectForPictogramElement(context.getPictogramElement()) instanceof ISEDMethodCall) {
+            // TODO: If collapsed x otherwise y
             data.getGenericContextButtons().add(createCustomContextButtonEntry(new MethodCallCollapseFeature(getFeatureProvider()), context, "Collapse", null, IPlatformImageConstants.IMG_EDIT_COLLAPSE));
          }
-
+         
          List<IContextButtonEntry> epEntries = collectContextButtonEntriesFromExtensionPoint(isReadOnly(), context);
          data.getGenericContextButtons().addAll(epEntries);
-         
+
          data.getGenericContextButtons().add(createCustomContextButtonEntry(new DebugNodeVisualizeStateFeature(getFeatureProvider()), context, "Visualize State", null, IExecutionTreeImageConstants.IMG_VISUALIZE_STATE));
 
          data.getGenericContextButtons().add(createCustomContextButtonEntry(new DebugNodeStepReturnFeature(getFeatureProvider()), context, "Step Return", null, IExecutionTreeImageConstants.IMG_STEP_RETURN));
