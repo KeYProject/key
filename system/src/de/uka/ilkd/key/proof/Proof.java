@@ -47,7 +47,6 @@ import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.ContractRuleApp;
@@ -146,8 +145,7 @@ public class Proof implements Named {
     private Proof(Name name, InitConfig initConfig, ProofSettings settings) {
         this.name = name;
         assert initConfig != null : "Tried to create proof without valid services.";
-        //Services services = initConfig.getServices().copyProofSpecific(this, false); // TODO: avoid copies as the PO should be responsible to do that
-	     this.initConfig = initConfig;//.copyWithServices(services);
+	     this.initConfig = initConfig;
         settingsListener =
                 new SettingsListener () {
                     @Override
@@ -155,6 +153,7 @@ public class Proof implements Named {
                         updateStrategyOnGoals();
                     }
                 };
+        localMgt = new ProofCorrectnessMgt(this);
 
                 
         setSettings(settings);
