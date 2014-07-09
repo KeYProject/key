@@ -159,15 +159,13 @@ options {
    private int savedGuessing = -1;
    
    /*
-    counter variables for parser rules accessterm and heap_selection suffix:
+    counter variable for parser rules accessterm and heap_selection suffix:
+    - stores nesting depth of alpha::select(h,o,f)-terms created via pretty syntax	
     - rule accessterm increases the counter
     - rule heap_selection_suffix calls method heapSelectionSuffix(), which resets
       the counter
    */
-   // store nesting depth of alpha::select(h,o,f)-terms created via pretty syntax	
    protected int globalImplicitHeapSuffixCounter = 0;
-   // store number of implicit heaps that will be replaced in case a heap_selection_suffix occurs
-   protected int globalImplicitHeapSuffixCounterReplacementDepth = 0;
 
    private int lineOffset=0;
    private int colOffset=0;

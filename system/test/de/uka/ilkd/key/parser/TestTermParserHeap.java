@@ -5,6 +5,7 @@ import java.io.File;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 /**
@@ -37,6 +38,12 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         JavaInfo javaInfo = new HelperClassForTests().parse(
                 new File(javaPath)).getFirstProof().getJavaInfo();
         return javaInfo.getServices();
+    }
+
+    private Term getSelectTerm(String sort, Term heap, Term object, Term field) {
+        Operator op = lookup_func(sort + "::select");
+        Term[] params = new Term[]{heap, object, field};
+        return tf.createTerm(op, params);
     }
 
     public void testParsePrettyPrintedSelect() {
@@ -75,14 +82,37 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         t1 = parseTerm("a1.(testTermParserHeap.A::f)@h");
         t2 = parseTerm("int::select(h, a1, testTermParserHeap.A::$f)");
         assertEquals(t1, t2);
-        
-        t1 = parseTerm("a.next.next.next.f@h");
-//        System.out.println(t1);
-//        assertEquals(t1, t2);
-    }
 
-    public void testStoreSyntax() {
-//        parseTerm("heap[a.f := 4]");
+        Term h = parseTerm("h");
+        Term a = parseTerm("a");
+        Term next = parseTerm("testTermParserHeap.A::$next");
+        Term f = parseTerm("testTermParserHeap.A::$f");
+        t1 = getSelectTerm("testTermParserHeap.A", h, a, next);
+        t1 = getSelectTerm("testTermParserHeap.A", h, t1, next);
+        t1 = getSelectTerm("testTermParserHeap.A", h, t1, next);
+        t1 = getSelectTerm("int", h, t1, f);
+
+        t2 = parseTerm("a.next.next.next.f@h");
+        assertEquals(t1, t2);
+
+        t2 = parseTerm("(a.next).next.next.f@h");
+        assertEquals(t1, t2);
+
+        t2 = parseTerm("(a.next.next).next.f@h");
+        assertEquals(t1, t2);
+
+        t2 = parseTerm("(a.next.next.next).f@h");
+        assertEquals(t1, t2);
+
+        Term h2 = parseTerm("h2");
+        t1 = getSelectTerm("testTermParserHeap.A", h2, a, next);
+        t1 = getSelectTerm("testTermParserHeap.A", h2, t1, next);
+        t1 = getSelectTerm("testTermParserHeap.A", h, t1, next);
+        t1 = getSelectTerm("int", h, t1, f);
+
+        t2 = parseTerm("(a.next.next@h2).next.f@h");
+        assertEquals(t1, t2);
+
     }
 
 }
