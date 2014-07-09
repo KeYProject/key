@@ -14,7 +14,13 @@
 package org.key_project.sed.ui.visualization.execution_tree.feature;
 
 import org.eclipse.graphiti.features.IFeatureProvider;
+import org.eclipse.graphiti.features.IReason;
 import org.eclipse.graphiti.features.IUpdateFeature;
+import org.eclipse.graphiti.features.context.IUpdateContext;
+import org.eclipse.graphiti.features.impl.Reason;
+import org.eclipse.graphiti.mm.algorithms.Rectangle;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.services.Graphiti;
 import org.key_project.sed.core.model.ISEDMethodCall;
 
 /**
@@ -29,6 +35,27 @@ public class MethodCallUpdateFeature extends AbstractDebugNodeUpdateFeature {
    public MethodCallUpdateFeature(IFeatureProvider fp) {
       super(fp);
    }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IReason updateNeeded(IUpdateContext context) {
+      PictogramElement pe = context.getPictogramElement();
+      boolean isCollapsed = Boolean.parseBoolean(Graphiti.getPeService().getPropertyValue(pe, "collapsed"));
+      if(!(pe.getGraphicsAlgorithm() instanceof Rectangle) && !isCollapsed)
+         return super.updateNeeded(context);
+      
+      return Reason.createFalseReason();
+   }
+   
+//   @Override
+//   public boolean update(IUpdateContext context) {
+////      super.update(context);
+//      System.out.println("MU: " + context.getPictogramElement());
+////      System.out.println("C");
+//      return false;
+//   }
 
    /**
     * {@inheritDoc}
