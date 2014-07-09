@@ -80,8 +80,6 @@ public class InteractiveProver implements InterruptListener {
 
     private AutoModeWorker worker;
 
-    private boolean autoMode; // autoModeStarted has been fired
-
     /**
      * creates a new interactive prover object
      */
@@ -132,7 +130,6 @@ public class InteractiveProver implements InterruptListener {
      * fires the event that automatic execution has started
      */
     protected void fireAutoModeStarted(ProofEvent e) {
-        autoMode = true; // Must be set before listeners are informed because they might like to check the auto mode state via isAutoMode()
         for (AutoModeListener aListenerList : listenerList) {
             aListenerList.autoModeStarted(e);
         }
@@ -142,7 +139,6 @@ public class InteractiveProver implements InterruptListener {
      * fires the event that automatic execution has stopped
      */
     public void fireAutoModeStopped(ProofEvent e) {
-        autoMode = false; // Must be set before listeners are informed because they might like to check the auto mode state via isAutoMode()
         for (AutoModeListener aListenerList : listenerList) {
             aListenerList.autoModeStopped(e);
         }
@@ -180,7 +176,7 @@ public class InteractiveProver implements InterruptListener {
      * running.
      */
     public boolean isAutoMode() {
-        return autoMode;
+        return worker != null;
     }
 
     /**
@@ -193,9 +189,9 @@ public class InteractiveProver implements InterruptListener {
             mediator().notify(new GeneralInformationEvent("No enabled goals available."));
             return;
         }
+        worker = new AutoModeWorker(goals);
         mediator().stopInterface(true);
         mediator().setInteractive(false);
-        worker = new AutoModeWorker(goals);
         worker.execute();
     }
 
@@ -611,12 +607,12 @@ public class InteractiveProver implements InterruptListener {
             }
 
             synchronized(applyStrategy) {
+                // make it possible to free memory and falsify the isAutoMode() property
+                worker = null;
                 // wait for apply Strategy to terminate
                 mediator().setInteractive(true);
                 mediator().startInterface(true);
             }
-            // make it possible to free memory
-            worker = null;
         }
 
         private void notifyException(final Exception exception) {
