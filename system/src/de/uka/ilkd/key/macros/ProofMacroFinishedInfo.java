@@ -65,6 +65,18 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
              info.getClosedGoals() + stratInfo.getClosedGoals());
     }
 
+    ProofMacroFinishedInfo setModClosedGoals(ImmutableList<Goal> goals) {
+        ImmutableList<Goal> newGoals = ImmutableSLList.<Goal>nil();
+        for (Goal g: goals) {
+            g = getProof().getGoal(g.node());
+            if (g != null) {
+                newGoals = newGoals.append(g);
+            }
+        }
+        return new ProofMacroFinishedInfo(getMacro(), newGoals, getProof(), getTime(),
+                                          getAppliedRules(), getClosedGoals());
+    }
+
     public ProofMacro getMacro() {
         return (ProofMacro)getSource();
     }
@@ -77,5 +89,9 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
         } else {
             return (ImmutableList<Goal>)result;
         }
+    }
+
+    public static ProofMacroFinishedInfo getDefaultInfo(ProofMacro macro, Proof proof) {
+        return new ProofMacroFinishedInfo(macro, ImmutableSLList.<Goal>nil(), proof);
     }
 }

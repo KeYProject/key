@@ -18,7 +18,6 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.ui.CompositePTListener;
 
 /**
  *
@@ -40,11 +39,11 @@ public abstract class SequentialOnLastGoalProofMacro extends SequentialProofMacr
     public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
-                                          ProverTaskListener listener) throws InterruptedException {
+                                          final ProverTaskListener listener) throws InterruptedException {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         for (ProofMacro macro : getProofMacros()) {
             // (here we do not reverse to original node)
-            final ProverTaskListener cptl = new CompositePTListener(getListener(), listener);
+            final ProverTaskListener cptl = new ProofMacroListener(macro, listener);
             cptl.taskStarted(macro.getName(), 0);
             info = macro.applyTo(mediator, goals, posInOcc, cptl);
             cptl.taskFinished(info);

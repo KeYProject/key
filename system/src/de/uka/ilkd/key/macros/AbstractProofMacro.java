@@ -43,7 +43,6 @@ public abstract class AbstractProofMacro implements ProofMacro {
      * A value of -1 means no changes.
      */
     private int numberSteps = -1;
-    private ProofMacroListener pml = null;
 
     private static ImmutableList<Goal> getGoals(Node node) {
         if (node == null) {
@@ -76,10 +75,6 @@ public abstract class AbstractProofMacro implements ProofMacro {
     @Override
     public ImmutableList<Goal> getGoals() {
         return this.goals;
-    }
-
-    public final ProofMacroListener getListener() {
-        return pml == null ? new ProofMacroListener(this) : pml;
     }
 
     @SuppressWarnings("unchecked")

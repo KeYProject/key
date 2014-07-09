@@ -21,11 +21,11 @@ import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
+import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * The Class TryCloseMacro tries to close goals. Goals are either closed or left
@@ -99,7 +99,6 @@ public class TryCloseMacro extends AbstractProofMacro {
         final ApplyStrategy applyStrategy =
                 new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
         final Proof proof = mediator.getInteractiveProver().getProof();
-        final UserInterface ui = mediator.getUI();
 
         //
         // set the max number of steps if given
@@ -111,8 +110,10 @@ public class TryCloseMacro extends AbstractProofMacro {
         }
         //
         // The observer to handle the progress bar
-        final ProverTaskListener pbl = ui.addListener(this, goals.size());
-        applyStrategy.addProverTaskObserver(pbl);
+        final ProofMacroListener l = 
+                new ProgressBarListener(this, goals.size(),
+                                        this.getNumberSteps(), listener);
+        applyStrategy.addProverTaskObserver(l);
 
         //
         // inform the listener
@@ -152,8 +153,8 @@ public class TryCloseMacro extends AbstractProofMacro {
             // reset the old number of steps
             mediator.setMaxAutomaticSteps(oldNumberOfSteps);
             setNumberSteps(oldNumberOfSteps);
-            applyStrategy.removeProverTaskObserver(pbl);
-            ui.removeListener(this);
+            applyStrategy.removeProverTaskObserver(l);
+            info = info.setModClosedGoals(goals);
         }
         return info;
     }
@@ -161,5 +162,47 @@ public class TryCloseMacro extends AbstractProofMacro {
     @Override
     public KeyStroke getKeyStroke () {
         return KeyStrokeManager.get(this);
+    }
+
+
+    /**
+     * This observer acts as intermediate instance between the reports by the
+     * strategy and the UI reporting progress.
+     *
+     * The number of total steps is computed and all local reports are
+     * translated in termini of the total number of steps such that a continuous
+     * progress is reported.
+     *
+     * fixes #1356
+     */
+    private class ProgressBarListener extends ProofMacroListener {
+        private int numberGoals;
+        private int numberSteps;
+        private int completedGoals;
+
+        ProgressBarListener(ProofMacro macro, int numberGoals, int numberSteps, ProverTaskListener l) {
+            super(macro, l);
+            this.numberGoals = numberGoals;
+            this.numberSteps = numberSteps;
+        }
+
+        @Override
+        public void taskStarted(String message, int size) {
+            assert size == numberSteps;
+            String suffix = " [" + (completedGoals + 1) + "/" + numberGoals + "]";
+            super.taskStarted(message + suffix, numberGoals * numberSteps);
+            super.taskProgress(completedGoals * numberSteps);
+        }
+
+        @Override
+        public void taskProgress(int position) {
+            super.taskProgress(completedGoals * numberSteps + position);
+        }
+
+        @Override
+        public void taskFinished(TaskFinishedInfo info) {
+            super.taskFinished(info);
+            completedGoals ++;
+        }
     }
 }
