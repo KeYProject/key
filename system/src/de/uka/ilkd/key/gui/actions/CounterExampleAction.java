@@ -81,7 +81,7 @@ public class CounterExampleAction extends MainWindowAction {
                 } else {
                     final Node selNode = getMediator().getSelectedNode();
                     //Can be applied only to leaf nodes
-                    setEnabled(selNode.childrenCount()==0);
+                    setEnabled(selNode.childrenCount()==0 && !selNode.isClosed());
                 }
             }
 
