@@ -43,6 +43,8 @@ import de.uka.ilkd.key.util.Debug;
 public class ConsoleUserInterface extends AbstractUserInterface {
     private static final int PROGRESS_BAR_STEPS = 50;
     private static final String PROGRESS_MARK = ">";
+    private int numOfInvokedMacros;
+
 
     // Substitute for TaskTree (GUI) to facilitate side proofs in console mode
     private ImmutableList<Proof> proofStack = ImmutableSLList.<Proof>nil();
@@ -58,6 +60,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     	this.batchMode = batchMode;
     	this.verbosity = verbosity;
         this.mediator  = new KeYMediator(this);
+        this.numOfInvokedMacros = 0;
    }
 
    public ConsoleUserInterface(BatchMode batchMode, boolean verbose) {
@@ -68,7 +71,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        return "[ APPLY " + getMacro().getClass().getSimpleName() + " ]";
    }
 
-   public void finish(Proof proof) {
+   private void finish(Proof proof) {
        // setInteractive(false) has to be called because the ruleAppIndex
        // has to be notified that we work in auto mode (CS)
        mediator.setInteractive(false);
@@ -87,26 +90,13 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        }
        final int openGoals = proof.openGoals().size();
        final Object result2 = info.getResult();
-       if (info.getSource() instanceof ApplyStrategy || info.getSource() instanceof ProofMacro) {
-           if (verbosity >= HIGH) {
-               System.out.println("]"); // end progress bar
+       if (info.getSource() instanceof ApplyStrategy ||
+           info.getSource() instanceof ProofMacro) {
+           if (numOfInvokedMacros == 0) {
+               finalizeBatchMode(openGoals, info, result2);
+           } else if (!macroChosen()) {
+               finish(proof);
            }
-           if (verbosity > SILENT) {
-               System.out.println("[ DONE  ... rule application ]");
-               if (verbosity >= HIGH) {
-                   System.out.println("\n== Proof "+ (openGoals > 0 ? "open": "closed")+ " ==");
-                   final Proof.Statistics stat = info.getProof().statistics();
-                   System.out.println("Proof steps: "+stat.nodes);
-                   System.out.println("Branches: "+stat.branches);
-                   System.out.println("Automode Time: "+stat.autoModeTime+"ms");
-                   System.out.println("Time per step: "+stat.timePerStep+"ms");
-               }
-               System.out.println("Number of goals remaining open: " +
-                       openGoals);
-               System.out.flush();
-           }
-           batchMode.finishedBatchMode ( result2, info.getProof() );
-           Debug.fail ( "Control flow should not reach this point." );
        } else if (info.getSource() instanceof ProblemLoader) {
            if (verbosity > SILENT) System.out.println("[ DONE ... loading ]");
            if (result2 != null) {
@@ -122,8 +112,20 @@ public class ConsoleUserInterface extends AbstractUserInterface {
                            openGoals);
                System.exit(0);
            }
+            if (macroChosen()) {
+                applyMacro();
+            } else {
+                finish(proof);
+            }
        }
    }
+
+
+    @Override
+    protected void macroFinished(TaskFinishedInfo info) {
+        numOfInvokedMacros--;
+    }
+
 
    @Override
     public void progressStarted(Object sender) {
@@ -201,6 +203,12 @@ public class ConsoleUserInterface extends AbstractUserInterface {
                 System.out.println(message);
             }
         }
+    }
+
+    @Override
+    protected void macroStarted(String message,
+                                int size) {
+        numOfInvokedMacros++;
     }
 
     @Override
@@ -312,4 +320,31 @@ public class ConsoleUserInterface extends AbstractUserInterface {
         }
       return false;
    }
+
+
+    private void finalizeBatchMode(final int openGoals,
+                                   TaskFinishedInfo info,
+                                   final Object result2) {
+        if (verbosity >= HIGH) {
+            System.out.println("]"); // end progress bar
+        }
+        if (verbosity > SILENT) {
+            System.out.println("[ DONE  ... rule application ]");
+            if (verbosity >= HIGH) {
+                System.out.println("\n== Proof "+ (openGoals > 0 ? "open": "closed")+ " ==");
+                final Proof.Statistics stat = info.getProof().statistics();
+                System.out.println("Proof steps: "+stat.nodes);
+                System.out.println("Branches: "+stat.branches);
+                System.out.println("Automode Time: "+stat.autoModeTime+"ms");
+                System.out.println("Time per step: "+stat.timePerStep+"ms");
+            }
+            System.out.println("Number of goals remaining open: " +
+                    openGoals);
+            System.out.flush();
+        }
+        // this seems to be a good place to free some memory
+        Runtime.getRuntime().gc();
+        batchMode.finishedBatchMode ( result2, info.getProof() );
+        Debug.fail ( "Control flow should not reach this point." );
+    }
 }

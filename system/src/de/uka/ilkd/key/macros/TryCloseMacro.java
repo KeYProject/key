@@ -29,7 +29,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * The Class TryCloseMacro tries to close goals. Goals are either closed or left
@@ -106,12 +105,12 @@ public class TryCloseMacro extends AbstractProofMacro {
         final IGoalChooser chooser =
                 mediator.getProfile().getSelectedGoalChooserBuilder().create();
         final ApplyStrategy applyStrategy =
-                new ApplyStrategy(chooser, finishAfterMacro());
+                new ApplyStrategy(chooser);
         final Proof proof = mediator.getInteractiveProver().getProof();
 
         //
         // The observer to handle the progress bar
-        TaskObserver taskObserver = new TaskObserver(mediator.getUI(), finishAfterMacro());
+        TaskObserver taskObserver = new TaskObserver(mediator.getUI());
         taskObserver.setNumberGoals(goals.size());
 
         //
@@ -187,13 +186,10 @@ public class TryCloseMacro extends AbstractProofMacro {
         private int numberGoals;
         private int numberSteps;
         private final ProverTaskListener backListener;
-        private final boolean finishAfterMacro;
         private int completedGoals;
 
-        public TaskObserver(ProverTaskListener backListener,
-                            boolean finishAfterMacro) {
+        public TaskObserver(ProverTaskListener backListener) {
             this.backListener = backListener;
-            this.finishAfterMacro = finishAfterMacro;
         }
 
         @Override
@@ -222,17 +218,14 @@ public class TryCloseMacro extends AbstractProofMacro {
             this.numberSteps = numberSteps;
         }
 
-        private void allTasksFinished(Proof proof, long time, int appliedRules, int closedGoals) {
-			TaskFinishedInfo info =
-					new DefaultTaskFinishedInfo(this, null, proof, time,
-                                                                    appliedRules, closedGoals);
-            assert backListener instanceof UserInterface;
-            final UserInterface ui = (UserInterface)backListener;
-            if (finishAfterMacro) {
-                backListener.taskFinished(info);
-            } else if (!ui.macroChosen()) {
-                ui.finish(proof);
-            }
+        private void allTasksFinished(Proof proof,
+                                      long time,
+                                      int appliedRules,
+                                      int closedGoals) {
+            TaskFinishedInfo info =
+                    new DefaultTaskFinishedInfo(this, null, proof, time,
+                                                appliedRules, closedGoals);
+            backListener.taskFinished(info);
         }
     }
 }

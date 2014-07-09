@@ -81,7 +81,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
         IGoalChooser goalChooser = mediator.getProfile().getSelectedGoalChooserBuilder().create();
-        final ApplyStrategy applyStrategy = new ApplyStrategy(goalChooser, false);
+        final ApplyStrategy applyStrategy = new ApplyStrategy(goalChooser);
 
         if(listener != null) {
             applyStrategy.addProverTaskObserver(listener);

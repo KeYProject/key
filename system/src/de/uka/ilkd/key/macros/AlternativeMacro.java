@@ -88,11 +88,11 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         for (ProofMacro macro : getProofMacros()) {
             if(macro.canApplyTo(mediator, goals, posInOcc)) {
-                final ProverTaskListener pml = getListener();
-                pml.taskStarted(macro.getName(), 0);
-                info = macro.applyTo(mediator, goals, posInOcc,
-                                    new CompositePTListener(listener, pml));
-                pml.taskFinished(info);
+                final ProverTaskListener cptl =
+                        new CompositePTListener(listener, getListener());
+                cptl.taskStarted(macro.getName(), 0);
+                info = macro.applyTo(mediator, goals, posInOcc, cptl);
+                cptl.taskFinished(info);
                 info = new ProofMacroFinishedInfo(this, info);
                 return info;
             }

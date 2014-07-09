@@ -106,8 +106,6 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      */
     boolean confirmTaskRemoval(String message);
 
-    void finish(Proof proof);
-
     /**
      * loads the problem or proof from the given file
      * @param file the File with the problem description or the proof

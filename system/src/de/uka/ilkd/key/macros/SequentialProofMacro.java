@@ -106,11 +106,11 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
         for (ProofMacro macro : getProofMacros()) {
             // reverse to original nodes
             for (Node initNode : initNodes) {
-                final ProverTaskListener pml = getListener();
-                pml.taskStarted(macro.getName(), 0);
-                info = macro.applyTo(mediator, initNode, posInOcc,
-                                     new CompositePTListener(listener, pml));
-                pml.taskFinished(info);
+                final ProverTaskListener cptl =
+                        new CompositePTListener(listener, getListener());
+                cptl.taskStarted(macro.getName(), 0);
+                info = macro.applyTo(mediator, initNode, posInOcc, cptl);
+                cptl.taskFinished(info);
                 info = new ProofMacroFinishedInfo(this, info);
             }
         }

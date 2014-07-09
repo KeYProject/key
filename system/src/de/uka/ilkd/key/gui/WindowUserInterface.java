@@ -52,7 +52,7 @@ import de.uka.ilkd.key.util.KeYExceptionHandler;
 public class WindowUserInterface extends AbstractUserInterface {
 
     private MainWindow mainWindow;
-
+    private int numOfInvokedMacros;
 
     private LinkedList<InteractiveRuleApplicationCompletion> completions =
             new LinkedList<InteractiveRuleApplicationCompletion>();
@@ -63,6 +63,7 @@ public class WindowUserInterface extends AbstractUserInterface {
         completions.add(new DependencyContractCompletion());
         completions.add(new LoopInvariantRuleCompletion());
         completions.add(new BlockContractCompletion(mainWindow));
+        this.numOfInvokedMacros = 0;
     }
 
     protected String getMacroConsoleOutput() {
@@ -158,8 +159,10 @@ public class WindowUserInterface extends AbstractUserInterface {
                 exceptionHandler.clear();
             } else {
                 KeYMediator mediator = mainWindow.getMediator();
-                mediator.getNotationInfo().refresh(
-                        mediator.getServices());
+                mediator.getNotationInfo().refresh(mediator.getServices());
+                if (macroChosen()) {
+                    applyMacro();
+                }
             }
         } else {
             resetStatus(this);
@@ -170,6 +173,13 @@ public class WindowUserInterface extends AbstractUserInterface {
         // this seems to be a good place to free some memory
         Runtime.getRuntime().gc();
     }
+
+
+    @Override
+    protected void macroFinished(TaskFinishedInfo info) {
+        numOfInvokedMacros--;
+    }
+
 
     protected boolean inStopAtFirstUncloseableGoalMode(Proof proof) {
         return proof.getSettings().getStrategySettings()
@@ -187,6 +197,12 @@ public class WindowUserInterface extends AbstractUserInterface {
     @Override
     public void taskStarted(String message, int size) {
         mainWindow.setStatusLine(message, size);
+    }
+
+    @Override
+    protected void macroStarted(String message,
+                                int size) {
+        numOfInvokedMacros++;
     }
 
     @Override
