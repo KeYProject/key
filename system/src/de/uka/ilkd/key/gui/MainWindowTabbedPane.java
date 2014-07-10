@@ -19,6 +19,11 @@ import javax.swing.KeyStroke;
 public class MainWindowTabbedPane extends JTabbedPane {
 
     /**
+     *
+     */
+    private static final long serialVersionUID = 334677113533050832L;
+
+    /**
      * the current proof tree
      */
     private final ProofTreeView proofTreeView;

@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;

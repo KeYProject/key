@@ -1556,7 +1556,7 @@ public final class MainWindow extends JFrame  {
         ImmutableList<Name> labelNamesFromProfile = getMediator()
                 .getProfile().getTermLabelManager().getSupportedTermLabelNames();
 
-        List<Name> labelNames = new LinkedList();
+        List<Name> labelNames = new LinkedList<Name>();
         for (Name labelName : labelNamesFromProfile) {
             labelNames.add(labelName);
         }

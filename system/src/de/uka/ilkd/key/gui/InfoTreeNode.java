@@ -14,6 +14,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 public class InfoTreeNode extends DefaultMutableTreeNode {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 4367487307094588140L;
     private final String description;
 
     /*
