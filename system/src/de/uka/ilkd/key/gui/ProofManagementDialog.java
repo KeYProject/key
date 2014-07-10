@@ -462,11 +462,12 @@ public final class ProofManagementDialog extends JDialog {
                 final ProofAggregate pl = pi.startProver(initConfig, po);
                 
                 if (env == null) {
-                   env = new ProofEnvironment(initConfig); 
-                   env.addProofEnvironmentListener(ui);
-                }                
+                   env = ui.createProofEnvironmentAndRegisterProof(po, pl, initConfig);
+                } else {
+                   env.registerProof(po, pl);
+                   
+                }
                 
-                env.registerProof(po, pl);
             } catch (ProofInputException exc) {
                 ExceptionDialog.showDialog(MainWindow.getInstance(), exc);
             }

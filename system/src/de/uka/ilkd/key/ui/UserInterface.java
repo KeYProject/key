@@ -25,6 +25,7 @@ import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
@@ -35,6 +36,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentListener;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
@@ -241,5 +243,15 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * for instance to open the proof management dialog as done by {@link ProblemLoader}.
      * @return true if the proof obligation was selected, and false if action was aborted
      */
-    public boolean selectProofObligation(InitConfig initConfig);
+     boolean selectProofObligation(InitConfig initConfig);
+
+    /**
+     * registers the proof aggregate at the UI
+     * 
+     * @param proofOblInput the {@link ProofOblInput}
+     * @param proofList the {@link ProofAggregate} 
+     * @param initConfig the {@link InitConfig} to be used
+     * @return the new {@link ProofEnvironment} where the {@link ProofAggregate} has been registered
+     */
+     ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput, ProofAggregate proofList, InitConfig initConfig);
 }

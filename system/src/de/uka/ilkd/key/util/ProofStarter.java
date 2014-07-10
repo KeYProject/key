@@ -80,7 +80,7 @@ public class ProofStarter {
 
         private Proof createProof(String proofName) {
 
-            final InitConfig initConfig = env.getInitConfig();
+            final InitConfig initConfig = env.getInitConfigForEnvironment().deepCopy();
 
             return new Proof(proofName,
                     seq,

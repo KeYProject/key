@@ -53,15 +53,20 @@ public class ProofEnvironment {
    }
 
 
-   public Services getInitialServices() {
+   /**
+    * returns the {@link Services} instance for the environment
+    * 
+    * @return the {@link Services} instance for the environment
+    */
+   public Services getServicesForEnvironment() {
       return initConfig.getServices();
    }
 
 
-   /** returns the initial configuration to be used to load proofs in
-    * this environment. 
+   /** returns the initial configuration of which a copy can be
+    * used to load proofs belonging to this environment. 
     */
-   public InitConfig getInitConfig() {
+   public InitConfig getInitConfigForEnvironment() {
       return initConfig;
    }
 
@@ -75,7 +80,7 @@ public class ProofEnvironment {
       pl.setProofEnv(this);
       proofs.add(pl);
       for(Proof p : pl.getProofs()) {
-         getInitialServices().getSpecificationRepository()
+         getServicesForEnvironment().getSpecificationRepository()
          .registerProof(po, p);
       }
       fireProofRegistered(new ProofEnvironmentEvent(this, po, pl));
@@ -118,7 +123,7 @@ public class ProofEnvironment {
    public void removeProofList(ProofAggregate pl) {
       proofs.remove(pl);
       for(Proof p : pl.getProofs()) {
-         getInitialServices().getSpecificationRepository()
+         getServicesForEnvironment().getSpecificationRepository()
          .removeProof(p);
       }
       fireProofUnregistered(new ProofEnvironmentEvent(this, null, pl));

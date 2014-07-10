@@ -170,7 +170,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         }
 
         TacletSoundnessPOLoader poloader =
-                new TacletSoundnessPOLoader(listener, filter, true, loader, loader.getProofEnvForTaclets().getInitConfig(), true);
+                new TacletSoundnessPOLoader(listener, filter, true, loader, loader.getProofEnvForTaclets().getInitConfigForEnvironment(), true);
 
         poloader.startSynchronously();
         if(proofObligation == null) {

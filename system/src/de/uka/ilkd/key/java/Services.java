@@ -236,6 +236,7 @@ public class Services implements TermServices {
     /**
      * creates a new services object containing a copy of the java info of
      * this object and a new TypeConverter (shallow copy)
+     * The copy does not belong to a {@link Proof} object and can hence be used for a new proof.
      * @param shareCaches {@code true} The created {@link Services} will use the same {@link ServiceCaches} like this instance; {@code false} the created {@link Services} will use a new empty {@link ServiceCaches} instance.
      * @return the copy
      */
@@ -245,6 +246,7 @@ public class Services implements TermServices {
 
     /**
      * Creates a copy of this {@link Services} in which the {@link Profile} is replaced.
+     * The copy does not belong to a {@link Proof} object and can hence be used for a new proof.
      * @param profile The new {@link Profile} to use in the copy of this {@link Services}.
      * @param shareCaches {@code true} The created {@link Services} will use the same {@link ServiceCaches} like this instance; {@code false} the created {@link Services} will use a new empty {@link ServiceCaches} instance.
      * @return The created copy.
@@ -299,6 +301,16 @@ public class Services implements TermServices {
     }
     
     
+    /** 
+     * Marks this services as proof specific 
+     * @param p_proof the Proof to which this {@link Services} instance belongs
+     */
+    public void setProof(Proof p_proof) {
+       assert proof == null;
+       proof = p_proof;
+    }
+    
+   
     public Services copyProofSpecific(Proof p_proof, boolean shareCaches) {
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
         final Services s = new Services(getProfile(), getJavaInfo().getKeYProgModelInfo().getServConf(), getJavaInfo().getKeYProgModelInfo().rec2key(),

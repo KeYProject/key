@@ -426,6 +426,9 @@ public class InitConfig {
     @SuppressWarnings("unchecked")
     public InitConfig copyWithServices(Services services) {
         InitConfig ic = new InitConfig(services);
+        if (settings != null) {
+           ic.setSettings(new ProofSettings(settings));
+        }
         ic.setActivatedChoices(activatedChoices);
         ic.category2DefaultChoice = ((HashMap<String,String>) category2DefaultChoice.clone());
         ic.setTaclet2Builder(

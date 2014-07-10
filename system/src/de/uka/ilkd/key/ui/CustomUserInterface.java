@@ -20,7 +20,10 @@ import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
@@ -157,6 +160,14 @@ public class CustomUserInterface extends ConsoleUserInterface {
             return super.completeBuiltInRuleApp(app, goal, forced);
          }
       }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput, ProofAggregate proofList, InitConfig initConfig) {
+      return null;
    }
 
    /**

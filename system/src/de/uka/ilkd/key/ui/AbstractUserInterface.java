@@ -27,6 +27,7 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -36,6 +37,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.Debug;
@@ -81,7 +83,17 @@ public abstract class AbstractUserInterface implements UserInterface {
         return !(getMacro() instanceof SkipMacro);
     }
 
-    public boolean applyMacro() {
+    @Override
+    public ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput, 
+          ProofAggregate proofList, InitConfig initConfig) {
+       final ProofEnvironment env = new ProofEnvironment(initConfig); 
+       env.addProofEnvironmentListener(this);
+       env.registerProof(proofOblInput, proofList);
+       return env;
+
+    }
+
+   public boolean applyMacro() {
         assert macroChosen();
         if (getMacro().canApplyTo(getMediator(), null)) {
             System.out.println(getMacroConsoleOutput());

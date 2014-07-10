@@ -91,6 +91,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             
             initConfig.setActivatedChoices(settings.getChoiceSettings()
         	      		                   .getDefaultChoicesAsSet());
+            
+            
         
         } catch (antlr.ANTLRException e) {
             throw new ProofInputException(e);      

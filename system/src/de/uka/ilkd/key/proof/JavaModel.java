@@ -103,13 +103,15 @@ public final class JavaModel {
     
     @Override    
     public boolean equals(Object o) {
-	if (!(o instanceof JavaModel)) {
-	    return false;
-	} else if(getModelTag() == null) {
-	    return ((JavaModel)o).getModelTag() == null;
-	} else {
-	    return getModelTag().equals(((JavaModel)o).getModelTag());
-	}
+       if (o == null || o.getClass() != this.getClass()) {
+          return false;
+       }       
+       final JavaModel other = (JavaModel)o;       
+       if(getModelTag() == null) {
+          return other.getModelTag() == null;
+       } else {
+          return getModelTag().equals(other.getModelTag());
+       }
     }
 	
 

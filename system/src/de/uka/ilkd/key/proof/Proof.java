@@ -102,6 +102,7 @@ public class Proof implements Named {
    /** maps the Abbreviations valid for this proof to their corresponding terms.*/
     private AbbrevMap abbreviations = new AbbrevMap();
 
+    /** the logic configuration for this proof, i.e., logic signature, rules etc.*/
     private InitConfig initConfig;    
     
     /** the environment of the proof with specs and java model*/
@@ -146,6 +147,9 @@ public class Proof implements Named {
         this.name = name;
         assert initConfig != null : "Tried to create proof without valid services.";
 	     this.initConfig = initConfig;
+	     
+	     this.initConfig.getServices().setProof(this);
+	     
         settingsListener =
                 new SettingsListener () {
                     @Override
@@ -153,9 +157,9 @@ public class Proof implements Named {
                         updateStrategyOnGoals();
                     }
                 };
+                        
         localMgt = new ProofCorrectnessMgt(this);
 
-                
         setSettings(settings);
         pis = ProofIndependentSettings.DEFAULT_INSTANCE;
     }
@@ -391,10 +395,6 @@ public class Proof implements Named {
             it.next ().clearAndDetachRuleAppIndex ();
     }
 
-
-    public JavaModel getJavaModel() {
-        return getServices().getJavaModel();
-    }
 
     /**
      * returns the root node of the proof

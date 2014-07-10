@@ -143,7 +143,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                     TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
                                  listener,
                                 new LemmaSelectionDialog(),true, tacletLoader, 
-                                tacletLoader.getProofEnvForTaclets().getInitConfig(), 
+                                tacletLoader.getProofEnvForTaclets().getInitConfigForEnvironment(), 
                                 true);
                     loader.start();
 
@@ -230,7 +230,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
                              listener,
                             new LemmaSelectionDialog(),loadAsLemmata,tacletLoader,
-                            tacletLoader.getProofEnvForTaclets().getInitConfig(),
+                            tacletLoader.getProofEnvForTaclets().getInitConfigForEnvironment(),
                             true);
                 loader.start();
 

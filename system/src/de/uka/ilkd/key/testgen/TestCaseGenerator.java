@@ -125,7 +125,7 @@ public class TestCaseGenerator {
 		services = proof.getServices();
 		junitFormat = settings.useJunit();
 		useRFL = settings.useRFL();
-		modDir = proof.getJavaModel().getModelDir();
+		modDir = services.getJavaModel().getModelDir();
 		dontCopy = modDir + File.separator + TestCaseGenerator.DONT_COPY;
 		directory = settings.getOutputFolderPath();
 		sortDummyClass = new HashMap<Sort, StringBuffer>();		
