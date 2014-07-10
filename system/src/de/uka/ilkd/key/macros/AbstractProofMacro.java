@@ -17,6 +17,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
+import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -74,4 +75,11 @@ public abstract class AbstractProofMacro implements ProofMacro {
                         ProverTaskListener listener) throws InterruptedException {
         applyTo(mediator, getGoals(node), posInOcc, listener);
     }
+
+
+    @Override
+    public javax.swing.KeyStroke getKeyStroke() {
+        return KeyStrokeManager.get(this);
+    }
+    
 }

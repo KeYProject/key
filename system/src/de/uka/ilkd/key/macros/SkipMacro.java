@@ -10,8 +10,6 @@ import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 
-import javax.swing.KeyStroke;
-
 /**
  * This macro does nothing and is not applicable. It can be used to create
  * compound macros, e.g. as an alternative macro for {@link DoWhileFinallyMacro}.
@@ -45,10 +43,4 @@ public class SkipMacro extends AbstractProofMacro {
                         ProverTaskListener listener) throws InterruptedException {
         // do nothing
     }
-
-    @Override
-    public KeyStroke getKeyStroke() {
-        return null;  // default implementation
-    }
-
 }
