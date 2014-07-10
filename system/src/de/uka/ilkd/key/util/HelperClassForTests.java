@@ -65,8 +65,7 @@ public class HelperClassForTests {
             	= new KeYUserProblemFile("UpdatetermTest", file, null, profile); 
             pi = new ProblemInitializer(profile);
            
-            pi.startProver(po, po);
-            result = po.getPO();                            
+            result = pi.startProver(po, po);
 
         } catch (Exception e) {
             System.err.println("Exception occurred while parsing "+file+"\n");
@@ -85,8 +84,7 @@ public class HelperClassForTests {
 	KeYUserProblemFile po 
 		= new KeYUserProblemFile("UpdatetermTest", file, null, profile); 
         ProblemInitializer pi = new ProblemInitializer(profile);
-        pi.startProver(po, po);
-        return po.getPO();        
+        return pi.startProver(po, po);
     }
        
     public Term extractProblemTerm(Proof p) {

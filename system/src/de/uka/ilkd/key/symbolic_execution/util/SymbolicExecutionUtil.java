@@ -1714,7 +1714,8 @@ public final class SymbolicExecutionUtil {
       while (exceptionDefinition.op() == Junctor.AND) {
          exceptionDefinitionParent = exceptionDefinition;
          Term firstSub = exceptionDefinition.sub(0);
-         if (firstSub.op() == node.proof().getEnv().getServicesForEnvironment().getJavaInfo().getInv()) { // TODO: Replace "node.proof().env().getInitialServices().getJavaInfo().getInv()" with "node.proof().getServices().getJavaInfo().getInv()" when bug item http://i12www.ira.uka.de/~klebanov/mantis/view.php?id=1386 is solved.
+         if (firstSub.op() == node.proof().getEnv().getServicesForEnvironment().getJavaInfo().getInv()) { 
+            // TODO: Replace "node.proof().env().getInitialServices().getJavaInfo().getInv()" with "node.proof().getServices().getJavaInfo().getInv()" when bug item http://i12www.ira.uka.de/~klebanov/mantis/view.php?id=1386 is solved.
             exceptionDefinition = exceptionDefinition.sub(1);
          }
          else {

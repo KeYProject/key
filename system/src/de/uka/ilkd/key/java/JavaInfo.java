@@ -1287,8 +1287,12 @@ public final class JavaInfo {
      * @see #getInvProgramVar()
      */
     public IObserverFunction getInv() {
+     
 	if(inv == null || inv.getHeapCount(services) != HeapContext.getModHeaps(services, false).size()) {
-	    inv = new ObserverFunction("<inv>",
+	   inv = (IObserverFunction) services.getNamespaces().functions().lookup(new ProgramElementName("<inv>", 
+	         getJavaLangObject().getSort().toString()));
+	   if (inv == null) {
+	      inv = new ObserverFunction("<inv>",
         			       Sort.FORMULA,
         			       null,
         			       services.getTypeConverter().getHeapLDT().targetSort(),
@@ -1297,6 +1301,8 @@ public final class JavaInfo {
         			       new ImmutableArray<KeYJavaType>(),
         			       HeapContext.getModHeaps(services, false).size(),
         			       1);
+	      
+	   }
 	}
 	return inv;
     }

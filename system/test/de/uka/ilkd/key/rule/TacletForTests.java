@@ -103,7 +103,7 @@ public class TacletForTests {
 
     public static InitConfig initConfig() {
 	if (initConfig == null) parse();
-	return initConfig;
+	return initConfig.deepCopy();
     }
 
     public static Services services() {

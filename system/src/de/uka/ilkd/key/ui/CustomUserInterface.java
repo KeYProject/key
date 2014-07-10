@@ -167,7 +167,9 @@ public class CustomUserInterface extends ConsoleUserInterface {
     */
    @Override
    public ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput, ProofAggregate proofList, InitConfig initConfig) {
-      return null;
+      //TODO: use line below instead of super after fixing bug http://i12www.ira.uka.de/~klebanov/mantis/view.php?id=1386
+      //initConfig.getServices().getSpecificationRepository().registerProof(proofOblInput, proofList.getFirstProof());
+      return super.createProofEnvironmentAndRegisterProof(proofOblInput, proofList, initConfig);
    }
 
    /**

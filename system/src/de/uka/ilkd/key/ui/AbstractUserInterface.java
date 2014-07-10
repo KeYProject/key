@@ -90,7 +90,6 @@ public abstract class AbstractUserInterface implements UserInterface {
        env.addProofEnvironmentListener(this);
        env.registerProof(proofOblInput, proofList);
        return env;
-
     }
 
    public boolean applyMacro() {
@@ -152,8 +151,9 @@ public abstract class AbstractUserInterface implements UserInterface {
     @Override
     public Proof createProof(InitConfig initConfig, ProofOblInput input) throws ProofInputException {
        ProblemInitializer init = createProblemInitializer(initConfig.getProfile());
-       
-       return init.startProver(initConfig, input).getFirstProof();
+       ProofAggregate proofList = init.startProver(initConfig, input);
+       createProofEnvironmentAndRegisterProof(input, proofList, initConfig);
+       return proofList.getFirstProof();
     }
     
     /**
