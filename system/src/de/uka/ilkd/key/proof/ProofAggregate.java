@@ -67,7 +67,22 @@ public abstract class ProofAggregate {
    public String description() {
       return name;
    }
+   
+   @Override
+   public boolean equals(Object o) {
+      if (o == null || o.getClass() != this.getClass()) {
+         return false;
+      }
+      final ProofAggregate other = (ProofAggregate) o;
+      
+      return size() == other.size() && name.equals(other.name);
+   }
 
+   @Override
+   public int hashCode() {
+      return 7*size() + 17*name.hashCode();
+   }
+   
    public String toString() {	
       return name;
    }   

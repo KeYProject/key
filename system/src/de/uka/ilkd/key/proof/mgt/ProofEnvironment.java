@@ -80,8 +80,7 @@ public class ProofEnvironment {
       pl.setProofEnv(this);
       proofs.add(pl);
       for(Proof p : pl.getProofs()) {
-         getServicesForEnvironment().getSpecificationRepository()
-         .registerProof(po, p);
+         getServicesForEnvironment().getSpecificationRepository().registerProof(po, p);
       }
       fireProofRegistered(new ProofEnvironmentEvent(this, po, pl));
    }
@@ -122,10 +121,18 @@ public class ProofEnvironment {
 
    public void removeProofList(ProofAggregate pl) {
       proofs.remove(pl);
+      
+      //TODO: the above line should be enough
+      for (ProofAggregate paChild : pl.getChildren()) {
+         proofs.remove(paChild);
+      }
+      // 
+      
       for(Proof p : pl.getProofs()) {
          getServicesForEnvironment().getSpecificationRepository()
          .removeProof(p);
       }
+      
       fireProofUnregistered(new ProofEnvironmentEvent(this, null, pl));
    }
 
