@@ -167,9 +167,9 @@ public class CustomUserInterface extends ConsoleUserInterface {
     */
    @Override
    public ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput, ProofAggregate proofList, InitConfig initConfig) {
-      //TODO: use line below instead of super after fixing bug http://i12www.ira.uka.de/~klebanov/mantis/view.php?id=1386
-      //initConfig.getServices().getSpecificationRepository().registerProof(proofOblInput, proofList.getFirstProof());
-      return super.createProofEnvironmentAndRegisterProof(proofOblInput, proofList, initConfig);
+      //TODO: Find out why the proof has to be registered. This method should just return null and do nothing.
+      initConfig.getServices().getSpecificationRepository().registerProof(proofOblInput, proofList.getFirstProof());
+      return null;
    }
 
    /**

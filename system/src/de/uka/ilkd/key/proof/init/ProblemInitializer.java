@@ -458,7 +458,6 @@ public final class ProblemInitializer {
         = initConfig.getServices().getTypeConverter().getHeapLDT();
         assert heapLDT != null;
         if (javaInfo != null) {
-            functions.add(javaInfo.getInv());
             for(KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
                 final Type type = kjt.getJavaType();
                 if(type instanceof ClassDeclaration 
