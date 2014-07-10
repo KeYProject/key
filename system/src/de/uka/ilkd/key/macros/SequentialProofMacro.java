@@ -98,7 +98,8 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
         for (ProofMacro macro : getProofMacros()) {
             // reverse to original nodes
             for (Node initNode : initNodes) {
-                macro.applyTo(mediator, initNode, posInOcc, listener);
+                if (macro.canApplyTo(mediator, initNode, posInOcc))
+                    macro.applyTo(mediator, initNode, posInOcc, listener);
             }
         }
     }
