@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.macros;
 
-import javax.swing.KeyStroke;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
@@ -98,7 +96,7 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
     abstract boolean getCondition();
 
     /**
-     * Returns the maximum number of rule applications allowed for
+     * Sets the maximum number of rule applications allowed for
      * this macro. The default implementation is the maximum amount
      * of proof steps for automatic mode.
      * @return the maximum number of rule applications allowed for
@@ -114,10 +112,5 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
                     .getStrategySettings().getMaxSteps();
         }
         setNumberSteps(steps);
-    }
-
-    @Override
-    public KeyStroke getKeyStroke() {
-        return null; // default implementation
     }
 }

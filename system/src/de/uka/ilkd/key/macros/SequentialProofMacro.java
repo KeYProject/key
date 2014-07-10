@@ -21,7 +21,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -106,12 +105,14 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
         for (ProofMacro macro : getProofMacros()) {
             // reverse to original nodes
             for (Node initNode : initNodes) {
-                final ProverTaskListener cptl =
-                        new ProofMacroListener(macro, listener);
-                cptl.taskStarted(macro.getName(), 0);
-                info = macro.applyTo(mediator, initNode, posInOcc, cptl);
-                cptl.taskFinished(info);
-                info = new ProofMacroFinishedInfo(this, info);
+                if (macro.canApplyTo(mediator, initNode, posInOcc)) {
+                    final ProverTaskListener cptl =
+                            new ProofMacroListener(macro, listener);
+                    cptl.taskStarted(macro.getName(), 0);
+                    info = macro.applyTo(mediator, initNode, posInOcc, cptl);
+                    cptl.taskFinished(info);
+                    info = new ProofMacroFinishedInfo(this, info);
+                }
             }
         }
         return info;
@@ -129,10 +130,5 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
             assert proofMacros.length > 0;
         }
         return Collections.unmodifiableList(Arrays.asList(proofMacros));
-    }
-
-    @Override
-    public javax.swing.KeyStroke getKeyStroke() {
-	return KeyStrokeManager.get(this);
     }
 }

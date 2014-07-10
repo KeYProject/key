@@ -43,15 +43,17 @@ public abstract class SequentialOnLastGoalProofMacro extends SequentialProofMacr
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         for (ProofMacro macro : getProofMacros()) {
             // (here we do not reverse to original node)
-            final ProverTaskListener cptl = new ProofMacroListener(macro, listener);
-            cptl.taskStarted(macro.getName(), 0);
-            info = macro.applyTo(mediator, goals, posInOcc, cptl);
-            cptl.taskFinished(info);
-            info = new ProofMacroFinishedInfo(this, info);
-            goals = getGoals();
-            // after the first macro the posInOcc does not match any more,
-            // because we changed the goal / node
-            posInOcc = null;
+            if (macro.canApplyTo(mediator, goals, posInOcc)) {
+                final ProverTaskListener cptl = new ProofMacroListener(macro, listener);
+                cptl.taskStarted(macro.getName(), 0);
+                info = macro.applyTo(mediator, goals, posInOcc, cptl);
+                cptl.taskFinished(info);
+                info = new ProofMacroFinishedInfo(this, info);
+                goals = getGoals();
+                // after the first macro the posInOcc does not match any more,
+                // because we changed the goal / node
+                posInOcc = null;
+            }
         }
         return info;
     }
