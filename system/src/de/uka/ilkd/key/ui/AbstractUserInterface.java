@@ -41,7 +41,6 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.Debug;
 
 public abstract class AbstractUserInterface implements UserInterface {
-   private boolean autoMode;
 
    /**
     * The used {@link PropertyChangeSupport}.

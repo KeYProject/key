@@ -40,7 +40,7 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironmentListener;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-public interface UserInterface extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor {
+public interface UserInterface extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor, ProofEnvironmentListener {
     /**
      * these methods are called immediately before automode is started to ensure that
      * the GUI can respond in a reasonable way, e.g., change the cursor to a waiting cursor
