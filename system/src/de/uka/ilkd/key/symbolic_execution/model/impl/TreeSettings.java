@@ -25,6 +25,11 @@ public class TreeSettings implements ITreeSettings {
     * or {@code false} allow that branch conditions contains branch conditions.
     */
    private final boolean mergeBranchConditions;
+
+   /**
+    * {@code true} use unicode characters, {@code false} do not use unicode characters.
+    */
+   private final boolean useUnicode;
    
    /**
     * {@code true} use pretty printing, {@code false} do not use pretty printing.
@@ -33,12 +38,15 @@ public class TreeSettings implements ITreeSettings {
 
    /**
     * Constructor.
-    * @param mergeBranchConditions {@code true} merge branch conditions which means that a branch condition never contains another branch condition
-    * or {@code false} allow that branch conditions contains branch conditions.
+    * @param mergeBranchConditions {@code true} merge branch conditions which means that a branch condition never contains another branch condition or {@code false} allow that branch conditions contains branch conditions.
+    * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
     */
-   public TreeSettings(boolean mergeBranchConditions, boolean usePrettyPrinting) {
+   public TreeSettings(boolean mergeBranchConditions, 
+                       boolean useUnicode,
+                       boolean usePrettyPrinting) {
       this.mergeBranchConditions = mergeBranchConditions;
+      this.useUnicode = useUnicode;
       this.usePrettyPrinting = usePrettyPrinting;
    }
 
@@ -48,6 +56,14 @@ public class TreeSettings implements ITreeSettings {
    @Override
    public boolean isMergeBranchConditions() {
       return mergeBranchConditions;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isUseUnicode() {
+      return useUnicode;
    }
 
    /**

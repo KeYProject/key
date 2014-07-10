@@ -16,6 +16,8 @@ Bundle-Vendor: KeY Project
 Export-Package: org.key_project.util.bean,
  org.key_project.util.eclipse,
  org.key_project.util.eclipse.job,
+ org.key_project.util.eclipse.preference,
+ org.key_project.util.eclipse.preference.event,
  org.key_project.util.eclipse.setup,
  org.key_project.util.eclipse.swt,
  org.key_project.util.eclipse.swt.dialog,

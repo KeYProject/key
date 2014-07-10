@@ -17,7 +17,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
@@ -131,11 +130,6 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
               throw new InterruptedException();
            }
         }
-    }
-
-    @Override
-    public final javax.swing.KeyStroke getKeyStroke () {
-	return KeyStrokeManager.get(this);
     }
 
 }

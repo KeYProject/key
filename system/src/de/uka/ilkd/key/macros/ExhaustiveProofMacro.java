@@ -12,7 +12,6 @@
 //
 package de.uka.ilkd.key.macros;
 
-import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -136,9 +135,4 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
      * @return the proofMacro.
      */
     abstract ProofMacro getProofMacro();
-
-    @Override
-    public KeyStroke getKeyStroke() {
-        return null; // default implementation
-    }
 }

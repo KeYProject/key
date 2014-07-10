@@ -735,10 +735,6 @@ public class KeYMediator {
         }
     }
 
-    public void setResumeAutoMode(boolean b) {
-       interactiveProver.setResumeAutoMode(b);
-    }
-
     /**
      * Switches interactive mode on or off.
      * @param b true iff interactive mode is to be turned on

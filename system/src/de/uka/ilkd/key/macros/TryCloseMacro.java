@@ -13,13 +13,11 @@
 
 package de.uka.ilkd.key.macros;
 
-import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
-import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
@@ -161,11 +159,6 @@ public class TryCloseMacro extends AbstractProofMacro {
             // inform the listener
             taskObserver.allTasksFinished(proof, time, appliedRules, goalsClosed);
         }
-    }
-
-    @Override
-    public KeyStroke getKeyStroke () {
-        return KeyStrokeManager.get(this);
     }
 
     /**
