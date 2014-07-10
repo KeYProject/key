@@ -1,12 +1,15 @@
-/**
-  * This file is part of the KeY Java Card API Reference Implementation.
-  *
-  * Author: Wojciech Mostowski, woj@cs.ru.nl
-  *   
-  * For details and license see README and LICENSE files.
-  *    
-  * $Id: SystemException.java 324 2011-06-16 08:59:15Z woj $
-  */
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
 
 package javacard.framework;
 
