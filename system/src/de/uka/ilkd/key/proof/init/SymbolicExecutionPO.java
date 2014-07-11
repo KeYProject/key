@@ -49,7 +49,7 @@ public class SymbolicExecutionPO extends AbstractOperationPO
                                Goal initiatingGoal,
                                Services services) {
         this(initConfig, contract, symbExecVars, initiatingGoal);
-        this.services = services;
+        this.environmentServices = services;
     }
 
 
@@ -248,23 +248,13 @@ public class SymbolicExecutionPO extends AbstractOperationPO
 // the following code is legacy code
     @Override
     @Deprecated
-    protected StatementBlock buildOperationBlock(
-            ImmutableList<LocationVariable> formalParVars,
-                                                 ProgramVariable selfVar,
-                                                 ProgramVariable resultVar) {
-        throw new UnsupportedOperationException("Not supported any more. " +
-                 "Please use the POSnippetFactory instead.");
-    }
-
-
-    @Override
-    @Deprecated
     protected ImmutableList<StatementBlock> buildOperationBlocks(
-                                                                 ImmutableList<LocationVariable> formalParVars,
-                                                                 ProgramVariable selfVar,
-                                                                 ProgramVariable resultVar) {
+            ImmutableList<LocationVariable> formalParVars,
+            ProgramVariable selfVar,
+            ProgramVariable resultVar,
+            Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
-                 "Please use the POSnippetFactory instead.");
+                "Please use the POSnippetFactory instead.");
     }
 
 
@@ -297,19 +287,18 @@ public class SymbolicExecutionPO extends AbstractOperationPO
     @Override
     @Deprecated
     protected Term buildFrameClause(List<LocationVariable> modHeaps,
-                                    Map<Term, Term> heapToAtPre,
-                                    ProgramVariable selfVar,
-                                    ImmutableList<ProgramVariable> paramVars) {
+            Map<Term, Term> heapToAtPre, ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars, Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
-                 "Please use the POSnippetFactory instead.");
+                "Please use the POSnippetFactory instead.");
     }
 
 
     @Override
     @Deprecated
     protected Term generateMbyAtPreDef(ProgramVariable selfVar,
-                                       ImmutableList<ProgramVariable> paramVars) {
+            ImmutableList<ProgramVariable> paramVars, Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
-                 "Please use the POSnippetFactory instead.");
+                "Please use the POSnippetFactory instead.");
     }
 }

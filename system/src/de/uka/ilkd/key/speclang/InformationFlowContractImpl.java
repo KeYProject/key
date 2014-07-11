@@ -392,8 +392,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public ContractPO createProofObl(InitConfig initConfig) {
-        return new InfFlowContractPO(initConfig, this);
+    public final ContractPO createProofObl(InitConfig initConfig) {
+        return (ContractPO)createProofObl(initConfig, this);
     }
 
 
@@ -402,6 +402,10 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         return services.getSpecificationRepository().getPO(this);
     }
 
+    @Override
+    public ProofOblInput createProofObl(InitConfig initConfig, Contract contract) {
+        return new InfFlowContractPO(initConfig, (InformationFlowContract) contract);
+    }
 
     @Override
     public String getDisplayName() {

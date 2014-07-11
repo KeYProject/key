@@ -58,7 +58,7 @@ public abstract class AbstractPO implements IPersistablePO {
 
     protected final TermBuilder tb; 
     protected final InitConfig environmentConfig;
-    protected final Services environmentServices;
+    protected Services environmentServices;
     protected final JavaInfo javaInfo;
     protected final HeapLDT heapLDT;
     protected final SpecificationRepository specRepos;
@@ -328,6 +328,9 @@ public abstract class AbstractPO implements IPersistablePO {
     private Proof createProof(String proofName,
                               Term poTerm,
                               InitConfig proofConfig) {
+        if (proofConfig == null) {
+            proofConfig = environmentConfig.deepCopy();
+        }
         final JavaModel javaModel = proofConfig.getServices().getJavaModel();
         createProofHeader(javaModel.getModelDir(),
                           javaModel.getClassPath(),

@@ -104,7 +104,7 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro {
             return info;
         }
 
-        InitConfig initConfig = proof.env().getInitConfig();
+        InitConfig initConfig = proof.getEnv().getInitConfigForEnvironment();
 
         BlockContractBuiltInRuleApp blockRuleApp = (BlockContractBuiltInRuleApp) app;
         BlockContract contract = blockRuleApp.getContract();
@@ -120,14 +120,14 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro {
                                        mediator.getServices(),
                                        mediator.getUI());
         try {
-            Proof p = pi.startProver(initConfig, blockExecPO, 0);
+            Proof p = pi.startProver(initConfig, blockExecPO).getFirstProof();
             p.unionIFSymbols(proof.getIFSymbols());
             // stop interface again, because it is activated by the proof
             // change through startProver; the ProofMacroWorker will activate
             // it again at the right time
             mediator.stopInterface(true);
             mediator.setInteractive(false);
-            info = new ProofMacroFinishedInfo(this, p.openEnabledGoals(), p);
+            info = new ProofMacroFinishedInfo(this, p);
         } catch (ProofInputException exc) {
             ExceptionDialog.showDialog(MainWindow.getInstance(), exc);
         }

@@ -56,7 +56,7 @@ public class LoopInvExecutionPO extends AbstractOperationPO
                               Services services) {
         this(initConfig, loopInv, symbExecVars, initiatingGoal, context,
              guardTerm);
-        this.services = services;
+        this.environmentServices = services;
     }
 
 
@@ -86,7 +86,7 @@ public class LoopInvExecutionPO extends AbstractOperationPO
 
 
     private boolean preAndPostExpressionsEqual() {
-        for (InfFlowSpec infFlowSpec: loopInvariant.getInfFlowSpecs(services)) {
+        for (InfFlowSpec infFlowSpec: loopInvariant.getInfFlowSpecs(environmentServices)) {
             if(infFlowSpec.preExpressions == infFlowSpec.postExpressions) {
                 return false;
             }
@@ -100,7 +100,7 @@ public class LoopInvExecutionPO extends AbstractOperationPO
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory =
                 POSnippetFactory.getBasicFactory(loopInvariant, symbExecVars,
-                                                 context, guardTerm, services);
+                                                 context, guardTerm, environmentServices);
 
         // symbolic execution
         Term symExec =
@@ -253,19 +253,11 @@ public class LoopInvExecutionPO extends AbstractOperationPO
     // the following code is legacy code
     @Override
     @Deprecated
-    protected StatementBlock buildOperationBlock(
-            ImmutableList<LocationVariable> formalParVars,
-            ProgramVariable selfVar, ProgramVariable resultVar) {
-        throw new UnsupportedOperationException("Not supported any more. " +
-                "Please use the POSnippetFactory instead.");
-    }
-
-    @Override
-    @Deprecated
     protected ImmutableList<StatementBlock> buildOperationBlocks(
-                                                                 ImmutableList<LocationVariable> formalParVars,
-                                                                 ProgramVariable selfVar,
-                                                                 ProgramVariable resultVar) {
+                                    ImmutableList<LocationVariable> formalParVars,
+                                    ProgramVariable selfVar,
+                                    ProgramVariable resultVar,
+                                    Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
                  "Please use the POSnippetFactory instead.");
     }
@@ -273,7 +265,8 @@ public class LoopInvExecutionPO extends AbstractOperationPO
     @Override
     @Deprecated
     protected Term generateMbyAtPreDef(ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars) {
+                                       ImmutableList<ProgramVariable> paramVars,
+                                       Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
                 "Please use the POSnippetFactory instead.");
     }
@@ -302,7 +295,8 @@ public class LoopInvExecutionPO extends AbstractOperationPO
     protected Term buildFrameClause(List<LocationVariable> modHeaps,
                                     Map<Term, Term> heapToAtPre,
                                     ProgramVariable selfVar,
-                                    ImmutableList<ProgramVariable> paramVars) {
+                                    ImmutableList<ProgramVariable> paramVars,
+                                    Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
                 "Please use the POSnippetFactory instead.");
     }

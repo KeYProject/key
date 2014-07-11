@@ -114,7 +114,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     */
    private Term uninterpretedPredicate;
 
-   private InitConfig proofConfig;
+   InitConfig proofConfig;
 
    /**
     * Constructor.

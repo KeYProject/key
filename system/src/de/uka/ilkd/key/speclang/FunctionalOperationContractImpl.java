@@ -1260,8 +1260,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
 
     @Override
-    public ContractPO createProofObl(InitConfig initConfig) {
-        return new FunctionalOperationContractPO(initConfig, this);
+    public final ContractPO createProofObl(InitConfig initConfig) {
+        return (ContractPO)createProofObl(initConfig, this);
     }
 
 
@@ -1270,6 +1270,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return services.getSpecificationRepository().getPO(this);
     }
 
+    @Override
     public ProofOblInput createProofObl(InitConfig initConfig, Contract contract) {
         return new FunctionalOperationContractPO(initConfig,
                 (FunctionalOperationContract) contract);

@@ -49,10 +49,10 @@ public class InfFlowContractPO extends AbstractOperationPO
         // generate proof obligation variables
         final IProgramMethod pm = contract.getTarget();
         symbExecVars =
-                new ProofObligationVars(pm, contract.getKJT(), services);
+                new ProofObligationVars(pm, contract.getKJT(), environmentServices);
 
         assert (symbExecVars.pre.self == null) == (pm.isStatic());
-        ifVars = new IFProofObligationVars(symbExecVars, services);
+        ifVars = new IFProofObligationVars(symbExecVars, environmentServices);
 
         // add new information flow symbols
         // (by the way: why only formal parameters?)
@@ -69,11 +69,15 @@ public class InfFlowContractPO extends AbstractOperationPO
 
     @Override
     public void readProblem() throws ProofInputException {
+        assert proofConfig == null;
+
+        proofConfig = environmentConfig.deepCopy();
+        environmentServices = proofConfig.getServices();
 
         // create proof obligation
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
-                                                   ifVars.c2, services);
+                                                   ifVars.c2, environmentServices);
         final Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
         final Term post =
@@ -83,7 +87,7 @@ public class InfFlowContractPO extends AbstractOperationPO
 
         // register final term, taclets and collect class axioms
         assignPOTerms(finalTerm);
-        collectClassAxioms(contract.getKJT());
+        collectClassAxioms(contract.getKJT(), proofConfig);
 
         for (final NoPosTacletApp t: taclets) {
             if (t.taclet().name().toString().startsWith("Class_invariant_axiom")) {
@@ -253,21 +257,11 @@ public class InfFlowContractPO extends AbstractOperationPO
     // the following code is legacy code
     @Override
     @Deprecated
-    protected StatementBlock buildOperationBlock(
-            ImmutableList<LocationVariable> formalParVars,
-            ProgramVariable selfVar,
-            ProgramVariable resultVar) {
-        throw new UnsupportedOperationException("Not supported any more. " +
-                                                "Please use the POSnippetFactory instead.");
-    }
-
-
-    @Override
-    @Deprecated
     protected ImmutableList<StatementBlock> buildOperationBlocks(
-                                                                 ImmutableList<LocationVariable> formalParVars,
-                                                                 ProgramVariable selfVar,
-                                                                 ProgramVariable resultVar) {
+                                        ImmutableList<LocationVariable> formalParVars,
+                                        ProgramVariable selfVar,
+                                        ProgramVariable resultVar,
+                                        Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
                  "Please use the POSnippetFactory instead.");
     }
@@ -304,7 +298,8 @@ public class InfFlowContractPO extends AbstractOperationPO
     protected Term buildFrameClause(List<LocationVariable> modHeaps,
                                     Map<Term, Term> heapToAtPre,
                                     ProgramVariable selfVar,
-                                    ImmutableList<ProgramVariable> paramVars) {
+                                    ImmutableList<ProgramVariable> paramVars,
+                                    Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
                                                 "Please use the POSnippetFactory instead.");
     }
@@ -313,7 +308,8 @@ public class InfFlowContractPO extends AbstractOperationPO
     @Override
     @Deprecated
     protected Term generateMbyAtPreDef(ProgramVariable selfVar,
-                                       ImmutableList<ProgramVariable> paramVars) {
+                                       ImmutableList<ProgramVariable> paramVars,
+                                       Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
                                                 "Please use the POSnippetFactory instead.");
     }

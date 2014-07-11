@@ -507,8 +507,16 @@ public final class DependencyContractImpl implements DependencyContract {
 
     
     @Override
-    public ContractPO createProofObl(InitConfig initConfig) {
-	return new DependencyContractPO(initConfig, this);
+    public ProofOblInput createProofObl(InitConfig initConfig,
+                                     Contract contract) {
+	return new DependencyContractPO(initConfig,
+	                                (DependencyContract)contract);
+    }
+
+
+    @Override
+    public final ContractPO createProofObl(InitConfig initConfig) {
+        return (ContractPO)createProofObl(initConfig, this);
     }
 
     
@@ -517,7 +525,7 @@ public final class DependencyContractImpl implements DependencyContract {
         return services.getSpecificationRepository().getPO(this);
     }
 
-	        	        
+
     @Override
     public DependencyContract setID(int newId) {
         return new DependencyContractImpl(baseName,

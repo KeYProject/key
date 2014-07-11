@@ -52,7 +52,7 @@ public class BlockExecutionPO extends AbstractOperationPO
                             ExecutionContext context,
                             Services services) {
         this(initConfig, contract, symbExecVars, initiatingGoal, context);
-        this.services = services;
+        this.environmentServices = services;
     }
 
     public BlockExecutionPO(InitConfig initConfig,
@@ -76,7 +76,7 @@ public class BlockExecutionPO extends AbstractOperationPO
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory =
                 POSnippetFactory.getBasicFactory(contract, symbExecVars,
-                                                 context, services);
+                                                 context, environmentServices);
 
         // symbolic execution
         final Term symExec =
@@ -246,21 +246,11 @@ public class BlockExecutionPO extends AbstractOperationPO
     // the following code is legacy code
     @Override
     @Deprecated
-    protected StatementBlock buildOperationBlock(
-            ImmutableList<LocationVariable> formalParVars,
-            ProgramVariable selfVar,
-            ProgramVariable resultVar) {
-        throw new UnsupportedOperationException("Not supported any more. " +
-                                                "Please use the POSnippetFactory instead.");
-    }
-
-
-    @Override
-    @Deprecated
     protected ImmutableList<StatementBlock> buildOperationBlocks(
-                                                                 ImmutableList<LocationVariable> formalParVars,
-                                                                 ProgramVariable selfVar,
-                                                                 ProgramVariable resultVar) {
+                                        ImmutableList<LocationVariable> formalParVars,
+                                        ProgramVariable selfVar,
+                                        ProgramVariable resultVar,
+                                        Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
                  "Please use the POSnippetFactory instead.");
     }
@@ -297,7 +287,8 @@ public class BlockExecutionPO extends AbstractOperationPO
     protected Term buildFrameClause(List<LocationVariable> modHeaps,
                                     Map<Term, Term> heapToAtPre,
                                     ProgramVariable selfVar,
-                                    ImmutableList<ProgramVariable> paramVars) {
+                                    ImmutableList<ProgramVariable> paramVars,
+                                    Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
                                                 "Please use the POSnippetFactory instead.");
     }
@@ -306,7 +297,8 @@ public class BlockExecutionPO extends AbstractOperationPO
     @Override
     @Deprecated
     protected Term generateMbyAtPreDef(ProgramVariable selfVar,
-                                       ImmutableList<ProgramVariable> paramVars) {
+                                       ImmutableList<ProgramVariable> paramVars,
+                                       Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
                                                 "Please use the POSnippetFactory instead.");
     }
