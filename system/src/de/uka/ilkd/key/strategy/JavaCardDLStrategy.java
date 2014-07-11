@@ -109,6 +109,7 @@ import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termfeature.AnonHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.IsInductionVariable;
 import de.uka.ilkd.key.strategy.termfeature.IsNonRigidTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.IsSelectSkolemConstantTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.OperatorClassTF;
@@ -253,7 +254,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         }
         
         final Feature oneStepSimplificationF 
-        	= oneStepSimplificationFeature(longConst(-11000));
+        	= oneStepSimplificationFeature(longConst(-20000));
       //  final Feature smtF = smtFeature(inftyConst());
         
         return SumFeature.createSum (AutomatedRuleFeature.INSTANCE,
@@ -602,6 +603,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             bindRuleSet ( d, "auto_induction_lemma", inftyConst());        	
         }
 
+        
+        if (autoInductionEnabled() || autoInductionLemmaEnabled()) {
+           bindRuleSet (d, "induction_var", 0);
+        } else {
+           bindRuleSet (d, "induction_var", ifZero(applyTF(instOf("uSub"), IsInductionVariable.INSTANCE), longConst(0), inftyConst()));
+        }
         
         return d;
     }
