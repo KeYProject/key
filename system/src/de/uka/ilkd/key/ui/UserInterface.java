@@ -94,6 +94,8 @@ public interface UserInterface
 
     boolean macroChosen();
 
+    public ProverTaskListener getListener();
+
     boolean applyMacro();
 
     /** 

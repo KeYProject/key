@@ -44,6 +44,8 @@ public abstract class AbstractUserInterface implements UserInterface {
 
     private ProofMacro autoMacro = new SkipMacro();
 
+    private ProverTaskListener pml = null;
+
     protected ProblemLoader getProblemLoader(File file, List<File> classPath,
                                              File bootClassPath, KeYMediator mediator) {
         final ProblemLoader pl =
@@ -76,6 +78,14 @@ public abstract class AbstractUserInterface implements UserInterface {
     }
 
     @Override
+    public final ProverTaskListener getListener() {
+        if (this.pml == null) {
+            this.pml = new ProofMacroListenerAdapter();
+        }
+        return new CompositePTListener(this, pml);
+    }
+
+    @Override
     public ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput, 
           ProofAggregate proofList, InitConfig initConfig) {
        final ProofEnvironment env = new ProofEnvironment(initConfig); 
@@ -93,8 +103,7 @@ public abstract class AbstractUserInterface implements UserInterface {
             try {
                 getMediator().stopInterface(true);
                 getMediator().setInteractive(false);
-                final ProverTaskListener ptl = new ProofMacroListenerAdapter();
-                taskStarted(getMacro().getName(), 0);
+                final ProverTaskListener ptl = getListener();
                 ptl.taskStarted(getMacro().getName(), 0);
                 info = getMacro().applyTo(getMediator(), null, ptl);
                 ptl.taskFinished(info);

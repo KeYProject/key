@@ -563,7 +563,7 @@ public final class MainWindow extends JFrame  {
     }
 
     private void setStatusLineImmediately(String str, int max) {
-        statusLine.reset();
+        //statusLine.reset();
         statusLine.setStatusText(str);
         if(max > 0) {
             getStatusLine().setProgressBarMaximum(max);

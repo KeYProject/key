@@ -35,7 +35,8 @@ public class CompositePTListener implements ProverTaskListener {
 
     @Override
     public void taskFinished(TaskFinishedInfo info) {
-        for (ProverTaskListener l: listeners) {
+        for (int i = listeners.length -1; 0 <= i; i--) {
+            ProverTaskListener l = listeners[i];
             if (l != null) {
                 l.taskFinished(info);
             }
