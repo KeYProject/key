@@ -38,8 +38,6 @@ import de.uka.ilkd.key.proof.Proof;
  */
 public class TryCloseMacro extends AbstractProofMacro {
 
-    ProofMacroListener pml;
-
     /**
      * Instantiates a new try close macro.
      * No changes to the max number of steps.
@@ -106,12 +104,18 @@ public class TryCloseMacro extends AbstractProofMacro {
         } else {
             setNumberSteps(oldNumberOfSteps);
         }
+        final ProofMacro macroAdapter = new SkipMacro() {
+            @Override
+            public String getName() { return "Apply automatic strategy"; }
+            @Override
+            public String getDescription() { return "Apply automatic strategy"; }
+            };
+        macroAdapter.setNumberSteps(getNumberSteps());
         //
         // The observer to handle the progress bar
-        final ProofMacroListener l = 
-                new ProgressBarListener(this, goals.size(),
-                                        this.getNumberSteps(), listener);
-        applyStrategy.addProverTaskObserver(l);
+        final ProofMacroListener pml =  new ProgressBarListener(macroAdapter, goals.size(),
+                                                                getNumberSteps(), listener);
+        applyStrategy.addProverTaskObserver(pml);
 
         //
         // inform the listener
@@ -151,7 +155,7 @@ public class TryCloseMacro extends AbstractProofMacro {
             // reset the old number of steps
             mediator.setMaxAutomaticSteps(oldNumberOfSteps);
             setNumberSteps(oldNumberOfSteps);
-            applyStrategy.removeProverTaskObserver(l);
+            applyStrategy.removeProverTaskObserver(pml);
             info = info.setModClosedGoals(goals);
         }
         return info;
@@ -172,7 +176,8 @@ public class TryCloseMacro extends AbstractProofMacro {
         private int numberSteps;
         private int completedGoals;
 
-        ProgressBarListener(ProofMacro macro, int numberGoals, int numberSteps, ProverTaskListener l) {
+        ProgressBarListener(ProofMacro macro, int numberGoals,
+                            int numberSteps, ProverTaskListener l) {
             super(macro, l);
             this.numberGoals = numberGoals;
             this.numberSteps = numberSteps;
