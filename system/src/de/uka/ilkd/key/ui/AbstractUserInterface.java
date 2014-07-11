@@ -249,6 +249,7 @@ public abstract class AbstractUserInterface implements UserInterface {
     abstract protected void macroStarted(String message, int size);
     abstract protected void macroFinished(TaskFinishedInfo info);
 
+
     private class ProofMacroListenerAdapter implements ProverTaskListener {
 
         @Override

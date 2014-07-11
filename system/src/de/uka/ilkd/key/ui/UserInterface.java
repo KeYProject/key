@@ -43,6 +43,8 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 public interface UserInterface
     extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor, ProofEnvironmentListener {
 
+    public static final String PROP_AUTO_MODE = "autoMode";
+
     /**
      * these methods are called immediately before automode is started to ensure that
      * the GUI can respond in a reasonable way, e.g., change the cursor to a waiting cursor
