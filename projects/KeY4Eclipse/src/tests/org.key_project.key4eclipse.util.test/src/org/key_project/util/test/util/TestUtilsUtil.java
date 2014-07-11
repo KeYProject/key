@@ -1512,7 +1512,7 @@ public class TestUtilsUtil {
       bot.waitUntil(new ICondition() {
          @Override
          public boolean test() throws Exception {
-            return mediator.autoMode();
+            return mediator.isInAutoMode();
          }
          
          @Override
@@ -1535,7 +1535,7 @@ public class TestUtilsUtil {
       bot.waitUntil(new ICondition() {
          @Override
          public boolean test() throws Exception {
-            return !mediator.autoMode();
+            return !mediator.isInAutoMode();
          }
          
          @Override

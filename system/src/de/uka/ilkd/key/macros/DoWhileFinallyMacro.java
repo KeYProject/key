@@ -1,14 +1,11 @@
 package de.uka.ilkd.key.macros;
 
-import javax.swing.KeyStroke;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.ui.CompositePTListener;
 
 /**
  * The abstract class DoWhileFinallyMacro can be used to create compound macros
@@ -61,7 +58,7 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
         int steps = getNumberSteps();
         while (getNumberSteps() > 0 && getCondition() && canApplyTo(mediator, goals, posInOcc)) {
             final ProverTaskListener cptl =
-                    new CompositePTListener(getListener(), listener);
+                    new ProofMacroListener(this, listener);
             cptl.taskStarted(getProofMacro().getName(), 0);
             info = getProofMacro().applyTo(mediator, goals, posInOcc, cptl);
             cptl.taskFinished(info);
@@ -73,7 +70,7 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
         }
         if (steps > 0 && getAltProofMacro().canApplyTo(mediator, goals, posInOcc)) {
             final ProverTaskListener cptl =
-                    new CompositePTListener(listener, getListener());
+                    new ProofMacroListener(this, listener);
             cptl.taskStarted(getAltProofMacro().getName(), 0);
             info = getAltProofMacro().applyTo(mediator, goals, posInOcc, cptl);
             info = new ProofMacroFinishedInfo(this, info);
@@ -99,7 +96,7 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
     abstract boolean getCondition();
 
     /**
-     * Returns the maximum number of rule applications allowed for
+     * Sets the maximum number of rule applications allowed for
      * this macro. The default implementation is the maximum amount
      * of proof steps for automatic mode.
      * @return the maximum number of rule applications allowed for
@@ -115,10 +112,5 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
                     .getStrategySettings().getMaxSteps();
         }
         setNumberSteps(steps);
-    }
-
-    @Override
-    public KeyStroke getKeyStroke() {
-        return null; // default implementation
     }
 }

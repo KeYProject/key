@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.actions.TestGenerationAction;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.testgen.TGInfoDialog;
 import de.uka.ilkd.key.gui.testgen.TestGenerationSettings;
@@ -125,7 +124,7 @@ public class TestCaseGenerator {
 		services = proof.getServices();
 		junitFormat = settings.useJunit();
 		useRFL = settings.useRFL();
-		modDir = proof.getJavaModel().getModelDir();
+		modDir = services.getJavaModel().getModelDir();
 		dontCopy = modDir + File.separator + TestCaseGenerator.DONT_COPY;
 		directory = settings.getOutputFolderPath();
 		sortDummyClass = new HashMap<Sort, StringBuffer>();		

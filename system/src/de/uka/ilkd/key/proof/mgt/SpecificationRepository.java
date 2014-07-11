@@ -766,23 +766,22 @@ public final class SpecificationRepository {
      * operation which refer to the passed modality.
      */
     public ImmutableSet<FunctionalOperationContract> getOperationContracts(KeYJavaType kjt,
-	    				                                   IProgramMethod pm,
-	    				                                   Modality modality) {
-	ImmutableSet<FunctionalOperationContract> result = getOperationContracts(kjt, pm);
-	final boolean transactionModality =
-	        (modality == Modality.DIA_TRANSACTION || modality == Modality.BOX_TRANSACTION);
-	final Modality matchModality =
-	        transactionModality ?
-	                ((modality == Modality.DIA_TRANSACTION) ? Modality.DIA : Modality.BOX) :
-	                    modality;
-	for(FunctionalOperationContract contract : result) {
-            if(!contract.getModality().equals(matchModality)
-             || (transactionModality && !contract.transactionApplicableContract()
-                     && !contract.isReadOnlyContract(services))) {
-		result = result.remove(contract);
-	    }
-	}
-	return result;
+                                                                           IProgramMethod pm,
+                                                                           Modality modality) {
+        ImmutableSet<FunctionalOperationContract> result = getOperationContracts(kjt, pm);
+        final boolean transactionModality =
+                (modality == Modality.DIA_TRANSACTION || modality == Modality.BOX_TRANSACTION);
+        final Modality matchModality = transactionModality ?
+                ((modality == Modality.DIA_TRANSACTION) ? Modality.DIA : Modality.BOX)
+                        : modality;
+        for (FunctionalOperationContract contract : result) {
+            if (!contract.getModality().equals(matchModality)
+                    || (transactionModality
+                            && !contract.transactionApplicableContract())) {
+                result = result.remove(contract);
+            }
+        }
+        return result;
     }
 
     /**

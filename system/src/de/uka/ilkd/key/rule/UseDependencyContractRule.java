@@ -579,7 +579,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
                 = new RuleJustificationBySpec(contract);
         final ComplexRuleJustificationBySpec cjust
                 = (ComplexRuleJustificationBySpec)
-                    goal.proof().env().getJustifInfo().getJustification(this);
+                    goal.proof().getInitConfig().getJustifInfo().getJustification(this);
         cjust.add(ruleApp, just);
 
         if(!useful) {

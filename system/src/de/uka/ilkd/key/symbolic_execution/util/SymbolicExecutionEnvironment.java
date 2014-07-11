@@ -124,7 +124,7 @@ public class SymbolicExecutionEnvironment<U extends UserInterface> extends KeYEn
       if (builder != null) {
          builder.dispose();
       }
-      if (proof != null && proof != getLoadedProof()) {
+      if (proof != null && !proof.isDisposed() && proof != getLoadedProof()) {
          proof.dispose();
       }
       super.dispose();

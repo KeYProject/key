@@ -251,6 +251,4 @@ public interface ProofMacro {
     ImmutableList<Goal> getGoals();
 
     void innerMacroFinished(TaskFinishedInfo info);
-
-    ProofMacroListener getListener();
 }

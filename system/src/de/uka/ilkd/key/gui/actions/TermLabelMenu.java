@@ -36,7 +36,7 @@ import javax.swing.JMenu;
 public class TermLabelMenu extends JMenu {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
     private final Map<Name, TermLabelCheckBox> checkBoxMap;
@@ -134,7 +134,8 @@ public class TermLabelMenu extends JMenu {
         /**
          *
          */
-        private static final long serialVersionUID = 1848906013431722616L;
+        private static final long serialVersionUID = 8766949321781919880L;
+
         public DisplayLabelsCheckBox(MainWindow mainWindow) {
             super(mainWindow, "Display term labels in formulas", true);
             setTooltip("Use this checkbox to toggle visibility for all term labels.");
@@ -158,13 +159,14 @@ public class TermLabelMenu extends JMenu {
 
     private class TermLabelCheckBox extends KeYMenuCheckBox {
 
-        // The name of the label, which belongs to this checkbox.
-        private final Name labelName;
-
         /**
          *
          */
-        private static final long serialVersionUID = -3473419737628245958L;
+        private static final long serialVersionUID = 4582177241207958225L;
+
+        // The name of the label, which belongs to this checkbox.
+        private final Name labelName;
+
         // This String is used as ToolTipText in case the CheckBox is enabled.
         private String enabledToolTipText;
 

@@ -3643,7 +3643,6 @@ varexp[TacletBuilder b]
         | varcond_static[b,negated]
         | varcond_staticmethod[b,negated]  
         | varcond_typecheck[b, negated]
-        | varcond_induction_variable[b, negated]
         | varcond_constant[b, negated]
         | varcond_label[b, negated]
         | varcond_static_field[b, negated]
@@ -4029,14 +4028,6 @@ varcond_freeLabelIn [TacletBuilder b, boolean negated]
     	b.addVariableCondition(new FreeLabelInVariableCondition((SchemaVariable) l, 
     	(SchemaVariable) statement, negated ));
     }
-;
-
-varcond_induction_variable [TacletBuilder b, boolean negated]
-:
-   ISINDUCTVAR LPAREN x=varId RPAREN {
-     b.addVariableCondition(new InductionVariableCondition (
-       (SchemaVariable)x, negated ));
-   }
 ;
 
 varcond_constant [TacletBuilder b, boolean negated]

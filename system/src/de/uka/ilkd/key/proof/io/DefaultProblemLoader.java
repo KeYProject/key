@@ -34,10 +34,11 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InfFlowPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
@@ -45,6 +46,7 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
@@ -272,7 +274,7 @@ public class DefaultProblemLoader {
                            po.readProblem();
                            for (Proof p: po.getPO().getProofs()) {
                                p.removeInfFlowProofSymbols();
-                               p.setProofEnv(initConfig.getProofEnv());
+                               p.setEnv(new ProofEnvironment(initConfig));
                                ui.getMediator().getSelectionModel().setProof(p);
                                specRepos.registerProof(po, p);
                                final File poFile = ui.saveProof(p, ".key");
@@ -341,7 +343,8 @@ public class DefaultProblemLoader {
    protected ProblemInitializer createProblemInitializer() {
       UserInterface ui = mediator.getUI();
       return new ProblemInitializer(ui,
-                                    new Services(envInput.getProfile(), mediator.getExceptionHandler()),
+                                    new Services(envInput.getProfile(), 
+                                          mediator.getExceptionHandler()),
                                     ui);
    }
 
@@ -434,8 +437,11 @@ public class DefaultProblemLoader {
     * @throws ProofInputException Occurred Exception.
     */
    protected Proof createProof(LoadedPOContainer poContainer) throws ProofInputException {
-       return problemInitializer.startProver(initConfig, poContainer.getProofOblInput(),
-                                             poContainer.getProofNum());
+      ProofAggregate proofList = problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
+      
+      mediator.getUI().createProofEnvironmentAndRegisterProof(poContainer.getProofOblInput(), proofList, initConfig);
+
+      return proofList.getProof(poContainer.getProofNum());
    }
 
    protected void replayProof(Proof proof) throws ProofInputException {

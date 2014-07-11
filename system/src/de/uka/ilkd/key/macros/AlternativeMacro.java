@@ -17,14 +17,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.KeyStroke;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.ui.CompositePTListener;
 
 /**
  * The abstract class AlternativeMacro can be used to create compound macros
@@ -90,7 +87,7 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
         for (ProofMacro macro : getProofMacros()) {
             if(macro.canApplyTo(mediator, goals, posInOcc)) {
                 final ProverTaskListener cptl =
-                        new CompositePTListener(getListener(), listener);
+                        new ProofMacroListener(macro, listener);
                 cptl.taskStarted(macro.getName(), 0);
                 info = macro.applyTo(mediator, goals, posInOcc, cptl);
                 cptl.taskFinished(info);
@@ -113,10 +110,5 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
             assert proofMacros.length > 0;
         }
         return Collections.unmodifiableList(Arrays.asList(proofMacros));
-    }
-
-    @Override
-    public KeyStroke getKeyStroke() {
-        return null; // default implementation
     }
 }

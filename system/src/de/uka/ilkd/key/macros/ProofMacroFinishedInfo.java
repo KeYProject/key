@@ -59,7 +59,7 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
     }
 
     ProofMacroFinishedInfo(ProofMacroFinishedInfo info, ApplyStrategyInfo stratInfo) {
-        this(info.getMacro(), info.getGoals(), stratInfo.getProof(),
+        this(info.getMacro(), stratInfo.nonCloseableGoal(), stratInfo.getProof(),
              info.getTime() + stratInfo.getTime(),
              info.getAppliedRules() + stratInfo.getAppliedRuleApps(),
              info.getClosedGoals() + stratInfo.getClosedGoals());
@@ -89,5 +89,9 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
         } else {
             return (ImmutableList<Goal>)result;
         }
+    }
+
+    public static ProofMacroFinishedInfo getDefaultInfo(ProofMacro macro, Proof proof) {
+        return new ProofMacroFinishedInfo(macro, ImmutableSLList.<Goal>nil(), proof);
     }
 }

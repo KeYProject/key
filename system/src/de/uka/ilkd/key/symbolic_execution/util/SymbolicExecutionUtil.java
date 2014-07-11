@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.util;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -92,7 +93,9 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -1714,7 +1717,7 @@ public final class SymbolicExecutionUtil {
       while (exceptionDefinition.op() == Junctor.AND) {
          exceptionDefinitionParent = exceptionDefinition;
          Term firstSub = exceptionDefinition.sub(0);
-         if (firstSub.op() == node.proof().env().getInitialServices().getJavaInfo().getInv()) { // TODO: Replace "node.proof().env().getInitialServices().getJavaInfo().getInv()" with "node.proof().getServices().getJavaInfo().getInv()" when bug item http://i12www.ira.uka.de/~klebanov/mantis/view.php?id=1386 is solved.
+         if (firstSub.op() == node.proof().getServices().getJavaInfo().getInv()) { 
             exceptionDefinition = exceptionDefinition.sub(1);
          }
          else {
@@ -3072,28 +3075,39 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
+    * <p>
     * Converts the given {@link Term} into a {@link String} respecting {@link #isUsePretty()}.
+    * </p>
+    * <p>
+    * The functionality is similar to {@link ProofSaver#printTerm(Term, Services, boolean)} but allows to set custom settings.
+    * </p>
     * @param term The {@link Term} to convert.
     * @param services The {@link Services} to use.
+    * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
     * @return The {@link String} representation of the given {@link Term}.
     */
-   public static String formatTerm(Term term, Services services, boolean usePrettyPrinting) {
-      if (usePrettyPrinting) {
-         synchronized (NotationInfo.class) {
-            boolean originalPrettySyntax = NotationInfo.PRETTY_SYNTAX;
-            try {
-               NotationInfo.PRETTY_SYNTAX = true;
-               StringBuffer sb = ProofSaver.printTerm(term, services, true);
-               return sb.toString();
-            }
-            finally {
-               NotationInfo.PRETTY_SYNTAX = originalPrettySyntax;
-            }
+   public static String formatTerm(Term term, 
+                                   Services services, 
+                                   boolean useUnicode,
+                                   boolean usePrettyPrinting) {
+      if (useUnicode || usePrettyPrinting) {
+         StringBuffer result;
+         NotationInfo ni = new NotationInfo();
+         LogicPrinter logicPrinter = new LogicPrinter(new ProgramPrinter(null), ni, services, true);
+         logicPrinter.getNotationInfo().refresh(services, usePrettyPrinting, useUnicode);
+         try {
+             logicPrinter.printTerm(term);
+         } catch(IOException ioe) {
+             System.err.println(ioe);
          }
+         result = logicPrinter.result();
+         if (result.charAt(result.length()-1) == '\n')
+             result.deleteCharAt(result.length()-1);
+         return result.toString();
       }
       else {
-         return term.toString();
+         return term != null ? term.toString() : null;
       }
    }
    

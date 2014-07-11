@@ -80,7 +80,7 @@ public final class ProofCorrectnessMgt {
     //-------------------------------------------------------------------------
     
     public RuleJustification getJustification(RuleApp r) {
-	return proof.env()
+	return proof.getInitConfig()
 	            .getJustifInfo()
 	            .getJustification(r, proof.getServices());
     }

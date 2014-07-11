@@ -42,6 +42,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -61,9 +62,9 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     // for a progress bar
     private int progressMax = 0;
 
-   public ConsoleUserInterface(BatchMode batchMode, byte verbosity) {
-    	this.batchMode = batchMode;
-    	this.verbosity = verbosity;
+    public ConsoleUserInterface(BatchMode batchMode, byte verbosity) {
+        this.batchMode = batchMode;
+        this.verbosity = verbosity;
         this.mediator  = new KeYMediator(this);
         this.numOfInvokedMacros = 0;
    }
@@ -84,6 +85,31 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        if (verbosity >= HIGH) { // WARNING: Is never executed since application terminates via System.exit() before.
            System.out.println(proof.statistics());
        }
+   }
+
+   private void finalizeBatchMode(final int openGoals,
+                                  TaskFinishedInfo info,
+                                  final Object result2) {
+       if (verbosity >= HIGH) {
+           System.out.println("]"); // end progress bar
+       }
+       if (verbosity > SILENT) {
+           System.out.println("[ DONE  ... rule application ]");
+           if (verbosity >= HIGH) {
+               System.out.println("\n== Proof "+ (openGoals > 0 ? "open": "closed")+ " ==");
+               final Proof.Statistics stat = info.getProof().statistics();
+               System.out.println("Proof steps: "+stat.nodes);
+               System.out.println("Branches: "+stat.branches);
+               System.out.println("Automode Time: "+stat.autoModeTime+"ms");
+               System.out.println("Time per step: "+stat.timePerStep+"ms");
+           }
+           System.out.println("Number of goals remaining open: " + openGoals);
+           System.out.flush();
+       }
+       // this seems to be a good place to free some memory
+       Runtime.getRuntime().gc();
+       batchMode.finishedBatchMode ( result2, info.getProof() );
+       Debug.fail ( "Control flow should not reach this point." );
    }
 
    public void taskFinished(TaskFinishedInfo info) {
@@ -117,7 +143,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
                            openGoals);
                System.exit(0);
            }
-            if (macroChosen()) {
+           if (macroChosen()) {
                 applyMacro();
             } else {
                 finish(proof);
@@ -125,14 +151,12 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        }
    }
 
-
     @Override
     protected void macroFinished(TaskFinishedInfo info) {
         numOfInvokedMacros--;
     }
 
-
-   @Override
+    @Override
     public void progressStarted(Object sender) {
         // TODO Implement ProblemInitializerListener.progressStarted
         if(verbosity >= DEBUG) {
@@ -150,10 +174,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     @Override
     public void proofCreated(ProblemInitializer sender,
             ProofAggregate proofAggregate) {
-        // TODO Implement ProblemInitializerListener.proofCreated
-        // XXX WHY AT THE MAINWINDOW?!?!
-        mediator.setProof(proofAggregate.getFirstProof());
-        proofStack = proofStack.prepend(proofAggregate.getFirstProof());
     }
 
     @Override
@@ -350,38 +370,17 @@ public class ConsoleUserInterface extends AbstractUserInterface {
         }
     }
 
-   @Override
-   public boolean selectProofObligation(InitConfig initConfig) {
-      if(verbosity >= DEBUG) {
-         System.out.println("Proof Obligation selection not supported by console.");
+    @Override
+    public boolean selectProofObligation(InitConfig initConfig) {
+        if(verbosity >= DEBUG) {
+            System.out.println("Proof Obligation selection not supported by console.");
         }
-      return false;
-   }
+        return false;
+    }
 
-
-    private void finalizeBatchMode(final int openGoals,
-                                   TaskFinishedInfo info,
-                                   final Object result2) {
-        if (verbosity >= HIGH) {
-            System.out.println("]"); // end progress bar
-        }
-        if (verbosity > SILENT) {
-            System.out.println("[ DONE  ... rule application ]");
-            if (verbosity >= HIGH) {
-                System.out.println("\n== Proof "+ (openGoals > 0 ? "open": "closed")+ " ==");
-                final Proof.Statistics stat = info.getProof().statistics();
-                System.out.println("Proof steps: "+stat.nodes);
-                System.out.println("Branches: "+stat.branches);
-                System.out.println("Automode Time: "+stat.autoModeTime+"ms");
-                System.out.println("Time per step: "+stat.timePerStep+"ms");
-            }
-            System.out.println("Number of goals remaining open: " +
-                    openGoals);
-            System.out.flush();
-        }
-        // this seems to be a good place to free some memory
-        Runtime.getRuntime().gc();
-        batchMode.finishedBatchMode ( result2, info.getProof() );
-        Debug.fail ( "Control flow should not reach this point." );
+    @Override
+    public void proofRegistered(ProofEnvironmentEvent event) {
+        mediator.setProof(event.getProofList().getFirstProof());
+        proofStack = proofStack.prepend(event.getProofList().getFirstProof());
     }
 }

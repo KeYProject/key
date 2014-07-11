@@ -16,19 +16,16 @@ package de.uka.ilkd.key.macros;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.ArrayList;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.ui.CompositePTListener;
-
-import java.util.ArrayList;
 
 /**
  * The abstract class SequentialProofMacro can be used to create compound macros
@@ -107,12 +104,14 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
         for (ProofMacro macro : getProofMacros()) {
             // reverse to original nodes
             for (Node initNode : initNodes) {
-                final ProverTaskListener cptl =
-                        new CompositePTListener(getListener(), listener);
-                cptl.taskStarted(macro.getName(), 0);
-                info = macro.applyTo(mediator, initNode, posInOcc, cptl);
-                cptl.taskFinished(info);
-                info = new ProofMacroFinishedInfo(this, info);
+                if (macro.canApplyTo(mediator, initNode, posInOcc)) {
+                    final ProverTaskListener cptl =
+                            new ProofMacroListener(macro, listener);
+                    cptl.taskStarted(macro.getName(), 0);
+                    info = macro.applyTo(mediator, initNode, posInOcc, cptl);
+                    cptl.taskFinished(info);
+                    info = new ProofMacroFinishedInfo(this, info);
+                }
             }
         }
         return info;
@@ -130,10 +129,5 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
             assert proofMacros.length > 0;
         }
         return Collections.unmodifiableList(Arrays.asList(proofMacros));
-    }
-
-    @Override
-    public javax.swing.KeyStroke getKeyStroke() {
-	return KeyStrokeManager.get(this);
     }
 }

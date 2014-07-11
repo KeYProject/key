@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.testgen;
 
-import de.uka.ilkd.key.testgen.*;
-
 /** This class creates either assignments or creates calls to setter methods to initiate fields.  
  * @author gladisch
  * @author herda
