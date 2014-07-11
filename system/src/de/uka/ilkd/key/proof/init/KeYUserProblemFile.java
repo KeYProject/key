@@ -91,6 +91,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             
             initConfig.setActivatedChoices(settings.getChoiceSettings()
         	      		                   .getDefaultChoicesAsSet());
+            
+            
         
         } catch (antlr.ANTLRException e) {
             throw new ProofInputException(e);      
@@ -181,7 +183,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
                           problemHeader,
                           initConfig.createTacletIndex(), 
                           initConfig.createBuiltInRuleIndex(),
-                          initConfig.getServices(), 
+                          initConfig, 
                           settings), 
                 name);
     }

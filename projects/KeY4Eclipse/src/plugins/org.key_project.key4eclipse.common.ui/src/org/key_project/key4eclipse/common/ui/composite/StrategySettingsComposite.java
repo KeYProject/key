@@ -215,7 +215,7 @@ public class StrategySettingsComposite extends Composite {
             mediator.addAutoModeListener(autoModeListener);
          }
          Name strategyName = proof.getSettings().getStrategySettings().getStrategy();
-         Profile profile = proof.env().getInitConfig().getProfile();
+         Profile profile = proof.getInitConfig().getProfile();
          StrategyFactory factory = strategyName != null ? profile.getStrategyFactory(strategyName) : null;
          if (factory == null) {
             factory = profile.getDefaultStrategyFactory();

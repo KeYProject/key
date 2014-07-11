@@ -229,11 +229,10 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 			}
 		}		
 		final Proof proof = new Proof("Test Case for NodeNr: "
-				+ node.serialNr(), newSequent, "", oldProof.env()
-				.getInitConfig().createTacletIndex(), oldProof.env()
-				.getInitConfig().createBuiltInRuleIndex(),
-				oldProof.getServices(), oldProof.getSettings());
-		proof.setProofEnv(oldProof.env());
+				+ node.serialNr(), newSequent, "", oldProof.getInitConfig().createTacletIndex(), 
+				oldProof.getInitConfig().createBuiltInRuleIndex(),
+				oldProof.getInitConfig(), oldProof.getSettings());
+		proof.setEnv(oldProof.getEnv());
 		proof.setNamespaces(oldProof.getNamespaces());
 		return proof;
 	}

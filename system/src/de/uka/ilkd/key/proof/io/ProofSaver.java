@@ -310,7 +310,7 @@ public class ProofSaver {
         if (appliedRuleApp.rule() instanceof UseOperationContractRule 
             || appliedRuleApp.rule() instanceof UseDependencyContractRule) {
             RuleJustification ruleJusti = 
-                            proof.env().getJustifInfo()
+                            proof.getInitConfig().getJustifInfo()
                                        .getJustification(appliedRuleApp, 
                                                          proof.getServices());
             

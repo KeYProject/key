@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
@@ -93,7 +94,7 @@ public class ProofTreeView extends JPanel {
     /** the model that is displayed by the delegateView */
     GUIProofTreeModel delegateModel;
 
-    private HashMap<Proof, GUIProofTreeModel> models = new LinkedHashMap<Proof, GUIProofTreeModel>(20);
+    private WeakHashMap<Proof, GUIProofTreeModel> models = new WeakHashMap<Proof, GUIProofTreeModel>(20);
 
     /** the proof this view shows */
     private Proof proof;
@@ -338,17 +339,11 @@ public class ProofTreeView extends JPanel {
         proofTreeSearchPanel.reset();
     }
 
-
-    public void removeProof(Proof p) {
-        models.remove(p);
-    }
-
     public void removeProofs(Proof[] ps) {
         for (final Proof p : ps) {
-	    models.remove(p);
-	}
+           models.remove(p);
+        }
     }
-
 
     /**
      *  moves the scope of the tree view to the given node so that it

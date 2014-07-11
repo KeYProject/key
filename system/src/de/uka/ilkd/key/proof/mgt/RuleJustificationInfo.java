@@ -59,4 +59,10 @@ public class RuleJustificationInfo {
    public void removeJustificationFor(Rule rule) {
       rule2justif.remove(new RuleKey(rule));
    }
+
+   public RuleJustificationInfo copy() {
+      RuleJustificationInfo info = new RuleJustificationInfo();
+      info.rule2justif.putAll(rule2justif);
+      return info;
+   }
 }

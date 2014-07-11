@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.proof.Counter;
+import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -89,6 +90,10 @@ public class Services implements TermServices {
      */
     private SpecificationRepository specRepos;
     
+    /*
+     * the Java model (with all paths)
+     */
+    private JavaModel javaModel;
 
     private NameRecorder nameRecorder;
     
@@ -142,8 +147,8 @@ public class Services implements TermServices {
     }    
     
 
-    private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc, 
-		     KeYRecoderMapping rec2key, HashMap<String, Counter> counters, ServiceCaches caches) {
+    private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc, KeYRecoderMapping rec2key, 
+		     HashMap<String, Counter> counters, ServiceCaches caches) {
    assert profile != null;
    assert counters != null;
    assert caches != null;
@@ -231,6 +236,7 @@ public class Services implements TermServices {
     /**
      * creates a new services object containing a copy of the java info of
      * this object and a new TypeConverter (shallow copy)
+     * The copy does not belong to a {@link Proof} object and can hence be used for a new proof.
      * @param shareCaches {@code true} The created {@link Services} will use the same {@link ServiceCaches} like this instance; {@code false} the created {@link Services} will use a new empty {@link ServiceCaches} instance.
      * @return the copy
      */
@@ -240,6 +246,7 @@ public class Services implements TermServices {
 
     /**
      * Creates a copy of this {@link Services} in which the {@link Profile} is replaced.
+     * The copy does not belong to a {@link Proof} object and can hence be used for a new proof.
      * @param profile The new {@link Profile} to use in the copy of this {@link Services}.
      * @param shareCaches {@code true} The created {@link Services} will use the same {@link ServiceCaches} like this instance; {@code false} the created {@link Services} will use a new empty {@link ServiceCaches} instance.
      * @return The created copy.
@@ -251,13 +258,14 @@ public class Services implements TermServices {
 	     "services: tried to copy schema cross reference service config.");
 	ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
 	Services s = new Services
-	    (profile, getJavaInfo().getKeYProgModelInfo().getServConf(),
-	     getJavaInfo().getKeYProgModelInfo().rec2key().copy(), copyCounters(), newCaches);
+	    (profile, getJavaInfo().getKeYProgModelInfo().getServConf(), getJavaInfo().getKeYProgModelInfo().rec2key().copy(),
+	     copyCounters(), newCaches);
         s.specRepos = specRepos;
 	s.setTypeConverter(getTypeConverter().copy(s));
 	s.setExceptionHandler(getExceptionHandler());
 	s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
+        s.setJavaModel(getJavaModel());
 	return s;
     }
     
@@ -287,20 +295,34 @@ public class Services implements TermServices {
 	s.setTypeConverter(getTypeConverter().copy(s));
 	s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
+        s.setJavaModel(getJavaModel());
+
 	return s;
     }
     
     
+    /** 
+     * Marks this services as proof specific 
+     * @param p_proof the Proof to which this {@link Services} instance belongs
+     */
+    public void setProof(Proof p_proof) {
+       assert proof == null;
+       proof = p_proof;
+    }
+    
+   
     public Services copyProofSpecific(Proof p_proof, boolean shareCaches) {
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
-        final Services s = new Services(getProfile(), getJavaInfo().getKeYProgModelInfo().getServConf(),
-                getJavaInfo().getKeYProgModelInfo().rec2key(), copyCounters(), newCaches);
+        final Services s = new Services(getProfile(), getJavaInfo().getKeYProgModelInfo().getServConf(), getJavaInfo().getKeYProgModelInfo().rec2key(),
+                copyCounters(), newCaches);
         s.proof = p_proof;
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setExceptionHandler(getExceptionHandler());
         s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
+        s.setJavaModel(getJavaModel());
+
         return s;
     }
 
@@ -380,4 +402,19 @@ public class Services implements TermServices {
     public TermFactory getTermFactory() {
         return termBuilder.tf();
     }
+
+
+    /**
+     * returns the {@link JavaModel} with all path information
+     * @return the {@link JavaModel} on which this services is based on
+     */
+   public JavaModel getJavaModel() {
+      return javaModel;
+   }
+
+
+   public void setJavaModel(JavaModel javaModel) {
+      assert this.javaModel == null;
+      this.javaModel = javaModel;
+   }
 }
