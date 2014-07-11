@@ -254,7 +254,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         }
         
         final Feature oneStepSimplificationF 
-        	= oneStepSimplificationFeature(longConst(-20000));
+        	= oneStepSimplificationFeature(longConst(-11000));
       //  final Feature smtF = smtFeature(inftyConst());
         
         return SumFeature.createSum (AutomatedRuleFeature.INSTANCE,
