@@ -337,8 +337,8 @@ public class ProofManager {
       initConfig.setTaclets(sourceInitConfig.getTaclets());
       // Create new ProofEnvironment and initialize it with values from initial one.
       initConfig.getServices().setJavaModel(sourceInitConfig.getServices().getJavaModel());
-      for (Taclet taclet : sourceInitConfig.activatedTaclets()) {
-         initConfig.registerRule(taclet, sourceInitConfig.getJustifInfo().getJustification(taclet));
+      for (Taclet taclet : initConfig.activatedTaclets()) {
+         initConfig.getJustifInfo().addJustification(taclet, sourceInitConfig.getJustifInfo().getJustification(taclet));
       }
       for (BuiltInRule rule : initConfig.builtInRules()) {
          RuleJustification origJusti = sourceInitConfig.getJustifInfo().getJustification(rule);
@@ -346,7 +346,7 @@ public class ProofManager {
             assert rule instanceof OneStepSimplifier;
             origJusti = AxiomJustification.INSTANCE;
          }
-         initConfig.registerRule(rule, origJusti);
+         initConfig.getJustifInfo().addJustification(rule, origJusti);
       }
       KeYEnvironment<CustomUserInterface> keyEnv = new KeYEnvironment<CustomUserInterface>(new CustomUserInterface(false), initConfig);
       return keyEnv;
