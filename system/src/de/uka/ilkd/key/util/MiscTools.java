@@ -523,8 +523,8 @@ public final class MiscTools {
      * @return The used {@link OneStepSimplifier} or {@code null} if not available.
      */
     public static OneStepSimplifier findOneStepSimplifier(Proof proof) {
-       if (proof != null && !proof.isDisposed() && proof.env()!=null && proof.env().getInitConfig() !=null) {
-          Profile profile = proof.env().getInitConfig().getProfile();
+       if (proof != null && !proof.isDisposed() && proof.getInitConfig() !=null) {
+          Profile profile = proof.getInitConfig().getProfile();
           return findOneStepSimplifier(profile);
        }
        else {

@@ -294,7 +294,7 @@ public final class KeYUtil {
                             EnvNode envChild = (EnvNode)child;
                             String srcPath = envChild.getProofEnv().getJavaModel().getModelDir();
                             if (srcPath != null && location.equals(new File(srcPath))) {
-                                result = envChild.getProofEnv().getInitConfig();
+                                result = envChild.getProofEnv().getInitConfigForEnvironment();
                             }
                         }
                         i++;

@@ -157,7 +157,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
    @Override
    protected ImmutableList<StatementBlock> buildOperationBlocks(ImmutableList<LocationVariable> formalParVars,
                                                 ProgramVariable selfVar,
-                                                ProgramVariable resultVar) {
+                                                ProgramVariable resultVar, Services services) {
       // Get program method to execute
       KeYJavaType type = getCalleeKeYJavaType();
       IProgramMethod pm = getProgramMethod();
@@ -176,7 +176,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
       // Register undeclared variables
       Set<LocationVariable> undeclaredVariables = undeclaredVariableCollector.result();
       for (LocationVariable x : undeclaredVariables) {
-         register(x);
+         register(x, services);
       }
       return ImmutableSLList.<StatementBlock>nil().prepend(null, result, null, null);
    }
@@ -245,9 +245,10 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
    protected Term buildFreePre(ProgramVariable selfVar,
                                KeYJavaType selfKJT,
                                ImmutableList<ProgramVariable> paramVars,
-                               List<LocationVariable> heaps) {
+                               List<LocationVariable> heaps,
+                               Services proofServices) {
       ImmutableList<ProgramVariable> paramVarsList = convert(undeclaredVariableCollector.result());
-      return super.buildFreePre(selfVar, selfKJT, paramVarsList, heaps);
+      return super.buildFreePre(selfVar, selfKJT, paramVarsList, heaps, proofServices);
    }
 
    /**
@@ -256,9 +257,10 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
    @Override
    protected Term buildUninterpretedPredicate(ImmutableList<ProgramVariable> paramVars,
                                               ProgramVariable exceptionVar,
-                                              String name) {
+                                              String name,
+                                              Services proofServices) {
       ImmutableList<ProgramVariable> paramVarsList = convert(undeclaredVariableCollector.result());
-      return super.buildUninterpretedPredicate(paramVarsList, exceptionVar, name);
+      return super.buildUninterpretedPredicate(paramVarsList, exceptionVar, name, proofServices);
    }
 
    /**

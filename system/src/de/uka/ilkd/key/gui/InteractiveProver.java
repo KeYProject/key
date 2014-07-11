@@ -66,12 +66,6 @@ public class InteractiveProver implements InterruptListener {
     private final ProverTaskListener focussedAutoModeTaskListener
             = new FocussedAutoModeTaskListener();
 
-    /**
-     * list of proof listeners and interactive proof listeners. We use an
-     * immutable list to store listeners to allow for addition/removal within
-     * listener code
-     */
-    private ImmutableList<AutoModeListener> listenerList = ImmutableSLList.nil();
 
     /**
      * the mediator
@@ -118,32 +112,6 @@ public class InteractiveProver implements InterruptListener {
         }
     }
 
-    public void addAutoModeListener(AutoModeListener p) {
-        listenerList = listenerList.prepend(p);
-    }
-
-    public void removeAutoModeListener(AutoModeListener p) {
-        listenerList = listenerList.removeAll(p);
-    }
-
-    /**
-     * fires the event that automatic execution has started
-     */
-    protected void fireAutoModeStarted(ProofEvent e) {
-        for (AutoModeListener aListenerList : listenerList) {
-            aListenerList.autoModeStarted(e);
-        }
-    }
-
-    /**
-     * fires the event that automatic execution has stopped
-     */
-    public void fireAutoModeStopped(ProofEvent e) {
-        for (AutoModeListener aListenerList : listenerList) {
-            aListenerList.autoModeStopped(e);
-        }
-    }
-
     /**
      * Apply a RuleApp and continue with update simplification or strategy
      * application according to current settings.
@@ -167,16 +135,6 @@ public class InteractiveProver implements InterruptListener {
      */
     public Proof getProof() {
         return proof;
-    }
-
-    /**
-     * Checks if the auto mode is currently running.
-     *
-     * @return {@code true} auto mode is running, {@code false} auto mode is not
-     * running.
-     */
-    public boolean isAutoMode() {
-        return worker != null;
     }
 
     /**

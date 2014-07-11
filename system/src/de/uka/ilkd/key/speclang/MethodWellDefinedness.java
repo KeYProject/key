@@ -38,6 +38,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
+import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * A contract for checking the well-definedness of a specification for a method or model field.
@@ -306,8 +307,8 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                 SchemaVariableFactory.createTermSV(new Name("callee"), getKJT().getSort());
         final ImmutableList<ParsableVariable> paramsSV = paramsSV();
         String ps = "";
-        for (ParsableVariable pv: paramsSV) {
-            ps = ps + " " + pv.sort();
+        for (ProgramVariable pv: getOrigVars().params) {
+            ps = ps + " " + pv.getKeYJavaType().getFullName();
         }
         final Term[] args = getArgs(selfSV, heapSV, heapAtPreSV, isStatic, twoState, paramsSV);
         if (isNormal(services)) {

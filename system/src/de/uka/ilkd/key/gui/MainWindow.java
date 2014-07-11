@@ -148,16 +148,6 @@ public final class MainWindow extends JFrame  {
 
     private static MainWindow instance = null;
 
-    private ProofManagementDialog proofManagementDialog = null;
-
-    public ProofManagementDialog getProofManagementDialog() {
-        return proofManagementDialog;
-    }
-
-    public void setProofManagementDialog(ProofManagementDialog proofManagementDialog) {
-        this.proofManagementDialog = proofManagementDialog;
-    }
-
     /** Search bar for Sequent Views. */
     public final SequentViewSearchBar sequentViewSearchBar;
 
@@ -1070,7 +1060,7 @@ public final class MainWindow extends JFrame  {
         /** focused node has changed */
         @Override
         public synchronized void selectedNodeChanged(KeYSelectionEvent e) {
-            if (getMediator().autoMode()) return;
+            if (getMediator().isInAutoMode()) return;
             updateSequentView();
         }
 

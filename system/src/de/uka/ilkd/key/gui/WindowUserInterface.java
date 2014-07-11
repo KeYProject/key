@@ -34,6 +34,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -97,8 +98,6 @@ public class WindowUserInterface extends AbstractUserInterface {
     @Override
     public void proofCreated(ProblemInitializer sender,
                              ProofAggregate proofAggregate) {
-        mainWindow.addProblem(proofAggregate);
-        mainWindow.setStandardStatusLine();
     }
 
     @Override
@@ -273,7 +272,7 @@ public class WindowUserInterface extends AbstractUserInterface {
 
     @Override
     public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
-        if (mainWindow.getMediator().autoMode()) {
+        if (mainWindow.getMediator().isInAutoMode()) {
             return super.completeBuiltInRuleApp(app, goal, forced);
         }
         IBuiltInRuleApp result = app;
@@ -328,22 +327,9 @@ public class WindowUserInterface extends AbstractUserInterface {
    @Override
    public void removeProof(Proof proof) {
        if (!proof.isDisposed()) {
-           // The following was copied from AbandonTaskAction when I redirected
-           // the abandon method there to this method.
-           // The code seems to do more than the original code of this method...
-           final TaskTreeNode rootTask = proof.getBasicTask().getRootTask();
-           mainWindow.getProofList().removeTask(rootTask);
-           final Proof[] rootTaskProofs = rootTask.allProofs();
-           for (Proof p : rootTaskProofs) {
-               //In a previous revision the following statement was performed only
-               //on one proof object, namely on: mediator.getProof()
-               p.dispose();
-           }
-           proof.dispose();
-           mainWindow.getProofTreeView().removeProofs(rootTaskProofs);
-
-           // The original code of this method. Neccessary?
+          // The original code of this method. Neccessary?
            mainWindow.getProofList().removeProof(proof);
+
 
            // Run the garbage collector.
            Runtime r = Runtime.getRuntime();
@@ -353,7 +339,14 @@ public class WindowUserInterface extends AbstractUserInterface {
 
    @Override
    public boolean selectProofObligation(InitConfig initConfig) {
-      ProofManagementDialog.showInstance(initConfig);
-      return ProofManagementDialog.startedProof();
+      return ProofManagementDialog.showInstance(initConfig);
    }
+
+   @Override
+   public void proofRegistered(ProofEnvironmentEvent event) {
+      mainWindow.addProblem(event.getProofList());
+      mainWindow.setStandardStatusLine();
+   }
+
+  
 }

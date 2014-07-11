@@ -28,6 +28,26 @@ public final class JavaModel {
    
     public static final JavaModel NO_MODEL = new JavaModel();
    
+    
+    
+    /**
+     * 
+     */
+    public static JavaModel createJavaModel(String javaPath,
+                                      List<File> classPath,
+                                      File bootClassPath) {
+        JavaModel result;
+        if(javaPath == null) {
+            result = JavaModel.NO_MODEL;
+        } else {
+            result = new JavaModel(javaPath,
+                                   classPath,
+                                   bootClassPath);
+        }
+        return result;
+    }
+         
+    
     private JavaModel() {
 	modelDir = null;
 	modelTag = null;
@@ -36,12 +56,11 @@ public final class JavaModel {
 	bootClassPath = null;
     }
 
-    public JavaModel(String modelDir, 
-	    	     String modelTag,
+    private JavaModel(String modelDir, 
 	    	     List<File> classPath,
 	    	     File bootClassPath) {
 	this.modelDir = (new File(modelDir)).getAbsolutePath();
-	this.modelTag = modelTag;
+	this.modelTag = "KeY_" + Long.valueOf((new java.util.Date()).getTime());
 	this.descr = "model "+(new File(modelDir)).getName()+"@"
 	    +DateFormat.getTimeInstance(DateFormat.MEDIUM).format(new Date());
 	StringBuffer sb = new StringBuffer();
@@ -84,13 +103,15 @@ public final class JavaModel {
     
     @Override    
     public boolean equals(Object o) {
-	if (!(o instanceof JavaModel)) {
-	    return false;
-	} else if(getModelTag() == null) {
-	    return ((JavaModel)o).getModelTag() == null;
-	} else {
-	    return getModelTag().equals(((JavaModel)o).getModelTag());
-	}
+       if (o == null || o.getClass() != this.getClass()) {
+          return false;
+       }       
+       final JavaModel other = (JavaModel)o;       
+       if(getModelTag() == null) {
+          return other.getModelTag() == null;
+       } else {
+          return getModelTag().equals(other.getModelTag());
+       }
     }
 	
 

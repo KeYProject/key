@@ -45,8 +45,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.ContractRuleApp;
@@ -96,19 +96,17 @@ public class Proof implements Named {
     /** declarations &c, read from a problem file or otherwise */
     private String problemHeader = "";
 
-    /** the java information object: JavaInfo+TypeConverter */
-    private Services services;
-
-    /** maps the Abbreviations valid for this proof to their corresponding terms.*/
+    /** the proof environment (optional) */
+    private ProofEnvironment env;
+    
+   /** maps the Abbreviations valid for this proof to their corresponding terms.*/
     private AbbrevMap abbreviations = new AbbrevMap();
 
-    /** the environment of the proof with specs and java model*/
-    private ProofEnvironment proofEnv;
-
+    /** the logic configuration for this proof, i.e., logic signature, rules etc.*/
+    private InitConfig initConfig;    
+    
     /** the environment of the proof with specs and java model*/
     private ProofCorrectnessMgt localMgt;
-
-    private BasicTask task;
 
     private ProofSettings settings;
     private ProofIndependentSettings pis;
@@ -145,10 +143,13 @@ public class Proof implements Named {
     private final List<ProofDisposedListener> proofDisposedListener = new LinkedList<ProofDisposedListener>();
     
     /** constructs a new empty proof with name */
-    private Proof(Name name, Services services, ProofSettings settings) {
+    private Proof(Name name, InitConfig initConfig, ProofSettings settings) {
         this.name = name;
-        assert services != null : "Tried to create proof without valid services.";
-	this.services = services.copyProofSpecific(this, false);
+        assert initConfig != null : "Tried to create proof without valid services.";
+	     this.initConfig = initConfig;
+	     
+	     this.initConfig.getServices().setProof(this);
+	     
         settingsListener =
                 new SettingsListener () {
                     @Override
@@ -156,8 +157,9 @@ public class Proof implements Named {
                         updateStrategyOnGoals();
                     }
                 };
+                        
+        localMgt = new ProofCorrectnessMgt(this);
 
-                
         setSettings(settings);
         pis = ProofIndependentSettings.DEFAULT_INSTANCE;
     }
@@ -169,7 +171,7 @@ public class Proof implements Named {
         StrategyProperties activeStrategyProperties =
             settings.getStrategySettings().getActiveStrategyProperties();
 
-        final Profile profile = services.getProfile();
+        final Profile profile = getServices().getProfile();
 
         if (profile.supportsStrategyFactory(settings.getStrategySettings().getStrategy())) {
             setActiveStrategy
@@ -184,23 +186,23 @@ public class Proof implements Named {
 
 
     /** constructs a new empty proof */
-    public Proof(Services services) {
-	this ( "", services );
+    public Proof(InitConfig initConfig) {
+	this ( "", initConfig );
     }
 
 
     /** constructs a new empty proof with name */
-    public Proof(String name, Services services) {
+    public Proof(String name, InitConfig initConfig) {
 	this ( new Name ( name ),
-               services,
+	      initConfig,
                new ProofSettings ( ProofSettings.DEFAULT_SETTINGS ) );
     }
 
     private Proof(String name, Sequent problem, TacletIndex rules,
-            BuiltInRuleIndex builtInRules, Services services,
+            BuiltInRuleIndex builtInRules, InitConfig initConfig,
             ProofSettings settings) {
 
-        this ( new Name ( name ), services, settings );
+        this ( new Name ( name ), initConfig, settings );
 
 	localMgt = new ProofCorrectnessMgt(this);
 
@@ -208,8 +210,8 @@ public class Proof implements Named {
         setRoot(rootNode);
 
 	Goal firstGoal = new Goal(rootNode,
-                                  new RuleAppIndex(new TacletAppIndex(rules, services),
-						   new BuiltInRuleAppIndex(builtInRules), services));
+                                  new RuleAppIndex(new TacletAppIndex(rules, getServices()),
+						   new BuiltInRuleAppIndex(builtInRules), getServices()));
 	openGoals = openGoals.prepend(firstGoal);
 
 	if (closed())
@@ -217,18 +219,18 @@ public class Proof implements Named {
     }
 
     public Proof(String name, Term problem, String header, TacletIndex rules,
-         BuiltInRuleIndex builtInRules, Services services, ProofSettings settings) {
+         BuiltInRuleIndex builtInRules, InitConfig initConfig, ProofSettings settings) {
         this ( name, Sequent.createSuccSequent
                  (Semisequent.EMPTY_SEMISEQUENT.insert(0,
                          new SequentFormula(problem)).semisequent()),
-                 rules, builtInRules, services, settings );
+                 rules, builtInRules, initConfig, settings );
         problemHeader = header;
     }
 
 
     public Proof(String name, Sequent sequent, String header, TacletIndex rules,
-            BuiltInRuleIndex builtInRules, Services services, ProofSettings settings) {
-        this ( name, sequent, rules, builtInRules, services, settings );
+            BuiltInRuleIndex builtInRules, InitConfig initConfig, ProofSettings settings) {
+        this ( name, sequent, rules, builtInRules, initConfig, settings );
         problemHeader = header;
     }
 
@@ -238,13 +240,13 @@ public class Proof implements Named {
                   String header,
                   TacletIndex rules,
                   BuiltInRuleIndex builtInRules,
-                  Services services) {
+                  InitConfig initConfig) {
         this ( name,
                problem,
                header,
                rules,
                builtInRules,
-               services,
+               initConfig,
                new ProofSettings ( ProofSettings.DEFAULT_SETTINGS ) );
     }
 
@@ -255,8 +257,8 @@ public class Proof implements Named {
      */
     public void dispose() {
         // Do required cleanup
-        if (services != null) {
-           services.getSpecificationRepository().removeProof(this);
+        if (getServices() != null) {
+           getServices().getSpecificationRepository().removeProof(this);
         }
         if (localMgt != null) {
            localMgt.removeProofListener(); // This is strongly required because the listener is contained in a static List
@@ -264,14 +266,13 @@ public class Proof implements Named {
         // remove setting listener from settings
         setSettings(null);
         // set every reference (except the name) to null
-        root = null;
+        root = null;        
+        env = null;
         openGoals = null;
         problemHeader = null;
-        services = null;
         abbreviations = null;
-        proofEnv = null;
+        initConfig = null;
         localMgt = null;
-        task = null;
         settings = null;
         userLog = null;
         keyVersionLog = null;
@@ -326,7 +327,7 @@ public class Proof implements Named {
 
     /** returns the Services with the java service classes */
     public Services getServices() {
-       return services;
+       return initConfig.getServices();
     }
 
     public long getAutoModeTime() {
@@ -338,6 +339,7 @@ public class Proof implements Named {
     }
 
 
+
     /** sets the variable, function, sort, heuristics namespaces */
     public void setNamespaces(NamespaceSet ns) {
         getServices().setNamespaces(ns);
@@ -346,17 +348,15 @@ public class Proof implements Named {
         openGoals().head().setProgramVariables(ns.programVariables());
     }
 
-
-    public void setBasicTask(BasicTask t) {
-	task = t;
+    public ProofEnvironment getEnv() {
+       return env;
     }
 
-
-    public BasicTask getBasicTask() {
-	return task;
+    public void setEnv(ProofEnvironment env) {
+       this.env = env;
     }
 
-
+    
     public AbbrevMap abbreviations(){
 	return abbreviations;
     }
@@ -393,21 +393,6 @@ public class Proof implements Named {
         final Iterator<Goal> it = openGoals ().iterator ();
         while ( it.hasNext () )
             it.next ().clearAndDetachRuleAppIndex ();
-    }
-
-
-    public JavaModel getJavaModel() {
-        return proofEnv.getJavaModel();
-    }
-
-
-    public void setProofEnv(ProofEnvironment env) {
-	proofEnv=env;
-    }
-
-
-    public ProofEnvironment env() {
-	return proofEnv;
     }
 
 
@@ -637,10 +622,10 @@ public class Proof implements Named {
 
                                 }
 
-                                if (Proof.this.env() != null && visitedNode.parent() != null) {
+                                if (initConfig != null && visitedNode.parent() != null) {
                                         	Proof.this.mgt().ruleUnApplied(visitedNode.parent().getAppliedRuleApp());
                                           for (final NoPosTacletApp app :  visitedNode.parent().getLocalIntroducedRules()){
-                                             env().getJustifInfo().removeJustificationFor(app.taclet());
+                                             initConfig.getJustifInfo().removeJustificationFor(app.taclet());
                                          }
 
                                 }
@@ -659,7 +644,7 @@ public class Proof implements Named {
                         public void visit(Proof proof, Node visitedNode) {
                             for (final NoPosTacletApp app :  visitedNode.getLocalIntroducedRules()){
                                 firstGoal.ruleAppIndex().removeNoPosTacletApp(app);
-                                env().getJustifInfo().removeJustificationFor(app.taclet());
+                                initConfig.getJustifInfo().removeJustificationFor(app.taclet());
                             }
 
                             firstGoal.pruneToParent();
@@ -1241,4 +1226,9 @@ public class Proof implements Named {
          l.proofDisposed(e);
       }
    }
+
+   public InitConfig getInitConfig() {
+      return initConfig;
+   }
+
 }

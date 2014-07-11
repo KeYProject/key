@@ -94,12 +94,12 @@ public class CounterExampleAction extends MainWindowAction {
         Sequent newSequent = Sequent.createSequent(oldSequent.antecedent(), oldSequent.succedent());
         Proof proof = new Proof("Semantics Blasting: " + oldProof.name(),
                 newSequent, "",
-                oldProof.env().getInitConfig().createTacletIndex(),
-                oldProof.env().getInitConfig().createBuiltInRuleIndex(),
-                oldProof.getServices(),
+                oldProof.getInitConfig().createTacletIndex(),
+                oldProof.getInitConfig().createBuiltInRuleIndex(),
+                oldProof.getInitConfig(),
                 oldProof.getSettings());
 
-        proof.setProofEnv(oldProof.env());
+        proof.setEnv(oldProof.getEnv());
         proof.setNamespaces(oldProof.getNamespaces());
 
         ProofAggregate pa = new SingleProof(proof, "XXX");
