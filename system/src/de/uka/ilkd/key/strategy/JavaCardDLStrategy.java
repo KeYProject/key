@@ -604,7 +604,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         }
 
         
-        if (autoInductionEnabled() || autoInductionLemmaEnabled()) {
+        if (strategyProperties.contains(StrategyProperties.AUTO_INDUCTION_ON) || 
+              strategyProperties.contains(StrategyProperties.AUTO_INDUCTION_LEMMA_ON)) {
            bindRuleSet (d, "induction_var", 0);
         } else {
            bindRuleSet (d, "induction_var", ifZero(applyTF(instOf("uSub"), IsInductionVariable.INSTANCE), longConst(0), inftyConst()));
