@@ -54,6 +54,10 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
         this(macro, goals, goals.isEmpty() ? null : goals.head().proof());
     }
 
+    ProofMacroFinishedInfo(ProofMacro macro, Proof proof) {
+        this(macro, proof.openEnabledGoals(), proof);
+    }
+
     ProofMacroFinishedInfo(ProofMacro macro, ProofMacroFinishedInfo info) {
         this(macro, info.getGoals(), info.getProof());
     }
