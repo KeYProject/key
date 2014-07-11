@@ -31,7 +31,6 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -508,24 +507,6 @@ public class InteractiveProver implements InterruptListener {
             }
         }
         return result;
-    }
-
-    /**
-     * adds a proverTaskListener to apply strategy.
-     *
-     * @param ptl the ProverTaskListener to be added
-     */
-    public void addProverTaskListener(ProverTaskListener ptl) {
-        applyStrategy.addProverTaskObserver(ptl);
-    }
-
-    /**
-     * removes <code>ptl</code> from the list of proverTaskListeners
-     *
-     * @param ptl the proverTaskListener to be removed
-     */
-    public void removeProverTaskListener(ProverTaskListener ptl) {
-        applyStrategy.removeProverTaskObserver(ptl);
     }
 
     /* <p>
