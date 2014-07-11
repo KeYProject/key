@@ -131,7 +131,6 @@ public class WindowUserInterface extends AbstractUserInterface {
     public void taskFinished(TaskFinishedInfo info) {
         if (info.getSource() instanceof ApplyStrategy) {
             if (numOfInvokedMacros == 0) {
-                System.out.println("Nice try, buddy!");
                 resetStatus(this);
             }
             ApplyStrategy.ApplyStrategyInfo result =

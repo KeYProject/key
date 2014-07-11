@@ -16,12 +16,13 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
+import de.uka.ilkd.key.ui.UserInterface;
+
 import javax.swing.KeyStroke;
 
 
@@ -96,12 +97,9 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro {
                 new SymbolicExecutionPO(initConfig, po.getContract(),
                                         po.getIFVars().symbExecVars.labelHeapAtPreAsAnonHeapFunc(),
                                         goals.head(), proof.getServices());
-        ProblemInitializer pi =
-                new ProblemInitializer(mediator.getUI(),
-                                       mediator.getServices(),
-                                       mediator.getUI());
+        final UserInterface ui = mediator.getUI();
         try {
-            Proof p = pi.startProver(initConfig, symbExecPO).getFirstProof();
+            Proof p = ui.createProof(initConfig, symbExecPO);
             p.unionIFSymbols(proof.getIFSymbols());
             // stop interface again, because it is activated by the proof
             // change through startProver; the ProofMacroWorker will activate

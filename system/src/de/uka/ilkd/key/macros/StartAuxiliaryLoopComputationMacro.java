@@ -14,13 +14,14 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.LoopInvExecutionPO;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.ui.UserInterface;
+
 import javax.swing.KeyStroke;
 
 public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro {
@@ -114,12 +115,9 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro {
                                        goals.head(), executionContext,
                                        guardTerm,
                                        proof.getServices());
-        ProblemInitializer pi =
-                new ProblemInitializer(mediator.getUI(),
-                                       mediator.getServices(),
-                                       mediator.getUI());
+        UserInterface ui = mediator.getUI();
         try {
-            Proof p = pi.startProver(initConfig, loopInvExecPO).getFirstProof();
+            Proof p = ui.createProof(initConfig, loopInvExecPO);
             p.unionIFSymbols(proof.getIFSymbols());
             // stop interface again, because it is activated by the proof
             // change through startProver; the ProofMacroWorker will activate
