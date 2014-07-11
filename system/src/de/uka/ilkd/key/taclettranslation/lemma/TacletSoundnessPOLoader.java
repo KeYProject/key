@@ -120,7 +120,7 @@ public class TacletSoundnessPOLoader {
 
         }
 
-
+        
         public TacletSoundnessPOLoader(
                         LoaderListener listener,
                         TacletFilter filter,
@@ -133,6 +133,7 @@ public class TacletSoundnessPOLoader {
                 this.tacletFilter = filter;
                 this.loadAsLemmata = loadAsLemmata;
                 this.originalConfig = originalConfig;
+
                 this.isOnlyUsedForProvingTaclets = isOnlyUsedForProvingTaclets;
 
                 if (listener != null) {
@@ -328,8 +329,9 @@ public class TacletSoundnessPOLoader {
                         ImmutableSet<Taclet> axioms, 
                         ImmutableSet<Taclet> loadedTaclets) {
 
-           tacletLoader.manageAvailableTaclets(originalConfig, 
+              tacletLoader.manageAvailableTaclets(originalConfig, 
                         loadedTaclets, tacletsToProve);
+
                 ProofObligationCreator creator = new ProofObligationCreator();
 
                 InitConfig[] proofConfigs = new InitConfig[tacletsToProve.size()];
@@ -347,7 +349,6 @@ public class TacletSoundnessPOLoader {
                            proofConfig.getJustifInfo().addJustification(taclet, AxiomJustification.INSTANCE);
                         }
                 }
-
 
                 registerProofs(p, proofEnvForTaclets);
                 return p;
