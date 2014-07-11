@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.ui;
 
-import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.util.List;
 
@@ -42,11 +41,6 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.Debug;
 
 public abstract class AbstractUserInterface implements UserInterface {
-
-   /**
-    * The used {@link PropertyChangeSupport}.
-    */
-    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     private ProofMacro autoMacro = new SkipMacro();
 
