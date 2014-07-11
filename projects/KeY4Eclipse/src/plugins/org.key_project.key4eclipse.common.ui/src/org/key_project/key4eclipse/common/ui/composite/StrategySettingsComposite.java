@@ -232,7 +232,7 @@ public class StrategySettingsComposite extends Composite {
             }
             data = (FormData)form.getData();
             updateShownContent();
-            setFormEditable(mediator == null || !mediator.autoMode());
+            setFormEditable(mediator == null || !mediator.isInAutoMode());
             layout.topControl = form;
          }
          else {
