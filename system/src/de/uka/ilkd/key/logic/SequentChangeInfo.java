@@ -255,8 +255,7 @@ public class SequentChangeInfo {
         rejectedFormulas(true).prepend(rejectedFormulas(false));
   }
   
-  public void combine(SequentChangeInfo succ) {    
-     
+  public void combine(SequentChangeInfo succ) {         
      final SequentChangeInfo antec = this;
      if (antec == succ) {
         return;

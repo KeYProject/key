@@ -1115,10 +1115,9 @@ public abstract class Taclet implements Rule, Named {
        }
     }
 
-
-
-
-    protected void applyAddProgVars(ImmutableSet<SchemaVariable> pvs, Goal goal,
+    protected void applyAddProgVars(ImmutableSet<SchemaVariable> pvs, 
+                                    SequentChangeInfo currentSequent,
+                                    Goal goal,
                                     PosInOccurrence posOfFind,
                                     Services services, 
                                     MatchConditions matchCond) {
@@ -1142,9 +1141,19 @@ public abstract class Taclet implements Rule, Named {
           if (!renamingMap.isEmpty()) {        
              //execute renaming
              final ProgVarReplacer pvr = new ProgVarReplacer(vn.getRenamingMap(), services);
-             pvr.replace(goal);
+             
+             //globals
+             goal.setGlobalProgVars(pvr.replace(goal.getGlobalProgVars()));
+
+             //taclet apps
+             pvr.replace(goal.ruleAppIndex().tacletIndex());
+
+             //sequent
+             currentSequent.combine(pvr.replace(currentSequent.sequent()));
+
              final RenamingTable rt = 
                    RenamingTable.getRenamingTable(vn.getRenamingMap());
+             
              renamings = renamings.append(rt);
           }
        }

@@ -386,22 +386,22 @@ public final class Goal  {
      * @param insts the given instantiations of the TacletApp to be created
      */
     public void addTaclet(Taclet           rule,
-			  SVInstantiations insts,
-			  boolean          isAxiom) {
-        NoPosTacletApp tacletApp =
-                NoPosTacletApp.createFixedNoPosTacletApp(rule,
-		    				     insts,
-		    				     proof().getServices());
-	if (tacletApp != null) {
-	    addNoPosTacletApp(tacletApp);
- 	    if (proof().getInitConfig() != null) { // do not break everything
-                                       // because of ProofMgt
-		proof().getInitConfig().registerRuleIntroducedAtNode(
-		        tacletApp,
-		        node.parent() != null ? node.parent() : node,
-		        isAxiom);
-	    }
-	}
+          SVInstantiations insts,
+          boolean          isAxiom) {
+       NoPosTacletApp tacletApp =
+             NoPosTacletApp.createFixedNoPosTacletApp(rule,
+                   insts,
+                   proof().getServices());
+       if (tacletApp != null) {
+          addNoPosTacletApp(tacletApp);
+          if (proof().getInitConfig() != null) { // do not break everything
+             // because of ProofMgt
+             proof().getInitConfig().registerRuleIntroducedAtNode(
+                   tacletApp,
+                   node.parent() != null ? node.parent() : node,
+                         isAxiom);
+          }
+       }
     }
 
     /**

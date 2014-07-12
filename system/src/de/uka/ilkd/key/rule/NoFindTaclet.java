@@ -123,19 +123,20 @@ public class NoFindTaclet extends Taclet {
 	                services,
 	                mc);
 	    
-	    currentGoal.setSequent(currentSequent);
-
 	    applyAddrule(     gt.rules(),
 			      currentGoal,
 			      services,
 			      mc);
 
 	    applyAddProgVars( gt.addedProgVars(),
-			      currentGoal,
-                              tacletApp.posInOccurrence(),
-                              services,
+	          currentSequent,  
+	          currentGoal,
+	          tacletApp.posInOccurrence(),
+	          services,
 			      mc);
-                              
+
+       currentGoal.setSequent(currentSequent);
+
 	    currentGoal.setBranchLabel(gt.name());
 	}
 

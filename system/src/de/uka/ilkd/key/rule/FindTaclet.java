@@ -228,8 +228,6 @@ public abstract class FindTaclet extends Taclet {
 	             services,
 	             mc );
 
-	    currentGoal.setSequent(currentSequent);
-	    
 	    applyAddrule( gt.rules(),
 			      currentGoal,
 			      services,
@@ -237,11 +235,14 @@ public abstract class FindTaclet extends Taclet {
 
 	    
 	    applyAddProgVars( gt.addedProgVars(),
+	            currentSequent,
 			      currentGoal,
-                              tacletApp.posInOccurrence(),
-                              services,
+               tacletApp.posInOccurrence(),
+               services,
 			      mc);
                                
+       currentGoal.setSequent(currentSequent);      	    
+	    
        currentGoal.setBranchLabel(gt.name());
 	}
 	
