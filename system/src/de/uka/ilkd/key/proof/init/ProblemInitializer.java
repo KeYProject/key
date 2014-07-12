@@ -22,6 +22,7 @@ import java.util.Vector;
 
 import recoder.io.PathList;
 import recoder.io.ProjectSettings;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -59,6 +60,7 @@ import de.uka.ilkd.key.proof.io.LDTInput;
 import de.uka.ilkd.key.proof.io.LDTInput.LDTInputListener;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
+import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
@@ -149,8 +151,10 @@ public final class ProblemInitializer {
         KeYFile[] keyFile = new KeYFile[in.getLDTIncludes().size()];
 
         int i = 0;
+        progMon.setMaximum(in.getIncludes().size());
         for (String name : in.getLDTIncludes()) {
             keyFile[i++] = new KeYFile(name, in.get(name), progMon, initConfig.getProfile());
+            progMon.setProgress(i);
         }
 
         LDTInput ldtInp = new LDTInput(keyFile, new LDTInputListener() {
@@ -181,9 +185,12 @@ public final class ProblemInitializer {
         readLDTIncludes(in, initConfig);
         
         //read normal includes
+        progMon.setMaximum(in.getIncludes().size());
+        int i = 0;
         for (String fileName : in.getIncludes()) {
             KeYFile keyFile = new KeYFile(fileName, in.get(fileName), progMon, envInput.getProfile());
             readEnvInput(keyFile, initConfig);
+            progMon.setProgress(++i);
         }
     }
     
@@ -387,16 +394,21 @@ public final class ProblemInitializer {
         }
 
         //register non-built-in rules
-        reportStatus("Registering rules");        
+        reportStatus("Registering rules");
 
         Proof[] proofs = pl.getProofs();
+        progMon.setMaximum(proofs.length * 10);
         for(int i = 0; i < proofs.length; i++) {
            proofs[i].getInitConfig().registerRules(proofs[i].getInitConfig().getTaclets(), 
                  AxiomJustification.INSTANCE);
            //register built in rules
            Profile profile = proofs[i].getInitConfig().getProfile();
-           for(Rule r : profile.getStandardRules().getStandardBuiltInRules()) {
+           final ImmutableList<BuiltInRule> rules = profile.getStandardRules().getStandardBuiltInRules();
+           int j = 0;
+           final int step = 10 / rules.size();
+           for(Rule r : rules) {
               proofs[i].getInitConfig().registerRule(r, profile.getJustification(r));
+              progMon.setProgress((++j) * step);
            }
 
             proofs[i].setNamespaces(proofs[i].getNamespaces());//TODO: refactor Proof.setNamespaces() so this becomes unnecessary
