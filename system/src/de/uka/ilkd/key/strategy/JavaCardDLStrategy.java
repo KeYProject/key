@@ -591,24 +591,26 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         //chrisg: The following rule, if active, must be applied delta rules.
         if(autoInductionEnabled()){
-        	bindRuleSet ( d, "auto_induction", -6500 ); //chrisg
+         bindRuleSet ( d, "auto_induction", -6500 ); //chrisg
         }else{
-        	bindRuleSet ( d, "auto_induction", inftyConst () ); //chrisg
+         bindRuleSet ( d, "auto_induction", inftyConst () ); //chrisg
         }
         
         //chrisg: The following rule is a beta rule that, if active, must have a higher priority than other beta rules.
         if(autoInductionLemmaEnabled()){
-        	bindRuleSet ( d, "auto_induction_lemma", -300 ) ; 
+         bindRuleSet ( d, "auto_induction_lemma", -300 ) ; 
         }else{
-            bindRuleSet ( d, "auto_induction_lemma", inftyConst());        	
+            bindRuleSet ( d, "auto_induction_lemma", inftyConst());           
         }
 
-        
         if (strategyProperties.contains(StrategyProperties.AUTO_INDUCTION_ON) || 
               strategyProperties.contains(StrategyProperties.AUTO_INDUCTION_LEMMA_ON)) {
            bindRuleSet (d, "induction_var", 0);
+        } else if (!autoInductionEnabled() && !autoInductionLemmaEnabled()) { 
+           bindRuleSet (d, "induction_var", inftyConst());           
         } else {
-           bindRuleSet (d, "induction_var", ifZero(applyTF(instOf("uSub"), IsInductionVariable.INSTANCE), longConst(0), inftyConst()));
+           bindRuleSet (d, "induction_var", 
+                 ifZero(applyTF(instOf("uSub"), IsInductionVariable.INSTANCE), longConst(0), inftyConst()));
         }
         
         return d;
@@ -1034,14 +1036,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                            applyTF( sub(FocusProjection.INSTANCE, 1), vf.nullTerm ) ),
                                      longConst ( -5 ),
                                      longConst ( 0 ) ),
-                            // punish cuts over formulas containing anon heap functions
-                            ifZero( applyTF( "cutFormula",
-                                             rec ( any(),
-                                                   not ( AnonHeapTermFeature.INSTANCE ) ) ),
-                                    longConst ( 0 ),
-                                    longConst ( 1000 ) ),
+                                    // punish cuts over formulas containing anon heap functions
+                                    ifZero( applyTF( "cutFormula",
+                                                     rec ( any(),
+                                                           not ( AnonHeapTermFeature.INSTANCE ) ) ),
+                                            longConst ( 0 ),
+                                            longConst ( 1000 ) ),
                             // standard costs
-                            longConst ( 10 )),
+                            longConst ( 200 )),
                       SumFeature.createSum (
                             applyTF ( "cutFormula",
                                       ff.cutAllowedBelowQuantifier ),
@@ -1320,7 +1322,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                           ff.notContainsExecutable ) ),
                      forEach ( varInst, HeuristicInstantiation.INSTANCE,
                                add ( instantiate ( "t", varInst ),
-                                     branchPrediction ) ) } ) );
+                                     branchPrediction ) ),
+                                     // standard costs
+                                     longConst(50)} ) );
             final TermBuffer splitInst = new TermBuffer();
             
             
