@@ -1179,7 +1179,7 @@ public abstract class Taclet implements Rule, Named {
           MatchConditions              p_matchCond,
           int                          p_numberOfNewGoals ) {
        ImmutableList<SequentChangeInfo>     res    = null;
-       Iterator<SequentChangeInfo> itGoal;
+       Iterator<SequentChangeInfo> itNewGoalSequents;
 
        // proof obligation for the if formulas
        Term           ifObl  = null;
@@ -1208,25 +1208,24 @@ public abstract class Taclet implements Rule, Named {
                     res = res.prepend(SequentChangeInfo.createSequentChangeInfo((SemisequentChangeInfo)null, 
                          (SemisequentChangeInfo)null, p_goal.sequent(), p_goal.sequent()));
                    }
-
-//                   res   = p_goal.split( p_numberOfNewGoals + 1 );
                    ifObl = ifPart;
-                } else
+                } else {
                    ifObl = services.getTermFactory().createTerm
                    ( Junctor.AND, ifObl, ifPart );
-
+                }
+                
                 // UGLY: We create a flat structure of the new
                 // goals, thus the if formulas have to be added to
                 // every new goal
-                itGoal = res.iterator ();
-                SequentChangeInfo seq = itGoal.next ();
-                while ( itGoal.hasNext () ) {
+                itNewGoalSequents = res.iterator ();
+                SequentChangeInfo seq = itNewGoalSequents.next ();
+                while ( itNewGoalSequents.hasNext () ) {
                    addToPosWithoutInst ( inst.getConstrainedFormula (),
                          seq,
                          null,
                          ( i > 0 ) ); // ( i > 0 ) iff inst is formula
                    // of the antecedent
-                   seq = itGoal.next ();
+                   seq = itNewGoalSequents.next ();
                 }
              }
 
@@ -1242,10 +1241,10 @@ public abstract class Taclet implements Rule, Named {
             }      
        } else {
           // find the sequent the if obligation has to be added to
-          itGoal = res.iterator ();
-          SequentChangeInfo seq = itGoal.next ();
-          while ( itGoal.hasNext () ) {
-             seq = itGoal.next ();
+          itNewGoalSequents = res.iterator ();
+          SequentChangeInfo seq = itNewGoalSequents.next ();
+          while ( itNewGoalSequents.hasNext () ) {
+             seq = itNewGoalSequents.next ();
           }
 
           addToPosWithoutInst ( new SequentFormula ( ifObl ),

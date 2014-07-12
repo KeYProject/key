@@ -244,6 +244,16 @@ public abstract class FindTaclet extends Taclet {
                                
        currentGoal.setBranchLabel(gt.name());
 	}
+	
+	// in case the assumes sequent of the taclet did not
+	// already occur in the goal sequent, we had to perform a cut
+	// in this loop we make sure to assign the cut goal its correct
+	// sequent
+	while (newSequentsIt.hasNext()) {
+	   goalIt.next().setSequent(newSequentsIt.next());
+	}
+	
+	assert !goalIt.hasNext();
 
 	return newGoals;
     }
