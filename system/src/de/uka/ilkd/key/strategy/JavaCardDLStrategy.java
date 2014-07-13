@@ -66,6 +66,7 @@ import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.FindDepthFeature;
 import de.uka.ilkd.key.strategy.feature.FindRightishFeature;
 import de.uka.ilkd.key.strategy.feature.FocusInAntecFeature;
+import de.uka.ilkd.key.strategy.feature.IfThenElseMalusFeature;
 import de.uka.ilkd.key.strategy.feature.InEquationMultFeature;
 import de.uka.ilkd.key.strategy.feature.MatchedIfFeature;
 import de.uka.ilkd.key.strategy.feature.MonomialsSmallerThanFeature;
@@ -77,6 +78,7 @@ import de.uka.ilkd.key.strategy.feature.NotBelowQuantifierFeature;
 import de.uka.ilkd.key.strategy.feature.NotInScopeOfModalityFeature;
 import de.uka.ilkd.key.strategy.feature.OnlyInScopeOfQuantifiersFeature;
 import de.uka.ilkd.key.strategy.feature.PolynomialValuesCmpFeature;
+import de.uka.ilkd.key.strategy.feature.PrintFeature;
 import de.uka.ilkd.key.strategy.feature.PurePosDPathFeature;
 import de.uka.ilkd.key.strategy.feature.QueryExpandCost;
 import de.uka.ilkd.key.strategy.feature.ReducibleMonomialsFeature;
@@ -105,6 +107,7 @@ import de.uka.ilkd.key.strategy.termProjection.FocusProjection;
 import de.uka.ilkd.key.strategy.termProjection.MonomialColumnOp;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termProjection.ReduceMonomialsProjection;
+import de.uka.ilkd.key.strategy.termProjection.SubtermProjection;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termfeature.AnonHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
@@ -1000,6 +1003,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private void setupSplitting(RuleSetDispatchFeature d) {
         final TermBuffer subFor = new TermBuffer ();
+        
         final Feature noCutsAllowed =
             sum ( subFor, AllowedCutPositionsGenerator.INSTANCE,
                   not ( applyTF ( subFor, ff.cutAllowed ) ) );
@@ -1011,47 +1015,75 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
              ScaleFeature.createScaled ( CountPosDPathFeature.INSTANCE, -3.0 ),
              ScaleFeature.createScaled ( CountMaxDPathFeature.INSTANCE, 10.0 ),
              longConst ( 20 )
-           ) );
+           )) ;
 
         
+
+        final ProjectionToTerm splitCondition = sub(FocusProjection.INSTANCE, 0);
         bindRuleSet ( d, "split_cond",
                       add ( // do not split over formulas containing auxiliary variables
                             applyTF ( FocusProjection.INSTANCE,
                                       rec ( any(),
                                             not ( IsSelectSkolemConstantTermFeature.INSTANCE ) ) ),
-                            longConst ( 1 ) ) );
+                            // prefer splits when condition has quantifiers (less likely to be simplified away)
+                            applyTF ( splitCondition,
+                                      rec ( ff.quantifiedFor,
+                                               ifZero(ff.quantifiedFor, longTermConst(-10) ) ) ),
+                            // prefer top level splits
+                            FindDepthFeature.INSTANCE,
+                            ScaleFeature.createScaled(countOccurrences(splitCondition), -2),
+                            ifZero(applyTF( FocusProjection.INSTANCE, ContainsExecutableCodeTermFeature.PROGRAMS), 
+                                  longConst(-100), longConst(5))));
 
+        ProjectionToTerm cutFormula = instOf("cutFormula");
+
+        Feature countOccurrencesInSeq = 
+              ScaleFeature.createScaled(countOccurrences(cutFormula), -1);
+        
+                
         bindRuleSet ( d, "cut_direct",
-           SumFeature.createSum ( new Feature [] {
+            SumFeature.createSum ( new Feature [] {
              not ( TopLevelFindFeature.ANTEC_OR_SUCC_WITH_UPDATE ),
              AllowedCutPositionFeature.INSTANCE,
              ifZero ( NotBelowQuantifierFeature.INSTANCE,
-                      add ( applyTF ( "cutFormula",
+                      add ( applyTF ( cutFormula,
                                       add ( ff.cutAllowed,
                                             // do not cut over formulas containing auxiliary variables
                                             rec ( any(),
                                                   not ( IsSelectSkolemConstantTermFeature.INSTANCE ) ) ) ),
-                            // prefere cuts over "something = null"
+                            // prefer cuts over "something = null"
                             ifZero ( add ( applyTF( FocusProjection.INSTANCE, tf.eqF ),
                                            applyTF( sub(FocusProjection.INSTANCE, 1), vf.nullTerm ) ),
                                      longConst ( -5 ),
                                      longConst ( 0 ) ),
                                     // punish cuts over formulas containing anon heap functions
-                                    ifZero( applyTF( "cutFormula",
+                                    ifZero( applyTF( cutFormula,
                                                      rec ( any(),
                                                            not ( AnonHeapTermFeature.INSTANCE ) ) ),
                                             longConst ( 0 ),
                                             longConst ( 1000 ) ),
                             // standard costs
-                            longConst ( 200 )),
-                      SumFeature.createSum (
-                            applyTF ( "cutFormula",
+                            countOccurrencesInSeq, longConst ( 100 ) ) ,
+                            // check for cuts below quantifiers 
+                            SumFeature.createSum ( new Feature [] {
+                                  applyTF ( cutFormula,
                                       ff.cutAllowedBelowQuantifier ),
-                            applyTF ( FocusFormulaProjection.INSTANCE,
-                                      ff.quantifiedClauseSet ),
-                            ifZero ( allowQuantifierSplitting (),
-                                       longConst ( 0 ), longConst ( 100 ) )) ) } ) );
-    }
+                                  applyTF ( FocusFormulaProjection.INSTANCE,
+                                      ff.quantifiedClauseSet ),                                     
+                                  ifZero ( allowQuantifierSplitting (),
+                                       longConst ( 0 ), longConst ( 100 ) ) } ) ) } ) ) ; 
+   }
+
+   private Feature countOccurrences(ProjectionToTerm cutFormula) {
+      TermBuffer sf = new TermBuffer();
+      TermBuffer sub = new TermBuffer();
+
+      Feature countOccurrencesInSeq = 
+              sum(sf, SequentFormulasGenerator.sequent(), 
+                    sum (sub, SubtermGenerator.leftTraverse(cutFormula, any()), // instead of any a condition which stops traversal when depth(cutF) > depth(sub) would be better 
+                          ifZero(applyTF(cutFormula, eq(sub)), longConst(1), longConst(0))));
+      return countOccurrencesInSeq;
+   }
 
     private void setupSplittingApproval(RuleSetDispatchFeature d) {
         bindRuleSet ( d, "beta",
@@ -1322,9 +1354,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                           ff.notContainsExecutable ) ),
                      forEach ( varInst, HeuristicInstantiation.INSTANCE,
                                add ( instantiate ( "t", varInst ),
-                                     branchPrediction ) ),
-                                     // standard costs
-                                     longConst(50)} ) );
+                                     branchPrediction, longConst(10) ) ) } ) );
             final TermBuffer splitInst = new TermBuffer();
             
             

@@ -141,8 +141,10 @@ public class Proof implements Named {
      * Contains all registered {@link ProofDisposedListener}.
      */
     private final List<ProofDisposedListener> proofDisposedListener = new LinkedList<ProofDisposedListener>();
-
-    /** constructs a new empty proof with name */
+    
+    /** 
+     * constructs a new empty proof with name 
+     */
     private Proof(Name name, InitConfig initConfig, ProofSettings settings) {
         this.name = name;
         assert initConfig != null : "Tried to create proof without valid services.";

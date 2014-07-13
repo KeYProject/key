@@ -756,7 +756,7 @@ public final class SideProofUtil {
          };
       }
       // Create new InitConfig
-      final InitConfig initConfig = new InitConfig(source.getServices().copy(profile, true));
+      final InitConfig initConfig = new InitConfig(source.getServices().copy(profile, false));
       // Set modified taclet options in which runtime exceptions are banned.
       ImmutableSet<Choice> choices = sourceInitConfig.getActivatedChoices();
       choices = choices.remove(new Choice("allow", "runtimeExceptions"));
