@@ -69,6 +69,7 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.results.ArrayResult;
 import org.eclipse.swtbot.swt.finder.results.BoolResult;
+import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.results.WidgetResult;
 import org.eclipse.swtbot.swt.finder.utils.MessageFormat;
@@ -80,6 +81,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
@@ -1782,5 +1784,25 @@ public class TestUtilsUtil {
       public String getFailureMessage() {
          return "Item " + item + " is still selected.";
       }
+   }
+
+   /**
+    * Selects the given text in the given {@link SWTBotStyledText}.
+    * @param styledText The {@link SWTBotStyledText} to select text in.
+    * @param text The text to select.
+    * @return The x and y coordinate of the selected text.
+    */
+   public static Point selectText(final SWTBotStyledText styledText, 
+                                  final String text) {
+      return syncExec(new Result<Point>() {
+         @Override
+         public Point run() {
+            int index = styledText.widget.getText().indexOf(text);
+            styledText.widget.setCaretOffset(index);
+            styledText.widget.setSelection(index, index + text.length());
+            int offset = styledText.widget.getCaretOffset();
+            return styledText.widget.getLocationAtOffset(offset);
+         }
+      });
    }
 }

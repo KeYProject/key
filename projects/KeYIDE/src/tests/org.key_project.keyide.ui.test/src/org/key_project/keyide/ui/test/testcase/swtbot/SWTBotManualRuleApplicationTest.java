@@ -14,6 +14,7 @@
 package org.key_project.keyide.ui.test.testcase.swtbot;
 
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
@@ -30,7 +31,9 @@ import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -66,9 +69,10 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                              return null;
                           }
                        },
-                       25, // x of false in text control of editor
-                       7, // y of false in text control of editor
+                       true,
+                       "false",
                        "closeFalse",
+                       null,
                        true);
    }
    
@@ -76,17 +80,19 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
    public void testAssignment_ProofStillOpen() throws Exception {
       doStartProofTest("SWTBotManualRuleApplicationTest_testAssignment_ProofStillOpen", 
                        null,
-                       110, // x of assignment text control of editor
-                       180, // y of assignment text control of editor
+                       false,
+                       "exc=null;",
                        "assignment",
+                       null,
                        false);
    }
    
    protected void doStartProofTest(String projectName, 
                                    final IStopCondition stopCondition,
-                                   final int x,
-                                   final int y,
+                                   final boolean useOperationContracts,
+                                   final String textToApplyRuleOn,
                                    final String ruleNameToApply,
+                                   final IAppliedRuleTest appliedRuleTest,
                                    final boolean expectedProofClosed) throws Exception {
       IKeYEditorTestSteps steps = new IKeYEditorTestSteps() {
          @Override
@@ -104,16 +110,24 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             if (stopCondition != null) {
                StrategySettings ss = keyEditor.getCurrentProof().getSettings().getStrategySettings();
                ss.setCustomApplyStrategyStopCondition(stopCondition);
+               SymbolicExecutionUtil.updateStrategySettings(proof, useOperationContracts, true, false, false);
+               StrategyProperties p = ss.getActiveStrategyProperties();
+               p.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, useOperationContracts ? StrategyProperties.METHOD_CONTRACT : StrategyProperties.METHOD_EXPAND);
+               ss.setActiveStrategyProperties(p);
                keyEditor.getUI().startAndWaitForAutoMode(keyEditor.getCurrentProof());
             }
             // Get node to apply rule on
             Node node = keyEditor.getCurrentNode();
             assertFalse(node.isClosed());
             assertEquals(0, node.childrenCount());
-            // Apply rule "assignment" interactively
+            // Apply rule interactively
             final SWTBotStyledText styledText = editor.bot().styledText();
-            TestUtilsUtil.setCursorLocation(styledText, x, y);
-            TestUtilsUtil.clickContextMenu(styledText, x, y, ruleNameToApply);
+            Point point = TestUtilsUtil.selectText(styledText, textToApplyRuleOn);
+            TestUtilsUtil.setCursorLocation(styledText, point.x - 5, point.y);
+            TestUtilsUtil.clickContextMenu(styledText, point.x - 5, point.y, ruleNameToApply);
+            if (appliedRuleTest != null) {
+               appliedRuleTest.test(project, environment, proof, bot, editor, keyEditor, node);
+            }
             // Make sure that correct rule was applied
             assertEquals(expectedProofClosed, keyEditor.getCurrentProof().closed());
             assertEquals(1, node.childrenCount());
@@ -130,5 +144,29 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                    5,
                    false, 
                    steps);
+   }
+   
+   /**
+    * Some additional test steps used by {@link SWTBotManualRuleApplicationTest#doStartProofTest(String, IStopCondition, int, int, String, IAppliedRuleTest, boolean)} to finish and test an applied rule.
+    * @author Martin Hentschel
+    */
+   protected static interface IAppliedRuleTest {
+      /**
+       * Finishes and tests a rule application.
+       * @param project The {@link IJavaProject} which contains the source code.
+       * @param environment The loaded {@link KeYEnvironment}.
+       * @param proof The current {@link Proof}.
+       * @param bot The {@link SWTWorkbenchBot} to use.
+       * @param editor The SWTBot editor in which the {@link Proof} is shown.
+       * @param keyEditor The {@link KeYEditor} in which the {@link Proof} is shown.
+       * @param nodeOnWhichRuleIsApplied The {@link Node} on which the rule is applied.
+       */
+      public void test(IJavaProject project, 
+                       KeYEnvironment<CustomUserInterface> environment, 
+                       Proof proof, 
+                       SWTWorkbenchBot bot, 
+                       SWTBotEditor editor, 
+                       KeYEditor keyEditor,
+                       Node nodeOnWhichRuleIsApplied);
    }
 }
