@@ -20,10 +20,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 /** class tests the goal, especially the split and set back mechanism. */
@@ -38,7 +36,7 @@ public class TestGoal extends TestCase {
 
         public void setUp() {
                 TacletForTests.parse();
-                proof = new Proof("", new Services(AbstractProfile.getDefaultProfile()));     
+                proof = new Proof("", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));     
         }
 
         public void tearDown() {
@@ -58,11 +56,9 @@ public class TestGoal extends TestCase {
                                   "",
                                   new TacletIndex(),
                                   new BuiltInRuleIndex(),                      
-                      new Services(AbstractProfile.getDefaultProfile()), new ProofSettings(ProofSettings.DEFAULT_SETTINGS));     
+                                  new InitConfig(new Services(AbstractProfile.getDefaultProfile())), new ProofSettings(ProofSettings.DEFAULT_SETTINGS));     
                 
-                
-                proof.setProofEnv(new ProofEnvironment(new InitConfig(proof.getServices())));
-                
+                                
                 Goal g = proof.openGoals().head();//new Goal(proof.root(), new RuleAppIndex(new TacletAppIndex(new TacletIndex(), proof.getServices()), new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices()));
                 ImmutableList<Goal> lg = g.split(3);
                 lg.head().addNoPosTacletApp(

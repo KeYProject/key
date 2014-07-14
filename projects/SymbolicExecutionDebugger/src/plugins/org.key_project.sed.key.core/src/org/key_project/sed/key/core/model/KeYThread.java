@@ -223,7 +223,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStarted(ProofEvent e) {
-      if (e.getSource() == getProof() && getMediator().autoMode()) { // Sadly auto mode started events are misused and do not really indicate that a auto mode is running
+      if (e.getSource() == getProof() && getMediator().isInAutoMode()) { // Sadly auto mode started events are misused and do not really indicate that a auto mode is running
          try {
             // Inform UI that the process is resumed
             super.resume();
@@ -240,7 +240,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * @param e The {@link ProofEvent}.
     */
    protected void handleAutoModeStopped(ProofEvent e) {
-      if (e.getSource() == getProof() && !getMediator().autoMode()) { // Sadly auto mode stopped events are misused and do not really indicate that a auto mode has stopped
+      if (e.getSource() == getProof() && !getMediator().isInAutoMode()) { // Sadly auto mode stopped events are misused and do not really indicate that a auto mode has stopped
          try {
             updateExecutionTree(getBuilder());
          }
@@ -298,7 +298,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    @Override
    public boolean canResume() {
       return super.canResume() && 
-             !getMediator().getInteractiveProver().isAutoMode() && // Only one proof completion per time is possible
+             !getMediator().isInAutoMode() && // Only one proof completion per time is possible
              getUi().isAutoModeSupported(getProof()); // Otherwise Auto Mode is not available.
    }
    
@@ -394,7 +394,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    @Override
    public boolean canSuspend() {
       return super.canSuspend() && 
-             getMediator().getInteractiveProver().isAutoMode() && // Only if the auto mode is in progress
+             getMediator().isInAutoMode() && // Only if the auto mode is in progress
              getMediator().getSelectedProof() == getProof(); // And the auto mode handles this proof
    }
    

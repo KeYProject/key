@@ -20,7 +20,11 @@ import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
 /**
@@ -78,6 +82,14 @@ public class CustomUserInterface extends ConsoleUserInterface {
    public void proofCreated(ProblemInitializer sender, ProofAggregate proofAggregate) {
       // Nothing to do
    }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void proofRegistered(ProofEnvironmentEvent event) {
+      // Nothing to do  
+   }
 
    /**
     * {@inheritDoc}
@@ -131,7 +143,7 @@ public class CustomUserInterface extends ConsoleUserInterface {
     */
    @Override
    public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
-      if (customiaztion == null || getMediator().autoMode()) {
+      if (customiaztion == null || getMediator().isInAutoMode()) {
          return super.completeBuiltInRuleApp(app, goal, forced);
       }
       else {
@@ -148,6 +160,16 @@ public class CustomUserInterface extends ConsoleUserInterface {
             return super.completeBuiltInRuleApp(app, goal, forced);
          }
       }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput, ProofAggregate proofList, InitConfig initConfig) {
+      //TODO: Find out why the proof has to be registered. This method should just return null and do nothing.
+      initConfig.getServices().getSpecificationRepository().registerProof(proofOblInput, proofList.getFirstProof());
+      return null;
    }
 
    /**

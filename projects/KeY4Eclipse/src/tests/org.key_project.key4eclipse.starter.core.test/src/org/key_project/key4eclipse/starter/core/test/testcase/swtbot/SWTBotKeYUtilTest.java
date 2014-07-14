@@ -247,12 +247,12 @@ public class SWTBotKeYUtilTest extends AbstractSetupTestCase {
         File firstLocation = ResourceUtil.getLocation(javaProject.getProject().getFolder("src"));
         InitConfig firstConfig = KeYUtil.getInitConfig(firstLocation);
         assertNotNull(firstConfig);
-        assertEquals(firstConfig.getProofEnv().getJavaModel().getModelDir(), firstLocation.getAbsolutePath());
+        assertEquals(firstConfig.getServices().getJavaModel().getModelDir(), firstLocation.getAbsolutePath());
         // Check second environment
         File secondLocation = ResourceUtil.getLocation(secondProject.getProject().getFolder("src"));
         InitConfig secondConfig = KeYUtil.getInitConfig(secondLocation);
         assertNotNull(secondConfig);
-        assertEquals(secondConfig.getProofEnv().getJavaModel().getModelDir(), secondLocation.getAbsolutePath());
+        assertEquals(secondConfig.getServices().getJavaModel().getModelDir(), secondLocation.getAbsolutePath());
         // Test invalid location
         File invalidLocation = ResourceUtil.getLocation(secondProject.getProject());
         assertNull(KeYUtil.getInitConfig(invalidLocation));

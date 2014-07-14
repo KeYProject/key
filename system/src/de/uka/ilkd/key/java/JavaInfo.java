@@ -1287,18 +1287,23 @@ public final class JavaInfo {
      * @see #getInvProgramVar()
      */
     public IObserverFunction getInv() {
-	if(inv == null || inv.getHeapCount(services) != HeapContext.getModHeaps(services, false).size()) {
-	    inv = new ObserverFunction("<inv>",
-        			       Sort.FORMULA,
-        			       null,
-        			       services.getTypeConverter().getHeapLDT().targetSort(),
-        			       getJavaLangObject(),
-        			       false,
-        			       new ImmutableArray<KeYJavaType>(),
-        			       HeapContext.getModHeaps(services, false).size(),
-        			       1);
-	}
-	return inv;
+       // TODO: Create function when source code is parsed and register it in namespace. Return only function from namespace here. No lazy creation to ensure that all proofs of the same proof environment have the same <inv> symbol.
+       if(inv == null || inv.getHeapCount(services) != HeapContext.getModHeaps(services, false).size()) { // TODO: Why is the initial check with the heaps needed?
+          inv = (IObserverFunction) services.getNamespaces().functions().lookup(ObserverFunction.createName("<inv>", getJavaLangObject()));
+          if (inv == null) {
+             inv = new ObserverFunction("<inv>",
+                          Sort.FORMULA,
+                          null,
+                          services.getTypeConverter().getHeapLDT().targetSort(),
+                          getJavaLangObject(),
+                          false,
+                          new ImmutableArray<KeYJavaType>(),
+                          HeapContext.getModHeaps(services, false).size(),
+                          1);
+             services.getNamespaces().functions().add(inv);
+          }
+       }
+       return inv;
     }
 
     /**
@@ -1321,17 +1326,25 @@ public final class JavaInfo {
      * Returns the special symbol <code>&lt;staticInv&gt;</code> which stands for the static invariant of a type.
      */
     public IObserverFunction getStaticInv(KeYJavaType target) {
-        if (!staticInvs.containsKey(target))
-            staticInvs.put(target, new ObserverFunction("<$inv>",
-                           Sort.FORMULA,
-                           null,
-                           services.getTypeConverter().getHeapLDT().targetSort(),
-                           target,
-                           true,
-                           new ImmutableArray<KeYJavaType>(),
-        			       HeapContext.getModHeaps(services, false).size(),
-                           1));
-        return staticInvs.get(target);
+       // TODO: Create functions when source code is parsed and register them in namespace. Return only functions from namespace here. No lazy creation to ensure that all proofs of the same proof environment have the same <$inv> symbols.
+       IObserverFunction inv = staticInvs.get(target);
+        if (inv == null) {
+           inv = (IObserverFunction) services.getNamespaces().functions().lookup(ObserverFunction.createName("<$inv>", target));
+           if (inv == null) {
+              inv = new ObserverFunction("<$inv>",
+                    Sort.FORMULA,
+                    null,
+                    services.getTypeConverter().getHeapLDT().targetSort(),
+                    target,
+                    true,
+                    new ImmutableArray<KeYJavaType>(),
+               HeapContext.getModHeaps(services, false).size(),
+                    1);
+              services.getNamespaces().functions().add(inv);
+           }
+           staticInvs.put(target, inv);
+        }
+        return inv;
     }
 
     /**
