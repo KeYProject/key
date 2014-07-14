@@ -247,8 +247,4 @@ public interface ProofMacro {
      * @return null if no shortcut or the key stroke to invoke the macro.
      */
     public javax.swing.KeyStroke getKeyStroke();
-
-    ImmutableList<Goal> getGoals();
-
-    void innerMacroFinished(TaskFinishedInfo info);
 }

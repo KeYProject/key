@@ -79,7 +79,7 @@ public class TryCloseMacro extends AbstractProofMacro {
     public boolean canApplyTo(KeYMediator mediator,
                               ImmutableList<Goal> goals,
                               PosInOccurrence posInOcc) {
-        return true;
+        return goals != null && !goals.isEmpty();
     }
 
     /*
@@ -90,11 +90,18 @@ public class TryCloseMacro extends AbstractProofMacro {
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
+        if (goals == null || goals.isEmpty()) {
+            // should not happen, because in this case canApplyTo returns
+            // false
+            return null;
+        }
+
         //
         // create the rule application engine
         final ApplyStrategy applyStrategy =
                 new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
-        final Proof proof = mediator.getInteractiveProver().getProof();
+        // assert: all goals have the same proof
+        final Proof proof = goals.head().proof();
 
         //
         // set the max number of steps if given
@@ -119,12 +126,8 @@ public class TryCloseMacro extends AbstractProofMacro {
 
         //
         // inform the listener
-        int goalsClosed = 0;
-        long time = 0;
-        int appliedRules = 0;
         ProofMacroFinishedInfo info =
-                new ProofMacroFinishedInfo(this, goals, proof, time,
-                                           appliedRules, goalsClosed);
+                new ProofMacroFinishedInfo(this, goals, proof, 0, 0, 0);
 
         //
         // start actual autoprove
@@ -136,14 +139,12 @@ public class TryCloseMacro extends AbstractProofMacro {
                 // retreat if not closed
                 if(!node.isClosed()) {
                     proof.pruneProof(node);
+                    // update statistics
+                    info = new ProofMacroFinishedInfo(info, result);
                 } else {
-                    goalsClosed++;
+                    // update statistics
+                    info = new ProofMacroFinishedInfo(info, result, info.getGoals().removeFirst(goal));
                 }
-
-                // update statistics
-                time += result.getTime();
-                appliedRules += result.getAppliedRuleApps();
-                info = new ProofMacroFinishedInfo(info, result);
 
                 synchronized(applyStrategy) { // wait for applyStrategy to finish its last rule application
                    if(applyStrategy.hasBeenInterrupted()) { // only now reraise the interruption exception
@@ -156,7 +157,6 @@ public class TryCloseMacro extends AbstractProofMacro {
             mediator.setMaxAutomaticSteps(oldNumberOfSteps);
             setNumberSteps(oldNumberOfSteps);
             applyStrategy.removeProverTaskObserver(pml);
-            info = info.setModClosedGoals(goals);
         }
         return info;
     }
