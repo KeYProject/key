@@ -195,7 +195,7 @@ public abstract class AbstractUserInterface implements UserInterface {
      */
     @Override
     public void waitWhileAutoMode() {
-       while (getMediator().autoMode()) { // Wait until auto mode has stopped.
+       while (getMediator().isInAutoMode()) { // Wait until auto mode has stopped.
           try {
              Thread.sleep(100);
           }

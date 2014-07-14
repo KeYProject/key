@@ -1060,7 +1060,7 @@ public final class MainWindow extends JFrame  {
         /** focused node has changed */
         @Override
         public synchronized void selectedNodeChanged(KeYSelectionEvent e) {
-            if (getMediator().autoMode()) return;
+            if (getMediator().isInAutoMode()) return;
             updateSequentView();
         }
 

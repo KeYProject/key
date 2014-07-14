@@ -73,6 +73,13 @@ provable: ./heap/block_contracts/Simple__unnecessaryLoopInvariant.key
 # provable: ./heap/block_contracts/GreatestCommonDivisor.key
 provable: ./standard_key/java_dl/jml-assert/assert.key
 
+# Tests for Java Card (should also include the API, pending fix to bug #1475)
+
+provable: ./heap/javacard/updateBalance0.key
+provable: ./heap/javacard/updateBalance1.key
+provable: ./heap/javacard/setArray1.key
+provable: ./heap/javacard/setArray2.key
+
 # Other tests:
 provable: ./heap/coincidence_count/project.key
 provable: ./heap/fm12_01_LRS/lcp.key

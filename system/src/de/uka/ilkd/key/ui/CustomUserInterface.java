@@ -143,7 +143,7 @@ public class CustomUserInterface extends ConsoleUserInterface {
     */
    @Override
    public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
-      if (customiaztion == null || getMediator().autoMode()) {
+      if (customiaztion == null || getMediator().isInAutoMode()) {
          return super.completeBuiltInRuleApp(app, goal, forced);
       }
       else {
