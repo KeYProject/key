@@ -1,23 +1,23 @@
 package org.key_project.key4eclipse.common.ui.completion;
 
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.key_project.key4eclipse.common.ui.provider.ContractLabelProvider;
 import org.key_project.key4eclipse.common.ui.provider.ImmutableCollectionContentProvider;
+import org.key_project.util.eclipse.swt.SWTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.ContractConfigurator;
+import de.uka.ilkd.key.gui.ContractSelectionPanel;
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule.Instantiation;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 /**
@@ -26,33 +26,28 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
  * 
  * @author Martin Hentschel
  */
-public class FunctionalOperationContractCompletion extends
-      AbstractInteractiveRuleApplicationCompletion {
+public class FunctionalOperationContractCompletion extends AbstractInteractiveRuleApplicationCompletion {
    /**
     * {@inheritDoc}
     */
    @Override
    public boolean canComplete(IBuiltInRuleApp app) {
-      return de.uka.ilkd.key.gui.FunctionalOperationContractCompletion
-            .checkCanComplete(app);
+      return de.uka.ilkd.key.gui.FunctionalOperationContractCompletion.checkCanComplete(app);
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   protected IInteractiveRuleApplicationCompletionPerform createPerform(
-         IBuiltInRuleApp app, Goal goal, boolean forced) {
+   protected IInteractiveRuleApplicationCompletionPerform createPerform(IBuiltInRuleApp app, Goal goal, boolean forced) {
       return new Perform(app, goal, forced);
    }
 
    /**
     * The used {@link IInteractiveRuleApplicationCompletionPerform}.
-    * 
     * @author Martin Hentschel
     */
-   public static class Perform extends
-         AbstractInteractiveRuleApplicationCompletionPerform {
+   public static class Perform extends AbstractInteractiveRuleApplicationCompletionPerform {
       /**
        * The {@link Instantiation}.
        */
@@ -93,10 +88,8 @@ public class FunctionalOperationContractCompletion extends
       public Perform(IBuiltInRuleApp app, Goal goal, boolean forced) {
          super(app, goal, forced);
          services = goal.proof().getServices();
-         inst = UseOperationContractRule.computeInstantiation(app
-               .posInOccurrence().subTerm(), getServices());
-         contracts = UseOperationContractRule.getApplicableContracts(inst,
-               getServices());
+         inst = UseOperationContractRule.computeInstantiation(app.posInOccurrence().subTerm(), getServices());
+         contracts = UseOperationContractRule.getApplicableContracts(inst, getServices());
       }
 
       /**
@@ -121,25 +114,30 @@ public class FunctionalOperationContractCompletion extends
       @Override
       public void createControl(Composite root) {
          viewer = new TableViewer(root);
-         viewer.setContentProvider(ImmutableCollectionContentProvider
-               .getInstance());
+         viewer.setContentProvider(ImmutableCollectionContentProvider.getInstance());
          labelViewer = new ContractLabelProvider(services);
          viewer.setLabelProvider(labelViewer);
          viewer.setInput(contracts);
-         // TODO: Ensure that "Finish" is only available when at least one
-         // contract is selected (use setErrorMessage)
-         setErrorMessage("Please select at least one contract.");
          viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
-               IStructuredSelection selection = (IStructuredSelection) viewer
-                     .getSelection();
-               if (!selection.isEmpty()) {
-                  setErrorMessage(null);
-               }
+               updateErrorMessage();
             }
          });
+         updateErrorMessage();
+      }
+      
+      /**
+       * Updates the shown error message.
+       */
+      protected void updateErrorMessage() {
+         ISelection selection = viewer.getSelection();
+         if (!selection.isEmpty()) {
+            setErrorMessage(null);
+         }
+         else {
+            setErrorMessage("Please select at least one contract.");
+         }
       }
 
       /**
@@ -147,18 +145,23 @@ public class FunctionalOperationContractCompletion extends
        */
       @Override
       public IBuiltInRuleApp finish() {
-         FunctionalOperationContract[] contractsArr = contracts
-               .toArray(new FunctionalOperationContract[contracts.size()]);
-         ContractConfigurator cc = new ContractConfigurator(
-               MainWindow.getInstance(), services, contractsArr,
-               "Contracts for " + inst.pm.getName(), true);
-
-         if (cc.wasSuccessful()) {
-            return ((UseOperationContractRule) getApp().rule()).createApp(
-                  getApp().posInOccurrence()).setContract(cc.getContract());
+         // Similiar behavior as de.uka.ilkd.key.gui.FunctionalOperationContractCompletion#complete(...).
+         Contract contract = getSelectedContract();
+         if (contract != null) {
+            return ((UseOperationContractRule) getApp().rule()).createApp(getApp().posInOccurrence()).setContract(contract);
          }
-         return getApp(); // TODO: Implement similar as
-                      // de.uka.ilkd.key.collection.ImmutableSet.FunctionalOperationContractCompletion
+         else {
+            return getApp();
+         }
+      }
+      
+      /**
+       * Returns the selected {@link Contract}.
+       * @return The selected {@link Contract} or {@code null} if not available.
+       */
+      protected Contract getSelectedContract() {
+         final Object[] selection = SWTUtil.toArray(viewer.getSelection());
+         return ContractSelectionPanel.computeContract(services, selection);
       }
 
       /**
