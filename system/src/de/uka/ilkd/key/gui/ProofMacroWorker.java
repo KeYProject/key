@@ -16,6 +16,7 @@ import javax.swing.SwingWorker;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.util.Debug;
@@ -69,13 +70,15 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
 
     @Override
     protected Void doInBackground() throws Exception {
+        final ProverTaskListener ptl = mediator.getUI().getListener();
+        TaskFinishedInfo info =
+                ProofMacroFinishedInfo.getDefaultInfo(macro, mediator.getSelectedProof());
         try {
             synchronized(macro) {
-                final ProverTaskListener ptl = mediator.getUI().getListener();
                 ptl.taskStarted(macro.getName(), 0);
-                final TaskFinishedInfo info = macro.applyTo(mediator, posInOcc, ptl);
-                ptl.taskFinished(info);
+                info = macro.applyTo(mediator, posInOcc, ptl);
             }
+            ptl.taskFinished(info);
         } catch (final InterruptedException exception) {
             Debug.out("Proof macro has been interrupted:");
             Debug.out(exception);

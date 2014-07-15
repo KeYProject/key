@@ -22,14 +22,14 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.util.ExtList;
 
 public class ExecutionContext
-    extends JavaNonTerminalProgramElement 
-    implements IExecutionContext, Reference {
-    
+extends JavaNonTerminalProgramElement 
+implements IExecutionContext, Reference {
+
     /**
      * the class context 
      */
     protected final TypeReference classContext;
-    
+
     /**
      * the reference to the active object
      */
@@ -39,32 +39,32 @@ public class ExecutionContext
      * the currently active method
      */
     private IProgramMethod methodContext;
-   
+
     /**
      * creates an execution context reference
-     * @param classContext the TypeReference refering to the next enclosing
+     * @param classContext the TypeReference referring to the next enclosing
      * class 
-    * @param methodContext the IProgramMethod referring to the currently active method
+     * @param methodContext the IProgramMethod referring to the currently active method
      * @param runtimeInstance a ReferencePrefix to the object that
      * is currently active/executed
      */
     public ExecutionContext(TypeReference classContext, 
-			    IProgramMethod methodContext, ReferencePrefix runtimeInstance) {
-	this.classContext = classContext;
-	this.methodContext = methodContext;
-	this.runtimeInstance = runtimeInstance;
+                    IProgramMethod methodContext, ReferencePrefix runtimeInstance) {
+        this.classContext = classContext;
+        this.methodContext = methodContext;
+        this.runtimeInstance = runtimeInstance;
     }
-    
+
     /**
      * creates an execution context reference
      * @param children an ExtList with the required children of the execution
      * context
      */
     public ExecutionContext(ExtList children) {
-	this.classContext = children.get(TypeReference.class);	
-	children.remove(this.classContext);
-	this.methodContext = children.get(IProgramMethod.class);
-	this.runtimeInstance = children.get(ReferencePrefix.class);
+        this.classContext = children.get(TypeReference.class);	
+        children.remove(this.classContext);
+        this.methodContext = children.get(IProgramMethod.class);
+        this.runtimeInstance = children.get(ReferencePrefix.class);
     }
 
 
@@ -73,12 +73,13 @@ public class ExecutionContext
      * Returns the number of children of this node.
      * @return an int giving the number of children of this node
      */
+    @Override
     public int getChildCount() {
-	int count = 0;
-	if (classContext != null) count++;
-   if (methodContext != null) count++;
-	if (runtimeInstance != null) count++;
-	return count;
+        int count = 0;
+        if (classContext != null) count++;
+        if (methodContext != null) count++;
+        if (runtimeInstance != null) count++;
+        return count;
     }
 
     /**
@@ -89,20 +90,21 @@ public class ExecutionContext
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
      *    of bounds
      */
+    @Override
     public ProgramElement getChildAt(int index) {
-	if (classContext != null) {
-	    if (index == 0) return classContext;
-	    index--;
-	}
-   if (methodContext != null) {
-      if (index == 0) return methodContext;
-      index--;
-  }
-	if (runtimeInstance != null) {
-	    if (index == 0) return runtimeInstance;
-	    index--;
-	}
-	throw new ArrayIndexOutOfBoundsException();
+        if (classContext != null) {
+            if (index == 0) return classContext;
+            index--;
+        }
+        if (methodContext != null) {
+            if (index == 0) return methodContext;
+            index--;
+        }
+        if (runtimeInstance != null) {
+            if (index == 0) return runtimeInstance;
+            index--;
+        }
+        throw new ArrayIndexOutOfBoundsException();
     }
 
     /**
@@ -110,7 +112,7 @@ public class ExecutionContext
      */
     @Override
     public TypeReference getTypeReference() {
-	return classContext;
+        return classContext;
     }
 
     /**
@@ -118,31 +120,34 @@ public class ExecutionContext
      */
     @Override
     public IProgramMethod getMethodContext() {
-      return methodContext;
-   }
+        return methodContext;
+    }
 
-   /**
+    /**
      * {@inheritDoc}
      */
     @Override
     public ReferencePrefix getRuntimeInstance() {
-	return runtimeInstance;
+        return runtimeInstance;
     }
 
     /** calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
      * @param v the Visitor
      */
+    @Override
     public void visit(Visitor v) {
-	v.performActionOnExecutionContext(this);
+        v.performActionOnExecutionContext(this);
     }
 
+    @Override
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printExecutionContext(this);
     }
 
+    @Override
     public String toString() {
         return "Context: "+classContext+ "#" + methodContext + " Instance: "+runtimeInstance;
     }
-    
+
 }

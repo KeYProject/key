@@ -16,21 +16,28 @@ public class ProofMacroListener implements ProverTaskListener {
 
     @Override
     public void taskStarted(String message, int size) {
-        assert message != null;
         numOfInvokedMacros++;
-        superordinateListener.taskStarted(getMacro().getName() + " -- " + message, size);
+        if (superordinateListener != null) {
+            superordinateListener.taskStarted(getMacro().getName()
+                                            + (getMacro().getName().length() == 0
+                                                ? "" : " -- ")
+                                            + message, size);
+        }
     }
 
     @Override
     public void taskProgress(int position) {
-        superordinateListener.taskProgress(position);
+        if (superordinateListener != null) {
+            superordinateListener.taskProgress(position);
+        }
     }
 
     @Override
     public void taskFinished(TaskFinishedInfo info) {
-        macro.innerMacroFinished(info);
         numOfInvokedMacros--;
-        superordinateListener.taskFinished(info);
+        if (superordinateListener != null) {
+            superordinateListener.taskFinished(info);
+        }
     }
 
     public ProofMacro getMacro() {

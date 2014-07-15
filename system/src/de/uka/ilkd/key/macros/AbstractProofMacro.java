@@ -17,7 +17,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -37,8 +36,6 @@ import de.uka.ilkd.key.proof.Node;
  */
 public abstract class AbstractProofMacro implements ProofMacro {
 
-    private ImmutableList<Goal> goals = ImmutableSLList.<Goal>nil();
-
     /**
      * The max number of steps to be applied.
      * A value of -1 means no changes.
@@ -54,15 +51,6 @@ public abstract class AbstractProofMacro implements ProofMacro {
         }
     }
 
-    private static boolean isGoalList(ImmutableList<?> list) {
-        for (Object entry : list) {
-            if (!(entry instanceof Goal)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     @Override
     public void setNumberSteps(int numberSteps) {
         this.numberSteps = numberSteps;
@@ -71,24 +59,6 @@ public abstract class AbstractProofMacro implements ProofMacro {
     @Override
     public int getNumberSteps() {
         return this.numberSteps;
-    }
-
-    @Override
-    public ImmutableList<Goal> getGoals() {
-        return this.goals;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public void innerMacroFinished(TaskFinishedInfo info) {
-        if (info != null) {
-            Object result = info.getResult();
-            if (result instanceof ImmutableList<?> &&
-                    isGoalList((ImmutableList<?>) result)) {
-                final ImmutableList<Goal> newGoals = (ImmutableList<Goal>) result;
-                this.goals = newGoals;
-            }
-        }
     }
 
     @Override

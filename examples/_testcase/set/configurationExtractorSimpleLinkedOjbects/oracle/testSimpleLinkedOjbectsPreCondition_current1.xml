@@ -5,14 +5,14 @@
       <term term="SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next)"/>
    </equivalenceClass>
    <state name="return x.value+x.next.value+x.next.next.value;">
-      <association name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" target="o2"/>
+      <association name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" target="o1"/>
    </state>
-   <object xml:id="o1" name="SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next)" type="SimpleLinkedOjbects">
-      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="Z(3(#))" type="int"/>
-      <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o1"/>
-   </object>
-   <object xml:id="o2" name="x" type="SimpleLinkedOjbects">
+   <object xml:id="o1" name="x" type="SimpleLinkedOjbects">
       <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="Z(1(#))" type="int"/>
-      <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+      <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o2"/>
+   </object>
+   <object xml:id="o2" name="SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next)" type="SimpleLinkedOjbects">
+      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="Z(3(#))" type="int"/>
+      <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o2"/>
    </object>
 </model>

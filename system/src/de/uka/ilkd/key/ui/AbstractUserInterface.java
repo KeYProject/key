@@ -109,22 +109,21 @@ public abstract class AbstractUserInterface implements UserInterface {
             System.out.println(getMacroConsoleOutput());
             Proof proof = getMediator().getSelectedProof();
             TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(getMacro(), proof);
-            final ProverTaskListener ptl = getListener();
+            ProverTaskListener ptl = getListener();
             try {
                 getMediator().stopInterface(true);
-                getMediator().setInteractive(false);                
+                getMediator().setInteractive(false);
                 ptl.taskStarted(getMacro().getName(), 0);
                 info = getMacro().applyTo(getMediator(), null, ptl);
                 synchronized(getMacro()) {
                     // wait for macro to terminate
+                    ptl.taskFinished(info);
                     getMediator().setInteractive(true);
                     getMediator().startInterface(true);
                 }
             } catch(InterruptedException ex) {
                 Debug.out("Proof macro has been interrupted:");
                 Debug.out(ex);
-            } finally {
-                ptl.taskFinished(info);
             }
             return true;
         } else {

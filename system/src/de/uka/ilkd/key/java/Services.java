@@ -33,6 +33,7 @@ import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
@@ -303,10 +304,15 @@ public class Services implements TermServices {
     
     /** 
      * Marks this services as proof specific 
+     * Please make sure that the {@link Services} does not not yet belong to an existing proof 
+     * or that it is owned by a proof environment. In both cases copy the {@link InitConfig} via
+     * {@link InitConfig#deepCopy()} or one of the other copy methods first. 
      * @param p_proof the Proof to which this {@link Services} instance belongs
      */
     public void setProof(Proof p_proof) {
-       assert proof == null;
+       if (this.proof != null) {
+          throw new IllegalStateException("Services are already owned by another proof:" + proof.name());
+       }
        proof = p_proof;
     }
     
