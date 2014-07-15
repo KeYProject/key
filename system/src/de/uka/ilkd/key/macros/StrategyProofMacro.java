@@ -56,7 +56,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
     public boolean canApplyTo(KeYMediator mediator,
                               ImmutableList<Goal> goals,
                               PosInOccurrence posInOcc) {
-        return true;
+        return goals != null && !goals.isEmpty();
     }
 
     /**
@@ -79,8 +79,17 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
+        if (goals == null || goals.isEmpty()) {
+            // should not happen, because in this case canApplyTo returns
+            // false
+            return null;
+        }
+
+        Proof proof = goals.head().proof();
         IGoalChooser goalChooser = mediator.getProfile().getSelectedGoalChooserBuilder().create();
         final ApplyStrategy applyStrategy = new ApplyStrategy(goalChooser);
+        final ImmutableList<Goal> ignoredOpenGoals =
+                setDifference(proof.openGoals(), goals);
 
         if(listener != null) {
             applyStrategy.addProverTaskObserver(listener);
@@ -99,17 +108,18 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         }
 
         // set a new strategy.
-        Proof proof = mediator.getSelectedProof();
         Strategy oldStrategy = proof.getActiveStrategy();
         proof.setActiveStrategy(createStrategy(mediator, posInOcc));
 
         ProofMacroFinishedInfo info =
-                new ProofMacroFinishedInfo(this, proof.openEnabledGoals(), proof);
+                new ProofMacroFinishedInfo(this, goals, proof);
         try {
             // find the relevant goals
             // and start
-            applyStrategy.start(proof, proof.getSubtreeEnabledGoals(mediator.getSelectedNode()));
-            info = new ProofMacroFinishedInfo(this, proof.openEnabledGoals(), proof);
+            applyStrategy.start(proof, goals);
+            ImmutableList<Goal> resultingGoals =
+                    setDifference(proof.openGoals(), ignoredOpenGoals);
+            info = new ProofMacroFinishedInfo(this, resultingGoals);
         } finally {
             // this resets the proof strategy and the managers after the automation
             // has run
@@ -136,4 +146,12 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         return info;
     }
 
+    private static ImmutableList<Goal> setDifference(ImmutableList<Goal> goals1,
+                                                     ImmutableList<Goal> goals2) {
+        ImmutableList<Goal> difference = goals1;
+        for (Goal goal : goals2) {
+            difference = difference.removeFirst(goal);
+        }
+        return difference;
+    }
 }

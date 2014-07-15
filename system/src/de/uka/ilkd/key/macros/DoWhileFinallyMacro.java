@@ -65,7 +65,7 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
             steps -= info.getAppliedRules();
             setNumberSteps(steps);
             info = new ProofMacroFinishedInfo(this, info);
-            goals = getGoals();
+            goals = info.getGoals();
             posInOcc = null;
         }
         if (steps > 0 && getAltProofMacro().canApplyTo(mediator, goals, posInOcc)) {

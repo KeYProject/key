@@ -28,7 +28,6 @@ public class ProofMacroListener implements ProverTaskListener {
 
     @Override
     public void taskFinished(TaskFinishedInfo info) {
-        macro.innerMacroFinished(info);
         numOfInvokedMacros--;
         superordinateListener.taskFinished(info);
     }

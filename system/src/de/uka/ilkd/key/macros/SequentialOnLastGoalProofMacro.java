@@ -49,7 +49,7 @@ public abstract class SequentialOnLastGoalProofMacro extends SequentialProofMacr
                 info = macro.applyTo(mediator, goals, posInOcc, cptl);
                 cptl.taskFinished(info);
                 info = new ProofMacroFinishedInfo(this, info);
-                goals = getGoals();
+                goals = info.getGoals();
                 // after the first macro the posInOcc does not match any more,
                 // because we changed the goal / node
                 posInOcc = null;

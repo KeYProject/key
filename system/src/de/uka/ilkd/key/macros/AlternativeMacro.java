@@ -91,6 +91,7 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
                 cptl.taskStarted(macro.getName(), 0);
                 info = macro.applyTo(mediator, goals, posInOcc, cptl);
                 cptl.taskFinished(info);
+                // change source to this macro ... [TODO]
                 info = new ProofMacroFinishedInfo(this, info);
                 return info;
             }
