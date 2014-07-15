@@ -255,6 +255,11 @@ public class SequentChangeInfo {
         rejectedFormulas(true).prepend(rejectedFormulas(false));
   }
   
+  /**
+   * This method combines this change information from this info and its successor. 
+   * ATTENTION: it takes over ownership over {@link succ} and does not release it. This means
+   * when invoking the method it must be snsured that succ is never used afterwards.
+   */
   public void combine(SequentChangeInfo succ) {         
      final SequentChangeInfo antec = this;
      if (antec == succ) {

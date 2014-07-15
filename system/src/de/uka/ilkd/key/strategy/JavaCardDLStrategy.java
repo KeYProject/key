@@ -66,7 +66,6 @@ import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.FindDepthFeature;
 import de.uka.ilkd.key.strategy.feature.FindRightishFeature;
 import de.uka.ilkd.key.strategy.feature.FocusInAntecFeature;
-import de.uka.ilkd.key.strategy.feature.IfThenElseMalusFeature;
 import de.uka.ilkd.key.strategy.feature.InEquationMultFeature;
 import de.uka.ilkd.key.strategy.feature.MatchedIfFeature;
 import de.uka.ilkd.key.strategy.feature.MonomialsSmallerThanFeature;
@@ -78,7 +77,6 @@ import de.uka.ilkd.key.strategy.feature.NotBelowQuantifierFeature;
 import de.uka.ilkd.key.strategy.feature.NotInScopeOfModalityFeature;
 import de.uka.ilkd.key.strategy.feature.OnlyInScopeOfQuantifiersFeature;
 import de.uka.ilkd.key.strategy.feature.PolynomialValuesCmpFeature;
-import de.uka.ilkd.key.strategy.feature.PrintFeature;
 import de.uka.ilkd.key.strategy.feature.PurePosDPathFeature;
 import de.uka.ilkd.key.strategy.feature.QueryExpandCost;
 import de.uka.ilkd.key.strategy.feature.ReducibleMonomialsFeature;
@@ -107,7 +105,6 @@ import de.uka.ilkd.key.strategy.termProjection.FocusProjection;
 import de.uka.ilkd.key.strategy.termProjection.MonomialColumnOp;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.strategy.termProjection.ReduceMonomialsProjection;
-import de.uka.ilkd.key.strategy.termProjection.SubtermProjection;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termfeature.AnonHeapTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
@@ -231,7 +228,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         depFilter.addRuleToSet(UseDependencyContractRule.INSTANCE);
         if (depProp.equals(StrategyProperties.DEP_ON)) {
                 depSpecF = ConditionalFeature.createConditional(depFilter,
-                                                                longConst(400));
+                                                                longConst(300));
         } else {
             depSpecF = ConditionalFeature.createConditional(depFilter,
         	    					    inftyConst());
