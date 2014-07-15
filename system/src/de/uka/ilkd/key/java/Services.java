@@ -306,7 +306,10 @@ public class Services implements TermServices {
      * @param p_proof the Proof to which this {@link Services} instance belongs
      */
     public void setProof(Proof p_proof) {
-       assert proof == null;
+        // TODO
+    // this assertion prevents opening side proofs, e.g., counter example generation -- DB 15/07/14
+//       assert proof == null;
+        // better raise IllegalStateException instead, anyway
        proof = p_proof;
     }
     
