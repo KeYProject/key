@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -76,7 +77,7 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
 
     @Override
     protected void addToAntec(Semisequent semi,
-                              Goal goal,
+                              SequentChangeInfo currentSequent,
                               PosInOccurrence pos,
                               Services services,
                               MatchConditions matchCond,
@@ -85,8 +86,9 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
             instantiateSemisequent(semi, services, matchCond, pos);
         assert replacements.size() == 1 : "information flow taclets must have " +
                                   "exactly one add!";
-        updateStrategyInfo(goal, replacements.iterator().next().formula());
-        super.addToAntec(semi, goal, pos, services, matchCond, applicationPosInOccurrence);
+        updateStrategyInfo(services.getProof().openEnabledGoals().head(),
+                           replacements.iterator().next().formula());
+        super.addToAntec(semi, currentSequent, pos, services, matchCond, applicationPosInOccurrence);
     }
 
 

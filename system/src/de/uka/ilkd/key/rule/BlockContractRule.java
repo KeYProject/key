@@ -432,7 +432,7 @@ public class BlockContractRule implements BuiltInRule {
         final SequentFormula poFormula = buildBodyPreservesSequent(infFlowFactory, proof);
 
         // add proof obligation to goal
-        infFlowGoal.addFormulaToSuccedent(poFormula, true);
+        infFlowGoal.addFormula(poFormula, false, true);
 
         proof.addIFSymbol(contractApplTerm);
         proof.addIFSymbol(informationFlowContractApp);
