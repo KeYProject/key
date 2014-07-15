@@ -91,9 +91,18 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         final ImmutableList<Goal> ignoredOpenGoals =
                 setDifference(proof.openGoals(), goals);
 
-        if(listener != null) {
-            applyStrategy.addProverTaskObserver(listener);
-        }
+        final ProofMacro macroAdapter = new SkipMacro() {
+            @Override
+            public String getName() { return ""; }
+            @Override
+            public String getDescription() { return ""; }
+        };
+        macroAdapter.setNumberSteps(getNumberSteps());
+        //
+        // The observer to handle the progress bar
+        final ProofMacroListener pml =  new ProgressBarListener(macroAdapter, goals.size(),
+                                                                getNumberSteps(), listener);
+        applyStrategy.addProverTaskObserver(pml);
 
         // add a focus manager if there is a focus
         if(posInOcc != null && goals != null) {
@@ -117,9 +126,14 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
             // find the relevant goals
             // and start
             applyStrategy.start(proof, goals);
-            ImmutableList<Goal> resultingGoals =
-                    setDifference(proof.openGoals(), ignoredOpenGoals);
-            info = new ProofMacroFinishedInfo(this, resultingGoals);
+            synchronized(applyStrategy) { // wait for applyStrategy to finish it last rule application
+                final ImmutableList<Goal> resultingGoals =
+                        setDifference(proof.openGoals(), ignoredOpenGoals);
+                info = new ProofMacroFinishedInfo(this, resultingGoals);
+                if(applyStrategy.hasBeenInterrupted()) { // reraise interrupted exception if necessary
+                    throw new InterruptedException();
+                }
+            }
         } finally {
             // this resets the proof strategy and the managers after the automation
             // has run
@@ -134,14 +148,8 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
                     openGoal.setRuleAppManager(manager);
                 }
             }
-
             proof.setActiveStrategy(oldStrategy);
-        }
-        
-        synchronized(applyStrategy) { // wait for applyStrategy to finish it last rule application
-           if(applyStrategy.hasBeenInterrupted()) { // reraise interrupted exception if necessary
-              throw new InterruptedException();
-           }
+            applyStrategy.removeProverTaskObserver(pml);
         }
         return info;
     }

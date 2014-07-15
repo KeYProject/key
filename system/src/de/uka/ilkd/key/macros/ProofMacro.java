@@ -247,4 +247,46 @@ public interface ProofMacro {
      * @return null if no shortcut or the key stroke to invoke the macro.
      */
     public javax.swing.KeyStroke getKeyStroke();
+
+    /**
+     * This observer acts as intermediate instance between the reports by the
+     * strategy and the UI reporting progress.
+     *
+     * The number of total steps is computed and all local reports are
+     * translated in termini of the total number of steps such that a continuous
+     * progress is reported.
+     *
+     * fixes #1356
+     */
+    class ProgressBarListener extends ProofMacroListener {
+        private int numberGoals;
+        private int numberSteps;
+        private int completedGoals;
+
+        ProgressBarListener(ProofMacro macro, int numberGoals,
+                            int numberSteps, ProverTaskListener l) {
+            super(macro, l);
+            this.numberGoals = numberGoals;
+            this.numberSteps = numberSteps;
+        }
+
+        @Override
+        public void taskStarted(String message, int size) {
+            //assert size == numberSteps;
+            String suffix = " [" + (completedGoals + 1) + "/" + numberGoals + "]";
+            super.taskStarted(message + suffix, numberGoals * numberSteps);
+            super.taskProgress(completedGoals * numberSteps);
+        }
+
+        @Override
+        public void taskProgress(int position) {
+            super.taskProgress(completedGoals * numberSteps + position);
+        }
+
+        @Override
+        public void taskFinished(TaskFinishedInfo info) {
+            super.taskFinished(info);
+            completedGoals ++;
+        }
+    }
 }

@@ -19,7 +19,6 @@ import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -113,10 +112,10 @@ public class TryCloseMacro extends AbstractProofMacro {
         }
         final ProofMacro macroAdapter = new SkipMacro() {
             @Override
-            public String getName() { return "Apply automatic strategy"; }
+            public String getName() { return ""; }
             @Override
-            public String getDescription() { return "Apply automatic strategy"; }
-            };
+            public String getDescription() { return ""; }
+        };
         macroAdapter.setNumberSteps(getNumberSteps());
         //
         // The observer to handle the progress bar
@@ -135,18 +134,24 @@ public class TryCloseMacro extends AbstractProofMacro {
             for (Goal goal : goals) {
                 Node node = goal.node();
                 ApplyStrategyInfo result = applyStrategy.start(proof, goal);
+                final Goal closedGoal;
 
                 // retreat if not closed
                 if(!node.isClosed()) {
                     proof.pruneProof(node);
-                    // update statistics
-                    info = new ProofMacroFinishedInfo(info, result);
+                    synchronized (proof) {
+                        closedGoal = null;
+                    }
                 } else {
-                    // update statistics
-                    info = new ProofMacroFinishedInfo(info, result, info.getGoals().removeFirst(goal));
+                    closedGoal = goal;
                 }
-
                 synchronized(applyStrategy) { // wait for applyStrategy to finish its last rule application
+                    // update statistics
+                    if (closedGoal == null) {
+                        info = new ProofMacroFinishedInfo(info, result);
+                    } else {
+                        info = new ProofMacroFinishedInfo(info, result, info.getGoals().removeFirst(goal));
+                    }
                    if(applyStrategy.hasBeenInterrupted()) { // only now reraise the interruption exception
                       throw new InterruptedException();
                    }
@@ -159,47 +164,5 @@ public class TryCloseMacro extends AbstractProofMacro {
             applyStrategy.removeProverTaskObserver(pml);
         }
         return info;
-    }
-
-    /**
-     * This observer acts as intermediate instance between the reports by the
-     * strategy and the UI reporting progress.
-     *
-     * The number of total steps is computed and all local reports are
-     * translated in termini of the total number of steps such that a continuous
-     * progress is reported.
-     *
-     * fixes #1356
-     */
-    private class ProgressBarListener extends ProofMacroListener {
-        private int numberGoals;
-        private int numberSteps;
-        private int completedGoals;
-
-        ProgressBarListener(ProofMacro macro, int numberGoals,
-                            int numberSteps, ProverTaskListener l) {
-            super(macro, l);
-            this.numberGoals = numberGoals;
-            this.numberSteps = numberSteps;
-        }
-
-        @Override
-        public void taskStarted(String message, int size) {
-            assert size == numberSteps;
-            String suffix = " [" + (completedGoals + 1) + "/" + numberGoals + "]";
-            super.taskStarted(message + suffix, numberGoals * numberSteps);
-            super.taskProgress(completedGoals * numberSteps);
-        }
-
-        @Override
-        public void taskProgress(int position) {
-            super.taskProgress(completedGoals * numberSteps + position);
-        }
-
-        @Override
-        public void taskFinished(TaskFinishedInfo info) {
-            super.taskFinished(info);
-            completedGoals ++;
-        }
     }
 }

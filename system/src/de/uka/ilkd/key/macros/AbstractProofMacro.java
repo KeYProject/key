@@ -17,7 +17,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -50,15 +49,6 @@ public abstract class AbstractProofMacro implements ProofMacro {
         } else {
             return node.proof().getSubtreeEnabledGoals(node);
         }
-    }
-
-    private static boolean isGoalList(ImmutableList<?> list) {
-        for (Object entry : list) {
-            if (!(entry instanceof Goal)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     @Override
