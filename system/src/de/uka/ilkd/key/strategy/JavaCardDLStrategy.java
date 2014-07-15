@@ -228,7 +228,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         depFilter.addRuleToSet(UseDependencyContractRule.INSTANCE);
         if (depProp.equals(StrategyProperties.DEP_ON)) {
                 depSpecF = ConditionalFeature.createConditional(depFilter,
-                                                                longConst(400));
+                                                                longConst(300));
         } else {
             depSpecF = ConditionalFeature.createConditional(depFilter,
         	    					    inftyConst());
@@ -591,24 +591,26 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         //chrisg: The following rule, if active, must be applied delta rules.
         if(autoInductionEnabled()){
-        	bindRuleSet ( d, "auto_induction", -6500 ); //chrisg
+         bindRuleSet ( d, "auto_induction", -6500 ); //chrisg
         }else{
-        	bindRuleSet ( d, "auto_induction", inftyConst () ); //chrisg
+         bindRuleSet ( d, "auto_induction", inftyConst () ); //chrisg
         }
         
         //chrisg: The following rule is a beta rule that, if active, must have a higher priority than other beta rules.
         if(autoInductionLemmaEnabled()){
-        	bindRuleSet ( d, "auto_induction_lemma", -300 ) ; 
+         bindRuleSet ( d, "auto_induction_lemma", -300 ) ; 
         }else{
-            bindRuleSet ( d, "auto_induction_lemma", inftyConst());        	
+            bindRuleSet ( d, "auto_induction_lemma", inftyConst());           
         }
 
-        
         if (strategyProperties.contains(StrategyProperties.AUTO_INDUCTION_ON) || 
               strategyProperties.contains(StrategyProperties.AUTO_INDUCTION_LEMMA_ON)) {
            bindRuleSet (d, "induction_var", 0);
+        } else if (!autoInductionEnabled() && !autoInductionLemmaEnabled()) { 
+           bindRuleSet (d, "induction_var", inftyConst());           
         } else {
-           bindRuleSet (d, "induction_var", ifZero(applyTF(instOf("uSub"), IsInductionVariable.INSTANCE), longConst(0), inftyConst()));
+           bindRuleSet (d, "induction_var", 
+                 ifZero(applyTF(instOf("uSub"), IsInductionVariable.INSTANCE), longConst(0), inftyConst()));
         }
         
         return d;
@@ -998,6 +1000,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private void setupSplitting(RuleSetDispatchFeature d) {
         final TermBuffer subFor = new TermBuffer ();
+        
         final Feature noCutsAllowed =
             sum ( subFor, AllowedCutPositionsGenerator.INSTANCE,
                   not ( applyTF ( subFor, ff.cutAllowed ) ) );
@@ -1009,47 +1012,75 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
              ScaleFeature.createScaled ( CountPosDPathFeature.INSTANCE, -3.0 ),
              ScaleFeature.createScaled ( CountMaxDPathFeature.INSTANCE, 10.0 ),
              longConst ( 20 )
-           ) );
+           )) ;
 
         
+
+        final ProjectionToTerm splitCondition = sub(FocusProjection.INSTANCE, 0);
         bindRuleSet ( d, "split_cond",
                       add ( // do not split over formulas containing auxiliary variables
                             applyTF ( FocusProjection.INSTANCE,
                                       rec ( any(),
                                             not ( IsSelectSkolemConstantTermFeature.INSTANCE ) ) ),
-                            longConst ( 1 ) ) );
+                            // prefer splits when condition has quantifiers (less likely to be simplified away)
+                            applyTF ( splitCondition,
+                                      rec ( ff.quantifiedFor,
+                                               ifZero(ff.quantifiedFor, longTermConst(-10) ) ) ),
+                            // prefer top level splits
+                            FindDepthFeature.INSTANCE,
+                            ScaleFeature.createScaled(countOccurrences(splitCondition), -2),
+                            ifZero(applyTF( FocusProjection.INSTANCE, ContainsExecutableCodeTermFeature.PROGRAMS), 
+                                  longConst(-100), longConst(5))));
 
+        ProjectionToTerm cutFormula = instOf("cutFormula");
+
+        Feature countOccurrencesInSeq = 
+              ScaleFeature.createScaled(countOccurrences(cutFormula), -1);
+        
+                
         bindRuleSet ( d, "cut_direct",
-           SumFeature.createSum ( new Feature [] {
+            SumFeature.createSum ( new Feature [] {
              not ( TopLevelFindFeature.ANTEC_OR_SUCC_WITH_UPDATE ),
              AllowedCutPositionFeature.INSTANCE,
              ifZero ( NotBelowQuantifierFeature.INSTANCE,
-                      add ( applyTF ( "cutFormula",
+                      add ( applyTF ( cutFormula,
                                       add ( ff.cutAllowed,
                                             // do not cut over formulas containing auxiliary variables
                                             rec ( any(),
                                                   not ( IsSelectSkolemConstantTermFeature.INSTANCE ) ) ) ),
-                            // prefere cuts over "something = null"
+                            // prefer cuts over "something = null"
                             ifZero ( add ( applyTF( FocusProjection.INSTANCE, tf.eqF ),
                                            applyTF( sub(FocusProjection.INSTANCE, 1), vf.nullTerm ) ),
                                      longConst ( -5 ),
                                      longConst ( 0 ) ),
-                            // punish cuts over formulas containing anon heap functions
-                            ifZero( applyTF( "cutFormula",
-                                             rec ( any(),
-                                                   not ( AnonHeapTermFeature.INSTANCE ) ) ),
-                                    longConst ( 0 ),
-                                    longConst ( 1000 ) ),
+                                    // punish cuts over formulas containing anon heap functions
+                                    ifZero( applyTF( cutFormula,
+                                                     rec ( any(),
+                                                           not ( AnonHeapTermFeature.INSTANCE ) ) ),
+                                            longConst ( 0 ),
+                                            longConst ( 1000 ) ),
                             // standard costs
-                            longConst ( 10 )),
-                      SumFeature.createSum (
-                            applyTF ( "cutFormula",
+                            countOccurrencesInSeq, longConst ( 100 ) ) ,
+                            // check for cuts below quantifiers 
+                            SumFeature.createSum ( new Feature [] {
+                                  applyTF ( cutFormula,
                                       ff.cutAllowedBelowQuantifier ),
-                            applyTF ( FocusFormulaProjection.INSTANCE,
-                                      ff.quantifiedClauseSet ),
-                            ifZero ( allowQuantifierSplitting (),
-                                       longConst ( 0 ), longConst ( 100 ) )) ) } ) );
-    }
+                                  applyTF ( FocusFormulaProjection.INSTANCE,
+                                      ff.quantifiedClauseSet ),                                     
+                                  ifZero ( allowQuantifierSplitting (),
+                                       longConst ( 0 ), longConst ( 100 ) ) } ) ) } ) ) ; 
+   }
+
+   private Feature countOccurrences(ProjectionToTerm cutFormula) {
+      TermBuffer sf = new TermBuffer();
+      TermBuffer sub = new TermBuffer();
+
+      Feature countOccurrencesInSeq = 
+              sum(sf, SequentFormulasGenerator.sequent(), 
+                    sum (sub, SubtermGenerator.leftTraverse(cutFormula, any()), // instead of any a condition which stops traversal when depth(cutF) > depth(sub) would be better 
+                          ifZero(applyTF(cutFormula, eq(sub)), longConst(1), longConst(0))));
+      return countOccurrencesInSeq;
+   }
 
     private void setupSplittingApproval(RuleSetDispatchFeature d) {
         bindRuleSet ( d, "beta",
@@ -1320,7 +1351,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                           ff.notContainsExecutable ) ),
                      forEach ( varInst, HeuristicInstantiation.INSTANCE,
                                add ( instantiate ( "t", varInst ),
-                                     branchPrediction ) ) } ) );
+                                     branchPrediction, longConst(10) ) ) } ) );
             final TermBuffer splitInst = new TermBuffer();
             
             
