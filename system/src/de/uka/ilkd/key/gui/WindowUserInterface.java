@@ -121,10 +121,6 @@ public class WindowUserInterface extends AbstractUserInterface {
         mainWindow.setStandardStatusLine();
     }
 
-    public void finish(Proof proof) {
-        // do nothing
-    }
-
     @Override
     public void taskFinished(TaskFinishedInfo info) {
         if (info.getSource() instanceof ApplyStrategy) {

@@ -75,7 +75,8 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
              stratInfo.getProof(),
              info.getTime() + stratInfo.getTime(),
              info.getAppliedRules() + stratInfo.getAppliedRuleApps(),
-             info.getClosedGoals() + stratInfo.getClosedGoals());
+             goals.size() <= info.getGoals().size()
+                 ? (info.getGoals().size() - goals.size()) : 0);
     }
 
     public ProofMacro getMacro() {
