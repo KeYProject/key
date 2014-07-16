@@ -228,7 +228,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         depFilter.addRuleToSet(UseDependencyContractRule.INSTANCE);
         if (depProp.equals(StrategyProperties.DEP_ON)) {
                 depSpecF = ConditionalFeature.createConditional(depFilter,
-                                                                longConst(300));
+                                                                longConst(250));
         } else {
             depSpecF = ConditionalFeature.createConditional(depFilter,
         	    					    inftyConst());
@@ -528,7 +528,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         
         //class axioms
         final String classAxiomPrio = strategyProperties.getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
-        final Feature classAxiomDefaultCost = longConst(-150);
+        final Feature classAxiomDefaultCost = longConst(-250);
         if (StrategyProperties.CLASS_AXIOM_FREE.equals(classAxiomPrio))
             // default as before
             bindRuleSet ( d, "classAxiom", classAxiomDefaultCost );
@@ -1186,7 +1186,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "cnf_setComm",
                       add ( SetsSmallerThanFeature.create(instOf("commRight"), instOf("commLeft"), locSetLDT),
                             NotInScopeOfModalityFeature.INSTANCE,
-                            longConst ( -150 ) ) );
+                            longConst ( -500 ) ) );
 
         bindRuleSet ( d, "elimQuantifier", -1000 );
         bindRuleSet ( d, "elimQuantifierWithCast", 50 );
@@ -1421,7 +1421,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             
         bindRuleSet ( d, "inEqSimp_expand", -4400);
         bindRuleSet ( d, "inEqSimp_directInEquations", -2900);
-        bindRuleSet ( d, "inEqSimp_propagation", -2400 );
+        bindRuleSet ( d, "inEqSimp_propagation", longConst(-2400));
         bindRuleSet ( d, "inEqSimp_pullOutGcd", -2150);
         bindRuleSet ( d, "inEqSimp_saturate", -1900 );
         bindRuleSet ( d, "inEqSimp_forNormalisation", -1000);
@@ -2400,7 +2400,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             depSpecF = ConditionalFeature.createConditional(
         	    		depFilter,
         	    		ifZero(new DependencyContractFeature(),
-        	    		       longConst(400),
+        	    		       longConst(250),
         	    		       inftyConst()));
         } else {
             depSpecF = ConditionalFeature.createConditional(depFilter, 
