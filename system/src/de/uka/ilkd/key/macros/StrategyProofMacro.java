@@ -86,7 +86,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         }
 
         Proof proof = goals.head().proof();
-        IGoalChooser goalChooser = mediator.getProfile().getSelectedGoalChooserBuilder().create();
+        final IGoalChooser goalChooser = mediator.getProfile().getSelectedGoalChooserBuilder().create();
         final ApplyStrategy applyStrategy = new ApplyStrategy(goalChooser);
         final ImmutableList<Goal> ignoredOpenGoals =
                 setDifference(proof.openGoals(), goals);
@@ -126,10 +126,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
             // find the relevant goals
             // and start
             applyStrategy.start(proof, goals);
-            synchronized(applyStrategy) { // wait for applyStrategy to finish it last rule application
-                final ImmutableList<Goal> resultingGoals =
-                        setDifference(proof.openGoals(), ignoredOpenGoals);
-                info = new ProofMacroFinishedInfo(this, resultingGoals);
+            synchronized(applyStrategy) { // wait for applyStrategy to finish its last rule application
                 if(applyStrategy.hasBeenInterrupted()) { // reraise interrupted exception if necessary
                     throw new InterruptedException();
                 }
@@ -148,7 +145,11 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
                     openGoal.setRuleAppManager(manager);
                 }
             }
+            final ImmutableList<Goal> resultingGoals =
+                    setDifference(proof.openGoals(), ignoredOpenGoals);
+            info = new ProofMacroFinishedInfo(this, resultingGoals);
             proof.setActiveStrategy(oldStrategy);
+            doPostProcessing(proof);
             applyStrategy.removeProverTaskObserver(pml);
         }
         return info;

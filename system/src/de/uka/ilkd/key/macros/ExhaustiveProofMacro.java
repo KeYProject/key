@@ -125,12 +125,15 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
             }
             PosInOccurrence applicableAt = applicableOnNodeAtPos.get(goal.node());
             if (applicableAt != null) {
-                final ProverTaskListener cptl =
+                final ProverTaskListener pml =
                         new ProofMacroListener(macro, listener);
-                cptl.taskStarted(getName(), 0);
-                info = macro.applyTo(mediator, ImmutableSLList.<Goal>nil().prepend(goal),
-                                    applicableAt, cptl);
-                cptl.taskFinished(info);
+                pml.taskStarted(getName(), 0);
+                synchronized(getProofMacro()) {
+                    // wait for macro to terminate
+                    info = macro.applyTo(mediator, ImmutableSLList.<Goal>nil().prepend(goal),
+                                         applicableAt, pml);
+                }
+                pml.taskFinished(info);
                 info = new ProofMacroFinishedInfo(this, info);
             }
         }

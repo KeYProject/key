@@ -73,18 +73,19 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
         final ProverTaskListener ptl = mediator.getUI().getListener();
         TaskFinishedInfo info =
                 ProofMacroFinishedInfo.getDefaultInfo(macro, mediator.getSelectedProof());
+        ptl.taskStarted(macro.getName(), 0);
         try {
             synchronized(macro) {
-                ptl.taskStarted(macro.getName(), 0);
                 info = macro.applyTo(mediator, posInOcc, ptl);
             }
-            ptl.taskFinished(info);
         } catch (final InterruptedException exception) {
             Debug.out("Proof macro has been interrupted:");
             Debug.out(exception);
         } catch (final Exception exception) {
             // This should actually never happen.
             ExceptionDialog.showDialog(MainWindow.getInstance(), exception);
+        } finally {
+            ptl.taskFinished(info);
         }
         return null;
     }

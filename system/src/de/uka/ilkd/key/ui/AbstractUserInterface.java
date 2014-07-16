@@ -105,16 +105,17 @@ public abstract class AbstractUserInterface implements UserInterface {
                 getMediator().stopInterface(true);
                 getMediator().setInteractive(false);
                 ptl.taskStarted(getMacro().getName(), 0);
-                info = getMacro().applyTo(getMediator(), null, ptl);
                 synchronized(getMacro()) {
                     // wait for macro to terminate
-                    ptl.taskFinished(info);
-                    getMediator().setInteractive(true);
-                    getMediator().startInterface(true);
+                    info = getMacro().applyTo(getMediator(), null, ptl);
                 }
             } catch(InterruptedException ex) {
                 Debug.out("Proof macro has been interrupted:");
                 Debug.out(ex);
+            } finally {
+                ptl.taskFinished(info);
+                getMediator().setInteractive(true);
+                getMediator().startInterface(true);
             }
             return true;
         } else {

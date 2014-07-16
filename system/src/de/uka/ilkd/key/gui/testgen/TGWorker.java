@@ -102,11 +102,10 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 				}
 				mediator.setProof(proof);
 
+				ptl.taskStarted(macro.getName(), 0);
 				synchronized(macro) {
-			                ptl.taskStarted(macro.getName(), 0);
 			                info = macro.applyTo(mediator, null, ptl);
 				}
-				ptl.taskFinished(info);
 				problems.addAll(SMTProblem.createSMTProblems(mediator
 						.getSelectedProof()));
 				// mediator.getUI().removeProof(mediator.getSelectedProof());
@@ -118,6 +117,10 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 			} catch (final Exception e) {
 				tgInfoDialog.writeln(e.getLocalizedMessage());
 				System.err.println(e);
+			} finally {
+			    ptl.taskFinished(info);
+			    getMediator().setInteractive(true);
+			    getMediator().startInterface(true);
 			}
 		}
 		tgInfoDialog.writeln("\nDone applying semantic blasting.");
