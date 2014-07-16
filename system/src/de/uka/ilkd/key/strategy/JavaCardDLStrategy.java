@@ -1421,7 +1421,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             
         bindRuleSet ( d, "inEqSimp_expand", -4400);
         bindRuleSet ( d, "inEqSimp_directInEquations", -2900);
-        bindRuleSet ( d, "inEqSimp_propagation", -2400 );
+        bindRuleSet ( d, "inEqSimp_propagation", 
+        		add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(-2400) ) );
         bindRuleSet ( d, "inEqSimp_pullOutGcd", -2150);
         bindRuleSet ( d, "inEqSimp_saturate", -1900 );
         bindRuleSet ( d, "inEqSimp_forNormalisation", -1000);
