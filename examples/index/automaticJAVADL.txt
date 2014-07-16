@@ -79,6 +79,8 @@ provable: ./heap/javacard/updateBalance0.key
 provable: ./heap/javacard/updateBalance1.key
 provable: ./heap/javacard/setArray1.key
 provable: ./heap/javacard/setArray2.key
+# For this only "half" of the proof is done (see bug #1475), but it makes sure that the PO with two subproofs is initialisable:
+provable: ./heap/javacard/arrayFillNonAtomic.key
 
 # Other tests:
 provable: ./heap/coincidence_count/project.key

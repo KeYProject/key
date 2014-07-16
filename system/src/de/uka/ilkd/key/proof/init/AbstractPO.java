@@ -357,9 +357,11 @@ public abstract class AbstractPO implements IPersistablePO {
         }
 
         Proof[] proofs = new Proof[poTerms.length];
+        InitConfig ic = getCreatedInitConfigForSingleProof();
         for (int i = 0; i < proofs.length; i++) {
+        	if(i>0) { ic = ic.deepCopy(); }
             proofs[i] = createProof(poNames != null ? poNames[i] : name,
-                                    poTerms[i], getCreatedInitConfigForSingleProof());
+                                    poTerms[i], ic);
             if (taclets != null) {
                 proofs[i].getGoal(proofs[i].root()).indexOfTaclets().addTaclets(
                         taclets);

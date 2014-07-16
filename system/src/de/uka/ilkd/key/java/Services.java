@@ -119,61 +119,61 @@ public class Services implements TermServices {
     
     private final TermBuilder termBuilder;
 
-   /**
+    /**
      * creates a new Services object with a new TypeConverter and a new
      * JavaInfo object with no information stored at none of these.
      */
     public Services(Profile profile, KeYExceptionHandler exceptionHandler){
-       assert profile != null;
-       this.profile = profile;
-       this.counters = new LinkedHashMap<String, Counter>();
-       this.caches = new ServiceCaches();
-       this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
-       this.specRepos = new SpecificationRepository(this);
-	cee = new ConstantExpressionEvaluator(this);
-        typeconverter = new TypeConverter(this);
-	if(exceptionHandler == null){
-	    this.exceptionHandler = new KeYRecoderExcHandler();
-	}else{
-	    this.exceptionHandler = exceptionHandler;
-	}
-        javainfo = new JavaInfo
-        	(new KeYProgModelInfo(this, typeconverter, this.exceptionHandler), this);
-        nameRecorder = new NameRecorder();
+    	assert profile != null;
+    	this.profile = profile;
+    	this.counters = new LinkedHashMap<String, Counter>();
+    	this.caches = new ServiceCaches();
+    	this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
+    	this.specRepos = new SpecificationRepository(this);
+    	cee = new ConstantExpressionEvaluator(this);
+    	typeconverter = new TypeConverter(this);
+    	if(exceptionHandler == null){
+    		this.exceptionHandler = new KeYRecoderExcHandler();
+    	}else{
+    		this.exceptionHandler = exceptionHandler;
+    	}
+    	javainfo = new JavaInfo
+    			(new KeYProgModelInfo(this, typeconverter, this.exceptionHandler), this);
+    	nameRecorder = new NameRecorder();
     }
-    
+
     // ONLY for tests
     public Services(Profile profile) {
-	this(profile, null);
+    	this(profile, null);
     }    
-    
+
 
     private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc, KeYRecoderMapping rec2key, 
-		     HashMap<String, Counter> counters, ServiceCaches caches) {
-   assert profile != null;
-   assert counters != null;
-   assert caches != null;
+    		HashMap<String, Counter> counters, ServiceCaches caches) {
+    	assert profile != null;
+    	assert counters != null;
+    	assert caches != null;
 
-   this.profile = profile;
-   this.counters = counters;
-   this.caches = caches;
-   this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
-   this.specRepos = new SpecificationRepository(this);
-	cee = new ConstantExpressionEvaluator(this);
-	typeconverter = new TypeConverter(this);
-	javainfo = new JavaInfo
-	    (new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
-	nameRecorder = new NameRecorder();
+    	this.profile = profile;
+    	this.counters = counters;
+    	this.caches = caches;
+    	this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
+    	this.specRepos = new SpecificationRepository(this);
+    	cee = new ConstantExpressionEvaluator(this);
+    	typeconverter = new TypeConverter(this);
+    	javainfo = new JavaInfo
+    			(new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
+    	nameRecorder = new NameRecorder();
     }
 
-    
+
     public KeYExceptionHandler getExceptionHandler(){
-	return exceptionHandler;
+    	return exceptionHandler;
     }
-    
+
 
     public void setExceptionHandler(KeYExceptionHandler keh){
-	exceptionHandler = keh;
+    	exceptionHandler = keh;
     }
 
     
@@ -181,12 +181,12 @@ public class Services implements TermServices {
      * Returns the TypeConverter associated with this Services object.
      */
     public TypeConverter getTypeConverter(){
-        return typeconverter;
+    	return typeconverter;
     }
 
-    
+
     private void setTypeConverter(TypeConverter tc) {
-	typeconverter = tc;
+    	typeconverter = tc;
     }
 
     
@@ -253,21 +253,21 @@ public class Services implements TermServices {
      * @return The created copy.
      */
     public Services copy(Profile profile, boolean shareCaches) {
-	Debug.assertTrue
-	    (!(getJavaInfo().getKeYProgModelInfo().getServConf() 
-	       instanceof SchemaCrossReferenceServiceConfiguration),
-	     "services: tried to copy schema cross reference service config.");
-	ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
-	Services s = new Services
-	    (profile, getJavaInfo().getKeYProgModelInfo().getServConf(), getJavaInfo().getKeYProgModelInfo().rec2key().copy(),
-	     copyCounters(), newCaches);
-        s.specRepos = specRepos;
-	s.setTypeConverter(getTypeConverter().copy(s));
-	s.setExceptionHandler(getExceptionHandler());
-	s.setNamespaces(namespaces.copy());
-        nameRecorder = nameRecorder.copy();
-        s.setJavaModel(getJavaModel());
-	return s;
+    	Debug.assertTrue
+    	(!(getJavaInfo().getKeYProgModelInfo().getServConf() 
+    			instanceof SchemaCrossReferenceServiceConfiguration),
+    			"services: tried to copy schema cross reference service config.");
+    	ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
+    	Services s = new Services
+    			(profile, getJavaInfo().getKeYProgModelInfo().getServConf(), getJavaInfo().getKeYProgModelInfo().rec2key().copy(),
+    					copyCounters(), newCaches);
+    	s.specRepos = specRepos;
+    	s.setTypeConverter(getTypeConverter().copy(s));
+    	s.setExceptionHandler(getExceptionHandler());
+    	s.setNamespaces(namespaces.copy());
+    	nameRecorder = nameRecorder.copy();
+    	s.setJavaModel(getJavaModel());
+    	return s;
     }
     
     /**
@@ -288,17 +288,17 @@ public class Services implements TermServices {
      * as the actual one
      */
     public Services copyPreservesLDTInformation() {
-	Debug.assertTrue
-	    (!(javainfo.getKeYProgModelInfo().getServConf() 
-	       instanceof SchemaCrossReferenceServiceConfiguration),
-	     "services: tried to copy schema cross reference service config.");
-	Services s = new Services(getProfile(), getExceptionHandler());
-	s.setTypeConverter(getTypeConverter().copy(s));
-	s.setNamespaces(namespaces.copy());
-        nameRecorder = nameRecorder.copy();
-        s.setJavaModel(getJavaModel());
+    	Debug.assertTrue
+    	(!(javainfo.getKeYProgModelInfo().getServConf() 
+    			instanceof SchemaCrossReferenceServiceConfiguration),
+    			"services: tried to copy schema cross reference service config.");
+    	Services s = new Services(getProfile(), getExceptionHandler());
+    	s.setTypeConverter(getTypeConverter().copy(s));
+    	s.setNamespaces(namespaces.copy());
+    	nameRecorder = nameRecorder.copy();
+    	s.setJavaModel(getJavaModel());
 
-	return s;
+    	return s;
     }
     
     
