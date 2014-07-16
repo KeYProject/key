@@ -57,11 +57,14 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
         setMaxSteps(mediator);
         int steps = getNumberSteps();
         while (getNumberSteps() > 0 && getCondition() && canApplyTo(mediator, goals, posInOcc)) {
-            final ProverTaskListener cptl =
+            final ProverTaskListener pml =
                     new ProofMacroListener(this, listener);
-            cptl.taskStarted(getProofMacro().getName(), 0);
-            info = getProofMacro().applyTo(mediator, goals, posInOcc, cptl);
-            cptl.taskFinished(info);
+            pml.taskStarted(getProofMacro().getName(), 0);
+            synchronized(getProofMacro()) {
+                // wait for macro to terminate
+                info = getProofMacro().applyTo(mediator, goals, posInOcc, pml);
+            }
+            pml.taskFinished(info);
             steps -= info.getAppliedRules();
             setNumberSteps(steps);
             info = new ProofMacroFinishedInfo(this, info);
@@ -69,12 +72,15 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
             posInOcc = null;
         }
         if (steps > 0 && getAltProofMacro().canApplyTo(mediator, goals, posInOcc)) {
-            final ProverTaskListener cptl =
+            final ProverTaskListener pml =
                     new ProofMacroListener(this, listener);
-            cptl.taskStarted(getAltProofMacro().getName(), 0);
-            info = getAltProofMacro().applyTo(mediator, goals, posInOcc, cptl);
-            info = new ProofMacroFinishedInfo(this, info);
-            cptl.taskFinished(info);
+            pml.taskStarted(getAltProofMacro().getName(), 0);
+            info = getAltProofMacro().applyTo(mediator, goals, posInOcc, pml);
+            synchronized(getAltProofMacro()) {
+                // wait for macro to terminate
+                info = new ProofMacroFinishedInfo(this, info);
+            }
+            pml.taskFinished(info);
         }
         return info;
     }

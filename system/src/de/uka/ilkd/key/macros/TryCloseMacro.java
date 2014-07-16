@@ -133,28 +133,28 @@ public class TryCloseMacro extends AbstractProofMacro {
         try {
             for (Goal goal : goals) {
                 Node node = goal.node();
-                ApplyStrategyInfo result = applyStrategy.start(proof, goal);
+                final ApplyStrategyInfo result = applyStrategy.start(proof, goal);
                 final Goal closedGoal;
 
                 // retreat if not closed
                 if(!node.isClosed()) {
+                    // FIXME: Goals might be incorrect
                     proof.pruneProof(node);
-                    synchronized (proof) {
-                        closedGoal = null;
-                    }
+                    closedGoal = null;
                 } else {
                     closedGoal = goal;
                 }
-                synchronized(applyStrategy) { // wait for applyStrategy to finish its last rule application
+
+                synchronized(applyStrategy) { // wait for applyStrategy to finish it last rule application
                     // update statistics
                     if (closedGoal == null) {
                         info = new ProofMacroFinishedInfo(info, result);
                     } else {
                         info = new ProofMacroFinishedInfo(info, result, info.getGoals().removeFirst(goal));
                     }
-                   if(applyStrategy.hasBeenInterrupted()) { // only now reraise the interruption exception
-                      throw new InterruptedException();
-                   }
+                    if(applyStrategy.hasBeenInterrupted()) { // only now reraise the interruption exception
+                        throw new InterruptedException();
+                    }
                 }
             }
         } finally {

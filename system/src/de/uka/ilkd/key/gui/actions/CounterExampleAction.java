@@ -135,15 +135,16 @@ public class CounterExampleAction extends MainWindowAction {
             final SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
             TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
             final ProverTaskListener ptl = mediator.getUI().getListener();
+            ptl.taskStarted(macro.getName(), 0);
 
             try {
-                ptl.taskStarted(macro.getName(), 0);
-                info = macro.applyTo(mediator, null, ptl);
+                synchronized(macro) {
+                    // wait for macro to terminate
+                    info = macro.applyTo(mediator, null, ptl);
+                }
             } catch (InterruptedException e) {
                 Debug.out("Semantics blasting interrupted");
-            }
-            synchronized(macro) {
-                // wait for macro to terminate
+            } finally {
                 ptl.taskFinished(info);
                 getMediator().setInteractive(true);
                 getMediator().startInterface(true);

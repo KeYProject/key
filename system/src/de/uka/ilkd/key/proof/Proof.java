@@ -688,16 +688,18 @@ public class Proof implements Named {
      * Since the class has influence on the internal state of the proof it should not be
      * moved to a new file, in order to restrict the access to it.
      */
-    private class ProofPruner{
+    private class ProofPruner {
         private Node firstLeaf = null;
 
-        public ImmutableList<Node> prune(final Node cuttingPoint){
+        public ImmutableList<Node> prune(final Node cuttingPoint) {
 
-            // there is only one leaf containing a open goal that is interesting for pruning the sub-tree of <code>node</code>,
-            // namely the first leave that is found by a breadth first search.
-            // The other leaves containing open goals are only important for removing the open goals from the open goal list.
-            // To that end those leaves are stored in residualLeaves. For increasing the performance a tree structure has been
-            // chosen, because it offers the operation <code>contains</code> in O(log n).
+            // there is only one leaf containing an open goal that is interesting for pruning the
+            // sub-tree of <code>node</code>, namely the first leave that is found by a breadth first search.
+            // The other leaves containing open goals are only important for removing the open goals
+            // from the open goal list.
+            // To that end, those leaves are stored in residualLeaves. For increasing the performance,
+            // a tree structure has been chosen, because it offers the operation
+            // <code>contains</code> in O(log n).
             final Set<Node> residualLeaves = new TreeSet<Node>(new Comparator<Node>() {
                 @Override
                 public int compare(Node o1, Node o2) {
@@ -706,16 +708,16 @@ public class Proof implements Named {
             });
 
 
-            // First, make a breadth first search, in order to find the leaf with the shortest distance to the cutting point
-            // and to remove the rule applications from the proof management system.
+            // First, make a breadth first search, in order to find the leaf with the shortest distance
+            // to the cutting point and to remove the rule applications from the proof management system.
             // Furthermore store the residual leaves.
             breadthFirstSearch(cuttingPoint, new ProofVisitor() {
                 @Override
                 public void visit(Proof proof, Node visitedNode) {
                     if(visitedNode.leaf() && !visitedNode.isClosed()){
-                        if(firstLeaf == null){
+                        if(firstLeaf == null) {
                             firstLeaf = visitedNode;
-                        }else{
+                        } else {
                             residualLeaves.add(visitedNode);
                         }
 
@@ -723,7 +725,7 @@ public class Proof implements Named {
 
                     if (initConfig != null && visitedNode.parent() != null) {
                         Proof.this.mgt().ruleUnApplied(visitedNode.parent().getAppliedRuleApp());
-                        for (final NoPosTacletApp app :  visitedNode.parent().getLocalIntroducedRules()){
+                        for (final NoPosTacletApp app :  visitedNode.parent().getLocalIntroducedRules()) {
                             initConfig.getJustifInfo().removeJustificationFor(app.taclet());
                         }
 
@@ -735,8 +737,8 @@ public class Proof implements Named {
             final Goal firstGoal = getGoal(firstLeaf);
             assert firstGoal != null;
 
-            // Go from the first leaf that has been found to the cutting point. For each node on the path remove
-            // the local rules from firstGoal that have been added by the considered node.
+            // Go from the first leaf that has been found to the cutting point. For each node on the path,
+            // remove the local rules from firstGoal that have been added by the considered node.
             traverseFromChildToParent(firstLeaf,cuttingPoint,new ProofVisitor() {
 
                 @Override
@@ -770,7 +772,7 @@ public class Proof implements Named {
 
         }
 
-        private void refreshGoal(Goal goal, Node node){
+        private void refreshGoal(Goal goal, Node node) {
             goal.setGlobalProgVars(node.getGlobalProgVars());
             goal.getRuleAppManager().clearCache();
             goal.ruleAppIndex().clearIndexes();
@@ -778,7 +780,7 @@ public class Proof implements Named {
             node.clearNameCache();
         }
 
-        private void removeOpenGoals(Collection<Node> toBeRemoved){
+        private void removeOpenGoals(Collection<Node> toBeRemoved) {
             ImmutableList<Goal> newGoalList = ImmutableSLList.nil();
             for(Goal openGoal : openGoals){
                 if(!toBeRemoved.contains(openGoal.node())){
@@ -789,7 +791,7 @@ public class Proof implements Named {
         }
 
 
-        private ImmutableList<Node> cut(Node node){
+        private ImmutableList<Node> cut(Node node) {
             ImmutableList<Node> children = ImmutableSLList.nil();
             Iterator<Node> it = node.childrenIterator();
 
@@ -805,7 +807,7 @@ public class Proof implements Named {
 
     }
 
-    public void pruneProof(Goal goal){
+    public synchronized void pruneProof(Goal goal) {
         if(goal.node().parent()!= null){
             pruneProof(goal.node().parent());
         }
@@ -813,28 +815,28 @@ public class Proof implements Named {
 
     /**
      * Prunes the subtree beneath the node <code>cuttingPoint</code>, i.e. the node
-     * <code>cuttingPoint</code> remains as the last node on the branch. As a result a
-     * open goal is associated with this node.
+     * <code>cuttingPoint</code> remains as the last node on the branch. As a result,
+     * an open goal is associated with this node.
      * @param cuttingPoint
      * @return Returns the sub trees that has been pruned.
      */
 
-    public ImmutableList<Node> pruneProof(Node cuttingPoint){
+    public synchronized ImmutableList<Node> pruneProof(Node cuttingPoint) {
         return pruneProof(cuttingPoint,true);
     }
 
-    public ImmutableList<Node> pruneProof(Node cuttingPoint,boolean fireChanges){
+    public synchronized ImmutableList<Node> pruneProof(Node cuttingPoint, boolean fireChanges) {
         assert cuttingPoint.proof() == this;
-        if(getGoal(cuttingPoint)!= null || cuttingPoint.isClosed()){
+        if(getGoal(cuttingPoint) != null || cuttingPoint.isClosed()){
             return null;
         }
 
         ProofPruner pruner = new ProofPruner();
-        if(fireChanges){
+        if (fireChanges) {
             fireProofIsBeingPruned(cuttingPoint);
         }
         ImmutableList<Node> result = pruner.prune(cuttingPoint);
-        if(fireChanges){
+        if (fireChanges) {
             fireProofGoalsChanged();
             fireProofPruned(cuttingPoint);
         }
@@ -846,7 +848,7 @@ public class Proof implements Named {
      *  <code>startNode</code>. The visited notes are reported to the object <code>visitor</code>.
      *  The first reported node is <code>startNode</code>.
      */
-    public void breadthFirstSearch(Node startNode, ProofVisitor visitor){
+    public void breadthFirstSearch(Node startNode, ProofVisitor visitor) {
         ArrayDeque<Node> queue = new ArrayDeque<Node>();
         queue.add(startNode);
         while(!queue.isEmpty()){
@@ -859,7 +861,7 @@ public class Proof implements Named {
         }
     }
 
-    public void traverseFromChildToParent(Node child, Node parent, ProofVisitor visitor){
+    public void traverseFromChildToParent(Node child, Node parent, ProofVisitor visitor) {
         do{
             visitor.visit(this, child);
             child = child.parent();
@@ -1183,7 +1185,9 @@ public class Proof implements Named {
                     } else if (ruleApp instanceof TacletApp) {
                         final de.uka.ilkd.key.rule.Taclet t = ((TacletApp)ruleApp).taclet();
                         final String tName = t.name().toString();
-                        if (tName.startsWith("allLeft") || tName.startsWith("exRight") || tName.startsWith("inst")) {
+                        if (tName.startsWith("allLeft")
+                                || tName.startsWith("exRight")
+                                || tName.startsWith("inst")) {
                             tmpQuant++;
                         }
                     }
@@ -1235,7 +1239,8 @@ public class Proof implements Named {
             }
 
             summaryList.add(new Pair<String, String>("Rule applications", ""));
-            summaryList.add(new Pair<String, String>("Quantifier instantiations", ""+quantifierInstantiations));
+            summaryList.add(new Pair<String, String>("Quantifier instantiations",
+                                                     ""+quantifierInstantiations));
             summaryList.add(new Pair<String, String>("One-step Simplifier apps", "" +
                             ossApps));
             summaryList.add(new Pair<String, String>("SMT solver apps", "" +

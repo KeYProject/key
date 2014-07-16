@@ -86,11 +86,14 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         for (ProofMacro macro : getProofMacros()) {
             if(macro.canApplyTo(mediator, goals, posInOcc)) {
-                final ProverTaskListener cptl =
+                final ProverTaskListener pml =
                         new ProofMacroListener(macro, listener);
-                cptl.taskStarted(macro.getName(), 0);
-                info = macro.applyTo(mediator, goals, posInOcc, cptl);
-                cptl.taskFinished(info);
+                pml.taskStarted(macro.getName(), 0);
+                synchronized(macro) {
+                    // wait for macro to terminate
+                    info = macro.applyTo(mediator, goals, posInOcc, pml);
+                }
+                pml.taskFinished(info);
                 // change source to this macro ... [TODO]
                 info = new ProofMacroFinishedInfo(this, info);
                 return info;
