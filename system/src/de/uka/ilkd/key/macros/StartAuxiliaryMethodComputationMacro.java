@@ -23,9 +23,6 @@ import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.ui.UserInterface;
 
-import javax.swing.KeyStroke;
-
-
 /**
  *
  * @author christoph
@@ -99,7 +96,10 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro {
                                         goals.head(), proof.getServices());
         final UserInterface ui = mediator.getUI();
         try {
-            Proof p = ui.createProof(initConfig, symbExecPO);
+            final Proof p;
+            synchronized (symbExecPO) {
+                p = ui.createProof(initConfig, symbExecPO);
+            }
             p.unionIFSymbols(proof.getIFSymbols());
             // stop interface again, because it is activated by the proof
             // change through startProver; the ProofMacroWorker will activate
@@ -111,11 +111,5 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro {
             ExceptionDialog.showDialog(MainWindow.getInstance(), exc);
         }
         return info;
-    }
-
-
-    @Override
-    public KeyStroke getKeyStroke() {
-        return null; // default implementation
     }
 }

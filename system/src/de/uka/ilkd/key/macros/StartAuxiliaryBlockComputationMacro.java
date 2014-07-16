@@ -25,8 +25,6 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.ui.UserInterface;
 
-import javax.swing.KeyStroke;
-
 
 /**
  *
@@ -118,7 +116,10 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro {
                                      proof.getServices());
         final UserInterface ui = mediator.getUI();
         try {
-            Proof p = ui.createProof(initConfig, blockExecPO);
+            final Proof p;
+            synchronized (blockExecPO) {
+                p = ui.createProof(initConfig, blockExecPO);
+            }
             p.unionIFSymbols(proof.getIFSymbols());
             // stop interface again, because it is activated by the proof
             // change through startProver; the ProofMacroWorker will activate
@@ -130,11 +131,5 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro {
             ExceptionDialog.showDialog(MainWindow.getInstance(), exc);
         }
         return info;
-    }
-
-
-    @Override
-    public KeyStroke getKeyStroke() {
-        return null; // default implementation
     }
 }

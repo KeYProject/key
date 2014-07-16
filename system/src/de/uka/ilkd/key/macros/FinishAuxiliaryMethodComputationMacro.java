@@ -21,8 +21,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.MethodInfFlowUnfoldTacletBuilder;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.util.GuiUtilities;
-import javax.swing.KeyStroke;
-
 
 /**
  *
@@ -47,7 +45,6 @@ public class FinishAuxiliaryMethodComputationMacro
                 services.getSpecificationRepository().getProofOblInput(proof);
         return poForProof instanceof SymbolicExecutionPO;
     }
-
 
     @Override
     public ProofMacroFinishedInfo applyTo(final KeYMediator mediator,
@@ -102,11 +99,5 @@ public class FinishAuxiliaryMethodComputationMacro
             }
         });
         return new ProofMacroFinishedInfo(this, initiatingGoal);
-    }
-
-
-    @Override
-    public KeyStroke getKeyStroke() {
-        return null; // default implementation
     }
 }

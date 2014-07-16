@@ -45,16 +45,9 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
                     Integer.getInteger("key.autopilot.closesteps", 1000);
 
             @Override
-            public String getName() {
-                return "Auxiliary Computation Auto Pilot";
-            }
-
+            public String getName() { return ""; }
             @Override
-            public String getDescription() {
-                return "<html><ol><li>Start auxiliary computation" +
-                       "<li>Finish symbolic execution" +
-                       "<li>Try to close as many goals as possible</ol>";
-            }
+            public String getDescription() { return "Anonymous Macro"; }
 
             @Override
             protected ProofMacro[] createProofMacroArray() {
@@ -63,28 +56,19 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
                 // own (anonymous) SequentialProofMacro.
                 SequentialProofMacro finishSymbExecAndTryToClose =
                         new SequentialProofMacro() {
-
                     @Override
                     protected ProofMacro[] createProofMacroArray() {
-                        return new ProofMacro[]{
-                            new FinishSymbolicExecutionMacro(),
-                            new TryCloseMacro(NUMBER_OF_TRY_STEPS)
-                        };
+                        return new ProofMacro[]{ new FinishSymbolicExecutionMacro(),
+                                                 new TryCloseMacro(NUMBER_OF_TRY_STEPS)};
                     }
-
                     @Override
-                    public String getName() {
-                        return "Anonymous Macro";
-                    }
-
+                    public String getName() { return ""; }
                     @Override
-                    public String getDescription() {
-                        return "Anonymous Macro";
-                    }
+                    public String getDescription() { return "Anonymous Macro"; }
                 };
-                return new ProofMacro[]{
-                    new StartAuxiliaryComputationMacro(),
-                    finishSymbExecAndTryToClose};
+
+                return new ProofMacro[]{ new StartAuxiliaryComputationMacro(),
+                                         finishSymbExecAndTryToClose };
             }
         };
     }

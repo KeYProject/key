@@ -72,12 +72,12 @@ public class InfFlowContractPO extends AbstractOperationPO
         assert proofConfig == null;
 
         proofConfig = environmentConfig.deepCopy();
-        environmentServices = proofConfig.getServices();
+        Services proofServices = proofConfig.getServices();
 
         // create proof obligation
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
-                                                   ifVars.c2, environmentServices);
+                                                   ifVars.c2, proofServices);
         final Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
         final Term post =

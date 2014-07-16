@@ -18,7 +18,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.LoopInfFlowUnfoldTacletBuilder;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.GuiUtilities;
-import javax.swing.KeyStroke;
 
 public class FinishAuxiliaryLoopComputationMacro extends
         AbstractFinishAuxiliaryComputationMacro {
@@ -105,10 +104,5 @@ public class FinishAuxiliaryLoopComputationMacro extends
             }
         });
         return new ProofMacroFinishedInfo(this, initiatingGoal);
-    }
-
-    @Override
-    public KeyStroke getKeyStroke() {
-        return null; // default implementation
     }
 }
