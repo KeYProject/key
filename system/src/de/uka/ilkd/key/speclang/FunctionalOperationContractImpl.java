@@ -1178,7 +1178,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
                 if(atPreVars.get(h) != null && originalAtPreVar != null) {
-                    map.put(TB.var(originalAtPreVar), TB.var(atPreVars.get(h)));
+                    map.put(TB.var(atPre ? h : originalAtPreVar), TB.var(atPreVars.get(h)));
                 }
             }
         }
