@@ -6,7 +6,7 @@
             <statement name="i=i+1;" pathCondition="true" pathConditionChanged="false">
                <statement name="i--;" pathCondition="true" pathConditionChanged="false">
                   <statement name="return i;" pathCondition="true" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of lost&gt;" signature="&lt;return of LabelTest.lost();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of lost&gt;" signature="&lt;return of LabelTest.lost();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                         <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>

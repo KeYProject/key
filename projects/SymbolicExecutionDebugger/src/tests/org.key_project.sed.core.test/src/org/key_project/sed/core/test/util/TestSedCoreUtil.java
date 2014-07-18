@@ -14,6 +14,8 @@
 package org.key_project.sed.core.test.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.util.Arrays;
@@ -1383,6 +1385,35 @@ public final class TestSedCoreUtil {
                                            boolean compareCallStack) throws DebugException {
       compareStackFrame(expected, current, compareVariables);
       compareNode(expected, current, compareReferences, compareId, compareVariables, compareCallStack);
+      compareMethodReturnConditions(expected.getMethodReturnConditions(), current.getMethodReturnConditions(), compareReferences, compareId, compareVariables, compareCallStack);
+   }
+
+   /**
+    * Compares the given method return conditions.
+    * @param expected The expected conditions.
+    * @param current The current conditions.
+    * @param compareReferences Compare also the containment hierarchy?
+    * @param compareId Compare the value of {@link ISEDDebugElement#getId()}?
+    * @param compareVariables Compare variables?
+    * @param compareCallStack Compare call stack?
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void compareMethodReturnConditions(ISEDBranchCondition[] expected, 
+                                                       ISEDBranchCondition[] current, 
+                                                       boolean compareReferences, 
+                                                       boolean compareId, 
+                                                       boolean compareVariables, 
+                                                       boolean compareCallStack) throws DebugException {
+      if (expected != null) {
+         assertNotNull(current);
+         assertEquals(expected.length, current.length);
+         for (int i = 0; i < expected.length; i++) {
+            compareBranchCondition(expected[i], current[i], false, compareId, compareVariables, compareCallStack);
+         }
+      }
+      else {
+         assertNull(current);
+      }
    }
 
    /**
@@ -1480,6 +1511,7 @@ public final class TestSedCoreUtil {
                                              boolean compareVariables,
                                              boolean compareCallStack) throws DebugException {
       compareStackFrame(expected, current, compareVariables);
+      compareNode(expected.getMethodReturnCondition(), current.getMethodReturnCondition(), false, compareId, compareVariables, compareCallStack);
       compareNode(expected, current, compareReferences, compareId, compareVariables, compareCallStack);
    }
 

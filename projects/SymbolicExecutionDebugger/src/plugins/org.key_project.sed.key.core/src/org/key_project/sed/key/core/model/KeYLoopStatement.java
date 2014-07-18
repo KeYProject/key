@@ -83,6 +83,7 @@ public class KeYLoopStatement extends AbstractSEDLoopStatement implements IKeYSE
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      target.registerDebugNode(this);
       initializeAnnotations();
    }
 

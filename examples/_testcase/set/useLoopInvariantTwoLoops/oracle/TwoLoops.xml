@@ -14,7 +14,7 @@ mod: false" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" i
                </branchCondition>
                <branchCondition name="equals(x_0,Z(0(#)))" pathCondition="and(geq(x,Z(0(#))),equals(x_0,Z(0(#))))" pathConditionChanged="true" branchCondition="equals(x_0,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
                   <statement name="return x;" pathCondition="and(geq(x,Z(0(#))),equals(x_0,Z(0(#))))" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of TwoLoops.main(x);&gt;" pathCondition="and(geq(x,Z(0(#))),equals(x_0,Z(0(#))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(0(#)) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(0(#)) as result of TwoLoops.main(x);&gt;" isReturnValueComputed="true">
+                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of TwoLoops.main(x);&gt;" pathCondition="and(geq(x,Z(0(#))),equals(x_0,Z(0(#))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(0(#)) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(0(#)) as result of TwoLoops.main(x);&gt;" isReturnValueComputed="true" methodReturnCondition="and(geq(x,Z(0(#))),equals(x_0,Z(0(#))))">
                         <methodReturnValue name="Z(0(#))" returnValueString="Z(0(#))" hasCondition="false">
                         </methodReturnValue>
                         <termination name="&lt;end&gt;" pathCondition="and(geq(x,Z(0(#))),equals(x_0,Z(0(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
@@ -37,7 +37,7 @@ mod: false" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initially
                   </branchCondition>
                   <branchCondition name="equals(x_4,Z(0(#)))" pathCondition="and(leq(x,Z(neglit(1(#)))),equals(x_4,Z(0(#))))" pathConditionChanged="true" branchCondition="equals(x_4,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
                      <statement name="return x;" pathCondition="and(leq(x,Z(neglit(1(#)))),equals(x_4,Z(0(#))))" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of main&gt;" signature="&lt;return of TwoLoops.main(x);&gt;" pathCondition="and(leq(x,Z(neglit(1(#)))),equals(x_4,Z(0(#))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(0(#)) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(0(#)) as result of TwoLoops.main(x);&gt;" isReturnValueComputed="true">
+                        <methodReturn name="&lt;return of main&gt;" signature="&lt;return of TwoLoops.main(x);&gt;" pathCondition="and(leq(x,Z(neglit(1(#)))),equals(x_4,Z(0(#))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(0(#)) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(0(#)) as result of TwoLoops.main(x);&gt;" isReturnValueComputed="true" methodReturnCondition="and(leq(x,Z(neglit(1(#)))),equals(x_4,Z(0(#))))">
                            <methodReturnValue name="Z(0(#))" returnValueString="Z(0(#))" hasCondition="false">
                            </methodReturnValue>
                            <termination name="&lt;end&gt;" pathCondition="and(leq(x,Z(neglit(1(#)))),equals(x_4,Z(0(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">

@@ -3,14 +3,14 @@
    <methodCall name="MethodCallOnObject.main();" pathCondition="true" pathConditionChanged="false">
       <statement name="MethodCallOnObject x = new MethodCallOnObject ();" pathCondition="true" pathConditionChanged="false">
          <methodCall name="MethodCallOnObject();" pathCondition="true" pathConditionChanged="false">
-            <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of MethodCallOnObject();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of MethodCallOnObject();&gt;" isReturnValueComputed="true">
+            <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of MethodCallOnObject();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of MethodCallOnObject();&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                <statement name="return x.doSomething();" pathCondition="true" pathConditionChanged="false">
                   <methodCall name="x.doSomething();" pathCondition="true" pathConditionChanged="false">
                      <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of doSomething&gt;" signature="&lt;return of x.doSomething();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of doSomething&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of x.doSomething();&gt;" isReturnValueComputed="true">
+                        <methodReturn name="&lt;return of doSomething&gt;" signature="&lt;return of x.doSomething();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of doSomething&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of x.doSomething();&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                            <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                            </methodReturnValue>
-                           <methodReturn name="&lt;return of main&gt;" signature="&lt;return of MethodCallOnObject.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodCallOnObject.main();&gt;" isReturnValueComputed="true">
+                           <methodReturn name="&lt;return of main&gt;" signature="&lt;return of MethodCallOnObject.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of MethodCallOnObject.main();&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                               <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                               </methodReturnValue>
                               <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">

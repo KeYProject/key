@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
+import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDMethodCall;
@@ -74,6 +75,11 @@ public class SEDMemoryMethodCall extends AbstractSEDMethodCall implements ISEDMe
     * The method call stack.
     */
    private ISEDDebugNode[] callStack;
+
+   /**
+    * The up to know discovered method return conditions.
+    */
+   private final List<ISEDBranchCondition> methodReturnConditions = new LinkedList<ISEDBranchCondition>();
    
    /**
     * Constructor.
@@ -277,5 +283,23 @@ public class SEDMemoryMethodCall extends AbstractSEDMethodCall implements ISEDMe
    @Override
    public void setCallStack(ISEDDebugNode[] callStack) {
       this.callStack = callStack;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDBranchCondition[] getMethodReturnConditions()throws DebugException {
+      return methodReturnConditions.toArray(new ISEDBranchCondition[methodReturnConditions.size()]);
+   }
+   
+   /**
+    * Adds a new method return condition.
+    * @param methodReturnCondition The method return condition to add.
+    */
+   public void addMethodReturnCondition(ISEDBranchCondition methodReturnCondition) {
+      if (methodReturnCondition != null) {
+         methodReturnConditions.add(methodReturnCondition);
+      }
    }
 }

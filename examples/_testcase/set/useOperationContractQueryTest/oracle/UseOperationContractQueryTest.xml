@@ -9,7 +9,7 @@ post: result_0 = javaMulInt(value, 2) &amp; exc_0 = null
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <callStackEntry path="/0"/>
-            <methodReturn name="&lt;return of main&gt;" signature="&lt;return of UseOperationContractQueryTest.main(value);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+            <methodReturn name="&lt;return of main&gt;" signature="&lt;return of UseOperationContractQueryTest.main(value);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                <callStackEntry path="/0"/>
                <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                </termination>

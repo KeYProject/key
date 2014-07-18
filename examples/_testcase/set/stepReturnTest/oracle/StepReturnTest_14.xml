@@ -11,7 +11,7 @@
                            <methodCall name="self.fourthLevel(a_4);" pathCondition="true" pathConditionChanged="false">
                               <statement name="throw new Exception ();" pathCondition="true" pathConditionChanged="false">
                                  <statement name="a_2=a_2*2;" pathCondition="true" pathConditionChanged="false">
-                                    <methodReturn name="&lt;return of secondLevel&gt;" signature="&lt;return of self.secondLevel(a_2);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                    <methodReturn name="&lt;return of secondLevel&gt;" signature="&lt;return of self.secondLevel(a_2);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                        <statement name="secondLevel(a_1);" pathCondition="true" pathConditionChanged="false">
                                           <methodCall name="self.secondLevel(a_5);" pathCondition="true" pathConditionChanged="false">
                                              <statement name="thirdLevel(a_5);" pathCondition="true" pathConditionChanged="false">
@@ -20,8 +20,8 @@
                                                       <methodCall name="self.fourthLevel(a_7);" pathCondition="true" pathConditionChanged="false">
                                                          <statement name="throw new Exception ();" pathCondition="true" pathConditionChanged="false">
                                                             <statement name="a_5=a_5*2;" pathCondition="true" pathConditionChanged="false">
-                                                               <methodReturn name="&lt;return of secondLevel&gt;" signature="&lt;return of self.secondLevel(a_5);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                                  <methodReturn name="&lt;return of firstLevel&gt;" signature="&lt;return of self.firstLevel(a_1);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                               <methodReturn name="&lt;return of secondLevel&gt;" signature="&lt;return of self.secondLevel(a_5);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                                                  <methodReturn name="&lt;return of firstLevel&gt;" signature="&lt;return of self.firstLevel(a_1);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                                      <statement name="firstLevel(a);" pathCondition="true" pathConditionChanged="false">
                                                                         <methodCall name="self.firstLevel(a_8);" pathCondition="true" pathConditionChanged="false">
                                                                            <statement name="secondLevel(a_8);" pathCondition="true" pathConditionChanged="false">
@@ -32,7 +32,7 @@
                                                                                           <methodCall name="self.fourthLevel(a_11);" pathCondition="true" pathConditionChanged="false">
                                                                                              <statement name="throw new Exception ();" pathCondition="true" pathConditionChanged="false">
                                                                                                 <statement name="a_9=a_9*2;" pathCondition="true" pathConditionChanged="false">
-                                                                                                   <methodReturn name="&lt;return of secondLevel&gt;" signature="&lt;return of self.secondLevel(a_9);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                                                                   <methodReturn name="&lt;return of secondLevel&gt;" signature="&lt;return of self.secondLevel(a_9);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                                                                       <statement name="secondLevel(a_8);" pathCondition="true" pathConditionChanged="false">
                                                                                                          <methodCall name="self.secondLevel(a_12);" pathCondition="true" pathConditionChanged="false">
                                                                                                             <statement name="thirdLevel(a_12);" pathCondition="true" pathConditionChanged="false">
@@ -41,10 +41,10 @@
                                                                                                                      <methodCall name="self.fourthLevel(a_14);" pathCondition="true" pathConditionChanged="false">
                                                                                                                         <statement name="throw new Exception ();" pathCondition="true" pathConditionChanged="false">
                                                                                                                            <statement name="a_12=a_12*2;" pathCondition="true" pathConditionChanged="false">
-                                                                                                                              <methodReturn name="&lt;return of secondLevel&gt;" signature="&lt;return of self.secondLevel(a_12);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                                                                                                 <methodReturn name="&lt;return of firstLevel&gt;" signature="&lt;return of self.firstLevel(a_8);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                                                                                              <methodReturn name="&lt;return of secondLevel&gt;" signature="&lt;return of self.secondLevel(a_12);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                                                                                                                 <methodReturn name="&lt;return of firstLevel&gt;" signature="&lt;return of self.firstLevel(a_8);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                                                                                                     <statement name="a=a*4;" pathCondition="true" pathConditionChanged="false">
-                                                                                                                                       <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main(a);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                                                                                                       <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main(a);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                                                                                                           <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                                                                                                           </termination>
                                                                                                                                        </methodReturn>

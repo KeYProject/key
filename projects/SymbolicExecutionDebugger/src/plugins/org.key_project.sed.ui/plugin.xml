@@ -133,6 +133,12 @@
                     label="Call Stack">
               </propertyTab>
               <propertyTab
+                    afterTab="org.key_project.sed.ui.node.tab"
+                    category="Debug"
+                    id="org.key_project.sed.ui.methodReturns.tab"
+                    label="Method Returns">
+              </propertyTab>
+              <propertyTab
                     afterTab="org.key_project.sed.ui.callStack.tab"
                     category="Debug"
                     id="org.key_project.sed.ui.source.tab"
@@ -171,6 +177,12 @@
                     filter="org.key_project.sed.ui.property.SEDDebugNodeTreeFilter"
                     id="org.key_project.sed.ui.property.CallStackPropertySection"
                     tab="org.key_project.sed.ui.callStack.tab">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.property.MethodReturnConditionsPropertySection"
+                    filter="org.key_project.sed.ui.property.SEDMethodCallTreeFilter"
+                    id="org.key_project.sed.ui.property.MethodReturnConditionsPropertySection"
+                    tab="org.key_project.sed.ui.methodReturns.tab">
               </propertySection>
               <propertySection
                     class="org.key_project.sed.ui.property.SourcePropertySection"

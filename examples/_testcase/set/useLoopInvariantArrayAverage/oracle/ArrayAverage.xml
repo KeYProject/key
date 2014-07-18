@@ -55,7 +55,7 @@ mod: false" pathCondition="not(equals(array,null))" pathConditionChanged="false"
                                  <statement name="return sum_2;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(i_0,Z(0(#))),not(equals(array,null))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathConditionChanged="false">
                                     <callStackEntry path="/0"/>
                                     <callStackEntry path="/0/0/0"/>
-                                    <methodReturn name="&lt;return of sum&gt;" signature="&lt;return of ArrayAverage.sum(array_1);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(i_0,Z(0(#))),not(equals(array,null))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return sum_2_0 as result of sum&gt;" signatureIncludingReturnValue="&lt;return sum_2_0 as result of ArrayAverage.sum(array_1);&gt;" isReturnValueComputed="true">
+                                    <methodReturn name="&lt;return of sum&gt;" signature="&lt;return of ArrayAverage.sum(array_1);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(i_0,Z(0(#))),not(equals(array,null))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return sum_2_0 as result of sum&gt;" signatureIncludingReturnValue="&lt;return sum_2_0 as result of ArrayAverage.sum(array_1);&gt;" isReturnValueComputed="true" methodReturnCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(i_0,Z(0(#))),not(equals(array,null))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))">
                                        <methodReturnValue name="sum_2_0" returnValueString="sum_2_0" hasCondition="false">
                                        </methodReturnValue>
                                        <callStackEntry path="/0"/>
@@ -73,7 +73,7 @@ mod: false" pathCondition="not(equals(array,null))" pathConditionChanged="false"
 as result of average&gt;" signatureIncludingReturnValue="&lt;return 
 	quotient_2 {gt(sum_2_0,Z(neglit(1(#))))}, 
 	mul(quotient_3,Z(neglit(1(#)))) {lt(sum_2_0,Z(0(#)))}
-as result of ArrayAverage.average(array);&gt;" isReturnValueComputed="true">
+as result of ArrayAverage.average(array);&gt;" isReturnValueComputed="true" methodReturnCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(i_0,Z(1(#))),not(equals(array,null))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))">
                                                 <methodReturnValue name="quotient_2 {gt(sum_2_0,Z(neglit(1(#))))}" returnValueString="quotient_2" hasCondition="true" conditionString="gt(sum_2_0,Z(neglit(1(#))))">
                                                 </methodReturnValue>
                                                 <methodReturnValue name="mul(quotient_3,Z(neglit(1(#)))) {lt(sum_2_0,Z(0(#)))}" returnValueString="mul(quotient_3,Z(neglit(1(#))))" hasCondition="true" conditionString="lt(sum_2_0,Z(0(#)))">

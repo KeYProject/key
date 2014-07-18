@@ -41,7 +41,7 @@ termination: diamond" pathCondition="x &gt;  -1" pathConditionChanged="false" pr
                      </value>
                   </variable>
                   <callStackEntry path="/0"/>
-                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of PrettyPrintTest.main(x);&gt;" pathCondition="x &gt;  -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of main&gt;" signatureIncludingReturnValue="&lt;return 42 as result of PrettyPrintTest.main(x);&gt;" isReturnValueComputed="true">
+                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of PrettyPrintTest.main(x);&gt;" pathCondition="x &gt;  -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of main&gt;" signatureIncludingReturnValue="&lt;return 42 as result of PrettyPrintTest.main(x);&gt;" isReturnValueComputed="true" methodReturnCondition="x &gt;  -1">
                      <methodReturnValue name="42" returnValueString="42" hasCondition="false">
                      </methodReturnValue>
                      <variable name="x" arrayIndex="-1" isArrayIndex="false">
@@ -117,7 +117,7 @@ mod: false" pathCondition="x &lt; 0" pathConditionChanged="false" initiallyValid
                         </value>
                      </variable>
                      <callStackEntry path="/0"/>
-                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of PrettyPrintTest.main(x);&gt;" pathCondition="x &lt;= -1 &amp; x_0 = -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return -1 as result of main&gt;" signatureIncludingReturnValue="&lt;return -1 as result of PrettyPrintTest.main(x);&gt;" isReturnValueComputed="true">
+                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of PrettyPrintTest.main(x);&gt;" pathCondition="x &lt;= -1 &amp; x_0 = -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return -1 as result of main&gt;" signatureIncludingReturnValue="&lt;return -1 as result of PrettyPrintTest.main(x);&gt;" isReturnValueComputed="true" methodReturnCondition="x &lt;= -1 &amp; x_0 = -1">
                         <methodReturnValue name="-1" returnValueString="-1" hasCondition="false">
                         </methodReturnValue>
                         <variable name="x" arrayIndex="-1" isArrayIndex="false">

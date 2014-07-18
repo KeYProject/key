@@ -52,7 +52,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
    private Term pathCondition;
    
    /**
-    * The human readable path condition to reach this term.
+    * The human readable path condition to reach this node.
     */
    private String formatedPathCondition;
    

@@ -179,7 +179,6 @@ public final class KeYModelUtil {
       else {
          throw new DebugException(LogUtil.getLogger().createErrorStatus("Not supported execution node \"" + executionNode + "\"."));
       }
-      target.registerDebugNode(result);
       return result;
    }
    

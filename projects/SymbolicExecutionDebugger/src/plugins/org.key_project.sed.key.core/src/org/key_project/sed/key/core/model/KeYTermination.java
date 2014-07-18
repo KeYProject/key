@@ -59,6 +59,7 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYSEDDeb
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      target.registerDebugNode(this);
       initializeAnnotations();
    }
 

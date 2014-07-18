@@ -183,6 +183,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Attribute name to store {@link IExecutionBranchCondition#getAdditionalBranchLabel()}.
     */
    public static final String ATTRIBUTE_ADDITIONAL_BRANCH_LABEL = "additionalBranchLabel";
+
+   /**
+    * Attribute name to store {@link IExecutionMethodReturn#getMethodReturnCondition()}.
+    */
+   public static final String ATTRIBUTE_METHOD_RETURN_CONDITION = "methodReturnCondition";
    
    /**
     * Tag name to store {@link IExecutionBranchCondition}s.
@@ -578,6 +583,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
          attributeValues.put(ATTRIBUTE_SIGNATURE_INCLUDING_RETURN_VALUE, node.getSignatureIncludingReturnValue());
       }
       attributeValues.put(ATTRIBUTE_RETURN_VALUE_COMPUTED, node.isReturnValuesComputed() + "");
+      attributeValues.put(ATTRIBUTE_METHOD_RETURN_CONDITION, node.getFormatedMethodReturnCondition());
       appendStartTag(level, TAG_METHOD_RETURN, attributeValues, sb);
       if (saveReturnValues) {
          IExecutionMethodReturnValue[] returnValues = node.getReturnValues();

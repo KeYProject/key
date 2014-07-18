@@ -18,7 +18,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                      <callStackEntry path="/0"/>
                      <statement name="returnExpr=0;" pathCondition="equals(array,null)" pathConditionChanged="false">
                         <callStackEntry path="/0"/>
-                        <methodReturn name="&lt;return of sum&gt;" signature="&lt;return of ArraySumWhileWithReturn.sum(array);&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" isReturnValueComputed="false">
+                        <methodReturn name="&lt;return of sum&gt;" signature="&lt;return of ArraySumWhileWithReturn.sum(array);&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="equals(array,null)">
                            <callStackEntry path="/0"/>
                            <termination name="&lt;end&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
@@ -33,7 +33,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                            <callStackEntry path="/0"/>
                            <statement name="returnExpr=result_1;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),i_0)))" pathConditionChanged="false">
                               <callStackEntry path="/0"/>
-                              <methodReturn name="&lt;return of sum&gt;" signature="&lt;return of ArraySumWhileWithReturn.sum(array);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),i_0)))" pathConditionChanged="false" isReturnValueComputed="false">
+                              <methodReturn name="&lt;return of sum&gt;" signature="&lt;return of ArraySumWhileWithReturn.sum(array);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),i_0)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),i_0)))">
                                  <callStackEntry path="/0"/>
                                  <termination name="&lt;end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),i_0)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                  </termination>

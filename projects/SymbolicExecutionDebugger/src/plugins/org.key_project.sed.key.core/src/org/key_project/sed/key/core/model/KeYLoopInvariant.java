@@ -80,6 +80,7 @@ public class KeYLoopInvariant extends AbstractSEDLoopInvariant implements IKeYSE
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      target.registerDebugNode(this);
       initializeAnnotations();
    }
 
