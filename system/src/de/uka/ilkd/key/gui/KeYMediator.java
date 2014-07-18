@@ -21,6 +21,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.EventListenerList;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
@@ -107,6 +108,19 @@ public class KeYMediator {
      */
     private AutoSaver autoSaver;
 
+    
+    /**
+     * list of proof listeners and interactive proof listeners. We use an
+     * immutable list to store listeners to allow for addition/removal within
+     * listener code
+     */
+    private ImmutableList<AutoModeListener> automodeListenerList = ImmutableSLList.nil();
+
+    /**
+     * boolean flag indicating if the GUI is in auto mode
+     */
+    private boolean inAutoMode = false;
+    
 
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
@@ -234,7 +248,8 @@ public class KeYMediator {
     public boolean ensureProofLoaded() {
     	return getSelectedProof() != null;
     }
-
+   
+   
     /**
      * Returns a filter that is used for filtering taclets that should not be showed while
      * interactive proving.
@@ -591,14 +606,33 @@ public class KeYMediator {
 	listenerList.remove(GUIListener.class, listener);
     }
 
-    public void addAutoModeListener(AutoModeListener listener) {
-	interactiveProver.addAutoModeListener(listener);
+    /**
+     * fires the event that automatic execution has started
+     */
+    protected void fireAutoModeStarted(ProofEvent e) {
+        for (AutoModeListener aListenerList : automodeListenerList) {
+            aListenerList.autoModeStarted(e);
+        }
     }
 
-    public void removeAutoModeListener(AutoModeListener listener) {
-	interactiveProver.removeAutoModeListener(listener);
+    /**
+     * fires the event that automatic execution has stopped
+     */
+    public void fireAutoModeStopped(ProofEvent e) {
+        for (AutoModeListener aListenerList : automodeListenerList) {
+            aListenerList.autoModeStopped(e);
+        }
+    }
+    
+    public void addAutoModeListener(AutoModeListener p) {
+       automodeListenerList = automodeListenerList.prepend(p);
     }
 
+    public void removeAutoModeListener(AutoModeListener p) {
+       automodeListenerList = automodeListenerList.removeAll(p);
+    }
+
+         
     public void addInterruptedListener(InterruptListener listener) {
         listenerList.add(InterruptListener.class, listener);
     }
@@ -770,7 +804,8 @@ public class KeYMediator {
          public void run() {
             ui.notifyAutoModeBeingStarted();
             if (b) {
-               interactiveProver.fireAutoModeStarted(
+               inAutoMode = true;
+               fireAutoModeStarted(
                   new ProofEvent(getSelectedProof()));
             }
          }
@@ -782,8 +817,10 @@ public class KeYMediator {
       final boolean b = fullStop;
       Runnable interfaceSignaller = new Runnable() {
          public void run() {
-            if ( b )
-               interactiveProver.fireAutoModeStopped (new ProofEvent(getSelectedProof()));
+            if ( b ) {
+               inAutoMode = false;
+               fireAutoModeStopped (new ProofEvent(getSelectedProof()));
+            }
             ui.notifyAutomodeStopped();
             if (getSelectedProof() != null)
                 keySelectionModel.fireSelectedProofChanged();
@@ -792,9 +829,16 @@ public class KeYMediator {
       GuiUtilities.invokeAndWait(interfaceSignaller);
    }
 
-    public boolean autoMode() {
-        return interactiveProver.isAutoMode();
-    }
+   
+   /**
+    * Checks if the auto mode is currently running.
+    *
+    * @return {@code true} auto mode is running, {@code false} auto mode is not
+    * running.
+    */
+   public boolean isInAutoMode() {
+       return inAutoMode;
+   }
 
     class KeYMediatorProofTreeListener extends ProofTreeAdapter {
     	private boolean pruningInProcess;
@@ -828,7 +872,7 @@ public class KeYMediator {
     	}
 
     	public void proofStructureChanged(ProofTreeEvent e) {
-    		if (autoMode() || pruningInProcess) return;
+    		if (isInAutoMode() || pruningInProcess) return;
     		Proof p = e.getSource();
     		if (p == getSelectedProof()) {
     			Node sel_node = getSelectedNode();
@@ -849,7 +893,7 @@ public class KeYMediator {
 
 	/** invoked when a rule has been applied */
 	public void ruleApplied(ProofEvent e) {
-	    if (autoMode()) return;
+	    if (isInAutoMode()) return;
 	    if (e.getSource() == getSelectedProof()) {
 	        keySelectionModel.defaultSelection();
 	    }

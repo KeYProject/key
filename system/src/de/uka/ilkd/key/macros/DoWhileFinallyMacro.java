@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.macros;
 
-import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
@@ -97,9 +96,4 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
 			return ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getMaxSteps();
 		}
 	}
-
-    @Override
-    public KeyStroke getKeyStroke() {
-        return null; // default implementation
-    }
 }

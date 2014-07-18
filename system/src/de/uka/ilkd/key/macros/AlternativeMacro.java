@@ -17,8 +17,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.KeyStroke;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
@@ -105,10 +103,5 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
             assert proofMacros.length > 0;
         }
         return Collections.unmodifiableList(Arrays.asList(proofMacros));
-    }
-
-    @Override
-    public KeyStroke getKeyStroke() {
-        return null; // default implementation
     }
 }

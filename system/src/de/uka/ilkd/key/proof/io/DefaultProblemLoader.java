@@ -25,6 +25,7 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
@@ -35,6 +36,7 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.ui.UserInterface;
@@ -240,7 +242,8 @@ public class DefaultProblemLoader {
    protected ProblemInitializer createProblemInitializer() {
       UserInterface ui = mediator.getUI();
       return new ProblemInitializer(ui,
-                                    new Services(envInput.getProfile(), mediator.getExceptionHandler()),
+                                    new Services(envInput.getProfile(), 
+                                          mediator.getExceptionHandler()),
                                     ui);
    }
 
@@ -333,7 +336,11 @@ public class DefaultProblemLoader {
     * @throws ProofInputException Occurred Exception.
     */
    protected Proof createProof(LoadedPOContainer poContainer) throws ProofInputException {
-      return problemInitializer.startProver(initConfig, poContainer.getProofOblInput(), poContainer.getProofNum());
+      ProofAggregate proofList = problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
+      
+      mediator.getUI().createProofEnvironmentAndRegisterProof(poContainer.getProofOblInput(), proofList, initConfig);
+
+      return proofList.getProof(poContainer.getProofNum());
    }
 
    protected void replayProof(Proof proof) throws ProofInputException {

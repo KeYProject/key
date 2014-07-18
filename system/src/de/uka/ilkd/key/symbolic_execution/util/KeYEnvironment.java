@@ -265,7 +265,7 @@ public class KeYEnvironment<U extends UserInterface> {
     * Disposes this {@link KeYEnvironment}.
     */
    public void dispose() {
-      if (loadedProof != null) {
+      if (loadedProof != null && !loadedProof.isDisposed()) {
          loadedProof.dispose();
       }
       disposed = true;

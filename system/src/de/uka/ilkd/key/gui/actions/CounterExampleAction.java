@@ -19,6 +19,7 @@ import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.util.Debug;
 import java.awt.event.ActionEvent;
@@ -92,14 +93,15 @@ public class CounterExampleAction extends MainWindowAction {
         Proof oldProof = node.proof();
         Sequent oldSequent = node.sequent();
         Sequent newSequent = Sequent.createSequent(oldSequent.antecedent(), oldSequent.succedent());
+        InitConfig newInitConfig = oldProof.getInitConfig().deepCopy();
         Proof proof = new Proof("Semantics Blasting: " + oldProof.name(),
                 newSequent, "",
-                oldProof.env().getInitConfig().createTacletIndex(),
-                oldProof.env().getInitConfig().createBuiltInRuleIndex(),
-                oldProof.getServices(),
-                oldProof.getSettings());
+                newInitConfig.createTacletIndex(),
+                newInitConfig.createBuiltInRuleIndex(),
+                newInitConfig,
+                newInitConfig.getSettings());
 
-        proof.setProofEnv(oldProof.env());
+        proof.setEnv(oldProof.getEnv());
         proof.setNamespaces(oldProof.getNamespaces());
 
         ProofAggregate pa = new SingleProof(proof, "XXX");

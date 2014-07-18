@@ -1747,7 +1747,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(enabled);
       if (proof != null && !proof.isDisposed()) {
          proof.getProofIndependentSettings().getGeneralSettings().setOneStepSimplification(enabled);
-         OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(proof.env().getInitConfig().getProfile());
+         OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(proof.getServices().getProfile());
          if (simplifier != null) {
             simplifier.refresh(proof);
          }

@@ -59,7 +59,6 @@ import de.uka.ilkd.key.proof.io.LDTInput;
 import de.uka.ilkd.key.proof.io.LDTInput.LDTInputListener;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
@@ -221,30 +220,6 @@ public final class ProblemInitializer {
     
     
     /**
-     * Helper for readJava().
-     */
-    private JavaModel createJavaModel(String javaPath,
-                                      List<File> classPath,
-                                      File bootClassPath)
-                throws ProofInputException {
-        JavaModel result;
-        if(javaPath == null) {
-            result = JavaModel.NO_MODEL;
-        } else if (javaPath.equals(System.getProperty("user.home"))) {
-            throw new ProofInputException("You do not want to have "+
-            "your home directory as the program model.");
-        } else {
-            String modelTag = "KeY_" + Long.valueOf((new java.util.Date()).getTime());
-            result = new JavaModel(javaPath,
-                                   modelTag,
-                                   classPath,
-                                   bootClassPath);
-        }
-        return result;
-    }
-         
-    
-    /**
      * Helper for readEnvInput().
      */
     private void readJava(EnvInput envInput, InitConfig initConfig) 
@@ -254,7 +229,7 @@ public final class ProblemInitializer {
                           .getJavaInfo()
                           .rec2key()
                           .parsedSpecial();
-        assert initConfig.getProofEnv().getJavaModel() == null;
+        assert initConfig.getServices().getJavaModel() == null;
 
         //read Java source and classpath settings
         envInput.setInitConfig(initConfig);
@@ -287,9 +262,9 @@ public final class ProblemInitializer {
             reportStatus("Reading Java libraries");
             r2k.parseSpecialClasses();
         }
-        initConfig.getProofEnv().setJavaModel(createJavaModel(javaPath,
-                                                              classPath,
-                                                              bootClassPath));
+        initConfig.getServices().setJavaModel(JavaModel.createJavaModel(javaPath,
+                                                                        classPath,
+                                                                        bootClassPath));
     }
     
     /**
@@ -404,7 +379,7 @@ public final class ProblemInitializer {
     }
 
 
-    private void setUpProofHelper(ProofOblInput problem,ProofAggregate pl, InitConfig initConfig) 
+    private void setUpProofHelper(ProofOblInput problem, ProofAggregate pl) 
         throws ProofInputException {
         //ProofAggregate pl = problem.getPO();
         if(pl == null) {
@@ -413,16 +388,20 @@ public final class ProblemInitializer {
 
         //register non-built-in rules
         reportStatus("Registering rules");        
-        initConfig.getProofEnv().registerRules(initConfig.getTaclets(), 
-                                               AxiomJustification.INSTANCE);
 
         Proof[] proofs = pl.getProofs();
         for(int i = 0; i < proofs.length; i++) {
+           proofs[i].getInitConfig().registerRules(proofs[i].getInitConfig().getTaclets(), 
+                 AxiomJustification.INSTANCE);
+           //register built in rules
+           Profile profile = proofs[i].getInitConfig().getProfile();
+           for(Rule r : profile.getStandardRules().getStandardBuiltInRules()) {
+              proofs[i].getInitConfig().registerRule(r, profile.getJustification(r));
+           }
+
             proofs[i].setNamespaces(proofs[i].getNamespaces());//TODO: refactor Proof.setNamespaces() so this becomes unnecessary
             populateNamespaces(proofs[i]);
         }
-        initConfig.getProofEnv().registerProof(problem, pl);
-
     }
     
     
@@ -467,12 +446,6 @@ public final class ProblemInitializer {
         //create initConfig
          InitConfig initConfig = referenceConfig.copy();
         
-        //register built in rules
-        Profile profile = envInput.getProfile();
-        for(Rule r : profile.getStandardRules().getStandardBuiltInRules()) {
-            initConfig.getProofEnv().registerRule(r, 
-                    profile.getJustification(r));
-        }
 
         //read Java
         readJava(envInput, initConfig);
@@ -485,7 +458,6 @@ public final class ProblemInitializer {
         = initConfig.getServices().getTypeConverter().getHeapLDT();
         assert heapLDT != null;
         if (javaInfo != null) {
-            functions.add(javaInfo.getInv());
             for(KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
                 final Type type = kjt.getJavaType();
                 if(type instanceof ClassDeclaration 
@@ -523,7 +495,7 @@ public final class ProblemInitializer {
     }
 
     
-    public Proof startProver(InitConfig initConfig, ProofOblInput po, int proofNum) 
+    public ProofAggregate startProver(InitConfig initConfig, ProofOblInput po) 
                 throws ProofInputException {
         assert initConfig != null;
         if(listener!= null){
@@ -538,13 +510,13 @@ public final class ProblemInitializer {
             po.readProblem();
             ProofAggregate pa = po.getPO();
             //final work
-            setUpProofHelper(po, pa, initConfig);
+            setUpProofHelper(po, pa);
 
             //done
             if(listener != null){
                 listener.proofCreated(this, pa);
             }
-          return pa.getProofs()[proofNum];
+          return pa;
 
         } catch (ProofInputException e) {    
             if(listener != null){
@@ -561,22 +533,9 @@ public final class ProblemInitializer {
     }
     
     
-    public void startProver(ProofEnvironment env, ProofOblInput po) 
+    public ProofAggregate startProver(EnvInput envInput, ProofOblInput po) 
                 throws ProofInputException {
-        assert env.getInitConfig().getProofEnv() == env;
-        startProver(env.getInitConfig(), po, 0);
-    }
-    
-    
-    public void startProver(EnvInput envInput, ProofOblInput po) 
-                throws ProofInputException {
-        try {
-            InitConfig initConfig = prepare(envInput);
-            startProver(initConfig, po, 0);
-        } catch(ProofInputException e) {
-            reportStatus(envInput.name() + " failed");
-            throw e;
-        }
+       return startProver(prepare(envInput), po);
     }
     
     

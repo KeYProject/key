@@ -80,14 +80,14 @@ public class ProofStarter {
 
         private Proof createProof(String proofName) {
 
-            final InitConfig initConfig = env.getInitConfig();
+            final InitConfig initConfig = env.getInitConfigForEnvironment().deepCopy();
 
             return new Proof(proofName,
                     seq,
                     EMPTY_PROOF_HEADER,
                     initConfig.createTacletIndex(),
                     initConfig.createBuiltInRuleIndex(),
-                    initConfig.getServices(),
+                    initConfig,
                     initConfig.getSettings() != null
                     ? initConfig.getSettings()
                             : new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
@@ -150,7 +150,7 @@ public class ProofStarter {
     public void init(Term formulaToProve, ProofEnvironment env) throws ProofInputException {
         final ProofOblInput input = new UserProvidedInput(formulaToProve, env);
         proof = input.getPO().getFirstProof();
-        proof.setProofEnv(env);
+        proof.setEnv(env);
     }
 
     /**
@@ -161,7 +161,7 @@ public class ProofStarter {
     public void init(Sequent sequentToProve, ProofEnvironment env) throws ProofInputException {
        final ProofOblInput input = new UserProvidedInput(sequentToProve, env);
        proof = input.getPO().getFirstProof();
-       proof.setProofEnv(env);
+       proof.setEnv(env);
     }
 
     /**
@@ -207,7 +207,7 @@ public class ProofStarter {
     */
     public ApplyStrategyInfo start(ImmutableList<Goal> goals, boolean finishAfterStrategy) {
         try {
-           final Profile profile = proof.env().getInitConfig().getProfile();
+           final Profile profile = proof.getInitConfig().getProfile();
            final StrategyFactory factory = profile.getDefaultStrategyFactory();
            if (strategyProperties == null) {
               strategyProperties = factory.getSettingsDefinition().getDefaultPropertiesFactory().createDefaultStrategyProperties();
