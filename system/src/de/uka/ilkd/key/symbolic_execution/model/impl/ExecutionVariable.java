@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
@@ -158,23 +159,24 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     */
    protected ExecutionValue[] lazyComputeValues() throws ProofInputException {
       if (!isDisposed()) {
-         final TermBuilder tb = getServices().getTermBuilder();
+         final Services services = getServices();
+         final TermBuilder tb = services.getTermBuilder();
          // Start site proof to extract the value of the result variable.
          SiteProofVariableValueInput sequentToProve;
          Term siteProofSelectTerm = null;
          Term siteProofCondition = parentNode.getPathCondition();
          if (getParentValue() != null || SymbolicExecutionUtil.isStaticVariable(getProgramVariable())) {
-            siteProofSelectTerm = createSelectTerm();
+            siteProofSelectTerm = createSelectTerm(services);
             if (getParentValue() != null) { // Is null at static variables
                siteProofCondition = tb.and(siteProofCondition, getParentValue().getCondition());
             }
             if (lengthValue != null) {
                siteProofCondition = tb.and(siteProofCondition, lengthValue.getCondition());
             }
-            sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(getServices(), getProofNode(), siteProofCondition, siteProofSelectTerm, true); 
+            sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(services, getProofNode(), siteProofCondition, siteProofSelectTerm, true); 
          }
          else {
-            sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(getServices(), getProofNode(), siteProofCondition, getProgramVariable());
+            sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(services, getProofNode(), siteProofCondition, getProgramVariable());
          }
          ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
                                                                              sequentToProve.getSequentToProve(), 
@@ -188,7 +190,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
             // Group values of the branches
             Map<Term, List<Goal>> valueMap = new LinkedHashMap<Term, List<Goal>>();
             List<Goal> unknownValues = new LinkedList<Goal>();
-            groupGoalsByValue(info.getProof().openGoals(), sequentToProve.getOperator(), siteProofSelectTerm, siteProofCondition, valueMap, unknownValues);
+            groupGoalsByValue(info.getProof().openGoals(), sequentToProve.getOperator(), siteProofSelectTerm, siteProofCondition, valueMap, unknownValues, services);
             // Instantiate child values
             for (Entry<Term, List<Goal>> valueEntry : valueMap.entrySet()) {
                Term value = valueEntry.getKey();
@@ -197,7 +199,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
                // Determine type
                String typeString = value.sort().toString();
                // Compute value condition
-               Term condition = computeValueCondition(tb, valueEntry.getValue());
+               Term condition = computeValueCondition(tb, valueEntry.getValue(), services);
                String conditionString = null;
                if (condition != null) {
                   conditionString = formatTerm(condition);
@@ -216,7 +218,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
             // Instantiate unknown child values
             if (!unknownValues.isEmpty()) {
                // Compute value condition
-               Term condition = computeValueCondition(tb, unknownValues);
+               Term condition = computeValueCondition(tb, unknownValues, services);
                String conditionString = null;
                if (condition != null) {
                   conditionString = formatTerm(condition);
@@ -248,26 +250,28 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     * Groups all {@link Goal}s which provides the same value.
     * @param goals All available {@link Goal}s to group.
     * @param operator The {@link Operator} of the {@link Term} which provides the value.
+    * @param services The {@link Services} to use.
     */
    protected void groupGoalsByValue(ImmutableList<Goal> goals, 
                                     Operator operator, 
                                     Term siteProofSelectTerm,
                                     Term siteProofCondition,
                                     Map<Term, List<Goal>> valueMap,
-                                    List<Goal> unknownValues) throws ProofInputException {
+                                    List<Goal> unknownValues,
+                                    Services services) throws ProofInputException {
       for (Goal goal : goals) {
          // Extract value
          Term value = SideProofUtil.extractOperatorValue(goal, operator);
          assert value != null;
-         value = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), value, getServices());
+         value = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), value, services);
          // Compute unknown flag if required
          boolean unknownValue = false;
          if (siteProofSelectTerm != null) {
-            if (SymbolicExecutionUtil.isNullSort(value.sort(), getServices())) { 
-               unknownValue = SymbolicExecutionUtil.isNull(getServices(), getProofNode(), siteProofCondition, siteProofSelectTerm); // Check if the symbolic value is not null, if it fails the value is treated as unknown
+            if (SymbolicExecutionUtil.isNullSort(value.sort(), services)) { 
+               unknownValue = SymbolicExecutionUtil.isNull(services, getProofNode(), siteProofCondition, siteProofSelectTerm); // Check if the symbolic value is not null, if it fails the value is treated as unknown
             }
             else {
-               unknownValue = SymbolicExecutionUtil.isNotNull(getServices(), getProofNode(), siteProofCondition, siteProofSelectTerm); // Check if the symbolic value is not null, if it fails the value is treated as unknown
+               unknownValue = SymbolicExecutionUtil.isNotNull(services, getProofNode(), siteProofCondition, siteProofSelectTerm); // Check if the symbolic value is not null, if it fails the value is treated as unknown
             }
          }
          // Add to result list
@@ -290,10 +294,11 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     * or combination of each path condition per {@link Goal}.
     * @param tb The {@link TermBuilder} to use passed to ensure that it is still available even if the {@link Proof} is disposed in between.
     * @param valueGoals The {@link Goal}s to compute combined path condition for.
+    * @param services The {@link Services} to use.
     * @return The combined path condition.
     * @throws ProofInputException Occurred Exception.
     */
-   protected Term computeValueCondition(TermBuilder tb, List<Goal> valueGoals) throws ProofInputException {
+   protected Term computeValueCondition(TermBuilder tb, List<Goal> valueGoals, Services services) throws ProofInputException {
       if (!valueGoals.isEmpty()) {
          List<Term> pathConditions = new LinkedList<Term>();
          Proof proof = null;
@@ -303,7 +308,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          }
          Term comboundPathCondition = tb.or(pathConditions);
          comboundPathCondition = SymbolicExecutionUtil.simplify(proof, comboundPathCondition);
-         comboundPathCondition = SymbolicExecutionUtil.improveReadability(comboundPathCondition, proof.getServices());
+         comboundPathCondition = SymbolicExecutionUtil.improveReadability(comboundPathCondition, services);
          return comboundPathCondition;
       }
       else {
@@ -314,37 +319,38 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
    /**
     * Creates recursive a term which can be used to determine the value
     * of {@link #getProgramVariable()}.
+    * @param services The {@link Services} to use.
     * @return The created term.
     */
-   protected Term createSelectTerm() {
+   protected Term createSelectTerm(Services services) {
       if (SymbolicExecutionUtil.isStaticVariable(getProgramVariable())) {
          // Static field access
-         Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)getProgramVariable(), getServices());
-         return getServices().getTermBuilder().staticDot(getProgramVariable().sort(), function);
+         Function function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)getProgramVariable(), services);
+         return services.getTermBuilder().staticDot(getProgramVariable().sort(), function);
       }
       else {
          if (getParentValue() == null) {
             // Direct access to a variable, so return it as term
-            return getServices().getTermBuilder().var((ProgramVariable)getProgramVariable());
+            return services.getTermBuilder().var((ProgramVariable)getProgramVariable());
          }
          else {
-            Term parentTerm = getParentValue().getVariable().createSelectTerm();
+            Term parentTerm = getParentValue().getVariable().createSelectTerm(services);
             if (programVariable != null) {
-               if (getServices().getJavaInfo().getArrayLength() == getProgramVariable()) {
+               if (services.getJavaInfo().getArrayLength() == getProgramVariable()) {
                   // Special handling for length attribute of arrays
-                  Function function = getServices().getTypeConverter().getHeapLDT().getLength();
-                  return getServices().getTermBuilder().func(function, parentTerm);
+                  Function function = services.getTypeConverter().getHeapLDT().getLength();
+                  return services.getTermBuilder().func(function, parentTerm);
                }
                else {
                   // Field access on the parent variable
-                  Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)getProgramVariable(), getServices());
-                  return getServices().getTermBuilder().dot(getProgramVariable().sort(), parentTerm, function);
+                  Function function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)getProgramVariable(), services);
+                  return services.getTermBuilder().dot(getProgramVariable().sort(), parentTerm, function);
                }
             }
             else {
                // Special handling for array indices.
-               Term idx = getServices().getTermBuilder().zTerm("" + arrayIndex);
-               return getServices().getTermBuilder().dotArr(parentTerm, idx);
+               Term idx = services.getTermBuilder().zTerm("" + arrayIndex);
+               return services.getTermBuilder().dotArr(parentTerm, idx);
             }
          }
       }

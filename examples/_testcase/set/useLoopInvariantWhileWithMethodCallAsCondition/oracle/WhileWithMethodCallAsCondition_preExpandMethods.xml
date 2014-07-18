@@ -12,8 +12,8 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                <methodCall name="WhileWithMethodCallAsCondition.goOnNice(array_3,i_3);" pathCondition="true" pathConditionChanged="false">
                   <callStackEntry path="/0"/>
                   <statement name="throw new RuntimeException ();" pathCondition="true" pathConditionChanged="false">
-                     <callStackEntry path="/0"/>
                      <callStackEntry path="/0/0/0/0/0"/>
+                     <callStackEntry path="/0"/>
                      <termination name="&lt;uncaught java.lang.RuntimeException&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                      </termination>
                   </statement>

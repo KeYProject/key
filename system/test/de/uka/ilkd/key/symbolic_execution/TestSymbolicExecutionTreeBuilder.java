@@ -39,10 +39,32 @@ import de.uka.ilkd.key.ui.CustomUserInterface;
  */
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: examples/_testcase/set/simpleMethodCallStackTest
+    */
+   public void testSimpleMethodCallStack() throws Exception {
+      doSETTest(keyRepDirectory,
+                "examples/_testcase/set/simpleMethodCallStackTest/test/SimpleMethodCallStackTest.java",
+                "SimpleMethodCallStackTest",
+                "magic",
+                null,
+                "examples/_testcase/set/simpleMethodCallStackTest/oracle/SimpleMethodCallStackTest.xml",
+                false,
+                true,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/methodCallStackTest
     */
    public void testMethodCallStack() throws Exception {
-      // TODO: This test should fail because it indicates a bug in the call stack.
       doSETTest(keyRepDirectory,
                 "examples/_testcase/set/methodCallStackTest/test/MethodCallStackTest.java",
                 "MethodCallStackTest",
