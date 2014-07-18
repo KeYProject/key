@@ -1,45 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_737ca7a8-d8a5-47b2-abbf-82ca60f5b72f" name="main(AliasTest.IntWrapper, AliasTest.IntWrapper)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_ea3020e3-48a1-4439-b6e8-9c5b6cccd456" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_526c9423-225a-4749-b2c9-777b077d9773" name="self.main(a,b);" pathCondition="true" lineNumber="-1" charStart="217" charEnd="221" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testAliasTest_AliasChecksImmediately\src\AliasTest.java">
-            <sedStatement xml:id="_82f256f3-3d79-4fa9-88f7-91c4a4ea01e2" name="a.value=2;" pathCondition="true" lineNumber="-1" charStart="255" charEnd="267" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testAliasTest_AliasChecksImmediately\src\AliasTest.java">
-               <sedBranchCondition xml:id="_8678504d-2c4d-4a3e-8ff0-0e796b7a2055" name="not(equals(a,null))" pathCondition="not(equals(a,null))">
-                  <sedStatement xml:id="_a3eeaecd-8ec5-4af4-89cc-e4e086cb509c" name="b.value=3;" pathCondition="not(equals(a,null))" lineNumber="-1" charStart="271" charEnd="283" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testAliasTest_AliasChecksImmediately\src\AliasTest.java">
-                     <sedBranchCondition xml:id="_995f59cc-4521-43db-a705-46e19d2a3d3f" name="not(equals(b,null))" pathCondition="and(not(equals(a,null)),not(equals(b,null)))">
-                        <sedBranchCondition xml:id="_d5aa98e9-9420-4c82-a186-f319dd74263d" name="not(equals(b,a))" pathCondition="and(and(not(equals(a,null)),not(equals(b,null))),not(equals(b,a)))">
-                           <sedStatement xml:id="_5e698ae5-7c42-46e9-82b9-bb019a17a139" name="return a.value+b.value;" pathCondition="and(and(not(equals(a,null)),not(equals(b,null))),not(equals(b,a)))" lineNumber="-1" charStart="287" charEnd="312" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testAliasTest_AliasChecksImmediately\src\AliasTest.java">
-                              <sedMethodReturn xml:id="_97f5426b-355d-410a-b601-917305ada90e" name="&lt;return of self.main(a,b);&gt;" pathCondition="and(and(not(equals(a,null)),not(equals(b,null))),not(equals(b,a)))" lineNumber="-1" charStart="217" charEnd="221" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testAliasTest_AliasChecksImmediately\src\AliasTest.java" methodReturnConditionRef="_cab53646-95b2-4eb9-b2b0-3595907041af">
-                                 <sedTermination xml:id="_3c019e37-faf3-46e9-9b6e-1834847c4c2d" name="&lt;end&gt;" pathCondition="and(and(not(equals(a,null)),not(equals(b,null))),not(equals(b,a)))" verified="true">
+   <sedTarget xml:id="_d49bb236-e28b-4788-8dc0-60ed5b46efb1" name="main(AliasTest.IntWrapper, AliasTest.IntWrapper)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_1eed3619-850e-44a6-8be2-40b681fdf09a" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_956e4392-3126-4caf-b07f-de0be444d594" name="self.main(a,b);" pathCondition="true" lineNumber="-1" charStart="217" charEnd="221" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testAliasTest_AliasChecksImmediately\src\AliasTest.java">
+            <sedStatement xml:id="_200e6ed3-c1ce-4c69-be29-4cf49a9cd5ba" name="a.value=2;" pathCondition="true" lineNumber="-1" charStart="255" charEnd="267" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testAliasTest_AliasChecksImmediately\src\AliasTest.java">
+               <sedBranchCondition xml:id="_3754fadd-c569-4255-a754-81e5617b0a27" name="not(equals(a,null))" pathCondition="not(equals(a,null))">
+                  <sedStatement xml:id="_84c14d65-c46e-4b2c-a8d3-0eb1375ad804" name="b.value=3;" pathCondition="not(equals(a,null))" lineNumber="-1" charStart="271" charEnd="283" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testAliasTest_AliasChecksImmediately\src\AliasTest.java">
+                     <sedBranchCondition xml:id="_c79735aa-3bf2-4d75-8a2b-fdc3898cd75c" name="not(equals(b,null))" pathCondition="and(not(equals(a,null)),not(equals(b,null)))">
+                        <sedBranchCondition xml:id="_bcf811f1-c1ae-4782-b749-346ff56cb6e9" name="not(equals(b,a))" pathCondition="and(and(not(equals(a,null)),not(equals(b,null))),not(equals(b,a)))">
+                           <sedStatement xml:id="_1f64013f-d431-464a-8d5b-497c9eea0a4b" name="return a.value+b.value;" pathCondition="and(and(not(equals(a,null)),not(equals(b,null))),not(equals(b,a)))" lineNumber="-1" charStart="287" charEnd="312" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testAliasTest_AliasChecksImmediately\src\AliasTest.java">
+                              <sedMethodReturn xml:id="_3ae563b8-292d-448c-a1f1-0dd7f8150a67" name="&lt;return of self.main(a,b);&gt;" pathCondition="and(and(not(equals(a,null)),not(equals(b,null))),not(equals(b,a)))" lineNumber="-1" charStart="217" charEnd="221" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testAliasTest_AliasChecksImmediately\src\AliasTest.java" methodReturnConditionRef="_87041aba-8f70-410c-998b-1af1a50d30a1">
+                                 <sedTermination xml:id="_edc9cccf-dfe9-447f-b0ee-9ce8b67c9d10" name="&lt;end&gt;" pathCondition="and(and(not(equals(a,null)),not(equals(b,null))),not(equals(b,a)))" verified="true">
                                  </sedTermination>
                               </sedMethodReturn>
                            </sedStatement>
                         </sedBranchCondition>
-                        <sedBranchCondition xml:id="_9558badb-11bb-4706-a811-019cf9cb7cfb" name="equals(b,a)" pathCondition="and(not(equals(a,null)),equals(b,a))">
-                           <sedStatement xml:id="_bab5e0e7-697c-4d66-83cf-2b41287c7718" name="return a.value+b.value;" pathCondition="and(not(equals(a,null)),equals(b,a))" lineNumber="-1" charStart="287" charEnd="312" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testAliasTest_AliasChecksImmediately\src\AliasTest.java">
-                              <sedMethodReturn xml:id="_8a23afce-d2ad-4031-b7b1-8a3fe29f5f97" name="&lt;return of self.main(a,b);&gt;" pathCondition="and(not(equals(a,null)),equals(b,a))" lineNumber="-1" charStart="217" charEnd="221" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testAliasTest_AliasChecksImmediately\src\AliasTest.java" methodReturnConditionRef="_4d880c29-bd66-4af4-8778-8c90808ec1f6">
-                                 <sedTermination xml:id="_8e8124dc-05a1-48e8-9a6c-86bca196ae21" name="&lt;end&gt;" pathCondition="and(not(equals(a,null)),equals(b,a))" verified="true">
+                        <sedBranchCondition xml:id="_1abde85e-d89b-42e9-a16a-260dfa37a2ba" name="equals(b,a)" pathCondition="and(not(equals(a,null)),equals(b,a))">
+                           <sedStatement xml:id="_e51b00d5-e294-413d-813f-35130288fa18" name="return a.value+b.value;" pathCondition="and(not(equals(a,null)),equals(b,a))" lineNumber="-1" charStart="287" charEnd="312" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testAliasTest_AliasChecksImmediately\src\AliasTest.java">
+                              <sedMethodReturn xml:id="_9215abdd-1533-4b12-9846-0c484d4de2bd" name="&lt;return of self.main(a,b);&gt;" pathCondition="and(not(equals(a,null)),equals(b,a))" lineNumber="-1" charStart="217" charEnd="221" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testAliasTest_AliasChecksImmediately\src\AliasTest.java" methodReturnConditionRef="_d88db19d-64f8-434c-8c2b-6af72eb70d4a">
+                                 <sedTermination xml:id="_1dc91105-c8e9-4387-b13f-ce30a624f1f0" name="&lt;end&gt;" pathCondition="and(not(equals(a,null)),equals(b,a))" verified="true">
                                  </sedTermination>
                               </sedMethodReturn>
                            </sedStatement>
                         </sedBranchCondition>
                      </sedBranchCondition>
-                     <sedBranchCondition xml:id="_a61561eb-245a-400f-903c-95621a3bfae9" name="equals(b,null)" pathCondition="and(not(equals(a,null)),equals(b,null))">
-                        <sedExceptionalTermination xml:id="_1fea556a-1e80-4352-b8fe-d4a8e61589a7" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(not(equals(a,null)),equals(b,null))" verified="true">
+                     <sedBranchCondition xml:id="_bfcc154b-a189-4fb7-a021-f9dbb1d6869a" name="equals(b,null)" pathCondition="and(not(equals(a,null)),equals(b,null))">
+                        <sedExceptionalTermination xml:id="_ccdfcbdc-8d6b-4135-b671-527e879c6e2a" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(not(equals(a,null)),equals(b,null))" verified="true">
                         </sedExceptionalTermination>
                      </sedBranchCondition>
                   </sedStatement>
                </sedBranchCondition>
-               <sedBranchCondition xml:id="_e646e6f3-f507-4b22-a22e-615eb26dcf21" name="equals(a,null)" pathCondition="equals(a,null)">
-                  <sedExceptionalTermination xml:id="_bb54dbe1-1642-47b1-a5f4-33cda5596826" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(a,null)" verified="true">
+               <sedBranchCondition xml:id="_c5f31744-0d57-4869-b220-51c82469bf49" name="equals(a,null)" pathCondition="equals(a,null)">
+                  <sedExceptionalTermination xml:id="_35e7874e-5a68-41c7-ad56-8ceafd01a468" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(a,null)" verified="true">
                   </sedExceptionalTermination>
                </sedBranchCondition>
             </sedStatement>
-            <sedMethodCallMethodReturnCondition xml:id="_cab53646-95b2-4eb9-b2b0-3595907041af" name="and(and(not(equals(a,null)),not(equals(b,null))),not(equals(b,a)))" pathCondition="true">
-               <sedChildReference nodeIdRef="_97f5426b-355d-410a-b601-917305ada90e"/>
+            <sedMethodCallMethodReturnCondition xml:id="_87041aba-8f70-410c-998b-1af1a50d30a1" name="and(and(not(equals(a,null)),not(equals(b,null))),not(equals(b,a)))" pathCondition="true">
+               <sedChildReference nodeIdRef="_3ae563b8-292d-448c-a1f1-0dd7f8150a67"/>
             </sedMethodCallMethodReturnCondition>
-            <sedMethodCallMethodReturnCondition xml:id="_4d880c29-bd66-4af4-8778-8c90808ec1f6" name="and(not(equals(a,null)),equals(b,a))" pathCondition="true">
-               <sedChildReference nodeIdRef="_8a23afce-d2ad-4031-b7b1-8a3fe29f5f97"/>
+            <sedMethodCallMethodReturnCondition xml:id="_d88db19d-64f8-434c-8c2b-6af72eb70d4a" name="and(not(equals(a,null)),equals(b,a))" pathCondition="true">
+               <sedChildReference nodeIdRef="_9215abdd-1533-4b12-9846-0c484d4de2bd"/>
             </sedMethodCallMethodReturnCondition>
          </sedMethodCall>
       </sedThread>

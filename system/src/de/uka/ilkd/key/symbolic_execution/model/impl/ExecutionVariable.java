@@ -195,14 +195,14 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
             for (Entry<Term, List<Goal>> valueEntry : valueMap.entrySet()) {
                Term value = valueEntry.getKey();
                // Format return vale
-               String valueString = formatTerm(value);
+               String valueString = formatTerm(value, services);
                // Determine type
                String typeString = value.sort().toString();
                // Compute value condition
                Term condition = computeValueCondition(tb, valueEntry.getValue(), services);
                String conditionString = null;
                if (condition != null) {
-                  conditionString = formatTerm(condition);
+                  conditionString = formatTerm(condition, services);
                }
                // Update result
                result.add(new ExecutionValue(getMediator(),
@@ -221,7 +221,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
                Term condition = computeValueCondition(tb, unknownValues, services);
                String conditionString = null;
                if (condition != null) {
-                  conditionString = formatTerm(condition);
+                  conditionString = formatTerm(condition, services);
                }
                // Update result
                result.add(new ExecutionValue(getMediator(),
