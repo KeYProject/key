@@ -80,7 +80,8 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
     */
    @Override
    public Services getServices() {
-      return getProof().getServices();
+      Proof proof = getProof();
+      return proof != null ? proof.getServices() : null;
    }
 
    /**

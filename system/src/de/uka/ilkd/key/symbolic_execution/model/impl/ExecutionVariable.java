@@ -157,85 +157,90 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     * @throws ProofInputException Occurred Exception.
     */
    protected ExecutionValue[] lazyComputeValues() throws ProofInputException {
-      final TermBuilder tb = getServices().getTermBuilder();
-      // Start site proof to extract the value of the result variable.
-      SiteProofVariableValueInput sequentToProve;
-      Term siteProofSelectTerm = null;
-      Term siteProofCondition = parentNode.getPathCondition();
-      if (getParentValue() != null || SymbolicExecutionUtil.isStaticVariable(getProgramVariable())) {
-         siteProofSelectTerm = createSelectTerm();
-         if (getParentValue() != null) { // Is null at static variables
-            siteProofCondition = tb.and(siteProofCondition, getParentValue().getCondition());
+      if (!isDisposed()) {
+         final TermBuilder tb = getServices().getTermBuilder();
+         // Start site proof to extract the value of the result variable.
+         SiteProofVariableValueInput sequentToProve;
+         Term siteProofSelectTerm = null;
+         Term siteProofCondition = parentNode.getPathCondition();
+         if (getParentValue() != null || SymbolicExecutionUtil.isStaticVariable(getProgramVariable())) {
+            siteProofSelectTerm = createSelectTerm();
+            if (getParentValue() != null) { // Is null at static variables
+               siteProofCondition = tb.and(siteProofCondition, getParentValue().getCondition());
+            }
+            if (lengthValue != null) {
+               siteProofCondition = tb.and(siteProofCondition, lengthValue.getCondition());
+            }
+            sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(getServices(), getProofNode(), siteProofCondition, siteProofSelectTerm, true); 
          }
-         if (lengthValue != null) {
-            siteProofCondition = tb.and(siteProofCondition, lengthValue.getCondition());
+         else {
+            sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(getServices(), getProofNode(), siteProofCondition, getProgramVariable());
          }
-         sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(getServices(), getProofNode(), siteProofCondition, siteProofSelectTerm, true); 
+         ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
+                                                                             sequentToProve.getSequentToProve(), 
+                                                                             StrategyProperties.METHOD_NONE,
+                                                                             StrategyProperties.LOOP_NONE,
+                                                                             StrategyProperties.QUERY_OFF,
+                                                                             StrategyProperties.SPLITTING_DELAYED,
+                                                                             true);
+         try {
+            List<ExecutionValue> result = new ArrayList<ExecutionValue>(info.getProof().openGoals().size());
+            // Group values of the branches
+            Map<Term, List<Goal>> valueMap = new LinkedHashMap<Term, List<Goal>>();
+            List<Goal> unknownValues = new LinkedList<Goal>();
+            groupGoalsByValue(info.getProof().openGoals(), sequentToProve.getOperator(), siteProofSelectTerm, siteProofCondition, valueMap, unknownValues);
+            // Instantiate child values
+            for (Entry<Term, List<Goal>> valueEntry : valueMap.entrySet()) {
+               Term value = valueEntry.getKey();
+               // Format return vale
+               String valueString = formatTerm(value);
+               // Determine type
+               String typeString = value.sort().toString();
+               // Compute value condition
+               Term condition = computeValueCondition(tb, valueEntry.getValue());
+               String conditionString = null;
+               if (condition != null) {
+                  conditionString = formatTerm(condition);
+               }
+               // Update result
+               result.add(new ExecutionValue(getMediator(),
+                                             getProofNode(),
+                                             this,
+                                             false,
+                                             value,
+                                             valueString,
+                                             typeString,
+                                             condition,
+                                             conditionString));
+            }
+            // Instantiate unknown child values
+            if (!unknownValues.isEmpty()) {
+               // Compute value condition
+               Term condition = computeValueCondition(tb, unknownValues);
+               String conditionString = null;
+               if (condition != null) {
+                  conditionString = formatTerm(condition);
+               }
+               // Update result
+               result.add(new ExecutionValue(getMediator(),
+                                             getProofNode(),
+                                             this,
+                                             true,
+                                             null,
+                                             null,
+                                             null,
+                                             condition,
+                                             conditionString));
+            }
+            // Return child values as result
+            return result.toArray(new ExecutionValue[result.size()]);
+         }
+         finally {
+            SideProofUtil.disposeOrStore("Value computation on node " + getProofNode().serialNr(), info);
+         }
       }
       else {
-         sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(getServices(), getProofNode(), siteProofCondition, getProgramVariable());
-      }
-      ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
-                                                                          sequentToProve.getSequentToProve(), 
-                                                                          StrategyProperties.METHOD_NONE,
-                                                                          StrategyProperties.LOOP_NONE,
-                                                                          StrategyProperties.QUERY_OFF,
-                                                                          StrategyProperties.SPLITTING_DELAYED,
-                                                                          true);
-      try {
-         List<ExecutionValue> result = new ArrayList<ExecutionValue>(info.getProof().openGoals().size());
-         // Group values of the branches
-         Map<Term, List<Goal>> valueMap = new LinkedHashMap<Term, List<Goal>>();
-         List<Goal> unknownValues = new LinkedList<Goal>();
-         groupGoalsByValue(info.getProof().openGoals(), sequentToProve.getOperator(), siteProofSelectTerm, siteProofCondition, valueMap, unknownValues);
-         // Instantiate child values
-         for (Entry<Term, List<Goal>> valueEntry : valueMap.entrySet()) {
-            Term value = valueEntry.getKey();
-            // Format return vale
-            String valueString = formatTerm(value);
-            // Determine type
-            String typeString = value.sort().toString();
-            // Compute value condition
-            Term condition = computeValueCondition(tb, valueEntry.getValue());
-            String conditionString = null;
-            if (condition != null) {
-               conditionString = formatTerm(condition);
-            }
-            // Update result
-            result.add(new ExecutionValue(getMediator(),
-                                          getProofNode(),
-                                          this,
-                                          false,
-                                          value,
-                                          valueString,
-                                          typeString,
-                                          condition,
-                                          conditionString));
-         }
-         // Instantiate unknown child values
-         if (!unknownValues.isEmpty()) {
-            // Compute value condition
-            Term condition = computeValueCondition(tb, unknownValues);
-            String conditionString = null;
-            if (condition != null) {
-               conditionString = formatTerm(condition);
-            }
-            // Update result
-            result.add(new ExecutionValue(getMediator(),
-                                          getProofNode(),
-                                          this,
-                                          true,
-                                          null,
-                                          null,
-                                          null,
-                                          condition,
-                                          conditionString));
-         }
-         // Return child values as result
-         return result.toArray(new ExecutionValue[result.size()]);
-      }
-      finally {
-         SideProofUtil.disposeOrStore("Value computation on node " + getProofNode().serialNr(), info);
+         return null;
       }
    }
 
