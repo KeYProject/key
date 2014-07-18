@@ -44,4 +44,16 @@ public interface ISEDMethodCall extends ISEDDebugNode, IStackFrame {
     * the failure.</li>
     */
    public ISEDBranchCondition[] getMethodReturnConditions() throws DebugException;
+   
+   /**
+    * Checks if this {@link ISEDMethodCall} is collapsed.
+    * @return {@code true} collapsed, {@code false} expanded (default state).
+    */
+   public boolean isCollapsed();
+   
+   /**
+    * Defines if this {@link ISEDMethodCall} is collapsed.
+    * @param collapsed {@code true} collapsed, {@code false} expanded (default state).
+    */
+   public void setCollapsed(boolean collapsed);
 }
