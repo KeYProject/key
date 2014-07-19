@@ -9,7 +9,7 @@ mod: empty
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <branchCondition name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="return magicValue;" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of SimpleIntQuery.main(x);&gt;" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of SimpleIntQuery.main(x);&gt;" isReturnValueComputed="true">
+                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of SimpleIntQuery.main(x);&gt;" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of SimpleIntQuery.main(x);&gt;" isReturnValueComputed="true" methodReturnCondition="gt(x,Z(neglit(1(#))))">
                      <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                      </methodReturnValue>
                      <termination name="&lt;end&gt;" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
@@ -19,7 +19,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
             </branchCondition>
             <branchCondition name="lt(x,Z(0(#)))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="return magicValue;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of SimpleIntQuery.main(x);&gt;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(1(1(7(4(#)))))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(neglit(1(1(7(4(#)))))) as result of SimpleIntQuery.main(x);&gt;" isReturnValueComputed="true">
+                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of SimpleIntQuery.main(x);&gt;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(1(1(7(4(#)))))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(neglit(1(1(7(4(#)))))) as result of SimpleIntQuery.main(x);&gt;" isReturnValueComputed="true" methodReturnCondition="lt(x,Z(0(#)))">
                      <methodReturnValue name="Z(neglit(1(1(7(4(#))))))" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="false">
                      </methodReturnValue>
                      <termination name="&lt;end&gt;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">

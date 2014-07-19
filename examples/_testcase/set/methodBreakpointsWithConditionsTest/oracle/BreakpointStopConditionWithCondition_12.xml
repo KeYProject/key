@@ -7,7 +7,7 @@
                <statement name="int y = x_2*x_2;" pathCondition="true" pathConditionChanged="false">
                   <statement name="x_2++;" pathCondition="true" pathConditionChanged="false">
                      <statement name="return y_1;" pathCondition="true" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of somethingLocal&gt;" signature="&lt;return of SimpleConditionExample.somethingLocal(x_2);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                        <methodReturn name="&lt;return of somethingLocal&gt;" signature="&lt;return of SimpleConditionExample.somethingLocal(x_2);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                            <statement name="somethingLocal(x);" pathCondition="true" pathConditionChanged="false">
                            </statement>
                         </methodReturn>

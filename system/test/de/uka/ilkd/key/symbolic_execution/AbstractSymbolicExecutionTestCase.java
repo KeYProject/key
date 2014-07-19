@@ -440,6 +440,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             assertTrue(((IExecutionMethodReturn)expected).getSignatureIncludingReturnValue() + " does not match " + ((IExecutionMethodReturn)current).getSignatureIncludingReturnValue(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getSignatureIncludingReturnValue(), ((IExecutionMethodReturn)current).getSignatureIncludingReturnValue()));
          }
          assertEquals(((IExecutionMethodReturn)expected).isReturnValuesComputed(), ((IExecutionMethodReturn)current).isReturnValuesComputed());
+         assertTrue(((IExecutionMethodReturn)expected).getFormatedMethodReturnCondition() + " does not match " + ((IExecutionMethodReturn)current).getFormatedMethodReturnCondition(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getFormatedMethodReturnCondition(), ((IExecutionMethodReturn)current).getFormatedMethodReturnCondition()));
          assertVariables((IExecutionMethodReturn)expected, (IExecutionMethodReturn)current, compareVariables);
          if (compareReturnValues) {
             assertReturnValues(((IExecutionMethodReturn)expected).getReturnValues(), ((IExecutionMethodReturn)current).getReturnValues());

@@ -80,7 +80,8 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
     */
    @Override
    public Services getServices() {
-      return getProof().getServices();
+      Proof proof = getProof();
+      return proof != null ? proof.getServices() : null;
    }
 
    /**
@@ -130,11 +131,12 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
    /**
     * Converts the given {@link Term} into a {@link String} respecting {@link #isUsePretty()}.
     * @param term The {@link Term} to convert.
+    * @param services The {@link Services} to use.
     * @return The {@link String} representation of the given {@link Term}.
     */
-   protected String formatTerm(Term term) {
+   protected String formatTerm(Term term, Services services) {
       return SymbolicExecutionUtil.formatTerm(term, 
-                                              getServices(), 
+                                              services, 
                                               settings.isUseUnicode(),
                                               settings.isUsePrettyPrinting());
    }

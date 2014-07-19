@@ -3,7 +3,7 @@
    <methodCall name="EmptyPathConditionAndNoUpdates.compute(obj);" pathCondition="true" pathConditionChanged="false">
       <statement name="return obj.x;" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="not(equals(obj,null))" pathCondition="not(equals(obj,null))" pathConditionChanged="true" branchCondition="not(equals(obj,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of EmptyPathConditionAndNoUpdates.compute(obj);&gt;" pathCondition="not(equals(obj,null))" pathConditionChanged="false" isReturnValueComputed="false">
+            <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of EmptyPathConditionAndNoUpdates.compute(obj);&gt;" pathCondition="not(equals(obj,null))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="not(equals(obj,null))">
                <termination name="&lt;end&gt;" pathCondition="not(equals(obj,null))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                </termination>
             </methodReturn>

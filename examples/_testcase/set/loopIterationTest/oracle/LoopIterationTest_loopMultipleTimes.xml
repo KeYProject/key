@@ -9,19 +9,19 @@
                      <statement name="i+=innerLoop();" pathCondition="true" pathConditionChanged="false">
                         <methodCall name="self.innerLoop();" pathCondition="true" pathConditionChanged="false">
                            <statement name="return 1;" pathCondition="true" pathConditionChanged="false">
-                              <methodReturn name="&lt;return of innerLoop&gt;" signature="&lt;return of self.innerLoop();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                              <methodReturn name="&lt;return of innerLoop&gt;" signature="&lt;return of self.innerLoop();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                  <loopCondition name="i&lt;3" pathCondition="true" pathConditionChanged="false">
                                     <statement name="i+=innerLoop();" pathCondition="true" pathConditionChanged="false">
                                        <methodCall name="self.innerLoop();" pathCondition="true" pathConditionChanged="false">
                                           <statement name="return 1;" pathCondition="true" pathConditionChanged="false">
-                                             <methodReturn name="&lt;return of innerLoop&gt;" signature="&lt;return of self.innerLoop();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                             <methodReturn name="&lt;return of innerLoop&gt;" signature="&lt;return of self.innerLoop();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                 <loopCondition name="i&lt;3" pathCondition="true" pathConditionChanged="false">
                                                    <statement name="i+=innerLoop();" pathCondition="true" pathConditionChanged="false">
                                                       <methodCall name="self.innerLoop();" pathCondition="true" pathConditionChanged="false">
                                                          <statement name="return 1;" pathCondition="true" pathConditionChanged="false">
-                                                            <methodReturn name="&lt;return of innerLoop&gt;" signature="&lt;return of self.innerLoop();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                            <methodReturn name="&lt;return of innerLoop&gt;" signature="&lt;return of self.innerLoop();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                                <loopCondition name="i&lt;3" pathCondition="true" pathConditionChanged="false">
-                                                                  <methodReturn name="&lt;return of doLoop&gt;" signature="&lt;return of self.doLoop();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                                  <methodReturn name="&lt;return of doLoop&gt;" signature="&lt;return of self.doLoop();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                                      <statement name="doLoop();" pathCondition="true" pathConditionChanged="false">
                                                                         <methodCall name="self.doLoop();" pathCondition="true" pathConditionChanged="false">
                                                                            <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
@@ -30,20 +30,20 @@
                                                                                     <statement name="i_1+=innerLoop();" pathCondition="true" pathConditionChanged="false">
                                                                                        <methodCall name="self.innerLoop();" pathCondition="true" pathConditionChanged="false">
                                                                                           <statement name="return 1;" pathCondition="true" pathConditionChanged="false">
-                                                                                             <methodReturn name="&lt;return of innerLoop&gt;" signature="&lt;return of self.innerLoop();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                                                             <methodReturn name="&lt;return of innerLoop&gt;" signature="&lt;return of self.innerLoop();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                                                                 <loopCondition name="i_1&lt;3" pathCondition="true" pathConditionChanged="false">
                                                                                                    <statement name="i_1+=innerLoop();" pathCondition="true" pathConditionChanged="false">
                                                                                                       <methodCall name="self.innerLoop();" pathCondition="true" pathConditionChanged="false">
                                                                                                          <statement name="return 1;" pathCondition="true" pathConditionChanged="false">
-                                                                                                            <methodReturn name="&lt;return of innerLoop&gt;" signature="&lt;return of self.innerLoop();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                                                                            <methodReturn name="&lt;return of innerLoop&gt;" signature="&lt;return of self.innerLoop();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                                                                                <loopCondition name="i_1&lt;3" pathCondition="true" pathConditionChanged="false">
                                                                                                                   <statement name="i_1+=innerLoop();" pathCondition="true" pathConditionChanged="false">
                                                                                                                      <methodCall name="self.innerLoop();" pathCondition="true" pathConditionChanged="false">
                                                                                                                         <statement name="return 1;" pathCondition="true" pathConditionChanged="false">
-                                                                                                                           <methodReturn name="&lt;return of innerLoop&gt;" signature="&lt;return of self.innerLoop();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                                                                                           <methodReturn name="&lt;return of innerLoop&gt;" signature="&lt;return of self.innerLoop();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                                                                                               <loopCondition name="i_1&lt;3" pathCondition="true" pathConditionChanged="false">
-                                                                                                                                 <methodReturn name="&lt;return of doLoop&gt;" signature="&lt;return of self.doLoop();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                                                                                                    <methodReturn name="&lt;return of loopMultipleTimes&gt;" signature="&lt;return of self.loopMultipleTimes();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                                                                                                 <methodReturn name="&lt;return of doLoop&gt;" signature="&lt;return of self.doLoop();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                                                                                                                    <methodReturn name="&lt;return of loopMultipleTimes&gt;" signature="&lt;return of self.loopMultipleTimes();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                                                                                                        <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                                                                                                        </termination>
                                                                                                                                     </methodReturn>

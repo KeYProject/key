@@ -13,6 +13,9 @@
 
 package org.key_project.sed.key.core.model;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
@@ -21,6 +24,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ISourceRange;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
+import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.impl.AbstractSEDMethodCall;
 import org.key_project.sed.key.core.util.KeYModelUtil;
@@ -68,6 +72,11 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     * The method call stack.
     */
    private IKeYSEDDebugNode<?>[] callStack;
+   
+   /**
+    * The up to know discovered {@link KeYMethodReturn} nodes.
+    */
+   private final List<KeYMethodReturn> methodReturns = new LinkedList<KeYMethodReturn>();
 
    /**
     * Constructor.
@@ -83,6 +92,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      target.registerDebugNode(this);
       initializeAnnotations();
    }
 
@@ -242,6 +252,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
    public boolean hasVariables() throws DebugException {
       try {
          return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
+                !executionNode.isDisposed() && 
                 SymbolicExecutionUtil.canComputeVariables(executionNode, executionNode.getServices()) &&
                 super.hasVariables();
       }
@@ -354,5 +365,29 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
          }
          return callStack;
       }
+   }
+   
+   /**
+    * Registers the given {@link KeYMethodReturn} of this node.
+    * @param methodReturn The {@link KeYMethodReturn} to register.
+    */
+   public void addMehodReturn(KeYMethodReturn methodReturn) {
+      Assert.isNotNull(methodReturn);
+      Assert.isTrue(methodReturn.getMethodCall() == this);
+      methodReturns.add(methodReturn);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDBranchCondition[] getMethodReturnConditions() throws DebugException {
+      ISEDBranchCondition[] result = new ISEDBranchCondition[methodReturns.size()];
+      int i = 0;
+      for (KeYMethodReturn methodReturn : methodReturns) {
+         result[i] = methodReturn.getMethodReturnCondition();
+         i++;
+      }
+      return result;
    }
 }

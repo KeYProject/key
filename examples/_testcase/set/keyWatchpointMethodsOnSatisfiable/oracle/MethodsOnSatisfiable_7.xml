@@ -7,8 +7,8 @@
                <methodCall name="MethodsOnSatisfiable.main(x_2);" pathCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="false">
                   <branchStatement name="if (x_2&gt;=0)" pathCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="false">
                      <statement name="return 42;" pathCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of main&gt;" signature="&lt;return of MethodsOnSatisfiable.main(x_2);&gt;" pathCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="false" isReturnValueComputed="false">
-                           <methodReturn name="&lt;return of doSomething&gt;" signature="&lt;return of MethodsOnSatisfiable.doSomething();&gt;" pathCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="false" isReturnValueComputed="false">
+                        <methodReturn name="&lt;return of main&gt;" signature="&lt;return of MethodsOnSatisfiable.main(x_2);&gt;" pathCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                           <methodReturn name="&lt;return of doSomething&gt;" signature="&lt;return of MethodsOnSatisfiable.doSomething();&gt;" pathCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))">
                               <termination name="&lt;end&gt;" pathCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>
                            </methodReturn>
@@ -23,8 +23,8 @@
                <methodCall name="MethodsOnSatisfiable.main(x_3);" pathCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false">
                   <branchStatement name="if (x_3&gt;=0)" pathCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false">
                      <statement name="return -4711;" pathCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of main&gt;" signature="&lt;return of MethodsOnSatisfiable.main(x_3);&gt;" pathCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false" isReturnValueComputed="false">
-                           <methodReturn name="&lt;return of doSomething&gt;" signature="&lt;return of MethodsOnSatisfiable.doSomething();&gt;" pathCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false" isReturnValueComputed="false">
+                        <methodReturn name="&lt;return of main&gt;" signature="&lt;return of MethodsOnSatisfiable.main(x_3);&gt;" pathCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                           <methodReturn name="&lt;return of doSomething&gt;" signature="&lt;return of MethodsOnSatisfiable.doSomething();&gt;" pathCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))">
                               <termination name="&lt;end&gt;" pathCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>
                            </methodReturn>

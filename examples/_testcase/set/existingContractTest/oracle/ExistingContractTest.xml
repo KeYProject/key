@@ -4,7 +4,7 @@
       <statement name="int first = _value;" pathCondition="true" pathConditionChanged="false">
          <statement name="int second = _value;" pathCondition="true" pathConditionChanged="false">
             <statement name="return first_1+second_1;" pathCondition="true" pathConditionChanged="false">
-               <methodReturn name="&lt;return of doubleValue&gt;" signature="&lt;return of self.doubleValue(_value);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+               <methodReturn name="&lt;return of doubleValue&gt;" signature="&lt;return of self.doubleValue(_value);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                   <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>

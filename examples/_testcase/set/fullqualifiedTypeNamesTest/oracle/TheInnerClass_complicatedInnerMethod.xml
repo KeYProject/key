@@ -2,7 +2,7 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.complicatedInnerMethod(z,a,b,x,o,ac);" pathCondition="true" pathConditionChanged="false">
       <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
-         <methodReturn name="&lt;return of complicatedInnerMethod&gt;" signature="&lt;return of self.complicatedInnerMethod(z,a,b,x,o,ac);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+         <methodReturn name="&lt;return of complicatedInnerMethod&gt;" signature="&lt;return of self.complicatedInnerMethod(z,a,b,x,o,ac);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
             <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
             </termination>
          </methodReturn>

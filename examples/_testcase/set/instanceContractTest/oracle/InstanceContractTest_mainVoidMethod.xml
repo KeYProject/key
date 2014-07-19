@@ -7,7 +7,7 @@ post: self.value = 42 &amp; self.&lt;inv&gt; &amp; exc_0 = null
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
          <statement name="return this.value;" pathCondition="true" pathConditionChanged="false">
-            <methodReturn name="&lt;return of mainVoidMethod&gt;" signature="&lt;return of self.mainVoidMethod();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of mainVoidMethod&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of self.mainVoidMethod();&gt;" isReturnValueComputed="true">
+            <methodReturn name="&lt;return of mainVoidMethod&gt;" signature="&lt;return of self.mainVoidMethod();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of mainVoidMethod&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of self.mainVoidMethod();&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                </methodReturnValue>
                <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">

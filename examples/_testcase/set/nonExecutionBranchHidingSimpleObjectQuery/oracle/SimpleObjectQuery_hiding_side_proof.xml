@@ -17,7 +17,7 @@ as result of main&gt;" signatureIncludingReturnValue="&lt;return
 	res_subMagic_0 {equals(x,null)}, 
 	Z(2(4(#))) {and(not(equals(x,null)),equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x))}, 
 	Z(neglit(1(1(7(4(#)))))) {and(not(equals(x,null)),not(equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x)))}
-as result of SimpleObjectQuery.main(x);&gt;" isReturnValueComputed="true">
+as result of SimpleObjectQuery.main(x);&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                      <methodReturnValue name="res_subMagic_0 {equals(x,null)}" returnValueString="res_subMagic_0" hasCondition="true" conditionString="equals(x,null)">
                      </methodReturnValue>
                      <methodReturnValue name="Z(2(4(#))) {and(not(equals(x,null)),equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x))}" returnValueString="Z(2(4(#)))" hasCondition="true" conditionString="and(not(equals(x,null)),equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x))">

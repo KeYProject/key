@@ -78,6 +78,7 @@ public class KeYStatement extends AbstractSEDStatement implements IKeYSEDDebugNo
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      target.registerDebugNode(this);
       initializeAnnotations();
    }
 

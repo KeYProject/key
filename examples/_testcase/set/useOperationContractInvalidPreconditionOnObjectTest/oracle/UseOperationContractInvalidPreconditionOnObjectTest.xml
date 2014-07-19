@@ -10,7 +10,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
             <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
                <statement name="int magicNumberCopy = magicNumber;" pathCondition="true" pathConditionChanged="false">
                   <statement name="return magicNumber+magicNumberCopy;" pathCondition="true" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of UseOperationContractInvalidPreconditionOnObjectTest.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of UseOperationContractInvalidPreconditionOnObjectTest.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                         <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>

@@ -19,6 +19,7 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.impl.AbstractSEDMethodReturn;
+import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 
@@ -64,6 +65,11 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
    private IKeYSEDDebugNode<?>[] callStack;
 
    /**
+    * The condition under which this method return is reached from its calling node.
+    */
+   private SEDMemoryBranchCondition methodReturnCondition;
+
+   /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this branch condition is contained.
     * @param parent The parent in that this node is contained as child.
@@ -77,6 +83,7 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      getMethodCall().addMehodReturn(this);
       initializeAnnotations();
    }
 
@@ -354,6 +361,28 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
             callStack = KeYModelUtil.createCallStack(getDebugTarget(), executionNode.getCallStack()); 
          }
          return callStack;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public SEDMemoryBranchCondition getMethodReturnCondition() throws DebugException {
+      try {
+         synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+            if (methodReturnCondition == null) {
+               KeYMethodCall methodCall = getMethodCall();
+               methodReturnCondition = new SEDMemoryBranchCondition(getDebugTarget(), methodCall, getThread());
+               methodReturnCondition.addChild(this);
+               methodReturnCondition.setName(executionNode.getFormatedMethodReturnCondition());
+               methodReturnCondition.setPathCondition(methodCall.getPathCondition());
+            }
+            return methodReturnCondition;
+         }
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute method return condition.", e));
       }
    }
 }

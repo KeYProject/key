@@ -12,7 +12,7 @@ post: result_0 = javaAddInt(x.value, y.value) &amp; exc_2 = null
 mod: allLocs
 termination: diamond" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                         <statement name="return add_1;" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false">
-                           <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of ConfigurationExtractorWithOperationContractsTest.compute(x,y);&gt;" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false" isReturnValueComputed="false">
+                           <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of ConfigurationExtractorWithOperationContractsTest.compute(x,y);&gt;" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(not(equals(x,null)),not(equals(y,null)))">
                               <termination name="&lt;end&gt;" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>
                            </methodReturn>

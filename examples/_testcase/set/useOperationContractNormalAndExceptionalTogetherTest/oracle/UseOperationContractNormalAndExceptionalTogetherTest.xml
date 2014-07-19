@@ -13,7 +13,7 @@ mod: \if (true)  \then (allLocs)  \else (allLocs)
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="int magicNumberCopy = magicNumber;" pathCondition="true" pathConditionChanged="false">
                <statement name="return magicNumber+magicNumberCopy;" pathCondition="true" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of UseOperationContractNormalAndExceptionalTogetherTest.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of UseOperationContractNormalAndExceptionalTogetherTest.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                      <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
