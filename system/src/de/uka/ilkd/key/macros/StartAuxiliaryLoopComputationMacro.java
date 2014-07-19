@@ -51,8 +51,8 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro {
                 || posInOcc.subTerm() == null) {
             return false;
         }
-        Proof proof = goals.head().proof();
-        Services services = proof.getServices();
+        final Proof proof = goals.head().proof();
+        final Services services = proof.getServices();
 
         RuleApp app = goals.head().node().parent().getAppliedRuleApp();
         if (!(app instanceof LoopInvariantBuiltInRuleApp)) {
@@ -70,11 +70,11 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro {
                 loopInvRuleApp.getExecutionContext();
         final Term guardTerm = loopInvRuleApp.getGuard();
 
-        InfFlowPOSnippetFactory f =
+        final InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(loopInv, ifVars.c1,
                                                    ifVars.c2, executionContext,
                                                    guardTerm, services);
-        Term selfComposedExec =
+        final Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
 
         return posInOcc.subTerm().equalsModRenaming(selfComposedExec);
@@ -95,7 +95,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro {
             return info;
         }
 
-        InitConfig initConfig = proof.getEnv().getInitConfigForEnvironment();
+        final InitConfig initConfig = proof.getEnv().getInitConfigForEnvironment();
 
         final LoopInvariantBuiltInRuleApp loopInvRuleApp =
                 (LoopInvariantBuiltInRuleApp) app;
@@ -107,13 +107,13 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro {
         final Term guardTerm = loopInvRuleApp.getGuard();
 
 
-        LoopInvExecutionPO loopInvExecPO =
+        final LoopInvExecutionPO loopInvExecPO =
                 new LoopInvExecutionPO(initConfig, loopInv,
                                        ifVars.symbExecVars.labelHeapAtPreAsAnonHeapFunc(),
                                        goals.head(), executionContext,
                                        guardTerm,
                                        proof.getServices());
-        UserInterface ui = mediator.getUI();
+        final UserInterface ui = mediator.getUI();
         try {
             final Proof p;
             synchronized (loopInvExecPO) {

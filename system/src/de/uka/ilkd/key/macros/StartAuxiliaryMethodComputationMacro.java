@@ -61,13 +61,13 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro {
         if (!(poForProof instanceof InfFlowContractPO)) {
             return false;
         }
-        InfFlowContractPO po = (InfFlowContractPO) poForProof;
+        final InfFlowContractPO po = (InfFlowContractPO) poForProof;
 
-        InfFlowPOSnippetFactory f =
+        final InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(po.getContract(),
                                                    po.getIFVars().c1,
                                                    po.getIFVars().c2, services);
-        Term selfComposedExec =
+        final Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
 
         return posInOcc.subTerm().equalsModRenaming(selfComposedExec);
@@ -81,16 +81,16 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         final Proof proof = goals.head().proof();
 
-        Services services = proof.getServices();
-        ProofOblInput poForProof = services.getSpecificationRepository().getProofOblInput(proof);
+        final Services services = proof.getServices();
+        final ProofOblInput poForProof = services.getSpecificationRepository().getProofOblInput(proof);
         if (!(poForProof instanceof InfFlowContractPO)) {
             return info;
         }
 
-        InitConfig initConfig = proof.getEnv().getInitConfigForEnvironment();
-        InfFlowContractPO po = (InfFlowContractPO) poForProof;
+        final InitConfig initConfig = proof.getEnv().getInitConfigForEnvironment();
+        final InfFlowContractPO po = (InfFlowContractPO) poForProof;
 
-        SymbolicExecutionPO symbExecPO =
+        final SymbolicExecutionPO symbExecPO =
                 new SymbolicExecutionPO(initConfig, po.getContract(),
                                         po.getIFVars().symbExecVars.labelHeapAtPreAsAnonHeapFunc(),
                                         goals.head(), proof.getServices());

@@ -60,29 +60,29 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro {
             return false;
         }
 
-        Proof proof = goals.head().proof();
-        Services services = proof.getServices();
+        final Proof proof = goals.head().proof();
+        final Services services = proof.getServices();
 
-        RuleApp app = goals.head().node().parent().getAppliedRuleApp();
+        final RuleApp app = goals.head().node().parent().getAppliedRuleApp();
         if (!(app instanceof BlockContractBuiltInRuleApp)) {
             return false;
         }
-        BlockContractBuiltInRuleApp blockRuleApp =
+        final BlockContractBuiltInRuleApp blockRuleApp =
                 (BlockContractBuiltInRuleApp) app;
-        BlockContract contract = blockRuleApp.getContract();
-        IFProofObligationVars ifVars =
+        final BlockContract contract = blockRuleApp.getContract();
+        final IFProofObligationVars ifVars =
                 blockRuleApp.getInformationFlowProofObligationVars();
         if (ifVars == null) {
             return false;
         }
 
-        InfFlowPOSnippetFactory f =
+        final InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(contract,
                                                    ifVars.c1,
                                                    ifVars.c2,
                                                    blockRuleApp.getExecutionContext(),
                                                    services);
-        Term selfComposedExec =
+        final Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
 
         return posInOcc.subTerm().equalsModRenaming(selfComposedExec);
@@ -98,18 +98,18 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro {
         if (goals.head().node().parent() == null) {
             return info;
         }
-        RuleApp app = goals.head().node().parent().getAppliedRuleApp();
+        final RuleApp app = goals.head().node().parent().getAppliedRuleApp();
         if (!(app instanceof BlockContractBuiltInRuleApp)) {
             return info;
         }
 
-        InitConfig initConfig = proof.getEnv().getInitConfigForEnvironment();
+        final InitConfig initConfig = proof.getEnv().getInitConfigForEnvironment();
 
-        BlockContractBuiltInRuleApp blockRuleApp = (BlockContractBuiltInRuleApp) app;
-        BlockContract contract = blockRuleApp.getContract();
-        IFProofObligationVars ifVars = blockRuleApp.getInformationFlowProofObligationVars();
+        final BlockContractBuiltInRuleApp blockRuleApp = (BlockContractBuiltInRuleApp) app;
+        final BlockContract contract = blockRuleApp.getContract();
+        final IFProofObligationVars ifVars = blockRuleApp.getInformationFlowProofObligationVars();
 
-        BlockExecutionPO blockExecPO =
+        final BlockExecutionPO blockExecPO =
                 new BlockExecutionPO(initConfig, contract,
                                      ifVars.symbExecVars.labelHeapAtPreAsAnonHeapFunc(),
                                      goals.head(), blockRuleApp.getExecutionContext(),
