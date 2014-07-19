@@ -85,7 +85,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
             return null;
         }
 
-        Proof proof = goals.head().proof();
+        final Proof proof = goals.head().proof();
         final IGoalChooser goalChooser = mediator.getProfile().getSelectedGoalChooserBuilder().create();
         final ApplyStrategy applyStrategy = new ApplyStrategy(goalChooser);
         final ImmutableList<Goal> ignoredOpenGoals =
@@ -95,7 +95,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
             @Override
             public String getName() { return ""; }
             @Override
-            public String getDescription() { return ""; }
+            public String getDescription() { return "Anonymous macro"; }
         };
         macroAdapter.setNumberSteps(getNumberSteps());
         //
@@ -103,7 +103,6 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         final ProofMacroListener pml =  new ProgressBarListener(macroAdapter, goals.size(),
                                                                 getNumberSteps(), listener);
         applyStrategy.addProverTaskObserver(pml);
-
         // add a focus manager if there is a focus
         if(posInOcc != null && goals != null) {
             AutomatedRuleApplicationManager realManager = null;

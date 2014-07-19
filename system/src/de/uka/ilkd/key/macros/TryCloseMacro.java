@@ -114,13 +114,15 @@ public class TryCloseMacro extends AbstractProofMacro {
             @Override
             public String getName() { return ""; }
             @Override
-            public String getDescription() { return ""; }
+            public String getDescription() { return "Anonymous macro"; }
         };
         macroAdapter.setNumberSteps(getNumberSteps());
         //
         // The observer to handle the progress bar
         final ProofMacroListener pml =  new ProgressBarListener(macroAdapter, goals.size(),
                                                                 getNumberSteps(), listener);
+        final ImmutableList<Goal> ignoredOpenGoals =
+                setDifference(proof.openGoals(), goals);
         applyStrategy.addProverTaskObserver(pml);
 
         //
@@ -131,27 +133,29 @@ public class TryCloseMacro extends AbstractProofMacro {
         //
         // start actual autoprove
         try {
-            for (Goal goal : goals) {
+            for (final Goal goal : goals) {
                 Node node = goal.node();
                 final ApplyStrategyInfo result = applyStrategy.start(proof, goal);
-                final Goal closedGoal;
+                //final Goal closedGoal;
 
                 // retreat if not closed
                 if(!node.isClosed()) {
-                    // FIXME: Goals might be incorrect
                     proof.pruneProof(node);
-                    closedGoal = null;
+                    //closedGoal = null;
                 } else {
-                    closedGoal = goal;
+                    //closedGoal = goal;
                 }
 
-                synchronized(applyStrategy) { // wait for applyStrategy to finish it last rule application
+                synchronized(applyStrategy) { // wait for applyStrategy to finish its last rule application
                     // update statistics
-                    if (closedGoal == null) {
+                    /*if (closedGoal == null) { TODO: This incremental approach would be nicer, but
+                     *                                  therefore the comparison of Goal needs to be fixed.
                         info = new ProofMacroFinishedInfo(info, result);
                     } else {
-                        info = new ProofMacroFinishedInfo(info, result, info.getGoals().removeFirst(goal));
-                    }
+                        info = new ProofMacroFinishedInfo(info, result,
+                                                          info.getGoals().removeFirst(closedGoal));
+                    }*/
+                    info = new ProofMacroFinishedInfo(info, result);
                     if(applyStrategy.hasBeenInterrupted()) { // only now reraise the interruption exception
                         throw new InterruptedException();
                     }
@@ -162,7 +166,19 @@ public class TryCloseMacro extends AbstractProofMacro {
             mediator.setMaxAutomaticSteps(oldNumberOfSteps);
             setNumberSteps(oldNumberOfSteps);
             applyStrategy.removeProverTaskObserver(pml);
+            final ImmutableList<Goal> resultingGoals =
+                    setDifference(proof.openGoals(), ignoredOpenGoals);
+            info = new ProofMacroFinishedInfo(this, info, resultingGoals);
         }
         return info;
+    }
+
+    private static ImmutableList<Goal> setDifference(ImmutableList<Goal> goals1,
+                                                     ImmutableList<Goal> goals2) {
+        ImmutableList<Goal> difference = goals1;
+        for (Goal goal : goals2) {
+            difference = difference.removeFirst(goal);
+        }
+        return difference;
     }
 }

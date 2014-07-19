@@ -778,7 +778,7 @@ public class Proof implements Named {
     }
 
 
-    /** fires the event that the proof has been pruned at the given node */
+    /** fires the event that the proof is being pruned at the given node */
     protected void fireProofIsBeingPruned(Node below) {
         ProofTreeEvent e = new ProofTreeEvent(this, below);
         for (ProofTreeListener listener : listenerList) {

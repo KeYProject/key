@@ -56,13 +56,14 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         setMaxSteps(mediator);
         int steps = getNumberSteps();
-        while (getNumberSteps() > 0 && getCondition() && canApplyTo(mediator, goals, posInOcc)) {
+        final ProofMacro macro = getProofMacro();
+        while (getNumberSteps() > 0 && getCondition() && macro.canApplyTo(mediator, goals, posInOcc)) {
             final ProverTaskListener pml =
                     new ProofMacroListener(this, listener);
-            pml.taskStarted(getProofMacro().getName(), 0);
-            synchronized(getProofMacro()) {
+            pml.taskStarted(macro.getName(), 0);
+            synchronized(macro) {
                 // wait for macro to terminate
-                info = getProofMacro().applyTo(mediator, goals, posInOcc, pml);
+                info = macro.applyTo(mediator, goals, posInOcc, pml);
             }
             pml.taskFinished(info);
             steps -= info.getAppliedRules();
@@ -71,12 +72,13 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
             goals = info.getGoals();
             posInOcc = null;
         }
-        if (steps > 0 && getAltProofMacro().canApplyTo(mediator, goals, posInOcc)) {
+        final ProofMacro altMacro = getAltProofMacro();
+        if (steps > 0 && altMacro.canApplyTo(mediator, goals, posInOcc)) {
             final ProverTaskListener pml =
                     new ProofMacroListener(this, listener);
-            pml.taskStarted(getAltProofMacro().getName(), 0);
-            info = getAltProofMacro().applyTo(mediator, goals, posInOcc, pml);
-            synchronized(getAltProofMacro()) {
+            pml.taskStarted(altMacro.getName(), 0);
+            info = altMacro.applyTo(mediator, goals, posInOcc, pml);
+            synchronized(altMacro) {
                 // wait for macro to terminate
                 info = new ProofMacroFinishedInfo(this, info);
             }

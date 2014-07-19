@@ -60,7 +60,7 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
     public boolean canApplyTo(KeYMediator mediator,
                               ImmutableList<Goal> goals,
                               PosInOccurrence posInOcc) {
-        List<ProofMacro> macros = getProofMacros();
+        final List<ProofMacro> macros = getProofMacros();
         for (int i = 0; i < macros.size(); i++) {
             if (macros.get(i).canApplyTo(mediator, goals, posInOcc)) {
                 return true;
@@ -84,7 +84,7 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
                                     PosInOccurrence posInOcc,
                                     ProverTaskListener listener) throws InterruptedException {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
-        for (ProofMacro macro : getProofMacros()) {
+        for (final ProofMacro macro : getProofMacros()) {
             if(macro.canApplyTo(mediator, goals, posInOcc)) {
                 final ProverTaskListener pml =
                         new ProofMacroListener(macro, listener);
