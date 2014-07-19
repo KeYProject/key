@@ -9,7 +9,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
             <callStackEntry path="/0"/>
             <statement name="return i;" pathCondition="true" pathConditionChanged="false">
                <callStackEntry path="/0"/>
-               <methodReturn name="&lt;return of deadBody&gt;" signature="&lt;return of LoopBodyBranchClosed.deadBody();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+               <methodReturn name="&lt;return of deadBody&gt;" signature="&lt;return of LoopBodyBranchClosed.deadBody();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                   <callStackEntry path="/0"/>
                   <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>

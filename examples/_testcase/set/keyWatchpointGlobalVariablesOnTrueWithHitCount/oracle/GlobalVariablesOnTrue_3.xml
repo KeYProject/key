@@ -6,7 +6,7 @@
             <methodCall name="GlobalVariablesOnTrue.main(x_1);" pathCondition="true" pathConditionChanged="false">
                <branchStatement name="if (x_1&gt;=0)" pathCondition="true" pathConditionChanged="false">
                   <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of GlobalVariablesOnTrue.main(x_1);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of GlobalVariablesOnTrue.main(x_1);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                         <statement name="x_global=-1;" pathCondition="true" pathConditionChanged="false">
                         </statement>
                      </methodReturn>

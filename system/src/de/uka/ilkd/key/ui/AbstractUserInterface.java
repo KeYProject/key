@@ -105,18 +105,19 @@ public abstract class AbstractUserInterface implements UserInterface {
 
    public boolean applyMacro() {
         assert macroChosen();
-        if (getMacro().canApplyTo(getMediator(), null)) {
+        final ProofMacro macro = getMacro();
+        if (macro.canApplyTo(getMediator(), null)) {
             System.out.println(getMacroConsoleOutput());
             Proof proof = getMediator().getSelectedProof();
-            TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(getMacro(), proof);
+            TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
             ProverTaskListener ptl = getListener();
             try {
                 getMediator().stopInterface(true);
                 getMediator().setInteractive(false);
-                ptl.taskStarted(getMacro().getName(), 0);
-                synchronized(getMacro()) {
+                ptl.taskStarted(macro.getName(), 0);
+                synchronized(macro) {
                     // wait for macro to terminate
-                    info = getMacro().applyTo(getMediator(), null, ptl);
+                    info = macro.applyTo(getMediator(), null, ptl);
                 }
             } catch(InterruptedException ex) {
                 Debug.out("Proof macro has been interrupted:");
@@ -128,7 +129,7 @@ public abstract class AbstractUserInterface implements UserInterface {
             }
             return true;
         } else {
-            System.out.println(getMacro().getClass().getSimpleName() + " not applicable!");
+            System.out.println(macro.getClass().getSimpleName() + " not applicable!");
         }
         return false;
     }

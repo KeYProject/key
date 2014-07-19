@@ -15,7 +15,7 @@
                                        <statement name="i++;" pathCondition="true" pathConditionChanged="false">
                                           <loopCondition name="i&lt;3" pathCondition="true" pathConditionChanged="false">
                                              <statement name="return result_1;" pathCondition="true" pathConditionChanged="false">
-                                                <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                    <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                    </termination>
                                                 </methodReturn>

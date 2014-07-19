@@ -99,6 +99,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
       getMediator().addAutoModeListener(autoModeListener);
+      target.registerDebugNode(this);
       initializeAnnotations();
    }
 

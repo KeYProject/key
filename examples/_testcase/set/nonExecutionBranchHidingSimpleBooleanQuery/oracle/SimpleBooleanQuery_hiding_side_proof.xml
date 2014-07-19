@@ -14,7 +14,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
 as result of main&gt;" signatureIncludingReturnValue="&lt;return 
 	Z(2(4(#))) {equals(x,TRUE)}, 
 	Z(neglit(1(1(7(4(#)))))) {not(equals(x,TRUE))}
-as result of SimpleBooleanQuery.main(x);&gt;" isReturnValueComputed="true">
+as result of SimpleBooleanQuery.main(x);&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                   <methodReturnValue name="Z(2(4(#))) {equals(x,TRUE)}" returnValueString="Z(2(4(#)))" hasCondition="true" conditionString="equals(x,TRUE)">
                   </methodReturnValue>
                   <methodReturnValue name="Z(neglit(1(1(7(4(#)))))) {not(equals(x,TRUE))}" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="true" conditionString="not(equals(x,TRUE))">

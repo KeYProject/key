@@ -83,7 +83,7 @@
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main(a,b);&gt;" pathCondition="not(equals(b,a))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(5(#)) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(5(#)) as result of self.main(a,b);&gt;" isReturnValueComputed="true">
+                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main(a,b);&gt;" pathCondition="not(equals(b,a))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(5(#)) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(5(#)) as result of self.main(a,b);&gt;" isReturnValueComputed="true" methodReturnCondition="not(equals(b,a))">
                      <methodReturnValue name="Z(5(#))" returnValueString="Z(5(#))" hasCondition="false">
                      </methodReturnValue>
                      <variable name="self" arrayIndex="-1" isArrayIndex="false">
@@ -141,7 +141,7 @@
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main(a,b);&gt;" pathCondition="equals(b,a)" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(6(#)) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(6(#)) as result of self.main(a,b);&gt;" isReturnValueComputed="true">
+                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main(a,b);&gt;" pathCondition="equals(b,a)" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(6(#)) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(6(#)) as result of self.main(a,b);&gt;" isReturnValueComputed="true" methodReturnCondition="equals(b,a)">
                      <methodReturnValue name="Z(6(#))" returnValueString="Z(6(#))" hasCondition="false">
                      </methodReturnValue>
                      <variable name="self" arrayIndex="-1" isArrayIndex="false">

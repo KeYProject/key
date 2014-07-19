@@ -27,7 +27,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                   <callStackEntry path="/0"/>
                   <statement name="return result_1;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="false">
                      <callStackEntry path="/0"/>
-                     <methodReturn name="&lt;return of sum&gt;" signature="&lt;return of ArraySumWhile.sum(array);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="false" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of sum&gt;" signature="&lt;return of ArraySumWhile.sum(array);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))">
                         <callStackEntry path="/0"/>
                         <termination name="&lt;end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>

@@ -9,7 +9,7 @@ mod: empty
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <branchCondition name="equals(x,TRUE)" pathCondition="equals(x,TRUE)" pathConditionChanged="true" branchCondition="equals(x,TRUE)" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="return magicValue;" pathCondition="equals(x,TRUE)" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of SimpleBooleanQuery.main(x);&gt;" pathCondition="equals(x,TRUE)" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of SimpleBooleanQuery.main(x);&gt;" isReturnValueComputed="true">
+                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of SimpleBooleanQuery.main(x);&gt;" pathCondition="equals(x,TRUE)" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of SimpleBooleanQuery.main(x);&gt;" isReturnValueComputed="true" methodReturnCondition="equals(x,TRUE)">
                      <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                      </methodReturnValue>
                      <termination name="&lt;end&gt;" pathCondition="equals(x,TRUE)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
@@ -19,7 +19,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
             </branchCondition>
             <branchCondition name="not(equals(x,TRUE))" pathCondition="not(equals(x,TRUE))" pathConditionChanged="true" branchCondition="not(equals(x,TRUE))" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="return magicValue;" pathCondition="not(equals(x,TRUE))" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of SimpleBooleanQuery.main(x);&gt;" pathCondition="not(equals(x,TRUE))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(1(1(7(4(#)))))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(neglit(1(1(7(4(#)))))) as result of SimpleBooleanQuery.main(x);&gt;" isReturnValueComputed="true">
+                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of SimpleBooleanQuery.main(x);&gt;" pathCondition="not(equals(x,TRUE))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(1(1(7(4(#)))))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(neglit(1(1(7(4(#)))))) as result of SimpleBooleanQuery.main(x);&gt;" isReturnValueComputed="true" methodReturnCondition="not(equals(x,TRUE))">
                      <methodReturnValue name="Z(neglit(1(1(7(4(#))))))" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="false">
                      </methodReturnValue>
                      <termination name="&lt;end&gt;" pathCondition="not(equals(x,TRUE))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">

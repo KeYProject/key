@@ -14,7 +14,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
 as result of main&gt;" signatureIncludingReturnValue="&lt;return 
 	Z(2(4(#))) {gt(x,Z(neglit(1(#))))}, 
 	Z(neglit(1(1(7(4(#)))))) {lt(x,Z(0(#)))}
-as result of SimpleIntQuery.main(x);&gt;" isReturnValueComputed="true">
+as result of SimpleIntQuery.main(x);&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                   <methodReturnValue name="Z(2(4(#))) {gt(x,Z(neglit(1(#))))}" returnValueString="Z(2(4(#)))" hasCondition="true" conditionString="gt(x,Z(neglit(1(#))))">
                   </methodReturnValue>
                   <methodReturnValue name="Z(neglit(1(1(7(4(#)))))) {lt(x,Z(0(#)))}" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="true" conditionString="lt(x,Z(0(#)))">

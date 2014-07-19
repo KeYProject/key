@@ -17,9 +17,10 @@ public class ProofMacroListener implements ProverTaskListener {
     @Override
     public void taskStarted(String message, int size) {
         numOfInvokedMacros++;
+        final String macroName = getMacro().getName();
         if (superordinateListener != null) {
-            superordinateListener.taskStarted(getMacro().getName()
-                                            + (getMacro().getName().length() == 0
+            superordinateListener.taskStarted(macroName
+                                            + (macroName.length() == 0
                                                 ? "" : " -- ")
                                             + message, size);
         }

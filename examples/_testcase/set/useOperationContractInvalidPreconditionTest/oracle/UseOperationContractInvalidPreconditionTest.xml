@@ -3,7 +3,7 @@
    <methodCall name="UseOperationContractInvalidPreconditionTest.main();" pathCondition="true" pathConditionChanged="false">
       <statement name="UseOperationContractInvalidPreconditionTest obj = new UseOperationContractInvalidPreconditionTest ();" pathCondition="true" pathConditionChanged="false">
          <methodCall name="UseOperationContractInvalidPreconditionTest();" pathCondition="true" pathConditionChanged="false">
-            <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of UseOperationContractInvalidPreconditionTest();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+            <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of UseOperationContractInvalidPreconditionTest();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                <statement name="int magicNumber = obj.magic(-123);" pathCondition="true" pathConditionChanged="false">
                   <operationContract name="result_0 = obj.magic(-123) catch(exc_0)
 pre: -123 &gt;= 0 &amp; obj.&lt;inv&gt;
@@ -13,7 +13,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
                      <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
                         <statement name="int magicNumberCopy = magicNumber;" pathCondition="true" pathConditionChanged="false">
                            <statement name="return magicNumber+magicNumberCopy;" pathCondition="true" pathConditionChanged="false">
-                              <methodReturn name="&lt;return of main&gt;" signature="&lt;return of UseOperationContractInvalidPreconditionTest.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                              <methodReturn name="&lt;return of main&gt;" signature="&lt;return of UseOperationContractInvalidPreconditionTest.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                  </termination>
                               </methodReturn>

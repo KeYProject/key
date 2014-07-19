@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -35,6 +36,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
@@ -76,6 +78,16 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
     * The possible return values.
     */
    private IExecutionMethodReturnValue[] returnValues;
+   
+   /**
+    * The method return condition to reach this node from its calling {@link IExecutionMethodCall}.
+    */
+   private Term methodReturnCondition;
+   
+   /**
+    * The human readable method return condition to reach this node from its calling {@link IExecutionMethodCall}.
+    */
+   private String formatedMethodReturnCondition;
    
    /**
     * Constructor.
@@ -245,14 +257,15 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
     */
    protected IExecutionMethodReturnValue[] lazyComputeReturnValues() throws ProofInputException {
       if (!isDisposed()) {
+         final Services services = getServices();
          // Check if a result variable is available
          MethodBodyStatement mbs = getMethodCall().getActiveStatement();
          IProgramVariable resultVar = mbs.getResultVariable();
          // Create a temporary result variable for non void methods in case that it is missing in method frame
          if (resultVar == null) {
-            IProgramMethod pm = mbs.getProgramMethod(getServices());
+            IProgramMethod pm = mbs.getProgramMethod(services);
             if (!pm.isVoid()) {
-               resultVar = new LocationVariable(new ProgramElementName(getServices().getTermBuilder().newName("TmpResultVar")), pm.getReturnType());
+               resultVar = new LocationVariable(new ProgramElementName(services.getTermBuilder().newName("TmpResultVar")), pm.getReturnType());
             }
          }
          if (resultVar != null) {
@@ -260,9 +273,9 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
             Node methodReturnNode = findMethodReturnNode(getProofNode());
             if (methodReturnNode != null) {
                // Start site proof to extract the value of the result variable.
-               SiteProofVariableValueInput input = SymbolicExecutionUtil.createExtractReturnVariableValueSequent(getServices(),
+               SiteProofVariableValueInput input = SymbolicExecutionUtil.createExtractReturnVariableValueSequent(services,
                                                                                                                  mbs.getBodySourceAsTypeReference(),
-                                                                                                                 mbs.getProgramMethod(getServices()),
+                                                                                                                 mbs.getProgramMethod(services),
                                                                                                                  mbs.getDesignatedContext(), 
                                                                                                                  methodReturnNode,
                                                                                                                  getProofNode(),
@@ -279,7 +292,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                      Goal goal = info.getProof().openGoals().head();
                      Term returnValue = SideProofUtil.extractOperatorValue(goal, input.getOperator());
                      assert returnValue != null;
-                     returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), returnValue, getServices());
+                     returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), returnValue, services);
                      return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), returnValue, null)};
                   }
                   else {
@@ -288,7 +301,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                      for (Goal goal : info.getProof().openGoals()) {
                         Term returnValue = SideProofUtil.extractOperatorValue(goal, input.getOperator());
                         assert returnValue != null;
-                        returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.node().sequent(), returnValue, getServices());
+                        returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.node().sequent(), returnValue, services);
                         List<Node> nodeList = valueNodeMap.get(returnValue);
                         if (nodeList == null) {
                            nodeList = new LinkedList<Node>();
@@ -310,7 +323,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                               Term condition = SymbolicExecutionUtil.computePathCondition(node, false);
                               conditions.add(condition);
                            }
-                           Term condition = getServices().getTermBuilder().or(conditions);
+                           Term condition = services.getTermBuilder().or(conditions);
                            if (conditions.size() >= 2) {
                               condition = SymbolicExecutionUtil.simplify(info.getProof(), condition);
                            }
@@ -393,5 +406,54 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
    @Override
    public String getElementType() {
       return "Method Return";
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Term getMethodReturnCondition() throws ProofInputException {
+      if (methodReturnCondition == null) {
+         lazyComputeMethodReturnCondition();
+      }
+      return methodReturnCondition;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getFormatedMethodReturnCondition() throws ProofInputException {
+      if (methodReturnCondition == null) {
+         lazyComputeMethodReturnCondition();
+      }
+      return formatedMethodReturnCondition;
+   }
+
+   /**
+    * Computes the path condition lazily when {@link #getMethodReturnCondition()}
+    * or {@link #getFormatedMethodReturnCondition()} is called the first time.
+    * @throws ProofInputException Occurred Exception
+    */
+   protected void lazyComputeMethodReturnCondition() throws ProofInputException {
+      if (!isDisposed()) {
+         final Services services = getServices();
+         // Collect branch conditions
+         List<Term> bcs = new LinkedList<Term>();
+         AbstractExecutionNode parent = getParent();
+         while (parent != null && parent != methodCall) {
+            if (parent instanceof IExecutionBranchCondition) {
+               bcs.add(((IExecutionBranchCondition)parent).getBranchCondition());
+            }
+            parent = parent.getParent();
+         }
+         // Add current branch condition to path
+         methodReturnCondition = services.getTermBuilder().and(bcs);
+         // Simplify path condition
+         methodReturnCondition = SymbolicExecutionUtil.simplify(getProof(), methodReturnCondition);
+         methodReturnCondition = SymbolicExecutionUtil.improveReadability(methodReturnCondition, services);
+         // Format path condition
+         formatedMethodReturnCondition = formatTerm(methodReturnCondition, services);
+      }
    }
 }

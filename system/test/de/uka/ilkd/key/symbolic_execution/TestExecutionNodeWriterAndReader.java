@@ -184,7 +184,7 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       KeYlessMethodCall mc = new KeYlessMethodCall(ln, "mc", "pc8", false);
       mc.addCallStackEntry(mc);
       ln.addChild(mc);
-      KeYlessMethodReturn mr = new KeYlessMethodReturn(mc, "mr", "pc9", true, "mc with return value", "mc(arg)", "mc(arg) with return value", true);
+      KeYlessMethodReturn mr = new KeYlessMethodReturn(mc, "mr", "pc9", true, "mc with return value", "mc(arg)", "mc(arg) with return value", true, "myMethodReturnCondition");
       mr.addReturnValue(new KeYlessMethodReturnValue("rv1", "rv1String", false, null));
       mr.addReturnValue(new KeYlessMethodReturnValue("rv2", "rv2String", true, "c2String"));
       mc.addCallStackEntry(mc);

@@ -8,7 +8,7 @@ post: result_0 = javaMulInt(x, x) &amp; self.&lt;inv&gt; &amp; exc_0 = null
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="false" notNullCheckComplied="false">
             <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (result)">
-               <methodReturn name="&lt;return of mainResult&gt;" signature="&lt;return of self.mainResult(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return result_0 as result of mainResult&gt;" signatureIncludingReturnValue="&lt;return result_0 as result of self.mainResult(x);&gt;" isReturnValueComputed="true">
+               <methodReturn name="&lt;return of mainResult&gt;" signature="&lt;return of self.mainResult(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return result_0 as result of mainResult&gt;" signatureIncludingReturnValue="&lt;return result_0 as result of self.mainResult(x);&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                   <methodReturnValue name="result_0" returnValueString="result_0" hasCondition="false">
                   </methodReturnValue>
                   <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">

@@ -82,6 +82,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      target.registerDebugNode(this);
       initializeAnnotations();
    }
 

@@ -3091,7 +3091,7 @@ public final class SymbolicExecutionUtil {
                                    Services services, 
                                    boolean useUnicode,
                                    boolean usePrettyPrinting) {
-      if (useUnicode || usePrettyPrinting) {
+      if ((useUnicode || usePrettyPrinting) && services != null) {
          StringBuffer result;
          NotationInfo ni = new NotationInfo();
          LogicPrinter logicPrinter = new LogicPrinter(new ProgramPrinter(null), ni, services, true);
