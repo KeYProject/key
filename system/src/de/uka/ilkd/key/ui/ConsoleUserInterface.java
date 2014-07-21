@@ -320,7 +320,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
    @Override
    public File saveProof(Proof proof, String fileExtension) {
-       if (batchMode.isLoadOnly()) {
+       if (batchMode == null || batchMode.isLoadOnly()) {
            return null;
        }
        final String defaultName =
