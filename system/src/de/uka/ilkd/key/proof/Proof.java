@@ -192,11 +192,6 @@ public class Proof implements Named {
     }
 
 
-    /** constructs a new empty proof */
-    public Proof(InitConfig initConfig) {
-        this ( "", initConfig );
-    }
-
 
     /** constructs a new empty proof with name */
     public Proof(String name, InitConfig initConfig) {
