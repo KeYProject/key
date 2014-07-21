@@ -19,13 +19,16 @@
                                     </methodReturn>
                                  </statement>
                               </statement>
+                              <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
                            </methodCall>
                         </statement>
                      </methodReturn>
                   </statement>
                </statement>
+               <methodReturnEntry path="/0/0/0/0/0/0/0"/>
             </methodCall>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
 </start>

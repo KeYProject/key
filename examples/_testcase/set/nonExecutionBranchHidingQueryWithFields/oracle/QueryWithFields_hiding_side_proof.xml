@@ -29,5 +29,6 @@ as result of self.main(x);&gt;" isReturnValueComputed="true" methodReturnConditi
             </statement>
          </operationContract>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0"/>
    </methodCall>
 </start>

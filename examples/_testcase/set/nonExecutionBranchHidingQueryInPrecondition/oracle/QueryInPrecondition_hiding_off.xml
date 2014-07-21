@@ -47,5 +47,8 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
             </branchCondition>
          </operationContract>
       </statement>
+      <methodReturnEntry path="/0/0/0/1/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/1/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/0/0/0"/>
    </methodCall>
 </start>

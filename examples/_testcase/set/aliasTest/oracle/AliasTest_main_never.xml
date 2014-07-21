@@ -127,5 +127,6 @@ as result of self.main(a,b);&gt;" isReturnValueComputed="true" methodReturnCondi
             </statement>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0"/>
    </methodCall>
 </start>

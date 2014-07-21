@@ -450,9 +450,14 @@ public final class SEDUIUtil {
                            }
                         }
                      };
-                     treeViewer.getControl().getDisplay().syncExec(run);
-                     if (run.getException() != null) {
-                        throw new DebugException(LogUtil.getLogger().createErrorStatus(run.getException().getMessage(), run.getException()));
+                     if (!treeViewer.getControl().isDisposed()) {
+                        treeViewer.getControl().getDisplay().syncExec(run);
+                        if (run.getException() != null) {
+                           throw new DebugException(LogUtil.getLogger().createErrorStatus(run.getException().getMessage(), run.getException()));
+                        }
+                     }
+                     else {
+                        monitor.setCanceled(true);
                      }
                   }
                   finally {

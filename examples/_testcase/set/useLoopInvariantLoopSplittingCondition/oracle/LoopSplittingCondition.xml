@@ -57,6 +57,7 @@ mod: false" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" i
                            </methodReturn>
                         </statement>
                      </branchStatement>
+                     <methodReturnEntry path="/0/0/0/0/0/0/0/0/0"/>
                   </methodCall>
                </branchCondition>
                <branchCondition name="update-application(parallel-upd(elem-update(i)(i_1),elem-update(x)(x_8)),\&lt;{method-frame(source=main(int)@LoopSplittingCondition): {
@@ -147,6 +148,7 @@ mod: false" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initially
                            </methodReturn>
                         </statement>
                      </branchStatement>
+                     <methodReturnEntry path="/0/0/1/0/0/0/0/0/0"/>
                   </methodCall>
                </branchCondition>
                <branchCondition name="update-application(parallel-upd(elem-update(i)(i_0),elem-update(x)(x_0)),\&lt;{method-frame(source=main(int)@LoopSplittingCondition): {
@@ -183,5 +185,7 @@ mod: false" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initially
             </loopInvariant>
          </branchCondition>
       </statement>
+      <methodReturnEntry path="/0/0/1/0/1/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/1/0/0"/>
    </methodCall>
 </start>

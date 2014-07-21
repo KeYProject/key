@@ -27,10 +27,12 @@
                                                             </statement>
                                                          </methodReturn>
                                                       </statement>
+                                                      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                    </methodCall>
                                                 </statement>
                                              </methodReturn>
                                           </statement>
+                                          <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                        </methodCall>
                                     </statement>
                                  </branchCondition>
@@ -45,11 +47,15 @@
                               </branchStatement>
                            </methodReturn>
                         </statement>
+                        <methodReturnEntry path="/0/0/0/0/0/0/0/0/0"/>
                      </methodCall>
                   </statement>
                </methodReturn>
             </statement>
+            <methodReturnEntry path="/0/0/0/0/0"/>
          </methodCall>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/1/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
 </start>
