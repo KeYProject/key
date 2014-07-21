@@ -108,7 +108,6 @@ public class Proof implements Named {
     /** the environment of the proof with specs and java model*/
     private ProofCorrectnessMgt localMgt;
 
-    private ProofSettings settings;
     private ProofIndependentSettings pis;
     /**
      * when different users load and save a proof this vector fills up with
@@ -145,7 +144,7 @@ public class Proof implements Named {
     /** 
      * constructs a new empty proof with name 
      */
-    private Proof(Name name, InitConfig initConfig, ProofSettings settings) {
+    private Proof(Name name, InitConfig initConfig) {
         this.name = name;
         assert initConfig != null : "Tried to create proof without valid services.";
         this.initConfig = initConfig;
@@ -162,7 +161,8 @@ public class Proof implements Named {
 
         localMgt = new ProofCorrectnessMgt(this);
 
-        setSettings(settings);
+        initConfig.getSettings().getStrategySettings().addSettingsListener(settingsListener);
+
         pis = ProofIndependentSettings.DEFAULT_INSTANCE;
     }
 
@@ -171,13 +171,13 @@ public class Proof implements Named {
      */
     private void initStrategy() {
         StrategyProperties activeStrategyProperties =
-                        settings.getStrategySettings().getActiveStrategyProperties();
+                        initConfig.getSettings().getStrategySettings().getActiveStrategyProperties();
 
         final Profile profile = getServices().getProfile();
 
-        if (profile.supportsStrategyFactory(settings.getStrategySettings().getStrategy())) {
+        if (profile.supportsStrategyFactory(initConfig.getSettings().getStrategySettings().getStrategy())) {
             setActiveStrategy
-            (profile.getStrategyFactory(settings.getStrategySettings().
+            (profile.getStrategyFactory(initConfig.getSettings().getStrategySettings().
                             getStrategy()).create(this, activeStrategyProperties));
         } else {
             setActiveStrategy(
@@ -196,15 +196,13 @@ public class Proof implements Named {
     /** constructs a new empty proof with name */
     public Proof(String name, InitConfig initConfig) {
         this ( new Name ( name ),
-                        initConfig,
-                        new ProofSettings ( ProofSettings.DEFAULT_SETTINGS ) );
+                        initConfig);
     }
 
     private Proof(String name, Sequent problem, TacletIndex rules,
-                    BuiltInRuleIndex builtInRules, InitConfig initConfig,
-                    ProofSettings settings) {
+                    BuiltInRuleIndex builtInRules, InitConfig initConfig) {
 
-        this ( new Name ( name ), initConfig, settings );
+        this ( new Name ( name ), initConfig );
 
         localMgt = new ProofCorrectnessMgt(this);
 
@@ -221,35 +219,19 @@ public class Proof implements Named {
     }
 
     public Proof(String name, Term problem, String header, TacletIndex rules,
-                    BuiltInRuleIndex builtInRules, InitConfig initConfig, ProofSettings settings) {
+                    BuiltInRuleIndex builtInRules, InitConfig initConfig ) {
         this ( name, Sequent.createSuccSequent
                         (Semisequent.EMPTY_SEMISEQUENT.insert(0,
                                         new SequentFormula(problem)).semisequent()),
-                                        rules, builtInRules, initConfig, settings );
+                                        rules, builtInRules, initConfig );
         problemHeader = header;
     }
 
 
     public Proof(String name, Sequent sequent, String header, TacletIndex rules,
-                    BuiltInRuleIndex builtInRules, InitConfig initConfig, ProofSettings settings) {
-        this ( name, sequent, rules, builtInRules, initConfig, settings );
+                    BuiltInRuleIndex builtInRules, InitConfig initConfig ) {
+        this ( name, sequent, rules, builtInRules, initConfig );
         problemHeader = header;
-    }
-
-
-    public Proof (String name,
-                    Term problem,
-                    String header,
-                    TacletIndex rules,
-                    BuiltInRuleIndex builtInRules,
-                    InitConfig initConfig) {
-        this ( name,
-                        problem,
-                        header,
-                        rules,
-                        builtInRules,
-                        initConfig,
-                        new ProofSettings ( ProofSettings.DEFAULT_SETTINGS ) );
     }
 
 
@@ -266,7 +248,7 @@ public class Proof implements Named {
             localMgt.removeProofListener(); // This is strongly required because the listener is contained in a static List
         }
         // remove setting listener from settings
-        setSettings(null);
+        initConfig.getSettings().getStrategySettings().removeSettingsListener(settingsListener);
         // set every reference (except the name) to null
         root = null;        
         env = null;
@@ -275,14 +257,13 @@ public class Proof implements Named {
         abbreviations = null;
         initConfig = null;
         localMgt = null;
-        settings = null;
         userLog = null;
         keyVersionLog = null;
         activeStrategy = null;
         settingsListener = null;
-        disposed = true;
         ruleAppListenerList = null;
         listenerList = null;
+        disposed = true;
         fireProofDisposed(new ProofDisposedEvent(this));
     }
 
@@ -421,21 +402,8 @@ public class Proof implements Named {
     }
 
 
-    public final void setSettings(ProofSettings newSettings) {
-        if (settings != null ){
-            // deregister settings listener
-            settings.getStrategySettings().removeSettingsListener(settingsListener);
-        }
-        settings = newSettings;
-        if (settings != null ){
-            // register settings listener
-            settings.getStrategySettings().addSettingsListener (settingsListener);
-        }
-    }
-
-
     public ProofSettings getSettings() {
-        return settings;
+        return initConfig.getSettings();
     }
     public ProofIndependentSettings getProofIndependentSettings(){
         return pis;
@@ -591,16 +559,18 @@ public class Proof implements Named {
      * Since the class has influence on the internal state of the proof it should not be
      * moved to a new file, in order to restrict the access to it.
      */
-    private class ProofPruner{
+    private class ProofPruner {
         private Node firstLeaf = null;
 
-        public ImmutableList<Node> prune(final Node cuttingPoint){
+        public ImmutableList<Node> prune(final Node cuttingPoint) {
 
-            // there is only one leaf containing a open goal that is interesting for pruning the sub-tree of <code>node</code>,
-            // namely the first leave that is found by a breadth first search.
-            // The other leaves containing open goals are only important for removing the open goals from the open goal list.
-            // To that end those leaves are stored in residualLeaves. For increasing the performance a tree structure has been
-            // chosen, because it offers the operation <code>contains</code> in O(log n).
+            // there is only one leaf containing an open goal that is interesting for pruning the
+            // sub-tree of <code>node</code>, namely the first leave that is found by a breadth first search.
+            // The other leaves containing open goals are only important for removing the open goals
+            // from the open goal list.
+            // To that end, those leaves are stored in residualLeaves. For increasing the performance,
+            // a tree structure has been chosen, because it offers the operation
+            // <code>contains</code> in O(log n).
             final Set<Node> residualLeaves = new TreeSet<Node>(new Comparator<Node>() {
                 @Override
                 public int compare(Node o1, Node o2) {
@@ -609,16 +579,16 @@ public class Proof implements Named {
             });
 
 
-            // First, make a breadth first search, in order to find the leaf with the shortest distance to the cutting point
-            // and to remove the rule applications from the proof management system.
+            // First, make a breadth first search, in order to find the leaf with the shortest distance
+            // to the cutting point and to remove the rule applications from the proof management system.
             // Furthermore store the residual leaves.
             breadthFirstSearch(cuttingPoint, new ProofVisitor() {
                 @Override
                 public void visit(Proof proof, Node visitedNode) {
                     if(visitedNode.leaf() && !visitedNode.isClosed()){
-                        if(firstLeaf == null){
+                        if(firstLeaf == null) {
                             firstLeaf = visitedNode;
-                        }else{
+                        } else {
                             residualLeaves.add(visitedNode);
                         }
 
@@ -626,7 +596,7 @@ public class Proof implements Named {
 
                     if (initConfig != null && visitedNode.parent() != null) {
                         Proof.this.mgt().ruleUnApplied(visitedNode.parent().getAppliedRuleApp());
-                        for (final NoPosTacletApp app :  visitedNode.parent().getLocalIntroducedRules()){
+                        for (final NoPosTacletApp app :  visitedNode.parent().getLocalIntroducedRules()) {
                             initConfig.getJustifInfo().removeJustificationFor(app.taclet());
                         }
 
@@ -638,8 +608,8 @@ public class Proof implements Named {
             final Goal firstGoal = getGoal(firstLeaf);
             assert firstGoal != null;
 
-            // Go from the first leaf that has been found to the cutting point. For each node on the path remove
-            // the local rules from firstGoal that have been added by the considered node.
+            // Go from the first leaf that has been found to the cutting point. For each node on the path,
+            // remove the local rules from firstGoal that have been added by the considered node.
             traverseFromChildToParent(firstLeaf,cuttingPoint,new ProofVisitor() {
 
                 @Override
@@ -666,7 +636,7 @@ public class Proof implements Named {
 
         }
 
-        private void refreshGoal(Goal goal, Node node){
+        private void refreshGoal(Goal goal, Node node) {
             goal.setGlobalProgVars(node.getGlobalProgVars());
             goal.getRuleAppManager().clearCache();
             goal.ruleAppIndex().clearIndexes();
@@ -674,7 +644,7 @@ public class Proof implements Named {
             node.clearNameCache();
         }
 
-        private void removeOpenGoals(Collection<Node> toBeRemoved){
+        private void removeOpenGoals(Collection<Node> toBeRemoved) {
             ImmutableList<Goal> newGoalList = ImmutableSLList.nil();
             for(Goal openGoal : openGoals){
                 if(!toBeRemoved.contains(openGoal.node())){
@@ -685,7 +655,7 @@ public class Proof implements Named {
         }
 
 
-        private ImmutableList<Node> cut(Node node){
+        private ImmutableList<Node> cut(Node node) {
             ImmutableList<Node> children = ImmutableSLList.nil();
             Iterator<Node> it = node.childrenIterator();
 
@@ -701,7 +671,7 @@ public class Proof implements Named {
 
     }
 
-    public void pruneProof(Goal goal){
+    public synchronized void pruneProof(Goal goal) {
         if(goal.node().parent()!= null){
             pruneProof(goal.node().parent());
         }
@@ -709,28 +679,28 @@ public class Proof implements Named {
 
     /**
      * Prunes the subtree beneath the node <code>cuttingPoint</code>, i.e. the node
-     * <code>cuttingPoint</code> remains as the last node on the branch. As a result a
-     * open goal is associated with this node.
+     * <code>cuttingPoint</code> remains as the last node on the branch. As a result,
+     * an open goal is associated with this node.
      * @param cuttingPoint
      * @return Returns the sub trees that has been pruned.
      */
 
-    public ImmutableList<Node> pruneProof(Node cuttingPoint){
+    public synchronized ImmutableList<Node> pruneProof(Node cuttingPoint) {
         return pruneProof(cuttingPoint,true);
     }
 
-    public ImmutableList<Node> pruneProof(Node cuttingPoint,boolean fireChanges){
+    public synchronized ImmutableList<Node> pruneProof(Node cuttingPoint, boolean fireChanges) {
         assert cuttingPoint.proof() == this;
-        if(getGoal(cuttingPoint)!= null || cuttingPoint.isClosed()){
+        if(getGoal(cuttingPoint) != null || cuttingPoint.isClosed()){
             return null;
         }
 
         ProofPruner pruner = new ProofPruner();
-        if(fireChanges){
+        if (fireChanges) {
             fireProofIsBeingPruned(cuttingPoint);
         }
         ImmutableList<Node> result = pruner.prune(cuttingPoint);
-        if(fireChanges){
+        if (fireChanges) {
             fireProofGoalsChanged();
             fireProofPruned(cuttingPoint);
         }
@@ -742,7 +712,7 @@ public class Proof implements Named {
      *  <code>startNode</code>. The visited notes are reported to the object <code>visitor</code>.
      *  The first reported node is <code>startNode</code>.
      */
-    public void breadthFirstSearch(Node startNode, ProofVisitor visitor){
+    public void breadthFirstSearch(Node startNode, ProofVisitor visitor) {
         ArrayDeque<Node> queue = new ArrayDeque<Node>();
         queue.add(startNode);
         while(!queue.isEmpty()){
@@ -755,7 +725,7 @@ public class Proof implements Named {
         }
     }
 
-    public void traverseFromChildToParent(Node child, Node parent, ProofVisitor visitor){
+    public void traverseFromChildToParent(Node child, Node parent, ProofVisitor visitor) {
         do{
             visitor.visit(this, child);
             child = child.parent();
@@ -776,7 +746,7 @@ public class Proof implements Named {
     }
 
 
-    /** fires the event that the proof has been pruned at the given node */
+    /** fires the event that the proof is being pruned at the given node */
     protected void fireProofIsBeingPruned(Node below) {
         ProofTreeEvent e = new ProofTreeEvent(this, below);
         for (ProofTreeListener listener : listenerList) {
@@ -1079,7 +1049,9 @@ public class Proof implements Named {
                     } else if (ruleApp instanceof TacletApp) {
                         final de.uka.ilkd.key.rule.Taclet t = ((TacletApp)ruleApp).taclet();
                         final String tName = t.name().toString();
-                        if (tName.startsWith("allLeft") || tName.startsWith("exRight") || tName.startsWith("inst")) {
+                        if (tName.startsWith("allLeft")
+                                || tName.startsWith("exRight")
+                                || tName.startsWith("inst")) {
                             tmpQuant++;
                         }
                     }
@@ -1131,7 +1103,8 @@ public class Proof implements Named {
             }
 
             summaryList.add(new Pair<String, String>("Rule applications", ""));
-            summaryList.add(new Pair<String, String>("Quantifier instantiations", ""+quantifierInstantiations));
+            summaryList.add(new Pair<String, String>("Quantifier instantiations",
+                                                     ""+quantifierInstantiations));
             summaryList.add(new Pair<String, String>("One-step Simplifier apps", "" +
                             ossApps));
             summaryList.add(new Pair<String, String>("SMT solver apps", "" +

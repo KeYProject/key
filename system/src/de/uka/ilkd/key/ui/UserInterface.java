@@ -40,7 +40,9 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironmentListener;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-public interface UserInterface extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor, ProofEnvironmentListener {
+public interface UserInterface
+    extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor, ProofEnvironmentListener {
+
     /**
      * these methods are called immediately before automode is started to ensure that
      * the GUI can respond in a reasonable way, e.g., change the cursor to a waiting cursor
@@ -73,8 +75,6 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      */
     boolean confirmTaskRemoval(String message);
 
-    void finish(Proof proof);
-
     /**
      * loads the problem or proof from the given file
      * @param file the File with the problem description or the proof
@@ -94,6 +94,8 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
     ProofMacro getMacro();
 
     boolean macroChosen();
+
+    public ProverTaskListener getListener();
 
     boolean applyMacro();
 

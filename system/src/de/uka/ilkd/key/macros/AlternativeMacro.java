@@ -60,7 +60,7 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
     public boolean canApplyTo(KeYMediator mediator,
                               ImmutableList<Goal> goals,
                               PosInOccurrence posInOcc) {
-        List<ProofMacro> macros = getProofMacros();
+        final List<ProofMacro> macros = getProofMacros();
         for (int i = 0; i < macros.size(); i++) {
             if (macros.get(i).canApplyTo(mediator, goals, posInOcc)) {
                 return true;
@@ -79,16 +79,27 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
      *             if the macro is interrupted.
      */
     @Override
-    public void applyTo(KeYMediator mediator,
-                        ImmutableList<Goal> goals,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) throws InterruptedException {
-        for (ProofMacro macro : getProofMacros()) {
+    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+                                    ImmutableList<Goal> goals,
+                                    PosInOccurrence posInOcc,
+                                    ProverTaskListener listener) throws InterruptedException {
+        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
+        for (final ProofMacro macro : getProofMacros()) {
             if(macro.canApplyTo(mediator, goals, posInOcc)) {
-                macro.applyTo(mediator, goals, posInOcc, listener);
-                return;
+                final ProverTaskListener pml =
+                        new ProofMacroListener(macro, listener);
+                pml.taskStarted(macro.getName(), 0);
+                synchronized(macro) {
+                    // wait for macro to terminate
+                    info = macro.applyTo(mediator, goals, posInOcc, pml);
+                }
+                pml.taskFinished(info);
+                // change source to this macro ... [TODO]
+                info = new ProofMacroFinishedInfo(this, info);
+                return info;
             }
         }
+        return info;
     }
 
     /**

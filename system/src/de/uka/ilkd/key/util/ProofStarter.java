@@ -17,7 +17,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -87,10 +86,7 @@ public class ProofStarter {
                     EMPTY_PROOF_HEADER,
                     initConfig.createTacletIndex(),
                     initConfig.createBuiltInRuleIndex(),
-                    initConfig,
-                    initConfig.getSettings() != null
-                    ? initConfig.getSettings()
-                            : new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
+                    initConfig );
         }
 
 
@@ -197,15 +193,15 @@ public class ProofStarter {
      * starts proof attempt
      * @return the proof after the attempt terminated
      */
-     public ApplyStrategyInfo start(boolean finishAfterProof) {
-        return start(proof.openGoals(), finishAfterProof);
+     public ApplyStrategyInfo start() {
+        return start(proof.openGoals());
      }
 
    /**
     * starts proof attempt
     * @return the proof after the attempt terminated
     */
-    public ApplyStrategyInfo start(ImmutableList<Goal> goals, boolean finishAfterStrategy) {
+    public ApplyStrategyInfo start(ImmutableList<Goal> goals) {
         try {
            final Profile profile = proof.getInitConfig().getProfile();
            final StrategyFactory factory = profile.getDefaultStrategyFactory();
@@ -224,7 +220,7 @@ public class ProofStarter {
            profile.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);
 
            IGoalChooser goalChooser = profile.getSelectedGoalChooserBuilder().create();
-           ApplyStrategy prover = new ApplyStrategy(goalChooser, finishAfterStrategy);
+           ApplyStrategy prover = new ApplyStrategy(goalChooser);
            if (ptl != null) {
               prover.addProverTaskObserver(ptl);
            }
