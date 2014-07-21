@@ -193,15 +193,15 @@ public class ProofStarter {
      * starts proof attempt
      * @return the proof after the attempt terminated
      */
-     public ApplyStrategyInfo start(boolean finishAfterProof) {
-        return start(proof.openGoals(), finishAfterProof);
+     public ApplyStrategyInfo start() {
+        return start(proof.openGoals());
      }
 
    /**
     * starts proof attempt
     * @return the proof after the attempt terminated
     */
-    public ApplyStrategyInfo start(ImmutableList<Goal> goals, boolean finishAfterStrategy) {
+    public ApplyStrategyInfo start(ImmutableList<Goal> goals) {
         try {
            final Profile profile = proof.getInitConfig().getProfile();
            final StrategyFactory factory = profile.getDefaultStrategyFactory();
@@ -220,7 +220,7 @@ public class ProofStarter {
            profile.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);
 
            IGoalChooser goalChooser = profile.getSelectedGoalChooserBuilder().create();
-           ApplyStrategy prover = new ApplyStrategy(goalChooser, finishAfterStrategy);
+           ApplyStrategy prover = new ApplyStrategy(goalChooser);
            if (ptl != null) {
               prover.addProverTaskObserver(ptl);
            }

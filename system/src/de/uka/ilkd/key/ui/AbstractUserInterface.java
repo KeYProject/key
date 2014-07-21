@@ -13,15 +13,15 @@
 
 package de.uka.ilkd.key.ui;
 
-import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -42,12 +42,9 @@ import de.uka.ilkd.key.util.Debug;
 
 public abstract class AbstractUserInterface implements UserInterface {
 
-   /**
-    * The used {@link PropertyChangeSupport}.
-    */
-    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-
     private ProofMacro autoMacro = new SkipMacro();
+
+    private ProverTaskListener pml = null;
 
     protected ProblemLoader getProblemLoader(File file, List<File> classPath,
                                              File bootClassPath, KeYMediator mediator) {
@@ -81,6 +78,14 @@ public abstract class AbstractUserInterface implements UserInterface {
     }
 
     @Override
+    public final ProverTaskListener getListener() {
+        if (this.pml == null) {
+            this.pml = new ProofMacroListenerAdapter();
+        }
+        return new CompositePTListener(this, pml);
+    }
+
+    @Override
     public ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput, 
           ProofAggregate proofList, InitConfig initConfig) {
        final ProofEnvironment env = new ProofEnvironment(initConfig); 
@@ -91,27 +96,31 @@ public abstract class AbstractUserInterface implements UserInterface {
 
    public boolean applyMacro() {
         assert macroChosen();
-        if (getMacro().canApplyTo(getMediator(), null)) {
+        final ProofMacro macro = getMacro();
+        if (macro.canApplyTo(getMediator(), null)) {
             System.out.println(getMacroConsoleOutput());
+            Proof proof = getMediator().getSelectedProof();
+            TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
+            ProverTaskListener ptl = getListener();
             try {
                 getMediator().stopInterface(true);
                 getMediator().setInteractive(false);
-                getMacro().applyTo(getMediator(), null, this);
-                getMediator().setInteractive(true);
-                getMediator().startInterface(true);
+                ptl.taskStarted(macro.getName(), 0);
+                synchronized(macro) {
+                    // wait for macro to terminate
+                    info = macro.applyTo(getMediator(), null, ptl);
+                }
             } catch(InterruptedException ex) {
                 Debug.out("Proof macro has been interrupted:");
                 Debug.out(ex);
             } finally {
-                Proof proof = getMediator().getSelectedProof();
-                TaskFinishedInfo info =
-                        new DefaultTaskFinishedInfo(getMacro(), null, proof, proof.getAutoModeTime(),
-                                                    proof.countNodes(), proof.openGoals().size());
-                taskFinished(info);
+                ptl.taskFinished(info);
+                getMediator().setInteractive(true);
+                getMediator().startInterface(true);
             }
             return true;
         } else {
-            System.out.println(getMacro().getClass().getSimpleName() + " not applicable!");
+            System.out.println(macro.getClass().getSimpleName() + " not applicable!");
         }
         return false;
     }
@@ -217,11 +226,33 @@ public abstract class AbstractUserInterface implements UserInterface {
     @Override
     public void notifyAutomodeStopped() {
     }
-    
+
     @Override
     public void proofUnregistered(ProofEnvironmentEvent event) {
        if (event.getSource().getProofs().isEmpty()) {
           event.getSource().removeProofEnvironmentListener(this);
        }
+    }
+
+    abstract protected void macroStarted(String message, int size);
+    abstract protected void macroFinished(TaskFinishedInfo info);
+
+
+    private class ProofMacroListenerAdapter implements ProverTaskListener {
+
+        @Override
+        public void taskStarted(String message, int size) {
+            macroStarted(message, size);
+        }
+
+        @Override
+        public void taskProgress(int position) {
+            // not needed yet
+        }
+
+        @Override
+        public void taskFinished(TaskFinishedInfo info) {
+            macroFinished(info);
+        }
     }
 }
