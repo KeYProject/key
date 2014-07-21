@@ -99,7 +99,7 @@ public class CounterExampleAction extends MainWindowAction {
                 newInitConfig.createTacletIndex(),
                 newInitConfig.createBuiltInRuleIndex(),
                 newInitConfig,
-                newInitConfig.getSettings());
+                oldProof.getSettings());
 
         proof.setEnv(oldProof.getEnv());
         proof.setNamespaces(oldProof.getNamespaces());
