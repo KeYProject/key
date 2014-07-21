@@ -115,7 +115,7 @@ public class TestProofTree extends TestCase {
 		SequentFormula(t_b7)).semisequent(),
 	     Semisequent.EMPTY_SEMISEQUENT); 
 
-	p=new Proof(new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+	p=new Proof("TestProofTree", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
 
 	n1=new Node(p, s1);
 	n2=new Node(p, s2);

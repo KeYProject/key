@@ -49,7 +49,8 @@ import de.uka.ilkd.key.rule.tacletbuilder.AntecTacletBuilder;
 public class TestVariableNamer extends TestCase {
     
 
-    private final Proof proof = new Proof(new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+    private final Proof proof = new Proof("TestVariableNamer", 
+    		new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
     private final Services services = proof.getServices();
     private final ProgramVariable x     = constructProgramVariable("x");
     private final ProgramVariable xx    = constructProgramVariable("x");
