@@ -17,7 +17,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -87,10 +86,7 @@ public class ProofStarter {
                     EMPTY_PROOF_HEADER,
                     initConfig.createTacletIndex(),
                     initConfig.createBuiltInRuleIndex(),
-                    initConfig,
-                    initConfig.getSettings() != null
-                    ? initConfig.getSettings()
-                            : new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
+                    initConfig );
         }
 
 

@@ -35,7 +35,7 @@ public class StrategySettings implements Settings, Cloneable {
     private static final String STEPS_KEY = "[Strategy]MaximumNumberOfAutomaticApplications";
     private static final String TIMEOUT_KEY = "[Strategy]Timeout";
     
-    private LinkedList<SettingsListener> listenerList = 
+    private final LinkedList<SettingsListener> listenerList = 
         new LinkedList<SettingsListener>();
     
     private Name activeStrategy;

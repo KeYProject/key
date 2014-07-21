@@ -145,7 +145,6 @@ public class KeYFile implements EnvInput {
                problemParser.profile();
                ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
                 settings.loadSettingsFromString(problemParser.preferences());
-                initConfig.setSettings(settings);
                 return settings;                
             } catch (antlr.ANTLRException e) {
                 throw new ProofInputException(e);
