@@ -149,6 +149,11 @@ public class Proof implements Named {
         assert initConfig != null : "Tried to create proof without valid services.";
         this.initConfig = initConfig;
 
+        if (initConfig.getSettings() == null) {
+        	// if no settings have been assigned yet, take default settings
+            initConfig.setSettings( new ProofSettings(ProofSettings.DEFAULT_SETTINGS) );
+        }
+        
         this.initConfig.getServices().setProof(this);
 
         settingsListener =
@@ -160,7 +165,7 @@ public class Proof implements Named {
         };
 
         localMgt = new ProofCorrectnessMgt(this);
-
+        
         initConfig.getSettings().getStrategySettings().addSettingsListener(settingsListener);
 
         pis = ProofIndependentSettings.DEFAULT_INSTANCE;
