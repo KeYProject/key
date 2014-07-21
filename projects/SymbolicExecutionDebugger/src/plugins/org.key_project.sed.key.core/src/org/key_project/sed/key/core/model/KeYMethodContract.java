@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -22,7 +22,6 @@ import org.eclipse.jdt.core.ISourceRange;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEDMethodContract;
-import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDMethodContract;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
@@ -73,16 +72,26 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this method contract is contained.
     * @param parent The parent in that this node is contained as child.
-    * @param thread The {@link ISEDThread} in that this node is contained.
+    * @param thread The {@link KeYThread} in that this node is contained.
     * @param executionNode The {@link IExecutionMethodContract} to represent by this debug node.
     */
    public KeYMethodContract(KeYDebugTarget target, 
                             IKeYSEDDebugNode<?> parent, 
-                            ISEDThread thread, 
-                            IExecutionOperationContract executionNode) {
+                            KeYThread thread, 
+                            IExecutionOperationContract executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      target.registerDebugNode(this);
+      initializeAnnotations();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYThread getThread() {
+      return (KeYThread)super.getThread();
    }
    
    /**
@@ -256,7 +265,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     */
    @Override
    public boolean canStepInto() {
-      return getDebugTarget().canStepInto(this);
+      return getThread().canStepInto(this);
    }
 
    /**
@@ -264,7 +273,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     */
    @Override
    public void stepInto() throws DebugException {
-      getDebugTarget().stepInto(this);
+      getThread().stepInto(this);
    }
 
    /**
@@ -272,7 +281,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     */
    @Override
    public boolean canStepOver() {
-      return getDebugTarget().canStepOver(this);
+      return getThread().canStepOver(this);
    }
 
    /**
@@ -280,7 +289,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     */
    @Override
    public void stepOver() throws DebugException {
-      getDebugTarget().stepOver(this);
+      getThread().stepOver(this);
    }
 
    /**
@@ -288,7 +297,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     */
    @Override
    public boolean canStepReturn() {
-      return getDebugTarget().canStepReturn(this);
+      return getThread().canStepReturn(this);
    }
 
    /**
@@ -296,7 +305,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     */
    @Override
    public void stepReturn() throws DebugException {
-      getDebugTarget().stepReturn(this);
+      getThread().stepReturn(this);
    }
    
    /**
@@ -304,7 +313,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     */
    @Override
    public boolean canResume() {
-      return getDebugTarget().canResume(this);
+      return getThread().canResume(this);
    }
    
    /**
@@ -312,7 +321,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     */
    @Override
    public void resume() throws DebugException {
-      getDebugTarget().resume(this);
+      getThread().resume(this);
    }
 
    /**
@@ -320,7 +329,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     */
    @Override
    public boolean canSuspend() {
-      return getDebugTarget().canSuspend(this);
+      return getThread().canSuspend(this);
    }
 
    /**
@@ -328,7 +337,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     */
    @Override
    public void suspend() throws DebugException {
-      getDebugTarget().suspend(this);
+      getThread().suspend(this);
    }
 
    /**

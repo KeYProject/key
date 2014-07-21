@@ -1,17 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
-
+//
 
 package de.uka.ilkd.key.rule.tacletbuilder;
 
@@ -189,20 +187,17 @@ public class TacletPrefixBuilder {
     
 
     private boolean atMostOneRepl() {
-	RewriteTacletBuilder rwtacletBuilder=(RewriteTacletBuilder)tacletBuilder;
-	Iterator<TacletGoalTemplate> it
-	    =rwtacletBuilder.goalTemplates().iterator();
-	int count=0;
-	while (it.hasNext()) {
-	    TacletGoalTemplate tmpl = it.next();
-	    if (tmpl instanceof RewriteTacletGoalTemplate) {
-		if (((RewriteTacletGoalTemplate)tmpl).replaceWith()!=null) {
-		    count++;
-		}
-	    }
-	    if (count>1) return false;
-	}
-	return true;
+       RewriteTacletBuilder rwtacletBuilder=(RewriteTacletBuilder)tacletBuilder;
+       int count=0;
+       for (TacletGoalTemplate tmpl : rwtacletBuilder.goalTemplates()) {
+          if (tmpl instanceof RewriteTacletGoalTemplate) {
+             if (((RewriteTacletGoalTemplate)tmpl).replaceWith()!=null) {
+                count++;
+             }
+          }
+          if (count>1) return false;
+       }
+       return true;
     }
 
     private boolean occurrsOnlyInFindOrRepl(SchemaVariable sv) {
@@ -259,5 +254,3 @@ public class TacletPrefixBuilder {
     }
 
 }
-
-

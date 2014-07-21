@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -29,6 +29,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ApplyStrategy;
+import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -55,6 +56,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -73,6 +75,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicState;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicValue;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
+import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.ProofStarter;
 
@@ -251,11 +254,15 @@ public class SymbolicLayoutExtractor {
    /**
     * Constructor.
     * @param node The {@link Node} of KeY's proof tree to compute memory layouts for.
+    * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
+    * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
     */
-   public SymbolicLayoutExtractor(Node node, boolean usePrettyPrinting) {
+   public SymbolicLayoutExtractor(Node node, 
+                                  boolean useUnicode,
+                                  boolean usePrettyPrinting) {
       assert node != null;
       this.node = node;
-      this.settings = new ModelSettings(usePrettyPrinting);
+      this.settings = new ModelSettings(useUnicode, usePrettyPrinting);
    }
 
    /**
@@ -272,7 +279,7 @@ public class SymbolicLayoutExtractor {
       synchronized (this) {
          if (!isAnalysed()) {
             // Get path condition
-            pathCondition = SymbolicExecutionUtil.computePathCondition(node, true, false);
+            pathCondition = SymbolicExecutionUtil.computePathCondition(node, false);
             pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
             // Compute all locations used in path conditions and updates. The values of the locations will be later computed in the state computation (and finally shown in a memory layout).
             Set<ExtractLocationParameter> temporaryCurrentLocations = new LinkedHashSet<ExtractLocationParameter>();
@@ -293,13 +300,19 @@ public class SymbolicLayoutExtractor {
             symbolicObjectsResultingInCurrentState.add(getServices().getTermBuilder().NULL()); // Add null because it can happen that a object is null and this option must be included in equivalence class computation
             // Compute a Sequent with the initial conditions of the proof without modality
             Sequent initialConditionsSequent = createSequentForEquivalenceClassComputation(pathCondition);
-            // Instantiate proof in which equivalent classes of symbolic objects are computed.
-            ProofStarter equivalentClassesProofStarter = SymbolicExecutionUtil.createSideProof(getProof(), initialConditionsSequent);
+            ApplyStrategyInfo info = null;
             try {
+               // Instantiate proof in which equivalent classes of symbolic objects are computed.
+               ProofStarter equivalentClassesProofStarter = SideProofUtil.createSideProof(getProof(), initialConditionsSequent, true);
                // Apply cut rules to compute equivalent classes
                applyCutRules(equivalentClassesProofStarter, symbolicObjectsResultingInCurrentState);
                // Finish proof automatically
-               SymbolicExecutionUtil.startSideProof(getProof(), equivalentClassesProofStarter, StrategyProperties.SPLITTING_NORMAL);
+               info = SideProofUtil.startSideProof(getProof(), 
+                                                   equivalentClassesProofStarter, 
+                                                   StrategyProperties.METHOD_CONTRACT,
+                                                   StrategyProperties.LOOP_INVARIANT,
+                                                   StrategyProperties.QUERY_ON,
+                                                   StrategyProperties.SPLITTING_NORMAL);
                // Compute the available instance memory layout via the opened goals of the equivalent proof.
                appliedCutsPerLayout = extractAppliedCutsFromGoals(equivalentClassesProofStarter.getProof());
                // Create predicate required for state computation
@@ -311,7 +324,7 @@ public class SymbolicLayoutExtractor {
                layoutsEquivalentClasses = new LinkedHashMap<Integer, ImmutableList<ISymbolicEquivalenceClass>>();
             }
             finally {
-               equivalentClassesProofStarter.getProof().dispose();
+               SideProofUtil.disposeOrStore("Equivalence class computation on node " + node.serialNr() + ".", info);
             }
          }
       }
@@ -503,7 +516,7 @@ public class SymbolicLayoutExtractor {
          }
       }
       starter.setMaxRuleApplications(maxProofSteps);
-      starter.start();
+      starter.start(false);
    }
 
    /**
@@ -530,7 +543,7 @@ public class SymbolicLayoutExtractor {
             TacletApp t2 = c.addInstantiation(cutF, term, false, getServices());
 
             final ImmutableList<Goal> branches = g.apply(t2);
-            starter.start(branches);
+            starter.start(branches, false);
         }
       }
    }
@@ -1111,16 +1124,22 @@ public class SymbolicLayoutExtractor {
             additionalUpdates = additionalUpdates.append(evp.createPreUpdate());
          }
          ImmutableList<Term> newUpdates = ImmutableSLList.<Term>nil().append(getServices().getTermBuilder().parallel(additionalUpdates));
-         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, layoutCondition, layoutTerm, newUpdates);
+         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, layoutCondition, layoutTerm, newUpdates, false);
          // Instantiate and run proof
-         ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(getProof(), sequent, StrategyProperties.SPLITTING_NORMAL);
+         ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
+                                                                             sequent, 
+                                                                             StrategyProperties.METHOD_CONTRACT,
+                                                                             StrategyProperties.LOOP_INVARIANT,
+                                                                             StrategyProperties.QUERY_ON,
+                                                                             StrategyProperties.SPLITTING_NORMAL,
+                                                                             true);
          try {
             // Extract values and objects from result predicate and store them in variable value pairs
             Set<ExecutionVariableValuePair> pairs = new LinkedHashSet<ExecutionVariableValuePair>();
             int goalCount = info.getProof().openGoals().size();
             for (Goal goal : info.getProof().openGoals()) {
-               Term resultTerm = SymbolicExecutionUtil.extractOperatorTerm(goal, layoutTerm.op());
-               Term condition = goalCount == 1 ? null : SymbolicExecutionUtil.computePathCondition(goal.node(), true, true);
+               Term resultTerm = SideProofUtil.extractOperatorTerm(goal, layoutTerm.op());
+               Term condition = goalCount == 1 ? null : SymbolicExecutionUtil.computePathCondition(goal.node(), true);
                for (ExtractLocationParameter param : locations) {
                   ExecutionVariableValuePair pair;
                   if (param.isArrayIndex()) {
@@ -1136,7 +1155,7 @@ public class SymbolicLayoutExtractor {
             return createLayoutFromExecutionVariableValuePairs(equivalentClasses, pairs, stateName);
          }
          finally {
-            info.getProof().dispose();
+            SideProofUtil.disposeOrStore("Layout computation on node " + node.serialNr() + " with layout term " + ProofSaver.printAnything(layoutTerm, getServices()) + ".", info);
          }
       }
       else {
@@ -1156,7 +1175,7 @@ public class SymbolicLayoutExtractor {
                                                  Set<Term> objectsToIgnore) throws ProofInputException {
       Set<Term> result = new LinkedHashSet<Term>();
       for (SequentFormula sf : sequent) {
-         if (!SymbolicExecutionUtil.isSkolemEquality(sf)) {
+         if (SymbolicExecutionUtil.checkSkolemEquality(sf) == 0) {
             result.addAll(collectSymbolicObjectsFromTerm(sf.formula(), objectsToIgnore));
          }
       }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -47,7 +47,7 @@ import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Writer for the meta files.
@@ -173,7 +173,7 @@ public class ProofMetaFileWriter {
     * @param environment - the {@link KeYEnvironment} to use
     * @return the {@link KeYJavaType} form the {@link KeYEnvironment}
     */
-   private KeYJavaType getKeYJavaTypeFromEnv(KeYJavaType kjt, KeYEnvironment<CustomConsoleUserInterface> environment){
+   private KeYJavaType getKeYJavaTypeFromEnv(KeYJavaType kjt, KeYEnvironment<CustomUserInterface> environment){
       Set<KeYJavaType> envKjts = environment.getJavaInfo().getAllKeYJavaTypes();
       for(KeYJavaType envKjt : envKjts){
          if(envKjt.getFullName().equals(kjt.getFullName())){

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -35,6 +35,8 @@ public class KeYSEDPreferencesInitializer extends AbstractPreferenceInitializer 
       KeYSEDPreferences.setDefaultShowVariablesOfSelectedDebugNode(true);
       KeYSEDPreferences.setDefaultShowKeYMainWindow(false);
       KeYSEDPreferences.setDefaultMergeBranchConditions(false);
+      KeYSEDPreferences.setDefaultUseUnicode(false);
       KeYSEDPreferences.setDefaultUsePrettyPrinting(true);
+      KeYSEDPreferences.setDefaultShowSignatureOnMethodReturnNodes(false);
    }
 }

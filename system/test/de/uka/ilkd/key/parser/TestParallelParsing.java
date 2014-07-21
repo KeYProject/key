@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.parser;
 
 import java.io.File;
@@ -10,7 +23,7 @@ import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * This {@link TestCase} tests the parallel usage of {@link KeYParser}
@@ -108,7 +121,7 @@ public class TestParallelParsing extends AbstractSymbolicExecutionTestCase {
       @Override
       public void run() {
          try {
-            KeYEnvironment<CustomConsoleUserInterface> env = KeYEnvironment.load(new JavaProfile(), location, null, null);
+            KeYEnvironment<CustomUserInterface> env = KeYEnvironment.load(new JavaProfile(), location, null, null);
             env.dispose();
          }
          catch (Exception e) {

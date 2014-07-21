@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -42,7 +42,7 @@ import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * SWTBot tests for {@link KeYExampleNewWizard}.
@@ -167,7 +167,7 @@ public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
                   Assert.isNotNull(location);
                   Assert.isTrue(location.exists());
                   try {
-                     KeYEnvironment<CustomConsoleUserInterface> env = KeYEnvironment.load(location, classPaths, bootClassPath);
+                     KeYEnvironment<CustomUserInterface> env = KeYEnvironment.load(location, classPaths, bootClassPath);
                      env.dispose();
                   }
                   catch (Exception e) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -26,7 +26,7 @@ import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Preference page to edit the taclet options.
@@ -73,7 +73,7 @@ public class TacletOptionsPreferencePage extends AbstractChoicePreferencePage {
     * @throws ProblemLoaderException
     */
    public static void loadChoiceSettings() throws ProblemLoaderException {
-      KeYEnvironment<CustomConsoleUserInterface> env = KeYEnvironment.load(KeYExampleUtil.getExampleProof(), null, null);
+      KeYEnvironment<CustomUserInterface> env = KeYEnvironment.load(KeYExampleUtil.getExampleProof(), null, null);
       env.dispose();
    }
    

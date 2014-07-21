@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
@@ -28,25 +41,40 @@ public class AutoSaver implements ProverTaskListener {
     private final boolean saveClosed;
 
     private static int defaultSaveInterval = 0;
-    
     private static boolean defaultSaveClosedProof = false;
     
     /**
-     * Initialize the singleton instance.
+     * Set default values.
      * @param saveInterval the interval (= number of proof steps) to periodically save
      * @param saveClosedProof whether to save the final closed proof
      */
-    public static void init ( int saveInterval, boolean saveClosedProof ) {
+    public static void setDefaultValues ( int saveInterval, boolean saveClosedProof ) {
        defaultSaveInterval = saveInterval;
        defaultSaveClosedProof = saveClosedProof;
     }
+    
+    /**
+     * Create a new instance using default values, 
+     * or null if auto save is disabled by default.
+     * The default values can be set through <code>AutoSaver.setDefaultValues()</code>
+     */
+    public static AutoSaver getDefaultInstance() {
+        return defaultSaveInterval > 0 || defaultSaveClosedProof?
+                        new AutoSaver(): null;
+    }
 
-    public AutoSaver () {
+    private AutoSaver () {
        this(defaultSaveInterval, defaultSaveClosedProof);
     }
     
+    /**
+     * Create a custom instance.
+     * @param saveInterval
+     * @param saveClosedProof
+     */
     public AutoSaver (int saveInterval, boolean saveClosedProof) {
-        assert saveInterval >= 0;
+        if (saveInterval <= 0)
+            throw new IllegalArgumentException("Save interval must be positive");
         interval = saveInterval;
         saveClosed = saveClosedProof;
     }

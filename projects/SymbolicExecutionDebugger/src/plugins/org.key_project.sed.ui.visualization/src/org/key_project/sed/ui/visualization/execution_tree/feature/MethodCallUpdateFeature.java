@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -42,8 +42,8 @@ public class MethodCallUpdateFeature extends AbstractDebugNodeUpdateFeature {
    @Override
    public IReason updateNeeded(IUpdateContext context) {
       PictogramElement pe = context.getPictogramElement();
-      boolean isCollapsed = Boolean.parseBoolean(Graphiti.getPeService().getPropertyValue(pe, "collapsed"));
-      if(!(pe.getGraphicsAlgorithm() instanceof Rectangle) && !isCollapsed)
+
+      if(!(pe.getGraphicsAlgorithm() instanceof Rectangle))
          return super.updateNeeded(context);
       
       return Reason.createFalseReason();

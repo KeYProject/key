@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -18,7 +18,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.key_project.key4eclipse.common.ui.provider.ContractLabelProvider;
-import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.dialog.ElementTableSelectionDialog;
 
 import de.uka.ilkd.key.java.Services;
@@ -47,7 +46,6 @@ public class ContractSelectionDialog extends ElementTableSelectionDialog {
     protected TableViewer createViewer(Composite parent) {
         TableViewer viewer = super.createViewer(parent);
         viewer.getTable().setLinesVisible(true);
-        SWTUtil.makeTableShowingFullTableItemImages(viewer.getTable());
         return viewer;
     }
 }

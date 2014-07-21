@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.logic;
 
 import java.util.LinkedList;
@@ -16,7 +29,7 @@ import java.util.StringTokenizer;
  * </ul>
  * 
  */
-public class PosInTerm {
+public final class PosInTerm {
 
     private static final PosInTerm TOP_LEVEL = new PosInTerm();
 
@@ -256,7 +269,7 @@ public class PosInTerm {
         return "subterm: " + integerList(iterator());
     }
 
-    public static class PiTIterator implements IntIterator {
+    public static final class PiTIterator implements IntIterator {
         private final PosInTerm pit;
         private int pos;
         private final boolean order;

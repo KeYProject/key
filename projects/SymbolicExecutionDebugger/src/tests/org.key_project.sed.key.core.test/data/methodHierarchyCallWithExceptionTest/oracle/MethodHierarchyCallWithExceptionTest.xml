@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_6fec3494-a326-4f1f-b8a7-22de77911f67" name="main()" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_71f99e76-d7a2-4b2c-95e1-b173c00b2b26" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_285aa19d-1561-476c-a748-8b18e02032fd" name="self.main();" pathCondition="true" lineNumber="-1" charStart="125" charEnd="129">
-            <sedStatement xml:id="_b7e4f970-96b1-4f4b-b1bc-a43e775bcfec" name="a();" pathCondition="true" lineNumber="-1" charStart="141" charEnd="145">
-               <sedCallStackEntry nodeIdRef="_285aa19d-1561-476c-a748-8b18e02032fd"/>
-               <sedMethodCall xml:id="_0abc4240-0521-4515-b2d7-70326ed50ddc" name="self.a();" pathCondition="true" lineNumber="-1" charStart="173" charEnd="174">
-                  <sedCallStackEntry nodeIdRef="_285aa19d-1561-476c-a748-8b18e02032fd"/>
-                  <sedStatement xml:id="_0c41b728-e143-4066-8a26-4fe5cb2c159e" name="b();" pathCondition="true" lineNumber="-1" charStart="202" charEnd="206">
-                     <sedCallStackEntry nodeIdRef="_285aa19d-1561-476c-a748-8b18e02032fd"/>
-                     <sedCallStackEntry nodeIdRef="_0abc4240-0521-4515-b2d7-70326ed50ddc"/>
-                     <sedMethodCall xml:id="_416fb13b-2b52-4345-b12c-bbc1c1911817" name="self.b();" pathCondition="true" lineNumber="-1" charStart="330" charEnd="331">
-                        <sedCallStackEntry nodeIdRef="_285aa19d-1561-476c-a748-8b18e02032fd"/>
-                        <sedCallStackEntry nodeIdRef="_0abc4240-0521-4515-b2d7-70326ed50ddc"/>
-                        <sedStatement xml:id="_8be913bc-53df-42fe-bdd9-d7f91c6b3a57" name="c();" pathCondition="true" lineNumber="-1" charStart="343" charEnd="347">
-                           <sedCallStackEntry nodeIdRef="_285aa19d-1561-476c-a748-8b18e02032fd"/>
-                           <sedCallStackEntry nodeIdRef="_0abc4240-0521-4515-b2d7-70326ed50ddc"/>
-                           <sedCallStackEntry nodeIdRef="_416fb13b-2b52-4345-b12c-bbc1c1911817"/>
-                           <sedMethodCall xml:id="_432225af-c393-4ecf-a3ca-187a2f8188a6" name="self.c();" pathCondition="true" lineNumber="-1" charStart="375" charEnd="376">
-                              <sedCallStackEntry nodeIdRef="_285aa19d-1561-476c-a748-8b18e02032fd"/>
-                              <sedCallStackEntry nodeIdRef="_0abc4240-0521-4515-b2d7-70326ed50ddc"/>
-                              <sedCallStackEntry nodeIdRef="_416fb13b-2b52-4345-b12c-bbc1c1911817"/>
-                              <sedStatement xml:id="_c76968f7-39a0-43cf-aaaa-791b291222fc" name="throw new RuntimeException ();" pathCondition="true" lineNumber="-1" charStart="388" charEnd="417">
-                                 <sedCallStackEntry nodeIdRef="_285aa19d-1561-476c-a748-8b18e02032fd"/>
-                                 <sedCallStackEntry nodeIdRef="_0abc4240-0521-4515-b2d7-70326ed50ddc"/>
-                                 <sedCallStackEntry nodeIdRef="_416fb13b-2b52-4345-b12c-bbc1c1911817"/>
-                                 <sedCallStackEntry nodeIdRef="_432225af-c393-4ecf-a3ca-187a2f8188a6"/>
-                                 <sedStatement xml:id="_61ff2873-a1a2-41d5-953c-be647767265a" name="int ae = -1;" pathCondition="true" lineNumber="-1" charStart="262" charEnd="274">
-                                    <sedCallStackEntry nodeIdRef="_285aa19d-1561-476c-a748-8b18e02032fd"/>
-                                    <sedCallStackEntry nodeIdRef="_0abc4240-0521-4515-b2d7-70326ed50ddc"/>
-                                    <sedStatement xml:id="_86f2224f-ddb5-4ac4-a3b8-77527df90ed3" name="int a1 = 1;" pathCondition="true" lineNumber="-1" charStart="291" charEnd="302">
-                                       <sedCallStackEntry nodeIdRef="_285aa19d-1561-476c-a748-8b18e02032fd"/>
-                                       <sedCallStackEntry nodeIdRef="_0abc4240-0521-4515-b2d7-70326ed50ddc"/>
-                                       <sedMethodReturn xml:id="_8d673106-3fd7-4639-b359-a2f618163a89" name="&lt;return of self.a();&gt;" pathCondition="true" lineNumber="-1" charStart="173" charEnd="174">
-                                          <sedCallStackEntry nodeIdRef="_285aa19d-1561-476c-a748-8b18e02032fd"/>
-                                          <sedCallStackEntry nodeIdRef="_0abc4240-0521-4515-b2d7-70326ed50ddc"/>
-                                          <sedMethodReturn xml:id="_3b096315-6da0-4a55-9dd0-7b710e8a3d7e" name="&lt;return of self.main();&gt;" pathCondition="true" lineNumber="-1" charStart="125" charEnd="129">
-                                             <sedCallStackEntry nodeIdRef="_285aa19d-1561-476c-a748-8b18e02032fd"/>
-                                             <sedTermination xml:id="_8171efac-410a-43e2-97be-c6bb61421828" name="&lt;end&gt;" pathCondition="true" verified="true">
+   <sedTarget xml:id="_d1c4049e-527e-43f5-9d07-759b702a19c5" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_b6aa85ff-de81-43b5-942f-b354c6da9335" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_33a577a4-a840-4f5e-9708-fb16a71ae3dc" name="self.main();" pathCondition="true" lineNumber="-1" charStart="125" charEnd="129" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallHierarchyWithException\src\MethodHierarchyCallWithExceptionTest.java">
+            <sedStatement xml:id="_fec2456f-02c5-48b7-a5aa-d3d3cbe35da9" name="a();" pathCondition="true" lineNumber="-1" charStart="141" charEnd="145" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallHierarchyWithException\src\MethodHierarchyCallWithExceptionTest.java">
+               <sedCallStackEntry nodeIdRef="_33a577a4-a840-4f5e-9708-fb16a71ae3dc"/>
+               <sedMethodCall xml:id="_4013da0b-0950-4d33-97b2-9700567ec0a0" name="self.a();" pathCondition="true" lineNumber="-1" charStart="173" charEnd="174" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallHierarchyWithException\src\MethodHierarchyCallWithExceptionTest.java">
+                  <sedCallStackEntry nodeIdRef="_33a577a4-a840-4f5e-9708-fb16a71ae3dc"/>
+                  <sedStatement xml:id="_05e40683-cc3d-4066-abf0-a25b7f160966" name="b();" pathCondition="true" lineNumber="-1" charStart="202" charEnd="206" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallHierarchyWithException\src\MethodHierarchyCallWithExceptionTest.java">
+                     <sedCallStackEntry nodeIdRef="_4013da0b-0950-4d33-97b2-9700567ec0a0"/>
+                     <sedCallStackEntry nodeIdRef="_33a577a4-a840-4f5e-9708-fb16a71ae3dc"/>
+                     <sedMethodCall xml:id="_d37f4c45-3a76-40fc-8e56-165fc51b8aad" name="self.b();" pathCondition="true" lineNumber="-1" charStart="330" charEnd="331" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallHierarchyWithException\src\MethodHierarchyCallWithExceptionTest.java">
+                        <sedCallStackEntry nodeIdRef="_4013da0b-0950-4d33-97b2-9700567ec0a0"/>
+                        <sedCallStackEntry nodeIdRef="_33a577a4-a840-4f5e-9708-fb16a71ae3dc"/>
+                        <sedStatement xml:id="_ee73bd7f-be7e-4806-aff9-ee4cec6209fd" name="c();" pathCondition="true" lineNumber="-1" charStart="343" charEnd="347" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallHierarchyWithException\src\MethodHierarchyCallWithExceptionTest.java">
+                           <sedCallStackEntry nodeIdRef="_d37f4c45-3a76-40fc-8e56-165fc51b8aad"/>
+                           <sedCallStackEntry nodeIdRef="_4013da0b-0950-4d33-97b2-9700567ec0a0"/>
+                           <sedCallStackEntry nodeIdRef="_33a577a4-a840-4f5e-9708-fb16a71ae3dc"/>
+                           <sedMethodCall xml:id="_34a3c51f-abc6-4b6c-94cc-6e279d796b5a" name="self.c();" pathCondition="true" lineNumber="-1" charStart="375" charEnd="376" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallHierarchyWithException\src\MethodHierarchyCallWithExceptionTest.java">
+                              <sedCallStackEntry nodeIdRef="_d37f4c45-3a76-40fc-8e56-165fc51b8aad"/>
+                              <sedCallStackEntry nodeIdRef="_4013da0b-0950-4d33-97b2-9700567ec0a0"/>
+                              <sedCallStackEntry nodeIdRef="_33a577a4-a840-4f5e-9708-fb16a71ae3dc"/>
+                              <sedStatement xml:id="_52e0c17c-f1fa-4f8b-8f50-a4073c158b56" name="throw new RuntimeException ();" pathCondition="true" lineNumber="-1" charStart="388" charEnd="417" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallHierarchyWithException\src\MethodHierarchyCallWithExceptionTest.java">
+                                 <sedCallStackEntry nodeIdRef="_34a3c51f-abc6-4b6c-94cc-6e279d796b5a"/>
+                                 <sedCallStackEntry nodeIdRef="_d37f4c45-3a76-40fc-8e56-165fc51b8aad"/>
+                                 <sedCallStackEntry nodeIdRef="_4013da0b-0950-4d33-97b2-9700567ec0a0"/>
+                                 <sedCallStackEntry nodeIdRef="_33a577a4-a840-4f5e-9708-fb16a71ae3dc"/>
+                                 <sedStatement xml:id="_8a761b73-c57d-4fc3-b2a3-7729e2958f6a" name="int ae = -1;" pathCondition="true" lineNumber="-1" charStart="262" charEnd="274" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallHierarchyWithException\src\MethodHierarchyCallWithExceptionTest.java">
+                                    <sedCallStackEntry nodeIdRef="_4013da0b-0950-4d33-97b2-9700567ec0a0"/>
+                                    <sedCallStackEntry nodeIdRef="_33a577a4-a840-4f5e-9708-fb16a71ae3dc"/>
+                                    <sedStatement xml:id="_1a759b60-837b-432d-86ef-8bfc7bfb80db" name="int a1 = 1;" pathCondition="true" lineNumber="-1" charStart="291" charEnd="302" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallHierarchyWithException\src\MethodHierarchyCallWithExceptionTest.java">
+                                       <sedCallStackEntry nodeIdRef="_4013da0b-0950-4d33-97b2-9700567ec0a0"/>
+                                       <sedCallStackEntry nodeIdRef="_33a577a4-a840-4f5e-9708-fb16a71ae3dc"/>
+                                       <sedMethodReturn xml:id="_9b848ffa-c869-475f-a672-59458f2d2b64" name="&lt;return of self.a();&gt;" pathCondition="true" lineNumber="-1" charStart="173" charEnd="174" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallHierarchyWithException\src\MethodHierarchyCallWithExceptionTest.java" methodReturnConditionRef="_bbfeae85-1cc0-4899-89c9-31990f7b344f">
+                                          <sedCallStackEntry nodeIdRef="_4013da0b-0950-4d33-97b2-9700567ec0a0"/>
+                                          <sedCallStackEntry nodeIdRef="_33a577a4-a840-4f5e-9708-fb16a71ae3dc"/>
+                                          <sedMethodReturn xml:id="_6494e899-c4c5-4af2-ab17-f442a4759abc" name="&lt;return of self.main();&gt;" pathCondition="true" lineNumber="-1" charStart="125" charEnd="129" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallHierarchyWithException\src\MethodHierarchyCallWithExceptionTest.java" methodReturnConditionRef="_652e1c49-0e9c-4a1c-aa21-8f01bffa186b">
+                                             <sedCallStackEntry nodeIdRef="_33a577a4-a840-4f5e-9708-fb16a71ae3dc"/>
+                                             <sedTermination xml:id="_2be25571-6bf0-4e13-8d2d-f0695e557f18" name="&lt;end&gt;" pathCondition="true" verified="true">
                                              </sedTermination>
                                           </sedMethodReturn>
                                        </sedMethodReturn>
@@ -48,8 +48,14 @@
                         </sedStatement>
                      </sedMethodCall>
                   </sedStatement>
+                  <sedMethodCallMethodReturnCondition xml:id="_bbfeae85-1cc0-4899-89c9-31990f7b344f" name="true" pathCondition="true">
+                     <sedChildReference nodeIdRef="_9b848ffa-c869-475f-a672-59458f2d2b64"/>
+                  </sedMethodCallMethodReturnCondition>
                </sedMethodCall>
             </sedStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_652e1c49-0e9c-4a1c-aa21-8f01bffa186b" name="true" pathCondition="true">
+               <sedChildReference nodeIdRef="_6494e899-c4c5-4af2-ab17-f442a4759abc"/>
+            </sedMethodCallMethodReturnCondition>
          </sedMethodCall>
       </sedThread>
    </sedTarget>

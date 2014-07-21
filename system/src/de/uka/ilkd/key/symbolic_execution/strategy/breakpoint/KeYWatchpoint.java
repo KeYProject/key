@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -33,6 +33,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 
@@ -88,6 +89,7 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint{
       if(suspendOnTrue){
          return super.conditionMet(ruleApp, proof, node);
       }else{
+         ApplyStrategyInfo info = null;
          try {
             Term negatedCondition = getProof().getServices().getTermBuilder().not(getCondition());
             //initialize values
@@ -105,11 +107,20 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint{
             //start side proof
             Term toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
             Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, ruleApp, toProof);
-            ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(proof, sequent, StrategyProperties.SPLITTING_DELAYED);
+            info = SideProofUtil.startSideProof(proof, 
+                                                sequent, 
+                                                StrategyProperties.METHOD_CONTRACT,
+                                                StrategyProperties.LOOP_INVARIANT,
+                                                StrategyProperties.QUERY_ON,
+                                                StrategyProperties.SPLITTING_DELAYED,
+                                                false);
             return !info.getProof().closed();
          }
          catch (ProofInputException e) {
             return false;
+         }
+         finally {
+            SideProofUtil.disposeOrStore("KeY Watchpoint evaluation on node " + node.serialNr() + ".", info);
          }
       }
    }

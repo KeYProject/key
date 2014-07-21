@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -14,7 +14,7 @@
 package org.key_project.key4eclipse.starter.core.job;
 
 import org.eclipse.core.runtime.jobs.Job;
-import org.key_project.util.eclipse.job.ObjectchedulingRule;
+import org.key_project.util.eclipse.job.ObjectSchedulingRule;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
@@ -26,7 +26,7 @@ import de.uka.ilkd.key.gui.MainWindow;
  * <p>
  * It is not possible to execute multiple {@link AbstractKeYMainWindowJob}
  * instances at the same time. It is ensured thanks to an
- * {@link ObjectchedulingRule} that uses the class of {@link MainWindow}
+ * {@link ObjectSchedulingRule} that uses the class of {@link MainWindow}
  * as conflicting {@link Object}.
  * </p>
  * @author Martin Hentschel
@@ -38,6 +38,6 @@ public abstract class AbstractKeYMainWindowJob extends Job {
     */
    public AbstractKeYMainWindowJob(String name) {
       super(name);
-      setRule(new ObjectchedulingRule(MainWindow.class));
+      setRule(new ObjectSchedulingRule(MainWindow.class));
    }
 }

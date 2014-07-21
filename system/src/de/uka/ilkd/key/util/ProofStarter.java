@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -24,6 +24,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -34,6 +35,7 @@ import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 /**
@@ -78,14 +80,14 @@ public class ProofStarter {
 
         private Proof createProof(String proofName) {
 
-            final InitConfig initConfig = env.getInitConfig();
+            final InitConfig initConfig = env.getInitConfigForEnvironment().deepCopy();
 
             return new Proof(proofName,
                     seq,
                     EMPTY_PROOF_HEADER,
                     initConfig.createTacletIndex(),
                     initConfig.createBuiltInRuleIndex(),
-                    initConfig.getServices(),
+                    initConfig,
                     initConfig.getSettings() != null
                     ? initConfig.getSettings()
                             : new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
@@ -97,7 +99,8 @@ public class ProofStarter {
             final Proof proof = createProof("Proof object for "+
                     ProofSaver.printAnything(seq, null));
 
-            return ProofAggregate.createProofAggregate(proof, "ProofAggregate for claim: "+proof.name());
+            return ProofAggregate.createProofAggregate(proof,
+                                                       "ProofAggregate for claim: "+proof.name());
         }
 
         @Override
@@ -114,7 +117,7 @@ public class ProofStarter {
 
     private long timeout = -1L;
 
-    private StrategyProperties strategyProperties = new StrategyProperties();
+    private StrategyProperties strategyProperties;
 
     private ProverTaskListener ptl;
     
@@ -135,10 +138,9 @@ public class ProofStarter {
     public ProofStarter(ProverTaskListener ptl, boolean useAutoSaver) {
     	this.ptl = ptl;
       if (useAutoSaver) {
-         autoSaver = new AutoSaver();
+         autoSaver = AutoSaver.getDefaultInstance();
       }
     }
-
 
     /**
      * creates a new proof object for formulaToProve and registers it in the given environment
@@ -148,7 +150,7 @@ public class ProofStarter {
     public void init(Term formulaToProve, ProofEnvironment env) throws ProofInputException {
         final ProofOblInput input = new UserProvidedInput(formulaToProve, env);
         proof = input.getPO().getFirstProof();
-        proof.setProofEnv(env);
+        proof.setEnv(env);
     }
 
     /**
@@ -159,7 +161,7 @@ public class ProofStarter {
     public void init(Sequent sequentToProve, ProofEnvironment env) throws ProofInputException {
        final ProofOblInput input = new UserProvidedInput(sequentToProve, env);
        proof = input.getPO().getFirstProof();
-       proof.setProofEnv(env);
+       proof.setEnv(env);
     }
 
     /**
@@ -195,20 +197,21 @@ public class ProofStarter {
      * starts proof attempt
      * @return the proof after the attempt terminated
      */
-     public ApplyStrategyInfo start() {
-        return start(proof.openGoals());
+     public ApplyStrategyInfo start(boolean finishAfterProof) {
+        return start(proof.openGoals(), finishAfterProof);
      }
 
    /**
     * starts proof attempt
     * @return the proof after the attempt terminated
     */
-    public ApplyStrategyInfo start(ImmutableList<Goal> goals) {
+    public ApplyStrategyInfo start(ImmutableList<Goal> goals, boolean finishAfterStrategy) {
         try {
-           proof.setRuleAppIndexToAutoMode();
-           
-           final Profile profile = proof.env().getInitConfig().getProfile();
-           proof.setActiveStrategy(profile.getDefaultStrategyFactory().create(proof, strategyProperties));
+           final Profile profile = proof.getInitConfig().getProfile();
+           final StrategyFactory factory = profile.getDefaultStrategyFactory();
+           if (strategyProperties == null) {
+              strategyProperties = factory.getSettingsDefinition().getDefaultPropertiesFactory().createDefaultStrategyProperties();
+           }
 
            if (proof.getProofIndependentSettings().getGeneralSettings().oneStepSimplification()) {
               OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(proof);
@@ -216,10 +219,12 @@ public class ProofStarter {
                  simplifier.refresh(proof);
               }
            }
+           proof.setActiveStrategy(factory.create(proof, strategyProperties));
 
            profile.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);
 
-           ApplyStrategy prover = new ApplyStrategy(profile.getSelectedGoalChooserBuilder().create());
+           IGoalChooser goalChooser = profile.getSelectedGoalChooserBuilder().create();
+           ApplyStrategy prover = new ApplyStrategy(goalChooser, finishAfterStrategy);
            if (ptl != null) {
               prover.addProverTaskObserver(ptl);
            }
@@ -228,13 +233,16 @@ public class ProofStarter {
               prover.addProverTaskObserver(autoSaver);
            }
 
-           boolean stopMode = strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY).equals(StrategyProperties.STOPMODE_NONCLOSE);
+           boolean stopMode = strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
+                                                       .equals(StrategyProperties.STOPMODE_NONCLOSE);
            ApplyStrategy.ApplyStrategyInfo result;
+           proof.setRuleAppIndexToAutoMode();
            result = prover.start(proof, goals, maxSteps, timeout, stopMode);
            
            if (result.isError()) {
-               throw new RuntimeException("Proof attempt failed due to exception:"+result.getException(),
-                       result.getException());
+               throw new RuntimeException("Proof attempt failed due to exception:"
+                                           + result.getException(),
+                                          result.getException());
            }
 
            if (ptl != null) {
@@ -252,6 +260,13 @@ public class ProofStarter {
         }
     }
 
+    public void init(Proof proof) {
+       this.proof = proof;
+       this.setMaxRuleApplications(proof.getSettings().getStrategySettings().getMaxSteps());
+       this.setTimeout(proof.getSettings().getStrategySettings().getTimeout());
+       this.setStrategy(proof.getSettings().getStrategySettings().getActiveStrategyProperties());
+    }
+    
     public void init(ProofAggregate proofAggregate) {
     	this.proof = proofAggregate.getFirstProof();
 

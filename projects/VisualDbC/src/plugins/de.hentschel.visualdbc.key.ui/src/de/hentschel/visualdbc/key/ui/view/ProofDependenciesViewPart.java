@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -36,7 +36,7 @@ import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListene
 import org.key_project.key4eclipse.starter.core.util.event.ProofProviderAdapter;
 import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
 import org.key_project.util.eclipse.WorkbenchUtil;
-import org.key_project.util.eclipse.job.ObjectchedulingRule;
+import org.key_project.util.eclipse.job.ObjectSchedulingRule;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.view.editorInView.AbstractEditorInViewView;
 import org.key_project.util.java.ArrayUtil;
@@ -472,7 +472,7 @@ public class ProofDependenciesViewPart extends AbstractEditorInViewView<DbCDiagr
                }
             }
          };
-         activeJob.setRule(new ObjectchedulingRule(this));
+         activeJob.setRule(new ObjectSchedulingRule(this));
          activeJob.schedule();
       }
       else {

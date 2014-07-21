@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.io.IOException;
@@ -13,13 +26,13 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.MethodBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 public class TestMethodBreakpointWithConditions extends AbstractSymbolicExecutionTestCase {
    public void testBreakpointStopCondition() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
-      SymbolicExecutionEnvironment<CustomConsoleUserInterface> envMain=null;
-      SymbolicExecutionEnvironment<CustomConsoleUserInterface> envSomethingMain=null;
-      SymbolicExecutionEnvironment<CustomConsoleUserInterface> envSomethingLocalMain=null;
+      SymbolicExecutionEnvironment<CustomUserInterface> envMain=null;
+      SymbolicExecutionEnvironment<CustomUserInterface> envSomethingMain=null;
+      SymbolicExecutionEnvironment<CustomUserInterface> envSomethingLocalMain=null;
       HashMap<String, String> originalTacletOptions = null;
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try{
@@ -33,7 +46,7 @@ public class TestMethodBreakpointWithConditions extends AbstractSymbolicExecutio
          originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
          setOneStepSimplificationEnabled(null, true);
          // Create proof environment for symbolic execution
-         envMain = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false);
+         envMain = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false, false);
          // Make sure that initial tree is valid
          int oracleIndex = 0;
          assertSetTreeAfterStep(envMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory);
@@ -51,7 +64,7 @@ public class TestMethodBreakpointWithConditions extends AbstractSymbolicExecutio
          
          
          //Test method somethingMain()
-         envSomethingMain = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, "somethingMain", null, false, false, false, false, false, false);
+         envSomethingMain = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, "somethingMain", null, false, false, false, false, false, false, false);
          IProgramMethod something = searchProgramMethod(envSomethingMain.getServices(), "SimpleConditionExample", "something");
          IProgramMethod somethingMain = searchProgramMethod(envSomethingMain.getServices(), "SimpleConditionExample", "somethingMain");
          allBreakpoints = new CompoundStopCondition();
@@ -67,7 +80,7 @@ public class TestMethodBreakpointWithConditions extends AbstractSymbolicExecutio
          stepReturnWithBreakpoints(envSomethingMain.getUi(), envSomethingMain.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);
          
          //Test method somethingLocalMain()
-         envSomethingLocalMain = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, "somethingLocalMain", null, false, false, false, false, false, false);
+         envSomethingLocalMain = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, "somethingLocalMain", null, false, false, false, false, false, false, false);
          IProgramMethod somethingLocal = searchProgramMethod(envSomethingLocalMain.getServices(), "SimpleConditionExample", "somethingLocal");
          IProgramMethod somethingLocalMain = searchProgramMethod(envSomethingLocalMain.getServices(), "SimpleConditionExample", "somethingLocalMain");
          allBreakpoints = new CompoundStopCondition();

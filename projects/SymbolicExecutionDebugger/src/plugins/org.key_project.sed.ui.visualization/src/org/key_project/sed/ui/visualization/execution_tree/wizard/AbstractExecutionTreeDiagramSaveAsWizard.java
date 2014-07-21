@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -150,7 +150,8 @@ public abstract class AbstractExecutionTreeDiagramSaveAsWizard extends BasicNewR
          String modelContent = writer.toXML(targets, 
                                             "UTF-8", 
                                             optionsPage != null && optionsPage.isSaveVariables(), 
-                                            optionsPage != null && optionsPage.isSaveCallStack());
+                                            optionsPage != null && optionsPage.isSaveCallStack(),
+                                            null);
          getModelPage().setInitialContents(new ByteArrayInputStream(modelContent.getBytes(Charset.forName("UTF-8"))));
          IFile domainFile = getModelPage().createNewFile();
          if (domainFile != null) {

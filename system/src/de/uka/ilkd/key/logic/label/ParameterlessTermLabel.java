@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.logic.label;
 
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
 
 /**
  * The Class {@link ParameterlessTermLabel} can be used to define labels without parameters.
@@ -112,6 +113,17 @@ public final class ParameterlessTermLabel implements TermLabel {
     */
    public static final TermLabel UNDEFINED_VALUE_LABEL =
            new ParameterlessTermLabel(UNDEFINED_VALUE_LABEL_NAME);
+
+   /**
+    * Name of {@link #RESULT_LABEL}.
+    */
+   public static final Name RESULT_LABEL_NAME = new Name("RES");
+
+   /**
+    * Label attached to a {@link Term} to evaluate in a side proof.
+    */
+   public static final TermLabel RESULT_LABEL =
+           new ParameterlessTermLabel(RESULT_LABEL_NAME);
 
     /**
      * The unique name of this label.

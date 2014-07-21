@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -44,7 +44,7 @@ public abstract class AbstractSEDDebugElement extends DebugElement implements IS
     * to make the ID a valid XML name.
     * @return A new computed ID.
     */
-   protected String computeNewId() {
+   public static String computeNewId() {
       return "_" + UUID.randomUUID().toString();
    }
 
@@ -70,7 +70,11 @@ public abstract class AbstractSEDDebugElement extends DebugElement implements IS
    @Override
    public String getId() {
       if (id == null) {
-         id = computeNewId();
+         synchronized (this) {
+            if (id == null) {
+               id = computeNewId();
+            }
+         }
       }
       return id;
    }

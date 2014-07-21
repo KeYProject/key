@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.pp;
 
@@ -346,15 +345,18 @@ public final class NotationInfo {
     //-------------------------------------------------------------------------
     
     public void refresh(Services services) {
-	createDefaultNotationTable();
-	assert defaultNotationCache != null;
-	if(PRETTY_SYNTAX && services != null) {
-	    addFancyNotations(services);
-	    if (UNICODE_ENABLED)
-	        addVeryFancyNotations(services);
-	}
-    }    
-        
+       refresh(services, PRETTY_SYNTAX, UNICODE_ENABLED);
+    }
+
+    public void refresh(Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+   createDefaultNotationTable();
+   assert defaultNotationCache != null;
+   if(usePrettyPrinting && services != null) {
+       addFancyNotations(services);
+       if (useUnicodeSymbols)
+           addVeryFancyNotations(services);
+   }
+    }
     
     public AbbrevMap getAbbrevMap(){
 	return scm;

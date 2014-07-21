@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -28,8 +28,7 @@ import org.key_project.sed.key.ui.util.LogUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * This {@link IHandler} opens a save as dialog to save the {@link Proof}
@@ -40,7 +39,6 @@ public class OpenProofHandler extends AbstractHandler {
    /**
     * {@inheritDoc}
     */
-   @SuppressWarnings("unchecked")
    @Override
    public Object execute(ExecutionEvent event) throws ExecutionException {
       try {
@@ -55,10 +53,10 @@ public class OpenProofHandler extends AbstractHandler {
                IDebugTarget target = ((IDebugElement)element).getDebugTarget();
                if (target instanceof KeYDebugTarget) {
                   KeYDebugTarget keyTarget = (KeYDebugTarget)target;
-                  if (keyTarget.getEnvironment().getUi() instanceof CustomConsoleUserInterface) {
+                  if (keyTarget.getEnvironment().getUi() instanceof CustomUserInterface) {
                      StarterUtil.openProofStarter(HandlerUtil.getActiveShell(event), 
                                                   keyTarget.getProof(), 
-                                                  (SymbolicExecutionEnvironment<CustomConsoleUserInterface>)keyTarget.getEnvironment(), 
+                                                  keyTarget.getEnvironment(), 
                                                   keyTarget.getMethod(),
                                                   false,
                                                   false,

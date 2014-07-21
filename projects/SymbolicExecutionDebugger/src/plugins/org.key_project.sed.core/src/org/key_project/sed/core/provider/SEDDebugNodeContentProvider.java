@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -21,7 +21,9 @@ import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementContentPr
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IPresentationContext;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerUpdate;
 import org.eclipse.debug.ui.IDebugUIConstants;
+import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.util.ISEDConstants;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
@@ -110,6 +112,25 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
             else {
                return EMPTY;
             }
+         }
+         else {
+            return EMPTY;
+         }
+      }
+      else if (ISEDConstants.ID_METHOD_RETURN_CONDITIONS.equals(context.getId())) {
+         if (parent instanceof ISEDMethodCall) {
+            Object root = context.getProperty(ISEDConstants.PRESENTATION_CONTEXT_PROPERTY_INPUT);
+            if (root == null || root == parent) { // Return only children if it is the viewers input because otherwise the stack elements are expandable.
+               ISEDBranchCondition[] conditions = ((ISEDMethodCall)parent).getMethodReturnConditions();
+               return conditions != null ? conditions : EMPTY; 
+            }
+            else {
+               return EMPTY;
+            }
+         }
+         if (parent instanceof ISEDBranchCondition) {
+            ISEDDebugNode[] children = ((ISEDDebugNode)parent).getChildren();
+            return children != null ? children : EMPTY; 
          }
          else {
             return EMPTY;
@@ -256,7 +277,8 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
       return IDebugUIConstants.ID_DEBUG_VIEW.equals(id) ||
              IDebugUIConstants.ID_VARIABLE_VIEW.equals(id) ||
              IDebugUIConstants.ID_REGISTER_VIEW.equals(id) ||
-             ISEDConstants.ID_CALL_STACK.equals(id);
+             ISEDConstants.ID_CALL_STACK.equals(id) ||
+             ISEDConstants.ID_METHOD_RETURN_CONDITIONS.equals(id);
    }
    
    /**

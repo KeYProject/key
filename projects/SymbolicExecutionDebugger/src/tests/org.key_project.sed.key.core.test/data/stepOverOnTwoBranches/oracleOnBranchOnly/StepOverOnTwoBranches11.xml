@@ -1,60 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_4af31dee-b02a-451e-b115-3ce9e2186676" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_f094767b-94dd-4d8c-b311-5246723ae949" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_0693e9a3-2223-4ac0-a2f6-469ca3709915" name="self.main(a);" pathCondition="true" lineNumber="-1" charStart="52" charEnd="56">
-            <sedBranchStatement xml:id="_65ac567a-7005-4fc5-b6c7-cec89ceacd36" name="if (a==0)" pathCondition="true" lineNumber="-1" charStart="69" charEnd="497">
-               <sedBranchCondition xml:id="_ee6bace1-b49c-4d2f-950d-e044b952cc12" name="equals(a,Z(0(#)))" pathCondition="equals(a,Z(0(#)))">
-                  <sedStatement xml:id="_c0a5497a-19a0-4239-8ca8-e4cf7a1d640e" name="int i = 2;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="87" charEnd="97">
-                     <sedStatement xml:id="_72dce8ad-fc34-4267-ba09-9ba64ce8af43" name="int j = 3;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="102" charEnd="112">
-                        <sedStatement xml:id="_1456fa02-ca5e-4bfd-9772-f327bbf4ffdc" name="int x = valueLonger(i_1);" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="117" charEnd="140">
-                           <sedMethodCall xml:id="_3e0334bf-3943-4023-aeba-fa89a9a6600d" name="self.valueLonger(i_2);" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="568" charEnd="579">
-                              <sedStatement xml:id="_bbf678a9-79e6-488e-a3f0-e0907d26e792" name="int j = i_2;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="592" charEnd="602">
-                                 <sedStatement xml:id="_68afb669-2563-40c4-9517-ceac91b9af3c" name="i_2=j_1;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="606" charEnd="612">
-                                    <sedStatement xml:id="_27500c3f-e2c1-4bc1-83b0-a1cdb010904f" name="return j_1;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="616" charEnd="625">
-                                       <sedMethodReturn xml:id="_8621bc21-00a9-4431-a776-40d43fab9473" name="&lt;return of self.valueLonger(i_2);&gt;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="568" charEnd="579">
-                                          <sedStatement xml:id="_aee4bff1-8873-46c3-b834-884b34dc8303" name="int y = value(j);" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="145" charEnd="162">
-                                             <sedMethodCall xml:id="_bb9c3422-72ef-44f8-a565-56408ee94870" name="self.value(i_3);" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="518" charEnd="523">
-                                                <sedStatement xml:id="_6086641a-e530-43d3-a778-5b16209a8317" name="return i_3;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="536" charEnd="545">
-                                                   <sedMethodReturn xml:id="_997a3b78-d60b-477c-a183-6d920cddae1a" name="&lt;return of self.value(i_3);&gt;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="518" charEnd="523">
-                                                      <sedStatement xml:id="_3754cf80-26f7-4bce-8e47-3551f318682f" name="int z = valueLonger(x)+valueLonger(y);" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="167" charEnd="207">
+   <sedTarget xml:id="_2a2036b9-952e-4170-8674-3856abc96b3e" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_740cc09c-43fa-4da8-9813-c0792f5ad2c8" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_55e6dc52-64ba-46c2-8676-d7ce7440d019" name="self.main(a);" pathCondition="true" lineNumber="-1" charStart="52" charEnd="56" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
+            <sedBranchStatement xml:id="_fdb9344b-6845-4c8f-81f8-0c23c7bc4437" name="if (a==0)" pathCondition="true" lineNumber="-1" charStart="69" charEnd="81" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
+               <sedBranchCondition xml:id="_a3b9e592-c2d7-4782-9a38-cbdcc8c47daa" name="equals(a,Z(0(#)))" pathCondition="equals(a,Z(0(#)))">
+                  <sedStatement xml:id="_e195e3d8-6ee6-40c2-a057-f4af0b33b6df" name="int i = 2;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="87" charEnd="97" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
+                     <sedStatement xml:id="_af455568-b5e7-4e9e-8d07-53bad0ba9aba" name="int j = 3;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="102" charEnd="112" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
+                        <sedStatement xml:id="_5bb254a0-ec68-428b-b73d-6adc49c9f1d4" name="int x = valueLonger(i_1);" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="117" charEnd="140" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
+                           <sedMethodCall xml:id="_9c08d98f-04e4-449a-94e9-6aff04543a57" name="self.valueLonger(i_2);" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="568" charEnd="579" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
+                              <sedStatement xml:id="_aa750e48-86db-495a-9fa5-9f43c217a077" name="int j = i_2;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="592" charEnd="602" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
+                                 <sedStatement xml:id="_87311aba-ab8f-4f10-9038-75b2c7b0ba37" name="i_2=j_1;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="606" charEnd="612" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
+                                    <sedStatement xml:id="_0b58edd8-a9ac-4403-aed3-521f298eab40" name="return j_1;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="616" charEnd="625" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
+                                       <sedMethodReturn xml:id="_2eb251b0-62a9-4f97-be9a-264b63178a55" name="&lt;return of self.valueLonger(i_2);&gt;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="568" charEnd="579" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java" methodReturnConditionRef="_b90f2d68-b13e-4ca9-8557-c84ed0620387">
+                                          <sedStatement xml:id="_cc677c35-940e-4aad-92f5-844bf04f7955" name="int y = value(j);" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="145" charEnd="162" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
+                                             <sedMethodCall xml:id="_62936843-6303-442d-8280-e27634cbff89" name="self.value(i_3);" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="518" charEnd="523" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
+                                                <sedStatement xml:id="_abb7b88a-2244-4814-b103-4809473071cf" name="return i_3;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="536" charEnd="545" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
+                                                   <sedMethodReturn xml:id="_c6ce4f87-3799-40ab-8ac9-27b53017a8cc" name="&lt;return of self.value(i_3);&gt;" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="518" charEnd="523" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java" methodReturnConditionRef="_dafaf52a-d9cf-4d71-9798-28c6d7d70865">
+                                                      <sedStatement xml:id="_a7ef7ebc-8798-41a3-ad45-dcf4c2a79ee5" name="int z = valueLonger(x)+valueLonger(y);" pathCondition="equals(a,Z(0(#)))" lineNumber="-1" charStart="167" charEnd="207" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
                                                       </sedStatement>
                                                    </sedMethodReturn>
                                                 </sedStatement>
+                                                <sedMethodCallMethodReturnCondition xml:id="_dafaf52a-d9cf-4d71-9798-28c6d7d70865" name="true" pathCondition="equals(a,Z(0(#)))">
+                                                   <sedChildReference nodeIdRef="_c6ce4f87-3799-40ab-8ac9-27b53017a8cc"/>
+                                                </sedMethodCallMethodReturnCondition>
                                              </sedMethodCall>
                                           </sedStatement>
                                        </sedMethodReturn>
                                     </sedStatement>
                                  </sedStatement>
                               </sedStatement>
+                              <sedMethodCallMethodReturnCondition xml:id="_b90f2d68-b13e-4ca9-8557-c84ed0620387" name="true" pathCondition="equals(a,Z(0(#)))">
+                                 <sedChildReference nodeIdRef="_2eb251b0-62a9-4f97-be9a-264b63178a55"/>
+                              </sedMethodCallMethodReturnCondition>
                            </sedMethodCall>
                         </sedStatement>
                      </sedStatement>
                   </sedStatement>
                </sedBranchCondition>
-               <sedBranchCondition xml:id="_96a76954-1806-4729-94eb-006af6f1090c" name="not(equals(a,Z(0(#))))" pathCondition="not(equals(a,Z(0(#))))">
-                  <sedStatement xml:id="_e1560389-48d9-4081-9f19-6658c78263b0" name="int i = 2;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="297" charEnd="307">
-                     <sedStatement xml:id="_b6e28616-8e0e-441b-8399-7094a5a4c1e8" name="int j = 3;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="312" charEnd="322">
-                        <sedStatement xml:id="_0ad23407-6c0a-42b4-88d7-2158d6068e89" name="int x = value(i);" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="327" charEnd="344">
-                           <sedMethodCall xml:id="_dd1bfe96-76f8-462a-9553-3d5e714cedee" name="self.value(i_4);" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="518" charEnd="523">
-                              <sedStatement xml:id="_c777f62e-d9ba-4819-b6d4-c8ddff5b2bd5" name="return i_4;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="536" charEnd="545">
-                                 <sedMethodReturn xml:id="_8bc4a0a1-519d-44e5-b15c-e50f5e09affa" name="&lt;return of self.value(i_4);&gt;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="518" charEnd="523">
-                                    <sedStatement xml:id="_2b817ab4-fa3c-4a27-805e-f6a9e98bfc12" name="int y = valueLonger(j_2);" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="349" charEnd="372">
-                                       <sedMethodCall xml:id="_46bb71fd-5bc5-42be-830b-ddb9797a0f70" name="self.valueLonger(i_5);" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="568" charEnd="579">
-                                          <sedStatement xml:id="_f9c2d6e6-a825-4786-a744-edfb00acaa86" name="int j = i_5;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="592" charEnd="602">
-                                             <sedStatement xml:id="_26ea7898-da58-4344-b1a8-4246d1ef9a9a" name="i_5=j_3;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="606" charEnd="612">
-                                                <sedStatement xml:id="_7da02408-63dd-4077-bbcc-6de2b02faead" name="return j_3;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="616" charEnd="625">
-                                                   <sedMethodReturn xml:id="_b15b1a72-df56-40a5-bda8-1e1700fefc2b" name="&lt;return of self.valueLonger(i_5);&gt;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="568" charEnd="579">
-                                                      <sedStatement xml:id="_7d1746bc-c0cf-4129-9247-dbae31cbe68d" name="int z = value(x_4)+value(y_1);" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="377" charEnd="405">
+               <sedBranchCondition xml:id="_e6855483-7362-49fb-a08a-a88c9e44b324" name="not(equals(a,Z(0(#))))" pathCondition="not(equals(a,Z(0(#))))">
+                  <sedStatement xml:id="_827f9b8e-b939-4016-9dc4-e62d9fda6214" name="int i = 2;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="297" charEnd="307" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
+                     <sedStatement xml:id="_6198d90c-1877-41f9-8f2e-4988ceca5df1" name="int j = 3;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="312" charEnd="322" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
+                        <sedStatement xml:id="_c767819d-7073-4a24-b695-7317ef2d836d" name="int x = value(i);" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="327" charEnd="344" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
+                           <sedMethodCall xml:id="_a575a43c-1203-43d4-80e0-9c049ce892e3" name="self.value(i_4);" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="518" charEnd="523" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
+                              <sedStatement xml:id="_b5077804-47ad-4de1-9e68-f8b5f7b78037" name="return i_4;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="536" charEnd="545" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
+                                 <sedMethodReturn xml:id="_f864b246-5c2e-4769-9728-96cd0aba9d93" name="&lt;return of self.value(i_4);&gt;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="518" charEnd="523" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java" methodReturnConditionRef="_8433f8d4-e722-41c3-908d-ce19588bf53a">
+                                    <sedStatement xml:id="_fb2b17da-01a7-43a5-971c-b0cc2d5a7a8c" name="int y = valueLonger(j_2);" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="349" charEnd="372" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
+                                       <sedMethodCall xml:id="_68ba32f2-1066-4cbd-95e9-31a78be7b381" name="self.valueLonger(i_5);" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="568" charEnd="579" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
+                                          <sedStatement xml:id="_290375f1-f004-40d2-b48b-6eae65247f7a" name="int j = i_5;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="592" charEnd="602" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
+                                             <sedStatement xml:id="_cfdec71c-d3d2-49ac-a876-b60f4fe73e00" name="i_5=j_3;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="606" charEnd="612" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
+                                                <sedStatement xml:id="_e3cc527e-c70b-4aa9-9e42-64aa67165d4f" name="return j_3;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="616" charEnd="625" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
+                                                   <sedMethodReturn xml:id="_787cca74-6da2-49ca-baea-416f8b6e2c17" name="&lt;return of self.valueLonger(i_5);&gt;" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="568" charEnd="579" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java" methodReturnConditionRef="_f19fded0-87f8-4e4e-8981-e745c4516382">
+                                                      <sedStatement xml:id="_0d1a8fd9-316e-43ad-876b-e721241ce2a3" name="int z = value(x_4)+value(y_1);" pathCondition="not(equals(a,Z(0(#))))" lineNumber="-1" charStart="377" charEnd="405" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
                                                       </sedStatement>
                                                    </sedMethodReturn>
                                                 </sedStatement>
                                              </sedStatement>
                                           </sedStatement>
+                                          <sedMethodCallMethodReturnCondition xml:id="_f19fded0-87f8-4e4e-8981-e745c4516382" name="true" pathCondition="not(equals(a,Z(0(#))))">
+                                             <sedChildReference nodeIdRef="_787cca74-6da2-49ca-baea-416f8b6e2c17"/>
+                                          </sedMethodCallMethodReturnCondition>
                                        </sedMethodCall>
                                     </sedStatement>
                                  </sedMethodReturn>
                               </sedStatement>
+                              <sedMethodCallMethodReturnCondition xml:id="_8433f8d4-e722-41c3-908d-ce19588bf53a" name="true" pathCondition="not(equals(a,Z(0(#))))">
+                                 <sedChildReference nodeIdRef="_f864b246-5c2e-4769-9728-96cd0aba9d93"/>
+                              </sedMethodCallMethodReturnCondition>
                            </sedMethodCall>
                         </sedStatement>
                      </sedStatement>

@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -31,12 +31,10 @@ public class ShowProofStatistics extends MainWindowAction {
     private static final long serialVersionUID = -8814798230037775905L;
 
     public ShowProofStatistics(MainWindow mainWindow) {
-	super(mainWindow);
-	setName("Show Proof Statistics...");
+	    super(mainWindow);
+	    setName("Show Proof Statistics");
         setIcon(IconFactory.statistics(16));
-	
-	getMediator().enableWhenProofLoaded(this);
-
+	    getMediator().enableWhenProofLoaded(this);
     }
 
     @Override
@@ -49,7 +47,9 @@ public class ShowProofStatistics extends MainWindowAction {
         } else {
 
             final int openGoals = proof.openGoals().size();
-            String stats = (openGoals > 0)? ""+openGoals+" open goals.": "Closed.";
+            String stats;
+            if (openGoals > 0) stats = openGoals+" open goal"+(openGoals > 1? "s.":".");
+            else stats = "Closed.";
             stats += "\n\n";
             for (Pair<String,String> x: proof.statistics().getSummary()) {
                 if ("".equals(x.second)) stats +="\n";

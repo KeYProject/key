@@ -1,21 +1,21 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.strategy.feature;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -82,17 +82,20 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
 
         
         // compare the if-sequent instantiations
-        if ( newApp.ifFormulaInstantiations () == null
-                || cmp.ifFormulaInstantiations () == null ) {  
-            if ( newApp.ifFormulaInstantiations () != null
-                    || cmp.ifFormulaInstantiations () != null ) { 
+       final ImmutableList<IfFormulaInstantiation> newAppIfFmlInstantiations = newApp.ifFormulaInstantiations ();
+       final ImmutableList<IfFormulaInstantiation> cmpIfFmlInstantiations = cmp.ifFormulaInstantiations ();
+       if ( newAppIfFmlInstantiations == null
+                || cmpIfFmlInstantiations == null ) {  
+            if ( newAppIfFmlInstantiations != null
+                    || cmpIfFmlInstantiations != null ) { 
                 return false;
             } 
         } else { 
-            final Iterator<IfFormulaInstantiation> it0 =
-                newApp.ifFormulaInstantiations ().iterator ();
+
+           final Iterator<IfFormulaInstantiation> it0 =
+                newAppIfFmlInstantiations.iterator ();
             final Iterator<IfFormulaInstantiation> it1 =
-                cmp.ifFormulaInstantiations ().iterator ();
+                cmpIfFmlInstantiations.iterator ();
 
             while ( it0.hasNext () ) {
                 // this test should be improved

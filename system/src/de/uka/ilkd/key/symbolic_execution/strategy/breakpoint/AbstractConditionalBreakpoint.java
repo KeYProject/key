@@ -1,15 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
+
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import java.util.HashMap;
@@ -56,6 +57,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -343,6 +345,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     * @return true if the condition evaluates to true
     */
    protected boolean conditionMet(RuleApp ruleApp, Proof proof, Node node) {
+      ApplyStrategyInfo info = null;
       try {
          //initialize values
          PosInOccurrence pio = ruleApp.posInOccurrence();
@@ -360,11 +363,20 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
          //start side proof
          Term toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
          Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, ruleApp, toProof);
-         ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(proof, sequent, StrategyProperties.SPLITTING_DELAYED);
+         info = SideProofUtil.startSideProof(proof, 
+                                             sequent, 
+                                             StrategyProperties.METHOD_CONTRACT,
+                                             StrategyProperties.LOOP_INVARIANT,
+                                             StrategyProperties.QUERY_ON,
+                                             StrategyProperties.SPLITTING_DELAYED,
+                                             false);
          return info.getProof().closed();
       }
       catch (ProofInputException e) {
          return false;
+      }
+      finally {
+         SideProofUtil.disposeOrStore("Breakpoint condition computation on node " + node.serialNr() + ".", info);
       }
    }
    

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -50,70 +50,29 @@ public class MethodCallAddFeature extends AbstractDebugNodeAddFeature {
     */
    public PictogramElement add(IAddContext context) {
       ISEDDebugNode addedNode = (ISEDDebugNode) context.getNewObject();
+
+      IPeCreateService peCreateService = Graphiti.getPeCreateService();
+      IGaService gaService = Graphiti.getGaService();
       
-      try {
-         ISEDDebugNode parent = addedNode.getParent();
-         PictogramElement pe = getFeatureProvider().getPictogramElementForBusinessObject(parent);
-         boolean isInMethod = Boolean.parseBoolean(Graphiti.getPeService().getPropertyValue(pe, "isInMethod"));
-         
-         IPeCreateService peCreateService = Graphiti.getPeCreateService();
-         IGaService gaService = Graphiti.getGaService();
-         
-         ContainerShape invisContainer;
-         Diagram targetDiagram = (Diagram) context.getTargetContainer();
-         invisContainer = peCreateService.createContainerShape(targetDiagram, true);
-         if(isInMethod)
-         {
-            while(!(parent instanceof ISEDMethodCall))
-               parent = parent.getParent();
-            
-            ContainerShape parentMethod = (ContainerShape) getFeatureProvider().getPictogramElementForBusinessObject(parent);
-//            invisContainer = peCreateService.createContainerShape(parentMethod, true);
-//            invisContainer = peCreateService.createContainerShape(parentMethod, true);
-            Graphiti.getPeService().setPropertyValue(invisContainer, "methodID", parent.getId());
-         }
-//         else
-//         {
-//            Diagram targetDiagram = (Diagram) context.getTargetContainer();
-//            invisContainer = peCreateService.createContainerShape(targetDiagram, true);
-//         }
-            
-         Rectangle inv = gaService.createInvisibleRectangle(invisContainer);
-         link(invisContainer, addedNode);
-         
-         Shape rectShape = peCreateService.createShape(invisContainer, false);
-         
-         Rectangle rect = gaService.createRectangle(rectShape);
-         rect.setForeground(manageColor(new ColorConstant(255, 102, 0)));
-         rect.setLineWidth(2);
-         rect.setFilled(false);
-         link(rectShape, addedNode);
-         
-         ContainerShape nodeContainer = createNodeDesign(addedNode, context);
-         nodeContainer.setContainer(invisContainer);
-         
-         GraphicsAlgorithm ga = nodeContainer.getGraphicsAlgorithm();
+      Diagram targetDiagram = (Diagram) context.getTargetContainer();
+      ContainerShape container = peCreateService.createContainerShape(targetDiagram, true);
 
-         gaService.setLocationAndSize(inv, context.getX(), context.getY(), ga.getWidth(), ga.getHeight());
-         gaService.setLocationAndSize(rect, 0, ga.getHeight() / 2, ga.getWidth(), ga.getHeight());
-         gaService.setLocationAndSize(ga, 0, 0, ga.getWidth(), ga.getHeight());
+      Rectangle rect = gaService.createRectangle(container);
+      rect.setForeground(manageColor(new ColorConstant(255, 102, 0)));
+      rect.setLineWidth(2);
+      rect.setFilled(false);
+      link(container, addedNode);
+      
+      GraphicsAlgorithm ga = super.add(context).getGraphicsAlgorithm();
 
-         Graphiti.getPeService().setPropertyValue(invisContainer, "collapsed", "false");
-         Graphiti.getPeService().setPropertyValue(invisContainer, "width", Integer.toString(inv.getWidth()));
-         Graphiti.getPeService().setPropertyValue(invisContainer, "height", Integer.toString(inv.getHeight()));
-         Graphiti.getPeService().setPropertyValue(invisContainer, "offX", Integer.toString(inv.getX()));
-         Graphiti.getPeService().setPropertyValue(invisContainer, "offY", Integer.toString(inv.getY()));
-         Graphiti.getPeService().setPropertyValue(invisContainer, "isInMethod", Boolean.toString(isInMethod));
-         
-         createAnchor(nodeContainer);
-         
-         return invisContainer;
-      }
-      catch (DebugException e) {
-         LogUtil.getLogger().logError(e);
-      }
+      gaService.setLocationAndSize(rect, context.getX(), context.getY() + ga.getHeight() / 2, ga.getWidth(), ga.getHeight());
+      
+      Graphiti.getPeService().setPropertyValue(container, "width", Integer.toString(rect.getWidth()));
+      Graphiti.getPeService().setPropertyValue(container, "height", Integer.toString(rect.getHeight()));
+      Graphiti.getPeService().setPropertyValue(container, "offX", Integer.toString(rect.getX()));
+      Graphiti.getPeService().setPropertyValue(container, "offY", Integer.toString(rect.getY()));
 
-      return null;
+      return container;
    }
 
    /**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -42,7 +42,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * Provides utility method to work with starts registered via extension points.
@@ -379,7 +378,7 @@ public final class StarterUtil {
     */
    public static void openProofStarter(Shell parentShell, 
                                        Proof proof, 
-                                       KeYEnvironment<CustomConsoleUserInterface> environment, 
+                                       KeYEnvironment<?> environment, 
                                        IMethod method,
                                        boolean canStartAutomode,
                                        boolean canApplyRules,

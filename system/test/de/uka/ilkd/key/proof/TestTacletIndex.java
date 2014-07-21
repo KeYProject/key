@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 /** tests the TacletIndex class.*/
 package de.uka.ilkd.key.proof;
@@ -27,6 +26,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -266,7 +266,7 @@ public class TestTacletIndex extends TestCase{
 
     private RuleAppIndex createGoalFor(Sequent seq_p5, TacletIndex ruleIdx) {
         final Node node_p5 =
-            new Node (new Proof (new Services(AbstractProfile.getDefaultProfile())), seq_p5);
+            new Node (new Proof (new InitConfig(new Services(AbstractProfile.getDefaultProfile()))), seq_p5);
         final BuiltInRuleAppIndex builtinIdx =
             new BuiltInRuleAppIndex (new BuiltInRuleIndex ());
         final Goal goal_p5 =

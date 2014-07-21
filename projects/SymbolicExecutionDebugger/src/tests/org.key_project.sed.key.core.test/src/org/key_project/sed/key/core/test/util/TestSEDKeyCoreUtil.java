@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -135,7 +135,9 @@ public final class TestSEDKeyCoreUtil {
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node? Use {@code null} to use default value.
     * @param showKeYMainWindow Show KeY's main window? Use {@code null} to use default value.
     * @param mergeBranchConditions Merge branch conditions?
+    * @param useUnicode Use unicode characters?
     * @param usePrettyPrinting Use pretty printing?
+    * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @throws Exception Occurred Exception.
     */
    public static void launchKeY(final IMethod method,
@@ -145,7 +147,9 @@ public final class TestSEDKeyCoreUtil {
                                 final Boolean showVariablesOfSelectedDebugNode,
                                 final Boolean showKeYMainWindow,
                                 final Boolean mergeBranchConditions,
-                                final Boolean usePrettyPrinting) throws Exception {
+                                final Boolean useUnicode,
+                                final Boolean usePrettyPrinting,
+                                final Boolean showSignatureOnMethodReturnNodes) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
          @Override
          public void run() {
@@ -180,8 +184,14 @@ public final class TestSEDKeyCoreUtil {
                if (mergeBranchConditions != null) {
                   wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, mergeBranchConditions);
                }
+               if (useUnicode != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_UNICODE, useUnicode);
+               }
                if (usePrettyPrinting != null) {
                   wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING, usePrettyPrinting);
+               }
+               if (showSignatureOnMethodReturnNodes != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_SIGNATURE_ON_MEHTOD_RETURN_NODES, showSignatureOnMethodReturnNodes);
                }
                config = wc.doSave();
                DebugUITools.launch(config, KeySEDUtil.MODE);
@@ -243,7 +253,7 @@ public final class TestSEDKeyCoreUtil {
       target.setModelIdentifier(KeYDebugTarget.MODEL_IDENTIFIER);
       target.setName(targetName);
       // Add thread
-      SEDMemoryThread thread = new SEDMemoryThread(target);
+      SEDMemoryThread thread = new SEDMemoryThread(target, false);
       thread.setName(IExecutionStart.DEFAULT_START_NODE_NAME);
       target.addSymbolicThread(thread);
       return target;

@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -437,7 +437,7 @@ public class DefaultProofFileParser implements IProofFileParser {
        TacletApp ourApp = null;
        PosInOccurrence pos = null;
 
-       Taclet t = proof.env().getInitConfig().lookupActiveTaclet(new Name(currTacletName));
+       Taclet t = proof.getInitConfig().lookupActiveTaclet(new Name(currTacletName));
        if (t==null) {
            ourApp = currGoal.indexOfTaclets().lookup(currTacletName);
        } else {

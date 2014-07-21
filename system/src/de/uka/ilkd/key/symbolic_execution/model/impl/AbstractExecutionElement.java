@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -80,7 +80,8 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
     */
    @Override
    public Services getServices() {
-      return getProof().getServices();
+      Proof proof = getProof();
+      return proof != null ? proof.getServices() : null;
    }
 
    /**
@@ -130,10 +131,14 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
    /**
     * Converts the given {@link Term} into a {@link String} respecting {@link #isUsePretty()}.
     * @param term The {@link Term} to convert.
+    * @param services The {@link Services} to use.
     * @return The {@link String} representation of the given {@link Term}.
     */
-   protected String formatTerm(Term term) {
-      return SymbolicExecutionUtil.formatTerm(term, getServices(), settings.isUsePrettyPrinting());
+   protected String formatTerm(Term term, Services services) {
+      return SymbolicExecutionUtil.formatTerm(term, 
+                                              services, 
+                                              settings.isUseUnicode(),
+                                              settings.isUsePrettyPrinting());
    }
 
    /**
