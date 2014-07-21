@@ -63,7 +63,16 @@ public class MethodCallAddFeature extends AbstractDebugNodeAddFeature {
       rect.setFilled(false);
       link(container, addedNode);
       
-      GraphicsAlgorithm ga = super.add(context).getGraphicsAlgorithm();
+      ContainerShape nodeContainer = createNodeDesign(addedNode, context);
+
+      createAnchor(nodeContainer);
+      
+      // call the layout feature to compute real heights and widths
+      layoutPictogramElement(nodeContainer);
+      
+      GraphicsAlgorithm ga = nodeContainer.getGraphicsAlgorithm();
+      
+//      GraphicsAlgorithm ga = super.add(context).getGraphicsAlgorithm();
 
       gaService.setLocationAndSize(rect, context.getX(), context.getY() + ga.getHeight() / 2, ga.getWidth(), ga.getHeight());
       
