@@ -41,7 +41,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
     * Tests parallel site proofs on a new instantiate proof after applying "resume" on it.
     */
    //Commented out for the moment as Hudson throws an OOM Exception
-   public void xxxtestNewProof() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+   public void testNewProof() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       // Define test settings
       String javaPathInkeyRepDirectory = "examples/_testcase/set/magic42/test/Magic42.java";
       String containerTypeName = "Magic42";
@@ -86,7 +86,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
       // Create threads
       List<SiteProofThread<?>> threads = new LinkedList<SiteProofThread<?>>();
       ExecutionNodePreorderIterator iter = new ExecutionNodePreorderIterator(env.getBuilder().getStartNode());
-      while (iter.hasNext() && threads.size() < 30) {
+      while (iter.hasNext() && threads.size() < 54) {
          IExecutionNode next = iter.next(); 
          if (next instanceof IExecutionStateNode) {
             threads.add(new ExecutionVariableSiteProofThread((IExecutionStateNode<?>)next));
@@ -96,7 +96,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
          }
       }
       // Make sure that the correct number of threads are available
-      assertEquals(31, threads.size());
+      assertEquals(54, threads.size());
       // Start threads
       for (SiteProofThread<?> thread : threads) {
          thread.start();
