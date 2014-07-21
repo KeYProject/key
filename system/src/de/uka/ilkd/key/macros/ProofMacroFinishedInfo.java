@@ -8,6 +8,15 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Proof.Statistics;
 
+/**
+ * An information object with additional information about the
+ * finished proof macro. The source is always a proof macro and
+ * the result is always a list of goals. This information is
+ * created and passed on by every application of a proof macro
+ * as for the passed listener(s) to deal with it.
+ *
+ * @author Michael Kirsten
+ */
 public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
 
     ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals,

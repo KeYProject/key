@@ -3,6 +3,13 @@ package de.uka.ilkd.key.ui;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 
+/**
+ * A composite structure for prover task listeners.
+ * For the moment, this is only used for the application
+ * of proof macros at the outermost level.
+ *
+ * @author Michael Kirsten
+ */
 public class CompositePTListener implements ProverTaskListener {
     private ProverTaskListener[] listeners;
 
