@@ -29,8 +29,8 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
     
     
     public DefaultTaskFinishedInfo(Object source, Object result,
-            Proof proof, long time, 
-            int appliedRules, int closedGoals) {
+                                   Proof proof, long time,
+                                   int appliedRules, int closedGoals) {
         this.source = source;
         this.result = result;
         this.proof = proof;

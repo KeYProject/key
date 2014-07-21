@@ -22,6 +22,8 @@ import javax.swing.JOptionPane;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -33,7 +35,6 @@ import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
-import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractUserInterface;
@@ -53,7 +54,7 @@ import de.uka.ilkd.key.util.KeYExceptionHandler;
 public class WindowUserInterface extends AbstractUserInterface {
 
     private MainWindow mainWindow;
-
+    private int numOfInvokedMacros;
 
     private LinkedList<InteractiveRuleApplicationCompletion> completions =
             new LinkedList<InteractiveRuleApplicationCompletion>();
@@ -64,6 +65,7 @@ public class WindowUserInterface extends AbstractUserInterface {
         completions.add(new DependencyContractCompletion());
         completions.add(new LoopInvariantRuleCompletion());
         completions.add(new BlockContractCompletion(mainWindow));
+        this.numOfInvokedMacros = 0;
     }
 
     protected String getMacroConsoleOutput() {
@@ -119,14 +121,12 @@ public class WindowUserInterface extends AbstractUserInterface {
         mainWindow.setStandardStatusLine();
     }
 
-    public void finish(Proof proof) {
-        // do nothing
-    }
-
     @Override
     public void taskFinished(TaskFinishedInfo info) {
         if (info.getSource() instanceof ApplyStrategy) {
-            resetStatus(this);
+            if (numOfInvokedMacros == 0) {
+                resetStatus(this);
+            }
             ApplyStrategy.ApplyStrategyInfo result =
                     (ApplyStrategyInfo) info.getResult();
 
@@ -147,6 +147,24 @@ public class WindowUserInterface extends AbstractUserInterface {
                 }
             }
             mainWindow.displayResults(info.toString());
+        } else if (info.getSource() instanceof ProofMacro) {
+            if (numOfInvokedMacros == 0) {
+                resetStatus(this);
+                assert info instanceof ProofMacroFinishedInfo;
+                Proof proof = info.getProof();
+                if (!proof.closed()) {
+                    Goal g = proof.openGoals().head();
+                    mainWindow.getMediator().goalChosen(g);
+                    if (inStopAtFirstUncloseableGoalMode(info.getProof())) {
+                        // iff Stop on non-closeable Goal is selected a little
+                        // popup is generated and proof is stopped
+                        AutoDismissDialog dialog = new AutoDismissDialog(
+                                "Couldn't close Goal Nr. " + g.node().serialNr()
+                                + " automatically");
+                        dialog.show();
+                    }
+                }
+            }
         } else if (info.getSource() instanceof ProblemLoader) {
             resetStatus(this);
             if (info.getResult() != null) {
@@ -157,8 +175,10 @@ public class WindowUserInterface extends AbstractUserInterface {
                 exceptionHandler.clear();
             } else {
                 KeYMediator mediator = mainWindow.getMediator();
-                mediator.getNotationInfo().refresh(
-                        mediator.getServices());
+                mediator.getNotationInfo().refresh(mediator.getServices());
+                if (macroChosen()) {
+                    applyMacro();
+                }
             }
         } else {
             resetStatus(this);
@@ -169,6 +189,13 @@ public class WindowUserInterface extends AbstractUserInterface {
         // this seems to be a good place to free some memory
         Runtime.getRuntime().gc();
     }
+
+
+    @Override
+    protected void macroFinished(TaskFinishedInfo info) {
+        numOfInvokedMacros--;
+    }
+
 
     protected boolean inStopAtFirstUncloseableGoalMode(Proof proof) {
         return proof.getSettings().getStrategySettings()
@@ -186,6 +213,12 @@ public class WindowUserInterface extends AbstractUserInterface {
     @Override
     public void taskStarted(String message, int size) {
         mainWindow.setStatusLine(message, size);
+    }
+
+    @Override
+    protected void macroStarted(String message,
+                                int size) {
+        numOfInvokedMacros++;
     }
 
     @Override

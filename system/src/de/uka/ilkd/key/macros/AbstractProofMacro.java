@@ -26,8 +26,8 @@ import de.uka.ilkd.key.proof.Node;
  * Takes care of providing the whole ProofMacro interface by only making it
  * necessary to implement to most general application methods for a given
  * list of goals and translating the less general versions (firstly for a
- * given node and secondly having neither any goals nor a node. Although all
- * these methods can be redefined by inheritance, this is usually not
+ * given node and secondly having neither any goals nor a node). Although
+ * all these methods can be redefined by inheritance, this is usually not
  * necessary, unless you know <tt>exactly</tt> what you are doing.
  * The exception is {@link #finishAfterMacro()} for compound macros
  * (see description in {@link ProofMacro#finishAfterMacro()}).
@@ -35,6 +35,12 @@ import de.uka.ilkd.key.proof.Node;
  * @author Michael Kirsten
  */
 public abstract class AbstractProofMacro implements ProofMacro {
+
+    /**
+     * The max number of steps to be applied.
+     * A value of -1 means no changes.
+     */
+    private int numberSteps = -1;
 
     private static ImmutableList<Goal> getGoals(Node node) {
         if (node == null) {
@@ -46,8 +52,13 @@ public abstract class AbstractProofMacro implements ProofMacro {
     }
 
     @Override
-    public boolean finishAfterMacro() {
-        return true;
+    public void setNumberSteps(int numberSteps) {
+        this.numberSteps = numberSteps;
+    }
+
+    @Override
+    public int getNumberSteps() {
+        return this.numberSteps;
     }
 
     @Override
@@ -63,22 +74,23 @@ public abstract class AbstractProofMacro implements ProofMacro {
     }
 
     @Override
-    public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc,
-                        ProverTaskListener listener) throws InterruptedException {
-        applyTo(mediator, getGoals(mediator.getSelectedNode()), posInOcc, listener);
+    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) throws InterruptedException {
+        return applyTo(mediator, getGoals(mediator.getSelectedNode()), posInOcc, listener);
     }
 
     @Override
-    public void applyTo(KeYMediator mediator,
-                        Node node,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) throws InterruptedException {
-        applyTo(mediator, getGoals(node), posInOcc, listener);
+    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+                                          Node node,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) throws InterruptedException {
+        return applyTo(mediator, getGoals(node), posInOcc, listener);
     }
 
 
     @Override
-    public javax.swing.KeyStroke getKeyStroke() {
+    public final javax.swing.KeyStroke getKeyStroke() {
         return KeyStrokeManager.get(this);
     }
     

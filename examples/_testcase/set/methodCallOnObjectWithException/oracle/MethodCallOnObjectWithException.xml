@@ -25,9 +25,11 @@
                                                 </methodReturn>
                                              </methodReturn>
                                           </statement>
+                                          <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                        </methodCall>
                                     </statement>
                                  </methodReturn>
+                                 <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
                               </methodCall>
                            </statement>
                         </statement>
@@ -35,7 +37,9 @@
                   </methodCall>
                </statement>
             </methodReturn>
+            <methodReturnEntry path="/0/0/0/0"/>
          </methodCall>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
 </start>

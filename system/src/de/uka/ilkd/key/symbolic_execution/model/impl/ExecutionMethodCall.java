@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
@@ -20,9 +22,10 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -30,6 +33,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * @author Martin Hentschel
  */
 public class ExecutionMethodCall extends AbstractExecutionStateNode<MethodBodyStatement> implements IExecutionMethodCall {
+   /**
+    * The up to know discovered {@link IExecutionMethodReturn}s.
+    */
+   private ImmutableList<IExecutionMethodReturn> methodReturns = ImmutableSLList.nil();
+
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
@@ -120,5 +128,24 @@ public class ExecutionMethodCall extends AbstractExecutionStateNode<MethodBodySt
    @Override
    public String getElementType() {
       return "Method Call";
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ImmutableList<IExecutionMethodReturn> getMethodReturns() {
+      return methodReturns;
+   }
+   
+   /**
+    * Registers the given {@link IExecutionMethodReturn}.
+    * @param methodReturn The {@link IExecutionMethodReturn} to register.
+    */
+   public void addMethodReturn(IExecutionMethodReturn methodReturn) {
+      if (methodReturn != null) {
+         assert methodReturn.getMethodCall() == this;
+         methodReturns = methodReturns.prepend(methodReturn);
+      }
    }
 }

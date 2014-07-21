@@ -20,6 +20,7 @@ import java.io.Reader;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -431,6 +432,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       else if (expected instanceof IExecutionMethodCall) {
          assertTrue("Expected IExecutionMethodCall but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionMethodCall);
          assertVariables((IExecutionMethodCall)expected, (IExecutionMethodCall)current, compareVariables);
+         assertMethodReturns((IExecutionMethodCall)expected, (IExecutionMethodCall)current);
       }
       else if (expected instanceof IExecutionMethodReturn) {
          assertTrue("Expected IExecutionMethodReturn but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionMethodReturn);
@@ -438,8 +440,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          if (compareReturnValues) {
             assertTrue(((IExecutionMethodReturn)expected).getNameIncludingReturnValue() + " does not match " + ((IExecutionMethodReturn)current).getNameIncludingReturnValue(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getNameIncludingReturnValue(), ((IExecutionMethodReturn)current).getNameIncludingReturnValue()));
             assertTrue(((IExecutionMethodReturn)expected).getSignatureIncludingReturnValue() + " does not match " + ((IExecutionMethodReturn)current).getSignatureIncludingReturnValue(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getSignatureIncludingReturnValue(), ((IExecutionMethodReturn)current).getSignatureIncludingReturnValue()));
+            assertEquals(((IExecutionMethodReturn)expected).isReturnValuesComputed(), ((IExecutionMethodReturn)current).isReturnValuesComputed());
          }
-         assertEquals(((IExecutionMethodReturn)expected).isReturnValuesComputed(), ((IExecutionMethodReturn)current).isReturnValuesComputed());
          assertTrue(((IExecutionMethodReturn)expected).getFormatedMethodReturnCondition() + " does not match " + ((IExecutionMethodReturn)current).getFormatedMethodReturnCondition(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getFormatedMethodReturnCondition(), ((IExecutionMethodReturn)current).getFormatedMethodReturnCondition()));
          assertVariables((IExecutionMethodReturn)expected, (IExecutionMethodReturn)current, compareVariables);
          if (compareReturnValues) {
@@ -483,6 +485,31 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Optionally compare parent
       if (compareParent) {
          assertExecutionNode(expected, current, false, compareVariables, compareCallStack, compareReturnValues);
+      }
+   }
+
+   /**
+    * Compares the method returns.
+    * @param expected The expected {@link IExecutionMethodCall}.
+    * @param current The current {@link IExecutionMethodCall}.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected static void assertMethodReturns(IExecutionMethodCall expected, IExecutionMethodCall current) throws ProofInputException {
+      ImmutableList<IExecutionMethodReturn> expectedEntries = expected.getMethodReturns();
+      ImmutableList<IExecutionMethodReturn> currentEntries = current.getMethodReturns();
+      if (expectedEntries != null) {
+         assertNotNull("Call stack of \"" + current + "\" should not be null.", currentEntries);
+         assertEquals("Node: " + expected, expectedEntries.size(), currentEntries.size());
+         Iterator<IExecutionMethodReturn> expectedIter = expectedEntries.iterator();
+         Iterator<IExecutionMethodReturn> currentIter = currentEntries.iterator();
+         while (expectedIter.hasNext() && currentIter.hasNext()) {
+            assertExecutionNode(expectedIter.next(), currentIter.next(), false, false, false, false);
+         }
+         assertFalse(expectedIter.hasNext());
+         assertFalse(currentIter.hasNext());
+      }
+      else{
+         assertTrue("Method return entries of \"" + current + "\" is \"" + currentEntries + "\" but should be null or empty.", currentEntries == null || currentEntries.isEmpty());
       }
    }
 

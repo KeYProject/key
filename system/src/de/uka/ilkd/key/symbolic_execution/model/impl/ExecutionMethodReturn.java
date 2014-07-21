@@ -57,7 +57,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
    /**
     * The {@link IExecutionMethodCall} which is now returned.
     */
-   private final IExecutionMethodCall methodCall;
+   private final ExecutionMethodCall methodCall;
    
    /**
     * The node name with signature including the return value.
@@ -99,10 +99,11 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
    public ExecutionMethodReturn(ITreeSettings settings,
                                 KeYMediator mediator, 
                                 Node proofNode, 
-                                IExecutionMethodCall methodCall) {
+                                ExecutionMethodCall methodCall) {
       super(settings, mediator, proofNode);
       assert methodCall != null;
       this.methodCall = methodCall;
+      this.methodCall.addMethodReturn(this);
    }
 
    /**

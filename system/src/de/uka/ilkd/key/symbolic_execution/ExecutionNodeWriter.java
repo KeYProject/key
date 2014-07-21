@@ -21,22 +21,23 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
@@ -263,6 +264,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Tag name to store one entry of {@link IExecutionNode#getCallStack()}.
     */
    public static final String TAG_CALL_STACK_ENTRY = "callStackEntry";
+
+   /**
+    * Tag name to store one entry of {@link IExecutionMethodCall#getMethodReturns()}.
+    */
+   public static final String TAG_METHOD_RETURN_ENTRY = "methodReturnEntry";
 
    /**
     * Character to separate path entries in attributes {@value #ATTRIBUTE_PATH_IN_TREE}.
@@ -554,6 +560,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendVariables(level + 1, node, saveVariables, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
+      appendMethodReturns(level + 1, node, sb);
       appendEndTag(level, TAG_METHOD_CALL, sb);
    }
 
@@ -843,6 +850,23 @@ public class ExecutionNodeWriter extends AbstractWriter {
                attributeValues.put(ATTRIBUTE_PATH_IN_TREE, computePath(stackNode));
                appendEmptyTag(level, TAG_CALL_STACK_ENTRY, attributeValues, sb);
             }
+         }
+      }
+   }
+
+   /**
+    * Appends the method return entries to the given {@link StringBuffer}.
+    * @param level The level of the children.
+    * @param node The {@link IExecutionMethodCall} which provides the call stack.
+    * @param sb The {@link StringBuffer} to append to.
+    */
+   protected void appendMethodReturns(int level, IExecutionMethodCall node, StringBuffer sb) {
+      ImmutableList<IExecutionMethodReturn> methodReturns = node.getMethodReturns();
+      if (methodReturns != null) {
+         for (IExecutionMethodReturn methodReturn : methodReturns) {
+            Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+            attributeValues.put(ATTRIBUTE_PATH_IN_TREE, computePath(methodReturn));
+            appendEmptyTag(level, TAG_METHOD_RETURN_ENTRY, attributeValues, sb);
          }
       }
    }

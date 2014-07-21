@@ -20,7 +20,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -57,7 +56,6 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
@@ -771,8 +769,8 @@ public class SymbolicExecutionTreeBuilder {
                   if (!methodReturnsToIgnore.contains(callNode)) {
                      // Find the call Node representation in SED, if not available ignore it.
                      IExecutionNode callSEDNode = keyNodeMapping.get(callNode);
-                     if (callSEDNode instanceof IExecutionMethodCall) { // Could be the start node if the initial sequent already contains some method frames.
-                        result = new ExecutionMethodReturn(settings, mediator, node, (IExecutionMethodCall)callSEDNode);
+                     if (callSEDNode instanceof ExecutionMethodCall) { // Could be the start node if the initial sequent already contains some method frames.
+                        result = new ExecutionMethodReturn(settings, mediator, node, (ExecutionMethodCall)callSEDNode);
                      }
                   }
                }

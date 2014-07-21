@@ -24,6 +24,8 @@ import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+
 import java.util.ArrayList;
 
 /**
@@ -87,21 +89,36 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
      *             if one of the wrapped macros is interrupted.
      */
     @Override
-    public void applyTo(KeYMediator mediator,
-                        ImmutableList<Goal> goals,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) throws InterruptedException {
+    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+                                          ImmutableList<Goal> goals,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) throws InterruptedException {
         final List<Node> initNodes = new ArrayList<Node>(goals.size());
         for (Goal goal : goals) {
             initNodes.add(goal.node());
         }
-        for (ProofMacro macro : getProofMacros()) {
+        final Proof proof = initNodes.isEmpty() ?
+                mediator.getSelectedProof() : initNodes.get(0).proof();
+        final ImmutableList<Goal> gs = initNodes.isEmpty() ?
+                proof.openEnabledGoals() : proof.getSubtreeEnabledGoals(initNodes.get(0));
+        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, gs, proof);
+        for (final ProofMacro macro : getProofMacros()) {
             // reverse to original nodes
             for (Node initNode : initNodes) {
-                if (macro.canApplyTo(mediator, initNode, posInOcc))
-                    macro.applyTo(mediator, initNode, posInOcc, listener);
+                if (macro.canApplyTo(mediator, initNode, posInOcc)) {
+                    final ProverTaskListener pml =
+                            new ProofMacroListener(macro, listener);
+                    pml.taskStarted(macro.getName(), 0);
+                    synchronized(macro) {
+                        // wait for macro to terminate
+                        info = macro.applyTo(mediator, initNode, posInOcc, pml);
+                    }
+                    pml.taskFinished(info);
+                    info = new ProofMacroFinishedInfo(this, info);
+                }
             }
         }
+        return info;
     }
 
     /**

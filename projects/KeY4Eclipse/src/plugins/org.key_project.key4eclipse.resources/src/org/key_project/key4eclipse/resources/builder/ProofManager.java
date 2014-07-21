@@ -702,7 +702,7 @@ public class ProofManager {
          
          ProofStarter ps = new ProofStarter(false);
          ps.init(new SingleProof(proof, pe.getProofObl().name()));
-         ps.start(true);
+         ps.start();
          
          OneStepSimplifier oss = MiscTools.findOneStepSimplifier(proof);
          if (oss != null) {
