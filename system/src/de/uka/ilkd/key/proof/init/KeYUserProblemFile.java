@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.proof.init;
 
@@ -76,8 +75,10 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         
         //read activated choices
         try {
-            ProofSettings settings = getPreferences();
-            
+
+        	ProofSettings settings = getPreferences();
+            initConfig.setSettings(settings);	
+        	
             ParserConfig pc = new ParserConfig
                 (initConfig.getServices(), 
                  initConfig.namespaces());
@@ -92,6 +93,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             
             initConfig.setActivatedChoices(settings.getChoiceSettings()
         	      		                   .getDefaultChoicesAsSet());
+            
         
         } catch (antlr.ANTLRException e) {
             throw new ProofInputException(e);      
@@ -138,8 +140,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
                                     initConfig.getTaclet2Builder(),
                                     initConfig.getTaclets()); 
             problemTerm = problemParser.parseProblem();
-            String searchS = "\\problem";            
-
+            String searchS = "\\problem";
 	    if(problemTerm == null) {
 	       boolean chooseDLContract = problemParser.getChooseContract() != null;
           boolean proofObligation = problemParser.getProofObligation() != null;
@@ -152,6 +153,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 	       else {
 	         throw new ProofInputException("No \\problem or \\chooseContract or \\proofObligation in the input file!");
 	       }
+	       
 	    }
 
             problemHeader = lexer.getCapturedText();
@@ -176,14 +178,14 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         assert problemTerm != null;
         String name = name();
         ProofSettings settings = getPreferences();
+        initConfig.setSettings(settings);
         return ProofAggregate.createProofAggregate(
                 new Proof(name, 
                           problemTerm, 
                           problemHeader,
                           initConfig.createTacletIndex(), 
                           initConfig.createBuiltInRuleIndex(),
-                          initConfig.getServices(), 
-                          settings), 
+                          initConfig), 
                 name);
     }
     

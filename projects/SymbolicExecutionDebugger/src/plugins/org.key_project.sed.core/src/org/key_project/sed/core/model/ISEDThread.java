@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -13,6 +13,7 @@
 
 package org.key_project.sed.core.model;
 
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.key_project.sed.core.model.impl.AbstractSEDThread;
@@ -36,4 +37,9 @@ import org.key_project.sed.core.model.memory.SEDMemoryThread;
  * @see ISEDDebugNode
  */
 public interface ISEDThread extends ISEDDebugNode, IThread {
+   /**
+    * Returns all leaf nodes to select.
+    * @return The leaf nodes to select.
+    */
+   public ISEDDebugNode[] getLeafsToSelect() throws DebugException;
 }

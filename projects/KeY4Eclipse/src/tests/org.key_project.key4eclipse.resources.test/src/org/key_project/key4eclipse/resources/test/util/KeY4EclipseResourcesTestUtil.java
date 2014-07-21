@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -47,7 +47,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 public class KeY4EclipseResourcesTestUtil {
 
@@ -153,7 +153,7 @@ public class KeY4EclipseResourcesTestUtil {
       File location = ResourceUtil.getLocation(project);
       File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
       List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
-      KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(location, classPaths, bootClassPath);
+      KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(location, classPaths, bootClassPath);
       environment = KeYEnvironment.load(file, null, null);
       return environment.getLoadedProof();
    }

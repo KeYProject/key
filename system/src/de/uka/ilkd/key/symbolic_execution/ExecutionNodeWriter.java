@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -58,6 +58,16 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Attribute name to store {@link IExecutionMethodReturn#getNameIncludingReturnValue()}.
     */
    public static final String ATTRIBUTE_NAME_INCLUDING_RETURN_VALUE = "nameIncludingReturnValue";
+
+   /**
+    * Attribute name to store {@link IExecutionMethodReturn#getSignatureIncludingReturnValue()}.
+    */
+   public static final String ATTRIBUTE_SIGNATURE_INCLUDING_RETURN_VALUE = "signatureIncludingReturnValue";
+
+   /**
+    * Attribute name to store {@link IExecutionMethodReturn#getSignature()}.
+    */
+   public static final String ATTRIBUTE_SIGNATURE = "signature";
 
    /**
     * Attribute exceptional termination to store {@link IExecutionTermination#getTerminationKind()}.
@@ -173,6 +183,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Attribute name to store {@link IExecutionBranchCondition#getAdditionalBranchLabel()}.
     */
    public static final String ATTRIBUTE_ADDITIONAL_BRANCH_LABEL = "additionalBranchLabel";
+
+   /**
+    * Attribute name to store {@link IExecutionMethodReturn#getMethodReturnCondition()}.
+    */
+   public static final String ATTRIBUTE_METHOD_RETURN_CONDITION = "methodReturnCondition";
    
    /**
     * Tag name to store {@link IExecutionBranchCondition}s.
@@ -560,12 +575,15 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                               StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
+      attributeValues.put(ATTRIBUTE_SIGNATURE, node.getSignature());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       if (saveReturnValues) {
          attributeValues.put(ATTRIBUTE_NAME_INCLUDING_RETURN_VALUE, node.getNameIncludingReturnValue());
+         attributeValues.put(ATTRIBUTE_SIGNATURE_INCLUDING_RETURN_VALUE, node.getSignatureIncludingReturnValue());
       }
       attributeValues.put(ATTRIBUTE_RETURN_VALUE_COMPUTED, node.isReturnValuesComputed() + "");
+      attributeValues.put(ATTRIBUTE_METHOD_RETURN_CONDITION, node.getFormatedMethodReturnCondition());
       appendStartTag(level, TAG_METHOD_RETURN, attributeValues, sb);
       if (saveReturnValues) {
          IExecutionMethodReturnValue[] returnValues = node.getReturnValues();

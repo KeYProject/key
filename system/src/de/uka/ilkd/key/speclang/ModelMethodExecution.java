@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -58,9 +58,26 @@ public final class ModelMethodExecution extends ClassAxiom {
     }
 
     @Override
+    public boolean equals(Object o) {
+       if (o == null || this.getClass() != o.getClass()) return false;
+       final ModelMethodExecution other = (ModelMethodExecution) o;
+       
+       if (!name.equals(other.name)) return false;
+       if (!target.equals(other.target)) return false;
+       if (!kjt.equals(other.kjt)) return false;
+       
+       return true;
+    }
+    
+    @Override
+    public int hashCode() {
+       return 17*(name.hashCode() + 17 * target.hashCode());
+    }
+    
+    @Override
     public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, Services services) {
 
-		Name tacletName = MiscTools.toValidTacletName(name);
+        Name tacletName = MiscTools.toValidTacletName(name);
         TacletGenerator TG = TacletGenerator.getInstance();
         return null;
 //            return TG.generateModelMethodExecutionTaclets(tacletName,

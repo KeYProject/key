@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -247,12 +247,12 @@ public class SWTBotKeYUtilTest extends AbstractSetupTestCase {
         File firstLocation = ResourceUtil.getLocation(javaProject.getProject().getFolder("src"));
         InitConfig firstConfig = KeYUtil.getInitConfig(firstLocation);
         assertNotNull(firstConfig);
-        assertEquals(firstConfig.getProofEnv().getJavaModel().getModelDir(), firstLocation.getAbsolutePath());
+        assertEquals(firstConfig.getServices().getJavaModel().getModelDir(), firstLocation.getAbsolutePath());
         // Check second environment
         File secondLocation = ResourceUtil.getLocation(secondProject.getProject().getFolder("src"));
         InitConfig secondConfig = KeYUtil.getInitConfig(secondLocation);
         assertNotNull(secondConfig);
-        assertEquals(secondConfig.getProofEnv().getJavaModel().getModelDir(), secondLocation.getAbsolutePath());
+        assertEquals(secondConfig.getServices().getJavaModel().getModelDir(), secondLocation.getAbsolutePath());
         // Test invalid location
         File invalidLocation = ResourceUtil.getLocation(secondProject.getProject());
         assertNull(KeYUtil.getInitConfig(invalidLocation));

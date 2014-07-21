@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -358,7 +358,7 @@ public abstract class AbstractEditorInViewView<E extends IEditorPart, C extends 
       Display.getDefault().syncExec(new Runnable() {
          @Override
          public void run() {
-            if (editorComposite != null) {
+            if (editorComposite != null && !editorComposite.isDisposed()) {
                editorComposite.setEnabled(AbstractEditorInViewView.this.editorEnabled);
             }
             updateEditorsGlobalEnablement(AbstractEditorInViewView.this.editorEnabled && isEditorShown());

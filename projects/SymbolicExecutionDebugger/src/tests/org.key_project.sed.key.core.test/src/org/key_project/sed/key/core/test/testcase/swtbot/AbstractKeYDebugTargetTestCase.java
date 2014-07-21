@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -155,7 +155,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
       oracleFile.getParentFile().mkdirs();
       // Create oracle file
       SEDXMLWriter writer = new SEDXMLWriter();
-      writer.write(target.getLaunch(), SEDXMLWriter.DEFAULT_ENCODING, new FileOutputStream(oracleFile), saveVariables, saveCallStack);
+      writer.write(target.getLaunch(), SEDXMLWriter.DEFAULT_ENCODING, new FileOutputStream(oracleFile), saveVariables, saveCallStack, null);
       // Print message to the user.
       printOracleDirectory();
    }
@@ -317,7 +317,17 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                menuItem.click();
             }
          });
+         waitUntilDeselected(bot, launchTreeItem);
       }
+   }
+   
+   /**
+    * Waits until the given {@link SWTBotTreeItem} is no longer selected.
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @param item The {@link SWTBotTreeItem} to wait for.
+    */
+   protected static void waitUntilDeselected(SWTWorkbenchBot bot, SWTBotTreeItem item) {
+      TestUtilsUtil.waitUntilDeselected(bot, item);
    }
    
    /**
@@ -370,6 +380,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                menuItem.click();
             }
          });
+         waitUntilDeselected(bot, launchTreeItem);
       }
    }
    
@@ -423,6 +434,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                menuItem.click();
             }
          });
+         waitUntilDeselected(bot, launchTreeItem);
       }
    }
    
@@ -493,7 +505,9 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
+    * @param useUnicode Use unicode characters?
     * @param usePrettyPrinting Use pretty printing?
+    * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -509,8 +523,10 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean showVariablesOfSelectedDebugNode,
                                        Boolean showKeYMainWindow,
                                        Boolean mergeBranchConditions,
+                                       Boolean useUnicode,
                                        Boolean usePrettyPrinting,
-                                       int timeoutFactor,
+                                       Boolean showSignatureOnMethodReturnNodes,
+                                       int timeoutFactor, 
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       doKeYDebugTargetTest(projectName,
                            Activator.PLUGIN_ID, 
@@ -524,7 +540,9 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                            showVariablesOfSelectedDebugNode, 
                            showKeYMainWindow, 
                            mergeBranchConditions,
+                           useUnicode,
                            usePrettyPrinting,
+                           showSignatureOnMethodReturnNodes,
                            timeoutFactor, 
                            executor);
    }
@@ -545,7 +563,9 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
+    * @param useUnicode Use unicode characters?
     * @param usePrettyPrinting Use pretty printing?
+    * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -562,7 +582,9 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean showVariablesOfSelectedDebugNode,
                                        Boolean showKeYMainWindow,
                                        Boolean mergeBranchConditions,
+                                       Boolean useUnicode,
                                        Boolean usePrettyPrinting,
+                                       Boolean showSignatureOnMethodReturnNodes,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       doKeYDebugTargetTest(projectName, 
@@ -578,7 +600,9 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                            showVariablesOfSelectedDebugNode, 
                            showKeYMainWindow, 
                            mergeBranchConditions, 
+                           useUnicode,
                            usePrettyPrinting,
+                           showSignatureOnMethodReturnNodes,
                            timeoutFactor, 
                            executor);
    }
@@ -599,7 +623,9 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
+    * @param useUnicode Use unicode characters?
     * @param usePrettyPrinting Use pretty printing?
+    * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -617,7 +643,9 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean showVariablesOfSelectedDebugNode,
                                        Boolean showKeYMainWindow,
                                        Boolean mergeBranchConditions,
+                                       Boolean useUnicode,
                                        Boolean usePrettyPrinting,
+                                       Boolean showSignatureOnMethodReturnNodes,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       // Create test project
@@ -627,7 +655,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          projectConfigurator.configure(project);
       }
       // Do test steps
-      doKeYDebugTargetTest(project, closePropertiesView, closeExecutionTreeViews, selector, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, usePrettyPrinting, timeoutFactor, executor);
+      doKeYDebugTargetTest(project, closePropertiesView, closeExecutionTreeViews, selector, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, useUnicode, usePrettyPrinting, showSignatureOnMethodReturnNodes, timeoutFactor, executor);
    }
    
    /**
@@ -643,7 +671,9 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
+    * @param useUnicode Use unicode characters?
     * @param usePrettyPrinting Use pretty printing?
+    * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -658,7 +688,9 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean showVariablesOfSelectedDebugNode,
                                        Boolean showKeYMainWindow,
                                        Boolean mergeBranchConditions,
+                                       Boolean useUnicode,
                                        Boolean usePrettyPrinting,
+                                       Boolean showSignatureOnMethodReturnNodes,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       // Create bot
@@ -671,9 +703,10 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
       boolean restoreThumbinalExecutionTreeView = false;
       boolean restorePropertiesView = false;
       List<? extends SWTBotEditor> oldEditors = bot.editors();
+      // Open symbolic debug perspective
+      IPerspectiveDescriptor debugPerspective = TestSedCoreUtil.openSymbolicDebugPerspective();
       try {
-         // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective();
+         // Configure debug perspective
          if (closeExecutionTreeViews) {
             restoreExecutionTreeView = TestUtilsUtil.closeView(ExecutionTreeView.VIEW_ID);
             restoreThumbinalExecutionTreeView = TestUtilsUtil.closeView(ExecutionTreeThumbNailView.VIEW_ID);
@@ -681,6 +714,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          if (closePropertiesView) {
             restorePropertiesView = TestUtilsUtil.closeView(IPageLayout.ID_PROP_SHEET);
          }
+         executor.configureDebugPerspective(bot, debugPerspective);
          // Get method
          assertNotNull(selector);
          IMethod method = selector.getMethod(project);
@@ -693,7 +727,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
          assertEquals(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW, SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
          // Launch method
-         TestSEDKeyCoreUtil.launchKeY(method, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, usePrettyPrinting);
+         TestSEDKeyCoreUtil.launchKeY(method, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, useUnicode, usePrettyPrinting, showSignatureOnMethodReturnNodes);
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
@@ -717,6 +751,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
             }
          }
          // Restore closed views if required
+         executor.cleanupDebugPerspective(bot, debugPerspective);
          if (restorePropertiesView) {
             TestUtilsUtil.openView(IPageLayout.ID_PROP_SHEET);
          }
@@ -742,7 +777,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                                               final boolean useLoopInvariants,
                                                               final boolean nonExecutionBranchHidingSideProofs,
                                                               final boolean aliasChecks) {
-      return new IKeYDebugTargetTestExecutor() {
+      return new AbstractKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             // Test launch commands after loading completed
@@ -818,11 +853,11 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
             // Evaluate created tree
             if (clearProofListInKeYBeforeResume) {
                assertTrue(launch.canTerminate());
-               assertFalse(launch.isTerminated());
-               assertTrue(target.canDisconnect());
+               assertTrue(launch.isTerminated()); // launch.isTerminated() returns true if terminated or disconnected.
+               assertFalse(target.canDisconnect());
                assertFalse(target.canSuspend());
                assertTrue(target.canTerminate());
-               assertFalse(target.isDisconnected());
+               assertTrue(target.isDisconnected());
                assertTrue(target.isSuspended());
                assertFalse(target.isTerminated());
                assertFalse(target.canResume());
@@ -878,6 +913,15 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     */
    protected static interface IKeYDebugTargetTestExecutor {
       /**
+       * Can be used to initialize the debug perspective.
+       * @param bot The {@link SWTWorkbenchBot} to use.
+       * @param debugPerspective The currently shown debug perspective.
+       * @throws Exception Occurred Exception.
+       */
+      public void configureDebugPerspective(SWTWorkbenchBot bot, 
+                                            IPerspectiveDescriptor debugPerspective) throws Exception;
+      
+      /**
        * Does the test.
        * @param bot The {@link SWTWorkbenchBot} to use.
        * @param project The {@link IJavaProject} which contains the source code.
@@ -897,6 +941,42 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                        SWTBotTree debugTree, 
                        ISEDDebugTarget target, 
                        ILaunch launch) throws Exception;
+      
+      /**
+       * Reverts all changes done on the debug perspective.
+       * @param bot The {@link SWTWorkbenchBot} to use.
+       * @param debugPerspective The currently shown debug perspective.
+       * @throws Exception Occurred Exception.
+       */
+      public void cleanupDebugPerspective(SWTWorkbenchBot bot, 
+                                          IPerspectiveDescriptor debugPerspective) throws Exception;
+   }
+
+   /**
+    * Abstract implementation of {@link IKeYDebugTargetTestExecutor} which does nothing.
+    * @author Martin Hentschel
+    */
+   protected static abstract class AbstractKeYDebugTargetTestExecutor implements IKeYDebugTargetTestExecutor {
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void configureDebugPerspective(SWTWorkbenchBot bot, IPerspectiveDescriptor debugPerspective) throws Exception {
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void cleanupDebugPerspective(SWTWorkbenchBot bot, IPerspectiveDescriptor debugPerspective) throws Exception {
+      }
    }
    
    /**

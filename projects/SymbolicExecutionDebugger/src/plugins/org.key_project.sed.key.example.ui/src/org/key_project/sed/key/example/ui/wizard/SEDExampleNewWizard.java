@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -116,8 +116,10 @@ public class SEDExampleNewWizard extends AbstractNewJavaProjectWizard {
       KeYResourceProperties.setClassPathEntries(project, Collections.singletonList(new KeYClassPathEntry(KeYClassPathEntryKind.WORKSPACE, libSpecsFolder.getFullPath().toString())));
       // Add examples to src folder
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/src", sourceDirectory);
-      // Open first example
-      IResource firstExample = sourceDirectory.findMember("example1/Number.java");
+      // Add readme file
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/Readme.txt", project);
+      // Open readme
+      IResource firstExample = project.findMember("Readme.txt");
       if (firstExample instanceof IFile) {
          selectAndReveal(firstExample);
          openResource((IFile)firstExample);

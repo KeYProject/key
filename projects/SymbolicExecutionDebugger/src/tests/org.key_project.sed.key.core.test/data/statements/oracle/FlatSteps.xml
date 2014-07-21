@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_4ce9b959-9682-4e4f-a194-32514b11f480" name="doSomething(int, java.lang.String, boolean)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_7ebdd5a7-5e56-4f70-ad15-1797d6a440a9" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_11ff8b07-4e9a-4ce6-a1d8-bb180b0239be" name="self.doSomething(asdf,a,b);" pathCondition="true" lineNumber="-1" charStart="228" charEnd="239">
-            <sedStatement xml:id="_93813ff1-34d4-4f0c-b808-bafdc4be9d03" name="int x = 1;" pathCondition="true" lineNumber="-1" charStart="276" charEnd="286">
-               <sedStatement xml:id="_6e5aaf71-6a96-48fa-9fd3-33a88bbf0b9b" name="int y = 2;" pathCondition="true" lineNumber="-1" charStart="290" charEnd="300">
-                  <sedStatement xml:id="_3e22f34f-292f-4f86-88c3-84eaf7a9117c" name="int z = 3;" pathCondition="true" lineNumber="-1" charStart="304" charEnd="314">
-                     <sedMethodReturn xml:id="_774291e8-59e7-44d8-978b-4ab73366dea4" name="&lt;return of self.doSomething(asdf,a,b);&gt;" pathCondition="true" lineNumber="-1" charStart="228" charEnd="239">
-                        <sedTermination xml:id="_9472548a-d0c6-4112-abe8-6389352620b4" name="&lt;end&gt;" pathCondition="true" verified="true">
+   <sedTarget xml:id="_0032b771-8d98-4dcc-b810-89a9115dd1dc" name="doSomething(int, java.lang.String, boolean)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_4dd97003-9fec-4531-84e5-d5dee945da01" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_ad90840f-8ac9-4d38-b5af-910446b405c1" name="self.doSomething(asdf,a,b);" pathCondition="true" lineNumber="-1" charStart="228" charEnd="239" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements\src\FlatSteps.java">
+            <sedStatement xml:id="_ad2ead27-50eb-4b02-9c92-9000155b2012" name="int x = 1;" pathCondition="true" lineNumber="-1" charStart="276" charEnd="286" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements\src\FlatSteps.java">
+               <sedStatement xml:id="_8f44e595-ce82-41a0-b582-8ce5c350dd1f" name="int y = 2;" pathCondition="true" lineNumber="-1" charStart="290" charEnd="300" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements\src\FlatSteps.java">
+                  <sedStatement xml:id="_6723a136-c042-4b25-8508-cb71937d55bc" name="int z = 3;" pathCondition="true" lineNumber="-1" charStart="304" charEnd="314" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements\src\FlatSteps.java">
+                     <sedMethodReturn xml:id="_259a2b4a-96be-4ae5-9484-6bfae419aa21" name="&lt;return of self.doSomething(asdf,a,b);&gt;" pathCondition="true" lineNumber="-1" charStart="228" charEnd="239" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements\src\FlatSteps.java" methodReturnConditionRef="_24133496-47c3-4ae6-bbea-5b30acb62040">
+                        <sedTermination xml:id="_1635cd39-4751-4a94-b632-c957b2a8bd6a" name="&lt;end&gt;" pathCondition="true" verified="true">
                         </sedTermination>
                      </sedMethodReturn>
                   </sedStatement>
                </sedStatement>
             </sedStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_24133496-47c3-4ae6-bbea-5b30acb62040" name="true" pathCondition="true">
+               <sedChildReference nodeIdRef="_259a2b4a-96be-4ae5-9484-6bfae419aa21"/>
+            </sedMethodCallMethodReturnCondition>
          </sedMethodCall>
       </sedThread>
    </sedTarget>

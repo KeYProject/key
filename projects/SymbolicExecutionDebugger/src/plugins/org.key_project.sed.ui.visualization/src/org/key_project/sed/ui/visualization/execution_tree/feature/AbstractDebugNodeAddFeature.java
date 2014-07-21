@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -41,6 +41,7 @@ import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 import org.eclipse.graphiti.util.ColorConstant;
 import org.eclipse.graphiti.util.IColorConstant;
+import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
@@ -112,8 +113,9 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
       IGaService gaService = Graphiti.getGaService();
       
       // create and set graphics algorithm
+      ISEDAnnotation[] annotations = addedNode.computeUsedAnnotations();
       RoundedRectangle roundedRectangle = gaService.createRoundedRectangle(nodeContainer, 20, 20);
-      roundedRectangle.setStyle(ExecutionTreeStyleUtil.getStyleForDebugNode(getDiagram()));
+      roundedRectangle.setStyle(ExecutionTreeStyleUtil.getStyleForDebugNode(annotations, getDiagram()));
 
       // create link and wire it
       link(nodeContainer, addedNode);
@@ -139,7 +141,7 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
       catch (DebugException e) {
          text.setValue(e.getMessage());
       }
-      text.setStyle(ExecutionTreeStyleUtil.getStyleForDebugNodeText(getDiagram()));
+      text.setStyle(ExecutionTreeStyleUtil.getStyleForDebugNodeText(annotations, getDiagram()));
       text.setHorizontalAlignment(Orientation.ALIGNMENT_LEFT);
       text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
       int dummyWidth = 100; // Real width is defined via layout feature

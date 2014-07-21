@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.proof.io;
 
@@ -57,7 +56,7 @@ public class RuleSource {
 		}
 		input.close();
 	    } catch (IOException ioex){
-		System.err.println("IOException in class RuleSource");
+	        throw new RuntimeException("IOException in class RuleSource",ioex);
 	    }
 	}
     }
@@ -129,12 +128,12 @@ public class RuleSource {
 	    }
 	}
 	catch (IOException ioe) {
-	    System.err.println("*******************************************");
-	    System.err.println("IO-Error occured while opening rule stream.");
-	    System.err.println("URL: "+url);
-	    System.err.println(ioe);
-	    System.err.println("*******************************************");
-	    ioe.printStackTrace();
+//	    System.err.println("*******************************************");
+//	    System.err.println("IO-Error occured while opening rule stream.");
+//	    System.err.println("URL: "+url);
+//	    System.err.println(ioe);
+//	    System.err.println("*******************************************");
+//	    ioe.printStackTrace();
 	    throw new RuntimeException("Error while parsing rules.", ioe);
 	}
     }

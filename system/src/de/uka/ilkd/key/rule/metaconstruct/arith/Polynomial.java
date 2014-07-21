@@ -1,17 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
-
+//
 
 package de.uka.ilkd.key.rule.metaconstruct.arith;
 
@@ -28,6 +26,7 @@ import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.util.LRUCache;
 
 /**
  * Class for analysing and modifying polynomial expressions over the integers
@@ -50,10 +49,11 @@ public class Polynomial {
         new Polynomial ( ImmutableSLList.<Monomial>nil(), BigInteger.ONE );    
 
     public static Polynomial create(Term polyTerm, Services services) {
-        Polynomial res = services.getCaches().getPolynomialCache().get ( polyTerm );
+       final LRUCache<Term, Polynomial> cache = services.getCaches().getPolynomialCache();
+       Polynomial res = cache.get ( polyTerm );
         if ( res == null ) {
             res = createHelp ( polyTerm, services );
-            services.getCaches().getPolynomialCache().put ( polyTerm, res );
+            cache.put ( polyTerm, res );
         }
         return res;
     }

@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -39,7 +39,7 @@ public abstract class AbstractHitCountBreakpoint extends AbstractBreakpoint {
    /**
     * Map to save the nodes that already have been reached, so nodes are not counted twice for the hitcount
     */
-   private Map<Integer, Boolean> hittedNodes;
+   private final Map<Integer, Boolean> hittedNodes = new HashMap<Integer, Boolean>();
 
    /**
     * Creates a new {@link AbstractHitCountBreakpoint}.
@@ -50,7 +50,6 @@ public abstract class AbstractHitCountBreakpoint extends AbstractBreakpoint {
     */
    public AbstractHitCountBreakpoint(int hitCount, Proof proof, boolean enabled){
       super(proof, enabled);
-      hittedNodes = new HashMap<Integer, Boolean>();
       this.hitCount = hitCount;
    }
    
@@ -103,6 +102,10 @@ public abstract class AbstractHitCountBreakpoint extends AbstractBreakpoint {
     * @param hitCount the new value
     */
    public void setHitCount(int hitCount) {
-      this.hitCount = hitCount;
+      if (this.hitCount != hitCount) {
+         this.hitCount = hitCount;
+         this.hitted = 0;
+         hittedNodes.clear();
+      }
    }
 }

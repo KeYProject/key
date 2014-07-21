@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -23,7 +23,6 @@ import org.key_project.util.eclipse.WorkbenchUtil;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * Starts a proof in the KeYIDE user interface integrated in Eclipse.
@@ -40,7 +39,7 @@ public class KeYIDEProofStarter implements IProofStarter {
     */
    @Override
    public void open(Proof proof, 
-                    KeYEnvironment<CustomConsoleUserInterface> environment, 
+                    KeYEnvironment<?> environment, 
                     IMethod method,
                     boolean canStartAutomode,
                     boolean canApplyRules,

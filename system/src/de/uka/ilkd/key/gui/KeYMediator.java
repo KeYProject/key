@@ -3,14 +3,13 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 
 package de.uka.ilkd.key.gui;
 
@@ -22,6 +21,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.EventListenerList;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
@@ -68,7 +68,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 public class KeYMediator {
 
-	/** The user interface */
+    /** The user interface */
     private UserInterface ui;
 
     private InteractiveProver interactiveProver;
@@ -108,15 +108,26 @@ public class KeYMediator {
      */
     private AutoSaver autoSaver;
 
+    
+    /**
+     * list of proof listeners and interactive proof listeners. We use an
+     * immutable list to store listeners to allow for addition/removal within
+     * listener code
+     */
+    private ImmutableList<AutoModeListener> automodeListenerList = ImmutableSLList.nil();
+
+    /**
+     * boolean flag indicating if the GUI is in auto mode
+     */
+    private boolean inAutoMode = false;
+    
 
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
      */
-    public KeYMediator(UserInterface ui, boolean useAutoSaver) {
+    public KeYMediator(UserInterface ui) {
 	this.ui             = ui;
-	if (useAutoSaver) {
-		autoSaver = new AutoSaver();
-	}
+	this.autoSaver = AutoSaver.getDefaultInstance();
 
 	notationInfo        = new NotationInfo();
 	proofListener       = new KeYMediatorProofListener();
@@ -153,66 +164,76 @@ public class KeYMediator {
      * @return the variable namespace
      */
     public Namespace var_ns() {
-	return getSelectedProof().getNamespaces().variables();
+       NamespaceSet namespaces = namespaces();
+       return namespaces != null ? namespaces.variables() : null;
     }
 
     /** returns the program variable namespace
      * @return the program variable namespace
      */
     public Namespace progVar_ns() {
-	return getSelectedProof().getNamespaces().programVariables();
+       NamespaceSet namespaces = namespaces();
+       return namespaces != null ? namespaces.programVariables() : null;
     }
 
     /** returns the function namespace
      * @return the function namespace
      */
     public Namespace func_ns() {
-	return getSelectedProof().getNamespaces().functions();
+       NamespaceSet namespaces = namespaces();
+       return namespaces != null ? namespaces.functions() : null;
     }
 
     /** returns the sort namespace
      * @return the sort namespace
      */
     public Namespace sort_ns() {
-	return getSelectedProof().getNamespaces().sorts();
+       NamespaceSet namespaces = namespaces();
+       return namespaces != null ? namespaces.sorts() : null;
     }
 
     /** returns the heuristics namespace
      * @return the heuristics namespace
      */
     public Namespace heur_ns() {
-	return getSelectedProof().getNamespaces().ruleSets();
+       NamespaceSet namespaces = namespaces();
+       return namespaces != null ? namespaces.ruleSets() : null;
     }
 
     /** returns the choice namespace
      * @return the choice namespace
      */
     public Namespace choice_ns() {
-	return getSelectedProof().getNamespaces().choices();
+       NamespaceSet namespaces = namespaces();
+       return namespaces != null ? namespaces.choices() : null;
     }
 
     /** returns the prog var namespace
      * @return the prog var namespace
      */
     public Namespace pv_ns() {
-	return getSelectedProof().getNamespaces().programVariables();
+       NamespaceSet namespaces = namespaces();
+       return namespaces != null ? namespaces.programVariables() : null;
     }
 
     /** returns the namespace set
      * @return the  namespace set
      */
     public NamespaceSet namespaces() {
-	return getSelectedProof().getNamespaces();
+       Proof selectedProof = getSelectedProof();
+       return selectedProof != null ? selectedProof.getNamespaces() : null;
     }
 
     /** returns the JavaInfo with the java type information */
     public JavaInfo getJavaInfo() {
-       return getSelectedProof().getJavaInfo();
+       Proof selectedProof = getSelectedProof();
+       return selectedProof != null ? selectedProof.getJavaInfo() : null;
     }
 
     /** returns the Services with the java service classes */
     public Services getServices() {
-       return getSelectedProof().getServices();
+       Proof selectedProof = getSelectedProof();
+       return selectedProof != null ? selectedProof.getServices() : null;
     }
 
     /** simplified user interface? */
@@ -227,7 +248,8 @@ public class KeYMediator {
     public boolean ensureProofLoaded() {
     	return getSelectedProof() != null;
     }
-
+   
+   
     /**
      * Returns a filter that is used for filtering taclets that should not be showed while
      * interactive proving.
@@ -275,18 +297,17 @@ public class KeYMediator {
 
 
     private void finishSetBack(final Proof proof){
-        this.ui.taskFinished(
-                        new DefaultTaskFinishedInfo(this, null,
-                                        proof, 0,
-                                        0, getNrGoalsClosedByAutoMode()){
-                                @Override
-                                public String toString() {
-
-                                        return "Proof has been pruned: "+(proof.openGoals().size() == 1?
-                                                        "one open goal remains." :
-                                                        (proof.openGoals().size()+" open goals remain."));
-                                }
-                        });
+        TaskFinishedInfo info =
+                new DefaultTaskFinishedInfo(this, null, proof, 0, 0,
+                                            getNrGoalsClosedByAutoMode()) {
+            @Override
+            public String toString() {
+                return "Proof has been pruned: "+(proof.openGoals().size() == 1 ?
+                        "one open goal remains." :
+                            (proof.openGoals().size()+" open goals remain."));
+            }
+        };
+        this.ui.taskFinished(info);
         if (!proof.isDisposed()) {
            ServiceCaches caches = proof.getServices().getCaches();
            caches.getTermTacletAppIndexCache().clear();
@@ -313,33 +334,33 @@ public class KeYMediator {
 
 
     private void setProofHelper(Proof newProof) {
-      Proof oldProof = getSelectedProof();
-      if (oldProof != null) {
-         oldProof.removeProofTreeListener(proofTreeListener);
-         oldProof.removeRuleAppListener(proofListener);
-      }
-      if (newProof != null) {
-         notationInfo.setAbbrevMap(newProof.abbreviations());
-      }
-      if (newProof != null) {
-         newProof.addProofTreeListener(proofTreeListener);
-         newProof.addRuleAppListener(proofListener);
-      }
-      
-      // moved from layout main here; but does not actually belong here at all;
-      // we should get that rule to behave like a normal built-in rule
-      OneStepSimplifier newSimplifier = MiscTools.findOneStepSimplifier(newProof);
-      if (currentOneStepSimplifier != newSimplifier) {
-         if (currentOneStepSimplifier != null) {
-            removeKeYSelectionListener(currentOneStepSimplifier);
-         }
-         currentOneStepSimplifier = newSimplifier;
-         if (currentOneStepSimplifier != null) {
-            addKeYSelectionListener(currentOneStepSimplifier);
-         }
-      }
-      
-      keySelectionModel.setSelectedProof(newProof);
+        Proof oldProof = getSelectedProof();
+        if (oldProof != null) {
+            oldProof.removeProofTreeListener(proofTreeListener);
+            oldProof.removeRuleAppListener(proofListener);
+        }
+        if (newProof != null) {
+            notationInfo.setAbbrevMap(newProof.abbreviations());
+        }
+        if (newProof != null) {
+            newProof.addProofTreeListener(proofTreeListener);
+            newProof.addRuleAppListener(proofListener);
+        }
+
+        // moved from layout main here; but does not actually belong here at all;
+        // we should get that rule to behave like a normal built-in rule
+        OneStepSimplifier newSimplifier = MiscTools.findOneStepSimplifier(newProof);
+        if (currentOneStepSimplifier != newSimplifier) {
+            if (currentOneStepSimplifier != null) {
+                removeKeYSelectionListener(currentOneStepSimplifier);
+            }
+            currentOneStepSimplifier = newSimplifier;
+            if (currentOneStepSimplifier != null) {
+                addKeYSelectionListener(currentOneStepSimplifier);
+            }
+        }
+
+        keySelectionModel.setSelectedProof(newProof);
     }
 
 
@@ -585,14 +606,33 @@ public class KeYMediator {
 	listenerList.remove(GUIListener.class, listener);
     }
 
-    public void addAutoModeListener(AutoModeListener listener) {
-	interactiveProver.addAutoModeListener(listener);
+    /**
+     * fires the event that automatic execution has started
+     */
+    protected void fireAutoModeStarted(ProofEvent e) {
+        for (AutoModeListener aListenerList : automodeListenerList) {
+            aListenerList.autoModeStarted(e);
+        }
     }
 
-    public void removeAutoModeListener(AutoModeListener listener) {
-	interactiveProver.removeAutoModeListener(listener);
+    /**
+     * fires the event that automatic execution has stopped
+     */
+    public void fireAutoModeStopped(ProofEvent e) {
+        for (AutoModeListener aListenerList : automodeListenerList) {
+            aListenerList.autoModeStopped(e);
+        }
+    }
+    
+    public void addAutoModeListener(AutoModeListener p) {
+       automodeListenerList = automodeListenerList.prepend(p);
     }
 
+    public void removeAutoModeListener(AutoModeListener p) {
+       automodeListenerList = automodeListenerList.removeAll(p);
+    }
+
+         
     public void addInterruptedListener(InterruptListener listener) {
         listenerList.add(InterruptListener.class, listener);
     }
@@ -729,10 +769,6 @@ public class KeYMediator {
         }
     }
 
-    public void setResumeAutoMode(boolean b) {
-       interactiveProver.setResumeAutoMode(b);
-    }
-
     /**
      * Switches interactive mode on or off.
      * @param b true iff interactive mode is to be turned on
@@ -768,7 +804,8 @@ public class KeYMediator {
          public void run() {
             ui.notifyAutoModeBeingStarted();
             if (b) {
-               interactiveProver.fireAutoModeStarted(
+               inAutoMode = true;
+               fireAutoModeStarted(
                   new ProofEvent(getSelectedProof()));
             }
          }
@@ -780,8 +817,10 @@ public class KeYMediator {
       final boolean b = fullStop;
       Runnable interfaceSignaller = new Runnable() {
          public void run() {
-            if ( b )
-               interactiveProver.fireAutoModeStopped (new ProofEvent(getSelectedProof()));
+            if ( b ) {
+               inAutoMode = false;
+               fireAutoModeStopped (new ProofEvent(getSelectedProof()));
+            }
             ui.notifyAutomodeStopped();
             if (getSelectedProof() != null)
                 keySelectionModel.fireSelectedProofChanged();
@@ -790,9 +829,16 @@ public class KeYMediator {
       GuiUtilities.invokeAndWait(interfaceSignaller);
    }
 
-    public boolean autoMode() {
-        return interactiveProver.isAutoMode();
-    }
+   
+   /**
+    * Checks if the auto mode is currently running.
+    *
+    * @return {@code true} auto mode is running, {@code false} auto mode is not
+    * running.
+    */
+   public boolean isInAutoMode() {
+       return inAutoMode;
+   }
 
     class KeYMediatorProofTreeListener extends ProofTreeAdapter {
     	private boolean pruningInProcess;
@@ -826,7 +872,7 @@ public class KeYMediator {
     	}
 
     	public void proofStructureChanged(ProofTreeEvent e) {
-    		if (autoMode() || pruningInProcess) return;
+    		if (isInAutoMode() || pruningInProcess) return;
     		Proof p = e.getSource();
     		if (p == getSelectedProof()) {
     			Node sel_node = getSelectedNode();
@@ -847,7 +893,7 @@ public class KeYMediator {
 
 	/** invoked when a rule has been applied */
 	public void ruleApplied(ProofEvent e) {
-	    if (autoMode()) return;
+	    if (isInAutoMode()) return;
 	    if (e.getSource() == getSelectedProof()) {
 	        keySelectionModel.defaultSelection();
 	    }
@@ -894,7 +940,6 @@ public class KeYMediator {
         });
     }
 
-
     /**
      * takes a notification event and informs the notification
      * manager
@@ -940,8 +985,6 @@ public class KeYMediator {
        }
        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
     }
-
-
 
 //    /**
 //     * returns the prover task listener of the main frame

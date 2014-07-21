@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.proof;
 
@@ -371,21 +371,27 @@ public class Node  {
 	return -1;
     }
 
-    private int getIntroducedRulesCount() {
+    public StringBuffer getUniqueTacletId() {
+        StringBuffer id = new StringBuffer();
         int c = 0;
         Node n = this;
 
         while (n != null) {
             c += n.localIntroducedRules.size();
+                      
+            if (n.parent != null && n.parent.childrenCount() > 1) {
+               id.append(n.siblingNr);
+            }
+            
             n = n.parent;
-        }
-        return c;
+        }    
+        
+        id.append("_").append(c);
+        
+        return id;
     }
 
-    public int getUniqueTacletNr() {
-        return getIntroducedRulesCount();
-    }
-
+    
     /** helps toString method
      * @param prefix needed to keep track if a line has to be printed
      * @param tree the tree representation we want to add this subtree
@@ -656,4 +662,5 @@ public class Node  {
                     "structure this way is not allowed.");
         }
     }
+
  }

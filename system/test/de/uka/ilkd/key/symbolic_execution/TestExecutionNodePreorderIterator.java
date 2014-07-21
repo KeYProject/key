@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.AbstractKeYlessExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessStart;
@@ -29,7 +30,7 @@ import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.impl.TreeSettings;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
 
 /**
@@ -42,7 +43,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
     */
    public void testNodesThreeLevel() throws ProofInputException {
       // Create tree to test
-      Proof proof = new Proof("target", new Services(AbstractProfile.getDefaultProfile()));
+      Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
       Node root = appendRoot(proof);
       Node l1 = appendNode(proof, root);
       Node l11 = appendNode(proof, l1);
@@ -87,7 +88,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
     */
    public void testNodesTwoLevel() throws ProofInputException {
       // Create tree to test
-      Proof proof = new Proof("target", new Services(AbstractProfile.getDefaultProfile()));
+      Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
       Node root = appendRoot(proof);
       Node l1 = appendNode(proof, root);
       Node l11 = appendNode(proof, l1);
@@ -124,7 +125,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
     */
    public void testNodesOneLevel() throws ProofInputException {
       // Create tree to test
-      Proof proof = new Proof("target", new Services(AbstractProfile.getDefaultProfile()));
+      Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
       Node root = appendRoot(proof);
       Node child1 = appendNode(proof, root);
       Node child2 = appendNode(proof, root);
@@ -158,12 +159,12 @@ public class TestExecutionNodePreorderIterator extends TestCase {
     */
    public void testEmptyRoot() throws ProofInputException {
       // Create tree to test
-      UserInterface ui = new CustomConsoleUserInterface(false);
-      KeYMediator mediator = new KeYMediator(ui, false);
-      Proof proof = new Proof("target", new Services(AbstractProfile.getDefaultProfile()));
+      UserInterface ui = new CustomUserInterface(false);
+      KeYMediator mediator = new KeYMediator(ui);
+      Proof proof = new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
       Node root = appendRoot(proof);
       // Create execution test model
-      TreeSettings settings = new TreeSettings(false, false);
+      TreeSettings settings = new TreeSettings(false, false, false);
       ExecutionStart executionRoot = new ExecutionStart(settings, mediator, root);
       // Test tree
       assertRoot(executionRoot, createExpectedNodes("<start>"));

@@ -149,7 +149,7 @@ sub grep_proof_files {
 # Capturing the output is difficult then, however!
 sub runAuto {
     my $file = $_[0];
-    my $command = "'" . $path_to_key . "/bin/key' --K-headless --auto-loadonly '$file'";
+    my $command = "'" . $path_to_key . "/bin/key' --auto-loadonly '$file'";
     print "Command is: $command\n";
     my $starttime = time();
     my @output = `$command`;

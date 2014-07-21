@@ -1,27 +1,25 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
+
 package de.uka.ilkd.key.gui.nodeviews;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.CopyToClipboardAction;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
-import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.util.GuiUtilities;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
@@ -33,8 +31,9 @@ import javax.swing.border.EmptyBorder;
  *
  * @author Kai Wallisch
  */
-@SuppressWarnings("serial")
 public final class MainFrame extends JScrollPane {
+
+    private static final long serialVersionUID = 513236416130998762L;
 
     private final MainWindow mainWindow;
 
@@ -50,7 +49,7 @@ public final class MainFrame extends JScrollPane {
             getViewport().setViewPosition(oldSequentViewPosition);
 
             // Additional option to show taclet info in case of: sequentView instanceof InnerNodeView
-            ProofTreeView ptv = mainWindow.getProofView();
+            ProofTreeView ptv = mainWindow.getProofTreeView();
             if (ptv != null) {
                 ptv.tacletInfoToggle.setSequentView(sequentView);
             }
@@ -70,16 +69,7 @@ public final class MainFrame extends JScrollPane {
         getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
                 "copy");
-        getActionMap().put("copy", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // FIXME: Can this ever be reached ?!?! (MU 2013)
-                PosInSequent pos = mainWindow.currentGoalView.getMousePosInSequent();
-                if (pos != null) {
-                    GuiUtilities.copyHighlightToClipboard(mainWindow.currentGoalView, pos);
-                }
-            }
-        });
+        getActionMap().put("copy", new CopyToClipboardAction(mainWindow));
 
         setContent(emptySequent);
     }

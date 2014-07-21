@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<introContent>
+   <extensionContent style="css/sedExamples.css" name="Symbolic Execution Debugger - SED Examples" path="overview/@">
+      <group style-id="content-group">
+            <link label="Symbolic Execution Debugger - SED Examples" url="http://org.eclipse.ui.intro/showHelpTopic?id=/org.key_project.sed.key.example.ui/help/tasks/CreateSEDExamples.htm" id="openSEDExamples" style-id="content-link">
+               <text>Read how to create the SED Examples explaining the Symbolic Execution Debugger (SED) with KeY as symbolic execution engine.</text>
+            </link>
+      </group>
+   </extensionContent>
+</introContent>

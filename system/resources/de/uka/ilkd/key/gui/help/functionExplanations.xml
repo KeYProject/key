@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    
+<comment>
+    Put descriptions for JavaDL function and predicate symbols in here.
+</comment>
+
+<entry key="array/length">The length of an array is not stored on the heap but is an inherent property of the object reference which denotes the array.
+Hence, this functions takes only one argument: the object reference whose length (as an array) is to be retrieved.
+This function always results in a non-negative value.</entry>
+
+<entry key="array/arrayStoreValid">This predicate is true if the described array update is valid in Java.
+
+Java has the peculiarity of covariant array types. They allow an array assignment to fail at runtime (with an ArrayStoreException). This predicate deals with the issue in the logic.
+
+(tbd)
+</entry>
+
+<entry key="field/arr">This function turns an integer into a field reference.
+
+Integers are used to access the entries of entries within arrays stored on the heap. This function provides the injection of the integer domain into that of the type Field. It is ensured that this image of arr is disjoint from any defined field constant.
+
+The array access a[i], for instance for an int-array a, becomes int::select(heap, a, arr(i)).</entry>
+
+<entry key="field/java.lang.Object::&lt;transient&gt;">tbd</entry>
+<entry key="field/java.lang.Object::&lt;transactionConditionallyUpdated&gt;">tbd</entry>
+<entry key="field/java.lang.Object::&lt;created&gt;">tbd</entry>
+<entry key="field/java.lang.Object::&lt;initialized&gt;">tbd</entry>
+<entry key="field/alpha::&lt;classPrepared&gt;">tbd</entry>
+<entry key="field/alpha::&lt;classInitialized&gt;">tbd</entry>
+<entry key="field/alpha::&lt;classInitializationInProgress&gt;">tbd</entry>
+<entry key="field/alpha::&lt;classErroneous&gt;">tbd</entry>
+
+<entry key="heap/heap">This program variable holds to the current heap state. Its type is Heap. Any assignment statement in a modality modifies the value of this program variable and any expression reading from the heap within a Java modality refers to the heap stored in this program variable.</entry>
+
+<entry key="heap/wellformed">This predicate takes an argument of type Heap. It is true if the following conditions hold for its the argument:
+1. Every location contains a reference to a created (in this heap) object or null.
+2. Every location set stored on the heap contains only created objects.
+3. Every location belonging to a declared Java field holds a value compatible with its type.
+4. Only finitely many objects are created on the heap.</entry>
+
+<entry key="heap/store">This function modifies a heap by changing the value in one location.
+It takes four arguments:
+1. The heap h which is to be modified
+2. The object o reference of the location which is to be modified
+3. The field of the location which is to be modified
+4. The value v which is to be written in the designated location.
+The result is a heap which coincides with h in all locations but in (o,f), where v is stored.
+In the theory of arrays, store is somtimes called "write".
+The field java.lang.Object::&lt;created&gt; cannot be updated using store; use "create".</entry>
+
+<entry key="heap/create">This function modifies a heap by changing the createdness of one object.
+It takes two arguments:
+1. The heap h which is to be modified
+2. The object reference o for the object which is to be set created.
+The result is a heap which coincides with h in all locations but in (o,java.lang.Object::&lt;created&gt;), which has been set to true.
+There is no means to modify a heap by setting the createdness of an object to false.</entry>
+
+<entry key="heap/anon">tbd</entry>
+
+<entry key="heap/memset">This function modifies a heap by changing the value in one location.
+It takes three arguments:
+1. The heap h which is to be modified
+2. The location set s whose locations are to be modified
+4. The value v which is to be written in the designated locations.
+The result is a heap which coincides with h in all locations but in the locations in s where v is stored.
+The field java.lang.Object::&lt;created&gt; cannot be updated using memset; use "create".</entry>
+
+<entry key="heap/alpha::select">tbd</entry>
+    
+<entry key="locset/empty">The empty location set which does not contain any elements.</entry>
+
+<entry key="locset/allLocs">The unique location set containing all locations, i.e. elementOf(o, f, allLocs) will always return true for an arbitrary Field f and Object o.</entry>
+
+<entry key="locset/singleton">Converts a single location to a locations set with one element.</entry>
+
+<entry key="locset/union">Union between two location sets.</entry>
+
+<entry key="locset/intersect">Intersection between two location sets.</entry>
+
+<entry key="locset/setMinus">Realizes relative complement (a.k.a. set difference) between two locations sets. It takes as arguments two location sets and returns another location set which contains all elements from the first argument except those that are elements of the second argument.</entry>
+
+<entry key="locset/infiniteUnion">Takes as argument a term of type LocSet, which may contain a free variable. The term represents a family of locations sets, which is parameterized by the unbound variable. The returned location set is the union over all members of the parameterized family.</entry>
+
+<entry key="locset/allFields">The set that contains all locations which belong to the object o given as argument.
+
+A location (a,b) is in the set allFields(o) iff a=o.
+In JML, the function corresponds to o.*.</entry>
+
+<entry key="locset/allObjects">The set of all locations that belong to a particular field f given as argument.
+
+A location (a,b) is in the set allObjects(f) iff b=f.</entry>
+
+<entry key="locset/arrayRange">tbd</entry>
+
+<entry key="locset/freshLocs">The set of locations which are fresh (that is not created) w.r.t. the heap h given as argument.
+A location (a,b) is in the set freshLocs(h) iff o.&lt;created&gt;@h = FALSE.</entry>
+
+<entry key="locset/allElementsOfArray">tbd</entry>
+
+<entry key="locset/allElementsOfArrayLocsets">tbd</entry>
+
+<entry key="locset/elementOf">This is the set theoretic membership predicate to be used for location sets.
+
+It takes three arguments: The first two (an Object and a Field) make up the location and the third is the location set against which membership is tested.</entry>
+
+<entry key="locset/subset">This is the set theoretic subset predicate to be used for location sets. 
+
+A location set A is subset of another location set B iff every element of A is also element of B.</entry>
+
+<entry key="locset/disjoint">This binary predicate models disjointness of location sets.
+
+disjoint(A,B) is true iff A and B have an empty intersection, 
+it is thus equivalent to intersect(A,B) = empty.</entry>
+
+<entry key="locset/createdInHeap">tbd</entry>
+
+<entry key="map/mapGet">Retrieve the mapping value of a key.</entry>
+<entry key="map/mapUndef">A unique value, which is returned by mapGet in case no mapping value is declared for the specified key.</entry>
+<entry key="map/mapForeach">Generalized quantifier for maps. This is a generic constructor for maps.</entry>
+<entry key="map/mapEmpty">The empty map, which does not contain any entries.</entry>
+<entry key="map/mapSingleton">A map, which contains only one entry.</entry>
+<entry key="map/mapOverride">Takes as arguments two maps and creates a new map from their entries. In case their domains overlap, entries of the second map are used for keys from the intersection.</entry>
+<entry key="map/seq2map">Converts a sequence to a map. The map domain consists of exactly those integers, which are inside the sequence bounds.</entry>
+<entry key="map/mapUpdate">Adds an entry to a map or overwrites an existing one.</entry>
+<entry key="map/mapRemove">Removes an entry from a map.</entry>
+<entry key="map/mapSize">Returns the number of entries of a map.</entry>
+<entry key="map/isFinite">Returns true iff the specified map contains a finite amount of entries.</entry>
+<entry key="map/inDomain">Takes two arguments: key &#8712; any and map &#8712; Map. Returns true iff key is in the domain of map.</entry>
+<entry key="map/inDomainImpliesCreated">Returns true iff the domain of the specified map contains only objects that are &lt;created&gt; in the implicit heap (additional non-object values may also be part of the domain). This can be used in a JML specification as an invariant to ensure, that non-created objects are not (yet) part of the domain of a map.</entry>
+    
+<entry key="seq/seqLen">Return the length of a sequence.</entry>
+<entry key="seq/seqGet">Return the element at a position within a sequence. The type read from the sequence is part of the function name.</entry>
+<entry key="seq/seqIndexOf">Return the first index in a sequence that holds a value.</entry>
+<entry key="seq/seqGetOutside">The underspecified error value if a sequence is accessed outside its idnex range.</entry>
+<entry key="seq/seqEmpty">The empty sequence.</entry>
+<entry key="seq/seqSingleton">A singleton sequence that has the argument as only entry.</entry>
+<entry key="seq/seqConcat">Concatenates two sequences.</entry>
+<entry key="seq/seqSub">Takes a subsequence from a sequence. 
+The first argument is the original sequence,
+the second is the first index to consider (inclusive) and
+the third is the last index to consider (!exclusive!).
+</entry>
+<entry key="seq/seqReverse">Reverses a sequence. The result has the same entries as the argument but in reverse order.</entry>
+<entry key="seq/seqDef">This function binds an integer variable and evaluates an expression over this variable for a range of values to obtain the entries of a sequence.
+    
+The sequence 
+  seqDef{int i;}(-2, 3, i*i)
+has, for instance, the entries
+  [ 4, 1, 0, 1, 4 ].
+
+The first and second argument give the range over which the variable goes. Again, the right-hand bound is exclusive.
+
+seqDef is related to the lambda operator in lambda calculus.
+</entry>
+
+<entry key="seq/seqSwap">Takes a sequence and two indices. The elements at the specified indices are exchanged in the resulting sequence. In case one of the indices is out of bounds, the sequence is left unchanged.</entry>
+<entry key="seq/seqRemove">Takes a sequence and removes the element at the specified index. In case the index is out of bounds, the sequence is left unchanged.</entry>
+<entry key="seq/seqNPermInv">Takes a sequence of naturals (zero included) and treats it as a permutation. The resulting sequence is the inverse permutation of the original one.</entry>
+<entry key="seq/array2seq">Convert a Java array to a JavaDL sequence.</entry>
+
+<entry key="pair/pair">Return the (unique) ordered pair of two specified elements.</entry>
+<entry key="pair/first">Return the first element of an ordered pair.</entry>
+<entry key="pair/second">Return the second element of an ordered pair.</entry>
+
+<entry key="exactInstance">A boolean function which is true iff the dynamic type of its argument is precisely the type which is part of the function name.</entry>
+
+<entry key="instance">A boolean function which is true iff the dynamic type of its argument is a subtype of the type which is part of the function name.</entry>
+
+<entry key="cast">tbd</entry>
+
+<entry key="null">A constant holding the object reference pointing to the Java null object.
+Quite the same as the keyword "null" in Java.</entry>
+
+<entry key="nonNull">tbd</entry>
+
+<entry key="inInt">tbd</entry>
+
+</properties>
+

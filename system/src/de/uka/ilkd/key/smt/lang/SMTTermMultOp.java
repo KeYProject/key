@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 /** 
  * Created on: Mar 17, 2011
  */
@@ -20,7 +33,7 @@ public class SMTTermMultOp extends SMTTerm {
 
     private static HashMap<Op, String> bvSymbols;
     private static HashMap<Op,String> intSymbols;
-    public enum OpProperty{
+    public static enum OpProperty{
 	NONE,
 	LEFTASSOC,
 	RIGHTASSOC,
@@ -29,7 +42,7 @@ public class SMTTermMultOp extends SMTTerm {
 	PAIRWISE
     }
 
-    public enum Op {
+    public static enum Op {
 	// Bool/Int operator
 	IFF, IMPLIES, EQUALS, MUL, DIV, REM,
 	LT, LTE, GT, GTE, PLUS, MINUS, AND, OR,XOR, DISTINCT,
@@ -452,7 +465,7 @@ public class SMTTermMultOp extends SMTTerm {
 	    symbol = bvSymbols.get(operator);
 	}
 	if(symbol==null){
-	    throw new RuntimeException("Unknown operator: "+operator);
+	    throw new RuntimeException("Unknown operator: "+operator + "(class:"+Op.class+") intSym.size="+intSymbols.size()+ " bvSym.size="+bvSymbols.size());
 	}
 	return symbol;
     }

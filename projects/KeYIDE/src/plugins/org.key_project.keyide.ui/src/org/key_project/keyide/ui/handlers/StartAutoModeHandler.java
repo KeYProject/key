@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -44,7 +44,7 @@ public class StartAutoModeHandler extends AbstractSaveExecutionHandler {
          final IProofProvider proofProvider = (IProofProvider)editorPart.getAdapter(IProofProvider.class);
          if (proofProvider != null && 
              proofProvider.getUI().isAutoModeSupported(proofProvider.getCurrentProof()) && 
-             !proofProvider.getMediator().autoMode()) {
+             !proofProvider.getMediator().isInAutoMode()) {
             new AbstractKeYEnvironmentJob("Auto Mode", proofProvider.getEnvironment()) {
                // job that starts the automode in KeY
                @Override

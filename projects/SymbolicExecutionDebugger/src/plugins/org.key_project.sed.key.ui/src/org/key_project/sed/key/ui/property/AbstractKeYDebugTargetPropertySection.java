@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -13,15 +13,14 @@
 
 package org.key_project.sed.key.ui.property;
 
-import org.eclipse.debug.core.Launch;
-import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
 import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
+import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.ui.launch.AbstractTabbedPropertiesAndLaunchConfigurationTabComposite;
+import org.key_project.sed.ui.property.AbstractSEDDebugTargetPropertySection;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
@@ -29,7 +28,7 @@ import org.key_project.util.eclipse.swt.SWTUtil;
  * via {@link AbstractTabbedPropertiesAndLaunchConfigurationTabComposite} instances.
  * @author Martin Hentschel
  */
-public abstract class AbstractKeYDebugTargetPropertySection extends AbstractPropertySection {
+public abstract class AbstractKeYDebugTargetPropertySection extends AbstractSEDDebugTargetPropertySection {
    /**
     * The shown content.
     */
@@ -67,7 +66,7 @@ public abstract class AbstractKeYDebugTargetPropertySection extends AbstractProp
     */
    protected KeYDebugTarget getDebugTarget() {
       Object object = SWTUtil.getFirstElement(getSelection());
-      return getDebugTarget(object);
+      return getKeYDebugTarget(object);
    }
    
    /**
@@ -75,15 +74,8 @@ public abstract class AbstractKeYDebugTargetPropertySection extends AbstractProp
     * @param object The given {@link Object}.
     * @return The {@link KeYDebugTarget} or {@code null} if conversion is not possible.
     */
-   public static KeYDebugTarget getDebugTarget(Object object) {
-      if (object instanceof Launch) {
-         IDebugTarget[] targets = ((Launch)object).getDebugTargets();
-         return targets != null && targets.length == 1 && targets[0] instanceof KeYDebugTarget ? 
-                (KeYDebugTarget)targets[0] : 
-                null;
-      }
-      else {
-         return object instanceof KeYDebugTarget ? (KeYDebugTarget)object : null;
-      }
+   public static KeYDebugTarget getKeYDebugTarget(Object object) {
+      ISEDDebugTarget target = AbstractKeYDebugTargetPropertySection.getDebugTarget(object);
+      return target instanceof KeYDebugTarget ? (KeYDebugTarget)target : null;
    }
 }

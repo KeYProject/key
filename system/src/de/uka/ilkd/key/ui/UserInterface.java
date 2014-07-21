@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -21,8 +21,11 @@ import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
@@ -30,11 +33,15 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironmentListener;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-public interface UserInterface extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor {
+public interface UserInterface
+    extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor, ProofEnvironmentListener {
 
     /**
      * these methods are called immediately before automode is started to ensure that
@@ -55,7 +62,7 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
 
     /**
      * called to complete and apply a taclet instantiations
-     * @param models the  partial models with all different possible instantiations found automatically
+     * @param models the partial models with all different possible instantiations found automatically
      * @param goal the Goal where to apply
      */
     void completeAndApplyTacletMatch(ApplyTacletDialogModel[] models, Goal goal);
@@ -81,6 +88,16 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * @param bootClassPath the boot class path to use. 
      */
     void loadProblem(File file, List<File> classPath, File bootClassPath);
+
+    void setMacro(ProofMacro macro);
+
+    ProofMacro getMacro();
+
+    boolean macroChosen();
+
+    public ProverTaskListener getListener();
+
+    boolean applyMacro();
 
     /** 
      * called to open the build in examples 
@@ -108,7 +125,7 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * uses KeY.
      * </p>
      * @param profile The {@link Profile} to use.
-     * @return The instantiated {@link ProblemInitializer}.
+    * @return The instantiated {@link ProblemInitializer}.
      */
     ProblemInitializer createProblemInitializer(Profile profile);
     
@@ -184,4 +201,23 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * @param proof The {@link Proof} to remove.
      */
     void removeProof(Proof proof);
+
+    
+    /**
+     * This method is called if no {@link LoadedPOContainer} was created
+     * via {@link #createProofObligationContainer()} and can be overwritten
+     * for instance to open the proof management dialog as done by {@link ProblemLoader}.
+     * @return true if the proof obligation was selected, and false if action was aborted
+     */
+     boolean selectProofObligation(InitConfig initConfig);
+
+    /**
+     * registers the proof aggregate at the UI
+     * 
+     * @param proofOblInput the {@link ProofOblInput}
+     * @param proofList the {@link ProofAggregate} 
+     * @param initConfig the {@link InitConfig} to be used
+     * @return the new {@link ProofEnvironment} where the {@link ProofAggregate} has been registered
+     */
+     ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput, ProofAggregate proofList, InitConfig initConfig);
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -294,7 +294,7 @@ public final class KeYUtil {
                             EnvNode envChild = (EnvNode)child;
                             String srcPath = envChild.getProofEnv().getJavaModel().getModelDir();
                             if (srcPath != null && location.equals(new File(srcPath))) {
-                                result = envChild.getProofEnv().getInitConfig();
+                                result = envChild.getProofEnv().getInitConfigForEnvironment();
                             }
                         }
                         i++;
@@ -550,10 +550,16 @@ public final class KeYUtil {
           Object child = model.getChild(model.getRoot(), 0);
           if (child instanceof EnvNode) {
              EnvNode envChild = (EnvNode)child;
+             for (Proof proof : envChild.allProofs()) {
+                main.getUserInterface().removeProof(proof);
+             }
              for (int j = 0; j < envChild.getChildCount(); j++) {
                 Object envTaskChild = envChild.getChildAt(j);
                 if (envTaskChild instanceof TaskTreeNode) {
-                   main.getProofList().removeTask((TaskTreeNode)envTaskChild);
+                   TaskTreeNode ttn = (TaskTreeNode)envTaskChild;
+                   for (Proof proof : ttn.allProofs()) {
+                      main.getUserInterface().removeProof(proof);
+                   }
                 }
              }
           }
