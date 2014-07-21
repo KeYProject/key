@@ -51,12 +51,13 @@ public class TestGoal extends TestCase {
                                                                                 TacletForTests.parseTerm("A")))
                                                 .semisequent());
 
-                proof = new Proof("", 
+                final InitConfig initConfig = new InitConfig(new Services(AbstractProfile.getDefaultProfile()));
+				proof = new Proof("", 
                                   seq,
                                   "",
-                                  new TacletIndex(),
-                                  new BuiltInRuleIndex(),                      
-                                  new InitConfig(new Services(AbstractProfile.getDefaultProfile())), new ProofSettings(ProofSettings.DEFAULT_SETTINGS));     
+                                  initConfig.createTacletIndex(),
+                                  initConfig.createBuiltInRuleIndex(),                      
+                                  initConfig);     
                 
                                 
                 Goal g = proof.openGoals().head();//new Goal(proof.root(), new RuleAppIndex(new TacletAppIndex(new TacletIndex(), proof.getServices()), new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices()));

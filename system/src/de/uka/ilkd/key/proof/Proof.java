@@ -108,7 +108,6 @@ public class Proof implements Named {
     /** the environment of the proof with specs and java model*/
     private ProofCorrectnessMgt localMgt;
 
-    private ProofSettings settings;
     private ProofIndependentSettings pis;
     /**
      * when different users load and save a proof this vector fills up with
@@ -145,7 +144,7 @@ public class Proof implements Named {
     /** 
      * constructs a new empty proof with name 
      */
-    private Proof(Name name, InitConfig initConfig, ProofSettings settings) {
+    private Proof(Name name, InitConfig initConfig) {
         this.name = name;
         assert initConfig != null : "Tried to create proof without valid services.";
         this.initConfig = initConfig;
@@ -162,7 +161,8 @@ public class Proof implements Named {
 
         localMgt = new ProofCorrectnessMgt(this);
 
-        setSettings(settings);
+        initConfig.getSettings().getStrategySettings().addSettingsListener(settingsListener);
+
         pis = ProofIndependentSettings.DEFAULT_INSTANCE;
     }
 
@@ -171,13 +171,13 @@ public class Proof implements Named {
      */
     private void initStrategy() {
         StrategyProperties activeStrategyProperties =
-                        settings.getStrategySettings().getActiveStrategyProperties();
+                        initConfig.getSettings().getStrategySettings().getActiveStrategyProperties();
 
         final Profile profile = getServices().getProfile();
 
-        if (profile.supportsStrategyFactory(settings.getStrategySettings().getStrategy())) {
+        if (profile.supportsStrategyFactory(initConfig.getSettings().getStrategySettings().getStrategy())) {
             setActiveStrategy
-            (profile.getStrategyFactory(settings.getStrategySettings().
+            (profile.getStrategyFactory(initConfig.getSettings().getStrategySettings().
                             getStrategy()).create(this, activeStrategyProperties));
         } else {
             setActiveStrategy(
@@ -196,15 +196,13 @@ public class Proof implements Named {
     /** constructs a new empty proof with name */
     public Proof(String name, InitConfig initConfig) {
         this ( new Name ( name ),
-                        initConfig,
-                        new ProofSettings ( ProofSettings.DEFAULT_SETTINGS ) );
+                        initConfig);
     }
 
     private Proof(String name, Sequent problem, TacletIndex rules,
-                    BuiltInRuleIndex builtInRules, InitConfig initConfig,
-                    ProofSettings settings) {
+                    BuiltInRuleIndex builtInRules, InitConfig initConfig) {
 
-        this ( new Name ( name ), initConfig, settings );
+        this ( new Name ( name ), initConfig );
 
         localMgt = new ProofCorrectnessMgt(this);
 
@@ -221,35 +219,19 @@ public class Proof implements Named {
     }
 
     public Proof(String name, Term problem, String header, TacletIndex rules,
-                    BuiltInRuleIndex builtInRules, InitConfig initConfig, ProofSettings settings) {
+                    BuiltInRuleIndex builtInRules, InitConfig initConfig ) {
         this ( name, Sequent.createSuccSequent
                         (Semisequent.EMPTY_SEMISEQUENT.insert(0,
                                         new SequentFormula(problem)).semisequent()),
-                                        rules, builtInRules, initConfig, settings );
+                                        rules, builtInRules, initConfig );
         problemHeader = header;
     }
 
 
     public Proof(String name, Sequent sequent, String header, TacletIndex rules,
-                    BuiltInRuleIndex builtInRules, InitConfig initConfig, ProofSettings settings) {
-        this ( name, sequent, rules, builtInRules, initConfig, settings );
+                    BuiltInRuleIndex builtInRules, InitConfig initConfig ) {
+        this ( name, sequent, rules, builtInRules, initConfig );
         problemHeader = header;
-    }
-
-
-    public Proof (String name,
-                    Term problem,
-                    String header,
-                    TacletIndex rules,
-                    BuiltInRuleIndex builtInRules,
-                    InitConfig initConfig) {
-        this ( name,
-                        problem,
-                        header,
-                        rules,
-                        builtInRules,
-                        initConfig,
-                        new ProofSettings ( ProofSettings.DEFAULT_SETTINGS ) );
     }
 
 
@@ -266,7 +248,7 @@ public class Proof implements Named {
             localMgt.removeProofListener(); // This is strongly required because the listener is contained in a static List
         }
         // remove setting listener from settings
-        setSettings(null);
+        initConfig.getSettings().getStrategySettings().removeSettingsListener(settingsListener);
         // set every reference (except the name) to null
         root = null;        
         env = null;
@@ -275,14 +257,13 @@ public class Proof implements Named {
         abbreviations = null;
         initConfig = null;
         localMgt = null;
-        settings = null;
         userLog = null;
         keyVersionLog = null;
         activeStrategy = null;
         settingsListener = null;
-        disposed = true;
         ruleAppListenerList = null;
         listenerList = null;
+        disposed = true;
         fireProofDisposed(new ProofDisposedEvent(this));
     }
 
@@ -421,21 +402,8 @@ public class Proof implements Named {
     }
 
 
-    public final void setSettings(ProofSettings newSettings) {
-        if (settings != null ){
-            // deregister settings listener
-            settings.getStrategySettings().removeSettingsListener(settingsListener);
-        }
-        settings = newSettings;
-        if (settings != null ){
-            // register settings listener
-            settings.getStrategySettings().addSettingsListener (settingsListener);
-        }
-    }
-
-
     public ProofSettings getSettings() {
-        return settings;
+        return initConfig.getSettings();
     }
     public ProofIndependentSettings getProofIndependentSettings(){
         return pis;
