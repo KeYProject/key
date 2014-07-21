@@ -31,5 +31,6 @@ as result of ComplexPrecondition.main(x,y);&gt;" isReturnValueComputed="true" me
             </statement>
          </operationContract>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0"/>
    </methodCall>
 </start>

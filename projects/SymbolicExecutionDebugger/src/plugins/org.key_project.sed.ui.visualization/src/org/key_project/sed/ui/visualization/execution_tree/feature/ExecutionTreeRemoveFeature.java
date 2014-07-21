@@ -77,9 +77,15 @@ public class ExecutionTreeRemoveFeature extends DefaultRemoveFeature {
                   ISEDIterator iter = new SEDPreorderIterator((ISEDDebugElement)businessObject);
                   while (iter.hasNext()) {
                      ISEDDebugElement next = iter.next();
-                     PictogramElement childPe = getFeatureProvider().getPictogramElementForBusinessObject(next);
-                     if (childPe != null) {
-                        children.add(new RemoveContext(childPe));
+                     
+                     PictogramElement[] childPEs = getFeatureProvider().getAllPictogramElementsForBusinessObject(next);
+                     
+                     for(PictogramElement childPE : childPEs) {
+                     
+//                     PictogramElement childPe = getFeatureProvider().getPictogramElementForBusinessObject(next);
+                        if (childPE != null) {
+                           children.add(new RemoveContext(childPE));
+                        }
                      }
                   }
                }

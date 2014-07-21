@@ -396,9 +396,6 @@ public class InitConfig {
     
     
     public ProofSettings getSettings() {
-       if ( settings == null ) {
-    	   setSettings( new ProofSettings(ProofSettings.DEFAULT_SETTINGS) );
-       }
        return settings;
     }
 

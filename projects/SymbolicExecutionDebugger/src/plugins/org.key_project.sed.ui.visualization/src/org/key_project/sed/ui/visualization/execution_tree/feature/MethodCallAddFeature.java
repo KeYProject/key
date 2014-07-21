@@ -13,11 +13,24 @@
 
 package org.key_project.sed.ui.visualization.execution_tree.feature;
 
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
+import org.eclipse.graphiti.features.context.IAddContext;
+import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
+import org.eclipse.graphiti.mm.algorithms.Rectangle;
+import org.eclipse.graphiti.mm.pictograms.ContainerShape;
+import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.mm.pictograms.Shape;
+import org.eclipse.graphiti.services.Graphiti;
+import org.eclipse.graphiti.services.IGaService;
+import org.eclipse.graphiti.services.IPeCreateService;
+import org.eclipse.graphiti.util.ColorConstant;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.ui.visualization.execution_tree.provider.IExecutionTreeImageConstants;
+import org.key_project.sed.ui.visualization.util.LogUtil;
 
 /**
  * Implementation of {@link IAddFeature} for {@link ISEDMethodCall}s.
@@ -30,6 +43,45 @@ public class MethodCallAddFeature extends AbstractDebugNodeAddFeature {
     */
    public MethodCallAddFeature(IFeatureProvider fp) {
       super(fp);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   public PictogramElement add(IAddContext context) {
+      ISEDDebugNode addedNode = (ISEDDebugNode) context.getNewObject();
+
+      IPeCreateService peCreateService = Graphiti.getPeCreateService();
+      IGaService gaService = Graphiti.getGaService();
+      
+      Diagram targetDiagram = (Diagram) context.getTargetContainer();
+      ContainerShape container = peCreateService.createContainerShape(targetDiagram, true);
+
+      Rectangle rect = gaService.createRectangle(container);
+      rect.setForeground(manageColor(new ColorConstant(255, 102, 0)));
+      rect.setLineWidth(2);
+      rect.setFilled(false);
+      link(container, addedNode);
+      
+      ContainerShape nodeContainer = createNodeDesign(addedNode, context);
+
+      createAnchor(nodeContainer);
+      
+      // call the layout feature to compute real heights and widths
+      layoutPictogramElement(nodeContainer);
+      
+      GraphicsAlgorithm ga = nodeContainer.getGraphicsAlgorithm();
+      
+//      GraphicsAlgorithm ga = super.add(context).getGraphicsAlgorithm();
+
+      gaService.setLocationAndSize(rect, context.getX(), context.getY() + ga.getHeight() / 2, ga.getWidth(), ga.getHeight());
+      
+      Graphiti.getPeService().setPropertyValue(container, "width", Integer.toString(rect.getWidth()));
+      Graphiti.getPeService().setPropertyValue(container, "height", Integer.toString(rect.getHeight()));
+      Graphiti.getPeService().setPropertyValue(container, "offX", Integer.toString(rect.getX()));
+      Graphiti.getPeService().setPropertyValue(container, "offY", Integer.toString(rect.getY()));
+
+      return container;
    }
 
    /**

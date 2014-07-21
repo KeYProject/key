@@ -27,5 +27,6 @@ as result of SimpleIntQuery.mainWithSymbolicUpdates(x);&gt;" isReturnValueComput
             </operationContract>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0"/>
    </methodCall>
 </start>

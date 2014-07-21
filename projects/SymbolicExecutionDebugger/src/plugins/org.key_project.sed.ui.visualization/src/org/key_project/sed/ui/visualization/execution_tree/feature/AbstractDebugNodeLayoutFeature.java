@@ -79,68 +79,14 @@ public abstract class AbstractDebugNodeLayoutFeature extends AbstractLayoutFeatu
     */
    protected abstract boolean canLayoutBusinessObject(Object businessObject);
 
-//   /**
-//    * {@inheritDoc}
-//    */
-//   @Override
-//   public boolean layout(ILayoutContext context) {
-//      boolean anythingChanged = false;
-//      ContainerShape containerShape = (ContainerShape) context.getPictogramElement();
-//      GraphicsAlgorithm containerGa = containerShape.getGraphicsAlgorithm();
-//      // Update width and height to the defined one
-//      int widthToSet = getWidthToSet(context);
-//      if (widthToSet >= 0) {
-//         containerGa.setWidth(widthToSet);
-//      }
-//      int heightToSet = getHeightToSet(context);
-//      if (heightToSet >= 0) {
-//         containerGa.setHeight(heightToSet);
-//      }
-//      // Make sure that minimal width and height holds
-//      final int MIN_WIDTH = AbstractDebugNodeAddFeature.computeMinWidth(getDiagram());
-//      final int MIN_HEIGHT = AbstractDebugNodeAddFeature.computeMinHeight(getDiagram());
-//      // height
-//      if (containerGa.getHeight() < MIN_HEIGHT) {
-//         containerGa.setHeight(MIN_HEIGHT);
-//         anythingChanged = true;
-//      }
-//      // width
-//      if (containerGa.getWidth() < MIN_WIDTH) {
-//         containerGa.setWidth(MIN_WIDTH);
-//         anythingChanged = true;
-//      }
-//      // Update PictogramElement
-//      int containerWidth = containerGa.getWidth();
-//      int containerHeight = containerGa.getHeight();
-
-//      List<Shape> shapes = containerShape.getChildren();
-//      if (layoutImageShape(shapes.get(0), containerWidth, containerHeight)) {
-//         anythingChanged = true;
-//      }
-//      if (layoutTextShape(shapes.get(1), containerWidth, containerHeight)) {
-//         anythingChanged = true;
-//      }
-//      return anythingChanged;
-//   }
    /**
     * {@inheritDoc}
     */
    @Override
    public boolean layout(ILayoutContext context) {
       boolean anythingChanged = false;
-      
-      PictogramElement nodeElement = context.getPictogramElement();
-      ISEDDebugNode node = (ISEDDebugNode) getFeatureProvider().getBusinessObjectForPictogramElement(nodeElement);
-
-      ContainerShape containerShape;
-      
-      if(node instanceof ISEDMethodCall)
-         containerShape = (ContainerShape)((ContainerShape)nodeElement).getContainer().getChildren().get(0);
-      else
-         containerShape = (ContainerShape) nodeElement;
-      
+      ContainerShape containerShape = (ContainerShape) context.getPictogramElement();
       GraphicsAlgorithm containerGa = containerShape.getGraphicsAlgorithm();
-
       // Update width and height to the defined one
       int widthToSet = getWidthToSet(context);
       if (widthToSet >= 0) {
@@ -164,9 +110,6 @@ public abstract class AbstractDebugNodeLayoutFeature extends AbstractLayoutFeatu
          anythingChanged = true;
       }
       // Update PictogramElement
-      if(containerShape.getChildren().size() == 1)
-         containerShape = ((ContainerShape) containerShape.getChildren().get(0));
-      
       int containerWidth = containerGa.getWidth();
       int containerHeight = containerGa.getHeight();
 
@@ -177,9 +120,66 @@ public abstract class AbstractDebugNodeLayoutFeature extends AbstractLayoutFeatu
       if (layoutTextShape(shapes.get(1), containerWidth, containerHeight)) {
          anythingChanged = true;
       }
-
       return anythingChanged;
    }
+//   /**
+//    * {@inheritDoc}
+//    */
+//   @Override
+//   public boolean layout(ILayoutContext context) {
+//      boolean anythingChanged = false;
+//      
+//      PictogramElement nodeElement = context.getPictogramElement();
+//      ISEDDebugNode node = (ISEDDebugNode) getFeatureProvider().getBusinessObjectForPictogramElement(nodeElement);
+//
+//      ContainerShape containerShape;
+//      
+////      if(node instanceof ISEDMethodCall)
+////         containerShape = (ContainerShape)((ContainerShape)nodeElement).getContainer().getChildren().get(0);
+////      else
+//         containerShape = (ContainerShape) nodeElement;
+//      
+//      GraphicsAlgorithm containerGa = containerShape.getGraphicsAlgorithm();
+//
+//      // Update width and height to the defined one
+//      int widthToSet = getWidthToSet(context);
+//      if (widthToSet >= 0) {
+//         containerGa.setWidth(widthToSet);
+//      }
+//      int heightToSet = getHeightToSet(context);
+//      if (heightToSet >= 0) {
+//         containerGa.setHeight(heightToSet);
+//      }
+//      // Make sure that minimal width and height holds
+//      final int MIN_WIDTH = AbstractDebugNodeAddFeature.computeMinWidth(getDiagram());
+//      final int MIN_HEIGHT = AbstractDebugNodeAddFeature.computeMinHeight(getDiagram());
+//      // height
+//      if (containerGa.getHeight() < MIN_HEIGHT) {
+//         containerGa.setHeight(MIN_HEIGHT);
+//         anythingChanged = true;
+//      }
+//      // width
+//      if (containerGa.getWidth() < MIN_WIDTH) {
+//         containerGa.setWidth(MIN_WIDTH);
+//         anythingChanged = true;
+//      }
+//      // Update PictogramElement
+//      if(containerShape.getChildren().size() == 1)
+//         containerShape = ((ContainerShape) containerShape.getChildren().get(0));
+//      
+//      int containerWidth = containerGa.getWidth();
+//      int containerHeight = containerGa.getHeight();
+//
+//      List<Shape> shapes = containerShape.getChildren();
+//      if (layoutImageShape(shapes.get(0), containerWidth, containerHeight)) {
+//         anythingChanged = true;
+//      }
+//      if (layoutTextShape(shapes.get(1), containerWidth, containerHeight)) {
+//         anythingChanged = true;
+//      }
+//
+//      return anythingChanged;
+//   }
    
    /**
     * Returns the width to set or {@code -1} if it should not be changed.

@@ -40,5 +40,6 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
             </statement>
          </loopStatement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/1/0/0"/>
    </methodCall>
 </start>

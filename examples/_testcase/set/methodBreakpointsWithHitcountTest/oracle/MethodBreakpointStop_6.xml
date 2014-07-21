@@ -92,6 +92,7 @@
                                                                                                                                                                            </loopCondition>
                                                                                                                                                                         </statement>
                                                                                                                                                                      </loopStatement>
+                                                                                                                                                                     <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                                                                                   </methodCall>
                                                                                                                                                                </statement>
                                                                                                                                                             </methodReturn>
@@ -111,6 +112,7 @@
                                                                                                                   </loopCondition>
                                                                                                                </statement>
                                                                                                             </loopStatement>
+                                                                                                            <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                          </methodCall>
                                                                                                       </statement>
                                                                                                    </methodReturn>
@@ -130,17 +132,20 @@
                                                          </loopCondition>
                                                       </statement>
                                                    </loopStatement>
+                                                   <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                 </methodCall>
                                              </statement>
                                           </statement>
                                        </methodReturn>
                                     </statement>
                                  </statement>
+                                 <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                               </methodCall>
                            </statement>
                         </methodReturn>
                      </statement>
                   </statement>
+                  <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
                </methodCall>
             </branchCondition>
             <branchCondition name="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" pathCondition="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" pathConditionChanged="true" branchCondition="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -149,5 +154,6 @@
             </branchCondition>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
 </start>

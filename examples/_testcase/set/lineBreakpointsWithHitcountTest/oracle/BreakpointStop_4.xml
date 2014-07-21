@@ -13,6 +13,7 @@
                         </methodReturn>
                      </statement>
                   </statement>
+                  <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
                </methodCall>
             </branchCondition>
             <branchCondition name="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" pathCondition="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" pathConditionChanged="true" branchCondition="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" mergedBranchCondition="false" isBranchConditionComputed="true">

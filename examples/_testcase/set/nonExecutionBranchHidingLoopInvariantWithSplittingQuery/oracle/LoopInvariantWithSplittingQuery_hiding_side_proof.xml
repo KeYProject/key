@@ -92,6 +92,8 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                      </statement>
                   </branchCondition>
                </branchStatement>
+               <methodReturnEntry path="/0/0/0/0/0/1/0/0"/>
+               <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
             </methodCall>
          </branchCondition>
          <branchCondition name="update-application(elem-update(x)(x_0),\&lt;{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
@@ -133,5 +135,6 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
             </statement>
          </branchCondition>
       </loopInvariant>
+      <methodReturnEntry path="/0/0/1/0/0"/>
    </methodCall>
 </start>

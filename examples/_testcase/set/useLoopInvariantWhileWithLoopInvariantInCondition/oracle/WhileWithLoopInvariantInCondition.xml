@@ -76,6 +76,7 @@ mod: false" pathCondition="not(or(not(equals(i_2_0,Z(neglit(1(#))))),not(imp(equ
                               </statement>
                            </branchCondition>
                         </loopInvariant>
+                        <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
                      </methodCall>
                   </branchCondition>
                </branchCondition>

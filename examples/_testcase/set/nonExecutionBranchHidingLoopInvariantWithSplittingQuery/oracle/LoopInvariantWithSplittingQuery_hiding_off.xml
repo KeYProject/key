@@ -59,6 +59,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                         </methodReturn>
                      </statement>
                   </branchStatement>
+                  <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
                </methodCall>
             </branchCondition>
             <branchCondition name="lt(x_0,Z(0(#)))" pathCondition="not(or(geq(x_0,Z(0(#))),not(imp(leq(x_0,Z(neglit(1(#)))),update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
@@ -103,6 +104,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                         </methodReturn>
                      </statement>
                   </branchStatement>
+                  <methodReturnEntry path="/0/0/0/1/0/0/0/0"/>
                </methodCall>
             </branchCondition>
          </branchCondition>
@@ -145,5 +147,6 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
             </statement>
          </branchCondition>
       </loopInvariant>
+      <methodReturnEntry path="/0/0/1/0/0"/>
    </methodCall>
 </start>

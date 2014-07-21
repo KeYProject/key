@@ -26,7 +26,7 @@ public class MethodCallCollapseFeature extends AbstractDebugNodeCollapseFeature 
     */
    @Override
    public String getName() {
-      return "Collapse Functionbody";
+      return "Collapse/Expand Functionbody";
    }
    
    /**
@@ -34,7 +34,7 @@ public class MethodCallCollapseFeature extends AbstractDebugNodeCollapseFeature 
     */
    @Override
    public String getDescription() {
-      return "Collapse the Functionbody";
+      return "Collapse/Expand the Functionbody";
    }
    
    /**

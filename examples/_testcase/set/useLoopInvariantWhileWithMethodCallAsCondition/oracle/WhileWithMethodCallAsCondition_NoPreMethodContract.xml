@@ -275,5 +275,6 @@ termination: diamond" pathCondition="update-application(parallel-upd(elem-update
             </loopInvariant>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/1/0/0/0"/>
    </methodCall>
 </start>

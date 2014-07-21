@@ -27,9 +27,12 @@ import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.IPictogramElementContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
+import org.eclipse.graphiti.mm.PropertyContainer;
+import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.palette.IPaletteCompartmentEntry;
 import org.eclipse.graphiti.platform.IPlatformImageConstants;
+import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.tb.ContextButtonEntry;
 import org.eclipse.graphiti.tb.ContextMenuEntry;
 import org.eclipse.graphiti.tb.DefaultToolBehaviorProvider;
@@ -93,13 +96,23 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
    @Override
    public IContextButtonPadData getContextButtonPad(IPictogramElementContext context) {
       IContextButtonPadData data = super.getContextButtonPad(context);
+      
+      if(context.getPictogramElement().getGraphicsAlgorithm() instanceof Rectangle) {
+         data.getGenericContextButtons().clear();
+         return data;
+      }
+      
       if (isReadOnly()) {
          data.getGenericContextButtons().clear();
          
          // collapse
          if(getFeatureProvider().getBusinessObjectForPictogramElement(context.getPictogramElement()) instanceof ISEDMethodCall) {
-            // TODO: If collapsed x otherwise y
-            data.getGenericContextButtons().add(createCustomContextButtonEntry(new MethodCallCollapseFeature(getFeatureProvider()), context, "Collapse", null, IPlatformImageConstants.IMG_EDIT_COLLAPSE));
+            if(Boolean.parseBoolean(Graphiti.getPeService().getPropertyValue((PropertyContainer) context.getPictogramElement().eContainer(), "collapsed"))) {
+               data.getGenericContextButtons().add(createCustomContextButtonEntry(new MethodCallCollapseFeature(getFeatureProvider()), context, "Expand", null, IPlatformImageConstants.IMG_EDIT_EXPAND));
+            }
+            else {
+               data.getGenericContextButtons().add(createCustomContextButtonEntry(new MethodCallCollapseFeature(getFeatureProvider()), context, "Collapse", null, IPlatformImageConstants.IMG_EDIT_COLLAPSE));
+            }
          }
          
          List<IContextButtonEntry> epEntries = collectContextButtonEntriesFromExtensionPoint(isReadOnly(), context);
