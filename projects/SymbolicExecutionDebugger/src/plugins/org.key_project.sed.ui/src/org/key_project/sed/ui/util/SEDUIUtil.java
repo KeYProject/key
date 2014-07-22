@@ -338,15 +338,20 @@ public final class SEDUIUtil {
     * @return {@code true} is unknown, {@code false} is known.
     */
    protected static boolean isUnknownInTreeViewer(final TreeViewer treeViewer, final Object toTest) {
-      IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
-         @Override
-         public void run() {
-            Widget item = treeViewer.testFindItem(toTest);
-            setResult(item == null);
-         }
-      };
-      treeViewer.getControl().getDisplay().syncExec(run);
-      return run.getResult() != null && run.getResult().booleanValue();
+      if (!treeViewer.getControl().isDisposed()) {
+         IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+            @Override
+            public void run() {
+               Widget item = treeViewer.testFindItem(toTest);
+               setResult(item == null);
+            }
+         };
+         treeViewer.getControl().getDisplay().syncExec(run);
+         return run.getResult() != null && run.getResult().booleanValue();
+      }
+      else {
+         return false;
+      }
    }
    
    /**

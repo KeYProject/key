@@ -153,7 +153,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    protected Goal createGoal(InitConfig initConfig, Sequent sequent) {
-      Proof proof = new Proof(initConfig.deepCopy());
+      Proof proof = new Proof("TestTermLabelManager", initConfig.deepCopy());
       Node node = new Node(proof, sequent);
       return new Goal(node, new RuleAppIndex(new TacletAppIndex(new TacletIndex(), initConfig.getServices()), new BuiltInRuleAppIndex(new BuiltInRuleIndex()), initConfig.getServices()));
    }
