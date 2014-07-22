@@ -162,5 +162,6 @@ as result of self.average(array);&gt;" isReturnValueComputed="true" methodReturn
             </statement>
          </branchCondition>
       </branchStatement>
+      <methodReturnEntry path="/0/0/0/0/0/0/1/0"/>
    </methodCall>
 </start>

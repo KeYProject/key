@@ -27,5 +27,7 @@
             </branchCondition>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/1/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
    </methodCall>
 </start>

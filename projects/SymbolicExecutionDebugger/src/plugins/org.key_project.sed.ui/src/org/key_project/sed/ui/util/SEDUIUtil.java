@@ -338,15 +338,20 @@ public final class SEDUIUtil {
     * @return {@code true} is unknown, {@code false} is known.
     */
    protected static boolean isUnknownInTreeViewer(final TreeViewer treeViewer, final Object toTest) {
-      IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
-         @Override
-         public void run() {
-            Widget item = treeViewer.testFindItem(toTest);
-            setResult(item == null);
-         }
-      };
-      treeViewer.getControl().getDisplay().syncExec(run);
-      return run.getResult() != null && run.getResult().booleanValue();
+      if (!treeViewer.getControl().isDisposed()) {
+         IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+            @Override
+            public void run() {
+               Widget item = treeViewer.testFindItem(toTest);
+               setResult(item == null);
+            }
+         };
+         treeViewer.getControl().getDisplay().syncExec(run);
+         return run.getResult() != null && run.getResult().booleanValue();
+      }
+      else {
+         return false;
+      }
    }
    
    /**
@@ -450,9 +455,14 @@ public final class SEDUIUtil {
                            }
                         }
                      };
-                     treeViewer.getControl().getDisplay().syncExec(run);
-                     if (run.getException() != null) {
-                        throw new DebugException(LogUtil.getLogger().createErrorStatus(run.getException().getMessage(), run.getException()));
+                     if (!treeViewer.getControl().isDisposed()) {
+                        treeViewer.getControl().getDisplay().syncExec(run);
+                        if (run.getException() != null) {
+                           throw new DebugException(LogUtil.getLogger().createErrorStatus(run.getException().getMessage(), run.getException()));
+                        }
+                     }
+                     else {
+                        monitor.setCanceled(true);
                      }
                   }
                   finally {

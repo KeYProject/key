@@ -37,7 +37,7 @@ public class TestSideProofStore extends TestCase {
     * </ul>
     */
    @SuppressWarnings("unchecked")
-   public void testProofManagenet() {
+   public void testProofManagement() {
       LoggingProofStoreListener listener = new LoggingProofStoreListener();
       try {
          SideProofStore.DEFAULT_INSTANCE.addProofStoreListener(listener);
@@ -45,11 +45,11 @@ public class TestSideProofStore extends TestCase {
          Services services = new Services(AbstractProfile.getDefaultProfile());
          InitConfig ic = new InitConfig(services);
          ProofEnvironment pe = new ProofEnvironment(ic);
-         Proof p1 = new Proof(ic.deepCopy());
+         Proof p1 = new Proof("TestSideProofStore 1", ic.deepCopy());
          p1.setEnv(pe);
-         Proof p2 = new Proof(ic.deepCopy());
+         Proof p2 = new Proof("TestSideProofStore 2", ic.deepCopy());
          p2.setEnv(pe);
-         Proof p3 = new Proof(ic.deepCopy());
+         Proof p3 = new Proof("TestSideProofStore 3", ic.deepCopy());
          p3.setEnv(pe);
          Proof[] allProofs = new Proof[] {p1, p2, p3};
          // Test initial state

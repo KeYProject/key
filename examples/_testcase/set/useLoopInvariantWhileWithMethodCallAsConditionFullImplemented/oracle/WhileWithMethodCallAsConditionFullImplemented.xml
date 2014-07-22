@@ -56,6 +56,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                               </methodReturn>
                            </statement>
                         </branchStatement>
+                        <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0"/>
                      </methodCall>
                   </branchCondition>
                   <branchCondition name="equals(array,null)" pathCondition="not(or(not(equals(array,null)),not(imp(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsConditionFullImplemented): {
@@ -118,5 +119,6 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
             </loopInvariant>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/1/0/0"/>
    </methodCall>
 </start>

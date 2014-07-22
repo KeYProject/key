@@ -25,5 +25,6 @@ as result of SimpleIntQuery.main(x);&gt;" isReturnValueComputed="true" methodRet
             </statement>
          </operationContract>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0"/>
    </methodCall>
 </start>

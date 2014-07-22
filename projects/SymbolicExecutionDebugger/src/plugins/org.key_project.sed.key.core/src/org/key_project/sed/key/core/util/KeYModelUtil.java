@@ -150,7 +150,21 @@ public final class KeYModelUtil {
          result = new KeYMethodCall(target, parent, thread, (IExecutionMethodCall)executionNode);
       }
       else if (executionNode instanceof IExecutionMethodReturn) {
-         result = new KeYMethodReturn(target, parent, thread, (IExecutionMethodReturn)executionNode);
+         IExecutionMethodReturn executionReturn = ((IExecutionMethodReturn)executionNode);
+         IKeYSEDDebugNode<?> callNode = target.getDebugNode(executionReturn.getMethodCall());
+         Assert.isTrue(callNode instanceof KeYMethodCall);
+         KeYMethodCall keyCall = (KeYMethodCall)callNode;
+         KeYMethodReturn resultReturn = keyCall.getMethodReturn(executionReturn);
+         if (resultReturn != null) {
+            // Reuse method return created by the method call and set its parent now
+            Assert.isTrue(resultReturn.getParent() == null || resultReturn.getParent() == parent);
+            resultReturn.setParent(parent);
+            result = resultReturn;
+         }
+         else {
+            // Create new method return
+            result = new KeYMethodReturn(target, parent, thread, keyCall, executionReturn);
+         }
       }
       else if (executionNode instanceof IExecutionStatement) {
          result = new KeYStatement(target, parent, thread, (IExecutionStatement)executionNode);

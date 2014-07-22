@@ -9,6 +9,7 @@
                      <methodReturn name="&lt;return of something&gt;" signature="&lt;return of SimpleConditionExample.something(a_1,b_1);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                      </methodReturn>
                   </statement>
+                  <methodReturnEntry path="/0/0/0/0/0/0/0"/>
                </methodCall>
             </statement>
          </statement>

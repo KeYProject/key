@@ -35,6 +35,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -126,6 +127,20 @@ public class ExecutionNodeReader {
                   entry.getKey().addCallStackEntry(stackEntry);
                }
             }
+            // Construct method returns
+            Set<Entry<KeYlessMethodCall, List<String>>> methodReturnEntries = handler.getMethodReturnPathEntries().entrySet();
+            for (Entry<KeYlessMethodCall, List<String>> entry : methodReturnEntries) {
+               for (String path : entry.getValue()) {
+                  IExecutionNode returnEntry = findNode(root, path);
+                  if (returnEntry == null) {
+                     throw new SAXException("Can't find call stack entry \"" + path + "\" in parsed symbolic execution tree.");
+                  }
+                  if (!(returnEntry instanceof IExecutionMethodReturn)) {
+                     throw new SAXException("Expected method return on \"" + path + "\" but is " + returnEntry.getElementType() + ".");
+                  }
+                  entry.getKey().addMethodReturn((IExecutionMethodReturn)returnEntry);
+               }
+            }
             // Return result
             return root;
          }
@@ -184,18 +199,23 @@ public class ExecutionNodeReader {
        * The parent hierarchy filled by {@link #startElement(String, String, String, Attributes)}
        * and emptied by {@link #endElement(String, String, String)}.
        */
-      private Deque<AbstractKeYlessExecutionNode> parentNodeStack = new LinkedList<AbstractKeYlessExecutionNode>();
+      private final Deque<AbstractKeYlessExecutionNode> parentNodeStack = new LinkedList<AbstractKeYlessExecutionNode>();
 
       /**
        * The parent hierarchy of {@link IExecutionVariable} and {@link IExecutionValue} filled by {@link #startElement(String, String, String, Attributes)}
        * and emptied by {@link #endElement(String, String, String)}. 
        */
-      private Deque<Object> parentVariableValueStack = new LinkedList<Object>();
+      private final Deque<Object> parentVariableValueStack = new LinkedList<Object>();
       
       /**
        * Maps an {@link AbstractKeYlessExecutionNode} to the path entries of its call stack.
        */
-      private Map<AbstractKeYlessExecutionNode, List<String>> callStackPathEntries = new LinkedHashMap<ExecutionNodeReader.AbstractKeYlessExecutionNode, List<String>>();
+      private final Map<AbstractKeYlessExecutionNode, List<String>> callStackPathEntries = new LinkedHashMap<ExecutionNodeReader.AbstractKeYlessExecutionNode, List<String>>();
+      
+      /**
+       * Maps an {@link KeYlessMethodCall} to the path entries of its method returns.
+       */
+      private final Map<KeYlessMethodCall, List<String>> methodReturnPathEntries = new LinkedHashMap<ExecutionNodeReader.KeYlessMethodCall, List<String>>();
       
       /**
        * {@inheritDoc}
@@ -236,6 +256,14 @@ public class ExecutionNodeReader {
             }
             callStackEntries.add(getPathInTree(attributes));
          }
+         else if (isMethodReturnEntry(uri, localName, qName)) {
+            List<String> methodReturnEntries = methodReturnPathEntries.get(parent);
+            if (methodReturnEntries == null) {
+               methodReturnEntries = new LinkedList<String>();
+               methodReturnPathEntries.put((KeYlessMethodCall)parent, methodReturnEntries);
+            }
+            methodReturnEntries.add(0, getPathInTree(attributes));
+         }
          else if (isMethodReturnValue(uri, localName, qName)) {
             Object parentValue = parentNodeStack.peekFirst();
             if (!(parentValue instanceof KeYlessMethodReturn)) {
@@ -270,6 +298,9 @@ public class ExecutionNodeReader {
          else if (isCallStackEntry(uri, localName, qName)) {
             // Nothing to do.
          }
+         else if (isMethodReturnEntry(uri, localName, qName)) {
+            // Nothing to do.
+         }
          else if (isMethodReturnValue(uri, localName, qName)) {
             // Nothing to do.
          }
@@ -292,6 +323,14 @@ public class ExecutionNodeReader {
        */
       public Map<AbstractKeYlessExecutionNode, List<String>> getCallStackPathEntries() {
          return callStackPathEntries;
+      }
+
+      /**
+       * Returns the mapping of a {@link KeYlessMethodCall} to its method return entries.
+       * @return The mapping of a {@link KeYlessMethodCall} to its method return entries.
+       */
+      public Map<KeYlessMethodCall, List<String>> getMethodReturnPathEntries() {
+         return methodReturnPathEntries;
       }
    }
    
@@ -337,6 +376,17 @@ public class ExecutionNodeReader {
     */
    protected boolean isCallStackEntry(String uri, String localName, String qName) {
       return ExecutionNodeWriter.TAG_CALL_STACK_ENTRY.equals(qName);
+   }
+
+   /**
+    * Checks if the currently parsed tag represents an entry of {@link IExecutionMethodCall#getMethodReturns()}.
+    * @param uri The URI.
+    * @param localName THe local name.
+    * @param qName The qName.
+    * @return {@code true} represents method return entry, {@code false} is something else.
+    */
+   protected boolean isMethodReturnEntry(String uri, String localName, String qName) {
+      return ExecutionNodeWriter.TAG_METHOD_RETURN_ENTRY.equals(qName);
    }
 
    /**
@@ -1331,6 +1381,11 @@ public class ExecutionNodeReader {
     */
    public static class KeYlessMethodCall extends AbstractKeYlessStateNode<MethodBodyStatement> implements IExecutionMethodCall {
       /**
+       * The up to now discovered {@link IExecutionMethodReturn}s.
+       */
+      private ImmutableList<IExecutionMethodReturn> methodReturns = ImmutableSLList.nil();
+      
+      /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
@@ -1390,6 +1445,24 @@ public class ExecutionNodeReader {
       @Override
       public IProgramMethod getExplicitConstructorProgramMethod() {
          return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ImmutableList<IExecutionMethodReturn> getMethodReturns() {
+         return methodReturns;
+      }
+      
+      /**
+       * Adds the given {@link IExecutionMethodReturn}.
+       * @param methodReturn The {@link IExecutionMethodReturn} to add.
+       */
+      public void addMethodReturn(IExecutionMethodReturn methodReturn) {
+         if (methodReturn != null) {
+            methodReturns = methodReturns.prepend(methodReturn);
+         }
       }
    }
 
