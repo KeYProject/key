@@ -380,7 +380,7 @@ public interface SolverType  {
 
         @Override
         public String getDefaultSolverParameters() {
-            return "-m --interactive --lang smt2";
+            return "--no-print-success -m --interactive --lang smt2";
         }
 
         @Override
