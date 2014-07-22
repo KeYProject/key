@@ -40,7 +40,6 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ProofStarter;
 
 public class ConsoleUserInterface extends AbstractUserInterface {
     private static final int PROGRESS_BAR_STEPS = 50;
@@ -52,8 +51,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     private ImmutableList<Proof> proofStack = ImmutableSLList.<Proof>nil();
 
     private final BatchMode batchMode;
-    private ProofStarter ps;
-
     private final byte verbosity;
     private KeYMediator mediator;
 
@@ -79,7 +76,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
         // setInteractive(false) has to be called because the ruleAppIndex
         // has to be notified that we work in auto mode (CS)
         mediator.setInteractive(false);
-        final Object result = ps.start();
+        startAndWaitForAutoMode(proof);
         if (verbosity >= HIGH) { // WARNING: Is never executed since application terminates via System.exit() before.
             System.out.println(proof.statistics());
         }
@@ -150,8 +147,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     @Override
     public void proofCreated(ProblemInitializer sender,
             ProofAggregate proofAggregate) {
-    	ps = new ProofStarter(this, mediator.getAutoSaver() != null);
-    	ps.init(proofAggregate);
     }
 
     @Override
