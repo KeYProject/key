@@ -34,9 +34,9 @@ public class TestProofUserManager extends TestCase {
     * {@link ProofUserManager#getProofs(KeYEnvironment)}.
     */
    public void testUserManagement_Environment() {
-      Proof firstProof = new Proof(new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
-      Proof secondProof = new Proof(new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
-      Proof thirdProof = new Proof(new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+      Proof firstProof = new Proof("TestProofUserManager 1", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+      Proof secondProof = new Proof("TestProofUserManager 2", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+      Proof thirdProof = new Proof("TestProofUserManager 3", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
       Object firstUser = new Object();
       Object secondUser = new Object();
       Object thirdUser = new Object();
@@ -141,9 +141,9 @@ public class TestProofUserManager extends TestCase {
     * {@link ProofUserManager#getUsers(Proof)}.
     */
    public void testUserManagement_NoEnvironment() throws Exception {
-      Proof firstProof = new Proof(new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
-      Proof secondProof = new Proof(new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
-      Proof thirdProof = new Proof(new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+      Proof firstProof = new Proof("TestProofUserManager NoEnv 1", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+      Proof secondProof = new Proof("TestProofUserManager NoEnv 2", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+      Proof thirdProof = new Proof("TestProofUserManager NoEnv 3", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
       Object firstUser = new Object();
       Object secondUser = new Object();
       Object thirdUser = new Object();
@@ -222,14 +222,14 @@ public class TestProofUserManager extends TestCase {
       ProofUserManager.getInstance().removeUserAndDispose(thirdProof, firstUser);
       assertProofs(firstProof, secondProof, thirdProof, true, true, true, null, null, null);
       // Test dispose of not registered proof
-      Proof fourthProof = new Proof(new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+      Proof fourthProof = new Proof("TestProofUserManager 4", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
       assertFalse(fourthProof.isDisposed());
       assertEquals(0, ProofUserManager.getInstance().getProofs().length);
       ProofUserManager.getInstance().removeUserAndDispose(fourthProof, new Object());
       assertTrue(fourthProof.isDisposed());
       assertEquals(0, ProofUserManager.getInstance().getProofs().length);
       // Test garbage collection
-      Proof fifthProof = new Proof(new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+      Proof fifthProof = new Proof("TestProofUserManager 5", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
       ProofUserManager.getInstance().addUser(fifthProof, null, new Object());
       assertProofs(fifthProof);
       fifthProof.dispose();

@@ -78,7 +78,7 @@ import de.uka.ilkd.key.util.Pair;
 public class Proof implements Named {
 
     /** name of the proof */
-    private Name name;
+    private final Name name;
 
     /** the root of the proof */
     private Node root;
@@ -149,6 +149,11 @@ public class Proof implements Named {
         assert initConfig != null : "Tried to create proof without valid services.";
         this.initConfig = initConfig;
 
+        if (initConfig.getSettings() == null) {
+        	// if no settings have been assigned yet, take default settings
+            initConfig.setSettings( new ProofSettings(ProofSettings.DEFAULT_SETTINGS) );
+        }
+        
         this.initConfig.getServices().setProof(this);
 
         settingsListener =
@@ -160,7 +165,7 @@ public class Proof implements Named {
         };
 
         localMgt = new ProofCorrectnessMgt(this);
-
+        
         initConfig.getSettings().getStrategySettings().addSettingsListener(settingsListener);
 
         pis = ProofIndependentSettings.DEFAULT_INSTANCE;
@@ -175,10 +180,10 @@ public class Proof implements Named {
 
         final Profile profile = getServices().getProfile();
 
-        if (profile.supportsStrategyFactory(initConfig.getSettings().getStrategySettings().getStrategy())) {
+        final Name strategy = initConfig.getSettings().getStrategySettings().getStrategy();
+		if (profile.supportsStrategyFactory(strategy)) {
             setActiveStrategy
-            (profile.getStrategyFactory(initConfig.getSettings().getStrategySettings().
-                            getStrategy()).create(this, activeStrategyProperties));
+            (profile.getStrategyFactory(strategy).create(this, activeStrategyProperties));
         } else {
             setActiveStrategy(
                             profile.getDefaultStrategyFactory().create(this,
@@ -186,11 +191,6 @@ public class Proof implements Named {
         }
     }
 
-
-    /** constructs a new empty proof */
-    public Proof(InitConfig initConfig) {
-        this ( "", initConfig );
-    }
 
 
     /** constructs a new empty proof with name */
@@ -338,7 +338,6 @@ public class Proof implements Named {
     public void setEnv(ProofEnvironment env) {
         this.env = env;
     }
-
 
     public AbbrevMap abbreviations(){
         return abbreviations;
@@ -507,13 +506,6 @@ public class Proof implements Named {
         }
     }
 
-    /** for testing only */
-    @Deprecated
-    void remove2(Goal goal){
-        remove(goal);
-    }
-
-
     /** adds a new goal to the list of goals
      * @param goal the Goal to be added
      */
@@ -538,7 +530,6 @@ public class Proof implements Named {
         // For the moment it is necessary to fire the message ALWAYS
         // in order to detect branch closing.
         fireProofGoalsAdded(goals);
-
     }
 
 
@@ -548,10 +539,6 @@ public class Proof implements Named {
     public boolean closed () {
         return root.isClosed() && openGoals.isEmpty();
     }
-
-
-
-
 
     /**
      * This class is responsible for pruning a proof tree at a certain cutting point.
@@ -684,7 +671,6 @@ public class Proof implements Named {
      * @param cuttingPoint
      * @return Returns the sub trees that has been pruned.
      */
-
     public synchronized ImmutableList<Node> pruneProof(Node cuttingPoint) {
         return pruneProof(cuttingPoint,true);
     }
@@ -732,11 +718,6 @@ public class Proof implements Named {
         }while(child != parent);
     }
 
-
-
-
-
-
     /** fires the event that the proof has been expanded at the given node */
     public void fireProofExpanded(Node node) {
         ProofTreeEvent e = new ProofTreeEvent(this, node);
@@ -745,7 +726,6 @@ public class Proof implements Named {
         }
     }
 
-
     /** fires the event that the proof is being pruned at the given node */
     protected void fireProofIsBeingPruned(Node below) {
         ProofTreeEvent e = new ProofTreeEvent(this, below);
@@ -753,7 +733,6 @@ public class Proof implements Named {
             listener.proofIsBeingPruned(e);
         }
     }
-
 
     /** fires the event that the proof has been pruned at the given node */
     protected void fireProofPruned(Node below) {

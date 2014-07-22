@@ -64,7 +64,7 @@ public class TestCollisionResolving extends TestCase {
    	services = TacletForTests.services();
 
 	//build a goal (needed for creating TacletInstantiationsTableModel)
-    	Proof proof = new Proof(TacletForTests.initConfig());
+    	Proof proof = new Proof("TestCollisionResolving", TacletForTests.initConfig());
        	Semisequent empty = Semisequent.EMPTY_SEMISEQUENT;
     	Sequent seq = Sequent.createSequent(empty, empty);
 	
