@@ -53,6 +53,9 @@ public abstract class AbstractSolverSocket implements PipeListener<SolverCommuni
 		else if(type == SolverType.CVC3_SOLVER){
 			return new CVC3Socket(name, query);
 		}
+        else if(type == SolverType.CVC4_SOLVER){
+            return new CVC4Socket(name, query);
+        }
 
 		return null;
 	}
@@ -220,7 +223,7 @@ class CVC3Socket extends AbstractSolverSocket{
 		SolverCommunication sc = pipe.getSession();
 		sc.addMessage(message);
 		if(type == Pipe.ERROR_MESSAGE && message.indexOf("Interrupted by signal")==-1){
-			throw new RuntimeException("Error while executing CVC:\n" +message);
+			throw new RuntimeException("Error while executing CVC3:\n" +message);
 		}
 
 		if(sc.getState() == WAIT_FOR_RESULT ){
@@ -238,6 +241,34 @@ class CVC3Socket extends AbstractSolverSocket{
 
 }
 
+class CVC4Socket extends AbstractSolverSocket{
+
+    public CVC4Socket(String name, ModelExtractor query) {
+        super(name, query);
+    }
+
+    // TODO
+    public void messageIncoming(Pipe<SolverCommunication> pipe, String message, int type) {
+        SolverCommunication sc = pipe.getSession();
+        sc.addMessage(message);
+        if(type == Pipe.ERROR_MESSAGE && message.indexOf("Interrupted by signal")==-1){
+            throw new RuntimeException("Error while executing CVC4:\n" +message);
+        }
+
+        if(sc.getState() == WAIT_FOR_RESULT ){
+            if(message.indexOf("unsat") > -1){
+                sc.setFinalResult(SMTSolverResult.createValidResult(name));
+            } else if(message.indexOf("sat") > -1){
+                sc.setFinalResult(SMTSolverResult.createInvalidResult(name));
+            }
+
+            sc.setState(FINISH);
+            pipe.close();
+        }
+
+    }
+
+}
 class SimplifySocket extends AbstractSolverSocket{
 
 	public SimplifySocket(String name, ModelExtractor query) {
