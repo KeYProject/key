@@ -157,7 +157,7 @@ public final class KeYModelUtil {
          KeYMethodReturn resultReturn = keyCall.getMethodReturn(executionReturn);
          if (resultReturn != null) {
             // Reuse method return created by the method call and set its parent now
-            Assert.isTrue(resultReturn.getParent() == null);
+            Assert.isTrue(resultReturn.getParent() == null || resultReturn.getParent() == parent);
             resultReturn.setParent(parent);
             result = resultReturn;
          }
