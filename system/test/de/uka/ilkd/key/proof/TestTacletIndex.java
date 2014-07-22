@@ -266,7 +266,7 @@ public class TestTacletIndex extends TestCase{
 
     private RuleAppIndex createGoalFor(Sequent seq_p5, TacletIndex ruleIdx) {
         final Node node_p5 =
-            new Node (new Proof (new InitConfig(new Services(AbstractProfile.getDefaultProfile()))), seq_p5);
+            new Node (new Proof ("TestTacletIndex", new InitConfig(new Services(AbstractProfile.getDefaultProfile()))), seq_p5);
         final BuiltInRuleAppIndex builtinIdx =
             new BuiltInRuleAppIndex (new BuiltInRuleIndex ());
         final Goal goal_p5 =

@@ -25,7 +25,8 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.collection.TestLeftistHeapOfInteger.class,
         de.uka.ilkd.key.util.TestLexicographicComparator.class,
         de.uka.ilkd.key.util.TestMiscTools.class,
-        de.uka.ilkd.key.util.pp.TestLayouter.class
+        de.uka.ilkd.key.util.pp.TestLayouter.class,
+        de.uka.ilkd.key.util.TestProofStarter.class
     }; 
 
 
