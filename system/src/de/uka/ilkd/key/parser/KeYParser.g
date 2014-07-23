@@ -820,7 +820,7 @@ options {
                 }
                 // WATCHOUT why not in DECLARATION MODE	   
                 if(!isDeclParser()) {			      	
-                    ProgramVariable var = javaInfo.getFieldType(attributeName, prefixKJT);
+                    ProgramVariable var = javaInfo.getCanonicalFieldProgramVariable(attributeName, prefixKJT);
 
                     if (var == null) {
                         semanticError("There is no attribute '" + attributeName + 
