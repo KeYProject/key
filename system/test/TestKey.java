@@ -97,7 +97,7 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.smt.test.TestZ3.class,
         de.uka.ilkd.key.smt.test.TestYices.class,
         de.uka.ilkd.key.smt.test.TestCvc3.class,
-
+        de.uka.ilkd.key.smt.test.TestCvc4.class,
     };
 
     static Class<? extends TestCase>[] setTests = new Class[] {
