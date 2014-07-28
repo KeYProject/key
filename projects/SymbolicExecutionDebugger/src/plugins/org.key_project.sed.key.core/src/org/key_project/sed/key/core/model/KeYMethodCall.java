@@ -377,7 +377,8 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          Assert.isNotNull(methodReturn);
          Assert.isTrue(methodReturn.getMethodCall() == this);
-         knownMethodReturns.put(methodReturn.getExecutionNode(), methodReturn);
+         KeYMethodReturn oldReturn = knownMethodReturns.put(methodReturn.getExecutionNode(), methodReturn);
+         Assert.isTrue(oldReturn == null);
       }
    }
 
@@ -395,7 +396,6 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
             if (keyReturn == null) {
                // Create new method return, its parent will be set later when the full child hierarchy is explored.
                keyReturn = new KeYMethodReturn(getDebugTarget(), null, getThread(), this, executionReturn);
-               addMehodReturn(keyReturn);
             }
             result[i] = keyReturn.getMethodReturnCondition();
             i++;

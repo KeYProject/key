@@ -339,7 +339,6 @@ public class Proof implements Named {
         this.env = env;
     }
 
-
     public AbbrevMap abbreviations(){
         return abbreviations;
     }
@@ -540,10 +539,6 @@ public class Proof implements Named {
     public boolean closed () {
         return root.isClosed() && openGoals.isEmpty();
     }
-
-
-
-
 
     /**
      * This class is responsible for pruning a proof tree at a certain cutting point.

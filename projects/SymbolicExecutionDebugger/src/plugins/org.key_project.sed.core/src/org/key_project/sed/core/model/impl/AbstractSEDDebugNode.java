@@ -113,7 +113,7 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
     * @param parent The new parent to set.
     */
    protected void setParent(ISEDDebugNode parent) {
-      Assert.isTrue(this.parent == null);
+      Assert.isTrue(this.parent == null || this.parent == parent);
       this.parent = parent;
    }
 
