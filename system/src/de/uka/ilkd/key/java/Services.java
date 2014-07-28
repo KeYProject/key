@@ -106,15 +106,6 @@ public class Services implements TermServices {
 
     private final Profile profile;
     
-    public ITermProgramVariableCollectorFactory getFactory() {
-      return factory;
-   }
-
-
-   public void setFactory(ITermProgramVariableCollectorFactory factory) {
-      this.factory = factory;
-   }
-   
     private final ServiceCaches caches;
     
     private final TermBuilder termBuilder;
@@ -408,6 +399,16 @@ public class Services implements TermServices {
     public TermFactory getTermFactory() {
         return termBuilder.tf();
     }
+
+    public ITermProgramVariableCollectorFactory getFactory() {
+        return factory;
+    }
+
+
+    public void setFactory(ITermProgramVariableCollectorFactory factory) {
+        this.factory = factory;
+    }
+
 
     /**
      * returns the {@link JavaModel} with all path information

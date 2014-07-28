@@ -93,7 +93,9 @@ as result of ArrayAverage.average(array);&gt;" isReturnValueComputed="true" meth
                   </statement>
                </branchCondition>
             </branchStatement>
+            <methodReturnEntry path="/0/0/0/0/1/0/0/0/0/1/0/0"/>
          </methodCall>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/1/0/0/0/0/1/0/0/0/1/0"/>
    </methodCall>
 </start>

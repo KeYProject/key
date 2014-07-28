@@ -31,5 +31,6 @@ termination: diamond" pathCondition="and(not(equals(x,null)),not(equals(y,null))
             </termination>
          </branchCondition>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
 </start>

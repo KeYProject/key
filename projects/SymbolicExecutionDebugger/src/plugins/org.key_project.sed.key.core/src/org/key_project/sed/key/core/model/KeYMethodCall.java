@@ -13,8 +13,8 @@
 
 package org.key_project.sed.key.core.model;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
@@ -31,9 +31,11 @@ import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.jdt.JDTUtil;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -76,7 +78,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
    /**
     * The up to know discovered {@link KeYMethodReturn} nodes.
     */
-   private final List<KeYMethodReturn> methodReturns = new LinkedList<KeYMethodReturn>();
+   private final Map<IExecutionMethodReturn, KeYMethodReturn> knownMethodReturns = new HashMap<IExecutionMethodReturn, KeYMethodReturn>();
 
    /**
     * Constructor.
@@ -372,9 +374,12 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     * @param methodReturn The {@link KeYMethodReturn} to register.
     */
    public void addMehodReturn(KeYMethodReturn methodReturn) {
-      Assert.isNotNull(methodReturn);
-      Assert.isTrue(methodReturn.getMethodCall() == this);
-      methodReturns.add(methodReturn);
+      synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+         Assert.isNotNull(methodReturn);
+         Assert.isTrue(methodReturn.getMethodCall() == this);
+         KeYMethodReturn oldReturn = knownMethodReturns.put(methodReturn.getExecutionNode(), methodReturn);
+         Assert.isTrue(oldReturn == null);
+      }
    }
 
    /**
@@ -382,12 +387,29 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     */
    @Override
    public ISEDBranchCondition[] getMethodReturnConditions() throws DebugException {
-      ISEDBranchCondition[] result = new ISEDBranchCondition[methodReturns.size()];
-      int i = 0;
-      for (KeYMethodReturn methodReturn : methodReturns) {
-         result[i] = methodReturn.getMethodReturnCondition();
-         i++;
+      synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+         ImmutableList<IExecutionMethodReturn> executionReturns = executionNode.getMethodReturns();
+         ISEDBranchCondition[] result = new ISEDBranchCondition[executionReturns.size()];
+         int i = 0;
+         for (IExecutionMethodReturn executionReturn : executionReturns) {
+            KeYMethodReturn keyReturn = getMethodReturn(executionReturn);
+            if (keyReturn == null) {
+               // Create new method return, its parent will be set later when the full child hierarchy is explored.
+               keyReturn = new KeYMethodReturn(getDebugTarget(), null, getThread(), this, executionReturn);
+            }
+            result[i] = keyReturn.getMethodReturnCondition();
+            i++;
+         }
+         return result;
       }
-      return result;
+   }
+   
+   /**
+    * Returns the {@link KeYMethodReturn} with the given {@link IExecutionMethodReturn} if available.
+    * @param executionReturn The {@link IExecutionMethodReturn} to search its {@link KeYMethodReturn}.
+    * @return The found {@link KeYMethodReturn} or {@code null} if not available.
+    */
+   public KeYMethodReturn getMethodReturn(final IExecutionMethodReturn executionReturn) {
+      return knownMethodReturns.get(executionReturn);
    }
 }

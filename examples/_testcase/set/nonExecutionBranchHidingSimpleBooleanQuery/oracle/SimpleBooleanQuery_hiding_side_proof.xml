@@ -25,5 +25,6 @@ as result of SimpleBooleanQuery.main(x);&gt;" isReturnValueComputed="true" metho
             </statement>
          </operationContract>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0"/>
    </methodCall>
 </start>

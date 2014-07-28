@@ -446,8 +446,6 @@ public final class ProblemInitializer {
         }
     }
     
-    
-    
     //-------------------------------------------------------------------------
     //public interface
     //------------------------------------------------------------------------- 
@@ -484,7 +482,7 @@ public final class ProblemInitializer {
     
     public InitConfig prepare(EnvInput envInput, InitConfig referenceConfig)throws ProofInputException{
         //create initConfig
-         InitConfig initConfig = referenceConfig.copy();
+    	InitConfig initConfig = referenceConfig.copy();
         
 
         //read Java

@@ -19,7 +19,6 @@ import java.util.Properties;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -341,10 +340,7 @@ public abstract class AbstractPO implements IPersistablePO {
                                 header,
                                 proofConfig.createTacletIndex(),
                                 proofConfig.createBuiltInRuleIndex(),
-                                proofConfig,
-                                proofConfig.getSettings() != null
-                                ? proofConfig.getSettings()
-                                : new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
+                                proofConfig);
         assert proof.openGoals().size() == 1 : "expected one first open goal";
         final boolean isInfFlowProof =
                 (this instanceof InfFlowPO);

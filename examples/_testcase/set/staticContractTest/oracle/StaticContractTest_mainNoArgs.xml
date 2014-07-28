@@ -15,5 +15,6 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
             </methodReturn>
          </operationContract>
       </statement>
+      <methodReturnEntry path="/0/0/0/0"/>
    </methodCall>
 </start>

@@ -27,15 +27,19 @@
                                                                   </statement>
                                                                </methodReturn>
                                                             </statement>
+                                                            <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                          </methodCall>
                                                       </methodReturn>
                                                    </methodReturn>
+                                                   <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                 </methodCall>
                                              </statement>
+                                             <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                           </methodCall>
                                        </statement>
                                     </methodReturn>
                                  </statement>
+                                 <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
                               </methodCall>
                            </statement>
                         </statement>
