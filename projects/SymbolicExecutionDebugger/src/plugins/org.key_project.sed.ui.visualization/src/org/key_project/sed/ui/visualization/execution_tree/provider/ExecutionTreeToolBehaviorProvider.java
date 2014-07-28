@@ -43,6 +43,7 @@ import org.eclipse.graphiti.tb.IToolBehaviorProvider;
 import org.eclipse.graphiti.ui.internal.GraphitiUIPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
+import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeResumeFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeStepIntoFeature;
@@ -106,8 +107,9 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
          data.getGenericContextButtons().clear();
          
          // collapse
-         if(getFeatureProvider().getBusinessObjectForPictogramElement(context.getPictogramElement()) instanceof ISEDMethodCall) {
-            if(Boolean.parseBoolean(Graphiti.getPeService().getPropertyValue((PropertyContainer) context.getPictogramElement().eContainer(), "collapsed"))) {
+         ISEDDebugNode node = (ISEDDebugNode) getFeatureProvider().getBusinessObjectForPictogramElement(context.getPictogramElement());
+         if(node instanceof ISEDMethodCall) {
+            if(((ISEDMethodCall) node).isCollapsed()) {
                data.getGenericContextButtons().add(createCustomContextButtonEntry(new MethodCallCollapseFeature(getFeatureProvider()), context, "Expand", null, IPlatformImageConstants.IMG_EDIT_EXPAND));
             }
             else {
