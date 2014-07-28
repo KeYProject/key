@@ -24,8 +24,10 @@ import org.eclipse.graphiti.features.context.IRemoveContext;
 import org.eclipse.graphiti.features.context.impl.RemoveContext;
 import org.eclipse.graphiti.features.impl.DefaultRemoveFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.util.ISEDIterator;
 import org.key_project.sed.core.util.SEDPreorderIterator;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeFeatureProvider;
@@ -85,6 +87,18 @@ public class ExecutionTreeRemoveFeature extends DefaultRemoveFeature {
 //                     PictogramElement childPe = getFeatureProvider().getPictogramElementForBusinessObject(next);
                         if (childPE != null) {
                            children.add(new RemoveContext(childPE));
+                        }
+                     }
+                     
+                     if(next instanceof ISEDMethodCall) {
+                        ISEDMethodCall mc =  (ISEDMethodCall) next;
+                        if(mc.isCollapsed()) {
+                           for(ISEDBranchCondition bc : mc.getMethodReturnConditions()) {
+                              PictogramElement bcPE = getFeatureProvider().getPictogramElementForBusinessObject(bc);
+                              if(bcPE != null) {
+                                 children.add(new RemoveContext(bcPE));
+                              }
+                           }
                         }
                      }
                   }
