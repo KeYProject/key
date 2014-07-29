@@ -145,7 +145,7 @@ public class ExecutionMethodCall extends AbstractExecutionStateNode<MethodBodySt
    public void addMethodReturn(IExecutionMethodReturn methodReturn) {
       if (methodReturn != null) {
          assert methodReturn.getMethodCall() == this;
-         methodReturns = methodReturns.prepend(methodReturn);
+         methodReturns = methodReturns.append(methodReturn);
       }
    }
 }
