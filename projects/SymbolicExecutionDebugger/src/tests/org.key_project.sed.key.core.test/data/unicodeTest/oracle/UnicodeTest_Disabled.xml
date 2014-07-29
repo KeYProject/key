@@ -1,33 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_0dac4346-c9b4-455e-b72c-fb4b1981bb1f" name="magic(boolean, boolean)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_8bff7f97-9a04-47ca-9cf0-5862498553da" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_ebab2cb9-5817-4280-a3b9-b3883359a747" name="UnicodeTest.magic(x,y);" pathCondition="true" lineNumber="-1" charStart="49" charEnd="54" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUseUnicode\src\UnicodeTest.java">
-            <sedBranchStatement xml:id="_9a95dc2d-9d4f-4f94-8547-1f5a20489c22" name="if (x&amp;y)" pathCondition="true" lineNumber="-1" charStart="86" charEnd="97" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUseUnicode\src\UnicodeTest.java">
-               <sedBranchCondition xml:id="_9c991045-7de0-4f51-9a74-dc15f59f2283" name="x = TRUE &amp; y = TRUE" pathCondition="x = TRUE &amp; y = TRUE">
-                  <sedStatement xml:id="_58edd7ec-03f6-44a4-9f37-32783c2b47fc" name="return 1;" pathCondition="x = TRUE &amp; y = TRUE" lineNumber="-1" charStart="109" charEnd="118" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUseUnicode\src\UnicodeTest.java">
-                     <sedMethodReturn xml:id="_571f1b13-9bd5-4872-b86b-e48cf2c42b08" name="&lt;return of UnicodeTest.magic(x,y);&gt;" pathCondition="x = TRUE &amp; y = TRUE" lineNumber="-1" charStart="49" charEnd="54" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUseUnicode\src\UnicodeTest.java" methodReturnConditionRef="_849f9def-8939-4e8c-a2cd-55f1e345b0ac">
-                        <sedTermination xml:id="_49880d40-5624-40e0-992d-3c885fac5d8e" name="&lt;end&gt;" pathCondition="x = TRUE &amp; y = TRUE" verified="true">
+   <sedTarget xml:id="_4742fdfe-7242-4721-adbe-8a8397f37aed" name="magic(boolean, boolean)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_89d1ab49-cd35-41f9-8b50-493cac93461c" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_28446ce8-a60c-4215-9e2d-671f57e0bfad" name="UnicodeTest.magic(x,y);" pathCondition="true" lineNumber="-1" charStart="49" charEnd="54" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUseUnicode\src\UnicodeTest.java">
+            <sedBranchStatement xml:id="_8a536869-335e-4c99-9ebd-aaf41c53ea83" name="if (x&amp;y)" pathCondition="true" lineNumber="-1" charStart="86" charEnd="97" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUseUnicode\src\UnicodeTest.java">
+               <sedBranchCondition xml:id="_22ef6367-f496-4b72-ad0e-ce71881ffdf0" name="x = TRUE &amp; y = TRUE" pathCondition="x = TRUE &amp; y = TRUE">
+                  <sedStatement xml:id="_33f92c76-4682-40c4-a69a-35e04eab2c2d" name="return 1;" pathCondition="x = TRUE &amp; y = TRUE" lineNumber="-1" charStart="109" charEnd="118" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUseUnicode\src\UnicodeTest.java">
+                     <sedMethodReturn xml:id="_f68204c3-6233-427a-ad4a-42ceb13f7bf4" name="&lt;return of UnicodeTest.magic(x,y);&gt;" pathCondition="x = TRUE &amp; y = TRUE" lineNumber="-1" charStart="49" charEnd="54" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUseUnicode\src\UnicodeTest.java" methodReturnConditionRef="_a82a8e6f-b270-4be4-9bd8-b49ec43196bb">
+                        <sedTermination xml:id="_b4e2c64d-3c25-4f93-9f74-6bf6163e82e1" name="&lt;end&gt;" pathCondition="x = TRUE &amp; y = TRUE" verified="true">
                         </sedTermination>
                      </sedMethodReturn>
                   </sedStatement>
                </sedBranchCondition>
-               <sedBranchCondition xml:id="_1bfe1c34-710b-4b71-b4e0-3eb673190c0c" name="!x = TRUE | !y = TRUE" pathCondition="!(x = TRUE &amp; y = TRUE)">
-                  <sedStatement xml:id="_9ae3d85f-0b8f-40ee-95e8-05a15fbd28a5" name="return -1;" pathCondition="!(x = TRUE &amp; y = TRUE)" lineNumber="-1" charStart="152" charEnd="162" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUseUnicode\src\UnicodeTest.java">
-                     <sedMethodReturn xml:id="_5caf10b4-fb7d-4e8d-9845-94079c0ca812" name="&lt;return of UnicodeTest.magic(x,y);&gt;" pathCondition="!(x = TRUE &amp; y = TRUE)" lineNumber="-1" charStart="49" charEnd="54" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUseUnicode\src\UnicodeTest.java" methodReturnConditionRef="_a61e8f0e-033a-4a33-91ab-ad16ffd1f293">
-                        <sedTermination xml:id="_ebab5c47-3e3d-4264-871d-cf5b07c96bee" name="&lt;end&gt;" pathCondition="!(x = TRUE &amp; y = TRUE)" verified="true">
+               <sedBranchCondition xml:id="_b641eeef-1932-49bf-b509-a355aad211d9" name="!x = TRUE | !y = TRUE" pathCondition="!(x = TRUE &amp; y = TRUE)">
+                  <sedStatement xml:id="_1d0dbd8e-0210-41a1-9d14-07f191abf109" name="return -1;" pathCondition="!(x = TRUE &amp; y = TRUE)" lineNumber="-1" charStart="152" charEnd="162" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUseUnicode\src\UnicodeTest.java">
+                     <sedMethodReturn xml:id="_1558140f-958b-4ace-becb-abedf508938c" name="&lt;return of UnicodeTest.magic(x,y);&gt;" pathCondition="!(x = TRUE &amp; y = TRUE)" lineNumber="-1" charStart="49" charEnd="54" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotUseUnicode\src\UnicodeTest.java" methodReturnConditionRef="_3efede38-eb06-4798-9a11-bed1dd70d82a">
+                        <sedTermination xml:id="_91be1118-6d5f-4a55-a594-927c73b3ec1b" name="&lt;end&gt;" pathCondition="!(x = TRUE &amp; y = TRUE)" verified="true">
                         </sedTermination>
                      </sedMethodReturn>
                   </sedStatement>
                </sedBranchCondition>
             </sedBranchStatement>
-            <sedMethodCallMethodReturnCondition xml:id="_a61e8f0e-033a-4a33-91ab-ad16ffd1f293" name="!(x = TRUE &amp; y = TRUE)" pathCondition="true">
-               <sedChildReference nodeIdRef="_5caf10b4-fb7d-4e8d-9845-94079c0ca812"/>
+            <sedMethodCallMethodReturnCondition xml:id="_3efede38-eb06-4798-9a11-bed1dd70d82a" name="!(x = TRUE &amp; y = TRUE)" pathCondition="true">
+               <sedChildReference nodeIdRef="_1558140f-958b-4ace-becb-abedf508938c"/>
             </sedMethodCallMethodReturnCondition>
-            <sedMethodCallMethodReturnCondition xml:id="_849f9def-8939-4e8c-a2cd-55f1e345b0ac" name="x = TRUE &amp; y = TRUE" pathCondition="true">
-               <sedChildReference nodeIdRef="_571f1b13-9bd5-4872-b86b-e48cf2c42b08"/>
+            <sedMethodCallMethodReturnCondition xml:id="_a82a8e6f-b270-4be4-9bd8-b49ec43196bb" name="x = TRUE &amp; y = TRUE" pathCondition="true">
+               <sedChildReference nodeIdRef="_f68204c3-6233-427a-ad4a-42ceb13f7bf4"/>
             </sedMethodCallMethodReturnCondition>
          </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_b4e2c64d-3c25-4f93-9f74-6bf6163e82e1"/>
+         <sedTerminationEntry nodeIdRef="_91be1118-6d5f-4a55-a594-927c73b3ec1b"/>
       </sedThread>
    </sedTarget>
 </launch>

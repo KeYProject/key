@@ -177,6 +177,11 @@ public class SEDXMLWriter {
    public static final String TAG_CALL_STACK_ENTRY = "sedCallStackEntry";
 
    /**
+    * Tag name to store one entry of {@link ISEDThread#getTerminations()}.
+    */
+   public static final String TAG_TERMINATION_ENTRY = "sedTerminationEntry";
+
+   /**
     * Tag name to store a reference to an existing {@link ISEDDebugNode}.
     */
    public static final String TAG_CHILD_REFERENCE = "sedChildReference";
@@ -1043,11 +1048,43 @@ public class SEDXMLWriter {
          if (node instanceof ISEDMethodCall) {
             appendMethodReturnNodes(level + 1, (ISEDMethodCall)node, saveVariables, saveCallStack, sb, monitor);
          }
+         // Append terminations
+         else if (node instanceof ISEDThread) {
+            appendTerminations(level + 1, (ISEDThread)node, sb);
+         }
          // Append end tag
          appendEndTag(level, tagName, sb);
       }
    }
+
+   /**
+    * Appends the known terminations to the given {@link StringBuffer}.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param node The {@link ISEDThread} which provides the known terminations.
+    * @param sb The {@link StringBuffer} to write to.
+    * @throws DebugException Occurred Exception.
+    */
+   protected void appendTerminations(int level, ISEDThread node, StringBuffer sb) throws DebugException {
+      ISEDTermination[] terminations = node.getTerminations();
+      if (terminations != null) {
+         for (ISEDTermination termination : terminations) {
+            Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+            attributeValues.put(ATTRIBUTE_NODE_ID_REF, termination.getId());
+            appendEmptyTag(level, TAG_TERMINATION_ENTRY, attributeValues, sb);
+         }
+      }
+   }
    
+   /**
+    * Appends all known method returns.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param node The {@link ISEDMethodCall} which provides the known return nodes.
+    * @param saveVariables Save variables?
+    * @param saveCallStack Save call stack?
+    * @param sb The {@link StringBuffer} to write to.
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @throws DebugException Occurred Exception.
+    */
    protected void appendMethodReturnNodes(int level, ISEDMethodCall node, boolean saveVariables, boolean saveCallStack, StringBuffer sb, IProgressMonitor monitor) throws DebugException {
       ISEDBranchCondition[] conditions = node.getMethodReturnConditions();
       if (conditions != null) {

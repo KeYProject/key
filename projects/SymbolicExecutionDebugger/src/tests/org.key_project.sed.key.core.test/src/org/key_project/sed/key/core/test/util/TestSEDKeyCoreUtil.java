@@ -255,6 +255,7 @@ public final class TestSEDKeyCoreUtil {
       // Add thread
       SEDMemoryThread thread = new SEDMemoryThread(target, false);
       thread.setName(IExecutionStart.DEFAULT_START_NODE_NAME);
+      thread.setPathCondition("true");
       target.addSymbolicThread(thread);
       return target;
    }

@@ -60,6 +60,7 @@ public class KeYExceptionalTermination extends AbstractSEDExceptionalTermination
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
       target.registerDebugNode(this);
+      thread.addTermination(this);
       initializeAnnotations();
    }
 

@@ -60,6 +60,7 @@ public class KeYLoopBodyTermination extends AbstractSEDLoopBodyTermination imple
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
       target.registerDebugNode(this);
+      thread.addTermination(this);
       initializeAnnotations();
    }
 

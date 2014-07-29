@@ -13,9 +13,12 @@
 
 package org.key_project.sed.core.model.impl;
 
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IBreakpoint;
@@ -23,6 +26,7 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.util.ISEDIterator;
 import org.key_project.sed.core.util.SEDBreadthFirstIterator;
@@ -49,6 +53,11 @@ public abstract class AbstractSEDThread extends AbstractSEDDebugNode implements 
     * Indicates that the process is currently suspended or not.
     */
    private boolean suspended = true;
+
+   /**
+    * The known {@link ISEDTermination}s of this {@link ISEDThread}.
+    */
+   private final Set<ISEDTermination> knownTerminations = new LinkedHashSet<ISEDTermination>();
    
    /**
     * Constructor.
@@ -294,5 +303,23 @@ public abstract class AbstractSEDThread extends AbstractSEDDebugNode implements 
       else {
          return leafs.toArray(new ISEDDebugNode[leafs.size()]);
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDTermination[] getTerminations() throws DebugException {
+      return knownTerminations.toArray(new ISEDTermination[knownTerminations.size()]);
+   }
+   
+   /**
+    * Registers the given {@link ISEDTermination}.
+    * @param termination The {@link ISEDTermination} to register.
+    */
+   public void addTermination(ISEDTermination termination) {
+      Assert.isNotNull(termination);
+      Assert.isTrue(!knownTerminations.contains(termination));
+      knownTerminations.add(termination);
    }
 }
