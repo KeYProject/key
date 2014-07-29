@@ -32,6 +32,7 @@ public abstract class TextualJMLConstruct {
     
     protected final ImmutableList<String> mods;
     private Position approxPos = Position.UNDEFINED;
+    private String sourceFile = null;
     
     /** A user-provided identifier to keep an overview over large specification collections */
     protected String name;
@@ -63,14 +64,24 @@ public abstract class TextualJMLConstruct {
     }
     
     /**
+     * Return the source file name where this construct appears.
+     */
+    public String getSourceFileName() {
+        return sourceFile;
+    }
+    
+    /**
      * Sets the approximate position of this construct
      * when first called with a valid position.
      * The approximate position can still be changed
      * while it is undefined.
+     * Also set source file name if known.
      */
     protected void setPosition (PositionedString ps) {
-        if (approxPos == Position.UNDEFINED)
+        if (sourceFile == null) {
             approxPos = ps.pos;
+            sourceFile = ps.fileName;
+        }
     }
 
     protected void addGeneric(Map<String, ImmutableList<PositionedString>> item, PositionedString ps) {
