@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_cac370ec-4d31-4f6a-84e7-07407570ab05" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_3b6ddeae-46e8-425f-8928-3e9c3969cb77" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_4c1ad417-0835-4cd7-9b90-8dac10665312" name="UseOperationContractNormalAndExceptionalBranchTest.main(value);" pathCondition="true" lineNumber="-1" charStart="88" charEnd="92" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalBranchTest\src\UseOperationContractNormalAndExceptionalBranchTest.java">
-            <sedStatement xml:id="_352e02db-1efa-4729-a7bb-a24122dd703a" name="int magicNumber = magic(value);" pathCondition="true" lineNumber="-1" charStart="119" charEnd="150" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalBranchTest\src\UseOperationContractNormalAndExceptionalBranchTest.java">
-               <sedMethodContract xml:id="_6841f73f-7e0d-41c1-a41e-b79971c8cc82" name="result_0 = magic(value) catch(exc_0)
+   <sedTarget xml:id="_606ccdea-a3d6-45c8-bf45-5ffe46bea6df" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_8bf137dc-171f-49dc-9ff0-ad76aa625ccf" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_1d17f06f-482c-4697-a495-fc4351b3fb7a" name="UseOperationContractNormalAndExceptionalBranchTest.main(value);" pathCondition="true" lineNumber="-1" charStart="88" charEnd="92" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalBranchTest\src\UseOperationContractNormalAndExceptionalBranchTest.java">
+            <sedStatement xml:id="_4a0a8edf-dee5-43cd-a48a-f53a2e0bc56e" name="int magicNumber = magic(value);" pathCondition="true" lineNumber="-1" charStart="119" charEnd="150" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalBranchTest\src\UseOperationContractNormalAndExceptionalBranchTest.java">
+               <sedMethodContract xml:id="_c51bbbf8-48e0-49d5-8243-acf9cf252921" name="result_0 = magic(value) catch(exc_0)
 pre: value &lt; 0 &amp; value &gt;= javaUnaryMinusInt(10)
 | value &lt; javaUnaryMinusInt(10)
 | value &gt;= 0
@@ -37,35 +37,35 @@ mod: \if (true)
          \then (allLocs)
          \else (allLocs)
 termination: diamond" pathCondition="true" lineNumber="-1" charStart="819" charEnd="824" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalBranchTest\src\UseOperationContractNormalAndExceptionalBranchTest.java" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-                  <sedBranchCondition xml:id="_5ab6aa59-eeec-4f3b-a2c3-3208738bba4c" name="Post (magic): gt(value,Z(neglit(1(#))))" pathCondition="gt(value,Z(neglit(1(#))))">
-                     <sedStatement xml:id="_f7dc1535-5f9e-4817-af01-698f70497058" name="int magicNumberCopy = magicNumber;" pathCondition="gt(value,Z(neglit(1(#))))" lineNumber="-1" charStart="155" charEnd="189" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalBranchTest\src\UseOperationContractNormalAndExceptionalBranchTest.java">
-                        <sedStatement xml:id="_3c6614bc-fd08-4b1d-b18d-29fae83022b8" name="return magicNumber+magicNumberCopy;" pathCondition="gt(value,Z(neglit(1(#))))" lineNumber="-1" charStart="194" charEnd="231" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalBranchTest\src\UseOperationContractNormalAndExceptionalBranchTest.java">
-                           <sedMethodReturn xml:id="_d4bc8d72-376e-406c-a92b-98ed8a9b4d81" name="&lt;return of UseOperationContractNormalAndExceptionalBranchTest.main(value);&gt;" pathCondition="gt(value,Z(neglit(1(#))))" lineNumber="-1" charStart="88" charEnd="92" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalBranchTest\src\UseOperationContractNormalAndExceptionalBranchTest.java" methodReturnConditionRef="_6af81121-03b9-47bf-b01e-d90f26c559f0">
-                              <sedTermination xml:id="_80c101d6-443b-4ef3-ace8-d50240c3bea2" name="&lt;end&gt;" pathCondition="gt(value,Z(neglit(1(#))))" verified="true">
+                  <sedBranchCondition xml:id="_0fb6c1e6-8e9a-492e-8422-b3515e3c7da5" name="Post (magic): gt(value,Z(neglit(1(#))))" pathCondition="gt(value,Z(neglit(1(#))))">
+                     <sedStatement xml:id="_96bcc7d7-75f1-43ca-8467-eedc2dc730b7" name="int magicNumberCopy = magicNumber;" pathCondition="gt(value,Z(neglit(1(#))))" lineNumber="-1" charStart="155" charEnd="189" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalBranchTest\src\UseOperationContractNormalAndExceptionalBranchTest.java">
+                        <sedStatement xml:id="_8a1f1bae-1eca-49ac-905d-1b856cea5bcc" name="return magicNumber+magicNumberCopy;" pathCondition="gt(value,Z(neglit(1(#))))" lineNumber="-1" charStart="194" charEnd="231" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalBranchTest\src\UseOperationContractNormalAndExceptionalBranchTest.java">
+                           <sedMethodReturn xml:id="_2cffca08-d2ad-4b7b-8cb7-6d650b266e55" name="&lt;return of UseOperationContractNormalAndExceptionalBranchTest.main(value);&gt;" pathCondition="gt(value,Z(neglit(1(#))))" lineNumber="-1" charStart="88" charEnd="92" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalBranchTest\src\UseOperationContractNormalAndExceptionalBranchTest.java" methodReturnConditionRef="_0975a219-ab62-4f62-95cc-1bf7e94a7a07">
+                              <sedTermination xml:id="_4c5e3797-3da9-418e-b2a9-a9064a7a612d" name="&lt;end&gt;" pathCondition="gt(value,Z(neglit(1(#))))" verified="true">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedStatement>
                      </sedStatement>
                   </sedBranchCondition>
-                  <sedBranchCondition xml:id="_b29eb8e4-ad44-41fc-8470-494cca353326" name="Exceptional Post (magic): lt(value,Z(0(#)))" pathCondition="lt(value,Z(0(#)))">
-                     <sedStatement xml:id="_d3c09109-644b-476c-b688-bc37105a3e25" name="return -1;" pathCondition="lt(value,Z(0(#)))" lineNumber="-1" charStart="266" charEnd="276" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalBranchTest\src\UseOperationContractNormalAndExceptionalBranchTest.java">
-                        <sedMethodReturn xml:id="_963b1200-aeb2-40e8-963a-de8c6e09bf83" name="&lt;return of UseOperationContractNormalAndExceptionalBranchTest.main(value);&gt;" pathCondition="lt(value,Z(0(#)))" lineNumber="-1" charStart="88" charEnd="92" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalBranchTest\src\UseOperationContractNormalAndExceptionalBranchTest.java" methodReturnConditionRef="_b80f7122-db04-476e-b3e8-fd53025834d2">
-                           <sedTermination xml:id="_cf53d7d3-84ec-4d3d-b5a5-855cb5e8c0fd" name="&lt;end&gt;" pathCondition="lt(value,Z(0(#)))" verified="true">
+                  <sedBranchCondition xml:id="_4cc4f3e6-5114-4c50-aa6d-fb44f79b1f4f" name="Exceptional Post (magic): lt(value,Z(0(#)))" pathCondition="lt(value,Z(0(#)))">
+                     <sedStatement xml:id="_a8252a1c-e06a-4ba0-9c29-f74aa178ce85" name="return -1;" pathCondition="lt(value,Z(0(#)))" lineNumber="-1" charStart="266" charEnd="276" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalBranchTest\src\UseOperationContractNormalAndExceptionalBranchTest.java">
+                        <sedMethodReturn xml:id="_85ea093f-19f8-4c6a-a8e4-32befb7321f7" name="&lt;return of UseOperationContractNormalAndExceptionalBranchTest.main(value);&gt;" pathCondition="lt(value,Z(0(#)))" lineNumber="-1" charStart="88" charEnd="92" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNormalAndExceptionalBranchTest\src\UseOperationContractNormalAndExceptionalBranchTest.java" methodReturnConditionRef="_78f7961c-6698-41b7-bb04-1aef8dad6dbc">
+                           <sedTermination xml:id="_5e4a5b2f-d82b-457d-88e0-c9af81af434c" name="&lt;end&gt;" pathCondition="lt(value,Z(0(#)))" verified="true">
                            </sedTermination>
                         </sedMethodReturn>
                      </sedStatement>
                   </sedBranchCondition>
                </sedMethodContract>
             </sedStatement>
-            <sedMethodCallMethodReturnCondition xml:id="_6af81121-03b9-47bf-b01e-d90f26c559f0" name="gt(value,Z(neglit(1(#))))" pathCondition="true">
-               <sedChildReference nodeIdRef="_d4bc8d72-376e-406c-a92b-98ed8a9b4d81"/>
+            <sedMethodCallMethodReturnCondition xml:id="_0975a219-ab62-4f62-95cc-1bf7e94a7a07" name="gt(value,Z(neglit(1(#))))" pathCondition="true">
+               <sedChildReference nodeIdRef="_2cffca08-d2ad-4b7b-8cb7-6d650b266e55"/>
             </sedMethodCallMethodReturnCondition>
-            <sedMethodCallMethodReturnCondition xml:id="_b80f7122-db04-476e-b3e8-fd53025834d2" name="lt(value,Z(0(#)))" pathCondition="true">
-               <sedChildReference nodeIdRef="_963b1200-aeb2-40e8-963a-de8c6e09bf83"/>
+            <sedMethodCallMethodReturnCondition xml:id="_78f7961c-6698-41b7-bb04-1aef8dad6dbc" name="lt(value,Z(0(#)))" pathCondition="true">
+               <sedChildReference nodeIdRef="_85ea093f-19f8-4c6a-a8e4-32befb7321f7"/>
             </sedMethodCallMethodReturnCondition>
          </sedMethodCall>
-         <sedTerminationEntry nodeIdRef="_cf53d7d3-84ec-4d3d-b5a5-855cb5e8c0fd"/>
-         <sedTerminationEntry nodeIdRef="_80c101d6-443b-4ef3-ace8-d50240c3bea2"/>
+         <sedTerminationEntry nodeIdRef="_4c5e3797-3da9-418e-b2a9-a9064a7a612d"/>
+         <sedTerminationEntry nodeIdRef="_5e4a5b2f-d82b-457d-88e0-c9af81af434c"/>
       </sedThread>
    </sedTarget>
 </launch>

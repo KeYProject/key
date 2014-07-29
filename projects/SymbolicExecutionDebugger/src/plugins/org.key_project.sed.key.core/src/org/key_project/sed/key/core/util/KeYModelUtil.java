@@ -177,23 +177,64 @@ public final class KeYModelUtil {
       }
       else if (executionNode instanceof IExecutionTermination) {
          IExecutionTermination terminationExecutionNode = (IExecutionTermination)executionNode;
-         if (terminationExecutionNode.getTerminationKind() == TerminationKind.EXCEPTIONAL) {
-            result = new KeYExceptionalTermination(target, parent, thread, (IExecutionTermination)executionNode);
-         }
-         else if (terminationExecutionNode.getTerminationKind() == TerminationKind.NORMAL) {
-            result = new KeYTermination(target, parent, thread, (IExecutionTermination)executionNode);
-         }
-         else if (terminationExecutionNode.getTerminationKind() == TerminationKind.LOOP_BODY) {
-            result = new KeYLoopBodyTermination(target, parent, thread, (IExecutionTermination)executionNode);
-         }
-         else {
-            throw new DebugException(LogUtil.getLogger().createErrorStatus("Not supported termination kind \"" + terminationExecutionNode.getTerminationKind() + "\"."));
-         }
+         result = createTermination(target, thread, parent, terminationExecutionNode);
       }
       else {
          throw new DebugException(LogUtil.getLogger().createErrorStatus("Not supported execution node \"" + executionNode + "\"."));
       }
       return result;
+   }
+   
+   /**
+    * Creates the termination node for the given {@link IExecutionTermination}.
+    * @param target The {@link KeYDebugTarget} to use.
+    * @param thread The parent {@link KeYThread}.
+    * @param parent The parent {@link IKeYSEDDebugNode} in the debug model.
+    * @param terminationExecutionNode The {@link IExecutionTermination} of the execution tree.
+    * @return The termination node for the given {@link IExecutionTermination}.
+    * @throws DebugException Occurred Exception.
+    */
+   public static IKeYSEDDebugNode<?> createTermination(KeYDebugTarget target, 
+                                                       KeYThread thread, 
+                                                       IKeYSEDDebugNode<?> parent, 
+                                                       IExecutionTermination terminationExecutionNode) throws DebugException {
+      IKeYSEDDebugNode<?> terminationNode = target.getDebugNode(terminationExecutionNode);
+      if (terminationNode != null) {
+         // Reuse method return created by the method call and set its parent now
+         if (terminationNode.getParent() == null) {
+            if (terminationNode instanceof KeYExceptionalTermination) {
+               ((KeYExceptionalTermination)terminationNode).setParent(parent);
+            }
+            else if (terminationNode instanceof KeYTermination) {
+               ((KeYTermination)terminationNode).setParent(parent);
+            }
+            else if (terminationNode instanceof KeYLoopBodyTermination) {
+               ((KeYLoopBodyTermination)terminationNode).setParent(parent);
+            }
+            else {
+               throw new DebugException(LogUtil.getLogger().createErrorStatus("Not supported termination \"" + terminationNode + "\"."));
+            }
+         }
+         else {
+            Assert.isTrue(terminationNode.getParent() == parent);
+         }
+         return terminationNode;
+      }
+      else {
+         // Create new termination
+         if (terminationExecutionNode.getTerminationKind() == TerminationKind.EXCEPTIONAL) {
+            return new KeYExceptionalTermination(target, parent, thread, terminationExecutionNode);
+         }
+         else if (terminationExecutionNode.getTerminationKind() == TerminationKind.NORMAL) {
+            return new KeYTermination(target, parent, thread, terminationExecutionNode);
+         }
+         else if (terminationExecutionNode.getTerminationKind() == TerminationKind.LOOP_BODY) {
+            return new KeYLoopBodyTermination(target, parent, thread, terminationExecutionNode);
+         }
+         else {
+            throw new DebugException(LogUtil.getLogger().createErrorStatus("Not supported termination kind \"" + terminationExecutionNode.getTerminationKind() + "\"."));
+         }
+      }
    }
    
    /**

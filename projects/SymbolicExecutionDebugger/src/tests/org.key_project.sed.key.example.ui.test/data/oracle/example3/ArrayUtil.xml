@@ -56,10 +56,10 @@ termination: diamond" pathCondition="imp(geq(length(array),Z(0(#))),and(and(leq(
                <sedChildReference nodeIdRef="_2acf094b-821a-4afe-9586-36d532760e11"/>
             </sedMethodCallMethodReturnCondition>
          </sedMethodCall>
-         <sedTerminationEntry nodeIdRef="_0bd950a4-5001-4089-899c-e27093c23e1e"/>
-         <sedTerminationEntry nodeIdRef="_0c653fde-2a1b-47b8-9bd6-6d9917fb0419"/>
          <sedTerminationEntry nodeIdRef="_e10c6832-8baa-476e-b187-0c1abadea9f4"/>
          <sedTerminationEntry nodeIdRef="_2517562d-3f05-4609-b235-3162c4d0ed72"/>
+         <sedTerminationEntry nodeIdRef="_0bd950a4-5001-4089-899c-e27093c23e1e"/>
+         <sedTerminationEntry nodeIdRef="_0c653fde-2a1b-47b8-9bd6-6d9917fb0419"/>
       </sedThread>
    </sedTarget>
 </launch>

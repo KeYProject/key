@@ -1,67 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_3f0b28f9-8bc3-4741-a32a-e17af5d62eca" name="switchCase(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_9fe129e6-39ee-462e-ac39-20d509ae3ba4" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_7752fd4a-58ba-4a2b-a747-16bc23a145bd" name="self.switchCase(x);" pathCondition="true" lineNumber="-1" charStart="45" charEnd="55" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
-            <sedStatement xml:id="_33699fc5-664f-4205-96bd-b5b0ea48cf3f" name="int a;" pathCondition="true" lineNumber="-1" charStart="68" charEnd="74" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
-               <sedBranchStatement xml:id="_25ceeb15-e7c6-4262-8377-2f6e7cd3c316" name="switch (x)" pathCondition="true" lineNumber="-1" charStart="78" charEnd="97" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
-                  <sedBranchCondition xml:id="_6bd8c5cb-6c93-4061-a043-f5ce5d981289" name="equals(x,Z(0(#)))" pathCondition="equals(x,Z(0(#)))">
-                     <sedStatement xml:id="_c05fc2ac-26af-45e6-8d6a-042b5ddb22e8" name="a=1;" pathCondition="equals(x,Z(0(#)))" lineNumber="-1" charStart="106" charEnd="112" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
-                        <sedStatement xml:id="_b350350c-dc38-4621-8b10-691a9f4460f6" name="return a;" pathCondition="equals(x,Z(0(#)))" lineNumber="-1" charStart="284" charEnd="293" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
-                           <sedMethodReturn xml:id="_73b0701b-5994-4cd3-9ef8-582c4e458182" name="&lt;return of self.switchCase(x);&gt;" pathCondition="equals(x,Z(0(#)))" lineNumber="-1" charStart="45" charEnd="55" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java" methodReturnConditionRef="_7e81e9f8-92d4-4f8c-a29a-02f3baeb9cf4">
-                              <sedTermination xml:id="_f65b604a-2319-452e-a6ea-8b9e5f454e9e" name="&lt;end&gt;" pathCondition="equals(x,Z(0(#)))" verified="true">
+   <sedTarget xml:id="_6c912256-f7b5-4183-a497-cb1045cee3f6" name="switchCase(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_034ca94d-0236-4471-be5b-956101eb18e1" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_f4263f55-ef20-423c-bb81-514544bb2fc7" name="self.switchCase(x);" pathCondition="true" lineNumber="-1" charStart="45" charEnd="55" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
+            <sedStatement xml:id="_7d8a5144-825f-4400-b787-f37849d255f8" name="int a;" pathCondition="true" lineNumber="-1" charStart="68" charEnd="74" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
+               <sedBranchStatement xml:id="_ff3f8455-4157-4117-952d-1edc0a809e3a" name="switch (x)" pathCondition="true" lineNumber="-1" charStart="78" charEnd="97" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
+                  <sedBranchCondition xml:id="_9f3d5332-b9c8-4edd-9623-7509939feb71" name="equals(x,Z(0(#)))" pathCondition="equals(x,Z(0(#)))">
+                     <sedStatement xml:id="_1c6009df-4b97-46e2-8b27-0ee8ca52fb1c" name="a=1;" pathCondition="equals(x,Z(0(#)))" lineNumber="-1" charStart="106" charEnd="112" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
+                        <sedStatement xml:id="_1edeac28-2ab3-4677-9418-142ec4316a69" name="return a;" pathCondition="equals(x,Z(0(#)))" lineNumber="-1" charStart="284" charEnd="293" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
+                           <sedMethodReturn xml:id="_b3b6e12f-c951-491d-9a9a-791f630b3b43" name="&lt;return of self.switchCase(x);&gt;" pathCondition="equals(x,Z(0(#)))" lineNumber="-1" charStart="45" charEnd="55" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java" methodReturnConditionRef="_3fd05e4d-0eeb-4719-ad84-1e382fb15e4e">
+                              <sedTermination xml:id="_2a18d165-f178-42de-a8a7-ed1e9a5e070e" name="&lt;end&gt;" pathCondition="equals(x,Z(0(#)))" verified="true">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedStatement>
                      </sedStatement>
                   </sedBranchCondition>
-                  <sedBranchCondition xml:id="_efb66ad9-aa26-4b8a-b4d3-c1ed5d501cc3" name="equals(x,Z(1(#)))" pathCondition="equals(x,Z(1(#)))">
-                     <sedStatement xml:id="_3b96fd2f-6e88-4bd4-ab80-74f796f1d281" name="a=-1;" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="165" charEnd="172" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
-                        <sedStatement xml:id="_ffc12598-f0a5-4977-a6c5-577665b6e3c1" name="a=x*x;" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="188" charEnd="198" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
-                           <sedStatement xml:id="_2ae9c083-0e2c-4063-94ea-920d7505ff50" name="return a;" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="284" charEnd="293" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
-                              <sedMethodReturn xml:id="_0daa0afc-7939-4878-9f3f-763d29752ce1" name="&lt;return of self.switchCase(x);&gt;" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="45" charEnd="55" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java" methodReturnConditionRef="_61f86605-e260-4524-9932-16eca0521733">
-                                 <sedTermination xml:id="_9c80618f-80b0-436f-9141-c3c80ab1abff" name="&lt;end&gt;" pathCondition="equals(x,Z(1(#)))" verified="true">
+                  <sedBranchCondition xml:id="_23a3c970-03e9-4f34-9a6c-7d58fd8c9108" name="equals(x,Z(1(#)))" pathCondition="equals(x,Z(1(#)))">
+                     <sedStatement xml:id="_a1008ff5-a532-410a-aaae-58ded43b9b3a" name="a=-1;" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="165" charEnd="172" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
+                        <sedStatement xml:id="_5d00baea-33e8-4786-886f-100c04edd9fe" name="a=x*x;" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="188" charEnd="198" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
+                           <sedStatement xml:id="_560f1270-fc9f-4037-a784-27ad2f52256a" name="return a;" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="284" charEnd="293" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
+                              <sedMethodReturn xml:id="_71f3602c-f828-4e27-92cb-d12697a472d7" name="&lt;return of self.switchCase(x);&gt;" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="45" charEnd="55" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java" methodReturnConditionRef="_ddc2a677-82dc-4c86-8a73-bd5f356a7e14">
+                                 <sedTermination xml:id="_1551740c-3f12-426e-b759-2809947b319c" name="&lt;end&gt;" pathCondition="equals(x,Z(1(#)))" verified="true">
                                  </sedTermination>
                               </sedMethodReturn>
                            </sedStatement>
                         </sedStatement>
                      </sedStatement>
                   </sedBranchCondition>
-                  <sedBranchCondition xml:id="_09aa8b12-88f0-431c-a487-942b4518e906" name="equals(x,Z(2(#)))" pathCondition="equals(x,Z(2(#)))">
-                     <sedStatement xml:id="_264db90c-cac1-4df8-8c66-6907043afc5a" name="a=-1;" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="165" charEnd="172" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
-                        <sedStatement xml:id="_6cd28b13-d47e-4d79-992e-b99d196040eb" name="a=x*x;" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="188" charEnd="198" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
-                           <sedStatement xml:id="_03e02b0d-85be-48f3-9a20-7a90a704cecc" name="return a;" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="284" charEnd="293" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
-                              <sedMethodReturn xml:id="_e31ba8a7-b7e0-41ac-9f00-b29bed61cb0b" name="&lt;return of self.switchCase(x);&gt;" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="45" charEnd="55" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java" methodReturnConditionRef="_a4088583-03b0-4969-9195-ffdd95e41c65">
-                                 <sedTermination xml:id="_6a738512-45fe-484d-a1f2-0c757d6a75f1" name="&lt;end&gt;" pathCondition="equals(x,Z(2(#)))" verified="true">
+                  <sedBranchCondition xml:id="_585f810b-c477-40ef-8c3a-75f821b3bfa4" name="equals(x,Z(2(#)))" pathCondition="equals(x,Z(2(#)))">
+                     <sedStatement xml:id="_92685aa3-9852-46af-a4fc-15b5da9249e5" name="a=-1;" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="165" charEnd="172" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
+                        <sedStatement xml:id="_5f38a3f0-074a-46b1-8ba9-97955e3b596f" name="a=x*x;" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="188" charEnd="198" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
+                           <sedStatement xml:id="_29a439a0-d56d-435f-b14d-63e9fdbdfc46" name="return a;" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="284" charEnd="293" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
+                              <sedMethodReturn xml:id="_abc2c713-87c0-493f-9005-7effeb5f3d9d" name="&lt;return of self.switchCase(x);&gt;" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="45" charEnd="55" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java" methodReturnConditionRef="_0aec3a63-e6d4-44f9-8105-4afd7d309442">
+                                 <sedTermination xml:id="_8a76c173-b060-428d-a8e7-edb8fbe7de29" name="&lt;end&gt;" pathCondition="equals(x,Z(2(#)))" verified="true">
                                  </sedTermination>
                               </sedMethodReturn>
                            </sedStatement>
                         </sedStatement>
                      </sedStatement>
                   </sedBranchCondition>
-                  <sedBranchCondition xml:id="_75fdeb9e-376e-425d-bc39-9d4cadb3af12" name="equals(x,Z(3(#)))" pathCondition="equals(x,Z(3(#)))">
-                     <sedStatement xml:id="_97fc9872-dadb-4433-b764-9d1ce12347a3" name="a=x*x;" pathCondition="equals(x,Z(3(#)))" lineNumber="-1" charStart="188" charEnd="198" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
-                        <sedStatement xml:id="_dab1a318-32e8-4c6d-942c-bdce3e75fa7f" name="return a;" pathCondition="equals(x,Z(3(#)))" lineNumber="-1" charStart="284" charEnd="293" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
-                           <sedMethodReturn xml:id="_9e6002a0-6159-43ab-8f9e-588c802a4ca8" name="&lt;return of self.switchCase(x);&gt;" pathCondition="equals(x,Z(3(#)))" lineNumber="-1" charStart="45" charEnd="55" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java" methodReturnConditionRef="_03dec8c2-8a85-49b7-b99b-99985f3c8245">
-                              <sedTermination xml:id="_1c916187-946f-481f-9d60-29e3eb85a945" name="&lt;end&gt;" pathCondition="equals(x,Z(3(#)))" verified="true">
+                  <sedBranchCondition xml:id="_3bb3780b-7444-40d3-9f84-d4b5db01fb03" name="equals(x,Z(3(#)))" pathCondition="equals(x,Z(3(#)))">
+                     <sedStatement xml:id="_6cf34bf8-6c0b-4cde-9263-a10e6bed4d47" name="a=x*x;" pathCondition="equals(x,Z(3(#)))" lineNumber="-1" charStart="188" charEnd="198" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
+                        <sedStatement xml:id="_a0426f6e-7d63-4f4e-94a9-545f0a969428" name="return a;" pathCondition="equals(x,Z(3(#)))" lineNumber="-1" charStart="284" charEnd="293" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
+                           <sedMethodReturn xml:id="_06b8048c-b4a8-4fc9-8cf5-69c2ec83dba8" name="&lt;return of self.switchCase(x);&gt;" pathCondition="equals(x,Z(3(#)))" lineNumber="-1" charStart="45" charEnd="55" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java" methodReturnConditionRef="_07c148c9-5a81-435b-a635-a4f65971e851">
+                              <sedTermination xml:id="_fa483389-81fc-46ab-92e2-d7c855c58786" name="&lt;end&gt;" pathCondition="equals(x,Z(3(#)))" verified="true">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedStatement>
                      </sedStatement>
                   </sedBranchCondition>
-                  <sedBranchCondition xml:id="_c0dca141-bf76-4981-a178-c7fad0a7cec5" name="equals(x,Z(4(#)))" pathCondition="equals(x,Z(4(#)))">
-                     <sedStatement xml:id="_6949f860-d795-4ff0-9b34-f3e72b4fdd0a" name="return 42;" pathCondition="equals(x,Z(4(#)))" lineNumber="-1" charStart="242" charEnd="252" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
-                        <sedMethodReturn xml:id="_1b5286f5-0ead-42ec-b24e-9b81864504d8" name="&lt;return of self.switchCase(x);&gt;" pathCondition="equals(x,Z(4(#)))" lineNumber="-1" charStart="45" charEnd="55" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java" methodReturnConditionRef="_5b54b93b-1f5d-4ac2-8594-81edcc48d791">
-                           <sedTermination xml:id="_7527bca9-b777-43a5-82a0-c9ef9d2accb6" name="&lt;end&gt;" pathCondition="equals(x,Z(4(#)))" verified="true">
+                  <sedBranchCondition xml:id="_3f0952ec-d3ba-43f0-94b4-208420b07788" name="equals(x,Z(4(#)))" pathCondition="equals(x,Z(4(#)))">
+                     <sedStatement xml:id="_dd306413-08c1-4bbb-ae09-4de45eae821a" name="return 42;" pathCondition="equals(x,Z(4(#)))" lineNumber="-1" charStart="242" charEnd="252" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
+                        <sedMethodReturn xml:id="_cf7cfde9-be4e-4b19-a41e-014b5e24bf30" name="&lt;return of self.switchCase(x);&gt;" pathCondition="equals(x,Z(4(#)))" lineNumber="-1" charStart="45" charEnd="55" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java" methodReturnConditionRef="_6bb71653-f91f-41d2-ae34-9b2fff38ec32">
+                           <sedTermination xml:id="_a8d03f16-dc34-4184-bf88-824794b87e75" name="&lt;end&gt;" pathCondition="equals(x,Z(4(#)))" verified="true">
                            </sedTermination>
                         </sedMethodReturn>
                      </sedStatement>
                   </sedBranchCondition>
-                  <sedBranchCondition xml:id="_c0063b6f-a93b-4d7a-8dcd-460c7b4cc017" name="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))">
-                     <sedStatement xml:id="_a4820f46-cb52-4813-9d12-e85d98ac705b" name="a=x;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" lineNumber="-1" charStart="269" charEnd="275" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
-                        <sedStatement xml:id="_7583216d-30df-405d-9a3f-a6b6e4d5a191" name="return a;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" lineNumber="-1" charStart="284" charEnd="293" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
-                           <sedMethodReturn xml:id="_31b001c0-c0f5-42a3-b899-8f52a1030225" name="&lt;return of self.switchCase(x);&gt;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" lineNumber="-1" charStart="45" charEnd="55" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java" methodReturnConditionRef="_8d460671-906d-48ad-8d53-44fece11e796">
-                              <sedTermination xml:id="_ca2101ee-5b31-421a-9e9e-acb39cff6228" name="&lt;end&gt;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" verified="true">
+                  <sedBranchCondition xml:id="_82f71d2b-a322-4c32-8fed-5e8b6cd50a52" name="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))">
+                     <sedStatement xml:id="_956cec77-5acc-49cd-8b4a-34d16fb051d1" name="a=x;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" lineNumber="-1" charStart="269" charEnd="275" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
+                        <sedStatement xml:id="_be19881a-0796-4fb9-8a3e-92f4199316db" name="return a;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" lineNumber="-1" charStart="284" charEnd="293" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java">
+                           <sedMethodReturn xml:id="_48d58adc-dce3-4680-9fca-7696809ff043" name="&lt;return of self.switchCase(x);&gt;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" lineNumber="-1" charStart="45" charEnd="55" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions\src\SwitchCaseTest.java" methodReturnConditionRef="_38d0465a-380d-4f5b-8af8-b19186a34850">
+                              <sedTermination xml:id="_18904b5c-d657-4ad9-a50a-8981b7944535" name="&lt;end&gt;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" verified="true">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedStatement>
@@ -69,31 +69,31 @@
                   </sedBranchCondition>
                </sedBranchStatement>
             </sedStatement>
-            <sedMethodCallMethodReturnCondition xml:id="_7e81e9f8-92d4-4f8c-a29a-02f3baeb9cf4" name="equals(x,Z(0(#)))" pathCondition="true">
-               <sedChildReference nodeIdRef="_73b0701b-5994-4cd3-9ef8-582c4e458182"/>
+            <sedMethodCallMethodReturnCondition xml:id="_3fd05e4d-0eeb-4719-ad84-1e382fb15e4e" name="equals(x,Z(0(#)))" pathCondition="true">
+               <sedChildReference nodeIdRef="_b3b6e12f-c951-491d-9a9a-791f630b3b43"/>
             </sedMethodCallMethodReturnCondition>
-            <sedMethodCallMethodReturnCondition xml:id="_61f86605-e260-4524-9932-16eca0521733" name="equals(x,Z(1(#)))" pathCondition="true">
-               <sedChildReference nodeIdRef="_0daa0afc-7939-4878-9f3f-763d29752ce1"/>
+            <sedMethodCallMethodReturnCondition xml:id="_ddc2a677-82dc-4c86-8a73-bd5f356a7e14" name="equals(x,Z(1(#)))" pathCondition="true">
+               <sedChildReference nodeIdRef="_71f3602c-f828-4e27-92cb-d12697a472d7"/>
             </sedMethodCallMethodReturnCondition>
-            <sedMethodCallMethodReturnCondition xml:id="_a4088583-03b0-4969-9195-ffdd95e41c65" name="equals(x,Z(2(#)))" pathCondition="true">
-               <sedChildReference nodeIdRef="_e31ba8a7-b7e0-41ac-9f00-b29bed61cb0b"/>
+            <sedMethodCallMethodReturnCondition xml:id="_0aec3a63-e6d4-44f9-8105-4afd7d309442" name="equals(x,Z(2(#)))" pathCondition="true">
+               <sedChildReference nodeIdRef="_abc2c713-87c0-493f-9005-7effeb5f3d9d"/>
             </sedMethodCallMethodReturnCondition>
-            <sedMethodCallMethodReturnCondition xml:id="_03dec8c2-8a85-49b7-b99b-99985f3c8245" name="equals(x,Z(3(#)))" pathCondition="true">
-               <sedChildReference nodeIdRef="_9e6002a0-6159-43ab-8f9e-588c802a4ca8"/>
+            <sedMethodCallMethodReturnCondition xml:id="_07c148c9-5a81-435b-a635-a4f65971e851" name="equals(x,Z(3(#)))" pathCondition="true">
+               <sedChildReference nodeIdRef="_06b8048c-b4a8-4fc9-8cf5-69c2ec83dba8"/>
             </sedMethodCallMethodReturnCondition>
-            <sedMethodCallMethodReturnCondition xml:id="_5b54b93b-1f5d-4ac2-8594-81edcc48d791" name="equals(x,Z(4(#)))" pathCondition="true">
-               <sedChildReference nodeIdRef="_1b5286f5-0ead-42ec-b24e-9b81864504d8"/>
+            <sedMethodCallMethodReturnCondition xml:id="_6bb71653-f91f-41d2-ae34-9b2fff38ec32" name="equals(x,Z(4(#)))" pathCondition="true">
+               <sedChildReference nodeIdRef="_cf7cfde9-be4e-4b19-a41e-014b5e24bf30"/>
             </sedMethodCallMethodReturnCondition>
-            <sedMethodCallMethodReturnCondition xml:id="_8d460671-906d-48ad-8d53-44fece11e796" name="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" pathCondition="true">
-               <sedChildReference nodeIdRef="_31b001c0-c0f5-42a3-b899-8f52a1030225"/>
+            <sedMethodCallMethodReturnCondition xml:id="_38d0465a-380d-4f5b-8af8-b19186a34850" name="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" pathCondition="true">
+               <sedChildReference nodeIdRef="_48d58adc-dce3-4680-9fca-7696809ff043"/>
             </sedMethodCallMethodReturnCondition>
          </sedMethodCall>
-         <sedTerminationEntry nodeIdRef="_7527bca9-b777-43a5-82a0-c9ef9d2accb6"/>
-         <sedTerminationEntry nodeIdRef="_f65b604a-2319-452e-a6ea-8b9e5f454e9e"/>
-         <sedTerminationEntry nodeIdRef="_1c916187-946f-481f-9d60-29e3eb85a945"/>
-         <sedTerminationEntry nodeIdRef="_ca2101ee-5b31-421a-9e9e-acb39cff6228"/>
-         <sedTerminationEntry nodeIdRef="_9c80618f-80b0-436f-9141-c3c80ab1abff"/>
-         <sedTerminationEntry nodeIdRef="_6a738512-45fe-484d-a1f2-0c757d6a75f1"/>
+         <sedTerminationEntry nodeIdRef="_2a18d165-f178-42de-a8a7-ed1e9a5e070e"/>
+         <sedTerminationEntry nodeIdRef="_1551740c-3f12-426e-b759-2809947b319c"/>
+         <sedTerminationEntry nodeIdRef="_8a76c173-b060-428d-a8e7-edb8fbe7de29"/>
+         <sedTerminationEntry nodeIdRef="_fa483389-81fc-46ab-92e2-d7c855c58786"/>
+         <sedTerminationEntry nodeIdRef="_a8d03f16-dc34-4184-bf88-824794b87e75"/>
+         <sedTerminationEntry nodeIdRef="_18904b5c-d657-4ad9-a50a-8981b7944535"/>
       </sedThread>
    </sedTarget>
 </launch>

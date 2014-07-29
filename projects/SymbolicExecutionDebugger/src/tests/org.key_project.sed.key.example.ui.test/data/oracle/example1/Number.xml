@@ -34,9 +34,9 @@
                <sedChildReference nodeIdRef="_749f2f28-ada1-4fd3-bf87-92cf752cf36e"/>
             </sedMethodCallMethodReturnCondition>
          </sedMethodCall>
-         <sedTerminationEntry nodeIdRef="_7ba9252e-1583-44ca-91ec-a2af89849d28"/>
          <sedTerminationEntry nodeIdRef="_4c3b3800-9aac-43f8-adf1-0b9571580633"/>
          <sedTerminationEntry nodeIdRef="_2bc95c7c-b3da-490c-95be-bf2b476b3f65"/>
+         <sedTerminationEntry nodeIdRef="_7ba9252e-1583-44ca-91ec-a2af89849d28"/>
       </sedThread>
    </sedTarget>
 </launch>

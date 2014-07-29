@@ -133,12 +133,26 @@ public class ExecutionNodeReader {
                for (String path : entry.getValue()) {
                   IExecutionNode returnEntry = findNode(root, path);
                   if (returnEntry == null) {
-                     throw new SAXException("Can't find call stack entry \"" + path + "\" in parsed symbolic execution tree.");
+                     throw new SAXException("Can't find method return entry \"" + path + "\" in parsed symbolic execution tree.");
                   }
                   if (!(returnEntry instanceof IExecutionMethodReturn)) {
                      throw new SAXException("Expected method return on \"" + path + "\" but is " + returnEntry.getElementType() + ".");
                   }
                   entry.getKey().addMethodReturn((IExecutionMethodReturn)returnEntry);
+               }
+            }
+            // Construct terminations
+            Set<Entry<KeYlessStart, List<String>>> terminationEntries = handler.getTerminationPathEntries().entrySet();
+            for (Entry<KeYlessStart, List<String>> entry : terminationEntries) {
+               for (String path : entry.getValue()) {
+                  IExecutionNode terminationEntry = findNode(root, path);
+                  if (terminationEntry == null) {
+                     throw new SAXException("Can't find termination entry \"" + path + "\" in parsed symbolic execution tree.");
+                  }
+                  if (!(terminationEntry instanceof IExecutionTermination)) {
+                     throw new SAXException("Expected termination on \"" + path + "\" but is " + terminationEntry.getElementType() + ".");
+                  }
+                  entry.getKey().addTermination((IExecutionTermination)terminationEntry);
                }
             }
             // Return result
@@ -210,12 +224,17 @@ public class ExecutionNodeReader {
       /**
        * Maps an {@link AbstractKeYlessExecutionNode} to the path entries of its call stack.
        */
-      private final Map<AbstractKeYlessExecutionNode, List<String>> callStackPathEntries = new LinkedHashMap<ExecutionNodeReader.AbstractKeYlessExecutionNode, List<String>>();
+      private final Map<AbstractKeYlessExecutionNode, List<String>> callStackPathEntries = new LinkedHashMap<AbstractKeYlessExecutionNode, List<String>>();
       
       /**
        * Maps an {@link KeYlessMethodCall} to the path entries of its method returns.
        */
-      private final Map<KeYlessMethodCall, List<String>> methodReturnPathEntries = new LinkedHashMap<ExecutionNodeReader.KeYlessMethodCall, List<String>>();
+      private final Map<KeYlessMethodCall, List<String>> methodReturnPathEntries = new LinkedHashMap<KeYlessMethodCall, List<String>>();
+      
+      /**
+       * Maps an {@link KeYlessStart} to the path entries of its terminations.
+       */
+      private final Map<KeYlessStart, List<String>> terminationPathEntries = new LinkedHashMap<KeYlessStart, List<String>>();
       
       /**
        * {@inheritDoc}
@@ -264,6 +283,14 @@ public class ExecutionNodeReader {
             }
             methodReturnEntries.add(0, getPathInTree(attributes));
          }
+         else if (isTerminationEntry(uri, localName, qName)) {
+            List<String> terminationEntries = terminationPathEntries.get(parent);
+            if (terminationEntries == null) {
+               terminationEntries = new LinkedList<String>();
+               terminationPathEntries.put((KeYlessStart)parent, terminationEntries);
+            }
+            terminationEntries.add(0, getPathInTree(attributes));
+         }
          else if (isMethodReturnValue(uri, localName, qName)) {
             Object parentValue = parentNodeStack.peekFirst();
             if (!(parentValue instanceof KeYlessMethodReturn)) {
@@ -301,6 +328,9 @@ public class ExecutionNodeReader {
          else if (isMethodReturnEntry(uri, localName, qName)) {
             // Nothing to do.
          }
+         else if (isTerminationEntry(uri, localName, qName)) {
+            // Nothing to do.
+         }
          else if (isMethodReturnValue(uri, localName, qName)) {
             // Nothing to do.
          }
@@ -332,6 +362,14 @@ public class ExecutionNodeReader {
       public Map<KeYlessMethodCall, List<String>> getMethodReturnPathEntries() {
          return methodReturnPathEntries;
       }
+
+      /**
+       * Returns the mapping of a {@link KeYlessStart} to its termination entries.
+       * @return The mapping of a {@link KeYlessStart} to its termination entries.
+       */
+      public Map<KeYlessStart, List<String>> getTerminationPathEntries() {
+         return terminationPathEntries;
+      }
    }
    
    /**
@@ -352,7 +390,7 @@ public class ExecutionNodeReader {
     * @param qName The qName.
     * @return {@code true} represents an {@link IExecutionMethodReturnValue}, {@code false} is something else.
     */
-   public boolean isMethodReturnValue(String uri, String localName, String qName) {
+   protected boolean isMethodReturnValue(String uri, String localName, String qName) {
       return ExecutionNodeWriter.TAG_METHOD_RETURN_VALUE.equals(qName);
    }
 
@@ -387,6 +425,17 @@ public class ExecutionNodeReader {
     */
    protected boolean isMethodReturnEntry(String uri, String localName, String qName) {
       return ExecutionNodeWriter.TAG_METHOD_RETURN_ENTRY.equals(qName);
+   }
+
+   /**
+    * Checks if the currently parsed tag represents an entry of {@link IExecutionStart#getTerminations()}.
+    * @param uri The URI.
+    * @param localName THe local name.
+    * @param qName The qName.
+    * @return {@code true} represents termination entry, {@code false} is something else.
+    */
+   protected boolean isTerminationEntry(String uri, String localName, String qName) {
+      return ExecutionNodeWriter.TAG_TERMINATION_ENTRY.equals(qName);
    }
 
    /**
@@ -1080,6 +1129,11 @@ public class ExecutionNodeReader {
     */
    public static class KeYlessStart extends AbstractKeYlessExecutionNode implements IExecutionStart {
       /**
+       * The up to now discovered {@link IExecutionTermination}s.
+       */
+      private ImmutableList<IExecutionTermination> terminations = ImmutableSLList.nil();
+      
+      /**
        * Constructor.
        * @param name The name of this node.
        * @param formatedPathCondition The formated path condition.
@@ -1097,6 +1151,24 @@ public class ExecutionNodeReader {
       @Override
       public String getElementType() {
          return "Start";
+      }
+      
+      /**
+       * Adds the given {@link IExecutionTermination}.
+       * @param termination The {@link IExecutionTermination} to add.
+       */
+      public void addTermination(IExecutionTermination termination) {
+         if (termination != null) {
+            terminations = terminations.prepend(termination);
+         }
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ImmutableList<IExecutionTermination> getTerminations() {
+         return terminations;
       }
    }
    
