@@ -69,6 +69,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     public void setVariant(PositionedString ps) {
         assert variant == null;
         variant = ps;
+        setPosition(ps);
     }
 
     public ImmutableList<PositionedString> getInvariant(String hName) {

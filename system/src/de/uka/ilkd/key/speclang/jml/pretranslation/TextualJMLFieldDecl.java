@@ -28,6 +28,7 @@ public final class TextualJMLFieldDecl extends TextualJMLConstruct {
         super(mods);
         assert decl != null;
         this.decl = decl;
+        setPosition(decl);
     }
     
     
