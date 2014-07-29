@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_19e3630d-e3dc-49bd-817f-208c7ee1b50c" name="main(boolean, boolean)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_7cb8385a-0ebe-43c6-bb36-4964e1be7bd1" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_91ecca09-303a-4a0d-a7ef-1f607fc493df" name="self.main(a,b);" pathCondition="true" lineNumber="-1" charStart="55" charEnd="59" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables\src\ElseIfDifferentVariables.java">
-            <sedBranchStatement xml:id="_b7bef29a-55d8-42d1-9467-ba66c5621a0d" name="if (a)" pathCondition="true" lineNumber="-1" charStart="87" charEnd="94" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables\src\ElseIfDifferentVariables.java">
-               <sedBranchCondition xml:id="_585c9b49-bc68-4bee-b9d2-fe5ac852ed1a" name="equals(a,TRUE)" pathCondition="equals(a,TRUE)">
-                  <sedStatement xml:id="_36191d28-b999-4c82-9787-234a927714f5" name="return 1;" pathCondition="equals(a,TRUE)" lineNumber="-1" charStart="100" charEnd="109" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables\src\ElseIfDifferentVariables.java">
-                     <sedMethodReturn xml:id="_8212b775-703a-4977-9ab5-75fbbcbbc4cc" name="&lt;return Z(1(#)) as result of self.main(a,b);&gt;" pathCondition="equals(a,TRUE)" lineNumber="-1" charStart="55" charEnd="59" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables\src\ElseIfDifferentVariables.java" methodReturnConditionRef="_78d08fe1-30a0-472d-add7-fafc02581c45">
-                        <sedTermination xml:id="_6db1364e-4e41-4141-9532-639c12c01651" name="&lt;end&gt;" pathCondition="equals(a,TRUE)" verified="true">
+   <sedTarget xml:id="_0927bad5-b4fa-4ca2-bfbe-dc842ad34773" name="main(boolean, boolean)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_372d2f0f-913e-402b-8b5c-86c9aa5b2ee5" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_85b93eca-6b77-4d50-8456-502758652446" name="self.main(a,b);" pathCondition="true" lineNumber="-1" charStart="55" charEnd="59" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables\src\ElseIfDifferentVariables.java">
+            <sedBranchStatement xml:id="_07d6d91e-12ee-45a3-bcbf-bc1426e88e68" name="if (a)" pathCondition="true" lineNumber="-1" charStart="87" charEnd="94" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables\src\ElseIfDifferentVariables.java">
+               <sedBranchCondition xml:id="_ec7ba0e6-0d96-43db-8622-d751242145bb" name="equals(a,TRUE)" pathCondition="equals(a,TRUE)">
+                  <sedStatement xml:id="_fd44145b-2007-418a-a602-83e59916e693" name="return 1;" pathCondition="equals(a,TRUE)" lineNumber="-1" charStart="100" charEnd="109" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables\src\ElseIfDifferentVariables.java">
+                     <sedMethodReturn xml:id="_1a3238e8-55f2-4eaa-bf70-65847c23ef4d" name="&lt;return Z(1(#)) as result of self.main(a,b);&gt;" pathCondition="equals(a,TRUE)" lineNumber="-1" charStart="55" charEnd="59" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables\src\ElseIfDifferentVariables.java" methodReturnConditionRef="_61168401-c7b4-4ca0-a2a3-4c22f3df28ab">
+                        <sedTermination xml:id="_7ff2f1d0-10b6-4211-81d8-f641fd207af8" name="&lt;end&gt;" pathCondition="equals(a,TRUE)" verified="true">
                         </sedTermination>
                      </sedMethodReturn>
                   </sedStatement>
                </sedBranchCondition>
-               <sedBranchCondition xml:id="_d55979de-3e8f-40bf-a2dd-86f8207c0b8f" name="not(equals(a,TRUE))" pathCondition="not(equals(a,TRUE))">
-                  <sedBranchStatement xml:id="_babae96b-ab77-404b-b135-b62a1cca0219" name="if (b)" pathCondition="not(equals(a,TRUE))" lineNumber="-1" charStart="87" charEnd="94" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables\src\ElseIfDifferentVariables.java">
-                     <sedBranchCondition xml:id="_8df725a0-6f9b-4b95-a911-a027b8aee0ad" name="equals(b,TRUE)" pathCondition="and(not(equals(a,TRUE)),equals(b,TRUE))">
-                        <sedStatement xml:id="_d3dca757-d13c-4e5d-b3ce-0e63a2003672" name="return 2;" pathCondition="and(not(equals(a,TRUE)),equals(b,TRUE))" lineNumber="-1" charStart="136" charEnd="145" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables\src\ElseIfDifferentVariables.java">
-                           <sedMethodReturn xml:id="_f9a8ef33-4044-4d21-b787-8e0e05050a86" name="&lt;return Z(2(#)) as result of self.main(a,b);&gt;" pathCondition="and(not(equals(a,TRUE)),equals(b,TRUE))" lineNumber="-1" charStart="55" charEnd="59" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables\src\ElseIfDifferentVariables.java" methodReturnConditionRef="_0e9b7f76-b758-49c8-ae05-e7ac848e630b">
-                              <sedTermination xml:id="_7fcfa135-457f-4df2-b173-0518ca94a0d0" name="&lt;end&gt;" pathCondition="and(not(equals(a,TRUE)),equals(b,TRUE))" verified="true">
+               <sedBranchCondition xml:id="_1a56aec1-d14f-4f54-944f-3a988c56e702" name="not(equals(a,TRUE))" pathCondition="not(equals(a,TRUE))">
+                  <sedBranchStatement xml:id="_6bd1ae0f-1f5f-4422-b5f6-39dae4ccb59d" name="if (b)" pathCondition="not(equals(a,TRUE))" lineNumber="-1" charStart="87" charEnd="94" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables\src\ElseIfDifferentVariables.java">
+                     <sedBranchCondition xml:id="_4bdf3dab-2db2-4e55-a48a-44522e4e47d2" name="equals(b,TRUE)" pathCondition="and(not(equals(a,TRUE)),equals(b,TRUE))">
+                        <sedStatement xml:id="_f5f543c4-7f78-46ef-9c6b-e79f0612ce1f" name="return 2;" pathCondition="and(not(equals(a,TRUE)),equals(b,TRUE))" lineNumber="-1" charStart="136" charEnd="145" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables\src\ElseIfDifferentVariables.java">
+                           <sedMethodReturn xml:id="_dadc60c0-c08b-4ee4-b936-9535f85d0ed3" name="&lt;return Z(2(#)) as result of self.main(a,b);&gt;" pathCondition="and(not(equals(a,TRUE)),equals(b,TRUE))" lineNumber="-1" charStart="55" charEnd="59" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables\src\ElseIfDifferentVariables.java" methodReturnConditionRef="_ae452f6a-ed7d-4d7a-bffa-b5e6c07debb9">
+                              <sedTermination xml:id="_969a2c1c-ddcd-41da-8c39-49b126633df2" name="&lt;end&gt;" pathCondition="and(not(equals(a,TRUE)),equals(b,TRUE))" verified="true">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedStatement>
                      </sedBranchCondition>
-                     <sedBranchCondition xml:id="_666040eb-47df-4a58-88de-3c78150cac2a" name="not(equals(b,TRUE))" pathCondition="and(not(equals(a,TRUE)),not(equals(b,TRUE)))">
-                        <sedStatement xml:id="_18643513-d962-433a-b6d9-a83e01a29c33" name="return 3;" pathCondition="and(not(equals(a,TRUE)),not(equals(b,TRUE)))" lineNumber="-1" charStart="165" charEnd="174" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables\src\ElseIfDifferentVariables.java">
-                           <sedMethodReturn xml:id="_9dd5b427-f364-45d3-bba1-81e4fc476e67" name="&lt;return Z(3(#)) as result of self.main(a,b);&gt;" pathCondition="and(not(equals(a,TRUE)),not(equals(b,TRUE)))" lineNumber="-1" charStart="55" charEnd="59" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables\src\ElseIfDifferentVariables.java" methodReturnConditionRef="_23880bea-4f8d-4eac-9b5e-f676662c005e">
-                              <sedTermination xml:id="_fe2c1c46-e494-4e5f-9f49-8f4a5d30f595" name="&lt;end&gt;" pathCondition="and(not(equals(a,TRUE)),not(equals(b,TRUE)))" verified="true">
+                     <sedBranchCondition xml:id="_819df06f-faa1-4250-bf5d-e0df8c74a0de" name="not(equals(b,TRUE))" pathCondition="and(not(equals(a,TRUE)),not(equals(b,TRUE)))">
+                        <sedStatement xml:id="_1fb17455-354b-486b-83bf-8b014d36b2dd" name="return 3;" pathCondition="and(not(equals(a,TRUE)),not(equals(b,TRUE)))" lineNumber="-1" charStart="165" charEnd="174" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables\src\ElseIfDifferentVariables.java">
+                           <sedMethodReturn xml:id="_dd63c570-c902-4803-8c13-e9987f20d0f0" name="&lt;return Z(3(#)) as result of self.main(a,b);&gt;" pathCondition="and(not(equals(a,TRUE)),not(equals(b,TRUE)))" lineNumber="-1" charStart="55" charEnd="59" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables\src\ElseIfDifferentVariables.java" methodReturnConditionRef="_b145c517-b2e6-48bb-9121-2c30bcb5b84c">
+                              <sedTermination xml:id="_9fb6fe88-429a-4250-a66a-f890eadf5bf3" name="&lt;end&gt;" pathCondition="and(not(equals(a,TRUE)),not(equals(b,TRUE)))" verified="true">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedStatement>
@@ -33,19 +33,19 @@
                   </sedBranchStatement>
                </sedBranchCondition>
             </sedBranchStatement>
-            <sedMethodCallMethodReturnCondition xml:id="_23880bea-4f8d-4eac-9b5e-f676662c005e" name="and(not(equals(a,TRUE)),not(equals(b,TRUE)))" pathCondition="true">
-               <sedChildReference nodeIdRef="_9dd5b427-f364-45d3-bba1-81e4fc476e67"/>
+            <sedMethodCallMethodReturnCondition xml:id="_61168401-c7b4-4ca0-a2a3-4c22f3df28ab" name="equals(a,TRUE)" pathCondition="true">
+               <sedChildReference nodeIdRef="_1a3238e8-55f2-4eaa-bf70-65847c23ef4d"/>
             </sedMethodCallMethodReturnCondition>
-            <sedMethodCallMethodReturnCondition xml:id="_0e9b7f76-b758-49c8-ae05-e7ac848e630b" name="and(not(equals(a,TRUE)),equals(b,TRUE))" pathCondition="true">
-               <sedChildReference nodeIdRef="_f9a8ef33-4044-4d21-b787-8e0e05050a86"/>
+            <sedMethodCallMethodReturnCondition xml:id="_ae452f6a-ed7d-4d7a-bffa-b5e6c07debb9" name="and(not(equals(a,TRUE)),equals(b,TRUE))" pathCondition="true">
+               <sedChildReference nodeIdRef="_dadc60c0-c08b-4ee4-b936-9535f85d0ed3"/>
             </sedMethodCallMethodReturnCondition>
-            <sedMethodCallMethodReturnCondition xml:id="_78d08fe1-30a0-472d-add7-fafc02581c45" name="equals(a,TRUE)" pathCondition="true">
-               <sedChildReference nodeIdRef="_8212b775-703a-4977-9ab5-75fbbcbbc4cc"/>
+            <sedMethodCallMethodReturnCondition xml:id="_b145c517-b2e6-48bb-9121-2c30bcb5b84c" name="and(not(equals(a,TRUE)),not(equals(b,TRUE)))" pathCondition="true">
+               <sedChildReference nodeIdRef="_dd63c570-c902-4803-8c13-e9987f20d0f0"/>
             </sedMethodCallMethodReturnCondition>
          </sedMethodCall>
-         <sedTerminationEntry nodeIdRef="_6db1364e-4e41-4141-9532-639c12c01651"/>
-         <sedTerminationEntry nodeIdRef="_7fcfa135-457f-4df2-b173-0518ca94a0d0"/>
-         <sedTerminationEntry nodeIdRef="_fe2c1c46-e494-4e5f-9f49-8f4a5d30f595"/>
+         <sedTerminationEntry nodeIdRef="_7ff2f1d0-10b6-4211-81d8-f641fd207af8"/>
+         <sedTerminationEntry nodeIdRef="_969a2c1c-ddcd-41da-8c39-49b126633df2"/>
+         <sedTerminationEntry nodeIdRef="_9fb6fe88-429a-4250-a66a-f890eadf5bf3"/>
       </sedThread>
    </sedTarget>
 </launch>

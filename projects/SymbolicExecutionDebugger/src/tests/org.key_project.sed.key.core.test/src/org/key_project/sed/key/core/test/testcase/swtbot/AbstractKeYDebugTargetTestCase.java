@@ -862,7 +862,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                assertFalse(target.isTerminated());
                assertFalse(target.canResume());
                // Test the execution tree
-               TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
+               TestSEDKeyCoreUtil.assertDisposedInitialTarget(target, targetName);
             }
             else {
                if (!stepIntoInsteadOfRun) {
