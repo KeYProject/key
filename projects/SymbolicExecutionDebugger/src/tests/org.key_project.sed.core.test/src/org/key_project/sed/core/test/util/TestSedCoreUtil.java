@@ -902,7 +902,7 @@ public final class TestSedCoreUtil {
          }
          else if (expectedNext instanceof ISEDThread) {
             TestCase.assertTrue("Expected ISEDThread on " + ((ISEDThread)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDThread);
-            compareThread((ISEDThread)expectedNext, (ISEDThread)currentNext, true, compareId);
+            compareThread((ISEDThread)expectedNext, (ISEDThread)currentNext, true, compareId, compareVariables, compareCallStack);
          }
          else if (expectedNext instanceof ISEDMethodContract) {
             TestCase.assertTrue("Expected ISEDMethodContract on " + ((ISEDMethodContract)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDMethodContract);
@@ -1102,6 +1102,26 @@ public final class TestSedCoreUtil {
     */
    protected static void compareCallStack(ISEDDebugNode[] expectedEntries, 
                                           ISEDDebugNode[] currentEntries) throws DebugException {
+      if (expectedEntries != null) {
+         TestCase.assertNotNull(currentEntries);
+         TestCase.assertEquals(expectedEntries.length, currentEntries.length);
+         for (int i = 0; i < expectedEntries.length; i++) {
+            compareNode(expectedEntries[i], currentEntries[i], false, false, false, false);
+         }
+      }
+      else {
+         TestCase.assertTrue(ArrayUtil.isEmpty(currentEntries));
+      }
+   }
+   
+   /**
+    * Compares the given termination entries.
+    * @param expected The expected {@link ISEDTermination}s.
+    * @param current The current {@link ISEDTermination}s.
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void compareTerminations(ISEDTermination[] expectedEntries, 
+                                             ISEDTermination[] currentEntries) throws DebugException {
       if (expectedEntries != null) {
          TestCase.assertNotNull(currentEntries);
          TestCase.assertEquals(expectedEntries.length, currentEntries.length);
@@ -1326,6 +1346,7 @@ public final class TestSedCoreUtil {
                                        boolean compareCallStack) throws DebugException {
       compareThread((IThread)expected, (IThread)current, compareReferences, compareVariables);
       compareNode(expected, current, compareReferences, compareId, compareVariables, compareCallStack);
+      compareTerminations(expected.getTerminations(), current.getTerminations());
    }
 
    /**

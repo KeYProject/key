@@ -15,6 +15,7 @@ package org.key_project.sed.key.core.model;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
+import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
 import org.key_project.sed.core.model.impl.AbstractSEDExceptionalTermination;
 import org.key_project.sed.key.core.util.KeYModelUtil;
@@ -60,6 +61,7 @@ public class KeYExceptionalTermination extends AbstractSEDExceptionalTermination
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
       target.registerDebugNode(this);
+      thread.addTermination(this);
       initializeAnnotations();
    }
 
@@ -85,6 +87,14 @@ public class KeYExceptionalTermination extends AbstractSEDExceptionalTermination
    @Override
    public IKeYSEDDebugNode<?> getParent() throws DebugException {
       return (IKeYSEDDebugNode<?>)super.getParent();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setParent(ISEDDebugNode parent) {
+      super.setParent(parent);
    }
 
    /**

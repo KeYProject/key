@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_bfb32dbe-6689-411b-994d-2c6e30676313" name="min(int, int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_faa07741-da64-4fef-a408-92c3ead86c74" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_e5dbe22d-05e0-4178-80d3-b17f12815a31" name="self.min(i,j);" pathCondition="true" lineNumber="-1" charStart="413" charEnd="416" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes\src\SimpleIf.java">
-            <sedStatement xml:id="_9aa99a4e-8adc-43f1-b9f4-379cb38b1b76" name="int result;" pathCondition="true" lineNumber="-1" charStart="436" charEnd="447" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes\src\SimpleIf.java">
-               <sedBranchStatement xml:id="_ce77a9d8-4328-4b62-9b42-833d52929dd5" name="if (i&lt;j)" pathCondition="true" lineNumber="-1" charStart="451" charEnd="462" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes\src\SimpleIf.java">
-                  <sedBranchCondition xml:id="_c55b3e18-41da-4aae-af18-bdf38600235a" name="gt(j,i)" pathCondition="gt(j,i)">
-                     <sedStatement xml:id="_76573400-cee3-45e4-9f98-6aaa3a5d653f" name="result_1=i;" pathCondition="gt(j,i)" lineNumber="-1" charStart="468" charEnd="479" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes\src\SimpleIf.java">
-                        <sedStatement xml:id="_db292257-0f1c-47ca-b963-a2ea6dcc5cb5" name="return result_1;" pathCondition="gt(j,i)" lineNumber="-1" charStart="519" charEnd="533" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes\src\SimpleIf.java">
-                           <sedMethodReturn xml:id="_35da320a-49ff-450c-9c9f-9d723870a47b" name="&lt;return of min&gt;" pathCondition="gt(j,i)" lineNumber="-1" charStart="413" charEnd="416" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes\src\SimpleIf.java" methodReturnConditionRef="_e126182f-9553-4d0a-815d-8cc31f76b856">
-                              <sedTermination xml:id="_fb4e0678-9788-42c1-8c7c-b66bf6d595e2" name="&lt;end&gt;" pathCondition="gt(j,i)" verified="true">
+   <sedTarget xml:id="_7441b2be-ac43-4a0c-a965-4d3ea3a81c26" name="min(int, int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_e806c933-6c7f-4d4c-8e4b-33f1d8ffc753" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_0147cd91-185f-47ed-bcdf-61e36f828126" name="self.min(i,j);" pathCondition="true" lineNumber="-1" charStart="413" charEnd="416" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes\src\SimpleIf.java">
+            <sedStatement xml:id="_e6b85d1a-6961-441c-84a6-1f779d551906" name="int result;" pathCondition="true" lineNumber="-1" charStart="436" charEnd="447" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes\src\SimpleIf.java">
+               <sedBranchStatement xml:id="_8d8c44a7-8749-45a9-ba9a-62b4ef5ba121" name="if (i&lt;j)" pathCondition="true" lineNumber="-1" charStart="451" charEnd="462" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes\src\SimpleIf.java">
+                  <sedBranchCondition xml:id="_f81cb455-fb44-40be-acd1-9644fa01510b" name="gt(j,i)" pathCondition="gt(j,i)">
+                     <sedStatement xml:id="_0c25a15f-b27e-4a9e-bb2c-4846e1125bcb" name="result_1=i;" pathCondition="gt(j,i)" lineNumber="-1" charStart="468" charEnd="479" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes\src\SimpleIf.java">
+                        <sedStatement xml:id="_3977180e-cc78-4865-8d42-add919e473cf" name="return result_1;" pathCondition="gt(j,i)" lineNumber="-1" charStart="519" charEnd="533" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes\src\SimpleIf.java">
+                           <sedMethodReturn xml:id="_ed2e92b6-1a26-41fd-947f-32c6ae797305" name="&lt;return of min&gt;" pathCondition="gt(j,i)" lineNumber="-1" charStart="413" charEnd="416" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes\src\SimpleIf.java" methodReturnConditionRef="_d1bece73-f689-4f4a-8450-7da5df6e89c4">
+                              <sedTermination xml:id="_52b7f269-f93d-48de-8cb8-917f30fda4fe" name="&lt;end&gt;" pathCondition="gt(j,i)" verified="true">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedStatement>
                      </sedStatement>
                   </sedBranchCondition>
-                  <sedBranchCondition xml:id="_1f27552e-1725-4ed6-8de2-19d87ddd0d7f" name="leq(j,i)" pathCondition="leq(j,i)">
-                     <sedStatement xml:id="_83b37e80-d404-4f75-9b57-76b9a1198da1" name="result_1=j;" pathCondition="leq(j,i)" lineNumber="-1" charStart="499" charEnd="510" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes\src\SimpleIf.java">
-                        <sedStatement xml:id="_36daf1a6-6f0b-48e0-bd09-378d129ca6ae" name="return result_1;" pathCondition="leq(j,i)" lineNumber="-1" charStart="519" charEnd="533" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes\src\SimpleIf.java">
-                           <sedMethodReturn xml:id="_35f8e38b-7f0e-4e46-b447-eccc43581422" name="&lt;return of min&gt;" pathCondition="leq(j,i)" lineNumber="-1" charStart="413" charEnd="416" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes\src\SimpleIf.java" methodReturnConditionRef="_b8ad5454-be63-47e5-a1b8-c803d596dcd7">
-                              <sedTermination xml:id="_81e3fb4e-18d5-4948-a19b-fb3df4868ab8" name="&lt;end&gt;" pathCondition="leq(j,i)" verified="true">
+                  <sedBranchCondition xml:id="_24c91fc2-be6e-41d8-872b-e471d805b016" name="leq(j,i)" pathCondition="leq(j,i)">
+                     <sedStatement xml:id="_e8c455f3-bb23-45fe-b0fd-6a1ce1575f00" name="result_1=j;" pathCondition="leq(j,i)" lineNumber="-1" charStart="499" charEnd="510" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes\src\SimpleIf.java">
+                        <sedStatement xml:id="_66c31c5e-b587-4a70-89a4-396b20e7e679" name="return result_1;" pathCondition="leq(j,i)" lineNumber="-1" charStart="519" charEnd="533" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes\src\SimpleIf.java">
+                           <sedMethodReturn xml:id="_18b522dd-9728-4d9a-90cb-1db9560bd9d9" name="&lt;return of min&gt;" pathCondition="leq(j,i)" lineNumber="-1" charStart="413" charEnd="416" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes\src\SimpleIf.java" methodReturnConditionRef="_4f1e014c-9ed5-492d-9540-1bc818a2c785">
+                              <sedTermination xml:id="_0b708adc-84f4-448a-8c50-3dd5fc562dc4" name="&lt;end&gt;" pathCondition="leq(j,i)" verified="true">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedStatement>
@@ -27,13 +27,15 @@
                   </sedBranchCondition>
                </sedBranchStatement>
             </sedStatement>
-            <sedMethodCallMethodReturnCondition xml:id="_b8ad5454-be63-47e5-a1b8-c803d596dcd7" name="leq(j,i)" pathCondition="true">
-               <sedChildReference nodeIdRef="_35f8e38b-7f0e-4e46-b447-eccc43581422"/>
+            <sedMethodCallMethodReturnCondition xml:id="_d1bece73-f689-4f4a-8450-7da5df6e89c4" name="gt(j,i)" pathCondition="true">
+               <sedChildReference nodeIdRef="_ed2e92b6-1a26-41fd-947f-32c6ae797305"/>
             </sedMethodCallMethodReturnCondition>
-            <sedMethodCallMethodReturnCondition xml:id="_e126182f-9553-4d0a-815d-8cc31f76b856" name="gt(j,i)" pathCondition="true">
-               <sedChildReference nodeIdRef="_35da320a-49ff-450c-9c9f-9d723870a47b"/>
+            <sedMethodCallMethodReturnCondition xml:id="_4f1e014c-9ed5-492d-9540-1bc818a2c785" name="leq(j,i)" pathCondition="true">
+               <sedChildReference nodeIdRef="_18b522dd-9728-4d9a-90cb-1db9560bd9d9"/>
             </sedMethodCallMethodReturnCondition>
          </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_52b7f269-f93d-48de-8cb8-917f30fda4fe"/>
+         <sedTerminationEntry nodeIdRef="_0b708adc-84f4-448a-8c50-3dd5fc562dc4"/>
       </sedThread>
    </sedTarget>
 </launch>

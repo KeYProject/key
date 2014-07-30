@@ -32,7 +32,6 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -136,26 +135,19 @@ public class ExecutionOperationContract extends AbstractExecutionStateNode<Sourc
          }
          ImmutableList<Term> contractParams = UseOperationContractRule.computeParams(baseHeapTerm, atPres, baseHeap, inst, services.getTermFactory());
          // Compute contract text
-         synchronized (NotationInfo.class) {
-            boolean originalPrettySyntax = NotationInfo.PRETTY_SYNTAX;
-            try {
-               NotationInfo.PRETTY_SYNTAX = true;
-               return FunctionalOperationContractImpl.getText(contract, 
-                                                              contractParams, 
-                                                              resultTerm, 
-                                                              contractSelf, 
-                                                              search.getExceptionEquality().sub(0), 
-                                                              baseHeap, 
-                                                              baseHeapTerm, 
-                                                              heapContext, 
-                                                              atPres, 
-                                                              false, 
-                                                              services).trim();
-            }
-            finally {
-               NotationInfo.PRETTY_SYNTAX = originalPrettySyntax;
-            }
-         }
+         return FunctionalOperationContractImpl.getText(contract, 
+                                                        contractParams, 
+                                                        resultTerm, 
+                                                        contractSelf, 
+                                                        search.getExceptionEquality().sub(0), 
+                                                        baseHeap, 
+                                                        baseHeapTerm, 
+                                                        heapContext, 
+                                                        atPres, 
+                                                        false, 
+                                                        services,
+                                                        getSettings().isUsePrettyPrinting(),
+                                                        getSettings().isUseUnicode()).trim();
       }
       else {
          return null;

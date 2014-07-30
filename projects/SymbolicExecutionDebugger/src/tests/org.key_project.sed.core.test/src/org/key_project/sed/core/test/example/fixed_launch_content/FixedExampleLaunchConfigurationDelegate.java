@@ -144,6 +144,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        et.setName("throws DivisionByZeroException()");
        et.setPathCondition("pc9");
        bzero.addChild(et);
+       thread.addTermination(et);
        
        SEDMemoryBranchCondition bnotzero = new SEDMemoryBranchCondition(target, s3, thread);
        bnotzero.setName("z != 0");
@@ -182,6 +183,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        terminationNegative.setName("<end>");
        terminationNegative.setPathCondition("pc15");
        returnNegative.addChild(terminationNegative);
+       thread.addTermination(terminationNegative);
        
        SEDMemoryBranchCondition bpositive = new SEDMemoryBranchCondition(target, branch, thread);
        bpositive.setName("result >= 0");
@@ -229,5 +231,6 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        terminationPositive.setName("<loop body end>");
        terminationPositive.setPathCondition("pc18");
        returnPositive.addChild(terminationPositive);
+       thread.addTermination(terminationPositive);
     }
 }

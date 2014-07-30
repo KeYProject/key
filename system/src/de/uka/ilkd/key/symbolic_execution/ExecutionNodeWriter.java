@@ -271,6 +271,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
    public static final String TAG_METHOD_RETURN_ENTRY = "methodReturnEntry";
 
    /**
+    * Tag name to store one entry of {@link IExecutionStart#getTerminations()}.
+    */
+   public static final String TAG_TERMINATION_ENTRY = "terminationEntry";
+
+   /**
     * Character to separate path entries in attributes {@value #ATTRIBUTE_PATH_IN_TREE}.
     */
    public static final char PATH_SEPARATOR = '/';
@@ -452,7 +457,25 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendStartTag(level, TAG_START, attributeValues, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
+      appendTerminations(level + 1, node, sb);
       appendEndTag(level, TAG_START, sb);
+   }
+
+   /**
+    * Appends the termination entries to the given {@link StringBuffer}.
+    * @param level The level of the children.
+    * @param node The {@link IExecutionStart} which provides the termination entries.
+    * @param sb The {@link StringBuffer} to append to.
+    */
+   protected void appendTerminations(int level, IExecutionStart node, StringBuffer sb) {
+      ImmutableList<IExecutionTermination> terminations = node.getTerminations();
+      if (terminations != null) {
+         for (IExecutionTermination termination : terminations) {
+            Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+            attributeValues.put(ATTRIBUTE_PATH_IN_TREE, computePath(termination));
+            appendEmptyTag(level, TAG_TERMINATION_ENTRY, attributeValues, sb);
+         }
+      }
    }
 
    /**

@@ -60,7 +60,7 @@ import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTre
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeFeatureProvider;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
-import org.key_project.util.eclipse.job.AbstractDependingOnObjectJob;
+import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
@@ -305,9 +305,9 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
     * @return {@code true} {@link Job} is in progress, {@code false} no {@link Job} is in progress.
     */
    protected boolean isJobInProgress() {
-      Job[] diagramJobs = AbstractDependingOnObjectJob.getJobs(getEditorPart());
+      Job[] diagramJobs = AbstractDependingOnObjectsJob.getJobs(getEditorPart());
       if (ArrayUtil.isEmpty(diagramJobs)) {
-         Job[] debugJobs = AbstractDependingOnObjectJob.getJobs(getDebugView());
+         Job[] debugJobs = AbstractDependingOnObjectsJob.getJobs(getDebugView());
          return !ArrayUtil.isEmpty(debugJobs);
       }
       else {
@@ -405,7 +405,7 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
                         setEditorEnabled(true);
                      }
                   });
-                  AbstractDependingOnObjectJob.cancelJobs(editor);
+                  AbstractDependingOnObjectsJob.cancelJobs(editor);
                   editor.executeFeatureInJob("Changing Symbolic Execution Tree", feature, context);
                   // Unset message
                   setMessage(null);

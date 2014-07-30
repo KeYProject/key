@@ -22,4 +22,5 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
          </statement>
       </statement>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0"/>
 </start>
