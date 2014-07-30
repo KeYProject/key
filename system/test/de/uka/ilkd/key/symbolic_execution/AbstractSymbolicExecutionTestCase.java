@@ -1666,7 +1666,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             assertFalse(contracts.isEmpty());
             Contract contract = contracts.iterator().next();
             // Start proof
-            proof = environment.createProof(contract.createProofObl(environment.getInitConfig()));
+            proof = environment.createProof(contract.createProofObl(environment.getInitConfig(), contract));
             assertNotNull(proof);
          }
          catch (Exception e) {

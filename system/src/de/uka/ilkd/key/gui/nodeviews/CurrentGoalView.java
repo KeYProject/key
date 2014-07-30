@@ -30,7 +30,6 @@ import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
-
 import java.util.LinkedList;
 
 /**

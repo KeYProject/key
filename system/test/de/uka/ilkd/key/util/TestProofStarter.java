@@ -44,7 +44,7 @@ public class TestProofStarter extends AbstractSymbolicExecutionTestCase {
          env = KeYEnvironment.load(file, null, null);
          Proof proof = env.getLoadedProof();
          assertNotNull(proof);
-         ProofStarter ps = new ProofStarter(true);
+         ProofStarter ps = new ProofStarter(false);
          ps.init(proof);
          setOneStepSimplificationEnabled(proof, oneStepSimplification);
          ApplyStrategyInfo info = ps.start();

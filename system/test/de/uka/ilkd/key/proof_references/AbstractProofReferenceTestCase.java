@@ -327,7 +327,7 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
          assertFalse(contracts.isEmpty());
          Contract contract = contracts.iterator().next();
          // Start proof
-         proof = environment.createProof(contract.createProofObl(environment.getInitConfig()));
+         proof = environment.createProof(contract.createProofObl(environment.getInitConfig(), contract));
          assertNotNull(proof);
          // Start auto mode
          doProofTest(environment, proof, useContracts, tester);
@@ -384,7 +384,7 @@ public abstract class AbstractProofReferenceTestCase extends AbstractSymbolicExe
          assertFalse(operationContracts.isEmpty());
          FunctionalOperationContract foc = operationContracts.iterator().next();
          // Start proof
-         proof = environment.createProof(foc.createProofObl(environment.getInitConfig()));
+         proof = environment.createProof(foc.createProofObl(environment.getInitConfig(), foc));
          assertNotNull(proof);
          // Start auto mode
          doProofTest(environment, proof, useContracts, tester);
