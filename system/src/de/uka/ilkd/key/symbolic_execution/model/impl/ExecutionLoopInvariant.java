@@ -48,16 +48,7 @@ public class ExecutionLoopInvariant extends AbstractExecutionStateNode<SourceEle
     */
    @Override
    protected String lazyComputeName() {
-      synchronized (NotationInfo.class) {
-         boolean originalPrettySyntax = NotationInfo.PRETTY_SYNTAX;
-         try {
-            NotationInfo.PRETTY_SYNTAX = true;
-            return getLoopInvariant().getPlainText(getServices()).trim();
-         }
-         finally {
-            NotationInfo.PRETTY_SYNTAX = originalPrettySyntax;
-         }
-      }
+      return getLoopInvariant().getPlainText(getServices(), getSettings().isUsePrettyPrinting(), getSettings().isUseUnicode()).trim();
    }
    
    /**

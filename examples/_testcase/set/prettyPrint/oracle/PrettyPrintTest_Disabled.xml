@@ -137,7 +137,10 @@ mod: false" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initially
             </loopInvariant>
          </branchCondition>
       </branchStatement>
-      <methodReturnEntry path="/0/0/1/0/1/0/0"/>
       <methodReturnEntry path="/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/1/0/1/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/1/0/0/0"/>
 </start>

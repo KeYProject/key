@@ -13,12 +13,16 @@
 
 package org.key_project.sed.core.model.memory;
 
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDThread;
 
@@ -47,6 +51,11 @@ public class SEDMemoryThread extends AbstractSEDThread implements ISEDMemoryDebu
     * The method call stack.
     */
    private ISEDDebugNode[] callStack;
+   
+   /**
+    * The known {@link ISEDTermination}s of this {@link ISEDThread}.
+    */
+   private final Set<ISEDTermination> knownTerminations = new LinkedHashSet<ISEDTermination>();
    
    /**
     * Constructor.
@@ -181,4 +190,22 @@ public class SEDMemoryThread extends AbstractSEDThread implements ISEDMemoryDebu
    public void setCallStack(ISEDDebugNode[] callStack) {
       this.callStack = callStack;
    }
+   
+   /**
+    * Registers the given {@link ISEDTermination}.
+    * @param termination The {@link ISEDTermination} to register.
+    */
+   public void addTermination(ISEDTermination termination) {
+      Assert.isNotNull(termination);
+      Assert.isTrue(!knownTerminations.contains(termination));
+      knownTerminations.add(termination);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDTermination[] getTerminations() throws DebugException {
+      return knownTerminations.toArray(new ISEDTermination[knownTerminations.size()]);
+   } 
 }

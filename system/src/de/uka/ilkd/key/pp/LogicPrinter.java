@@ -134,9 +134,14 @@ public class LogicPrinter {
             QuantifiableVariablePrintMode.NORMAL;
 
     public static String quickPrintTerm(Term t, Services services) {
+        return quickPrintTerm(t, services, NotationInfo.PRETTY_SYNTAX, NotationInfo.UNICODE_ENABLED);
+    }
+    
+
+    public static String quickPrintTerm(Term t, Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         final NotationInfo ni = new NotationInfo();
         if (services != null) {
-            ni.refresh(services);
+            ni.refresh(services, usePrettyPrinting, useUnicodeSymbols);
         }
         LogicPrinter p = new LogicPrinter(new ProgramPrinter(),
                                           ni,
@@ -147,7 +152,7 @@ public class LogicPrinter {
             return t.toString();
         }
         return p.result().toString();
-    }
+    }    
 
     public static String quickPrintSemisequent(Semisequent s, Services services) {
         final NotationInfo ni = new NotationInfo();

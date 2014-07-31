@@ -411,6 +411,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       }
       else if (expected instanceof IExecutionStart) {
          assertTrue("Expected IExecutionStartNode but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionStart);
+         assertTerminations((IExecutionStart)expected, (IExecutionStart)current);
       }
       else if (expected instanceof IExecutionTermination) {
          assertTrue("Expected IExecutionTermination but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionTermination);
@@ -498,7 +499,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       ImmutableList<IExecutionMethodReturn> expectedEntries = expected.getMethodReturns();
       ImmutableList<IExecutionMethodReturn> currentEntries = current.getMethodReturns();
       if (expectedEntries != null) {
-         assertNotNull("Call stack of \"" + current + "\" should not be null.", currentEntries);
+         assertNotNull("Method return of \"" + current + "\" should not be null.", currentEntries);
          assertEquals("Node: " + expected, expectedEntries.size(), currentEntries.size());
          Iterator<IExecutionMethodReturn> expectedIter = expectedEntries.iterator();
          Iterator<IExecutionMethodReturn> currentIter = currentEntries.iterator();
@@ -510,6 +511,31 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       }
       else{
          assertTrue("Method return entries of \"" + current + "\" is \"" + currentEntries + "\" but should be null or empty.", currentEntries == null || currentEntries.isEmpty());
+      }
+   }
+
+   /**
+    * Compares the terminations.
+    * @param expected The expected {@link IExecutionStart}.
+    * @param current The current {@link IExecutionStart}.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected static void assertTerminations(IExecutionStart expected, IExecutionStart current) throws ProofInputException {
+      ImmutableList<IExecutionTermination> expectedEntries = expected.getTerminations();
+      ImmutableList<IExecutionTermination> currentEntries = current.getTerminations();
+      if (expectedEntries != null) {
+         assertNotNull("Termination of \"" + current + "\" should not be null.", currentEntries);
+         assertEquals("Node: " + expected, expectedEntries.size(), currentEntries.size());
+         Iterator<IExecutionTermination> expectedIter = expectedEntries.iterator();
+         Iterator<IExecutionTermination> currentIter = currentEntries.iterator();
+         while (expectedIter.hasNext() && currentIter.hasNext()) {
+            assertExecutionNode(expectedIter.next(), currentIter.next(), false, false, false, false);
+         }
+         assertFalse(expectedIter.hasNext());
+         assertFalse(currentIter.hasNext());
+      }
+      else{
+         assertTrue("Termination entries of \"" + current + "\" is \"" + currentEntries + "\" but should be null or empty.", currentEntries == null || currentEntries.isEmpty());
       }
    }
 

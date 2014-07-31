@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_136986bf-71b5-4cc1-96e4-9ddf0585d998" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_87fe8a90-209d-46cd-928e-422c533792f2" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_79ea7cbf-17e2-419e-bcc7-31043c13f85c" name="self.main(a);" pathCondition="true" lineNumber="-1" charStart="46" charEnd="50" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
+   <sedTarget xml:id="_3ac6d7f0-f032-4814-900b-ae3174fc1098" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_da8c1ed0-be36-4502-9457-2b5d05325193" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_2090b3ba-1404-475e-b1b3-b5394c4b1293" name="self.main(a);" pathCondition="true" lineNumber="-1" charStart="46" charEnd="50" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
          </sedMethodCall>
       </sedThread>
    </sedTarget>

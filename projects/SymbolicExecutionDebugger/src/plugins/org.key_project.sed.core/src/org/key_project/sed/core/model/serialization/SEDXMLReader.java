@@ -43,6 +43,7 @@ import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.memory.ISEDMemoryDebugNode;
 import org.key_project.sed.core.model.memory.ISEDMemoryStackFrameCompatibleDebugNode;
@@ -173,6 +174,20 @@ public class SEDXMLReader {
                }
                entry.getKey().setCallStack(callStack.toArray(new ISEDDebugNode[callStack.size()]));
             }
+            // Set known terminations
+            Set<Entry<SEDMemoryThread, List<String>>> terminationEntries = handler.getTerminationEntriesMap().entrySet();
+            for (Entry<SEDMemoryThread, List<String>> entry : terminationEntries) {
+               for (String nodeRefId : entry.getValue()) {
+                  ISEDDebugElement element = handler.getElementById(nodeRefId);
+                  if (element == null) {
+                     throw new SAXException("Referenced node with ID \"" + nodeRefId + "\" is not available in model.");
+                  }
+                  if (!(element instanceof ISEDTermination)) {
+                     throw new SAXException("Referenced node with ID \"" + nodeRefId + "\" refers to wrong model object \"" + element + "\".");
+                  }
+                  entry.getKey().addTermination((ISEDTermination)element);
+               }
+            }
             // Inject child references
             Set<Entry<ISEDMemoryDebugNode, List<ChildReference>>> childReferences = handler.getNodeChildReferences().entrySet();
             for (Entry<ISEDMemoryDebugNode, List<ChildReference>> entry : childReferences) {
@@ -248,6 +263,11 @@ public class SEDXMLReader {
        * Maps {@link ISEDMemoryDebugNode} to the IDs of their calls tacks.
        */
       private final Map<ISEDMemoryDebugNode, List<String>> callStackEntriesMap = new HashMap<ISEDMemoryDebugNode, List<String>>();
+      
+      /**
+       * Maps {@link ISEDThread} to the IDs of their known termination nodes.
+       */
+      private final Map<SEDMemoryThread, List<String>> terminationEntriesMap = new HashMap<SEDMemoryThread, List<String>>();
 
       /**
        * Maps the element ID ({@link ISEDDebugElement#getId()}) to the its {@link ISEDDebugElement} instance.
@@ -282,6 +302,19 @@ public class SEDXMLReader {
                callStackEntriesMap.put(parent, callStack);
             }
             callStack.add(getNodeIdRef(attributes));
+         }
+         else if (isTerminationEntry(uri, localName, qName)) {
+            if (parent == null) {
+               List<String> entriesList = terminationEntriesMap.get(thread);
+               if (entriesList == null) {
+                  entriesList = new LinkedList<String>();
+                  terminationEntriesMap.put(thread, entriesList);
+               }
+               entriesList.add(getNodeIdRef(attributes));
+            }
+            else {
+               throw new SAXException("Can't add termination entry to parent.");
+            }
          }
          else {
             Object obj = createElement(target, parent != null ? parent : thread, thread, uri, localName, qName, attributes, annotationIdMapping, methodReturnConditionReferences);
@@ -383,6 +416,9 @@ public class SEDXMLReader {
          else if (isCallStackEntry(uri, localName, qName)) {
             // Nothing to do
          }
+         else if (isTerminationEntry(uri, localName, qName)) {
+            // Nothing to do
+         }
          else if (isAnnotation(uri, localName, qName)) {
             // Nothing to do
          }
@@ -431,6 +467,14 @@ public class SEDXMLReader {
       }
 
       /**
+       * Returns the mapping of {@link SEDMemoryThread}s to their call stacks.
+       * @return The mapping of {@link SEDMemoryThread}s to their call stacks.
+       */
+      public Map<SEDMemoryThread, List<String>> getTerminationEntriesMap() {
+         return terminationEntriesMap;
+      }
+
+      /**
        * Returns the nod child references.
        * @return The node child references.
        */
@@ -465,6 +509,17 @@ public class SEDXMLReader {
     */
    protected boolean isCallStackEntry(String uri, String localName, String qName) {
       return SEDXMLWriter.TAG_CALL_STACK_ENTRY.equals(qName);
+   }
+   
+   /**
+    * Checks if the given tag name represents a termination entry.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @return {@code true} represents a termination entry, {@code false} represents something else.
+    */
+   protected boolean isTerminationEntry(String uri, String localName, String qName) {
+      return SEDXMLWriter.TAG_TERMINATION_ENTRY.equals(qName);
    }
    
    /**

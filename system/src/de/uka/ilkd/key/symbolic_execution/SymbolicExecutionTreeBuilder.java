@@ -715,6 +715,7 @@ public class SymbolicExecutionTreeBuilder {
             else if (SymbolicExecutionUtil.isTerminationNode(node, node.getAppliedRuleApp())) {
                if (!SymbolicExecutionUtil.hasLoopBodyLabel(node.getAppliedRuleApp())) {
                   result = new ExecutionTermination(settings, mediator, node, exceptionVariable, null);
+                  startNode.addTermination((ExecutionTermination)result);
                }
             }
             else if (SymbolicExecutionUtil.isBranchStatement(node, node.getAppliedRuleApp(), statement, posInfo)) {
@@ -750,6 +751,7 @@ public class SymbolicExecutionTreeBuilder {
       }
       else if (SymbolicExecutionUtil.isLoopBodyTermination(node, node.getAppliedRuleApp())) {
          result = new ExecutionTermination(settings, mediator, node, exceptionVariable, TerminationKind.LOOP_BODY);
+         startNode.addTermination((ExecutionTermination)result);
       }
       return result;
    }

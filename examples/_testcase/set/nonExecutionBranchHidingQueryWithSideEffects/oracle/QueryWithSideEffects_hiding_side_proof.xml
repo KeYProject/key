@@ -37,4 +37,5 @@ as result of self.main(x);&gt;" isReturnValueComputed="true" methodReturnConditi
       </statement>
       <methodReturnEntry path="/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0"/>
 </start>

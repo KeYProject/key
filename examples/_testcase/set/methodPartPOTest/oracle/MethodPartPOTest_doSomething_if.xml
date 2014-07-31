@@ -18,4 +18,6 @@
          </statement>
       </branchCondition>
    </branchStatement>
+   <terminationEntry path="/0/0/0/0/0"/>
+   <terminationEntry path="/0/1/0/0/0"/>
 </start>

@@ -11,4 +11,5 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
          </termination>
       </operationContract>
    </methodCall>
+   <terminationEntry path="/0/0/0"/>
 </start>

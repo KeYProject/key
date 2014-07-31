@@ -13,17 +13,25 @@
 
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 
 /**
  * The default implementation of {@link IExecutionStart}.
  * @author Martin Hentschel
  */
 public class ExecutionStart extends AbstractExecutionNode implements IExecutionStart {
+   /**
+    * The up to know discovered {@link IExecutionTermination}s.
+    */
+   private ImmutableList<IExecutionTermination> terminations = ImmutableSLList.nil();
+   
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
@@ -50,5 +58,23 @@ public class ExecutionStart extends AbstractExecutionNode implements IExecutionS
    @Override
    public String getElementType() {
       return "Start";
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ImmutableList<IExecutionTermination> getTerminations() {
+      return terminations;
+   }
+   
+   /**
+    * Registers the given {@link IExecutionTermination}.
+    * @param termination The {@link IExecutionTermination} to register.
+    */
+   public void addTermination(IExecutionTermination termination) {
+      if (termination != null) {
+         terminations = terminations.append(termination);
+      }
    }
 }
