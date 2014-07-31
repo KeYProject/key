@@ -28,7 +28,7 @@ public class Triple<T1, T2, T3> {
 
 
     public String toString() { 
-	return "(" + first + ", " + second + ", " + third + ")"; 
+        return "(" + first + ", " + second + ", " + third + ")"; 
     }
     
 
@@ -44,6 +44,10 @@ public class Triple<T1, T2, T3> {
     
     
     public int hashCode() {
-        return 666*first.hashCode() + 42*second.hashCode() + 23*third.hashCode();
+        int res = 0;
+        if (first != null) res += 666*first.hashCode();
+        if (second != null) res += 42*second.hashCode();
+        if (third != null) res += 23*third.hashCode();
+        return res;
     }
 }

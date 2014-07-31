@@ -395,7 +395,7 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
             KeYMethodReturn keyReturn = getMethodReturn(executionReturn);
             if (keyReturn == null) {
                // Create new method return, its parent will be set later when the full child hierarchy is explored.
-               keyReturn = new KeYMethodReturn(getDebugTarget(), null, getThread(), this, executionReturn);
+               keyReturn = KeYModelUtil.createMethodReturn(getDebugTarget(), getThread(), null, this, executionReturn);
             }
             result[i] = keyReturn.getMethodReturnCondition();
             i++;

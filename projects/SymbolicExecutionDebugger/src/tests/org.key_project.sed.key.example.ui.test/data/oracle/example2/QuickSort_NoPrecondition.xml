@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_8bc35a37-ff27-4007-ac7d-12c8bf78eded" name="sort()" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_5a66aaba-4e91-4112-a15f-6add51c37d19" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_26a4d522-9eba-4730-9e65-b1403c7f05ac" name="self.sort();" pathCondition="true" lineNumber="-1" charStart="2080" charEnd="2084" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSEDExampleNewWizardTest_testExample2_noPrecondition\src\example2\QuickSort.java">
-            <sedStatement xml:id="_be72bcb8-dc5f-4c4c-8725-856963426f9e" name="sort(0,this.numbers.length-1);" pathCondition="true" lineNumber="-1" charStart="2091" charEnd="2119" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSEDExampleNewWizardTest_testExample2_noPrecondition\src\example2\QuickSort.java">
-               <sedBranchCondition xml:id="_eaa82a3e-6b60-4141-8439-a8cee46c79dd" name="not(equals(int[]::select(heap,self,example2.QuickSort::$numbers),null))" pathCondition="not(equals(int[]::select(heap,self,example2.QuickSort::$numbers),null))">
-                  <sedMethodCall xml:id="_0e256ab9-1574-46f8-b3e9-596268dd72e1" name="self.sort(low,high);" pathCondition="not(equals(int[]::select(heap,self,example2.QuickSort::$numbers),null))" lineNumber="-1" charStart="2138" charEnd="2142" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSEDExampleNewWizardTest_testExample2_noPrecondition\src\example2\QuickSort.java">
+   <sedTarget xml:id="_b75c8fc5-8984-478f-894e-19270ddab77c" name="sort()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_62e073f9-b142-4e7a-8d1a-3a446500a89e" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_9e3d0616-f45d-49f3-8c2e-3ae058d0ea46" name="self.sort();" pathCondition="true" lineNumber="-1" charStart="2080" charEnd="2084" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSEDExampleNewWizardTest_testExample2_noPrecondition\src\example2\QuickSort.java">
+            <sedStatement xml:id="_8b32d213-ef64-4042-a7be-0cbdf99dff7a" name="sort(0,this.numbers.length-1);" pathCondition="true" lineNumber="-1" charStart="2091" charEnd="2119" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSEDExampleNewWizardTest_testExample2_noPrecondition\src\example2\QuickSort.java">
+               <sedBranchCondition xml:id="_3bdcb807-d2c3-425e-85ba-a201d0b651dd" name="not(equals(int[]::select(heap,self,example2.QuickSort::$numbers),null))" pathCondition="not(equals(int[]::select(heap,self,example2.QuickSort::$numbers),null))">
+                  <sedMethodCall xml:id="_4230f912-abb0-40d7-82a3-1f5a1fccab97" name="self.sort(low,high);" pathCondition="not(equals(int[]::select(heap,self,example2.QuickSort::$numbers),null))" lineNumber="-1" charStart="2138" charEnd="2142" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSEDExampleNewWizardTest_testExample2_noPrecondition\src\example2\QuickSort.java">
                   </sedMethodCall>
                </sedBranchCondition>
-               <sedBranchCondition xml:id="_c9ffcbb9-7a91-48ae-8488-81b53fb73c94" name="equals(int[]::select(heap,self,example2.QuickSort::$numbers),null)" pathCondition="equals(int[]::select(heap,self,example2.QuickSort::$numbers),null)">
-                  <sedExceptionalTermination xml:id="_34017e46-1f94-4477-b4c0-5b255cd376db" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(int[]::select(heap,self,example2.QuickSort::$numbers),null)" verified="true">
+               <sedBranchCondition xml:id="_baadc7eb-23c4-4bcf-992d-7f5766c32381" name="equals(int[]::select(heap,self,example2.QuickSort::$numbers),null)" pathCondition="equals(int[]::select(heap,self,example2.QuickSort::$numbers),null)">
+                  <sedExceptionalTermination xml:id="_5ea60374-8658-4c9a-ba37-9376eb1ac152" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(int[]::select(heap,self,example2.QuickSort::$numbers),null)" verified="true">
                   </sedExceptionalTermination>
                </sedBranchCondition>
             </sedStatement>
          </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_5ea60374-8658-4c9a-ba37-9376eb1ac152"/>
       </sedThread>
    </sedTarget>
 </launch>

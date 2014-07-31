@@ -20,12 +20,13 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.util.eclipse.job.AbstractDependingOnObjectJob;
+import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
@@ -77,8 +78,8 @@ public class StatisticsPropertySection extends AbstractSEDDebugTargetPropertySec
       final ISEDDebugTarget target = getDebugTarget();
       if (target != null) {
          showLabel("Please wait until statisitcs are computed.");
-         AbstractDependingOnObjectJob.cancelJobs(this);
-         Job job = new AbstractDependingOnObjectJob("Computing statistics", this) {
+         AbstractDependingOnObjectsJob.cancelJobs(this);
+         Job job = new AbstractDependingOnObjectsJob("Computing statistics", this, PlatformUI.getWorkbench()) {
             @Override
             protected IStatus run(final IProgressMonitor monitor) {
                try {

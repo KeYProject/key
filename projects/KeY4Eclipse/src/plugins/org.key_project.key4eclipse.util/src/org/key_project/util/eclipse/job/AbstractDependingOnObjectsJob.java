@@ -15,28 +15,28 @@ package org.key_project.util.eclipse.job;
 
 import org.eclipse.core.runtime.jobs.Job;
 import org.key_project.util.eclipse.JobUtil;
-import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.ArrayUtil;
 
 /**
  * Abstract super class for {@link Job}s depending on a single {@link Object}
  * and thus have to be executed in serial order. 
  * @author Martin Hentschel
  */
-public abstract class AbstractDependingOnObjectJob extends Job {
+public abstract class AbstractDependingOnObjectsJob extends Job {
    /**
-    * The {@link Object} on which this {@link Job} depends on.
+    * The {@link Object}s on which this {@link Job} depends on.
     */
-   private Object object;
+   private final Object[] objects;
    
    /**
     * Constructor.
     * @param name The name of this {@link Job}.
-    * @param object The {@link Object} on which this {@link Job} depends on.
+    * @param objects The {@link Object}s on which this {@link Job} depends on.
     */
-   public AbstractDependingOnObjectJob(String name, Object object) {
+   public AbstractDependingOnObjectsJob(String name, Object... objects) {
       super(name);
-      this.object = object;
-      setRule(new ObjectSchedulingRule(object));
+      this.objects = objects;
+      setRule(new ObjectsSchedulingRule(objects));
    }
 
    /**
@@ -44,7 +44,7 @@ public abstract class AbstractDependingOnObjectJob extends Job {
     */
    @Override
    public boolean belongsTo(Object family) {
-      if (ObjectUtil.equals(object, family)) {
+      if (ArrayUtil.contains(objects, family)) {
          return true;
       }
       else {
@@ -65,10 +65,10 @@ public abstract class AbstractDependingOnObjectJob extends Job {
    
    /**
     * Returns all {@link Job}s that does something with the given {@link Object}.
-    * @param part The {@link Object} to search {@link Job}s for.
+    * @param object The {@link Object} to search {@link Job}s for.
     * @return The {@link Job}s that does something with the given {@link Object}.
     */
-   public static Job[] getJobs(Object part) {
-      return Job.getJobManager().find(part);
+   public static Job[] getJobs(Object object) {
+      return Job.getJobManager().find(object);
    }
 }

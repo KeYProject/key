@@ -104,7 +104,7 @@ public interface LoopInvariant extends SpecificationElement {
     /**
      * Returns the invariant in pretty plain text format.
      */
-    public String getPlainText(Services services);
+    public String getPlainText(Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols);
 
     public IProgramMethod getTarget();
 
