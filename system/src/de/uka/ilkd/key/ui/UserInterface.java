@@ -15,6 +15,7 @@ package de.uka.ilkd.key.ui;
 
 import java.io.File;
 import java.util.List;
+import java.util.Properties;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
@@ -142,10 +143,11 @@ public interface UserInterface
      * @param file The java file to open.
      * @param classPaths The class path entries to use.
      * @param bootClassPath The boot class path to use.
+     * @param poPropertiesToForce Some optional {@link Properties} for the PO which extend or overwrite saved PO {@link Properties}.
      * @return The opened {@link DefaultProblemLoader}.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    DefaultProblemLoader load(Profile profile, File file, List<File> classPaths, File bootClassPath) throws ProblemLoaderException;
+    DefaultProblemLoader load(Profile profile, File file, List<File> classPaths, File bootClassPath, Properties poPropertiesToForce) throws ProblemLoaderException;
     
     /**
      * Instantiates a new {@link Proof} in this {@link UserInterface} for the given

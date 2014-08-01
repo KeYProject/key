@@ -61,7 +61,17 @@ public interface IPersistablePO extends ProofOblInput {
     * is set during loading by the loader and needs not be saved.
     */
    public static final String PROPERTY_FILENAME = "#key.filename";
+   
+   /**
+    * The key used to store {@link AbstractOperationPO#isAddSymbolicExecutionLabel()}.
+    */
+   public static final String PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL = "addSymbolicExecutionLabel";
 
+   /**
+    * The key used to store {@link AbstractOperationPO#isAddUninterpretedPredicate()}.
+    */
+   public static final String PROPERTY_ADD_UNINTERPRETED_PREDICATE = "addUninterpretedPredicate";
+   
    /**
     * This method is called by a {@link ProofSaver} to store the proof
     * specific settings in the given {@link Properties}. The stored settings

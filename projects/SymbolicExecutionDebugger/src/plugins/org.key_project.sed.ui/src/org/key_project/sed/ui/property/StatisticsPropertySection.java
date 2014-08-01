@@ -93,14 +93,16 @@ public class StatisticsPropertySection extends AbstractSEDDebugTargetPropertySec
                   }
                   final Map<String, String> statisticsToShow = statistics;
                   SWTUtil.checkCanceled(monitor);
-                  containerComposite.getDisplay().asyncExec(new Runnable() {
-                     @Override
-                     public void run() {
-                        if (!monitor.isCanceled()) {
-                           recreateContent(statisticsToShow);
+                  if (!containerComposite.isDisposed()) {
+                     containerComposite.getDisplay().asyncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                           if (!monitor.isCanceled() && !containerComposite.isDisposed()) {
+                              recreateContent(statisticsToShow);
+                           }
                         }
-                     }
-                  });
+                     });
+                  }
                   return Status.OK_STATUS;
                }
                catch (OperationCanceledException e) {

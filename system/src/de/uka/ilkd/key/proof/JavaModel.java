@@ -24,6 +24,7 @@ public final class JavaModel {
     private final String modelTag;
     private final String descr;
     private final String classPath;
+    private final List<File> classPathEntries;
     private final String bootClassPath;
     private final File initialFile;
    
@@ -56,12 +57,13 @@ public final class JavaModel {
 	modelTag = null;
 	descr = "no model";
 	classPath = null;
+   classPathEntries = null;
 	bootClassPath = null;
 	initialFile = null;
     }
 
     private JavaModel(String modelDir, 
-	    	     List<File> classPath,
+	    	     List<File> classPathEntries,
 	    	     File bootClassPath,
 	     	     File initialFile) {
 	this.modelDir = (new File(modelDir)).getAbsolutePath();
@@ -69,13 +71,14 @@ public final class JavaModel {
 	this.descr = "model "+(new File(modelDir)).getName()+"@"
 	    +DateFormat.getTimeInstance(DateFormat.MEDIUM).format(new Date());
 	StringBuffer sb = new StringBuffer();
-	if(classPath != null && !classPath.isEmpty()) {
-	    for(File f : classPath) {
+	if(classPathEntries != null && !classPathEntries.isEmpty()) {
+	    for(File f : classPathEntries) {
 		sb.append(f.getAbsolutePath() + ", ");
 	    }
 	    sb.setLength(sb.length() - 2);
 	}
 	this.classPath = sb.toString();
+	this.classPathEntries = classPathEntries;
 	this.bootClassPath = bootClassPath == null 
 	                     ? null 
 	                     : bootClassPath.getAbsolutePath();
@@ -94,7 +97,11 @@ public final class JavaModel {
 	return classPath;
     }
     
-    public String getBootClassPath() {
+    public List<File> getClassPathEntries() {
+      return classPathEntries;
+    }
+
+   public String getBootClassPath() {
 	return bootClassPath;
     }
    

@@ -161,7 +161,7 @@ public class Proof implements Named {
         }
         
         this.initConfig.getServices().setProof(this);
-        this.proofFile = initConfig.getServices().getJavaModel().getInitialFile();
+        this.proofFile = initConfig.getServices().getJavaModel() != null ? initConfig.getServices().getJavaModel().getInitialFile() : null;
 
         settingsListener =
                         new SettingsListener () {
