@@ -1394,10 +1394,11 @@ public class Recoder2KeYConverter {
                 final Literal compileTimeConstant = getCompileTimeConstantInitializer(recoderVarSpec);
 
                 boolean isModel = false;
+                boolean isFinal = recoderVarSpec.isFinal();
                 for(recoder.java.declaration.Modifier mod : recoderVarSpec.getParent().getModifiers()) {
                     if(mod instanceof de.uka.ilkd.key.java.recoderext.Model) {
-                	isModel = true;
-                	break;
+                        isModel = true;
+                        break;
                     }
                 }
 
@@ -1405,7 +1406,7 @@ public class Recoder2KeYConverter {
                     pv = new LocationVariable(pen, getKeYJavaType(recoderType),
                             getKeYJavaType(recContainingClassType),
                             recoderVarSpec.isStatic(),
-                            isModel);
+                            isModel, false, isFinal);
                 } else {
                     pv = new ProgramConstant(pen, getKeYJavaType(recoderType),
                             getKeYJavaType(recContainingClassType),
@@ -1564,11 +1565,12 @@ public class Recoder2KeYConverter {
                     fr.getIdentifier());
 
             final boolean isModel = false; // bytecode-only fields are no model fields
+            final boolean isFinal = fs.isFinal();
 
             pv = new LocationVariable(new ProgramElementName(makeAdmissibleName(fs.getName()),
                     makeAdmissibleName(recField.getContainingClassType().getFullName())),
                     getKeYJavaType(recoderType), getKeYJavaType(recField
-                            .getContainingClassType()), recField.isStatic(), isModel);
+                            .getContainingClassType()), recField.isStatic(), isModel, false, isFinal);
             insertToMap(fs, new FieldSpecification(pv));
             return new FieldReference(pv, prefix);
         }
