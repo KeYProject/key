@@ -25,6 +25,7 @@ public final class JavaModel {
     private final String descr;
     private final String classPath;
     private final String bootClassPath;
+    private final File initialFile;
    
     public static final JavaModel NO_MODEL = new JavaModel();
    
@@ -35,14 +36,16 @@ public final class JavaModel {
      */
     public static JavaModel createJavaModel(String javaPath,
                                       List<File> classPath,
-                                      File bootClassPath) {
+                                      File bootClassPath,
+                                      File initialFile) {
         JavaModel result;
         if(javaPath == null) {
             result = JavaModel.NO_MODEL;
         } else {
             result = new JavaModel(javaPath,
                                    classPath,
-                                   bootClassPath);
+                                   bootClassPath,
+                                   initialFile);
         }
         return result;
     }
@@ -54,11 +57,13 @@ public final class JavaModel {
 	descr = "no model";
 	classPath = null;
 	bootClassPath = null;
+	initialFile = null;
     }
 
     private JavaModel(String modelDir, 
 	    	     List<File> classPath,
-	    	     File bootClassPath) {
+	    	     File bootClassPath,
+	     	     File initialFile) {
 	this.modelDir = (new File(modelDir)).getAbsolutePath();
 	this.modelTag = "KeY_" + Long.valueOf((new java.util.Date()).getTime());
 	this.descr = "model "+(new File(modelDir)).getName()+"@"
@@ -74,6 +79,7 @@ public final class JavaModel {
 	this.bootClassPath = bootClassPath == null 
 	                     ? null 
 	                     : bootClassPath.getAbsolutePath();
+	this.initialFile = initialFile;
     }
    
     public String getModelDir() {
@@ -92,7 +98,11 @@ public final class JavaModel {
 	return bootClassPath;
     }
    
-    public boolean isEmpty() {
+    public File getInitialFile() {
+      return initialFile;
+    }
+
+   public boolean isEmpty() {
 	return this == NO_MODEL;
     }
    

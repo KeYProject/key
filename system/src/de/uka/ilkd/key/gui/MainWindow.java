@@ -877,7 +877,8 @@ public final class MainWindow extends JFrame  {
     /** saves a proof */
     public void saveProof(File proofFile) {
         String filename = proofFile.getAbsolutePath();
-        ProofSaver saver = new ProofSaver(getMediator().getSelectedProof(), filename, Main.INTERNAL_VERSION);
+        Proof proof = getMediator().getSelectedProof();
+        ProofSaver saver = new ProofSaver(proof, filename, Main.INTERNAL_VERSION);
         String errorMsg ;
 
         try {
@@ -889,6 +890,9 @@ public final class MainWindow extends JFrame  {
         if (errorMsg != null) {
             notify(new GeneralFailureEvent
                     ("Saving Proof failed.\n Error: " + errorMsg));
+        }
+        else {
+           proof.setProofFile(proofFile);
         }
     }
 
