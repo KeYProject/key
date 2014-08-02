@@ -392,7 +392,7 @@ public final class KeYUtil {
                             main.setVisible(true);
                         }
                         // Check if location is already loaded
-                        DefaultProblemLoader loader = main.getUserInterface().load(null, location, classPaths, bootClassPath);
+                        DefaultProblemLoader loader = main.getUserInterface().load(null, location, classPaths, bootClassPath, null);
                         InitConfig initConfig = loader.getInitConfig();
                         // Get method to proof in KeY
                         IProgramMethod pm = getProgramMethod(method, initConfig.getServices().getJavaInfo());

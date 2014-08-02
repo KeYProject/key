@@ -3642,6 +3642,7 @@ varexp[TacletBuilder b]
         | varcond_referencearray[b, negated]
         | varcond_static[b,negated]
         | varcond_staticmethod[b,negated]  
+        | varcond_final[b,negated]
         | varcond_typecheck[b, negated]
         | varcond_constant[b, negated]
         | varcond_label[b, negated]
@@ -3956,6 +3957,14 @@ varcond_enum_const [TacletBuilder b]
    ENUM_CONST LPAREN x=varId RPAREN {
       b.addVariableCondition(new EnumConstantCondition(
 	(SchemaVariable) x));     
+   }
+;
+
+varcond_final [TacletBuilder b, boolean negated]
+:
+   FINAL LPAREN x=varId RPAREN {
+      b.addVariableCondition(new FinalReferenceCondition(
+  (SchemaVariable) x, negated));     
    }
 ;
 

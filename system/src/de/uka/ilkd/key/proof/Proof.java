@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.io.File;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -141,6 +142,11 @@ public class Proof implements Named {
      */
     private final List<ProofDisposedListener> proofDisposedListener = new LinkedList<ProofDisposedListener>();
     
+    /**
+     * The {@link File} under which this {@link Proof} was saved the last time if available or {@code null} otherwise.
+     */
+    private File proofFile;
+    
     /** 
      * constructs a new empty proof with name 
      */
@@ -155,6 +161,7 @@ public class Proof implements Named {
         }
         
         this.initConfig.getServices().setProof(this);
+        this.proofFile = initConfig.getServices().getJavaModel() != null ? initConfig.getServices().getJavaModel().getInitialFile() : null;
 
         settingsListener =
                         new SettingsListener () {
@@ -1185,4 +1192,19 @@ public class Proof implements Named {
         return initConfig;
     }
 
+    /**
+     * Returns the {@link File} under which the {@link Proof} was saved the last time if available.
+     * @return The {@link File} under which the {@link Proof} was saved the last time or {@code null} if not available.
+     */
+    public File getProofFile() {
+       return proofFile;
+    }
+
+    /**
+     * Sets the {@link File} under which the {@link Proof} was saved the last time.
+     * @param proofFile The {@link File} under which the {@link Proof} was saved the last time.
+     */
+    public void setProofFile(File proofFile) {
+       this.proofFile = proofFile;
+    }
 }

@@ -28,7 +28,6 @@ import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
@@ -210,14 +209,7 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
    protected boolean lazyComputeBranchVerified() {
       if (!isDisposed()) {
          // Find uninterpreted predicate
-         Term predicate = null;
-         ProofOblInput problem = getServices().getSpecificationRepository().getProofOblInput(getProof());
-         if (problem instanceof AbstractOperationPO) {
-            AbstractOperationPO operationPO = (AbstractOperationPO)problem;
-            if (operationPO.isAddUninterpretedPredicate()) {
-               predicate = operationPO.getUninterpretedPredicate();
-            }
-         }
+         Term predicate = AbstractOperationPO.getUninterpretedPredicate(getProof());
          // Check if node can be treated as verified/closed
          if (predicate != null) {
             boolean verified = true;

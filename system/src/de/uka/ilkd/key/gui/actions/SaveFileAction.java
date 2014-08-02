@@ -15,10 +15,12 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
 
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -45,13 +47,19 @@ public final class SaveFileAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         if (mainWindow.getMediator().ensureProofLoaded()) {
             final KeYFileChooser jFC = GuiUtilities.getFileChooser("Choose filename to save proof");
+            // Try to save back to file where proof was initially loaded from
+            File selectedFile = null;
+            Proof selectedProof = mainWindow.getMediator().getSelectedProof();
+            if (selectedProof != null) {
+               selectedFile = selectedProof.getProofFile();
+            }
+            // Suggest default file name if required
+            if (selectedFile == null) {
+               String defaultName = MiscTools.toValidFileName(selectedProof.name().toString()) + ".proof";
+               selectedFile = new File(jFC.getCurrentDirectory(), defaultName);
+            }
             
-            final String defaultName 
-            	= MiscTools.toValidFileName(mainWindow.getMediator().getSelectedProof()
-                    .name()
-                    .toString());
-            
-            boolean saved = jFC.showSaveDialog(mainWindow, defaultName + ".proof");
+            boolean saved = jFC.showSaveDialog(mainWindow, selectedFile);
             if (saved) {
                 mainWindow.saveProof(jFC.getSelectedFile());
             }
