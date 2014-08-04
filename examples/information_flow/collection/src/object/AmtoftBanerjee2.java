@@ -15,7 +15,7 @@ public class AmtoftBanerjee2 {
 
     //@ normal_behavior
     //@ assignable marg, res;
-    //@ determines z, \result \by \itself;
+    //@ determines \result \by z;
     int cexp(int z) {
         if (z == marg && z != 0) {
             return res;
@@ -33,7 +33,7 @@ public class AmtoftBanerjee2 {
     //@ ensures \result == expensive(z);
     //@ assignable \strictly_nothing;
     //@ accessible \nothing;
-    //@ determines z, \result \by \itself;
+    //@ determines \result \by z;
     //@ helper
     int expensive(int z) {
         return z;
