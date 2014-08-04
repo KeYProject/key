@@ -15,6 +15,7 @@ package de.uka.ilkd.key.ui;
 
 import java.io.File;
 import java.util.List;
+import java.util.Properties;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
@@ -50,7 +51,7 @@ public abstract class AbstractUserInterface implements UserInterface {
                                              File bootClassPath, KeYMediator mediator) {
         final ProblemLoader pl =
                 new ProblemLoader(file, classPath, bootClassPath,
-                                  AbstractProfile.getDefaultProfile(), mediator, true);
+                                  AbstractProfile.getDefaultProfile(), mediator, true, null);
         pl.addTaskListener(this);
         return pl;
     }
@@ -132,11 +133,12 @@ public abstract class AbstractUserInterface implements UserInterface {
     public DefaultProblemLoader load(Profile profile,
                                      File file,
                                      List<File> classPath,
-                                     File bootClassPath) throws ProblemLoaderException {
+                                     File bootClassPath,
+                                     Properties poPropertiesToForce) throws ProblemLoaderException {
        DefaultProblemLoader loader = null;
        try {
           getMediator().stopInterface(true);
-          loader = new DefaultProblemLoader(file, classPath, bootClassPath, profile, getMediator(), false);
+          loader = new DefaultProblemLoader(file, classPath, bootClassPath, profile, getMediator(), false, poPropertiesToForce);
           loader.load();
           return loader;
        }

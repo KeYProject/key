@@ -19,6 +19,8 @@ import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import java.io.File;
 import java.util.List;
+import java.util.Properties;
+
 import javax.swing.SwingWorker;
 
 /**
@@ -35,9 +37,10 @@ public final class ProblemLoader extends DefaultProblemLoader {
 
     public ProblemLoader(File file, List<File> classPath, File bootClassPath,
                          Profile profileOfNewProofs, KeYMediator mediator,
-                         boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
+                         boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
+                         Properties poPropertiesToForce) {
         super(file, classPath, bootClassPath, profileOfNewProofs, mediator,
-              askUiToSelectAProofObligationIfNotDefinedByLoadedFile);
+              askUiToSelectAProofObligationIfNotDefinedByLoadedFile, poPropertiesToForce);
     }
 
     public void addTaskListener(final ProverTaskListener ptl) {

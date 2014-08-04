@@ -836,10 +836,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
    public void fillSaveProperties(Properties properties) throws IOException {
        super.fillSaveProperties(properties);
        if (isAddUninterpretedPredicate()) {
-           properties.setProperty("addUninterpretedPredicate", isAddUninterpretedPredicate() + "");
+           properties.setProperty(IPersistablePO.PROPERTY_ADD_UNINTERPRETED_PREDICATE, isAddUninterpretedPredicate() + "");
        }
        if (isAddSymbolicExecutionLabel()) {
-          properties.setProperty("addSymbolicExecutionLabel", isAddSymbolicExecutionLabel() + "");
+          properties.setProperty(IPersistablePO.PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL, isAddSymbolicExecutionLabel() + "");
        }
    }
 
@@ -849,7 +849,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @return {@code true} is set, {@code false} is not set.
     */
    protected static boolean isAddUninterpretedPredicate(Properties properties) {
-      String value = properties.getProperty("addUninterpretedPredicate");
+      String value = properties.getProperty(IPersistablePO.PROPERTY_ADD_UNINTERPRETED_PREDICATE);
       return value != null && !value.isEmpty() ? Boolean.valueOf(value) : false;
    }
 
@@ -859,7 +859,25 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @return {@code true} is set, {@code false} is not set.
     */
    protected static boolean isAddSymbolicExecutionLabel(Properties properties) {
-      String value = properties.getProperty("addSymbolicExecutionLabel");
+      String value = properties.getProperty(IPersistablePO.PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL);
       return value != null && !value.isEmpty() ? Boolean.valueOf(value) : false;
+   }
+
+   /**
+    * Returns the uninterpreted predicate used in the given {@link Proof} if available.
+    * @param proof The {@link Proof} to get its uninterpreted predicate.
+    * @return The uninterpreted predicate or {@code null} if not used.
+    */
+   public static Term getUninterpretedPredicate(Proof proof) {
+      if (proof != null && !proof.isDisposed()) {
+         ProofOblInput problem = proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+         if (problem instanceof AbstractOperationPO) {
+            AbstractOperationPO operationPO = (AbstractOperationPO)problem;
+            if (operationPO.isAddUninterpretedPredicate()) {
+               return operationPO.getUninterpretedPredicate();
+            }
+         }
+      }
+      return null;
    }
 }
