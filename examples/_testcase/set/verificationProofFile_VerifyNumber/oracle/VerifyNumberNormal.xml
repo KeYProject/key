@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.equals(_n);" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (this.content==_n.content)" pathCondition="true" pathConditionChanged="false">
+         <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <branchCondition name="equals(int::select(heap,self,VerifyNumber::$content),int::select(heap,n,VerifyNumber::$content))" pathCondition="equals(int::select(heap,self,VerifyNumber::$content),int::select(heap,n,VerifyNumber::$content))" pathConditionChanged="true" branchCondition="equals(int::select(heap,self,VerifyNumber::$content),int::select(heap,n,VerifyNumber::$content))" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <statement name="return true;" pathCondition="equals(int::select(heap,self,VerifyNumber::$content),int::select(heap,n,VerifyNumber::$content))" pathConditionChanged="false">
+                  <methodReturn name="&lt;return of equals&gt;" signature="&lt;return of self.equals(_n);&gt;" pathCondition="equals(int::select(heap,self,VerifyNumber::$content),int::select(heap,n,VerifyNumber::$content))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="equals(int::select(heap,self,VerifyNumber::$content),int::select(heap,n,VerifyNumber::$content))">
+                     <termination name="&lt;end&gt;" pathCondition="equals(int::select(heap,self,VerifyNumber::$content),int::select(heap,n,VerifyNumber::$content))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                     </termination>
+                  </methodReturn>
+               </statement>
+            </branchCondition>
+            <branchCondition name="not(equals(int::select(heap,self,VerifyNumber::$content),int::select(heap,n,VerifyNumber::$content)))" pathCondition="not(equals(int::select(heap,self,VerifyNumber::$content),int::select(heap,n,VerifyNumber::$content)))" pathConditionChanged="true" branchCondition="not(equals(int::select(heap,self,VerifyNumber::$content),int::select(heap,n,VerifyNumber::$content)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <statement name="return false;" pathCondition="not(equals(int::select(heap,self,VerifyNumber::$content),int::select(heap,n,VerifyNumber::$content)))" pathConditionChanged="false">
+                  <methodReturn name="&lt;return of equals&gt;" signature="&lt;return of self.equals(_n);&gt;" pathCondition="not(equals(int::select(heap,self,VerifyNumber::$content),int::select(heap,n,VerifyNumber::$content)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="not(equals(int::select(heap,self,VerifyNumber::$content),int::select(heap,n,VerifyNumber::$content)))">
+                     <termination name="&lt;end&gt;" pathCondition="not(equals(int::select(heap,self,VerifyNumber::$content),int::select(heap,n,VerifyNumber::$content)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                     </termination>
+                  </methodReturn>
+               </statement>
+            </branchCondition>
+         </branchCondition>
+      </branchStatement>
+      <methodReturnEntry path="/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/1/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/1/0/0/0"/>
+</start>

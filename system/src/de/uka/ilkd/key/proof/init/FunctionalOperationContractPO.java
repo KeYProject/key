@@ -390,13 +390,15 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
        }
        else {
            ProofOblInput po;
-           if (isAddUninterpretedPredicate(properties)) {
+           boolean addUninterpretedPredicate = isAddUninterpretedPredicate(properties);
+           boolean addSymbolicExecutionLabel = isAddSymbolicExecutionLabel(properties);
+           if (addUninterpretedPredicate || addSymbolicExecutionLabel) {
                if (!(contract instanceof FunctionalOperationContract)) {
                    throw new IOException("Found contract \"" + contract +
                                          "\" is no FunctionalOperationContract.");
                }
                po = new FunctionalOperationContractPO(
-                       initConfig, (FunctionalOperationContract)contract, true, true);
+                       initConfig, (FunctionalOperationContract)contract, addUninterpretedPredicate, addSymbolicExecutionLabel);
            }
            else {
                po = contract.createProofObl(initConfig);

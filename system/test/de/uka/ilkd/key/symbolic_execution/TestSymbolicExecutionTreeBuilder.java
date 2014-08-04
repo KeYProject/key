@@ -39,6 +39,63 @@ import de.uka.ilkd.key.ui.CustomUserInterface;
  */
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: examples/_testcase/set/verificationProofFile_VerifyNumber
+    */
+   public void testVerifyNumberNormal() throws Exception {
+      doSETTest(keyRepDirectory,
+                "examples/_testcase/set/verificationProofFile_VerifyNumber/test/VerifyNumberNormal.proof",
+                "examples/_testcase/set/verificationProofFile_VerifyNumber/oracle/VerifyNumberNormal.xml",
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/verificationProofFile_VerifyMin
+    */
+   public void testVerifyMinTrueBranch() throws Exception {
+      doSETTest(keyRepDirectory,
+                "examples/_testcase/set/verificationProofFile_VerifyMin/test/VerifyMinTrueBranch.proof",
+                "examples/_testcase/set/verificationProofFile_VerifyMin/oracle/VerifyMinTrueBranch.xml",
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/verificationProofFile_VerifyMin
+    */
+   public void testVerifyMin() throws Exception {
+      doSETTest(keyRepDirectory,
+                "examples/_testcase/set/verificationProofFile_VerifyMin/test/VerifyMin.proof",
+                "examples/_testcase/set/verificationProofFile_VerifyMin/oracle/VerifyMin.xml",
+                true,
+                true,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/simpleMethodCallStackTest
     */
    public void testSimpleMethodCallStack() throws Exception {

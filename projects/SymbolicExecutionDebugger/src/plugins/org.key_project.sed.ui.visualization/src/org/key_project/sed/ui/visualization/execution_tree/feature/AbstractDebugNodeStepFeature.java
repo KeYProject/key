@@ -46,21 +46,33 @@ public abstract class AbstractDebugNodeStepFeature extends AbstractCustomFeature
     */
    @Override
    public boolean canExecute(ICustomContext context) {
-      boolean canExecute = false;
+      boolean canExecute = true;
       PictogramElement[] pes = context.getPictogramElements();
+      List<IStep> stepsToHandle = new LinkedList<IStep>();
       if (pes != null) {
          int i = 0;
-         while (i < pes.length && !canExecute) {
+         while (i < pes.length && canExecute) {
             Object businessObject = getBusinessObjectForPictogramElement(pes[i]);
             if (businessObject instanceof IStep) {
-               canExecute = canExecute((IStep)businessObject);
+               IStep step = (IStep)businessObject;
+               stepsToHandle.add(step);
+               canExecute = canExecute(step);
             }
             i++;
          }
       }
-      return canExecute;
+      return canExecute && checkCompatibility(stepsToHandle);
    }
    
+   /**
+    * Checks if the found {@link IStep}s are compatible.
+    * @param stepsToHandle The {@link IStep}s to check.
+    * @return {@code true} {@link IStep}s are compatible, {@code false} {@link IStep}s are incompatible.
+    */
+   protected boolean checkCompatibility(List<IStep> stepsToHandle) {
+      return stepsToHandle.size() == 1; // Only exactly one IStep is executable at the same time
+   }
+
    /**
     * Checks if the execution on the given {@link IStep} is allowed.
     * @param step The {@link IStep} to check.

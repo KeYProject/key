@@ -413,7 +413,7 @@ public class Recoder2KeYTypeConverter {
                         	     integerType, 
                         	     superArrayType, 
                         	     false,
-                        	     false));
+                        	     false, false, true));
         FieldDeclaration f = new FieldDeclaration(new Modifier[] {
                 new Public(), new Final() }, new TypeRef(integerType),
                 new FieldSpecification[] { specLength }, false);

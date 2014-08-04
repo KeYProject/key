@@ -23,6 +23,8 @@ import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
+import java.util.Properties;
+
 import javax.swing.SwingWorker;
 
 /**
@@ -39,9 +41,10 @@ public final class ProblemLoader extends DefaultProblemLoader {
 
    public ProblemLoader(File file, List<File> classPath, File bootClassPath,
                         Profile profileOfNewProofs, KeYMediator mediator,
-                        boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
+                        boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
+                        Properties poPropertiesToForce) {
       super(file, classPath, bootClassPath, profileOfNewProofs, mediator,
-            askUiToSelectAProofObligationIfNotDefinedByLoadedFile);
+            askUiToSelectAProofObligationIfNotDefinedByLoadedFile, poPropertiesToForce);
    }
 
    public void addTaskListener(ProverTaskListener ptl) {
@@ -106,7 +109,8 @@ public final class ProblemLoader extends DefaultProblemLoader {
    }
 
    public void runAsynchronously() {
-       final SwingWorker<Throwable, Void> worker = new SwingWorker<Throwable, Void>() {
+       final SwingWorker<Throwable, Void> worker =
+               new SwingWorker<Throwable, Void>() {
 
            private long runTime;
 

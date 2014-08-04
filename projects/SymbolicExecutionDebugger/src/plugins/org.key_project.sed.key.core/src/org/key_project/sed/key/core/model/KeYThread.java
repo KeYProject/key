@@ -469,12 +469,14 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * @param keyNode The {@link IKeYSEDDebugNode} which requests the step into.
     */
    public void stepInto(IKeYSEDDebugNode<?> keyNode) throws DebugException {
-      runAutoMode(keyNode,
-                  ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_FOR_ONE_STEP, 
-                  SymbolicExecutionUtil.collectGoalsInSubtree(keyNode.getExecutionNode()),
-                  false,
-                  false);
-      super.stepInto();
+      if (canStepInto()) {
+         runAutoMode(keyNode,
+                     ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_FOR_ONE_STEP, 
+                     SymbolicExecutionUtil.collectGoalsInSubtree(keyNode.getExecutionNode()),
+                     false,
+                     false);
+         super.stepInto();
+      }
    }
 
    /**
@@ -507,12 +509,14 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * @param keyNode The {@link IKeYSEDDebugNode} which requests the step over.
     */
    public void stepOver(IKeYSEDDebugNode<?> keyNode) throws DebugException {
-      runAutoMode(keyNode,
-                  KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), 
-                  SymbolicExecutionUtil.collectGoalsInSubtree(keyNode.getExecutionNode()),
-                  true,
-                  false);
-      super.stepOver();
+      if (canStepOver()) {
+         runAutoMode(keyNode,
+                     KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), 
+                     SymbolicExecutionUtil.collectGoalsInSubtree(keyNode.getExecutionNode()),
+                     true,
+                     false);
+         super.stepOver();
+      }
    }
 
    /**
@@ -545,12 +549,14 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * @param keyNode The {@link IKeYSEDDebugNode} which requests the step return.
     */
    public void stepReturn(IKeYSEDDebugNode<?> keyNode) throws DebugException {
-      runAutoMode(keyNode,
-                  KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), 
-                  SymbolicExecutionUtil.collectGoalsInSubtree(keyNode.getExecutionNode()),
-                  false,
-                  true);
-      super.stepReturn();
+      if (canStepReturn()) {
+         runAutoMode(keyNode,
+                     KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), 
+                     SymbolicExecutionUtil.collectGoalsInSubtree(keyNode.getExecutionNode()),
+                     false,
+                     true);
+         super.stepReturn();
+      }
    }
    
    /**
