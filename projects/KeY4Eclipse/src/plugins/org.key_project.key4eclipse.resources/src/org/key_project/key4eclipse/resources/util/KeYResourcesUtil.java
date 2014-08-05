@@ -66,11 +66,11 @@ public class KeYResourcesUtil {
     * @param project - the {@link IProject} to use
     * @throws CoreException
     */
-   public static void cleanBuildProject(final IProject project) throws CoreException{
+   public static void cleanBuildProject(final IProject project) throws CoreException {
       IWorkspace workspace = ResourcesPlugin.getWorkspace();
       IWorkspaceDescription desc = workspace.getDescription();
       boolean autoBuilding = desc.isAutoBuilding();
-      if(autoBuilding){
+      if (autoBuilding) {
          try {
             desc.setAutoBuilding(false);
             workspace.setDescription(desc);
@@ -82,10 +82,9 @@ public class KeYResourcesUtil {
             workspace.setDescription(desc);
          }
       }
-      else{
+      else {
          //build
-         new Job("Converting into KeY project") {
-
+         new Job("Converting into KeY Project") {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                try {
@@ -96,7 +95,6 @@ public class KeYResourcesUtil {
                   return LogUtil.getLogger().createErrorStatus(e);
                }
             }
-            
          }.schedule();
       }
    }
