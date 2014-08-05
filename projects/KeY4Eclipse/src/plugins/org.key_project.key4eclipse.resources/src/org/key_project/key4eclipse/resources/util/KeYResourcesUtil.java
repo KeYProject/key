@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
@@ -31,6 +32,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IClasspathEntry;
@@ -45,6 +47,7 @@ import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.speclang.Contract;
@@ -243,5 +246,19 @@ public class KeYResourcesUtil {
    public static boolean isKeYProject(IProject project) throws CoreException {
       return project != null &&
              project.hasNature(KeYProjectNature.NATURE_ID);
+   }
+   
+   /**
+    * Returns the {@link IFile} of the {@link Proof} specified by the given {@link IMarker}.
+    * @param marker The {@link IMarker}.
+    * @return The {@link IFile} of the {@link Proof}.
+    * @throws CoreException Occurred Exception
+    */
+   public static IFile getProofFile(IMarker marker) throws CoreException{
+      String str = (String) marker.getAttribute(IMarker.SOURCE_ID);
+      IPath proofFilePath = new Path(str);
+      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+      IFile proofFile = root.getFile(proofFilePath);
+      return proofFile;
    }
 }

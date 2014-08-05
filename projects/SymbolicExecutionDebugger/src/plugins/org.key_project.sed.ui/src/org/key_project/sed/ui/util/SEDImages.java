@@ -174,6 +174,11 @@ public final class SEDImages {
      * The key for the image that is used to follow an {@link ISEDAnnotationLink}.
      */
     public static final String ANNOTATION_GO_TO = "org.key_project.sed.ui.images.annotation.goTo";
+
+    /**
+     * The key for the image that is used for symbolic debugging.
+     */
+    public static final String SYMBOLIC_DEBUG = "org.key_project.sed.ui.images.symbolicDebug";
     
     /**
      * Forbid instances.
@@ -309,6 +314,9 @@ public final class SEDImages {
         else if (ANNOTATION_GO_TO.equals(key)) {
            path = "icons/follow_annotation_link.gif";
         }
+        else if (SYMBOLIC_DEBUG.equals(key)) {
+           path = "icons/symbolic_debug.gif";
+        }
         // Load image if possible
         if (path != null) {
            InputStream in = null;
@@ -373,6 +381,7 @@ public final class SEDImages {
                registry.remove(METHOD_RETURN);
                registry.remove(TERMINATION);
                registry.remove(TERMINATION_NOT_VERIFIED);
+               registry.remove(SYMBOLIC_DEBUG);
             }
          });
        }

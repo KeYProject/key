@@ -53,6 +53,7 @@ import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
 
 import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 
@@ -744,7 +745,7 @@ public class ProofManager {
    private String generateProofMarkerMessage(ProofElement pe, Proof proof, long time){
       StringBuffer sb = new StringBuffer();
       boolean closed = pe.getProofClosed();
-      String newLine ="\n";
+      String newLine =  StringUtil.NEW_LINE;
       
       sb.append(closed? "Closed Proof:" : "Open Proof:");
       sb.append(newLine);
@@ -765,16 +766,16 @@ public class ProofManager {
             }
          }
          if(uncloseable){
-            sb.append("Reason: Goal can't be closed automatically");
+            sb.append("Reason: Goal can't be closed automatically.");
             sb.append(newLine);
-            sb.append("Hint: Check code and specifications for bugs or continue proof interactively");
+            sb.append("Hint: Check code and specifications for bugs or continue proof interactively.");
             sb.append(newLine);
             sb.append(newLine);
          }
          else{
-            sb.append("Reason: Max. Rule Applications reached");
+            sb.append("Reason: Max. Rule Applications reached.");
             sb.append(newLine);
-            sb.append("Hint: Continue proof automatic- or interactively");
+            sb.append("Hint: Continue proof automatic- or interactively.");
             sb.append(newLine);
             sb.append(newLine);
          }
