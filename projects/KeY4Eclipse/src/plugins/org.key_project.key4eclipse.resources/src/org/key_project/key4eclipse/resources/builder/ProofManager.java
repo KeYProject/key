@@ -18,6 +18,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
@@ -371,6 +373,7 @@ public class ProofManager {
       else {
          file.create(new ByteArrayInputStream(out.toByteArray()), true, null);
       }
+      KeYResourcesUtil.setProofClosed(file, Boolean.valueOf(pe.getProofClosed()));
    }
 
    
@@ -429,8 +432,41 @@ public class ProofManager {
          markerManager.setRecursionMarker(cycle);
       }
       restoreOldMarkerForRemovedCycles();
+      setInRecursionCycleProofFileProperty();
    }
-   
+
+   /**
+    * Updates the {@link IResource} persistent property
+    * KeYResourcesUtil#isProofInRecursionCycle(IFile)
+    * of all proof files in the proof folder.
+    * @throws CoreException
+    */
+   private void setInRecursionCycleProofFileProperty() throws CoreException {
+      // Compute all proof files which are part of at least one cycle
+      final Set<IFile> proofFilesInCycles = new HashSet<IFile>();
+      for (LinkedList<ProofElement> cycle : cycles) {
+         for (ProofElement pe : cycle) {
+            proofFilesInCycles.add(pe.getProofFile());
+         }
+      }
+      // Update resource persistent property.
+      mainProofFolder.accept(new IResourceVisitor() {
+         @Override
+         public boolean visit(IResource resource) throws CoreException {
+            if (resource instanceof IFile) {
+               IFile file = (IFile) resource;
+               if (proofFilesInCycles.contains(file)) {
+                  KeYResourcesUtil.setProofInRecursionCycle(file, Boolean.TRUE);
+               }
+               else {
+                  KeYResourcesUtil.setProofInRecursionCycle(file, null);
+               }
+            }
+            return true;
+         }
+      });
+   }
+
    private void restoreOldMarkerForRemovedCycles() throws CoreException{
       for(ProofElement pe : proofElements){
          if(pe.getMarker().isEmpty()){

@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IClasspathEntry;
@@ -41,6 +42,7 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
+import org.key_project.key4eclipse.resources.decorator.ProofFileLightweightLabelDecorator;
 import org.key_project.key4eclipse.resources.nature.KeYProjectNature;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 
@@ -60,6 +62,16 @@ public class KeYResourcesUtil {
    public static final String PROOF_FOLDER_NAME = "proofs";
    public static final String PROOF_FILE_EXTENSION = "proof";
    public static final String META_FILE_EXTENSION = "proofmeta";
+   
+   /**
+    * Key of {@link IResource#getPersistentProperty(QualifiedName)} to store the proof closed result of a proof file.
+    */
+   public static final QualifiedName PROOF_CLOSED = new QualifiedName("org.key_project.key4eclipse.resources", "closed");
+   
+   /**
+    * Key of {@link IResource#getPersistentProperty(QualifiedName)} to indicate that a proof is in a recursion cycle.
+    */
+   public static final QualifiedName PROOF_IN_RECURSION_CYCLE = new QualifiedName("org.key_project.key4eclipse.resources", "inRecursionCycle");
    
    /**
     * Runs an {@link IncrementalProjectBuilder}s INCREMENTAL_BUILD for the given {@link IProject} and waits for the build to finish.
@@ -258,5 +270,75 @@ public class KeYResourcesUtil {
       IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
       IFile proofFile = root.getFile(proofFilePath);
       return proofFile;
+   }
+   
+   /**
+    * Defines the persistent property indicating that the proof is closed
+    * of the given proof file.
+    * @param proofFile The proof file to update its property.
+    * @param closed The closed state or {@code null} if unknown.
+    * @throws CoreException Occurred Exception.
+    */
+   public static void setProofClosed(IFile proofFile, Boolean closed) throws CoreException {
+      if (proofFile != null) {
+         proofFile.setPersistentProperty(PROOF_CLOSED, closed != null ? closed.toString() : null);
+         ProofFileLightweightLabelDecorator.redecorateProofFile(proofFile);
+      }
+   }
+   
+   /**
+    * Checks if the given proof file is closed.
+    * @param proofFile The proof file to check.
+    * @return The closed state or {@code null} if unknown.
+    * @throws CoreException Occurred Exception.
+    */
+   public static Boolean isProofClosed(IFile proofFile) throws CoreException {
+      if (proofFile != null) {
+         String property = proofFile.getPersistentProperty(PROOF_CLOSED);
+         if (property != null) {
+            return Boolean.valueOf(property);
+         }
+         else {
+            return null;
+         }
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Defines the persistent property indicating that the proof is part of a recursion cycle
+    * of the given proof file.
+    * @param proofFile The proof file to update its property.
+    * @param closed The recursion cycle state or {@code null} if unknown.
+    * @throws CoreException Occurred Exception.
+    */
+   public static void setProofInRecursionCycle(IFile proofFile, Boolean closed) throws CoreException {
+      if (proofFile != null) {
+         proofFile.setPersistentProperty(PROOF_IN_RECURSION_CYCLE, closed != null ? closed.toString() : null);
+         ProofFileLightweightLabelDecorator.redecorateProofFile(proofFile);
+      }
+   }
+   
+   /**
+    * Checks if the given proof file is part of a recursion cycle.
+    * @param proofFile The proof file to check.
+    * @return The recursion cycle state or {@code null} if unknown.
+    * @throws CoreException Occurred Exception.
+    */
+   public static Boolean isProofInRecursionCycle(IFile proofFile) throws CoreException {
+      if (proofFile != null) {
+         String property = proofFile.getPersistentProperty(PROOF_IN_RECURSION_CYCLE);
+         if (property != null) {
+            return Boolean.valueOf(property);
+         }
+         else {
+            return null;
+         }
+      }
+      else {
+         return null;
+      }
    }
 }

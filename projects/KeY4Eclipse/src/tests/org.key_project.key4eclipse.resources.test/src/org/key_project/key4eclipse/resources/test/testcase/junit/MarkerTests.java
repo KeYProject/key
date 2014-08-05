@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
 import org.key_project.key4eclipse.resources.test.Activator;
 import org.key_project.key4eclipse.resources.test.util.KeY4EclipseResourcesTestUtil;
+import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
@@ -475,6 +476,13 @@ public class MarkerTests extends AbstractResourceTest {
       LinkedList<IMarker> markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile);
       assertTrue(markerList.size() == 1);
       assertTrue(testMarker(markerList, MarkerManager.CLOSEDMARKER_ID, 115, 118));
+      for (IMarker marker : markerList) {
+         IFile proofFile = KeYResourcesUtil.getProofFile(marker);
+         assertNotNull(proofFile);
+         assertTrue(proofFile.exists());
+         assertEquals(Boolean.TRUE, KeYResourcesUtil.isProofClosed(proofFile));
+         assertNull(KeYResourcesUtil.isProofInRecursionCycle(proofFile));
+      }
    }
    
    private void testProofNotClosedMarker(IProject project) throws CoreException{
@@ -490,6 +498,13 @@ public class MarkerTests extends AbstractResourceTest {
       LinkedList<IMarker> markerList = KeY4EclipseResourcesTestUtil.getAllKeYMarker(javaFile);
       assertTrue(markerList.size() == 1);
       assertTrue(testMarker(markerList, MarkerManager.NOTCLOSEDMARKER_ID, 121, 124));
+      for (IMarker marker : markerList) {
+         IFile proofFile = KeYResourcesUtil.getProofFile(marker);
+         assertNotNull(proofFile);
+         assertTrue(proofFile.exists());
+         assertEquals(Boolean.FALSE, KeYResourcesUtil.isProofClosed(proofFile));
+         assertNull(KeYResourcesUtil.isProofInRecursionCycle(proofFile));
+      }
    }
    
    private void testNoDuplicatedMarker(IProject project) throws CoreException{
@@ -584,7 +599,13 @@ public class MarkerTests extends AbstractResourceTest {
       assertTrue(KeY4EclipseResourcesTestUtil.getMarkerCount(project) == 2);
       assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 285, 286));
       assertTrue(testMarker(markerList, MarkerManager.RECURSIONMARKER_ID, 410, 411));
-      
+      for (IMarker marker : markerList) {
+         IFile proofFile = KeYResourcesUtil.getProofFile(marker);
+         assertNotNull(proofFile);
+         assertTrue(proofFile.exists());
+         assertEquals(Boolean.TRUE, KeYResourcesUtil.isProofClosed(proofFile));
+         assertEquals(Boolean.TRUE, KeYResourcesUtil.isProofInRecursionCycle(proofFile));
+      }
    }
    
    
