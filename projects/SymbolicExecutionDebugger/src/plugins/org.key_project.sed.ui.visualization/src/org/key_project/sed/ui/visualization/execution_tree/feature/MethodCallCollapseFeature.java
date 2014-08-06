@@ -1,24 +1,16 @@
 package org.key_project.sed.ui.visualization.execution_tree.feature;
 
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICustomContext;
-import org.eclipse.graphiti.features.context.impl.AddContext;
-import org.eclipse.graphiti.features.context.impl.AreaContext;
 import org.eclipse.graphiti.features.context.impl.RemoveContext;
 import org.eclipse.graphiti.features.context.impl.UpdateContext;
 import org.eclipse.graphiti.features.impl.DefaultRemoveFeature;
-import org.eclipse.graphiti.features.impl.Reason;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Polyline;
 import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
@@ -33,9 +25,6 @@ import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
-import org.key_project.sed.core.model.memory.SEDMemoryBranchStatement;
-import org.key_project.sed.core.model.memory.SEDMemoryMethodReturn;
-import org.key_project.sed.core.model.memory.SEDMemoryStatement;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeStyleUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
@@ -69,109 +58,134 @@ public class MethodCallCollapseFeature extends AbstractDebugNodeCollapseFeature 
          
          try
          {
-            ISEDBranchCondition[] bcs = mc.getMethodReturnConditions();
+            UpdateContext uc;
+            MethodCallUpdateFeature uf;
+            
+            uc = new UpdateContext(pes[1]);
+            uf = (MethodCallUpdateFeature) getFeatureProvider().getUpdateFeature(uc);
+            
+            ISEDBranchCondition[] bcs = uf.getSortedBCs(mc);
             
             GraphicsAlgorithm rectGA = pes[0].getGraphicsAlgorithm();
             GraphicsAlgorithm nodeGA = pes[1].getGraphicsAlgorithm();
             
             int OFFSET = getDiagram().getGridUnit() * 2;
             int height = 2 * (nodeGA.getHeight() + OFFSET);
+            IProgressMonitor monitor = GraphitiUtil.getProgressMonitor(context);
             
             if(!mc.isCollapsed())
             {
-               mc.setCollapsed(!mc.isCollapsed());
-               removeChildren(mc, mc);
-               removeConnections(pes[1]);
+               uf.removeChildren(mc, mc);
+               uf.removeConnections(pes[1]);
                
-               int methodHeight = Integer.parseInt(Graphiti.getPeService().getPropertyValue(pes[0], "height"));
-               int diff = methodHeight - height;
+               mc.setCollapsed(true);
+               
+               int diff = rectGA.getHeight() - height;
 
-//               System.out.println("MH: " + methodHeight + ", H: " + height);
-//               if(methodHeight > height){
-                  rectGA.setHeight(height);
-                  Graphiti.getPeService().setPropertyValue(pes[0], "height", Integer.toString(height));
-//               }
-                  
-               UpdateContext uc;
-               AbstractDebugNodeUpdateFeature uf;
-               
+               Graphiti.getPeService().setPropertyValue(pes[0], "DIFF", Integer.toString(diff));
+               uf.updateCollapsedRectHeight(mc, nodeGA, diff);
+
+               int maxX = 0;
+               boolean need2Move = true;
+
+               nodeGA.setX(rectGA.getX());
+//               Graphiti.getPeService().setPropertyValue(pes[1], "MOVE", Integer.toString(nodeGA.getX()));
                for(ISEDBranchCondition bc : bcs)
                {
-                  AreaContext areaContext = new AreaContext();
-                  areaContext.setX(0);
-                  areaContext.setY(rectGA.getY() + nodeGA.getHeight() / 2 + OFFSET);
+//                  AreaContext areaContext = new AreaContext();
+//                  areaContext.setX(maxX);
+//                  areaContext.setY(rectGA.getY() + nodeGA.getHeight() / 2 + OFFSET);
+//                  
+//                  AddContext addContext = new AddContext(areaContext, bc);
+//                  addContext.setTargetContainer(getDiagram());
+//                  // Execute add feature manually because getFeatureProvider().addIfPossible(addContext) changes the selection
+//                  IAddFeature feature = getFeatureProvider().getAddFeature(addContext);
+//                  if (feature != null && feature.canExecute(addContext)) {
+//                     feature.execute(addContext);
+//                  }
+
+                  uf.createGraphicalRepresentationForNode(bc, OFFSET, maxX);
                   
-                  AddContext addContext = new AddContext(areaContext, bc);
-                  addContext.setTargetContainer(getDiagram());
-                  // Execute add feature manually because getFeatureProvider().addIfPossible(addContext) changes the selection
-                  IAddFeature feature = getFeatureProvider().getAddFeature(addContext);
-                  if (feature != null && feature.canExecute(addContext)) {
-                     feature.execute(addContext);
-                  }
                   
                   PictogramElement bcPE = getFeatureProvider().getPictogramElementForBusinessObject(bc);
+                  GraphicsAlgorithm bcGA = bcPE.getGraphicsAlgorithm();
 
-                  for(ISEDDebugNode node : bc.getChildren()) {
-                     ISEDMethodReturn mr = (ISEDMethodReturn) node;
-                     PictogramElement mrPE = getFeatureProvider().getPictogramElementForBusinessObject(mr);
-                     GraphicsAlgorithm mrGA = mrPE.getGraphicsAlgorithm();
-                     
-                     uc = new UpdateContext(mrPE);
-                     uf = (AbstractDebugNodeUpdateFeature) getFeatureProvider().getUpdateFeature(uc);
-                     uf.moveSubTreeVertical(mr, -diff);
-                     
-//                     mrGA.setY(mrGA.getY() - diff);
-                     createConnection((AnchorContainer)bcPE, (AnchorContainer)mrPE);
+                  ISEDMethodReturn mr = (ISEDMethodReturn) bc.getChildren()[0];
+                  PictogramElement mrPE = getFeatureProvider().getPictogramElementForBusinessObject(mr);
+                  GraphicsAlgorithm mrGA = mrPE.getGraphicsAlgorithm();
+                  
+//                     uf.updateChildren(pictogramElement, offsetBetweenPictogramElements, monitor)
+                  
+                  int widthDiff = bcGA.getX() + bcGA.getWidth() - mrGA.getX() - mrGA.getWidth();
+
+                  if(bcGA.getWidth() < mrGA.getWidth())
+                  {
+                     bcGA.setX(mrGA.getX() + (mrGA.getWidth() - bcGA.getWidth()) / 2);
+                     need2Move = false;
                   }
+//                        if(widthDiff > 0)
+//                           bcGA.setX(bcGA.getX() + bcGA.getWidth() + OFFSET);
+//                        else
+//                           bcGA.setX(mrGA.getX() + mrGA.getWidth() + OFFSET);
+                  
+
+                  maxX = uf.findMostRightXInSubtree(bc) + OFFSET;
+                  
+                  int hMove = 0;
+                  
+                  if(need2Move)
+                  {
+                     hMove = (bcGA.getX() - mrGA.getX() + widthDiff) / 2;
+                     uf.moveSubTreeHorizontal(mr, hMove, new SubProgressMonitor(monitor, 1));
+                  }
+
+                  Graphiti.getPeService().setPropertyValue(mrPE, "MOVE", Integer.toString(hMove));
+                  
+                  createConnection((AnchorContainer)bcPE, (AnchorContainer)mrPE);
                }
                
-//               IProgressMonitor monitor = GraphitiUtil.getProgressMonitor(context);
-
-               uc = new UpdateContext(pes[1]);
-//               uf = (AbstractDebugNodeUpdateFeature) getFeatureProvider().getUpdateFeature(uc);
-//               uf.centerChildren(new HashSet<ISEDDebugNode>(Arrays.asList(mc.getMethodReturnConditions())), new SubProgressMonitor(monitor, 1));
-               MethodCallUpdateFeature mcuf = (MethodCallUpdateFeature) getFeatureProvider().getUpdateFeature(uc);
-               mcuf.centerCollapsedMethod(mc.getMethodReturnConditions());
+               Set<ISEDDebugNode> leafs = new HashSet<ISEDDebugNode>();
+               leafs.add(mc);
+               uf.centerChildren(leafs, new SubProgressMonitor(monitor, 1));
+               monitor.worked(1);
             }
             else
             {
-               mc.setCollapsed(!mc.isCollapsed());
                DefaultRemoveFeature drf = new DefaultRemoveFeature(getFeatureProvider());
                for(ISEDBranchCondition bc : bcs) {
                   PictogramElement pe = getFeatureProvider().getPictogramElementForBusinessObject(bc);
-                  removeConnections(pe, drf);
+                  uf.removeConnections(pe, drf);
                   drf.remove(new RemoveContext(pe));
                }
 
-               removeConnections(pes[1], drf);
+               uf.removeConnections(pes[1], drf);
+               
+               mc.setCollapsed(false);
                
                rectGA.setHeight(nodeGA.getHeight() / 2);
-               Graphiti.getPeService().setPropertyValue(pes[0], "height", Integer.toString(nodeGA.getHeight() / 2));
-               
-               UpdateContext uc = new UpdateContext(pes[1]);
-               AbstractDebugNodeUpdateFeature feature = (AbstractDebugNodeUpdateFeature) getFeatureProvider().getUpdateFeature(uc);
-               feature.update(uc);
-               
-               rectGA.setHeight(rectGA.getHeight() + nodeGA.getHeight() + OFFSET);
-               Graphiti.getPeService().setPropertyValue(pes[0], "height", Integer.toString(rectGA.getHeight()));
+               nodeGA.setX(rectGA.getX());
+//               nodeGA.setX(Integer.parseInt(Graphiti.getPeService().getPropertyValue(pes[1], "X")));
                
                for(ISEDBranchCondition bc : bcs) {
-                  for(ISEDDebugNode node : bc.getChildren()) {
-                     ISEDMethodReturn mr = (ISEDMethodReturn) node;
-                     PictogramElement mrPE = getFeatureProvider().getPictogramElementForBusinessObject(mr);
-                     PictogramElement parentPE = getFeatureProvider().getPictogramElementForBusinessObject(mr.getParent());
-                     GraphicsAlgorithm mrGA = mrPE.getGraphicsAlgorithm();
-                     
-                     uc = new UpdateContext(mrPE);
-                     feature = (AbstractDebugNodeUpdateFeature) getFeatureProvider().getUpdateFeature(uc);
-                     feature.moveSubTreeVertical(mr, rectGA.getY() + rectGA.getHeight() - mrGA.getY() - mrGA.getHeight() / 2);
-                     
-//                     mrGA.setY(rectGA.getY() + rectGA.getHeight() - mrGA.getHeight() / 2);
-                     createConnection((AnchorContainer)parentPE, (AnchorContainer)mrPE);
-                  }
+                  ISEDMethodReturn mr = (ISEDMethodReturn) bc.getChildren()[0];
+                  PictogramElement mrPE = getFeatureProvider().getPictogramElementForBusinessObject(mr);
+
+                  uf.moveSubTreeHorizontal(mr, -Integer.parseInt(Graphiti.getPeService().getPropertyValue(mrPE, "MOVE")), new SubProgressMonitor(monitor, 1));
                }
                
-
+               uf.updateCollapsedRectHeight(mc, nodeGA, -Integer.parseInt(Graphiti.getPeService().getPropertyValue(pes[0], "DIFF")));
+               uf.updateChildren(pes[1], OFFSET, new SubProgressMonitor(monitor, 1));
+               monitor.worked(1);
+               
+               for(ISEDBranchCondition bc : bcs) {
+                   ISEDMethodReturn mr = (ISEDMethodReturn) uf.getChildren(bc)[0];
+                   PictogramElement mrPE = getFeatureProvider().getPictogramElementForBusinessObject(mr);
+                   PictogramElement parentPE = getFeatureProvider().getPictogramElementForBusinessObject(uf.getParent(mr));
+                   
+                   createConnection((AnchorContainer)parentPE, (AnchorContainer)mrPE);
+                   uf.updateParents(mrPE, OFFSET, new SubProgressMonitor(monitor, 1));
+                   monitor.worked(1);
+                }
             }
             
 //            mc.setCollapsed(!mc.isCollapsed());
@@ -196,54 +210,6 @@ public class MethodCallCollapseFeature extends AbstractDebugNodeCollapseFeature 
 
       Polyline polyline = gaService.createPolyline(connection);
       polyline.setStyle(ExecutionTreeStyleUtil.getStyleForParentConnection(getDiagram()));
-   }
-   
-   /**
-    * This function removes all children and connections of the given node, until
-    * there are no more children or {@link ISEDMethodReturn} is reached and returns
-    * all found MethodReturns.
-    * @param ISEDDebugNode node The current node
-    * @return Set<ISEDDebugNode> methodCloses Contains all MethodReturns
-    * @throws DebugException
-    */
-   private void removeChildren(ISEDDebugNode node, ISEDMethodCall mc) throws DebugException {
-      ISEDDebugNode[] children = node.getChildren();
-      
-      if(children.length == 0)
-         return;
-      
-      DefaultRemoveFeature drf = new DefaultRemoveFeature(getFeatureProvider());
-      
-      for(ISEDDebugNode child : children)
-      {
-         PictogramElement[] pes = getFeatureProvider().getAllPictogramElementsForBusinessObject(child);
-         
-         if(pes == null || child instanceof ISEDMethodReturn && child.getCallStack()[0] == mc) {
-            continue;
-         }
-         
-         if(!(child instanceof ISEDMethodReturn) || child.getCallStack()[0] != mc)
-            removeChildren(child, mc);
-         
-         for(PictogramElement pe : pes)
-         {
-            if(!(child instanceof ISEDMethodCall)) {
-               removeConnections(pe, drf);
-            }
-            drf.remove(new RemoveContext(pe));
-         }
-      }
-   }
-   
-   private void removeConnections(PictogramElement pe) {
-      removeConnections(pe, new DefaultRemoveFeature(getFeatureProvider()));
-   }
-
-   private void removeConnections(PictogramElement pe, DefaultRemoveFeature drf) {
-      List<Connection> cons = Graphiti.getPeService().getOutgoingConnections((AnchorContainer) pe);
-   
-      for(Connection con : cons)
-         drf.remove(new RemoveContext(con));
    }
    
    /**
