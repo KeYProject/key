@@ -33,4 +33,5 @@ as result of QueryInPrecondition.main(x,y);&gt;" isReturnValueComputed="true" me
       </statement>
       <methodReturnEntry path="/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0"/>
 </start>

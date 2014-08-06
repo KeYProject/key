@@ -247,7 +247,7 @@ public final class TestSEDKeyCoreUtil {
     * @param targetName The expected name of the {@link ISEDDebugTarget}. 
     * @return The created expected model.
     */
-   public static ISEDDebugTarget createExpectedInitialModel(String targetName) {
+   public static ISEDDebugTarget createExpectedInitialModel(String targetName, boolean disposed) {
       // Create debug target
       SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(null, false);
       target.setModelIdentifier(KeYDebugTarget.MODEL_IDENTIFIER);
@@ -255,6 +255,9 @@ public final class TestSEDKeyCoreUtil {
       // Add thread
       SEDMemoryThread thread = new SEDMemoryThread(target, false);
       thread.setName(IExecutionStart.DEFAULT_START_NODE_NAME);
+      if (!disposed) {
+         thread.setPathCondition("true");
+      }
       target.addSymbolicThread(thread);
       return target;
    }
@@ -266,8 +269,19 @@ public final class TestSEDKeyCoreUtil {
     * @param targetName The expected name of the {@link ISEDDebugTarget}. 
     * @throws DebugException Occurred Exception.
     */
+   public static void assertDisposedInitialTarget(ISEDDebugTarget target, String targetName) throws DebugException {
+      TestSedCoreUtil.compareDebugTarget(createExpectedInitialModel(targetName, true), target, false, false, false);
+   }
+   
+   /**
+    * Makes sure that the given {@link ISEDDebugTarget} is
+    * in the initial state.
+    * @param target The give {@link ISEDDebugTarget} to check.
+    * @param targetName The expected name of the {@link ISEDDebugTarget}. 
+    * @throws DebugException Occurred Exception.
+    */
    public static void assertInitialTarget(ISEDDebugTarget target, String targetName) throws DebugException {
-      TestSedCoreUtil.compareDebugTarget(createExpectedInitialModel(targetName), target, false, false, false);
+      TestSedCoreUtil.compareDebugTarget(createExpectedInitialModel(targetName, false), target, false, false, false);
    }
    
    /**

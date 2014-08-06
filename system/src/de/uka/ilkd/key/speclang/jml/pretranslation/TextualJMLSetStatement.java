@@ -30,6 +30,7 @@ public final class TextualJMLSetStatement extends TextualJMLConstruct {
         super(mods);
         assert assignment != null;
         this.assignment = assignment;
+        setPosition(assignment);
     }
     
     

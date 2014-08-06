@@ -17,18 +17,17 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.ObjectUtil;
 
 /**
  * This {@link ISchedulingRule} can be used to let {@link Job}s waiting
  * if they use the same given {@link Object}.
  * @author Martin Hentschel
  */
-public class ObjectSchedulingRule implements ISchedulingRule {
+public class ObjectsSchedulingRule implements ISchedulingRule {
    /**
-    * The object which causes conflicts.
+    * The objects which causes conflicts.
     */
-   private Object conflictsWith;
+   private final Object[] conflictsWith;
    
    /**
     * <p>
@@ -39,15 +38,15 @@ public class ObjectSchedulingRule implements ISchedulingRule {
     * {@code org.eclipse.core.resources} is loaded which avoids some bugs during runtime.
     * </p>
     */
-   private IResource[] conflictingResources;
+   private final IResource[] conflictingResources;
    
    /**
     * Constructor.
-    * @param conflictsWith The object which causes conflicts.
+    * @param conflictsWith The objects which causes conflicts.
     * @param conflictingResources Contains all {@link IResource}s which also conflicts with this {@link ISchedulingRule}.
     */
-   public ObjectSchedulingRule(Object conflictsWith, 
-                              IResource... conflictingResources) {
+   public ObjectsSchedulingRule(Object[] conflictsWith, 
+                                IResource... conflictingResources) {
       super();
       this.conflictsWith = conflictsWith;
       this.conflictingResources = conflictingResources;
@@ -58,9 +57,22 @@ public class ObjectSchedulingRule implements ISchedulingRule {
     */
    @Override
    public boolean contains(ISchedulingRule rule) {
-      if (rule instanceof ObjectSchedulingRule) {
-         ObjectSchedulingRule otherRule = (ObjectSchedulingRule)rule;
-         return ObjectUtil.equals(conflictsWith, otherRule.getConflictsWith());
+      if (rule instanceof ObjectsSchedulingRule) {
+         if (conflictsWith != null) { 
+            Object[] otherConflicts = ((ObjectsSchedulingRule)rule).getConflictsWith();
+            boolean hasConflictingObject = false;
+            int i = 0;
+            while (!hasConflictingObject && i < conflictsWith.length) {
+               if (ArrayUtil.contains(otherConflicts, conflictsWith[i])) {
+                  hasConflictingObject = true;
+               }
+               i++;
+            }
+            return hasConflictingObject;
+         }
+         else {
+            return false;
+         }
       }
       else {
          if (rule instanceof IResource) {
@@ -81,10 +93,10 @@ public class ObjectSchedulingRule implements ISchedulingRule {
    }
 
    /**
-    * Returns the object which causes conflicts.
-    * @return The object which causes conflicts.
+    * Returns the objects which causes conflicts.
+    * @return The objects which causes conflicts.
     */
-   public Object getConflictsWith() {
+   public Object[] getConflictsWith() {
       return conflictsWith;
    }
 }

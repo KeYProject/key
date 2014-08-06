@@ -1452,7 +1452,12 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                KeYUtil.waitWhileMainWindowIsFrozen(MainWindow.getInstance());
             }
             // Test the unmodified execution tree
-            TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
+            if (clearProofListInKeYBeforeDisconnect) {
+               TestSEDKeyCoreUtil.assertDisposedInitialTarget(target, targetName);
+            }
+            else {
+               TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
+            }
          }
       };
       doKeYDebugTargetTest(projectName, 

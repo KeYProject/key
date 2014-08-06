@@ -149,4 +149,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
       </loopInvariant>
       <methodReturnEntry path="/0/0/1/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/1/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/0/0"/>
 </start>

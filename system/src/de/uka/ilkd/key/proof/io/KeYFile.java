@@ -492,4 +492,9 @@ public class KeYFile implements EnvInput {
     public Profile getProfile() {
         return profile;
     }
+    
+    @Override
+    public File getInitialFile() {
+       return file != null ? file.file() : null;
+    }
 }
