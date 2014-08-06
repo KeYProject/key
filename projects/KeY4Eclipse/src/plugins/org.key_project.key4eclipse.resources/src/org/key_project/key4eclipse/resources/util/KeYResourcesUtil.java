@@ -280,7 +280,7 @@ public class KeYResourcesUtil {
     * @throws CoreException Occurred Exception.
     */
    public static void setProofClosed(IFile proofFile, Boolean closed) throws CoreException {
-      if (proofFile != null) {
+      if (proofFile != null && proofFile.exists()) {
          proofFile.setPersistentProperty(PROOF_CLOSED, closed != null ? closed.toString() : null);
          ProofFileLightweightLabelDecorator.redecorateProofFile(proofFile);
       }
@@ -293,7 +293,7 @@ public class KeYResourcesUtil {
     * @throws CoreException Occurred Exception.
     */
    public static Boolean isProofClosed(IFile proofFile) throws CoreException {
-      if (proofFile != null) {
+      if (proofFile != null && proofFile.exists()) {
          String property = proofFile.getPersistentProperty(PROOF_CLOSED);
          if (property != null) {
             return Boolean.valueOf(property);
@@ -315,7 +315,7 @@ public class KeYResourcesUtil {
     * @throws CoreException Occurred Exception.
     */
    public static void setProofInRecursionCycle(IFile proofFile, Boolean closed) throws CoreException {
-      if (proofFile != null) {
+      if (proofFile != null && proofFile.exists()) {
          proofFile.setPersistentProperty(PROOF_IN_RECURSION_CYCLE, closed != null ? closed.toString() : null);
          ProofFileLightweightLabelDecorator.redecorateProofFile(proofFile);
       }
@@ -328,7 +328,7 @@ public class KeYResourcesUtil {
     * @throws CoreException Occurred Exception.
     */
    public static Boolean isProofInRecursionCycle(IFile proofFile) throws CoreException {
-      if (proofFile != null) {
+      if (proofFile != null && proofFile.exists()) {
          String property = proofFile.getPersistentProperty(PROOF_IN_RECURSION_CYCLE);
          if (property != null) {
             return Boolean.valueOf(property);
