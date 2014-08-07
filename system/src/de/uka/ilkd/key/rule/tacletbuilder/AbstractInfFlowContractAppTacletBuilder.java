@@ -170,7 +170,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
                 buildContractApplications(schemaDataFind,
                                           schemaDataAssumes, services);
 
-        // collect quantifaible variables of the post term and replace them
+        // collect quantifiable variables of the post term and replace them
         // by schema variables
         Map<QuantifiableVariable, SchemaVariable> quantifiableVarsToSchemaVars =
                 collectQuantifiableVariables(replaceWithTerm, services);
