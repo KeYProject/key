@@ -92,6 +92,7 @@ public class FinishAuxiliaryMethodComputationMacro
                 proof.saveProof(mediator.getUI());
                 // make everyone listen to the proof remove
                 mediator.startInterface(true);
+                initiatingProof.addSideProof(proof);
                 mediator.getUI().removeProof(proof);
                 mediator.getSelectionModel().setSelectedGoal(initiatingGoal);
                 // go into automode again

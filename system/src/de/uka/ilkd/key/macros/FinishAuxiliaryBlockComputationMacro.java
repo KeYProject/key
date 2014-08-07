@@ -65,7 +65,8 @@ public class FinishAuxiliaryBlockComputationMacro
         }
 
         final Goal initiatingGoal = ((BlockExecutionPO) poForProof).getInitiatingGoal();
-        final Services services = initiatingGoal.proof().getServices();
+        final Proof initiatingProof = initiatingGoal.proof();
+        final Services services = initiatingProof.getServices();
 
         if (initiatingGoal.node().parent() == null) {
             return info;
@@ -102,6 +103,7 @@ public class FinishAuxiliaryBlockComputationMacro
                 proof.saveProof(mediator.getUI());
                 // make everyone listen to the proof remove
                 mediator.startInterface(true);
+                initiatingProof.addSideProof(proof);
                 mediator.getUI().removeProof(proof);
                 mediator.getSelectionModel().setSelectedGoal(initiatingGoal);
                 // go into automode again

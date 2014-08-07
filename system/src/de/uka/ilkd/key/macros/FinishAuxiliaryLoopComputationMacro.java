@@ -58,7 +58,8 @@ public class FinishAuxiliaryLoopComputationMacro extends
         final LoopInvExecutionPO loopInvExecPO = (LoopInvExecutionPO) poForProof;
 
         final Goal initiatingGoal = loopInvExecPO.getInitiatingGoal();
-        final Services services = initiatingGoal.proof().getServices();
+        final Proof initiatingProof = initiatingGoal.proof();
+        final Services services = initiatingProof.getServices();
 
         if (initiatingGoal.node().parent() == null) {
             return info;
@@ -97,6 +98,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
                 proof.saveProof(mediator.getUI());
                 // make everyone listen to the proof remove
                 mediator.startInterface(true);
+                initiatingProof.addSideProof(proof);
                 mediator.getUI().removeProof(proof);
                 mediator.getSelectionModel().setSelectedGoal(initiatingGoal);
                 // go into automode again

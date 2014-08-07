@@ -156,6 +156,11 @@ public class Proof implements Named {
      */
     private File proofFile;
 
+    /**
+     * Aggregated proof statistics from other proofs which contributed to this one.
+     */
+    private SideProofStatistics sideProofStatistics = null;
+
     /** 
      * constructs a new empty proof with name 
      */
@@ -1071,6 +1076,105 @@ public class Proof implements Named {
         return result.toString();
     }
 
+    public boolean hasSideProofs() {
+        return this.sideProofStatistics != null;
+    }
+
+    public void addSideProof(Proof proof) {
+        assert proof != null;
+        addSideProofStatistics(proof.statistics());
+    }
+
+    private void addSideProofStatistics(Statistics stat) {
+        assert stat != null;
+        if (this.hasSideProofs()) {
+            sideProofStatistics.add(stat);
+        } else {
+            sideProofStatistics = SideProofStatistics.create(stat);
+        }
+    }
+
+    final static class SideProofStatistics {
+        int nodes = 0;
+        int branches = 0;
+        int interactiveSteps = 0;
+        int quantifierInstantiations = 0;
+        int ossApps = 0;
+        int totalRuleApps = 0;
+        int smtSolverApps = 0;
+        int dependencyContractApps = 0;
+        int operationContractApps = 0;
+        int loopInvApps = 0;
+        long autoModeTime = 0;
+        long time = 0;
+        float timePerStep = 0;
+
+        private SideProofStatistics(int nodes,
+                                    int branches,
+                                    int interactiveSteps,
+                                    int quantifierInstantiations,
+                                    int ossApps,
+                                    int totalRuleApps,
+                                    int smtSolverApps,
+                                    int dependencyContractApps,
+                                    int operationContractApps,
+                                    int loopInvApps,
+                                    long autoModeTime,
+                                    long time,
+                                    float timePerStep) {
+            this.nodes = nodes;
+            this.branches = branches;
+            this.interactiveSteps = interactiveSteps;
+            this.quantifierInstantiations = quantifierInstantiations;
+            this.ossApps = ossApps;
+            this.totalRuleApps = totalRuleApps;
+            this.smtSolverApps = smtSolverApps;
+            this.dependencyContractApps = dependencyContractApps;
+            this.operationContractApps = operationContractApps;
+            this.loopInvApps = loopInvApps;
+            this.autoModeTime = autoModeTime;
+            this.time = time;
+            this.timePerStep = timePerStep;
+        }
+
+        static SideProofStatistics create(Statistics stat) {
+            return new SideProofStatistics(stat.nodes,
+                                           stat.branches,
+                                           stat.interactiveSteps,
+                                           stat.quantifierInstantiations,
+                                           stat.ossApps,
+                                           stat.totalRuleApps,
+                                           stat.smtSolverApps,
+                                           stat.dependencyContractApps,
+                                           stat.operationContractApps,
+                                           stat.loopInvApps,
+                                           stat.autoModeTime,
+                                           stat.time,
+                                           stat.timePerStep);
+        }
+
+        void add(Statistics stat) {
+            this.nodes += stat.nodes;
+            this.branches += stat.branches;
+            this.interactiveSteps += stat.interactiveSteps;
+            this.quantifierInstantiations += stat.quantifierInstantiations;
+            this.ossApps += stat.ossApps;
+            this.totalRuleApps += stat.totalRuleApps;
+            this.smtSolverApps += stat.smtSolverApps;
+            this.dependencyContractApps += stat.dependencyContractApps;
+            this.operationContractApps += stat.operationContractApps;
+            this.loopInvApps += stat.loopInvApps;
+            this.autoModeTime += stat.autoModeTime;
+            this.time += stat.time;
+            this.timePerStep = this.nodes != 0 ? this.autoModeTime/(float)this.nodes : 0;
+        }
+
+        void setAutoModeTime(long autoTime) {
+            this.autoModeTime = autoTime;
+            this.timePerStep = this.nodes != 0 ? this.autoModeTime/(float)this.nodes : 0;
+        }
+    }
+
     /**
      * Instances of this class encapsulate statistical information about proofs,
      * such as the number of nodes, or the number of interactions.
@@ -1095,6 +1199,21 @@ public class Proof implements Named {
         private List<Pair<String, String>> summaryList =
                         new ArrayList<Pair<String, String>>(14);
 
+        private Statistics(SideProofStatistics side) {
+            this.nodes = side.nodes;
+            this.branches = side.branches;
+            this.interactiveSteps = side.interactiveSteps;
+            this.quantifierInstantiations = side.quantifierInstantiations;
+            this.ossApps = side.ossApps;
+            this.totalRuleApps = side.totalRuleApps;
+            this.smtSolverApps = side.smtSolverApps;
+            this.dependencyContractApps = side.dependencyContractApps;
+            this.operationContractApps = side.operationContractApps;
+            this.loopInvApps = side.loopInvApps;
+            this.autoModeTime = side.autoModeTime;
+            this.time = side.time;
+            this.timePerStep = side.timePerStep;
+        }
 
         private Statistics(Proof proof) {
             final Iterator<Node> it = proof.root().subtreeIterator();
@@ -1170,14 +1289,26 @@ public class Proof implements Named {
         }
 
         private void generateSummary(Proof proof) {
+            final boolean sideProofs = proof.hasSideProofs();
+            final Statistics stat;
+            if (sideProofs) {
+                long autoTime = proof.getAutoModeTime()
+                        + proof.sideProofStatistics.autoModeTime;
+                proof.addSideProofStatistics(this);
+                proof.sideProofStatistics.setAutoModeTime(autoTime);
+                stat = new Statistics(proof.sideProofStatistics);
+            } else {
+                stat = this;
+            }
+
             final String nodeString =
-                            EnhancedStringBuffer.format(nodes).toString();
+                            EnhancedStringBuffer.format(stat.nodes).toString();
             summaryList.add(new Pair<String, String>("Nodes", nodeString));
             summaryList.add(new Pair<String, String>("Branches",
-                            EnhancedStringBuffer.format(branches).toString()));
+                            EnhancedStringBuffer.format(stat.branches).toString()));
             summaryList.add(new Pair<String, String>("Interactive steps", "" +
-                            interactiveSteps));
-            final long time = proof.getAutoModeTime();
+                            stat.interactiveSteps));
+            final long time = sideProofs ? stat.autoModeTime : proof.getAutoModeTime();
             summaryList.add(new Pair<String, String>("Automode time",
                             EnhancedStringBuffer.formatTime(time).toString()));
             if (time >= 10000) {
@@ -1185,8 +1316,8 @@ public class Proof implements Named {
                                 time +
                                 "ms"));
             }
-            if (nodes > 0) {
-                String avgTime = "" + timePerStep;
+            if (stat.nodes > 0) {
+                String avgTime = "" + stat.timePerStep;
                 // round to 3 digits after point
                 int i = avgTime.indexOf('.')+4;
                 if (i > avgTime.length()) i = avgTime.length();
@@ -1198,19 +1329,19 @@ public class Proof implements Named {
 
             summaryList.add(new Pair<String, String>("Rule applications", ""));
             summaryList.add(new Pair<String, String>("Quantifier instantiations",
-                                                     ""+quantifierInstantiations));
+                                                     ""+stat.quantifierInstantiations));
             summaryList.add(new Pair<String, String>("One-step Simplifier apps", "" +
-                            ossApps));
+                            stat.ossApps));
             summaryList.add(new Pair<String, String>("SMT solver apps", "" +
-                            smtSolverApps));
+                            stat.smtSolverApps));
             summaryList.add(new Pair<String, String>("Dependency Contract apps", "" +
-                            dependencyContractApps));
+                            stat.dependencyContractApps));
             summaryList.add(new Pair<String, String>("Operation Contract apps", "" +
-                            operationContractApps));
+                            stat.operationContractApps));
             summaryList.add(new Pair<String, String>("Loop invariant apps", "" +
-                            loopInvApps));
+                            stat.loopInvApps));
             summaryList.add(new Pair<String, String>("Total rule apps",
-                            EnhancedStringBuffer.format(totalRuleApps).toString()));
+                            EnhancedStringBuffer.format(stat.totalRuleApps).toString()));
         }
 
 
