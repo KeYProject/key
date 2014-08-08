@@ -15,8 +15,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -25,8 +27,10 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 import org.key_project.key4eclipse.resources.projectinfo.AbstractContractContainer;
 import org.key_project.key4eclipse.resources.projectinfo.AbstractTypeContainer;
@@ -53,6 +57,7 @@ import org.key_project.util.eclipse.swt.viewer.ObservableTreeViewer;
  * This {@link IViewPart} shows the verification status.
  * @author Martin Hentschel
  */
+@SuppressWarnings("restriction")
 public class VerificationStatusView extends ViewPart {
    /**
     * The root {@link Composite} which contains all shown content.
@@ -274,10 +279,6 @@ public class VerificationStatusView extends ViewPart {
             ContractInfo info = (ContractInfo) element;
             element = info.getParent();
          }
-         if (element instanceof MethodInfo) {
-            MethodInfo info = (MethodInfo) element;
-            element = info.getParent();
-         }
          if (element instanceof ObserverFunctionInfo) {
             ObserverFunctionInfo info = (ObserverFunctionInfo) element;
             element = info.getParent();
@@ -294,10 +295,39 @@ public class VerificationStatusView extends ViewPart {
             }
          }
          else if (element instanceof TypeInfo) {
-            TypeInfo info = (TypeInfo) element;
-            IType type = info.findJDTType();
-            if (type != null && type.exists()) {
-               WorkbenchUtil.selectAndReveal(type.getResource());
+            try {
+               TypeInfo info = (TypeInfo) element;
+               if (info.getFile() != null) {
+                  IEditorPart editor = WorkbenchUtil.openEditor(info.getFile());
+                  if (editor instanceof JavaEditor) {
+                     IType type = info.findJDTType();
+                     if (type != null && type.exists()) {
+                        ((JavaEditor) editor).setSelection(type);
+                     }
+                  }
+               }
+            }
+            catch (PartInitException e) {
+               LogUtil.getLogger().logError(e);
+               LogUtil.getLogger().openErrorDialog(getSite().getShell(), e);
+            }
+         }
+         else if (element instanceof MethodInfo) {
+            try {
+               MethodInfo info = (MethodInfo) element;
+               if (info.getParent().getFile() != null) {
+                  IEditorPart editor = WorkbenchUtil.openEditor(info.getParent().getFile());
+                  if (editor instanceof JavaEditor) {
+                     IMethod type = info.findJDTMethod();
+                     if (type != null && type.exists()) {
+                        ((JavaEditor) editor).setSelection(type);
+                     }
+                  }
+               }
+            }
+            catch (Exception e) {
+               LogUtil.getLogger().logError(e);
+               LogUtil.getLogger().openErrorDialog(getSite().getShell(), e);
             }
          }
       }
