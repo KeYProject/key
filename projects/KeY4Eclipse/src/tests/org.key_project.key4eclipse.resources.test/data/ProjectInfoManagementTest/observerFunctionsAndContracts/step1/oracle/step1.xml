@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<project>
+   <package name="(default package)" path="/ProjectInfoManagementTest_testObserverFunctionsAndContracts/src">
+      <type name="ClassWithoutPackage" path="/ProjectInfoManagementTest_testObserverFunctionsAndContracts/src/ClassWithoutPackage.java">
+      </type>
+   </package>
+   <package name="hello" path="/ProjectInfoManagementTest_testObserverFunctionsAndContracts/src/hello">
+      <type name="ClassInHello" path="/ProjectInfoManagementTest_testObserverFunctionsAndContracts/src/hello/ClassInHello.java">
+      </type>
+   </package>
+   <package name="hello.world" path="/ProjectInfoManagementTest_testObserverFunctionsAndContracts/src/hello/world">
+      <type name="ClassInHelloWorld" path="/ProjectInfoManagementTest_testObserverFunctionsAndContracts/src/hello/world/ClassInHelloWorld.java">
+      </type>
+   </package>
+</project>

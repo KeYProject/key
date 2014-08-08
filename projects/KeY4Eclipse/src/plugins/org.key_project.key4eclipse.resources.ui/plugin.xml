@@ -168,4 +168,19 @@
             name="Proof Meta Text Editor">
       </editor>
    </extension>
+      <extension
+            point="org.eclipse.ui.views">
+         <category
+               id="org.key_project.key4eclipse.resources.ui.view.category"
+               name="KeY Resources">
+         </category>
+         <view
+               category="org.key_project.key4eclipse.resources.ui.view.category"
+               class="org.key_project.key4eclipse.resources.ui.view.VerificationStatusView"
+               icon="icons/logo16.gif"
+               id="org.key_project.key4eclipse.resources.ui.view.VerificationStatusView"
+               name="Verification Status"
+               restorable="true">
+         </view>
+      </extension>
 </plugin>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<project>
+   <package name="(default package)" path="/ProjectInfoManagementTest_testMethodContracts/src">
+      <type name="ClassWithoutPackage" path="/ProjectInfoManagementTest_testMethodContracts/src/ClassWithoutPackage.java">
+         <method displayName="m()" name="m" parameterTypes="">
+         </method>
+         <method displayName="n()" name="n" parameterTypes="">
+         </method>
+      </type>
+   </package>
+   <package name="hello" path="/ProjectInfoManagementTest_testMethodContracts/src/hello">
+      <type name="ClassInHello" path="/ProjectInfoManagementTest_testMethodContracts/src/hello/ClassInHello.java">
+         <method displayName="m()" name="m" parameterTypes="">
+         </method>
+         <method displayName="n()" name="n" parameterTypes="">
+         </method>
+      </type>
+   </package>
+   <package name="hello.world" path="/ProjectInfoManagementTest_testMethodContracts/src/hello/world">
+      <type name="ClassInHelloWorld" path="/ProjectInfoManagementTest_testMethodContracts/src/hello/world/ClassInHelloWorld.java">
+         <method displayName="m()" name="m" parameterTypes="">
+         </method>
+         <method displayName="n()" name="n" parameterTypes="">
+         </method>
+      </type>
+   </package>
+</project>

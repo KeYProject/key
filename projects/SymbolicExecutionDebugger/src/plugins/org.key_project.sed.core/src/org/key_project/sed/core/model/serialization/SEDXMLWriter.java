@@ -20,7 +20,6 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -85,11 +84,6 @@ public class SEDXMLWriter {
     * The used namespace.
     */
    public static final String NAMESPACE = "http://key-project.org/sed/serialization";
-   
-   /**
-    * The used leading white space in each level.
-    */
-   public static final String LEADING_WHITE_SPACE_PER_LEVEL = "   ";
    
    /**
     * Tag name to store {@link ILaunch}s.
@@ -205,11 +199,6 @@ public class SEDXMLWriter {
     * Tag name to store {@link ISEDAnnotationLink}s.
     */
    public static final String TAG_ANNOTATION_LINK = "sedAnnotationLink";
-
-   /**
-    * Attribute name to store encodings.
-    */
-   private static final String ATTRIBUTE_ENCODING = "encoding";
 
    /**
     * Attribute name to define namespaces.
@@ -541,12 +530,12 @@ public class SEDXMLWriter {
       monitor.beginTask("Convert to XML", IProgressMonitor.UNKNOWN);
       StringBuffer sb = new StringBuffer();
       if (targets != null) {
-         appendXmlHeader(encoding, sb);
+         XMLUtil.appendXmlHeader(encoding, sb);
          sb.append("<");
          sb.append(TAG_LAUNCH);
-         appendAttribute(ATTRIBUTE_NAMESPACE, NAMESPACE, sb);
+         XMLUtil.appendAttribute(ATTRIBUTE_NAMESPACE, NAMESPACE, sb);
          sb.append(">");
-         appendNewLine(sb);
+         XMLUtil.appendNewLine(sb);
          for (IDebugTarget target : targets) {
             SWTUtil.checkCanceled(monitor);
             if (target instanceof ISEDDebugTarget) {
@@ -560,7 +549,7 @@ public class SEDXMLWriter {
          sb.append("</");
          sb.append(TAG_LAUNCH);
          sb.append(">");
-         appendNewLine(sb);
+         XMLUtil.appendNewLine(sb);
       }
       monitor.done();
       return sb.toString();
@@ -583,15 +572,15 @@ public class SEDXMLWriter {
                           IProgressMonitor monitor) throws DebugException {
       StringBuffer sb = new StringBuffer();
       if (target != null) {
-         appendWhiteSpace(level, sb);
+         XMLUtil.appendWhiteSpace(level, sb);
          sb.append("<");
          sb.append(TAG_DEBUG_TARGET);
-         appendAttribute(ATTRIBUTE_ID, target.getId(), sb);
-         appendAttribute(ATTRIBUTE_NAME, target.getName(), sb);
-         appendAttribute(ATTRIBUTE_MODEL_IDENTIFIER, target.getModelIdentifier(), sb);
+         XMLUtil.appendAttribute(ATTRIBUTE_ID, target.getId(), sb);
+         XMLUtil.appendAttribute(ATTRIBUTE_NAME, target.getName(), sb);
+         XMLUtil.appendAttribute(ATTRIBUTE_MODEL_IDENTIFIER, target.getModelIdentifier(), sb);
          appenSourcePathAttribute(target, sb);
          sb.append(">");
-         appendNewLine(sb);
+         XMLUtil.appendNewLine(sb);
          ISEDAnnotation[] annotations = target.getRegisteredAnnotations();
          for (ISEDAnnotation annotation : annotations) {
             sb.append(toXML(level + 1, annotation));
@@ -602,11 +591,11 @@ public class SEDXMLWriter {
             sb.append(toXML(level + 1, thread, saveVariables, saveCallStack, monitor));
             monitor.worked(1);
          }
-         appendWhiteSpace(level, sb);
+         XMLUtil.appendWhiteSpace(level, sb);
          sb.append("</");
          sb.append(TAG_DEBUG_TARGET);
          sb.append(">");
-         appendNewLine(sb);
+         XMLUtil.appendNewLine(sb);
       }
       return sb.toString();
    }
@@ -1018,7 +1007,7 @@ public class SEDXMLWriter {
                              StringBuffer sb, IProgressMonitor monitor) throws DebugException {
       if (node != null) {
          // Append start tag
-         appendStartTag(level, tagName, attributeValues, sb);
+         XMLUtil.appendStartTag(level, tagName, attributeValues, sb);
          // Append annotation links
          ISEDAnnotationLink[] links = node.getAnnotationLinks();
          for (ISEDAnnotationLink link : links) {
@@ -1037,7 +1026,7 @@ public class SEDXMLWriter {
             if (childrenByID) {
                Map<String, String> childAttributeValues = new LinkedHashMap<String, String>();
                childAttributeValues.put(ATTRIBUTE_NODE_ID_REF, child.getId());
-               appendEmptyTag(level + 1, TAG_CHILD_REFERENCE, childAttributeValues, sb);               
+               XMLUtil.appendEmptyTag(level + 1, TAG_CHILD_REFERENCE, childAttributeValues, sb);               
             }
             else {
                sb.append(toXML(level + 1, child, saveVariables, saveCallStack, monitor));
@@ -1053,7 +1042,7 @@ public class SEDXMLWriter {
             appendTerminations(level + 1, (ISEDThread)node, sb);
          }
          // Append end tag
-         appendEndTag(level, tagName, sb);
+         XMLUtil.appendEndTag(level, tagName, sb);
       }
    }
 
@@ -1070,7 +1059,7 @@ public class SEDXMLWriter {
          for (ISEDTermination termination : terminations) {
             Map<String, String> attributeValues = new LinkedHashMap<String, String>();
             attributeValues.put(ATTRIBUTE_NODE_ID_REF, termination.getId());
-            appendEmptyTag(level, TAG_TERMINATION_ENTRY, attributeValues, sb);
+            XMLUtil.appendEmptyTag(level, TAG_TERMINATION_ENTRY, attributeValues, sb);
          }
       }
    }
@@ -1109,7 +1098,7 @@ public class SEDXMLWriter {
             for (ISEDDebugNode entry : callStack) {
                Map<String, String> attributeValues = new LinkedHashMap<String, String>();
                attributeValues.put(ATTRIBUTE_NODE_ID_REF, entry.getId());
-               appendEmptyTag(level, TAG_CALL_STACK_ENTRY, attributeValues, sb);
+               XMLUtil.appendEmptyTag(level, TAG_CALL_STACK_ENTRY, attributeValues, sb);
             }
          }
       }
@@ -1151,13 +1140,13 @@ public class SEDXMLWriter {
       }
       attributeValues.put(ATTRIBUTE_NAME, variable.getName());
       attributeValues.put(ATTRIBUTE_REFERENCE_TYPE_NAME, variable.getReferenceTypeName());
-      appendStartTag(level, TAG_VARIABLE, attributeValues, sb);
+      XMLUtil.appendStartTag(level, TAG_VARIABLE, attributeValues, sb);
       // Append children
       if (variable.getValue() != null) {
          appendValue(level + 1, variable.getValue(), sb, monitor);
       }
       // Append end tag
-      appendEndTag(level, TAG_VARIABLE, sb);
+      XMLUtil.appendEndTag(level, TAG_VARIABLE, sb);
    }
 
    /**
@@ -1180,7 +1169,7 @@ public class SEDXMLWriter {
       if (value instanceof ISEDValue) {
          attributeValues.put(ATTRIBUTE_MULTI_VALUED, ((ISEDValue)value).isMultiValued() + "");
       }
-      appendStartTag(level, TAG_VALUE, attributeValues, sb);
+      XMLUtil.appendStartTag(level, TAG_VALUE, attributeValues, sb);
       // Append children
       if (value.hasVariables()) {
          IVariable[] variables = value.getVariables();
@@ -1191,7 +1180,7 @@ public class SEDXMLWriter {
          }
       }
       // Append end tag
-      appendEndTag(level, TAG_VALUE, sb);
+      XMLUtil.appendEndTag(level, TAG_VALUE, sb);
    }
 
    /**
@@ -1215,7 +1204,7 @@ public class SEDXMLWriter {
          if (!StringUtil.isTrimmedEmpty(savedContent)) {
             attributeValues.put(ATTRIBUTE_CONTENT, XMLUtil.encodeText(savedContent));
          }
-         appendEmptyTag(level, TAG_ANNOTATION, attributeValues, sb);
+         XMLUtil.appendEmptyTag(level, TAG_ANNOTATION, attributeValues, sb);
       }
       return sb.toString();
    }
@@ -1237,70 +1226,9 @@ public class SEDXMLWriter {
          if (!StringUtil.isTrimmedEmpty(savedContent)) {
             attributeValues.put(ATTRIBUTE_CONTENT, XMLUtil.encodeText(savedContent));
          }
-         appendEmptyTag(level, TAG_ANNOTATION_LINK, attributeValues, sb);
+         XMLUtil.appendEmptyTag(level, TAG_ANNOTATION_LINK, attributeValues, sb);
       }
       return sb.toString();
-   }
-
-   /**
-    * Appends an empty tag to the given {@link StringBuffer}.
-    * @param level The level.
-    * @param tagName The tag name.
-    * @param attributeValues The attributes.
-    * @param sb The {@link StringBuffer} to append to.
-    */
-   protected void appendEmptyTag(int level, String tagName, Map<String, String> attributeValues, StringBuffer sb) {
-      appendWhiteSpace(level, sb);
-      sb.append("<");
-      sb.append(tagName);
-      for (Entry<String, String> entry : attributeValues.entrySet()) {
-         appendAttribute(entry.getKey(), entry.getValue(), sb);
-      }
-      sb.append("/>");
-      appendNewLine(sb);
-   }
-
-   /**
-    * Appends a start tag to the given {@link StringBuffer}.
-    * @param level The level.
-    * @param tagName The tag name.
-    * @param attributeValues The attributes.
-    * @param sb The {@link StringBuffer} to append to.
-    */
-   protected void appendStartTag(int level, String tagName, Map<String, String> attributeValues, StringBuffer sb) {
-      appendWhiteSpace(level, sb);
-      sb.append("<");
-      sb.append(tagName);
-      for (Entry<String, String> entry : attributeValues.entrySet()) {
-         appendAttribute(entry.getKey(), entry.getValue(), sb);
-      }
-      sb.append(">");
-      appendNewLine(sb);
-   }
-
-   /**
-    * Appends an end tag to the given {@link StringBuffer}.
-    * @param level The level.
-    * @param tagName The tag name.
-    * @param sb The {@link StringBuffer} to append to.
-    */
-   protected void appendEndTag(int level, String tagName, StringBuffer sb) {
-      appendWhiteSpace(level, sb);
-      sb.append("</");
-      sb.append(tagName);
-      sb.append(">");
-      appendNewLine(sb);
-   }
-
-   /**
-    * Adds leading white space to the {@link StringBuffer}.
-    * @param level The level in the tree used for leading white space (formating).
-    * @param sb The {@link StringBuffer} to write to.
-    */
-   protected void appendWhiteSpace(int level, StringBuffer sb) {
-      for (int i = 0; i < level; i++) {
-         sb.append(LEADING_WHITE_SPACE_PER_LEVEL);
-      }
    }
 
    /**
@@ -1310,43 +1238,7 @@ public class SEDXMLWriter {
     */
    protected void appenSourcePathAttribute(Object object, StringBuffer sb) {
       if (object instanceof ISourcePathProvider) {
-         appendAttribute(ATTRIBUTE_SOURCE_PATH, ((ISourcePathProvider) object).getSourcePath(), sb);
+         XMLUtil.appendAttribute(ATTRIBUTE_SOURCE_PATH, ((ISourcePathProvider) object).getSourcePath(), sb);
       }
-   }
-   
-   /**
-    * Adds an XML attribute to the given {@link StringBuffer}.
-    * @param attributeName The attribute name.
-    * @param value The attribute value.
-    * @param sb The {@link StringBuffer} to write to.
-    */
-   protected void appendAttribute(String attributeName, String value, StringBuffer sb) {
-      if (attributeName != null && value != null) {
-         sb.append(" ");
-         sb.append(attributeName);
-         sb.append("=\"");
-         sb.append(XMLUtil.encodeText(value));
-         sb.append("\"");
-      }
-   }
-   
-   /**
-    * Adds an XML header to the given {@link StringBuffer}.
-    * @param encoding The encoding to use.
-    * @param sb The {@link StringBuffer} to write to.
-    */
-   protected void appendXmlHeader(String encoding, StringBuffer sb) {
-      sb.append("<?xml version=\"1.0\"");
-      appendAttribute(ATTRIBUTE_ENCODING, encoding, sb);
-      sb.append("?>");
-      appendNewLine(sb);
-   }
-   
-   /**
-    * Adds a line break to the given {@link StringBuffer}.
-    * @param sb The {@link StringBuffer} to write to.
-    */
-   protected void appendNewLine(StringBuffer sb) {
-      sb.append(StringUtil.NEW_LINE);
    }
 }

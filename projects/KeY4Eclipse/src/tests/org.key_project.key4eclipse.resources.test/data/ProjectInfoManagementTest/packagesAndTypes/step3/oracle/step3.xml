@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<project>
+   <package name="(default package)" path="/ProjectInfoManagementTest_testPackagesAndTypes/src">
+      <type name="A" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/A.java">
+      </type>
+      <type name="ClassWithoutPackage" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/ClassWithoutPackage.java">
+      </type>
+      <type name="Z" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/Z.java">
+      </type>
+   </package>
+   <package name="hello" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello">
+      <type name="A" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/A.java">
+      </type>
+      <type name="ClassInHello" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/ClassInHello.java">
+      </type>
+      <type name="Z" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/Z.java">
+      </type>
+   </package>
+   <package name="hello.world" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/world">
+      <type name="A" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/world/A.java">
+      </type>
+      <type name="ClassInHelloWorld" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/world/ClassInHelloWorld.java">
+      </type>
+      <type name="Z" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/world/Z.java">
+      </type>
+   </package>
+</project>

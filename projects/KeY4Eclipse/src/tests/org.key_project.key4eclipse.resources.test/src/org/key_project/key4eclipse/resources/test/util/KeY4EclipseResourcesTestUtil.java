@@ -13,6 +13,7 @@
 
 package org.key_project.key4eclipse.resources.test.util;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -37,6 +38,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.key_project.key4eclipse.resources.builder.KeYProjectBuilder;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
 import org.key_project.key4eclipse.resources.nature.KeYProjectNature;
+import org.key_project.key4eclipse.resources.projectinfo.ProjectInfoManager;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -247,5 +249,12 @@ public class KeY4EclipseResourcesTestUtil {
       IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
       return root.getFolder(path);
    }
-   
+
+   public static void assertNoProofFiles(IFolder proofFolder) throws CoreException {
+      if (proofFolder.exists()) {
+         IFile infoFile = proofFolder.getFile(ProjectInfoManager.PROJECT_INFO_FILE);
+         assertTrue(infoFile.exists());
+         assertEquals(1, proofFolder.members().length);
+      }
+   }
 }

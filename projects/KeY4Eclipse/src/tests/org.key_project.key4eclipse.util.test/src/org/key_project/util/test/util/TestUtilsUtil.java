@@ -14,8 +14,9 @@
 package org.key_project.util.test.util;
 
 import static org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable.syncExec;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -1781,6 +1782,24 @@ public class TestUtilsUtil {
       @Override
       public String getFailureMessage() {
          return "Item " + item + " is still selected.";
+      }
+   }
+
+   /**
+    * Ensures that the given arrays contain the same elements.
+    * @param expected The first array.
+    * @param actual The second array.
+    */
+   public static <T> void assertArrayEquals(T[] expected, T[] actual) {
+      if (expected != null) {
+         assertNotNull(actual);
+         assertEquals(expected.length, actual.length);
+         for (int i = 0; i < expected.length; i++) {
+            assertEquals(expected[i], actual[i]);
+         }
+      }
+      else {
+         assertNull(actual);
       }
    }
 }

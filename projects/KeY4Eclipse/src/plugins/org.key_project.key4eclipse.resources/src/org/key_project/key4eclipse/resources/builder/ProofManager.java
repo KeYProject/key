@@ -18,10 +18,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -47,6 +50,16 @@ import org.key_project.key4eclipse.resources.io.ProofMetaFileReader;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileTypeElement;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileWriter;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
+import org.key_project.key4eclipse.resources.projectinfo.AbstractContractContainer;
+import org.key_project.key4eclipse.resources.projectinfo.AbstractTypeContainer;
+import org.key_project.key4eclipse.resources.projectinfo.ContractInfo;
+import org.key_project.key4eclipse.resources.projectinfo.ContractInfo.ContractModality;
+import org.key_project.key4eclipse.resources.projectinfo.MethodInfo;
+import org.key_project.key4eclipse.resources.projectinfo.ObserverFunctionInfo;
+import org.key_project.key4eclipse.resources.projectinfo.PackageInfo;
+import org.key_project.key4eclipse.resources.projectinfo.ProjectInfo;
+import org.key_project.key4eclipse.resources.projectinfo.ProjectInfoManager;
+import org.key_project.key4eclipse.resources.projectinfo.TypeInfo;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
@@ -61,6 +74,7 @@ import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.ClassTree;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaSourceElement;
@@ -68,6 +82,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.SingleProof;
@@ -77,9 +92,11 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -157,7 +174,7 @@ public class ProofManager {
    public void runProofs(LinkedList<IFile> changedJavaFiles, IProgressMonitor monitor) throws Exception{
       markerManager.deleteKeYMarkerByType(project, IResource.DEPTH_ZERO, MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID);
       
-      proofElements = getAllProofElements();
+      proofElements = computeProofElementsAndUpdateProjectInfo();
       
       this.changedJavaFiles = changedJavaFiles;
       //set up monitor
@@ -190,11 +207,17 @@ public class ProofManager {
     * @return - the {@link LinkedList} with all {@link ProofElement}s
     * @throws CoreException 
     */
-   private LinkedList<ProofElement> getAllProofElements() throws CoreException {
+   private LinkedList<ProofElement> computeProofElementsAndUpdateProjectInfo() throws CoreException {
+      ProjectInfo projectInfo = ProjectInfoManager.getInstance().getProjectInfo(project);
       Set<KeYJavaType> kjts = environment.getJavaInfo().getAllKeYJavaTypes();
       KeYJavaType[] kjtsarr = KeYUtil.sortKeYJavaTypes(kjts);
       LinkedList<ProofElement> proofElements = new LinkedList<ProofElement>();
+      Map<AbstractTypeContainer, Integer> typeIndexMap = new HashMap<AbstractTypeContainer, Integer>();
+      int packageIndex = 0;
+      Map<String, PackageInfo> alreadyTreatedPackages = new HashMap<String, PackageInfo>();
+      Map<String, TypeInfo> typeInfoMap = new HashMap<String, TypeInfo>();
       for (KeYJavaType type : kjtsarr) {
+         // Find java file
          ImmutableSet<IObserverFunction> targets = environment.getSpecificationRepository().getContractTargets(type);
          Type javaType = type.getJavaType();
          IFile javaFile = null;
@@ -208,8 +231,94 @@ public class ProofManager {
             scl = KeYUtil.convertToSourceLocation(javaElement.getPositionInfo());
             scl = KeYUtil.updateToMethodNameLocation(javaFile, scl);
          }
+         // Find parent
+         AbstractTypeContainer parentTypeContainer = null;
+         String parentName = KeYTypeUtil.getParentName(environment.getServices(), type);
+         if (!KeYTypeUtil.isType(environment.getServices(), parentName)) {
+            if (parentName == null) {
+               parentName = "(default package)";
+            }
+            parentTypeContainer = alreadyTreatedPackages.get(parentName);
+            if (parentTypeContainer == null) {
+               PackageInfo packageInfo = projectInfo.getPackage(parentName);
+               if (packageInfo == null) {
+                  packageInfo = new PackageInfo(projectInfo, parentName, javaFile != null ? javaFile.getParent() : null);
+                  projectInfo.addPackage(packageInfo, packageIndex);
+               }
+               else {
+                  removePackagesIfRequired(projectInfo, packageIndex, projectInfo.indexOfPackage(packageInfo));
+               }
+               parentTypeContainer = packageInfo;
+               packageIndex++;
+               alreadyTreatedPackages.put(parentName, packageInfo);
+            }
+         }
+         else {
+            parentTypeContainer = typeInfoMap.get(parentName);
+         }
+         // Update type and methods
+         TypeInfo typeInfo = parentTypeContainer.getType(type.getName());
+         Integer typeIndex = typeIndexMap.get(parentTypeContainer);
+         if (typeIndex == null) {
+            typeIndex = Integer.valueOf(0);
+         }
+         typeIndexMap.put(parentTypeContainer, typeIndex + 1);
+         if (typeInfo == null) {
+            typeInfo = new TypeInfo(projectInfo, type.getName(), javaFile, parentTypeContainer);
+            parentTypeContainer.addType(typeInfo, typeIndex.intValue());
+         }
+         else {
+            removeTypesIfRequired(parentTypeContainer, typeIndex.intValue(), parentTypeContainer.indexOfType(typeInfo));
+         }
+         typeInfoMap.put(type.getFullName(), typeInfo);
+         ImmutableList<IProgramMethod> methods = environment.getJavaInfo().getAllProgramMethodsLocallyDeclared(type);
+         Map<IObserverFunction, AbstractContractContainer> targetMap = new HashMap<IObserverFunction, AbstractContractContainer>();
+         int methodIndex = 0;
+         for (IProgramMethod method : methods) {
+            if (!method.isImplicit()) {
+               String displayName = ClassTree.getDisplayName(environment.getServices(), method);
+               MethodInfo methodInfo = typeInfo.getMethod(displayName);
+               if (methodInfo == null) {
+                  String[] parameterTypes = new String[method.getParameters().size()];
+                  for (int i = 0; i < parameterTypes.length; i++) {
+                     parameterTypes[i] = method.getParameters().get(i).getTypeReference().getKeYJavaType().getFullName();
+                  }
+                  methodInfo = new MethodInfo(projectInfo, typeInfo, displayName, method.getName(), parameterTypes);
+                  typeInfo.addMethod(methodInfo, methodIndex);
+               }
+               else {
+                  removeMethodsIfRequired(typeInfo, methodIndex, typeInfo.indexOfMethod(methodInfo));
+               }
+               targetMap.put(method, methodInfo);
+               methodIndex++;
+            }
+         }
+         removeMethodsIfRequired(typeInfo, methodIndex, typeInfo.countMethods());
+         // Update observer function and contracts
+         int observerFunctionIndex = 0;
          for (IObserverFunction target : targets) {
-            if(target instanceof IProgramMethod){
+            AbstractContractContainer targetInfo;
+            if (target instanceof IProgramMethod) {
+               targetInfo = targetMap.get(target);
+               Assert.isTrue(targetInfo instanceof MethodInfo);
+            }
+            else {
+               targetInfo = targetMap.get(target);
+               if (targetInfo == null) {
+                  String displayName = ClassTree.getDisplayName(environment.getServices(), target);
+                  targetInfo = typeInfo.getObserverFunction(displayName);
+                  if (targetInfo == null) {
+                     targetInfo = new ObserverFunctionInfo(projectInfo, typeInfo, displayName);
+                     typeInfo.addObserverFunction((ObserverFunctionInfo)targetInfo, observerFunctionIndex);
+                  }
+                  else {
+                     removeObserverFunctionsIfRequired(typeInfo, observerFunctionIndex, typeInfo.indexOfObserverFunction((ObserverFunctionInfo)targetInfo));
+                  }
+                  targetMap.put(target, targetInfo);
+                  observerFunctionIndex++;
+               }
+            }
+            if (target instanceof IProgramMethod) {
                IProgramMethod progMethod = (IProgramMethod) target;
                if(progMethod.getContainerType().getJavaType().equals(javaType)){
                   scl = KeYUtil.convertToSourceLocation(progMethod.getPositionInfo());
@@ -217,16 +326,124 @@ public class ProofManager {
                }
             }
             ImmutableSet<Contract> contracts = environment.getSpecificationRepository().getContracts(type, target);
+            int contractIndex = 0;
             for (Contract contract : contracts) {
+               Assert.isTrue(target == contract.getTarget());
                IFolder proofFolder = getProofFolder(javaFile);
                IFile proofFile = getProofFile(contract.getName(), proofFolder.getFullPath());
                IFile metaFile = getProofMetaFile(proofFile);
                LinkedHashSet<IMarker> oldMarker = markerManager.getOldProofMarker(javaFile, scl, proofFile);
                proofElements.add(new ProofElement(javaFile, scl, environment, proofFolder, proofFile, metaFile, oldMarker, contract));
+               ContractInfo contractInfo = targetInfo.getContract(contract.getName());
+               if (contractInfo == null) {
+                  ContractModality modalityInfo = null;
+                  if (contract instanceof FunctionalOperationContract) {
+                     Modality modality = ((FunctionalOperationContract) contract).getModality();
+                     if (Modality.BOX == modality || Modality.BOX_TRANSACTION == modality) {
+                        modalityInfo = ContractModality.BOX;
+                     }
+                     else if (Modality.DIA == modality || Modality.DIA_TRANSACTION == modality) {
+                        modalityInfo = ContractModality.DIAMOND;
+                     }
+                  }
+                  contractInfo = new ContractInfo(targetInfo, contract.getName(), modalityInfo, proofFile);
+                  targetInfo.addContract(contractInfo, contractIndex);
+               }
+               else {
+                  removeContractsIfRequired(targetInfo, contractIndex, targetInfo.indexOfContract(contractInfo));
+               }
+               contractIndex++;
             }
+            removeContractsIfRequired(targetInfo, contractIndex, targetInfo.countContracts());
          }
+         removeObserverFunctionsIfRequired(typeInfo, observerFunctionIndex, typeInfo.countObserverFunctions());
+         typeIndex++;
       }
+      for (Entry<AbstractTypeContainer, Integer> entry : typeIndexMap.entrySet()) {
+         removeTypesIfRequired(entry.getKey(), entry.getValue().intValue(), entry.getKey().countTypes());
+      }
+      ProjectInfoManager.getInstance().save(project, projectInfo);
       return proofElements;
+   }
+   
+   /**
+    * Removes all {@link PackageInfo} between the given indices.
+    * @param projectInfo The {@link ProjectInfo} to remove {@link PackageInfo}s in.
+    * @param startIndex The start index.
+    * @param endIndex The end index.
+    */
+   protected void removePackagesIfRequired(ProjectInfo projectInfo, int startIndex, int endIndex) {
+      if (endIndex > startIndex) {
+         List<PackageInfo> toRemove = new LinkedList<PackageInfo>();
+         for (int i = startIndex; i < endIndex; i++) {
+            toRemove.add(projectInfo.getPackage(i));
+         }
+         projectInfo.removePackages(toRemove);
+      }
+   }
+
+   /**
+    * Removes all {@link TypeInfo} between the given indices.
+    * @param tcInfo The {@link AbstractTypeContainer} to remove {@link TypeInfo}s in.
+    * @param startIndex The start index.
+    * @param endIndex The end index.
+    */
+   protected void removeTypesIfRequired(AbstractTypeContainer tcInfo, int startIndex, int endIndex) {
+      if (endIndex > startIndex) {
+         List<TypeInfo> toRemove = new LinkedList<TypeInfo>();
+         for (int i = startIndex; i < endIndex; i++) {
+            toRemove.add(tcInfo.getType(i));
+         }
+         tcInfo.removeTypes(toRemove);
+      }
+   }
+   
+   /**
+    * Removes all {@link MethodInfo} between the given indices.
+    * @param typeInfo The {@link TypeInfo} to remove {@link MethodInfo}s in.
+    * @param startIndex The start index.
+    * @param endIndex The end index.
+    */
+   protected void removeMethodsIfRequired(TypeInfo typeInfo, int startIndex, int endIndex) {
+      if (endIndex > startIndex) {
+         List<MethodInfo> toRemove = new LinkedList<MethodInfo>();
+         for (int i = startIndex; i < endIndex; i++) {
+            toRemove.add(typeInfo.getMethod(i));
+         }
+         typeInfo.removeMethods(toRemove);
+      }
+   }
+   
+   /**
+    * Removes all {@link ObserverFunctionInfo} between the given indices.
+    * @param typeInfo The {@link TypeInfo} to remove {@link ObserverFunctionInfo}s in.
+    * @param startIndex The start index.
+    * @param endIndex The end index.
+    */
+   protected void removeObserverFunctionsIfRequired(TypeInfo typeInfo, int startIndex, int endIndex) {
+      if (endIndex > startIndex) {
+         List<ObserverFunctionInfo> toRemove = new LinkedList<ObserverFunctionInfo>();
+         for (int i = startIndex; i < endIndex; i++) {
+            toRemove.add(typeInfo.getObserverFunction(i));
+         }
+         typeInfo.removeObserverFunctions(toRemove);
+      }
+   }
+   
+   /**
+    * Removes all {@link ContractInfo} between the given indices.
+    * @param ccInfo The {@link AbstractContractContainer} to remove {@link ContractInfo}s in.
+    * @param startIndex The start index.
+    * @param endIndex The end index.
+    */
+   protected void removeContractsIfRequired(AbstractContractContainer ccInfo, int startIndex, int endIndex) {
+      if (endIndex > startIndex) {
+         List<ContractInfo> toRemove = new LinkedList<ContractInfo>();
+         for (int i = startIndex; i < endIndex; i++) {
+            toRemove.add(ccInfo.getContract(i));
+         }
+         ccInfo.removeContracts(toRemove);
+      }
    }
 
    /**
@@ -551,7 +768,8 @@ public class ProofManager {
          IResource[] members = folder.members();
          for(IResource res : members){
             if(res.getType() == IResource.FILE){
-               if(!proofFiles.contains(res)){
+               if(!proofFiles.contains(res) && 
+                  !ProjectInfoManager.getInstance().isProjectInfoFile((IFile)res)){
                   res.delete(true, null);
                }
             }

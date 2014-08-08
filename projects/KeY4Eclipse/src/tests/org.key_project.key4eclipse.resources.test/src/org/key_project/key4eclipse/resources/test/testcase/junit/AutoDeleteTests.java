@@ -186,7 +186,7 @@ public class AutoDeleteTests extends AbstractResourceTest {
       IFile metaFile = KeY4EclipseResourcesTestUtil.getFile(proofFile.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       
       assertTrue(!javaFile.exists());
-      assertTrue(!proofFolder.exists());
+      KeY4EclipseResourcesTestUtil.assertNoProofFiles(proofFolder);
       assertTrue(!proofFile.exists() && !metaFile.exists());
       
       
@@ -206,7 +206,7 @@ public class AutoDeleteTests extends AbstractResourceTest {
       KeY4EclipseResourcesTestUtil.build(project);
       
       assertTrue(!javaFile.exists());
-      assertTrue(!proofFolder.exists());
+      KeY4EclipseResourcesTestUtil.assertNoProofFiles(proofFolder);
       assertTrue(!proofFile.exists() && !metaFile.exists());
    }
    
@@ -223,7 +223,7 @@ public class AutoDeleteTests extends AbstractResourceTest {
       IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       
       assertTrue(!javaFile.exists());
-      assertTrue(!proofFolder.exists());
+      KeY4EclipseResourcesTestUtil.assertNoProofFiles(proofFolder);
       assertTrue(!proofFile0.exists() && !metaFile0.exists());
       assertTrue(!proofFile1.exists() && !metaFile1.exists());
       
@@ -262,7 +262,7 @@ public class AutoDeleteTests extends AbstractResourceTest {
       IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       
       assertTrue(!javaFile.exists());
-      assertTrue(!proofFolder.exists());
+      KeY4EclipseResourcesTestUtil.assertNoProofFiles(proofFolder);
       assertTrue(!proofFile0.exists() && !metaFile0.exists());
       assertTrue(!proofFile1.exists() && !metaFile1.exists());
       
@@ -282,7 +282,7 @@ public class AutoDeleteTests extends AbstractResourceTest {
       KeY4EclipseResourcesTestUtil.build(project);
 
       assertTrue(javaFile.exists());
-      assertTrue(!proofFolder.exists());
+      KeY4EclipseResourcesTestUtil.assertNoProofFiles(proofFolder);
       assertTrue(!proofFile0.exists() && !metaFile0.exists());
       assertTrue(!proofFile1.exists() && !metaFile1.exists());
       
@@ -303,7 +303,7 @@ public class AutoDeleteTests extends AbstractResourceTest {
       IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       
       assertTrue(!javaFile0.exists() && !javaFile1.exists());
-      assertTrue(!proofFolder.exists());
+      KeY4EclipseResourcesTestUtil.assertNoProofFiles(proofFolder);
       assertTrue(!proofFile0.exists() && !metaFile0.exists());
       assertTrue(!proofFile1.exists() && !metaFile1.exists());
       
@@ -346,7 +346,7 @@ public class AutoDeleteTests extends AbstractResourceTest {
             project.getFullPath().append("proofs").append("package1"));
       
       assertTrue(!javaFile0.exists() && !javaFile1.exists());
-      assertTrue(!proofFolder.exists());
+      KeY4EclipseResourcesTestUtil.assertNoProofFiles(proofFolder);
       assertTrue(!proofFile0.exists() && !metaFile0.exists());
       assertTrue(!proofFile1.exists() && !metaFile1.exists());
       assertTrue(!package0Folder.exists() && !package1Folder.exists());
