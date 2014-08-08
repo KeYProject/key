@@ -21,7 +21,7 @@ provable: ./information_flow/collection/Voter(Voter__isValid(int)).Non-interfere
 provable: ./information_flow/collection/Voter(Voter__sendVote(int)).Non-interference contract.0.key
 provable: ./information_flow/collection/Voter(Voter__inputVote()).Non-interference contract.0.key
 provable: ./information_flow/collection/Voter(Voter__secure_voting()).Non-interference contract.0.key
-#provable: ./information_flow/collection/ConditionalConfidentialExample(ConditionalConfidentialExample__getConfidentialData(ConditionalConfidentialExample.User)).Non-interference contract.0.key
+#provable: ./information_flow/collection/CConfidentialExample(CConfidentialExample__getConfidentialData(CConfidentialExample.User)).Non-interference contract.0.key
 provable: ./information_flow/collection/SumExample(SumExample__getSum()).Non-interference contract.0.key
 provable: ./information_flow/collection/banking_example.UserAccount(banking_example.UserAccount__getBankAccount(int)).Non-interference contract.0.key
 provable: ./information_flow/collection/banking_example.UserAccount(banking_example.UserAccount__tryLogin(int,(C)).Non-interference contract.0.key

@@ -21,8 +21,8 @@ provable: ./information_flow/collection/Voter(Voter__isValid(int)).JML normal_be
 provable: ./information_flow/collection/Voter(Voter__sendVote(int)).JML normal_behavior operation contract.0.key
 provable: ./information_flow/collection/Voter(Voter__inputVote()).JML normal_behavior operation contract.0.key
 provable: ./information_flow/collection/Voter(Voter__secure_voting()).JML normal_behavior operation contract.0.key
-provable: ./information_flow/collection/ConditionalConfidentialExample(ConditionalConfidentialExample__hasAccessRight(ConditionalConfidentialExample.User)).JML normal_behavior operation contract.0.key
-provable: ./information_flow/collection/ConditionalConfidentialExample(ConditionalConfidentialExample__getConfidentialData(ConditionalConfidentialExample.User)).JML normal_behavior operation contract.0.key
+provable: ./information_flow/collection/CConfidentialExample(CConfidentialExample__hasAccessRight(CConfidentialExample.User)).JML normal_behavior operation contract.0.key
+provable: ./information_flow/collection/CConfidentialExample(CConfidentialExample__getConfidentialData(CConfidentialExample.User)).JML normal_behavior operation contract.0.key
 provable: ./information_flow/collection/SumExample(SumExample__getSum()).JML normal_behavior operation contract.0.key
 provable: ./information_flow/collection/banking_example.UserAccount(banking_example.UserAccount__getBankAccount(int)).JML normal_behavior operation contract.0.key
 provable: ./information_flow/collection/banking_example.UserAccount(banking_example.UserAccount__tryLogin(int,(C)).JML normal_behavior operation contract.0.key

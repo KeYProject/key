@@ -6,10 +6,10 @@
 
 
 /**
- *
+ * ConditionalConfidentialExample
  * @author christoph
  */
-public class ConditionalConfidentialExample {
+public class CConfidentialExample {
     private User[] trustworthyUsers;
     private int confidentialData;
 
