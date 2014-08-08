@@ -3,7 +3,10 @@ package org.key_project.key4eclipse.resources.ui.view;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -23,16 +26,20 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
+import org.key_project.key4eclipse.resources.io.ProofMetaFileAssumption;
 import org.key_project.key4eclipse.resources.projectinfo.AbstractContractContainer;
 import org.key_project.key4eclipse.resources.projectinfo.AbstractTypeContainer;
 import org.key_project.key4eclipse.resources.projectinfo.ContractInfo;
@@ -53,6 +60,9 @@ import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.eclipse.swt.CustomProgressBar;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.viewer.ObservableTreeViewer;
+import org.key_project.util.java.StringUtil;
+
+import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
  * This {@link IViewPart} shows the verification status.
@@ -170,13 +180,30 @@ public class VerificationStatusView extends ViewPart {
       }
    };
    
+   /**
+    * The color for open proofs.
+    */
    private Color openProofColor;
 
+   /**
+    * The color for unspecified elements.
+    */
    private Color unspecifiedColor;
 
+   /**
+    * The color for unproven dependencies.
+    */
    private Color unprovenDependencyColor;
 
+   /**
+    * The color for closed proofs.
+    */
    private Color closedProofColor;
+   
+   /**
+    * The text which shows assumptions
+    */
+   private Text assumptionText;
    
    /**
     * {@inheritDoc}
@@ -185,6 +212,7 @@ public class VerificationStatusView extends ViewPart {
    public void createPartControl(Composite parent) {
       rootComposite = new Composite(parent, SWT.NONE);
       rootComposite.setLayout(new GridLayout(1, false));
+      // progressComposite
       Composite progressComposite = new Composite(rootComposite, SWT.NONE);
       progressComposite.setLayout(new GridLayout(4, false));
       progressComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -196,7 +224,19 @@ public class VerificationStatusView extends ViewPart {
       specificationLabel.setText("Specifications");
       specificationProgressBar = new CustomProgressBar(progressComposite, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF, ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
       specificationProgressBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-      treeViewer = new ObservableTreeViewer(rootComposite, SWT.BORDER | SWT.MULTI | SWT.VIRTUAL);
+      // tabFolder
+      CTabFolder tabFolder = new CTabFolder(rootComposite, SWT.FLAT | SWT.BOTTOM);
+      tabFolder.setLayoutData(new GridData(GridData.FILL_BOTH));
+      // treeViewrLegendComposite
+      Composite treeViewrLegendComposite = new Composite(tabFolder, SWT.NONE);
+      treeViewrLegendComposite.setLayout(new GridLayout(1, false));
+      // proofAndSpecsTabItem
+      CTabItem proofAndSpecsTabItem = new CTabItem(tabFolder, SWT.NONE);
+      proofAndSpecsTabItem.setText("&Proofs and Specifications");
+      proofAndSpecsTabItem.setControl(treeViewrLegendComposite);
+      tabFolder.setSelection(proofAndSpecsTabItem);
+      // treeViewer
+      treeViewer = new ObservableTreeViewer(treeViewrLegendComposite, SWT.BORDER | SWT.MULTI | SWT.VIRTUAL);
       treeViewer.setUseHashlookup(true);
       treeViewer.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
       contentProvider = new ProjectInfoLazyTreeContentProvider();
@@ -209,7 +249,8 @@ public class VerificationStatusView extends ViewPart {
             handleDoubleClick(event);
          }
       });
-      Composite legendComposite = new Composite(rootComposite, SWT.NONE);
+      // legendComposite
+      Composite legendComposite = new Composite(treeViewrLegendComposite, SWT.NONE);
       legendComposite.setLayout(new GridLayout(5, false));
       Label legendLabel = new Label(legendComposite, SWT.NONE);
       legendLabel.setText("Colors: ");
@@ -236,6 +277,13 @@ public class VerificationStatusView extends ViewPart {
       closedProofLabel.setToolTipText("A proof is sucefull closed and all used specifications of the project are proven as well.");
       updateShownContent();
       ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceChangeListener);
+      // assumptionText
+      assumptionText = new Text(tabFolder, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
+      assumptionText.setEditable(false);
+      // projectTabItem
+      CTabItem assumptionTabItem = new CTabItem(tabFolder, SWT.NONE);
+      assumptionTabItem.setText("&Assumptions");
+      assumptionTabItem.setControl(assumptionText);
    }
 
    /**
@@ -259,7 +307,7 @@ public class VerificationStatusView extends ViewPart {
          treeViewer.setInput(projects);
          colorSynchronizer = new ProjectInfoColorTreeSynchronizer(projects, treeViewer);
       }
-      updateProgressBars(); // Always update progress bars because method is called on any resource change
+      updateProgressBarsAndAssumptions(); // Always update progress bars because method is called on any resource change
    }
 
    /**
@@ -370,7 +418,7 @@ public class VerificationStatusView extends ViewPart {
    /**
     * Updates the progress bars {@link #proofProgressBar} and {@link #specificationProgressBar}.
     */
-   protected void updateProgressBars() {
+   protected void updateProgressBarsAndAssumptions() {
       AbstractDependingOnObjectsJob.cancelJobs(VerificationStatusView.this);
       Job job = new AbstractDependingOnObjectsJob("Computing verification status", VerificationStatusView.this) {
          @Override
@@ -385,20 +433,64 @@ public class VerificationStatusView extends ViewPart {
                   }
                }
                SWTUtil.checkCanceled(monitor);
-               proofProgressBar.getDisplay().syncExec(new Runnable() {
-                  @Override
-                  public void run() {
-                     proofProgressBar.setToolTipText(status.numOfProvenContracts + " of " + status.numOfContracts + " proof obligations are proven.");
-                     proofProgressBar.reset(status.numOfProvenContracts != status.numOfContracts, false, status.numOfProvenContracts, status.numOfContracts);
-                     specificationProgressBar.setToolTipText(status.numOfSpecifiedMethods + " of " + status.numOfMethods + " methods are specified.");
-                     specificationProgressBar.reset(status.numOfSpecifiedMethods != status.numOfMethods, false, status.numOfSpecifiedMethods, status.numOfMethods);
-                  }
-               });
+               if (!proofProgressBar.isDisposed()) {
+                  proofProgressBar.getDisplay().syncExec(new Runnable() {
+                     @Override
+                     public void run() {
+                        proofProgressBar.setToolTipText(status.numOfProvenContracts + " of " + status.numOfContracts + " proof obligations are proven.");
+                        proofProgressBar.reset(status.numOfProvenContracts != status.numOfContracts, false, status.numOfProvenContracts, status.numOfContracts);
+                        specificationProgressBar.setToolTipText(status.numOfSpecifiedMethods + " of " + status.numOfMethods + " methods are specified.");
+                        specificationProgressBar.reset(status.numOfSpecifiedMethods != status.numOfMethods, false, status.numOfSpecifiedMethods, status.numOfMethods);
+                     }
+                  });
+               }
+               SWTUtil.checkCanceled(monitor);
+               final String assumptions = createAssumptionText(status, monitor);
+               SWTUtil.checkCanceled(monitor);
+               if (!assumptionText.isDisposed()) {
+                  assumptionText.getDisplay().syncExec(new Runnable() {
+                     @Override
+                     public void run() {
+                        assumptionText.setText(assumptions);
+                     }
+                  });
+               }
                return Status.OK_STATUS;
             }
             catch (OperationCanceledException e) {
                return Status.CANCEL_STATUS;
             }
+         }
+         
+         private String createAssumptionText(VerificationStatus status, IProgressMonitor monitor) {
+            StringBuffer sb = new StringBuffer();
+            sb.append("Proofs are performed under the following assumptions still needs to be proven:");
+            sb.append(StringUtil.NEW_LINE);
+            int i = 1;
+            for (Entry<ProofMetaFileAssumption, List<IFile>> entry : status.assumptions.entrySet()) {
+               sb.append(i);
+               sb.append(": ");
+               sb.append(entry.getKey());
+               sb.append(StringUtil.NEW_LINE);
+               for (IFile file : entry.getValue()) {
+                  sb.append("\t - Used by proof: ");
+                  sb.append(file.getFullPath());
+                  sb.append(StringUtil.NEW_LINE);
+               }
+               i++;
+            }
+            sb.append(i);
+            sb.append(": Java and JML semantics are correctly modeled in KeY.");
+            sb.append(StringUtil.NEW_LINE);
+            i++;
+            sb.append(i);
+            sb.append(": Source code is compiled using a correct Java compiler.");
+            sb.append(StringUtil.NEW_LINE);
+            i++;
+            sb.append(i);
+            sb.append(": Program is run on a a correct JVM.");
+            sb.append(StringUtil.NEW_LINE);
+            return sb.toString();
          }
          
          private void updateStatus(ProjectInfo projectInfo, VerificationStatus status, IProgressMonitor monitor) {
@@ -453,6 +545,22 @@ public class VerificationStatusView extends ViewPart {
             if (closed != null && closed.booleanValue()) {
                status.numOfProvenContracts++;
             }
+            try {
+               List<ProofMetaFileAssumption> assumptions = contractInfo.checkAssumptions();
+               if (assumptions != null) {
+                  for (ProofMetaFileAssumption assumption : assumptions) {
+                     List<IFile> files = status.assumptions.get(assumption);
+                     if (files == null) {
+                        files = new LinkedList<IFile>();
+                        status.assumptions.put(assumption, files);
+                     }
+                     files.add(contractInfo.getProofFile());
+                  }
+               }
+            }
+            catch (Exception e) {
+               LogUtil.getLogger().logError(e);
+            }
          }
       };
       job.setSystem(true);
@@ -460,7 +568,7 @@ public class VerificationStatusView extends ViewPart {
    }
    
    /**
-    * Utility class used by {@link VerificationStatus#updateProgressBars()}
+    * Utility class used by {@link VerificationStatus#updateProgressBarsAndAssumptions()}
     * @author Martin Hentschel
     */
    private static class VerificationStatus {
@@ -483,6 +591,11 @@ public class VerificationStatusView extends ViewPart {
        * The number of specified methods.
        */
       private int numOfSpecifiedMethods = 0;
+      
+      /**
+       * The made assumptions.
+       */
+      private final Map<ProofMetaFileAssumption, List<IFile>> assumptions = new LinkedHashMap<ProofMetaFileAssumption, List<IFile>>();
    }
    
    /**
@@ -492,7 +605,7 @@ public class VerificationStatusView extends ViewPart {
     * @param index The index.
     */
    protected void handleTypeAdded(final AbstractTypeContainer tcInfo, final TypeInfo type, final int index) {
-      updateProgressBars();
+      updateProgressBarsAndAssumptions();
    }
 
    /**
@@ -501,7 +614,7 @@ public class VerificationStatusView extends ViewPart {
     * @param types The removed {@link TypeInfo}s.
     */
    protected void handleTypesRemoved(final AbstractTypeContainer tcInfo, final Collection<TypeInfo> types) {
-      updateProgressBars();
+      updateProgressBarsAndAssumptions();
    }
    
    /**
@@ -511,7 +624,7 @@ public class VerificationStatusView extends ViewPart {
     * @param index The index.
     */
    protected void handleMethodAdded(final TypeInfo type, final MethodInfo method, final int index) {
-      updateProgressBars();
+      updateProgressBarsAndAssumptions();
    }
 
    /**
@@ -520,7 +633,7 @@ public class VerificationStatusView extends ViewPart {
     * @param methods The removed {@link MethodInfo}s.
     */
    protected void handleMethodsRemoved(final TypeInfo type, final Collection<MethodInfo> methods) {
-      updateProgressBars();
+      updateProgressBarsAndAssumptions();
    }
 
    /**
@@ -530,7 +643,7 @@ public class VerificationStatusView extends ViewPart {
     * @param index The index.
     */
    protected void handleObserverFunctionAdded(final TypeInfo type, final ObserverFunctionInfo observerFunction, final int index) {
-      updateProgressBars();
+      updateProgressBarsAndAssumptions();
    }
 
    /**
@@ -539,7 +652,7 @@ public class VerificationStatusView extends ViewPart {
     * @param observerFunctions The removed {@link ObserverFunctionInfo}s.
     */
    protected void handleObserFunctionsRemoved(final TypeInfo type, final Collection<ObserverFunctionInfo> observerFunctions) {
-      updateProgressBars();
+      updateProgressBarsAndAssumptions();
    }
 
    /**
@@ -549,7 +662,7 @@ public class VerificationStatusView extends ViewPart {
     * @param index The index.
     */
    protected void handleContractAdded(final AbstractContractContainer cc, final ContractInfo contract, final int index) {
-      updateProgressBars();
+      updateProgressBarsAndAssumptions();
    }
 
    /**
@@ -558,7 +671,7 @@ public class VerificationStatusView extends ViewPart {
     * @param contracts The removed {@link ContractInfo}s.
     */
    protected void handleContractsRemoved(final AbstractContractContainer cc, final Collection<ContractInfo> contracts) {
-      updateProgressBars();
+      updateProgressBarsAndAssumptions();
    }
 
    /**
@@ -568,7 +681,7 @@ public class VerificationStatusView extends ViewPart {
     * @param index The index.
     */
    protected void handlePackageAdded(final ProjectInfo projectInfo, final PackageInfo packageInfo, final int index) {
-      updateProgressBars();
+      updateProgressBarsAndAssumptions();
    }
 
    /**
@@ -577,7 +690,7 @@ public class VerificationStatusView extends ViewPart {
     * @param packages The removed {@link PackageInfo}s.
     */
    protected void handlePackagesRemoved(final ProjectInfo projectInfo, final Collection<PackageInfo> packages) {
-      updateProgressBars();
+      updateProgressBarsAndAssumptions();
    }
 
    /**
@@ -618,6 +731,18 @@ public class VerificationStatusView extends ViewPart {
       }
       if (labelProvider != null) {
          labelProvider.dispose();
+      }
+      if (openProofColor != null) {
+         openProofColor.dispose();
+      }
+      if (closedProofColor != null) {
+         closedProofColor.dispose();
+      }
+      if (unspecifiedColor != null) {
+         unspecifiedColor.dispose();
+      }
+      if (unprovenDependencyColor != null) {
+         unprovenDependencyColor.dispose();
       }
       super.dispose();
    }

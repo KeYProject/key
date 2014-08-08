@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
+import org.key_project.key4eclipse.resources.io.ProofMetaFileAssumption;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileReader;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 
@@ -130,6 +131,21 @@ public class ContractInfo {
          else {
             return Boolean.FALSE;
          }
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Tries to read the made assumptions.
+    * @return The made assumptions or {@code null} if not available.
+    * @throws Exception Occurred Exception.
+    */
+   public List<ProofMetaFileAssumption> checkAssumptions() throws Exception {
+      if (metaFile != null && metaFile.exists()) {
+         ProofMetaFileReader pmfr = new ProofMetaFileReader(metaFile);
+         return pmfr.getAssumptions();
       }
       else {
          return null;
