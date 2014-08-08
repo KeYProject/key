@@ -315,6 +315,21 @@ public class ProjectInfo implements IStatusInfo {
       }
       return !allClosed;
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasUnprovenDependencies() {
+      boolean allDependeniesProven = true;
+      Iterator<PackageInfo> typeIter = packageList.iterator();
+      while (allDependeniesProven && typeIter.hasNext()) {
+         if (typeIter.next().hasUnprovenDependencies()) {
+            allDependeniesProven = false;
+         }
+      }
+      return !allDependeniesProven;
+   }
    
    /**
     * Maps the {@link IResource} to the given model object.

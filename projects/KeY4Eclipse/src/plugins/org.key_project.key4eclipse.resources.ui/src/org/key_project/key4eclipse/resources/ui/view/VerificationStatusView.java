@@ -23,6 +23,7 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -169,6 +170,14 @@ public class VerificationStatusView extends ViewPart {
       }
    };
    
+   private Color openProofColor;
+
+   private Color unspecifiedColor;
+
+   private Color unprovenDependencyColor;
+
+   private Color closedProofColor;
+   
    /**
     * {@inheritDoc}
     */
@@ -200,6 +209,31 @@ public class VerificationStatusView extends ViewPart {
             handleDoubleClick(event);
          }
       });
+      Composite legendComposite = new Composite(rootComposite, SWT.NONE);
+      legendComposite.setLayout(new GridLayout(5, false));
+      Label legendLabel = new Label(legendComposite, SWT.NONE);
+      legendLabel.setText("Colors: ");
+      legendLabel.setToolTipText("Colors indicate the verification status and parents are colored according to the worst verification stati of their children.");
+      openProofColor = new Color(legendLabel.getDisplay(), ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
+      Label openProofLabel = new Label(legendComposite, SWT.NONE);
+      openProofLabel.setForeground(openProofColor);
+      openProofLabel.setText("Open proof");
+      openProofLabel.setToolTipText("A proof is still open which may indicate a bug or that KeY was not powerful enough to finish the proof automatially.");
+      unspecifiedColor = new Color(legendLabel.getDisplay(), ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
+      Label unspecifiedLabel = new Label(legendComposite, SWT.NONE);
+      unspecifiedLabel.setForeground(unspecifiedColor);
+      unspecifiedLabel.setText("Unspecified");
+      unspecifiedLabel.setToolTipText("A method has no specification which is dangerous because it might call methods in illegal state which is not proven.");
+      unprovenDependencyColor = new Color(legendLabel.getDisplay(), ProjectInfoColorTreeSynchronizer.COLOR_UNPROVEN_DEPENDENCY);
+      Label unprovenDependencyLabel = new Label(legendComposite, SWT.NONE);
+      unprovenDependencyLabel.setForeground(unprovenDependencyColor);
+      unprovenDependencyLabel.setText("Unproven dependency");
+      unprovenDependencyLabel.setToolTipText("A proof is sucefull closed but uses at least one unproven specification of the project.");
+      closedProofColor = new Color(legendLabel.getDisplay(), ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
+      Label closedProofLabel = new Label(legendComposite, SWT.NONE);
+      closedProofLabel.setForeground(closedProofColor);
+      closedProofLabel.setText("Closed proof");
+      closedProofLabel.setToolTipText("A proof is sucefull closed and all used specifications of the project are proven as well.");
       updateShownContent();
       ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceChangeListener);
    }

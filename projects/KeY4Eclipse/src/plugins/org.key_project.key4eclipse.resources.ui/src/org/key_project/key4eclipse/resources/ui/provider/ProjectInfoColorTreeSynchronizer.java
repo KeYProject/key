@@ -49,6 +49,11 @@ public class ProjectInfoColorTreeSynchronizer extends AbstractProjectInfoBasedCo
    public static final RGB COLOR_CLOSED_PROOF = new RGB(0, 128, 0);
    
    /**
+    * The color used for closed proofs.
+    */
+   public static final RGB COLOR_UNPROVEN_DEPENDENCY = new RGB(0, 128, 192);
+   
+   /**
     * The color used for open proofs.
     */
    public static final RGB COLOR_OPEN_PROOF = new RGB(128, 0, 0);
@@ -216,7 +221,20 @@ public class ProjectInfoColorTreeSynchronizer extends AbstractProjectInfoBasedCo
             closed = null;
          }
          if (closed != null && closed.booleanValue()) {
-            item.setForeground(createColor(COLOR_CLOSED_PROOF, viewer.getControl().getDisplay()));
+            Boolean unprovenDependency;
+            try {
+               unprovenDependency = info.checkUnprovenDependencies();
+            }
+            catch (Exception e) {
+               LogUtil.getLogger().logError(e);
+               unprovenDependency = null;
+            }
+            if (unprovenDependency != null && !unprovenDependency.booleanValue()) {
+               item.setForeground(createColor(COLOR_CLOSED_PROOF, viewer.getControl().getDisplay()));
+            }
+            else {
+               item.setForeground(createColor(COLOR_UNPROVEN_DEPENDENCY, viewer.getControl().getDisplay()));
+            }
          }
          else {
             item.setForeground(createColor(COLOR_OPEN_PROOF, viewer.getControl().getDisplay()));
@@ -228,7 +246,12 @@ public class ProjectInfoColorTreeSynchronizer extends AbstractProjectInfoBasedCo
             item.setForeground(createColor(COLOR_OPEN_PROOF, viewer.getControl().getDisplay()));
          }
          else {
-            item.setForeground(createColor(COLOR_CLOSED_PROOF, viewer.getControl().getDisplay()));
+            if (info.hasUnprovenDependencies()) {
+               item.setForeground(createColor(COLOR_UNPROVEN_DEPENDENCY, viewer.getControl().getDisplay()));
+            }
+            else {
+               item.setForeground(createColor(COLOR_CLOSED_PROOF, viewer.getControl().getDisplay()));
+            }
          }
       }
       else if (data instanceof IStatusInfo) {
@@ -238,6 +261,9 @@ public class ProjectInfoColorTreeSynchronizer extends AbstractProjectInfoBasedCo
          }
          else if (info.isUnspecified()) {
             item.setForeground(createColor(COLOR_UNSPECIFIED, viewer.getControl().getDisplay()));
+         }
+         else if (info.hasUnprovenDependencies()) {
+            item.setForeground(createColor(COLOR_UNPROVEN_DEPENDENCY, viewer.getControl().getDisplay()));
          }
          else {
             item.setForeground(createColor(COLOR_CLOSED_PROOF, viewer.getControl().getDisplay()));

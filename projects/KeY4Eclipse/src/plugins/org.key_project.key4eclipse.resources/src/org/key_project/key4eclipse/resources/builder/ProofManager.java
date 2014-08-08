@@ -347,7 +347,7 @@ public class ProofManager {
                         modalityInfo = ContractModality.DIAMOND;
                      }
                   }
-                  contractInfo = new ContractInfo(targetInfo, contract.getName(), modalityInfo, proofFile);
+                  contractInfo = new ContractInfo(targetInfo, contract.getName(), modalityInfo, proofFile, metaFile);
                   targetInfo.addContract(contractInfo, contractIndex);
                }
                else {

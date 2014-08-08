@@ -510,6 +510,7 @@ public class ProjectInfoManagementTest extends AbstractResourceTest {
          assertEquals(expected.getName(), current.getName());
          assertEquals(expected.getModality(), current.getModality());
          assertEquals(expected.getProofFile(), current.getProofFile());
+         assertEquals(expected.getMetaFile(), current.getMetaFile());
       }
       else {
          assertNull(current);

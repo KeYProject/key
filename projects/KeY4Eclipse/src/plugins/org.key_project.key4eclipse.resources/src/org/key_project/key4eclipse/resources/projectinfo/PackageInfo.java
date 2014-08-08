@@ -106,4 +106,19 @@ public class PackageInfo extends AbstractTypeContainer implements IStatusInfo {
       }
       return !allClosed;
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasUnprovenDependencies() {
+      boolean allDependeniesProven = true;
+      Iterator<TypeInfo> typeIter = getTypes().iterator();
+      while (allDependeniesProven && typeIter.hasNext()) {
+         if (typeIter.next().hasUnprovenDependencies()) {
+            allDependeniesProven = false;
+         }
+      }
+      return !allDependeniesProven;
+   }
 }

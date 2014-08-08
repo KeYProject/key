@@ -59,6 +59,7 @@ public abstract class AbstractContractContainer {
          contractsMap.put(contract.getName(), contract);
          contractsList.add(index, contract);
          projectInfo.mapResource(contract.getProofFile(), contract);
+         projectInfo.mapResource(contract.getMetaFile(), contract);
          projectInfo.fireContractAdded(this, contract, index);
       }
    }
@@ -80,6 +81,7 @@ public abstract class AbstractContractContainer {
          for (ContractInfo contract : contracts) {
             contractsMap.remove(contract.getName());
             projectInfo.unmapResource(contract.getProofFile(), contract);
+            projectInfo.unmapResource(contract.getMetaFile(), contract);
          }
          contractsList.removeAll(contracts);
          projectInfo.fireContractsRemoved(this, contracts);
@@ -138,6 +140,29 @@ public abstract class AbstractContractContainer {
             closed = null;
          }
          if (closed == null || !closed.booleanValue()) {
+            result = true;
+         }
+      }
+      return result;
+   }
+
+   /**
+    * Checks if the current proof is based on unproven specifications.
+    * @return {@code true} proof is based on unproven specifications, {@code false} all used specifications are proven.
+    */   
+   public boolean hasUnprovenDependencies() {
+      boolean result = false;
+      Iterator<ContractInfo> iter = getContracts().iterator();
+      while (!result && iter.hasNext()) {
+         Boolean unproven;
+         try {
+            unproven = iter.next().checkUnprovenDependencies();
+         }
+         catch (Exception e) {
+            LogUtil.getLogger().logError(e);
+            unproven = null;
+         }
+         if (unproven == null || unproven.booleanValue()) {
             result = true;
          }
       }

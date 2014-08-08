@@ -316,4 +316,35 @@ public class TypeInfo extends AbstractTypeContainer implements IStatusInfo {
       }
       return !allClosed;
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasUnprovenDependencies() {
+      boolean allDependeniesProven = true;
+      Iterator<MethodInfo> methodIter = methodsList.iterator();
+      while (allDependeniesProven && methodIter.hasNext()) {
+         if (methodIter.next().hasUnprovenDependencies()) {
+            allDependeniesProven = false;
+         }
+      }
+      if (allDependeniesProven) {
+         Iterator<ObserverFunctionInfo> observerFunctionIter = observerFunctionsList.iterator();
+         while (allDependeniesProven && observerFunctionIter.hasNext()) {
+            if (observerFunctionIter.next().hasUnprovenDependencies()) {
+               allDependeniesProven = false;
+            }
+         }
+      }
+      if (allDependeniesProven) {
+         Iterator<TypeInfo> typeIter = getTypes().iterator();
+         while (allDependeniesProven && typeIter.hasNext()) {
+            if (typeIter.next().hasUnprovenDependencies()) {
+               allDependeniesProven = false;
+            }
+         }
+      }
+      return !allDependeniesProven;
+   }
 }

@@ -16,4 +16,10 @@ public interface IStatusInfo {
     * @return {@code true} open proof contained, {@code false} everything is successful proven.
     */
    public boolean hasOpenProof();
+   
+   /**
+    * Checks if the current proof is based on unproven specifications.
+    * @return {@code true} proof is based on unproven specifications, {@code false} all used specifications are proven.
+    */
+   public boolean hasUnprovenDependencies();
 }

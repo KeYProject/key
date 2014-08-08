@@ -100,6 +100,11 @@ public final class ProjectInfoManager {
    private static final String ATTRIBUTE_PROOF_FILE_PATH = "proofFilePath";
 
    /**
+    * Attribute name to store a meta file path.
+    */
+   private static final String ATTRIBUTE_META_FILE_PATH = "metaFilePath";
+
+   /**
     * Attribute name to store a modality.
     */
    private static final String ATTRIBUTE_MODALITY = "modality";
@@ -258,7 +263,7 @@ public final class ProjectInfoManager {
             Object parent = parentStack.peekFirst();
             Assert.isTrue(parent instanceof AbstractContractContainer);
             AbstractContractContainer ccInfo = (AbstractContractContainer) parent;
-            ContractInfo contractInfo = new ContractInfo(ccInfo, getName(attributes), getModality(attributes), getProofFile(attributes));
+            ContractInfo contractInfo = new ContractInfo(ccInfo, getName(attributes), getModality(attributes), getProofFile(attributes), getMetaFile(attributes));
             ccInfo.addContract(contractInfo, ccInfo.countContracts());
             parentStack.addFirst(contractInfo);
          }
@@ -343,6 +348,21 @@ public final class ProjectInfoManager {
        */
       public IFile getProofFile(Attributes attributes) {
          String path = attributes.getValue(ATTRIBUTE_PROOF_FILE_PATH);
+         if (path != null) {
+            return ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(path));
+         }
+         else {
+            return null;
+         }
+      }
+
+      /**
+       * Returns the meta file.
+       * @param attributes The attributes to read from.
+       * @return The read value.
+       */
+      public IFile getMetaFile(Attributes attributes) {
+         String path = attributes.getValue(ATTRIBUTE_META_FILE_PATH);
          if (path != null) {
             return ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(path));
          }
@@ -534,6 +554,9 @@ public final class ProjectInfoManager {
       }
       if (contractInfo.getProofFile() != null) {
          attributeValues.put(ATTRIBUTE_PROOF_FILE_PATH, contractInfo.getProofFile().getFullPath().toString());
+      }
+      if (contractInfo.getMetaFile() != null) {
+         attributeValues.put(ATTRIBUTE_META_FILE_PATH, contractInfo.getMetaFile().getFullPath().toString());
       }
       XMLUtil.appendEmptyTag(level, TAG_CONTRACT_INFO, attributeValues, sb);
    }
