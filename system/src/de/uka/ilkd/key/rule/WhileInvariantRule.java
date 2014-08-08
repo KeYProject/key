@@ -711,7 +711,6 @@ public final class WhileInvariantRule implements BuiltInRule {
         if (!checkFocus(progPost)) {
             return false;
         }
-
         // active statement must be while loop
         final SourceElement activeStatement = JavaTools.getActiveStatement(progPost.javaBlock());
         if (!(activeStatement instanceof While)) {

@@ -174,15 +174,35 @@ public abstract class LoopStatement extends JavaStatement
     }
 
 
+    /**
+     * Loop statement. This constructor is used for the transformation
+     * of Recoder to KeY.
+     * @param inits the initializers of the loop
+     * @param guard the guard of the loop
+     * @param updates the updates of the loop
+     * @param body the body of the loop
+     * @param pos the position of the loop
+     */
+     public LoopStatement(ILoopInit inits, IGuard guard,
+                          IForUpdates updates, Statement body,
+                          PositionInfo pos) {
+         super(pos);
+         this.body    = body;
+         this.updates = updates;
+         this.inits   = inits;
+         this.guard   = guard;
+     }
+
+
    /**
     * Loop statement. This constructor is used for the transformation
     * of Recoder to KeY.
     * @param inits the initializers of the loop
     * @param guard the guard of the loop
     * @param updates the updates of the loop
-    * @param body the body of the loop   
+    * @param body the body of the loop
     */
-    public LoopStatement(ILoopInit inits, IGuard guard, 
+    public LoopStatement(ILoopInit inits, IGuard guard,
 			 IForUpdates updates, Statement body) {
         this.body    = body;
 	this.updates = updates;
@@ -397,14 +417,13 @@ public abstract class LoopStatement extends JavaStatement
 
         LoopStatement cmp = (LoopStatement)o;
         return super.equals(cmp)
-                && this.getStartPosition().getLine()
-                    == cmp.getStartPosition().getLine();
+                && (this.getStartPosition().equals(Position.UNDEFINED) ||
+                        cmp.getStartPosition().equals(Position.UNDEFINED) ||
+                        this.getStartPosition().getLine() == cmp.getStartPosition().getLine());
     }
 
     @Override
     public int hashCode() {
-        int hash = super.hashCode();
-        hash =  67 * hash + (this.getStartPosition().getLine() << 8);
-        return hash;
+        return super.hashCode();
     }
 }

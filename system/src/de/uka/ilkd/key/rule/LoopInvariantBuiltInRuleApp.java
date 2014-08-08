@@ -304,7 +304,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         Modality m = (Modality)programTerm().op();
         boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION); 
         return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv,
-                                               HeapContext.getModHeaps(goal.proof().getServices(),
+                                               HeapContext.getModHeaps(services,
                                                                        transaction),
                                                services);
     }
