@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -40,7 +41,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     }
 
     private static final String[] ADMITTED_RULES = {
-        "andLeft", "orLeft", "impRight", "unfold_computed_formula"
+        "andLeft", "orLeft", "impRight", "unfold_computed_formula", "andRight"
     };
 
     private static final String INF_FLOW_UNFOLD_PREFIX = "unfold_computed_formula";
@@ -95,19 +96,23 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
+        public RuleAppCost computeCost(RuleApp ruleApp,
+                                       PosInOccurrence pio,
+                                       Goal goal) {
             String name = ruleApp.rule().name().toString();
-            if((
-                    admittedRuleNames.contains(name) ||
-                    name.startsWith(INF_FLOW_UNFOLD_PREFIX)
-               ) &&
-                    ruleApplicationInContextAllowed(ruleApp, pio, goal)) {
+            if (    (   admittedRuleNames.contains(name)
+                     || name.startsWith(INF_FLOW_UNFOLD_PREFIX))
+                 && ruleApplicationInContextAllowed(ruleApp, pio, goal)) {
                 JavaCardDLStrategy.Factory strategyFactory =
                         new JavaCardDLStrategy.Factory();
                 Strategy javaDlStrategy =
                         strategyFactory.create(goal.proof(),
                                                new StrategyProperties());
-                return javaDlStrategy.computeCost(ruleApp, pio, goal);
+                RuleAppCost costs = javaDlStrategy.computeCost(ruleApp, pio, goal);
+                if ("orLeft".equals(name)) {
+                    costs = costs.add(NumberRuleAppCost.create(100));
+                }
+                return costs;
             } else {
                 return TopRuleAppCost.INSTANCE;
             }
