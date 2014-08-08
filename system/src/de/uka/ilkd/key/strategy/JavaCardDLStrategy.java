@@ -361,6 +361,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet (d, "no_self_application", ifZero ( MatchedIfFeature.INSTANCE,
                                                         NoSelfApplicationFeature.INSTANCE ) );
 
+        bindRuleSet (d, "find_term_not_in_assumes",
+                ifZero ( MatchedIfFeature.INSTANCE,
+                         not( contains(AssumptionProjection.create(0),
+                                       FocusProjection.INSTANCE) ) ) );
+
         bindRuleSet (d, "update_elim",
                 add( longConst(-8000), ScaleFeature.createScaled ( FindDepthFeature.INSTANCE, 10.0 ) ) ); 
         bindRuleSet (d, "update_apply_on_update", 
