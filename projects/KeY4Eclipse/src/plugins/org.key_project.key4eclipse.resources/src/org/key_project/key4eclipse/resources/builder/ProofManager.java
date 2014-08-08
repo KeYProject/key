@@ -221,15 +221,15 @@ public class ProofManager {
          ImmutableSet<IObserverFunction> targets = environment.getSpecificationRepository().getContractTargets(type);
          Type javaType = type.getJavaType();
          IFile javaFile = null;
-         SourceLocation scl = null;
+         SourceLocation typeScl = null;
          if(javaType instanceof JavaSourceElement){
             JavaSourceElement javaElement = (JavaSourceElement) javaType;
             String fileName = SymbolicExecutionUtil.getSourcePath(javaElement.getPositionInfo());
             IPath location = new Path(fileName);
             IPath relatviePath = location.makeRelativeTo(project.getLocation().removeLastSegments(1));
             javaFile = ResourcesPlugin.getWorkspace().getRoot().getFile(relatviePath);
-            scl = KeYUtil.convertToSourceLocation(javaElement.getPositionInfo());
-            scl = KeYUtil.updateToMethodNameLocation(javaFile, scl);
+            typeScl = KeYUtil.convertToSourceLocation(javaElement.getPositionInfo());
+            typeScl = KeYUtil.updateToTypeNameLocation(javaFile, typeScl);
          }
          // Find parent
          AbstractTypeContainer parentTypeContainer = null;
@@ -318,11 +318,12 @@ public class ProofManager {
                   observerFunctionIndex++;
                }
             }
+            SourceLocation targetLocation = typeScl;
             if (target instanceof IProgramMethod) {
                IProgramMethod progMethod = (IProgramMethod) target;
                if(progMethod.getContainerType().getJavaType().equals(javaType)){
-                  scl = KeYUtil.convertToSourceLocation(progMethod.getPositionInfo());
-                  scl = KeYUtil.updateToMethodNameLocation(javaFile, scl);
+                  targetLocation = KeYUtil.convertToSourceLocation(progMethod.getPositionInfo());
+                  targetLocation = KeYUtil.updateToMethodNameLocation(javaFile, targetLocation);
                }
             }
             ImmutableSet<Contract> contracts = environment.getSpecificationRepository().getContracts(type, target);
@@ -332,8 +333,8 @@ public class ProofManager {
                IFolder proofFolder = getProofFolder(javaFile);
                IFile proofFile = getProofFile(contract.getName(), proofFolder.getFullPath());
                IFile metaFile = getProofMetaFile(proofFile);
-               LinkedHashSet<IMarker> oldMarker = markerManager.getOldProofMarker(javaFile, scl, proofFile);
-               proofElements.add(new ProofElement(javaFile, scl, environment, proofFolder, proofFile, metaFile, oldMarker, contract));
+               LinkedHashSet<IMarker> oldMarker = markerManager.getOldProofMarker(javaFile, targetLocation, proofFile);
+               proofElements.add(new ProofElement(javaFile, targetLocation, environment, proofFolder, proofFile, metaFile, oldMarker, contract));
                ContractInfo contractInfo = targetInfo.getContract(contract.getName());
                if (contractInfo == null) {
                   ContractModality modalityInfo = null;

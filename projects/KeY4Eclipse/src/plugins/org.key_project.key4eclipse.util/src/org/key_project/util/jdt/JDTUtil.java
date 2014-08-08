@@ -97,6 +97,30 @@ public class JDTUtil {
    }
    
    /**
+    * Searches the {@link IType} as JDT representation which ends
+    * at the given index.
+    * @param cu The {@link ICompilationUnit} to search in.
+    * @param endIndex The index in the file at that the required method ends.
+    * @return The found {@link IType} or {@code null} if the JDT representation is not available.
+    * @throws JavaModelException Occurred Exception.
+    * @throws IOException Occurred Exception.
+    */
+   public static IType findJDTType(ICompilationUnit cu, int endIndex) throws JavaModelException, IOException {
+      IType result = null;
+      if (cu != null) {
+         IType[] types = cu.getAllTypes();
+         int i = 0;
+         while (result == null && i < types.length) {
+            ISourceRange typeRange = types[i].getSourceRange();
+            if (endIndex == typeRange.getOffset() + typeRange.getLength()) {
+               result = types[i];
+            }
+         }
+      }
+      return result;
+   }
+   
+   /**
     * Returns the tab width used in the given {@link IJavaElement}.
     * @param element The {@link IJavaElement} to get its tab width.
     * @return The tab width.
