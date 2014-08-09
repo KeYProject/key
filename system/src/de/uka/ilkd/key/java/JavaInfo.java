@@ -1000,8 +1000,10 @@ public final class JavaInfo {
      Traverses type hierarchy to find the first {@link KeYJavaType} in which
      a field of name programName is declared, starting from parameter type. And
      then returns a {@link ProgramVariable} for that field/type combination.
+     
+     TODO@Kai say something about canonical
      */
-    public ProgramVariable getFieldType(String programName, KeYJavaType type) {
+    public ProgramVariable getCanonicalFieldProgramVariable(String fieldName, KeYJavaType type) {
 
         ImmutableList<ProgramVariable> result = ImmutableSLList.<ProgramVariable>nil();
 
@@ -1010,12 +1012,12 @@ public final class JavaInfo {
         }
 
         if (type.getJavaType() instanceof ArrayType) {
-            ProgramVariable var = find(programName, getFields(((ArrayDeclaration) type.getJavaType())
+            ProgramVariable var = find(fieldName, getFields(((ArrayDeclaration) type.getJavaType())
                     .getMembers()));
             if (var != null) {
                 result = result.prepend(var);
             }
-            var = getAttribute(programName, getJavaLangObject());
+            var = getAttribute(fieldName, getJavaLangObject());
             if (var != null) {
                 result = result.prepend(var);
             }
@@ -1031,7 +1033,7 @@ public final class JavaInfo {
         while (it.hasNext()) {
             KeYJavaType st = it.next();
             if (st != null) {
-                final ProgramVariable var = getAttribute(programName, st);
+                final ProgramVariable var = getAttribute(fieldName, st);
                 if (var != null) {
                     return var;
                 }

@@ -98,7 +98,7 @@ public abstract class AbstractTestTermParser extends TestCase {
         }
     }
 
-    private KeYParserF stringTermParser(String s) {
+    protected KeYParserF stringTermParser(String s) {
         return new KeYParserF(ParserMode.TERM,
                 new KeYLexerF(s,
                         "No file. Call of parser from parser/" + getClass().getSimpleName(),

@@ -43,7 +43,7 @@ public class KeYParserF extends KeYParser {
         if (depth > 0) {
 
             if (!isSelectTerm(term)) {
-                semanticError("Expecting select term of arity 3 before '@', not: " + term);
+                semanticError("Expecting select term before '@', not: " + term);
             }
 
             if (!isImplicitHeap(term.sub(0))) {

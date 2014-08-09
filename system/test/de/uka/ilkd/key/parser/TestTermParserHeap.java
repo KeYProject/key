@@ -113,6 +113,30 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         t2 = parseTerm("(a.next.next@h2).next.f@h");
         assertEquals(t1, t2);
 
+        t1 = parseTerm("a.array[a.f]@h");
+
+        Term x = getSelectTerm("int", tb.getBaseHeap(), a, f);
+        Term idx = tb.arr(x);
+        Term y = getSelectTerm("int[]", h, a, parseTerm("testTermParserHeap.A::$array"));
+        Term z = getSelectTerm("int", h, y, idx);
+        assertEquals(z, t1);
+
+        t1 = getSelectTerm("testTermParserHeap.A", tb.getBaseHeap(), a, next);
+        t1 = getSelectTerm("testTermParserHeap.A", h, t1, next);
+        t1 = getSelectTerm("int", h, t1, f);
+        t2 = parseTerm("(a.next@heap).next.f@h");
+        assertEquals(t1, t2);
+        t2 = parseTerm("((a.next@heap)).next.f@h");
+        assertEquals(t1, t2);
+    }
+
+    public void testSyntax() {
+        try {
+            stringTermParser("(a.f + a.f)@h2").term();
+            fail();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("Expecting select term before '@', not: "));
+        }
     }
 
 }
