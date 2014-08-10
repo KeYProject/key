@@ -33,11 +33,15 @@ import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.key_project.sed.core.model.ISEDBranchCondition;
+import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDExceptionalTermination;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.util.ISEDIterator;
+import org.key_project.sed.core.util.NodeUtil;
+import org.key_project.sed.core.util.SEDMethodPreorderIterator;
 import org.key_project.sed.core.util.SEDPreorderIterator;
 import org.key_project.util.java.ArrayUtil;
 
@@ -79,9 +83,9 @@ public class MethodCallUpdateFeature extends AbstractDebugNodeUpdateFeature {
          {
             boolean isLeaf = true;
 
-            if(!ArrayUtil.isEmpty(getChildren(next)))
+            if(!ArrayUtil.isEmpty(NodeUtil.getChildren(next)))
             {
-               for(ISEDDebugNode child : getChildren(next))
+               for(ISEDDebugNode child : NodeUtil.getChildren(next))
                {
                   if(getPictogramElementForBusinessObject(child) != null) {
                      isLeaf = false;
@@ -97,90 +101,130 @@ public class MethodCallUpdateFeature extends AbstractDebugNodeUpdateFeature {
       }
       return leafs;
    }
-
-   protected void updateCollapsedRectHeight(ISEDDebugNode mc, GraphicsAlgorithm ga, int diff) throws DebugException {
+   
+   protected void shrinkRectHeights(ISEDDebugNode mc) throws DebugException {
+      GraphicsAlgorithm nodeGA = getPictogramElementForBusinessObject(mc).getGraphicsAlgorithm();
+      GraphicsAlgorithm rectGA = getPictogramElementForBusinessObject(mc, 0).getGraphicsAlgorithm();
+      
+      int height = 2 * (nodeGA.getHeight() + OFFSET);
+      int diff = rectGA.getHeight() - height;
       do
       {
-         PictogramElement mcPE = getPictogramElementForBusinessObject(mc, 0);
-         GraphicsAlgorithm mcGA = mcPE.getGraphicsAlgorithm();
-
          ISEDBranchCondition[] bcs = ((ISEDMethodCall) mc).getMethodReturnConditions();
-
-         mcGA.setHeight(mcGA.getHeight() - diff);
          
+
+         rectGA.setHeight(rectGA.getHeight() - diff);
+
          for(int i = 0; i < bcs.length; i++) {
             ISEDDebugNode mr = bcs[i].getChildren()[0];
             PictogramElement mrPE = getPictogramElementForBusinessObject(mr);
-            
+                             
             if(mrPE != null) {
-//               mrPE.getGraphicsAlgorithm().setY(mrPE.getGraphicsAlgorithm().getY() - diff);
                moveSubTreeBetweenMRVertical(mr, mr, -diff);
             }
          }
-         
-//         ISEDTermination[] terminations = mc.getThread().getTerminations();
-//         for(ISEDTermination t : terminations)
-//         {
-//            if(t instanceof ISEDExceptionalTermination)
-//            {
-//               ISEDDebugNode parent = t.getParent();
-//               if(parent.getCallStack() != null && parent.getCallStack().length > 0)
-//               {
-//                  PictogramElement tPE = getPictogramElementForBusinessObject(t);
-//                  
-//                  if(tPE != null){
-//                     moveSubTreeVertical(t, -diff);
-//                  }
-//               }  
-//            }
+            
+   //         ISEDTermination[] terminations = mc.getThread().getTerminations();
+   //         for(ISEDTermination t : terminations)
+   //         {
+   //            if(t instanceof ISEDExceptionalTermination)
+   //            {
+   //               ISEDDebugNode parent = t.getParent();
+   //               if(parent.getCallStack() != null && parent.getCallStack().length > 0)
+   //               {
+   //                  PictogramElement tPE = getPictogramElementForBusinessObject(t);
+   //                  
+   //                  if(tPE != null){
+   //                     moveSubTreeVertical(t, -diff);
+   //                  }
+   //               }  
+   //            }
+   //         }
 //         }
-
          mc = !ArrayUtil.isEmpty(mc.getCallStack()) ? mc.getCallStack()[0] : null;
          if(mc != null) {
-            mcPE = getPictogramElementForBusinessObject(mc, 0);
-            mcGA = mcPE.getGraphicsAlgorithm();
-            if(diff > 0)
-            {
-               if(findDeepestYInMethod(mc, mc, 0) > mcGA.getY() + mcGA.getHeight() - diff) {
-                  mc = null;
-               }   
-            }
-            else
-            {
-               if(findDeepestYInMethod(mc, mc, 0) < mcGA.getY() + mcGA.getHeight() + diff) {
-                  mc = null;
-               }
-            }
+            rectGA = getPictogramElementForBusinessObject(mc, 0).getGraphicsAlgorithm();
+            int deepestY = findDeepestYInMethod((ISEDMethodCall) mc);
+//            PictogramElement deepestPE = findDeepestYInMethod((ISEDMethodCall) mc);
+//            GraphicsAlgorithm deepestGA = deepestPE.getGraphicsAlgorithm();
+
+            if(deepestY > rectGA.getY() + rectGA.getHeight() - diff) {
+               diff = rectGA.getY() + rectGA.getHeight() - deepestY - OFFSET - nodeGA.getHeight() / 2;
+            }   
          }
       } while(mc != null);
    }
    
-   private int findDeepestYInMethod(ISEDDebugNode mc, ISEDDebugNode node, int deepestY) throws DebugException {
-      
-      if(node == null || !(node instanceof ISEDBranchCondition) && ArrayUtil.isEmpty(node.getCallStack()) && !node.equals(mc)) {
-         return deepestY;
-      }
-      
-      if(node instanceof ISEDMethodReturn)
-      {
-         if(node.getCallStack()[0].equals(mc)) {
-            return deepestY;
+   private int findDeepestYInMethod(ISEDMethodCall mc) throws DebugException {
+      int deepestY = 0;
+      ISEDIterator iter = new SEDMethodPreorderIterator(mc);
+      while (iter.hasNext()) {
+         ISEDDebugElement next = iter.next();
+         
+         if(next instanceof ISEDDebugNode)
+         {
+            ISEDDebugNode nextNode = (ISEDDebugNode) next;
+            
+            if(ArrayUtil.isEmpty(nextNode.getCallStack()) && !(nextNode instanceof ISEDBranchCondition)) {
+               continue;
+            }
+            
+            if(nextNode instanceof ISEDMethodReturn)
+            {
+               if(nextNode.getCallStack()[0].equals(mc)) {
+                  continue;
+               }
+            }
+            
+            PictogramElement pe = getPictogramElementForBusinessObject(nextNode);
+            if (pe != null) {
+               GraphicsAlgorithm ga = pe.getGraphicsAlgorithm();
+               if (ga.getY() + ga.getHeight() > deepestY) {
+                  deepestY = ga.getY() + ga.getHeight();
+               }
+            }
          }
-      }
-      
-      PictogramElement pe = getPictogramElementForBusinessObject(node);
-      if (pe != null) {
-         if (pe.getGraphicsAlgorithm().getY() > deepestY) {
-            deepestY = pe.getGraphicsAlgorithm().getY();
-         }
-      }
-      
-      for(ISEDDebugNode child : getChildren(node)) {
-         deepestY = findDeepestYInMethod(mc, child, deepestY);
       }
 
       return deepestY;
    }
+   
+//   private PictogramElement findDeepestYInMethod(ISEDMethodCall mc) throws DebugException {
+//      int deepestY = 0;
+//      PictogramElement deepestPE = null;
+//      ISEDIterator iter = new SEDMethodPreorderIterator(mc);
+//      while (iter.hasNext()) {
+//         ISEDDebugElement next = iter.next();
+//         
+//         if(next instanceof ISEDDebugNode)
+//         {
+//            ISEDDebugNode nextNode = (ISEDDebugNode) next;
+//            
+//            if(ArrayUtil.isEmpty(nextNode.getCallStack()) && !(nextNode instanceof ISEDBranchCondition)) {
+//               continue;
+//            }
+//            
+//            if(nextNode instanceof ISEDMethodReturn)
+//            {
+//               if(nextNode.getCallStack()[0].equals(mc)) {
+//                  continue;
+//               }
+//            }
+//            
+//            PictogramElement pe = getPictogramElementForBusinessObject(nextNode);
+//            if (pe != null) {
+//               GraphicsAlgorithm ga = pe.getGraphicsAlgorithm();
+//               if (ga.getY() + ga.getHeight() > deepestY) {
+//                  System.out.println(nextNode);
+//                  deepestY = ga.getY() + ga.getHeight();
+//                  deepestPE = pe;
+//               }
+//            }
+//         }
+//      }
+//
+//      return deepestPE;
+//   }
    
    /**
     * Moves all nodes in the sub tree between the given {@link ISEDMethodReturn} and
@@ -198,10 +242,11 @@ public class MethodCallUpdateFeature extends AbstractDebugNodeUpdateFeature {
       
       PictogramElement pe = getPictogramElementForBusinessObject(node);
       if (pe != null) {
+//         System.out.println(node);
          pe.getGraphicsAlgorithm().setY(pe.getGraphicsAlgorithm().getY() + distance);
       }
       
-      for(ISEDDebugNode child : getChildren(node)) {
+      for(ISEDDebugNode child : NodeUtil.getChildren(node)) {
          moveSubTreeBetweenMRVertical(mr, child, distance);
       }
    }
@@ -214,34 +259,68 @@ public class MethodCallUpdateFeature extends AbstractDebugNodeUpdateFeature {
     * @return Set<ISEDDebugNode> methodCloses Contains all MethodReturns
     * @throws DebugException
     */
-   protected void removeChildren(ISEDDebugNode node, ISEDMethodCall mc) throws DebugException {
-      ISEDDebugNode[] children = getChildren(node);
-      
-      if(children.length == 0)
-         return;
-      
+   protected void removeChildren(ISEDMethodCall node, ISEDMethodCall mc) throws DebugException {
       DefaultRemoveFeature drf = new DefaultRemoveFeature(getFeatureProvider());
-      
-      for(ISEDDebugNode child : children)
-      {
-         PictogramElement[] pes = getFeatureProvider().getAllPictogramElementsForBusinessObject(child);
+      ISEDIterator iter = new SEDMethodPreorderIterator(node);
+      while (iter.hasNext()) {
+         ISEDDebugElement next = iter.next();
          
-         if(pes == null || child instanceof ISEDMethodReturn && child.getCallStack()[0] == mc ||
-              !(child instanceof ISEDBranchCondition) && ArrayUtil.isEmpty(child.getCallStack())) {
+         if(next.equals(mc)) {
             continue;
          }
-
-         if(!(child instanceof ISEDMethodReturn) || child.getCallStack()[0] != mc)
-            removeChildren(child, mc);
          
-         for(PictogramElement pe : pes)
+         if(next instanceof ISEDDebugNode)
          {
-            if(!(child instanceof ISEDMethodCall)) {
-               removeConnections(pe, drf);
+            ISEDDebugNode nextNode = (ISEDDebugNode) next;
+
+            PictogramElement[] pes = getFeatureProvider().getAllPictogramElementsForBusinessObject(nextNode);
+            
+            if(pes == null || nextNode instanceof ISEDMethodReturn && nextNode.getCallStack()[0] == mc ||
+                 !(nextNode instanceof ISEDBranchCondition) &&
+                 !(nextNode instanceof ISEDExceptionalTermination) && ArrayUtil.isEmpty(nextNode.getCallStack())) {
+               continue;
             }
-            drf.remove(new RemoveContext(pe));
+
+//            if(!(nextNode instanceof ISEDMethodReturn) || nextNode.getCallStack()[0] != mc)
+//               removeChildren(child, mc);
+            
+            for(PictogramElement pe : pes)
+            {
+               if(!(nextNode instanceof ISEDMethodCall)) {
+                  removeConnections(pe, drf);
+               }
+               drf.remove(new RemoveContext(pe));
+            }
          }
       }
+//      
+//      ISEDDebugNode[] children = NodeUtil.getChildren(node);
+//      
+//      if(children.length == 0)
+//         return;
+//      
+//      DefaultRemoveFeature drf = new DefaultRemoveFeature(getFeatureProvider());
+//      
+//      for(ISEDDebugNode child : children)
+//      {
+//         PictogramElement[] pes = getFeatureProvider().getAllPictogramElementsForBusinessObject(child);
+//         
+//         if(pes == null || child instanceof ISEDMethodReturn && child.getCallStack()[0] == mc ||
+//              !(child instanceof ISEDBranchCondition) && ArrayUtil.isEmpty(child.getCallStack())) {
+//            continue;
+//         }
+//
+//         if(!(child instanceof ISEDMethodReturn) || child.getCallStack()[0] != mc)
+//            removeChildren(child, mc);
+//         
+//         for(PictogramElement pe : pes)
+//         {
+//            if(!(child instanceof ISEDMethodCall)) {
+//               removeConnections(pe, drf);
+//            }
+//            drf.remove(new RemoveContext(pe));
+//         }
+//      }
    }
    
    protected void removeConnections(PictogramElement pe) {

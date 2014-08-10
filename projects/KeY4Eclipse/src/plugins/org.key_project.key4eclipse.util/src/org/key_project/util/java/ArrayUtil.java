@@ -429,6 +429,41 @@ public final class ArrayUtil {
    }
    
    /**
+    * Checks if the given element is the first element in the array.
+    * @param <T> The type of the array.
+    * @param array The array.
+    * @param toSearch The element to search.
+    * @return {@code true} is first element, {@code false} is not first element or even not contained in the array.
+    */
+   public static <T> boolean isFirst(T[] array, T toSearch) {
+      return isFirst(array, toSearch, ObjectUtil.createEqualsComparator());
+   }
+
+   /**
+    * Checks if the given element is the first element in the array.
+    * Objects are equal if the comparison result is {@code 0}.
+    * @param <T> The type of the array.
+    * @param array The array.
+    * @param toSearch The element to search.
+    * @param comparator the {@link Comparator} to use.
+    * @return {@code true} is first element, {@code false} is not first element or even not contained in the array.
+    * @throws IllegalArgumentException If the comparator is {@code null}.
+    */
+   public static <T> boolean isFirst(T[] array, T toSearch, Comparator<T> comparator) {
+      if (array != null && array.length >= 1) {
+         if (comparator == null) {
+            throw new IllegalArgumentException("Comparator is null.");
+         }
+         else {
+            return comparator.compare(array[0], toSearch) == 0;
+         }
+      }
+      else {
+         return false;
+      }
+   }
+   
+   /**
     * Returns the first element from the given array.
     * @param array The array to get first element from.
     * @return The first element or {@code null} if no element is available.

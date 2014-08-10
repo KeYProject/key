@@ -25,6 +25,7 @@ import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
+import org.key_project.sed.core.util.NodeUtil;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeStyleUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
@@ -64,13 +65,13 @@ public class MethodCallCollapseFeature extends AbstractDebugNodeCollapseFeature 
             uc = new UpdateContext(pes[1]);
             uf = (MethodCallUpdateFeature) getFeatureProvider().getUpdateFeature(uc);
             
-            ISEDBranchCondition[] bcs = uf.getSortedBCs(mc);
+            ISEDBranchCondition[] bcs = NodeUtil.getSortedBCs(mc);
             
             GraphicsAlgorithm rectGA = pes[0].getGraphicsAlgorithm();
             GraphicsAlgorithm nodeGA = pes[1].getGraphicsAlgorithm();
             
             int OFFSET = getDiagram().getGridUnit() * 2;
-            int height = 2 * (nodeGA.getHeight() + OFFSET);
+//            int height = 2 * (nodeGA.getHeight() + OFFSET);
             IProgressMonitor monitor = GraphitiUtil.getProgressMonitor(context);
             
             if(!mc.isCollapsed())
@@ -80,10 +81,11 @@ public class MethodCallCollapseFeature extends AbstractDebugNodeCollapseFeature 
                
                mc.setCollapsed(true);
                
-               int diff = rectGA.getHeight() - height;
+//               int diff = rectGA.getHeight() - height;
 
-               Graphiti.getPeService().setPropertyValue(pes[0], "DIFF", Integer.toString(diff));
-               uf.updateCollapsedRectHeight(mc, nodeGA, diff);
+//               Graphiti.getPeService().setPropertyValue(pes[0], "DIFF", Integer.toString(diff));
+//               uf.updateCollapsedRectHeight(mc, false);
+               uf.shrinkRectHeights(mc);
 
                int maxX = 0;
                boolean need2Move = true;
@@ -104,7 +106,7 @@ public class MethodCallCollapseFeature extends AbstractDebugNodeCollapseFeature 
 //                     feature.execute(addContext);
 //                  }
 
-                  uf.createGraphicalRepresentationForNode(bc, OFFSET, maxX);
+                  uf.createGraphicalRepresentationForNode(bc, uf.OFFSET, maxX);
                   
                   
                   PictogramElement bcPE = getFeatureProvider().getPictogramElementForBusinessObject(bc);
@@ -129,7 +131,7 @@ public class MethodCallCollapseFeature extends AbstractDebugNodeCollapseFeature 
 //                           bcGA.setX(mrGA.getX() + mrGA.getWidth() + OFFSET);
                   
 
-                  maxX = uf.findMostRightXInSubtree(bc) + OFFSET;
+                  maxX = uf.findMostRightXInSubtree(bc) + uf.OFFSET;
                   
                   int hMove = 0;
                   
@@ -162,28 +164,34 @@ public class MethodCallCollapseFeature extends AbstractDebugNodeCollapseFeature 
                
                mc.setCollapsed(false);
                
-               rectGA.setHeight(nodeGA.getHeight() / 2);
-               nodeGA.setX(rectGA.getX());
+//               rectGA.setHeight(nodeGA.getHeight() / 2);
+//               nodeGA.setX(rectGA.getX());
 //               nodeGA.setX(Integer.parseInt(Graphiti.getPeService().getPropertyValue(pes[1], "X")));
                
                for(ISEDBranchCondition bc : bcs) {
                   ISEDMethodReturn mr = (ISEDMethodReturn) bc.getChildren()[0];
                   PictogramElement mrPE = getFeatureProvider().getPictogramElementForBusinessObject(mr);
 
-                  uf.moveSubTreeHorizontal(mr, -Integer.parseInt(Graphiti.getPeService().getPropertyValue(mrPE, "MOVE")), new SubProgressMonitor(monitor, 1));
+//                  uf.moveSubTreeHorizontal(mr, -Integer.parseInt(Graphiti.getPeService().getPropertyValue(mrPE, "MOVE")), new SubProgressMonitor(monitor, 1));
                }
                
-               uf.updateCollapsedRectHeight(mc, nodeGA, -Integer.parseInt(Graphiti.getPeService().getPropertyValue(pes[0], "DIFF")));
-               uf.updateChildren(pes[1], OFFSET, new SubProgressMonitor(monitor, 1));
+//               uf.updateCollapsedRectHeight(mc, nodeGA, -Integer.parseInt(Graphiti.getPeService().getPropertyValue(pes[0], "DIFF")));
+//               uf.updateChildren(pes[1], OFFSET, new SubProgressMonitor(monitor, 1));
+               
+//               int collapsedHeight = rectGA.getHeight();
+               uf.update(uc);
                monitor.worked(1);
                
+//               int diff = rectGA.getHeight() - height;
+//               uf.updateCollapsedRectHeight(mc, true);
+               
                for(ISEDBranchCondition bc : bcs) {
-                   ISEDMethodReturn mr = (ISEDMethodReturn) uf.getChildren(bc)[0];
+                   ISEDMethodReturn mr = (ISEDMethodReturn) NodeUtil.getChildren(bc)[0];
                    PictogramElement mrPE = getFeatureProvider().getPictogramElementForBusinessObject(mr);
-                   PictogramElement parentPE = getFeatureProvider().getPictogramElementForBusinessObject(uf.getParent(mr));
+                   PictogramElement parentPE = getFeatureProvider().getPictogramElementForBusinessObject(NodeUtil.getParent(mr));
                    
                    createConnection((AnchorContainer)parentPE, (AnchorContainer)mrPE);
-                   uf.updateParents(mrPE, OFFSET, new SubProgressMonitor(monitor, 1));
+                   uf.updateParents(mrPE, uf.OFFSET, new SubProgressMonitor(monitor, 1));
                    monitor.worked(1);
                 }
             }

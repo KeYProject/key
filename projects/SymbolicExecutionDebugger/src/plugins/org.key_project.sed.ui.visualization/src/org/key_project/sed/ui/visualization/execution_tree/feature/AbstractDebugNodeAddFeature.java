@@ -41,6 +41,7 @@ import org.eclipse.graphiti.services.IPeCreateService;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
+import org.key_project.sed.core.util.NodeUtil;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeStyleUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
@@ -167,7 +168,7 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
       
       ChopboxAnchor anchor = peCreateService.createChopboxAnchor(nodeContainer);
       
-      ISEDDebugNode parentNode = ((ISEDDebugNode) getBusinessObjectForPictogramElement(nodeContainer)).getParent();//addedNode.getParent();
+      ISEDDebugNode parentNode = NodeUtil.getParent((ISEDDebugNode) getBusinessObjectForPictogramElement(nodeContainer));
       if(parentNode != null)
       {
          PictogramElement pe = parentNode instanceof ISEDMethodCall ? 
