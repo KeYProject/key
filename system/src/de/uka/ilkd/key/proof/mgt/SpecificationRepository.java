@@ -116,8 +116,8 @@ public final class SpecificationRepository {
             new LinkedHashMap<ProofOblInput, ImmutableSet<Proof>>();
     private final Map<LoopStatement, LoopInvariant> loopInvs =
             new LinkedHashMap<LoopStatement, LoopInvariant>();
-    private final Map<StatementBlock, ImmutableSet<BlockContract>> blockContracts =
-            new LinkedHashMap<StatementBlock, ImmutableSet<BlockContract>>();
+    private final Map<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>> blockContracts =
+            new LinkedHashMap<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>>();
     private final Map<IObserverFunction, IObserverFunction> unlimitedToLimited =
             new LinkedHashMap<IObserverFunction, IObserverFunction>();
     private final Map<IObserverFunction, IObserverFunction> limitedToUnlimited =
@@ -1461,10 +1461,12 @@ public final class SpecificationRepository {
     }
 
     public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
-        if (blockContracts.get(block) == null) {
+        final Pair<StatementBlock, Integer> b =
+                new Pair<StatementBlock, Integer>(block, block.getStartPosition().getLine());
+        if (blockContracts.get(b) == null) {
             return DefaultImmutableSet.<BlockContract> nil();
         } else {
-            return blockContracts.get(block);
+            return blockContracts.get(b);
         }
     }
 
@@ -1484,7 +1486,9 @@ public final class SpecificationRepository {
 
     public void addBlockContract(final BlockContract contract) {
         final StatementBlock block = contract.getBlock();
-        blockContracts.put(block, getBlockContracts(block).add(contract));
+        final Pair<StatementBlock, Integer> b =
+                new Pair<StatementBlock, Integer> (block, block.getStartPosition().getLine());
+        blockContracts.put(b, getBlockContracts(block).add(contract));
     }
 
     public void addSpecs(ImmutableSet<SpecificationElement> specs) {
