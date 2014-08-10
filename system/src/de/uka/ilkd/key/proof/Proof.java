@@ -1113,7 +1113,6 @@ public class Proof implements Named {
         int operationContractApps = 0;
         int loopInvApps = 0;
         long autoModeTime = 0;
-        long time = 0;
         float timePerStep = 0;
 
         private SideProofStatistics(int nodes,
@@ -1127,7 +1126,6 @@ public class Proof implements Named {
                                     int operationContractApps,
                                     int loopInvApps,
                                     long autoModeTime,
-                                    long time,
                                     float timePerStep) {
             this.nodes = nodes;
             this.branches = branches;
@@ -1140,7 +1138,6 @@ public class Proof implements Named {
             this.operationContractApps = operationContractApps;
             this.loopInvApps = loopInvApps;
             this.autoModeTime = autoModeTime;
-            this.time = time;
             this.timePerStep = timePerStep;
         }
 
@@ -1156,7 +1153,6 @@ public class Proof implements Named {
                                            stat.operationContractApps,
                                            stat.loopInvApps,
                                            stat.autoModeTime,
-                                           stat.time,
                                            stat.timePerStep);
         }
 
@@ -1172,40 +1168,37 @@ public class Proof implements Named {
                                            stat.operationContractApps,
                                            stat.loopInvApps,
                                            stat.autoModeTime,
-                                           stat.time,
                                            stat.timePerStep);
         }
 
         SideProofStatistics add(SideProofStatistics stat) {
         	return new SideProofStatistics(this.nodes + stat.nodes,
-        								   this.branches + stat.branches,
-        								   this.interactiveSteps + stat.interactiveSteps,
-        								   this.quantifierInstantiations + stat.quantifierInstantiations,
-        								   this.ossApps + stat.ossApps,
-        								   this.totalRuleApps + stat.totalRuleApps,
-        								   this.smtSolverApps + stat.smtSolverApps,
-        								   this.dependencyContractApps + stat.dependencyContractApps,
-        								   this.operationContractApps + stat.operationContractApps,
-        								   this.loopInvApps + stat.loopInvApps,
-        								   this.autoModeTime + stat.autoModeTime,
-        								   System.currentTimeMillis() - Main.getStartTime(),
-        								   this.nodes != 0 ? this.autoModeTime/(float)this.nodes : 0);
+                                               this.branches + stat.branches,
+                                               this.interactiveSteps + stat.interactiveSteps,
+                                               this.quantifierInstantiations + stat.quantifierInstantiations,
+                                               this.ossApps + stat.ossApps,
+                                               this.totalRuleApps + stat.totalRuleApps,
+                                               this.smtSolverApps + stat.smtSolverApps,
+                                               this.dependencyContractApps + stat.dependencyContractApps,
+                                               this.operationContractApps + stat.operationContractApps,
+                                               this.loopInvApps + stat.loopInvApps,
+                                               this.autoModeTime + stat.autoModeTime,
+                                               this.nodes != 0 ? this.autoModeTime/(float)this.nodes : 0);
         }
 
         SideProofStatistics add(Statistics stat) {
         	return new SideProofStatistics(this.nodes + stat.nodes,
-        								   this.branches + stat.branches,
-        								   this.interactiveSteps + stat.interactiveSteps,
-        								   this.quantifierInstantiations + stat.quantifierInstantiations,
-        								   this.ossApps + stat.ossApps,
-        								   this.totalRuleApps + stat.totalRuleApps,
-        								   this.smtSolverApps + stat.smtSolverApps,
-        								   this.dependencyContractApps + stat.dependencyContractApps,
-        								   this.operationContractApps + stat.operationContractApps,
-        								   this.loopInvApps + stat.loopInvApps,
-        								   this.autoModeTime + stat.autoModeTime,
-        								   System.currentTimeMillis() - Main.getStartTime(),
-        								   this.nodes != 0 ? this.autoModeTime/(float)this.nodes : 0);
+                                               this.branches + stat.branches,
+                                               this.interactiveSteps + stat.interactiveSteps,
+                                               this.quantifierInstantiations + stat.quantifierInstantiations,
+                                               this.ossApps + stat.ossApps,
+                                               this.totalRuleApps + stat.totalRuleApps,
+                                               this.smtSolverApps + stat.smtSolverApps,
+                                               this.dependencyContractApps + stat.dependencyContractApps,
+                                               this.operationContractApps + stat.operationContractApps,
+                                               this.loopInvApps + stat.loopInvApps,
+                                               this.autoModeTime + stat.autoModeTime,
+                                               this.nodes != 0 ? this.autoModeTime/(float)this.nodes : 0);
         }
 
         void setAutoModeTime(long autoTime) {
@@ -1239,18 +1232,18 @@ public class Proof implements Named {
                         new ArrayList<Pair<String, String>>(14);
 
         private Statistics(int nodes,
-                		   int branches,
-                		   int interactiveSteps,
-                		   int quantifierInstantiations,
-                		   int ossApps,
-                		   int totalRuleApps,
-                		   int smtSolverApps,
-                		   int dependencyContractApps,
-                		   int operationContractApps,
-                		   int loopInvApps,
-                		   long autoModeTime,
-                		   long time,
-                		   float timePerStep) {
+                           int branches,
+                           int interactiveSteps,
+                           int quantifierInstantiations,
+                           int ossApps,
+                           int totalRuleApps,
+                           int smtSolverApps,
+                           int dependencyContractApps,
+                           int operationContractApps,
+                           int loopInvApps,
+                           long autoModeTime,
+                           long time,
+                           float timePerStep) {
             this.nodes = nodes;
             this.branches = branches;
             this.interactiveSteps = interactiveSteps;
@@ -1268,18 +1261,18 @@ public class Proof implements Named {
 
         static Statistics create(SideProofStatistics side) {
         	return new Statistics(side.nodes,
-        						  side.branches,
-        						  side.interactiveSteps,
-        						  side.quantifierInstantiations,
-        						  side.ossApps,
-        						  side.totalRuleApps,
-        						  side.smtSolverApps,
-        						  side.dependencyContractApps,
-        						  side.operationContractApps,
-        						  side.loopInvApps,
-        						  side.autoModeTime,
-        						  side.time,
-        						  side.timePerStep);
+                                      side.branches,
+                                      side.interactiveSteps,
+                                      side.quantifierInstantiations,
+                                      side.ossApps,
+                                      side.totalRuleApps,
+                                      side.smtSolverApps,
+                                      side.dependencyContractApps,
+                                      side.operationContractApps,
+                                      side.loopInvApps,
+                                      side.autoModeTime,
+                                      System.currentTimeMillis() - Main.getStartTime(),
+                                      side.timePerStep);
         }
 
         private Statistics(Proof proof) {
@@ -1359,10 +1352,10 @@ public class Proof implements Named {
             final boolean sideProofs = proof.hasSideProofs();
             final Statistics stat;
             if (sideProofs) {
-                long autoTime = proof.getAutoModeTime()
+                final long autoTime = proof.getAutoModeTime()
                         + proof.sideProofStatistics.autoModeTime;
-                proof.addSideProofStatistics(this);
-                proof.sideProofStatistics.setAutoModeTime(autoTime);
+                final SideProofStatistics side = proof.sideProofStatistics.add(this);
+                side.setAutoModeTime(autoTime);
                 stat = Statistics.create(proof.sideProofStatistics);
             } else {
                 stat = this;
