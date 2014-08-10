@@ -112,8 +112,8 @@ public final class InfFlowBlockContractTacletBuilder
         for (BlockContract cont : ifContracts) {
             if ((cont.getBlock().getStartPosition().getLine() ==
                     blockContract.getBlock().getStartPosition().getLine()) &&
-                    cont.getTarget().getFullName()
-                    .equalsIgnoreCase(blockContract.getTarget().getFullName())) {
+                    cont.getTarget().getUniqueName()
+                    .equalsIgnoreCase(blockContract.getTarget().getUniqueName())) {
                 result = result.add(cont);
             }
         }

@@ -483,7 +483,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     public String getUniqueName() {
         if (pm != null)
             return "Loop Invariant " + getLoop().getStartPosition().getLine() +
-                    " " + getTarget().getFullName();
+                    " " + getTarget().getUniqueName();
         else
             return "Loop Invariant " + getLoop().getStartPosition().getLine() +
                     " " + Math.abs(getLoop().hashCode());

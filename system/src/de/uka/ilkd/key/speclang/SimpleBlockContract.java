@@ -330,7 +330,7 @@ public final class SimpleBlockContract implements BlockContract {
     public String getUniqueName() {
         if (getTarget() != null)
             return "Block Contract " + getBlock().getStartPosition().getLine() +
-                    " " + getTarget().getFullName();
+                    " " + getTarget().getUniqueName();
         else
             return "Block Contract " + getBlock().getStartPosition().getLine() +
                     " " + Math.abs(getBlock().hashCode());

@@ -49,7 +49,7 @@ public final class InfFlowMethodContractTacletBuilder
     @Override
     Name generateName() {
         return MiscTools.toValidTacletName("Use information flow contract for " +
-                                           methodContract.getTarget().getFullName());
+                                           methodContract.getTarget().getUniqueName());
     }
 
 

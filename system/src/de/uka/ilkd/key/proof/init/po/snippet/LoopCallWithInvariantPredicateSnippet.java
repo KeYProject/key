@@ -19,7 +19,7 @@ public class LoopCallWithInvariantPredicateSnippet extends TwoStateMethodPredica
         final String nameString =
                 MiscTools.toValidTacletName("EXECUTION_OF_LOOP_" + "at_line_" +
                                             loopInv.getLoop().getStartPosition().getLine() +
-                                            "_in_" + pm.getFullName() + "_WITH_INV").toString();
+                                            "_in_" + pm.getUniqueName() + "_WITH_INV").toString();
         return nameString;
     }
 }

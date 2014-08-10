@@ -58,6 +58,8 @@ public interface IProgramMethod extends IObserverFunction, SourceElement, Progra
 
    public abstract ProgramElementName getProgramElementName();
 
+   public abstract String getUniqueName();
+
    public abstract String getFullName();
 
    public abstract String getName();
