@@ -90,16 +90,14 @@ public class StatementBlock extends JavaStatement
         StatementBlock block = (StatementBlock)o;
 
         return super.equals(block)
-                && this.getStartPosition().getLine()
-                    == block.getStartPosition().getLine();
+                && (this.getStartPosition().equals(Position.UNDEFINED) ||
+                        block.getStartPosition().equals(Position.UNDEFINED) ||
+                        this.getStartPosition().getLine() == block.getStartPosition().getLine());
     }
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 67 * hash + super.hashCode();
-        hash =  67 * hash + (getStartPosition().getLine() << 8);
-        return hash;
+        return super.hashCode();
     }
 
     private ImmutableArray<ProgramPrefix> computePrefixElements(ImmutableArray<? extends Statement> b) {
