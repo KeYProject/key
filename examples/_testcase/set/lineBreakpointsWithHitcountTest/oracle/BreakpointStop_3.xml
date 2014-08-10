@@ -9,7 +9,12 @@
                   </statement>
                </methodCall>
             </branchCondition>
+            <branchCondition name="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" pathCondition="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" pathConditionChanged="true" branchCondition="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+               </termination>
+            </branchCondition>
          </statement>
       </statement>
    </methodCall>
+   <terminationEntry path="/0/0/0/1/0"/>
 </start>

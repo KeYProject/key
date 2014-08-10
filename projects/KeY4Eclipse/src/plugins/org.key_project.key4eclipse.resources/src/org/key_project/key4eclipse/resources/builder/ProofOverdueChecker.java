@@ -25,16 +25,16 @@ import org.key_project.util.eclipse.ResourceUtil;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 public class ProofOverdueChecker {
    
    private IProject project;
    private List<ProofElement> proofElements;
    private List<IFile> changedJavaFiles;
-   private KeYEnvironment<CustomConsoleUserInterface> environment;
+   private KeYEnvironment<CustomUserInterface> environment;
    
-   public ProofOverdueChecker(IProject project, List<ProofElement> proofElements, List<IFile> changedJavaFiles, KeYEnvironment<CustomConsoleUserInterface> environment){
+   public ProofOverdueChecker(IProject project, List<ProofElement> proofElements, List<IFile> changedJavaFiles, KeYEnvironment<CustomUserInterface> environment){
       this.project = project;
       this.proofElements = proofElements;
       this.changedJavaFiles = changedJavaFiles;
@@ -269,7 +269,7 @@ public class ProofOverdueChecker {
     * @param type - the types full name
     * @return the {@link KeYJavaType}
     */
-   private KeYJavaType getkeYJavaType(KeYEnvironment<CustomConsoleUserInterface> env, String type){
+   private KeYJavaType getkeYJavaType(KeYEnvironment<CustomUserInterface> env, String type){
       Set<KeYJavaType> envKjts = env.getServices().getJavaInfo().getAllKeYJavaTypes();
       for(KeYJavaType kjt : envKjts){
          if(type.equals(kjt.getFullName())){

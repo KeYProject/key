@@ -1,15 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
+
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Point;
@@ -30,7 +31,7 @@ import javax.swing.event.PopupMenuListener;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.macros.ProofMacroMenu;
+import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import java.awt.event.MouseListener;
@@ -47,6 +48,7 @@ import java.awt.event.MouseListener;
 class CurrentGoalViewListener
         implements MouseListener, DragGestureListener {
 
+    private static final int POPUP_DELAY = 400;
     private final KeYMediator mediator;
     private final CurrentGoalView currentGoalView;
 
@@ -74,10 +76,9 @@ class CurrentGoalViewListener
         if (!modalDragNDropEnabled()) {
             // if a popup menu is cancelled by a click we do not want to 
             // activate another using the same click event 
-            if (Math.abs(System.currentTimeMillis() - block) >= 400) {
+            if (Math.abs(System.currentTimeMillis() - block) >= POPUP_DELAY) {
                 PosInSequent mousePos = currentGoalView.getPosInSequent(me.getPoint());
                 boolean macroActive = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isRightClickMacro();
-//		boolean macroActive = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().isRightClickMacro();
                 if (mediator != null && mousePos != null) {
                     if (me.isShiftDown()) {
                         if (mediator.getInteractiveProver() != null) {

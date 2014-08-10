@@ -1,18 +1,19 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -111,11 +112,6 @@ public final class StrategySelectionView extends JPanel {
    };
 
    /**
-    * The {@link MainWindow} in which this {@link StrategySelectionView} is shown.
-    */
-   private final MainWindow mainWindow;
-
-   /**
     * The {@link KeYMediator} which provides the active proof.
     */
    private KeYMediator mediator;
@@ -125,9 +121,8 @@ public final class StrategySelectionView extends JPanel {
     */
    private StrategySelectionComponents components;
 
-   public StrategySelectionView(MainWindow mainWindow) {
-      this.mainWindow = mainWindow;
-      layoutPane();
+   public StrategySelectionView(AutoModeAction autoModeAction) {
+      layoutPane(autoModeAction);
       refresh(mediator == null ? null : mediator.getSelectedProof());
       setVisible(true);
       addComponentListener(new java.awt.event.ComponentAdapter() {
@@ -138,7 +133,7 @@ public final class StrategySelectionView extends JPanel {
    }
 
    /** Build everything */
-   private void layoutPane() {
+   private void layoutPane(AutoModeAction autoModeAction) {
       assert components == null : "Content can not be created a second time!";
       components = new StrategySelectionComponents();
 
@@ -160,7 +155,7 @@ public final class StrategySelectionView extends JPanel {
 
       // //////////////////////////////////////////////////////////////////////
 
-      JButton go = new JButton(mainWindow.getAutoModeAction());
+      JButton go = new JButton(autoModeAction);
 
       JPanel timeout = createDefaultPanel(components);
 

@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.gui;
 
@@ -96,27 +96,39 @@ public class TaskTree extends JPanel {
         setVisible(true);
     }
 
+    public void removeTask(Proof p) {
+       TaskTreeNode taskForProof = model.getTaskForProof(p);
+       if (taskForProof instanceof BasicTask) {
+          taskForProof = ((BasicTask) taskForProof).getRootTask();
+       }
+       removeTask(taskForProof);
+    }
+    
     public void removeTask(TaskTreeNode tn) {
-        model.removeTask(tn);
-	    mediator.notify(new AbandonTaskEvent());
-	    for (int i=0; i<tn.allProofs().length; i++) {
-		tn.allProofs()[i].removeProofTreeListener(proofTreeListener);
-                tn.allProofs()[i].mgt().removeProofListener();
-	    }
-            MainWindow.getInstance().getProofView().
-                removeProofs(tn.allProofs());
-	    //go to some other node, take the last leaf.
-	    TreePath path 
-		= delegateView.getPathForRow(delegateView.getRowCount()-1);
-	    if(mediator.getInteractiveProver()!=null){
-	        mediator.getInteractiveProver().clear();
-	    }
-	    if (path!=null) {
-		TaskTreeNode tn0 = (TaskTreeNode) path.getLastPathComponent();
-		mediator.setProof(tn0.proof());
-	    } else {
-		mediator.setProof(null);
-	    }
+       model.removeTask(tn);
+       mediator.notify(new AbandonTaskEvent());
+       for (int i=0; i<tn.allProofs().length; i++) {
+          tn.allProofs()[i].removeProofTreeListener(proofTreeListener);
+          tn.allProofs()[i].mgt().removeProofListener();
+       }
+       MainWindow.getInstance().getProofTreeView().
+       removeProofs(tn.allProofs());
+       //go to some other node, take the last leaf.
+       TreePath path 
+       = delegateView.getPathForRow(delegateView.getRowCount()-1);
+       if(mediator.getInteractiveProver()!=null){
+          mediator.getInteractiveProver().clear();
+       }
+
+       if (path!=null) {
+          TaskTreeNode tn0 = (TaskTreeNode) path.getLastPathComponent();
+          mediator.setProof(tn0.proof());
+       } else {
+          mediator.setProof(null);
+       }
+       for (int i=0; i<tn.allProofs().length; i++) {
+          tn.allProofs()[i].dispose();
+       }
     }
     
     public void updateUI() {
@@ -204,7 +216,7 @@ public class TaskTree extends JPanel {
      */
     public void removeProof(Proof proof) {
        if (proof != null) {
-          ProofEnvironment env = proof.env();
+          ProofEnvironment env = proof.getEnv();
           // Search EnvNode which contains the environment of the given proof.
           EnvNode envNode = null;
           for (int i = 0; i < model.getChildCount(model.getRoot()); i++) {
@@ -351,5 +363,3 @@ public class TaskTree extends JPanel {
        return model;
     }
 } // end of TaskTree
-
-

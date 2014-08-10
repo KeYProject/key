@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.io.IOException;
@@ -12,14 +25,15 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
+import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.SymbolicExecutionExceptionBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 public class TestExceptionBreakpointStopConditionWithHitCount extends AbstractSymbolicExecutionTestCase {
    public void testBreakpointStopCondition() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       HashMap<String, String> originalTacletOptions = null;
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
-      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = null;
+      SymbolicExecutionEnvironment<CustomUserInterface> env = null;
       try {
          // Define test settings
          String javaPathInkeyRepDirectory = "examples/_testcase/set/exceptionBreakpointsWithHitCountTest/test/ClassCastAndNullpointerExceptions.java";
@@ -31,7 +45,7 @@ public class TestExceptionBreakpointStopConditionWithHitCount extends AbstractSy
          originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
          setOneStepSimplificationEnabled(null, true);
          // Create proof environment for symbolic execution
-         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false);
+         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false, false);
          // Make sure that initial tree is valid
          int oracleIndex = 0;
          assertSetTreeAfterStep(env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory);
@@ -43,9 +57,10 @@ public class TestExceptionBreakpointStopConditionWithHitCount extends AbstractSy
          props.put(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_EXPAND);
          proof.getSettings().getStrategySettings().setActiveStrategyProperties(props);
          
-         ExceptionBreakpointStopCondition firstBreakpoint = new ExceptionBreakpointStopCondition(proof,"java.lang.NullPointerException", true, true, false, true, 2);
-         allBreakpoints.addChildren(firstBreakpoint);
-         env.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(allBreakpoints));
+         SymbolicExecutionExceptionBreakpoint firstBreakpoint = new SymbolicExecutionExceptionBreakpoint(proof,"java.lang.NullPointerException", true, true, false, true, 2);
+         SymbolicExecutionBreakpointStopCondition bc = new SymbolicExecutionBreakpointStopCondition(firstBreakpoint);
+         allBreakpoints.addChildren(bc);
+         env.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(bc));
          // Do steps
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);
          stepReturnWithBreakpoints(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory, allBreakpoints);

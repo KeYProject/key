@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -306,8 +306,8 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                 SchemaVariableFactory.createTermSV(new Name("callee"), getKJT().getSort());
         final ImmutableList<ParsableVariable> paramsSV = paramsSV();
         String ps = "";
-        for (ParsableVariable pv: paramsSV) {
-            ps = ps + " " + pv.sort();
+        for (ProgramVariable pv: getOrigVars().params) {
+            ps = ps + " " + pv.getKeYJavaType().getFullName();
         }
         final Term[] args = getArgs(selfSV, heapSV, heapAtPreSV, isStatic, twoState, paramsSV);
         if (isNormal(services)) {

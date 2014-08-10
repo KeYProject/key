@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.key.example.ui.test.testcase.swtbot;
 
 import org.eclipse.core.resources.IFile;
@@ -21,7 +34,6 @@ import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.test.testcase.swtbot.AbstractKeYDebugTargetTestCase;
-import org.key_project.sed.key.core.test.testcase.swtbot.AbstractKeYDebugTargetTestCase.IMethodSelector;
 import org.key_project.sed.key.example.ui.test.Activator;
 import org.key_project.sed.key.example.ui.wizard.SEDExampleNewWizard;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -77,9 +89,9 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
    @Test
    public void testExample3() throws Exception {
       doExampleResumeTest("SWTBotSEDExampleNewWizardTest_testExample3",
-                          createMethodSelector("example3.ArrayUtil", "indexOf", "[QObject;", "QSelector;"),
+                          createMethodSelector("example3.ArrayUtil", "indexOf", "[QObject;", "QFilter;"),
                           true,
-                          "example3.ArrayUtil[example3.ArrayUtil::indexOf([Ljava.lang.Object,example3.ArrayUtil.Selector)].JML normal_behavior operation contract.0",
+                          "example3.ArrayUtil[example3.ArrayUtil::indexOf([Ljava.lang.Object,example3.ArrayUtil.Filter)].JML normal_behavior operation contract.0",
                           "data/oracle/example3/ArrayUtil.xml",
                           true,
                           true);
@@ -119,7 +131,7 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
       IExampleTestSteps steps = new IExampleTestSteps() {
          @Override
          public void doTest(IJavaProject javaProject) throws Exception {
-            IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+            IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
                @Override
                public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                   SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
@@ -129,7 +141,7 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
                   assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false);
                }
             };
-            doKeYDebugTargetTest(javaProject, true, true, selector, useExistingContract, preconditionOrExistingContract, false, false, false, false, false, 10, executor);
+            doKeYDebugTargetTest(javaProject, true, true, selector, useExistingContract, preconditionOrExistingContract, false, false, false, false, false, false, true, 10, executor);
          }
       };
       doExampleTest(projectName, steps);
@@ -157,7 +169,7 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
          @Override
          public void doTest(IJavaProject javaProject) throws Exception {
             IKeYDebugTargetTestExecutor executor = createResumeExecutor(false, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false, false, false, useMethodContracts, useLoopInvariants, false, false);
-            doKeYDebugTargetTest(javaProject, true, true, selector, useExistingContract, preconditionOrExistingContract, false, false, false, false, false, 10, executor);
+            doKeYDebugTargetTest(javaProject, true, true, selector, useExistingContract, preconditionOrExistingContract, false, false, false, false, false, false, true, 10, executor);
          }
       };
       doExampleTest(projectName, steps);
@@ -195,9 +207,11 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
          IJavaProject javaProject = JavaCore.create(project);
          assertNotNull(javaProject);
          assertTrue(javaProject.exists());
+         // Unify line breaks
+         TestUtilsUtil.unifyLineBreaks(project, "java");
          // Test opened editor
          SWTBotEditor editor = bot.activeEditor();
-         assertEquals(project.getFile(new Path("src/example1/Number.java")), editor.getReference().getEditorInput().getAdapter(IFile.class));
+         assertEquals(project.getFile(new Path("Readme.txt")), editor.getReference().getEditorInput().getAdapter(IFile.class));
          editor.close();
          // Do test
          steps.doTest(javaProject);

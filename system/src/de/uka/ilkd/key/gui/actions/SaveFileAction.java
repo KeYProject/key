@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -15,10 +15,12 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
 
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -34,7 +36,7 @@ public final class SaveFileAction extends MainWindowAction {
 
     public SaveFileAction(MainWindow mainWindow) {
 	super(mainWindow);
-        setName("Save ...");
+        setName("Save");
         setIcon(IconFactory.saveFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Save current proof.");
         setAcceleratorLetter(KeyEvent.VK_S);
@@ -45,13 +47,19 @@ public final class SaveFileAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         if (mainWindow.getMediator().ensureProofLoaded()) {
             final KeYFileChooser jFC = GuiUtilities.getFileChooser("Choose filename to save proof");
+            // Try to save back to file where proof was initially loaded from
+            File selectedFile = null;
+            Proof selectedProof = mainWindow.getMediator().getSelectedProof();
+            if (selectedProof != null) {
+               selectedFile = selectedProof.getProofFile();
+            }
+            // Suggest default file name if required
+            if (selectedFile == null) {
+               String defaultName = MiscTools.toValidFileName(selectedProof.name().toString()) + ".proof";
+               selectedFile = new File(jFC.getCurrentDirectory(), defaultName);
+            }
             
-            final String defaultName 
-            	= MiscTools.toValidFileName(mainWindow.getMediator().getSelectedProof()
-                    .name()
-                    .toString());
-            
-            boolean saved = jFC.showSaveDialog(mainWindow, defaultName + ".proof");
+            boolean saved = jFC.showSaveDialog(mainWindow, selectedFile);
             if (saved) {
                 mainWindow.saveProof(jFC.getSelectedFile());
             }

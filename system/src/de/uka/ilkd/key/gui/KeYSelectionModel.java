@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 package de.uka.ilkd.key.gui;
 
@@ -193,8 +193,8 @@ public class KeYSelectionModel {
     }
 
 
-    /** selectes the first goal in the goal list of proof if available
-     * if not it selectes a leaf of the proof tree
+    /** selects the first goal in the goal list of proof if available
+     * if not it selects a leaf of the proof tree
      */
     public void defaultSelection() {
 	Goal           g       = null;
@@ -272,7 +272,7 @@ public class KeYSelectionModel {
     }
 
     /**
-     * retrievs the first open goal below the given node, i.e. the goal
+     * retrieves the first open goal below the given node, i.e. the goal
      * containing the first leaf of the subtree starting at
      *  <code>n</code> which is not already closed
      *

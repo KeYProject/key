@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -60,10 +60,10 @@ public class DebugTargetResumeSuspendListener implements IDebugEventSetListener 
    public void handleDebugEvents(DebugEvent[] events) {
       for (DebugEvent event : events) {
          if (ObjectUtil.equals(target, event.getSource())) {
-            if (event.getDetail() == DebugEvent.SUSPEND) {
+            if (event.getKind() == DebugEvent.SUSPEND) {
                suspendDetected = true;
             }
-            else if (event.getDetail() == DebugEvent.RESUME) {
+            else if (event.getKind() == DebugEvent.RESUME) {
                resumeDetected = true;
             }
          }

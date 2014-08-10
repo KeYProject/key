@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -83,7 +83,7 @@ public class ExecutionTreeUtilTest extends AbstractSetupTestCase {
       targets = ExecutionTreeUtil.getAllDebugTargets(typeProvider);
       assertDebugTargets(targets);
       // Test one linked debug target
-      SEDMemoryDebugTarget firstTarget = new SEDMemoryDebugTarget(null);
+      SEDMemoryDebugTarget firstTarget = new SEDMemoryDebugTarget(null, false);
       final ISEDDebugTarget[] expectedTargetsOne = {firstTarget};
       domain.getCommandStack().execute(new RecordingCommand(domain) {
          @Override
@@ -94,7 +94,7 @@ public class ExecutionTreeUtilTest extends AbstractSetupTestCase {
       targets = ExecutionTreeUtil.getAllDebugTargets(typeProvider);
       assertDebugTargets(targets, firstTarget);
       // Test two linked debug targets
-      SEDMemoryDebugTarget secondTarget = new SEDMemoryDebugTarget(null);
+      SEDMemoryDebugTarget secondTarget = new SEDMemoryDebugTarget(null, false);
       final ISEDDebugTarget[] expectedTargetsTwo = {firstTarget, secondTarget};
       domain.getCommandStack().execute(new RecordingCommand(domain) {
          @Override

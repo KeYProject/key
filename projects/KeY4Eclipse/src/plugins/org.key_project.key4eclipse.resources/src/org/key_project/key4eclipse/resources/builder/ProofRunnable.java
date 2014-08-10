@@ -38,7 +38,7 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProofStarter;
 
@@ -47,11 +47,11 @@ public class ProofRunnable implements Runnable {
    private IProject project;
    private List<ProofElement> proofElements;
    private List<ProofElement> proofsToDo;
-   private final KeYEnvironment<CustomConsoleUserInterface> environment;
+   private final KeYEnvironment<CustomUserInterface> environment;
    private MarkerManager markerManager;
    private final IProgressMonitor monitor;
    
-   public ProofRunnable(IProject project, List<ProofElement> proofElements, List<ProofElement> proofsToDo, KeYEnvironment<CustomConsoleUserInterface> environment, IProgressMonitor monitor){
+   public ProofRunnable(IProject project, List<ProofElement> proofElements, List<ProofElement> proofsToDo, KeYEnvironment<CustomUserInterface> environment, IProgressMonitor monitor){
       this.project = project;
       this.proofsToDo = proofsToDo;
       this.proofElements = proofElements;
@@ -166,7 +166,7 @@ public class ProofRunnable implements Runnable {
       Proof proof = null;
       File file = pe.getProofFile().getLocation().toFile();
       Profile profile = pe.getKeYEnvironment().getInitConfig().getProfile();
-      KeYEnvironment<CustomConsoleUserInterface> loadEnv = null;
+      KeYEnvironment<CustomUserInterface> loadEnv = null;
       boolean error = false;
       try{
          loadEnv = KeYEnvironment.load(profile, file, null, null);

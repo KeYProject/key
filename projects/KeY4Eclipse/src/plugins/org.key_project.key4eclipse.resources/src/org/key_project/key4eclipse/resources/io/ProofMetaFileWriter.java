@@ -48,7 +48,7 @@ import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Writer for the meta files.
@@ -180,7 +180,7 @@ public class ProofMetaFileWriter {
     * @param environment - the {@link KeYEnvironment} to use
     * @return the {@link KeYJavaType} form the {@link KeYEnvironment}
     */
-   private KeYJavaType getKeYJavaTypeFromEnv(KeYJavaType kjt, KeYEnvironment<CustomConsoleUserInterface> environment){
+   private KeYJavaType getKeYJavaTypeFromEnv(KeYJavaType kjt, KeYEnvironment<CustomUserInterface> environment){
       Set<KeYJavaType> envKjts = environment.getJavaInfo().getAllKeYJavaTypes();
       for(KeYJavaType envKjt : envKjts){
          if(envKjt.getFullName().equals(kjt.getFullName())){

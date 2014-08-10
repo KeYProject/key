@@ -124,9 +124,9 @@
       </command>
       <command
             categoryId="org.eclipse.debug.ui.category.run"
-            description="Generates an Object Diagram for configurations of the current node."
-            id="org.key_project.sed.key.ui.visualizeConfigurationsCommand"
-            name="Visualize Configurations">
+            description="Computes all memory layouts of the current node and visualizes them."
+            id="org.key_project.sed.key.ui.visualizeMemoryLayoutsCommand"
+            name="Visualize Memory Layouts">
       </command>
       <command
             categoryId="org.eclipse.debug.ui.category.run"
@@ -152,8 +152,8 @@
                icon="icons/saveKeYProof.gif">
          </image>
          <image
-               commandId="org.key_project.sed.key.ui.visualizeConfigurationsCommand"
-               icon="icons/configurations_object_diagram.gif">
+               commandId="org.key_project.sed.key.ui.visualizeMemoryLayoutsCommand"
+               icon="icons/memory_layouts_object_diagram.gif">
          </image>
          <image
                commandId="org.key_project.sed.key.ui.addWatchpointCommand"
@@ -199,8 +199,8 @@
             </enabledWhen>
          </handler>
          <handler
-               class="org.key_project.sed.key.ui.visualization.execution_tree.command.VisualizeConfigurationsCommand"
-               commandId="org.key_project.sed.key.ui.visualizeConfigurationsCommand">
+               class="org.key_project.sed.key.ui.visualization.execution_tree.command.VisualizeMemoryLayoutsCommand"
+               commandId="org.key_project.sed.key.ui.visualizeMemoryLayoutsCommand">
             <enabledWhen>
                <iterate
                      ifEmpty="false"
@@ -212,7 +212,7 @@
                         </instanceof>
                         <test
                               forcePluginActivation="true"
-                              property="org.key_project.sed.key.ui.canVisualizeConfigurations">
+                              property="org.key_project.sed.key.ui.canVisualizeMemoryLayouts">
                         </test>
                      </and>
                   </or>
@@ -271,7 +271,7 @@
             sequence="M1+M2+K">
       </key>
       <key
-            commandId="org.key_project.sed.key.ui.visualizeConfigurationsCommand"
+            commandId="org.key_project.sed.key.ui.visualizeMemoryLayoutsCommand"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M2+C">
@@ -384,8 +384,8 @@
                allPopups="true"
                locationURI="popup:org.eclipse.debug.ui.DebugView?after=additions">
             <command
-                  commandId="org.key_project.sed.key.ui.visualizeConfigurationsCommand"
-                  icon="icons/configurations_object_diagram.gif"
+                  commandId="org.key_project.sed.key.ui.visualizeMemoryLayoutsCommand"
+                  icon="icons/memory_layouts_object_diagram.gif"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -399,7 +399,7 @@
                            </instanceof>
                            <test
                                  forcePluginActivation="true"
-                                 property="org.key_project.sed.key.ui.canVisualizeConfigurations">
+                                 property="org.key_project.sed.key.ui.canVisualizeMemoryLayouts">
                            </test>
                         </and>
                      </or>
@@ -510,34 +510,34 @@
                type="org.eclipse.debug.core.model.IDebugElement">
          </propertyTester>
          <propertyTester
-               class="org.key_project.sed.key.ui.propertyTester.CanVisualizeConfigurationsPropertyTester"
-               id="org.key_project.sed.key.ui.canVisualizeConfigurationsPropertyTester"
+               class="org.key_project.sed.key.ui.propertyTester.CanVisualizeMemoryLayoutsPropertyTester"
+               id="org.key_project.sed.key.ui.canVisualizeMemoryLayoutsPropertyTester"
                namespace="org.key_project.sed.key.ui"
-               properties="canVisualizeConfigurations"
+               properties="canVisualizeMemoryLayouts"
                type="java.lang.Object">
          </propertyTester>
       </extension>
       <extension
             point="org.key_project.sed.ui.visualization.executionTree.contextMenuEntries">
          <entry
-               factory="org.key_project.sed.key.ui.visualization.execution_tree.feature.DebugNodeVisualizeConfigurationsFeatureFactory"
-               icon="icons/configurations_object_diagram.gif"
-               iconId="org.key_project.sed.key.ui.visualization.VisualizeConfigurationsFeature"
+               factory="org.key_project.sed.key.ui.visualization.execution_tree.feature.DebugNodeVisualizeMemoryLayoutsFeatureFactory"
+               icon="icons/memory_layouts_object_diagram.gif"
+               iconId="org.key_project.sed.key.ui.visualization.VisualizeMemoryLayoutsFeature"
                inButtonPad="true"
                inMenu="true"
                modes="READ_ONLY"
-               text="Visualize Configurations">
+               text="Visualize Memory Layouts">
          </entry>
       </extension>
       <extension
             point="org.eclipse.ui.editors">
          <editor
-               class="org.key_project.sed.key.ui.visualization.object_diagram.editor.ConfigurationObjectDiagramEditor"
+               class="org.key_project.sed.key.ui.visualization.object_diagram.editor.MemoryLayoutDiagramEditor"
                contributorClass="org.key_project.sed.ui.visualization.object_diagram.editor.ReadonlyObjectDiagramActionBarContributor"
                default="false"
-               icon="icons/configurations_object_diagram.gif"
-               id="org.key_project.sed.key.ui.ConfigurationObjectDiagramEditor"
-               name="Configurations Object Diagram Editor">
+               icon="icons/memory_layouts_object_diagram.gif"
+               id="org.key_project.sed.key.ui.MemoryLayoutDiagramEditor"
+               name="Memory Layout Diagram Editor">
          </editor>
       </extension>
       <extension
@@ -548,6 +548,14 @@
                icon="icons/logo16.gif"
                id="org.key_project.sed.key.ui.view.SymbolicExecutionProofSearchStragyView"
                name="Symbolic Execution Settings"
+               restorable="true">
+         </view>
+         <view
+               category="org.key_project.sed.ui.category"
+               class="org.key_project.sed.key.ui.view.SideProofsView"
+               icon="icons/logo16.gif"
+               id="org.key_project.sed.key.ui.view.SideProofsView"
+               name="Side Proofs"
                restorable="true">
          </view>
       </extension>
@@ -633,5 +641,15 @@
                </instanceof>
             </enabledWhen>
          </page>
+      </extension>
+      <extension
+            point="org.eclipse.jdt.ui.javaEditorTextHovers">
+         <hover
+               activate="true"
+               class="org.key_project.sed.key.ui.text.SymbolicallyReachedJavaEditorTextHover"
+               description="The highlighted code was reached during symbolic execution."
+               id="org.key_project.sed.ui.textannotation.ExecutedSEDNodeJavaEditorTextHover"
+               label="Symbolically Reached Text Hover">
+         </hover>
       </extension>
 </plugin>

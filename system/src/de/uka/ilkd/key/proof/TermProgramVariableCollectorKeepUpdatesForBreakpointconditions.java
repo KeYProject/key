@@ -1,32 +1,33 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
+
 package de.uka.ilkd.key.proof;
 
-import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.symbolic_execution.strategy.ConditionalBreakpointStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
+import de.uka.ilkd.key.strategy.IBreakpointStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.AbstractConditionalBreakpoint;
+import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
 
 public class TermProgramVariableCollectorKeepUpdatesForBreakpointconditions extends TermProgramVariableCollector {
-   private CompoundStopCondition parentCondition;
+   private IBreakpointStopCondition breakpointStopCondition;
    
-   public TermProgramVariableCollectorKeepUpdatesForBreakpointconditions(Services services, CompoundStopCondition parentCondition) {
+   public TermProgramVariableCollectorKeepUpdatesForBreakpointconditions(Services services, IBreakpointStopCondition breakpointStopCondition) {
        super(services);
-       this.parentCondition=parentCondition;
+       this.breakpointStopCondition = breakpointStopCondition;
    }
    
    /**
@@ -41,11 +42,11 @@ public class TermProgramVariableCollectorKeepUpdatesForBreakpointconditions exte
    }
    
    private void addVarsToKeep() {
-      for(IStopCondition stopCondition : parentCondition.getChildren()){
-         if(stopCondition instanceof ConditionalBreakpointStopCondition){
-            ConditionalBreakpointStopCondition lineBreakpoint = (ConditionalBreakpointStopCondition) stopCondition;
-            if(lineBreakpoint.getToKeep()!=null){
-               for(SVSubstitute sub : lineBreakpoint.getToKeep()){
+      for(IBreakpoint breakpoint : breakpointStopCondition.getBreakpoints()){
+         if(breakpoint instanceof AbstractConditionalBreakpoint){
+            AbstractConditionalBreakpoint conditionalBreakpoint = (AbstractConditionalBreakpoint) breakpoint;
+            if(conditionalBreakpoint.getToKeep() != null){
+               for(SVSubstitute sub : conditionalBreakpoint.getToKeep()){
                   if(sub instanceof LocationVariable){
                      super.result().add((LocationVariable)sub);
                   }
@@ -54,5 +55,4 @@ public class TermProgramVariableCollectorKeepUpdatesForBreakpointconditions exte
          }
       }
    }
-
 }

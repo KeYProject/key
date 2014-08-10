@@ -1,17 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
-
+//
 
 package de.uka.ilkd.key.logic.op;
 
@@ -56,8 +54,7 @@ public class ObserverFunction extends Function implements IObserverFunction {
 	            	    ImmutableArray<KeYJavaType> paramTypes,
 	            	    int heapCount,
 	            	    int stateCount) {
-	super(new ProgramElementName(baseName, 
-		                     container.getSort().toString()),
+	super(createName(baseName, container),
               sort, 
               getArgSorts(heapSort, container, isStatic, paramTypes, heapCount, stateCount));
 	assert type == null || type.getSort() == sort;
@@ -68,6 +65,10 @@ public class ObserverFunction extends Function implements IObserverFunction {
 	this.paramTypes = paramTypes;
 	this.heapCount = heapCount;
 	this.stateCount = stateCount;
+    }
+    
+    public static ProgramElementName createName(String baseName, KeYJavaType container) {
+       return new ProgramElementName(baseName, container.getSort().toString());
     }
     
     

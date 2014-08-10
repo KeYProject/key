@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.smt;
 
@@ -29,7 +28,7 @@ import de.uka.ilkd.key.smt.AbstractSMTTranslator.Configuration;
  * - supported versions
  *
  */
-public interface SolverType extends PipeListener<SolverCommunication> {
+public interface SolverType  {
 
 	/**
 	 * Creates an instance of SMTSolver representing a concrete instance of that solver.
@@ -123,15 +122,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 	 */
 	public boolean supportHasBeenChecked();
 
-    /**
-     * Get the object to retrieve the model from this solver
-     */
-	public ModelExtractor getQuery();
-
-    /**
-     * Set the object to retrieve the model from this solver
-     */	
-    public void setQuery(ModelExtractor query);
+   
 
 	
 	/**
@@ -206,55 +197,10 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 //                                    + " the execution command.";
             }
 
-            private static final int WAIT_FOR_RESULT = 0;
-            private static final int WAIT_FOR_DETAILS =1;
 
 
-			@Override
-			public void messageIncoming(Pipe<SolverCommunication> pipe, String message, int type) {
-				SolverCommunication sc = pipe.getSession();
-				if(type == Pipe.ERROR_MESSAGE || message.startsWith("(error")){
-					 sc.addMessage(message);
-					 if(message.indexOf("WARNING:")>-1){
-						return;
-					 }
-					 throw new RuntimeException("Error while executing Z3:\n" +message);
-				 }
-				if (!message.equals("success")) {
-					sc.addMessage(message);
-				}
 
-			switch (sc.getState()) {
-			case WAIT_FOR_RESULT:
-				 if(message.equals("unsat")){
-					 sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
-					 // One cannot ask for proofs and models at one time
-					 // rather have modesl than proofs (MU, 2013-07-19)
-					 // pipe.sendMessage("(get-proof)\n");
-					 pipe.sendMessage("(exit)\n");
-					 sc.setState(WAIT_FOR_DETAILS);
-				 }
-				 if(message.equals("sat")){
-					 sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
-					 pipe.sendMessage("(get-model)");
-					 pipe.sendMessage("(exit)\n");
-					 sc.setState(WAIT_FOR_DETAILS);
-
-				 }
-				 if(message.equals("unknown")){
-					 sc.setFinalResult(SMTSolverResult.createUnknownResult(getName()));
-					 sc.setState(WAIT_FOR_DETAILS);
-					 pipe.sendMessage("(exit)\n");
-				 }
-				break;
-
-			case WAIT_FOR_DETAILS:
-				if(message.equals("success")){
-					pipe.close();
-				}
-				break;
-			}
-		}
+			
 
     };
 
@@ -291,7 +237,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 		};
 
 		public String[] getSupportedVersions() {
-			return new String[] {"version 3.2","version 4.1","version 4.3.0", "version 4.3.1"};
+			return new String[] {"version 4.3.1"};
 		};
 
 		public String[] getDelimiters() {
@@ -324,91 +270,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 			//                                        + " the execution command.";
 		}
 
-		private static final int WAIT_FOR_RESULT = 0;
-		private static final int WAIT_FOR_DETAILS =1;
-		private static final int WAIT_FOR_QUERY = 2;
-		private static final int WAIT_FOR_MODEL = 3;
-
-
-
-		@Override
-		public void messageIncoming(Pipe<SolverCommunication> pipe, String message, int type) {
-
-
-
-			SolverCommunication sc = pipe.getSession();
-			if(type == Pipe.ERROR_MESSAGE || message.startsWith("(error")){
-				sc.addMessage(message);
-				if(message.indexOf("WARNING:")>-1){
-					return;
-				}
-				throw new RuntimeException("Error while executing Z3:\n" +message);
-			}
-			if (!message.equals("success")) {
-				sc.addMessage(message);
-			}
-
-			switch (sc.getState()) {
-			case WAIT_FOR_RESULT:
-				if(message.equals("unsat")){
-					sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
-					//pipe.sendMessage("(get-proof)\n");
-					pipe.sendMessage("(exit)\n");
-					sc.setState(WAIT_FOR_DETAILS);
-				}
-				if(message.equals("sat")){
-					sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
-					pipe.sendMessage("(get-model)");
-					pipe.sendMessage("(echo \"endmodel\")");
-					sc.setState(WAIT_FOR_MODEL);					
-				}
-				if(message.equals("unknown")){
-					sc.setFinalResult(SMTSolverResult.createUnknownResult(getName()));
-					sc.setState(WAIT_FOR_DETAILS);
-					pipe.sendMessage("(exit)\n");
-				}
-
-				break;
-
-			case WAIT_FOR_DETAILS:
-				if(message.equals("success")){
-					pipe.close();
-				}						
-				break;		
-
-			case WAIT_FOR_QUERY:
-				if(message.equals("success")){
-					pipe.close();
-				}
-				else{
-					query.messageIncoming(pipe, message, type);
-				}
-
-				break;
-
-			case WAIT_FOR_MODEL:
-				if(message.equals("endmodel")){
-					if(query !=null && query.getState()==ModelExtractor.DEFAULT){						 
-						//System.out.println("Starting query");						 
-						query.start(pipe);
-						sc.setState(WAIT_FOR_QUERY);
-					}
-					else{
-						pipe.sendMessage("(exit)\n");
-						sc.setState(WAIT_FOR_DETAILS); 
-					}
-				}
-
-
-				break;
-			}
-
-
-
-
-
-
-		}
+		
 
 	};
 
@@ -418,102 +280,140 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 	 */
 	static public final SolverType CVC3_SOLVER = new AbstractSolverType() {
 
-		@Override
-		public String getName() {
-			return "CVC3";
-		}
+	    @Override
+	    public String getName() {
+	        return "CVC3";
+	    }
 
-		@Override
-		public SMTSolver createSolver(SMTProblem problem,
-				SolverListener listener, Services services) {
-			return new SMTSolverImplementation(problem, listener,
-					services, this);
-		}
+	    @Override
+	    public SMTSolver createSolver(SMTProblem problem,
+	                    SolverListener listener, Services services) {
+	        return new SMTSolverImplementation(problem, listener,
+	                        services, this);
+	    }
 
-		public String getDefaultSolverCommand() {
-			return "cvc3";
-                }
+	    public String getDefaultSolverCommand() {
+	        return "cvc3";
+	    }
 
-            private boolean useNewVersion () {
-                    final String solverVersion = getRawVersion();
-                    return "version 2.4.1".equals(solverVersion);
-                }
+	    private boolean useNewVersion () {
+	        final String solverVersion = getRawVersion();
+	        return "version 2.4.1".equals(solverVersion);
+	    }
 
-                @Override
-                public String getRawVersion () {
-                    final String tmp = super.getRawVersion();
-                    if (tmp==null) return null;
-                    return tmp.substring(tmp.indexOf("version"));
-                }
+	    @Override
+	    public String getRawVersion () {
+	        final String tmp = super.getRawVersion();
+	        if (tmp==null) return null;
+	        return tmp.substring(tmp.indexOf("version"));
+	    }
 
-		@Override
-		public String getDefaultSolverParameters() {
-                    // version 2.4.1 uses different parameters
-                    if (useNewVersion())
-                        return "-lang smt -interactive";
-//                      return "-lang smt2 -interactive";
-                    else
-			return "+lang smt +model +int";
-		}
+	    @Override
+	    public String getDefaultSolverParameters() {
+	        // version 2.4.1 uses different parameters
+	        if (useNewVersion())
+	            return "-lang smt +model +interactive";
+	        //                      return "-lang smt2 +model +interactive";
+	        else
+	            return "+lang smt +model +int";
+	    }
 
-		public String[] getDelimiters() {
-                    if (useNewVersion())
-                        return new String[]{"\n","\r"};
-                    else
-			return new String [] {"CVC>","C>"};
-                }
+	    public String[] getDelimiters() {
+	        return new String [] {"CVC>","C>"};
+	    }
 
-		public String[] getSupportedVersions() {
-                	return new String[] {"version 2.2", "version 2.4.1"};
-                }
+	    public String[] getSupportedVersions() {
+	        return new String[] {"version 2.2", "version 2.4.1"};
+	    }
 
-		public String getVersionParameter() {
-			return "-version";
-                }
+	    public String getVersionParameter() {
+	        return "-version";
+	    }
 
-		@Override
-		public SMTTranslator createTranslator(Services services) {
-                    final Configuration conf = new Configuration(false, true);
-//                    if (useNewParameterSchema())
-//                        return new SmtLib2Translator(services, conf);
-//                    else
-                        return new SmtLibTranslator(services,conf);
-		}
+	    @Override
+	    public SMTTranslator createTranslator(Services services) {
+	        final Configuration conf = new Configuration(false, true);
+	        //                    if (useNewVersion())
+	        //                        return new SmtLib2Translator(services, conf);
+	        //                    else
+	        return new SmtLibTranslator(services,conf);
+	    }
 
-		public boolean supportsIfThenElse() {
-			return true;
-                }
+	    public boolean supportsIfThenElse() {
+	        return true;
+	    }
 
-		@Override
-		public String getInfo() {
-			return null;
-		}
+	    @Override
+	    public String getInfo() {
+	        return null;
+	    }
 
 
 
-		final static int WAIT_FOR_RESULT=0;
-		final static int FINISH = 1;
-		@Override
-		public void messageIncoming(Pipe<SolverCommunication> pipe, String message, int type) {
-			SolverCommunication sc = pipe.getSession();
-			sc.addMessage(message);
-			if(type == Pipe.ERROR_MESSAGE && message.indexOf("Interrupted by signal")==-1){
-				throw new RuntimeException("Error while executing CVC:\n" +message);
-			}
 
-			if(sc.getState() == WAIT_FOR_RESULT ){
-				if(message.indexOf(" unsat") > -1){
-					sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
-                         } else if(message.indexOf("sat") > -1){
-							 sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
-				}
-				sc.setState(FINISH);
-				pipe.close();
+	};
+	
+	/**
+	 * CVC4 is the successor to CVC3.
+	 * @author bruns
+	 */
+	static public final SolverType CVC4_SOLVER = new AbstractSolverType() {
 
-			}
+	    // TODO move to AbstractSolverType?
+        @Override
+        public SMTSolver createSolver(SMTProblem problem,
+                        SolverListener listener, Services services) {
+            return new SMTSolverImplementation(problem, listener,
+                            services, this);
+        }
 
-		}
+        @Override
+        public String getName() {
+            return "CVC4";
+        }
 
+        @Override
+        public String getInfo() {
+            // todo Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public String getDefaultSolverParameters() {
+            return "--no-print-success -m --interactive --lang smt2";
+        }
+
+        @Override
+        public String getDefaultSolverCommand() {
+            return "cvc4";
+        }
+
+        @Override
+        public SMTTranslator createTranslator(Services services) {
+            final Configuration conf = new Configuration(false, true);
+            return new SmtLib2Translator(services, conf);
+        }
+
+        @Override
+        public String[] getDelimiters() {
+            return new String[]{"CVC4>"};
+        }
+
+        @Override
+        public boolean supportsIfThenElse() {
+            return true;
+        }
+
+        @Override
+        public String getVersionParameter() {
+            return "--version";
+        }
+
+        @Override
+        public String[] getSupportedVersions() {
+            return new String[]{"version 1.3"};
+        }
+	    
 	};
 
 
@@ -576,23 +476,6 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 
 
 
-		@Override
-		public void messageIncoming(Pipe<SolverCommunication> pipe, String message, int type) {
-			SolverCommunication sc = pipe.getSession();
-			message = message.replaceAll("\n","");
-			sc.addMessage(message);		
-
-
-			if(message.equals("unsat")){
-				sc.setFinalResult(SMTSolverResult.createValidResult(getName()));						
-				pipe.close();
-			}
-			if(message.equals("sat")){
-				sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));						 
-				pipe.close();
-			}
-
-		}
 
 		public String modifyProblem(String problem) {
 			return problem += "\n\n check\n";
@@ -663,29 +546,6 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 }
 
 
-		@Override
-		public void messageIncoming(Pipe<SolverCommunication> pipe,String message, int type) {
-			SolverCommunication sc = pipe.getSession();
-			sc.addMessage(message);		
-
-
-			if(message.indexOf("Valid.")>-1){
-				sc.setFinalResult(SMTSolverResult.createValidResult(getName()));						
-				pipe.close();
-			}
-
-			if(message.indexOf("Invalid.")>-1){
-				sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));						 
-				pipe.close();
-			}
-
-			if(message.indexOf("Bad input:")>-1){
-				pipe.close();
-			}
-
-
-
-		}
 	};
 
 }
@@ -700,7 +560,7 @@ abstract class AbstractSolverType implements SolverType {
 	private boolean supportHasBeenChecked = false;
 
 
-	protected ModelExtractor query = null;
+	
 
 
 
@@ -709,21 +569,7 @@ abstract class AbstractSolverType implements SolverType {
 
 
 
-	/**
-	 * @return the query
-	 */
-	 public ModelExtractor getQuery() {
-		return query;
-	}
-
-
-
-	 /**
-	  * @param query the query to set
-	  */
-	 public void setQuery(ModelExtractor query) {
-		 this.query = query;
-	 }
+	
 
 
 
@@ -847,15 +693,6 @@ abstract class AbstractSolverType implements SolverType {
                 return VersionChecker.INSTANCE.getVersionFor(getSolverCommand(),getVersionParameter());
             else return null;
 	 }
-
-
-	 @Override
-	 public void exceptionOccurred(Pipe<SolverCommunication> pipe,
-			 Throwable exception) {
-		 pipe.getSession().addException(exception);
-
-	 }
-
 
 	 public String toString() {
 		 return getName();

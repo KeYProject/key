@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -104,7 +104,21 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
                 copy(data);
         }
         
-        public void copy(ProofIndependentSMTSettings data){
+        
+        
+        public int getMaxConcurrentProcesses() {
+			return maxConcurrentProcesses;
+		}
+
+
+
+		public void setMaxConcurrentProcesses(int maxConcurrentProcesses) {
+			this.maxConcurrentProcesses = maxConcurrentProcesses;
+		}
+
+
+
+		public void copy(ProofIndependentSMTSettings data){
                 this.showResultsAfterExecution     = data.showResultsAfterExecution;
                 this.storeSMTTranslationToFile     = data.storeSMTTranslationToFile;
                 this.storeTacletTranslationToFile  = data.storeTacletTranslationToFile;
@@ -147,13 +161,16 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
                 dataOfSolvers.put(SolverType.YICES_SOLVER, new SolverData(SolverType.YICES_SOLVER));
                 dataOfSolvers.put(SolverType.SIMPLIFY_SOLVER, new SolverData(SolverType.SIMPLIFY_SOLVER));
                 dataOfSolvers.put(SolverType.CVC3_SOLVER, new SolverData(SolverType.CVC3_SOLVER));
+                dataOfSolvers.put(SolverType.CVC4_SOLVER, new SolverData(SolverType.CVC4_SOLVER));
                 solverUnions.add(new SolverTypeCollection("Z3",1,SolverType.Z3_SOLVER));
                 solverUnions.add(new SolverTypeCollection("Yices",1,SolverType.YICES_SOLVER));
                 solverUnions.add(new SolverTypeCollection("CVC3",1,SolverType.CVC3_SOLVER));
+                solverUnions.add(new SolverTypeCollection("CVC4",1,SolverType.CVC4_SOLVER));
                 solverUnions.add(new SolverTypeCollection("Simplify",1,SolverType.SIMPLIFY_SOLVER));
                 solverUnions.add(new SolverTypeCollection("Multiple Solvers",2,SolverType.Z3_SOLVER,
                                 SolverType.YICES_SOLVER,
                                 SolverType.CVC3_SOLVER,
+                                SolverType.CVC4_SOLVER,
                                 SolverType.SIMPLIFY_SOLVER));
         }
 

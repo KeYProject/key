@@ -3,14 +3,13 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 
 package de.uka.ilkd.key.gui.prooftree;
 
@@ -26,6 +25,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
@@ -66,7 +66,7 @@ import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
-import de.uka.ilkd.key.gui.macros.ProofMacroMenu;
+import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.nodeviews.TacletInfoToggle;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -94,7 +94,7 @@ public class ProofTreeView extends JPanel {
     /** the model that is displayed by the delegateView */
     GUIProofTreeModel delegateModel;
 
-    private HashMap<Proof, GUIProofTreeModel> models = new LinkedHashMap<Proof, GUIProofTreeModel>(20);
+    private WeakHashMap<Proof, GUIProofTreeModel> models = new WeakHashMap<Proof, GUIProofTreeModel>(20);
 
     /** the proof this view shows */
     private Proof proof;
@@ -339,17 +339,11 @@ public class ProofTreeView extends JPanel {
         proofTreeSearchPanel.reset();
     }
 
-
-    public void removeProof(Proof p) {
-        models.remove(p);
-    }
-
     public void removeProofs(Proof[] ps) {
         for (final Proof p : ps) {
-	    models.remove(p);
-	}
+           models.remove(p);
+        }
     }
-
 
     /**
      *  moves the scope of the tree view to the given node so that it

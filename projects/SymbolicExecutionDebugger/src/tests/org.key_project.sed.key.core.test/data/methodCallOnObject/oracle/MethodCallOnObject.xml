@@ -1,27 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_3fa3f237-b3a0-463e-8cdb-989f604ea1d9" name="main()" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_a80bbc75-0475-45cb-b6c3-13c736d4cc0f" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_3079b1b6-9a38-4263-bbea-e00ec3d2cbd0" name="MethodCallOnObject.main();" pathCondition="true" lineNumber="-1" charStart="56" charEnd="60">
-            <sedStatement xml:id="_796c85ec-a93c-4941-a817-3d3d453a0ce1" name="MethodCallOnObject x = new MethodCallOnObject ();" pathCondition="true" lineNumber="-1" charStart="68" charEnd="116">
-               <sedMethodCall xml:id="_eff7fa42-54a7-4d5a-afc9-d917e1b29cf0" name="MethodCallOnObject();" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-                  <sedMethodReturn xml:id="_f54a9b5e-76ee-4769-b2df-fb8dc4c7c314" name="&lt;return of MethodCallOnObject();&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-                     <sedStatement xml:id="_8f87ae32-8a52-4535-a564-394c4aebb6fb" name="return x.doSomething();" pathCondition="true" lineNumber="-1" charStart="120" charEnd="143">
-                        <sedMethodCall xml:id="_1893eb54-7470-4643-9790-103c9fbe1fed" name="x.doSomething();" pathCondition="true" lineNumber="-1" charStart="164" charEnd="175">
-                           <sedStatement xml:id="_e2372560-f958-48c6-a92e-8631564e4c86" name="return 42;" pathCondition="true" lineNumber="-1" charStart="183" charEnd="193">
-                              <sedMethodReturn xml:id="_7056161d-c9ad-4121-9ffb-a96bed4894bd" name="&lt;return Z(2(4(#))) as result of x.doSomething();&gt;" pathCondition="true" lineNumber="-1" charStart="164" charEnd="175">
-                                 <sedMethodReturn xml:id="_e0c1b70b-4cc7-4eb8-a331-57c695309804" name="&lt;return Z(2(4(#))) as result of MethodCallOnObject.main();&gt;" pathCondition="true" lineNumber="-1" charStart="56" charEnd="60">
-                                    <sedTermination xml:id="_cbf5c557-1933-4032-8146-07397e493f6a" name="&lt;end&gt;" pathCondition="true" verified="true">
+   <sedTarget xml:id="_8f6224b1-cd1a-424d-92b1-ca26d1e75e22" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_d8375e37-d25c-45a8-9ab1-500bf140e7ff" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_ceb03d2c-3caa-4d41-8d97-926812dbee9e" name="MethodCallOnObject.main();" pathCondition="true" lineNumber="-1" charStart="56" charEnd="60" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallOnObject\src\MethodCallOnObject.java">
+            <sedStatement xml:id="_d18fc078-78ee-48f5-8a01-ea8e3b0b6092" name="MethodCallOnObject x = new MethodCallOnObject ();" pathCondition="true" lineNumber="-1" charStart="68" charEnd="116" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallOnObject\src\MethodCallOnObject.java">
+               <sedMethodCall xml:id="_746c6645-f873-46aa-8d3b-8c1a3263480e" name="MethodCallOnObject();" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallOnObject\src\MethodCallOnObject.java">
+                  <sedMethodReturn xml:id="_81336e51-8540-4937-b7a7-4e0663e96961" name="&lt;return of MethodCallOnObject();&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallOnObject\src\MethodCallOnObject.java" methodReturnConditionRef="_c8f73428-772a-48e2-b672-06d200a6b592">
+                     <sedStatement xml:id="_e619d0a1-5067-4d3a-b4bf-13873a234297" name="return x.doSomething();" pathCondition="true" lineNumber="-1" charStart="120" charEnd="143" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallOnObject\src\MethodCallOnObject.java">
+                        <sedMethodCall xml:id="_f9c1a227-1cd2-42c6-b076-d203cd9932e8" name="x.doSomething();" pathCondition="true" lineNumber="-1" charStart="164" charEnd="175" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallOnObject\src\MethodCallOnObject.java">
+                           <sedStatement xml:id="_cfc9376b-ff76-4f50-826f-c89c265044d0" name="return 42;" pathCondition="true" lineNumber="-1" charStart="183" charEnd="193" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallOnObject\src\MethodCallOnObject.java">
+                              <sedMethodReturn xml:id="_36dc5f17-7496-4e74-b8b5-57425d433ed6" name="&lt;return Z(2(4(#))) as result of x.doSomething();&gt;" pathCondition="true" lineNumber="-1" charStart="164" charEnd="175" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallOnObject\src\MethodCallOnObject.java" methodReturnConditionRef="_9cca1a07-8596-468a-89a5-cec682511f96">
+                                 <sedMethodReturn xml:id="_20c411a7-0074-4108-962b-fa8cc855e549" name="&lt;return Z(2(4(#))) as result of MethodCallOnObject.main();&gt;" pathCondition="true" lineNumber="-1" charStart="56" charEnd="60" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallOnObject\src\MethodCallOnObject.java" methodReturnConditionRef="_d9b3851f-76ce-4bee-8a62-e0372466b6f2">
+                                    <sedTermination xml:id="_25bc1ba7-2710-4234-8766-e2e7b061e0f9" name="&lt;end&gt;" pathCondition="true" verified="true">
                                     </sedTermination>
                                  </sedMethodReturn>
                               </sedMethodReturn>
                            </sedStatement>
+                           <sedMethodCallMethodReturnCondition xml:id="_9cca1a07-8596-468a-89a5-cec682511f96" name="true" pathCondition="true">
+                              <sedChildReference nodeIdRef="_36dc5f17-7496-4e74-b8b5-57425d433ed6"/>
+                           </sedMethodCallMethodReturnCondition>
                         </sedMethodCall>
                      </sedStatement>
                   </sedMethodReturn>
+                  <sedMethodCallMethodReturnCondition xml:id="_c8f73428-772a-48e2-b672-06d200a6b592" name="true" pathCondition="true">
+                     <sedChildReference nodeIdRef="_81336e51-8540-4937-b7a7-4e0663e96961"/>
+                  </sedMethodCallMethodReturnCondition>
                </sedMethodCall>
             </sedStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_d9b3851f-76ce-4bee-8a62-e0372466b6f2" name="true" pathCondition="true">
+               <sedChildReference nodeIdRef="_20c411a7-0074-4108-962b-fa8cc855e549"/>
+            </sedMethodCallMethodReturnCondition>
          </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_25bc1ba7-2710-4234-8766-e2e7b061e0f9"/>
       </sedThread>
    </sedTarget>
 </launch>

@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.key.example.ui.wizard;
 
 import java.util.Collections;
@@ -103,8 +116,10 @@ public class SEDExampleNewWizard extends AbstractNewJavaProjectWizard {
       KeYResourceProperties.setClassPathEntries(project, Collections.singletonList(new KeYClassPathEntry(KeYClassPathEntryKind.WORKSPACE, libSpecsFolder.getFullPath().toString())));
       // Add examples to src folder
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/src", sourceDirectory);
-      // Open first example
-      IResource firstExample = sourceDirectory.findMember("example1/Number.java");
+      // Add readme file
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/Readme.txt", project);
+      // Open readme
+      IResource firstExample = project.findMember("Readme.txt");
       if (firstExample instanceof IFile) {
          selectAndReveal(firstExample);
          openResource((IFile)firstExample);

@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.rule;
 
@@ -1162,20 +1161,23 @@ public abstract class TacletApp implements RuleApp {
      * from type TacletApp with equal taclets, instantiations and positions.
      */
     public boolean equals(Object o) {
-	if (o == this)
-	    return true;
-	if (!(o instanceof TacletApp))
-	    return false;
-	TacletApp s = (TacletApp) o;
-	return (s.taclet().equals(taclet()) && s.instantiations().equals(
-		instantiations()));
+       if (o == this)
+          return true;
+       if (o == null || o.getClass()  != this.getClass()) {
+          return false;
+       }
+       final TacletApp s = (TacletApp) o;
+       return (s.taclet.equals(taclet) && s.instantiations.equals(
+             instantiations));// && (ifInstantiations == null ? s.ifInstantiations == null : 
+                //ifInstantiations.equals(s.ifInstantiations));
     }
 
     public int hashCode() {
-	int result = 17;
-	result = 37 * result + taclet.hashCode();
-	result = 37 * result + instantiations.hashCode();
-	return result;
+       int result = 17;
+       result = 37 * result + taclet.hashCode();
+       result = 37 * result + instantiations.hashCode();
+       result = 37 * result + (ifInstantiations == null ? 0 : ifInstantiations.hashCode()); 
+       return result;
     }
 
     public String toString() {

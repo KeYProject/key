@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -92,12 +92,12 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
                        String mode, 
                        ILaunch launch, 
                        IProgressMonitor monitor) throws CoreException {
-       SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(launch);
+       SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(launch, false);
        target.setName("Fixed Example Target");
        target.setModelIdentifier(MODEL_IDENTIFIER);
        launch.addDebugTarget(target);
        
-       SEDMemoryThread thread = new SEDMemoryThread(target);
+       SEDMemoryThread thread = new SEDMemoryThread(target, false);
        thread.setName("Fixed Example Thread");
        thread.setPathCondition("pc1");
        target.addSymbolicThread(thread);
@@ -144,6 +144,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        et.setName("throws DivisionByZeroException()");
        et.setPathCondition("pc9");
        bzero.addChild(et);
+       thread.addTermination(et);
        
        SEDMemoryBranchCondition bnotzero = new SEDMemoryBranchCondition(target, s3, thread);
        bnotzero.setName("z != 0");
@@ -171,12 +172,18 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        returnNegative.setName("return -1");
        returnNegative.setPathCondition("pc14");
        returnNegative.setCallStack(new ISEDDebugNode[] {call});
+       SEDMemoryBranchCondition returnCondition = new SEDMemoryBranchCondition(target, call, thread);
+       returnCondition.setName("A Return Condition");
+       returnCondition.addChild(returnNegative);
+       call.addMethodReturnCondition(returnCondition);
+       returnNegative.setMethodReturnCondition(returnCondition);
        bnegative.addChild(returnNegative);
        
        SEDMemoryTermination terminationNegative = new SEDMemoryTermination(target, returnNegative, thread, true);
        terminationNegative.setName("<end>");
        terminationNegative.setPathCondition("pc15");
        returnNegative.addChild(terminationNegative);
+       thread.addTermination(terminationNegative);
        
        SEDMemoryBranchCondition bpositive = new SEDMemoryBranchCondition(target, branch, thread);
        bpositive.setName("result >= 0");
@@ -224,5 +231,6 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        terminationPositive.setName("<loop body end>");
        terminationPositive.setPathCondition("pc18");
        returnPositive.addChild(terminationPositive);
+       thread.addTermination(terminationPositive);
     }
 }

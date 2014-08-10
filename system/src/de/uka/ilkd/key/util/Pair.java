@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.util;
 
@@ -18,34 +17,39 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import static de.uka.ilkd.key.util.MiscTools.equalsOrNull;
+
 public class Pair<T1, T2> {    
     public final T1 first;
     public final T2 second;
 
-    
+
     public Pair(T1 first, T2 second) { 
-	this.first = first;
-	this.second = second;   
+        this.first = first;
+        this.second = second;   
     }
 
 
     public String toString() { 
-	return "(" + first + ", " + second + ")"; 
+        return "(" + first + ", " + second + ")"; 
     }
-    
-    
+
+
     public boolean equals(Object o) {
-	if(!(o instanceof Pair<?, ?>)) {
-	    return false;
-	} 
-	Pair<?, ?> p = (Pair<?, ?>) o;
-	return (first == null ? p.first == null : first.equals(p.first))
-	       && (second == null ? p.second == null : second.equals(p.second));
+        if(!(o instanceof Pair<?, ?>)) {
+            return false;
+        } 
+        Pair<?, ?> p = (Pair<?, ?>) o;
+        return equalsOrNull(first, p.first)
+                        && equalsOrNull(second, p.second);
     }
-    
-    
+
+
     public int hashCode() {
-	return first.hashCode() + second.hashCode();
+        int res = 0;
+        if (first != null) res += first.hashCode();
+        if (second != null) res += second.hashCode();
+        return res;
     }
     
     ///////////////////////////////////////////////////////////

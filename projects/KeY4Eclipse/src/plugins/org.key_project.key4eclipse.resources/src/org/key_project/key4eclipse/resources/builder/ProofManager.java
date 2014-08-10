@@ -56,7 +56,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * The ProofManager is responsible for the maintasks during the build. It runs and saves the 
@@ -65,7 +65,7 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  */
 public class ProofManager {
 
-   private KeYEnvironment<CustomConsoleUserInterface> environment;
+   private KeYEnvironment<CustomUserInterface> environment;
    private MarkerManager markerManager;
    private IFolder mainProofFolder;
    private IProject project;
@@ -361,7 +361,7 @@ public class ProofManager {
     * Clones the global {@link KeYEnvironment}.
     * @return the cloned {@link KeYEnvironment}
     */
-   private KeYEnvironment<CustomConsoleUserInterface> cloneEnvironment() {
+   private KeYEnvironment<CustomUserInterface> cloneEnvironment() {
       InitConfig sourceInitConfig = environment.getInitConfig();
       // Create new profile which has separate OneStepSimplifier instance
       JavaProfile profile = new JavaProfile();
@@ -373,9 +373,8 @@ public class ProofManager {
       initConfig.setTaclet2Builder(sourceInitConfig.getTaclet2Builder());
       initConfig.setTaclets(sourceInitConfig.getTaclets());
       // Create new ProofEnvironment and initialize it with values from initial one.
-//      initConfig.getServices().setJavaModel(sourceInitConfig.getServices().getJavaModel());
-      initConfig.getProofEnv().setJavaModel(sourceInitConfig.getProofEnv().getJavaModel());
-      KeYEnvironment<CustomConsoleUserInterface> keyEnv = new KeYEnvironment<CustomConsoleUserInterface>(new CustomConsoleUserInterface(false), initConfig);
+      initConfig.getServices().setJavaModel(sourceInitConfig.getServices().getJavaModel());
+      KeYEnvironment<CustomUserInterface> keyEnv = new KeYEnvironment<CustomUserInterface>(new CustomUserInterface(false), initConfig);
       return keyEnv;
    }
    

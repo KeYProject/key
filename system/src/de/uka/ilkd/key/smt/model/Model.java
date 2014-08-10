@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.smt.model;
 
 import java.util.HashMap;
@@ -16,6 +29,8 @@ import de.uka.ilkd.key.smt.lang.SMTSort;
  *
  */
 public class Model {
+	
+	private boolean empty;
 	/**
 	 * Maps constant names to constant values. (constantName, constantValue)
 	 */
@@ -43,12 +58,33 @@ public class Model {
 
 
 	public Model() {
+		empty = true;
 		constants = new HashMap<String,String>();
 		heaps = new LinkedList<Heap>();
 		locsets = new LinkedList<LocationSet>();
 		reversedConstants = new HashMap<String, String>();
 		sequences = new LinkedList<Sequence>();
 	}
+	
+	
+	
+	
+
+	public boolean isEmpty() {
+		return empty;
+	}
+
+
+
+
+
+	public void setEmpty(boolean empty) {
+		this.empty = empty;
+	}
+
+
+
+
 
 	/**
 	 * Transforms an Object id from binary form to #on, where n is a decimal number.
@@ -561,7 +597,7 @@ public class Model {
 			String value = constants.get(c);
 			SMTSort s = types.getTypeForConstant(c);
 			if(s == null){
-				System.err.println("No sort for: "+c);
+				//System.err.println("No sort for: "+c);
 			}
 			else{
 				newConstants.put(c, processConstantValue(value,s));

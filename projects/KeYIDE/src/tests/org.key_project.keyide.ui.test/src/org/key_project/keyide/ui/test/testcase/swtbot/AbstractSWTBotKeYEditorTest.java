@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.keyide.ui.test.testcase.swtbot;
 
 import org.eclipse.core.resources.IFolder;
@@ -36,7 +49,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Provides the basic functionality to test the {@link KeYEditor}.
@@ -99,7 +112,7 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
       IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
       IFolder src = project.getProject().getFolder("src");
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathToSourceFilesInBundle, src);
-      KeYEnvironment<CustomConsoleUserInterface> environment = null;
+      KeYEnvironment<CustomUserInterface> environment = null;
       Proof proof = null;
       SWTBotEditor editor = null;
       try {
@@ -123,7 +136,7 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
          if (editor != null) {
             editor.close();
          }
-         if (proof != null) {
+         if (proof != null && !proof.isDisposed()) {
             proof.dispose();
          }
          if (environment != null) {
@@ -148,7 +161,7 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
        * @throws Exception Occurred Exception.
        */
       public void test(IJavaProject project, 
-                       KeYEnvironment<CustomConsoleUserInterface> environment, 
+                       KeYEnvironment<CustomUserInterface> environment, 
                        Proof proof, 
                        SWTWorkbenchBot bot,
                        SWTBotEditor editor,
@@ -163,7 +176,7 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
     * @throws Exception Occurred Exception.
     */
    protected void openProof(final SWTWorkbenchBot bot, 
-                            final KeYEnvironment<CustomConsoleUserInterface> environment, 
+                            final KeYEnvironment<CustomUserInterface> environment, 
                             final Proof proof) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
          @Override
@@ -194,7 +207,7 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
    protected void applyTaclet(KeYMediator mediator, Sequent sequent, boolean inAntecedent, int index, PosInTerm pit, final String tacletName) {
       PosInOccurrence pio = new PosInOccurrence((inAntecedent ? sequent.antecedent() : sequent.succedent()).get(index), pit, inAntecedent);
       PosInSequent pis = PosInSequent.createCfmaPos(pio);
-      ImmutableList<TacletApp> rules = KeYIDEUtil.findRules(mediator, pis);
+      ImmutableList<TacletApp> rules = KeYIDEUtil.findTaclets(mediator, pis);
       TacletApp tacletApp = CollectionUtil.search(rules, new IFilter<TacletApp>() {
          @Override
          public boolean select(TacletApp element) {

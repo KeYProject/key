@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -794,5 +794,48 @@ public class IOUtilTest extends TestCase {
        assertFalse(subSubDir2.exists());
        assertFalse(subSubSubDir2.exists());
        assertFalse(subSubSubDir2File.exists());
+   }
+   
+   /**
+    * Tests {@link IOUtil#copy(InputStream, java.io.OutputStream)}.
+    */
+   @Test
+   public void testCopy() throws IOException {
+      doTestCopy(null);
+      assertFalse(IOUtil.copy(null, null));
+      assertFalse(IOUtil.copy(new ByteArrayInputStream("NotCopied".getBytes()), null));
+      doTestCopy("One Line");
+      doTestCopy("First Line\n\rSecond Line");
+      doTestCopy("One Line\r");
+      doTestCopy("One Line\n");
+      doTestCopy("One Line\r\n");
+      doTestCopy("One Line\n\r");
+      StringBuffer sb = new StringBuffer();
+      for (int i = 0; i < IOUtil.BUFFER_SIZE * 3; i++) {
+         sb.append("A");
+      }
+      doTestCopy(sb.toString());
+   }
+   
+   /**
+    * Executes the assertions for {@link #testCopy()}.
+    * @param text The text to check.
+    * @throws IOException Occurred Exception.
+    */
+   protected void doTestCopy(String text) throws IOException {
+      if (text != null) {
+         byte[] inBytes = text.getBytes();
+         ByteArrayInputStream in = new ByteArrayInputStream(inBytes);
+         ByteArrayOutputStream out = new ByteArrayOutputStream();
+         assertTrue(IOUtil.copy(in, out));
+         byte[] outBytes = out.toByteArray();
+         assertEquals(inBytes.length, outBytes.length);
+         for (int i = 0; i < inBytes.length; i++) {
+            assertEquals(inBytes[i], outBytes[i]);
+         }
+      }
+      else {
+         assertFalse(IOUtil.copy(null, new ByteArrayOutputStream()));
+      }
    }
 }

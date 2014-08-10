@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_340a4dfb-3c38-4f63-861d-c3c6e8055a36" name="doSomething(int, java.lang.String, boolean)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_36ae12dc-2c7e-43be-aa08-9e2aebbd71a3" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_0c3e712b-c613-4b36-8931-77bc7b7ac098" name="self.doSomething(asdf,a,b);" pathCondition="true" lineNumber="-1" charStart="248" charEnd="259">
-            <sedStatement xml:id="_43456b94-217d-4741-ab98-120d12fe22b5" name="int x = 0;" pathCondition="true" lineNumber="-1" charStart="296" charEnd="306">
-               <sedBranchStatement xml:id="_6e4c7573-021f-440b-8c11-594e47e826ed" name="if (asdf&lt;0)" pathCondition="true" lineNumber="-1" charStart="310" charEnd="400">
-                  <sedBranchCondition xml:id="_1b686376-91ab-4620-b9b4-f10c853da77f" name="asdf &lt; 0" pathCondition="asdf &lt; 0">
-                     <sedStatement xml:id="_7e1f2812-b235-4db3-a7ea-946ea01ba9e4" name="x=x*-1;" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="330" charEnd="341">
-                        <sedStatement xml:id="_e9e62b7c-d787-401f-af03-02f47bc834d4" name="x+=2;" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="346" charEnd="353">
-                           <sedStatement xml:id="_6b40e352-60a8-4f12-8f4c-1941b2c49bd3" name="x=1*asdf;" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="404" charEnd="417">
-                              <sedStatement xml:id="_bd643eca-b222-4711-89b3-90f7a46488a7" name="int y = 2+CONSTANT+this.field;" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="421" charEnd="450">
-                                 <sedStatement xml:id="_3e029be1-b097-447b-9853-06f966cf6fed" name="int doubleValue = doubleValue(x);" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="454" charEnd="487">
-                                    <sedMethodCall xml:id="_86c64568-a491-4f43-a88a-a1e8e2306786" name="self.doubleValue(value);" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="554" charEnd="565">
-                                       <sedStatement xml:id="_1098f0d8-1319-46d2-88f2-d6dde8de7b15" name="int result;" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="582" charEnd="593">
-                                          <sedStatement xml:id="_d5c30487-4e5b-4a36-99f6-f14b9f53e03b" name="result_1=value+value;" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="597" charEnd="620">
-                                             <sedStatement xml:id="_236fb1c8-0726-437b-933b-cafa6d00a11b" name="return result_1;" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="624" charEnd="638">
-                                                <sedMethodReturn xml:id="_c3cbd533-3080-430b-b846-abf5e1ecec46" name="&lt;return asdf * 2 as result of self.doubleValue(value);&gt;" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="554" charEnd="565">
-                                                   <sedStatement xml:id="_422ceed7-8580-4b51-972c-04f5c505bbc8" name="int z = x+y+doubleValue;" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="491" charEnd="519">
-                                                      <sedStatement xml:id="_cede9869-060c-48e5-96ff-1ea3da45b48f" name="return z;" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="523" charEnd="532">
-                                                         <sedMethodReturn xml:id="_ea494f37-9a00-48ad-8150-9b5098aa0b5f" name="&lt;return 4 + asdf * 3 + self.field as result of self.doSomething(asdf,a,b);&gt;" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="248" charEnd="259">
-                                                            <sedTermination xml:id="_24907687-be85-478f-bf25-5c150bf76f7a" name="&lt;end&gt;" pathCondition="asdf &lt; 0" verified="true">
+   <sedTarget xml:id="_b1a3524f-4f80-41bd-843f-a684de527ccc" name="doSomething(int, java.lang.String, boolean)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_b0eaf4ed-2105-4ede-b762-4ddaa4256561" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_82cb4a0b-badd-4d6f-82b4-4c8355d85688" name="self.doSomething(asdf,a,b);" pathCondition="true" lineNumber="-1" charStart="248" charEnd="259" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorMethodNameSelected\src\MethodPartPOTest.java">
+            <sedStatement xml:id="_ed1bccfb-c78b-4dd2-b34e-34265f2aa279" name="int x = 0;" pathCondition="true" lineNumber="-1" charStart="296" charEnd="306" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorMethodNameSelected\src\MethodPartPOTest.java">
+               <sedBranchStatement xml:id="_40f29ac8-1529-46a6-aa18-152ad802e6e7" name="if (asdf&lt;0)" pathCondition="true" lineNumber="-1" charStart="310" charEnd="324" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorMethodNameSelected\src\MethodPartPOTest.java">
+                  <sedBranchCondition xml:id="_8ad798b6-33da-4475-824c-ec9119ca1cdc" name="asdf &lt; 0" pathCondition="asdf &lt; 0">
+                     <sedStatement xml:id="_655cba7b-2f5d-4a53-b463-b87dc071155a" name="x=x*-1;" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="330" charEnd="341" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorMethodNameSelected\src\MethodPartPOTest.java">
+                        <sedStatement xml:id="_b562e7c1-7bba-49c6-972f-767e79d41023" name="x+=2;" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="346" charEnd="353" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorMethodNameSelected\src\MethodPartPOTest.java">
+                           <sedStatement xml:id="_11ee871a-7881-4254-a07d-33542e9d3e63" name="x=1*asdf;" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="404" charEnd="417" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorMethodNameSelected\src\MethodPartPOTest.java">
+                              <sedStatement xml:id="_e501ec70-17db-4fee-a0e9-4889c0c67739" name="int y = 2+CONSTANT+this.field;" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="421" charEnd="450" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorMethodNameSelected\src\MethodPartPOTest.java">
+                                 <sedStatement xml:id="_67fad4e1-4f78-47ba-8a2b-11603e40821f" name="int doubleValue = doubleValue(x);" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="454" charEnd="487" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorMethodNameSelected\src\MethodPartPOTest.java">
+                                    <sedMethodCall xml:id="_9f61707e-5b50-4474-9e91-26ea8a5d5270" name="self.doubleValue(value);" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="554" charEnd="565" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorMethodNameSelected\src\MethodPartPOTest.java">
+                                       <sedStatement xml:id="_a8a9c971-113c-4e04-a9fe-18aa6f6e2a3a" name="int result;" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="582" charEnd="593" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorMethodNameSelected\src\MethodPartPOTest.java">
+                                          <sedStatement xml:id="_5b553616-9069-4795-b915-8e4165add601" name="result_1=value+value;" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="597" charEnd="620" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorMethodNameSelected\src\MethodPartPOTest.java">
+                                             <sedStatement xml:id="_cc00babe-1f54-4d13-ba0a-de1423e63930" name="return result_1;" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="624" charEnd="638" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorMethodNameSelected\src\MethodPartPOTest.java">
+                                                <sedMethodReturn xml:id="_9aca3212-35a5-4598-a499-adb6de768423" name="&lt;return asdf * 2 as result of doubleValue&gt;" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="554" charEnd="565" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorMethodNameSelected\src\MethodPartPOTest.java" methodReturnConditionRef="_4a128106-4b27-406a-9eb5-57c10a7f13eb">
+                                                   <sedStatement xml:id="_9240b348-5013-4f41-9634-8093a82a42e2" name="int z = x+y+doubleValue;" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="491" charEnd="519" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorMethodNameSelected\src\MethodPartPOTest.java">
+                                                      <sedStatement xml:id="_0a579504-28c1-449a-9ce6-8c473ab4eb7a" name="return z;" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="523" charEnd="532" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorMethodNameSelected\src\MethodPartPOTest.java">
+                                                         <sedMethodReturn xml:id="_e614fce3-def7-490e-8f70-9c3cefc6bf3a" name="&lt;return 4 + asdf * 3 + self.field as result of doSomething&gt;" pathCondition="asdf &lt; 0" lineNumber="-1" charStart="248" charEnd="259" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorMethodNameSelected\src\MethodPartPOTest.java" methodReturnConditionRef="_126985f7-f319-4ddc-bebb-7b71b6a4ef8c">
+                                                            <sedTermination xml:id="_a0757fc0-692b-41fe-b860-3725dc181565" name="&lt;end&gt;" pathCondition="asdf &lt; 0" verified="true">
                                                             </sedTermination>
                                                          </sedMethodReturn>
                                                       </sedStatement>
@@ -28,6 +28,9 @@
                                              </sedStatement>
                                           </sedStatement>
                                        </sedStatement>
+                                       <sedMethodCallMethodReturnCondition xml:id="_4a128106-4b27-406a-9eb5-57c10a7f13eb" name="true" pathCondition="asdf &lt; 0">
+                                          <sedChildReference nodeIdRef="_9aca3212-35a5-4598-a499-adb6de768423"/>
+                                       </sedMethodCallMethodReturnCondition>
                                     </sedMethodCall>
                                  </sedStatement>
                               </sedStatement>
@@ -35,11 +38,11 @@
                         </sedStatement>
                      </sedStatement>
                   </sedBranchCondition>
-                  <sedBranchCondition xml:id="_49f0c659-3c19-4bb2-9089-5a448be30d4e" name="asdf &gt;  -1" pathCondition="asdf &gt;  -1">
-                     <sedStatement xml:id="_2d0d4160-4370-4626-901d-cd259ebd9769" name="x-=42;" pathCondition="asdf &gt;  -1" lineNumber="-1" charStart="373" charEnd="381">
-                        <sedStatement xml:id="_ab8f647f-ccc9-428e-b44b-564887f70531" name="return x;" pathCondition="asdf &gt;  -1" lineNumber="-1" charStart="386" charEnd="395">
-                           <sedMethodReturn xml:id="_b4cf01a2-36a9-4fcf-93e3-2146e90afe37" name="&lt;return -42 as result of self.doSomething(asdf,a,b);&gt;" pathCondition="asdf &gt;  -1" lineNumber="-1" charStart="248" charEnd="259">
-                              <sedTermination xml:id="_36f70132-e947-45de-8dc5-875b996bacaa" name="&lt;end&gt;" pathCondition="asdf &gt;  -1" verified="true">
+                  <sedBranchCondition xml:id="_3ce8aa9c-1567-406a-a69f-da79cb2aa175" name="asdf &gt;  -1" pathCondition="asdf &gt;  -1">
+                     <sedStatement xml:id="_07b19f31-8638-448d-892f-2366a570abe9" name="x-=42;" pathCondition="asdf &gt;  -1" lineNumber="-1" charStart="373" charEnd="381" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorMethodNameSelected\src\MethodPartPOTest.java">
+                        <sedStatement xml:id="_52ca0a79-73e5-47d5-ab85-a6876c122077" name="return x;" pathCondition="asdf &gt;  -1" lineNumber="-1" charStart="386" charEnd="395" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorMethodNameSelected\src\MethodPartPOTest.java">
+                           <sedMethodReturn xml:id="_836e5d6a-68b0-4133-8038-9e90c587489a" name="&lt;return -42 as result of doSomething&gt;" pathCondition="asdf &gt;  -1" lineNumber="-1" charStart="248" charEnd="259" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorMethodNameSelected\src\MethodPartPOTest.java" methodReturnConditionRef="_9b259aed-1bd6-481f-8610-92ee8c888038">
+                              <sedTermination xml:id="_281e04a0-5f46-4c3e-bca1-d5a7758563dd" name="&lt;end&gt;" pathCondition="asdf &gt;  -1" verified="true">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedStatement>
@@ -47,7 +50,15 @@
                   </sedBranchCondition>
                </sedBranchStatement>
             </sedStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_126985f7-f319-4ddc-bebb-7b71b6a4ef8c" name="asdf &lt; 0" pathCondition="true">
+               <sedChildReference nodeIdRef="_e614fce3-def7-490e-8f70-9c3cefc6bf3a"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedMethodCallMethodReturnCondition xml:id="_9b259aed-1bd6-481f-8610-92ee8c888038" name="asdf &gt;  -1" pathCondition="true">
+               <sedChildReference nodeIdRef="_836e5d6a-68b0-4133-8038-9e90c587489a"/>
+            </sedMethodCallMethodReturnCondition>
          </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_a0757fc0-692b-41fe-b860-3725dc181565"/>
+         <sedTerminationEntry nodeIdRef="_281e04a0-5f46-4c3e-bca1-d5a7758563dd"/>
       </sedThread>
    </sedTarget>
 </launch>

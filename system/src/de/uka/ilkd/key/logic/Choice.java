@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.logic;
 
@@ -32,12 +31,6 @@ public class Choice implements Named {
 	this.name = name;
 	// .intern() crucial for correct equals
 	this.category = category.intern();       
-    }
-
-    
-    public Choice(Name name){
-	this.name = name;
-	category  = null;
     }
 
     
@@ -64,8 +57,7 @@ public class Choice implements Named {
     
     @Override
     public int hashCode() {
-	return name.hashCode()*37 + 
-	    (category == null ? 13 : category.hashCode()*1369);
+	return name.hashCode()*37;
     }
 
 

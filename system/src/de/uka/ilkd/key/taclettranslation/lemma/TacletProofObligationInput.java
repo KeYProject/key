@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.io.File;
@@ -14,7 +27,6 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.Taclet;
@@ -35,7 +47,6 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
 
     private String tacletName;
     private ProofAggregate proofObligation;
-    private final InitConfig initConfig;
 
     // The following may all possibly be null
     private String definitionFile;
@@ -92,6 +103,8 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         public void progressStarted(Object sender) {
         }
     };
+   
+    private final InitConfig environmentConfig;
  
 
     /**
@@ -104,7 +117,7 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
      */
     public TacletProofObligationInput(String tacletName, InitConfig initConfig) {
         this.tacletName = tacletName;
-        this.initConfig = initConfig;
+        this.environmentConfig = initConfig;
     }
 
     /*
@@ -143,20 +156,21 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
     @Override 
     public void readProblem() throws ProofInputException {
         TacletLoader loader = null;
+        
         if (tacletFile == null) {
             // prove a KeY taclet
-            loader = new TacletLoader.KeYsTacletsLoader(null, null, getProfile());
+            loader = new TacletLoader.KeYsTacletsLoader(null, null, environmentConfig.getProfile());
         } else {
             final ProblemInitializer problemInitializer =
-                    new ProblemInitializer(getProfile());
+                    new ProblemInitializer( environmentConfig.getProfile());
             // bugfix: All files are loaded relative to the basedir of the loaded file
             loader = new TacletLoader.TacletFromFileLoader(null, null, problemInitializer,
                     new File(baseDir, definitionFile), new File(baseDir, tacletFile), 
-                    fileCollection(axiomFiles), initConfig.getProofEnv());
+                    fileCollection(axiomFiles), environmentConfig);
         }
 
         TacletSoundnessPOLoader poloader =
-                new TacletSoundnessPOLoader(listener, filter, true, loader);
+                new TacletSoundnessPOLoader(listener, filter, true, loader, loader.getProofEnvForTaclets().getInitConfigForEnvironment(), true);
 
         poloader.startSynchronously();
         if(proofObligation == null) {
@@ -165,9 +179,6 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
             }
     }
 
-    public Profile getProfile() {
-        return initConfig.getProfile();
-    }
 
     private Collection<File> fileCollection(String[] strings) {
         ArrayList<File> result = new ArrayList<File>();

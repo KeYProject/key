@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="SimpleMethodCallStackTest.magic(x,y);" pathCondition="true" pathConditionChanged="false">
+      <statement name="int tempx = nothing(x);" pathCondition="true" pathConditionChanged="false">
+         <callStackEntry path="/0"/>
+         <methodCall name="SimpleMethodCallStackTest.nothing(x_2);" pathCondition="true" pathConditionChanged="false">
+            <callStackEntry path="/0"/>
+            <statement name="return x_2;" pathCondition="true" pathConditionChanged="false">
+               <callStackEntry path="/0/0/0"/>
+               <callStackEntry path="/0"/>
+               <methodReturn name="&lt;return of nothing&gt;" signature="&lt;return of SimpleMethodCallStackTest.nothing(x_2);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return x as result of nothing&gt;" signatureIncludingReturnValue="&lt;return x as result of SimpleMethodCallStackTest.nothing(x_2);&gt;" isReturnValueComputed="true" methodReturnCondition="true">
+                  <methodReturnValue name="x" returnValueString="x" hasCondition="false">
+                  </methodReturnValue>
+                  <callStackEntry path="/0/0/0"/>
+                  <callStackEntry path="/0"/>
+                  <statement name="return tempx;" pathCondition="true" pathConditionChanged="false">
+                     <callStackEntry path="/0"/>
+                     <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of SimpleMethodCallStackTest.magic(x,y);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return x as result of magic&gt;" signatureIncludingReturnValue="&lt;return x as result of SimpleMethodCallStackTest.magic(x,y);&gt;" isReturnValueComputed="true" methodReturnCondition="true">
+                        <methodReturnValue name="x" returnValueString="x" hasCondition="false">
+                        </methodReturnValue>
+                        <callStackEntry path="/0"/>
+                        <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        </termination>
+                     </methodReturn>
+                  </statement>
+               </methodReturn>
+            </statement>
+            <methodReturnEntry path="/0/0/0/0/0"/>
+         </methodCall>
+      </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0"/>
+</start>

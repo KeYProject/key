@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -50,6 +50,8 @@ import org.eclipse.ui.services.IEvaluationService;
 import org.eclipse.ui.views.navigator.ResourceComparator;
 import org.eclipse.ui.wizards.newresource.BasicNewFolderResourceWizard;
 import org.key_project.util.eclipse.swt.viewer.FileSelectionValidator;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 
 /**
@@ -463,6 +465,21 @@ public final class WorkbenchUtil {
                   ((WorkbenchWindow)window).updateActionSets();
                }
             }
+         }
+      });
+   }
+
+   /**
+    * Searches the {@link IWorkbenchWindow} for the given {@link Shell}.
+    * @param shell The {@link Shell} for which the {@link IWorkbenchWindow} is requested.
+    * @return The found {@link IWorkbenchWindow} of the given {@link Shell} or {@code null} if not available.
+    */
+   public static IWorkbenchWindow findWorkbenchWindow(final Shell shell) {
+      IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
+      return ArrayUtil.search(windows, new IFilter<IWorkbenchWindow>() {
+         @Override
+         public boolean select(IWorkbenchWindow element) {
+            return element.getShell() == shell;
          }
       });
    }

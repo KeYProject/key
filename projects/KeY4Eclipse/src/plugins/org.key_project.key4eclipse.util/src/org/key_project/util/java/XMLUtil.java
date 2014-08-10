@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -197,5 +197,17 @@ public final class XMLUtil {
       else {
          return null;
       }
+   }
+   
+   /**
+    * Checks if the given character is valid to be used in entity names (between {@code &...;}).
+    * @param character The character to check.
+    * @return {@code true} is valid, {@code false} is not valid.
+    */
+   public static boolean isEntityNameCharacter(char character) {
+      return '#' == character ||
+             StringUtil.LATIN_ALPHABET_BIG.contains(character + "") ||
+             StringUtil.LATIN_ALPHABET_SMALL.contains(character + "") ||
+             StringUtil.NUMERALS.contains(character + "");
    }
 }

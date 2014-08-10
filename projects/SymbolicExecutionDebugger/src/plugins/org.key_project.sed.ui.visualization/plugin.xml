@@ -160,10 +160,22 @@
                     label="Call Stack">
               </propertyTab>
               <propertyTab
+                    afterTab="org.key_project.sed.ui.visualization.node.tab"
+                    category="Graphiti"
+                    id="org.key_project.sed.ui.visualization.methodReturns.tab"
+                    label="Method Returns">
+              </propertyTab>
+              <propertyTab
                     afterTab="org.key_project.sed.ui.visualization.callStack.tab"
                     category="Graphiti"
                     id="org.key_project.sed.ui.visualization.source.tab"
                     label="Source">
+              </propertyTab>
+              <propertyTab
+                    afterTab="org.key_project.sed.ui.visualization.source.tab"
+                    category="Graphiti"
+                    id="org.key_project.sed.ui.visualization.annotationLinks.tab"
+                    label="Annotation Links">
               </propertyTab>
           </propertyTabs>
       </extension>
@@ -183,10 +195,22 @@
                     tab="org.key_project.sed.ui.visualization.callStack.tab">
               </propertySection>
               <propertySection
+                    class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiMethodReturnConditionsPropertySection"
+                    filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiReadonlyMethodCallTreeFilter"
+                    id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiMethodReturnConditionsPropertySection"
+                    tab="org.key_project.sed.ui.visualization.methodReturns.tab">
+              </propertySection>
+              <propertySection
                     class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiSourcePropertySection"
                     filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiSourceTreeFilter"
                     id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiSourcePropertySection"
                     tab="org.key_project.sed.ui.visualization.source.tab">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiAnnotationLinkPropertySection"
+                    filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiReadonlyDebugNodeTreeFilter"
+                    id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiAnnotationLinkPropertySection"
+                    tab="org.key_project.sed.ui.visualization.annotationLinks.tab">
               </propertySection>
           </propertySections>
       </extension>    
@@ -320,12 +344,22 @@
            id="org.key_project.sed.ui.visualization.visualizeStateCommand"
            name="Visualize State">
      </command>
+     <command
+           categoryId="org.eclipse.debug.ui.category.run"
+           description="Saves the currently selected symbolic exeution tree as *.set file."
+           id="org.key_project.sed.ui.visualization.saveSetAsCommand"
+           name="Save Symbolic Execution Tree as Set File">
+     </command>
   </extension>
   <extension
         point="org.eclipse.ui.commandImages">
      <image
            commandId="org.key_project.sed.ui.visualization.visualizeStateCommand"
            icon="icons/object_diagram.gif">
+     </image>
+     <image
+           commandId="org.key_project.sed.ui.visualization.saveSetAsCommand"
+           icon="icons/saveas_edit.gif">
      </image>
   </extension>
   <extension
@@ -354,6 +388,30 @@
            </iterate>
         </enabledWhen>
      </handler>
+     <handler
+           class="org.key_project.sed.ui.visualization.execution_tree.command.SaveSetAsCommand"
+           commandId="org.key_project.sed.ui.visualization.saveSetAsCommand">
+        <enabledWhen>
+           <iterate
+                 ifEmpty="false"
+                 operator="and">
+              <or>
+                 <instanceof
+                       value="org.key_project.sed.core.model.ISEDDebugTarget">
+                 </instanceof>
+                 <and>
+                    <instanceof
+                          value="org.eclipse.debug.core.ILaunch">
+                    </instanceof>
+                    <test
+                          forcePluginActivation="true"
+                          property="org.key_project.sed.core.hasSEDDebugTarget">
+                    </test>
+                 </and>
+              </or>
+           </iterate>
+        </enabledWhen>
+     </handler>
   </extension>
   <extension
         point="org.eclipse.ui.bindings">
@@ -369,6 +427,32 @@
      <menuContribution
            allPopups="true"
            locationURI="popup:org.eclipse.debug.ui.DebugView?after=additions">
+        <command
+              commandId="org.key_project.sed.ui.visualization.saveSetAsCommand"
+              icon="icons/saveas_edit.gif"
+              style="push">
+           <visibleWhen
+                 checkEnabled="false">
+              <iterate
+                    ifEmpty="false"
+                    operator="and">
+                 <or>
+                    <instanceof
+                          value="org.key_project.sed.core.model.ISEDDebugTarget">
+                    </instanceof>
+                    <and>
+                       <instanceof
+                             value="org.eclipse.debug.core.ILaunch">
+                       </instanceof>
+                       <test
+                             forcePluginActivation="true"
+                             property="org.key_project.sed.core.hasSEDDebugTarget">
+                       </test>
+                    </and>
+                 </or>
+              </iterate>
+           </visibleWhen>
+        </command>
         <command
               commandId="org.key_project.sed.ui.visualization.visualizeStateCommand"
               icon="icons/object_diagram.gif"
@@ -429,5 +513,99 @@
            id="org.key_project.sed.ui.visualization.preference.page.VisualizationPreferencePage"
            name="Visualization">
      </page>
+  </extension>
+  <extension
+        point="org.eclipse.debug.core.launchConfigurationTypes">
+     <launchConfigurationType
+           delegate="org.key_project.sed.ui.visualization.launch.SETFileLaunchConfigurationDelegate"
+           id="org.key_project.sed.ui.visualization.setFile"
+           modes="debug"
+           name="Symbolic Execution Tree File"
+           sourceLocatorId="org.key_project.sed.ui.visualization.setFile.sourceLocator"
+           sourcePathComputerId="org.key_project.sed.ui.visualization.setFile.sourcePathComputer">
+     </launchConfigurationType>
+  </extension>
+  <extension
+        point="org.eclipse.debug.ui.launchShortcuts">
+     <shortcut
+           class="org.key_project.sed.ui.visualization.launch.SETFileLaunchShortcut"
+           icon="icons/symbolic_debug.gif"
+           id="org.key_project.sed.ui.visualization.setFile.shortcut"
+           label="Symbolic Execution Tree File"
+           modes="debug">
+        <configurationType
+              id="org.key_project.sed.ui.visualization.setFile">
+        </configurationType>
+        <description
+              description="Symbolic Execution Debugger based on a SET file"
+              mode="debug">
+        </description>
+        <contextualLaunch>
+           <enablement>
+              <or>
+                 <with
+                       variable="selection">
+                    <and>
+                       <count
+                             value="1">
+                       </count>
+                       <iterate
+                             ifEmpty="false"
+                             operator="and">
+                          <instanceof
+                                value="org.eclipse.core.resources.IFile">
+                          </instanceof>
+                          <test
+                                forcePluginActivation="true"
+                                property="org.eclipse.core.resources.extension"
+                                value="set">
+                          </test>
+                       </iterate>
+                    </and>
+                 </with>
+              </or>
+           </enablement>
+        </contextualLaunch>
+     </shortcut>
+  </extension>
+  <extension
+        point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+     <launchConfigurationTypeImage
+           configTypeID="org.key_project.sed.ui.visualization.setFile"
+           icon="icons/symbolic_debug.gif"
+           id="org.key_project.sed.ui.visualization.setFile.typeImage">
+     </launchConfigurationTypeImage>
+  </extension>
+  <extension
+        point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+     <launchConfigurationTabGroup
+           class="org.key_project.sed.ui.visualization.launch.SETFileLaunchConfigurationTabGroup"
+           id="org.key_project.sed.ui.visualization.setFile.tabGroup"
+           type="org.key_project.sed.ui.visualization.setFile">
+     </launchConfigurationTabGroup>
+  </extension>
+  <extension
+        point="org.eclipse.debug.core.sourceLocators">
+     <sourceLocator
+           class="org.key_project.sed.ui.visualization.launch.SETFileSourceLookupDirector"
+           id="org.key_project.sed.ui.visualization.setFile.sourceLocator"
+           name="SET File Source Locator">
+     </sourceLocator>
+  </extension>
+  <extension
+        point="org.eclipse.debug.core.sourcePathComputers">
+     <sourcePathComputer
+           class="org.key_project.sed.ui.visualization.launch.SETFileSourcePathComputerDelegate"
+           id="org.key_project.sed.ui.visualization.setFile.sourcePathComputer">
+     </sourcePathComputer>
+  </extension>
+  <extension
+        point="org.eclipse.debug.core.sourceContainerTypes">
+     <sourceContainerType
+           class="org.key_project.sed.ui.visualization.launch.AbsoluteFileSystemPathSourceContainerTypeDelegate"
+           description="Absolute File System Paths"
+           id="org.key_project.sed.ui.visualization.absoluteFileSystemPathsSourceContainerType"
+           name="Absolute File System Paths">
+     </sourceContainerType>
   </extension>
 </plugin>
