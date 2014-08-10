@@ -88,8 +88,8 @@ mod: false" pathCondition="x &lt; 0" pathConditionChanged="false" initiallyValid
                         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <variable name="heapBeforeLoop" arrayIndex="-1" isArrayIndex="false">
-                        <value name="heapBeforeLoop {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <variable name="heapBefore_LOOP" arrayIndex="-1" isArrayIndex="false">
+                        <value name="heapBefore_LOOP {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <variable name="variant" arrayIndex="-1" isArrayIndex="false">
