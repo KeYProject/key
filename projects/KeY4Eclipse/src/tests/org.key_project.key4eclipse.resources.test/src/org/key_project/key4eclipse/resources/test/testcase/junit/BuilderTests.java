@@ -20,9 +20,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.jobs.Job;
 import org.junit.Test;
 import org.key_project.key4eclipse.resources.test.Activator;
 import org.key_project.key4eclipse.resources.test.util.KeY4EclipseResourcesTestUtil;
@@ -558,7 +556,7 @@ public class BuilderTests extends AbstractResourceTest {
    
    
    private void testFileDeleted(IProject project, boolean proofDeleted) throws CoreException{
-      ResourcesPlugin.getWorkspace().addResourceChangeListener(listener, IProject.b)
+//      ResourcesPlugin.getWorkspace().addResourceChangeListener(listener, IProject.b)
       
       IFolder proofFolder = KeY4EclipseResourcesTestUtil.getProofFolder(project);
       IFile javaFile = KeY4EclipseResourcesTestUtil.getFile(
@@ -572,7 +570,7 @@ public class BuilderTests extends AbstractResourceTest {
       assertTrue(!proofFile.exists());
       assertTrue(!metaFile.exists());
       
-      int oldBuildCount = buildListener.getBuildCount();
+//      int oldBuildCount = buildListener.getBuildCount();
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/BuilderTests/testFileDeleted/", project.getFolder("src"));
       // TODO: Wait until buildListener.getBuildCount() > oldBuildCount 
       // TODO: Wait until Job is done

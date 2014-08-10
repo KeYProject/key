@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -13,6 +13,7 @@
 
 package org.key_project.key4eclipse.resources.builder;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,7 +37,7 @@ public class ProofElement {
 
    private IFile javaFile;
    private SourceLocation scl;
-   private LinkedList<IMarker> marker;
+   private List<IMarker> marker;
    private IMarker overdueProofMarker;
    private String markerMsg;
    
@@ -51,7 +52,7 @@ public class ProofElement {
    
    private boolean proofClosed;
    
-   private LinkedHashSet<IProofReference<?>> proofReferences;
+   private HashSet<IProofReference<?>> proofReferences;
    private List<ProofElement> usedContracts;
    
    
@@ -63,7 +64,7 @@ public class ProofElement {
       return scl;
    }
    
-   public LinkedList<IMarker> getMarker(){
+   public List<IMarker> getMarker(){
       return marker;
    }
    public void setMarker(LinkedList<IMarker> marker){
@@ -130,7 +131,7 @@ public class ProofElement {
    }
    
    
-   public LinkedHashSet<IProofReference<?>> getProofReferences(){
+   public HashSet<IProofReference<?>> getProofReferences(){
       return proofReferences;
    }
    public void setProofReferences(LinkedHashSet<IProofReference<?>> proofReferences){
@@ -143,7 +144,7 @@ public class ProofElement {
       this.usedContracts = usedContracts;
    }
    
-   public ProofElement(IFile javaFile, SourceLocation scl , KeYEnvironment<CustomConsoleUserInterface> environment, IFolder proofFolder, IFile proofFile, IFile metaFile, LinkedList<IMarker> marker, IMarker overdueProofMarker, Contract contract){
+   public ProofElement(IFile javaFile, SourceLocation scl , KeYEnvironment<CustomConsoleUserInterface> environment, IFolder proofFolder, IFile proofFile, IFile metaFile, List<IMarker> marker, IMarker overdueProofMarker, Contract contract){
       this.javaFile = javaFile;
       this.scl = scl;
       this.marker = marker;

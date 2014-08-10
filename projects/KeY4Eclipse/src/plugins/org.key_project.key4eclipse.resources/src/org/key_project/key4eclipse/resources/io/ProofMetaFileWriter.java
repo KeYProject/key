@@ -1,7 +1,21 @@
+/*******************************************************************************
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.key4eclipse.resources.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -134,7 +148,7 @@ public class ProofMetaFileWriter {
    
    private Element createUsedTypes() throws ProofReferenceException{
       Element usedTypes = doc.createElement("usedTypes");
-      LinkedHashSet<IProofReference<?>> proofReferences = pe.getProofReferences();
+      HashSet<IProofReference<?>> proofReferences = pe.getProofReferences();
       for(IProofReference<?> proofRef : proofReferences){
          KeYJavaType kjt = getKeYJavaType(proofRef);
          if(!KeYResourcesUtil.filterKeYJavaType(kjt) && !addedTypes.contains(kjt.getFullName())){

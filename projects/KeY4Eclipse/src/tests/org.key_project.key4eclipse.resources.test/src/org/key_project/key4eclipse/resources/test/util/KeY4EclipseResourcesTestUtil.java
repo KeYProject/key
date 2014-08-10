@@ -138,25 +138,22 @@ public class KeY4EclipseResourcesTestUtil {
     * @param project - the {@link IProject} to use
     * @throws CoreException
     */
-   public static void build(IProject project) throws CoreException{
-      
-      
-      
-//      project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, null);
-//      IJobManager jobMan = Job.getJobManager();
-//      Job[] jobs = jobMan.find("KeYProjectBuildJob");
-//      if (jobs != null) {
-//         for (Job job : jobs) {
-//             TestUtilsUtil.waitForJob(job);
-//         }
-//      }
-//      project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, null);
-//      jobs = jobMan.find("KeYProjectBuildJob");
-//      if (jobs != null) {
-//         for (Job job : jobs) {
-//             TestUtilsUtil.waitForJob(job);
-//         }
-//      }
+   public static void build(IProject project) throws CoreException{      
+      project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, null);
+      IJobManager jobMan = Job.getJobManager();
+      Job[] jobs = jobMan.find("KeYProjectBuildJob");
+      if (jobs != null) {
+         for (Job job : jobs) {
+             TestUtilsUtil.waitForJob(job);
+         }
+      }
+      project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, null);
+      jobs = jobMan.find("KeYProjectBuildJob");
+      if (jobs != null) {
+         for (Job job : jobs) {
+             TestUtilsUtil.waitForJob(job);
+         }
+      }
    }
    
    public static void cleanBuild(IProject project) throws CoreException{

@@ -5,14 +5,18 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.key_project.key4eclipse.resources.util.EditorSelection;
+import org.key_project.key4eclipse.resources.util.EditorSelector;
 
 public class KeYProjectBuildJob extends Job{
 
    private IProject project;
+   private EditorSelection editorSelection;
       
    public KeYProjectBuildJob(String name, IProject project){
       super(name);
       this.project = project;
+      editorSelection = new EditorSelector().getEditorSelection();
    }
    
    @Override
@@ -25,7 +29,7 @@ public class KeYProjectBuildJob extends Job{
       ProofManager proofManager = null;
       try{
          proofManager = new ProofManager(project);
-         proofManager.runProofs(monitor);
+         proofManager.runProofs(monitor, editorSelection);
       } catch (Exception e){
          //TODO
          System.out.println("Error");

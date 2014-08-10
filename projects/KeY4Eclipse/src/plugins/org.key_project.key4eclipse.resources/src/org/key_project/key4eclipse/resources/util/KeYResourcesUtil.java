@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -13,7 +13,7 @@
 
 package org.key_project.key4eclipse.resources.util;
 
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -131,7 +131,7 @@ public class KeYResourcesUtil {
    
    public static LinkedList<ProofElement> getUsedContractsProofElements(ProofElement pe, List<ProofElement> proofElements){
       LinkedList<ProofElement> usedContracts = new LinkedList<ProofElement>();
-      LinkedHashSet<IProofReference<?>> proofReferences = pe.getProofReferences();
+      HashSet<IProofReference<?>> proofReferences = pe.getProofReferences();
       if(proofReferences != null && !proofReferences.isEmpty()){
          for(IProofReference<?> proofRef : proofReferences){
             Object target = proofRef.getTarget();
@@ -265,5 +265,13 @@ public class KeYResourcesUtil {
             dest.add(t);
          }
       }
+   }
+   
+   public static <T> List<T> arrayToList(T[] array){
+      List<T> list = new LinkedList<T>();
+      for(T t : array){
+         list.add(t);
+      }
+      return list;
    }
 }

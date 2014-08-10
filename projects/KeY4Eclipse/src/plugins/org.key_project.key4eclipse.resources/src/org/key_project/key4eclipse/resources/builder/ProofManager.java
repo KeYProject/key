@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -31,8 +31,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
+import org.key_project.key4eclipse.resources.util.EditorSelection;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
@@ -40,6 +43,7 @@ import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.util.eclipse.ResourceUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -49,12 +53,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.proof.mgt.AxiomJustification;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.proof.mgt.RuleJustification;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -110,20 +108,20 @@ public class ProofManager {
    }
    
 
-
    /**
     * Runs the {@link Proof}s available in the {@link IProject} dependent on the ProofManageMentProperties.
     * @param changedJavaFiles - {@link LinkedList} with all changed java{@link IFile}s
     * @param monitor - the {@link IProgressMonitor}
     * @throws Exception
     */
-   public void runProofs(IProgressMonitor monitor) throws Exception{
+   public void runProofs(IProgressMonitor monitor, EditorSelection editorSelection) throws Exception{
       KeYProjectDelta keyDelta = KeYProjectDeltaManager.getInstance().getDelta(project);
       changedJavaFiles = keyDelta.getChangedJavaFiles();
       keyDelta.reset();
       markerManager.deleteKeYMarkerByType(project, IResource.DEPTH_ZERO, MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID);
       proofElements = getAllProofElements();
-      sortProofElements();
+      sortProofElements(editorSelection);
+      setOverdueMarker();
       //set up monitor
       monitor.beginTask("Build all proofs", proofElements.size());
       initThreads(monitor);
@@ -136,13 +134,87 @@ public class ProofManager {
    }
    
    
-   private void sortProofElements() {
-      for(int i = 1; i < proofElements.size(); i++){
-         ProofElement pe = proofElements.get(i);
-         if(pe.getOverdueProofMarker() != null){
-            proofElements.remove(i);
-            proofElements.add(0, pe);
+   private void sortProofElements(EditorSelection editorSelection) {
+      List<ProofElement> sortedProofs = new LinkedList<ProofElement>();
+      
+      List<ProofElement> activeEditorProofs = new LinkedList<ProofElement>();
+      if(editorSelection.getActiveEditor() != null){
+         ITextEditor activeEditor = editorSelection.getActiveEditor();
+         IFile file = ((IFileEditorInput) activeEditor.getEditorInput()).getFile();
+         for(ProofElement pe : proofElements){
+            if(pe.getJavaFile() != null && pe.getJavaFile().equals(file)){
+               activeEditorProofs.add(pe);
+            }
          }
+         sortedProofs.addAll(activeEditorProofs);
+      }
+      
+//      file = ((IFileEditorInput) activeEditor.getEditorInput()).getFile();
+//      IJavaElement javaElement = JavaCore.create(file);
+//      ITextSelection selection = (ITextSelection) editorSelection.getActiveSelection();
+//      if(javaElement instanceof ICompilationUnit){
+//         try{
+//            ICompilationUnit compUnit = (ICompilationUnit) javaElement;
+//            IJavaElement selected = compUnit.getElementAt(selection.getOffset());
+//            if(selected != null && selected.getElementType() == IJavaElement.METHOD){
+//               IMethod method = (IMethod) selected;
+//               ISourceRange range = method.getSourceRange();
+//               int offset = range.getOffset();
+//               int length = range.getLength();
+//               int end = offset+length;
+//
+//               for(ProofElement pe : activeEditorProofs){
+//                  SourceLocation scl = pe.getSourceLocation();
+//                  int startScl = scl.getCharStart();
+//                  int endScl = scl.getCharEnd();
+//               }
+//            }
+//         }
+//         catch(JavaModelException e){
+//            LogUtil.getLogger().logError(e);
+//         }
+//      }
+
+      List<ProofElement> openEditorProofs = new LinkedList<ProofElement>();
+      if(editorSelection.getOpenEditors() != null){
+         for(ITextEditor editor : editorSelection.getOpenEditors()){
+            IFile file = ((IFileEditorInput) editor.getEditorInput()).getFile();
+            for(ProofElement pe : proofElements){
+               if(pe.getJavaFile() != null && pe.getJavaFile().equals(file)){
+                  openEditorProofs.add(pe);
+               }
+            }
+         }
+         sortedProofs.addAll(openEditorProofs);
+      }
+
+      List<ProofElement> overdueProofs = new LinkedList<ProofElement>();
+      
+      for(ProofElement pe : proofElements){
+         if(pe.getOverdueProofMarker() != null && !activeEditorProofs.contains(pe) && !openEditorProofs.contains(pe)){
+            overdueProofs.add(pe);
+         }
+         sortedProofs.addAll(overdueProofs);
+      }
+      
+      List<ProofElement> otherProofs = new LinkedList<ProofElement>();
+      
+      for(ProofElement pe : proofElements){
+         if(!activeEditorProofs.contains(pe) && !openEditorProofs.contains(pe) && !overdueProofs.contains(pe)){
+            otherProofs.add(pe);
+         }
+         sortedProofs.addAll(otherProofs);
+      }
+      proofElements = sortedProofs;
+   }
+   
+   
+   private void setOverdueMarker(){
+      ProofOverdueChecker poc = new ProofOverdueChecker(project, proofElements, changedJavaFiles, environment);
+      List<ProofElement> overdueProofs = poc.getOverdueProofs();
+      
+      for(ProofElement pe : overdueProofs){
+         markerManager.setOverdueProofMarker(pe);
       }
    }
    
@@ -248,7 +320,7 @@ public class ProofManager {
          threads = new Thread[numOfThreads];
          for (int i = 0; i < numOfThreads; i++) {
 
-            ProofRunnable run = new ProofRunnable(project, changedJavaFiles, proofElements, proofsToDo, cloneEnvironment(), monitor);
+            ProofRunnable run = new ProofRunnable(project, proofElements, proofsToDo, cloneEnvironment(), monitor);
             Thread thread = new Thread(run);
             threads[i] = thread;
          }
@@ -257,7 +329,7 @@ public class ProofManager {
          }
       }
       else{
-         ProofRunnable run = new ProofRunnable(project, changedJavaFiles, proofElements,proofsToDo, environment, monitor);
+         ProofRunnable run = new ProofRunnable(project, proofElements,proofsToDo, environment, monitor);
          Thread thread = new Thread(run);
          threads = new Thread[1];
          threads[0] = thread;
@@ -289,31 +361,20 @@ public class ProofManager {
     * Clones the global {@link KeYEnvironment}.
     * @return the cloned {@link KeYEnvironment}
     */
-   private KeYEnvironment<CustomConsoleUserInterface> cloneEnvironment(){
+   private KeYEnvironment<CustomConsoleUserInterface> cloneEnvironment() {
       InitConfig sourceInitConfig = environment.getInitConfig();
       // Create new profile which has separate OneStepSimplifier instance
       JavaProfile profile = new JavaProfile();
       // Create new InitConfig and initialize it with value from initial one.
       InitConfig initConfig = new InitConfig(environment.getServices().copy(profile, false));
       initConfig.setActivatedChoices(sourceInitConfig.getActivatedChoices());
-      initConfig.setSettings(sourceInitConfig.getSettings());
+      ProofSettings clonedSettings = sourceInitConfig.getSettings() != null ? new ProofSettings(sourceInitConfig.getSettings()) : null;
+      initConfig.setSettings(clonedSettings);
       initConfig.setTaclet2Builder(sourceInitConfig.getTaclet2Builder());
       initConfig.setTaclets(sourceInitConfig.getTaclets());
       // Create new ProofEnvironment and initialize it with values from initial one.
-      ProofEnvironment env = initConfig.getProofEnv();
-      env.setJavaModel(sourceInitConfig.getProofEnv().getJavaModel());
-      env.setRuleConfig(sourceInitConfig.getProofEnv().getRuleConfig());
-      for (Taclet taclet : sourceInitConfig.activatedTaclets()) {
-         env.getJustifInfo().addJustification(taclet, sourceInitConfig.getProofEnv().getJustifInfo().getJustification(taclet));
-      }
-      for (BuiltInRule rule : initConfig.builtInRules()) {
-         RuleJustification origJusti = sourceInitConfig.getProofEnv().getJustifInfo().getJustification(rule);
-         if (origJusti == null) {
-            assert rule instanceof OneStepSimplifier;
-            origJusti = AxiomJustification.INSTANCE;
-         }
-         env.getJustifInfo().addJustification(rule, origJusti);
-      }
+//      initConfig.getServices().setJavaModel(sourceInitConfig.getServices().getJavaModel());
+      initConfig.getProofEnv().setJavaModel(sourceInitConfig.getProofEnv().getJavaModel());
       KeYEnvironment<CustomConsoleUserInterface> keyEnv = new KeYEnvironment<CustomConsoleUserInterface>(new CustomConsoleUserInterface(false), initConfig);
       return keyEnv;
    }
@@ -387,15 +448,15 @@ public class ProofManager {
    
    private void removeAllRecursiveMarker() throws CoreException{
       for(ProofElement pe : proofElements){
-         LinkedList<IMarker> peMarker = pe.getMarker();
-         LinkedList<IMarker> toBeRemoved = new LinkedList<IMarker>();
+         List<IMarker> peMarker = pe.getMarker();
+         List<IMarker> toBeRemoved = new LinkedList<IMarker>();
          for(IMarker marker : peMarker){
             if(marker != null && MarkerManager.RECURSIONMARKER_ID.equals(marker.getType())){
                toBeRemoved.add(marker);
             }
          }
          while(!toBeRemoved.isEmpty()){
-            IMarker marker = toBeRemoved.removeFirst();
+            IMarker marker = toBeRemoved.remove(0);
             pe.removeMarker(marker);
             marker.delete();
          }

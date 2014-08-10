@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -22,6 +22,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
+import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.util.java.StringUtil;
 
@@ -44,8 +45,8 @@ public class MarkerManager {
     * @throws CoreException
     */
    public void setMarker(ProofElement pe) throws CoreException {
-      LinkedList<IMarker> oldMarker = pe.getMarker();
-      LinkedList<IMarker> toBeRemoved = new LinkedList<IMarker>();
+      List<IMarker> oldMarker = pe.getMarker();
+      List<IMarker> toBeRemoved = new LinkedList<IMarker>();
       for(IMarker marker : oldMarker){
          if(marker != null){
             toBeRemoved.add(marker);
@@ -92,8 +93,8 @@ public class MarkerManager {
     */
    public void setRecursionMarker(List<ProofElement> cycle) throws CoreException{
       ProofElement pe = cycle.get(0);
-      LinkedList<IMarker> oldMarker = pe.getMarker();
-      LinkedList<IMarker> toBeRemoved = new LinkedList<IMarker>();
+      List<IMarker> oldMarker = pe.getMarker();
+      List<IMarker> toBeRemoved = new LinkedList<IMarker>();
       for(IMarker marker : oldMarker){
          if(marker != null && !RECURSIONMARKER_ID.equals(marker.getType()) && !OVERDUEPROOFMARKER_ID.equals(marker.getType())){
             toBeRemoved.add(marker);
@@ -114,24 +115,29 @@ public class MarkerManager {
    }
    
    
-   public void setOverdueProofMarker(ProofElement pe) throws CoreException{
+   public void setOverdueProofMarker(ProofElement pe){
       IMarker overdueProofMarker = pe.getOverdueProofMarker();
-      if(overdueProofMarker != null){
-         overdueProofMarker.delete();
-      }
-      SourceLocation scl = pe.getSourceLocation();
-      if(scl != null){
-         IMarker marker = pe.getJavaFile().createMarker(OVERDUEPROOFMARKER_ID);
-         if (marker.exists()) {
-            marker.setAttribute(IMarker.MESSAGE, "Overdue proof");
-            marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
-            marker.setAttribute(IMarker.LINE_NUMBER, scl.getLineNumber()); // Required for compatibility with other tools like FeatureIDE even if char start and end is defined.
-            marker.setAttribute(IMarker.LOCATION, "line " + scl.getLineNumber()); // Otherwise value "Unknown" is shown in Problems-View
-            marker.setAttribute(IMarker.CHAR_START, scl.getCharStart());
-            marker.setAttribute(IMarker.CHAR_END, scl.getCharEnd());
-            marker.setAttribute(IMarker.SOURCE_ID, pe.getProofFile().getFullPath().toString());
-            pe.setOverdueProofMarker(marker);
+      try{
+         if(overdueProofMarker != null){
+            overdueProofMarker.delete();
          }
+         SourceLocation scl = pe.getSourceLocation();
+         if(scl != null){
+            IMarker marker = pe.getJavaFile().createMarker(OVERDUEPROOFMARKER_ID);
+            if (marker.exists()) {
+               marker.setAttribute(IMarker.MESSAGE, "Overdue proof");
+               marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+               marker.setAttribute(IMarker.LINE_NUMBER, scl.getLineNumber()); // Required for compatibility with other tools like FeatureIDE even if char start and end is defined.
+               marker.setAttribute(IMarker.LOCATION, "line " + scl.getLineNumber()); // Otherwise value "Unknown" is shown in Problems-View
+               marker.setAttribute(IMarker.CHAR_START, scl.getCharStart());
+               marker.setAttribute(IMarker.CHAR_END, scl.getCharEnd());
+               marker.setAttribute(IMarker.SOURCE_ID, pe.getProofFile().getFullPath().toString());
+               pe.setOverdueProofMarker(marker);
+            }
+         }
+      }
+      catch(CoreException e){
+         LogUtil.getLogger().logError(e);
       }
    }
    
@@ -151,9 +157,9 @@ public class MarkerManager {
       return sb.toString();
    }
    
-   private void removeMarker(LinkedList<IMarker> toBeRemoved, ProofElement pe) throws CoreException{
+   private void removeMarker(List<IMarker> toBeRemoved, ProofElement pe) throws CoreException{
       while(!toBeRemoved.isEmpty()){
-         IMarker marker = toBeRemoved.getFirst();
+         IMarker marker = toBeRemoved.get(0);
          if(marker != null){
             pe.removeMarker(marker);
             marker.delete();
@@ -222,10 +228,12 @@ public class MarkerManager {
       LinkedList<IMarker> newMarkerList = new LinkedList<IMarker>();
       LinkedList<IMarker> markerList = getKeYMarkerByType(res, IResource.DEPTH_ZERO, types);
       for(IMarker marker : markerList){
-         Integer startChar = (Integer) marker.getAttribute(IMarker.CHAR_START);
-         Integer endChar = (Integer) marker.getAttribute(IMarker.CHAR_END);
-         if(scl.getCharStart() == startChar && scl.getCharEnd() == endChar){
-            newMarkerList.add(marker);
+         if(marker != null && marker.exists()){
+            Integer startChar = (Integer) marker.getAttribute(IMarker.CHAR_START);
+            Integer endChar = (Integer) marker.getAttribute(IMarker.CHAR_END);
+            if(scl.getCharStart() == startChar && scl.getCharEnd() == endChar){
+               newMarkerList.add(marker);
+            }
          }
       }
       return newMarkerList;

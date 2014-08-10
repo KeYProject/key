@@ -4,9 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -18,27 +16,16 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragment;
-import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileException;
-import org.key_project.key4eclipse.resources.io.ProofMetaFileReader;
-import org.key_project.key4eclipse.resources.io.ProofMetaFileTypeElement;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileWriter;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
-import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 
 import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.SingleProof;
@@ -58,17 +45,15 @@ import de.uka.ilkd.key.util.ProofStarter;
 public class ProofRunnable implements Runnable {
    
    private IProject project;
-   private List<IFile> changedJavaFiles;
    private List<ProofElement> proofElements;
    private List<ProofElement> proofsToDo;
    private final KeYEnvironment<CustomConsoleUserInterface> environment;
    private MarkerManager markerManager;
    private final IProgressMonitor monitor;
    
-   public ProofRunnable(IProject project, List<IFile> changedJavaFiles, List<ProofElement> proofElements, List<ProofElement> proofsToDo, KeYEnvironment<CustomConsoleUserInterface> environment, IProgressMonitor monitor){
+   public ProofRunnable(IProject project, List<ProofElement> proofElements, List<ProofElement> proofsToDo, KeYEnvironment<CustomConsoleUserInterface> environment, IProgressMonitor monitor){
       this.project = project;
       this.proofsToDo = proofsToDo;
-      this.changedJavaFiles = changedJavaFiles;
       this.proofElements = proofElements;
       this.proofsToDo = proofsToDo;
       this.environment = environment;
@@ -81,56 +66,28 @@ public class ProofRunnable implements Runnable {
       try{
          ProofElement pe;
          while ((pe = getProofToDo()) != null) {
-            pe.setKeYEnvironment(environment);
-            pe.setProofObl(pe.getContract().createProofObl(environment.getInitConfig(), pe.getContract()));
-            
-            monitor.subTask("Building " + pe.getProofObl().name());
-            
-            boolean processProof = false;
-            
-            if(!KeYProjectProperties.isEnableBuildRequiredProofsOnly(project)){
-               processProof = true;
+            monitor.subTask("Building " + pe.getContract().getName());
+         
+            if(monitor.isCanceled()){
+               monitor.worked(1);
             }
-            else{
-               IFile metaFile = pe.getMetaFile();
-               if(pe.getMarker().isEmpty() || pe.getOverdueProofMarker() != null){
-                  processProof = true;
-               }
-               else if(metaFile.exists()){
-                  ProofMetaFileReader pmfr = new ProofMetaFileReader(metaFile);
-                  LinkedList<IType> javaTypes = collectAllJavaITypes();
-                  if(MD5changed(pe.getProofFile(), pmfr) || typeOrSubTypeChanged(pe, pmfr, javaTypes) || superTypeChanged(pe, javaTypes)){
-                     processProof = true;
-                  }
-                  else{
-                     pe.setProofClosed(pmfr.getProofClosed());
-                     pe.setMarkerMsg(pmfr.getMarkerMessage());
-                     pe.setUsedContracts(KeYResourcesUtil.getProofElementsByProofFiles(pmfr.getUsedContracts(), proofElements));
-                  }
-               }
-               else{
-                  processProof = true;
-               }
-            }
+            else if(pe.getOverdueProofMarker() != null){
             
-            if(processProof){
-               if(monitor.isCanceled()){
-                  markerManager.setOverdueProofMarker(pe);
-               }
-               else {
-                  long proofStart = System.currentTimeMillis();
-                  Proof proof = processProof(pe);
-                  long proofDuration = System.currentTimeMillis()-proofStart;
-                  if(proof != null){
-                     pe.setProofClosed(proof.closed());
-                     pe.setProofReferences(ProofReferenceUtil.computeProofReferences(proof));
-                     pe.setUsedContracts(KeYResourcesUtil.getUsedContractsProofElements(pe, proofElements));
-                     pe.setMarkerMsg(generateProofMarkerMessage(pe, proof, proofDuration));
-                     markerManager.setMarker(pe);
-                     markerManager.deleteOverdueProofMarker(pe);
-                     save(proof,pe);
-                     proof.dispose();
-                  }
+               pe.setKeYEnvironment(environment);
+               pe.setProofObl(pe.getContract().createProofObl(environment.getInitConfig(), pe.getContract()));
+
+               long proofStart = System.currentTimeMillis();
+               Proof proof = processProof(pe);
+               long proofDuration = System.currentTimeMillis()-proofStart;
+               if(proof != null){
+                  pe.setProofClosed(proof.closed());
+                  pe.setProofReferences(ProofReferenceUtil.computeProofReferences(proof));
+                  pe.setUsedContracts(KeYResourcesUtil.getUsedContractsProofElements(pe, proofElements));
+                  pe.setMarkerMsg(generateProofMarkerMessage(pe, proof, proofDuration));
+                  markerManager.setMarker(pe);
+                  save(proof,pe);
+                  markerManager.deleteOverdueProofMarker(pe);
+                  proof.dispose();
                }
             }
             monitor.worked(1);
@@ -151,194 +108,6 @@ public class ProofRunnable implements Runnable {
       return pe;
    }
    
-   /**
-    * Collects all {@link IType}s of the project.
-    * @return a {@link LinkedList} with all {@link IType}s
-    * @throws JavaModelException
-    */
-   private LinkedList<IType> collectAllJavaITypes() throws JavaModelException{
-      LinkedList<IType> typeList = new LinkedList<IType>();
-      IJavaProject javaProject = JavaCore.create(project);
-      IPackageFragment[] packageFragments = javaProject.getPackageFragments();
-      for(IPackageFragment packageFragment : packageFragments){
-         ICompilationUnit[] units = packageFragment.getCompilationUnits();
-         for(ICompilationUnit unit : units){
-            IType[] types = unit.getTypes();
-            for(IType type : types){
-               typeList.add(type);
-               typeList.addAll(collectAllJavaITypesForIType(type));
-            }
-         }
-      }
-      return typeList;
-   }
-   
-   /**
-    * Collects all {@link IType}s of the gien {@link IType}.
-    * @param type - the {@link IType} to use
-    * @return all {@link IType}s of the given {@link IType}
-    * @throws JavaModelException
-    */
-   private LinkedList<IType> collectAllJavaITypesForIType(IType type) throws JavaModelException{
-      LinkedList<IType> types = new LinkedList<IType>();
-      IType[] subTypes = type.getTypes();
-      for(IType subType : subTypes){
-         types.add(subType);
-         types.addAll(collectAllJavaITypesForIType(subType));
-      }
-      return types;
-   }
-   
-   /**
-    * Checks if the MD5 of the proof{@link IFile} is different to the MD5 stored in the metafile.
-    * @param proofFile - the proof{@link IFile} to use
-    * @param pmfr - the {@link ProofMetaFileReader} to use
-    * @return false if both MD5s are equal. true otherwise
-    * @throws CoreException 
-    * @throws IOException 
-    */
-   private boolean MD5changed(IFile proofFile, ProofMetaFileReader pmfr) throws IOException, CoreException{
-      if(proofFile.exists()){
-         String metaFilesProofMD5 = pmfr.getProofFileMD5();
-         String proofFileHasCode = ResourceUtil.computeContentMD5(proofFile);
-         if(metaFilesProofMD5.equals(proofFileHasCode)){
-            return false;
-         }
-         else{
-            return true;
-         }
-      }
-      else{
-         return true;
-      }
-   }
-   
-   /**
-    * Checks if a type or a subtype from the metafile were changed.  
-    * @param pmfr - the {@link ProofMetaFileReader} to use
-    * @param javaTypes the {@link LinkedList} with all changed java{@link IFile}s
-    * @return true if a type or a subtype was changed. false otherwise
-    * @throws JavaModelException
-    */
-   private boolean typeOrSubTypeChanged(ProofElement pe, ProofMetaFileReader pmfr, LinkedList<IType> javaTypes) throws JavaModelException{
-      LinkedList<ProofMetaFileTypeElement> typeElements = pmfr.getTypeElements();
-      for(ProofMetaFileTypeElement te : typeElements){
-         if(typeChanged(te.getType(), javaTypes)){
-            return true;
-         }
-         else if(subTypeChanged(pe, te, javaTypes)){
-            return true;
-         }
-      }
-      return false;
-   }
-   
-   /**
-    * Checks if the given type was changed.
-    * @param type - the type to check
-    * @param javaTypes - all {@link IType}s of the project
-    * @return true if the type was changed. false otherwise
-    * @throws JavaModelException
-    */
-   private boolean typeChanged(String type, LinkedList<IType> javaTypes) throws JavaModelException{
-      IFile javaFile = getJavaFileForType(type, javaTypes);
-      //check if type has changed itself
-      if(changedJavaFiles.contains(javaFile)){
-         return true;
-      }
-      else {
-         return false;
-      }
-   }
-   
-   /**
-    * Chacks if any subTypes of the given {@link ProofMetaFileTypeElement} were changed.
-    * @param te - the {@link ProofMetaFileTypeElement} to use
-    * @param javaTypes - all {@link IType}s of the project
-    * @return true if any subTypes were changed. false otherwise
-    * @throws JavaModelException
-    */
-   private boolean subTypeChanged(ProofElement pe, ProofMetaFileTypeElement te, LinkedList<IType> javaTypes) throws JavaModelException{
-      String type = te.getType();
-      KeYJavaType kjt = getkeYJavaType(pe.getKeYEnvironment(), type);
-//    ImmutableList<KeYJavaType> envSubKjts = environment.getJavaInfo().getAllSubtypes(kjt);
-    ImmutableList<KeYJavaType> envSubKjts = pe.getKeYEnvironment().getJavaInfo().getAllSubtypes(kjt);
-      
-      LinkedList<String> subTypes = te.getSubTypes();
-      
-      if(envSubKjts.size() != subTypes.size()){
-         return true;
-      }
-      else {
-         for(String subType : subTypes){
-            if(typeChanged(subType, javaTypes)){
-               return true;
-            }
-         }
-      }
-      return false;
-   }
-   
-   /**
-    * Checks if any superTypes of the given {@link KeYJavaType} were changed.
-    * @param kjt - the {@link KeYJavaType} to use
-    * @param changedJavaFiles - all changed java{@link IFile}s
-    * @param javaTypes - all {@link IType}s of the project
-    * @return true if any superTypes were changed. false otherwise
-    * @throws JavaModelException
-    */
-   private boolean superTypeChanged(ProofElement pe, LinkedList<IType> javaTypes) throws JavaModelException{
-      KeYJavaType kjt = pe.getContract().getKJT();
-      KeYJavaType envKjt = getkeYJavaType(pe.getKeYEnvironment(), kjt.getFullName());
-      if(envKjt != null){
-         ImmutableList<KeYJavaType> envSuperKjts = pe.getKeYEnvironment().getJavaInfo().getAllSupertypes(envKjt);
-         for(KeYJavaType envSuperKjt : envSuperKjts){
-            IFile javaFile = getJavaFileForType(envSuperKjt.getFullName(), javaTypes);
-            if(changedJavaFiles.contains(javaFile)){
-               return true;
-            }
-         }
-         return false;
-      }
-      else{
-         return true;
-      }
-   }
-   
-   /**
-    * Returns the java{@link IFile} for the given metaType.
-    * @param metaType - the given type
-    * @param typeList - all {@link IType}s of the project
-    * @return the java{@link IFile} for the given type
-    * @throws JavaModelException
-    */
-   private IFile getJavaFileForType(String metaType, LinkedList<IType> typeList) throws JavaModelException{
-      for(IType iType : typeList){
-         String typeName = iType.getFullyQualifiedName('.');
-         if(typeName.equalsIgnoreCase(metaType)){
-            IPath filePath = iType.getResource().getFullPath();
-            IFile javaFile = ResourcesPlugin.getWorkspace().getRoot().getFile(filePath);
-            return javaFile;
-         }
-      }
-      
-      return null;
-   }
-   
-   /**
-    * Returns the {@link KeYJavaType} for the given fullName.
-    * @param type - the types full name
-    * @return the {@link KeYJavaType}
-    */
-   private KeYJavaType getkeYJavaType(KeYEnvironment<CustomConsoleUserInterface> env, String type){
-      Set<KeYJavaType> envKjts = env.getServices().getJavaInfo().getAllKeYJavaTypes();
-      for(KeYJavaType kjt : envKjts){
-         if(type.equals(kjt.getFullName())){
-            return kjt;
-         }
-      }
-      return null;
-   }
    
    /**
     * If the {@link ProofElement}s proof{@link IFile} exists the {@link Proof} stored in this {@link IFile} will be loaded. When the {@link Proof} is 
@@ -359,7 +128,6 @@ public class ProofRunnable implements Runnable {
             proof = createProof(pe);
          }
       }
-//      proof = createProof(pe);
       return proof;
    }
    
