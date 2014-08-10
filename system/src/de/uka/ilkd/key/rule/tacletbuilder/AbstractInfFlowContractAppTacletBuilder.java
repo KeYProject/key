@@ -9,8 +9,10 @@
 //
 package de.uka.ilkd.key.rule.tacletbuilder;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -35,6 +37,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
     private Term[] contextUpdates;
     private ProofObligationVars poVars;
+    private static ImmutableSet<Name> alreadyRegistered = DefaultImmutableSet.<Name>nil();
 
     public AbstractInfFlowContractAppTacletBuilder(final Services services) {
         super(services);
@@ -67,6 +70,16 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
 
     abstract Name generateName();
+
+    private static Name checkName(Name name) {
+        final String s = name.toString();
+        int i = 0;
+        while (alreadyRegistered.contains(name)) {
+            name = new Name(s + "_" + i++);
+        }
+        alreadyRegistered = alreadyRegistered.add(name);
+        return name;
+    }
 
 
     abstract Term generateSchemaAssumes(ProofObligationVars schemaDataAssumes,
@@ -155,7 +168,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
     private Taclet genInfFlowContractApplTaclet(ProofObligationVars appData,
                                                 Services services) {
-        Name tacletName = generateName();
+        Name tacletName = checkName(generateName());
 
         // generate schemaFind and schemaAssumes terms
         ProofObligationVars schemaDataFind = generateApplicationDataSVs(
