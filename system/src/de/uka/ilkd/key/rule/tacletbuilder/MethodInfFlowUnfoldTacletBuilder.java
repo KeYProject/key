@@ -35,8 +35,7 @@ public class MethodInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTacle
 
     @Override
     Name getTacletName() {
-        return MiscTools.toValidTacletName("unfold computed formula " +
-                                           unfoldCounter + " of " +
+        return MiscTools.toValidTacletName(UNFOLD + unfoldCounter + " of " +
                                            contract.getTarget().getUniqueName());
     }
 

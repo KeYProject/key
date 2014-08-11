@@ -48,8 +48,7 @@ public class LoopInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTacletB
 
     @Override
     Name getTacletName() {
-        return MiscTools.toValidTacletName("unfold computed formula " +
-                                           unfoldCounter + " of " +
+        return MiscTools.toValidTacletName(UNFOLD + unfoldCounter + " of " +
                                            loopInv.getUniqueName());
     }
 

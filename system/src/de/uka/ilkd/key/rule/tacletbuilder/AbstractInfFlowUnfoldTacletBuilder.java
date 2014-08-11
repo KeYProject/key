@@ -34,6 +34,7 @@ import java.util.Map;
 abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletBuilder {
 
     private static final String SCHEMA_PREFIX = "sv_";
+    static final String UNFOLD = "unfold computed formula ";
 
     /** Counter to allow several side-proofs. */
     static int unfoldCounter = 0;

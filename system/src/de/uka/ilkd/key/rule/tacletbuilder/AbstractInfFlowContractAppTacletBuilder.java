@@ -9,10 +9,8 @@
 //
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -24,7 +22,9 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApplPart;
+
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 
@@ -37,7 +37,8 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
     private Term[] contextUpdates;
     private ProofObligationVars poVars;
-    private static ImmutableSet<Name> alreadyRegistered = DefaultImmutableSet.<Name>nil();
+    private static final Map<Name, Taclet> alreadyRegistered = new LinkedHashMap<Name, Taclet>();
+    static final String USE_IF = "Use information flow contract for ";
 
     public AbstractInfFlowContractAppTacletBuilder(final Services services) {
         super(services);
@@ -70,17 +71,6 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
 
     abstract Name generateName();
-
-    private static Name checkName(Name name) {
-        final String s = name.toString();
-        int i = 0;
-        while (alreadyRegistered.contains(name)) {
-            name = new Name(s + "_" + i++);
-        }
-        alreadyRegistered = alreadyRegistered.add(name);
-        return name;
-    }
-
 
     abstract Term generateSchemaAssumes(ProofObligationVars schemaDataAssumes,
                                         Services services);
@@ -168,52 +158,55 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
     private Taclet genInfFlowContractApplTaclet(ProofObligationVars appData,
                                                 Services services) {
-        Name tacletName = checkName(generateName());
+        final Name tacletName = generateName();
+        Taclet taclet = alreadyRegistered.get(tacletName);
+        if (taclet == null) {
+            // generate schemaFind and schemaAssumes terms
+            ProofObligationVars schemaDataFind =
+                    generateApplicationDataSVs("find_", appData, services);
+            Term schemaFind = generateSchemaFind(schemaDataFind, services);
+            ProofObligationVars schemaDataAssumes =
+                    generateApplicationDataSVs("assumes_", appData, services);
+            Term schemaAssumes = generateSchemaAssumes(schemaDataAssumes, services);
 
-        // generate schemaFind and schemaAssumes terms
-        ProofObligationVars schemaDataFind = generateApplicationDataSVs(
-                "find_", appData, services);
-        Term schemaFind = generateSchemaFind(schemaDataFind, services);
-        ProofObligationVars schemaDataAssumes = generateApplicationDataSVs(
-                "assumes_", appData, services);
-        Term schemaAssumes = generateSchemaAssumes(schemaDataAssumes, services);
+            // generate post term
+            Term replaceWithTerm =
+                    buildContractApplications(schemaDataFind,
+                                              schemaDataAssumes, services);
 
-        // generate post term
-        Term replaceWithTerm =
-                buildContractApplications(schemaDataFind,
-                                          schemaDataAssumes, services);
+            // collect quantifiable variables of the post term and replace them
+            // by schema variables
+            Map<QuantifiableVariable, SchemaVariable> quantifiableVarsToSchemaVars =
+                    collectQuantifiableVariables(replaceWithTerm, services);
+            final OpReplacer or = new OpReplacer(quantifiableVarsToSchemaVars,
+                                                 services.getTermFactory());
+            replaceWithTerm = or.replace(replaceWithTerm);
 
-        // collect quantifiable variables of the post term and replace them
-        // by schema variables
-        Map<QuantifiableVariable, SchemaVariable> quantifiableVarsToSchemaVars =
-                collectQuantifiableVariables(replaceWithTerm, services);
-	final OpReplacer or = new OpReplacer(quantifiableVarsToSchemaVars,
-	                                     services.getTermFactory());
-	replaceWithTerm = or.replace(replaceWithTerm);
+            //create sequents
+            Sequent assumesSeq = Sequent.createAnteSequent(
+                    new Semisequent(new SequentFormula(schemaAssumes)));
+            Sequent replaceWithSeq = Sequent.createAnteSequent(
+                    new Semisequent(new SequentFormula(replaceWithTerm)));
 
-        //create sequents
-        Sequent assumesSeq = Sequent.createAnteSequent(
-                new Semisequent(new SequentFormula(schemaAssumes)));
-        Sequent replaceWithSeq = Sequent.createAnteSequent(
-                new Semisequent(new SequentFormula(replaceWithTerm)));
-
-        //create taclet
-        InfFlowContractAppRewriteTacletBuilder tacletBuilder =
-                new InfFlowContractAppRewriteTacletBuilder();
-        tacletBuilder.setName(tacletName);
-        tacletBuilder.setFind(schemaFind);
-        tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);
-        tacletBuilder.setIfSequent(assumesSeq);
-        RewriteTacletGoalTemplate goalTemplate =
-                new RewriteTacletGoalTemplate(replaceWithSeq,
-                                              ImmutableSLList.<Taclet>nil(),
-                                              schemaFind);
-        tacletBuilder.addTacletGoalTemplate(goalTemplate);
-        tacletBuilder.addRuleSet(new RuleSet(new Name("information_flow_contract_appl")));
-        tacletBuilder.setSurviveSmbExec(true);
-        addVarconds(tacletBuilder, quantifiableVarsToSchemaVars.values());
-
-        return tacletBuilder.getTaclet();
+            //create taclet
+            InfFlowContractAppRewriteTacletBuilder tacletBuilder =
+                    new InfFlowContractAppRewriteTacletBuilder();
+            tacletBuilder.setName(tacletName);
+            tacletBuilder.setFind(schemaFind);
+            tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);
+            tacletBuilder.setIfSequent(assumesSeq);
+            RewriteTacletGoalTemplate goalTemplate =
+                    new RewriteTacletGoalTemplate(replaceWithSeq,
+                                                  ImmutableSLList.<Taclet>nil(),
+                                                  schemaFind);
+            tacletBuilder.addTacletGoalTemplate(goalTemplate);
+            tacletBuilder.addRuleSet(new RuleSet(new Name("information_flow_contract_appl")));
+            tacletBuilder.setSurviveSmbExec(true);
+            addVarconds(tacletBuilder, quantifiableVarsToSchemaVars.values());
+            taclet = tacletBuilder.getTaclet();
+            alreadyRegistered.put(tacletName, taclet);
+        }
+        return taclet;
     }
 
 
@@ -223,7 +216,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
 
     /**
-     * A Normal RewriteTacletBuilder except that an InfFlowContractAppTaclet is
+     * A normal RewriteTacletBuilder except that an InfFlowContractAppTaclet is
      * returned instead of a normal RewriteTaclet.  InfFlowContractAppTaclet's
      * are normal RewriteTaclet's except that the formula which is added by the
      * taclets are also added to the list of formulas contained in the

@@ -51,8 +51,7 @@ public final class InfFlowBlockContractTacletBuilder
 
     @Override
     Name generateName() {
-        return MiscTools.toValidTacletName("Use information flow contract for " +
-                                           blockContract.getUniqueName());
+        return MiscTools.toValidTacletName(USE_IF + blockContract.getUniqueName());
     }
 
     @Override
