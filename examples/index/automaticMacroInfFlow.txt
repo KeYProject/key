@@ -41,7 +41,7 @@ notprovable: ./information_flow/collection/contract.IFBlockExamples(contract.IFB
 provable: ./information_flow/collection/contract.IFBlockExamples(contract.IFBlockExamples__while_block_secure(int)).Non-interference contract.0.key
 provable: ./information_flow/collection/contract.IFBlockExamples(contract.IFBlockExamples__block_while_secure(int)).Non-interference contract.0.key
 notprovable: ./information_flow/collection/contract.IFBlockExamples(contract.IFBlockExamples__insecure_4(int)).Non-interference contract.0.key
-#notprovable: ./information_flow/collection/contract.IFBlockExamples(contract.IFBlockExamples__insecure_3(int)).Non-interference contract.0.key
+notprovable: ./information_flow/collection/contract.IFBlockExamples(contract.IFBlockExamples__insecure_3(int)).Non-interference contract.0.key
 provable: ./information_flow/collection/contract.IFBlockExamples(contract.IFBlockExamples__secure_3(int)).Non-interference contract.0.key
 provable: ./information_flow/collection/contract.IFBlockExamples(contract.IFBlockExamples__secure_2(int)).Non-interference contract.0.key
 provable: ./information_flow/collection/contract.IFBlockExamples(contract.IFBlockExamples__secure_8(int)).Non-interference contract.0.key
@@ -149,6 +149,7 @@ provable: ./information_flow/collection/simple_evoting.SMT(simple_evoting.SMT__s
 provable: ./information_flow/collection/simple_evoting.SMT(simple_evoting.SMT__send(simple_evoting.Message,int,simple_evoting.Server)).Non-interference contract.0.key
 provable: ./information_flow/collection/simple_evoting.SMTEnv(simple_evoting.SMTEnv__send(int,int,int,simple_evoting.Server,int)).Non-interference contract.0.key
 provable: ./information_flow/collection/simple_evoting.NetworkClient(simple_evoting.NetworkClient__send((B,simple_evoting.Server,int)).Non-interference contract.0.key
+# Following two contracts throw a TacletBuilderException (Bound SchemaVariable variables occurs both in assumes and find clauses.)
 #provable: ./information_flow/collection/simple_evoting.Setup(simple_evoting.Setup__publishResult()).Non-interference contract.0.key
 #provable: ./information_flow/collection/simple_evoting.Setup(simple_evoting.Setup__main()).Non-interference contract.0.key
 provable: ./information_flow/collection/simple_evoting.Voter(simple_evoting.Voter__onSendBallot(simple_evoting.Server)).Non-interference contract.1.key
