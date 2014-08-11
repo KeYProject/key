@@ -373,26 +373,23 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             ImmutableList<InfFlowSpec>> newInfFlowSpecs
             = new LinkedHashMap<LocationVariable,
                                 ImmutableList<InfFlowSpec>>();
-        //LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
 
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            if (inv.getInfFlowSpecs(heap) != null) {
-                final Term m =
-                        replaceVariablesInTerm(inv.getModifies(heap, selfTerm,
-                                                               atPres,
-                                                               services));
-                newMods.put(heap, m);
-                final ImmutableList<InfFlowSpec> infFlowSpecs =
-                        replaceVariablesInTermListTriples(inv.getInfFlowSpecs(heap, selfTerm,
-                                                                              atPres,
-                                                                              services));
-                newInfFlowSpecs.put(heap, infFlowSpecs);
-                final Term i =
-                        replaceVariablesInTerm(inv.getInvariant(heap, selfTerm,
-                                                                atPres,
-                                                                services));
-                newInvariants.put(heap, i);
-            }
+            final Term m =
+                    replaceVariablesInTerm(inv.getModifies(heap, selfTerm,
+                                                           atPres,
+                                                           services));
+            newMods.put(heap, m);
+            final ImmutableList<InfFlowSpec> infFlowSpecs =
+                    replaceVariablesInTermListTriples(inv.getInfFlowSpecs(heap, selfTerm,
+                                                                          atPres,
+                                                                          services));
+            newInfFlowSpecs.put(heap, infFlowSpecs);
+            final Term i =
+                    replaceVariablesInTerm(inv.getInvariant(heap, selfTerm,
+                                                            atPres,
+                                                            services));
+            newInvariants.put(heap, i);
         }
 
         //variant

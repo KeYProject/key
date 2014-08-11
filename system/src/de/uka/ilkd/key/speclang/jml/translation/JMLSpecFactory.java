@@ -1404,15 +1404,17 @@ public class JMLSpecFactory {
         ImmutableList<ProgramVariable> localVars =
                 collectLocalVariables(pm.getBody(), loop);
         paramVars = paramVars.append(localVars);
+        final ImmutableList<LocationVariable> allHeaps =
+                services.getTypeConverter().getHeapLDT().getAllHeaps();
 
         Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable,Term>();
-        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        for(LocationVariable heap : allHeaps) {
           atPres.put(heap, TB.var(TB.heapAtPreVar(heap+"AtPre", heap.sort(), false)));
         }
 
         //translateToTerm invariant
         Map<LocationVariable,Term> invariants = new LinkedHashMap<LocationVariable,Term>();
-        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        for(LocationVariable heap : allHeaps) {
           Term invariant;
           ImmutableList<PositionedString> originalInvariant =
                   originalInvariants.get(heap.name().toString());
@@ -1456,19 +1458,22 @@ public class JMLSpecFactory {
            mods.put(heap, a);
         }
 
-        ImmutableList<InfFlowSpec>
-                infFlowSpecTermList = ImmutableSLList.<InfFlowSpec>nil();
-        LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
-        if(!originalInfFlowSpecs.isEmpty()) {
-            infFlowSpecTermList = translateInfFlowSpecClauses(pm, selfVar, paramVars,
-                                                           resultVar, originalInfFlowSpecs);
-        }
-
+        //translateToTerm infFlowSpecs
         Map<LocationVariable,
-            ImmutableList<InfFlowSpec>>
-                infFlowSpecs = new LinkedHashMap<LocationVariable,
-                                             ImmutableList<InfFlowSpec>>();
-        infFlowSpecs.put(baseHeap, infFlowSpecTermList);
+        ImmutableList<InfFlowSpec>>
+            infFlowSpecs = new LinkedHashMap<LocationVariable,
+                                         ImmutableList<InfFlowSpec>>();
+        ImmutableList<InfFlowSpec> infFlowSpecTermList;
+        final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+        for(LocationVariable heap : allHeaps) {
+            if (!originalInfFlowSpecs.isEmpty() && heap.equals(baseHeap)) {
+                infFlowSpecTermList = translateInfFlowSpecClauses(pm, selfVar, paramVars,
+                                                                  resultVar, originalInfFlowSpecs);
+            } else {
+                infFlowSpecTermList = ImmutableSLList.<InfFlowSpec>nil();
+            }
+            infFlowSpecs.put(heap, infFlowSpecTermList);
+        }
 
         //translateToTerm variant
         Term variant;

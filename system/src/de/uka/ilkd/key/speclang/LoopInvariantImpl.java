@@ -231,9 +231,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
     @Override
     public ImmutableList<InfFlowSpec> getInfFlowSpecs(LocationVariable heap) {
-        ImmutableList<InfFlowSpec> infFlowSpecs = ImmutableSLList.<InfFlowSpec>nil();
-        // apparently infFlowSpecs can be null
-        return infFlowSpecs.append(originalInfFlowSpecs.get(heap));
+        return originalInfFlowSpecs.get(heap);
     }
 
     @Override
