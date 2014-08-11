@@ -9,8 +9,10 @@
 //
 package de.uka.ilkd.key.rule.tacletbuilder;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -24,7 +26,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApplPart;
 
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 
@@ -37,8 +38,9 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
     private Term[] contextUpdates;
     private ProofObligationVars poVars;
-    private static final Map<Name, Taclet> alreadyRegistered = new LinkedHashMap<Name, Taclet>();
+    private static ImmutableSet<Name> alreadyRegistered = DefaultImmutableSet.<Name>nil();
     static final String USE_IF = "Use information flow contract for ";
+    private static final String IF_CONTRACT_APPLICATION = "information_flow_contract_appl";
 
     public AbstractInfFlowContractAppTacletBuilder(final Services services) {
         super(services);
@@ -71,6 +73,16 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
 
     abstract Name generateName();
+
+    private static Name checkName(Name name) {
+        int i = 0;
+        final String s = name.toString();
+        while (alreadyRegistered.contains(name)) {
+            name = new Name(s + "_" + i++);
+        }
+        alreadyRegistered = alreadyRegistered.add(name);
+        return name;
+    }
 
     abstract Term generateSchemaAssumes(ProofObligationVars schemaDataAssumes,
                                         Services services);
@@ -158,9 +170,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
     private Taclet genInfFlowContractApplTaclet(ProofObligationVars appData,
                                                 Services services) {
-        final Name tacletName = generateName();
-        Taclet taclet = alreadyRegistered.get(tacletName);
-        if (taclet == null) {
+        Name tacletName = checkName(generateName());
             // generate schemaFind and schemaAssumes terms
             ProofObligationVars schemaDataFind =
                     generateApplicationDataSVs("find_", appData, services);
@@ -200,13 +210,10 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
                                                   ImmutableSLList.<Taclet>nil(),
                                                   schemaFind);
             tacletBuilder.addTacletGoalTemplate(goalTemplate);
-            tacletBuilder.addRuleSet(new RuleSet(new Name("information_flow_contract_appl")));
+            tacletBuilder.addRuleSet(new RuleSet(new Name(IF_CONTRACT_APPLICATION)));
             tacletBuilder.setSurviveSmbExec(true);
             addVarconds(tacletBuilder, quantifiableVarsToSchemaVars.values());
-            taclet = tacletBuilder.getTaclet();
-            alreadyRegistered.put(tacletName, taclet);
-        }
-        return taclet;
+            return tacletBuilder.getTaclet();
     }
 
 
