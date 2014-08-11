@@ -148,7 +148,7 @@ provable: ./information_flow/collection/object.AmtoftBanerjee2(object.AmtoftBane
 notprovable: ./information_flow/collection/passwordfile.SecurePasswordFile(passwordfile.SecurePasswordFile___userIndex()).JML accessible clause.0.key
 provable: ./information_flow/collection/simple_evoting.Environment(simple_evoting.Environment__untrustedOutputMessage((B)).JML normal_behavior operation contract.0.key
 provable: ./information_flow/collection/simple_evoting.Environment(simple_evoting.Environment__untrustedInputMessage((B)).JML normal_behavior operation contract.0.key
-# provable: ./information_flow/collection/simple_evoting.Environment(simple_evoting.Environment__untrustedInputMessage()).JML normal_behavior operation contract.0.key
+provable: ./information_flow/collection/simple_evoting.Environment(simple_evoting.Environment__untrustedInputMessage()).JML normal_behavior operation contract.0.key
 provable: ./information_flow/collection/simple_evoting.Environment(simple_evoting.Environment__untrustedOutput(int)).JML normal_behavior operation contract.0.key
 notprovable: ./information_flow/collection/simple_evoting.Environment(simple_evoting.Environment__untrustedInput(int)).JML normal_behavior operation contract.0.key
 notprovable: ./information_flow/collection/simple_evoting.Environment(simple_evoting.Environment__untrustedInput()).JML normal_behavior operation contract.0.key
