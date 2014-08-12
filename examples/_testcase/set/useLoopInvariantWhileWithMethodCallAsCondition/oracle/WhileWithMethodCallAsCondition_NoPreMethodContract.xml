@@ -72,7 +72,7 @@ mod: \if (true)
 termination: diamond" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
     b_3=goOnNice(array,i);
   }
-}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))))),equals(array,null)))" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="false" notNullCheckComplied="false">
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))))),equals(array,null)))" pathConditionChanged="false" resultTerm="result_4" exceptionTerm="exc_6" preconditionComplied="false" hasNotNullCheck="false" notNullCheckComplied="false">
                         <callStackEntry path="/0"/>
                         <branchCondition name="not(equals(array,null))" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
     b_3=goOnNice(array,i);
@@ -179,7 +179,7 @@ mod: \if (true)
 termination: diamond" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
     b_3=goOnNice(array,i);
   }
-}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="false" notNullCheckComplied="false">
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="false" resultTerm="result_5" exceptionTerm="exc_7" preconditionComplied="false" hasNotNullCheck="false" notNullCheckComplied="false">
                         <callStackEntry path="/0"/>
                         <branchCondition name="true" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
     b_3=goOnNice(array,i);

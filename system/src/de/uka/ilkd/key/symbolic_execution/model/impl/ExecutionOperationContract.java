@@ -57,6 +57,16 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.ContractPos
  */
 public class ExecutionOperationContract extends AbstractExecutionStateNode<SourceElement> implements IExecutionOperationContract {
    /**
+    * The exception {@link Term} used by the applied {@link Contract}.
+    */
+   private Term exceptionTerm;
+
+   /**
+    * The result {@link Term} used by the applied {@link Contract}.
+    */
+   private Term resultTerm;
+   
+   /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
     * @param mediator The used {@link KeYMediator} during proof.
@@ -83,17 +93,9 @@ public class ExecutionOperationContract extends AbstractExecutionStateNode<Sourc
          // Compute instantiation
          Instantiation inst = UseOperationContractRule.computeInstantiation(getProofNode().getAppliedRuleApp().posInOccurrence().subTerm(), services);
          // Extract used result and exception variable from proof nodes
-         ProgramVariable resultVar = null;
-         Term resultTerm = null;
-         if (contract.hasResultVar()) {
-            resultVar = extractResultVariableFromPostBranch(getProofNode(), services);
-            if (resultVar == null) {
-               // Result variable not found in child, create a temporary variable to use in specification
-               resultVar = UseOperationContractRule.computeResultVar(inst, services);
-            }
-            resultTerm = services.getTermBuilder().var(resultVar);
-         }
+         resultTerm = searchResultTerm(contract, inst, services);
          ContractPostOrExcPostExceptionVariableResult search = SymbolicExecutionUtil.searchContractPostOrExcPostExceptionVariable(getProofNode().child(0), services); // Post branch
+         exceptionTerm = search.getExceptionEquality().sub(0);
          // Rename variables in contract to the current one
          List<LocationVariable> heapContext = HeapContext.getModHeaps(services, inst.transaction);
          Map<LocationVariable,LocationVariable> atPreVars = UseOperationContractRule.computeAtPreVars(heapContext, services, inst);
@@ -139,7 +141,7 @@ public class ExecutionOperationContract extends AbstractExecutionStateNode<Sourc
                                                         contractParams, 
                                                         resultTerm, 
                                                         contractSelf, 
-                                                        search.getExceptionEquality().sub(0), 
+                                                        exceptionTerm, 
                                                         baseHeap, 
                                                         baseHeapTerm, 
                                                         heapContext, 
@@ -152,6 +154,70 @@ public class ExecutionOperationContract extends AbstractExecutionStateNode<Sourc
       else {
          return null;
       }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Term getResultTerm() throws ProofInputException {
+      synchronized (this) {
+         if (!isNameComputed()) {
+            getName(); // Compute name and result term
+         }
+         return resultTerm;
+      }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Term getExceptionTerm() throws ProofInputException {
+      synchronized (this) {
+         if (!isNameComputed()) {
+            getName(); // Compute name and exception term
+         }
+         return exceptionTerm;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getFormatedResultTerm() throws ProofInputException {
+      Term resultTerm = getResultTerm();            
+      return resultTerm != null ? formatTerm(resultTerm, getServices()) : null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getFormatedExceptionTerm() throws ProofInputException {
+      Term exceptionTerm = getExceptionTerm();
+      return exceptionTerm != null ? formatTerm(exceptionTerm, getServices()) : null;
+   }
+   
+   /**
+    * Searches the result {@link Term}.
+    * @param contract The {@link FunctionalOperationContract}.
+    * @param inst The {@link Instantiation}.
+    * @param services The {@link Services}.
+    * @return The found result {@link Term} or {@code null} otherwise.
+    */
+   protected Term searchResultTerm(FunctionalOperationContract contract, Instantiation inst, Services services) {
+      Term resultTerm = null;
+      if (contract.hasResultVar()) {
+         ProgramVariable resultVar = extractResultVariableFromPostBranch(getProofNode(), services);
+         if (resultVar == null) {
+            // Result variable not found in child, create a temporary variable to use in specification
+            resultVar = UseOperationContractRule.computeResultVar(inst, services);
+         }
+         resultTerm = services.getTermBuilder().var(resultVar);
+      }
+      return resultTerm;
    }
    
    /**

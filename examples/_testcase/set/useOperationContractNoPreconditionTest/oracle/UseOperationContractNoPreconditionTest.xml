@@ -6,7 +6,7 @@
 pre: true
 post: result_0 = 42 &amp; exc_0 = null
 mod: allLocs
-termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="int magicNumberCopy = magicNumber;" pathCondition="true" pathConditionChanged="false">
                <statement name="return magicNumber+magicNumberCopy;" pathCondition="true" pathConditionChanged="false">
                   <methodReturn name="&lt;return of main&gt;" signature="&lt;return of UseOperationContractNoPreconditionTest.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">

@@ -6,7 +6,7 @@
 pre: self.&lt;inv&gt;
 post: result_0 = 42 &amp; self.&lt;inv&gt; &amp; exc_0 = null
 mod: allLocs
-termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <methodReturn name="&lt;return of mainNoArgs&gt;" signature="&lt;return of self.mainNoArgs();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of mainNoArgs&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of self.mainNoArgs();&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                </methodReturnValue>

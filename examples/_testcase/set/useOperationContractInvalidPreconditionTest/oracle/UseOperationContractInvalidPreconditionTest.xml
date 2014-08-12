@@ -9,7 +9,7 @@
 pre: -123 &gt;= 0 &amp; obj.&lt;inv&gt;
 post: result_0 = 42 &amp; obj.&lt;inv&gt; &amp; exc_0 = null
 mod: allLocs
-termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="true">
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="true">
                      <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
                         <statement name="int magicNumberCopy = magicNumber;" pathCondition="true" pathConditionChanged="false">
                            <statement name="return magicNumber+magicNumberCopy;" pathCondition="true" pathConditionChanged="false">

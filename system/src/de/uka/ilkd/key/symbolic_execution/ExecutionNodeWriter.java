@@ -189,6 +189,16 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Attribute name to store {@link IExecutionMethodReturn#getMethodReturnCondition()}.
     */
    public static final String ATTRIBUTE_METHOD_RETURN_CONDITION = "methodReturnCondition";
+
+   /**
+    * Attribute name to store {@link IExecutionOperationContract#getFormatedResultTerm()}.
+    */
+   public static final String ATTRIBUTE_RESULT_TERM = "resultTerm";
+
+   /**
+    * Attribute name to store {@link IExecutionOperationContract#getFormatedExceptionTerm()}.
+    */
+   public static final String ATTRIBUTE_EXCEPTION_TERM = "exceptionTerm";
    
    /**
     * Tag name to store {@link IExecutionBranchCondition}s.
@@ -693,6 +703,8 @@ public class ExecutionNodeWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
+      attributeValues.put(ATTRIBUTE_RESULT_TERM, node.getFormatedResultTerm());
+      attributeValues.put(ATTRIBUTE_EXCEPTION_TERM, node.getFormatedExceptionTerm());
 
       attributeValues.put(ATTRIBUTE_PRECONDITION_COMPLIED, node.isPreconditionComplied() + "");
       attributeValues.put(ATTRIBUTE_HAS_NOT_NULL_CHECK, node.hasNotNullCheck() + "");

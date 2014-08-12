@@ -96,7 +96,7 @@ mod: \if (true)
 termination: diamond" pathCondition="not(or(or(or(not(or(or(equals(x,null),equals(array,null)),java.lang.Object::&lt;inv&gt;(heap,x))),not(imp(java.lang.Object::&lt;inv&gt;(heap,x),or(or(equals(x,null),equals(array,null)),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
     b_3=x.goOnNice(array,i);
   }
-}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))))))),not(imp(equals(array,null),equals(x,null)))),equals(x,null)))" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))))))),not(imp(equals(array,null),equals(x,null)))),equals(x,null)))" pathConditionChanged="false" resultTerm="result_5" exceptionTerm="exc_8" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
                         <callStackEntry path="/0"/>
                         <branchCondition name="and(and(java.lang.Object::&lt;inv&gt;(heap,x),not(equals(array,null))),not(equals(x,null)))" pathCondition="not(or(or(or(not(or(or(equals(x,null),equals(array,null)),java.lang.Object::&lt;inv&gt;(heap,x))),not(imp(java.lang.Object::&lt;inv&gt;(heap,x),or(or(equals(x,null),equals(array,null)),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
     b_3=x.goOnNice(array,i);
@@ -227,7 +227,7 @@ mod: \if (true)
 termination: diamond" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
     b_3=x.goOnNice(array,i);
   }
-}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="false" resultTerm="result_6" exceptionTerm="exc_9" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
                         <callStackEntry path="/0"/>
                         <branchCondition name="true" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(WhileWithMethodCallAsConditionOnObject, int[])@WhileWithMethodCallAsConditionOnObject,this=self): {
     b_3=x.goOnNice(array,i);

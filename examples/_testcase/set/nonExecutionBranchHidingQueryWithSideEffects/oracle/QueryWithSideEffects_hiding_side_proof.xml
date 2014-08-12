@@ -16,7 +16,7 @@ post: result_0 = self.subMagic(x)
             &amp; self.&lt;inv&gt;))))
 &amp; exc_0 = null
 mod: empty
-termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue+this.instanceField+classField;" pathCondition="true" pathConditionChanged="false">
                <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
 	Z(0(2(1(#)))) {gt(x,Z(neglit(1(#))))}, 

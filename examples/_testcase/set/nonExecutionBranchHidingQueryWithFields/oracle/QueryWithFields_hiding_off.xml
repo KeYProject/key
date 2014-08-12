@@ -6,7 +6,7 @@
 pre: self.&lt;inv&gt;
 post: result_0 = self.subMagic(x) &amp; self.&lt;inv&gt; &amp; exc_0 = null
 mod: empty
-termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <branchCondition name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
                <branchCondition name="not(equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#)))))" pathCondition="and(geq(x,Z(0(#))),not(equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#))))))" pathConditionChanged="true" branchCondition="not(equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#)))))" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="return magicValue;" pathCondition="and(geq(x,Z(0(#))),not(equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#))))))" pathConditionChanged="false">

@@ -1717,11 +1717,29 @@ public final class SymbolicExecutionUtil {
       while (exceptionDefinition.op() == Junctor.AND) {
          exceptionDefinitionParent = exceptionDefinition;
          Term firstSub = exceptionDefinition.sub(0);
+//         if (firstSub.op() == Junctor.NOT) {
+//            firstSub = firstSub.sub(0);
+//         }
+//         if (firstSub.op() == Equality.EQUALS && 
+//             isNullSort(firstSub.sub(1).sort(), services) &&
+//             services.getJavaInfo().isSubtype(services.getJavaInfo().getKeYJavaType(firstSub.sub(0).sort()), services.getJavaInfo().getKeYJavaType("java.lang.Throwable"))) {
+//            exceptionDefinition = exceptionDefinition.sub(0);
+//         }
+//         else {
+//            exceptionDefinition = exceptionDefinition.sub(1);
+//         }
          if (firstSub.op() == node.proof().getServices().getJavaInfo().getInv()) { 
             exceptionDefinition = exceptionDefinition.sub(1);
          }
          else {
-            exceptionDefinition = firstSub;
+            if (firstSub.op() == Equality.EQUALS && 
+                (!isNullSort(firstSub.sub(1).sort(), services) ||
+                !services.getJavaInfo().isSubtype(services.getJavaInfo().getKeYJavaType(firstSub.sub(0).sort()), services.getJavaInfo().getKeYJavaType("java.lang.Throwable")))) {
+               exceptionDefinition = exceptionDefinition.sub(1);
+            }
+            else {
+               exceptionDefinition = firstSub;//exceptionDefinition.sub(exceptionDefinition.arity() - 1);
+            }
          }
       }
       // Make sure that exception equality was found

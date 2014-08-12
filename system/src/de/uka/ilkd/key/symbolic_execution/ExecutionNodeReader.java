@@ -538,7 +538,7 @@ public class ExecutionNodeReader {
          return new KeYlessTermination(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getTerminationKind(attributes), getBranchVerified(attributes));
       }
       else if (ExecutionNodeWriter.TAG_OPERATION_CONTRACT.equals(qName)) {
-         return new KeYlessOperationContract(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isPreconditionComplied(attributes), isHasNotNullCheck(attributes), isNotNullCheckComplied(attributes));
+         return new KeYlessOperationContract(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isPreconditionComplied(attributes), isHasNotNullCheck(attributes), isNotNullCheckComplied(attributes), getResultTerm(attributes), getExceptionTerm(attributes));
       }
       else if (ExecutionNodeWriter.TAG_LOOP_INVARIANT.equals(qName)) {
          return new KeYlessLoopInvariant(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isInitiallyValid(attributes));
@@ -735,6 +735,24 @@ public class ExecutionNodeReader {
     */
    protected String getTypeString(Attributes attributes) {
       return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_TYPE_STRING);
+   }
+
+   /**
+    * Returns the exception term value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getExceptionTerm(Attributes attributes) {
+      return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_EXCEPTION_TERM);
+   }
+
+   /**
+    * Returns the result term value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getResultTerm(Attributes attributes) {
+      return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_RESULT_TERM);
    }
 
    /**
@@ -1822,6 +1840,16 @@ public class ExecutionNodeReader {
       private final boolean notNullCheckComplied;
 
       /**
+       * The formated result term.
+       */
+      private final String formatedResultTerm;
+
+      /**
+       * The formated exception term.
+       */
+      private final String formatedExceptionTerm;
+
+      /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
@@ -1837,11 +1865,15 @@ public class ExecutionNodeReader {
                                       boolean pathConditionChanged,
                                       boolean preconditionComplied,
                                       boolean hasNotNullCheck,
-                                      boolean notNullCheckComplied) {
+                                      boolean notNullCheckComplied,
+                                      String formatedResultTerm,
+                                      String formatedExceptionTerm) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
          this.preconditionComplied = preconditionComplied;
          this.hasNotNullCheck = hasNotNullCheck;
          this.notNullCheckComplied = notNullCheckComplied;
+         this.formatedResultTerm = formatedResultTerm;
+         this.formatedExceptionTerm = formatedExceptionTerm;
       }
       
       /**
@@ -1890,6 +1922,38 @@ public class ExecutionNodeReader {
       @Override
       public boolean isNotNullCheckComplied() {
          return notNullCheckComplied;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Term getResultTerm() throws ProofInputException {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Term getExceptionTerm() throws ProofInputException {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getFormatedResultTerm() throws ProofInputException {
+         return formatedResultTerm;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getFormatedExceptionTerm() throws ProofInputException {
+         return formatedExceptionTerm;
       }
    }
 

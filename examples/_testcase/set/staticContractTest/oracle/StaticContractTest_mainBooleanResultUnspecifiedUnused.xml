@@ -5,7 +5,7 @@
 pre: true
 post: exc_0 = null
 mod: allLocs
-termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
          <methodReturn name="&lt;return of mainBooleanResultUnspecifiedUnused&gt;" signature="&lt;return of StaticContractTest.mainBooleanResultUnspecifiedUnused(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of mainBooleanResultUnspecifiedUnused&gt;" signatureIncludingReturnValue="&lt;return of StaticContractTest.mainBooleanResultUnspecifiedUnused(x);&gt;" isReturnValueComputed="true" methodReturnCondition="true">
             <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
             </termination>
