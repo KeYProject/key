@@ -9,10 +9,8 @@
 //
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -38,8 +36,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
     private Term[] contextUpdates;
     private ProofObligationVars poVars;
-    private static ImmutableSet<Name> alreadyRegistered = DefaultImmutableSet.<Name>nil();
-    static final String USE_IF = "Use information flow contract for ";
+    static final String USE_IF = InfFlowContractAppTaclet.USE_IF;
     private static final String IF_CONTRACT_APPLICATION = "information_flow_contract_appl";
 
     public AbstractInfFlowContractAppTacletBuilder(final Services services) {
@@ -77,10 +74,10 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
     private static Name checkName(Name name) {
         int i = 0;
         final String s = name.toString();
-        while (alreadyRegistered.contains(name)) {
+        while (InfFlowContractAppTaclet.registered(name)) {
             name = new Name(s + "_" + i++);
         }
-        alreadyRegistered = alreadyRegistered.add(name);
+        InfFlowContractAppTaclet.register(name);
         return name;
     }
 

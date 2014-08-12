@@ -4,6 +4,7 @@
  */
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -35,6 +36,9 @@ import de.uka.ilkd.key.util.properties.Properties;
  */
 public class InfFlowContractAppTaclet extends RewriteTaclet {
 
+    public static final String USE_IF = "Use information flow contract for ";
+    private static ImmutableSet<Name> alreadyRegistered = DefaultImmutableSet.<Name>nil();
+
     /**
      * Strategy property which saves the list of formulas which where added
      * by information flow contract applications. This list is used by the
@@ -46,6 +50,30 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
             new Properties.Property<ImmutableList<Term>>(
                     (Class<ImmutableList<Term>>) (Class<?>) ImmutableList.class,
                      "information flow contract applicaton property");
+
+
+    public static boolean hasType(Rule rule) {
+        return rule != null && rule.name().toString().startsWith(USE_IF);
+    }
+
+
+    public static boolean registered(Name name) {
+        return name != null && alreadyRegistered.contains(name);
+    }
+
+
+    public static void register(Name name) {
+        alreadyRegistered = alreadyRegistered.add(name);
+    }
+
+
+    public static boolean unregister(Name name) {
+        final boolean registered = registered(name);
+        if (registered) {
+            alreadyRegistered = alreadyRegistered.remove(name);
+        }
+        return registered;
+    }
 
 
     public InfFlowContractAppTaclet(Name name,

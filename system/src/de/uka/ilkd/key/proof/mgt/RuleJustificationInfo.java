@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.rule.InfFlowContractAppTaclet;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleKey;
@@ -58,6 +59,9 @@ public class RuleJustificationInfo {
     }
 
     public void removeJustificationFor(Rule rule) {
+        if (InfFlowContractAppTaclet.hasType(rule)) {
+            InfFlowContractAppTaclet.unregister(rule.name());
+        }
         rule2justif.remove(new RuleKey(rule));
     }
 
