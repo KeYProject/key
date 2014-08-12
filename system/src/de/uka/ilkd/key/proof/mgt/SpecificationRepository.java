@@ -114,8 +114,8 @@ public final class SpecificationRepository {
             new LinkedHashMap<KeYJavaType, ImmutableSet<InitiallyClause>>();
     private final Map<ProofOblInput, ImmutableSet<Proof>> proofs =
             new LinkedHashMap<ProofOblInput, ImmutableSet<Proof>>();
-    private final Map<LoopStatement, LoopInvariant> loopInvs =
-            new LinkedHashMap<LoopStatement, LoopInvariant>();
+    private final Map<Pair<LoopStatement, Integer>, LoopInvariant> loopInvs =
+            new LinkedHashMap<Pair<LoopStatement, Integer>, LoopInvariant>();
     private final Map<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>> blockContracts =
             new LinkedHashMap<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>>();
     private final Map<IObserverFunction, IObserverFunction> unlimitedToLimited =
@@ -1431,7 +1431,15 @@ public final class SpecificationRepository {
      * Returns the registered loop invariant for the passed loop, or null.
      */
     public LoopInvariant getLoopInvariant(LoopStatement loop) {
-        return loopInvs.get(loop);
+        final int line = loop.getStartPosition().getLine();
+        Pair<LoopStatement, Integer> l =
+                new Pair<LoopStatement, Integer>(loop, line);
+        LoopInvariant inv = loopInvs.get(l);
+        if (inv == null && line != -1) {
+            l = new Pair<LoopStatement, Integer>(loop, -1);
+            inv = loopInvs.get(l);
+        }
+        return inv;
     }
 
     /**
@@ -1457,16 +1465,24 @@ public final class SpecificationRepository {
      */
     public void addLoopInvariant(final LoopInvariant inv) {
         final LoopStatement loop = inv.getLoop();
-        loopInvs.put(loop, inv);
+        final int line = loop.getStartPosition().getLine();
+        Pair<LoopStatement, Integer> l =
+                new Pair<LoopStatement, Integer> (loop, line);
+        loopInvs.put(l, inv);
+        if (line != -1) {
+            l = new Pair<LoopStatement, Integer> (loop, -1);
+            loopInvs.put(l, inv);
+        }
     }
 
     public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
         final Pair<StatementBlock, Integer> b =
                 new Pair<StatementBlock, Integer>(block, block.getStartPosition().getLine());
-        if (blockContracts.get(b) == null) {
+        final ImmutableSet<BlockContract> contracts = blockContracts.get(b);
+        if (contracts == null) {
             return DefaultImmutableSet.<BlockContract> nil();
         } else {
-            return blockContracts.get(b);
+            return contracts;
         }
     }
 
