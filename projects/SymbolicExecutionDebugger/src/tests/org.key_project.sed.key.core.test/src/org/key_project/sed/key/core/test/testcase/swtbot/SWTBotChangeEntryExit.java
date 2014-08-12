@@ -33,7 +33,7 @@ public class SWTBotChangeEntryExit extends AbstractKeYDebugTargetTestCase {
    
    @Test
    public void test() throws Exception{
-      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+      IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {            
             // Get debug target TreeItem
@@ -62,7 +62,8 @@ public class SWTBotChangeEntryExit extends AbstractKeYDebugTargetTestCase {
             Boolean.FALSE,
             Boolean.FALSE,
             Boolean.FALSE,
-            8,
-            executor);   
+            Boolean.FALSE,
+            Boolean.TRUE,
+            8, executor);   
    } 
 }

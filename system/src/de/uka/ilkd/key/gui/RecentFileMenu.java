@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.gui.configuration.PathConfig;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.Enumeration;
@@ -24,6 +25,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import de.uka.ilkd.key.util.Debug;
+import java.awt.event.ActionEvent;
 
 /**
  * This class offers a mechanism to manage recent files; it adds the
@@ -37,6 +39,10 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class RecentFileMenu {
 
+    /**
+     * The maximum number of recent files displayed.
+     */
+    private static final int MAX_RECENT_FILES = 8;
 
     /** this is the maximal number of recent files. */
     private int maxNumberOfEntries;
@@ -68,20 +74,23 @@ public class RecentFileMenu {
      * files to be displayed initially.
      * Or <code>null</code> to use no initial information.
      */
-    public RecentFileMenu(ActionListener listener, int maxNumberOfEntries,
-			  Properties p) {
-	this.menu = new JMenu("Recent Files");
+    public RecentFileMenu(final KeYMediator mediator) {
+        this.menu = new JMenu("Recent Files");
 
-        this.lissy = listener;
-        this.maxNumberOfEntries = maxNumberOfEntries;
+        this.lissy = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mediator.getUI().loadProblem(new File(getAbsolutePath((JMenuItem) e.getSource())));
+            }
+        };
+        this.maxNumberOfEntries = MAX_RECENT_FILES;
 
-	this.recentFiles = new LinkedHashMap<JMenuItem, RecentFileEntry>();
+        this.recentFiles = new LinkedHashMap<JMenuItem, RecentFileEntry>();
 
-        if (p != null) load(p);
-
-	menu.setEnabled(menu.getItemCount()!=0);
+        menu.setEnabled(menu.getItemCount() != 0);
         menu.setIcon(IconFactory.recentFiles(16));
 
+        load(PathConfig.getRecentFileStorage());
     }
 
     /**
@@ -162,7 +171,7 @@ public class RecentFileMenu {
 
     /**
      * specify the maximal number of recent files in the list.
-     * The default is 5
+     * The default is MAX_RECENT_FILES
      */
     public void setMaxNumberOfEntries(int max) {
         if (maxNumberOfEntries > max && menu.getItemCount() > max) {
@@ -211,7 +220,7 @@ public class RecentFileMenu {
     }
 
     /** read the recent files from the given properties file */
-    public void load(String filename) {
+    public final void load(String filename) {
         FileInputStream propStream = null;
         try {
             propStream = new FileInputStream(filename);
@@ -270,12 +279,12 @@ public class RecentFileMenu {
             try {
                 if (fin != null) fin.close();
             } catch (IOException e) {
-                System.out.println("CLosing streams failed.");
+                System.out.println("Closing streams failed.");
             }
             try {
                 if (fout != null) fout.close();
             } catch (IOException e) {
-                System.out.println("CLosing streams failed.");
+                System.out.println("Closing streams failed.");
             }
         }
     }
@@ -302,6 +311,7 @@ public class RecentFileMenu {
 	    return fileName;
 	}
 
+        @Override
 	public String toString() {
 	    return fileName;
 	}

@@ -45,6 +45,11 @@ import javax.swing.text.Highlighter;
  */
 public abstract class SequentView extends JTextArea {
     
+    /**
+     *
+     */
+    private static final long serialVersionUID = 5012937393965787981L;
+
     protected static final Color INACTIVE_BACKGROUND_COLOR
             = new Color(UIManager.getColor("Panel.background").getRGB());
 
@@ -188,7 +193,7 @@ public abstract class SequentView extends JTextArea {
             }
         } catch (BadLocationException badLocation) {
             System.err.println("SequentView tried to highlight an area "
-                    + "that does not exist.");
+                    + "that does not exist: "+range);
             badLocation.printStackTrace();
         }
     }

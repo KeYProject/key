@@ -36,7 +36,6 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
@@ -135,9 +134,14 @@ public class LogicPrinter {
             QuantifiableVariablePrintMode.NORMAL;
 
     public static String quickPrintTerm(Term t, Services services) {
+        return quickPrintTerm(t, services, NotationInfo.PRETTY_SYNTAX, NotationInfo.UNICODE_ENABLED);
+    }
+    
+
+    public static String quickPrintTerm(Term t, Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         final NotationInfo ni = new NotationInfo();
         if (services != null) {
-            ni.refresh(services);
+            ni.refresh(services, usePrettyPrinting, useUnicodeSymbols);
         }
         LogicPrinter p = new LogicPrinter(new ProgramPrinter(),
                                           ni,
@@ -148,7 +152,7 @@ public class LogicPrinter {
             return t.toString();
         }
         return p.result().toString();
-    }
+    }    
 
     public static String quickPrintSemisequent(Semisequent s, Services services) {
         final NotationInfo ni = new NotationInfo();
@@ -1089,6 +1093,9 @@ public class LogicPrinter {
             layouter.print("[" + opName + "(").beginC(0);
 
             for(int i = 1; i < t.arity(); i++) {
+                // do not print anon_heap
+                if ("anon".equals(opName) && i == 2) break;
+                
                 if(i > 1) {
                     layouter.print(",").brk(1,0);
                 }

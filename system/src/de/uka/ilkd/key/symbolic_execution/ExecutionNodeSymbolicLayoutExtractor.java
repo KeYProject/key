@@ -32,7 +32,9 @@ public class ExecutionNodeSymbolicLayoutExtractor extends SymbolicLayoutExtracto
     * @param executionNode The {@link IExecutionNode} to extract memory layouts from.
     */
    public ExecutionNodeSymbolicLayoutExtractor(IExecutionNode executionNode) {
-      super(executionNode.getProofNode(), executionNode.getSettings().isUsePrettyPrinting());
+      super(executionNode.getProofNode(), 
+            executionNode.getSettings().isUseUnicode(), 
+            executionNode.getSettings().isUsePrettyPrinting());
       this.executionNode = executionNode;
    }
 

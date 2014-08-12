@@ -50,7 +50,7 @@ public class EnvironmentCreator  {
                                 new Services(profile, new KeYRecoderExcHandler()),
                                 listener );
                
-                return pi.prepare(keyFile).getProofEnv();
+                return new ProofEnvironment(pi.prepare(keyFile));
         }
 
         private File createDummyKeYFile(String pathForDummyFile) throws IOException {

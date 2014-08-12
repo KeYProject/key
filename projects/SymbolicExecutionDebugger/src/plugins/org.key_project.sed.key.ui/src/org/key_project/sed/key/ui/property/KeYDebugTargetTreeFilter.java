@@ -26,6 +26,6 @@ public class KeYDebugTargetTreeFilter implements IFilter {
     */
    @Override
    public boolean select(Object toTest) {
-      return AbstractKeYDebugTargetPropertySection.getDebugTarget(toTest) != null;
+      return AbstractKeYDebugTargetPropertySection.getKeYDebugTarget(toTest) != null;
    }
 }

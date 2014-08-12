@@ -416,7 +416,6 @@ public class SolverLauncher implements SolverListener {
     private void notifySolverHasFinished(SMTSolver solver) {
 	lock.lock();
 	try {		
-		solver.setQuery(solver.getType().getQuery());		
 		session.removeCurrentlyRunning(solver);
 		wait.signal();
 	} finally {

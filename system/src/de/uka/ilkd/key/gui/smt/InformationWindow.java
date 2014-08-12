@@ -101,11 +101,11 @@ public class InformationWindow extends JDialog {
 	   if(solver.getType() != SolverType.Z3_CE_SOLVER){		   
 		   return;
 	   }
-	   if(solver.getType().getQuery()==null){
+	   if(solver.getSocket().getQuery()==null){
 		   return;
 	   }
 	   
-	   Model m = solver.getType().getQuery().getModel();
+	   Model m = solver.getSocket().getQuery().getModel();
 	   this.model = m;
 	   this.setTitle("Counterexample "+this.getTitle());
 	   getTabbedPane().addTab("Counterexample", createModelTab());
@@ -126,7 +126,7 @@ public class InformationWindow extends JDialog {
 
 	   CETree tree = new CETree(model);
 	   JScrollPane pane = new JScrollPane();
-	   pane.getViewport().add(tree);
+           pane.getViewport().add(tree.getTreeComponent());
 	   pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 	   
 	   return pane;

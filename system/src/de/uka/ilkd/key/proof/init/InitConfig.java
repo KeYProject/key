@@ -13,8 +13,8 @@
 
 package de.uka.ilkd.key.proof.init;
 
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -24,16 +24,19 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.TacletIndex;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.proof.mgt.RuleJustification;
+import de.uka.ilkd.key.proof.mgt.RuleJustificationByAddRules;
+import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 
@@ -50,10 +53,7 @@ public class InitConfig {
      */
     private final Services services;
 
-    /**
-     * the proof environment this init config belongs to
-     */
-    private final ProofEnvironment env;
+    private RuleJustificationInfo justifInfo = new RuleJustificationInfo();
 
 
     private ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil();
@@ -84,8 +84,9 @@ public class InitConfig {
     	= DefaultImmutableSet.<Choice>nil();
 
     /** HashMap for quick lookups taclet name->taclet */
-    private HashMap<Name, Named> quickTacletMap;
-
+    private Map<Name, Taclet> activatedTacletCache = null;
+    
+    
     private String originalKeYFileName;
     
     private ProofSettings settings;    
@@ -97,15 +98,11 @@ public class InitConfig {
     //-------------------------------------------------------------------------
 
     public InitConfig(Services services) {
-	this.services  = services;
-	this.env       = new ProofEnvironment(this);
-		
-        category2DefaultChoice = ProofSettings.DEFAULT_SETTINGS
-                                              .getChoiceSettings()
-        	                              .getDefaultChoices();
-  	    for(LDT ldt : getServices().getTypeConverter().getModels()) {
-  		  ldt.proofSettingsUpdated(ProofSettings.DEFAULT_SETTINGS);
-  	    }
+       this.services  = services;
+       
+       category2DefaultChoice = ProofSettings.DEFAULT_SETTINGS
+             .getChoiceSettings()
+             .getDefaultChoices();
     }
 
            
@@ -135,16 +132,6 @@ public class InitConfig {
 
 
     /**
-     * returns the proof environment using this initial configuration
-     * @return the ProofEnvironment using this configuration
-     */
-    public ProofEnvironment getProofEnv() {
-	assert env.getInitConfig() == this;
-        return env;
-    }
-
-
-    /**
      * adds entries to the HashMap that maps categories to their
      * default choices.
      * Only entries of <code>init</init> with keys not already contained in
@@ -160,9 +147,10 @@ public class InitConfig {
         }
         if(changed) {
             @SuppressWarnings("unchecked")
-            HashMap<String, String> clone = (HashMap<String, String>)category2DefaultChoice.clone();
-            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().
-                setDefaultChoices(clone);
+            HashMap<String, String> clone = (HashMap<String, String>)category2DefaultChoice.clone();            
+            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
+            // invalidate active taclet cache
+            activatedTacletCache = null;
         }
     }
 
@@ -195,6 +183,7 @@ public class InitConfig {
 	    getDefaultChoices();
 
         @SuppressWarnings("unchecked")
+        
         HashMap<String, String> c2DC = (HashMap<String,String>)category2DefaultChoice.clone();
         for (final Choice c : activatedChoices) {
             c2DC.remove(c.category());
@@ -208,8 +197,8 @@ public class InitConfig {
         }
         this.activatedChoices = activatedChoices;
 
-        // invalidate quick taclet cache
-        quickTacletMap = null;
+        // invalidate active taclet cache
+        activatedTacletCache = null;
     }
 
 
@@ -225,6 +214,8 @@ public class InitConfig {
 
     public void setTaclets(ImmutableSet<Taclet> taclets){
         this.taclets = taclets;
+        // invalidate active taclet cache
+        this.activatedTacletCache = null;
     }
 
 
@@ -234,39 +225,45 @@ public class InitConfig {
 
 
     public Taclet lookupActiveTaclet(Name name) {
-	if (quickTacletMap == null) {
-            quickTacletMap = new LinkedHashMap<Name, Named>();
-            Iterator<Taclet> it = activatedTaclets().iterator();
-            while (it.hasNext())  {
-                Taclet t = it.next();
-                quickTacletMap.put(t.name(), t);
-            }
-        }
-
-        return (Taclet) quickTacletMap.get(name);
+       if (activatedTacletCache == null) {
+          fillActiveTacletCache();
+       }       
+       return activatedTacletCache.get(name);
     }
-
 
     /**
      * returns the activated taclets of this initial configuration
      */
-    public ImmutableSet<Taclet> activatedTaclets() {
-        ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
-        TacletBuilder b;
+    public Iterable<Taclet> activatedTaclets() {
+       if (activatedTacletCache == null) {
+          fillActiveTacletCache();
+       }
+       return activatedTacletCache.values();
+    }
 
-        for (Taclet t : taclets) {
-            b = taclet2Builder.get(t);
-            if(t.getChoices().subset(activatedChoices)){
-                if(b!=null && b.getGoal2Choices()!=null){
-                    t = b.getTacletWithoutInactiveGoalTemplates(
-                            activatedChoices);
-                }
-                if(t!=null){
-                    result = result.add(t);
-                }
-            }
-        }
-        return result;
+
+    /**
+     * fills the active taclet cache
+     */
+    private void fillActiveTacletCache() {
+       if (activatedTacletCache != null) {
+          return;
+       }
+       final LinkedHashMap<Name,Taclet> tacletCache = new LinkedHashMap<Name, Taclet>();
+       for (Taclet t : taclets) {
+          TacletBuilder b = taclet2Builder.get(t);
+          
+          if(t.getChoices().subset(activatedChoices)){
+             if (b != null && b.getGoal2Choices() != null){
+                t = b.getTacletWithoutInactiveGoalTemplates(activatedChoices);
+             }
+
+             if (t != null) {
+                tacletCache.put(t.name(), t);
+             }
+          }
+       }
+       activatedTacletCache = Collections.unmodifiableMap(tacletCache);
     }
 
 
@@ -277,6 +274,52 @@ public class InitConfig {
         return (profile == null
         	? ImmutableSLList.<BuiltInRule>nil()
         	: profile.getStandardRules().getStandardBuiltInRules());
+    }
+    
+    
+    /** registers a rule with the given justification at the
+     * justification managing {@link RuleJustification} object of this
+     * environment. 
+     */
+    public void registerRule(Rule r, RuleJustification j) {
+   justifInfo.addJustification(r, j);
+    }
+
+    public void registerRuleIntroducedAtNode(RuleApp r, 
+                                             Node node, 
+                                             boolean isAxiom) {
+        justifInfo.addJustification(r.rule(), 
+                                    new RuleJustificationByAddRules(node, 
+                                                                    isAxiom));
+    }
+
+    /** registers a set of rules with the given justification at the
+     * justification managing {@link RuleJustification} object of this
+     * environment. All rules of the set are given the same
+     * justification. 
+     */
+    public void registerRules(ImmutableSet<Taclet> s, RuleJustification j) {
+       for (Taclet r : s) {
+          registerRule(r, j);          
+       }
+    }
+
+    /** registers a list of rules with the given justification at the
+     * justification managing {@link RuleJustification} object of this
+     * environment. All rules of the list are given the same
+     * justification. 
+     */
+    public void registerRules(ImmutableList<BuiltInRule> s, RuleJustification j) {
+       for (BuiltInRule r : s) {
+          registerRule(r, j);          
+       }
+    }
+
+    /** returns the object managing the rules in this environment and
+     * their justifications. The object is unique to this environment. 
+     */
+    public RuleJustificationInfo getJustifInfo() {
+       return justifInfo;
     }
 
 
@@ -347,18 +390,13 @@ public class InitConfig {
     }
 
     
-    public void setSettings(ProofSettings settings) {
-	  this.settings = settings;
-	  for(LDT ldt : getServices().getTypeConverter().getModels()) {
-		ldt.proofSettingsUpdated(settings);
-	  }
-	  // replace the <inv> symbol as it may have changed arity
-	  namespaces().functions().add(services.getJavaInfo().getInv());
+    public void setSettings(ProofSettings newSettings) {
+      this.settings = newSettings;	  
 	}
     
     
     public ProofSettings getSettings() {
-	return settings;
+       return settings;
     }
 
 
@@ -366,36 +404,40 @@ public class InitConfig {
      * the contained JavaInfo while using the immutable set of taclets in the
      * copy
      */
-    @SuppressWarnings("unchecked")
     public InitConfig copy() {
-        InitConfig ic = new InitConfig(services.copyPreservesLDTInformation());
-        ic.setActivatedChoices(activatedChoices);
-        ic.category2DefaultChoice = ((HashMap<String,String>) category2DefaultChoice.clone());
-        ic.setTaclet2Builder(
-                (HashMap<Taclet, TacletBuilder>) taclet2Builder.clone());
-        ic.setTaclets(taclets);
-        ic.originalKeYFileName = originalKeYFileName;
-        return ic;
+        return copyWithServices(services.copyPreservesLDTInformation());
     }
-    
-    
 
     /** returns a copy of this initial configuration copying the namespaces,
      * the contained JavaInfo while using the immutable set of taclets in the
      * copy
      */
-    @SuppressWarnings("unchecked")
     public InitConfig deepCopy() {
-        InitConfig ic = new InitConfig(services.copy(false));
+       return copyWithServices(services.copy(false));
+    }
+
+    
+    /** returns a copy of this initial configuration copying the namespaces,
+     * the contained JavaInfo while using the immutable set of taclets in the
+     * copy
+     */
+    @SuppressWarnings("unchecked")
+    public InitConfig copyWithServices(Services services) {
+        InitConfig ic = new InitConfig(services);
+        if (settings != null) {
+           ic.setSettings(new ProofSettings(settings));
+        }
         ic.setActivatedChoices(activatedChoices);
         ic.category2DefaultChoice = ((HashMap<String,String>) category2DefaultChoice.clone());
         ic.setTaclet2Builder(
                 (HashMap<Taclet, TacletBuilder>) taclet2Builder.clone());
         ic.setTaclets(taclets);
         ic.originalKeYFileName = originalKeYFileName;
-        ic.env.setJavaModel(env.getJavaModel());
+        ic.justifInfo = justifInfo.copy();
         return ic;
     }
+    
+    
 
     public String toString() {
         return

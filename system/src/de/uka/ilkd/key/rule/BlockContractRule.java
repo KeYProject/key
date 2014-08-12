@@ -23,7 +23,6 @@ import java.util.Map;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.macros.WellDefinednessMacro;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -65,6 +64,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.macros.WellDefinednessMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -818,9 +818,8 @@ public class BlockContractRule implements BuiltInRule {
                                       final Term[] assumptions, final Term[] postconditions)
         {
             goal.setBranchLabel("Validity");
-            goal.addFormulaToAntecedent(new SequentFormula(
-                  services.getTermBuilder().applySequential(updates, services.getTermBuilder().and(assumptions))),
-                    false);
+            goal.addFormula(new SequentFormula(
+            services.getTermBuilder().applySequential(updates, services.getTermBuilder().and(assumptions))), true, false);
 
             final StatementBlock block =
                     new ValidityProgramConstructor(labels, instantiation.block,

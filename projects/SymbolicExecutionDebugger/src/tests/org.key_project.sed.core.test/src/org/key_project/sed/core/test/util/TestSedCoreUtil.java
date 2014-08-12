@@ -14,6 +14,8 @@
 package org.key_project.sed.core.test.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.util.Arrays;
@@ -71,6 +73,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.resources.ProjectExplorer;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.key_project.sed.core.annotation.ISEDAnnotation;
+import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchStatement;
 import org.key_project.sed.core.model.ISEDDebugElement;
@@ -198,10 +202,11 @@ public final class TestSedCoreUtil {
 
    /**
     * Opens the "Symbolic Debug" perspective.
+    * @return The {@link IPerspectiveDescriptor} of "Symbolic Debug" perspective.
     * @throws Exception Occurred Exception.
     */
-   public static void openSymbolicDebugPerspective() throws Exception {
-      IRunnableWithException run = new AbstractRunnableWithException() {
+   public static IPerspectiveDescriptor openSymbolicDebugPerspective() throws Exception {
+      IRunnableWithResult<IPerspectiveDescriptor> run = new AbstractRunnableWithResult<IPerspectiveDescriptor>() {
          @Override
          public void run() {
             try {
@@ -245,6 +250,7 @@ public final class TestSedCoreUtil {
       if (run.getException() != null) {
          throw run.getException();
       }
+      return run.getResult();
    }
 
    /**
@@ -839,6 +845,14 @@ public final class TestSedCoreUtil {
                                          boolean compareId, 
                                          boolean compareVariables,
                                          boolean compareCallStack) throws DebugException {
+      // Compare annotations
+      ISEDAnnotation[] expectedAnnotations = expected.getRegisteredAnnotations();
+      ISEDAnnotation[] currentAnnotations = current.getRegisteredAnnotations();
+      assertEquals(expectedAnnotations.length, currentAnnotations.length);
+      for (int i = 0; i < expectedAnnotations.length; i++) {
+         compareAnnotation(expectedAnnotations[i], currentAnnotations[i]);
+      }
+      // Compare nodes
       ISEDIterator expectedIter = new SEDPreorderIterator(expected);
       ISEDIterator currentIter = new SEDPreorderIterator(current);
       while (expectedIter.hasNext()) {
@@ -888,7 +902,7 @@ public final class TestSedCoreUtil {
          }
          else if (expectedNext instanceof ISEDThread) {
             TestCase.assertTrue("Expected ISEDThread on " + ((ISEDThread)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDThread);
-            compareThread((ISEDThread)expectedNext, (ISEDThread)currentNext, true, compareId);
+            compareThread((ISEDThread)expectedNext, (ISEDThread)currentNext, true, compareId, compareVariables, compareCallStack);
          }
          else if (expectedNext instanceof ISEDMethodContract) {
             TestCase.assertTrue("Expected ISEDMethodContract on " + ((ISEDMethodContract)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDMethodContract);
@@ -906,6 +920,38 @@ public final class TestSedCoreUtil {
       TestCase.assertFalse(currentIter.hasNext());
    }
    
+   /**
+    * Compares the given {@link ISEDAnnotation}s with each other.
+    * @param expected The expected {@link ISEDAnnotation}.
+    * @param current The current {@link ISEDAnnotation}.
+    */
+   protected static void compareAnnotation(ISEDAnnotation expected, ISEDAnnotation current) {
+      TestCase.assertNotNull(expected);
+      TestCase.assertNotNull(current);
+      TestCase.assertEquals(expected.getId(), current.getId());
+      TestCase.assertSame(expected.getType(), current.getType());
+      TestCase.assertEquals(expected.isEnabled(), current.isEnabled());
+      TestCase.assertEquals(expected.isHighlightBackground(), current.isHighlightBackground());
+      TestCase.assertEquals(expected.isHighlightForeground(), current.isHighlightForeground());
+      TestCase.assertEquals(expected.getBackgroundColor(), current.getBackgroundColor());
+      TestCase.assertEquals(expected.getForegroundColor(), current.getForegroundColor());
+      TestCase.assertEquals(expected.getType().saveAnnotation(expected), current.getType().saveAnnotation(current));
+   }
+   
+   /**
+    * Compares the given {@link ISEDAnnotationLink}s with each other.
+    * @param expected The expected {@link ISEDAnnotationLink}.
+    * @param current The current {@link ISEDAnnotationLink}.
+    */
+   protected static void compareAnnotationLink(ISEDAnnotationLink expected, ISEDAnnotationLink current) {
+      TestCase.assertNotNull(expected);
+      TestCase.assertNotNull(current);
+      TestCase.assertEquals(expected.getId(), current.getId());
+      TestCase.assertEquals(expected.getSource().getId(), current.getSource().getId());
+      TestCase.assertEquals(expected.getTarget().getId(), current.getTarget().getId());
+      TestCase.assertEquals(expected.getSource().getType().saveAnnotationLink(expected), current.getSource().getType().saveAnnotationLink(current));
+   }
+
    /**
     * Compares the given {@link IDebugTarget}s with each other.
     * @param expected The expected {@link IDebugTarget}.
@@ -958,6 +1004,13 @@ public final class TestSedCoreUtil {
          TestCase.assertTrue(expected.getPathCondition() + " does not match " + current.getPathCondition(), StringUtil.equalIgnoreWhiteSpace(expected.getPathCondition(), current.getPathCondition()));
          TestCase.assertEquals(expected.getNodeType(), current.getNodeType());
          compareDebugElement(expected, current, compareReferences, compareVariables);
+         // Compare annotation links
+         ISEDAnnotationLink[] expectedAnnotationLinks = expected.getAnnotationLinks();
+         ISEDAnnotationLink[] currentAnnotationLinks = current.getAnnotationLinks();
+         assertEquals(expectedAnnotationLinks.length, currentAnnotationLinks.length);
+         for (int i = 0; i < expectedAnnotationLinks.length; i++) {
+            compareAnnotationLink(expectedAnnotationLinks[i], currentAnnotationLinks[i]);
+         }
          // Compare call stack
          if (compareCallStack) {
             compareCallStack(expected.getCallStack(), current.getCallStack());
@@ -1049,6 +1102,26 @@ public final class TestSedCoreUtil {
     */
    protected static void compareCallStack(ISEDDebugNode[] expectedEntries, 
                                           ISEDDebugNode[] currentEntries) throws DebugException {
+      if (expectedEntries != null) {
+         TestCase.assertNotNull(currentEntries);
+         TestCase.assertEquals(expectedEntries.length, currentEntries.length);
+         for (int i = 0; i < expectedEntries.length; i++) {
+            compareNode(expectedEntries[i], currentEntries[i], false, false, false, false);
+         }
+      }
+      else {
+         TestCase.assertTrue(ArrayUtil.isEmpty(currentEntries));
+      }
+   }
+   
+   /**
+    * Compares the given termination entries.
+    * @param expected The expected {@link ISEDTermination}s.
+    * @param current The current {@link ISEDTermination}s.
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void compareTerminations(ISEDTermination[] expectedEntries, 
+                                             ISEDTermination[] currentEntries) throws DebugException {
       if (expectedEntries != null) {
          TestCase.assertNotNull(currentEntries);
          TestCase.assertEquals(expectedEntries.length, currentEntries.length);
@@ -1273,6 +1346,7 @@ public final class TestSedCoreUtil {
                                        boolean compareCallStack) throws DebugException {
       compareThread((IThread)expected, (IThread)current, compareReferences, compareVariables);
       compareNode(expected, current, compareReferences, compareId, compareVariables, compareCallStack);
+      compareTerminations(expected.getTerminations(), current.getTerminations());
    }
 
    /**
@@ -1332,6 +1406,35 @@ public final class TestSedCoreUtil {
                                            boolean compareCallStack) throws DebugException {
       compareStackFrame(expected, current, compareVariables);
       compareNode(expected, current, compareReferences, compareId, compareVariables, compareCallStack);
+      compareMethodReturnConditions(expected.getMethodReturnConditions(), current.getMethodReturnConditions(), compareReferences, compareId, compareVariables, compareCallStack);
+   }
+
+   /**
+    * Compares the given method return conditions.
+    * @param expected The expected conditions.
+    * @param current The current conditions.
+    * @param compareReferences Compare also the containment hierarchy?
+    * @param compareId Compare the value of {@link ISEDDebugElement#getId()}?
+    * @param compareVariables Compare variables?
+    * @param compareCallStack Compare call stack?
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void compareMethodReturnConditions(ISEDBranchCondition[] expected, 
+                                                       ISEDBranchCondition[] current, 
+                                                       boolean compareReferences, 
+                                                       boolean compareId, 
+                                                       boolean compareVariables, 
+                                                       boolean compareCallStack) throws DebugException {
+      if (expected != null) {
+         assertNotNull(current);
+         assertEquals(expected.length, current.length);
+         for (int i = 0; i < expected.length; i++) {
+            compareBranchCondition(expected[i], current[i], false, compareId, compareVariables, compareCallStack);
+         }
+      }
+      else {
+         assertNull(current);
+      }
    }
 
    /**
@@ -1429,6 +1532,7 @@ public final class TestSedCoreUtil {
                                              boolean compareVariables,
                                              boolean compareCallStack) throws DebugException {
       compareStackFrame(expected, current, compareVariables);
+      compareNode(expected.getMethodReturnCondition(), current.getMethodReturnCondition(), false, compareId, compareVariables, compareCallStack);
       compareNode(expected, current, compareReferences, compareId, compareVariables, compareCallStack);
    }
 

@@ -31,7 +31,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.util.MiscTools;
 
 public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest {
@@ -67,7 +67,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                           }
                        },
                        25, // x of false in text control of editor
-                       7, // y of false in text control of editor
+                       124, // y of false in text control of editor
                        "closeFalse",
                        true);
    }
@@ -91,7 +91,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
       IKeYEditorTestSteps steps = new IKeYEditorTestSteps() {
          @Override
          public void test(IJavaProject project, 
-                          KeYEnvironment<CustomConsoleUserInterface> environment, 
+                          KeYEnvironment<CustomUserInterface> environment, 
                           Proof proof, 
                           SWTWorkbenchBot bot, 
                           SWTBotEditor editor, 

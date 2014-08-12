@@ -32,6 +32,7 @@ import de.uka.ilkd.key.gui.smt.SettingsDialog;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
+import de.uka.ilkd.key.gui.testgen.TestGenerationSettings;
 import de.uka.ilkd.key.proof.Proof;
 
 
@@ -43,7 +44,7 @@ public class SMTOptionsAction extends MainWindowAction {
 
 public SMTOptionsAction(MainWindow mainWindow) {
 	super(mainWindow);
-	setName("SMT Solvers...");
+	setName("SMT Solvers Options");
         setIcon(IconFactory.toolbox(16));
     }
 
@@ -68,8 +69,10 @@ public SMTOptionsAction(MainWindow mainWindow) {
             pdSettings.addSettingsListener(listener);
             piSettings.addSettingsListener(listener);
             JComponent bottomComponent = null;
+            
+            TestGenerationSettings tgSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings();
          
-            final SMTSettingsModel settingsModel = new SMTSettingsModel(new SMTSettings(pdSettings,piSettings,proof));
+            final SMTSettingsModel settingsModel = new SMTSettingsModel(new SMTSettings(pdSettings,piSettings,proof),tgSettings);
        
             if(proof == null){
                     bottomComponent = new JLabel("No proof has been loaded: those are the default settings.");

@@ -56,9 +56,19 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
    private Button mergeBranchConditionsButton;
    
    /**
-    * Defines to use pretty printing or not..
+    * Defines to use unicode characters or not.
+    */
+   private Button useUnicodeButton;
+   
+   /**
+    * Defines to use pretty printing or not.
     */
    private Button usePrettyPrintingButton;
+   
+   /**
+    * Defines to show signatures on method return nodes.
+    */
+   private Button showSignatureOnMethodReturnNodes;
    
    /**
     * Constructor.
@@ -113,13 +123,30 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
          @Override
          public void widgetSelected(SelectionEvent e) {
             updateLaunchConfigurationDialog();
+            updatePrettyPrintingDependingEnabledStates();
+         }
+      });
+      useUnicodeButton = widgetFactory.createButton(symbolicExecutionTreeGroup, "Use &unicode symbols", SWT.CHECK);
+      useUnicodeButton.setEnabled(isEditable());
+      useUnicodeButton.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            updateLaunchConfigurationDialog();
+         }
+      });
+      showSignatureOnMethodReturnNodes = widgetFactory.createButton(symbolicExecutionTreeGroup, "Show signature instead of only the name on method &return nodes", SWT.CHECK);
+      showSignatureOnMethodReturnNodes.setEnabled(isEditable());
+      showSignatureOnMethodReturnNodes.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            updateLaunchConfigurationDialog();
          }
       });
       // KeY
       Group keyGroup = widgetFactory.createGroup(composite, "KeY");
       keyGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       keyGroup.setLayout(new GridLayout(1, false));
-      showKeYMainWindowButton = widgetFactory.createButton(keyGroup, "Show KeY's &main window (only for experienced user)", SWT.CHECK);
+      showKeYMainWindowButton = widgetFactory.createButton(keyGroup, "Show &KeY's main window (only for experienced user)", SWT.CHECK);
       showKeYMainWindowButton.setEnabled(isEditable());
       showKeYMainWindowButton.addSelectionListener(new SelectionAdapter() {
          @Override
@@ -127,6 +154,14 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
             updateLaunchConfigurationDialog();
          }
       });
+      updatePrettyPrintingDependingEnabledStates();
+   }
+
+   /**
+    * Updates the enabled state of settings depending on pretty printing.
+    */
+   protected void updatePrettyPrintingDependingEnabledStates() {
+      useUnicodeButton.setEnabled(isEditable() && usePrettyPrintingButton.getSelection());
    }
 
    /**
@@ -147,7 +182,10 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
          showVariablesOfSelectedDebugNodeButton.setSelection(KeySEDUtil.isShowVariablesOfSelectedDebugNode(configuration));
          showKeYMainWindowButton.setSelection(KeySEDUtil.isShowKeYMainWindow(configuration));
          mergeBranchConditionsButton.setSelection(KeySEDUtil.isMergeBranchConditions(configuration));
+         useUnicodeButton.setSelection(KeySEDUtil.isUseUnicode(configuration));
          usePrettyPrintingButton.setSelection(KeySEDUtil.isUsePrettyPrinting(configuration));
+         showSignatureOnMethodReturnNodes.setSelection(KeySEDUtil.isShowSignatureOnMethodReturnNodes(configuration));
+         updatePrettyPrintingDependingEnabledStates();
       } 
       catch (CoreException e) {
          LogUtil.getLogger().logError(e);
@@ -163,7 +201,10 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       showVariablesOfSelectedDebugNodeButton.setSelection(launchSettings.isShowVariablesOfSelectedDebugNode());
       showKeYMainWindowButton.setSelection(launchSettings.isShowKeYMainWindow());
       mergeBranchConditionsButton.setSelection(launchSettings.isMergeBranchConditions());
+      useUnicodeButton.setSelection(launchSettings.isUseUnicode());
       usePrettyPrintingButton.setSelection(launchSettings.isUsePrettyPrinting());
+      showSignatureOnMethodReturnNodes.setSelection(launchSettings.isShowSignatureOnMethodReturnNodes());
+      updatePrettyPrintingDependingEnabledStates();
    }
 
    /**
@@ -175,6 +216,8 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, showVariablesOfSelectedDebugNodeButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW, showKeYMainWindowButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, mergeBranchConditionsButton.getSelection());
+      configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_UNICODE, useUnicodeButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING, usePrettyPrintingButton.getSelection());
+      configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_SIGNATURE_ON_MEHTOD_RETURN_NODES, showSignatureOnMethodReturnNodes.getSelection());
    }
 }

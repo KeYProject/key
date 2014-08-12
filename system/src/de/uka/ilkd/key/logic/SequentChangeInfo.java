@@ -26,6 +26,8 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
  */
 public class SequentChangeInfo {
 
+ 
+   
   /** change information related to the antecedent, this means the
    * there added and removed formulas*/
   private SemisequentChangeInfo antecedent;
@@ -129,7 +131,7 @@ public class SequentChangeInfo {
    * @return true iff the sequent has been changed by the operation 
    */    
   public boolean hasChanged() {
-    return antecedent.hasChanged() || succedent.hasChanged();
+    return (antecedent == null || antecedent.hasChanged()) || (succedent == null || succedent.hasChanged());
   }
 
   /** 
@@ -253,7 +255,36 @@ public class SequentChangeInfo {
         rejectedFormulas(true).prepend(rejectedFormulas(false));
   }
   
-  
+  /**
+   * This method combines this change information from this info and its successor. 
+   * ATTENTION: it takes over ownership over {@link succ} and does not release it. This means
+   * when invoking the method it must be snsured that succ is never used afterwards.
+   */
+  public void combine(SequentChangeInfo succ) {         
+     final SequentChangeInfo antec = this;
+     if (antec == succ) {
+        return;
+     }     
+     
+     antec.resultingSequent  = succ.resultingSequent;
+     
+     if (antec.antecedent != succ.antecedent) {
+        if (antec.antecedent == null) {
+           antec.antecedent = succ.antecedent;            
+        } else if (succ.antecedent != null){         
+           antec.antecedent.combine(succ.antecedent);
+        }
+     }
+
+     if (antec.succedent != succ.succedent) {
+        if (antec.succedent == null) {
+           antec.succedent = succ.succedent;            
+        } else if (succ.succedent != null){         
+           antec.succedent.combine(succ.succedent);
+        }
+     }    
+  }
+
 
   /**
    * @return the original sequent
@@ -295,5 +326,6 @@ public class SequentChangeInfo {
 
     return result;
   }
+
 
 }

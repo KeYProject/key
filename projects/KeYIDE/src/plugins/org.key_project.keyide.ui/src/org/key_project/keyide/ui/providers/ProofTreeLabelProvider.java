@@ -14,8 +14,6 @@
 package org.key_project.keyide.ui.providers;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.viewers.LabelProvider;
@@ -25,93 +23,114 @@ import org.eclipse.swt.graphics.Image;
 import org.key_project.keyide.ui.util.KeYImages;
 import org.key_project.util.java.ObjectUtil;
 
-import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProofVisitor;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.proof.ProofTreeListener;
 
 /**
- * A class to provide the correct labels for the KeY-Outline.
- * 
- * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing, Martin Hentschel
+ * The {@link LabelProvider} used to label a proof tree consiting of 
+ * {@link Proof}s, {@link Node}s and {@link BranchFolder}s.
+ * @author Martin Hentschel
  */
 public class ProofTreeLabelProvider extends LabelProvider {
-   private Viewer viewer;
-   private KeYEnvironment<?> environment;
-   private Proof proof;
-   private Map<Node, BranchFolder> nodeToBranchMapping = new HashMap<Node, BranchFolder>();  
+   /**
+    * The {@link Viewer} in which this {@link LabelProvider} is used.
+    */
+   private final Viewer viewer;
    
    /**
-    * The AutoModeListener
+    * The shown {@link Proof} as root of the proof tree.
     */
-   private AutoModeListener autoModeListener = new AutoModeListener() {
+   private final Proof proof;
+   
+   /**
+    * A mapping from {@link Node}s to {@link BranchFolder}s.
+    */
+   private final Map<Node, BranchFolder> nodeToBranchMapping = new HashMap<Node, BranchFolder>(); 
+   
+   /**
+    * The ProofTreeListener
+    */
+   private final ProofTreeListener proofTreeListener = new ProofTreeListener() {
+      /**
+       * {@inheritDoc}
+       */
       @Override
-      public void autoModeStopped(ProofEvent e) {
-         updateLeafs(e);
+      public void smtDataUpdate(ProofTreeEvent e) {
       }
       
+      /**
+       * {@inheritDoc}
+       */
       @Override
-      public void autoModeStarted(ProofEvent e) {
+      public void proofStructureChanged(ProofTreeEvent e) {
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void proofPruned(ProofTreeEvent e) {
+         hanldeProofPruned(e);
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void proofIsBeingPruned(ProofTreeEvent e) {
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void proofGoalsChanged(ProofTreeEvent e) {
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void proofGoalsAdded(ProofTreeEvent e) {
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void proofGoalRemoved(ProofTreeEvent e) {
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void proofExpanded(ProofTreeEvent e) {
+         handleProofExpanded(e);
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void proofClosed(ProofTreeEvent e) {
+         handleProofClosed(e);
       }
    };
    
    
    /**
     * The Constructor
-    * @param viewer
-    * @param environment
-    * @param proof
+    * @param viewer The {@link Viewer} in which this {@link LabelProvider} is used.
+    * @param proof The shown {@link Proof} as root of the proof tree.
     */
-   public ProofTreeLabelProvider(Viewer viewer, KeYEnvironment<?> environment, Proof proof) {
-      super();
+   public ProofTreeLabelProvider(Viewer viewer, Proof proof) {
       this.viewer = viewer;
       this.proof = proof;
-      this.environment = environment;
-      if (environment != null) {
-         environment.getMediator().addAutoModeListener(autoModeListener);
-      }
-   }
-   
-   /**
-    * Iterates over the complete tree and collects leaf branch folders because their label has to change if the branch was closed.
-    * @param e - {@link ProofEvent}
-    */
-   protected void updateLeafs(ProofEvent e) { // TODO: Should this method not be called also when a rule is applied manually? Or in general an event thrown? If not remove proofTreeListener
-      final List<Object> possibleChangedLeaves = new LinkedList<Object>();
-      proof.breadthFirstSearch(proof.root(), new ProofVisitor() {
-         @Override
-         public void visit(Proof proof, Node visitedNode) {
-            if (visitedNode.isClosed()) {
-               BranchFolder visitedNodeBF = nodeToBranchMapping.get(visitedNode);
-               if (visitedNodeBF != null) {
-                  possibleChangedLeaves.add(visitedNodeBF);
-               }               
-            }
-         }
-      });
-      // Inform viewer about changed objects to update texts and images
-      if (!possibleChangedLeaves.isEmpty() && !viewer.getControl().isDisposed()) {
-         viewer.getControl().getDisplay().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-               if (!viewer.getControl().isDisposed()) {
-                  fireLabelProviderChanged(new LabelProviderChangedEvent(ProofTreeLabelProvider.this, possibleChangedLeaves.toArray()));
-               }
-            }
-         });
-      }
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void dispose() {
-      super.dispose();
-      if (environment != null) {
-         environment.getMediator().removeAutoModeListener(autoModeListener);
+      if (proof != null) {
+         proof.addProofTreeListener(proofTreeListener);
       }
    }
 
@@ -134,8 +153,13 @@ public class ProofTreeLabelProvider extends LabelProvider {
       }
    }
    
+   /**
+    * Returns the text to show for the given {@link Node}.
+    * @param node The {@link Node} for which the text is requested.
+    * @return The text of the node to show.
+    */
    public static String getNodeText(Node node) {
-      if(node.childrenCount() == 1) {
+      if (node.childrenCount() == 1) {
          Node child = node.child(0);
          if (child.getNodeInfo().getBranchLabel() != null) {
             return node.serialNr() + ":" + node.name() + ": " + child.getNodeInfo().getBranchLabel();
@@ -179,5 +203,67 @@ public class ProofTreeLabelProvider extends LabelProvider {
       else {
          return super.getImage(element); // Unknown element
       }
-   }      
+   }
+
+   /**
+    * When a {@link Node} was expanded.
+    * @param e The event.
+    */
+   protected void handleProofExpanded(final ProofTreeEvent e) {
+      if (!viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               if (!viewer.getControl().isDisposed()) {
+                  fireLabelProviderChanged(new LabelProviderChangedEvent(ProofTreeLabelProvider.this, e.getNode()));
+               }
+            }
+         });
+      }
+   }
+   
+   /**
+    * When a {@link Proof} is closed.
+    * @param e The event.
+    */
+   protected void handleProofClosed(ProofTreeEvent e) {
+      if (!viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               if (!viewer.getControl().isDisposed()) {
+                  fireLabelProviderChanged(new LabelProviderChangedEvent(ProofTreeLabelProvider.this));
+               }
+            }
+         });
+      }
+   }
+
+   /**
+    * When a {@link Node} was pruned.
+    * @param e The event.
+    */
+   protected void hanldeProofPruned(final ProofTreeEvent e) {
+      if (!viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               if (!viewer.getControl().isDisposed()) {
+                  fireLabelProviderChanged(new LabelProviderChangedEvent(ProofTreeLabelProvider.this, e.getNode()));
+               }
+            }
+         });
+      }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void dispose() {
+      if (proof != null) {
+         proof.removeProofTreeListener(proofTreeListener);
+      }
+      super.dispose();
+   }    
 }

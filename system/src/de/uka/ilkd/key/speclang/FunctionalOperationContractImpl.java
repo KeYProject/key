@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.speclang;
 
+import static de.uka.ilkd.key.util.Assert.assertEqualSort;
+import static de.uka.ilkd.key.util.Assert.assertSubSort;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -57,7 +60,6 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 
 /**
  * Standard implementation of the OperationContract interface.
@@ -208,7 +210,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
         //self
         if(selfVar != null) {
-            assert selfVar.sort().extendsTrans(originalSelfVar.sort());
+            assertSubSort(selfVar,originalSelfVar);
             result.put(originalSelfVar, selfVar);
         }
 
@@ -220,20 +222,22 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             while(it1.hasNext()) {
                 ProgramVariable originalParamVar = it1.next();
                 ProgramVariable paramVar         = it2.next();
-                assert originalParamVar.sort().equals(paramVar.sort());
+                // allow contravariant parameter types
+                assertSubSort(originalParamVar, paramVar);
                 result.put(originalParamVar, paramVar);
             }
         }
 
         //result
         if(resultVar != null) {
-            assert originalResultVar.sort().equals(resultVar.sort());
+            // workaround to allow covariant return types (bug #1384)
+            assertSubSort(resultVar, originalResultVar);
             result.put(originalResultVar, resultVar);
         }
 
         //exception
         if(excVar != null) {
-            assert originalExcVar.sort().equals(excVar.sort()) : "Incompatible sorts: "+originalExcVar.sort()+" and "+excVar.sort();
+            assertEqualSort(originalExcVar, excVar);
             result.put(originalExcVar, excVar);
         }
 
@@ -241,7 +245,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
             for(LocationVariable h : heapLDT.getAllHeaps()) {
                 if(atPreVars.get(h) != null) {
-                    assert originalAtPreVars.get(h).sort().equals(atPreVars.get(h).sort());
+                    assertEqualSort(originalAtPreVars.get(h), atPreVars.get(h));
                     result.put(originalAtPreVars.get(h), atPreVars.get(h));
                 }
             }
@@ -289,7 +293,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
         //self
         if(selfTerm != null) {
-            assert selfTerm.sort().extendsTrans(originalSelfVar.sort());
+            assertSubSort(selfTerm, originalSelfVar);
             result.put(TB.var(originalSelfVar), selfTerm);
         }
 
@@ -301,6 +305,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             while(it1.hasNext()) {
                 ProgramVariable originalParamVar = it1.next();
                 Term paramTerm                   = it2.next();
+                // TODO: what does this mean?
                 assert paramTerm.sort().extendsTrans(originalParamVar.sort());
                 result.put(TB.var(originalParamVar), paramTerm);
             }
@@ -308,13 +313,13 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
         //result
         if(resultTerm != null) {
-            assert originalResultVar.sort().equals(resultTerm.sort());
+            assertSubSort(resultTerm, originalResultVar);
             result.put(TB.var(originalResultVar), resultTerm);
         }
 
         //exception
         if(excTerm != null) {
-            assert originalExcVar.sort().equals(excTerm.sort());
+            assertEqualSort(originalExcVar, excTerm);
             result.put(TB.var(originalExcVar), excTerm);
         }
 
@@ -322,7 +327,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
             for(LocationVariable h : heapLDT.getAllHeaps()) {
                 if(atPres.get(h) != null) {
-                    assert originalAtPreVars.get(h).sort().equals(atPres.get(h).sort());
+                    assertEqualSort(originalAtPreVars.get(h), atPres.get(h));
                     result.put(TB.var(originalAtPreVars.get(h)), atPres.get(h));
                 }
             }
@@ -577,7 +582,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                       getModality(), 
                       transactionApplicableContract(), 
                       includeHtmlMarkup, 
-                      services);
+                      services,
+                      NotationInfo.PRETTY_SYNTAX, 
+                      NotationInfo.UNICODE_ENABLED);
     }
     
     public static String getText(FunctionalOperationContract contract,
@@ -590,7 +597,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                  List<LocationVariable> heapContext,
                                  Map<LocationVariable,Term> atPres,
                                  boolean includeHtmlMarkup, 
-                                 Services services) {
+                                 Services services,
+                                 boolean usePrettyPrinting, 
+                                 boolean useUnicodeSymbols) {
        ProgramVariable originalSelfVar = contractSelf != null ? (ProgramVariable)contractSelf.op() : null;
        ProgramVariable originalResultVar = resultTerm != null ? (ProgramVariable)resultTerm.op() : null;
        
@@ -664,7 +673,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                       contract.getModality(), 
                       contract.transactionApplicableContract(), 
                       includeHtmlMarkup, 
-                      services);
+                      services,
+                      usePrettyPrinting,
+                      useUnicodeSymbols);
     }
 
     private static String getText(IProgramMethod pm, 
@@ -683,7 +694,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                   Modality modality,
                                   boolean transaction,
                                   boolean includeHtmlMarkup, 
-                                  Services services) {
+                                  Services services,
+                                  boolean usePrettyPrinting, 
+                                  boolean useUnicodeSymbols) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final LocationVariable baseHeap = heapLDT.getHeap();
         final StringBuffer sig = new StringBuffer();
@@ -707,7 +720,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
               sig.append(named.name()).append(", ");
            }
            else if (subst instanceof Term) {
-              sig.append(ProofSaver.printAnything(subst, services)).append(", ");
+              sig.append(LogicPrinter.quickPrintTerm((Term)subst, services, usePrettyPrinting, useUnicodeSymbols).trim()).append(", ");
            }
            else {
               sig.append(subst).append(", ");
@@ -723,12 +736,12 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             sig.append(")");
         }
 
-        final String mby = hasMby ? LogicPrinter.quickPrintTerm(originalMby, services) : null;
+        final String mby = hasMby ? LogicPrinter.quickPrintTerm(originalMby, services, usePrettyPrinting, useUnicodeSymbols) : null;
 
         String mods = "";
         for (LocationVariable h : heapLDT.getAllHeaps()) {
             if (originalMods.get(h) != null) {
-                String printMods = LogicPrinter.quickPrintTerm(originalMods.get(h), services);
+                String printMods = LogicPrinter.quickPrintTerm(originalMods.get(h), services, usePrettyPrinting, useUnicodeSymbols);
                 mods = mods
                         + (includeHtmlMarkup ? "<br><b>" : "\n")
                         + "mod"
@@ -746,7 +759,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
         String globalUpdates = "";
         if (globalDefs!=null){
-            final String printUpdates = LogicPrinter.quickPrintTerm(globalDefs,services);
+            final String printUpdates = LogicPrinter.quickPrintTerm(globalDefs, services, usePrettyPrinting, useUnicodeSymbols);
             globalUpdates = (includeHtmlMarkup? "<br><b>": "\n")
                     + "defs" + (includeHtmlMarkup? "</b> " : ": ")
                     + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printUpdates,false) : printUpdates.trim());
@@ -755,7 +768,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         String pres = "";
         for (LocationVariable h : heapLDT.getAllHeaps()) {
             if (originalPres.get(h) != null) {
-                String printPres = LogicPrinter.quickPrintTerm(originalPres.get(h), services);
+                String printPres = LogicPrinter.quickPrintTerm(originalPres.get(h), services, usePrettyPrinting, useUnicodeSymbols);
                 pres = pres
                         + (includeHtmlMarkup ? "<br><b>" : "\n")
                         + "pre"
@@ -768,7 +781,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         String posts = "";
         for (LocationVariable h : heapLDT.getAllHeaps()) {
             if (originalPosts.get(h) != null) {
-                String printPosts = LogicPrinter.quickPrintTerm(originalPosts.get(h), services);
+                String printPosts = LogicPrinter.quickPrintTerm(originalPosts.get(h), services, usePrettyPrinting, useUnicodeSymbols);
                 posts = posts
                         + (includeHtmlMarkup ? "<br><b>" : "\n")
                         + "post"
@@ -782,7 +795,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         if (originalAxioms != null) {
             for(LocationVariable h : heapLDT.getAllHeaps()) {
                 if(originalAxioms.get(h) != null) {
-                    String printAxioms = LogicPrinter.quickPrintTerm(originalAxioms.get(h), services);
+                    String printAxioms = LogicPrinter.quickPrintTerm(originalAxioms.get(h), services, usePrettyPrinting, useUnicodeSymbols);
                     posts = posts
                             + (includeHtmlMarkup ? "<br><b>" : "\n")
                             + "axiom"
@@ -1030,7 +1043,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                    ProgramVariable resultVar,
                                    Map<LocationVariable, ? extends ProgramVariable> atPreVars,
                                    Services services) {
-        assert (selfVar == null) == (originalSelfVar == null);
+        assert (selfVar == null) == (originalSelfVar == null):
+            "Illegal instantiation:" + (originalSelfVar == null?
+                            "this is a static contract, instantiated with self variable '"+selfVar+"'"
+                            : "this is an instance contract, instantiated without a self variable");
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert (resultVar == null) == (originalResultVar == null);
@@ -1171,7 +1187,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
                 if(atPreVars.get(h) != null && originalAtPreVar != null) {
-                    map.put(TB.var(originalAtPreVar), TB.var(atPreVars.get(h)));
+                    map.put(TB.var(atPre ? h : originalAtPreVar), TB.var(atPreVars.get(h)));
                 }
             }
         }

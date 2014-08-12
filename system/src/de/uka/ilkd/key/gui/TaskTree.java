@@ -96,27 +96,39 @@ public class TaskTree extends JPanel {
         setVisible(true);
     }
 
+    public void removeTask(Proof p) {
+       TaskTreeNode taskForProof = model.getTaskForProof(p);
+       if (taskForProof instanceof BasicTask) {
+          taskForProof = ((BasicTask) taskForProof).getRootTask();
+       }
+       removeTask(taskForProof);
+    }
+    
     public void removeTask(TaskTreeNode tn) {
-        model.removeTask(tn);
-	    mediator.notify(new AbandonTaskEvent());
-	    for (int i=0; i<tn.allProofs().length; i++) {
-		tn.allProofs()[i].removeProofTreeListener(proofTreeListener);
-                tn.allProofs()[i].mgt().removeProofListener();
-	    }
-            MainWindow.getInstance().getProofView().
-                removeProofs(tn.allProofs());
-	    //go to some other node, take the last leaf.
-	    TreePath path 
-		= delegateView.getPathForRow(delegateView.getRowCount()-1);
-	    if(mediator.getInteractiveProver()!=null){
-	        mediator.getInteractiveProver().clear();
-	    }
-	    if (path!=null) {
-		TaskTreeNode tn0 = (TaskTreeNode) path.getLastPathComponent();
-		mediator.setProof(tn0.proof());
-	    } else {
-		mediator.setProof(null);
-	    }
+       model.removeTask(tn);
+       mediator.notify(new AbandonTaskEvent());
+       for (int i=0; i<tn.allProofs().length; i++) {
+          tn.allProofs()[i].removeProofTreeListener(proofTreeListener);
+          tn.allProofs()[i].mgt().removeProofListener();
+       }
+       MainWindow.getInstance().getProofTreeView().
+       removeProofs(tn.allProofs());
+       //go to some other node, take the last leaf.
+       TreePath path 
+       = delegateView.getPathForRow(delegateView.getRowCount()-1);
+       if(mediator.getInteractiveProver()!=null){
+          mediator.getInteractiveProver().clear();
+       }
+
+       if (path!=null) {
+          TaskTreeNode tn0 = (TaskTreeNode) path.getLastPathComponent();
+          mediator.setProof(tn0.proof());
+       } else {
+          mediator.setProof(null);
+       }
+       for (int i=0; i<tn.allProofs().length; i++) {
+          tn.allProofs()[i].dispose();
+       }
     }
     
     public void updateUI() {
@@ -204,7 +216,7 @@ public class TaskTree extends JPanel {
      */
     public void removeProof(Proof proof) {
        if (proof != null) {
-          ProofEnvironment env = proof.env();
+          ProofEnvironment env = proof.getEnv();
           // Search EnvNode which contains the environment of the given proof.
           EnvNode envNode = null;
           for (int i = 0; i < model.getChildCount(model.getRoot()); i++) {

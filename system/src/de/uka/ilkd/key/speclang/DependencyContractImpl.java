@@ -352,7 +352,7 @@ public final class DependencyContractImpl implements DependencyContract {
         for(LocationVariable h : originalPres.keySet()) {
             Term originalPre = originalPres.get(h);
             if(originalPre != null) {
-                pres = pres + "<b>pre</b>["+h+"] "+LogicPrinter.escapeHTML(LogicPrinter.quickPrintTerm(originalPre, services),false)+"<br>";
+                pres = pres + "<b>pre["+h+"]</b> "+LogicPrinter.escapeHTML(LogicPrinter.quickPrintTerm(originalPre, services),false)+"<br>";
             }
         }
         String deps = "";
@@ -362,7 +362,7 @@ public final class DependencyContractImpl implements DependencyContract {
             }
             Term originalDep = originalDeps.get(h);
             if(originalDep != null) {
-                deps = deps + "<b>dep</b>["+h+"] "+LogicPrinter.escapeHTML(LogicPrinter.quickPrintTerm(originalDep, services),false)+"<br>";
+                deps = deps + "<b>dep["+h+"]</b> "+LogicPrinter.escapeHTML(LogicPrinter.quickPrintTerm(originalDep, services),false)+"<br>";
             }
         }
         final String mby = hasMby()
@@ -425,7 +425,7 @@ public final class DependencyContractImpl implements DependencyContract {
             for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
                 if(atPreVars.get(h) != null && originalAtPreVar != null) {
-                    map.put(services.getTermBuilder().var(originalAtPreVar), services.getTermBuilder().var(atPreVars.get(h)));
+                    map.put(services.getTermBuilder().var(atPre ? h : originalAtPreVar), services.getTermBuilder().var(atPreVars.get(h)));
                 }
             }
         }

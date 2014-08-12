@@ -67,7 +67,7 @@
 
   <target name="hudsonUnitTest" depends="compile">
      <junit printsummary="yes" haltonfailure="yes" fork="yes" forkMode="once" enableTestListenerEvents="false" showoutput="true">
-     <jvmarg value="-Xmx2048m"/>
+     <jvmarg value="-Xmx4096m"/>
      <sysproperty key="key.home" value="${env.KEY_HOME}"/>
     <classpath>
       <pathelement location="${ext.dir}/antlr.jar"/>
@@ -104,16 +104,24 @@
 		  srcFile="${src.dir}/de/uka/ilkd/key/parser/KeYLexer.g"/>
 
 	<uptodate property="keyparser.notRequired"
-		  targetFile="${gen.dir}/de/uka/ilkd/key/parser/KeYParser.java"
-		  srcFile="${src.dir}/de/uka/ilkd/key/parser/KeYParser.g"/>
+		  targetFile="${gen.dir}/de/uka/ilkd/key/parser/KeYParser.java">
+	  <srcfiles dir="${src.dir}/de/uka/ilkd/key/parser">
+	    <include name="KeYParser.g"/>
+	    <include name="KeYLexer.g"/>
+	  </srcfiles>
+	</uptodate>
 
 	<uptodate property="jmlprelexer.notRequired"
 		  targetFile="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreLexer.java"
 		  srcFile="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreLexer.g"/>
 
 	<uptodate property="jmlpreparser.notRequired"
-		  targetFile="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreParser.java"
-		  srcFile="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreParser.g"/>
+		  targetFile="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreParser.java">
+	  <srcfiles dir="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/">
+	    <include name="KeYJMLPreParser.g"/>
+	    <include name="KeYJMLPreLexer.g"/>
+	  </srcfiles>
+	</uptodate>
 
 	<!-- no uptodate checks are needed for the javacc/antlr tasks, it is built-in there -->
   </target>

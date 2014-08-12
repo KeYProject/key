@@ -53,6 +53,11 @@ public class SWTBotGraphitiCallStackTabTest extends AbstractSWTBotGraphitiProper
          public void assertDiagram(SWTBotGefEditor editor, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
             assertFalse(tabs.hasTabItem("Call Stack"));
          }
+
+         @Override
+         public void assertMethodCall(SWTBotGefEditor editor, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertFalse(tabs.hasTabItem("Call Stack"));
+         }
       });
    }
 }

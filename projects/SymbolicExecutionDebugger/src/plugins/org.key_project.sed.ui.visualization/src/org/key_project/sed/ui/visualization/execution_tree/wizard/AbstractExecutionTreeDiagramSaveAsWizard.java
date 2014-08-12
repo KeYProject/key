@@ -150,7 +150,8 @@ public abstract class AbstractExecutionTreeDiagramSaveAsWizard extends BasicNewR
          String modelContent = writer.toXML(targets, 
                                             "UTF-8", 
                                             optionsPage != null && optionsPage.isSaveVariables(), 
-                                            optionsPage != null && optionsPage.isSaveCallStack());
+                                            optionsPage != null && optionsPage.isSaveCallStack(),
+                                            null);
          getModelPage().setInitialContents(new ByteArrayInputStream(modelContent.getBytes(Charset.forName("UTF-8"))));
          IFile domainFile = getModelPage().createNewFile();
          if (domainFile != null) {

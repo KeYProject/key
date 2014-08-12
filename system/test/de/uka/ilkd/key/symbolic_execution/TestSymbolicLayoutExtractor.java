@@ -26,14 +26,14 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Tests {@link SymbolicLayoutExtractor}.
@@ -629,7 +629,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
                          boolean useOperationContracts,
                          boolean onReturnStatementNode) throws Exception {
       HashMap<String, String> originalTacletOptions = null;
-      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = null;
+      SymbolicExecutionEnvironment<CustomUserInterface> env = null;
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       try {
          // Define test settings
@@ -637,7 +637,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
          // Make sure that the correct taclet options are defined.
          originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
          // Create proof environment for symbolic execution
-         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, useOperationContracts, false, false, false, false);
+         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, useOperationContracts, false, false, false, false, false);
          setOneStepSimplificationEnabled(null, true);
          // Resume
          resume(env.getUi(), env.getBuilder(), oraclePathInBaseDir + symbolicExecutionOracleFileName, keyRepDirectory);
@@ -669,7 +669,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
             nodeToTest = returnNode;
          }
          // Extract possible heaps
-         SymbolicLayoutExtractor extractor = new SymbolicLayoutExtractor(nodeToTest.getProofNode(), false);
+         SymbolicLayoutExtractor extractor = new SymbolicLayoutExtractor(nodeToTest.getProofNode(), false, false);
          extractor.analyse();
          // Test the initial memory layouts (first time with lazy computation)
          List<ISymbolicLayout> initialLayoutsFirstTime = new ArrayList<ISymbolicLayout>(extractor.getLayoutsCount());

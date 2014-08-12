@@ -144,8 +144,7 @@ public class KeYFile implements EnvInput {
                                     new KeYLexerF(getNewStream(), file.toString(), null));
                problemParser.profile();
                ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
-                settings.loadSettingsFromString(problemParser.preferences());
-                initConfig.setSettings(settings);
+               settings.loadSettingsFromString(problemParser.preferences());
                 return settings;                
             } catch (antlr.ANTLRException e) {
                 throw new ProofInputException(e);
@@ -492,5 +491,10 @@ public class KeYFile implements EnvInput {
     @Override
     public Profile getProfile() {
         return profile;
+    }
+    
+    @Override
+    public File getInitialFile() {
+       return file != null ? file.file() : null;
     }
 }

@@ -18,8 +18,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import de.uka.ilkd.key.util.NotSupported;
-
 public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Serializable {
 
     /**
@@ -80,6 +78,10 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 	System.arraycopy(content, srcIdx, dest, destIndex, length);
     }
 
+    public final boolean isEmpty() {  
+       return content.length == 0;
+    }
+    
     public boolean contains(S op) {
 	for (S el : content) {
 	   if (el.equals(op)) {
@@ -166,11 +168,9 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 	}
 
 	public void remove() {
-	    throw new NotSupported("Illegal modification access on unmodifiable array.");
+	    throw new UnsupportedOperationException("Illegal modification access on unmodifiable array.");
 	}
     }
 
-    public boolean isEmpty() {	
-	return content.length == 0;
-    }
+   
 }

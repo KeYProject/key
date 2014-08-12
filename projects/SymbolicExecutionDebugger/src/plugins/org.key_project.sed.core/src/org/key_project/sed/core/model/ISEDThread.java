@@ -13,6 +13,7 @@
 
 package org.key_project.sed.core.model;
 
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.key_project.sed.core.model.impl.AbstractSEDThread;
@@ -36,4 +37,19 @@ import org.key_project.sed.core.model.memory.SEDMemoryThread;
  * @see ISEDDebugNode
  */
 public interface ISEDThread extends ISEDDebugNode, IThread {
+   /**
+    * Returns all leaf nodes to select.
+    * @return The leaf nodes to select.
+    */
+   public ISEDDebugNode[] getLeafsToSelect() throws DebugException;
+
+   /**
+    * Returns the up to know discovered {@link ISEDTermination}s.
+    * @return The up to know discovered {@link ISEDTermination}s.
+    * @exception DebugException if this method fails.  Reasons include:
+    * <ul><li>Failure communicating with the VM.  The DebugException's
+    * status code contains the underlying exception responsible for
+    * the failure.</li>
+    */
+   public ISEDTermination[] getTerminations() throws DebugException;
 }

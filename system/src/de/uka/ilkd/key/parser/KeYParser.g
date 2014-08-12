@@ -169,7 +169,8 @@ options {
    private DeclPicker capturer = null;
    private IProgramMethod pm = null;
 
-   private ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil();
+   private LinkedHashMap<RuleKey, Taclet> taclets = new LinkedHashMap<RuleKey, Taclet>();
+            
    private ImmutableSet<Contract> contracts = DefaultImmutableSet.<Contract>nil();
    private ImmutableSet<ClassInvariant> invs = DefaultImmutableSet.<ClassInvariant>nil();
 
@@ -286,10 +287,16 @@ options {
         this.normalConfig = normalConfig;       
 	switchToNormalMode();
         this.taclet2Builder = taclet2Builder;
-        this.taclets = taclets;
-        if(normalConfig != null){
+        
+        if (taclets != null && !taclets.isEmpty()) {
+        	for (Taclet t : taclets) {
+	  		this.taclets.put(new RuleKey(t), t);        	
+        	}
+        }
+        
+        if (normalConfig != null){
             this.keh = normalConfig.services().getExceptionHandler();
-        }else{
+        } else{
             this.keh = new KeYRecoderExcHandler();
         }
     }
@@ -304,7 +311,7 @@ options {
         this.normalConfig = null;       
 	switchToNormalMode();
         this.taclet2Builder = null;
-        this.taclets = null;
+        this.taclets = new LinkedHashMap<RuleKey, Taclet>();
         this.keh = new KeYRecoderExcHandler();
     }
 
@@ -440,7 +447,19 @@ options {
     }
 
     public ImmutableSet<Taclet> getTaclets(){
-        return taclets;
+	ImmutableSet<Taclet> tacletSet = DefaultImmutableSet.<Taclet>nil(); 
+	
+	/** maintain correct order for taclet lemma proofs */
+	final List<Taclet> l = new LinkedList<Taclet>();	
+	for (Taclet t : taclets.values()) {
+		l.add(0,t);
+	}
+	
+	
+	for (Taclet t : l) {
+		tacletSet = tacletSet.add(t);
+	}
+        return tacletSet;
     }
 
     public ImmutableSet<Contract> getContracts(){
@@ -3623,8 +3642,8 @@ varexp[TacletBuilder b]
         | varcond_referencearray[b, negated]
         | varcond_static[b,negated]
         | varcond_staticmethod[b,negated]  
+        | varcond_final[b,negated]
         | varcond_typecheck[b, negated]
-        | varcond_induction_variable[b, negated]
         | varcond_constant[b, negated]
         | varcond_label[b, negated]
         | varcond_static_field[b, negated]
@@ -3941,6 +3960,14 @@ varcond_enum_const [TacletBuilder b]
    }
 ;
 
+varcond_final [TacletBuilder b, boolean negated]
+:
+   FINAL LPAREN x=varId RPAREN {
+      b.addVariableCondition(new FinalReferenceCondition(
+  (SchemaVariable) x, negated));     
+   }
+;
+
 varcond_static [TacletBuilder b, boolean negated]
 :
    STATIC LPAREN x=varId RPAREN {
@@ -4010,14 +4037,6 @@ varcond_freeLabelIn [TacletBuilder b, boolean negated]
     	b.addVariableCondition(new FreeLabelInVariableCondition((SchemaVariable) l, 
     	(SchemaVariable) statement, negated ));
     }
-;
-
-varcond_induction_variable [TacletBuilder b, boolean negated]
-:
-   ISINDUCTVAR LPAREN x=varId RPAREN {
-     b.addVariableCondition(new InductionVariableCondition (
-       (SchemaVariable)x, negated ));
-   }
 ;
 
 varcond_constant [TacletBuilder b, boolean negated]
@@ -4325,16 +4344,18 @@ problem returns [ Term _problem = null ]
             ( 
                 s = taclet[choices] SEMI
                 {
-                    try {
                         if (!skip_taclets) {
-                            taclets = taclets.addUnique(s);
+                            final RuleKey key = new RuleKey(s); 
+                            if (taclets.containsKey(key)) {
+	                        semanticError
+        	                ("Cannot add taclet \"" + s.name() + 
+                	            "\" to rule base as a taclet with the same "+
+                        	    "name already exists.");
+                            	
+                            } else {
+                            	taclets.put(key, s);
+                            }
                         }
-                    } catch(de.uka.ilkd.key.collection.NotUniqueException e) {
-                        semanticError
-                        ("Cannot add taclet \"" + s.name() + 
-                            "\" to rule base as a taclet with the same "+
-                            "name already exists.");
-                    }
                 }
             )*
             RBRACE {choices=DefaultImmutableSet.<Choice>nil();}

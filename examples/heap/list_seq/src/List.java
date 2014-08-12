@@ -59,7 +59,7 @@ public interface List {
       @   requires (\exists int i; 0 <= i && i < seq.length; seq[i] == o);
       @   assignable footprint;
       @   ensures (\exists int i; 0 <= i && i < \old(seq).length && \old(seq[i]) == o;
-      @      seq == \old(\seq_concat(seq[0..i-1], seq[i+1..seq.length-1])));
+      @      seq == \old(\seq_concat(seq[0..i], seq[i+1..seq.length])));
       @   ensures \new_elems_fresh(footprint);
       @*/
     public void remove(Object o);

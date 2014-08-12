@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_ccb98aad-39b4-4e1b-9829-82724f8718e9" name="main(UseOperationContractNoPreconditionWithNullCheckTest)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_90289688-9052-49f4-b8a4-def686ceb7e3" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_9612ec8b-c41e-4edb-9ba3-cf1459ed02ac" name="UseOperationContractNoPreconditionWithNullCheckTest.main(obj);" pathCondition="true" lineNumber="-1" charStart="89" charEnd="93">
-            <sedStatement xml:id="_b05d7baa-4244-4e6e-8a3a-5bdc777608d9" name="int magicNumber = obj.magic(123);" pathCondition="true" lineNumber="-1" charStart="156" charEnd="189">
-               <sedMethodContract xml:id="_c0cea96a-692d-44ae-be53-fbccc74a7027" name="result_0 = obj.magic(123) catch(exc_0)
+   <sedTarget xml:id="_c5b97944-1243-4320-9745-71bea73dbd85" name="main(UseOperationContractNoPreconditionWithNullCheckTest)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_a40198bf-4a53-4ece-9d24-9da46933c940" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_50dbefbf-a799-4c4e-be9b-fc1114fad68c" name="UseOperationContractNoPreconditionWithNullCheckTest.main(obj);" pathCondition="true" lineNumber="-1" charStart="89" charEnd="93" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNoPreconditionWithNullCheckTest\src\UseOperationContractNoPreconditionWithNullCheckTest.java">
+            <sedStatement xml:id="_4ff4f954-37ee-4be7-ade7-461717d000d1" name="int magicNumber = obj.magic(123);" pathCondition="true" lineNumber="-1" charStart="156" charEnd="189" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNoPreconditionWithNullCheckTest\src\UseOperationContractNoPreconditionWithNullCheckTest.java">
+               <sedMethodContract xml:id="_a77d5620-bf45-426b-9770-c727271dc95a" name="result_0 = obj.magic(123) catch(exc_0)
 pre: obj.&lt;inv&gt;
 post: result_0 = 42 &amp; obj.&lt;inv&gt; &amp; exc_0 = null
 mod: allLocs
-termination: diamond" pathCondition="true" lineNumber="-1" charStart="355" charEnd="360" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
-                  <sedBranchCondition xml:id="_8d6ce745-f9f4-4bab-8d23-79576dcb4f07" name="Post (magic): not(equals(obj,null))" pathCondition="not(equals(obj,null))">
-                     <sedStatement xml:id="_0492f1c3-07df-4b91-ae7c-eb70d1eaab57" name="int magicNumberCopy = magicNumber;" pathCondition="not(equals(obj,null))" lineNumber="-1" charStart="193" charEnd="227">
-                        <sedStatement xml:id="_ad082d17-bbdb-4586-9a57-32d7b4861fea" name="return magicNumber+magicNumberCopy;" pathCondition="not(equals(obj,null))" lineNumber="-1" charStart="231" charEnd="268">
-                           <sedMethodReturn xml:id="_be3d3117-edeb-4ef9-b9d4-86e685723663" name="&lt;return of UseOperationContractNoPreconditionWithNullCheckTest.main(obj);&gt;" pathCondition="not(equals(obj,null))" lineNumber="-1" charStart="89" charEnd="93">
-                              <sedTermination xml:id="_1d900ef3-fb3e-4435-af03-13a3324683c3" name="&lt;end&gt;" pathCondition="not(equals(obj,null))" verified="true">
+termination: diamond" pathCondition="true" lineNumber="-1" charStart="355" charEnd="360" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNoPreconditionWithNullCheckTest\src\UseOperationContractNoPreconditionWithNullCheckTest.java" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
+                  <sedBranchCondition xml:id="_dc4a4565-d97e-4bbb-abb6-06b0e2e29a0a" name="Post (magic): not(equals(obj,null))" pathCondition="not(equals(obj,null))">
+                     <sedStatement xml:id="_4e21454f-3121-41c6-807e-f7c211ea9a37" name="int magicNumberCopy = magicNumber;" pathCondition="not(equals(obj,null))" lineNumber="-1" charStart="193" charEnd="227" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNoPreconditionWithNullCheckTest\src\UseOperationContractNoPreconditionWithNullCheckTest.java">
+                        <sedStatement xml:id="_12cbc91d-4958-48d7-8817-07892d069107" name="return magicNumber+magicNumberCopy;" pathCondition="not(equals(obj,null))" lineNumber="-1" charStart="231" charEnd="268" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNoPreconditionWithNullCheckTest\src\UseOperationContractNoPreconditionWithNullCheckTest.java">
+                           <sedMethodReturn xml:id="_ab17f278-49fe-4e20-9438-40bbaa5a6f77" name="&lt;return of UseOperationContractNoPreconditionWithNullCheckTest.main(obj);&gt;" pathCondition="not(equals(obj,null))" lineNumber="-1" charStart="89" charEnd="93" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractNoPreconditionWithNullCheckTest\src\UseOperationContractNoPreconditionWithNullCheckTest.java" methodReturnConditionRef="_0ecf8ce5-05b7-4907-8f7b-effcc2e52a17">
+                              <sedTermination xml:id="_375a8891-8be3-4c8f-8e48-d3deaa9dfead" name="&lt;end&gt;" pathCondition="not(equals(obj,null))" verified="true">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedStatement>
@@ -21,7 +21,11 @@ termination: diamond" pathCondition="true" lineNumber="-1" charStart="355" charE
                   </sedBranchCondition>
                </sedMethodContract>
             </sedStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_0ecf8ce5-05b7-4907-8f7b-effcc2e52a17" name="not(equals(obj,null))" pathCondition="true">
+               <sedChildReference nodeIdRef="_ab17f278-49fe-4e20-9438-40bbaa5a6f77"/>
+            </sedMethodCallMethodReturnCondition>
          </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_375a8891-8be3-4c8f-8e48-d3deaa9dfead"/>
       </sedThread>
    </sedTarget>
 </launch>

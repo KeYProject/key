@@ -21,7 +21,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
  * removed formula to the semisequents. 
  */
 public class SemisequentChangeInfo {
-    
+   
     /** contains the added formulas to the semisequent */
     private ImmutableList<SequentFormula> added   = ImmutableSLList.<SequentFormula>nil();
     /** contains the removed formulas from the semisequent */
@@ -29,8 +29,7 @@ public class SemisequentChangeInfo {
     /** contains the modified formulas from the semisequent */
     private ImmutableList<FormulaChangeInfo> modified = ImmutableSLList.<FormulaChangeInfo>nil();
     /** stores the redundance free formula list of the semisequent */
-    private ImmutableList<SequentFormula> modifiedSemisequent =
-	ImmutableSLList.<SequentFormula>nil(); 
+    private ImmutableList<SequentFormula> modifiedSemisequent = ImmutableSLList.<SequentFormula>nil(); 
     /**
      * contains formulas that have been tried to add, but which have been rejected due to
      * already existing formulas in the sequent subsuming these formulas 
@@ -155,7 +154,65 @@ public class SemisequentChangeInfo {
 	}
 	
     }
+    
+    
+    /**
+     * This method combines this change information from this info and its successor. 
+     * ATTENTION: it takes over ownership over {@link succ} and does not release it. This means
+     * when invoking the method it must be snsured that succ is never used afterwards.
+     */
+    public void combine(SemisequentChangeInfo succ) {
+       final SemisequentChangeInfo predecessor = this;
+       if (succ == predecessor) {
+          return ;
+       }
+       
+       for (SequentFormula sf : succ.removed) {
+          predecessor.added = predecessor.added.removeAll(sf);
 
+          boolean skip = false; 
+          for (FormulaChangeInfo fci : predecessor.modified) {
+             if (fci.getNewFormula() == sf) {
+                predecessor.modified = predecessor.modified.removeAll(fci);
+                if (!predecessor.removed.contains(fci.getOriginalFormula())) {
+                   predecessor.removed  = predecessor.removed.append(fci.getOriginalFormula());
+                }
+                skip = true;
+                break;
+             }
+          }
+          if (!skip) {
+             predecessor.removedFormula(succ.lastFormulaIndex, sf);
+          }
+       }
+       
+       for (FormulaChangeInfo fci : succ.modified) {
+          if (predecessor.addedFormulas().contains(fci.getOriginalFormula())) {
+             predecessor.added = predecessor.added.removeAll(fci.getOriginalFormula());
+             predecessor.addedFormula(succ.lastFormulaIndex, fci.getNewFormula());
+          } else {
+             predecessor.modifiedFormula(succ.lastFormulaIndex, fci);
+          }
+       }
+
+       for (SequentFormula sf : succ.added) {
+          predecessor.removed = predecessor.removed.removeAll(sf);
+          if (!predecessor.added.contains(sf)) {
+             predecessor.addedFormula(succ.lastFormulaIndex, sf);
+          }
+       }
+       
+       for (SequentFormula sf : succ.rejected) {
+          if (!predecessor.rejected.contains(sf)) {
+             predecessor.rejectedFormula(sf);
+          }
+       }
+
+       predecessor.lastFormulaIndex = succ.lastFormulaIndex;
+       predecessor.modifiedSemisequent = succ.modifiedSemisequent;
+       predecessor.semisequent = succ.semisequent;
+    }
+    
     /**
      * returns the index of the last added formula
      */

@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IfThenElse;
@@ -35,7 +36,6 @@ import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.util.TermHelper;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
@@ -329,54 +329,58 @@ public final class RewriteTaclet extends FindTaclet {
     /** 
      * applies the replacewith part of Taclets
      * @param gt TacletGoalTemplate used to get the replaceexpression in the Taclet
-     * @param goal the Goal where the rule is applied
+     * @param currentSequent
+     *           the Sequent which is the current (intermediate) result of
+     *           applying the taclet
      * @param posOfFind the PosInOccurrence belonging to the find expression
      * @param services the Services encapsulating all java information
      * @param matchCond the MatchConditions with all required instantiations 
      */
-    @Override
-    protected void applyReplacewith(TacletGoalTemplate gt, 
-				    Goal               goal,
-				    PosInOccurrence    posOfFind,
-				    Services           services,
-				    MatchConditions    matchCond) {
-	if ( gt instanceof RewriteTacletGoalTemplate ) {
-            SequentFormula cf
-                = applyReplacewithHelper((RewriteTacletGoalTemplate)gt,
-                                         posOfFind,
-                                         services,
-                                         matchCond);
+   @Override
+   protected void applyReplacewith(TacletGoalTemplate gt,
+         SequentChangeInfo currentSequent, PosInOccurrence posOfFind,
+         Services services, MatchConditions matchCond) {
+      if (gt instanceof RewriteTacletGoalTemplate) {
+         SequentFormula cf = applyReplacewithHelper(
+               (RewriteTacletGoalTemplate) gt, posOfFind, services, matchCond);
 
-            goal.changeFormula ( cf, posOfFind );
-	} else {
-	    // Then there was no replacewith...
-	    // This is strange in a RewriteTaclet, but who knows...
-	}
-    }
+         currentSequent.combine(currentSequent.sequent().changeFormula(cf, posOfFind));
+      }
+      else {
+         // Then there was no replacewith...
+         // This is strange in a RewriteTaclet, but who knows...
+      }
+   }
 
-    /**
-     * adds the sequent of the add part of the Taclet to the goal sequent
-     * @param add the Sequent to be added
-     * @param goal the Goal to be updated
-     * @param posOfFind the PosInOccurrence describes the place where to add
-     * the semisequent
-     * @param services the Services encapsulating all java information
-     * @param matchCond the MatchConditions with all required instantiations 
-     */
-    @Override
-    protected void applyAdd(Sequent         add, 
-			    Goal            goal,
-			    PosInOccurrence posOfFind,
-			    Services        services,
-			    MatchConditions matchCond) {
-	if (posOfFind.isInAntec()) {
-	    addToAntec(add.antecedent(), goal, posOfFind, services, matchCond);
-	    addToSucc(add.succedent(), goal, null, services, matchCond);
-	} else {
-	    addToAntec(add.antecedent(), goal, null, services, matchCond);	
-	    addToSucc(add.succedent(), goal, posOfFind, services, matchCond);
-	}
-    }
+   /**
+    * adds the sequent of the add part of the Taclet to the goal sequent
+    * 
+    * @param add
+    *           the Sequent to be added
+    * @param currentSequent
+    *           the Sequent which is the current (intermediate) result of
+    *           applying the taclet
+    * @param posOfFind
+    *           the PosInOccurrence describes the place where to add the
+    *           semisequent
+    * @param services
+    *           the Services encapsulating all java information
+    * @param matchCond
+    *           the MatchConditions with all required instantiations
+    */
+   @Override
+   protected void applyAdd(Sequent add,
+         SequentChangeInfo currentSequent, PosInOccurrence posOfFind,
+         Services services, MatchConditions matchCond) {
+      if (posOfFind.isInAntec()) {
+         addToAntec(add.antecedent(), currentSequent, posOfFind, services, matchCond, posOfFind);
+         addToSucc(add.succedent(), currentSequent, null, services, matchCond, posOfFind);
+      }
+      else {
+         addToAntec(add.antecedent(), currentSequent, null, services, matchCond, posOfFind);
+         addToSucc(add.succedent(), currentSequent, posOfFind, services, matchCond, posOfFind);
+      }
+   }
     
     @Override
     protected Taclet setName(String s) {

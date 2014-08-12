@@ -120,11 +120,21 @@ public class KeYLaunchSettings {
     * The used boot class path.
     */
    private final File bootClassPath;
+
+   /**
+    * {@code true} use unicode characters, {@code false} do not use unicode characters.
+    */
+   private final boolean useUnicode;
    
    /**
     * Use pretty printing?
     */
    private final boolean usePrettyPrinting;
+   
+   /**
+    * Show signature on method return nodes?
+    */
+   private final boolean showSignatureOnMethodReturnNodes;
    
    /**
     * Constructor.
@@ -145,6 +155,7 @@ public class KeYLaunchSettings {
     * @param classPaths The used class path entries.
     * @param bootClassPath The used boot class path.
     * @param usePrettyPrinting Use pretty printing?
+    * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @throws JavaModelException Occurred Exception.
     */
    public KeYLaunchSettings(boolean newDebugSession,
@@ -163,7 +174,9 @@ public class KeYLaunchSettings {
                             File location,
                             List<File> classPaths,
                             File bootClassPath,
-                            boolean usePrettyPrinting) throws JavaModelException {
+                            boolean useUnicode,
+                            boolean usePrettyPrinting,
+                            boolean showSignatureOnMethodReturnNodes) throws JavaModelException {
       this.newDebugSession = newDebugSession;
       this.proofFileToContinue = proofFileToContinue;
       this.method = method;
@@ -181,7 +194,9 @@ public class KeYLaunchSettings {
       this.location = location;
       this.classPaths = classPaths;
       this.bootClassPath = bootClassPath;
+      this.useUnicode = useUnicode;
       this.usePrettyPrinting = usePrettyPrinting;
+      this.showSignatureOnMethodReturnNodes = showSignatureOnMethodReturnNodes;
    }
 
    /**
@@ -321,10 +336,26 @@ public class KeYLaunchSettings {
    }
 
    /**
+    * Checks if unicode characters are used.
+    * @return {@code true} use unicode characters, {@code false} do not use unicode characters.
+    */
+   public boolean isUseUnicode() {
+      return useUnicode;
+   }
+
+   /**
     * Checks if pretty printing should be used.
     * @return {@code true} use pretty printing, {@code false} do not use pretty printing.
     */
    public boolean isUsePrettyPrinting() {
       return usePrettyPrinting;
+   }
+
+   /**
+    * Checks if signature is shown on method return nodes.
+    * @return Show signature on method return nodes?
+    */
+   public boolean isShowSignatureOnMethodReturnNodes() {
+      return showSignatureOnMethodReturnNodes;
    }
 }

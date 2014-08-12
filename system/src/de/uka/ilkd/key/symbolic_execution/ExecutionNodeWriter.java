@@ -21,22 +21,23 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
@@ -58,6 +59,16 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Attribute name to store {@link IExecutionMethodReturn#getNameIncludingReturnValue()}.
     */
    public static final String ATTRIBUTE_NAME_INCLUDING_RETURN_VALUE = "nameIncludingReturnValue";
+
+   /**
+    * Attribute name to store {@link IExecutionMethodReturn#getSignatureIncludingReturnValue()}.
+    */
+   public static final String ATTRIBUTE_SIGNATURE_INCLUDING_RETURN_VALUE = "signatureIncludingReturnValue";
+
+   /**
+    * Attribute name to store {@link IExecutionMethodReturn#getSignature()}.
+    */
+   public static final String ATTRIBUTE_SIGNATURE = "signature";
 
    /**
     * Attribute exceptional termination to store {@link IExecutionTermination#getTerminationKind()}.
@@ -173,6 +184,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Attribute name to store {@link IExecutionBranchCondition#getAdditionalBranchLabel()}.
     */
    public static final String ATTRIBUTE_ADDITIONAL_BRANCH_LABEL = "additionalBranchLabel";
+
+   /**
+    * Attribute name to store {@link IExecutionMethodReturn#getMethodReturnCondition()}.
+    */
+   public static final String ATTRIBUTE_METHOD_RETURN_CONDITION = "methodReturnCondition";
    
    /**
     * Tag name to store {@link IExecutionBranchCondition}s.
@@ -248,6 +264,16 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Tag name to store one entry of {@link IExecutionNode#getCallStack()}.
     */
    public static final String TAG_CALL_STACK_ENTRY = "callStackEntry";
+
+   /**
+    * Tag name to store one entry of {@link IExecutionMethodCall#getMethodReturns()}.
+    */
+   public static final String TAG_METHOD_RETURN_ENTRY = "methodReturnEntry";
+
+   /**
+    * Tag name to store one entry of {@link IExecutionStart#getTerminations()}.
+    */
+   public static final String TAG_TERMINATION_ENTRY = "terminationEntry";
 
    /**
     * Character to separate path entries in attributes {@value #ATTRIBUTE_PATH_IN_TREE}.
@@ -431,7 +457,25 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendStartTag(level, TAG_START, attributeValues, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
+      appendTerminations(level + 1, node, sb);
       appendEndTag(level, TAG_START, sb);
+   }
+
+   /**
+    * Appends the termination entries to the given {@link StringBuffer}.
+    * @param level The level of the children.
+    * @param node The {@link IExecutionStart} which provides the termination entries.
+    * @param sb The {@link StringBuffer} to append to.
+    */
+   protected void appendTerminations(int level, IExecutionStart node, StringBuffer sb) {
+      ImmutableList<IExecutionTermination> terminations = node.getTerminations();
+      if (terminations != null) {
+         for (IExecutionTermination termination : terminations) {
+            Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+            attributeValues.put(ATTRIBUTE_PATH_IN_TREE, computePath(termination));
+            appendEmptyTag(level, TAG_TERMINATION_ENTRY, attributeValues, sb);
+         }
+      }
    }
 
    /**
@@ -539,6 +583,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendVariables(level + 1, node, saveVariables, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
+      appendMethodReturns(level + 1, node, sb);
       appendEndTag(level, TAG_METHOD_CALL, sb);
    }
 
@@ -560,12 +605,15 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                               StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
+      attributeValues.put(ATTRIBUTE_SIGNATURE, node.getSignature());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       if (saveReturnValues) {
          attributeValues.put(ATTRIBUTE_NAME_INCLUDING_RETURN_VALUE, node.getNameIncludingReturnValue());
+         attributeValues.put(ATTRIBUTE_SIGNATURE_INCLUDING_RETURN_VALUE, node.getSignatureIncludingReturnValue());
       }
       attributeValues.put(ATTRIBUTE_RETURN_VALUE_COMPUTED, node.isReturnValuesComputed() + "");
+      attributeValues.put(ATTRIBUTE_METHOD_RETURN_CONDITION, node.getFormatedMethodReturnCondition());
       appendStartTag(level, TAG_METHOD_RETURN, attributeValues, sb);
       if (saveReturnValues) {
          IExecutionMethodReturnValue[] returnValues = node.getReturnValues();
@@ -825,6 +873,23 @@ public class ExecutionNodeWriter extends AbstractWriter {
                attributeValues.put(ATTRIBUTE_PATH_IN_TREE, computePath(stackNode));
                appendEmptyTag(level, TAG_CALL_STACK_ENTRY, attributeValues, sb);
             }
+         }
+      }
+   }
+
+   /**
+    * Appends the method return entries to the given {@link StringBuffer}.
+    * @param level The level of the children.
+    * @param node The {@link IExecutionMethodCall} which provides the call stack.
+    * @param sb The {@link StringBuffer} to append to.
+    */
+   protected void appendMethodReturns(int level, IExecutionMethodCall node, StringBuffer sb) {
+      ImmutableList<IExecutionMethodReturn> methodReturns = node.getMethodReturns();
+      if (methodReturns != null) {
+         for (IExecutionMethodReturn methodReturn : methodReturns) {
+            Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+            attributeValues.put(ATTRIBUTE_PATH_IN_TREE, computePath(methodReturn));
+            appendEmptyTag(level, TAG_METHOD_RETURN_ENTRY, attributeValues, sb);
          }
       }
    }
