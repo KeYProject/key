@@ -28,6 +28,8 @@ import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
+import de.uka.ilkd.key.java.abstraction.ClassType;
+import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -1251,8 +1253,7 @@ public class LogicPrinter {
             final Term fieldTerm  = t.sub(2);
 
              if(objectTerm.equals(services.getTermBuilder().NULL())
-                && fieldTerm.op() instanceof Function
-                && ((Function)fieldTerm.op()).isUnique()) {
+        			&& isFieldConstant(fieldTerm)) {
                 // static field access
                 String className = heapLDT.getClassName((Function)fieldTerm.op());
 
@@ -1276,6 +1277,15 @@ public class LogicPrinter {
                 markEndSub();
 
             } else if(fieldTerm.arity() == 0) {
+        		
+        		// TODO @Kai this checks too little.
+        		
+        		Sort sort = objectTerm.sort();
+        		KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(sort);
+        		ClassType type = (ClassType)kjt.getJavaType();
+        		ImmutableList<Field> fields = type.getFields(services);
+        		
+        		
                 // field constant, skolemised field, field variable, ...
                 markStartSub(1);
                 printEmbeddedObserver(heapTerm, objectTerm);
@@ -1329,6 +1339,11 @@ public class LogicPrinter {
         }
     }
 
+	private boolean isFieldConstant(final Term fieldTerm) {
+		return fieldTerm.op() instanceof Function
+		&& ((Function)fieldTerm.op()).isUnique()
+		&& ((Function)fieldTerm.op()).name().toString().contains("::$");
+	}
 
     public void printPostfix(Term t, String postfix) throws IOException {
 	if(NotationInfo.PRETTY_SYNTAX) {
