@@ -223,27 +223,22 @@
       <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreParser.g" />
     </java>
   </target>
+  
+    <target name="jmllexer">
+        <java classpath="${ext.dir}/antlr.jar" fork="true" failonerror="true" classname="antlr.Tool">
+            <arg value="-o" />
+            <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation" />
+            <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/translation/jmllexer.g" />
+        </java>
+    </target>
 
-	<target name="jmllexer">
-	     <antlr
-	         target="${src.dir}/de/uka/ilkd/key/speclang/jml/translation/jmllexer.g"
-	         outputdirectory="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation">
-	        <classpath>
-	           <pathelement location="${ext.dir}/antlr.jar" />
-	        </classpath>
-	     </antlr>
-	  </target>
-
-
-	  <target name="jmlparser"  depends="jmllexer">
-	     <antlr
-	         target="${src.dir}/de/uka/ilkd/key/speclang/jml/translation/jmlparser.g"
-	         outputdirectory="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation">
-	        <classpath>
-	           <pathelement location="${ext.dir}/antlr.jar" />
-	        </classpath>
-	     </antlr>
-	  </target>
+    <target name="jmlparser"  depends="jmllexer">
+        <java classpath="${ext.dir}/antlr.jar" fork="true" failonerror="true" classname="antlr.Tool">
+            <arg value="-o" />
+            <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation" />
+            <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/translation/jmlparser.g" />
+        </java>
+    </target>
 
 
   <target name="schemajavaparser"> 
