@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -16,14 +17,15 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.key_project.key4eclipse.resources.projectinfo.ContractInfo;
 import org.key_project.key4eclipse.resources.projectinfo.ContractInfo.ContractModality;
+import org.key_project.key4eclipse.resources.projectinfo.ContractInfo.TacletOptionIssues;
 import org.key_project.key4eclipse.resources.projectinfo.MethodInfo;
 import org.key_project.key4eclipse.resources.projectinfo.ObserverFunctionInfo;
 import org.key_project.key4eclipse.resources.projectinfo.PackageInfo;
@@ -33,12 +35,16 @@ import org.key_project.key4eclipse.resources.projectinfo.TypeInfo;
 import org.key_project.key4eclipse.resources.ui.util.LogUtil;
 import org.key_project.key4eclipse.resources.ui.util.ResourcesUiImages;
 
+import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
+import de.uka.ilkd.key.gui.configuration.ChoiceSelector.ChoiceEntry;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+
 /**
  * An {@link ILabelProvider} to label {@link ProjectInfo}s and its content
  * in a {@link Viewer}.
  * @author Martin Hentschel
  */
-public class ProjectInfoLabelProvider extends LabelProvider {
+public class ProjectInfoLabelProvider extends ColumnLabelProvider {
    /**
     * The {@link Viewer} in which this {@link ILabelProvider} is used.
     */
@@ -176,19 +182,59 @@ public class ProjectInfoLabelProvider extends LabelProvider {
          }
          else if (element instanceof ContractInfo) {
             ContractInfo ci = (ContractInfo) element;
+            TacletOptionIssues tacletIssues;
+            try {
+               tacletIssues = ci.checkTaletOptions();
+            }
+            catch (ProofInputException e) {
+               LogUtil.getLogger().logError(e);
+               tacletIssues = null;
+            }
             if (ci.getParent() instanceof MethodInfo) {
-               if (ContractModality.BOX.equals(ci.getModality())) {
-                  return ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_BOX);
+               if (tacletIssues != null && !tacletIssues.getUnsoundOptions().isEmpty()) {
+                  if (ContractModality.BOX.equals(ci.getModality())) {
+                     return ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_BOX_WARNING);
+                  }
+                  else if (ContractModality.DIAMOND.equals(ci.getModality())) {
+                     return ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_DIAMOND_WARNING);
+                  }
+                  else {
+                     return ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_WARNING);
+                  }
                }
-               else if (ContractModality.DIAMOND.equals(ci.getModality())) {
-                  return ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_DIAMOND);
+               else if (tacletIssues != null && !tacletIssues.getIncompleteOptions().isEmpty()) {
+                  if (ContractModality.BOX.equals(ci.getModality())) {
+                     return ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_BOX_INFO);
+                  }
+                  else if (ContractModality.DIAMOND.equals(ci.getModality())) {
+                     return ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_DIAMOND_INFO);
+                  }
+                  else {
+                     return ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_INFO);
+                  }
                }
                else {
-                  return ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT);
+                  if (ContractModality.BOX.equals(ci.getModality())) {
+                     return ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_BOX);
+                  }
+                  else if (ContractModality.DIAMOND.equals(ci.getModality())) {
+                     return ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_DIAMOND);
+                  }
+                  else {
+                     return ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT);
+                  }
                }
             }
             else {
-               return ResourcesUiImages.getImage(ResourcesUiImages.OBSERVER_FUNCTION_CONTRACT);
+               if (tacletIssues != null && !tacletIssues.getUnsoundOptions().isEmpty()) {
+                  return ResourcesUiImages.getImage(ResourcesUiImages.OBSERVER_FUNCTION_CONTRACT_WARNING);
+               }
+               else if (tacletIssues != null && !tacletIssues.getIncompleteOptions().isEmpty()) {
+                  return ResourcesUiImages.getImage(ResourcesUiImages.OBSERVER_FUNCTION_CONTRACT_INFO);
+               }
+               else {
+                  return ResourcesUiImages.getImage(ResourcesUiImages.OBSERVER_FUNCTION_CONTRACT);
+               }
             }
          }
          else {
@@ -197,6 +243,62 @@ public class ProjectInfoLabelProvider extends LabelProvider {
       }
       catch (JavaModelException e) {
          LogUtil.getLogger().logError(e);
+         return null;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getToolTipText(Object element) {
+      if (element instanceof ContractInfo) {
+         try {
+            StringBuffer sb = new StringBuffer();
+            ContractInfo info = (ContractInfo) element;
+            // Add information about unproven proof dependencies
+            List<IFile> unprovenProofs = info.checkUnprovenDependencies();
+            if (unprovenProofs != null && !unprovenProofs.isEmpty()) {
+               sb.append("Unproven Dependency:\n");
+               for (IFile unprovenProof : unprovenProofs) {
+                  sb.append("- " + unprovenProof.getFullPath());
+               }
+            }
+            // Add information about taclet options
+            TacletOptionIssues tacletIssues = info.checkTaletOptions();
+            if (tacletIssues != null && 
+                (!tacletIssues.getIncompleteOptions().isEmpty() || !tacletIssues.getUnsoundOptions().isEmpty() || !tacletIssues.getInformationOptions().isEmpty())) {
+               if (sb.length() >= 1) {
+                  sb.append("\n\n");
+               }
+               sb.append("Taclet Options:");
+               for (String value : tacletIssues.getUnsoundOptions()) {
+                  if (sb.length() >= 1) {
+                     sb.append("\n");
+                  }
+                  sb.append("- " + value + ": " + ChoiceEntry.UNSOUND_TEXT);
+               }
+               for (String value : tacletIssues.getIncompleteOptions()) {
+                  if (sb.length() >= 1) {
+                     sb.append("\n");
+                  }
+                  sb.append("- " + value + ": " + ChoiceEntry.INCOMPLETE_TEXT);
+               }
+               for (String value : tacletIssues.getInformationOptions()) {
+                  if (sb.length() >= 1) {
+                     sb.append("\n");
+                  }
+                  sb.append("- " + value + ": " + ChoiceSelector.getInformation(value));
+               }
+            }
+            return sb.length() == 0 ? null : sb.toString();
+         }
+         catch (Exception e) {
+            LogUtil.getLogger().logError(e);
+            return null;
+         }
+      }
+      else {
          return null;
       }
    }

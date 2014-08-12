@@ -45,8 +45,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import de.uka.ilkd.key.gui.IconFactory;
-
-
+import de.uka.ilkd.key.symbolic_execution.util.IFilter;
+import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 public class ChoiceSelector extends JDialog {
 
@@ -129,7 +129,13 @@ public class ChoiceSelector extends JDialog {
             choiceList.setSelectedValue(category2DefaultChoice.get(cats[0]),true);
             choiceList.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
-                    setDefaultChoice((String) choiceList.getSelectedValue());
+                    Object selectedValue = choiceList.getSelectedValue();
+                    if (selectedValue instanceof ChoiceEntry) {
+                       setDefaultChoice(((ChoiceEntry) selectedValue).getChoice());
+                    }
+                    else {
+                       setDefaultChoice(null);
+                    }
                 }});
 
             JScrollPane choiceScrollPane = new 	    
@@ -226,16 +232,16 @@ public class ChoiceSelector extends JDialog {
      */
     private void setChoiceList() {
 	String selection = (String) catList.getSelectedValue();
-	choiceList.setListData(category2Choices.
-				get(selection).toArray());
-	choiceList.setSelectedValue(category2DefaultChoice.
-				    get(selection),false);
+	ChoiceEntry[] choices = createChoiceEntries(category2Choices.get(selection));
+	choiceList.setListData(choices);
+	ChoiceEntry selectedChoice = findChoice(choices, category2DefaultChoice.get(selection));
+	choiceList.setSelectedValue(selectedChoice, false);
 	explanationArea.setBorder(BorderFactory.createTitledBorder(selection));
 	explanationArea.setText(getExplanation(selection));
 	explanationArea.setCaretPosition(0);
     }
 
-    /**
+   /**
      * <p>
      * Returns the explanation for the given category.
      * </p>
@@ -272,6 +278,252 @@ public class ChoiceSelector extends JDialog {
         
         return result;
     }
+    
+    /**
+     * Checks if the given choice makes a proof unsound.
+     * @param choice The choice to check.
+     * @return {@code true} proof will be unsound, {@code false} proof will be sound as long as all other choices are sound.
+     */
+    public static boolean isUnsound(String choice) {
+       return "runtimeExceptions:ignore".equals(choice) ||
+              "initialisation:disableStaticInitialisation".equals(choice) ||
+              "intRules:arithmeticSemanticsIgnoringOF".equals(choice);
+    }
+    
+    /**
+     * Checks if the given choice makes a proof incomplete.
+     * @param choice The choice to check.
+     * @return {@code true} proof will be incomplete, {@code false} proof will be complete as long as all other choices are complete.
+     */
+    public static boolean isIncomplete(String choice) {
+       return "runtimeExceptions:ban".equals(choice) ||
+              "Strings:off".equals(choice) ||
+              "intRules:arithmeticSemanticsCheckingOF".equals(choice) ||
+              "integerSimplificationRules:minimal".equals(choice) ||
+              "programRules:None".equals(choice);
+    }
+    
+    /**
+     * Checks if additional information for the choice are available.
+     * @param choice The choice to check.
+     * @return The additional information or {@code null} if no information are available.
+     */
+    public static String getInformation(String choice) {
+       if ("JavaCard:on".equals(choice)) {
+          return "Sound if a JavaCard program is proven.";
+       }
+       else if ("JavaCard:off".equals(choice)) {
+          return "Sound if a Java program is proven.";
+       }
+       else if ("assertions:on".equals(choice)) {
+          return "Sound if JVM is started with enabled assertions for the whole system.";
+       }
+       else if ("assertions:off".equals(choice)) {
+          return "Sound if JVM is started with disabled assertions for the whole system.";
+       }
+       else {
+          return null;
+       }
+    }
 
+    /**
+     * Searches the choice in the given {@link ChoiceEntry}s.
+     * @param choices The {@link ChoiceEntry}s to search in.
+     * @param choice The choice to search.
+     * @return The found {@link ChoiceEntry} for the given choice or {@code null} otherwise.
+     */
+    public static ChoiceEntry findChoice(ChoiceEntry[] choices, final String choice) {
+       return JavaUtil.search(choices, new IFilter<ChoiceEntry>() {
+         @Override
+         public boolean select(ChoiceEntry element) {
+            return element.getChoice().equals(choice);
+         }
+       });
+    }
+    
+    /**
+     * Creates {@link ChoiceEntry}s for all given choices.
+     * @param choices The choices.
+     * @return The created {@link ChoiceEntry}s.
+     */
+    public static ChoiceEntry[] createChoiceEntries(Set<String> choices) {
+       if (choices != null) {
+          ChoiceEntry[] entries = new ChoiceEntry[choices.size()];
+          int i = 0;
+          for (String choice : choices) {
+             entries[i] = createChoiceEntry(choice);
+             i++;
+          }
+          return entries;
+       }
+       else {
+          return null;
+       }
+    }
 
+    /**
+     * Creates a {@link ChoiceEntry} for the given choice.
+     * @param choice The choice.
+     * @return The created {@link ChoiceEntry}.
+     */
+    public static ChoiceEntry createChoiceEntry(String choice) {
+       return new ChoiceEntry(choice, 
+                              isUnsound(choice), 
+                              isIncomplete(choice), 
+                              getInformation(choice));
+    }
+    
+   /**
+    * Represents a choice with all its meta information.
+    * @author Martin Hentschel
+    */
+   public static class ChoiceEntry {
+      /**
+       * Text shown to the user in case of incompletness.
+       */
+      public static final String INCOMPLETE_TEXT = "incomplete";
+      
+      /**
+       * Text shown to the user in case of unsoundness.
+       */
+      public static final String UNSOUND_TEXT = "Java modeling unsound";
+      
+      /**
+       * The choice.
+       */
+      private final String choice;
+
+      /**
+       * Is unsound?
+       */
+      private final boolean unsound;
+
+      /**
+       * Is incomplete?
+       */
+      private final boolean incomplete;
+      
+      /**
+       * An optionally information.
+       */
+      private final String information;
+
+      /**
+       * Constructor.
+       * @param choice The choice.
+       * @param unsound Is unsound?
+       * @param incomplete Is incomplete?
+       * @param information An optionally information.
+       */
+      public ChoiceEntry(String choice, boolean unsound, boolean incomplete, String information) {
+         assert choice != null;
+         this.choice = choice;
+         this.unsound = unsound;
+         this.incomplete = incomplete;
+         this.information = information;
+      }
+
+      /**
+       * Returns the choice.
+       * @return The choice.
+       */
+      public String getChoice() {
+         return choice;
+      }
+
+      /**
+       * Checks for soundness.
+       * @return {@code true} unsound, {@code false} sound.
+       */
+      public boolean isUnsound() {
+         return unsound;
+      }
+
+      /**
+       * Checks for completeness.
+       * @return {@code true} incomplete, {@code false} complete.
+       */
+      public boolean isIncomplete() {
+         return incomplete;
+      }
+
+      /**
+       * Returns the optionally information.
+       * @return The optionally information.
+       */
+      public String getInformation() {
+         return information;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public int hashCode() {
+         int hashcode = 5;
+         hashcode = hashcode * 17 + choice.hashCode();
+         hashcode = hashcode * 17 + (incomplete ? 5 : 3);
+         hashcode = hashcode * 17 + (unsound ? 5 : 3);
+         if (information != null) {
+            hashcode = hashcode * 17 + information.hashCode();          
+         }
+         return hashcode;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean equals(Object obj) {
+         if (obj instanceof ChoiceEntry) {
+            ChoiceEntry other = (ChoiceEntry)obj;
+            return choice.equals(other.getChoice()) &&
+                   incomplete == other.isIncomplete() &&
+                   unsound == other.isUnsound() &&
+                   JavaUtil.equals(information, other.getInformation());
+         }
+         else {
+            return false;
+         }
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String toString() {
+         if (unsound && incomplete) {
+            if (information != null) {
+               return choice + " (" + UNSOUND_TEXT + " and " + INCOMPLETE_TEXT + ", " + information + ")";
+            }
+            else {
+               return choice + " (" + UNSOUND_TEXT + " and " + INCOMPLETE_TEXT + ")";
+            }
+         }
+         else if (unsound) {
+            if (information != null) {
+               return choice + " (" + UNSOUND_TEXT + ", " + information + ")";
+            }
+            else {
+               return choice + " (" + UNSOUND_TEXT + ")";
+            }
+         }
+         else if (incomplete) {
+            if (information != null) {
+               return choice + " (" + INCOMPLETE_TEXT + ", " + information + ")";
+            }
+            else {
+               return choice + " (" + INCOMPLETE_TEXT + ")";
+            }
+         }
+         else {
+            if (information != null) {
+               return choice + " (" + information + ")";
+            }
+            else {
+               return choice;
+            }
+         }
+      }
+   }
 }

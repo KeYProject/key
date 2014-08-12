@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.key_project.key4eclipse.resources.util.LogUtil;
@@ -154,15 +155,16 @@ public abstract class AbstractContractContainer {
       boolean result = false;
       Iterator<ContractInfo> iter = getContracts().iterator();
       while (!result && iter.hasNext()) {
-         Boolean unproven;
+         boolean unproven;
          try {
-            unproven = iter.next().checkUnprovenDependencies();
+            List<IFile> unprovenProofs = iter.next().checkUnprovenDependencies();
+            unproven = unprovenProofs != null && !unprovenProofs.isEmpty();
          }
          catch (Exception e) {
             LogUtil.getLogger().logError(e);
-            unproven = null;
+            unproven = false;
          }
-         if (unproven == null || unproven.booleanValue()) {
+         if (unproven) {
             result = true;
          }
       }

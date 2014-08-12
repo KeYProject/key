@@ -18,13 +18,18 @@ import java.io.InputStream;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 import org.key_project.key4eclipse.resources.projectinfo.ContractInfo;
 import org.key_project.key4eclipse.resources.projectinfo.MethodInfo;
 import org.key_project.key4eclipse.resources.projectinfo.ObserverFunctionInfo;
 import org.key_project.key4eclipse.resources.ui.Activator;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithResult;
 
 /**
  * <p>
@@ -61,6 +66,52 @@ public final class ResourcesUiImages {
      * The key for the image that is used for a {@link ContractInfo} of a {@link MethodInfo} with diamond modality.
      */
     public static final String METHOD_CONTRACT_DIAMOND = "org.key_project.key4eclipse.resources.ui.methodContractDiamond";
+
+    /**
+     * The key for the image that is used for a {@link ContractInfo} of a {@link ObserverFunctionInfo} with a warning decoration.
+     */
+    public static final String OBSERVER_FUNCTION_CONTRACT_WARNING = "org.key_project.key4eclipse.resources.ui.observerFunctionContractWarning";
+
+    /**
+     * The key for the image that is used for a {@link ContractInfo} of a {@link MethodInfo} with a warning decoration.
+     */
+    public static final String METHOD_CONTRACT_WARNING = "org.key_project.key4eclipse.resources.ui.methodContractWarning";
+
+    /**
+     * The key for the image that is used for a {@link ContractInfo} of a {@link MethodInfo} with box modality with a warning decoration.
+     */
+    public static final String METHOD_CONTRACT_BOX_WARNING = "org.key_project.key4eclipse.resources.ui.methodContractBoxWarning";
+
+    /**
+     * The key for the image that is used for a {@link ContractInfo} of a {@link MethodInfo} with diamond modality with a warning decoration.
+     */
+    public static final String METHOD_CONTRACT_DIAMOND_WARNING = "org.key_project.key4eclipse.resources.ui.methodContractDiamondWarning";
+
+    /**
+     * The key for the image that is used for a {@link ContractInfo} of a {@link ObserverFunctionInfo} with an information decoration.
+     */
+    public static final String OBSERVER_FUNCTION_CONTRACT_INFO = "org.key_project.key4eclipse.resources.ui.observerFunctionContractInfo";
+
+    /**
+     * The key for the image that is used for a {@link ContractInfo} of a {@link MethodInfo} with an information decoration.
+     */
+    public static final String METHOD_CONTRACT_INFO = "org.key_project.key4eclipse.resources.ui.methodContractInfo";
+
+    /**
+     * The key for the image that is used for a {@link ContractInfo} of a {@link MethodInfo} with box modality with an information decoration.
+     */
+    public static final String METHOD_CONTRACT_BOX_INFO = "org.key_project.key4eclipse.resources.ui.methodContractBoxInfo";
+
+    /**
+     * The key for the image that is used for a {@link ContractInfo} of a {@link MethodInfo} with diamond modality with an information decoration.
+     */
+    public static final String METHOD_CONTRACT_DIAMOND_INFO = "org.key_project.key4eclipse.resources.ui.methodContractDiamondInfo";
+
+    /**
+     * The key for the image that is an information decoration.
+     */
+    public static final String DECORATION_INFO = "org.key_project.key4eclipse.resources.ui.infoDecoration";
+
 
     /**
      * Forbid instances.
@@ -137,6 +188,33 @@ public final class ResourcesUiImages {
         else if (OBSERVER_FUNCTION_CONTRACT.equals(key)) {
            path = "icons/DbCAxiomContract.gif";
         }
+        else if (DECORATION_INFO.equals(key)) {
+           path = "icons/DEC_FIELD_INFO.png";
+        }
+        else if (METHOD_CONTRACT_WARNING.equals(key)) {
+           return decorateImage(getImage(METHOD_CONTRACT), PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEC_FIELD_WARNING));
+        }
+        else if (METHOD_CONTRACT_BOX_WARNING.equals(key)) {
+           return decorateImage(getImage(METHOD_CONTRACT_BOX), PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEC_FIELD_WARNING));
+        }
+        else if (METHOD_CONTRACT_DIAMOND_WARNING.equals(key)) {
+           return decorateImage(getImage(METHOD_CONTRACT_DIAMOND), PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEC_FIELD_WARNING));
+        }
+        else if (OBSERVER_FUNCTION_CONTRACT_WARNING.equals(key)) {
+           return decorateImage(getImage(OBSERVER_FUNCTION_CONTRACT), PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEC_FIELD_WARNING));
+        }
+        else if (METHOD_CONTRACT_INFO.equals(key)) {
+           return decorateImage(getImage(METHOD_CONTRACT), getImage(DECORATION_INFO));
+        }
+        else if (METHOD_CONTRACT_BOX_INFO.equals(key)) {
+           return decorateImage(getImage(METHOD_CONTRACT_BOX), getImage(DECORATION_INFO));
+        }
+        else if (METHOD_CONTRACT_DIAMOND_INFO.equals(key)) {
+           return decorateImage(getImage(METHOD_CONTRACT_DIAMOND), getImage(DECORATION_INFO));
+        }
+        else if (OBSERVER_FUNCTION_CONTRACT_INFO.equals(key)) {
+           return decorateImage(getImage(OBSERVER_FUNCTION_CONTRACT), getImage(DECORATION_INFO));
+        }
         // Load image if possible
         if (path != null) {
            InputStream in = null;
@@ -164,7 +242,25 @@ public final class ResourcesUiImages {
         }
     }
     
-    /**
+    private static Image decorateImage(final Image image, final Image decorationImage) {
+       IRunnableWithResult<Image> run = new AbstractRunnableWithResult<Image>() {
+         @Override
+         public void run() {
+            Image result = new Image(Display.getDefault(), image.getBounds().width, image.getBounds().height);
+            
+            GC gc = new GC(result);
+            gc.drawImage(image, 0, 0);
+            gc.drawImage(decorationImage, image.getBounds().width - decorationImage.getBounds().width, image.getBounds().height - decorationImage.getBounds().height);
+            gc.dispose();
+            
+            setResult(result);
+         }
+       };
+       Display.getDefault().syncExec(run);
+       return run.getResult();
+   }
+
+   /**
      * Disposes all contained images. This method is automatically called
      * when the plug-in is unloaded from the {@link Activator}.
      * There is no need to call it from any other place!

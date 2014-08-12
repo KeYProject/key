@@ -22,6 +22,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -249,6 +250,7 @@ public class VerificationStatusView extends ViewPart {
             handleDoubleClick(event);
          }
       });
+      ColumnViewerToolTipSupport.enableFor(treeViewer);
       // legendComposite
       Composite legendComposite = new Composite(treeViewrLegendComposite, SWT.NONE);
       legendComposite.setLayout(new GridLayout(5, false));

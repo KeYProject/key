@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -221,19 +222,20 @@ public class ProjectInfoColorTreeSynchronizer extends AbstractProjectInfoBasedCo
             closed = null;
          }
          if (closed != null && closed.booleanValue()) {
-            Boolean unprovenDependency;
+            boolean unprovenDependency;
             try {
-               unprovenDependency = info.checkUnprovenDependencies();
+               List<IFile> unprovenProofs = info.checkUnprovenDependencies();
+               unprovenDependency = unprovenProofs != null && !unprovenProofs.isEmpty();
             }
             catch (Exception e) {
                LogUtil.getLogger().logError(e);
-               unprovenDependency = null;
+               unprovenDependency = false;
             }
-            if (unprovenDependency != null && !unprovenDependency.booleanValue()) {
-               item.setForeground(createColor(COLOR_CLOSED_PROOF, viewer.getControl().getDisplay()));
+            if (unprovenDependency) {
+               item.setForeground(createColor(COLOR_UNPROVEN_DEPENDENCY, viewer.getControl().getDisplay()));
             }
             else {
-               item.setForeground(createColor(COLOR_UNPROVEN_DEPENDENCY, viewer.getControl().getDisplay()));
+               item.setForeground(createColor(COLOR_CLOSED_PROOF, viewer.getControl().getDisplay()));
             }
          }
          else {
