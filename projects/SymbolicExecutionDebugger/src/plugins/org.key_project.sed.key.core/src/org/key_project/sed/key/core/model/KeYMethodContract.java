@@ -82,6 +82,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      target.registerDebugNode(this);
       initializeAnnotations();
    }
 
@@ -238,6 +239,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
    public boolean hasVariables() throws DebugException {
       try {
          return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
+                !executionNode.isDisposed() && 
                 SymbolicExecutionUtil.canComputeVariables(executionNode, executionNode.getServices()) &&
                 super.hasVariables();
       }

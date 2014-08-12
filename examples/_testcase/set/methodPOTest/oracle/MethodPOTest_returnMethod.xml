@@ -3,7 +3,7 @@
    <methodCall name="MethodPOTest.returnMethod(param);" pathCondition="true" pathConditionChanged="false">
       <statement name="return param.x;" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="not(equals(param,null))" pathCondition="not(equals(param,null))" pathConditionChanged="true" branchCondition="not(equals(param,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <methodReturn name="&lt;return of returnMethod&gt;" signature="&lt;return of MethodPOTest.returnMethod(param);&gt;" pathCondition="not(equals(param,null))" pathConditionChanged="false" isReturnValueComputed="false">
+            <methodReturn name="&lt;return of returnMethod&gt;" signature="&lt;return of MethodPOTest.returnMethod(param);&gt;" pathCondition="not(equals(param,null))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="not(equals(param,null))">
                <termination name="&lt;end&gt;" pathCondition="not(equals(param,null))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                </termination>
             </methodReturn>
@@ -13,5 +13,8 @@
             </termination>
          </branchCondition>
       </statement>
+      <methodReturnEntry path="/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0"/>
 </start>

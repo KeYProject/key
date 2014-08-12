@@ -10,7 +10,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
             <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
                <branchCondition name="equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x)" pathCondition="equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x)" pathConditionChanged="true" branchCondition="equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x)" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="return magicValue;" pathCondition="equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x)" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of SimpleObjectQuery.main(x);&gt;" pathCondition="equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x)" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of SimpleObjectQuery.main(x);&gt;" isReturnValueComputed="true">
+                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of SimpleObjectQuery.main(x);&gt;" pathCondition="equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x)" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of SimpleObjectQuery.main(x);&gt;" isReturnValueComputed="true" methodReturnCondition="equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x)">
                         <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                         </methodReturnValue>
                         <termination name="&lt;end&gt;" pathCondition="equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
@@ -20,7 +20,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
                </branchCondition>
                <branchCondition name="not(equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x))" pathCondition="not(equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x))" pathConditionChanged="true" branchCondition="not(equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x))" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="return magicValue;" pathCondition="not(equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x))" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of SimpleObjectQuery.main(x);&gt;" pathCondition="not(equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(1(1(7(4(#)))))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(neglit(1(1(7(4(#)))))) as result of SimpleObjectQuery.main(x);&gt;" isReturnValueComputed="true">
+                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of SimpleObjectQuery.main(x);&gt;" pathCondition="not(equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(1(1(7(4(#)))))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(neglit(1(1(7(4(#)))))) as result of SimpleObjectQuery.main(x);&gt;" isReturnValueComputed="true" methodReturnCondition="not(equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x))">
                         <methodReturnValue name="Z(neglit(1(1(7(4(#))))))" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="false">
                         </methodReturnValue>
                         <termination name="&lt;end&gt;" pathCondition="not(equals(java.lang.Object::select(heap,null,SimpleObjectQuery::$INSTANCE),x))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
@@ -31,5 +31,9 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
             </branchCondition>
          </operationContract>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/1/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/1/0/0/0"/>
 </start>

@@ -24,7 +24,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
 as result of main&gt;" signatureIncludingReturnValue="&lt;return 
 	Z(0(2(1(#)))) {gt(x,Z(neglit(1(#))))}, 
 	Z(neglit(7(8(7(4(#)))))) {lt(x,Z(0(#)))}
-as result of self.main(x);&gt;" isReturnValueComputed="true">
+as result of self.main(x);&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                   <methodReturnValue name="Z(0(2(1(#)))) {gt(x,Z(neglit(1(#))))}" returnValueString="Z(0(2(1(#))))" hasCondition="true" conditionString="gt(x,Z(neglit(1(#))))">
                   </methodReturnValue>
                   <methodReturnValue name="Z(neglit(7(8(7(4(#)))))) {lt(x,Z(0(#)))}" returnValueString="Z(neglit(7(8(7(4(#))))))" hasCondition="true" conditionString="lt(x,Z(0(#)))">
@@ -35,5 +35,7 @@ as result of self.main(x);&gt;" isReturnValueComputed="true">
             </statement>
          </operationContract>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0"/>
 </start>

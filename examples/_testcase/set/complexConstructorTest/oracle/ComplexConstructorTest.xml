@@ -5,150 +5,150 @@
          <callStackEntry path="/0"/>
          <methodCall name="DefaultConstructor();" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of DefaultConstructor();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of DefaultConstructor();&gt;" isReturnValueComputed="true">
-               <callStackEntry path="/0"/>
+            <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of DefaultConstructor();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of DefaultConstructor();&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                <callStackEntry path="/0/0/0"/>
+               <callStackEntry path="/0"/>
                <statement name="ExplicitConstructor ec = new ExplicitConstructor ();" pathCondition="true" pathConditionChanged="false">
                   <callStackEntry path="/0"/>
                   <methodCall name="ExplicitConstructor();" pathCondition="true" pathConditionChanged="false">
                      <callStackEntry path="/0"/>
-                     <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of ExplicitConstructor();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of ExplicitConstructor();&gt;" isReturnValueComputed="true">
-                        <callStackEntry path="/0"/>
+                     <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of ExplicitConstructor();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of ExplicitConstructor();&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                         <callStackEntry path="/0/0/0/0/0/0"/>
+                        <callStackEntry path="/0"/>
                         <statement name="ExplicitConstructorWithSuper ecws = new ExplicitConstructorWithSuper ();" pathCondition="true" pathConditionChanged="false">
                            <callStackEntry path="/0"/>
                            <methodCall name="ExplicitConstructorWithSuper();" pathCondition="true" pathConditionChanged="false">
                               <callStackEntry path="/0"/>
-                              <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of ExplicitConstructorWithSuper();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of ExplicitConstructorWithSuper();&gt;" isReturnValueComputed="true">
-                                 <callStackEntry path="/0"/>
+                              <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of ExplicitConstructorWithSuper();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of ExplicitConstructorWithSuper();&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                  <callStackEntry path="/0/0/0/0/0/0/0/0/0"/>
+                                 <callStackEntry path="/0"/>
                                  <statement name="A a = new A ();" pathCondition="true" pathConditionChanged="false">
                                     <callStackEntry path="/0"/>
                                     <methodCall name="A();" pathCondition="true" pathConditionChanged="false">
                                        <callStackEntry path="/0"/>
                                        <methodCall name="A(a_4);" pathCondition="true" pathConditionChanged="false">
-                                          <callStackEntry path="/0"/>
                                           <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                          <callStackEntry path="/0"/>
                                           <statement name="this.a=a_4;" pathCondition="true" pathConditionChanged="false">
-                                             <callStackEntry path="/0"/>
-                                             <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                              <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                             <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of A(a_4);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of A(a_4);&gt;" isReturnValueComputed="true">
-                                                <callStackEntry path="/0"/>
-                                                <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                             <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                             <callStackEntry path="/0"/>
+                                             <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of A(a_4);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of A(a_4);&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                                 <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of A();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of A();&gt;" isReturnValueComputed="true">
-                                                   <callStackEntry path="/0"/>
+                                                <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                <callStackEntry path="/0"/>
+                                                <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of A();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of A();&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                                    <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                   <callStackEntry path="/0"/>
                                                    <statement name="A aCustom = new A (12);" pathCondition="true" pathConditionChanged="false">
                                                       <callStackEntry path="/0"/>
                                                       <methodCall name="A(var);" pathCondition="true" pathConditionChanged="false">
                                                          <callStackEntry path="/0"/>
                                                          <statement name="this.a=var;" pathCondition="true" pathConditionChanged="false">
-                                                            <callStackEntry path="/0"/>
                                                             <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                            <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of A(var);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of A(var);&gt;" isReturnValueComputed="true">
-                                                               <callStackEntry path="/0"/>
+                                                            <callStackEntry path="/0"/>
+                                                            <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of A(var);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of A(var);&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                                                <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                               <callStackEntry path="/0"/>
                                                                <statement name="B b = new B ();" pathCondition="true" pathConditionChanged="false">
                                                                   <callStackEntry path="/0"/>
                                                                   <methodCall name="B();" pathCondition="true" pathConditionChanged="false">
                                                                      <callStackEntry path="/0"/>
                                                                      <methodCall name="B(b_4);" pathCondition="true" pathConditionChanged="false">
-                                                                        <callStackEntry path="/0"/>
                                                                         <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                        <callStackEntry path="/0"/>
                                                                         <methodCall name="A();" pathCondition="true" pathConditionChanged="false">
-                                                                           <callStackEntry path="/0"/>
-                                                                           <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                            <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                           <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                           <callStackEntry path="/0"/>
                                                                            <methodCall name="A(a_8);" pathCondition="true" pathConditionChanged="false">
-                                                                              <callStackEntry path="/0"/>
-                                                                              <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                              <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                               <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                              <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                              <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                              <callStackEntry path="/0"/>
                                                                               <statement name="this.a=a_8;" pathCondition="true" pathConditionChanged="false">
-                                                                                 <callStackEntry path="/0"/>
-                                                                                 <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                 <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                 <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                  <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                 <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of A(a_8);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of A(a_8);&gt;" isReturnValueComputed="true">
-                                                                                    <callStackEntry path="/0"/>
-                                                                                    <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                    <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                    <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                 <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                 <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                 <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                 <callStackEntry path="/0"/>
+                                                                                 <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of A(a_8);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of A(a_8);&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                                                                     <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                    <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of A();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of A();&gt;" isReturnValueComputed="true">
-                                                                                       <callStackEntry path="/0"/>
-                                                                                       <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                       <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                    <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                    <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                    <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                    <callStackEntry path="/0"/>
+                                                                                    <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of A();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of A();&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                                                                        <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                       <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                       <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                       <callStackEntry path="/0"/>
                                                                                        <statement name="this.b=b_4;" pathCondition="true" pathConditionChanged="false">
-                                                                                          <callStackEntry path="/0"/>
-                                                                                          <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                           <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                          <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of B(b_4);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of B(b_4);&gt;" isReturnValueComputed="true">
-                                                                                             <callStackEntry path="/0"/>
-                                                                                             <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                          <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                          <callStackEntry path="/0"/>
+                                                                                          <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of B(b_4);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of B(b_4);&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                                                                              <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                             <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of B();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of B();&gt;" isReturnValueComputed="true">
-                                                                                                <callStackEntry path="/0"/>
+                                                                                             <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                             <callStackEntry path="/0"/>
+                                                                                             <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of B();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of B();&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                                                                                 <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                <callStackEntry path="/0"/>
                                                                                                 <statement name="B bCustomB = new B (true);" pathCondition="true" pathConditionChanged="false">
                                                                                                    <callStackEntry path="/0"/>
                                                                                                    <methodCall name="B(var_1);" pathCondition="true" pathConditionChanged="false">
                                                                                                       <callStackEntry path="/0"/>
                                                                                                       <methodCall name="A();" pathCondition="true" pathConditionChanged="false">
-                                                                                                         <callStackEntry path="/0"/>
                                                                                                          <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                         <callStackEntry path="/0"/>
                                                                                                          <methodCall name="A(a_9);" pathCondition="true" pathConditionChanged="false">
-                                                                                                            <callStackEntry path="/0"/>
-                                                                                                            <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                             <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                            <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                            <callStackEntry path="/0"/>
                                                                                                             <statement name="this.a=a_9;" pathCondition="true" pathConditionChanged="false">
-                                                                                                               <callStackEntry path="/0"/>
-                                                                                                               <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                                               <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                                <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                                               <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of A(a_9);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of A(a_9);&gt;" isReturnValueComputed="true">
-                                                                                                                  <callStackEntry path="/0"/>
-                                                                                                                  <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                                                  <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                               <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                               <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                               <callStackEntry path="/0"/>
+                                                                                                               <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of A(a_9);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of A(a_9);&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                                                                                                   <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                                                  <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of A();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of A();&gt;" isReturnValueComputed="true">
-                                                                                                                     <callStackEntry path="/0"/>
-                                                                                                                     <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                                  <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                                  <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                                  <callStackEntry path="/0"/>
+                                                                                                                  <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of A();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of A();&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                                                                                                      <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                                     <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                                     <callStackEntry path="/0"/>
                                                                                                                      <statement name="this.b=var_1;" pathCondition="true" pathConditionChanged="false">
-                                                                                                                        <callStackEntry path="/0"/>
                                                                                                                         <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                                                        <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of B(var_1);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of B(var_1);&gt;" isReturnValueComputed="true">
-                                                                                                                           <callStackEntry path="/0"/>
+                                                                                                                        <callStackEntry path="/0"/>
+                                                                                                                        <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of B(var_1);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of B(var_1);&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                                                                                                            <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                                           <callStackEntry path="/0"/>
                                                                                                                            <statement name="B bCustomIB = new B (11,true);" pathCondition="true" pathConditionChanged="false">
                                                                                                                               <callStackEntry path="/0"/>
                                                                                                                               <methodCall name="B(var_2,var_3);" pathCondition="true" pathConditionChanged="false">
                                                                                                                                  <callStackEntry path="/0"/>
                                                                                                                                  <methodCall name="A(a_10);" pathCondition="true" pathConditionChanged="false">
-                                                                                                                                    <callStackEntry path="/0"/>
                                                                                                                                     <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                                                    <callStackEntry path="/0"/>
                                                                                                                                     <statement name="this.a=a_10;" pathCondition="true" pathConditionChanged="false">
-                                                                                                                                       <callStackEntry path="/0"/>
-                                                                                                                                       <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                                                        <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                                                                       <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of A(a_10);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of A(a_10);&gt;" isReturnValueComputed="true">
-                                                                                                                                          <callStackEntry path="/0"/>
-                                                                                                                                          <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                                                       <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                                                       <callStackEntry path="/0"/>
+                                                                                                                                       <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of A(a_10);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of A(a_10);&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                                                                                                                           <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                                                          <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                                                          <callStackEntry path="/0"/>
                                                                                                                                           <statement name="this.b=var_3;" pathCondition="true" pathConditionChanged="false">
-                                                                                                                                             <callStackEntry path="/0"/>
                                                                                                                                              <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                                                                                                                             <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of B(var_2,var_3);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of B(var_2,var_3);&gt;" isReturnValueComputed="true">
-                                                                                                                                                <callStackEntry path="/0"/>
+                                                                                                                                             <callStackEntry path="/0"/>
+                                                                                                                                             <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of B(var_2,var_3);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of &lt;init&gt;&gt;" signatureIncludingReturnValue="&lt;return of B(var_2,var_3);&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                                                                                                                                 <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                                                                                                                <callStackEntry path="/0"/>
                                                                                                                                                 <statement name="return dc.x+ec.x+ecws.x+a.a+aCustom.a+b.a+b.a+bCustomB.a+bCustomIB.a;" pathCondition="true" pathConditionChanged="false">
                                                                                                                                                    <callStackEntry path="/0"/>
-                                                                                                                                                   <methodReturn name="&lt;return of main&gt;" signature="&lt;return of ComplexConstructorTest.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(1(9(1(#)))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(1(9(1(#)))) as result of ComplexConstructorTest.main();&gt;" isReturnValueComputed="true">
+                                                                                                                                                   <methodReturn name="&lt;return of main&gt;" signature="&lt;return of ComplexConstructorTest.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(1(9(1(#)))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(1(9(1(#)))) as result of ComplexConstructorTest.main();&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                                                                                                                                       <methodReturnValue name="Z(1(9(1(#))))" returnValueString="Z(1(9(1(#))))" hasCondition="false">
                                                                                                                                                       </methodReturnValue>
                                                                                                                                                       <callStackEntry path="/0"/>
@@ -160,7 +160,9 @@
                                                                                                                                           </statement>
                                                                                                                                        </methodReturn>
                                                                                                                                     </statement>
+                                                                                                                                    <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                                                  </methodCall>
+                                                                                                                                 <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                                               </methodCall>
                                                                                                                            </statement>
                                                                                                                         </methodReturn>
@@ -168,8 +170,11 @@
                                                                                                                   </methodReturn>
                                                                                                                </methodReturn>
                                                                                                             </statement>
+                                                                                                            <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                          </methodCall>
+                                                                                                         <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                       </methodCall>
+                                                                                                      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                    </methodCall>
                                                                                                 </statement>
                                                                                              </methodReturn>
@@ -178,29 +183,41 @@
                                                                                     </methodReturn>
                                                                                  </methodReturn>
                                                                               </statement>
+                                                                              <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                            </methodCall>
+                                                                           <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                         </methodCall>
+                                                                        <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                      </methodCall>
+                                                                     <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                   </methodCall>
                                                                </statement>
                                                             </methodReturn>
                                                          </statement>
+                                                         <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                       </methodCall>
                                                    </statement>
                                                 </methodReturn>
                                              </methodReturn>
                                           </statement>
+                                          <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                        </methodCall>
+                                       <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                     </methodCall>
                                  </statement>
                               </methodReturn>
+                              <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0"/>
                            </methodCall>
                         </statement>
                      </methodReturn>
+                     <methodReturnEntry path="/0/0/0/0/0/0/0"/>
                   </methodCall>
                </statement>
             </methodReturn>
+            <methodReturnEntry path="/0/0/0/0"/>
          </methodCall>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
 </start>

@@ -54,7 +54,7 @@ public class FullAutoPilotProofMacro extends SequentialProofMacro {
     @Override
     protected ProofMacro[] createProofMacroArray() {
         return new ProofMacro[] {
-                new AutoPilotPrepareProofMacro() {public boolean finishAfterMacro() {return false;}},
+                new AutoPilotPrepareProofMacro(),
                 new TryCloseMacro(NUMBER_OF_TRY_STEPS)
         };
     }

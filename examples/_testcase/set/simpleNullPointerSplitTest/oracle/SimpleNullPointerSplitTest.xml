@@ -3,7 +3,7 @@
    <methodCall name="self.main(instance);" pathCondition="true" pathConditionChanged="false">
       <statement name="return instance.x;" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="not(equals(instance,null))" pathCondition="not(equals(instance,null))" pathConditionChanged="true" branchCondition="not(equals(instance,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main(instance);&gt;" pathCondition="not(equals(instance,null))" pathConditionChanged="false" isReturnValueComputed="false">
+            <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main(instance);&gt;" pathCondition="not(equals(instance,null))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="not(equals(instance,null))">
                <termination name="&lt;end&gt;" pathCondition="not(equals(instance,null))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                </termination>
             </methodReturn>
@@ -13,5 +13,8 @@
             </termination>
          </branchCondition>
       </statement>
+      <methodReturnEntry path="/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0"/>
 </start>

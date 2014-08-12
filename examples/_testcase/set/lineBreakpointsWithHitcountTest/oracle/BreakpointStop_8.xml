@@ -7,7 +7,7 @@
                <methodCall name="b.main(a_1);" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false">
                   <statement name="this.x=a_1+4;" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false">
                      <statement name="return a_1*this.x;" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of main&gt;" signature="&lt;return of b.main(a_1);&gt;" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false" isReturnValueComputed="false">
+                        <methodReturn name="&lt;return of main&gt;" signature="&lt;return of b.main(a_1);&gt;" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                            <statement name="this.x++;" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false">
                               <statement name="loop();" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false">
                                  <methodCall name="self.loop();" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false">
@@ -27,9 +27,9 @@
                                                                            <statement name="i++;" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false">
                                                                               <loopCondition name="i&lt;=3" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false">
                                                                                  <statement name="return this.x;" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false">
-                                                                                    <methodReturn name="&lt;return of loop&gt;" signature="&lt;return of self.loop();&gt;" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false" isReturnValueComputed="false">
+                                                                                    <methodReturn name="&lt;return of loop&gt;" signature="&lt;return of self.loop();&gt;" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                                                        <statement name="return this.x;" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false">
-                                                                                          <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main(a);&gt;" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false" isReturnValueComputed="false">
+                                                                                          <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main(a);&gt;" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))">
                                                                                              <termination name="&lt;end&gt;" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                                                              </termination>
                                                                                           </methodReturn>
@@ -51,12 +51,14 @@
                                           </loopCondition>
                                        </statement>
                                     </loopStatement>
+                                    <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                  </methodCall>
                               </statement>
                            </statement>
                         </methodReturn>
                      </statement>
                   </statement>
+                  <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
                </methodCall>
             </branchCondition>
             <branchCondition name="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" pathCondition="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" pathConditionChanged="true" branchCondition="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -65,5 +67,8 @@
             </branchCondition>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/1/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
 </start>

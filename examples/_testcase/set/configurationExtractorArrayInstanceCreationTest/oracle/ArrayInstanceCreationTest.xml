@@ -8,7 +8,7 @@
                   <statement name="this.next.instanceArray=new int[]{3 };" pathCondition="not(equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null))" pathConditionChanged="false">
                      <statement name="int[] localArray = {4,5 };" pathCondition="not(equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null))" pathConditionChanged="false">
                         <statement name="return localArray[0]+localArray[1];" pathCondition="not(equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null))" pathConditionChanged="false">
-                           <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of self.compute();&gt;" pathCondition="not(equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null))" pathConditionChanged="false" isReturnValueComputed="false">
+                           <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of self.compute();&gt;" pathCondition="not(equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="not(equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null))">
                               <termination name="&lt;end&gt;" pathCondition="not(equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>
                            </methodReturn>
@@ -18,7 +18,7 @@
                </branchCondition>
                <branchCondition name="equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null)" pathCondition="equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null)" pathConditionChanged="true" branchCondition="equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="return -100;" pathCondition="equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null)" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of self.compute();&gt;" pathCondition="equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null)" pathConditionChanged="false" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of self.compute();&gt;" pathCondition="equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null)">
                         <termination name="&lt;end&gt;" pathCondition="equals(ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next),null)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
@@ -27,5 +27,9 @@
             </branchStatement>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/1/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/1/0/0/0"/>
 </start>

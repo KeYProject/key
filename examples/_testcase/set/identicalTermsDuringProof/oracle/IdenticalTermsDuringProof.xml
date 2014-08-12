@@ -8,7 +8,7 @@
                   <branchCondition name="geq(y,x)" pathCondition="and(geq(y,x),gt(z,y))" pathConditionChanged="true" branchCondition="geq(y,x)" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <statement name="mid=y;" pathCondition="and(geq(y,x),gt(z,y))" pathConditionChanged="false">
                         <statement name="return mid;" pathCondition="and(geq(y,x),gt(z,y))" pathConditionChanged="false">
-                           <methodReturn name="&lt;return of mid&gt;" signature="&lt;return of IdenticalTermsDuringProof.mid(x,y,z);&gt;" pathCondition="and(geq(y,x),gt(z,y))" pathConditionChanged="false" isReturnValueComputed="false">
+                           <methodReturn name="&lt;return of mid&gt;" signature="&lt;return of IdenticalTermsDuringProof.mid(x,y,z);&gt;" pathCondition="and(geq(y,x),gt(z,y))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(geq(y,x),gt(z,y))">
                               <termination name="&lt;end&gt;" pathCondition="and(geq(y,x),gt(z,y))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>
                            </methodReturn>
@@ -17,7 +17,7 @@
                   </branchCondition>
                   <branchCondition name="lt(y,x)" pathCondition="and(lt(y,x),gt(z,y))" pathConditionChanged="true" branchCondition="lt(y,x)" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <statement name="return mid;" pathCondition="and(lt(y,x),gt(z,y))" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of mid&gt;" signature="&lt;return of IdenticalTermsDuringProof.mid(x,y,z);&gt;" pathCondition="and(lt(y,x),gt(z,y))" pathConditionChanged="false" isReturnValueComputed="false">
+                        <methodReturn name="&lt;return of mid&gt;" signature="&lt;return of IdenticalTermsDuringProof.mid(x,y,z);&gt;" pathCondition="and(lt(y,x),gt(z,y))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(lt(y,x),gt(z,y))">
                            <termination name="&lt;end&gt;" pathCondition="and(lt(y,x),gt(z,y))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
@@ -28,7 +28,7 @@
             <branchCondition name="leq(z,y)" pathCondition="leq(z,y)" pathConditionChanged="true" branchCondition="leq(z,y)" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="mid=y;" pathCondition="leq(z,y)" pathConditionChanged="false">
                   <statement name="return mid;" pathCondition="leq(z,y)" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of mid&gt;" signature="&lt;return of IdenticalTermsDuringProof.mid(x,y,z);&gt;" pathCondition="leq(z,y)" pathConditionChanged="false" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of mid&gt;" signature="&lt;return of IdenticalTermsDuringProof.mid(x,y,z);&gt;" pathCondition="leq(z,y)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="leq(z,y)">
                         <termination name="&lt;end&gt;" pathCondition="leq(z,y)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
@@ -37,5 +37,11 @@
             </branchCondition>
          </branchStatement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/0/1/0/0"/>
+      <methodReturnEntry path="/0/0/0/1/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/1/0/0/0"/>
+   <terminationEntry path="/0/0/0/1/0/0/0/0"/>
 </start>

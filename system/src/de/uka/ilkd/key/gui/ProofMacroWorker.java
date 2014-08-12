@@ -12,11 +12,14 @@
 // 
 package de.uka.ilkd.key.gui;
 
+import javax.swing.SwingWorker;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.util.Debug;
-
-import javax.swing.SwingWorker;
 
 /**
  * The Class ProofMacroWorker is a swing worker for the application of proof
@@ -26,6 +29,14 @@ import javax.swing.SwingWorker;
  * mediator to receive Stop-Button events
  */
 public class ProofMacroWorker extends SwingWorker<Void, Void> implements InterruptListener {
+
+    /**
+     * This flag decides whether after a macro an open is selected or not.
+     * If the macro closed all goals under the current pio, selection remains
+     * where it was.
+     */
+    private static final boolean SELECT_GOAL_AFTER_MACRO =
+            Boolean.parseBoolean(System.getProperty("key.macro.selectGoalAfter", "true"));
 
     /**
      * The macro which is to be executed
@@ -59,9 +70,13 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
 
     @Override
     protected Void doInBackground() throws Exception {
+        final ProverTaskListener ptl = mediator.getUI().getListener();
+        TaskFinishedInfo info =
+                ProofMacroFinishedInfo.getDefaultInfo(macro, mediator.getSelectedProof());
+        ptl.taskStarted(macro.getName(), 0);
         try {
             synchronized(macro) {
-                macro.applyTo(mediator, posInOcc, mediator.getUI());
+                info = macro.applyTo(mediator, posInOcc, ptl);
             }
         } catch (final InterruptedException exception) {
             Debug.out("Proof macro has been interrupted:");
@@ -69,6 +84,8 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
         } catch (final Exception exception) {
             // This should actually never happen.
             ExceptionDialog.showDialog(MainWindow.getInstance(), exception);
+        } finally {
+            ptl.taskFinished(info);
         }
         return null;
     }
@@ -81,9 +98,31 @@ public class ProofMacroWorker extends SwingWorker<Void, Void> implements Interru
     @Override
     protected void done() {
         synchronized(macro) {
+            if(SELECT_GOAL_AFTER_MACRO) {
+                selectOpenGoalBelow();
+            }
             mediator.setInteractive(true);
             mediator.startInterface(true);
             mediator.removeInterruptedListener(this);
+        }
+    }
+
+    /*
+     * Select a goal below the currently selected node.
+     * Does not do anything if that is not available.
+     * Only enabled goals are considered.
+     */
+    private void selectOpenGoalBelow() {
+        Node selectedNode = mediator.getSelectedNode();
+        for (Goal g : mediator.getInteractiveProver().getProof().openEnabledGoals()) {
+            Node n = g.node();
+            while(n != null) {
+                if(n == selectedNode) {
+                    mediator.getSelectionModel().setSelectedGoal(g);
+                    return;
+                }
+                n = n.parent();
+            }
         }
     }
 }

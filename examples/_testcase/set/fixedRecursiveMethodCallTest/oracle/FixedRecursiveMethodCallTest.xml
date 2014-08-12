@@ -14,11 +14,11 @@
                                     <methodCall name="FixedRecursiveMethodCallTest.decrease(n_3);" pathCondition="true" pathConditionChanged="false">
                                        <branchStatement name="if (n_3&gt;=1)" pathCondition="true" pathConditionChanged="false">
                                           <statement name="return n_3;" pathCondition="true" pathConditionChanged="false">
-                                             <methodReturn name="&lt;return of decrease&gt;" signature="&lt;return of FixedRecursiveMethodCallTest.decrease(n_3);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                <methodReturn name="&lt;return of decrease&gt;" signature="&lt;return of FixedRecursiveMethodCallTest.decrease(n_2);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                   <methodReturn name="&lt;return of decrease&gt;" signature="&lt;return of FixedRecursiveMethodCallTest.decrease(n_1);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                      <methodReturn name="&lt;return of decrease&gt;" signature="&lt;return of FixedRecursiveMethodCallTest.decrease(n);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                         <methodReturn name="&lt;return of decreaseValue&gt;" signature="&lt;return of FixedRecursiveMethodCallTest.decreaseValue();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                             <methodReturn name="&lt;return of decrease&gt;" signature="&lt;return of FixedRecursiveMethodCallTest.decrease(n_3);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                                <methodReturn name="&lt;return of decrease&gt;" signature="&lt;return of FixedRecursiveMethodCallTest.decrease(n_2);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                                   <methodReturn name="&lt;return of decrease&gt;" signature="&lt;return of FixedRecursiveMethodCallTest.decrease(n_1);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                                      <methodReturn name="&lt;return of decrease&gt;" signature="&lt;return of FixedRecursiveMethodCallTest.decrease(n);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                                         <methodReturn name="&lt;return of decreaseValue&gt;" signature="&lt;return of FixedRecursiveMethodCallTest.decreaseValue();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                             <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                             </termination>
                                                          </methodReturn>
@@ -28,16 +28,22 @@
                                              </methodReturn>
                                           </statement>
                                        </branchStatement>
+                                       <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                     </methodCall>
                                  </statement>
                               </branchStatement>
+                              <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                            </methodCall>
                         </statement>
                      </branchStatement>
+                     <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                   </methodCall>
                </statement>
             </branchStatement>
+            <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
          </methodCall>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
 </start>

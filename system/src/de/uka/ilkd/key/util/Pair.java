@@ -17,34 +17,39 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import static de.uka.ilkd.key.util.MiscTools.equalsOrNull;
+
 public class Pair<T1, T2> {    
     public final T1 first;
     public final T2 second;
 
-    
+
     public Pair(T1 first, T2 second) { 
-	this.first = first;
-	this.second = second;   
+        this.first = first;
+        this.second = second;   
     }
 
 
     public String toString() { 
-	return "(" + first + ", " + second + ")"; 
+        return "(" + first + ", " + second + ")"; 
     }
-    
-    
+
+
     public boolean equals(Object o) {
-	if(!(o instanceof Pair<?, ?>)) {
-	    return false;
-	} 
-	Pair<?, ?> p = (Pair<?, ?>) o;
-	return (first == null ? p.first == null : first.equals(p.first))
-	       && (second == null ? p.second == null : second.equals(p.second));
+        if(!(o instanceof Pair<?, ?>)) {
+            return false;
+        } 
+        Pair<?, ?> p = (Pair<?, ?>) o;
+        return equalsOrNull(first, p.first)
+                        && equalsOrNull(second, p.second);
     }
-    
-    
+
+
     public int hashCode() {
-	return first.hashCode() + second.hashCode();
+        int res = 0;
+        if (first != null) res += first.hashCode();
+        if (second != null) res += second.hashCode();
+        return res;
     }
     
     ///////////////////////////////////////////////////////////

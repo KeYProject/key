@@ -16,7 +16,6 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.While;
-import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -48,16 +47,7 @@ public class ExecutionLoopInvariant extends AbstractExecutionStateNode<SourceEle
     */
    @Override
    protected String lazyComputeName() {
-      synchronized (NotationInfo.class) {
-         boolean originalPrettySyntax = NotationInfo.PRETTY_SYNTAX;
-         try {
-            NotationInfo.PRETTY_SYNTAX = true;
-            return getLoopInvariant().getPlainText(getServices()).trim();
-         }
-         finally {
-            NotationInfo.PRETTY_SYNTAX = originalPrettySyntax;
-         }
-      }
+      return getLoopInvariant().getPlainText(getServices(), getSettings().isUsePrettyPrinting(), getSettings().isUseUnicode()).trim();
    }
    
    /**

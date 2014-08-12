@@ -5,7 +5,7 @@
          <statement name="x.next.value=2;" pathCondition="true" pathConditionChanged="false">
             <statement name="x.next.next.value=3;" pathCondition="true" pathConditionChanged="false">
                <statement name="return x.value+x.next.value+x.next.next.value;" pathCondition="true" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of SimpleLinkedOjbects.compute(x);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                  <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of SimpleLinkedOjbects.compute(x);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                      <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
@@ -13,5 +13,7 @@
             </statement>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0"/>
 </start>

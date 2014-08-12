@@ -4,7 +4,7 @@
       <branchStatement name="if (obj==IsInstanceTest.A)" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj)" pathCondition="equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj)" pathConditionChanged="true" branchCondition="equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj)" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return 1;" pathCondition="equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj)" pathConditionChanged="false">
-               <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of IsInstanceTest.compute(obj);&gt;" pathCondition="equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj)" pathConditionChanged="false" isReturnValueComputed="false">
+               <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of IsInstanceTest.compute(obj);&gt;" pathCondition="equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj)">
                   <termination name="&lt;end&gt;" pathCondition="equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
@@ -12,12 +12,16 @@
          </branchCondition>
          <branchCondition name="not(equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj))" pathCondition="not(equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj))" pathConditionChanged="true" branchCondition="not(equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return 0;" pathCondition="not(equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj))" pathConditionChanged="false">
-               <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of IsInstanceTest.compute(obj);&gt;" pathCondition="not(equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj))" pathConditionChanged="false" isReturnValueComputed="false">
+               <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of IsInstanceTest.compute(obj);&gt;" pathCondition="not(equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="not(equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj))">
                   <termination name="&lt;end&gt;" pathCondition="not(equals(IsInstanceTest::select(heap,null,IsInstanceTest::$A),obj))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </statement>
          </branchCondition>
       </branchStatement>
+      <methodReturnEntry path="/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/1/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/0/0"/>
 </start>

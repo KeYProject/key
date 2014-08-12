@@ -9,7 +9,7 @@
                      <branchCondition name="not(equals(SimpleLinkedOjbectsDeletion::select(heap,SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next),SimpleLinkedOjbectsDeletion::$next),null))" pathCondition="and(and(not(equals(x,null)),not(equals(SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next),null))),not(equals(SimpleLinkedOjbectsDeletion::select(heap,SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next),SimpleLinkedOjbectsDeletion::$next),null)))" pathConditionChanged="true" branchCondition="not(equals(SimpleLinkedOjbectsDeletion::select(heap,SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next),SimpleLinkedOjbectsDeletion::$next),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
                         <statement name="x.next=x.next.next;" pathCondition="and(and(not(equals(x,null)),not(equals(SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next),null))),not(equals(SimpleLinkedOjbectsDeletion::select(heap,SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next),SimpleLinkedOjbectsDeletion::$next),null)))" pathConditionChanged="false">
                            <statement name="return x.value+x.next.value;" pathCondition="and(and(not(equals(x,null)),not(equals(SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next),null))),not(equals(SimpleLinkedOjbectsDeletion::select(heap,SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next),SimpleLinkedOjbectsDeletion::$next),null)))" pathConditionChanged="false">
-                              <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of SimpleLinkedOjbectsDeletion.compute(x);&gt;" pathCondition="and(and(not(equals(x,null)),not(equals(SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next),null))),not(equals(SimpleLinkedOjbectsDeletion::select(heap,SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next),SimpleLinkedOjbectsDeletion::$next),null)))" pathConditionChanged="false" isReturnValueComputed="false">
+                              <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of SimpleLinkedOjbectsDeletion.compute(x);&gt;" pathCondition="and(and(not(equals(x,null)),not(equals(SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next),null))),not(equals(SimpleLinkedOjbectsDeletion::select(heap,SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next),SimpleLinkedOjbectsDeletion::$next),null)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(and(not(equals(x,null)),not(equals(SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next),null))),not(equals(SimpleLinkedOjbectsDeletion::select(heap,SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next),SimpleLinkedOjbectsDeletion::$next),null)))">
                                  <termination name="&lt;end&gt;" pathCondition="and(and(not(equals(x,null)),not(equals(SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next),null))),not(equals(SimpleLinkedOjbectsDeletion::select(heap,SimpleLinkedOjbectsDeletion::select(heap,x,SimpleLinkedOjbectsDeletion::$next),SimpleLinkedOjbectsDeletion::$next),null)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                  </termination>
                               </methodReturn>
@@ -33,5 +33,10 @@
             </termination>
          </branchCondition>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/1/0"/>
+   <terminationEntry path="/0/0/0/0/1/0"/>
+   <terminationEntry path="/0/0/1/0"/>
 </start>

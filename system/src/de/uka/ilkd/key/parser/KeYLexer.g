@@ -249,6 +249,7 @@ lexer grammar KeYLexer;
         FREELABELIN : '\\freeLabelIn';
 	HASSORT : '\\hasSort';
 	FIELDTYPE : '\\fieldType';
+	FINAL : '\\final';
 	ELEMSORT : '\\elemSort';
 	HASLABEL : '\\hasLabel';
 	HASSUBFORMULAS : '\\hasSubFormulas';

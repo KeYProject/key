@@ -22,6 +22,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IStep;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementContentProvider;
@@ -59,7 +60,7 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
    /**
     * The parent in that this node is contained as child.
     */
-   private final ISEDDebugNode parent;
+   private ISEDDebugNode parent;
    
    /**
     * The thread.
@@ -104,6 +105,16 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
    @Override
    public ISEDDebugNode getParent() throws DebugException {
       return parent;
+   }
+   
+   /**
+    * It is valid to set the parent as long it was not defined before.
+    * So a parent might be set lazily later but can never be changed.
+    * @param parent The new parent to set.
+    */
+   protected void setParent(ISEDDebugNode parent) {
+      Assert.isTrue(this.parent == null || this.parent == parent);
+      this.parent = parent;
    }
 
    /**
@@ -316,7 +327,14 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
       ISEDDebugNode[] children = getChildren();
       return !ArrayUtil.isEmpty(children);
    }
-   
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IBreakpoint[] computeHitBreakpoints() throws DebugException {
+      return getDebugTarget().computeHitBreakpoints(this);
+   }
    /**
     * {@inheritDoc}
     */

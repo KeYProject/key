@@ -68,7 +68,7 @@
                      </variable>
                   </value>
                </variable>
-               <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of UnknownTest();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+               <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of UnknownTest();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                   <variable name="u_1" arrayIndex="-1" isArrayIndex="false">
                      <value name="u_1 {true}" typeString="endless.UnknownTest" valueString="u_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="next" arrayIndex="-1" isArrayIndex="false">
@@ -159,7 +159,7 @@
                               </variable>
                            </value>
                         </variable>
-                        <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of UnknownTest();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                        <methodReturn name="&lt;return of &lt;init&gt;&gt;" signature="&lt;return of UnknownTest();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                            <variable name="u_7" arrayIndex="-1" isArrayIndex="false">
                               <value name="u_7 {true}" typeString="endless.UnknownTest" valueString="u_9" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  <variable name="next" arrayIndex="-1" isArrayIndex="false">
@@ -221,7 +221,7 @@
                                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
-                              <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                              <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                     <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                        <variable name="next" arrayIndex="-1" isArrayIndex="false">
@@ -259,11 +259,15 @@
                               </methodReturn>
                            </statement>
                         </methodReturn>
+                        <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
                      </methodCall>
                   </statement>
                </methodReturn>
+               <methodReturnEntry path="/0/0/0/0/0"/>
             </methodCall>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
 </start>

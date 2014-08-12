@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.model;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStart;
 
@@ -33,4 +34,10 @@ public interface IExecutionStart extends IExecutionNode {
     * The default name of an {@link IExecutionStart}.
     */
    public static final String DEFAULT_START_NODE_NAME = INTERNAL_NODE_NAME_START + "start" + INTERNAL_NODE_NAME_END;
+   
+   /**
+    * Returns the up to now discovered {@link IExecutionTermination}s.
+    * @return The up to now discovered {@link IExecutionTermination}s.
+    */
+   public ImmutableList<IExecutionTermination> getTerminations();
 }

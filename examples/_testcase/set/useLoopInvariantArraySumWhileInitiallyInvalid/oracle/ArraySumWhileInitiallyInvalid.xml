@@ -27,7 +27,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="fa
                   <callStackEntry path="/0"/>
                   <statement name="return result_1;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="false">
                      <callStackEntry path="/0"/>
-                     <methodReturn name="&lt;return of sum&gt;" signature="&lt;return of ArraySumWhileInitiallyInvalid.sum(array);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="false" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of sum&gt;" signature="&lt;return of ArraySumWhileInitiallyInvalid.sum(array);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))">
                         <callStackEntry path="/0"/>
                         <termination name="&lt;end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
@@ -37,5 +37,8 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="fa
             </loopInvariant>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/1/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/1/0/0/0"/>
 </start>

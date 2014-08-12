@@ -186,4 +186,9 @@ public class LDTInput implements EnvInput {
     public Profile getProfile() {
         return profile;
     }
+    
+    @Override
+    public File getInitialFile() {
+       return null;
+    }
 }

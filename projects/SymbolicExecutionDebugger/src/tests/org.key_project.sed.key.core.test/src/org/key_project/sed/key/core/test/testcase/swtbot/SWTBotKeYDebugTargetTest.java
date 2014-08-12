@@ -1181,6 +1181,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.FALSE,
+                           Boolean.FALSE,
                            Boolean.TRUE, 
                            6, executor);
    }
@@ -1344,6 +1345,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.valueOf(showKeYMainWindow),
                            Boolean.valueOf(mergeBranchConditions),
                            Boolean.FALSE,
+                           Boolean.FALSE,
                            Boolean.TRUE, 
                            timeoutFactor, executor);
    }
@@ -1450,7 +1452,12 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                KeYUtil.waitWhileMainWindowIsFrozen(MainWindow.getInstance());
             }
             // Test the unmodified execution tree
-            TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
+            if (clearProofListInKeYBeforeDisconnect) {
+               TestSEDKeyCoreUtil.assertDisposedInitialTarget(target, targetName);
+            }
+            else {
+               TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
+            }
          }
       };
       doKeYDebugTargetTest(projectName, 
@@ -1463,6 +1470,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE,
+                           Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE, 
@@ -1562,6 +1570,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE,
+                           Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE, 

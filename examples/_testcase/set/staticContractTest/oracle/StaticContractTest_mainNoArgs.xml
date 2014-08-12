@@ -7,7 +7,7 @@ pre: true
 post: result_0 = 42 &amp; exc_0 = null
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-            <methodReturn name="&lt;return of mainNoArgs&gt;" signature="&lt;return of StaticContractTest.mainNoArgs();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of mainNoArgs&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of StaticContractTest.mainNoArgs();&gt;" isReturnValueComputed="true">
+            <methodReturn name="&lt;return of mainNoArgs&gt;" signature="&lt;return of StaticContractTest.mainNoArgs();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of mainNoArgs&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of StaticContractTest.mainNoArgs();&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                </methodReturnValue>
                <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
@@ -15,5 +15,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
             </methodReturn>
          </operationContract>
       </statement>
+      <methodReturnEntry path="/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0"/>
 </start>

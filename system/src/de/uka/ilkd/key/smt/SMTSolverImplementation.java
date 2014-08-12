@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
+import de.uka.ilkd.key.testgen.ProofInfo;
 
 interface SolverListener {
         void processStarted(SMTSolver solver, SMTProblem problem);
@@ -343,7 +344,8 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 
 
         	if(getType() == SolverType.Z3_CE_SOLVER){
-        		SMTObjTranslator objTrans = new SMTObjTranslator(smtSettings, services);
+        		ProofInfo info = new ProofInfo(problem.getGoal().proof());
+        		SMTObjTranslator objTrans = new SMTObjTranslator(smtSettings, services,info);
         		problemString = objTrans.translateProblem(term, services, smtSettings).toString();
         		problemTypeInformation = objTrans.getTypes();
         		ModelExtractor query = objTrans.getQuery();

@@ -371,21 +371,27 @@ public class Node  {
 	return -1;
     }
 
-    private int getIntroducedRulesCount() {
+    public StringBuffer getUniqueTacletId() {
+        StringBuffer id = new StringBuffer();
         int c = 0;
         Node n = this;
 
         while (n != null) {
             c += n.localIntroducedRules.size();
+                      
+            if (n.parent != null && n.parent.childrenCount() > 1) {
+               id.append(n.siblingNr);
+            }
+            
             n = n.parent;
-        }
-        return c;
+        }    
+        
+        id.append("_").append(c);
+        
+        return id;
     }
 
-    public int getUniqueTacletNr() {
-        return getIntroducedRulesCount();
-    }
-
+    
     /** helps toString method
      * @param prefix needed to keep track if a line has to be printed
      * @param tree the tree representation we want to add this subtree
@@ -656,4 +662,5 @@ public class Node  {
                     "structure this way is not allowed.");
         }
     }
+
  }

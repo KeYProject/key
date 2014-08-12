@@ -126,9 +126,9 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
       // Create TreeViewer
       super.createControl(parent);
       getTreeViewer().setUseHashlookup(true);
-      contentProvider = new LazyProofTreeContentProvider(getTreeViewer(), environment, proof);
+      contentProvider = new LazyProofTreeContentProvider();
       getTreeViewer().setContentProvider(contentProvider);
-      labelProvider = new ProofTreeLabelProvider(getTreeViewer(), environment, proof);
+      labelProvider = new ProofTreeLabelProvider(getTreeViewer(), proof);
       getTreeViewer().setLabelProvider(labelProvider);
       getTreeViewer().setInput(proof);
       // Create context menu of TreeViewer
@@ -225,12 +225,10 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage implements I
    @Override
    public void selectionChanged(SelectionChangedEvent event) {
       // Change selected node of mediator only if content provider is not in refresh phase after stopping the auto mode
-      if (!contentProvider.isRefreshAfterAutoModeStopped()) {
-         Node node = getSelectedNode(event.getSelection());
-         Node mediatorNode = environment.getMediator().getSelectedNode();
-         if (node != mediatorNode) {
-            environment.getMediator().getSelectionModel().setSelectedNode(node);
-         }
+      Node node = getSelectedNode(event.getSelection());
+      Node mediatorNode = environment.getMediator().getSelectedNode();
+      if (node != mediatorNode) {
+         environment.getMediator().getSelectionModel().setSelectedNode(node);
       }
       // Fire event to listener
       super.selectionChanged(event); 

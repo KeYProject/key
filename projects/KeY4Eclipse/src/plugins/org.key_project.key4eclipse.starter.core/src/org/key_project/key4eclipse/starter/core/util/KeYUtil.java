@@ -84,7 +84,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -294,7 +293,7 @@ public final class KeYUtil {
                             EnvNode envChild = (EnvNode)child;
                             String srcPath = envChild.getProofEnv().getJavaModel().getModelDir();
                             if (srcPath != null && location.equals(new File(srcPath))) {
-                                result = envChild.getProofEnv().getInitConfig();
+                                result = envChild.getProofEnv().getInitConfigForEnvironment();
                             }
                         }
                         i++;
@@ -388,7 +387,13 @@ public final class KeYUtil {
                         // Make sure that main window is available.
                         Assert.isTrue(MainWindow.hasInstance(), "KeY main window is not available.");
                         // Load location
-                        InitConfig initConfig = internalLoad(null, location, classPaths, bootClassPath, true);
+                        MainWindow main = MainWindow.getInstance();
+                        if (!main.isVisible()) {
+                            main.setVisible(true);
+                        }
+                        // Check if location is already loaded
+                        DefaultProblemLoader loader = main.getUserInterface().load(null, location, classPaths, bootClassPath, null);
+                        InitConfig initConfig = loader.getInitConfig();
                         // Get method to proof in KeY
                         IProgramMethod pm = getProgramMethod(method, initConfig.getServices().getJavaInfo());
                         Assert.isNotNull(pm, "Can't find method \"" + method + "\" in KeY.");
@@ -405,53 +410,6 @@ public final class KeYUtil {
                 throw run.getException();
             }
         }
-    }
-    
-    /**
-     * Loads the given location in KeY and returns the opened {@link InitConfig}.
-     * @param profile The {@link Profile} to use.
-     * @param location The location to load.
-     * @param classPaths The class path entries to use.
-     * @param bootClassPath The boot class path to use.
-     * @param showKeYMainWindow Show KeY {@link MainWindow}? <b>Attention: </b> The {@link InitConfig} is not available in the proof tree, because no proof is started.
-     * @return The opened {@link InitConfig}.
-     * @throws Exception Occurred Exception.
-     */
-    private static InitConfig internalLoad(final Profile profile,
-                                           final File location,
-                                           final List<File> classPaths,
-                                           final File bootClassPath,
-                                           final boolean showKeYMainWindow) throws Exception {
-        IRunnableWithResult<InitConfig> run = new AbstractRunnableWithResult<InitConfig>() {
-            @Override
-            public void run() {
-                try {
-                    MainWindow main = MainWindow.getInstance();
-                    if (showKeYMainWindow) {
-                       main.setVisible(true);
-                    }
-                    if (showKeYMainWindow && !main.isVisible()) {
-                        main.setVisible(true);
-                    }
-                    // Check if location is already loaded
-                    InitConfig initConfig = getInitConfig(location);
-                    if (initConfig == null) {
-                        // Load local file
-                        DefaultProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath);
-                        initConfig = loader.getInitConfig();
-                    }
-                    setResult(initConfig);
-                }
-                catch (Exception e) {
-                    setException(e);
-                }
-            }
-        };
-        SwingUtil.invokeAndWait(run);
-        if (run.getException() != null) {
-            throw run.getException();
-        }
-        return run.getResult();
     }
     
     /**

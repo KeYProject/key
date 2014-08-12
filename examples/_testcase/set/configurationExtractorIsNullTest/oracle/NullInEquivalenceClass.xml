@@ -4,7 +4,7 @@
       <branchStatement name="if (obj==null)" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="equals(obj,null)" pathCondition="equals(obj,null)" pathConditionChanged="true" branchCondition="equals(obj,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return 1;" pathCondition="equals(obj,null)" pathConditionChanged="false">
-               <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of IsNullTest.compute(obj);&gt;" pathCondition="equals(obj,null)" pathConditionChanged="false" isReturnValueComputed="false">
+               <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of IsNullTest.compute(obj);&gt;" pathCondition="equals(obj,null)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="equals(obj,null)">
                   <termination name="&lt;end&gt;" pathCondition="equals(obj,null)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
@@ -12,12 +12,16 @@
          </branchCondition>
          <branchCondition name="not(equals(obj,null))" pathCondition="not(equals(obj,null))" pathConditionChanged="true" branchCondition="not(equals(obj,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return 0;" pathCondition="not(equals(obj,null))" pathConditionChanged="false">
-               <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of IsNullTest.compute(obj);&gt;" pathCondition="not(equals(obj,null))" pathConditionChanged="false" isReturnValueComputed="false">
+               <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of IsNullTest.compute(obj);&gt;" pathCondition="not(equals(obj,null))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="not(equals(obj,null))">
                   <termination name="&lt;end&gt;" pathCondition="not(equals(obj,null))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </statement>
          </branchCondition>
       </branchStatement>
+      <methodReturnEntry path="/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/1/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/0/0"/>
 </start>

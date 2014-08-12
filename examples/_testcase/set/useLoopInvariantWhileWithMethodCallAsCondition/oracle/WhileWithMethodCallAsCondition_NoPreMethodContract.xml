@@ -258,7 +258,10 @@ termination: diamond" pathCondition="update-application(parallel-upd(elem-update
                         <methodReturn name="&lt;return of size&gt;" signature="&lt;return of WhileWithMethodCallAsCondition.size(array);&gt;" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
     b_3=goOnNice(array,i);
   }
-}\&gt; (and(not(equals(b_3,TRUE)),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))))),equals(array,null)))" pathConditionChanged="false" isReturnValueComputed="false">
+}\&gt; (and(not(equals(b_3,TRUE)),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))))),equals(array,null)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
+    b_3=goOnNice(array,i);
+  }
+}\&gt; (and(not(equals(b_3,TRUE)),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))))),equals(array,null)))">
                            <callStackEntry path="/0"/>
                            <termination name="&lt;end&gt;" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
     b_3=goOnNice(array,i);
@@ -272,5 +275,13 @@ termination: diamond" pathCondition="update-application(parallel-upd(elem-update
             </loopInvariant>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/1/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/1/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/0/1/0"/>
+   <terminationEntry path="/0/0/0/0/0/1/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/1/0/0/1/0"/>
+   <terminationEntry path="/0/0/0/0/0/1/0/1/0"/>
+   <terminationEntry path="/0/0/0/0/1/0/0/0/0"/>
 </start>

@@ -3,11 +3,13 @@
    <methodCall name="SimpleArrayCreation.compute();" pathCondition="true" pathConditionChanged="false">
       <statement name="int[] array = new int[]{1,2 };" pathCondition="true" pathConditionChanged="false">
          <statement name="return array[0]+array[1];" pathCondition="true" pathConditionChanged="false">
-            <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of SimpleArrayCreation.compute();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+            <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of SimpleArrayCreation.compute();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                </termination>
             </methodReturn>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0"/>
 </start>

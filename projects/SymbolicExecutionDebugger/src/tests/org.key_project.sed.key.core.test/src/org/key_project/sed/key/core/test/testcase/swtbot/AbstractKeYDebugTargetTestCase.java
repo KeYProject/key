@@ -317,7 +317,17 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                menuItem.click();
             }
          });
+         waitUntilDeselected(bot, launchTreeItem);
       }
+   }
+   
+   /**
+    * Waits until the given {@link SWTBotTreeItem} is no longer selected.
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @param item The {@link SWTBotTreeItem} to wait for.
+    */
+   protected static void waitUntilDeselected(SWTWorkbenchBot bot, SWTBotTreeItem item) {
+      TestUtilsUtil.waitUntilDeselected(bot, item);
    }
    
    /**
@@ -370,6 +380,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                menuItem.click();
             }
          });
+         waitUntilDeselected(bot, launchTreeItem);
       }
    }
    
@@ -423,6 +434,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                menuItem.click();
             }
          });
+         waitUntilDeselected(bot, launchTreeItem);
       }
    }
    
@@ -493,6 +505,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
+    * @param useUnicode Use unicode characters?
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
@@ -510,6 +523,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean showVariablesOfSelectedDebugNode,
                                        Boolean showKeYMainWindow,
                                        Boolean mergeBranchConditions,
+                                       Boolean useUnicode,
                                        Boolean usePrettyPrinting,
                                        Boolean showSignatureOnMethodReturnNodes,
                                        int timeoutFactor, 
@@ -526,6 +540,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                            showVariablesOfSelectedDebugNode, 
                            showKeYMainWindow, 
                            mergeBranchConditions,
+                           useUnicode,
                            usePrettyPrinting,
                            showSignatureOnMethodReturnNodes,
                            timeoutFactor, 
@@ -548,6 +563,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
+    * @param useUnicode Use unicode characters?
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
@@ -566,6 +582,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean showVariablesOfSelectedDebugNode,
                                        Boolean showKeYMainWindow,
                                        Boolean mergeBranchConditions,
+                                       Boolean useUnicode,
                                        Boolean usePrettyPrinting,
                                        Boolean showSignatureOnMethodReturnNodes,
                                        int timeoutFactor,
@@ -583,6 +600,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                            showVariablesOfSelectedDebugNode, 
                            showKeYMainWindow, 
                            mergeBranchConditions, 
+                           useUnicode,
                            usePrettyPrinting,
                            showSignatureOnMethodReturnNodes,
                            timeoutFactor, 
@@ -605,6 +623,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
+    * @param useUnicode Use unicode characters?
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
@@ -624,6 +643,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean showVariablesOfSelectedDebugNode,
                                        Boolean showKeYMainWindow,
                                        Boolean mergeBranchConditions,
+                                       Boolean useUnicode,
                                        Boolean usePrettyPrinting,
                                        Boolean showSignatureOnMethodReturnNodes,
                                        int timeoutFactor,
@@ -635,7 +655,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          projectConfigurator.configure(project);
       }
       // Do test steps
-      doKeYDebugTargetTest(project, closePropertiesView, closeExecutionTreeViews, selector, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, usePrettyPrinting, showSignatureOnMethodReturnNodes, timeoutFactor, executor);
+      doKeYDebugTargetTest(project, closePropertiesView, closeExecutionTreeViews, selector, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, useUnicode, usePrettyPrinting, showSignatureOnMethodReturnNodes, timeoutFactor, executor);
    }
    
    /**
@@ -651,6 +671,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
+    * @param useUnicode Use unicode characters?
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
@@ -667,6 +688,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                                        Boolean showVariablesOfSelectedDebugNode,
                                        Boolean showKeYMainWindow,
                                        Boolean mergeBranchConditions,
+                                       Boolean useUnicode,
                                        Boolean usePrettyPrinting,
                                        Boolean showSignatureOnMethodReturnNodes,
                                        int timeoutFactor,
@@ -705,7 +727,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
          assertEquals(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW, SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
          // Launch method
-         TestSEDKeyCoreUtil.launchKeY(method, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, usePrettyPrinting, showSignatureOnMethodReturnNodes);
+         TestSEDKeyCoreUtil.launchKeY(method, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, useUnicode, usePrettyPrinting, showSignatureOnMethodReturnNodes);
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
@@ -840,7 +862,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
                assertFalse(target.isTerminated());
                assertFalse(target.canResume());
                // Test the execution tree
-               TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
+               TestSEDKeyCoreUtil.assertDisposedInitialTarget(target, targetName);
             }
             else {
                if (!stepIntoInsteadOfRun) {

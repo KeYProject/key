@@ -280,14 +280,14 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
 
     @Override
-    public String getPlainText(Services services) {
+    public String getPlainText(Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
        final LocationVariable baseHeap = heapLDT.getHeap();
        
        String mods = "";
        for (LocationVariable h : heapLDT.getAllHeaps()) {
            if (originalModifies.get(h) != null) {
-               String printMods = LogicPrinter.quickPrintTerm(originalModifies.get(h), services);
+               String printMods = LogicPrinter.quickPrintTerm(originalModifies.get(h), services, usePrettyPrinting, useUnicodeSymbols);
                mods = mods
                        + "\n"
                        + "mod"
@@ -300,7 +300,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
        String invariants = "";
        for (LocationVariable h : heapLDT.getAllHeaps()) {
            if (originalInvariants.get(h) != null) {
-               String printPosts = LogicPrinter.quickPrintTerm(originalInvariants.get(h), services);
+               String printPosts = LogicPrinter.quickPrintTerm(originalInvariants.get(h), services, usePrettyPrinting, useUnicodeSymbols);
                invariants = invariants
                        + "\n"
                        + "invariant"
@@ -312,7 +312,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
        
        return invariants
              + ";\nvariant: "
-             + LogicPrinter.quickPrintTerm(originalVariant, services).trim() +
+             + LogicPrinter.quickPrintTerm(originalVariant, services, usePrettyPrinting, useUnicodeSymbols).trim() +
              mods;
     }
 

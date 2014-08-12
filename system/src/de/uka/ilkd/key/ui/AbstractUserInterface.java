@@ -13,20 +13,20 @@
 
 package de.uka.ilkd.key.ui;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.util.List;
+import java.util.Properties;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -36,24 +36,22 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.Debug;
 
 public abstract class AbstractUserInterface implements UserInterface {
-   private boolean autoMode;
-
-   /**
-    * The used {@link PropertyChangeSupport}.
-    */
-    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     private ProofMacro autoMacro = new SkipMacro();
+
+    private ProverTaskListener pml = null;
 
     protected ProblemLoader getProblemLoader(File file, List<File> classPath,
                                              File bootClassPath, KeYMediator mediator) {
         final ProblemLoader pl =
                 new ProblemLoader(file, classPath, bootClassPath,
-                                  AbstractProfile.getDefaultProfile(), mediator);
+                                  AbstractProfile.getDefaultProfile(), mediator, true, null);
         pl.addTaskListener(this);
         return pl;
     }
@@ -80,29 +78,50 @@ public abstract class AbstractUserInterface implements UserInterface {
         return !(getMacro() instanceof SkipMacro);
     }
 
-    public boolean applyMacro() {
+    @Override
+    public final ProverTaskListener getListener() {
+        if (this.pml == null) {
+            this.pml = new ProofMacroListenerAdapter();
+        }
+        return new CompositePTListener(this, pml);
+    }
+
+    @Override
+    public ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput, 
+          ProofAggregate proofList, InitConfig initConfig) {
+       final ProofEnvironment env = new ProofEnvironment(initConfig); 
+       env.addProofEnvironmentListener(this);
+       env.registerProof(proofOblInput, proofList);
+       return env;
+    }
+
+   public boolean applyMacro() {
         assert macroChosen();
-        if (getMacro().canApplyTo(getMediator(), null)) {
+        final ProofMacro macro = getMacro();
+        if (macro.canApplyTo(getMediator(), null)) {
             System.out.println(getMacroConsoleOutput());
+            Proof proof = getMediator().getSelectedProof();
+            TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
+            ProverTaskListener ptl = getListener();
             try {
                 getMediator().stopInterface(true);
                 getMediator().setInteractive(false);
-                getMacro().applyTo(getMediator(), null, this);
-                getMediator().setInteractive(true);
-                getMediator().startInterface(true);
+                ptl.taskStarted(macro.getName(), 0);
+                synchronized(macro) {
+                    // wait for macro to terminate
+                    info = macro.applyTo(getMediator(), null, ptl);
+                }
             } catch(InterruptedException ex) {
                 Debug.out("Proof macro has been interrupted:");
                 Debug.out(ex);
             } finally {
-                Proof proof = getMediator().getSelectedProof();
-                TaskFinishedInfo info =
-                        new DefaultTaskFinishedInfo(getMacro(), null, proof, proof.getAutoModeTime(),
-                                                    proof.countNodes(), proof.openGoals().size());
-                taskFinished(info);
+                ptl.taskFinished(info);
+                getMediator().setInteractive(true);
+                getMediator().startInterface(true);
             }
             return true;
         } else {
-            System.out.println(getMacro().getClass().getSimpleName() + " not applicable!");
+            System.out.println(macro.getClass().getSimpleName() + " not applicable!");
         }
         return false;
     }
@@ -114,11 +133,12 @@ public abstract class AbstractUserInterface implements UserInterface {
     public DefaultProblemLoader load(Profile profile,
                                      File file,
                                      List<File> classPath,
-                                     File bootClassPath) throws ProblemLoaderException {
+                                     File bootClassPath,
+                                     Properties poPropertiesToForce) throws ProblemLoaderException {
        DefaultProblemLoader loader = null;
        try {
           getMediator().stopInterface(true);
-          loader = new DefaultProblemLoader(file, classPath, bootClassPath, profile, getMediator());
+          loader = new DefaultProblemLoader(file, classPath, bootClassPath, profile, getMediator(), false, poPropertiesToForce);
           loader.load();
           return loader;
        }
@@ -139,7 +159,9 @@ public abstract class AbstractUserInterface implements UserInterface {
     @Override
     public Proof createProof(InitConfig initConfig, ProofOblInput input) throws ProofInputException {
        ProblemInitializer init = createProblemInitializer(initConfig.getProfile());
-       return init.startProver(initConfig, input, 0);
+       ProofAggregate proofList = init.startProver(initConfig, input);
+       createProofEnvironmentAndRegisterProof(input, proofList, initConfig);
+       return proofList.getFirstProof();
     }
     
     /**
@@ -184,7 +206,7 @@ public abstract class AbstractUserInterface implements UserInterface {
      */
     @Override
     public void waitWhileAutoMode() {
-       while (getMediator().autoMode()) { // Wait until auto mode has stopped.
+       while (getMediator().isInAutoMode()) { // Wait until auto mode has stopped.
           try {
              Thread.sleep(100);
           }
@@ -193,125 +215,46 @@ public abstract class AbstractUserInterface implements UserInterface {
        }
     }
 
-    @Override
-    public boolean isAutoMode() {
-        return autoMode;
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void notifyAutoModeBeingStarted() {
-       boolean oldValue = isAutoMode();
-       autoMode = true;
-       firePropertyChange(PROP_AUTO_MODE, oldValue, isAutoMode());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void notifyAutomodeStopped() {
-       boolean oldValue = isAutoMode();
-       autoMode = false;
-       firePropertyChange(PROP_AUTO_MODE, oldValue, isAutoMode());
     }
-    
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        pcs.addPropertyChangeListener(listener);
+    public void proofUnregistered(ProofEnvironmentEvent event) {
+       if (event.getSource().getProofs().isEmpty()) {
+          event.getSource().removeProofEnvironmentListener(this);
+       }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-        pcs.addPropertyChangeListener(propertyName, listener);
-    }
+    abstract protected void macroStarted(String message, int size);
+    abstract protected void macroFinished(TaskFinishedInfo info);
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        pcs.removePropertyChangeListener(listener);
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-        pcs.removePropertyChangeListener(propertyName, listener);
-    }
+    private class ProofMacroListenerAdapter implements ProverTaskListener {
 
-    /**
-     * Fires the event to all available listeners.
-     * @param propertyName The property name.
-     * @param index The changed index.
-     * @param oldValue The old value.
-     * @param newValue The new value.
-     */
-    protected void fireIndexedPropertyChange(String propertyName, int index, boolean oldValue, boolean newValue) {
-        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-    }
+        @Override
+        public void taskStarted(String message, int size) {
+            macroStarted(message, size);
+        }
 
-    /**
-     * Fires the event to all available listeners.
-     * @param propertyName The property name.
-     * @param index The changed index.
-     * @param oldValue The old value.
-     * @param newValue The new value.
-     */
-    protected void fireIndexedPropertyChange(String propertyName, int index, int oldValue, int newValue) {
-        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-    }
+        @Override
+        public void taskProgress(int position) {
+            // not needed yet
+        }
 
-    /**
-     * Fires the event to all available listeners.
-     * @param propertyName The property name.
-     * @param index The changed index.
-     * @param oldValue The old value.
-     * @param newValue The new value.
-     */
-    protected void fireIndexedPropertyChange(String propertyName, int index, Object oldValue, Object newValue) {
-        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-    }
-
-    /**
-     * Fires the event to all listeners.
-     * @param evt The event to fire.
-     */
-    protected void firePropertyChange(PropertyChangeEvent evt) {
-        pcs.firePropertyChange(evt);
-    }
-
-    /**
-     * Fires the event to all listeners.
-     * @param propertyName The changed property.
-     * @param oldValue The old value.
-     * @param newValue The new value.
-     */
-    protected void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
-        pcs.firePropertyChange(propertyName, oldValue, newValue);
-    }
-
-    /**
-     * Fires the event to all listeners.
-     * @param propertyName The changed property.
-     * @param oldValue The old value.
-     * @param newValue The new value.
-     */
-    protected void firePropertyChange(String propertyName, int oldValue, int newValue) {
-        pcs.firePropertyChange(propertyName, oldValue, newValue);
-    }
-
-    /**
-     * Fires the event to all listeners.
-     * @param propertyName The changed property.
-     * @param oldValue The old value.
-     * @param newValue The new value.
-     */
-    protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
-        pcs.firePropertyChange(propertyName, oldValue, newValue);
+        @Override
+        public void taskFinished(TaskFinishedInfo info) {
+            macroFinished(info);
+        }
     }
 }

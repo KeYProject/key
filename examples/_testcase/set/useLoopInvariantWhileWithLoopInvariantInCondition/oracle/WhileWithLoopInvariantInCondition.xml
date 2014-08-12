@@ -35,26 +35,26 @@ mod: false" pathCondition="not(or(not(equals(i_2_0,Z(neglit(1(#))))),not(imp(equ
     b_6=goOnNice(array,i);
   }
 }\] (and(equals(b_6,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))))))" pathConditionChanged="false" initiallyValid="false">
-                           <callStackEntry path="/0"/>
                            <callStackEntry path="/0/0/0/0/0/0/0"/>
+                           <callStackEntry path="/0"/>
                            <branchCondition name="equals(i_3_0,Z(neglit(1(#))))" pathCondition="not(or(or(not(equals(i_3_0,Z(neglit(1(#))))),not(imp(equals(i_3_0,Z(neglit(1(#)))),equals(i_2_0,Z(neglit(1(#))))))),not(imp(and(equals(i_2_0,Z(neglit(1(#)))),equals(i_3_0,Z(neglit(1(#))))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithLoopInvariantInCondition): {
     b_6=goOnNice(array,i);
   }
 }\] (and(equals(b_6,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))))))" pathConditionChanged="true" branchCondition="equals(i_3_0,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
-                              <callStackEntry path="/0"/>
                               <callStackEntry path="/0/0/0/0/0/0/0"/>
+                              <callStackEntry path="/0"/>
                               <statement name="return true;" pathCondition="not(or(or(not(equals(i_3_0,Z(neglit(1(#))))),not(imp(equals(i_3_0,Z(neglit(1(#)))),equals(i_2_0,Z(neglit(1(#))))))),not(imp(and(equals(i_2_0,Z(neglit(1(#)))),equals(i_3_0,Z(neglit(1(#))))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithLoopInvariantInCondition): {
     b_6=goOnNice(array,i);
   }
 }\] (and(equals(b_6,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))))))" pathConditionChanged="false">
-                                 <callStackEntry path="/0"/>
                                  <callStackEntry path="/0/0/0/0/0/0/0"/>
+                                 <callStackEntry path="/0"/>
                                  <methodReturn name="&lt;return of goOnNice&gt;" signature="&lt;return of WhileWithLoopInvariantInCondition.goOnNice(array_3,i_3);&gt;" pathCondition="not(or(or(not(equals(i_3_0,Z(neglit(1(#))))),not(imp(equals(i_3_0,Z(neglit(1(#)))),equals(i_2_0,Z(neglit(1(#))))))),not(imp(and(equals(i_2_0,Z(neglit(1(#)))),equals(i_3_0,Z(neglit(1(#))))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithLoopInvariantInCondition): {
     b_6=goOnNice(array,i);
   }
-}\] (and(equals(b_6,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))))))" pathConditionChanged="false" isReturnValueComputed="false">
-                                    <callStackEntry path="/0"/>
+}\] (and(equals(b_6,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="equals(i_3_0,Z(neglit(1(#))))">
                                     <callStackEntry path="/0/0/0/0/0/0/0"/>
+                                    <callStackEntry path="/0"/>
                                     <statement name="result_1++;" pathCondition="not(or(or(not(equals(i_3_0,Z(neglit(1(#))))),not(imp(equals(i_3_0,Z(neglit(1(#)))),equals(i_2_0,Z(neglit(1(#))))))),not(imp(and(equals(i_2_0,Z(neglit(1(#)))),equals(i_3_0,Z(neglit(1(#))))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithLoopInvariantInCondition): {
     b_6=goOnNice(array,i);
   }
@@ -76,6 +76,7 @@ mod: false" pathCondition="not(or(not(equals(i_2_0,Z(neglit(1(#))))),not(imp(equ
                               </statement>
                            </branchCondition>
                         </loopInvariant>
+                        <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
                      </methodCall>
                   </branchCondition>
                </branchCondition>
@@ -101,4 +102,5 @@ mod: false" pathCondition="not(or(not(equals(i_2_0,Z(neglit(1(#))))),not(imp(equ
          </statement>
       </statement>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
 </start>

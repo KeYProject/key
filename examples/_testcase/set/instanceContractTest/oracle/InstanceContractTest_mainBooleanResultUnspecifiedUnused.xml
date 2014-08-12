@@ -6,10 +6,12 @@ pre: self.&lt;inv&gt;
 post: self.&lt;inv&gt; &amp; exc_0 = null
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-         <methodReturn name="&lt;return of mainBooleanResultUnspecifiedUnused&gt;" signature="&lt;return of self.mainBooleanResultUnspecifiedUnused(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of mainBooleanResultUnspecifiedUnused&gt;" signatureIncludingReturnValue="&lt;return of self.mainBooleanResultUnspecifiedUnused(x);&gt;" isReturnValueComputed="true">
+         <methodReturn name="&lt;return of mainBooleanResultUnspecifiedUnused&gt;" signature="&lt;return of self.mainBooleanResultUnspecifiedUnused(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of mainBooleanResultUnspecifiedUnused&gt;" signatureIncludingReturnValue="&lt;return of self.mainBooleanResultUnspecifiedUnused(x);&gt;" isReturnValueComputed="true" methodReturnCondition="true">
             <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
             </termination>
          </methodReturn>
       </operationContract>
+      <methodReturnEntry path="/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0"/>
 </start>

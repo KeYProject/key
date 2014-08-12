@@ -59,6 +59,7 @@ import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -73,13 +74,8 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.proof.mgt.AxiomJustification;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof_references.ProofReferenceUtil;
-import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
@@ -324,31 +320,19 @@ public class ProofManager {
     * Clones the global {@link KeYEnvironment}.
     * @return the cloned {@link KeYEnvironment}
     */
-   private KeYEnvironment<CustomUserInterface> cloneEnvironment(){
+   private KeYEnvironment<CustomUserInterface> cloneEnvironment() {
       InitConfig sourceInitConfig = environment.getInitConfig();
       // Create new profile which has separate OneStepSimplifier instance
       JavaProfile profile = new JavaProfile();
       // Create new InitConfig and initialize it with value from initial one.
       InitConfig initConfig = new InitConfig(environment.getServices().copy(profile, false));
       initConfig.setActivatedChoices(sourceInitConfig.getActivatedChoices());
-      initConfig.setSettings(sourceInitConfig.getSettings());
+      ProofSettings clonedSettings = sourceInitConfig.getSettings() != null ? new ProofSettings(sourceInitConfig.getSettings()) : null;
+      initConfig.setSettings(clonedSettings);
       initConfig.setTaclet2Builder(sourceInitConfig.getTaclet2Builder());
       initConfig.setTaclets(sourceInitConfig.getTaclets());
       // Create new ProofEnvironment and initialize it with values from initial one.
-      ProofEnvironment env = initConfig.getProofEnv();
-      env.setJavaModel(sourceInitConfig.getProofEnv().getJavaModel());
-      env.setRuleConfig(sourceInitConfig.getProofEnv().getRuleConfig());
-      for (Taclet taclet : sourceInitConfig.activatedTaclets()) {
-         env.getJustifInfo().addJustification(taclet, sourceInitConfig.getProofEnv().getJustifInfo().getJustification(taclet));
-      }
-      for (BuiltInRule rule : initConfig.builtInRules()) {
-         RuleJustification origJusti = sourceInitConfig.getProofEnv().getJustifInfo().getJustification(rule);
-         if (origJusti == null) {
-            assert rule instanceof OneStepSimplifier;
-            origJusti = AxiomJustification.INSTANCE;
-         }
-         env.getJustifInfo().addJustification(rule, origJusti);
-      }
+      initConfig.getServices().setJavaModel(sourceInitConfig.getServices().getJavaModel());
       KeYEnvironment<CustomUserInterface> keyEnv = new KeYEnvironment<CustomUserInterface>(new CustomUserInterface(false), initConfig);
       return keyEnv;
    }

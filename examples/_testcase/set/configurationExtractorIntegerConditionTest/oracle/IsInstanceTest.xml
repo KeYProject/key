@@ -9,7 +9,7 @@
                      <branchStatement name="if (IntegerConditionTest.y==3)" pathCondition="and(equals(a,Z(1(#))),equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#))))" pathConditionChanged="false">
                         <branchCondition name="equals(int::select(heap,null,IntegerConditionTest::$y),Z(3(#)))" pathCondition="and(and(equals(a,Z(1(#))),equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#)))),equals(int::select(heap,null,IntegerConditionTest::$y),Z(3(#))))" pathConditionChanged="true" branchCondition="equals(int::select(heap,null,IntegerConditionTest::$y),Z(3(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
                            <statement name="return 42;" pathCondition="and(and(equals(a,Z(1(#))),equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#)))),equals(int::select(heap,null,IntegerConditionTest::$y),Z(3(#))))" pathConditionChanged="false">
-                              <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of self.compute(a);&gt;" pathCondition="and(and(equals(a,Z(1(#))),equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#)))),equals(int::select(heap,null,IntegerConditionTest::$y),Z(3(#))))" pathConditionChanged="false" isReturnValueComputed="false">
+                              <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of self.compute(a);&gt;" pathCondition="and(and(equals(a,Z(1(#))),equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#)))),equals(int::select(heap,null,IntegerConditionTest::$y),Z(3(#))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(and(equals(a,Z(1(#))),equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#)))),equals(int::select(heap,null,IntegerConditionTest::$y),Z(3(#))))">
                                  <termination name="&lt;end&gt;" pathCondition="and(and(equals(a,Z(1(#))),equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#)))),equals(int::select(heap,null,IntegerConditionTest::$y),Z(3(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                  </termination>
                               </methodReturn>
@@ -17,7 +17,7 @@
                         </branchCondition>
                         <branchCondition name="not(equals(int::select(heap,null,IntegerConditionTest::$y),Z(3(#))))" pathCondition="and(and(equals(a,Z(1(#))),equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#)))),not(equals(int::select(heap,null,IntegerConditionTest::$y),Z(3(#)))))" pathConditionChanged="true" branchCondition="not(equals(int::select(heap,null,IntegerConditionTest::$y),Z(3(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
                            <statement name="return -300;" pathCondition="and(and(equals(a,Z(1(#))),equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#)))),not(equals(int::select(heap,null,IntegerConditionTest::$y),Z(3(#)))))" pathConditionChanged="false">
-                              <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of self.compute(a);&gt;" pathCondition="and(and(equals(a,Z(1(#))),equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#)))),not(equals(int::select(heap,null,IntegerConditionTest::$y),Z(3(#)))))" pathConditionChanged="false" isReturnValueComputed="false">
+                              <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of self.compute(a);&gt;" pathCondition="and(and(equals(a,Z(1(#))),equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#)))),not(equals(int::select(heap,null,IntegerConditionTest::$y),Z(3(#)))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(and(equals(a,Z(1(#))),equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#)))),not(equals(int::select(heap,null,IntegerConditionTest::$y),Z(3(#)))))">
                                  <termination name="&lt;end&gt;" pathCondition="and(and(equals(a,Z(1(#))),equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#)))),not(equals(int::select(heap,null,IntegerConditionTest::$y),Z(3(#)))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                  </termination>
                               </methodReturn>
@@ -27,7 +27,7 @@
                   </branchCondition>
                   <branchCondition name="not(equals(a,Z(1(#))))" pathCondition="and(not(equals(a,Z(1(#)))),equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#))))" pathConditionChanged="true" branchCondition="not(equals(a,Z(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <statement name="return -200;" pathCondition="and(not(equals(a,Z(1(#)))),equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#))))" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of self.compute(a);&gt;" pathCondition="and(not(equals(a,Z(1(#)))),equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#))))" pathConditionChanged="false" isReturnValueComputed="false">
+                        <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of self.compute(a);&gt;" pathCondition="and(not(equals(a,Z(1(#)))),equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(not(equals(a,Z(1(#)))),equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#))))">
                            <termination name="&lt;end&gt;" pathCondition="and(not(equals(a,Z(1(#)))),equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
@@ -38,12 +38,20 @@
          </branchCondition>
          <branchCondition name="not(equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#))))" pathCondition="not(equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#))))" pathConditionChanged="true" branchCondition="not(equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return -100;" pathCondition="not(equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#))))" pathConditionChanged="false">
-               <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of self.compute(a);&gt;" pathCondition="not(equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#))))" pathConditionChanged="false" isReturnValueComputed="false">
+               <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of self.compute(a);&gt;" pathCondition="not(equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="not(equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#))))">
                   <termination name="&lt;end&gt;" pathCondition="not(equals(int::select(heap,self,IntegerConditionTest::$x),Z(1(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
             </statement>
          </branchCondition>
       </branchStatement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/1/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/0/1/0/0"/>
+      <methodReturnEntry path="/0/0/1/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/0/1/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/1/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/0/0"/>
 </start>

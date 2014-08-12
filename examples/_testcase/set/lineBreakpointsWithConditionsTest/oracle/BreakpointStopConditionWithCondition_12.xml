@@ -6,26 +6,30 @@
             <methodCall name="SimpleConditionExample.somethingLocal(x_2);" pathCondition="true" pathConditionChanged="false">
                <statement name="int y = x_2*x_2;" pathCondition="true" pathConditionChanged="false">
                   <statement name="return y_1;" pathCondition="true" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of somethingLocal&gt;" signature="&lt;return of SimpleConditionExample.somethingLocal(x_2);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of somethingLocal&gt;" signature="&lt;return of SimpleConditionExample.somethingLocal(x_2);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                         <statement name="return somethingLocal(x);" pathCondition="true" pathConditionChanged="false">
                            <methodCall name="SimpleConditionExample.somethingLocal(x_5);" pathCondition="true" pathConditionChanged="false">
                               <statement name="int y = x_5*x_5;" pathCondition="true" pathConditionChanged="false">
                                  <statement name="return y_2;" pathCondition="true" pathConditionChanged="false">
-                                    <methodReturn name="&lt;return of somethingLocal&gt;" signature="&lt;return of SimpleConditionExample.somethingLocal(x_5);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                       <methodReturn name="&lt;return of somethingLocalMain&gt;" signature="&lt;return of SimpleConditionExample.somethingLocalMain();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                    <methodReturn name="&lt;return of somethingLocal&gt;" signature="&lt;return of SimpleConditionExample.somethingLocal(x_5);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                       <methodReturn name="&lt;return of somethingLocalMain&gt;" signature="&lt;return of SimpleConditionExample.somethingLocalMain();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                           <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                           </termination>
                                        </methodReturn>
                                     </methodReturn>
                                  </statement>
                               </statement>
+                              <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
                            </methodCall>
                         </statement>
                      </methodReturn>
                   </statement>
                </statement>
+               <methodReturnEntry path="/0/0/0/0/0/0/0"/>
             </methodCall>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
 </start>

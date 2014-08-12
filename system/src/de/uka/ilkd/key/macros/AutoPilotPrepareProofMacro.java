@@ -51,6 +51,8 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
     private static final Name NON_HUMAN_INTERACTION_RULESET = new Name("notHumanReadable");
 
+    public AutoPilotPrepareProofMacro() { super(); }
+    
     @Override
     public String getName() {
         return "Auto pilot (preparation only)";

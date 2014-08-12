@@ -254,11 +254,15 @@ public class SymbolicLayoutExtractor {
    /**
     * Constructor.
     * @param node The {@link Node} of KeY's proof tree to compute memory layouts for.
+    * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
+    * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
     */
-   public SymbolicLayoutExtractor(Node node, boolean usePrettyPrinting) {
+   public SymbolicLayoutExtractor(Node node, 
+                                  boolean useUnicode,
+                                  boolean usePrettyPrinting) {
       assert node != null;
       this.node = node;
-      this.settings = new ModelSettings(usePrettyPrinting);
+      this.settings = new ModelSettings(useUnicode, usePrettyPrinting);
    }
 
    /**
@@ -512,7 +516,7 @@ public class SymbolicLayoutExtractor {
          }
       }
       starter.setMaxRuleApplications(maxProofSteps);
-      starter.start(false);
+      starter.start();
    }
 
    /**
@@ -539,7 +543,7 @@ public class SymbolicLayoutExtractor {
             TacletApp t2 = c.addInstantiation(cutF, term, false, getServices());
 
             final ImmutableList<Goal> branches = g.apply(t2);
-            starter.start(branches, false);
+            starter.start(branches);
         }
       }
    }

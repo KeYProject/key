@@ -157,6 +157,11 @@ public class SEDXMLWriter {
    public static final String TAG_THREAD = "sedThread";
 
    /**
+    * Tag name to store {@link ISEDMethodCall#getMethodReturnConditions()}s.
+    */
+   public static final String TAG_METHOD_RETURN_CONDITIONS = "sedMethodCallMethodReturnCondition";
+
+   /**
     * Tag name to store {@link IVariable}s.
     */
    public static final String TAG_VARIABLE = "sedVariable";
@@ -170,6 +175,16 @@ public class SEDXMLWriter {
     * Tag name to store one entry of {@link ISEDDebugNode#getCallStack()}.
     */
    public static final String TAG_CALL_STACK_ENTRY = "sedCallStackEntry";
+
+   /**
+    * Tag name to store one entry of {@link ISEDThread#getTerminations()}.
+    */
+   public static final String TAG_TERMINATION_ENTRY = "sedTerminationEntry";
+
+   /**
+    * Tag name to store a reference to an existing {@link ISEDDebugNode}.
+    */
+   public static final String TAG_CHILD_REFERENCE = "sedChildReference";
 
    /**
     * Tag name to store {@link ISEDMethodContract}s.
@@ -336,6 +351,11 @@ public class SEDXMLWriter {
     * Refers to an existing {@link ISEDDebugNode} with the defined id.
     */
    public static final String ATTRIBUTE_ANNOTATION_LINK_TARGET = "targetIdRef";
+
+   /**
+    * Refers to an existing {@link ISEDDebugNode} to store {@link ISEDMethodReturn#getMethodReturnCondition()}.
+    */
+   public static final String ATTRIBUTE_METHOD_RETURN_CONDITION = "methodReturnConditionRef";
    
    /**
     * Writes the given {@link ISEDDebugTarget}s into the {@link OutputStream} with the defined encoding.
@@ -666,7 +686,7 @@ public class SEDXMLWriter {
                           boolean saveCallStack,
                           IProgressMonitor monitor) throws DebugException {
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_BRANCH_CONDITION, branchCondition, saveVariables, saveCallStack, sb, monitor);
+      appendNode(level, TAG_BRANCH_CONDITION, branchCondition, saveVariables, saveCallStack, false, sb, monitor);
       return sb.toString();
    }
    
@@ -686,7 +706,7 @@ public class SEDXMLWriter {
                           boolean saveCallStack,
                           IProgressMonitor monitor) throws DebugException {
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_BRANCH_STATEMENT, branchStatement, saveVariables, saveCallStack, sb, monitor);
+      appendNode(level, TAG_BRANCH_STATEMENT, branchStatement, saveVariables, saveCallStack, false, sb, monitor);
       return sb.toString();
    }
    
@@ -708,7 +728,7 @@ public class SEDXMLWriter {
       Map<String, String> attributeValues = createDefaultNodeAttributes(exceptionalTermination);
       attributeValues.put(ATTRIBUTE_VERIFIED, exceptionalTermination.isVerified() + "");
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_EXCEPTIONAL_TERMINATION, exceptionalTermination, saveVariables, saveCallStack, attributeValues, sb, monitor);
+      appendNode(level, TAG_EXCEPTIONAL_TERMINATION, exceptionalTermination, saveVariables, saveCallStack, false, attributeValues, sb, monitor);
       return sb.toString();
    }
    
@@ -730,7 +750,7 @@ public class SEDXMLWriter {
       Map<String, String> attributeValues = createDefaultNodeAttributes(loopBodyTermination);
       attributeValues.put(ATTRIBUTE_VERIFIED, loopBodyTermination.isVerified() + "");
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_LOOP_BODY_TERMINATION, loopBodyTermination, saveVariables, saveCallStack, attributeValues, sb, monitor);
+      appendNode(level, TAG_LOOP_BODY_TERMINATION, loopBodyTermination, saveVariables, saveCallStack, false, attributeValues, sb, monitor);
       return sb.toString();
    }
    
@@ -750,7 +770,7 @@ public class SEDXMLWriter {
                           boolean saveCallStack,
                           IProgressMonitor monitor) throws DebugException {
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_LOOP_CONDITION, loopCondition, saveVariables, saveCallStack, sb, monitor);
+      appendNode(level, TAG_LOOP_CONDITION, loopCondition, saveVariables, saveCallStack, false, sb, monitor);
       return sb.toString();
    }
    
@@ -770,7 +790,7 @@ public class SEDXMLWriter {
                           boolean saveCallStack,
                           IProgressMonitor monitor) throws DebugException {
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_LOOP_STATEMENT, loopStatement, saveVariables, saveCallStack, sb, monitor);
+      appendNode(level, TAG_LOOP_STATEMENT, loopStatement, saveVariables, saveCallStack, false, sb, monitor);
       return sb.toString();
    }
    
@@ -790,7 +810,7 @@ public class SEDXMLWriter {
                           boolean saveCallStack,
                           IProgressMonitor monitor) throws DebugException {
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_METHOD_CALL, methodCall, saveVariables, saveCallStack, sb, monitor);
+      appendNode(level, TAG_METHOD_CALL, methodCall, saveVariables, saveCallStack, false, sb, monitor);
       return sb.toString();
    }
    
@@ -810,7 +830,7 @@ public class SEDXMLWriter {
                           boolean saveCallStack,
                           IProgressMonitor monitor) throws DebugException {
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_METHOD_RETURN, methodReturn, saveVariables, saveCallStack, sb, monitor);
+      appendNode(level, TAG_METHOD_RETURN, methodReturn, saveVariables, saveCallStack, false, sb, monitor);
       return sb.toString();
    }
    
@@ -830,7 +850,7 @@ public class SEDXMLWriter {
                           boolean saveCallStack,
                           IProgressMonitor monitor) throws DebugException {
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_STATEMENT, statement, saveVariables, saveCallStack, sb, monitor);
+      appendNode(level, TAG_STATEMENT, statement, saveVariables, saveCallStack, false, sb, monitor);
       return sb.toString();
    }
    
@@ -854,7 +874,7 @@ public class SEDXMLWriter {
       attributeValues.put(ATTRIBUTE_PRECONDITION_COMPLIED, methodContract.isPreconditionComplied() + "");
       attributeValues.put(ATTRIBUTE_HAS_NOT_NULL_CHECK, methodContract.hasNotNullCheck() + "");
       attributeValues.put(ATTRIBUTE_NOT_NULL_CHECK_COMPLIED, methodContract.isNotNullCheckComplied() + "");
-      appendNode(level, TAG_METHOD_CONTRACT, methodContract, saveVariables, saveCallStack, attributeValues, sb, monitor);
+      appendNode(level, TAG_METHOD_CONTRACT, methodContract, saveVariables, saveCallStack, false, attributeValues, sb, monitor);
       return sb.toString();
    }
    
@@ -876,7 +896,7 @@ public class SEDXMLWriter {
       StringBuffer sb = new StringBuffer();
       Map<String, String> attributeValues = createDefaultNodeAttributes(loopInvariant);
       attributeValues.put(ATTRIBUTE_INITIALLY_VALID, loopInvariant.isInitiallyValid() + "");
-      appendNode(level, TAG_LOOP_INVARIANT, loopInvariant, saveVariables, saveCallStack, attributeValues, sb, monitor);
+      appendNode(level, TAG_LOOP_INVARIANT, loopInvariant, saveVariables, saveCallStack, false, attributeValues, sb, monitor);
       return sb.toString();
    }
    
@@ -898,7 +918,7 @@ public class SEDXMLWriter {
       Map<String, String> attributeValues = createDefaultNodeAttributes(termination);
       attributeValues.put(ATTRIBUTE_VERIFIED, termination.isVerified() + "");
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_TERMINATION, termination, saveVariables, saveCallStack, attributeValues, sb, monitor);
+      appendNode(level, TAG_TERMINATION, termination, saveVariables, saveCallStack, false, attributeValues, sb, monitor);
       return sb.toString();
    }
    
@@ -918,7 +938,7 @@ public class SEDXMLWriter {
                           boolean saveCallStack,
                           IProgressMonitor monitor) throws DebugException {
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_THREAD, thread, saveVariables, saveCallStack, sb, monitor);
+      appendNode(level, TAG_THREAD, thread, saveVariables, saveCallStack, false, sb, monitor);
       return sb.toString();
    }
    
@@ -929,6 +949,7 @@ public class SEDXMLWriter {
     * @param node The {@link ISEDDebugNode} to serialize.
     * @param saveVariables Save variables?
     * @param saveCallStack Save call stack?
+    * @param childrenByID {@code true} only ID of children is saved, {@code false} full child hierarchy is saved.
     * @param sb The {@link StringBuffer} to write to.
     * @param monitor The {@link IProgressMonitor} to use.
     * @throws DebugException Occurred Exception.
@@ -938,9 +959,9 @@ public class SEDXMLWriter {
                              ISEDDebugNode node, 
                              boolean saveVariables, 
                              boolean saveCallStack,
-                             StringBuffer sb,
-                             IProgressMonitor monitor) throws DebugException {
-      appendNode(level, tagName, node, saveVariables, saveCallStack, createDefaultNodeAttributes(node), sb, monitor);
+                             boolean childrenByID,
+                             StringBuffer sb, IProgressMonitor monitor) throws DebugException {
+      appendNode(level, tagName, node, saveVariables, saveCallStack, childrenByID, createDefaultNodeAttributes(node), sb, monitor);
    }
    
    /**
@@ -964,6 +985,12 @@ public class SEDXMLWriter {
          if (node instanceof ISourcePathProvider) {
             attributeValues.put(ATTRIBUTE_SOURCE_PATH, ((ISourcePathProvider)node).getSourcePath());
          }
+         if (node instanceof ISEDMethodReturn) {
+            ISEDBranchCondition returnCondition = ((ISEDMethodReturn)node).getMethodReturnCondition();
+            if (returnCondition != null) {
+               attributeValues.put(ATTRIBUTE_METHOD_RETURN_CONDITION, returnCondition.getId());
+            }
+         }
       }
       return attributeValues;
    }
@@ -975,6 +1002,7 @@ public class SEDXMLWriter {
     * @param node The {@link ISEDDebugNode} to serialize.
     * @param saveVariables Save variables?
     * @param saveCallStack Save call stack?
+    * @param childrenByID {@code true} only ID of children is saved, {@code false} full child hierarchy is saved.
     * @param attributeValues The attributes to save.
     * @param sb The {@link StringBuffer} to write to.
     * @param monitor The {@link IProgressMonitor} to use.
@@ -985,9 +1013,9 @@ public class SEDXMLWriter {
                              ISEDDebugNode node, 
                              boolean saveVariables, 
                              boolean saveCallStack,
+                             boolean childrenByID,
                              Map<String, String> attributeValues,
-                             StringBuffer sb,
-                             IProgressMonitor monitor) throws DebugException {
+                             StringBuffer sb, IProgressMonitor monitor) throws DebugException {
       if (node != null) {
          // Append start tag
          appendStartTag(level, tagName, attributeValues, sb);
@@ -1006,14 +1034,66 @@ public class SEDXMLWriter {
          ISEDDebugNode[] children = node.getChildren();
          for (ISEDDebugNode child : children) {
             SWTUtil.checkCanceled(monitor);
-            sb.append(toXML(level + 1, child, saveVariables, saveCallStack, monitor));
+            if (childrenByID) {
+               Map<String, String> childAttributeValues = new LinkedHashMap<String, String>();
+               childAttributeValues.put(ATTRIBUTE_NODE_ID_REF, child.getId());
+               appendEmptyTag(level + 1, TAG_CHILD_REFERENCE, childAttributeValues, sb);               
+            }
+            else {
+               sb.append(toXML(level + 1, child, saveVariables, saveCallStack, monitor));
+            }
             monitor.worked(1);
+         }
+         // Append method return nodes
+         if (node instanceof ISEDMethodCall) {
+            appendMethodReturnNodes(level + 1, (ISEDMethodCall)node, saveVariables, saveCallStack, sb, monitor);
+         }
+         // Append terminations
+         else if (node instanceof ISEDThread) {
+            appendTerminations(level + 1, (ISEDThread)node, sb);
          }
          // Append end tag
          appendEndTag(level, tagName, sb);
       }
    }
+
+   /**
+    * Appends the known terminations to the given {@link StringBuffer}.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param node The {@link ISEDThread} which provides the known terminations.
+    * @param sb The {@link StringBuffer} to write to.
+    * @throws DebugException Occurred Exception.
+    */
+   protected void appendTerminations(int level, ISEDThread node, StringBuffer sb) throws DebugException {
+      ISEDTermination[] terminations = node.getTerminations();
+      if (terminations != null) {
+         for (ISEDTermination termination : terminations) {
+            Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+            attributeValues.put(ATTRIBUTE_NODE_ID_REF, termination.getId());
+            appendEmptyTag(level, TAG_TERMINATION_ENTRY, attributeValues, sb);
+         }
+      }
+   }
    
+   /**
+    * Appends all known method returns.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param node The {@link ISEDMethodCall} which provides the known return nodes.
+    * @param saveVariables Save variables?
+    * @param saveCallStack Save call stack?
+    * @param sb The {@link StringBuffer} to write to.
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @throws DebugException Occurred Exception.
+    */
+   protected void appendMethodReturnNodes(int level, ISEDMethodCall node, boolean saveVariables, boolean saveCallStack, StringBuffer sb, IProgressMonitor monitor) throws DebugException {
+      ISEDBranchCondition[] conditions = node.getMethodReturnConditions();
+      if (conditions != null) {
+         for (ISEDBranchCondition condition : conditions) {
+            appendNode(level, TAG_METHOD_RETURN_CONDITIONS, condition, saveVariables, saveCallStack, true, sb, monitor);
+         }
+      }
+   }
+
    /**
     * Appends the call stack to the given {@link StringBuffer}.
     * @param level The level in the tree used for leading white space (formating).

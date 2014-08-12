@@ -84,24 +84,6 @@ public final class ProgVarReplacer {
         base.setSemisequent(next.semisequent());
     }
 
-
-    /**
-     * replaces in a goal
-     */
-    public void replace(Goal goal) {
-	//globals
-    	ImmutableSet<ProgramVariable> set = replace(goal.getGlobalProgVars());
-	goal.setGlobalProgVars(set);
-
-	//taclet apps
-	replace(goal.ruleAppIndex().tacletIndex());
-
-	//sequent
-	SequentChangeInfo sci = replace(goal.sequent());
-	goal.setSequent(sci);
-    }
-
-
     /**
      * replaces in a set
      */
@@ -244,7 +226,7 @@ public final class ProgVarReplacer {
      * replaces in a semisequent
      */
     public SemisequentChangeInfo replace(Semisequent s) {
-    	SemisequentChangeInfo result = new SemisequentChangeInfo();
+    	  SemisequentChangeInfo result = new SemisequentChangeInfo();
         result.setFormulaList(s.toList());
         result.setSemisequent(s);
 
@@ -255,10 +237,7 @@ public final class ProgVarReplacer {
             final SequentFormula newcf = replace(oldcf);
 
             if(newcf != oldcf) {
-                SemisequentChangeInfo semiCI
-                                      = result.semisequent().
-                                      replace(formulaNumber, newcf);
-                mergeSemiCIs(result, semiCI, formulaNumber);
+                result.combine(result.semisequent().replace(formulaNumber, newcf));
             }
         }
 

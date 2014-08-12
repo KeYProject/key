@@ -64,7 +64,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
             Sequent s = goal.sequent();
             Semisequent antecedent = s.antecedent();
             if(!antecedent.containsEqual(sf)){
-                goal.addFormulaToAntecedent(sf, true);
+                goal.addFormula(sf, true, true);
             }
         }
         return new SemanticsBlastingStrategy();

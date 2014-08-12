@@ -16,7 +16,7 @@ mod[savedHeap]: allLocs" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="fal
                   </branchCondition>
                   <branchCondition name="equals(_x_1,Z(0(#)))" pathCondition="and(equals(_x_1,Z(0(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="true" branchCondition="equals(_x_1,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
                      <statement name="return _x;" pathCondition="and(equals(_x_1,Z(0(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of loop&gt;" signature="&lt;return of VerifiedTest.loop(_x);&gt;" pathCondition="and(equals(_x_1,Z(0(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="false" isReturnValueComputed="false">
+                        <methodReturn name="&lt;return of loop&gt;" signature="&lt;return of VerifiedTest.loop(_x);&gt;" pathCondition="and(equals(_x_1,Z(0(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(equals(_x_1,Z(0(#))),leq(x,Z(neglit(1(#)))))">
                            <termination name="&lt;end&gt;" pathCondition="and(equals(_x_1,Z(0(#))),leq(x,Z(neglit(1(#)))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
@@ -38,7 +38,7 @@ mod[savedHeap]: allLocs" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChan
                </branchCondition>
                <branchCondition name="equals(_x_0,Z(0(#)))" pathCondition="and(equals(_x_0,Z(0(#))),geq(x,Z(0(#))))" pathConditionChanged="true" branchCondition="equals(_x_0,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
                   <statement name="return _x;" pathCondition="and(equals(_x_0,Z(0(#))),geq(x,Z(0(#))))" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of loop&gt;" signature="&lt;return of VerifiedTest.loop(_x);&gt;" pathCondition="and(equals(_x_0,Z(0(#))),geq(x,Z(0(#))))" pathConditionChanged="false" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of loop&gt;" signature="&lt;return of VerifiedTest.loop(_x);&gt;" pathCondition="and(equals(_x_0,Z(0(#))),geq(x,Z(0(#))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(equals(_x_0,Z(0(#))),geq(x,Z(0(#))))">
                         <termination name="&lt;end&gt;" pathCondition="and(equals(_x_0,Z(0(#))),geq(x,Z(0(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
@@ -47,5 +47,11 @@ mod[savedHeap]: allLocs" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChan
             </loopInvariant>
          </branchCondition>
       </branchStatement>
+      <methodReturnEntry path="/0/0/0/0/0/1/0/0"/>
+      <methodReturnEntry path="/0/0/1/0/1/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/1/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/1/0/0/0"/>
 </start>

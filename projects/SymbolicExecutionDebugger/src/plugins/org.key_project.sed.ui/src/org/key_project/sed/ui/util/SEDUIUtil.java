@@ -27,7 +27,6 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -35,8 +34,10 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugTarget;
+import org.eclipse.debug.internal.ui.viewers.model.TreeModelContentProvider;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.IDebugView;
+import org.eclipse.jface.viewers.ContentViewer;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
 import org.eclipse.jface.viewers.ILazyTreePathContentProvider;
@@ -66,7 +67,7 @@ import org.key_project.sed.ui.action.ISEDAnnotationLinkEditAction;
 import org.key_project.sed.ui.edit.ISEDAnnotationEditor;
 import org.key_project.util.eclipse.JobUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
-import org.key_project.util.eclipse.job.AbstractDependingOnObjectJob;
+import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.eclipse.job.ScheduledJobCollector;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ArrayUtil;
@@ -84,6 +85,7 @@ import org.key_project.util.java.thread.IRunnableWithResult;
  * SED UI easier.
  * @author Martin Hentschel
  */
+@SuppressWarnings("restriction")
 public final class SEDUIUtil {
    /**
     * The ID Of the extension point with the annotation actions.
@@ -161,8 +163,8 @@ public final class SEDUIUtil {
       ISelection oldSelection = debugView.getViewer().getSelection();
       if (!selection.equals(SWTUtil.toList(oldSelection))) {
          // Change selection in debug view if new elements are selected in a Job because the debug view uses Jobs itself to expand the debug model and it is required to wait for them.
-         AbstractDependingOnObjectJob.cancelJobs(parentPart);
-         Job selectJob = new AbstractDependingOnObjectJob("Synchronizing selection", parentPart) {
+         AbstractDependingOnObjectsJob.cancelJobs(parentPart);
+         Job selectJob = new AbstractDependingOnObjectsJob("Synchronizing selection", parentPart) {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                try {
@@ -174,7 +176,7 @@ public final class SEDUIUtil {
                         try {
                            monitor.beginTask(getName(), IProgressMonitor.UNKNOWN);
                            monitor.subTask("Collecting unknown elements");
-                           Deque<Object> expandQue = collectUnknownElementsInParentHierarchy(treeViewer, element);
+                           Deque<Object> expandQue = collectUnknownElementsInParentHierarchy(treeViewer, element, monitor);
                            monitor.beginTask(getName(), expandQue.size() + 1);
                            monitor.subTask("Expanding unknown elements");
                            injectElements(treeViewer, expandQue, monitor);
@@ -211,8 +213,8 @@ public final class SEDUIUtil {
                                         final IDebugView debugView, 
                                         final List<?> toExpand) {
       // Change selection in debug view if new elements are selected in a Job because the debug view uses Jobs itself to expand the debug model and it is required to wait for them.
-      AbstractDependingOnObjectJob.cancelJobs(parentPart);
-      Job selectJob = new AbstractDependingOnObjectJob("Expanding elements", parentPart) {
+      AbstractDependingOnObjectsJob.cancelJobs(parentPart);
+      Job selectJob = new AbstractDependingOnObjectsJob("Expanding elements", parentPart) {
          @Override
          protected IStatus run(IProgressMonitor monitor) {
             try {
@@ -246,9 +248,9 @@ public final class SEDUIUtil {
                      try {
                         SWTUtil.checkCanceled(monitor);
                         monitor.subTask("Collecting unknown elements");
-                        Deque<Object> expandQue = collectUnknownElementsInParentHierarchy(treeViewer, element);
+                        Deque<Object> expandQue = collectUnknownElementsInParentHierarchy(treeViewer, element, monitor);
                         monitor.subTask("Injecting unknown elements");
-                        injectElements(treeViewer, expandQue, new NullProgressMonitor());
+                        injectElements(treeViewer, expandQue, monitor);
                         monitor.worked(1);
                      }
                      catch (DebugException e) {
@@ -306,12 +308,14 @@ public final class SEDUIUtil {
     * </p>
     * @param treeViewer The {@link TreeViewer} to search in.
     * @param element The element to start search for unknown elements.
+    * @param monitor The {@link IProgressMonitor} to use.
     * @return A {@link Deque} which contains all unknown elements in order from root to given element.
     * @throws DebugException Occurred Exception.
     */
-   protected static Deque<Object> collectUnknownElementsInParentHierarchy(final TreeViewer treeViewer, Object element) throws DebugException {
+   protected static Deque<Object> collectUnknownElementsInParentHierarchy(final TreeViewer treeViewer, Object element, IProgressMonitor monitor) throws DebugException {
       Deque<Object> expandQue = new LinkedList<Object>();
       while (element != null) {
+         SWTUtil.checkCanceled(monitor);
          // Check if the element is unknown in tree
          if (isUnknownInTreeViewer(treeViewer, element)) {
             // Element is not known, add to deque and continue with parent.
@@ -334,15 +338,20 @@ public final class SEDUIUtil {
     * @return {@code true} is unknown, {@code false} is known.
     */
    protected static boolean isUnknownInTreeViewer(final TreeViewer treeViewer, final Object toTest) {
-      IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
-         @Override
-         public void run() {
-            Widget item = treeViewer.testFindItem(toTest);
-            setResult(item == null);
-         }
-      };
-      treeViewer.getControl().getDisplay().syncExec(run);
-      return run.getResult() != null && run.getResult().booleanValue();
+      if (!treeViewer.getControl().isDisposed()) {
+         IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+            @Override
+            public void run() {
+               Widget item = treeViewer.testFindItem(toTest);
+               setResult(item == null);
+            }
+         };
+         treeViewer.getControl().getDisplay().syncExec(run);
+         return run.getResult() != null && run.getResult().booleanValue();
+      }
+      else {
+         return false;
+      }
    }
    
    /**
@@ -396,6 +405,7 @@ public final class SEDUIUtil {
    protected static void injectElements(final TreeViewer treeViewer, 
                                         Deque<Object> injectQue,
                                         final IProgressMonitor monitor) throws DebugException {
+      SWTUtil.checkCanceled(monitor);
       // Check if something must be done
       if (!CollectionUtil.isEmpty(injectQue)) {
          // Check if the provider is of the expected form.
@@ -445,9 +455,14 @@ public final class SEDUIUtil {
                            }
                         }
                      };
-                     treeViewer.getControl().getDisplay().syncExec(run);
-                     if (run.getException() != null) {
-                        throw new DebugException(LogUtil.getLogger().createErrorStatus(run.getException().getMessage(), run.getException()));
+                     if (!treeViewer.getControl().isDisposed()) {
+                        treeViewer.getControl().getDisplay().syncExec(run);
+                        if (run.getException() != null) {
+                           throw new DebugException(LogUtil.getLogger().createErrorStatus(run.getException().getMessage(), run.getException()));
+                        }
+                     }
+                     else {
+                        monitor.setCanceled(true);
                      }
                   }
                   finally {
@@ -459,7 +474,18 @@ public final class SEDUIUtil {
                   for (Job job : jobs) {
                      SWTUtil.checkCanceled(monitor);
                      JobUtil.waitFor(job, 10);
-                  }         
+                  }
+                  // Wait until the element is known by the viewer since sometimes waiting for jobs is not enough.
+                  while (!treeViewer.getControl().isDisposed() &&
+                         SWTUtil.testFindItem(treeViewer, toInject) == null) {
+                     SWTUtil.checkCanceled(monitor);
+                     try {
+                        Thread.sleep(10);
+                     }
+                     catch (InterruptedException e) {
+                     // Nothing to do.
+                     }
+                  }
                   // Update tree path for next loop iteration
                   tpElements.add(toInject);
                   // Update monitor
@@ -473,7 +499,7 @@ public final class SEDUIUtil {
          }
       }
    }
-   
+
    /**
     * Returns all available annotation action descriptions.
     * @return All available annotation action descriptions.
@@ -889,6 +915,25 @@ public final class SEDUIUtil {
       }
       else {
          LogUtil.getLogger().logError("Extension point registry is not loaded.");
+      }
+      return result;
+   }
+   
+   /**
+    * Returns the {@link TreeModelContentProvider} used in the given {@link IDebugView}.
+    * @param debugView The {@link IDebugView} to get its {@link TreeModelContentProvider}.
+    * @return The {@link TreeModelContentProvider} or {@code null} if not available.
+    */
+   public static TreeModelContentProvider getContentProvider(IDebugView debugView) {
+      TreeModelContentProvider result = null;
+      if (debugView != null) {
+         Viewer viewer = debugView.getViewer();
+         if (viewer instanceof ContentViewer) {
+            IContentProvider cp = ((ContentViewer)viewer).getContentProvider();
+            if (cp instanceof TreeModelContentProvider) {
+               result = (TreeModelContentProvider)cp;
+            }
+         }
       }
       return result;
    }

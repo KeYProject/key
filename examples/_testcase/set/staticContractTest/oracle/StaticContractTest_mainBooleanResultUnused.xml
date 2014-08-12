@@ -8,10 +8,12 @@ post: result_0
 &amp; exc_0 = null
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-         <methodReturn name="&lt;return of mainBooleanResultUnused&gt;" signature="&lt;return of StaticContractTest.mainBooleanResultUnused(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of mainBooleanResultUnused&gt;" signatureIncludingReturnValue="&lt;return of StaticContractTest.mainBooleanResultUnused(x);&gt;" isReturnValueComputed="true">
+         <methodReturn name="&lt;return of mainBooleanResultUnused&gt;" signature="&lt;return of StaticContractTest.mainBooleanResultUnused(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of mainBooleanResultUnused&gt;" signatureIncludingReturnValue="&lt;return of StaticContractTest.mainBooleanResultUnused(x);&gt;" isReturnValueComputed="true" methodReturnCondition="true">
             <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
             </termination>
          </methodReturn>
       </operationContract>
+      <methodReturnEntry path="/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0"/>
 </start>

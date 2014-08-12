@@ -1595,6 +1595,15 @@ public class TermBuilder {
             services),
             h, o, f);
     }
+    
+    /**
+     * Get the select expression for a location variabe
+     * representing the field.
+     */
+    public Term select(Sort asSort, Term h, Term o, LocationVariable field) {
+        final Function f = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(field, services);
+        return select(asSort, h, o, func(f));
+    }
 
 
     public Term dot(Sort asSort, Term o, Term f) {
@@ -1611,6 +1620,11 @@ public class TermBuilder {
         return f.sort() == fieldSort
                ? dot(asSort, o, func(f))
                : func(f, getBaseHeap(), o);
+    }
+    
+    public Term dot (Sort asSort, Term o, LocationVariable field) {
+        final Function f = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(field, services);
+        return dot(asSort, o, f);
     }
 
 

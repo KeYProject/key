@@ -8,7 +8,7 @@
                   <statement name="return this.first.value+this.second.value+tempX.value+tempY.value;" pathCondition="true" pathConditionChanged="false">
                      <branchCondition name="not(equals(x,null))" pathCondition="not(equals(x,null))" pathConditionChanged="true" branchCondition="not(equals(x,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
                         <branchCondition name="not(equals(OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y),null))" pathCondition="and(not(equals(x,null)),not(equals(OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y),null)))" pathConditionChanged="true" branchCondition="not(equals(OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
-                           <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of self.compute(x);&gt;" pathCondition="and(not(equals(x,null)),not(equals(OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y),null)))" pathConditionChanged="false" isReturnValueComputed="false">
+                           <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of self.compute(x);&gt;" pathCondition="and(not(equals(x,null)),not(equals(OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y),null)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(not(equals(x,null)),not(equals(OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y),null)))">
                               <termination name="&lt;end&gt;" pathCondition="and(not(equals(x,null)),not(equals(OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y),null)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>
                            </methodReturn>
@@ -27,5 +27,9 @@
             </statement>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/0/1/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/1/0"/>
 </start>

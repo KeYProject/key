@@ -8,7 +8,7 @@ post: self_0.value = 42 &amp; self_0.&lt;inv&gt; &amp; exc_0 = null
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return w.value;" pathCondition="true" pathConditionChanged="false">
-               <methodReturn name="&lt;return of mainConstructor&gt;" signature="&lt;return of self.mainConstructor();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of mainConstructor&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of self.mainConstructor();&gt;" isReturnValueComputed="true">
+               <methodReturn name="&lt;return of mainConstructor&gt;" signature="&lt;return of self.mainConstructor();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of mainConstructor&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of self.mainConstructor();&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                   <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                   </methodReturnValue>
                   <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
@@ -17,5 +17,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
             </statement>
          </operationContract>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0"/>
 </start>

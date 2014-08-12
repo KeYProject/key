@@ -116,8 +116,8 @@ public class StatementBlock extends JavaStatement
         return body;
     }
 
-    public boolean isEmpty() {
-	return body.size() == 0;
+    public final boolean isEmpty() {
+       return body.isEmpty();
     }
 
 

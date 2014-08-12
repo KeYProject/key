@@ -16,6 +16,11 @@ package org.key_project.sed.key.core.model;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.DoStatement;
+import org.eclipse.jdt.core.dom.EnhancedForStatement;
+import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.WhileStatement;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEDLoopStatement;
@@ -78,6 +83,7 @@ public class KeYLoopStatement extends AbstractSEDLoopStatement implements IKeYSE
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      target.registerDebugNode(this);
       initializeAnnotations();
    }
 
@@ -195,7 +201,28 @@ public class KeYLoopStatement extends AbstractSEDLoopStatement implements IKeYSE
     */
    protected SourceLocation computeSourceLocation() throws DebugException {
       SourceLocation location = KeYUtil.convertToSourceLocation(executionNode.getActivePositionInfo());
-      return KeYModelUtil.updateLocationFromAST(this, location);
+      ASTNode statementNode = KeYModelUtil.findASTNode(this, location);
+      if (statementNode != null) {
+         if (statementNode instanceof WhileStatement) {
+            return new SourceLocation(-1, statementNode.getStartPosition(), statementNode.getStartPosition() + "while".length());
+         }
+         else if (statementNode instanceof ForStatement) {
+            return new SourceLocation(-1, statementNode.getStartPosition(), statementNode.getStartPosition() + "for".length());
+         }
+         else if (statementNode instanceof EnhancedForStatement) {
+            EnhancedForStatement efs = (EnhancedForStatement)statementNode;
+            return new SourceLocation(-1, efs.getStartPosition(), efs.getBody().getStartPosition());
+         }
+         else if (statementNode instanceof DoStatement) {
+            return new SourceLocation(-1, statementNode.getStartPosition(), statementNode.getStartPosition() + "do".length());
+         }
+         else {
+            return KeYModelUtil.updateLocationFromAST(location, statementNode);
+         }
+      }
+      else {
+         return location;
+      }
    }
 
    /**
@@ -218,6 +245,7 @@ public class KeYLoopStatement extends AbstractSEDLoopStatement implements IKeYSE
    public boolean hasVariables() throws DebugException {
       try {
          return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
+                !executionNode.isDisposed() && 
                 SymbolicExecutionUtil.canComputeVariables(executionNode, executionNode.getServices()) &&
                 super.hasVariables();
       }

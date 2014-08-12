@@ -41,7 +41,7 @@ termination: diamond" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged
                      </value>
                   </variable>
                   <callStackEntry path="/0"/>
-                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of PrettyPrintTest.main(x);&gt;" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of PrettyPrintTest.main(x);&gt;" isReturnValueComputed="true">
+                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of PrettyPrintTest.main(x);&gt;" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of PrettyPrintTest.main(x);&gt;" isReturnValueComputed="true" methodReturnCondition="gt(x,Z(neglit(1(#))))">
                      <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                      </methodReturnValue>
                      <variable name="x" arrayIndex="-1" isArrayIndex="false">
@@ -117,7 +117,7 @@ mod: false" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initially
                         </value>
                      </variable>
                      <callStackEntry path="/0"/>
-                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of PrettyPrintTest.main(x);&gt;" pathCondition="and(leq(x,Z(neglit(1(#)))),equals(x_0,Z(neglit(1(#)))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(1(#))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(neglit(1(#))) as result of PrettyPrintTest.main(x);&gt;" isReturnValueComputed="true">
+                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of PrettyPrintTest.main(x);&gt;" pathCondition="and(leq(x,Z(neglit(1(#)))),equals(x_0,Z(neglit(1(#)))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(1(#))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(neglit(1(#))) as result of PrettyPrintTest.main(x);&gt;" isReturnValueComputed="true" methodReturnCondition="and(leq(x,Z(neglit(1(#)))),equals(x_0,Z(neglit(1(#)))))">
                         <methodReturnValue name="Z(neglit(1(#)))" returnValueString="Z(neglit(1(#)))" hasCondition="false">
                         </methodReturnValue>
                         <variable name="x" arrayIndex="-1" isArrayIndex="false">
@@ -137,5 +137,10 @@ mod: false" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initially
             </loopInvariant>
          </branchCondition>
       </branchStatement>
+      <methodReturnEntry path="/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/1/0/1/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/1/0/0/0"/>
 </start>

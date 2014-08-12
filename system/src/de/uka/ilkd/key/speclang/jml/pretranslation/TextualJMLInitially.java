@@ -31,6 +31,7 @@ public final class TextualJMLInitially extends TextualJMLConstruct {
         super(mods);
         assert inv != null;
         this.inv = inv;
+        setPosition(inv);
     }
     
     public PositionedString getInv() {

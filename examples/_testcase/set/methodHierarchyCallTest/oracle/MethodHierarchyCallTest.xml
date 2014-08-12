@@ -6,43 +6,43 @@
          <methodCall name="self.a();" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
             <statement name="return b();" pathCondition="true" pathConditionChanged="false">
-               <callStackEntry path="/0"/>
                <callStackEntry path="/0/0/0"/>
+               <callStackEntry path="/0"/>
                <methodCall name="self.b();" pathCondition="true" pathConditionChanged="false">
-                  <callStackEntry path="/0"/>
                   <callStackEntry path="/0/0/0"/>
+                  <callStackEntry path="/0"/>
                   <statement name="return c();" pathCondition="true" pathConditionChanged="false">
-                     <callStackEntry path="/0"/>
-                     <callStackEntry path="/0/0/0"/>
                      <callStackEntry path="/0/0/0/0/0"/>
+                     <callStackEntry path="/0/0/0"/>
+                     <callStackEntry path="/0"/>
                      <methodCall name="self.c();" pathCondition="true" pathConditionChanged="false">
-                        <callStackEntry path="/0"/>
-                        <callStackEntry path="/0/0/0"/>
                         <callStackEntry path="/0/0/0/0/0"/>
+                        <callStackEntry path="/0/0/0"/>
+                        <callStackEntry path="/0"/>
                         <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
-                           <callStackEntry path="/0"/>
-                           <callStackEntry path="/0/0/0"/>
-                           <callStackEntry path="/0/0/0/0/0"/>
                            <callStackEntry path="/0/0/0/0/0/0/0"/>
-                           <methodReturn name="&lt;return of c&gt;" signature="&lt;return of self.c();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of c&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of self.c();&gt;" isReturnValueComputed="true">
+                           <callStackEntry path="/0/0/0/0/0"/>
+                           <callStackEntry path="/0/0/0"/>
+                           <callStackEntry path="/0"/>
+                           <methodReturn name="&lt;return of c&gt;" signature="&lt;return of self.c();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of c&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of self.c();&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                               <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                               </methodReturnValue>
-                              <callStackEntry path="/0"/>
-                              <callStackEntry path="/0/0/0"/>
-                              <callStackEntry path="/0/0/0/0/0"/>
                               <callStackEntry path="/0/0/0/0/0/0/0"/>
-                              <methodReturn name="&lt;return of b&gt;" signature="&lt;return of self.b();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of b&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of self.b();&gt;" isReturnValueComputed="true">
+                              <callStackEntry path="/0/0/0/0/0"/>
+                              <callStackEntry path="/0/0/0"/>
+                              <callStackEntry path="/0"/>
+                              <methodReturn name="&lt;return of b&gt;" signature="&lt;return of self.b();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of b&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of self.b();&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                  <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                                  </methodReturnValue>
-                                 <callStackEntry path="/0"/>
-                                 <callStackEntry path="/0/0/0"/>
                                  <callStackEntry path="/0/0/0/0/0"/>
-                                 <methodReturn name="&lt;return of a&gt;" signature="&lt;return of self.a();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of a&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of self.a();&gt;" isReturnValueComputed="true">
+                                 <callStackEntry path="/0/0/0"/>
+                                 <callStackEntry path="/0"/>
+                                 <methodReturn name="&lt;return of a&gt;" signature="&lt;return of self.a();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of a&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of self.a();&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                     <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                                     </methodReturnValue>
-                                    <callStackEntry path="/0"/>
                                     <callStackEntry path="/0/0/0"/>
-                                    <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of self.main();&gt;" isReturnValueComputed="true">
+                                    <callStackEntry path="/0"/>
+                                    <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of self.main();&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                        <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                                        </methodReturnValue>
                                        <callStackEntry path="/0"/>
@@ -53,11 +53,16 @@
                               </methodReturn>
                            </methodReturn>
                         </statement>
+                        <methodReturnEntry path="/0/0/0/0/0/0/0/0/0"/>
                      </methodCall>
                   </statement>
+                  <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0"/>
                </methodCall>
             </statement>
+            <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
          </methodCall>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
 </start>

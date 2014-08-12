@@ -10,21 +10,23 @@
                         <statement name="int j = i_2;" pathCondition="equals(a,Z(0(#)))" pathConditionChanged="false">
                            <statement name="i_2=j_2;" pathCondition="equals(a,Z(0(#)))" pathConditionChanged="false">
                               <statement name="return j_2;" pathCondition="equals(a,Z(0(#)))" pathConditionChanged="false">
-                                 <methodReturn name="&lt;return of valueLonger&gt;" signature="&lt;return of self.valueLonger(i_2);&gt;" pathCondition="equals(a,Z(0(#)))" pathConditionChanged="false" isReturnValueComputed="false">
+                                 <methodReturn name="&lt;return of valueLonger&gt;" signature="&lt;return of self.valueLonger(i_2);&gt;" pathCondition="equals(a,Z(0(#)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                     <statement name="int y = value(j_1);" pathCondition="equals(a,Z(0(#)))" pathConditionChanged="false">
                                        <methodCall name="self.value(i_5);" pathCondition="equals(a,Z(0(#)))" pathConditionChanged="false">
                                           <statement name="return i_5;" pathCondition="equals(a,Z(0(#)))" pathConditionChanged="false">
-                                             <methodReturn name="&lt;return of value&gt;" signature="&lt;return of self.value(i_5);&gt;" pathCondition="equals(a,Z(0(#)))" pathConditionChanged="false" isReturnValueComputed="false">
+                                             <methodReturn name="&lt;return of value&gt;" signature="&lt;return of self.value(i_5);&gt;" pathCondition="equals(a,Z(0(#)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                 <statement name="int z = valueLonger(x)+valueLonger(y_1);" pathCondition="equals(a,Z(0(#)))" pathConditionChanged="false">
                                                 </statement>
                                              </methodReturn>
                                           </statement>
+                                          <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                        </methodCall>
                                     </statement>
                                  </methodReturn>
                               </statement>
                            </statement>
                         </statement>
+                        <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
                      </methodCall>
                   </statement>
                </statement>
@@ -36,23 +38,25 @@
                   <statement name="int x = value(i_1);" pathCondition="not(equals(a,Z(0(#))))" pathConditionChanged="false">
                      <methodCall name="self.value(i_3);" pathCondition="not(equals(a,Z(0(#))))" pathConditionChanged="false">
                         <statement name="return i_3;" pathCondition="not(equals(a,Z(0(#))))" pathConditionChanged="false">
-                           <methodReturn name="&lt;return of value&gt;" signature="&lt;return of self.value(i_3);&gt;" pathCondition="not(equals(a,Z(0(#))))" pathConditionChanged="false" isReturnValueComputed="false">
+                           <methodReturn name="&lt;return of value&gt;" signature="&lt;return of self.value(i_3);&gt;" pathCondition="not(equals(a,Z(0(#))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                               <statement name="int y = valueLonger(j);" pathCondition="not(equals(a,Z(0(#))))" pathConditionChanged="false">
                                  <methodCall name="self.valueLonger(i_4);" pathCondition="not(equals(a,Z(0(#))))" pathConditionChanged="false">
                                     <statement name="int j = i_4;" pathCondition="not(equals(a,Z(0(#))))" pathConditionChanged="false">
                                        <statement name="i_4=j_3;" pathCondition="not(equals(a,Z(0(#))))" pathConditionChanged="false">
                                           <statement name="return j_3;" pathCondition="not(equals(a,Z(0(#))))" pathConditionChanged="false">
-                                             <methodReturn name="&lt;return of valueLonger&gt;" signature="&lt;return of self.valueLonger(i_4);&gt;" pathCondition="not(equals(a,Z(0(#))))" pathConditionChanged="false" isReturnValueComputed="false">
+                                             <methodReturn name="&lt;return of valueLonger&gt;" signature="&lt;return of self.valueLonger(i_4);&gt;" pathCondition="not(equals(a,Z(0(#))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                 <statement name="int z = value(x_3)+value(y);" pathCondition="not(equals(a,Z(0(#))))" pathConditionChanged="false">
                                                 </statement>
                                              </methodReturn>
                                           </statement>
                                        </statement>
                                     </statement>
+                                    <methodReturnEntry path="/0/0/1/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                  </methodCall>
                               </statement>
                            </methodReturn>
                         </statement>
+                        <methodReturnEntry path="/0/0/1/0/0/0/0/0/0"/>
                      </methodCall>
                   </statement>
                </statement>

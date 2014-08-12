@@ -2,10 +2,12 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="VerifiedTest.magic();" pathCondition="true" pathConditionChanged="false">
       <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
-         <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of VerifiedTest.magic();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+         <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of VerifiedTest.magic();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
             <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
             </termination>
          </methodReturn>
       </statement>
+      <methodReturnEntry path="/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0"/>
 </start>

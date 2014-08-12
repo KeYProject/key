@@ -12,7 +12,7 @@
                               <loopCondition name="this.z&gt;=0" pathCondition="true" pathConditionChanged="false">
                                  <statement name="this.z--;" pathCondition="true" pathConditionChanged="false">
                                     <loopCondition name="this.z&gt;=0" pathCondition="true" pathConditionChanged="false">
-                                       <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                       <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                        </methodReturn>
                                     </loopCondition>
                                  </statement>
@@ -25,5 +25,6 @@
             </loopCondition>
          </loopStatement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
 </start>

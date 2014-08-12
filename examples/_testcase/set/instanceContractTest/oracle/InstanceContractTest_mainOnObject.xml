@@ -8,7 +8,7 @@ post: result_0 = x.value &amp; x.&lt;inv&gt; &amp; exc_0 = null
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
             <branchCondition name="not(equals(x,null))" pathCondition="not(equals(x,null))" pathConditionChanged="true" branchCondition="not(equals(x,null))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (getValue)">
-               <methodReturn name="&lt;return of mainOnObject&gt;" signature="&lt;return of self.mainOnObject(x);&gt;" pathCondition="not(equals(x,null))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return result_0 as result of mainOnObject&gt;" signatureIncludingReturnValue="&lt;return result_0 as result of self.mainOnObject(x);&gt;" isReturnValueComputed="true">
+               <methodReturn name="&lt;return of mainOnObject&gt;" signature="&lt;return of self.mainOnObject(x);&gt;" pathCondition="not(equals(x,null))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return result_0 as result of mainOnObject&gt;" signatureIncludingReturnValue="&lt;return result_0 as result of self.mainOnObject(x);&gt;" isReturnValueComputed="true" methodReturnCondition="not(equals(x,null))">
                   <methodReturnValue name="result_0" returnValueString="result_0" hasCondition="false">
                   </methodReturnValue>
                   <termination name="&lt;end&gt;" pathCondition="not(equals(x,null))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
@@ -17,5 +17,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
             </branchCondition>
          </operationContract>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0"/>
 </start>

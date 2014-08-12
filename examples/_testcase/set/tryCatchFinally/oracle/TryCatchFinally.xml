@@ -7,7 +7,7 @@
                <statement name="result_1=2;" pathCondition="equals(input,Z(0(#)))" pathConditionChanged="false">
                   <statement name="result_1=result_1*2;" pathCondition="equals(input,Z(0(#)))" pathConditionChanged="false">
                      <statement name="return result_1;" pathCondition="equals(input,Z(0(#)))" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of tryCatchFinally&gt;" signature="&lt;return of self.tryCatchFinally(input);&gt;" pathCondition="equals(input,Z(0(#)))" pathConditionChanged="false" isReturnValueComputed="false">
+                        <methodReturn name="&lt;return of tryCatchFinally&gt;" signature="&lt;return of self.tryCatchFinally(input);&gt;" pathCondition="equals(input,Z(0(#)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="equals(input,Z(0(#)))">
                            <termination name="&lt;end&gt;" pathCondition="equals(input,Z(0(#)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
@@ -18,7 +18,7 @@
             <branchCondition name="not(equals(input,Z(0(#))))" pathCondition="not(equals(input,Z(0(#))))" pathConditionChanged="true" branchCondition="not(equals(input,Z(0(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="result_1=result_1*2;" pathCondition="not(equals(input,Z(0(#))))" pathConditionChanged="false">
                   <statement name="return result_1;" pathCondition="not(equals(input,Z(0(#))))" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of tryCatchFinally&gt;" signature="&lt;return of self.tryCatchFinally(input);&gt;" pathCondition="not(equals(input,Z(0(#))))" pathConditionChanged="false" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of tryCatchFinally&gt;" signature="&lt;return of self.tryCatchFinally(input);&gt;" pathCondition="not(equals(input,Z(0(#))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="not(equals(input,Z(0(#))))">
                         <termination name="&lt;end&gt;" pathCondition="not(equals(input,Z(0(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
@@ -27,5 +27,9 @@
             </branchCondition>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/1/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/1/0/0/0/0"/>
 </start>

@@ -26,6 +26,10 @@ import javax.swing.event.TreeSelectionEvent;
  */
 public class InfoView extends JSplitPane {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = -6944612837850368411L;
     private final InfoTree infoTree;
     private final InfoViewContentPane contentPane;
     private final KeYMediator mediator;
