@@ -997,22 +997,24 @@ public final class JavaInfo {
     }
     
     /*
-     Traverses type hierarchy to find the first {@link KeYJavaType} in which
-     a field of name programName is declared, starting from parameter type. And
+     Traverses the type hierarchy to find the first {@link KeYJavaType} in which
+     a field of name {@code fieldName} is declared, starting from parameter {@code kjt}. And
      then returns a {@link ProgramVariable} for that field/type combination.
-     
-     TODO@Kai say something about canonical
+    
+     Type detection in this method is canonical, i.e. selecting a field of name
+     {@code fieldName} on an object of (dynamic) type {@code kjt} during Java program
+     execution would end up in the same type as the type of the returned {@link ProgramVariable}.
      */
-    public ProgramVariable getCanonicalFieldProgramVariable(String fieldName, KeYJavaType type) {
+    public ProgramVariable getCanonicalFieldProgramVariable(String fieldName, KeYJavaType kjt) {
 
         ImmutableList<ProgramVariable> result = ImmutableSLList.<ProgramVariable>nil();
 
-        if (!(type.getSort().extendsTrans(objectSort()))) {
+        if (!(kjt.getSort().extendsTrans(objectSort()))) {
             return null;
         }
 
-        if (type.getJavaType() instanceof ArrayType) {
-            ProgramVariable var = find(fieldName, getFields(((ArrayDeclaration) type.getJavaType())
+        if (kjt.getJavaType() instanceof ArrayType) {
+            ProgramVariable var = find(fieldName, getFields(((ArrayDeclaration) kjt.getJavaType())
                     .getMembers()));
             if (var != null) {
                 result = result.prepend(var);
@@ -1026,8 +1028,8 @@ public final class JavaInfo {
 
         // the assert statements below are not for fun, some methods rely
         // on the correct order
-        ImmutableList<KeYJavaType> hierarchy = kpmi.getAllSupertypes(type);
-        assert hierarchy.head() == type;
+        ImmutableList<KeYJavaType> hierarchy = kpmi.getAllSupertypes(kjt);
+        assert hierarchy.head() == kjt;
 
         final Iterator<KeYJavaType> it = hierarchy.iterator();
         while (it.hasNext()) {
