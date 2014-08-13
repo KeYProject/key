@@ -40,7 +40,6 @@ import java.util.Map;
 public final class TypeConverter {
 
     private final TermBuilder tb;
-
     private final Services services;
     
     private Map<Name,LDT> LDTs = null;
