@@ -92,8 +92,11 @@ public final class JMLTranslator {
     public static final Map<String,String> jml2jdl;
     static{
         Map<String,String> tmp = new TreeMap<String,String>();
-        tmp.put("\\map_empty", "mapEmpty");
         tmp.put("\\map_get", "mapGet");
+        tmp.put("\\map_empty", "mapEmpty");
+        tmp.put("\\map_singleton", "mapSingleton");
+        tmp.put("\\map_override", "mapOverride");
+        tmp.put("\\seq_2_map", "seq2map");
         tmp.put("\\map_update", "mapUpdate");
         tmp.put("\\map_remove", "mapRemove");
         tmp.put("\\in_domain", "inDomain");

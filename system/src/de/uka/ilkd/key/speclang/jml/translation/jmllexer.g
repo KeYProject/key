@@ -180,7 +180,7 @@ INDEXOF : "\\seq_indexOf";
 SEQDEF : "\\seq_def";
 
 MAPEMPTY : "\\map_empty";
-MAPEXPRESSION : "\\map_remove" | "\\map_update" | "\\in_domain" | "\\domain_implies_created" | "\\map_size" | "\\is_finite" | "\\map_get";
+MAPEXPRESSION : "\\map_get" | "\\map_singleton" | "\\map_override" | "\\seq_2_map" | "\\map_update" | "\\map_remove" | "\\in_domain" | "\\domain_implies_created" | "\\map_size" | "\\is_finite";
 
 FROM : "\\from";
 TO : "\\to";
