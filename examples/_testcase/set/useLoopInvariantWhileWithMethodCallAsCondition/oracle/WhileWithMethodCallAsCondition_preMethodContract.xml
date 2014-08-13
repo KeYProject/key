@@ -52,7 +52,7 @@ mod: \if (true)
 termination: diamond" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
     b_3=goOnNice(array,i);
   }
-}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="false" resultTerm="result_3" exceptionTerm="exc_3" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="false" resultTerm="result_3" exceptionTerm="exc_3" contractParameters="array, i" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                      <callStackEntry path="/0"/>
                      <statement name="result_1++;" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
     b_3=goOnNice(array,i);

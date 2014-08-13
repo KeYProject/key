@@ -6,7 +6,7 @@
 pre: true
 post: result_0 = subMagic(x) &amp; exc_0 = null
 mod: empty
-termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="x" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <branchCondition name="equals(x,TRUE)" pathCondition="equals(x,TRUE)" pathConditionChanged="true" branchCondition="equals(x,TRUE)" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="return magicValue;" pathCondition="equals(x,TRUE)" pathConditionChanged="false">
                   <methodReturn name="&lt;return of main&gt;" signature="&lt;return of SimpleBooleanQuery.main(x);&gt;" pathCondition="equals(x,TRUE)" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of SimpleBooleanQuery.main(x);&gt;" isReturnValueComputed="true" methodReturnCondition="equals(x,TRUE)">

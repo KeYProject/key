@@ -460,6 +460,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertEquals(((IExecutionOperationContract)expected).isNotNullCheckComplied(), ((IExecutionOperationContract)current).isNotNullCheckComplied());
          assertEquals(((IExecutionOperationContract)expected).getFormatedResultTerm(), ((IExecutionOperationContract)current).getFormatedResultTerm());
          assertEquals(((IExecutionOperationContract)expected).getFormatedExceptionTerm(), ((IExecutionOperationContract)current).getFormatedExceptionTerm());
+         assertEquals(((IExecutionOperationContract)expected).getFormatedSelfTerm(), ((IExecutionOperationContract)current).getFormatedSelfTerm());
+         assertEquals(((IExecutionOperationContract)expected).getFormatedContractParams(), ((IExecutionOperationContract)current).getFormatedContractParams());
          assertVariables((IExecutionOperationContract)expected, (IExecutionOperationContract)current, compareVariables);
       }
       else if (expected instanceof IExecutionLoopInvariant) {

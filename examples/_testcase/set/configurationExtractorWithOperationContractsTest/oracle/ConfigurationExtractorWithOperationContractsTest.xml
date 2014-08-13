@@ -10,7 +10,7 @@
 pre: !x = null &amp; !y = null
 post: result_0 = javaAddInt(x.value, y.value) &amp; exc_2 = null
 mod: allLocs
-termination: diamond" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_2" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+termination: diamond" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_2" contractParameters="x, y" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                         <statement name="return add_1;" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false">
                            <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of ConfigurationExtractorWithOperationContractsTest.compute(x,y);&gt;" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(not(equals(x,null)),not(equals(y,null)))">
                               <termination name="&lt;end&gt;" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">

@@ -538,7 +538,7 @@ public class ExecutionNodeReader {
          return new KeYlessTermination(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getTerminationKind(attributes), getBranchVerified(attributes));
       }
       else if (ExecutionNodeWriter.TAG_OPERATION_CONTRACT.equals(qName)) {
-         return new KeYlessOperationContract(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isPreconditionComplied(attributes), isHasNotNullCheck(attributes), isNotNullCheckComplied(attributes), getResultTerm(attributes), getExceptionTerm(attributes));
+         return new KeYlessOperationContract(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isPreconditionComplied(attributes), isHasNotNullCheck(attributes), isNotNullCheckComplied(attributes), getResultTerm(attributes), getExceptionTerm(attributes), getSelfTerm(attributes), getContractParameters(attributes));
       }
       else if (ExecutionNodeWriter.TAG_LOOP_INVARIANT.equals(qName)) {
          return new KeYlessLoopInvariant(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isInitiallyValid(attributes));
@@ -753,6 +753,24 @@ public class ExecutionNodeReader {
     */
    protected String getResultTerm(Attributes attributes) {
       return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_RESULT_TERM);
+   }
+
+   /**
+    * Returns the self term value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getSelfTerm(Attributes attributes) {
+      return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_SELF_TERM);
+   }
+
+   /**
+    * Returns the contract parameters value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getContractParameters(Attributes attributes) {
+      return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_CONTRACT_PARAMETERS);
    }
 
    /**
@@ -1850,6 +1868,16 @@ public class ExecutionNodeReader {
       private final String formatedExceptionTerm;
 
       /**
+       * The formated self term.
+       */
+      private final String formatedSelfTerm;
+
+      /**
+       * The formated contract parameters.
+       */
+      private final String formatedContractParams;
+
+      /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
@@ -1858,6 +1886,10 @@ public class ExecutionNodeReader {
        * @param preconditionComplied Is precondition complied?
        * @param hasNotNullCheck Has not null check?
        * @param notNullCheckComplied Is not null check complied?
+       * @param formatedResultTerm The formated result term.
+       * @param formatedExceptionTerm The formated exception term.
+       * @param formatedSelfTerm The formated self term.
+       * @param formatedContractParams The formated contract parameters.
        */
       public KeYlessOperationContract(IExecutionNode parent, 
                                       String name, 
@@ -1867,13 +1899,17 @@ public class ExecutionNodeReader {
                                       boolean hasNotNullCheck,
                                       boolean notNullCheckComplied,
                                       String formatedResultTerm,
-                                      String formatedExceptionTerm) {
+                                      String formatedExceptionTerm,
+                                      String formatedSelfTerm,
+                                      String formatedContractParams) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
          this.preconditionComplied = preconditionComplied;
          this.hasNotNullCheck = hasNotNullCheck;
          this.notNullCheckComplied = notNullCheckComplied;
          this.formatedResultTerm = formatedResultTerm;
          this.formatedExceptionTerm = formatedExceptionTerm;
+         this.formatedSelfTerm = formatedSelfTerm;
+         this.formatedContractParams = formatedContractParams;
       }
       
       /**
@@ -1954,6 +1990,38 @@ public class ExecutionNodeReader {
       @Override
       public String getFormatedExceptionTerm() throws ProofInputException {
          return formatedExceptionTerm;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Term getSelfTerm() throws ProofInputException {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ImmutableList<Term> getContractParams() throws ProofInputException {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getFormatedSelfTerm() throws ProofInputException {
+         return formatedSelfTerm;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getFormatedContractParams() throws ProofInputException {
+         return formatedContractParams;
       }
    }
 

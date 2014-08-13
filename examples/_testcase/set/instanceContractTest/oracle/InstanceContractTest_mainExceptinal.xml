@@ -9,7 +9,7 @@ post: !exc_0 = null
       -&gt; self.&lt;inv&gt;)
    &amp; java.lang.Exception::instance(exc_0) = TRUE)
 mod: allLocs
-termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" selfTerm="self" contractParameters="x" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <termination name="&lt;uncaught java.lang.Throwable&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
             </termination>
          </operationContract>

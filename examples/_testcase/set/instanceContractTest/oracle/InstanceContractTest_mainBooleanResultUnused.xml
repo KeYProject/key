@@ -8,7 +8,7 @@ post: result_0
 &amp; self.&lt;inv&gt;
 &amp; exc_0 = null
 mod: allLocs
-termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" selfTerm="self" contractParameters="x" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
          <methodReturn name="&lt;return of mainBooleanResultUnused&gt;" signature="&lt;return of self.mainBooleanResultUnused(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of mainBooleanResultUnused&gt;" signatureIncludingReturnValue="&lt;return of self.mainBooleanResultUnused(x);&gt;" isReturnValueComputed="true" methodReturnCondition="true">
             <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
             </termination>

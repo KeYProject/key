@@ -12,7 +12,7 @@ mod: \if (true)  \then (empty)  \else (allLocs)
 \cap \if (!(xPre(x) = TRUE &amp; y &lt; 0))
          \then (empty)
          \else (allLocs)
-termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="x, y" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <branchCondition name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
                <branchCondition name="lt(y,Z(0(#)))" pathCondition="and(geq(x,Z(0(#))),leq(y,Z(neglit(1(#)))))" pathConditionChanged="true" branchCondition="lt(y,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="return magicValue;" pathCondition="and(geq(x,Z(0(#))),leq(y,Z(neglit(1(#)))))" pathConditionChanged="false">

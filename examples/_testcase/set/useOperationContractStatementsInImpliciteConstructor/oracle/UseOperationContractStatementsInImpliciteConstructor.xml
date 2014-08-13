@@ -52,7 +52,7 @@ post: result_0
 &amp; self.&lt;inv&gt;
 &amp; exc_0 = null
 mod: allLocs
-termination: diamond" pathCondition="not(equals(array,null))" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+termination: diamond" pathCondition="not(equals(array,null))" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" selfTerm="self" contractParameters="array" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                   <variable name="self" arrayIndex="-1" isArrayIndex="false">
                      <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      </value>

@@ -65,6 +65,16 @@ public class ExecutionOperationContract extends AbstractExecutionStateNode<Sourc
     * The result {@link Term} used by the applied {@link Contract}.
     */
    private Term resultTerm;
+
+   /**
+    * The self {@link Term} or {@code null} if not available.
+    */
+   private Term selfTerm;
+   
+   /**
+    * The current contract parameters.
+    */
+   private ImmutableList<Term> contractParams;
    
    /**
     * Constructor.
@@ -103,7 +113,6 @@ public class ExecutionOperationContract extends AbstractExecutionStateNode<Sourc
          LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
          Term baseHeapTerm = services.getTermBuilder().getBaseHeap();
          
-         Term contractSelf = null;
          if (contract.hasSelfVar()) {
             if (inst.pm.isConstructor()) {
                Term selfDefinition = search.getExceptionDefinitionParent();
@@ -125,22 +134,22 @@ public class ExecutionOperationContract extends AbstractExecutionStateNode<Sourc
                if (!SymbolicExecutionUtil.isNullSort(selfEquality.sub(1).sort(), services)) {
                   throw new ProofInputException("Null expected, implementation of UseOperationContractRule might has changed!"); 
                }
-               contractSelf = selfEquality.sub(0);
-               KeYJavaType selfType = services.getJavaInfo().getKeYJavaType(contractSelf.sort());
+               selfTerm = selfEquality.sub(0);
+               KeYJavaType selfType = services.getJavaInfo().getKeYJavaType(selfTerm.sort());
                if (inst.staticType != selfType) {
                   throw new ProofInputException("Type \"" + inst.staticType + "\" expected but found \"" + selfType + "\", implementation of UseOperationContractRule might has changed!"); 
                }
             }
             else {
-               contractSelf = UseOperationContractRule.computeSelf(baseHeapTerm, atPres, baseHeap, inst, resultTerm, services.getTermFactory());
+               selfTerm = UseOperationContractRule.computeSelf(baseHeapTerm, atPres, baseHeap, inst, resultTerm, services.getTermFactory());
             }
          }
-         ImmutableList<Term> contractParams = UseOperationContractRule.computeParams(baseHeapTerm, atPres, baseHeap, inst, services.getTermFactory());
+         contractParams = UseOperationContractRule.computeParams(baseHeapTerm, atPres, baseHeap, inst, services.getTermFactory());
          // Compute contract text
          return FunctionalOperationContractImpl.getText(contract, 
                                                         contractParams, 
                                                         resultTerm, 
-                                                        contractSelf, 
+                                                        selfTerm, 
                                                         exceptionTerm, 
                                                         baseHeap, 
                                                         baseHeapTerm, 
@@ -181,6 +190,32 @@ public class ExecutionOperationContract extends AbstractExecutionStateNode<Sourc
          return exceptionTerm;
       }
    }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Term getSelfTerm() throws ProofInputException {
+      synchronized (this) {
+         if (!isNameComputed()) {
+            getName(); // Compute name and self term
+         }
+         return selfTerm;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ImmutableList<Term> getContractParams() throws ProofInputException {
+      synchronized (this) {
+         if (!isNameComputed()) {
+            getName(); // Compute name and contract term
+         }
+         return contractParams;
+      }
+   }
 
    /**
     * {@inheritDoc}
@@ -198,6 +233,40 @@ public class ExecutionOperationContract extends AbstractExecutionStateNode<Sourc
    public String getFormatedExceptionTerm() throws ProofInputException {
       Term exceptionTerm = getExceptionTerm();
       return exceptionTerm != null ? formatTerm(exceptionTerm, getServices()) : null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getFormatedSelfTerm() throws ProofInputException {
+      Term selfTerm = getSelfTerm();
+      return selfTerm != null ? formatTerm(selfTerm, getServices()) : null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getFormatedContractParams() throws ProofInputException {
+      ImmutableList<Term> contractParams = getContractParams();
+      if (contractParams != null && !contractParams.isEmpty()) {
+         StringBuffer sb = new StringBuffer();
+         boolean afterFirst = false;
+         for (Term term : contractParams) {
+            if (afterFirst) {
+               sb.append(", ");
+            }
+            else {
+               afterFirst = true;
+            }
+            sb.append(formatTerm(term, getServices()));
+         }
+         return sb.toString();
+      }
+      else {
+         return null;
+      }
    }
    
    /**

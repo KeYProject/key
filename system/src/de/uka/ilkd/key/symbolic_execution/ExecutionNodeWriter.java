@@ -199,6 +199,16 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Attribute name to store {@link IExecutionOperationContract#getFormatedExceptionTerm()}.
     */
    public static final String ATTRIBUTE_EXCEPTION_TERM = "exceptionTerm";
+
+   /**
+    * Attribute name to store {@link IExecutionOperationContract#getFormatedSelfTerm()}.
+    */
+   public static final String ATTRIBUTE_SELF_TERM = "selfTerm";
+
+   /**
+    * Attribute name to store {@link IExecutionOperationContract#getFormatedContractParams()}.
+    */
+   public static final String ATTRIBUTE_CONTRACT_PARAMETERS = "contractParameters";
    
    /**
     * Tag name to store {@link IExecutionBranchCondition}s.
@@ -705,6 +715,8 @@ public class ExecutionNodeWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       attributeValues.put(ATTRIBUTE_RESULT_TERM, node.getFormatedResultTerm());
       attributeValues.put(ATTRIBUTE_EXCEPTION_TERM, node.getFormatedExceptionTerm());
+      attributeValues.put(ATTRIBUTE_SELF_TERM, node.getFormatedSelfTerm());
+      attributeValues.put(ATTRIBUTE_CONTRACT_PARAMETERS, node.getFormatedContractParams());
 
       attributeValues.put(ATTRIBUTE_PRECONDITION_COMPLIED, node.isPreconditionComplied() + "");
       attributeValues.put(ATTRIBUTE_HAS_NOT_NULL_CHECK, node.hasNotNullCheck() + "");

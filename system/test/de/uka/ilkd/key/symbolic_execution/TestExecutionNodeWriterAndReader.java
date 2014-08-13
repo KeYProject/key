@@ -193,7 +193,7 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       mc.addCallStackEntry(mc);
       mc.addChild(mr);
       mc.addMethodReturn(mr);
-      KeYlessOperationContract contract = new KeYlessOperationContract(root, "useOperationContract", "pcUse", true, false, true, false, "ResultTerm", "ExceptionTerm");
+      KeYlessOperationContract contract = new KeYlessOperationContract(root, "useOperationContract", "pcUse", true, false, true, false, "ResultTerm", "ExceptionTerm", "SelfTerm", "ParamA, ParamB");
       root.addChild(contract);
       KeYlessLoopInvariant invariant = new KeYlessLoopInvariant(root, "useLoppInvariant", "pcUseLoopInvariant", false, true);
       root.addChild(invariant);

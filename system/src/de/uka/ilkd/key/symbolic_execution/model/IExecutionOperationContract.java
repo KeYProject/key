@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.model;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -79,6 +80,20 @@ public interface IExecutionOperationContract extends IExecutionStateNode<SourceE
    public Term getExceptionTerm() throws ProofInputException;
    
    /**
+    * Returns the self {@link Term} of the called method for which a {@link Contract} is applied.
+    * @return The self {@link Term} or {@code null} if not available.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public Term getSelfTerm() throws ProofInputException;
+   
+   /**
+    * Returns the parameters of the called method for which a {@link Contract} is applied.
+    * @return The parameters of the called method for which a {@link Contract} is applied.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public ImmutableList<Term> getContractParams() throws ProofInputException;
+   
+   /**
     * Returns the human readable result {@link Term} in which the result of the applied {@link Contract} is stored.
     * @return The human readable result {@link Term} in which the result of the applied {@link Contract} is stored.
     * @throws ProofInputException Occurred Exception.
@@ -91,4 +106,18 @@ public interface IExecutionOperationContract extends IExecutionStateNode<SourceE
     * @throws ProofInputException Occurred Exception.
     */
    public String getFormatedExceptionTerm() throws ProofInputException;
+   
+   /**
+    * Returns the human readable self {@link Term} of the called method for which a {@link Contract} is applied.
+    * @return The human readable self {@link Term} or {@code null} if not available.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public String getFormatedSelfTerm() throws ProofInputException;
+   
+   /**
+    * Returns the human readable parameters of the called method for which a {@link Contract} is applied.
+    * @return The human readable parameters of the called method for which a {@link Contract} is applied.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public String getFormatedContractParams() throws ProofInputException;
 }
