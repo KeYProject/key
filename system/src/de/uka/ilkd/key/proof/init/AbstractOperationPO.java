@@ -608,7 +608,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
          throw new IllegalStateException("The uninterpreted predicate is already available.");
       }
       // Create parameters for predicate SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
-      ImmutableList<Term> arguments = tb.var(paramVars); // Method parameters
+      ImmutableList<Term> arguments = ImmutableSLList.nil(); //tb.var(paramVars); // Method parameters
       for (LocationVariable formalParam : formalParamVars) {
          arguments = arguments.prepend(tb.var(formalParam));
       }
