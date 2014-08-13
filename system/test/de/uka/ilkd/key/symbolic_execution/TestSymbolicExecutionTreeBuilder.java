@@ -39,6 +39,29 @@ import de.uka.ilkd.key.ui.CustomUserInterface;
  */
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: examples/_testcase/set/useOperationContractVariableNestedOperationContractUse
+    */
+   public void testUseOperationContractVariableNestedOperationContractUse() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useOperationContractVariableNestedOperationContractUse/test/VariableNestedOperationContractUse.java", 
+                "VariableNestedOperationContractUse", 
+                "main", 
+                null,
+                "examples/_testcase/set/useOperationContractVariableNestedOperationContractUse/oracle/VariableNestedOperationContractUse.xml",
+                false,
+                false,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/useOperationContractApplyContractTwice
     */
    public void testUseOperationContractApplyContractTwice() throws Exception {

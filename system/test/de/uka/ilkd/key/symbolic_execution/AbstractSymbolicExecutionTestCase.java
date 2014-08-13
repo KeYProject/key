@@ -660,8 +660,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertNull(current);
       }
    }
-
-
    
    /**
     * Makes sure that the given values are the same.

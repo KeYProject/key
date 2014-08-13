@@ -112,29 +112,12 @@ public class ExecutionOperationContract extends AbstractExecutionStateNode<Sourc
          Map<LocationVariable,Term> atPres = HeapContext.getAtPres(atPreVars, services);
          LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
          Term baseHeapTerm = services.getTermBuilder().getBaseHeap();
-         
          if (contract.hasSelfVar()) {
             if (inst.pm.isConstructor()) {
-               Term selfDefinition = search.getExceptionDefinitionParent();
-               selfDefinition = selfDefinition.sub(1);
-               while (selfDefinition.op() == Junctor.AND) {
-                  selfDefinition = selfDefinition.sub(0);
+               selfTerm = searchConstructorSelfDefinition(search.getWorkingTerm(), inst.staticType, services);
+               if (selfTerm == null) {
+                  throw new ProofInputException("Can't find self term, implementation of UseOperationContractRule might has changed!"); 
                }
-               // Make sure that self equality was found
-               Term selfEquality;
-               if (selfDefinition.op() == Junctor.NOT) {
-                  selfEquality = selfDefinition.sub(0);
-               }
-               else {
-                  selfEquality = selfDefinition;
-               }
-               if (selfEquality.op() != Equality.EQUALS || selfEquality.arity() != 2) {
-                  throw new ProofInputException("Equality expected, implementation of UseOperationContractRule might has changed!"); 
-               }
-               if (!SymbolicExecutionUtil.isNullSort(selfEquality.sub(1).sort(), services)) {
-                  throw new ProofInputException("Null expected, implementation of UseOperationContractRule might has changed!"); 
-               }
-               selfTerm = selfEquality.sub(0);
                KeYJavaType selfType = services.getJavaInfo().getKeYJavaType(selfTerm.sort());
                if (inst.staticType != selfType) {
                   throw new ProofInputException("Type \"" + inst.staticType + "\" expected but found \"" + selfType + "\", implementation of UseOperationContractRule might has changed!"); 
@@ -162,6 +145,32 @@ public class ExecutionOperationContract extends AbstractExecutionStateNode<Sourc
       }
       else {
          return null;
+      }
+   }
+   
+   /**
+    * Tries to find the self {@link Term} of the given {@link KeYJavaType}.
+    * @param term The {@link Term} to start search in.
+    * @param staticType The expected {@link KeYJavaType}.
+    * @param services The {@link Services} to use.
+    * @return The found self {@link Term} or {@code null} if not available.
+    */
+   protected Term searchConstructorSelfDefinition(Term term, KeYJavaType staticType, Services services) {
+      if (term.op() == Junctor.NOT &&
+          term.sub(0).op() == Equality.EQUALS && 
+          term.sub(0).sub(0).op() instanceof LocationVariable && 
+          SymbolicExecutionUtil.isNullSort(term.sub(0).sub(1).sort(), services) &&
+          services.getJavaInfo().getKeYJavaType(term.sub(0).sub(0).sort()) == staticType) {
+         return term.sub(0).sub(0);
+      }
+      else {
+         Term result = null;
+         int i = term.arity() - 1;
+         while (result == null && i >= 0) {
+            result = searchConstructorSelfDefinition(term.sub(i), staticType, services);
+            i--;
+         }
+         return result;
       }
    }
    
