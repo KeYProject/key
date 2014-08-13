@@ -206,7 +206,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
           // Add uninterpreted predicate
           if (isAddUninterpretedPredicate()) {
               postTerm = tb.and(postTerm,
-                      buildUninterpretedPredicate(paramVars, null, getUninterpretedPredicateName(), proofServices));
+                      buildUninterpretedPredicate(paramVars, formalParamVars, null, getUninterpretedPredicateName(), proofServices));
           }
           ImmutableList<FunctionalOperationContract> lookupContracts = ImmutableSLList.<FunctionalOperationContract>nil();
           ImmutableSet<FunctionalOperationContract> cs = proofServices.getSpecificationRepository().getOperationContracts(getCalleeKeYJavaType(), pm);
@@ -337,7 +337,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
          // Add uninterpreted predicate
          if (isAddUninterpretedPredicate()) {
             postTerm = tb.and(postTerm,
-                              buildUninterpretedPredicate(paramVars, exceptionVar,
+                              buildUninterpretedPredicate(paramVars, formalParamVars, exceptionVar,
                                                           getUninterpretedPredicateName(), proofServices));
          }
 
@@ -593,11 +593,13 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * Builds a {@link Term} to use in the postcondition of the generated
     * {@link Sequent} which represents the uninterpreted predicate.
     * @param paramVars The parameters {@link ProgramVariable}s.
+    * @param formalParamVars The formal parameters {@link LocationVariable}s.
     * @param exceptionVar The exception variable.
     * @param name The name of the uninterpreted predicate.
     * @return The created uninterpreted predicate.
     */
    protected Term buildUninterpretedPredicate(ImmutableList<ProgramVariable> paramVars,
+                                              ImmutableList<LocationVariable> formalParamVars,
                                               ProgramVariable exceptionVar,
                                               String name,
                                               Services services) {
@@ -607,6 +609,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
       }
       // Create parameters for predicate SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
       ImmutableList<Term> arguments = tb.var(paramVars); // Method parameters
+      for (LocationVariable formalParam : formalParamVars) {
+         arguments = arguments.prepend(tb.var(formalParam));
+      }
       arguments = arguments.prepend(tb.var(exceptionVar)); // Exception variable (As second argument for the predicate)
       arguments = arguments.prepend(tb.getBaseHeap()); // Heap (As first argument for the predicate)
       // Create non-rigid predicate with signature: SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)

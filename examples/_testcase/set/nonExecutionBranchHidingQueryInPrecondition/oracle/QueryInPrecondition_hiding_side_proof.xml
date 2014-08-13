@@ -15,15 +15,15 @@ mod: \if (true)  \then (empty)  \else (allLocs)
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="x, y" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
                <methodReturn name="&lt;return of main&gt;" signature="&lt;return of QueryInPrecondition.main(x,y);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
-	Z(neglit(1(1(7(4(#)))))) {not(and(leq(y,Z(neglit(1(#)))),geq(x,Z(0(#)))))}, 
-	Z(2(4(#))) {and(gt(x,Z(neglit(1(#)))),and(lt(y,Z(0(#))),equals(QueryResult_0,TRUE)))}
+	Z(2(4(#))) {and(gt(x,Z(neglit(1(#)))),and(lt(y,Z(0(#))),equals(result_0,Z(2(4(#))))))}, 
+	Z(neglit(1(1(7(4(#)))))) {not(and(leq(y,Z(neglit(1(#)))),geq(x,Z(0(#)))))}
 as result of main&gt;" signatureIncludingReturnValue="&lt;return 
-	Z(neglit(1(1(7(4(#)))))) {not(and(leq(y,Z(neglit(1(#)))),geq(x,Z(0(#)))))}, 
-	Z(2(4(#))) {and(gt(x,Z(neglit(1(#)))),and(lt(y,Z(0(#))),equals(QueryResult_0,TRUE)))}
+	Z(2(4(#))) {and(gt(x,Z(neglit(1(#)))),and(lt(y,Z(0(#))),equals(result_0,Z(2(4(#))))))}, 
+	Z(neglit(1(1(7(4(#)))))) {not(and(leq(y,Z(neglit(1(#)))),geq(x,Z(0(#)))))}
 as result of QueryInPrecondition.main(x,y);&gt;" isReturnValueComputed="true" methodReturnCondition="true">
-                  <methodReturnValue name="Z(neglit(1(1(7(4(#)))))) {not(and(leq(y,Z(neglit(1(#)))),geq(x,Z(0(#)))))}" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="true" conditionString="not(and(leq(y,Z(neglit(1(#)))),geq(x,Z(0(#)))))">
+                  <methodReturnValue name="Z(2(4(#))) {and(gt(x,Z(neglit(1(#)))),and(lt(y,Z(0(#))),equals(result_0,Z(2(4(#))))))}" returnValueString="Z(2(4(#)))" hasCondition="true" conditionString="and(gt(x,Z(neglit(1(#)))),and(lt(y,Z(0(#))),equals(result_0,Z(2(4(#))))))">
                   </methodReturnValue>
-                  <methodReturnValue name="Z(2(4(#))) {and(gt(x,Z(neglit(1(#)))),and(lt(y,Z(0(#))),equals(QueryResult_0,TRUE)))}" returnValueString="Z(2(4(#)))" hasCondition="true" conditionString="and(gt(x,Z(neglit(1(#)))),and(lt(y,Z(0(#))),equals(QueryResult_0,TRUE)))">
+                  <methodReturnValue name="Z(neglit(1(1(7(4(#)))))) {not(and(leq(y,Z(neglit(1(#)))),geq(x,Z(0(#)))))}" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="true" conditionString="not(and(leq(y,Z(neglit(1(#)))),geq(x,Z(0(#)))))">
                   </methodReturnValue>
                   <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
