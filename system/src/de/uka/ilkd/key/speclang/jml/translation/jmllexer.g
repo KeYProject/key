@@ -180,7 +180,15 @@ INDEXOF : "\\seq_indexOf";
 SEQDEF : "\\seq_def";
 
 MAPEMPTY : "\\map_empty";
-MAPEXPRESSION : "\\map_get" | "\\map_singleton" | "\\map_override" | "\\seq_2_map" | "\\map_update" | "\\map_remove" | "\\in_domain" | "\\domain_implies_created" | "\\map_size" | "\\is_finite";
+MAPEXPRESSION : "\\map_get"
+                | "\\map_override"
+                | "\\map_update" 
+                | "\\map_remove" 
+                | "\\in_domain" 
+                | "\\domain_implies_created" 
+                | "\\map_si" ("ze" | "ingleton")
+                | "\\is_finite";
+SEQ2MAP : "\\seq_2_map";
 
 FROM : "\\from";
 TO : "\\to";
