@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.ui;
 
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.List;
 
@@ -25,9 +24,10 @@ import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -35,45 +35,14 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironmentListener;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
-public interface UserInterface extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor {
-    public static final String PROP_AUTO_MODE = "autoMode";
-    
-    /**
-     * Checks if the auto mode is running which is the case between
-     * {@link #notifyAutoModeBeingStarted()} and {@link #notifyAutomodeStopped()}.
-     * @return {@code true} auto mode is running, {@code false} auto mode is not running.
-     */
-    public boolean isAutoMode();
-   
-    /**
-     * Adds the given listener.
-     * @param listener The listener to add.
-     */
-    public void addPropertyChangeListener(PropertyChangeListener listener);
+public interface UserInterface
+    extends ProblemInitializerListener, ProverTaskListener, ProgressMonitor, ProofEnvironmentListener {
 
-    /**
-     * Adds the given listener for the given property only.
-     * @param propertyName The property to observe.
-     * @param listener The listener to add.
-     */
-    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener);
-    
-    /**
-     * Removes the given listener.
-     * @param listener The listener to remove.
-     */
-    public void removePropertyChangeListener(PropertyChangeListener listener);
-    
-    /**
-     * Removes the given listener from the given property.
-     * @param propertyName The property to no longer observe.
-     * @param listener The listener to remove.
-     */
-    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener);
-    
     /**
      * these methods are called immediately before automode is started to ensure that
      * the GUI can respond in a reasonable way, e.g., change the cursor to a waiting cursor
@@ -106,8 +75,6 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      */
     boolean confirmTaskRemoval(String message);
 
-    void finish(Proof proof);
-
     /**
      * loads the problem or proof from the given file
      * @param file the File with the problem description or the proof
@@ -127,6 +94,8 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
     ProofMacro getMacro();
 
     boolean macroChosen();
+
+    public ProverTaskListener getListener();
 
     boolean applyMacro();
 
@@ -156,7 +125,7 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * uses KeY.
      * </p>
      * @param profile The {@link Profile} to use.
-     * @return The instantiated {@link ProblemInitializer}.
+    * @return The instantiated {@link ProblemInitializer}.
      */
     ProblemInitializer createProblemInitializer(Profile profile);
     
@@ -240,5 +209,15 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * for instance to open the proof management dialog as done by {@link ProblemLoader}.
      * @return true if the proof obligation was selected, and false if action was aborted
      */
-    public boolean selectProofObligation(InitConfig initConfig);
+     boolean selectProofObligation(InitConfig initConfig);
+
+    /**
+     * registers the proof aggregate at the UI
+     * 
+     * @param proofOblInput the {@link ProofOblInput}
+     * @param proofList the {@link ProofAggregate} 
+     * @param initConfig the {@link InitConfig} to be used
+     * @return the new {@link ProofEnvironment} where the {@link ProofAggregate} has been registered
+     */
+     ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput, ProofAggregate proofList, InitConfig initConfig);
 }

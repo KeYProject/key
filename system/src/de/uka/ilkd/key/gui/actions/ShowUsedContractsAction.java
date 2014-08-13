@@ -51,7 +51,7 @@ public class ShowUsedContractsAction extends MainWindowAction {
 		                            + "for a proof you have to load one first"));
 	} else {
             ProofManagementDialog.showInstance
-                    (getMediator().getSelectedProof().env().getInitConfig(), getMediator().getSelectedProof());
+                    (getMediator().getSelectedProof().getInitConfig(), getMediator().getSelectedProof());
 	}
     }
 

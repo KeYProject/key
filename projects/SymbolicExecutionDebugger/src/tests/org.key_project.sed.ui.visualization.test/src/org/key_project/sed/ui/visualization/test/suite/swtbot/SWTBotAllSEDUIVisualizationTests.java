@@ -18,6 +18,7 @@ import org.junit.runners.Suite;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiAnnotationLinksTabTest;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiAnnotationsTabTest;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiCallStackTabTest;
+import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiMethodReturnsTabTest;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiNodeTabTest;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiSourceTabTest;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotSaveSetAsTest;
@@ -35,6 +36,7 @@ import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotSymbolicE
    SWTBotGraphitiAnnotationLinksTabTest.class,
    SWTBotGraphitiAnnotationsTabTest.class,
    SWTBotGraphitiCallStackTabTest.class,
+   SWTBotGraphitiMethodReturnsTabTest.class,
    SWTBotGraphitiNodeTabTest.class,
    SWTBotGraphitiSourceTabTest.class,
    SWTBotSaveSetAsTest.class,

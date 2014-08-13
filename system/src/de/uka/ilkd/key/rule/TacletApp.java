@@ -1161,20 +1161,23 @@ public abstract class TacletApp implements RuleApp {
      * from type TacletApp with equal taclets, instantiations and positions.
      */
     public boolean equals(Object o) {
-	if (o == this)
-	    return true;
-	if (!(o instanceof TacletApp))
-	    return false;
-	TacletApp s = (TacletApp) o;
-	return (s.taclet().equals(taclet()) && s.instantiations().equals(
-		instantiations()));
+       if (o == this)
+          return true;
+       if (o == null || o.getClass()  != this.getClass()) {
+          return false;
+       }
+       final TacletApp s = (TacletApp) o;
+       return (s.taclet.equals(taclet) && s.instantiations.equals(
+             instantiations));// && (ifInstantiations == null ? s.ifInstantiations == null : 
+                //ifInstantiations.equals(s.ifInstantiations));
     }
 
     public int hashCode() {
-	int result = 17;
-	result = 37 * result + taclet.hashCode();
-	result = 37 * result + instantiations.hashCode();
-	return result;
+       int result = 17;
+       result = 37 * result + taclet.hashCode();
+       result = 37 * result + instantiations.hashCode();
+       result = 37 * result + (ifInstantiations == null ? 0 : ifInstantiations.hashCode()); 
+       return result;
     }
 
     public String toString() {

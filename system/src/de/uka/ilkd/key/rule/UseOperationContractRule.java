@@ -850,7 +850,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         	= new RuleJustificationBySpec(contract);
         final ComplexRuleJustificationBySpec cjust
             	= (ComplexRuleJustificationBySpec)
-            	    goal.proof().env().getJustifInfo().getJustification(this);
+            	    goal.proof().getInitConfig().getJustifInfo().getJustification(this);
         cjust.add(ruleApp, just);
         return result;
     }

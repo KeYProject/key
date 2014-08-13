@@ -94,8 +94,8 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
 	@Override
 	public ImmutableList<Goal> apply(Goal goal, Services services,
 	        RuleApp ruleApp) {
-		if (goal.proof().env().getJustifInfo().getJustification(rule) == null) {
-			goal.proof().env().getJustifInfo().addJustification(rule,
+		if (goal.proof().getInitConfig().getJustifInfo().getJustification(rule) == null) {
+		   goal.proof().getInitConfig().registerRule(rule,
 					new RuleJustification() {
 
 				@Override

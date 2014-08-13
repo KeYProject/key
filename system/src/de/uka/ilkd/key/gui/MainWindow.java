@@ -148,16 +148,6 @@ public final class MainWindow extends JFrame  {
 
     private static MainWindow instance = null;
 
-    private ProofManagementDialog proofManagementDialog = null;
-
-    public ProofManagementDialog getProofManagementDialog() {
-        return proofManagementDialog;
-    }
-
-    public void setProofManagementDialog(ProofManagementDialog proofManagementDialog) {
-        this.proofManagementDialog = proofManagementDialog;
-    }
-
     /** Search bar for Sequent Views. */
     public final SequentViewSearchBar sequentViewSearchBar;
 
@@ -573,7 +563,7 @@ public final class MainWindow extends JFrame  {
     }
 
     private void setStatusLineImmediately(String str, int max) {
-        statusLine.reset();
+        //statusLine.reset();
         statusLine.setStatusText(str);
         if(max > 0) {
             getStatusLine().setProgressBarMaximum(max);
@@ -1070,7 +1060,7 @@ public final class MainWindow extends JFrame  {
         /** focused node has changed */
         @Override
         public synchronized void selectedNodeChanged(KeYSelectionEvent e) {
-            if (getMediator().autoMode()) return;
+            if (getMediator().isInAutoMode()) return;
             updateSequentView();
         }
 
@@ -1556,7 +1546,7 @@ public final class MainWindow extends JFrame  {
         ImmutableList<Name> labelNamesFromProfile = getMediator()
                 .getProfile().getTermLabelManager().getSupportedTermLabelNames();
 
-        List<Name> labelNames = new LinkedList();
+        List<Name> labelNames = new LinkedList<Name>();
         for (Name labelName : labelNamesFromProfile) {
             labelNames.add(labelName);
         }

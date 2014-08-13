@@ -106,7 +106,7 @@ public class QueryExpand implements BuiltInRule {
         // The following additional rewrite taclet increases performance
         // (sometimes significantly, e.g. by factor 10).
         RewriteTacletBuilder tb = new RewriteTacletBuilder();
-        Name tacletName = MiscTools.toValidTacletName("replaceKnownQuery_" + query.toString());
+        Name tacletName = MiscTools.toValidTacletName("replaceKnownQuery_" + query.toString() + "_" + g.node().getUniqueTacletId());
         tb.setName(tacletName);
         tb.setDisplayName("replaceKnownQuery");
         tb.setFind(query);

@@ -6,14 +6,16 @@
             <statement name="return something(a,b);" pathCondition="true" pathConditionChanged="false">
                <methodCall name="SimpleConditionExample.something(a_1,b_1);" pathCondition="true" pathConditionChanged="false">
                   <statement name="return a_1+b_1;" pathCondition="true" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of something&gt;" signature="&lt;return of SimpleConditionExample.something(a_1,b_1);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                        <methodReturn name="&lt;return of somethingMain&gt;" signature="&lt;return of SimpleConditionExample.somethingMain();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of something&gt;" signature="&lt;return of SimpleConditionExample.something(a_1,b_1);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                        <methodReturn name="&lt;return of somethingMain&gt;" signature="&lt;return of SimpleConditionExample.somethingMain();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                         </methodReturn>
                      </methodReturn>
                   </statement>
+                  <methodReturnEntry path="/0/0/0/0/0/0/0"/>
                </methodCall>
             </statement>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
    </methodCall>
 </start>

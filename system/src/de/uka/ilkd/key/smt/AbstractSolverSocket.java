@@ -224,7 +224,7 @@ class CVC3Socket extends AbstractSolverSocket{
 		}
 
 		if(sc.getState() == WAIT_FOR_RESULT ){
-			if(message.indexOf(" unsat") > -1){
+			if(message.indexOf("unsat") > -1){
 				sc.setFinalResult(SMTSolverResult.createValidResult(name));
 			} else if(message.indexOf("sat") > -1){
 				sc.setFinalResult(SMTSolverResult.createInvalidResult(name));

@@ -17,8 +17,10 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
+import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.impl.AbstractSEDMethodReturn;
+import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 
@@ -64,19 +66,35 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
    private IKeYSEDDebugNode<?>[] callStack;
 
    /**
+    * The condition under which this method return is reached from its calling node.
+    */
+   private SEDMemoryBranchCondition methodReturnCondition;
+   
+   /**
+    * The {@link KeYMethodCall} which is now returned.
+    */
+   private final KeYMethodCall methodCall;
+
+   /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this branch condition is contained.
     * @param parent The parent in that this node is contained as child.
     * @param thread The {@link KeYThread} in that this node is contained.
+    * @param methodCall The {@link KeYMethodCall} which is now returned.
     * @param executionNode The {@link IExecutionMethodReturn} to represent by this debug node.
     */
    public KeYMethodReturn(KeYDebugTarget target, 
                           IKeYSEDDebugNode<?> parent, 
                           KeYThread thread, 
+                          KeYMethodCall methodCall,
                           IExecutionMethodReturn executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
+      Assert.isNotNull(methodCall);
+      this.methodCall = methodCall;
       this.executionNode = executionNode;
+      getMethodCall().addMehodReturn(this);
+      target.registerDebugNode(this);
       initializeAnnotations();
    }
 
@@ -214,13 +232,7 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
     * @return The {@link KeYMethodCall} node or {@code null} if not available.
     */
    public KeYMethodCall getMethodCall() {
-      IKeYSEDDebugNode<?> callNode = getDebugTarget().getDebugNode(executionNode.getMethodCall());
-      if (callNode instanceof KeYMethodCall) {
-         return (KeYMethodCall)callNode;
-      }
-      else {
-         return null;
-      }
+      return methodCall;
    }
 
    /**
@@ -243,6 +255,7 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
    public boolean hasVariables() throws DebugException {
       try {
          return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
+                !executionNode.isDisposed() && 
                 SymbolicExecutionUtil.canComputeVariables(executionNode, executionNode.getServices()) &&
                 super.hasVariables();
       }
@@ -355,5 +368,35 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
          }
          return callStack;
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public SEDMemoryBranchCondition getMethodReturnCondition() throws DebugException {
+      try {
+         synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+            if (methodReturnCondition == null) {
+               KeYMethodCall methodCall = getMethodCall();
+               methodReturnCondition = new SEDMemoryBranchCondition(getDebugTarget(), methodCall, getThread());
+               methodReturnCondition.addChild(this);
+               methodReturnCondition.setName(executionNode.getFormatedMethodReturnCondition());
+               methodReturnCondition.setPathCondition(methodCall.getPathCondition());
+            }
+            return methodReturnCondition;
+         }
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute method return condition.", e));
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setParent(ISEDDebugNode parent) {
+      super.setParent(parent);
    }
 }

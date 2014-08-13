@@ -27,7 +27,6 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -177,7 +176,7 @@ public final class SEDUIUtil {
                         try {
                            monitor.beginTask(getName(), IProgressMonitor.UNKNOWN);
                            monitor.subTask("Collecting unknown elements");
-                           Deque<Object> expandQue = collectUnknownElementsInParentHierarchy(treeViewer, element);
+                           Deque<Object> expandQue = collectUnknownElementsInParentHierarchy(treeViewer, element, monitor);
                            monitor.beginTask(getName(), expandQue.size() + 1);
                            monitor.subTask("Expanding unknown elements");
                            injectElements(treeViewer, expandQue, monitor);
@@ -249,9 +248,9 @@ public final class SEDUIUtil {
                      try {
                         SWTUtil.checkCanceled(monitor);
                         monitor.subTask("Collecting unknown elements");
-                        Deque<Object> expandQue = collectUnknownElementsInParentHierarchy(treeViewer, element);
+                        Deque<Object> expandQue = collectUnknownElementsInParentHierarchy(treeViewer, element, monitor);
                         monitor.subTask("Injecting unknown elements");
-                        injectElements(treeViewer, expandQue, new NullProgressMonitor());
+                        injectElements(treeViewer, expandQue, monitor);
                         monitor.worked(1);
                      }
                      catch (DebugException e) {
@@ -309,12 +308,14 @@ public final class SEDUIUtil {
     * </p>
     * @param treeViewer The {@link TreeViewer} to search in.
     * @param element The element to start search for unknown elements.
+    * @param monitor The {@link IProgressMonitor} to use.
     * @return A {@link Deque} which contains all unknown elements in order from root to given element.
     * @throws DebugException Occurred Exception.
     */
-   protected static Deque<Object> collectUnknownElementsInParentHierarchy(final TreeViewer treeViewer, Object element) throws DebugException {
+   protected static Deque<Object> collectUnknownElementsInParentHierarchy(final TreeViewer treeViewer, Object element, IProgressMonitor monitor) throws DebugException {
       Deque<Object> expandQue = new LinkedList<Object>();
       while (element != null) {
+         SWTUtil.checkCanceled(monitor);
          // Check if the element is unknown in tree
          if (isUnknownInTreeViewer(treeViewer, element)) {
             // Element is not known, add to deque and continue with parent.
@@ -337,15 +338,20 @@ public final class SEDUIUtil {
     * @return {@code true} is unknown, {@code false} is known.
     */
    protected static boolean isUnknownInTreeViewer(final TreeViewer treeViewer, final Object toTest) {
-      IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
-         @Override
-         public void run() {
-            Widget item = treeViewer.testFindItem(toTest);
-            setResult(item == null);
-         }
-      };
-      treeViewer.getControl().getDisplay().syncExec(run);
-      return run.getResult() != null && run.getResult().booleanValue();
+      if (!treeViewer.getControl().isDisposed()) {
+         IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+            @Override
+            public void run() {
+               Widget item = treeViewer.testFindItem(toTest);
+               setResult(item == null);
+            }
+         };
+         treeViewer.getControl().getDisplay().syncExec(run);
+         return run.getResult() != null && run.getResult().booleanValue();
+      }
+      else {
+         return false;
+      }
    }
    
    /**
@@ -399,6 +405,7 @@ public final class SEDUIUtil {
    protected static void injectElements(final TreeViewer treeViewer, 
                                         Deque<Object> injectQue,
                                         final IProgressMonitor monitor) throws DebugException {
+      SWTUtil.checkCanceled(monitor);
       // Check if something must be done
       if (!CollectionUtil.isEmpty(injectQue)) {
          // Check if the provider is of the expected form.
@@ -448,9 +455,14 @@ public final class SEDUIUtil {
                            }
                         }
                      };
-                     treeViewer.getControl().getDisplay().syncExec(run);
-                     if (run.getException() != null) {
-                        throw new DebugException(LogUtil.getLogger().createErrorStatus(run.getException().getMessage(), run.getException()));
+                     if (!treeViewer.getControl().isDisposed()) {
+                        treeViewer.getControl().getDisplay().syncExec(run);
+                        if (run.getException() != null) {
+                           throw new DebugException(LogUtil.getLogger().createErrorStatus(run.getException().getMessage(), run.getException()));
+                        }
+                     }
+                     else {
+                        monitor.setCanceled(true);
                      }
                   }
                   finally {
@@ -464,7 +476,8 @@ public final class SEDUIUtil {
                      JobUtil.waitFor(job, 10);
                   }
                   // Wait until the element is known by the viewer since sometimes waiting for jobs is not enough.
-                  while (SWTUtil.testFindItem(treeViewer, toInject) == null) {
+                  while (!treeViewer.getControl().isDisposed() &&
+                         SWTUtil.testFindItem(treeViewer, toInject) == null) {
                      SWTUtil.checkCanceled(monitor);
                      try {
                         Thread.sleep(10);

@@ -163,7 +163,6 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
       initBreakpoints();
       // Add thread
       KeYThread thread = new KeYThread(this, environment.getBuilder().getStartNode());
-      registerDebugNode(thread);
       threads = new KeYThread[] {thread};
       // Initialize proof to use the symbolic execution strategy
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun());
@@ -252,10 +251,13 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
    /**
     * Registers the given {@link IKeYSEDDebugNode} as child of this {@link KeYDebugTarget}.
     * @param node The {@link IKeYSEDDebugNode} to register as child.
+    * @throws DebugException Occurred Exception
     */
-   public void registerDebugNode(IKeYSEDDebugNode<?> node) {
+   public void registerDebugNode(IKeYSEDDebugNode<?> node) throws DebugException {
       if (node != null) {
-         executionToDebugMapping.put(node.getExecutionNode(), node);
+         IKeYSEDDebugNode<?> oldNode = executionToDebugMapping.put(node.getExecutionNode(), node);
+         Assert.isTrue(oldNode == null);
+         addToSourceModel(node);
       }
    }
    

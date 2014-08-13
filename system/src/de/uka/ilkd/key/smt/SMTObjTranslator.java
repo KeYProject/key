@@ -25,7 +25,6 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.logic.Term;
@@ -52,6 +51,7 @@ import de.uka.ilkd.key.smt.lang.SMTTermMultOp;
 import de.uka.ilkd.key.smt.lang.SMTTermNumber;
 import de.uka.ilkd.key.smt.lang.SMTTermVariable;
 import de.uka.ilkd.key.smt.lang.Util;
+import de.uka.ilkd.key.testgen.ProofInfo;
 import de.uka.ilkd.key.util.Debug;
 
 public class SMTObjTranslator implements SMTTranslator {
@@ -75,6 +75,7 @@ public class SMTObjTranslator implements SMTTranslator {
 	private static final String SEQ_OUTSIDE = "seqGetOutside";
 	public static final String SEQ_GET = "seqGet";
 	public static final String SEQ_LEN = "seqLen";
+	private static final String SELF = "self";
 	/**
 	 * Mapps some basic KeY operators to their equivalent built in operators.
 	 * Initialized in initOpTable.
@@ -89,6 +90,10 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * KeY services provide a lot of useful stuff.
 	 */
 	private Services services;
+	/**
+	 * Info regarding the selected proof.
+	 */
+	private ProofInfo proofInfo;
 	/**
 	 * Assertions regarding Any2Object, Any2BInt, Object2Any, etc. functions.
 	 */
@@ -210,10 +215,11 @@ public class SMTObjTranslator implements SMTTranslator {
 	 */
 	private static boolean guardOverflow = true;
 
-	public SMTObjTranslator(SMTSettings settings, Services services) {
+	public SMTObjTranslator(SMTSettings settings, Services services, ProofInfo proofInfo) {
 		super();
 		this.settings = settings;
 		this.services = services;
+		this.proofInfo = proofInfo;
 		types = new ProblemTypeInformation(services);
 		initSorts();
 		initOpTable();
@@ -247,6 +253,7 @@ public class SMTObjTranslator implements SMTTranslator {
 		wellformedFunction = createWellFormedFunction();
 		elementOfFunction = createElementOfFunction();
 		emptyConstant = createEmptyConstant();
+		createSelfObject();
 		createLengthFunction();
 		createArrFunction();
 		createSeqConstantsAndAssertions();
@@ -271,6 +278,37 @@ public class SMTObjTranslator implements SMTTranslator {
 		SMTSort image = sorts.get(FIELD_SORT);
 		SMTFunction f = new SMTFunction(id, domain, image);
 		functions.put(id, f);
+	}
+	
+	private SMTFunction createSelfObject(){
+		SMTFunction f = new SMTFunction(SELF,
+		        new LinkedList<SMTSort>(), sorts.get(OBJECT_SORT));
+		SMTTerm zero = new SMTTermNumber(1, settings.getObjectBound(),
+		        sorts.get(OBJECT_SORT));
+		SMTFunctionDef def = new SMTFunctionDef(f,
+		        new LinkedList<SMTTermVariable>(), zero);		
+		functions.put(SELF, def);
+		functionDefinitionOrder.add(SELF);
+		types.putConstantType(Util.processName(SELF),
+		        sorts.get(OBJECT_SORT));
+		def.setComment("The self object");
+		
+		if(proofInfo.getTypeOfClassUnderTest()!=null){
+			     Sort sort = proofInfo.getTypeOfClassUnderTest().getSort();
+			     addTypePredicate(sort);
+			     SMTFunction tp = getTypePredicate(sort.name().toString());
+			     if(tp!=null){
+			    	 
+			    	 SMTTerm selfConst = SMTTerm.call(def);
+			    	 SMTTerm assertion = SMTTerm.call(tp,selfConst);
+			    	 assertion.setComment("Assertion regarding the type of self");
+			    	 functionTypeAssertions.add(assertion);
+			    	 
+			     }
+		}
+		
+		
+		return def;
 	}
 
 	/**

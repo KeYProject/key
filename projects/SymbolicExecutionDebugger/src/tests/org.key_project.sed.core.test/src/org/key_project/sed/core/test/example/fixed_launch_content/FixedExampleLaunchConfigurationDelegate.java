@@ -171,6 +171,11 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        returnNegative.setName("return -1");
        returnNegative.setPathCondition("pc14");
        returnNegative.setCallStack(new ISEDDebugNode[] {call});
+       SEDMemoryBranchCondition returnCondition = new SEDMemoryBranchCondition(target, call, thread);
+       returnCondition.setName("A Return Condition");
+       returnCondition.addChild(returnNegative);
+       call.addMethodReturnCondition(returnCondition);
+       returnNegative.setMethodReturnCondition(returnCondition);
        bnegative.addChild(returnNegative);
        
        SEDMemoryTermination terminationNegative = new SEDMemoryTermination(target, returnNegative, thread, true);
