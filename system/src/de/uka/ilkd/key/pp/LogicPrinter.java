@@ -1237,11 +1237,11 @@ public class LogicPrinter {
     public void printSelect(Term t, Term tacitHeap) throws IOException {
         assert t.boundVars().isEmpty();
         assert t.arity() == 3;
-        final HeapLDT heapLDT = services == null
-                ? null : services.getTypeConverter().getHeapLDT();
+        HeapLDT heapLDT = services == null ? null : services.getTypeConverter().getHeapLDT();
 
         if(NotationInfo.PRETTY_SYNTAX && heapLDT != null) {
 
+            // if tacitHeap is null, use default heap as tacitHeap
             if(tacitHeap == null) {
                 tacitHeap = services.getTermFactory().createTerm(heapLDT.getHeap());
             }
@@ -1252,31 +1252,10 @@ public class LogicPrinter {
             final Term objectTerm = t.sub(1);
             final Term fieldTerm  = t.sub(2);
 
-             if(objectTerm.equals(services.getTermBuilder().NULL())
-        			&& isFieldConstant(fieldTerm)) {
+            if (objectTerm.equals(services.getTermBuilder().NULL()) && isFieldConstant(fieldTerm)) {
                 // static field access
-                String className = heapLDT.getClassName((Function)fieldTerm.op());
-
-        	if(className == null) {
-                    // if the class name cannot be determined, print "null"
-                    markStartSub(1);
-        	    printTerm(objectTerm);
-        	    markEndSub();
-        	} else {
-                    markStartSub(1);
-                    // "null" not printed, print className (which is not a subterm)
-        	    markEndSub();
-        	    printClassName(className);
-        	}
-
-        	layouter.print(".");
-
-                markStartSub(2);
-                // is this right at all? // startTerm(0);
-                printTerm(fieldTerm);
-                markEndSub();
-
-            } else if(fieldTerm.arity() == 0) {
+                printSelectStatic(objectTerm, fieldTerm, heapLDT);
+            } else if (fieldTerm.arity() == 0) {
         		
         		// TODO @Kai this checks too little.
         		
@@ -1337,6 +1316,35 @@ public class LogicPrinter {
         } else {
             printFunctionTerm(t.op().name().toString(), t);
         }
+    }
+    
+    /*
+     * This code is only used once, in method {@link #printSelect(Term, Term) printSelect}.
+     * Purpose of putting it into a separate method is to improve readability of {@link printSelect(Term, Term) printSelect}.
+     * It prints out a static field access.
+     */
+    private void printSelectStatic(Term objectTerm, Term fieldTerm, HeapLDT heapLDT) throws IOException {
+
+        String className = heapLDT.getClassName((Function) fieldTerm.op());
+
+        if (className == null) {
+            // if the class name cannot be determined, print "null"
+            markStartSub(1);
+            printTerm(objectTerm);
+            markEndSub();
+        } else {
+            markStartSub(1);
+            // "null" not printed, print className (which is not a subterm)
+            markEndSub();
+            printClassName(className);
+        }
+
+        layouter.print(".");
+
+        markStartSub(2);
+        // is this right at all? // startTerm(0);
+        printTerm(fieldTerm);
+        markEndSub();
     }
 
 	private boolean isFieldConstant(final Term fieldTerm) {
