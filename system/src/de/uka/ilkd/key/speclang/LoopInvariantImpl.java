@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.speclang;
 
@@ -281,14 +280,14 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
 
     @Override
-    public String getPlainText(Services services) {
+    public String getPlainText(Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
        final LocationVariable baseHeap = heapLDT.getHeap();
        
        String mods = "";
        for (LocationVariable h : heapLDT.getAllHeaps()) {
            if (originalModifies.get(h) != null) {
-               String printMods = LogicPrinter.quickPrintTerm(originalModifies.get(h), services);
+               String printMods = LogicPrinter.quickPrintTerm(originalModifies.get(h), services, usePrettyPrinting, useUnicodeSymbols);
                mods = mods
                        + "\n"
                        + "mod"
@@ -301,7 +300,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
        String invariants = "";
        for (LocationVariable h : heapLDT.getAllHeaps()) {
            if (originalInvariants.get(h) != null) {
-               String printPosts = LogicPrinter.quickPrintTerm(originalInvariants.get(h), services);
+               String printPosts = LogicPrinter.quickPrintTerm(originalInvariants.get(h), services, usePrettyPrinting, useUnicodeSymbols);
                invariants = invariants
                        + "\n"
                        + "invariant"
@@ -313,7 +312,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
        
        return invariants
              + ";\nvariant: "
-             + LogicPrinter.quickPrintTerm(originalVariant, services).trim() +
+             + LogicPrinter.quickPrintTerm(originalVariant, services, usePrettyPrinting, useUnicodeSymbols).trim() +
              mods;
     }
 

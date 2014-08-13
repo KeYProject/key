@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -13,6 +13,7 @@
 
 package org.key_project.sed.core.model.impl;
 
+import org.eclipse.debug.core.DebugEvent;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDMethodCall;
@@ -24,6 +25,11 @@ import org.key_project.sed.core.model.ISEDThread;
  * @see ISEDMethodCall
  */
 public abstract class AbstractSEDMethodCall extends AbstractSEDStackFrameCompatibleDebugNode implements ISEDMethodCall {
+   /**
+    * The collapsed state.
+    */
+   private boolean collapsed;
+
    /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this method call is contained.
@@ -42,5 +48,24 @@ public abstract class AbstractSEDMethodCall extends AbstractSEDStackFrameCompati
    @Override
    public String getNodeType() {
       return "Method Call";
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isCollapsed() {
+      return collapsed;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setCollapsed(boolean collapsed) {
+      if (this.collapsed != collapsed) {
+         this.collapsed = collapsed;
+         fireChangeEvent(DebugEvent.CONTENT);
+      }
    }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -20,12 +20,16 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.IStateListener;
+import org.eclipse.core.commands.State;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -34,21 +38,27 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.dialogs.SaveAsDialog;
 import org.eclipse.ui.editors.text.TextEditor;
+import org.eclipse.ui.handlers.RegistryToggleState;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.eclipse.ui.views.properties.IPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.key_project.key4eclipse.common.ui.decorator.ProofSourceViewerDecorator;
+import org.key_project.key4eclipse.common.ui.util.EclipseUserInterfaceCustomization;
+import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.IProofProvider;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
-import org.key_project.key4eclipse.starter.core.util.ProofUserManager;
 import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
 import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
+import org.key_project.keyide.ui.breakpoints.KeYBreakpointManager;
 import org.key_project.keyide.ui.editor.input.ProofEditorInput;
 import org.key_project.keyide.ui.editor.input.ProofOblInputEditorInput;
+import org.key_project.keyide.ui.handlers.BreakpointToggleHandler;
 import org.key_project.keyide.ui.propertyTester.AutoModePropertyTester;
 import org.key_project.keyide.ui.propertyTester.ProofPropertyTester;
 import org.key_project.keyide.ui.util.LogUtil;
@@ -59,17 +69,20 @@ import org.key_project.util.bean.IBean;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.ArrayUtil;
 
+import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.ConsoleUserInterface;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.symbolic_execution.util.ProofUserManager;
 import de.uka.ilkd.key.ui.UserInterface;
 
 /**
@@ -121,7 +134,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    /**
     * The used {@link KeYEnvironment}
     */
-   private KeYEnvironment<CustomConsoleUserInterface> environment;
+   private KeYEnvironment<?> environment;
    
    /**
     * The current {@link Proof}.
@@ -146,23 +159,27 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    /**
     * Contains the registered {@link IProofProviderListener}.
     */
-   private List<IProofProviderListener> proofProviderListener = new LinkedList<IProofProviderListener>();
+   private final List<IProofProviderListener> proofProviderListener = new LinkedList<IProofProviderListener>();
    
    /**
-    * Listens for changes on {@link ConsoleUserInterface#isAutoMode()} 
-    * of the {@link ConsoleUserInterface} provided via {@link #getEnvironment()}.
+    * Listens for auto mode start and stop events.
     */
-   private PropertyChangeListener autoModeActiveListener = new PropertyChangeListener() {
+   private final AutoModeListener autoModeListener = new AutoModeListener() {
       @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-         handleAutoModeStartedOrStopped(evt);
+      public void autoModeStarted(ProofEvent e) {
+         handleAutoModeStarted(e);
+      }
+      
+      @Override
+      public void autoModeStopped(ProofEvent e) {
+         handleAutoModeStopped(e);
       }
    };
    
    /**
     * Listens for changes on {@link #currentProof}.
     */
-   private ProofTreeListener proofTreeListener = new ProofTreeListener() {
+   private final ProofTreeListener proofTreeListener = new ProofTreeListener() {
       @Override
       public void smtDataUpdate(ProofTreeEvent e) {
          handleProofChanged(e);
@@ -213,7 +230,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    /**
     * Listens for {@link Node} selection changes.
     */
-   private KeYSelectionListener keySelectionListener = new KeYSelectionListener() {
+   private final KeYSelectionListener keySelectionListener = new KeYSelectionListener() {
       @Override
       public void selectedProofChanged(KeYSelectionEvent e) {
          handleSelectedProofChanged(e);
@@ -228,7 +245,27 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    /**
     * The used {@link PropertyChangeSupport}.
     */
-   private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+   private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+   
+   /**
+    * Manages the available breakpoints.
+    */
+   private KeYBreakpointManager breakpointManager;
+   
+   /**
+    * The breakpoints activated {@link State}.
+    */
+   private State breakpointsActivatedState;
+   
+   /**
+    * Listens for changes on {@link #breakpointsActivatedState}.
+    */
+   private final IStateListener stateListener = new IStateListener() {
+      @Override
+      public void handleStateChange(State state, Object oldValue) {
+         configureProofForBreakpoints();
+      }
+   };
    
    /**
     * Constructor to initialize the ContextMenu IDs
@@ -243,11 +280,18 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    @Override
    public void dispose() {
+      if (breakpointsActivatedState != null) {
+         breakpointsActivatedState.removeListener(stateListener);
+         breakpointsActivatedState = null;
+      }
       if (viewerDecorator != null) {
          viewerDecorator.dispose();
       }
-      if (getUI() != null) {
-         getUI().removePropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
+      if(breakpointManager!=null){
+         DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(breakpointManager);
+      }
+      if (getMediator() != null) {
+         getMediator().removeAutoModeListener(autoModeListener);
       }
       if (environment != null) {
          environment.getMediator().removeKeYSelectionListener(keySelectionListener);
@@ -269,6 +313,16 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    @Override
    public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+      ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
+      if (service != null) {
+         Command hideCmd = service.getCommand(BreakpointToggleHandler.COMMAND_ID);
+         if (hideCmd != null) {
+            breakpointsActivatedState = hideCmd.getState(RegistryToggleState.STATE_ID);
+            if (breakpointsActivatedState != null) {
+               breakpointsActivatedState.addListener(stateListener);
+            }
+         }
+      }
       super.init(site, input);
    }
    
@@ -296,22 +350,28 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
             }
             else if (input instanceof FileEditorInput) {
                FileEditorInput fileInput = (FileEditorInput) input;
-               File file = ResourceUtil.getLocation(fileInput.getFile());
+               IFile eclipseFile = fileInput.getFile();
+               File file = ResourceUtil.getLocation(eclipseFile);
                Assert.isTrue(file != null, "File \"" + fileInput.getFile() + "\" is not local.");
-               this.environment = KeYEnvironment.load(file, null, null);
+               File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(eclipseFile.getProject());
+               List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(eclipseFile.getProject());
+               this.environment = KeYEnvironment.load(file, classPaths, bootClassPath, EclipseUserInterfaceCustomization.getInstance());
                Assert.isTrue(getEnvironment().getLoadedProof() != null, "No proof loaded.");
                this.currentProof = getEnvironment().getLoadedProof();
             }
             else {
                throw new CoreException(LogUtil.getLogger().createErrorStatus("Unsupported editor input \"" + input + "\"."));
             }
+            breakpointManager = new KeYBreakpointManager(currentProof);
+            DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(breakpointManager);
             ProofUserManager.getInstance().addUser(currentProof, environment, this);
             this.environment.getMediator().setProof(currentProof);
             this.environment.getMediator().setMinimizeInteraction(true);
             if (this.getEnvironment().getMediator().getSelectedNode() == null) {
                this.getEnvironment().getMediator().getSelectionModel().setSelectedNode(currentProof.root());
             }
-            this.currentNode = this.getEnvironment().getMediator().getSelectedNode(); 
+            this.currentNode = this.getEnvironment().getMediator().getSelectedNode();
+            configureProofForBreakpoints();
          }
          else {
             setCurrentNode(currentNode);
@@ -332,7 +392,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    public void createPartControl(Composite parent) {
       super.createPartControl(parent);
       getMediator().addKeYSelectionListener(keySelectionListener);
-      getUI().addPropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
+      getMediator().addAutoModeListener(autoModeListener);
       ISourceViewer sourceViewer = getSourceViewer();
       viewerDecorator = new ProofSourceViewerDecorator(sourceViewer);
       viewerDecorator.addPropertyChangeListener(ProofSourceViewerDecorator.PROP_SELECTED_POS_IN_SEQUENT, new PropertyChangeListener() {
@@ -488,10 +548,18 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
    }
 
    /**
-    * This method is called when the auto mode stops.
-    * @param evt The event.
+    * When the auto mode is started.
+    * @param e The {@link ProofEvent}.
     */
-   protected void handleAutoModeStartedOrStopped(PropertyChangeEvent evt) {
+   protected void handleAutoModeStopped(ProofEvent e) {
+      AutoModePropertyTester.updateProperties(); // Make sure that start/stop auto mode buttons are disabled when the proof is closed interactively.
+   }
+
+   /**
+    * When the auto mode has finished.
+    * @param e The {@link ProofEvent}.
+    */
+   protected void handleAutoModeStarted(ProofEvent e) {
       AutoModePropertyTester.updateProperties(); // Make sure that start/stop auto mode buttons are disabled when the proof is closed interactively.
    }
    
@@ -601,6 +669,8 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       }
       else if (IProofProvider.class.equals(adapter)) {
          return this;
+      } else if (KeYBreakpointManager.class.equals(adapter)){
+         return getBreakpointManager();
       }
       else {
          return super.getAdapter(adapter);
@@ -611,7 +681,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     * {@inheritDoc}
     */
    @Override
-   public KeYEnvironment<CustomConsoleUserInterface> getEnvironment() {
+   public KeYEnvironment<?> getEnvironment() {
       return environment;
    }
 
@@ -619,8 +689,8 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     * {@inheritDoc}
     */
    @Override
-   public CustomConsoleUserInterface getUI() {
-      KeYEnvironment<CustomConsoleUserInterface> environment = getEnvironment();
+   public UserInterface getUI() {
+      KeYEnvironment<?> environment = getEnvironment();
       return environment != null ? environment.getUi() : null;
    }
 
@@ -629,7 +699,7 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
     */
    @Override
    public KeYMediator getMediator() {
-      KeYEnvironment<CustomConsoleUserInterface> environment = getEnvironment();
+      KeYEnvironment<?> environment = getEnvironment();
       return environment != null ? environment.getMediator() : null;
    }
    
@@ -675,6 +745,43 @@ public class KeYEditor extends TextEditor implements IProofProvider, ITabbedProp
       IProofProviderListener[] toInform = proofProviderListener.toArray(new IProofProviderListener[proofProviderListener.size()]);
       for (IProofProviderListener l : toInform) {
          l.currentProofsChanged(e);
+      }
+   }
+
+   /**
+    * @return the breakpointManager
+    */
+   public KeYBreakpointManager getBreakpointManager() {
+      return breakpointManager;
+   }
+
+   /**
+    * @param breakpointManager the breakpointManager to set
+    */
+   public void setBreakpointManager(KeYBreakpointManager breakpointManager) {
+      this.breakpointManager = breakpointManager;
+   }
+
+   /**
+    * @return the breakpointsActivated
+    */
+   public boolean isBreakpointsActivated() {
+      Object value = breakpointsActivatedState.getValue();
+      return value instanceof Boolean && ((Boolean)value).booleanValue();
+   }
+
+   /**
+    * Configures the current {@link Proof} to use breakpoints or not.
+    */
+   protected void configureProofForBreakpoints() {
+      if (isBreakpointsActivated()) {
+         currentProof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(breakpointManager.getBreakpointStopCondition());
+         currentProof.getServices().setFactory(KeYBreakpointManager.createNewFactory(breakpointManager.getBreakpointStopCondition()));
+         StrategyProperties strategyProperties = currentProof.getSettings().getStrategySettings().getActiveStrategyProperties();
+         currentProof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(currentProof, strategyProperties));
+      }
+      else {
+         currentProof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(null);
       }
    }
 

@@ -1,18 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
-
-import java.util.HashMap;
+//
 
 import junit.framework.TestCase;
 import junit.framework.TestResult;
@@ -28,7 +25,8 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.collection.TestLeftistHeapOfInteger.class,
         de.uka.ilkd.key.util.TestLexicographicComparator.class,
         de.uka.ilkd.key.util.TestMiscTools.class,
-        de.uka.ilkd.key.util.pp.TestLayouter.class
+        de.uka.ilkd.key.util.pp.TestLayouter.class,
+        de.uka.ilkd.key.util.TestProofStarter.class
     }; 
 
 
@@ -98,16 +96,17 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.smt.test.TestSimplify.class,
         de.uka.ilkd.key.smt.test.TestZ3.class,
         de.uka.ilkd.key.smt.test.TestYices.class,
-        de.uka.ilkd.key.smt.test.TestCvc3.class,
-
+        de.uka.ilkd.key.smt.test.TestCvc3.class
+        //, de.uka.ilkd.key.smt.test.TestCvc4.class  //commented out as test take too long
     };
 
     static Class<? extends TestCase>[] setTests = new Class[] {
         de.uka.ilkd.key.util.TestNodePreorderIterator.class,
         de.uka.ilkd.key.symbolic_execution.TestExecutionNodePreorderIterator.class,
         de.uka.ilkd.key.symbolic_execution.TestExecutionNodeWriterAndReader.class,
-        de.uka.ilkd.key.symbolic_execution.TestSymbolicConfigurationExtractor.class,
-        de.uka.ilkd.key.symbolic_execution.TestSymbolicConfigurationWriterAndReader.class,
+        de.uka.ilkd.key.symbolic_execution.TestParallelSiteProofs.class,
+        de.uka.ilkd.key.symbolic_execution.TestSymbolicLayoutExtractor.class,
+        de.uka.ilkd.key.symbolic_execution.TestSymbolicLayoutWriterAndReader.class,
         de.uka.ilkd.key.symbolic_execution.TestSymbolicExecutionTreeBuilder.class,
         de.uka.ilkd.key.symbolic_execution.po.TestFunctionalOperationContractPO.class,
         de.uka.ilkd.key.symbolic_execution.po.TestProgramMethodPO.class,
@@ -118,9 +117,26 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.symbolic_execution.util.TestDefaultEntry.class,
         de.uka.ilkd.key.symbolic_execution.util.TestEqualsHashCodeResetter.class,
         de.uka.ilkd.key.symbolic_execution.util.TestJavaUtil.class,
+        de.uka.ilkd.key.symbolic_execution.util.TestProofUserManager.class,
+        de.uka.ilkd.key.symbolic_execution.util.TestSideProofStore.class,
         de.uka.ilkd.key.symbolic_execution.util.TestSymbolicExecutionUtil.class
+        
     };
-
+    
+    static Class<? extends TestCase>[] breakpointTests = new Class[] {
+       de.uka.ilkd.key.symbolic_execution.strategy.TestExceptionBreakpointStopConditionCaughtOrUncaught.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestExceptionBreakpointStopConditionWithHitCount.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestExceptionBreakpointStopConditionWithSubclasses.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestJavaWatchpointStopConditionWithHitCount.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestLineBreakpointStopConditionSimpleWithConditions.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestLineBreakpointStopConditionSimpleWithHitCount.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestMethodBreakpointWithConditions.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestKeYWatchpointGlobalVariablesOnSatisfiable.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestKeYWatchpointGlobalVariablesOnTrueWithHitCount.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestKeYWatchpointMethodsOnSatisfiable.class,
+       de.uka.ilkd.key.symbolic_execution.strategy.TestMethodBreakpointWithHitCount.class
+    };
+    
     static Class<? extends TestCase>[] proofReferencesTests = new Class[] {
         de.uka.ilkd.key.proof_references.TestKeYTypeUtil.class,
         de.uka.ilkd.key.proof_references.TestProofReferenceUtil.class,
@@ -150,8 +166,8 @@ public class TestKey extends TestSuite {
 
 
     public static junit.framework.Test suite() {
-        de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false;
-        de.uka.ilkd.key.gui.MainWindow.setVisibleMode(false);
+	de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false;
+	de.uka.ilkd.key.gui.MainWindow.setVisibleMode(false);
 
         TestSuite suite = new TestSuite();
         suite.addTest(createSuite(utilityTests, "Testing Utilities and Collections"));
@@ -162,6 +178,7 @@ public class TestKey extends TestSuite {
         suite.addTest(createSuite(javaTests, "Testing Java Datastructures"));
         suite.addTest(createSuite(speclangTests, "Testing JML frontend"));
         suite.addTest(createSuite(smtTests, "Testing SMT backend"));
+        suite.addTest(createSuite(breakpointTests, "Testing breakpoints"));
         suite.addTest(createSuite(setTests, "Testing Symbolic Execution Trees"));
         suite.addTest(createSuite(proofReferencesTests, "Testing Proof References"));
         suite.addTest(createSuite(new Class[]{de.uka.ilkd.key.util.DesignTests.class}, "Test Design Constraints"));

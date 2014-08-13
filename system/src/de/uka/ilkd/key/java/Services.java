@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.java;
 
@@ -29,9 +28,12 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.proof.Counter;
+import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.TermProgramVariableCollector;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
@@ -89,70 +91,80 @@ public class Services implements TermServices {
      */
     private SpecificationRepository specRepos;
     
+    /*
+     * the Java model (with all paths)
+     */
+    private JavaModel javaModel;
 
     private NameRecorder nameRecorder;
     
+    private ITermProgramVariableCollectorFactory factory = new ITermProgramVariableCollectorFactory(){
+      @Override
+      public TermProgramVariableCollector create(Services services) {
+         return new TermProgramVariableCollector(services);
+      }};
+
     private final Profile profile;
     
     private final ServiceCaches caches;
     
     private final TermBuilder termBuilder;
 
-   /**
+    /**
      * creates a new Services object with a new TypeConverter and a new
      * JavaInfo object with no information stored at none of these.
      */
     public Services(Profile profile, KeYExceptionHandler exceptionHandler){
-       assert profile != null;
-       this.profile = profile;
-       this.counters = new LinkedHashMap<String, Counter>();
-       this.caches = new ServiceCaches();
-       this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
-       this.specRepos = new SpecificationRepository(this);
-	cee = new ConstantExpressionEvaluator(this);
-        typeconverter = new TypeConverter(this);
-	if(exceptionHandler == null){
-	    this.exceptionHandler = new KeYRecoderExcHandler();
-	}else{
-	    this.exceptionHandler = exceptionHandler;
-	}
-        javainfo = new JavaInfo
-        	(new KeYProgModelInfo(this, typeconverter, this.exceptionHandler), this);
-        nameRecorder = new NameRecorder();
+    	assert profile != null;
+    	this.profile = profile;
+    	this.counters = new LinkedHashMap<String, Counter>();
+    	this.caches = new ServiceCaches();
+    	this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
+    	this.specRepos = new SpecificationRepository(this);
+    	cee = new ConstantExpressionEvaluator(this);
+    	typeconverter = new TypeConverter(this);
+    	if(exceptionHandler == null){
+    		this.exceptionHandler = new KeYRecoderExcHandler();
+    	}else{
+    		this.exceptionHandler = exceptionHandler;
+    	}
+    	javainfo = new JavaInfo
+    			(new KeYProgModelInfo(this, typeconverter, this.exceptionHandler), this);
+    	nameRecorder = new NameRecorder();
     }
-    
+
     // ONLY for tests
     public Services(Profile profile) {
-	this(profile, null);
+    	this(profile, null);
     }    
-    
 
-    private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc, 
-		     KeYRecoderMapping rec2key, HashMap<String, Counter> counters, ServiceCaches caches) {
-   assert profile != null;
-   assert counters != null;
-   assert caches != null;
 
-   this.profile = profile;
-   this.counters = counters;
-   this.caches = caches;
-   this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
-   this.specRepos = new SpecificationRepository(this);
-	cee = new ConstantExpressionEvaluator(this);
-	typeconverter = new TypeConverter(this);
-	javainfo = new JavaInfo
-	    (new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
-	nameRecorder = new NameRecorder();
+    private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc, KeYRecoderMapping rec2key, 
+    		HashMap<String, Counter> counters, ServiceCaches caches) {
+    	assert profile != null;
+    	assert counters != null;
+    	assert caches != null;
+
+    	this.profile = profile;
+    	this.counters = counters;
+    	this.caches = caches;
+    	this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
+    	this.specRepos = new SpecificationRepository(this);
+    	cee = new ConstantExpressionEvaluator(this);
+    	typeconverter = new TypeConverter(this);
+    	javainfo = new JavaInfo
+    			(new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
+    	nameRecorder = new NameRecorder();
     }
 
-    
+
     public KeYExceptionHandler getExceptionHandler(){
-	return exceptionHandler;
+    	return exceptionHandler;
     }
-    
+
 
     public void setExceptionHandler(KeYExceptionHandler keh){
-	exceptionHandler = keh;
+    	exceptionHandler = keh;
     }
 
     
@@ -160,12 +172,12 @@ public class Services implements TermServices {
      * Returns the TypeConverter associated with this Services object.
      */
     public TypeConverter getTypeConverter(){
-        return typeconverter;
+    	return typeconverter;
     }
 
-    
+
     private void setTypeConverter(TypeConverter tc) {
-	typeconverter = tc;
+    	typeconverter = tc;
     }
 
     
@@ -216,6 +228,7 @@ public class Services implements TermServices {
     /**
      * creates a new services object containing a copy of the java info of
      * this object and a new TypeConverter (shallow copy)
+     * The copy does not belong to a {@link Proof} object and can hence be used for a new proof.
      * @param shareCaches {@code true} The created {@link Services} will use the same {@link ServiceCaches} like this instance; {@code false} the created {@link Services} will use a new empty {@link ServiceCaches} instance.
      * @return the copy
      */
@@ -225,25 +238,27 @@ public class Services implements TermServices {
 
     /**
      * Creates a copy of this {@link Services} in which the {@link Profile} is replaced.
+     * The copy does not belong to a {@link Proof} object and can hence be used for a new proof.
      * @param profile The new {@link Profile} to use in the copy of this {@link Services}.
      * @param shareCaches {@code true} The created {@link Services} will use the same {@link ServiceCaches} like this instance; {@code false} the created {@link Services} will use a new empty {@link ServiceCaches} instance.
      * @return The created copy.
      */
     public Services copy(Profile profile, boolean shareCaches) {
-	Debug.assertTrue
-	    (!(getJavaInfo().getKeYProgModelInfo().getServConf() 
-	       instanceof SchemaCrossReferenceServiceConfiguration),
-	     "services: tried to copy schema cross reference service config.");
-	ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
-	Services s = new Services
-	    (profile, getJavaInfo().getKeYProgModelInfo().getServConf(),
-	     getJavaInfo().getKeYProgModelInfo().rec2key().copy(), copyCounters(), newCaches);
-        s.specRepos = specRepos;
-	s.setTypeConverter(getTypeConverter().copy(s));
-	s.setExceptionHandler(getExceptionHandler());
-	s.setNamespaces(namespaces.copy());
-        nameRecorder = nameRecorder.copy();
-	return s;
+    	Debug.assertTrue
+    	(!(getJavaInfo().getKeYProgModelInfo().getServConf() 
+    			instanceof SchemaCrossReferenceServiceConfiguration),
+    			"services: tried to copy schema cross reference service config.");
+    	ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
+    	Services s = new Services
+    			(profile, getJavaInfo().getKeYProgModelInfo().getServConf(), getJavaInfo().getKeYProgModelInfo().rec2key().copy(),
+    					copyCounters(), newCaches);
+    	s.specRepos = specRepos;
+    	s.setTypeConverter(getTypeConverter().copy(s));
+    	s.setExceptionHandler(getExceptionHandler());
+    	s.setNamespaces(namespaces.copy());
+    	nameRecorder = nameRecorder.copy();
+    	s.setJavaModel(getJavaModel());
+    	return s;
     }
     
     /**
@@ -264,28 +279,47 @@ public class Services implements TermServices {
      * as the actual one
      */
     public Services copyPreservesLDTInformation() {
-	Debug.assertTrue
-	    (!(javainfo.getKeYProgModelInfo().getServConf() 
-	       instanceof SchemaCrossReferenceServiceConfiguration),
-	     "services: tried to copy schema cross reference service config.");
-	Services s = new Services(getProfile(), getExceptionHandler());
-	s.setTypeConverter(getTypeConverter().copy(s));
-	s.setNamespaces(namespaces.copy());
-        nameRecorder = nameRecorder.copy();
-	return s;
+    	Debug.assertTrue
+    	(!(javainfo.getKeYProgModelInfo().getServConf() 
+    			instanceof SchemaCrossReferenceServiceConfiguration),
+    			"services: tried to copy schema cross reference service config.");
+    	Services s = new Services(getProfile(), getExceptionHandler());
+    	s.setTypeConverter(getTypeConverter().copy(s));
+    	s.setNamespaces(namespaces.copy());
+    	nameRecorder = nameRecorder.copy();
+    	s.setJavaModel(getJavaModel());
+
+    	return s;
     }
     
     
+    /** 
+     * Marks this services as proof specific 
+     * Please make sure that the {@link Services} does not not yet belong to an existing proof 
+     * or that it is owned by a proof environment. In both cases copy the {@link InitConfig} via
+     * {@link InitConfig#deepCopy()} or one of the other copy methods first. 
+     * @param p_proof the Proof to which this {@link Services} instance belongs
+     */
+    public void setProof(Proof p_proof) {
+       if (this.proof != null) {
+          throw new IllegalStateException("Services are already owned by another proof:" + proof.name());
+       }
+       proof = p_proof;
+    }
+    
+   
     public Services copyProofSpecific(Proof p_proof, boolean shareCaches) {
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
-        final Services s = new Services(getProfile(), getJavaInfo().getKeYProgModelInfo().getServConf(),
-                getJavaInfo().getKeYProgModelInfo().rec2key(), copyCounters(), newCaches);
+        final Services s = new Services(getProfile(), getJavaInfo().getKeYProgModelInfo().getServConf(), getJavaInfo().getKeYProgModelInfo().rec2key(),
+                copyCounters(), newCaches);
         s.proof = p_proof;
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setExceptionHandler(getExceptionHandler());
         s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
+        s.setJavaModel(getJavaModel());
+
         return s;
     }
 
@@ -327,6 +361,10 @@ public class Services implements TermServices {
     public Proof getProof() {
 	return proof;
     }
+    
+    public interface ITermProgramVariableCollectorFactory{
+       public TermProgramVariableCollector create(Services services);
+    }
 
     /**
      * Returns the sued {@link Profile}.
@@ -361,4 +399,28 @@ public class Services implements TermServices {
     public TermFactory getTermFactory() {
         return termBuilder.tf();
     }
+
+    public ITermProgramVariableCollectorFactory getFactory() {
+        return factory;
+     }
+
+
+    public void setFactory(ITermProgramVariableCollectorFactory factory) {
+    	this.factory = factory;
+    }
+     
+
+    /**
+     * returns the {@link JavaModel} with all path information
+     * @return the {@link JavaModel} on which this services is based on
+     */
+   public JavaModel getJavaModel() {
+      return javaModel;
+   }
+
+
+   public void setJavaModel(JavaModel javaModel) {
+      assert this.javaModel == null;
+      this.javaModel = javaModel;
+   }
 }

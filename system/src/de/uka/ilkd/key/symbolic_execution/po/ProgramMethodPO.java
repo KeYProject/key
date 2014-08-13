@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -145,7 +145,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
    @Override
    protected ImmutableList<StatementBlock> buildOperationBlocks(ImmutableList<LocationVariable> formalParVars,
                                                 ProgramVariable selfVar,
-                                                ProgramVariable resultVar) {
+                                                ProgramVariable resultVar, Services services) {
       // Get program method to execute
       IProgramMethod pm = getProgramMethod();
       // Extracts code parts of the method
@@ -160,7 +160,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
     */
    @Override
    protected Term generateMbyAtPreDef(ProgramVariable selfVar,
-                                      ImmutableList<ProgramVariable> paramVars) {
+                                      ImmutableList<ProgramVariable> paramVars, Services services) {
       return tb.tt();
    }
 
@@ -214,9 +214,9 @@ public class ProgramMethodPO extends AbstractOperationPO {
     */
    @Override
    protected Term buildFrameClause(List<LocationVariable> modHeaps,
-                                   Map<LocationVariable, Map<Term, Term>> heapToAtPre,
+                                   Map<Term, Term> heapToAtPre,
                                    ProgramVariable selfVar,
-                                   ImmutableList<ProgramVariable> paramVars) {
+                                   ImmutableList<ProgramVariable> paramVars, Services services) {
       return tb.tt();
    }
 

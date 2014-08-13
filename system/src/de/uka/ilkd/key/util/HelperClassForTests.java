@@ -1,15 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
+//
 
 /*
  * Created on 18.12.2004
@@ -65,8 +65,7 @@ public class HelperClassForTests {
             	= new KeYUserProblemFile("UpdatetermTest", file, null, profile); 
             pi = new ProblemInitializer(profile);
            
-            pi.startProver(po, po);
-            result = po.getPO();                            
+            result = pi.startProver(po, po);
 
         } catch (Exception e) {
             System.err.println("Exception occurred while parsing "+file+"\n");
@@ -85,8 +84,7 @@ public class HelperClassForTests {
 	KeYUserProblemFile po 
 		= new KeYUserProblemFile("UpdatetermTest", file, null, profile); 
         ProblemInitializer pi = new ProblemInitializer(profile);
-        pi.startProver(po, po);
-        return po.getPO();        
+        return pi.startProver(po, po);
     }
        
     public Term extractProblemTerm(Proof p) {

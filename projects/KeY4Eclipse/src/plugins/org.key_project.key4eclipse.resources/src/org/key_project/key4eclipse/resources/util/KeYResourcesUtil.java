@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -13,6 +13,7 @@
 
 package org.key_project.key4eclipse.resources.util;
 
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IContainer;
@@ -37,6 +38,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.resources.nature.KeYProjectNature;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 
@@ -44,6 +46,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.proof_references.KeYTypeUtil;
+import de.uka.ilkd.key.proof_references.reference.IProofReference;
+import de.uka.ilkd.key.speclang.Contract;
 
 /**
  * @author Stefan Käsdorf
@@ -52,7 +56,7 @@ public class KeYResourcesUtil {
    
    public static final String PROOF_FOLDER_NAME = "proofs";
    public static final String PROOF_FILE_EXTENSION = "proof";
-   public static final String META_FILE_EXTENSION = "meta";
+   public static final String META_FILE_EXTENSION = "proofmeta";
    
    /**
     * Runs an {@link IncrementalProjectBuilder}s INCREMENTAL_BUILD for the given {@link IProject} and waits for the build to finish.
@@ -120,6 +124,57 @@ public class KeYResourcesUtil {
          return true;
       }
       return false;
+   }
+   
+   
+   public static LinkedList<ProofElement> getUsedContractsProofElements(ProofElement pe, LinkedList<ProofElement> proofElements){
+      LinkedList<ProofElement> usedContracts = new LinkedList<ProofElement>();
+      LinkedHashSet<IProofReference<?>> proofReferences = pe.getProofReferences();
+      if(proofReferences != null && !proofReferences.isEmpty()){
+         for(IProofReference<?> proofRef : proofReferences){
+            Object target = proofRef.getTarget();
+            if(IProofReference.USE_CONTRACT.equals(proofRef.getKind()) && target instanceof Contract){
+               Contract contract = (Contract) target;
+               for(ProofElement proofElement : proofElements){
+                  if(contract.getName().equals(proofElement.getContract().getName())){
+                     usedContracts.add(proofElement);
+                     break;
+                  }
+               }
+            }
+         }
+      }
+      return usedContracts;
+   }
+   
+   
+   public static LinkedList<ProofElement> getProofElementsByProofFiles(LinkedList<IFile> proofFiles, LinkedList<ProofElement> proofElements){
+      LinkedList<ProofElement> tmpProofElements = cloneLinkedList(proofElements);
+      LinkedList<ProofElement> foundproofElements = new LinkedList<ProofElement>();
+      for(IFile proofFile : proofFiles){
+         for(ProofElement pe : tmpProofElements){
+            if(proofFile.equals(pe.getProofFile())){
+               foundproofElements.add(pe);
+               tmpProofElements.remove(pe);
+               break;
+            }
+         }
+      }
+      return foundproofElements;
+   }
+   
+   
+   /**
+    * Clones the given {@link LinkedList} of {@link ProofElement}s.
+    * @param proofElements - the {@link LinkedList} to clone
+    * @return the cloned {@link LinkedList}
+    */
+   public static LinkedList<ProofElement> cloneLinkedList(LinkedList<ProofElement> proofElements){
+      LinkedList<ProofElement> clone = new LinkedList<ProofElement>();
+      for(ProofElement pe : proofElements){
+         clone.add(pe);
+      }
+      return clone;
    }
    
    

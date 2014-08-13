@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.java;
 
 import java.util.Map;
@@ -18,6 +31,7 @@ import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature.TermInfo;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesGraph;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.TriggersSet;
 import de.uka.ilkd.key.util.LRUCache;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * <p>
@@ -103,6 +117,19 @@ public class ServiceCaches {
    private final Map<Sort,Map<Sort,Boolean>> disjointnessCache = new WeakHashMap<Sort,Map<Sort,Boolean>>();
    
    /**
+    * Cache used by HandleArith for caching formatted terms
+    */   
+   private final LRUCache<Term, Term> formattedTermCache = new LRUCache<Term, Term>(5000);
+
+   /**
+    * Caches used bu HandleArith to cache proof results
+    */
+   private LRUCache<Term, Term> provedByArithFstCache = new LRUCache<Term, Term>(5000);
+
+   private LRUCache<Pair<Term, Term>, Term> provedByArithSndCache = new LRUCache<Pair<Term, Term>, Term>(5000);
+
+   
+   /**
     * Returns the cache used by {@link TermTacletAppIndexCacheSet} instances.
     * @return The cache used by {@link TermTacletAppIndexCacheSet} instances.
     */
@@ -110,39 +137,53 @@ public class ServiceCaches {
       return termTacletAppIndexCache;
    }
 
-   public LRUCache<Term, TermInfo> getBetaCandidates() {
+   public final LRUCache<Term, TermInfo> getBetaCandidates() {
       return betaCandidates;
    }
 
-   public LRUCache<PosInOccurrence, RuleAppCost> getIfThenElseMalusCache() {
+   public final LRUCache<PosInOccurrence, RuleAppCost> getIfThenElseMalusCache() {
       return ifThenElseMalusCache;
    }
 
-   public LRUCache<Operator, Integer> getIntroductionTimeCache() {
+   public final LRUCache<Operator, Integer> getIntroductionTimeCache() {
       return introductionTimeCache;
    }
    
-   public LRUCache<Term, Monomial> getMonomialCache() {
+   public final LRUCache<Term, Monomial> getMonomialCache() {
       return monomialCache;
    }
 
-   public LRUCache<Term, Polynomial> getPolynomialCache() {
+   public final LRUCache<Term, Polynomial> getPolynomialCache() {
       return polynomialCache;
    }
 
-   public Map<Term, TriggersSet> getTriggerSetCache() {
+   public final Map<Term, TriggersSet> getTriggerSetCache() {
       return triggerSetCache;
    }
 
-   public Map<Term, ClausesGraph> getGraphCache() {
+   public final Map<Term, ClausesGraph> getGraphCache() {
       return graphCache;
    }
 
-   public Map<Term, Term> getTermFactoryCache() {
+   public final Map<Term, Term> getTermFactoryCache() {
        return termCache;
    }
 
-   public Map<Sort, Map<Sort, Boolean>> getDisjointnessCache() {
+   public final Map<Sort, Map<Sort, Boolean>> getDisjointnessCache() {
        return disjointnessCache;
    }
+
+   public final LRUCache<Term, Term> getFormattedTermCache() {
+      return formattedTermCache;
+   }
+
+   public final LRUCache<Term, Term> getProvedByArithFstCache() {
+      return provedByArithFstCache;
+   }
+
+   public final LRUCache<Pair<Term, Term>, Term> getProvedByArithSndCache() {
+      return provedByArithSndCache;
+   }
+
+   
 }

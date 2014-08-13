@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -18,7 +18,7 @@ import de.uka.ilkd.key.logic.Term;
 
 /**
  * An equivalence class which defines which {@link Term}s represent
- * the same {@link ISymbolicObject} in an {@link ISymbolicConfiguration}.
+ * the same {@link ISymbolicObject} in an {@link ISymbolicLayout}.
  * @author Martin Hentschel
  */
 public interface ISymbolicEquivalenceClass extends ISymbolicElement {

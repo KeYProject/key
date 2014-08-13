@@ -1,0 +1,194 @@
+ChangeLog
+=========
+
+Revision 2.2.2:
+===============
+ * Support for CVC3 version 2.4.1 SMT backend
+ * Bug fixes
+
+Revision 2.2.1:
+===============
+ * Test case generation using bounded SMT (requires Z3, OpenJML)
+ * Bug fixes
+
+Revision 2.2.0:
+===============
+ * Counter example generation using bounded SMT (requires Z3)
+ * Increased JML support / JML extensions
+     ** block contracts (extension) / assert statements
+     ** \min and \max numerical quantifiers
+     ** changed default semantics of signals_only to include unchecked exceptions
+     ** model methods (new implementation)
+     ** old clause (variable binder in contract)
+     ** nearly everything parseable 
+ * Verification of a large class of recursive methods
+     ** generalized variants to all ordered sets 
+ * Proof obligations for specification well-definedness
+ * Term labels
+ * Rule triggers (extended taclet syntax)
+ * More efficient handling of heap disjointness and heap selects
+ * Improved reasoning about bounded sums/products 
+ * User Interfaces
+     ** rule focus for inner nodes
+     ** improved search
+     ** detailed proof statistics
+     ** auto save and quick save features
+     ** keyboard shortcuts
+ * Reduced memory footprint
+ * A lot of bug fixes
+ * Java 8 compatibility
+ * Re-implemented .key parser 
+
+Revision 2.0.2:
+===============
+ * Support for latest versions of Z3 and CVC3
+ * Windows 8 compatibility
+ * Fix a soundness issue with types and heap access
+ * Various bug fixes
+
+Revision 2.0.1:
+===============
+ * Bug fixes
+     ** Incompleteness with Java integer arithmetics
+     ** Command line mode fixes
+     ** various other
+
+Revision 2.0.0:
+===============
+ * New explicit heap modeling
+     ** Data types for location sets and heaps
+     ** The heap is now a special (local) variable
+     ** Dynamic frames
+     ** JML extension for dynamic frame specification
+     ** Re-implementation of JavaCard transactions
+ * Verification of (primitive) recursive methods
+ * Sequence ADT
+ * Nearly complete JML support
+     ** model fields and methods
+     ** initially clauses and class axioms
+     ** measured_by clauses
+     ** accessible clauses
+     ** sum and product comprehension
+     ** the \bigint type, mixed integer semantics
+     ** weak purity by default
+     ** reachability predicate
+     ** \index and \values keywords for enhanced for-loops 
+  * Escape to dynamic logic from within JML
+  * MonKeY batch mode
+  * GUI changes
+     ** new dialog to enter invariants interactively
+     ** search in sequents and proof trees
+     ** logical symbols in Unicode
+  * Runnable from command line without windowing system 
+  * Improved integration of SMT solvers
+     ** SMT-LIB 2.0 backend interface
+     ** possible to run multiple solvers in parallel
+     ** support for integer division (Z3 only) 
+  * > 150 bug fixes 
+  * Discontinued features
+     ** RTSJ support
+     ** Test case generation
+     ** OCL
+     ** Proof reuse
+
+Revision 1.6.5:
+===============
+ * Minor bugfixes
+ * Java 7 compatibility 
+
+Revision 1.6.0:
+===============
+ * Support for Strings
+ * Enhanced JML support
+ * Improved integration of external SMT solvers
+ * Improved "verification-based testing" mechanism
+ * Real Time Java (RTSJ) calculus
+ * GUI improvements
+ * Various bugfixes
+
+
+Revision 1.4.0:
+===============
+ * Unified proof obligation framework
+     ** sharing of proof obligations across different specification languages
+     ** unified API for adding new proof obligations
+     ** same GUI elements used for all specification languages
+     ** more elegant translation of \old, @pre-like constructs
+ * Improved JavaCard DL Specification interface
+     ** specification of DL invariants
+ * Rewrite of JML front-end
+     ** ghost variables/fields and JML set statement
+     ** non_null by default
+     ** \old in loop invariants supported
+     ** \object_creation(type) in JML assignable clauses
+ * New standalone OCL front-end
+     ** discontinued support for Borland Together integration
+ * Java language support enhancements:
+     ** enum types (partially)
+     ** inner and anonymous classes
+     ** enhanced for loop
+     ** variable method arguments
+     ** covariant method signature
+ * Generation of JML specifications
+ * Strictly pure queries can be pushed directly into an update
+ * Stable proof loading and saving
+ * Classpath directive
+ * various bugfixes
+
+
+Revision 1.2.0:
+===============
+ * significantly improved proof strategies wrt. quantifier treatment
+   and arithmetics
+ * improved proof tree view, i.e. 
+     ** hiding of closed subtrees
+     ** hiding of intermediate proof steps
+     ** search in proof tree  
+ * improved proof saving and loading
+ * includes _alpha_ version of the visual debugger 
+ * various bugfixes 
+ 
+Revision 1.0.1:
+===============
+  * fixed an installation problem when KeY had not been installed before
+
+Revision 1.0.0:
+===============
+
+  * KeY-Book examples are based on this version
+    (except Schorr-Waite, which provides a developer version on 
+    the book example site)
+  * new proof-obligation generation framework 
+         * used currently only by the OCL translation; 
+            adaption of JML translation is underway
+  * new method lemma rule
+  * considerable improvements concerning arithmetics
+  * lots of bugfixes and improved stability
+
+Revision 1.0pre1a:
+==================
+  * bug fixes and improvements
+  * polynomial integer simplification
+
+Revision 1.0pre1:
+================
+  * pre-release of upcoming 1.0
+  * several improvements and fixes
+
+      
+Revision 0.99.2: 
+================
+   * fixed: Initialisation procedure of the KeY prover
+            (KeY did not work properly if installed on a fresh system
+             without a working KeY configuration file) 
+   * fixed: Source Code Distribution 0.99.1 was way too big
+
+Revision 0.99.1: 
+================
+   * bug fixes concerning JML front-end
+
+Release 0.99: 
+=============
+   * first version with the JML front-end
+   * support of loop invariants
+   * lots of new stuff 

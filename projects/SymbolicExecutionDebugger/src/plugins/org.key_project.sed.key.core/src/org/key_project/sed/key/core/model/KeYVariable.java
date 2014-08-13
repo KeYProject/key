@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -34,7 +34,7 @@ public class KeYVariable extends AbstractSEDVariable {
    /**
     * The {@link IExecutionVariable} to represent in debug model.
     */
-   private IExecutionVariable executionVariable;
+   private final IExecutionVariable executionVariable;
    
    /**
     * The contained {@link IValue}.
@@ -102,7 +102,7 @@ public class KeYVariable extends AbstractSEDVariable {
    public IValue getValue() throws DebugException {
       synchronized (this) {
          try {
-            if (value == null) {
+            if (value == null && !executionVariable.isDisposed()) {
                IExecutionValue[] values = executionVariable.getValues();
                if (values.length == 0) {
                   throw new DebugException(LogUtil.getLogger().createErrorStatus("An IExecutionVariable must provide at least one IExecutionValue."));

@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 /** this class is used to parse in Taclet from a file that are used by tests */
 package de.uka.ilkd.key.rule;
@@ -59,6 +58,7 @@ public class TacletForTests {
     public static NamespaceSet nss = new NamespaceSet();
     public static TacletIndex rules= null;
     public static Services services;
+    public static InitConfig initConfig;
     public static File lastFile=null;
 
     public static Namespace variables = null;
@@ -75,6 +75,7 @@ public class TacletForTests {
     public static void clear() {
         lastFile = null;
         services = null;
+        initConfig = null;
         rules = null;
         variables = null;
         scm = new AbbrevMap();
@@ -86,10 +87,10 @@ public class TacletForTests {
 	    if (!file.equals(lastFile)) {
 		KeYFileForTests envInput = new KeYFileForTests("Test", file, profile);	
 		ProblemInitializer pi = new ProblemInitializer(envInput.getProfile()); 
-		InitConfig ic = pi.prepare(envInput);
-              	nss      = ic.namespaces(); 
-                rules    = ic.createTacletIndex();
-                services = ic.getServices();
+		initConfig = pi.prepare(envInput);
+              	nss      = initConfig.namespaces(); 
+                rules    = initConfig.createTacletIndex();
+                services = initConfig.getServices();
 		lastFile = file;
 		variables = envInput.variables();
 	    }
@@ -100,11 +101,17 @@ public class TacletForTests {
 	}
     }
 
-    public static Services services() {
-	if (services == null) parse();
-	return services;
+    public static InitConfig initConfig() {
+	if (initConfig == null) parse();
+	return initConfig.deepCopy();
     }
 
+    public static Services services() {
+   if (services == null) parse();
+   return services;
+    }
+
+    
     public static JavaInfo javaInfo() {
 	return services ().getJavaInfo ();
     }
@@ -186,13 +193,13 @@ public class TacletForTests {
 	try {	    
 	    br   = new StringReader(termstr);
 	    KeYParserF parser = new KeYParserF(ParserMode.TERM,
-	                                     new KeYLexerF(br,null),
-					     "No file. " +
-					     "TacletForTests.parseTerm("
-					     +termstr+")",
-					     new Recoder2KeY(services, nss),
-					     services, nss,
-					     TacletForTests.getAbbrevs());
+		    new KeYLexerF(br,
+			    "No file. TacletForTests.parseTerm(" + termstr + ")",
+			    null),
+		    new Recoder2KeY(services, nss),
+		    services,
+		    nss,
+		    TacletForTests.getAbbrevs());
 	    return parser.term();
 	} catch (Exception e) {
 	    System.err.println("Exception during parsing!");
@@ -211,14 +218,12 @@ public class TacletForTests {
 	try {	    
 	    br = new StringReader(termstr);
 	    KeYParserF parser = new KeYParserF(ParserMode.TERM,
-	                                     new KeYLexerF(br,null),
-					     "No file. " +
-					     "TacletForTests.parseTerm("
-					     +termstr+")",
-					     new Recoder2KeY(services(), set),
-					     services(),
-					     set,
-					     new AbbrevMap());
+		    new KeYLexerF(br,
+			    "No file. TacletForTests.parseTerm(" + termstr + ")", null),
+		    new Recoder2KeY(services(), set),
+		    services(),
+		    set,
+		    new AbbrevMap());
 	    return parser.term();
 	} catch (Exception e) {
 	    System.err.println("Exception during parsing!");

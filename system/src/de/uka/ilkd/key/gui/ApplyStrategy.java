@@ -3,7 +3,7 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
@@ -11,17 +11,12 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-
-
-
-
 /*
 
 Uses code by Hans Muller and Kathy Walrath from
 http://java.sun.com/products/jfc/tsc/articles/threads/threads2.html
 
  */
-
 
 package de.uka.ilkd.key.gui;
 
@@ -551,8 +546,11 @@ public class ApplyStrategy {
         fireTaskStarted (stopCondition.getMaximalWork(maxSteps, timeout, newProof, goalChooser));
     }
 
+    public synchronized ApplyStrategyInfo start(Proof proof, Goal goal) {
+        return start(proof, ImmutableSLList.<Goal>nil().prepend(goal));
+    }
 
-    public ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals) {
+    public synchronized ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals) {
 
         ProofSettings settings = proof.getSettings();
         StrategySettings stratSet = settings.getStrategySettings();
@@ -578,8 +576,11 @@ public class ApplyStrategy {
      *             beforehand if needed
      */
     @Deprecated
-    public ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals, int maxSteps,
-            long timeout, boolean stopAtFirstNonCloseableGoal) {
+    public synchronized ApplyStrategyInfo start(Proof proof,
+                                                ImmutableList<Goal> goals,
+                                                int maxSteps,
+                                                long timeout,
+                                                boolean stopAtFirstNonCloseableGoal) {
         assert proof != null;
 
         this.stopAtFirstNonCloseableGoal = stopAtFirstNonCloseableGoal;
@@ -592,8 +593,8 @@ public class ApplyStrategy {
     }
 
 
-    private ProofTreeListener prepareStrategy(Proof proof, ImmutableList<Goal> goals, int maxSteps,
-            long timeout) {
+    private ProofTreeListener prepareStrategy(Proof proof, ImmutableList<Goal> goals,
+                                              int maxSteps, long timeout) {
         ProofTreeListener treeListener = new ProofTreeAdapter() {
             @Override
             public void proofGoalsAdded(ProofTreeEvent e) {
@@ -628,14 +629,11 @@ public class ApplyStrategy {
     }
 
     private void finishStrategy(ApplyStrategyInfo result) {
-//        if (result != null) {
         assert result != null; // CS
-            proof.addAutoModeTime(result.getTime());
-
-        fireTaskFinished (new DefaultTaskFinishedInfo(this, result,
-                proof, result.getTime(),
-                result.getAppliedRuleApps(), result.getClosedGoals()));
-//        }
+        proof.addAutoModeTime(result.getTime());
+        fireTaskFinished (new DefaultTaskFinishedInfo(this, result, proof, result.getTime(),
+                                                      result.getAppliedRuleApps(),
+                                                      result.getClosedGoals()));
     }
 
     // Used to combine multiple iteratively called proofs and integrate their results in final result

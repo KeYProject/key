@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -72,7 +72,10 @@ public class FileHeaderChecker {
             }
          };
          // Write settings into console
-         System.out.println("Working Directories: " + workingDirs);
+         System.out.println("Working Directories: ");
+         for (File workingDir : workingDirs) {
+            System.out.println("   - " + workingDir);
+         }
          System.out.println("New Header File: " + headerFile);
          System.out.println();
          // List files to check

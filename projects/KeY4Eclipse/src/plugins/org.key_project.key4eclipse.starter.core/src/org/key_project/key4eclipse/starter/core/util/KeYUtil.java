@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -22,6 +22,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -83,7 +84,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -293,7 +293,7 @@ public final class KeYUtil {
                             EnvNode envChild = (EnvNode)child;
                             String srcPath = envChild.getProofEnv().getJavaModel().getModelDir();
                             if (srcPath != null && location.equals(new File(srcPath))) {
-                                result = envChild.getProofEnv().getInitConfig();
+                                result = envChild.getProofEnv().getInitConfigForEnvironment();
                             }
                         }
                         i++;
@@ -387,7 +387,13 @@ public final class KeYUtil {
                         // Make sure that main window is available.
                         Assert.isTrue(MainWindow.hasInstance(), "KeY main window is not available.");
                         // Load location
-                        InitConfig initConfig = internalLoad(null, location, classPaths, bootClassPath, true);
+                        MainWindow main = MainWindow.getInstance();
+                        if (!main.isVisible()) {
+                            main.setVisible(true);
+                        }
+                        // Check if location is already loaded
+                        DefaultProblemLoader loader = main.getUserInterface().load(null, location, classPaths, bootClassPath, null);
+                        InitConfig initConfig = loader.getInitConfig();
                         // Get method to proof in KeY
                         IProgramMethod pm = getProgramMethod(method, initConfig.getServices().getJavaInfo());
                         Assert.isNotNull(pm, "Can't find method \"" + method + "\" in KeY.");
@@ -404,53 +410,6 @@ public final class KeYUtil {
                 throw run.getException();
             }
         }
-    }
-    
-    /**
-     * Loads the given location in KeY and returns the opened {@link InitConfig}.
-     * @param profile The {@link Profile} to use.
-     * @param location The location to load.
-     * @param classPaths The class path entries to use.
-     * @param bootClassPath The boot class path to use.
-     * @param showKeYMainWindow Show KeY {@link MainWindow}? <b>Attention: </b> The {@link InitConfig} is not available in the proof tree, because no proof is started.
-     * @return The opened {@link InitConfig}.
-     * @throws Exception Occurred Exception.
-     */
-    private static InitConfig internalLoad(final Profile profile,
-                                           final File location,
-                                           final List<File> classPaths,
-                                           final File bootClassPath,
-                                           final boolean showKeYMainWindow) throws Exception {
-        IRunnableWithResult<InitConfig> run = new AbstractRunnableWithResult<InitConfig>() {
-            @Override
-            public void run() {
-                try {
-                    MainWindow main = MainWindow.getInstance();
-                    if (showKeYMainWindow) {
-                       main.setVisible(true);
-                    }
-                    if (showKeYMainWindow && !main.isVisible()) {
-                        main.setVisible(true);
-                    }
-                    // Check if location is already loaded
-                    InitConfig initConfig = getInitConfig(location);
-                    if (initConfig == null) {
-                        // Load local file
-                        DefaultProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath);
-                        initConfig = loader.getInitConfig();
-                    }
-                    setResult(initConfig);
-                }
-                catch (Exception e) {
-                    setException(e);
-                }
-            }
-        };
-        SwingUtil.invokeAndWait(run);
-        if (run.getException() != null) {
-            throw run.getException();
-        }
-        return run.getResult();
     }
     
     /**
@@ -549,10 +508,16 @@ public final class KeYUtil {
           Object child = model.getChild(model.getRoot(), 0);
           if (child instanceof EnvNode) {
              EnvNode envChild = (EnvNode)child;
+             for (Proof proof : envChild.allProofs()) {
+                main.getUserInterface().removeProof(proof);
+             }
              for (int j = 0; j < envChild.getChildCount(); j++) {
                 Object envTaskChild = envChild.getChildAt(j);
                 if (envTaskChild instanceof TaskTreeNode) {
-                   main.getProofList().removeTask((TaskTreeNode)envTaskChild);
+                   TaskTreeNode ttn = (TaskTreeNode)envTaskChild;
+                   for (Proof proof : ttn.allProofs()) {
+                      main.getUserInterface().removeProof(proof);
+                   }
                 }
              }
           }
@@ -1048,6 +1013,78 @@ public final class KeYUtil {
       else {
          return -1;
       }
+   }
+   
+   /**
+    * Collects all {@link IMethod}s in the given {@link IResource}.
+    * @param res - the given {@link IResource}
+    * @return - the {@link LinkedList<IMethod>} with all {@link IMethod}s
+    * @throws JavaModelException
+    */
+   public static LinkedList<IMethod> getResourceMethods(IResource res) throws JavaModelException{
+      ICompilationUnit unit = (ICompilationUnit) JavaCore.create(res);
+      LinkedList<IMethod> methods = new LinkedList<IMethod>();
+      IType[] types = unit.getAllTypes();
+      for(IType type : types){
+         IMethod[] tmp = type.getMethods();
+         for(IMethod method : tmp){
+            methods.add(method);
+         }
+      }
+      return methods;
+   }
+   
+   /**
+    * Collects all {@link IMethod}s in the given {@link IResource}.
+    * @param res - the given {@link IResource}
+    * @return - the {@link LinkedList<IMethod>} with all {@link IMethod}s
+    * @throws JavaModelException
+    */
+   public static IType getType(IResource res) throws JavaModelException{
+      ICompilationUnit unit = (ICompilationUnit) JavaCore.create(res);
+      IType[] types = unit.getAllTypes();
+      return types[0];
+   }
+   
+   /**
+    * Returns the lineNumber of the given {@link IMethod}.
+    * @param method - the {@link IMethod} to use
+    * @return the lineNumber of the {@link IMethod}
+    * @throws CoreException
+    */
+   public static int getLineNumberOfMethod(IMethod method, int offset) throws CoreException {
+      Position pos = KeYUtil.getCursorPositionForOffset(method, offset);
+      return pos.getLine();
+   }
+
+   public static IMethod getContainingMethodForMethodStart(int charStart, IResource resource) throws CoreException {
+      ICompilationUnit unit = (ICompilationUnit) JavaCore.create(resource);
+      IJavaElement javaElement = unit.getElementAt(charStart);
+      if(javaElement instanceof IMethod){
+         return (IMethod) javaElement;
+      }
+      return null;
+   } 
+   
+   public static LinkedList<IProgramMethod> getProgramMethods(LinkedList<IMethod> methods, JavaInfo javaInfo) throws ProofInputException{
+      LinkedList<IProgramMethod> programMethods = new LinkedList<IProgramMethod>();
+      for(IMethod method : methods){
+         programMethods.add(getProgramMethod(method, javaInfo));
+      }
+      return programMethods;
+   }
+   
+
+   public static IMethod getContainingMethod(int lineNumber, IResource resource) throws CoreException {
+      LinkedList<IMethod>methods = getResourceMethods(resource);
+      for(IMethod method : methods){
+         int start = getLineNumberOfMethod(method, method.getSourceRange().getOffset());
+         int end = getLineNumberOfMethod(method, method.getSourceRange().getOffset()+method.getSourceRange().getLength());
+         if(lineNumber>start&&lineNumber<end){
+            return method;
+         }
+      }
+      return null;
    }
    
    /**

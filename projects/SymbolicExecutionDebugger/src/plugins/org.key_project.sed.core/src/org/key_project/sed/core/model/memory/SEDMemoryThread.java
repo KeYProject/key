@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -13,12 +13,16 @@
 
 package org.key_project.sed.core.model.memory;
 
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDThread;
 
@@ -31,7 +35,7 @@ public class SEDMemoryThread extends AbstractSEDThread implements ISEDMemoryDebu
    /**
     * The contained child nodes.
     */
-   private List<ISEDDebugNode> children = new LinkedList<ISEDDebugNode>();
+   private final List<ISEDDebugNode> children = new LinkedList<ISEDDebugNode>();
    
    /**
     * The name of this debug node.
@@ -49,11 +53,17 @@ public class SEDMemoryThread extends AbstractSEDThread implements ISEDMemoryDebu
    private ISEDDebugNode[] callStack;
    
    /**
+    * The known {@link ISEDTermination}s of this {@link ISEDThread}.
+    */
+   private final Set<ISEDTermination> knownTerminations = new LinkedHashSet<ISEDTermination>();
+   
+   /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this thread is contained.
-    */   
-   public SEDMemoryThread(ISEDDebugTarget target) {
-      super(target);
+    * @param executable {@code true} Support suspend, resume, etc.; {@code false} Do not support suspend, resume, etc.
+    */
+   public SEDMemoryThread(ISEDDebugTarget target, boolean executable) {
+      super(target, executable);
    }
 
    /**
@@ -180,4 +190,22 @@ public class SEDMemoryThread extends AbstractSEDThread implements ISEDMemoryDebu
    public void setCallStack(ISEDDebugNode[] callStack) {
       this.callStack = callStack;
    }
+   
+   /**
+    * Registers the given {@link ISEDTermination}.
+    * @param termination The {@link ISEDTermination} to register.
+    */
+   public void addTermination(ISEDTermination termination) {
+      Assert.isNotNull(termination);
+      Assert.isTrue(!knownTerminations.contains(termination));
+      knownTerminations.add(termination);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDTermination[] getTerminations() throws DebugException {
+      return knownTerminations.toArray(new ISEDTermination[knownTerminations.size()]);
+   } 
 }

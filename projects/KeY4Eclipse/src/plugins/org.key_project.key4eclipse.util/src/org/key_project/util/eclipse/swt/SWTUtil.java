@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -23,28 +23,36 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.jface.viewers.AbstractTableViewer;
+import org.eclipse.jface.viewers.AbstractTreeViewer;
+import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithResult;
 
 /**
  * Provides utility methods for SWT.
@@ -72,104 +80,6 @@ public final class SWTUtil {
     public static void checkCanceled(IProgressMonitor monitor) throws OperationCanceledException {
         if (monitor != null && monitor.isCanceled()) {
             throw new OperationCanceledException();
-        }
-    }
-    
-    /**
-     * <p>
-     * Configures the given {@link Table} to show only the column {@link Image}s
-     * with their real size.
-     * </p>
-     * <p>
-     * It is recommend that not text is set on the {@link TableItem} 
-     * (e.g. used {@link LabelProvider} returns no texts) because otherwise
-     * it is possible that the cells are to big.
-     * </p>
-     * @param table The {@link Table} to configure.
-     */
-    public static void makeTableShowingFullTableItemImages(final Table table) {
-        if (table != null) {
-            table.addListener(SWT.MeasureItem, new Listener() {
-                @Override
-                public void handleEvent(Event event) {
-                    TableItem item = (TableItem)event.item;
-                    event.width = item.getImage().getImageData().width;
-                    event.height = item.getImage().getImageData().height;
-                }
-            });
-            table.addListener(SWT.EraseItem, new Listener() {
-                public void handleEvent(Event event) {
-                    event.detail &= ~SWT.FOREGROUND;
-                }
-            });
-            table.addListener(SWT.PaintItem, new Listener() {
-                public void handleEvent(Event event) {
-                    TableItem item = (TableItem)event.item;
-                    event.gc.drawImage(item.getImage(), event.x >= 0 ? event.x : 0, event.y); // On Linux event.x is negativ what is wrong
-                }
-            });
-        }
-    }
-    
-    /**
-     * <p>
-     * Configures the given {@link Table} to show multilined text in cells.
-     * </p>
-     * <p>
-     * Example usage
-     * <pre><code>
-     *   final int TEXT_MARGIN = 3;
-     *   Display display = new Display();
-     *   Shell shell = new Shell(display);
-     *   shell.setLayout(new FillLayout());
-     *   final Table table = new Table(shell, SWT.FULL_SELECTION);
-     *
-     *   TableItem item = new TableItem(table, SWT.NONE);
-     *   item.setText("Line1\nLine2");
-     *
-     *   TableItem item2 = new TableItem(table, SWT.NONE);
-     *   item2.setText("1\n2\n3\n4\n5\n6");
-     *   
-     *   SWTUtil.makeTableMultilined(table, TEXT_MARGIN);
-     *
-     *   shell.open();
-     *   while (!shell.isDisposed()) {
-     *           if (!display.readAndDispatch()) display.sleep();
-     *   }
-     *   display.dispose();
-     * </code></pre>
-     * </p>
-     * <p>
-     * The code was copied from SWT Snippet 231.
-     * See <a href="http://git.eclipse.org/c/platform/eclipse.platform.swt.git/tree/examples/org.eclipse.swt.snippets/src/org/eclipse/swt/snippets/Snippet231.java">http://git.eclipse.org/c/platform/eclipse.platform.swt.git/tree/examples/org.eclipse.swt.snippets/src/org/eclipse/swt/snippets/Snippet231.java</a>
-     * </p>
-     * @param table The {@link Table} to configure. If it is {@code null} nothing happens.
-     * @param textMargin The text margin to use.
-     */
-    public static void makeTableMultilined(final Table table, final int textMargin) {
-        if (table != null) {
-            table.addListener(SWT.MeasureItem, new Listener() {
-                public void handleEvent(Event event) {
-                    TableItem item = (TableItem)event.item;
-                    String text = item.getText(event.index);
-                    Point size = event.gc.textExtent(text);
-                    event.width = size.x + (2 * textMargin);
-                    event.height = Math.max(event.height, size.y + textMargin);
-                }
-            });
-            table.addListener(SWT.EraseItem, new Listener() {
-                public void handleEvent(Event event) {
-                    event.detail &= ~SWT.FOREGROUND;
-                }
-            });
-            table.addListener(SWT.PaintItem, new Listener() {
-                public void handleEvent(Event event) {
-                    TableItem item = (TableItem)event.item;
-                    String text = item.getText(event.index);
-                    int yOffset = 0;
-                    event.gc.drawText(text, event.x + textMargin, event.y + yOffset, true);
-                }
-            });
         }
     }
     
@@ -475,6 +385,25 @@ public final class SWTUtil {
     }
     
     /**
+     * Thread save execution of {@link TreeViewer#expandToLevel(Object, int)}.
+     * @param viewer The {@link TreeViewer} to expand element in.
+     * @param elementOrTreePaths The element to expand.
+     * @param level Non-negative level, or {@link AbstractTreeViewer#ALL_LEVELS} to expand all levels of the tree.
+     */
+    public static void expandToLevel(final TreeViewer viewer, 
+                                     final Object elementOrTreePath,
+                                     final int level) {
+       if (viewer != null && !viewer.getControl().isDisposed()) {
+          viewer.getControl().getDisplay().syncExec(new Runnable() {
+             @Override
+             public void run() {
+                viewer.expandToLevel(elementOrTreePath, level);
+             }
+          });
+       }
+    }
+    
+    /**
      * Returns the new text which will be shown if {@link VerifyEvent#doit} is {@code true}.
      * @param e The {@link VerifyEvent}.
      * @return The new text.
@@ -492,4 +421,160 @@ public final class SWTUtil {
           throw new IllegalArgumentException("Widgets of type \"" + e.getSource().getClass() + " \" are not supported.");
        }
     }
+
+   /**
+    * Searches a {@link Button} with the given text in the given {@link Widget}.
+    * @param widget The {@link Widget} to search in.
+    * @param text The text of the {@link Button} to search.
+    * @return The found {@link Button} or {@code null} if no {@link Button} with that text is available.
+    */
+   public static Button findButtonByText(Widget widget, String text) {
+      Button result = null;
+      if (widget instanceof Button) {
+         Button button = (Button)widget;
+         if (button.getText().equals(text)) {
+            result = button;
+         }
+      }
+      else if (widget instanceof Composite) {
+         Composite composite = (Composite)widget;
+         Control[] children = composite.getChildren();
+         int i = 0;
+         while (result == null && i < children.length) {
+            result = findButtonByText(children[i], text);
+            i++;
+         }
+      }
+      return result;
+   }
+
+   /**
+    * Invokes {@link Viewer#refresh()} thread save.
+    * @param viewer The {@link Viewer} to invoke {@link Viewer#refresh()} on.
+    */
+   public static void refresh(final Viewer viewer) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.refresh();
+            }
+         });
+      }
+   }
+
+   /**
+    * Invokes {@link AbstractTableViewer#replace(Object, int)} thread save.
+    * @param viewer The {@link AbstractTableViewer} to invoke method on.
+    * @param element The new element.
+    * @param index The index to replace element at.
+    */
+   public static void replace(final AbstractTableViewer viewer, final Object element, final int index) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.replace(element, index);
+            }
+         });
+      }
+   }
+
+   /**
+    * Invokes {@link AbstractTableViewer#add(Object)} thread save.
+    * @param viewer The {@link AbstractTableViewer} to invoke method on.
+    * @param element The new element to add.
+    */
+   public static void add(final AbstractTableViewer viewer, final Object element) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.add(element);
+            }
+         });
+      }
+   }
+
+   /**
+    * Invokes {@link AbstractTableViewer#add(Object)} thread save.
+    * @param viewer The {@link AbstractTableViewer} to invoke method on.
+    * @param elements The new elements to add.
+    */
+   public static void add(final AbstractTableViewer viewer, final Object[] elements) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.add(elements);
+            }
+         });
+      }
+   }
+
+   /**
+    * Invokes {@link AbstractTableViewer#remove(Object)} thread save.
+    * @param viewer The {@link AbstractTableViewer} to invoke method on.
+    * @param element The old element to remove.
+    */
+   public static void remove(final AbstractTableViewer viewer, final Object element) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.remove(element);
+            }
+         });
+      }
+   }
+
+   /**
+    * Invokes {@link AbstractTableViewer#remove(Object)} thread save.
+    * @param viewer The {@link AbstractTableViewer} to invoke method on.
+    * @param elements The old elements to remove.
+    */
+   public static void remove(final AbstractTableViewer viewer, final Object[] elements) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.remove(elements);
+            }
+         });
+      }
+   }
+
+   /**
+    * Invokes {@link CheckboxTableViewer#setChecked(Object, boolean)} thread save.
+    * @param viewer The {@link AbstractTableViewer} to invoke method on.
+    * @param element The element to modify its checked state.
+    * @param state The new checked state to set.
+    */
+   public static void setChecked(final CheckboxTableViewer viewer, final Object element, final boolean state) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.setChecked(element, state);
+            }
+         });
+      }
+   }
+
+   /**
+    * Invokes {@link StructuredViewer#testFindItem(Object)} thread save.
+    * @param viewer The {@link StructuredViewer} to invoke method on.
+    * @param element The element to test.
+    * @return The found {@link Item} or {@code null} if not available.
+    */
+   public static Object testFindItem(final StructuredViewer viewer, final Object element) {
+      IRunnableWithResult<Object> run = new AbstractRunnableWithResult<Object>() {
+         @Override
+         public void run() {
+            setResult(viewer.testFindItem(element));
+         }
+      };
+      viewer.getControl().getDisplay().syncExec(run);
+      return run.getResult();
+   }
 }

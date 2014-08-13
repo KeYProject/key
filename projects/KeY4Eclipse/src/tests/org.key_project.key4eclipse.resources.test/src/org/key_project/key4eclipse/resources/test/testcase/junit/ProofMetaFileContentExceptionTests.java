@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -75,7 +75,7 @@ public class ProofMetaFileContentExceptionTests extends AbstractResourceTest {
             project.getFullPath().append("src").append("File.java"));
       IFile proofFile = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("proofs").append("File.java").append("File[File__add(int,int)]_JML_operation_contract_0.proof"));
-      IFile metaFile = KeY4EclipseResourcesTestUtil.getFile(proofFile.getFullPath().addFileExtension("meta"));
+      IFile metaFile = KeY4EclipseResourcesTestUtil.getFile(proofFile.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       
       assertTrue(!javaFile.exists());
       assertTrue(!proofFolder.exists());

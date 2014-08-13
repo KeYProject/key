@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
+import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDMethodReturn;
@@ -33,12 +34,12 @@ public class SEDMemoryMethodReturn extends AbstractSEDMethodReturn implements IS
    /**
     * The contained child nodes.
     */
-   private List<ISEDDebugNode> children = new LinkedList<ISEDDebugNode>();
+   private final List<ISEDDebugNode> children = new LinkedList<ISEDDebugNode>();
    
    /**
     * The contained variables.
     */
-   private List<IVariable> variables = new LinkedList<IVariable>();
+   private final List<IVariable> variables = new LinkedList<IVariable>();
    
    /**
     * The name of this debug node.
@@ -74,6 +75,11 @@ public class SEDMemoryMethodReturn extends AbstractSEDMethodReturn implements IS
     * The method call stack.
     */
    private ISEDDebugNode[] callStack;
+
+   /**
+    * The method return condition.
+    */
+   private ISEDBranchCondition methodReturnCondition;
    
    /**
     * Constructor.
@@ -277,5 +283,21 @@ public class SEDMemoryMethodReturn extends AbstractSEDMethodReturn implements IS
    @Override
    public void setCallStack(ISEDDebugNode[] callStack) {
       this.callStack = callStack;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDBranchCondition getMethodReturnCondition() throws DebugException {
+      return methodReturnCondition;
+   }
+
+   /**
+    * Sets the method return condition.
+    * @param methodReturnCondition The method return condition to set.
+    */
+   public void setMethodReturnCondition(ISEDBranchCondition methodReturnCondition) {
+      this.methodReturnCondition = methodReturnCondition;
    }
 }

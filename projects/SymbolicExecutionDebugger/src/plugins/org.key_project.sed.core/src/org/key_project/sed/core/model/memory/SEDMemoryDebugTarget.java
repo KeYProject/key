@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -18,7 +18,9 @@ import java.util.List;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
+import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDDebugTarget;
@@ -32,14 +34,15 @@ public class SEDMemoryDebugTarget extends AbstractSEDDebugTarget implements ISED
    /**
     * The contained {@link ISEDThread}s.
     */
-   private List<ISEDThread> threads = new LinkedList<ISEDThread>();
+   private final List<ISEDThread> threads = new LinkedList<ISEDThread>();
    
    /**
     * Constructor.
     * @param launch The {@link ILaunch} in that this {@link IDebugTarget} is used.
+    * @param executable {@code true} Support suspend, resume, etc.; {@code false} Do not support suspend, resume, etc.
     */
-   public SEDMemoryDebugTarget(ILaunch launch) {
-      super(launch);
+   public SEDMemoryDebugTarget(ILaunch launch, boolean executable) {
+      super(launch, executable);
    }
 
    /**
@@ -130,5 +133,28 @@ public class SEDMemoryDebugTarget extends AbstractSEDDebugTarget implements ISED
    @Override
    public void setId(String id) {
       super.setId(id);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void initBreakpoint(IBreakpoint breakpoint) throws DebugException {
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IBreakpoint[] getBreakpoints() {
+      return null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected boolean checkBreakpointHit(IBreakpoint breakpoint, ISEDDebugNode node) {
+      return false;
    }
 }

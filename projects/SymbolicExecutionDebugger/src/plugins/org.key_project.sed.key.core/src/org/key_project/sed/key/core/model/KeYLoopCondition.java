@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -19,7 +19,6 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEDLoopCondition;
-import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDLoopCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
@@ -38,7 +37,7 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
    /**
     * The {@link IExecutionLoopCondition} to represent by this debug node.
     */
-   private IExecutionLoopCondition executionNode;
+   private final IExecutionLoopCondition executionNode;
 
    /**
     * The contained children.
@@ -69,16 +68,26 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this branch condition is contained.
     * @param parent The parent in that this node is contained as child.
-    * @param thread The {@link ISEDThread} in that this node is contained.
+    * @param thread The {@link KeYThread} in that this node is contained.
     * @param executionNode The {@link IExecutionLoopCondition} to represent by this debug node.
     */
    public KeYLoopCondition(KeYDebugTarget target, 
                            IKeYSEDDebugNode<?> parent, 
-                           ISEDThread thread, 
-                           IExecutionLoopCondition executionNode) {
+                           KeYThread thread, 
+                           IExecutionLoopCondition executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      target.registerDebugNode(this);
+      initializeAnnotations();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYThread getThread() {
+      return (KeYThread)super.getThread();
    }
    
    /**
@@ -213,6 +222,7 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
    public boolean hasVariables() throws DebugException {
       try {
          return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
+                !executionNode.isDisposed() && 
                 SymbolicExecutionUtil.canComputeVariables(executionNode, executionNode.getServices()) &&
                 super.hasVariables();
       }
@@ -239,7 +249,7 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
     */
    @Override
    public boolean canStepInto() {
-      return getDebugTarget().canStepInto(this);
+      return getThread().canStepInto(this);
    }
 
    /**
@@ -247,7 +257,7 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
     */
    @Override
    public void stepInto() throws DebugException {
-      getDebugTarget().stepInto(this);
+      getThread().stepInto(this);
    }
 
    /**
@@ -255,7 +265,7 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
     */
    @Override
    public boolean canStepOver() {
-      return getDebugTarget().canStepOver(this);
+      return getThread().canStepOver(this);
    }
 
    /**
@@ -263,7 +273,7 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
     */
    @Override
    public void stepOver() throws DebugException {
-      getDebugTarget().stepOver(this);
+      getThread().stepOver(this);
    }
 
    /**
@@ -271,7 +281,7 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
     */
    @Override
    public boolean canStepReturn() {
-      return getDebugTarget().canStepReturn(this);
+      return getThread().canStepReturn(this);
    }
 
    /**
@@ -279,7 +289,7 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
     */
    @Override
    public void stepReturn() throws DebugException {
-      getDebugTarget().stepReturn(this);
+      getThread().stepReturn(this);
    }
    
    /**
@@ -287,7 +297,7 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
     */
    @Override
    public boolean canResume() {
-      return getDebugTarget().canResume(this);
+      return getThread().canResume(this);
    }
    
    /**
@@ -295,7 +305,7 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
     */
    @Override
    public void resume() throws DebugException {
-      getDebugTarget().resume(this);
+      getThread().resume(this);
    }
 
    /**
@@ -303,7 +313,7 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
     */
    @Override
    public boolean canSuspend() {
-      return getDebugTarget().canSuspend(this);
+      return getThread().canSuspend(this);
    }
 
    /**
@@ -311,7 +321,7 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
     */
    @Override
    public void suspend() throws DebugException {
-      getDebugTarget().suspend(this);
+      getThread().suspend(this);
    }
 
    /**

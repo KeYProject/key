@@ -3,14 +3,13 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 
 package de.uka.ilkd.key.speclang.jml;
 
@@ -39,6 +38,7 @@ import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
@@ -435,12 +435,16 @@ public final class JMLSpecExtractor implements SpecExtractor {
             if(modelMethodDecl != null && modelMethodDecl.getMethodDefinition() != null) {
                specCase.addAxioms(modelMethodDecl.getMethodDefinition());
             }
-
+            ;
             //add purity. Strict purity overrides purity.
             if(isStrictlyPure || pm.isModel()) {
-                specCase.addAssignable(new PositionedString("assignable \\strictly_nothing"));
+            	for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+            		specCase.addAssignable(new PositionedString("<"+heap.name().toString()+">assignable \\strictly_nothing"));
+            	}
             } else if(isPure) {
-                specCase.addAssignable(new PositionedString("assignable \\nothing"));
+            	for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+                	specCase.addAssignable(new PositionedString("<"+heap.name().toString()+">assignable \\nothing"));
+            	}
             }
 
             //add invariants

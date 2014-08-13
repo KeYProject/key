@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.key4eclipse.common.ui.composite;
 
 import java.util.HashMap;
@@ -202,7 +215,7 @@ public class StrategySettingsComposite extends Composite {
             mediator.addAutoModeListener(autoModeListener);
          }
          Name strategyName = proof.getSettings().getStrategySettings().getStrategy();
-         Profile profile = proof.env().getInitConfig().getProfile();
+         Profile profile = proof.getInitConfig().getProfile();
          StrategyFactory factory = strategyName != null ? profile.getStrategyFactory(strategyName) : null;
          if (factory == null) {
             factory = profile.getDefaultStrategyFactory();
@@ -219,7 +232,7 @@ public class StrategySettingsComposite extends Composite {
             }
             data = (FormData)form.getData();
             updateShownContent();
-            setFormEditable(mediator == null || !mediator.autoMode());
+            setFormEditable(mediator == null || !mediator.isInAutoMode());
             layout.topControl = form;
          }
          else {
@@ -430,7 +443,7 @@ public class StrategySettingsComposite extends Composite {
     * Updates the enabled state of the restore default values {@link Button}.
     */
    protected void updateRestoreDefaultEnabled() {
-      if (proof != null && data != null && data.getDefaultButton() != null) {
+      if (proof != null && !proof.isDisposed() && data != null && data.getDefaultButton() != null) {
          boolean defaultMaxRules = data.getMaxStepText() == null ||
                                    getStepsFromText(data.getMaxStepText()) == data.getModel().getDefaultMaxRuleApplications();
          boolean defaultProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties().equals(data.getModel().getDefaultPropertiesFactory().createDefaultStrategyProperties());

@@ -1,3 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.sed.key.ui.test.testcase.swtbot;
 
 import org.eclipse.debug.core.ILaunch;
@@ -41,10 +54,10 @@ public class SWTBotOpenProofTest extends AbstractKeYDebugTargetTestCase {
       StarterPreferenceUtil.setSelectedProofStarterID(KeYIDEProofStarter.STARTER_ID);
       KeYIDEPreferences.setSwitchToKeyPerspective(MessageDialogWithToggle.NEVER);
       try {
-         IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
-               // Resume on thread
+               // Perform step
                SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
                stepInto(bot, item, target);
                // Open editor
@@ -56,6 +69,7 @@ public class SWTBotOpenProofTest extends AbstractKeYDebugTargetTestCase {
                // Close editor
                editor.close();
                assertFalse(((KeYDebugTarget)target).getProof().isDisposed());
+               // Perform step
                stepInto(bot, item, target);
             }
          };
@@ -72,6 +86,8 @@ public class SWTBotOpenProofTest extends AbstractKeYDebugTargetTestCase {
                               Boolean.FALSE, 
                               Boolean.FALSE,
                               Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.TRUE,
                               8, 
                               executor);
       }
@@ -94,12 +110,9 @@ public class SWTBotOpenProofTest extends AbstractKeYDebugTargetTestCase {
       StarterPreferenceUtil.setSelectedProofStarterID(KeYIDEProofStarter.STARTER_ID);
       KeYIDEPreferences.setSwitchToKeyPerspective(MessageDialogWithToggle.NEVER);
       try {
-         IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
-               // Resume on thread
-               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
-               stepInto(bot, item, target);
                // Make sure that open proof is not available
                try {
                   TestUtilsUtil.clickContextMenu(debugTree, "Open Proof"); // Behavior in Eclipse 3.x is to throw an Exception because not available, in Eclipse 4.x the item is disabled and no Exception is thrown. 
@@ -123,6 +136,8 @@ public class SWTBotOpenProofTest extends AbstractKeYDebugTargetTestCase {
                               Boolean.TRUE, 
                               Boolean.FALSE,
                               Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.TRUE,
                               8, 
                               executor);
       }

@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -17,7 +17,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 
 /**
@@ -46,34 +46,34 @@ public interface IExecutionStateNode<S extends SourceElement> extends IExecution
    public IExecutionVariable[] getVariables();
    
    /**
-    * Returns the number of possible initial heap configurations.
-    * @return The number of possible initial heap configurations.
+    * Returns the number of memory layouts.
+    * @return The number of memory layouts.
     * @throws ProofInputException Occurred Exception.
     */
-   public int getConfigurationsCount() throws ProofInputException;
+   public int getLayoutsCount() throws ProofInputException;
    
    /**
-    * Returns the equivalence classes of the configuration with the given index.
-    * @param configurationIndex The index of the configuration.
-    * @return The equivalence classes of the configuration at the given index.
+    * Returns the equivalence classes of the memory layout with the given index.
+    * @param layoutIndex The index of the memory layout.
+    * @return The equivalence classes of the memory layout at the given index.
     * @throws ProofInputException Occurred Exception.
     */
-   public ImmutableList<ISymbolicEquivalenceClass> getConfigurationsEquivalenceClasses(int configurationIndex) throws ProofInputException;
+   public ImmutableList<ISymbolicEquivalenceClass> getLayoutsEquivalenceClasses(int layoutIndex) throws ProofInputException;
    
    /**
-    * Returns the initial configuration of the heap before the method was executed.
-    * @param configurationIndex The index of the configuration.
-    * @return The initial heap configuration at the given index.
+    * Returns the initial memory layout before the method was executed.
+    * @param layoutIndex The index of the memory layout.
+    * @return The initial memory layout at the given index.
     * @throws ProofInputException Occurred Exception.
     */
-   public ISymbolicConfiguration getInitialConfiguration(int configurationIndex) throws ProofInputException;
+   public ISymbolicLayout getInitialLayout(int layoutIndex) throws ProofInputException;
    
    /**
-    * Returns the current configuration of the heap which shows the heap
+    * Returns the current memory layout which shows the memory
     * structure before the current node in the symbolic execution tree is executed.
-    * @param configurationIndex The index of the configuration.
-    * @return The current heap configuration at the given index.
+    * @param layoutIndex The index of the memory layout.
+    * @return The current memory layout at the given index.
     * @throws ProofInputException Occurred Exception.
     */
-   public ISymbolicConfiguration getCurrentConfiguration(int configurationIndex) throws ProofInputException;
+   public ISymbolicLayout getCurrentLayout(int layoutIndex) throws ProofInputException;
 }

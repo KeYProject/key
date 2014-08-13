@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -35,6 +35,7 @@ import org.eclipse.core.runtime.Path;
 import org.junit.Test;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.IFileVisitor;
@@ -47,6 +48,82 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * @author Martin Hentschel
  */
 public class IOUtilTest extends TestCase {
+   /**
+    * {@link IOUtil#contains(Iterable, File)}.
+    */
+   @Test
+   public void testContains_Iterable() throws IOException {
+      File yesDir = IOUtil.createTempDirectory("contains", "yes");
+      File alsoYesDir = IOUtil.createTempDirectory("contains", "alsoYes");
+      File noDir = IOUtil.createTempDirectory("contains", "no");
+      try {
+         File yesFile = TestUtilsUtil.createFile(new File(yesDir, "Hello.txt"), "Hello");
+         File yesFolder = TestUtilsUtil.createFolder(new File(yesDir, "yesSub"));
+         File yesSubFile = TestUtilsUtil.createFile(new File(yesFolder, "Hello.txt"), "Hello");
+         File alsoYesFile = TestUtilsUtil.createFile(new File(alsoYesDir, "Hello.txt"), "Hello");
+         File alsoYesFolder = TestUtilsUtil.createFolder(new File(alsoYesDir, "yesSub"));
+         File alsoYesSubFile = TestUtilsUtil.createFile(new File(alsoYesFolder, "Hello.txt"), "Hello");
+         File noFile = TestUtilsUtil.createFile(new File(noDir, "Hello.txt"), "Hello");
+         File noFolder = TestUtilsUtil.createFolder(new File(noDir, "yesSub"));
+         File noSubFile = TestUtilsUtil.createFile(new File(noFolder, "Hello.txt"), "Hello");
+         List<File> parents = CollectionUtil.toList(yesDir, alsoYesDir);
+         assertFalse(IOUtil.contains((Iterable<File>)null, yesFile));
+         assertFalse(IOUtil.contains(parents, null));
+         assertFalse(IOUtil.contains((Iterable<File>)null, null));
+         assertFalse(IOUtil.contains(parents, yesDir.getParentFile()));
+         assertTrue(IOUtil.contains(parents, yesDir));
+         assertTrue(IOUtil.contains(parents, yesFile));
+         assertTrue(IOUtil.contains(parents, yesFolder));
+         assertTrue(IOUtil.contains(parents, yesSubFile));
+         assertTrue(IOUtil.contains(parents, alsoYesDir));
+         assertTrue(IOUtil.contains(parents, alsoYesFile));
+         assertTrue(IOUtil.contains(parents, alsoYesFolder));
+         assertTrue(IOUtil.contains(parents, alsoYesSubFile));
+         assertFalse(IOUtil.contains(parents, noDir));
+         assertFalse(IOUtil.contains(parents, noFile));
+         assertFalse(IOUtil.contains(parents, noFolder));
+         assertFalse(IOUtil.contains(parents, noSubFile));
+      }
+      finally {
+         IOUtil.delete(yesDir);
+         IOUtil.delete(alsoYesDir);
+         IOUtil.delete(noDir);
+      }
+   }
+   
+   /**
+    * {@link IOUtil#contains(File, File)}.
+    */
+   @Test
+   public void testContains_File() throws IOException {
+      File yesDir = IOUtil.createTempDirectory("contains", "yes");
+      File noDir = IOUtil.createTempDirectory("contains", "no");
+      try {
+         File yesFile = TestUtilsUtil.createFile(new File(yesDir, "Hello.txt"), "Hello");
+         File yesFolder = TestUtilsUtil.createFolder(new File(yesDir, "yesSub"));
+         File yesSubFile = TestUtilsUtil.createFile(new File(yesFolder, "Hello.txt"), "Hello");
+         File noFile = TestUtilsUtil.createFile(new File(noDir, "Hello.txt"), "Hello");
+         File noFolder = TestUtilsUtil.createFolder(new File(noDir, "yesSub"));
+         File noSubFile = TestUtilsUtil.createFile(new File(noFolder, "Hello.txt"), "Hello");
+         assertFalse(IOUtil.contains((File)null, yesFile));
+         assertFalse(IOUtil.contains(yesDir, null));
+         assertFalse(IOUtil.contains((File)null, null));
+         assertFalse(IOUtil.contains(yesDir, yesDir.getParentFile()));
+         assertTrue(IOUtil.contains(yesDir, yesDir));
+         assertTrue(IOUtil.contains(yesDir, yesFile));
+         assertTrue(IOUtil.contains(yesDir, yesFolder));
+         assertTrue(IOUtil.contains(yesDir, yesSubFile));
+         assertFalse(IOUtil.contains(yesDir, noDir));
+         assertFalse(IOUtil.contains(yesDir, noFile));
+         assertFalse(IOUtil.contains(yesDir, noFolder));
+         assertFalse(IOUtil.contains(yesDir, noSubFile));
+      }
+      finally {
+         IOUtil.delete(yesDir);
+         IOUtil.delete(noDir);
+      }
+   }
+   
    /**
     * {@link IOUtil#unifyLineBreaks(InputStream)}.
     */
@@ -717,5 +794,48 @@ public class IOUtilTest extends TestCase {
        assertFalse(subSubDir2.exists());
        assertFalse(subSubSubDir2.exists());
        assertFalse(subSubSubDir2File.exists());
+   }
+   
+   /**
+    * Tests {@link IOUtil#copy(InputStream, java.io.OutputStream)}.
+    */
+   @Test
+   public void testCopy() throws IOException {
+      doTestCopy(null);
+      assertFalse(IOUtil.copy(null, null));
+      assertFalse(IOUtil.copy(new ByteArrayInputStream("NotCopied".getBytes()), null));
+      doTestCopy("One Line");
+      doTestCopy("First Line\n\rSecond Line");
+      doTestCopy("One Line\r");
+      doTestCopy("One Line\n");
+      doTestCopy("One Line\r\n");
+      doTestCopy("One Line\n\r");
+      StringBuffer sb = new StringBuffer();
+      for (int i = 0; i < IOUtil.BUFFER_SIZE * 3; i++) {
+         sb.append("A");
+      }
+      doTestCopy(sb.toString());
+   }
+   
+   /**
+    * Executes the assertions for {@link #testCopy()}.
+    * @param text The text to check.
+    * @throws IOException Occurred Exception.
+    */
+   protected void doTestCopy(String text) throws IOException {
+      if (text != null) {
+         byte[] inBytes = text.getBytes();
+         ByteArrayInputStream in = new ByteArrayInputStream(inBytes);
+         ByteArrayOutputStream out = new ByteArrayOutputStream();
+         assertTrue(IOUtil.copy(in, out));
+         byte[] outBytes = out.toByteArray();
+         assertEquals(inBytes.length, outBytes.length);
+         for (int i = 0; i < inBytes.length; i++) {
+            assertEquals(inBytes[i], outBytes[i]);
+         }
+      }
+      else {
+         assertFalse(IOUtil.copy(null, new ByteArrayOutputStream()));
+      }
    }
 }

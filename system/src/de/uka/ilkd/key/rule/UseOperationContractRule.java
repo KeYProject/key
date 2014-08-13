@@ -3,14 +3,13 @@
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 
 package de.uka.ilkd.key.rule;
 
@@ -550,9 +549,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         // contract can be applied if modality is box and needs no termination
         // argument
-        // see #1417
-        // TODO what about BOX_TRANSACT? Better be conservative ...
-        if(inst.mod == Modality.BOX) {
+        // see #1417, BOX_TRANSACTION added according to Wojciech's proposal.
+        if(inst.mod == Modality.BOX || inst.mod == Modality.BOX_TRANSACTION) {
             return true;
         }
 
@@ -762,7 +760,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 		          .getPOForProof(goal.proof());
 	final Term mbyOk;
 	// see #1417
-	if(inst.mod != Modality.BOX && po != null && mby != null ) {
+	if(inst.mod != Modality.BOX && inst.mod != Modality.BOX_TRANSACTION && po != null && mby != null ) {
 //    	mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),
 //    			       TB.lt(mby, po.getMbyAtPre(), services));
 //	    mbyOk = TB.prec(mby, po.getMbyAtPre(), services);
@@ -852,7 +850,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         	= new RuleJustificationBySpec(contract);
         final ComplexRuleJustificationBySpec cjust
             	= (ComplexRuleJustificationBySpec)
-            	    goal.proof().env().getJustifInfo().getJustification(this);
+            	    goal.proof().getInitConfig().getJustifInfo().getJustification(this);
         cjust.add(ruleApp, just);
         return result;
     }

@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.proof;
 
@@ -31,6 +30,7 @@ import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 /** class tests the tree of proof
@@ -115,7 +115,7 @@ public class TestProofTree extends TestCase {
 		SequentFormula(t_b7)).semisequent(),
 	     Semisequent.EMPTY_SEMISEQUENT); 
 
-	p=new Proof(new Services(AbstractProfile.getDefaultProfile()));
+	p=new Proof("TestProofTree", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
 
 	n1=new Node(p, s1);
 	n2=new Node(p, s2);
@@ -215,5 +215,3 @@ public class TestProofTree extends TestCase {
 
     
 }
-
-

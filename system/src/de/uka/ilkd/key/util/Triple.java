@@ -1,16 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
-// 
-
+//
 
 package de.uka.ilkd.key.util;
 
@@ -29,7 +28,7 @@ public class Triple<T1, T2, T3> {
 
 
     public String toString() { 
-	return "(" + first + ", " + second + ", " + third + ")"; 
+        return "(" + first + ", " + second + ", " + third + ")"; 
     }
     
 
@@ -45,6 +44,10 @@ public class Triple<T1, T2, T3> {
     
     
     public int hashCode() {
-        return 666*first.hashCode() + 42*second.hashCode() + 23*third.hashCode();
+        int res = 0;
+        if (first != null) res += 666*first.hashCode();
+        if (second != null) res += 42*second.hashCode();
+        if (third != null) res += 23*third.hashCode();
+        return res;
     }
 }

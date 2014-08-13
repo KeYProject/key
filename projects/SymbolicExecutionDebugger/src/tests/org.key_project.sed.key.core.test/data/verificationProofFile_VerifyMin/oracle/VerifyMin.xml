@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_682a8c92-64a1-4b90-bd5e-f5eaea12ad3a" name="VerifyMin[VerifyMin::min(int,int)].JML normal_behavior operation contract.0" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_52b53b71-4c64-4d29-bb23-d2b4a324f013" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_41f0e7f3-c795-4628-bab7-694392451cb9" name="VerifyMin.min(_x,_y);" pathCondition="true" lineNumber="-1" charStart="202" charEnd="205" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java">
+            <sedBranchStatement xml:id="_9ba4083a-f545-4545-881a-5ca415f47b8a" name="if (_x&lt;_y)" pathCondition="true" lineNumber="-1" charStart="229" charEnd="240" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java">
+               <sedBranchCondition xml:id="_0b0fc3a0-729b-453b-8279-64097f0c0eae" name="gt(y,x)" pathCondition="gt(y,x)">
+                  <sedStatement xml:id="_48f8c593-b362-4a04-8238-aabb52e3d468" name="return _x;" pathCondition="gt(y,x)" lineNumber="-1" charStart="252" charEnd="261" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java">
+                     <sedMethodReturn xml:id="_56db5da7-741c-4e6e-b342-424727c5a487" name="&lt;return of min&gt;" pathCondition="gt(y,x)" lineNumber="-1" charStart="202" charEnd="205" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java" methodReturnConditionRef="_e0f9ffc5-82e2-437f-8d73-a9d7d6694efd">
+                        <sedTermination xml:id="_7374708b-28a1-41cf-af25-d7bc835990ae" name="&lt;end&gt;" pathCondition="gt(y,x)" verified="true">
+                        </sedTermination>
+                     </sedMethodReturn>
+                  </sedStatement>
+               </sedBranchCondition>
+               <sedBranchCondition xml:id="_5f22ff5b-0de4-4054-b78e-3f4557b5b194" name="leq(y,x)" pathCondition="leq(y,x)">
+                  <sedStatement xml:id="_b69b79b7-83a0-4408-a6d7-6ab8f7df93d0" name="return _y;" pathCondition="leq(y,x)" lineNumber="-1" charStart="295" charEnd="304" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java">
+                     <sedMethodReturn xml:id="_04896824-dd70-41a5-adf5-cfaa8098e514" name="&lt;return of min&gt;" pathCondition="leq(y,x)" lineNumber="-1" charStart="202" charEnd="205" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java" methodReturnConditionRef="_ba589472-4b1f-464d-b0d3-00e956afc4f5">
+                        <sedTermination xml:id="_d9df9741-a748-434b-8e3f-7bb11bdc013c" name="&lt;end&gt;" pathCondition="leq(y,x)" verified="true">
+                        </sedTermination>
+                     </sedMethodReturn>
+                  </sedStatement>
+               </sedBranchCondition>
+            </sedBranchStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_e0f9ffc5-82e2-437f-8d73-a9d7d6694efd" name="gt(y,x)" pathCondition="true">
+               <sedChildReference nodeIdRef="_56db5da7-741c-4e6e-b342-424727c5a487"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedMethodCallMethodReturnCondition xml:id="_ba589472-4b1f-464d-b0d3-00e956afc4f5" name="leq(y,x)" pathCondition="true">
+               <sedChildReference nodeIdRef="_04896824-dd70-41a5-adf5-cfaa8098e514"/>
+            </sedMethodCallMethodReturnCondition>
+         </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_7374708b-28a1-41cf-af25-d7bc835990ae"/>
+         <sedTerminationEntry nodeIdRef="_d9df9741-a748-434b-8e3f-7bb11bdc013c"/>
+      </sedThread>
+   </sedTarget>
+</launch>

@@ -1,8 +1,22 @@
+/*******************************************************************************
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
+ *                    Technical University Darmstadt, Germany
+ *                    Chalmers University of Technology, Sweden
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Technical University Darmstadt - initial API and implementation and/or initial documentation
+ *******************************************************************************/
+
 package org.key_project.key4eclipse.resources.io;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -33,7 +47,7 @@ import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Writer for the meta files.
@@ -56,12 +70,12 @@ public class ProofMetaFileWriter {
    /**
     * Creates the meta file for the given {@link ProofElement}.
     * @param pe - the {@link ProofElement} to use
-    * @throws Exception 
+    * @throws Exception
     */
    public void writeMetaFile() throws Exception {
       IFile metaIFile = pe.getMetaFile();
       this.addedTypes = new LinkedHashSet<String>();
-      doc = createDoument();
+      createDoument();
 
       TransformerFactory transFactory = TransformerFactory.newInstance();
       Transformer transformer = transFactory.newTransformer();
@@ -95,7 +109,7 @@ public class ProofMetaFileWriter {
     * @throws CoreException 
     * @throws IOException 
     */
-   private Document createDoument() throws Exception{
+   private void createDoument() throws Exception{
       DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
       DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
       
@@ -108,18 +122,38 @@ public class ProofMetaFileWriter {
       String md5 = ResourceUtil.computeContentMD5(pe.getProofFile());
       proofFileMD5.setAttribute("md5", md5);
       rootElement.appendChild(proofFileMD5);
+      
+      Element proofStatus = doc.createElement("proofStatus");
+      String status = String.valueOf(pe.getProofClosed());
+      proofStatus.setAttribute("proofClosed", status);
+      rootElement.appendChild(proofStatus);
+      
+      Element markerMessage = doc.createElement("markerMessage");
+      markerMessage.setAttribute("message", pe.getMarkerMsg());
+      rootElement.appendChild(markerMessage);
+      
+      Element usedTypes = createUsedTypes();
+      rootElement.appendChild(usedTypes);
+      
+      Element usedContracts = createUsedContracts();
+      rootElement.appendChild(usedContracts);
+   }
+   
+   private Element createUsedTypes() throws ProofReferenceException{
+      Element usedTypes = doc.createElement("usedTypes");
       LinkedHashSet<IProofReference<?>> proofReferences = pe.getProofReferences();
       for(IProofReference<?> proofRef : proofReferences){
          KeYJavaType kjt = getKeYJavaType(proofRef);
          if(!KeYResourcesUtil.filterKeYJavaType(kjt) && !addedTypes.contains(kjt.getFullName())){
-            createTypeElement(getKeYJavaTypeFromEnv(kjt, pe.getKeYEnvironment()));
+            Element typElement = createTypeElement(usedTypes, getKeYJavaTypeFromEnv(kjt, pe.getKeYEnvironment()));
+            usedTypes.appendChild(typElement);
          }
       }
-      return doc;
+      return usedTypes;
    }
    
    
-   private void createTypeElement(KeYJavaType kjt){
+   private Element createTypeElement(Element usedTypes,KeYJavaType kjt){
       addedTypes.add(kjt.getFullName());
       Element typeElement = doc.createElement("type");
       typeElement.setAttribute("name", kjt.getFullName());
@@ -129,7 +163,7 @@ public class ProofMetaFileWriter {
          subTypeElement.setAttribute("name", subType.getFullName());
          typeElement.appendChild(subTypeElement);
       }
-      doc.getDocumentElement().appendChild(typeElement);
+      return typeElement;
    }
    
    
@@ -139,7 +173,7 @@ public class ProofMetaFileWriter {
     * @param environment - the {@link KeYEnvironment} to use
     * @return the {@link KeYJavaType} form the {@link KeYEnvironment}
     */
-   private KeYJavaType getKeYJavaTypeFromEnv(KeYJavaType kjt, KeYEnvironment<CustomConsoleUserInterface> environment){
+   private KeYJavaType getKeYJavaTypeFromEnv(KeYJavaType kjt, KeYEnvironment<CustomUserInterface> environment){
       Set<KeYJavaType> envKjts = environment.getJavaInfo().getAllKeYJavaTypes();
       for(KeYJavaType envKjt : envKjts){
          if(envKjt.getFullName().equals(kjt.getFullName())){
@@ -175,7 +209,7 @@ public class ProofMetaFileWriter {
             kjt = progMeth.getContainerType();
          }
          else {
-            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected IProgramVariable");
+            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected IProgramMethod");
          }
       }
       else if(IProofReference.USE_AXIOM.equals(proofRef.getKind())){
@@ -184,7 +218,7 @@ public class ProofMetaFileWriter {
             kjt = classAx.getKJT();
          }
          else {
-            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected IProgramVariable");
+            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected ClassAxiom");
          }
       }
       else if(IProofReference.USE_CONTRACT.equals(proofRef.getKind())){
@@ -193,7 +227,7 @@ public class ProofMetaFileWriter {
             kjt = contract.getKJT();
          }
          else {
-            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected IProgramVariable");
+            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected Contract");
          }
       }
       else if(IProofReference.USE_INVARIANT.equals(proofRef.getKind())){
@@ -202,12 +236,24 @@ public class ProofMetaFileWriter {
             kjt = classInv.getKJT();
          }
          else {
-            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected IProgramVariable");
+            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected ClassInvariant");
          }
       }
       else {
          throw new ProofReferenceException("Unknow proof reference kind found: " + proofRef.getKind());
       }
       return kjt;
+   }
+   
+   
+   private Element createUsedContracts() throws ProofReferenceException{
+      Element usedContractsElement = doc.createElement("usedContracts");
+      LinkedList<ProofElement> usedContractsProofElements = pe.getUsedContracts();
+      for(ProofElement usedContractProofElement : usedContractsProofElements){
+         Element usedContractElement = doc.createElement("usedContract");
+         usedContractElement.setAttribute("proofFile", usedContractProofElement.getProofFile().getFullPath().toString());
+         usedContractsElement.appendChild(usedContractElement);
+      }
+      return usedContractsElement;
    }
 }

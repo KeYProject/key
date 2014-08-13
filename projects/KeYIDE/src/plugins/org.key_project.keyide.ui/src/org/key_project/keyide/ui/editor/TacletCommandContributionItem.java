@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -30,17 +30,17 @@ public class TacletCommandContributionItem extends CommandContributionItem {
    /***
     * The {@link TacletApp} to apply.
     */
-   private TacletApp app;
+   private final TacletApp app;
    
    /**
     * The {@link KeYMediator} to use.
     */
-   private KeYMediator mediator;
+   private final KeYMediator mediator;
    
    /**
     * The {@link PosInSequent} to apply {@link TacletApp} on.
     */
-   private PosInSequent pos;
+   private final PosInSequent pos;
    
    /**
     * The constructor with the additional parameters.

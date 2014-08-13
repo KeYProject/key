@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Karlsruhe Institute of Technology, Germany 
+ * Copyright (c) 2014 Karlsruhe Institute of Technology, Germany
  *                    Technical University Darmstadt, Germany
  *                    Chalmers University of Technology, Sweden
  * All rights reserved. This program and the accompanying materials
@@ -13,7 +13,6 @@
 
 package org.key_project.sed.ui.property;
 
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.key_project.sed.core.model.ISEDDebugNode;
 
@@ -27,7 +26,7 @@ public class CallStackPropertySection extends AbstractSEDDebugNodePropertySectio
     * {@inheritDoc}
     */
    @Override
-   protected AbstractSEDDebugNodeTabComposite createContentComposite(Composite parent, int style) {
-      return new CallStackTabComposite(parent, style, getWidgetFactory());
+   protected ISEDDebugNodeTabContent createContent() {
+      return new CallStackTabComposite();
    }
 }

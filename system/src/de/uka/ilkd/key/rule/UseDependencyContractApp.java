@@ -1,13 +1,13 @@
-// This file is part of KeY - Integrated Deductive Software Design 
+// This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
 //                         Technical University Darmstadt, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General 
+// The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 
@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -119,7 +120,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
         }
         return app;
     }
-
+    
     public UseDependencyContractApp tryToInstantiateContract(final Services services) {
         final Term focus = posInOccurrence().subTerm();
         if (! (focus.op() instanceof IObserverFunction))
@@ -159,6 +160,14 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
         return heapContext;
     }
 
+    @Override
+    public IObserverFunction getObserverFunction(Services services) {
+        final Operator op = posInOccurrence().subTerm().op();
+        return (IObserverFunction) (op instanceof IObserverFunction ? op : null); 
+    }
+
+    
+    
     @Override
     public UseDependencyContractApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);

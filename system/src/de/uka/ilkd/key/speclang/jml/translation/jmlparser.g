@@ -1334,7 +1334,11 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
 	    	result = lookupIdentifier(fullyQualifiedName + "." + lookupName, null, null, id);
 	    }
 	}
-    |
+    | tr:TRANSIENT
+    {
+        result = lookupIdentifier("<transient>", receiver, null, tr);
+    }
+    |    
      THIS
     {
     	result = new SLExpression(
@@ -1360,7 +1364,7 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
             ImmutableList<SLExpression> preHeapParams = ImmutableSLList.<SLExpression>nil();
             for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
               Term p;
-              if(atPres == null || atPres.get(heap) == null) { p = tb.NULL(); } else { p = atPres.get(heap); }
+              if(atPres == null || atPres.get(heap) == null) { p = tb.var(heap); } else { p = atPres.get(heap); }
               preHeapParams = preHeapParams.append(new SLExpression(p));
             }
             params = params.prepend(preHeapParams);
