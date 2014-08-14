@@ -1319,9 +1319,8 @@ public class LogicPrinter {
     }
     
     /*
-     * This code is only used once, in method {@link #printSelect(Term, Term) printSelect}.
-     * Purpose of putting it into a separate method is to improve readability of {@link printSelect(Term, Term) printSelect}.
-     * It prints out a static field access.
+     * Print out a static field access.
+     * (separated from {@link #printSelect(Term, Term) printSelect}, to improve code readability)
      */
     private void printSelectStatic(Term objectTerm, Term fieldTerm, HeapLDT heapLDT) throws IOException {
 
