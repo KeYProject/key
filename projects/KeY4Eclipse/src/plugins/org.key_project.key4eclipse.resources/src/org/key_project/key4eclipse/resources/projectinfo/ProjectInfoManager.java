@@ -151,7 +151,7 @@ public final class ProjectInfoManager {
             }
             // Create new info if loading failed
             if (info == null) {
-               info = new ProjectInfo();
+               info = new ProjectInfo(project);
             }
             info.mapResource(project, info);
             infos.put(project, info);
@@ -225,7 +225,7 @@ public final class ProjectInfoManager {
       public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
          if (TAG_PROJECT_INFO.equals(qName)) {
             Assert.isTrue(projectInfo == null);
-            projectInfo = new ProjectInfo();
+            projectInfo = new ProjectInfo(getProject(attributes));
             parentStack.addFirst(projectInfo);
          }
          else if (TAG_PACKAGE_INFO.equals(qName)) {
@@ -302,6 +302,21 @@ public final class ProjectInfoManager {
          String path = attributes.getValue(ATTRIBUTE_PATH);
          if (path != null) {
             return ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(path));
+         }
+         else {
+            return null;
+         }
+      }
+
+      /**
+       * Returns the {@link IProject}.
+       * @param attributes The attributes to read from.
+       * @return The read value.
+       */
+      protected IProject getProject(Attributes attributes) {
+         String name = getName(attributes);
+         if (name != null) {
+            return ResourcesPlugin.getWorkspace().getRoot().getProject(name);
          }
          else {
             return null;
@@ -411,15 +426,14 @@ public final class ProjectInfoManager {
     * @param info The {@link ProjectInfo} to save.
     * @throws CoreException Occurred Exception.
     */
-   public void save(IProject project, ProjectInfo info) throws CoreException {
-      Assert.isTrue(info == infos.get(project));
-      if (project.exists() && project.isOpen()) {
+   public void save(ProjectInfo info) throws CoreException {
+      if (info.getProject().exists() && info.getProject().isOpen()) {
          InputStream in = null;
          try {
             Charset charset = Charset.defaultCharset();
             String xml = toXML(charset, info);
             in = new ByteArrayInputStream(xml.getBytes(charset));
-            IFolder proofFolder = project.getFolder(KeYResourcesUtil.PROOF_FOLDER_NAME);
+            IFolder proofFolder = info.getProject().getFolder(KeYResourcesUtil.PROOF_FOLDER_NAME);
             if (!proofFolder.exists()) {
                proofFolder.create(true, true, null);
             }
@@ -454,7 +468,9 @@ public final class ProjectInfoManager {
    private String toXML(Charset charset, ProjectInfo info) {
       StringBuffer sb = new StringBuffer();
       XMLUtil.appendXmlHeader(charset.displayName(), sb);
-      XMLUtil.appendStartTag(0, TAG_PROJECT_INFO, null, sb);
+      Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+      attributeValues.put(ATTRIBUTE_NAME, info.getProject().getName());
+      XMLUtil.appendStartTag(0, TAG_PROJECT_INFO, attributeValues, sb);
       for (PackageInfo packageInfo : info.getPackages()) {
          appendPackageInfo(1, packageInfo, sb);
       }

@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.Assert;
 import org.key_project.key4eclipse.resources.projectinfo.event.IProjectInfoListener;
 
 /**
@@ -60,6 +61,20 @@ public class ProjectInfo implements IStatusInfo {
     */
    private final Map<IResource, Set<Object>> resourceToModelMap = new HashMap<IResource, Set<Object>>();
    
+   /**
+    * The {@link IProject}.
+    */
+   private final IProject project;
+   
+   /**
+    * Constructor.
+    * @param project The {@link IProject}.
+    */
+   public ProjectInfo(IProject project) {
+      Assert.isNotNull(project);
+      this.project = project;
+   }
+
    /**
     * Adds the given {@link PackageInfo} at the given index.
     * @param packageInfo The {@link PackageInfo} to add.
@@ -370,5 +385,13 @@ public class ProjectInfo implements IStatusInfo {
     */
    public Set<Object> getModelElements(IResource resource) {
       return resourceToModelMap.get(resource);
+   }
+
+   /**
+    * Returns the {@link IProject}.
+    * @return The {@link IProject}.
+    */
+   public IProject getProject() {
+      return project;
    }
 }

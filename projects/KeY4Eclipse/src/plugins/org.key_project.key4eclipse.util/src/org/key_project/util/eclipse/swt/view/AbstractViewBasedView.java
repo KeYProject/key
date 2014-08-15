@@ -36,37 +36,7 @@ import org.key_project.util.java.ObjectUtil;
  * </p>
  * @author Martin Hentschel
  */
-public abstract class AbstractViewBasedView extends ViewPart {
-   /**
-    * Listens for changes on the {@link IWorkbenchPage} of this {@link IViewSite}.
-    */
-   private IPartListener partListener = new IPartListener() {
-      @Override
-      public void partOpened(IWorkbenchPart part) {
-         handlePartOpened(part);
-      }
-      
-      @Override
-      public void partDeactivated(IWorkbenchPart part) {
-         handlePartDeactivated(part);
-      }
-      
-      @Override
-      public void partClosed(IWorkbenchPart part) {
-         handlePartClosed(part);
-      }
-      
-      @Override
-      public void partBroughtToTop(IWorkbenchPart part) {
-         handlePartBroughtToTop(part);
-      }
-      
-      @Override
-      public void partActivated(IWorkbenchPart part) {
-         handlePartActivated(part);
-      }
-   };
-   
+public abstract class AbstractViewBasedView extends AbstractWorkbenchPartBasedView {   
    /**
     * The {@link IViewPart} which is treated by this {@link IViewPart}.
     */
@@ -78,7 +48,6 @@ public abstract class AbstractViewBasedView extends ViewPart {
    @Override
    public void init(IViewSite site) throws PartInitException {
       super.init(site);
-      getViewSite().getPage().addPartListener(partListener);
       initBaseView(getViewSite());
    }
 
@@ -144,36 +113,6 @@ public abstract class AbstractViewBasedView extends ViewPart {
             setBaseView(baseView);
          }
       }
-   }
-
-   /**
-    * Handles the event {@link IPartListener#partActivated(IWorkbenchPart)}.
-    * @param part The activated {@link IWorkbenchPart}.
-    */
-   protected void handlePartActivated(IWorkbenchPart part) {
-   }
-
-   /**
-    * Handles the event {@link IPartListener#partBroughtToTop(IWorkbenchPart)}.
-    * @param part The {@link IWorkbenchPart} brought to top.
-    */
-   protected void handlePartBroughtToTop(IWorkbenchPart part) {
-   }
-
-   /**
-    * Handles the event {@link IPartListener#partDeactivated(IWorkbenchPart)}.
-    * @param part The deactivated {@link IWorkbenchPart}.
-    */
-   protected void handlePartDeactivated(IWorkbenchPart part) {
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void dispose() {
-      getViewSite().getPage().removePartListener(partListener);
-      super.dispose();
    }
 
    /**

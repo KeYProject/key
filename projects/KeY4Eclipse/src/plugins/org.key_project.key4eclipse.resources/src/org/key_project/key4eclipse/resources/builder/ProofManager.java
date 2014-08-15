@@ -363,7 +363,7 @@ public class ProofManager {
       for (Entry<AbstractTypeContainer, Integer> entry : typeIndexMap.entrySet()) {
          removeTypesIfRequired(entry.getKey(), entry.getValue().intValue(), entry.getKey().countTypes());
       }
-      ProjectInfoManager.getInstance().save(project, projectInfo);
+      ProjectInfoManager.getInstance().save(projectInfo);
       return proofElements;
    }
    

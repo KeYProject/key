@@ -168,7 +168,7 @@ public class ContractInfo {
    public TacletOptionIssues checkTaletOptions() throws ProofInputException {
       if (proofFile != null) {
          File localFile = ResourceUtil.getLocation(proofFile);
-         if (localFile != null) {
+         if (localFile != null && localFile.isFile()) {
             KeYFile file = new KeYFile("Check", localFile, null, AbstractProfile.getDefaultProfile());
             ProofSettings settings = file.readPreferences();
             List<String> unsoundTacletOptions = new LinkedList<String>();
