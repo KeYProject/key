@@ -47,22 +47,22 @@ public class ProjectInfoColorTreeSynchronizer extends AbstractProjectInfoBasedCo
    /**
     * The color used for closed proofs.
     */
-   public static final RGB COLOR_CLOSED_PROOF = new RGB(0, 128, 0);
+   public static final RGB COLOR_CLOSED_PROOF = new RGB(56, 141, 56); // JUnit green: 95, 191, 95;
    
    /**
     * The color used for closed proofs.
     */
-   public static final RGB COLOR_UNPROVEN_DEPENDENCY = new RGB(0, 128, 192);
+   public static final RGB COLOR_UNPROVEN_DEPENDENCY = new RGB(95, 95, 95); // JUnit stopped: 120, 120, 120
    
    /**
     * The color used for open proofs.
     */
-   public static final RGB COLOR_OPEN_PROOF = new RGB(128, 0, 0);
+   public static final RGB COLOR_OPEN_PROOF = new RGB(133, 52, 52); // JUnit red: 159, 63, 63
    
    /**
     * The color used for unspecified methods.
     */
-   public static final RGB COLOR_UNSPECIFIED = new RGB(255, 127, 39);
+   public static final RGB COLOR_UNSPECIFIED = new RGB(137, 108, 7); // Eclipse warning border: 246, 211, 87
    
    /**
     * Maps an {@link RGB} to the used {@link Color}.
