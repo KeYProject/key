@@ -1,6 +1,8 @@
 package org.key_project.key4eclipse.resources.ui.view;
 
+import java.io.File;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -16,34 +18,60 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.browser.LocationListener;
+import org.eclipse.swt.browser.StatusTextEvent;
+import org.eclipse.swt.browser.StatusTextListener;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.HTMLTransfer;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.part.ViewPart;
+import org.key_project.key4eclipse.common.ui.util.KeYImages;
+import org.key_project.key4eclipse.common.ui.util.StarterUtil;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileAssumption;
 import org.key_project.key4eclipse.resources.projectinfo.AbstractContractContainer;
 import org.key_project.key4eclipse.resources.projectinfo.AbstractTypeContainer;
 import org.key_project.key4eclipse.resources.projectinfo.ContractInfo;
+import org.key_project.key4eclipse.resources.projectinfo.ContractInfo.TacletOptionIssues;
 import org.key_project.key4eclipse.resources.projectinfo.MethodInfo;
 import org.key_project.key4eclipse.resources.projectinfo.ObserverFunctionInfo;
 import org.key_project.key4eclipse.resources.projectinfo.PackageInfo;
@@ -56,13 +84,22 @@ import org.key_project.key4eclipse.resources.ui.provider.ProjectInfoLabelProvide
 import org.key_project.key4eclipse.resources.ui.provider.ProjectInfoLazyTreeContentProvider;
 import org.key_project.key4eclipse.resources.ui.util.LogUtil;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.eclipse.swt.CustomProgressBar;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.viewer.ObservableTreeViewer;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithResult;
 
+import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
+import de.uka.ilkd.key.gui.configuration.ChoiceSelector.ChoiceEntry;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
@@ -71,6 +108,16 @@ import de.uka.ilkd.key.util.LinkedHashMap;
  */
 @SuppressWarnings("restriction")
 public class VerificationStatusView extends ViewPart {
+   /**
+    * The protocol used to link {@link ResourcesPlugin}s in the Eclipse workspace.
+    */
+   private static final String PROTOCOL_RESOURCE = "resource:";
+
+   /**
+    * The protocol used to link to {@link File}s in the local file system.
+    */
+   protected static final String PROTOCOL_FILE_PREFIX = "file:/";
+
    /**
     * The root {@link Composite} which contains all shown content.
     */
@@ -202,9 +249,14 @@ public class VerificationStatusView extends ViewPart {
    private Color closedProofColor;
    
    /**
-    * The text which shows assumptions
+    * The {@link Browser} which shows the HTML report.
     */
-   private Text assumptionText;
+   private Browser reportBrowser;
+   
+   /**
+    * The currently selected text in {@link #reportBrowser}.
+    */
+   private String selectedReportBrowserText;
    
    /**
     * {@inheritDoc}
@@ -251,6 +303,15 @@ public class VerificationStatusView extends ViewPart {
          }
       });
       ColumnViewerToolTipSupport.enableFor(treeViewer);
+      MenuManager treeViewerMenuManager = new MenuManager();
+      treeViewerMenuManager.setRemoveAllWhenShown(true);
+      treeViewerMenuManager.addMenuListener(new IMenuListener() {
+          @Override
+         public void menuAboutToShow(IMenuManager manager) {
+            handleTreeViewerMenuAboutToShow(manager);
+         }
+      });
+      treeViewer.getTree().setMenu(treeViewerMenuManager.createContextMenu(treeViewer.getTree()));
       // legendComposite
       Composite legendComposite = new Composite(treeViewrLegendComposite, SWT.NONE);
       legendComposite.setLayout(new GridLayout(5, false));
@@ -279,13 +340,38 @@ public class VerificationStatusView extends ViewPart {
       closedProofLabel.setToolTipText("A proof is sucefull closed and all used specifications of the project are proven as well.");
       updateShownContent();
       ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceChangeListener);
-      // assumptionText
-      assumptionText = new Text(tabFolder, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
-      assumptionText.setEditable(false);
-      // projectTabItem
-      CTabItem assumptionTabItem = new CTabItem(tabFolder, SWT.NONE);
-      assumptionTabItem.setText("&Assumptions");
-      assumptionTabItem.setControl(assumptionText);
+      // reportBrowser
+      reportBrowser = new Browser(tabFolder, SWT.BORDER);
+      reportBrowser.addLocationListener(new LocationListener() {
+         @Override
+         public void changing(LocationEvent event) {
+            handleReportBrowserChanging(event);
+         }
+         
+         @Override
+         public void changed(LocationEvent event) {
+            handleReportBrowserChanged(event);
+         }
+      });
+      reportBrowser.addStatusTextListener(new StatusTextListener() {
+         @Override
+         public void changed(StatusTextEvent event) {
+            selectedReportBrowserText = event.text;
+         }
+      });
+      MenuManager reportBrowserMenuManager = new MenuManager();
+      reportBrowserMenuManager.setRemoveAllWhenShown(true);
+      reportBrowserMenuManager.addMenuListener(new IMenuListener() {
+         @Override
+         public void menuAboutToShow(IMenuManager manager) {
+            handleReportBrowserMenuAboutToShow(manager);
+         }
+      });
+      reportBrowser.setMenu(reportBrowserMenuManager.createContextMenu(reportBrowser));
+      // reportTabItem
+      CTabItem reportTabItem = new CTabItem(tabFolder, SWT.NONE);
+      reportTabItem.setText("&Report");
+      reportTabItem.setControl(reportBrowser);
    }
 
    /**
@@ -309,7 +395,7 @@ public class VerificationStatusView extends ViewPart {
          treeViewer.setInput(projects);
          colorSynchronizer = new ProjectInfoColorTreeSynchronizer(projects, treeViewer);
       }
-      updateProgressBarsAndAssumptions(); // Always update progress bars because method is called on any resource change
+      updateProgressBarsAndReport(); // Always update progress bars because method is called on any resource change
    }
 
    /**
@@ -350,7 +436,91 @@ public class VerificationStatusView extends ViewPart {
    protected void handleDoubleClick(DoubleClickEvent event) {
       selectInWorkbench(event.getSelection());
    }
+
+   /**
+    * Updates the context menu of {@link #treeViewer}.
+    * @param manager The {@link IMenuManager} to update.
+    */
+   protected void handleTreeViewerMenuAboutToShow(IMenuManager manager) {
+      Object[] elements = SWTUtil.toArray(treeViewer.getSelection());
+      // Check if at least one proof file is available
+      List<IFile> proofFiles = new LinkedList<IFile>();
+      for (Object obj : elements) {
+         if (obj instanceof ContractInfo) {
+            IFile proofFile = ((ContractInfo) obj).getProofFile();
+            if (proofFile != null && proofFile.exists()) {
+               proofFiles.add(proofFile);
+            }
+         }
+      }
+      // Update menu
+      if (!proofFiles.isEmpty()) {
+         manager.add(createOpenProofsAction(proofFiles.toArray(new IFile[proofFiles.size()])));
+      }
+   }
    
+   /**
+    * Creates an {@link IAction} which allows to open given existing proof files.
+    * @param proofFiles The existing proof files to open.
+    * @return The created {@link IAction}.
+    */
+   protected IAction createOpenProofsAction(final IFile[] proofFiles) {
+      IAction action = new Action("Open proof", KeYImages.getImageDescriptor(KeYImages.KEY_LOGO)) {
+         @Override
+         public void run() {
+            openProofs(proofFiles);
+         }
+      };
+      action.setEnabled(!ArrayUtil.isEmpty(proofFiles));
+      return action;
+   }
+   
+   /**
+    * Creates an {@link IAction} which allows to open given existing proof files.
+    * @param proofFiles The existing proof files to open.
+    * @return The created {@link IAction}.
+    */
+   protected IAction createOpenFilesAction(final IFile[] files) {
+      IAction action = new Action("Open file") {
+         @Override
+         public void run() {
+            selectInWorkbench(SWTUtil.createSelection((Object[])files));
+         }
+      };
+      if (!ArrayUtil.isEmpty(files)) {
+         Image image = null;
+         int i = 0;
+         while (image == null && i < files.length) {
+            image = WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider().getImage(files[i]);
+            i++;
+         }
+         if (image != null) {
+            action.setImageDescriptor(ImageDescriptor.createFromImage(image));
+         }
+         action.setEnabled(true);
+      }
+      else {
+         action.setEnabled(false);
+      }
+      return action;
+   }
+   
+   /**
+    * Opens the selected proofs.
+    * @param proofFiles The {@link IFile}s of the proofs to open.
+    */
+   protected void openProofs(IFile[] proofFiles) {
+      try {
+         for (IFile file : proofFiles) {
+            StarterUtil.openFileStarter(rootComposite.getShell(), file);
+         }
+      }
+      catch (Exception e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(rootComposite.getShell(), e);
+      }
+   }
+
    /**
     * Selects the elements in the given {@link ISelection} in the {@link IWorkbench}.
     * @param selection The {@link ISelection} which provides the elements to select.
@@ -368,8 +538,17 @@ public class VerificationStatusView extends ViewPart {
             element = info.getParent();
          }
          // Try to select element
-         if (element instanceof IProject) {
-            WorkbenchUtil.selectAndReveal((IProject)element);
+         if (element instanceof IFile) {
+            try {
+               WorkbenchUtil.openEditor((IFile) element);
+            }
+            catch (PartInitException e) {
+               LogUtil.getLogger().logError(e);
+               LogUtil.getLogger().openErrorDialog(getSite().getShell(), e);
+            }
+         }
+         else if (element instanceof IResource) {
+            WorkbenchUtil.selectAndReveal((IResource)element);
          }
          else if (element instanceof PackageInfo) {
             PackageInfo info = (PackageInfo) element;
@@ -420,7 +599,7 @@ public class VerificationStatusView extends ViewPart {
    /**
     * Updates the progress bars {@link #proofProgressBar} and {@link #specificationProgressBar}.
     */
-   protected void updateProgressBarsAndAssumptions() {
+   protected void updateProgressBarsAndReport() {
       AbstractDependingOnObjectsJob.cancelJobs(VerificationStatusView.this);
       Job job = new AbstractDependingOnObjectsJob("Computing verification status", VerificationStatusView.this) {
          @Override
@@ -439,21 +618,35 @@ public class VerificationStatusView extends ViewPart {
                   proofProgressBar.getDisplay().syncExec(new Runnable() {
                      @Override
                      public void run() {
-                        proofProgressBar.setToolTipText(status.numOfProvenContracts + " of " + status.numOfContracts + " proof obligations are proven.");
-                        proofProgressBar.reset(status.numOfProvenContracts != status.numOfContracts, false, status.numOfProvenContracts, status.numOfContracts);
-                        specificationProgressBar.setToolTipText(status.numOfSpecifiedMethods + " of " + status.numOfMethods + " methods are specified.");
-                        specificationProgressBar.reset(status.numOfSpecifiedMethods != status.numOfMethods, false, status.numOfSpecifiedMethods, status.numOfMethods);
+                        if (!proofProgressBar.isDisposed()) {
+                           proofProgressBar.setToolTipText(status.numOfProvenContracts + " of " + status.numOfContracts + " proof obligations are proven.");
+                           proofProgressBar.reset(status.numOfProvenContracts != status.numOfContracts, false, status.numOfProvenContracts, status.numOfContracts);
+                           specificationProgressBar.setToolTipText(status.numOfSpecifiedMethods + " of " + status.numOfMethods + " methods are specified.");
+                           specificationProgressBar.reset(status.numOfSpecifiedMethods != status.numOfMethods, false, status.numOfSpecifiedMethods, status.numOfMethods);
+                        }
                      }
                   });
                }
                SWTUtil.checkCanceled(monitor);
-               final String assumptions = createAssumptionText(status, monitor);
+               IRunnableWithResult<FontData> fontRun = new AbstractRunnableWithResult<FontData>() {
+                  @Override
+                  public void run() {
+                     Font systemFont = Display.getDefault().getSystemFont();
+                     setResult(systemFont.getFontData()[0]);
+                  }
+               };
+               Display.getDefault().syncExec(fontRun);
                SWTUtil.checkCanceled(monitor);
-               if (!assumptionText.isDisposed()) {
-                  assumptionText.getDisplay().syncExec(new Runnable() {
+               final String report = createHtmlReport(status, monitor, fontRun.getResult().getName(), fontRun.getResult().getHeight());
+               SWTUtil.checkCanceled(monitor);
+               if (!reportBrowser.isDisposed()) {
+                  reportBrowser.getDisplay().syncExec(new Runnable() {
                      @Override
                      public void run() {
-                        assumptionText.setText(assumptions);
+                        if (!reportBrowser.isDisposed() && !ObjectUtil.equals(report, reportBrowser.getData())) {
+                           reportBrowser.setText(report, true);
+                           reportBrowser.setData(report);
+                        }
                      }
                   });
                }
@@ -462,54 +655,215 @@ public class VerificationStatusView extends ViewPart {
             catch (OperationCanceledException e) {
                return Status.CANCEL_STATUS;
             }
+            catch (Exception e) {
+               return LogUtil.getLogger().createErrorStatus(e);
+            }
          }
          
-         private String createAssumptionText(VerificationStatus status, IProgressMonitor monitor) {
+         private String createHtmlReport(VerificationStatus status, IProgressMonitor monitor, String font, int fontSize) throws Exception {
             StringBuffer sb = new StringBuffer();
-            sb.append("Proofs are performed under the following assumptions still needs to be proven:");
-            sb.append(StringUtil.NEW_LINE);
-            int i = 1;
-            for (Entry<ProofMetaFileAssumption, List<IFile>> entry : status.assumptions.entrySet()) {
-               sb.append(i);
-               sb.append(": ");
-               sb.append(entry.getKey());
-               sb.append(StringUtil.NEW_LINE);
-               for (IFile file : entry.getValue()) {
-                  sb.append("\t - Used by proof: ");
-                  sb.append(file.getFullPath());
-                  sb.append(StringUtil.NEW_LINE);
-               }
-               i++;
+            // Add header
+            sb.append("<html>" + StringUtil.NEW_LINE);
+            sb.append("<header>" + StringUtil.NEW_LINE);
+            sb.append("<title>Report</title>" + StringUtil.NEW_LINE);
+            sb.append("<style type=\"text/css\">" + StringUtil.NEW_LINE);
+            sb.append("html {font-family:'" + font + "'; font-size:" + fontSize + "pt;}" + StringUtil.NEW_LINE);
+            sb.append("h1 {font-family:'" + font + "'; font-size:" + (fontSize + 2) + "pt; margin-top: " + ((fontSize + 2) / 2) + "pt; margin-bottom: 1pt;}" + StringUtil.NEW_LINE);
+            sb.append("ol {margin-top: 0pt; margin-bottom: 0pt;}" + StringUtil.NEW_LINE);
+            sb.append("ul {margin-top: 0pt; margin-bottom: 0pt;}" + StringUtil.NEW_LINE);
+            sb.append("li {margin-top: 1pt; margin-bottom: 1pt;}" + StringUtil.NEW_LINE);
+            sb.append("a:link { color:blue; text-decoration:none; }" + StringUtil.NEW_LINE);
+            sb.append("a:visited { color:blue; text-decoration:none; }" + StringUtil.NEW_LINE);
+            sb.append("a:focus { color:blue; text-decoration:none; }" + StringUtil.NEW_LINE);
+            sb.append("a:hover { color:blue; text-decoration:underline; }" + StringUtil.NEW_LINE);
+            sb.append("a:active { color:blue; text-decoration:none; }" + StringUtil.NEW_LINE);
+            sb.append("</style>" + StringUtil.NEW_LINE);
+            sb.append("</header>" + StringUtil.NEW_LINE);
+            sb.append("<body>" + StringUtil.NEW_LINE);
+            sb.append("<h1><a name=\"#Contents\">List of Contents</a></h1>" + StringUtil.NEW_LINE);
+            sb.append("<ol>" + StringUtil.NEW_LINE);
+            if (!status.unprovenContracts.isEmpty()) {
+               sb.append("<li><a href=\"#OpenProofs\">Open Proofs</a></li>" + StringUtil.NEW_LINE);
             }
-            sb.append(i);
-            sb.append(": Java and JML semantics are correctly modeled in KeY.");
-            sb.append(StringUtil.NEW_LINE);
-            i++;
-            sb.append(i);
-            sb.append(": Source code is compiled using a correct Java compiler.");
-            sb.append(StringUtil.NEW_LINE);
-            i++;
-            sb.append(i);
-            sb.append(": Program is run on a a correct JVM.");
-            sb.append(StringUtil.NEW_LINE);
+            if (!status.unspecifiedMethods.isEmpty()) {
+               sb.append("<li><a href=\"#UnspecifiedMethods\">Unspecified Methods</a></li>" + StringUtil.NEW_LINE);
+            }
+            if (!status.unsoundTacletOptions.isEmpty()) {
+               sb.append("<li><a href=\"#TacletOptionsUnsound\">" + ChoiceEntry.UNSOUND_TEXT + " Taclet Options</a></li>" + StringUtil.NEW_LINE);
+            }
+            if (!status.incomplelteTacletOptions.isEmpty()) {
+               sb.append("<li><a href=\"#TacletOptionsIncomplete\">" + ChoiceEntry.INCOMPLETE_TEXT  + " Taclet Options</a></li>" + StringUtil.NEW_LINE);
+            }
+            if (!status.informationTacletOptions.isEmpty()) {
+               sb.append("<li><a href=\"#TacletOptionsInformation\">Taclet Options with additional Information</a></li>" + StringUtil.NEW_LINE);
+            }
+            sb.append("<li><a href=\"#Assumptions\">Assumptions</a></li>" + StringUtil.NEW_LINE);
+            sb.append("</ol>" + StringUtil.NEW_LINE);
+            // Add unspecified methods
+            if (!status.unspecifiedMethods.isEmpty()) {
+               sb.append("<h1><a name=\"#UnspecifiedMethods\">Unspecified Methods</a></h1>" + StringUtil.NEW_LINE);
+               sb.append((status.numOfMethods - status.numOfSpecifiedMethods) + " of " + status.numOfMethods + " methods are unspecified and may call methods in a state not satisfying the precondition: " + StringUtil.NEW_LINE);
+               sb.append("<ol>" + StringUtil.NEW_LINE);
+               for (Entry<TypeInfo, List<MethodInfo>> entry : status.unspecifiedMethods.entrySet()) {
+                  SWTUtil.checkCanceled(monitor);
+                  sb.append("<li>" + StringUtil.NEW_LINE);
+                  sb.append("<a href=\"" + toURL(entry.getKey().getFile()) + "\">");
+                  sb.append(entry.getKey().getName());
+                  sb.append("</a>" + StringUtil.NEW_LINE);
+                  sb.append("<ul>" + StringUtil.NEW_LINE);
+                  for (MethodInfo method : entry.getValue()) {
+                     SWTUtil.checkCanceled(monitor);
+                     sb.append("<li>" + method.getDisplayName() + "</li>" + StringUtil.NEW_LINE);
+                  }
+                  sb.append("</ul>" + StringUtil.NEW_LINE);
+                  sb.append("</li>" + StringUtil.NEW_LINE);
+               }
+               sb.append("</ol>" + StringUtil.NEW_LINE);
+            }
+            // Add open proofs
+            if (!status.unprovenContracts.isEmpty()) {
+               sb.append("<h1><a name=\"#OpenProofs\">Open Proofs</a></h1>" + StringUtil.NEW_LINE);
+               sb.append((status.numOfContracts - status.numOfProvenContracts) + " of " + status.numOfProvenContracts + " proofs are still open: " + StringUtil.NEW_LINE);
+               sb.append("<ol>" + StringUtil.NEW_LINE);
+               for (ContractInfo contractInfo : status.unprovenContracts) {
+                  SWTUtil.checkCanceled(monitor);
+                  sb.append("<li>" + StringUtil.NEW_LINE);
+                  sb.append("<a href=\"" + toURL(contractInfo.getProofFile()) + "\">");
+                  sb.append(contractInfo.getProofFile().getFullPath());
+                  sb.append("</a>" + StringUtil.NEW_LINE);
+                  List<IFile> usedByFiles = status.usedByProofs.get(contractInfo.getProofFile());
+                  if (!CollectionUtil.isEmpty(usedByFiles)) {
+                     sb.append("<ul>" + StringUtil.NEW_LINE);
+                     for (IFile usedByFile : usedByFiles) {
+                        SWTUtil.checkCanceled(monitor);
+                        sb.append("<li>Used by proof: <a href=\"" + toURL(usedByFile) + "\">" + StringUtil.NEW_LINE);
+                        sb.append(usedByFile.getFullPath());
+                        sb.append("</a></li>" + StringUtil.NEW_LINE);
+                     }
+                     sb.append("</ul>" + StringUtil.NEW_LINE);
+                  }
+                  sb.append("</li>" + StringUtil.NEW_LINE);
+               }
+               sb.append("</ol>" + StringUtil.NEW_LINE);
+            }
+            // Add unsound taclet options
+            if (!status.unsoundTacletOptions.isEmpty()) {
+               sb.append("<h1><a name=\"#TacletOptionsUnsound\">" + ChoiceEntry.UNSOUND_TEXT + " Taclet Options</a></h1>" + StringUtil.NEW_LINE);
+               sb.append("Proofs using a listed taclet options are " + ChoiceEntry.UNSOUND_TEXT + ":" + StringUtil.NEW_LINE);
+               sb.append("<ol>" + StringUtil.NEW_LINE);
+               SWTUtil.checkCanceled(monitor);
+               for (Entry<String, List<IFile>> entry : status.unsoundTacletOptions.entrySet()) {
+                  sb.append("<li>" + StringUtil.NEW_LINE);
+                  sb.append(ChoiceSelector.createChoiceEntry(entry.getKey()) + StringUtil.NEW_LINE);
+                  sb.append("<ul>" + StringUtil.NEW_LINE);
+                  for (IFile usedByFile : entry.getValue()) {
+                     SWTUtil.checkCanceled(monitor);
+                     sb.append("<li>Used by proof: <a href=\"" + toURL(usedByFile) + "\">" + StringUtil.NEW_LINE);
+                     sb.append(usedByFile.getFullPath());
+                     sb.append("</a></li>" + StringUtil.NEW_LINE);
+                  }
+                  sb.append("</ul>" + StringUtil.NEW_LINE);
+                  sb.append("</li>" + StringUtil.NEW_LINE);
+               }
+               sb.append("</ol>" + StringUtil.NEW_LINE);
+            }
+            // Add incomplete taclet options
+            if (!status.incomplelteTacletOptions.isEmpty()) {
+               sb.append("<h1><a name=\"#TacletOptionsIncomplete\">" + ChoiceEntry.INCOMPLETE_TEXT + " Taclet Options</a></h1>" + StringUtil.NEW_LINE);
+               sb.append("Proofs using a listed taclet options are " + ChoiceEntry.INCOMPLETE_TEXT + ":" + StringUtil.NEW_LINE);
+               sb.append("<ol>" + StringUtil.NEW_LINE);
+               for (Entry<String, List<IFile>> entry : status.incomplelteTacletOptions.entrySet()) {
+                  SWTUtil.checkCanceled(monitor);
+                  sb.append("<li>" + StringUtil.NEW_LINE);
+                  sb.append(ChoiceSelector.createChoiceEntry(entry.getKey()) + StringUtil.NEW_LINE);
+                  sb.append("<ul>" + StringUtil.NEW_LINE);
+                  for (IFile usedByFile : entry.getValue()) {
+                     SWTUtil.checkCanceled(monitor);
+                     sb.append("<li>Used by proof: <a href=\"" + toURL(usedByFile) + "\">" + StringUtil.NEW_LINE);
+                     sb.append(usedByFile.getFullPath());
+                     sb.append("</a></li>" + StringUtil.NEW_LINE);
+                  }
+                  sb.append("</ul>" + StringUtil.NEW_LINE);
+                  sb.append("</li>" + StringUtil.NEW_LINE);
+               }
+               sb.append("</ol>" + StringUtil.NEW_LINE);
+            }
+            // Add information taclet options
+            if (!status.informationTacletOptions.isEmpty()) {
+               sb.append("<h1><a name=\"#TacletOptionsInformation\">Taclet Options with additional Information</a></h1>" + StringUtil.NEW_LINE);
+               sb.append("Proofs using a taclet option with some additional information:" + StringUtil.NEW_LINE);
+               sb.append("<ol>" + StringUtil.NEW_LINE);
+               for (Entry<String, List<IFile>> entry : status.informationTacletOptions.entrySet()) {
+                  SWTUtil.checkCanceled(monitor);
+                  sb.append("<li>" + StringUtil.NEW_LINE);
+                  sb.append(ChoiceSelector.createChoiceEntry(entry.getKey()) + StringUtil.NEW_LINE);
+                  sb.append("<ul>" + StringUtil.NEW_LINE);
+                  for (IFile usedByFile : entry.getValue()) {
+                     SWTUtil.checkCanceled(monitor);
+                     sb.append("<li>Used by proof: <a href=\"" + toURL(usedByFile) + "\">" + StringUtil.NEW_LINE);
+                     sb.append(usedByFile.getFullPath());
+                     sb.append("</a></li>" + StringUtil.NEW_LINE);
+                  }
+                  sb.append("</ul>" + StringUtil.NEW_LINE);
+                  sb.append("</li>" + StringUtil.NEW_LINE);
+               }
+               sb.append("</ol>" + StringUtil.NEW_LINE);
+            }
+            // Add assumptions
+            sb.append("<h1><a name=\"#Assumptions\">Assumptions</a></h1>" + StringUtil.NEW_LINE);
+            sb.append("Proofs are performed under the following assumptions still needs to be proven:" + StringUtil.NEW_LINE);
+            sb.append("<ol>" + StringUtil.NEW_LINE);
+            for (Entry<ProofMetaFileAssumption, List<IFile>> entry : status.assumptions.entrySet()) {
+               SWTUtil.checkCanceled(monitor);
+               sb.append("<li>" + StringUtil.NEW_LINE);
+               sb.append(entry.getKey() + StringUtil.NEW_LINE);
+               sb.append("<ul>" + StringUtil.NEW_LINE);
+               for (IFile file : entry.getValue()) {
+                  SWTUtil.checkCanceled(monitor);
+                  sb.append("<li>Used by proof: <a href=\"" + toURL(file) + "\">" + StringUtil.NEW_LINE);
+                  sb.append(file.getFullPath());
+                  sb.append("</a></li>" + StringUtil.NEW_LINE);
+               }
+               sb.append("</ul>" + StringUtil.NEW_LINE);
+               sb.append("</li>" + StringUtil.NEW_LINE);
+            }
+            sb.append("<li><i>Java and JML semantics are correctly modeled in KeY.</i></li>" + StringUtil.NEW_LINE);
+            sb.append("<li><i>Source code is compiled using a correct Java compiler.</i></li>" + StringUtil.NEW_LINE);
+            sb.append("<li><i>Program is run on a a correct JVM.</i></li>" + StringUtil.NEW_LINE);
+            sb.append("</ol>" + StringUtil.NEW_LINE);
+            // Add footer
+            sb.append("</body>" + StringUtil.NEW_LINE);
+            sb.append("</html>");
             return sb.toString();
          }
+
+         private String toURL(IFile file) {
+            if (file != null) {
+               File localFile = ResourceUtil.getLocation(file);
+               return localFile != null ? 
+                      PROTOCOL_FILE_PREFIX + localFile.getAbsolutePath().replace(File.separatorChar, '/') : 
+                      PROTOCOL_RESOURCE + file.getFullPath();
+            }
+            else {
+               return null;
+            }
+         }
          
-         private void updateStatus(ProjectInfo projectInfo, VerificationStatus status, IProgressMonitor monitor) {
+         private void updateStatus(ProjectInfo projectInfo, VerificationStatus status, IProgressMonitor monitor) throws Exception {
             for (PackageInfo packageInfo : projectInfo.getPackages()) {
                SWTUtil.checkCanceled(monitor);
                updateStatus(packageInfo, status, monitor);
             }
          }
 
-         private void updateStatus(PackageInfo packageInfo, VerificationStatus status, IProgressMonitor monitor) {
+         private void updateStatus(PackageInfo packageInfo, VerificationStatus status, IProgressMonitor monitor) throws Exception {
             for (TypeInfo typeInfo : packageInfo.getTypes()) {
                SWTUtil.checkCanceled(monitor);
                updateStatus(typeInfo, status, monitor);
             }
          }
 
-         private void updateStatus(TypeInfo typeInfo, VerificationStatus status, IProgressMonitor monitor) {
+         private void updateStatus(TypeInfo typeInfo, VerificationStatus status, IProgressMonitor monitor) throws Exception {
             for (MethodInfo methodInfo : typeInfo.getMethods()) {
                SWTUtil.checkCanceled(monitor);
                status.numOfMethods++;
@@ -519,6 +873,14 @@ public class VerificationStatusView extends ViewPart {
                      SWTUtil.checkCanceled(monitor);
                      updateStatus(contractInfo, status);
                   }
+               }
+               else {
+                  List<MethodInfo> list = status.unspecifiedMethods.get(typeInfo);
+                  if (list == null) {
+                     list = new LinkedList<MethodInfo>();
+                     status.unspecifiedMethods.put(typeInfo, list);
+                  }
+                  list.add(methodInfo);
                }
             }
             for (ObserverFunctionInfo observerFunctionInfo : typeInfo.getObserverFunctions()) {
@@ -534,8 +896,9 @@ public class VerificationStatusView extends ViewPart {
             }
          }
 
-         private void updateStatus(ContractInfo contractInfo, VerificationStatus status) {
+         private void updateStatus(ContractInfo contractInfo, VerificationStatus status) throws Exception {
             status.numOfContracts++;
+            // Closed state
             Boolean closed;
             try {
                closed = contractInfo.checkProofClosed();
@@ -547,30 +910,170 @@ public class VerificationStatusView extends ViewPart {
             if (closed != null && closed.booleanValue()) {
                status.numOfProvenContracts++;
             }
-            try {
-               List<ProofMetaFileAssumption> assumptions = contractInfo.checkAssumptions();
-               if (assumptions != null) {
-                  for (ProofMetaFileAssumption assumption : assumptions) {
-                     List<IFile> files = status.assumptions.get(assumption);
-                     if (files == null) {
-                        files = new LinkedList<IFile>();
-                        status.assumptions.put(assumption, files);
-                     }
-                     files.add(contractInfo.getProofFile());
+            else {
+               status.unprovenContracts.add(contractInfo);
+            }
+            // Unproven dependencies
+            List<IFile> unprovenDependencies = contractInfo.checkUnprovenDependencies();
+            if (unprovenDependencies != null) {
+               for (IFile file : unprovenDependencies) {
+                  List<IFile> list = status.usedByProofs.get(file);
+                  if (list == null) {
+                     list = new LinkedList<IFile>();
+                     status.usedByProofs.put(file, list);
                   }
+                  list.add(contractInfo.getProofFile());
                }
             }
-            catch (Exception e) {
-               LogUtil.getLogger().logError(e);
+            // Assumptions
+            List<ProofMetaFileAssumption> assumptions = contractInfo.checkAssumptions();
+            if (assumptions != null) {
+               for (ProofMetaFileAssumption assumption : assumptions) {
+                  List<IFile> files = status.assumptions.get(assumption);
+                  if (files == null) {
+                     files = new LinkedList<IFile>();
+                     status.assumptions.put(assumption, files);
+                  }
+                  files.add(contractInfo.getProofFile());
+               }
+            }
+            // Taclet options
+            TacletOptionIssues issues = contractInfo.checkTaletOptions();
+            for (String choice : issues.getUnsoundOptions()) {
+               List<IFile> list = status.unsoundTacletOptions.get(choice);
+               if (list == null) {
+                  list = new LinkedList<IFile>();
+                  status.unsoundTacletOptions.put(choice, list);
+               }
+               list.add(contractInfo.getProofFile());
+            }
+            for (String choice : issues.getIncompleteOptions()) {
+               List<IFile> list = status.incomplelteTacletOptions.get(choice);
+               if (list == null) {
+                  list = new LinkedList<IFile>();
+                  status.incomplelteTacletOptions.put(choice, list);
+               }
+               list.add(contractInfo.getProofFile());
+            }
+            for (String choice : issues.getInformationOptions()) {
+               List<IFile> list = status.informationTacletOptions.get(choice);
+               if (list == null) {
+                  list = new LinkedList<IFile>();
+                  status.informationTacletOptions.put(choice, list);
+               }
+               list.add(contractInfo.getProofFile());
             }
          }
       };
       job.setSystem(true);
       job.schedule();
    }
+
+   /**
+    * When the content in {@link #reportBrowser} should be changed.
+    * @param event The event.
+    */
+   @SuppressWarnings("deprecation")
+   protected void handleReportBrowserChanging(LocationEvent event) {
+      if (event.location != null) {
+         event.doit = event.location.startsWith("about:blank");
+         if (!event.location.startsWith("about:blank#")) {
+            IFile[] files = null;
+            if (event.location.startsWith(PROTOCOL_RESOURCE)) {
+               String location = event.location.substring(PROTOCOL_RESOURCE.length());
+               IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(location));
+               if (file.exists()) {
+                  files = new IFile[] {file};
+               }
+            }
+            else if (event.location.startsWith(PROTOCOL_FILE_PREFIX)) {
+               String location = event.location.substring(PROTOCOL_FILE_PREFIX.length());
+               files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(new Path(location));
+            }
+            if (!ArrayUtil.isEmpty(files)) {
+               if (event.location.endsWith(KeYUtil.PROOF_FILE_EXTENSION) ||
+                   event.location.endsWith(KeYUtil.KEY_FILE_EXTENSION)) {
+                  openProofs(files);
+               }
+               else {
+                  selectInWorkbench(SWTUtil.createSelection((Object[])files));
+               }
+            }
+         }
+      }
+   }
+
+   /**
+    * When the content in {@link #reportBrowser} has changed.
+    * @param event The event.
+    */
+   protected void handleReportBrowserChanged(LocationEvent event) {
+   }
+
+   /**
+    * Creates the context menu to show in {@link #reportBrowser}.
+    * @param manager The {@link IMenuManager} to update.
+    */
+   @SuppressWarnings("deprecation")
+   protected void handleReportBrowserMenuAboutToShow(IMenuManager manager) {
+      if (selectedReportBrowserText != null) {
+         IFile[] files = null;
+         if (selectedReportBrowserText.startsWith(PROTOCOL_RESOURCE)) {
+            String location = selectedReportBrowserText.substring(PROTOCOL_RESOURCE.length());
+            IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(location));
+            if (file.exists()) {
+               files = new IFile[] {file};
+            }
+         }
+         else if (selectedReportBrowserText.startsWith(PROTOCOL_FILE_PREFIX)) {
+            String location = selectedReportBrowserText.substring(PROTOCOL_FILE_PREFIX.length());
+            files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(new Path(location));
+         }
+         if (!ArrayUtil.isEmpty(files)) {
+            if (selectedReportBrowserText.endsWith(KeYUtil.PROOF_FILE_EXTENSION) ||
+                selectedReportBrowserText.endsWith(KeYUtil.KEY_FILE_EXTENSION)) {
+               manager.add(createOpenProofsAction(files));
+            }
+            else {
+               manager.add(createOpenFilesAction(files));
+            }
+         }
+      }
+      manager.add(new Separator());
+      manager.add(createCopyHTMLAction());
+   }
    
    /**
-    * Utility class used by {@link VerificationStatus#updateProgressBarsAndAssumptions()}
+    * Creates the action which copies the HTML report into the {@link Clipboard}.
+    * @return The created action.
+    */
+   protected IAction createCopyHTMLAction() {
+      IAction action = new Action("Copy HTML", PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_COPY)) {
+         @Override
+         public void run() {
+            copyReportToClipboard();
+         }
+      };
+      action.setEnabled(reportBrowser.getData() instanceof String);
+      return action;
+   }
+   
+   /**
+    * Copies the HTML report into the {@link Clipboard}.
+    */
+   protected void copyReportToClipboard() {
+      if (reportBrowser.getData() instanceof String) {
+         Clipboard clipboard = new Clipboard(reportBrowser.getDisplay());
+         String htmlText = (String) reportBrowser.getData();
+         TextTransfer textTransfer = TextTransfer.getInstance();
+         HTMLTransfer htmlTransfer = HTMLTransfer.getInstance();
+         clipboard.setContents(new String[]{htmlText, htmlText}, new Transfer[]{textTransfer, htmlTransfer});
+         clipboard.dispose();
+      }
+   }
+
+   /**
+    * Utility class used by {@link VerificationStatus#updateProgressBarsAndReport()}
     * @author Martin Hentschel
     */
    private static class VerificationStatus {
@@ -595,6 +1098,36 @@ public class VerificationStatusView extends ViewPart {
       private int numOfSpecifiedMethods = 0;
       
       /**
+       * All unproven contracts.
+       */
+      private final List<ContractInfo> unprovenContracts = new LinkedList<ContractInfo>();
+      
+      /**
+       * Maps a proof file to all proof files in which it is used.
+       */
+      private final Map<IFile, List<IFile>> usedByProofs = new HashMap<IFile, List<IFile>>();
+
+      /**
+       * Maps a used unsound taclet option to the proofs in which it is used.
+       */
+      private final Map<String, List<IFile>> unsoundTacletOptions = new HashMap<String, List<IFile>>();
+
+      /**
+       * Maps a used incomplete taclet option to the proofs in which it is used.
+       */
+      private final Map<String, List<IFile>> incomplelteTacletOptions = new HashMap<String, List<IFile>>();
+
+      /**
+       * Maps a used taclet option with an information to the proofs in which it is used.
+       */
+      private final Map<String, List<IFile>> informationTacletOptions = new HashMap<String, List<IFile>>();
+      
+      /**
+       * Lists all unspecified {@link MethodInfo}s of a {@link TypeInfo}.
+       */
+      private final Map<TypeInfo, List<MethodInfo>> unspecifiedMethods = new HashMap<TypeInfo, List<MethodInfo>>();
+      
+      /**
        * The made assumptions.
        */
       private final Map<ProofMetaFileAssumption, List<IFile>> assumptions = new LinkedHashMap<ProofMetaFileAssumption, List<IFile>>();
@@ -607,7 +1140,7 @@ public class VerificationStatusView extends ViewPart {
     * @param index The index.
     */
    protected void handleTypeAdded(final AbstractTypeContainer tcInfo, final TypeInfo type, final int index) {
-      updateProgressBarsAndAssumptions();
+      updateProgressBarsAndReport();
    }
 
    /**
@@ -616,7 +1149,7 @@ public class VerificationStatusView extends ViewPart {
     * @param types The removed {@link TypeInfo}s.
     */
    protected void handleTypesRemoved(final AbstractTypeContainer tcInfo, final Collection<TypeInfo> types) {
-      updateProgressBarsAndAssumptions();
+      updateProgressBarsAndReport();
    }
    
    /**
@@ -626,7 +1159,7 @@ public class VerificationStatusView extends ViewPart {
     * @param index The index.
     */
    protected void handleMethodAdded(final TypeInfo type, final MethodInfo method, final int index) {
-      updateProgressBarsAndAssumptions();
+      updateProgressBarsAndReport();
    }
 
    /**
@@ -635,7 +1168,7 @@ public class VerificationStatusView extends ViewPart {
     * @param methods The removed {@link MethodInfo}s.
     */
    protected void handleMethodsRemoved(final TypeInfo type, final Collection<MethodInfo> methods) {
-      updateProgressBarsAndAssumptions();
+      updateProgressBarsAndReport();
    }
 
    /**
@@ -645,7 +1178,7 @@ public class VerificationStatusView extends ViewPart {
     * @param index The index.
     */
    protected void handleObserverFunctionAdded(final TypeInfo type, final ObserverFunctionInfo observerFunction, final int index) {
-      updateProgressBarsAndAssumptions();
+      updateProgressBarsAndReport();
    }
 
    /**
@@ -654,7 +1187,7 @@ public class VerificationStatusView extends ViewPart {
     * @param observerFunctions The removed {@link ObserverFunctionInfo}s.
     */
    protected void handleObserFunctionsRemoved(final TypeInfo type, final Collection<ObserverFunctionInfo> observerFunctions) {
-      updateProgressBarsAndAssumptions();
+      updateProgressBarsAndReport();
    }
 
    /**
@@ -664,7 +1197,7 @@ public class VerificationStatusView extends ViewPart {
     * @param index The index.
     */
    protected void handleContractAdded(final AbstractContractContainer cc, final ContractInfo contract, final int index) {
-      updateProgressBarsAndAssumptions();
+      updateProgressBarsAndReport();
    }
 
    /**
@@ -673,7 +1206,7 @@ public class VerificationStatusView extends ViewPart {
     * @param contracts The removed {@link ContractInfo}s.
     */
    protected void handleContractsRemoved(final AbstractContractContainer cc, final Collection<ContractInfo> contracts) {
-      updateProgressBarsAndAssumptions();
+      updateProgressBarsAndReport();
    }
 
    /**
@@ -683,7 +1216,7 @@ public class VerificationStatusView extends ViewPart {
     * @param index The index.
     */
    protected void handlePackageAdded(final ProjectInfo projectInfo, final PackageInfo packageInfo, final int index) {
-      updateProgressBarsAndAssumptions();
+      updateProgressBarsAndReport();
    }
 
    /**
@@ -692,7 +1225,7 @@ public class VerificationStatusView extends ViewPart {
     * @param packages The removed {@link PackageInfo}s.
     */
    protected void handlePackagesRemoved(final ProjectInfo projectInfo, final Collection<PackageInfo> packages) {
-      updateProgressBarsAndAssumptions();
+      updateProgressBarsAndReport();
    }
 
    /**

@@ -1,7 +1,5 @@
 package org.key_project.key4eclipse.resources.projectinfo;
 
-import java.util.Iterator;
-
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jdt.core.IJavaElement;
@@ -83,11 +81,13 @@ public class PackageInfo extends AbstractTypeContainer implements IStatusInfo {
    @Override
    public boolean isUnspecified() {
       boolean specified = true;
-      Iterator<TypeInfo> typeIter = getTypes().iterator();
-      while (specified && typeIter.hasNext()) {
-         if (typeIter.next().isUnspecified()) {
+      TypeInfo[] types = getTypes();
+      int i = 0;
+      while (specified && i < types.length) {
+         if (types[i].isUnspecified()) {
             specified = false;
          }
+         i++;
       }
       return !specified;
    }
@@ -98,11 +98,13 @@ public class PackageInfo extends AbstractTypeContainer implements IStatusInfo {
    @Override
    public boolean hasOpenProof() {
       boolean allClosed = true;
-      Iterator<TypeInfo> typeIter = getTypes().iterator();
-      while (allClosed && typeIter.hasNext()) {
-         if (typeIter.next().hasOpenProof()) {
+      TypeInfo[] types = getTypes();
+      int i = 0;
+      while (allClosed && i < types.length) {
+         if (types[i].hasOpenProof()) {
             allClosed = false;
          }
+         i++;
       }
       return !allClosed;
    }
@@ -113,11 +115,13 @@ public class PackageInfo extends AbstractTypeContainer implements IStatusInfo {
    @Override
    public boolean hasUnprovenDependencies() {
       boolean allDependeniesProven = true;
-      Iterator<TypeInfo> typeIter = getTypes().iterator();
-      while (allDependeniesProven && typeIter.hasNext()) {
-         if (typeIter.next().hasUnprovenDependencies()) {
+      TypeInfo[] types = getTypes();
+      int i = 0;
+      while (allDependeniesProven && i < types.length) {
+         if (types[i].hasUnprovenDependencies()) {
             allDependeniesProven = false;
          }
+         i++;
       }
       return !allDependeniesProven;
    }

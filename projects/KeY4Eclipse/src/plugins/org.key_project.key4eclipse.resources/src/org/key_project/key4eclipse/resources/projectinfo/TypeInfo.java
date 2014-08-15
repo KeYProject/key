@@ -1,9 +1,7 @@
 package org.key_project.key4eclipse.resources.projectinfo;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -126,16 +124,16 @@ public class TypeInfo extends AbstractTypeContainer implements IStatusInfo {
     * Returns all contained {@link MethodInfo}s.
     * @return All contained {@link MethodInfo}s.
     */
-   public Collection<MethodInfo> getMethods() {
-      return Collections.unmodifiableList(methodsList);
+   public MethodInfo[] getMethods() {
+      return methodsList.toArray(new MethodInfo[methodsList.size()]);
    }
    
    /**
     * Returns all contained {@link ObserverFunctionInfo}s.
     * @return All contained {@link ObserverFunctionInfo}s.
     */
-   public Collection<ObserverFunctionInfo> getObserverFunctions() {
-      return Collections.unmodifiableList(observerFunctionsList);
+   public ObserverFunctionInfo[] getObserverFunctions() {
+      return observerFunctionsList.toArray(new ObserverFunctionInfo[observerFunctionsList.size()]);
    }
    
    /**
@@ -269,18 +267,22 @@ public class TypeInfo extends AbstractTypeContainer implements IStatusInfo {
    @Override
    public boolean isUnspecified() {
       boolean specified = true;
-      Iterator<MethodInfo> methodIter = methodsList.iterator();
-      while (specified && methodIter.hasNext()) {
-         if (methodIter.next().isUnspecified()) {
+      MethodInfo[] methods = getMethods();
+      int i = 0;
+      while (specified && i < methods.length) {
+         if (methods[i].isUnspecified()) {
             specified = false;
          }
+         i++;
       }
       if (specified) {
-         Iterator<TypeInfo> typeIter = getTypes().iterator();
-         while (specified && typeIter.hasNext()) {
-            if (typeIter.next().isUnspecified()) {
+         TypeInfo[] types = getTypes();
+         i = 0;
+         while (specified && i < types.length) {
+            if (types[i].isUnspecified()) {
                specified = false;
             }
+            i++;
          }
       }
       return !specified;
@@ -292,26 +294,32 @@ public class TypeInfo extends AbstractTypeContainer implements IStatusInfo {
    @Override
    public boolean hasOpenProof() {
       boolean allClosed = true;
-      Iterator<MethodInfo> methodIter = methodsList.iterator();
-      while (allClosed && methodIter.hasNext()) {
-         if (methodIter.next().hasOpenProof()) {
+      MethodInfo[] methods = getMethods();
+      int i = 0;
+      while (allClosed && i < methods.length) {
+         if (methods[i].hasOpenProof()) {
             allClosed = false;
          }
+         i++;
       }
       if (allClosed) {
-         Iterator<ObserverFunctionInfo> observerFunctionIter = observerFunctionsList.iterator();
-         while (allClosed && observerFunctionIter.hasNext()) {
-            if (observerFunctionIter.next().hasOpenProof()) {
+         ObserverFunctionInfo[] observerFunctions = getObserverFunctions();
+         i = 0;
+         while (allClosed && i < observerFunctions.length) {
+            if (observerFunctions[i].hasOpenProof()) {
                allClosed = false;
             }
+            i++;
          }
       }
       if (allClosed) {
-         Iterator<TypeInfo> typeIter = getTypes().iterator();
-         while (allClosed && typeIter.hasNext()) {
-            if (typeIter.next().hasOpenProof()) {
+         TypeInfo[] types = getTypes();
+         i = 0;
+         while (allClosed && i < types.length) {
+            if (types[i].hasOpenProof()) {
                allClosed = false;
             }
+            i++;
          }
       }
       return !allClosed;
@@ -323,26 +331,32 @@ public class TypeInfo extends AbstractTypeContainer implements IStatusInfo {
    @Override
    public boolean hasUnprovenDependencies() {
       boolean allDependeniesProven = true;
-      Iterator<MethodInfo> methodIter = methodsList.iterator();
-      while (allDependeniesProven && methodIter.hasNext()) {
-         if (methodIter.next().hasUnprovenDependencies()) {
+      MethodInfo[] methods = getMethods();
+      int i = 0;
+      while (allDependeniesProven && i < methods.length) {
+         if (methods[i].hasUnprovenDependencies()) {
             allDependeniesProven = false;
          }
+         i++;
       }
       if (allDependeniesProven) {
-         Iterator<ObserverFunctionInfo> observerFunctionIter = observerFunctionsList.iterator();
-         while (allDependeniesProven && observerFunctionIter.hasNext()) {
-            if (observerFunctionIter.next().hasUnprovenDependencies()) {
+         ObserverFunctionInfo[] observerFunctions = getObserverFunctions();
+         i = 0;
+         while (allDependeniesProven && i < observerFunctions.length) {
+            if (observerFunctions[i].hasUnprovenDependencies()) {
                allDependeniesProven = false;
             }
+            i++;
          }
       }
       if (allDependeniesProven) {
-         Iterator<TypeInfo> typeIter = getTypes().iterator();
-         while (allDependeniesProven && typeIter.hasNext()) {
-            if (typeIter.next().hasUnprovenDependencies()) {
+         TypeInfo[] types = getTypes();
+         i = 0;
+         while (allDependeniesProven && i < types.length) {
+            if (types[i].hasUnprovenDependencies()) {
                allDependeniesProven = false;
             }
+            i++;
          }
       }
       return !allDependeniesProven;

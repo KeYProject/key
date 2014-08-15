@@ -1,7 +1,6 @@
 package org.key_project.key4eclipse.resources.projectinfo;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -79,8 +78,8 @@ public class ProjectInfo implements IStatusInfo {
     * Returns all contained {@link PackageInfo}s.
     * @return All contained {@link PackageInfo}s.
     */
-   public Collection<PackageInfo> getPackages() {
-      return Collections.unmodifiableList(packageList);
+   public PackageInfo[] getPackages() {
+      return packageList.toArray(new PackageInfo[packageList.size()]);
    }
    
    /**

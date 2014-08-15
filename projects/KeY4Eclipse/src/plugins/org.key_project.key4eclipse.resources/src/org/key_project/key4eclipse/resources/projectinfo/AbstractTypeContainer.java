@@ -1,7 +1,6 @@
 package org.key_project.key4eclipse.resources.projectinfo;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,8 +55,8 @@ public abstract class AbstractTypeContainer {
     * Returns all contained {@link TypeInfo}s.
     * @return All contained {@link TypeInfo}s.
     */
-   public Collection<TypeInfo> getTypes() {
-      return Collections.unmodifiableList(typesList);
+   public TypeInfo[] getTypes() {
+      return typesList.toArray(new TypeInfo[typesList.size()]);
    }
    
    /**

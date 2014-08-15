@@ -2,7 +2,6 @@ package org.key_project.key4eclipse.resources.test.testcase.junit;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -221,25 +220,20 @@ public class ProjectInfoManagementTest extends AbstractResourceTest {
          assertNotSame(expected, current);
          // Test contained packages
          assertEquals(expected.countPackages(), current.countPackages());
-         Iterator<PackageInfo> expectedIter = expected.getPackages().iterator();
-         Iterator<PackageInfo> currentIter = current.getPackages().iterator();
-         int index = 0;
-         while (expectedIter.hasNext() && currentIter.hasNext()) {
+         PackageInfo[] expectedPackages = expected.getPackages();
+         PackageInfo[] currentPackages = current.getPackages();
+         assertEquals(expectedPackages.length, currentPackages.length);
+         for (int i = 0; i < expectedPackages.length; i++) {
             // Compare elements
-            PackageInfo expectedPackage = expectedIter.next();
-            PackageInfo currentPackage = currentIter.next();
-            assertPackageInfo(expected, current, expectedPackage, currentPackage);
+            assertPackageInfo(expected, current, expectedPackages[i], currentPackages[i]);
             // Test other model functionality
-            assertSame(expectedPackage, expected.getPackage(index));
-            assertSame(currentPackage, current.getPackage(index));
-            assertSame(expectedPackage, expected.getPackage(expectedPackage.getName()));
-            assertSame(currentPackage, current.getPackage(currentPackage.getName()));
-            assertSame(index, expected.indexOfPackage(expectedPackage));
-            assertSame(index, current.indexOfPackage(currentPackage));
-            index++;
+            assertSame(expectedPackages[i], expected.getPackage(i));
+            assertSame(currentPackages[i], current.getPackage(i));
+            assertSame(expectedPackages[i], expected.getPackage(expectedPackages[i].getName()));
+            assertSame(currentPackages[i], current.getPackage(currentPackages[i].getName()));
+            assertSame(i, expected.indexOfPackage(expectedPackages[i]));
+            assertSame(i, current.indexOfPackage(currentPackages[i]));
          }
-         assertFalse(expectedIter.hasNext());
-         assertFalse(currentIter.hasNext());
       }
       else {
          assertNull(current);
@@ -267,25 +261,20 @@ public class ProjectInfoManagementTest extends AbstractResourceTest {
          assertEquals(expected.getContainer(), current.getContainer());
          // Test contained types
          assertEquals(expected.countTypes(), current.countTypes());
-         Iterator<TypeInfo> expectedIter = expected.getTypes().iterator();
-         Iterator<TypeInfo> currentIter = current.getTypes().iterator();
-         int index = 0;
-         while (expectedIter.hasNext() && currentIter.hasNext()) {
+         TypeInfo[] expectedTypes = expected.getTypes();
+         TypeInfo[] currentTypes = current.getTypes();
+         assertEquals(expectedTypes.length, currentTypes.length);
+         for (int i = 0; i < expectedTypes.length; i++) {
             // Compare elements
-            TypeInfo expectedType = expectedIter.next();
-            TypeInfo currentType = currentIter.next();
-            assertTypeInfo(expectedParentProjectInfo, currentParentProjectInfo, expected, current, expectedType, currentType);
+            assertTypeInfo(expectedParentProjectInfo, currentParentProjectInfo, expected, current, expectedTypes[i], currentTypes[i]);
             // Test other model functionality
-            assertSame(expectedType, expected.getType(index));
-            assertSame(currentType, current.getType(index));
-            assertSame(expectedType, expected.getType(expectedType.getName()));
-            assertSame(currentType, current.getType(currentType.getName()));
-            assertSame(index, expected.indexOfType(expectedType));
-            assertSame(index, current.indexOfType(currentType));
-            index++;
+            assertSame(expectedTypes[i], expected.getType(i));
+            assertSame(currentTypes[i], current.getType(i));
+            assertSame(expectedTypes[i], expected.getType(expectedTypes[i].getName()));
+            assertSame(currentTypes[i], current.getType(currentTypes[i].getName()));
+            assertSame(i, expected.indexOfType(expectedTypes[i]));
+            assertSame(i, current.indexOfType(currentTypes[i]));
          }
-         assertFalse(expectedIter.hasNext());
-         assertFalse(currentIter.hasNext());
       }
       else {
          assertNull(current);
@@ -319,67 +308,52 @@ public class ProjectInfoManagementTest extends AbstractResourceTest {
          assertEquals(expected.getFile(), current.getFile());
          // Test contained types
          assertEquals(expected.countTypes(), current.countTypes());
-         Iterator<TypeInfo> expectedTypeIter = expected.getTypes().iterator();
-         Iterator<TypeInfo> currentTypeIter = current.getTypes().iterator();
-         int index = 0;
-         while (expectedTypeIter.hasNext() && currentTypeIter.hasNext()) {
+         TypeInfo[] expectedInnerTypes = expected.getTypes();
+         TypeInfo[] currentInnerTypes = current.getTypes();
+         assertEquals(expectedInnerTypes.length, currentInnerTypes.length);
+         for (int i = 0; i < expectedInnerTypes.length; i++) {
             // Compare elements
-            TypeInfo expectedInnerType = expectedTypeIter.next();
-            TypeInfo currentInnerType = currentTypeIter.next();
-            assertTypeInfo(expectedParentProjectInfo, currentParentProjectInfo, expected, current, expectedInnerType, currentInnerType);
+            assertTypeInfo(expectedParentProjectInfo, currentParentProjectInfo, expected, current, expectedInnerTypes[i], currentInnerTypes[i]);
             // Test other model functionality
-            assertSame(expectedInnerType, expected.getType(index));
-            assertSame(currentInnerType, current.getType(index));
-            assertSame(expectedInnerType, expected.getType(expectedInnerType.getName()));
-            assertSame(currentInnerType, current.getType(currentInnerType.getName()));
-            assertSame(index, expected.indexOfType(expectedInnerType));
-            assertSame(index, current.indexOfType(currentInnerType));
-            index++;
+            assertSame(expectedInnerTypes[i], expected.getType(i));
+            assertSame(currentInnerTypes[i], current.getType(i));
+            assertSame(expectedInnerTypes[i], expected.getType(expectedInnerTypes[i].getName()));
+            assertSame(currentInnerTypes[i], current.getType(currentInnerTypes[i].getName()));
+            assertSame(i, expected.indexOfType(expectedInnerTypes[i]));
+            assertSame(i, current.indexOfType(currentInnerTypes[i]));
          }
-         assertFalse(expectedTypeIter.hasNext());
-         assertFalse(currentTypeIter.hasNext());
          // Test contained methods
          assertEquals(expected.countMethods(), current.countMethods());
-         Iterator<MethodInfo> expectedMethodIter = expected.getMethods().iterator();
-         Iterator<MethodInfo> currentMethodIter = current.getMethods().iterator();
-         index = 0;
-         while (expectedMethodIter.hasNext() && currentMethodIter.hasNext()) {
+         MethodInfo[] expectedMethods = expected.getMethods();
+         MethodInfo[] currentMethods = current.getMethods();
+         assertEquals(expectedMethods.length, currentMethods.length);
+         for (int i = 0; i < expectedMethods.length; i++) {
             // Compare elements
-            MethodInfo expectedMethod = expectedMethodIter.next();
-            MethodInfo currentMethod = currentMethodIter.next();
-            assertMethodInfo(expectedParentProjectInfo, currentParentProjectInfo, expected, current, expectedMethod, currentMethod);
+            assertMethodInfo(expectedParentProjectInfo, currentParentProjectInfo, expected, current, expectedMethods[i], currentMethods[i]);
             // Test other model functionality
-            assertSame(expectedMethod, expected.getMethod(index));
-            assertSame(currentMethod, current.getMethod(index));
-            assertSame(expectedMethod, expected.getMethod(expectedMethod.getDisplayName()));
-            assertSame(currentMethod, current.getMethod(currentMethod.getDisplayName()));
-            assertSame(index, expected.indexOfMethod(expectedMethod));
-            assertSame(index, current.indexOfMethod(currentMethod));
-            index++;
+            assertSame(expectedMethods[i], expected.getMethod(i));
+            assertSame(currentMethods[i], current.getMethod(i));
+            assertSame(expectedMethods[i], expected.getMethod(expectedMethods[i].getDisplayName()));
+            assertSame(currentMethods[i], current.getMethod(currentMethods[i].getDisplayName()));
+            assertSame(i, expected.indexOfMethod(expectedMethods[i]));
+            assertSame(i, current.indexOfMethod(currentMethods[i]));
          }
-         assertFalse(expectedMethodIter.hasNext());
-         assertFalse(currentMethodIter.hasNext());
          // Test contained observer functions
          assertEquals(expected.countObserverFunctions(), current.countObserverFunctions());
-         Iterator<ObserverFunctionInfo> expectedObserverFunctionIter = expected.getObserverFunctions().iterator();
-         Iterator<ObserverFunctionInfo> currentObserverFunctionIter = current.getObserverFunctions().iterator();
-         index = 0;
-         while (expectedObserverFunctionIter.hasNext() && currentObserverFunctionIter.hasNext()) {
+         ObserverFunctionInfo[] expectedObserverFunctions = expected.getObserverFunctions();
+         ObserverFunctionInfo[] currentObserverFunctions = current.getObserverFunctions();
+         assertEquals(expectedObserverFunctions.length, currentObserverFunctions.length);
+         for (int i = 0; i < expectedObserverFunctions.length; i++) {
             // Compare elements
-            ObserverFunctionInfo expectedObserverFunction = expectedObserverFunctionIter.next();
-            ObserverFunctionInfo currentObserverFunction = currentObserverFunctionIter.next();
-            assertObserverFunctionInfo(expectedParentProjectInfo, currentParentProjectInfo, expected, current, expectedObserverFunction, currentObserverFunction);
+            assertObserverFunctionInfo(expectedParentProjectInfo, currentParentProjectInfo, expected, current, expectedObserverFunctions[i], currentObserverFunctions[i]);
             // Test other model functionality
-            assertSame(expectedObserverFunction, expected.getObserverFunction(index));
-            assertSame(currentObserverFunction, current.getObserverFunction(index));
-            assertSame(expectedObserverFunction, expected.getObserverFunction(expectedObserverFunction.getDisplayName()));
-            assertSame(currentObserverFunction, current.getObserverFunction(currentObserverFunction.getDisplayName()));
-            assertSame(index, expected.indexOfObserverFunction(expectedObserverFunction));
-            assertSame(index, current.indexOfObserverFunction(currentObserverFunction));
-            index++;
+            assertSame(expectedObserverFunctions[i], expected.getObserverFunction(i));
+            assertSame(currentObserverFunctions[i], current.getObserverFunction(i));
+            assertSame(expectedObserverFunctions[i], expected.getObserverFunction(expectedObserverFunctions[i].getDisplayName()));
+            assertSame(currentObserverFunctions[i], current.getObserverFunction(currentObserverFunctions[i].getDisplayName()));
+            assertSame(i, expected.indexOfObserverFunction(expectedObserverFunctions[i]));
+            assertSame(i, current.indexOfObserverFunction(currentObserverFunctions[i]));
          }
-         assertFalse(expectedObserverFunctionIter.hasNext());
-         assertFalse(currentObserverFunctionIter.hasNext());
       }
       else {
          assertNull(current);
@@ -414,25 +388,20 @@ public class ProjectInfoManagementTest extends AbstractResourceTest {
          TestUtilsUtil.assertArrayEquals(expected.getParameterTypes(), current.getParameterTypes());
          // Test contained contracts
          assertEquals(expected.countContracts(), current.countContracts());
-         Iterator<ContractInfo> expectedIter = expected.getContracts().iterator();
-         Iterator<ContractInfo> currentIter = current.getContracts().iterator();
-         int index = 0;
-         while (expectedIter.hasNext() && currentIter.hasNext()) {
+         ContractInfo[] expectedContacts = expected.getContracts();
+         ContractInfo[] currentContracts = current.getContracts();
+         assertEquals(expectedContacts.length, currentContracts.length);
+         for (int i = 0; i < expectedContacts.length; i++) {
             // Compare elements
-            ContractInfo expectedContact = expectedIter.next();
-            ContractInfo currentContract = currentIter.next();
-            assertContractInfo(expected, current, expectedContact, currentContract);
+            assertContractInfo(expected, current, expectedContacts[i], currentContracts[i]);
             // Test other model functionality
-            assertSame(expectedContact, expected.getContract(index));
-            assertSame(currentContract, current.getContract(index));
-            assertSame(expectedContact, expected.getContract(expectedContact.getName()));
-            assertSame(currentContract, current.getContract(currentContract.getName()));
-            assertSame(index, expected.indexOfContract(expectedContact));
-            assertSame(index, current.indexOfContract(currentContract));
-            index++;
+            assertSame(expectedContacts[i], expected.getContract(i));
+            assertSame(currentContracts[i], current.getContract(i));
+            assertSame(expectedContacts[i], expected.getContract(expectedContacts[i].getName()));
+            assertSame(currentContracts[i], current.getContract(currentContracts[i].getName()));
+            assertSame(i, expected.indexOfContract(expectedContacts[i]));
+            assertSame(i, current.indexOfContract(currentContracts[i]));
          }
-         assertFalse(expectedIter.hasNext());
-         assertFalse(currentIter.hasNext());
       }
       else {
          assertNull(current);
@@ -465,25 +434,20 @@ public class ProjectInfoManagementTest extends AbstractResourceTest {
          assertEquals(expected.getDisplayName(), current.getDisplayName());
          // Test contained contracts
          assertEquals(expected.countContracts(), current.countContracts());
-         Iterator<ContractInfo> expectedIter = expected.getContracts().iterator();
-         Iterator<ContractInfo> currentIter = current.getContracts().iterator();
-         int index = 0;
-         while (expectedIter.hasNext() && currentIter.hasNext()) {
+         ContractInfo[] expectedContacts = expected.getContracts();
+         ContractInfo[] currentContracts = current.getContracts();
+         assertEquals(expectedContacts.length, currentContracts.length);
+         for (int i = 0; i < expectedContacts.length; i++) {
             // Compare elements
-            ContractInfo expectedContact = expectedIter.next();
-            ContractInfo currentContract = currentIter.next();
-            assertContractInfo(expected, current, expectedContact, currentContract);
+            assertContractInfo(expected, current, expectedContacts[i], currentContracts[i]);
             // Test other model functionality
-            assertSame(expectedContact, expected.getContract(index));
-            assertSame(currentContract, current.getContract(index));
-            assertSame(expectedContact, expected.getContract(expectedContact.getName()));
-            assertSame(currentContract, current.getContract(currentContract.getName()));
-            assertSame(index, expected.indexOfContract(expectedContact));
-            assertSame(index, current.indexOfContract(currentContract));
-            index++;
+            assertSame(expectedContacts[i], expected.getContract(i));
+            assertSame(currentContracts[i], current.getContract(i));
+            assertSame(expectedContacts[i], expected.getContract(expectedContacts[i].getName()));
+            assertSame(currentContracts[i], current.getContract(currentContracts[i].getName()));
+            assertSame(i, expected.indexOfContract(expectedContacts[i]));
+            assertSame(i, current.indexOfContract(currentContracts[i]));
          }
-         assertFalse(expectedIter.hasNext());
-         assertFalse(currentIter.hasNext());
       }
       else {
          assertNull(current);

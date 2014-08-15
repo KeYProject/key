@@ -1,9 +1,7 @@
 package org.key_project.key4eclipse.resources.projectinfo;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -69,8 +67,8 @@ public abstract class AbstractContractContainer {
     * Returns all contained {@link ContractInfo}s.
     * @return All contained {@link ContractInfo}s.
     */
-   public Collection<ContractInfo> getContracts() {
-      return Collections.unmodifiableList(contractsList);
+   public ContractInfo[] getContracts() {
+      return contractsList.toArray(new ContractInfo[contractsList.size()]);
    }
 
    /**
@@ -130,11 +128,12 @@ public abstract class AbstractContractContainer {
     */
    public boolean hasOpenProof() {
       boolean result = false;
-      Iterator<ContractInfo> iter = getContracts().iterator();
-      while (!result && iter.hasNext()) {
+      ContractInfo[] infos = getContracts();
+      int i = 0;
+      while (!result && i < infos.length) {
          Boolean closed;
          try {
-            closed = iter.next().checkProofClosed();
+            closed = infos[i].checkProofClosed();
          }
          catch (CoreException e) {
             LogUtil.getLogger().logError(e);
@@ -143,6 +142,7 @@ public abstract class AbstractContractContainer {
          if (closed == null || !closed.booleanValue()) {
             result = true;
          }
+         i++;
       }
       return result;
    }
@@ -153,11 +153,12 @@ public abstract class AbstractContractContainer {
     */   
    public boolean hasUnprovenDependencies() {
       boolean result = false;
-      Iterator<ContractInfo> iter = getContracts().iterator();
-      while (!result && iter.hasNext()) {
+      ContractInfo[] infos = getContracts();
+      int i = 0;
+      while (!result && i < infos.length) {
          boolean unproven;
          try {
-            List<IFile> unprovenProofs = iter.next().checkUnprovenDependencies();
+            List<IFile> unprovenProofs = infos[i].checkUnprovenDependencies();
             unproven = unprovenProofs != null && !unprovenProofs.isEmpty();
          }
          catch (Exception e) {
@@ -167,6 +168,7 @@ public abstract class AbstractContractContainer {
          if (unproven) {
             result = true;
          }
+         i++;
       }
       return result;
    }
