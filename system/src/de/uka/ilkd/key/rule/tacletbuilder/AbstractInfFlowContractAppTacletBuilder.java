@@ -188,6 +188,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
             final OpReplacer or = new OpReplacer(quantifiableVarsToSchemaVars,
                                                  services.getTermFactory());
             replaceWithTerm = or.replace(replaceWithTerm);
+            //TODO: replace also quantifiable variables in find and assumes terms
 
             //create sequents
             Sequent assumesSeq = Sequent.createAnteSequent(

@@ -95,8 +95,6 @@ public class BoundUniquenessChecker {
 	    }
 	}
 
-	// FIXME: The following statement breaks tests in de.uka.ilkd.key.rule.tacletbuilder.TestTacletBuild
-        //boundVars.removeAll(localVars);
 	return true;
     }
 

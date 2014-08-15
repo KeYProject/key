@@ -72,16 +72,18 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         final Term find = createFindTerm(ifVars);
         Term schemaFind = replace(find, ifVars, schemaVars, services);
 
-        // collect quantifaible variables of the find term and replace them
-        // by schema variables
+        // create replacewith term and replace information flow variables by
+        // schema variables in the replacewith term, too
+        Term schemaReplaceWith = replace(replacewith, ifVars, schemaVars, services);
+
+        // collect quantifiable variables of the find term and replacewith term
+        // and replace all quantifiable variables by schema variables
         Map<QuantifiableVariable, SchemaVariable> quantifiableVarsToSchemaVars =
                 collectQuantifiableVariables(schemaFind, services);
+        quantifiableVarsToSchemaVars.putAll(
+                collectQuantifiableVariables(schemaReplaceWith, services));
 	final OpReplacer or = new OpReplacer(quantifiableVarsToSchemaVars, tf());
 	schemaFind = or.replace(schemaFind);
-
-        // replace information flow variables by schema variables in the
-        // replacewith term, too
-        Term schemaReplaceWith = replace(replacewith, ifVars, schemaVars, services);
 	schemaReplaceWith = or.replace(schemaReplaceWith);
 
         //create taclet
