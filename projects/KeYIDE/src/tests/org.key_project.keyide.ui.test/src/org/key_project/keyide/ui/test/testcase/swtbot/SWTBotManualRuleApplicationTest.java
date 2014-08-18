@@ -18,6 +18,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.junit.Test;
 import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
@@ -108,51 +109,48 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
    
    @Test
    public void testUseOperationContract_Cancel() throws Exception {
+      IAppliedRuleTest appliedRuleTest =  new IAppliedRuleTest() {
+         @Override
+         public void test(IJavaProject project, KeYEnvironment<CustomUserInterface> environment, Proof proof, SWTWorkbenchBot bot, SWTBotEditor editor, KeYEditor keyEditor, Node nodeOnWhichRuleIsApplied) {
+            SWTBotShell shell = bot.shell("Contracts for charge");
+            TestUtilsUtil.clickDirectly(shell.bot().button("Cancel"));
+         }
+      };
       doStartProofTest("SWTBotManualRuleApplicationTest_testUseOperationContract_Cancel",
                         "data/paycard",
                         TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "chargeAndRecord(int)", "0", "normal_behavior"),
                         new IStopCondition() {
-                           
                            @Override
-                           public boolean shouldStop(int maxApplications, long timeout, Proof proof,
-                                 IGoalChooser goalChooser, long startTime, int countApplied,
-                                 SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                           public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
                               return false;
                            }
                            
                            @Override
-                           public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof,
-                                 IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+                           public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
                               RuleApp ruleApp = goal.getRuleAppManager().peekNext();
-                              return !"Use Operation Contract".equals(MiscTools.getRuleName(ruleApp)) ||
-                              proof.openEnabledGoals().size() >= 46;
+                              return !"Use Operation Contract".equals(MiscTools.getRuleName(ruleApp));
                            }
                            
                            @Override
-                           public String getStopMessage(int maxApplications, long timeout, Proof proof,
-                                 IGoalChooser goalChooser, long startTime, int countApplied,
-                                 SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                           public String getStopMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
                               return null;
                            }
                            
                            @Override
-                           public int getMaximalWork(int maxApplications, long timeout, Proof proof,
-                                 IGoalChooser goalChooser) {
+                           public int getMaximalWork(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser) {
                               return 0;
                            }
                            
                            @Override
-                           public String getGoalNotAllowedMessage(int maxApplications, long timeout,
-                                 Proof proof, IGoalChooser goalChooser, long startTime,
-                                 int countApplied, Goal goal) {
+                           public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
                               return null;
                            }
                         },
                         true,
-                        "{heapAtPre",
+                        "exc:=null}",
                         "Use Operation Contract",
-                        null,
-                        1,
+                        appliedRuleTest,
+                        0,
                         false);
    }
    

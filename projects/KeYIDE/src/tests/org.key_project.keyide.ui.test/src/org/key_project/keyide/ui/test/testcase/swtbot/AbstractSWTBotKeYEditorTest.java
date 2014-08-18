@@ -21,6 +21,7 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.ui.IEditorPart;
+import org.key_project.key4eclipse.common.ui.util.EclipseUserInterfaceCustomization;
 import org.key_project.key4eclipse.common.ui.util.StarterPreferenceUtil;
 import org.key_project.key4eclipse.common.ui.util.StarterUtil;
 import org.key_project.keyide.ui.editor.KeYEditor;
@@ -116,7 +117,7 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
       Proof proof = null;
       SWTBotEditor editor = null;
       try {
-         environment = KeYEnvironment.load(ResourceUtil.getLocation(src), null, null);
+         environment = KeYEnvironment.load(ResourceUtil.getLocation(src), null, null, EclipseUserInterfaceCustomization.getInstance());
          Contract contract = environment.getSpecificationRepository().getContractByName(contractName);
          proof = environment.createProof(contract.createProofObl(environment.getInitConfig(), contract));
          if (startAutoMode) {
