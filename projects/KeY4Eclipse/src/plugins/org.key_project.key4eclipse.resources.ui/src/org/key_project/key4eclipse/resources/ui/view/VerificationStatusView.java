@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -101,6 +102,7 @@ import org.key_project.key4eclipse.resources.ui.provider.ProjectInfoLabelProvide
 import org.key_project.key4eclipse.resources.ui.provider.ProjectInfoLazyTreeContentProvider;
 import org.key_project.key4eclipse.resources.ui.util.LogUtil;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
+import org.key_project.key4eclipse.resources.util.event.IKeYResourcePropertyListener;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
@@ -245,6 +247,26 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
          handleResourceChanged(event);
       }
    };
+   
+   /**
+    * Listens for changes made by {@link KeYResourcesUtil}.
+    */
+   private final IKeYResourcePropertyListener resourcePropertyListener = new IKeYResourcePropertyListener() {
+      @Override
+      public void proofClosedChanged(IFile proofFile, Boolean closed) {
+         handleProofClosedChanged(proofFile, closed);
+      }
+
+      @Override
+      public void proofRecursionCycleChanged(IFile proofFile, List<IFile> cycle) {
+         handlProofRecursionCycleChanged(proofFile, cycle);
+      }
+   };
+   
+   /**
+    * The color for cyclic proofs.
+    */
+   private Color cyclicProofsColor;
    
    /**
     * The color for open proofs.
@@ -396,10 +418,15 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
       treeViewer.getTree().setMenu(treeViewerMenuManager.createContextMenu(treeViewer.getTree()));
       // legendComposite
       Composite legendComposite = new Composite(treeViewrLegendComposite, SWT.NONE);
-      legendComposite.setLayout(new GridLayout(5, false));
+      legendComposite.setLayout(new GridLayout(6, false));
       Label legendLabel = new Label(legendComposite, SWT.NONE);
       legendLabel.setText("Colors: ");
       legendLabel.setToolTipText("Colors indicate the verification status and parents are colored according to the worst verification stati of their children.");
+      cyclicProofsColor = new Color(legendLabel.getDisplay(), ProjectInfoColorTreeSynchronizer.COLOR_PROOF_IN_RECURSION_CYCLE);
+      Label cylcicProofsLabel = new Label(legendComposite, SWT.NONE);
+      cylcicProofsLabel.setForeground(cyclicProofsColor);
+      cylcicProofsLabel.setText("Cyclic proofs");
+      cylcicProofsLabel.setToolTipText("Proofs form a cylic specification use which invalidates all of them.");
       openProofColor = new Color(legendLabel.getDisplay(), ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
       Label openProofLabel = new Label(legendComposite, SWT.NONE);
       openProofLabel.setForeground(openProofColor);
@@ -422,6 +449,7 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
       closedProofLabel.setToolTipText("A proof is sucefull closed and all used specifications of the project are proven as well.");
       updateShownContent();
       ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceChangeListener);
+      KeYResourcesUtil.addKeYResourcePropertyListener(resourcePropertyListener);
       // reportBrowser
       reportBrowser = new Browser(tabFolder, SWT.BORDER);
       reportBrowser.addLocationListener(new LocationListener() {
@@ -826,6 +854,9 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
             sb.append("<body>" + StringUtil.NEW_LINE);
             sb.append("<h1><a name=\"#Contents\">List of Contents</a></h1>" + StringUtil.NEW_LINE);
             sb.append("<ol>" + StringUtil.NEW_LINE);
+            if (!status.cycles.isEmpty()) {
+               sb.append("<li><a href=\"#CyclicProofs\">Cyclic Specification use in Proofs</a></li>" + StringUtil.NEW_LINE);
+            }
             if (!status.unprovenContracts.isEmpty()) {
                sb.append("<li><a href=\"#OpenProofs\">Open Proofs</a></li>" + StringUtil.NEW_LINE);
             }
@@ -843,21 +874,19 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
             }
             sb.append("<li><a href=\"#Assumptions\">Assumptions</a></li>" + StringUtil.NEW_LINE);
             sb.append("</ol>" + StringUtil.NEW_LINE);
-            // Add unspecified methods
-            if (!status.unspecifiedMethods.isEmpty()) {
-               sb.append("<h1><a name=\"#UnspecifiedMethods\">Unspecified Methods</a></h1>" + StringUtil.NEW_LINE);
-               sb.append((status.numOfMethods - status.numOfSpecifiedMethods) + " of " + status.numOfMethods + " methods are unspecified and may call methods in a state not satisfying the precondition: " + StringUtil.NEW_LINE);
+            // Add cyclic proofs
+            if (!status.cycles.isEmpty()) {
+               sb.append("<h1><a name=\"#CyclicProofs\">Cyclic Specification use in Proofs</a></h1>" + StringUtil.NEW_LINE);
                sb.append("<ol>" + StringUtil.NEW_LINE);
-               for (Entry<TypeInfo, List<MethodInfo>> entry : status.unspecifiedMethods.entrySet()) {
+               for (List<IFile> cycle : status.cycles) {
                   SWTUtil.checkCanceled(monitor);
-                  sb.append("<li>" + StringUtil.NEW_LINE);
-                  sb.append("<a href=\"" + toURL(entry.getKey().getFile()) + "\">");
-                  sb.append(entry.getKey().getName());
-                  sb.append("</a>" + StringUtil.NEW_LINE);
+                  sb.append("<li>The following proofs forms a cylic specification use which invalidates all of them:" + StringUtil.NEW_LINE);
                   sb.append("<ul>" + StringUtil.NEW_LINE);
-                  for (MethodInfo method : entry.getValue()) {
+                  for (IFile file : cycle) {
                      SWTUtil.checkCanceled(monitor);
-                     sb.append("<li>" + method.getDisplayName() + "</li>" + StringUtil.NEW_LINE);
+                     sb.append("<li>Participating proof: <a href=\"" + toURL(file) + "\">" + StringUtil.NEW_LINE);
+                     sb.append(file.getFullPath());
+                     sb.append("</a></li>" + StringUtil.NEW_LINE);
                   }
                   sb.append("</ul>" + StringUtil.NEW_LINE);
                   sb.append("</li>" + StringUtil.NEW_LINE);
@@ -886,6 +915,27 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
                      }
                      sb.append("</ul>" + StringUtil.NEW_LINE);
                   }
+                  sb.append("</li>" + StringUtil.NEW_LINE);
+               }
+               sb.append("</ol>" + StringUtil.NEW_LINE);
+            }
+            // Add unspecified methods
+            if (!status.unspecifiedMethods.isEmpty()) {
+               sb.append("<h1><a name=\"#UnspecifiedMethods\">Unspecified Methods</a></h1>" + StringUtil.NEW_LINE);
+               sb.append((status.numOfMethods - status.numOfSpecifiedMethods) + " of " + status.numOfMethods + " methods are unspecified and may call methods in a state not satisfying the precondition: " + StringUtil.NEW_LINE);
+               sb.append("<ol>" + StringUtil.NEW_LINE);
+               for (Entry<TypeInfo, List<MethodInfo>> entry : status.unspecifiedMethods.entrySet()) {
+                  SWTUtil.checkCanceled(monitor);
+                  sb.append("<li>" + StringUtil.NEW_LINE);
+                  sb.append("<a href=\"" + toURL(entry.getKey().getFile()) + "\">");
+                  sb.append(entry.getKey().getName());
+                  sb.append("</a>" + StringUtil.NEW_LINE);
+                  sb.append("<ul>" + StringUtil.NEW_LINE);
+                  for (MethodInfo method : entry.getValue()) {
+                     SWTUtil.checkCanceled(monitor);
+                     sb.append("<li>" + method.getDisplayName() + "</li>" + StringUtil.NEW_LINE);
+                  }
+                  sb.append("</ul>" + StringUtil.NEW_LINE);
                   sb.append("</li>" + StringUtil.NEW_LINE);
                }
                sb.append("</ol>" + StringUtil.NEW_LINE);
@@ -1109,6 +1159,11 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
                   list.add(contractInfo.getProofFile());
                }
             }
+            // Cycles
+            List<IFile> cycle = contractInfo.checkProofRecursionCycle();
+            if (!CollectionUtil.isEmpty(cycle)) {
+               status.cycles.add(cycle);
+            }
          }
       };
       job.setSystem(true);
@@ -1277,6 +1332,11 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
        * The made assumptions.
        */
       private final Map<ProofMetaFileAssumption, List<IFile>> assumptions = new LinkedHashMap<ProofMetaFileAssumption, List<IFile>>();
+      
+      /**
+       * All recursion cycles.
+       */
+      private final Set<List<IFile>> cycles = new LinkedHashSet<List<IFile>>();
    }
    
    /**
@@ -1379,6 +1439,33 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
     * @param event The {@link IResourceChangeEvent}.
     */
    protected void handleResourceChanged(IResourceChangeEvent event) {
+      updateShownContentThreadSave();
+   }
+
+   /**
+    * The proof closed persistent property has changed via
+    * {@link KeYResourcesUtil#setProofClosed(IFile, Boolean)}.
+    * @param proofFile The changed proof file.
+    * @param closed The new closed state.
+    */
+   protected void handleProofClosedChanged(IFile proofFile, Boolean closed) {
+      updateShownContentThreadSave();
+   }
+
+   /**
+    * The proof recursion cycle persistent property has changed via
+    * {@link KeYResourcesUtil#setProofRecursionCycle(IFile, List)}.
+    * @param proofFile The changed proof file.
+    * @param cycle The new recursion cycle or {@code null} if not part of a cycle.
+    */
+   protected void handlProofRecursionCycleChanged(IFile proofFile, List<IFile> cycle) {
+      updateShownContentThreadSave();
+   }
+
+   /**
+    * Calls {@link #updateShownContent()} thread save.
+    */
+   protected void updateShownContentThreadSave() {
       if (!treeViewer.getTree().isDisposed()) {
          treeViewer.getTree().getDisplay().syncExec(new Runnable() {
             @Override
@@ -1531,6 +1618,7 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
    @Override
    public void dispose() {
       ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceChangeListener);
+      KeYResourcesUtil.removeKeYResourcePropertyListener(resourcePropertyListener);
       removeProjectInfoListener();
       if (basePart instanceof EditorPart) {
          ((EditorPart) basePart).removePropertyListener(basePartListener);
@@ -1561,6 +1649,9 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
       }
       if (unprovenDependencyColor != null) {
          unprovenDependencyColor.dispose();
+      }
+      if (cyclicProofsColor != null) {
+         cyclicProofsColor.dispose();
       }
       super.dispose();
    }

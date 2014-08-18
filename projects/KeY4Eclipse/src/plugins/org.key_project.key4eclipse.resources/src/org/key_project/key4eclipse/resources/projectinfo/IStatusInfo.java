@@ -18,6 +18,12 @@ public interface IStatusInfo {
    public boolean hasOpenProof();
    
    /**
+    * Checks if the object itself or one of its children is part of a recursion cycle.
+    * @return {@code true} proof is part of recursion cycle, {@code false} all proofs are fine or {@code null} if unknown.
+    */
+   public boolean isPartOfRecursionCycle();
+   
+   /**
     * Checks if the current proof is based on unproven specifications.
     * @return {@code true} proof is based on unproven specifications, {@code false} all used specifications are proven.
     */

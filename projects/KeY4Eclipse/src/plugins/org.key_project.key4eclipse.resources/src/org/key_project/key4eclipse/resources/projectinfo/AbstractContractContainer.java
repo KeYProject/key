@@ -6,10 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.CoreException;
-import org.key_project.key4eclipse.resources.util.LogUtil;
 
 /**
  * Provides the basic functionality to maintain contracts as known by KeY.
@@ -127,24 +124,33 @@ public abstract class AbstractContractContainer {
     * @return {@code true} open proof contained, {@code false} everything is successful proven.
     */
    public boolean hasOpenProof() {
-      boolean result = false;
-      ContractInfo[] infos = getContracts();
+      boolean allClosed = true;
+      ContractInfo[] contracts = getContracts();
       int i = 0;
-      while (!result && i < infos.length) {
-         Boolean closed;
-         try {
-            closed = infos[i].checkProofClosed();
-         }
-         catch (CoreException e) {
-            LogUtil.getLogger().logError(e);
-            closed = null;
-         }
-         if (closed == null || !closed.booleanValue()) {
-            result = true;
+      while (allClosed && i < contracts.length) {
+         if (contracts[i].hasOpenProof()) {
+            allClosed = false;
          }
          i++;
       }
-      return result;
+      return !allClosed;
+   }
+   
+   /**
+    * Checks if the object itself or one of its children has an open proof.
+    * @return {@code true} open proof contained, {@code false} everything is successful proven.
+    */
+   public boolean isPartOfRecursionCycle() {
+      boolean partOfCycle = false;
+      ContractInfo[] contracts = getContracts();
+      int i = 0;
+      while (!partOfCycle && i < contracts.length) {
+         if (contracts[i].isPartOfRecursionCycle()) {
+            partOfCycle = true;
+         }
+         i++;
+      }
+      return partOfCycle;
    }
 
    /**
@@ -152,24 +158,15 @@ public abstract class AbstractContractContainer {
     * @return {@code true} proof is based on unproven specifications, {@code false} all used specifications are proven.
     */   
    public boolean hasUnprovenDependencies() {
-      boolean result = false;
-      ContractInfo[] infos = getContracts();
+      boolean allDependeniesProven = true;
+      ContractInfo[] contracts = getContracts();
       int i = 0;
-      while (!result && i < infos.length) {
-         boolean unproven;
-         try {
-            List<IFile> unprovenProofs = infos[i].checkUnprovenDependencies();
-            unproven = unprovenProofs != null && !unprovenProofs.isEmpty();
-         }
-         catch (Exception e) {
-            LogUtil.getLogger().logError(e);
-            unproven = false;
-         }
-         if (unproven) {
-            result = true;
+      while (allDependeniesProven && i < contracts.length) {
+         if (contracts[i].hasUnprovenDependencies()) {
+            allDependeniesProven = false;
          }
          i++;
       }
-      return result;
+      return !allDependeniesProven;
    }
 }

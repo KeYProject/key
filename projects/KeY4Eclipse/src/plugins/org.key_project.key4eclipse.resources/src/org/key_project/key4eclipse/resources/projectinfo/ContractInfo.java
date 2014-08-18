@@ -11,7 +11,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileAssumption;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileReader;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
+import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.CollectionUtil;
 
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -23,7 +25,7 @@ import de.uka.ilkd.key.proof.io.KeYFile;
  * Represents a contract as known by KeY.
  * @author Martin Hentschel
  */
-public class ContractInfo {
+public class ContractInfo implements IStatusInfo {
    /**
     * The parent {@link AbstractContractContainer} in which this {@link ContractInfo} is contained in.
     */
@@ -115,6 +117,14 @@ public class ContractInfo {
     */
    public Boolean checkProofClosed() throws CoreException {
       return KeYResourcesUtil.isProofClosed(proofFile);
+   }
+
+   /**
+    * Checks if the object itself or one of its children is part of a recursion cycle.
+    * @return The found recursion cycle or {@code null} if not part of a cycle.
+    */
+   public List<IFile> checkProofRecursionCycle() throws CoreException {
+      return KeYResourcesUtil.getProofRecursionCycle(proofFile);
    }
    
    /**
@@ -272,5 +282,58 @@ public class ContractInfo {
        * Diamond modality.
        */
       DIAMOND
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isUnspecified() {
+      return false;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasOpenProof() {
+      try {
+         Boolean closed = checkProofClosed();
+         return closed == null || !closed.booleanValue();
+      }
+      catch (CoreException e) {
+         LogUtil.getLogger().logError(e);
+         return false;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isPartOfRecursionCycle() {
+      try {
+         List<IFile> cycle = checkProofRecursionCycle();
+         return !CollectionUtil.isEmpty(cycle);
+      }
+      catch (CoreException e) {
+         LogUtil.getLogger().logError(e);
+         return false;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasUnprovenDependencies() {
+      try {
+         List<IFile> unprovenProofs = checkUnprovenDependencies();
+         return unprovenProofs != null && !unprovenProofs.isEmpty();
+      }
+      catch (Exception e) {
+         LogUtil.getLogger().logError(e);
+         return false;
+      }
    }
 }

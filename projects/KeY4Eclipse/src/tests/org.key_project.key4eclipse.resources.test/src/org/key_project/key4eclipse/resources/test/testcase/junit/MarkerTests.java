@@ -481,7 +481,7 @@ public class MarkerTests extends AbstractResourceTest {
          assertNotNull(proofFile);
          assertTrue(proofFile.exists());
          assertEquals(Boolean.TRUE, KeYResourcesUtil.isProofClosed(proofFile));
-         assertNull(KeYResourcesUtil.isProofInRecursionCycle(proofFile));
+         assertNull(KeYResourcesUtil.getProofRecursionCycle(proofFile));
       }
    }
    
@@ -503,7 +503,7 @@ public class MarkerTests extends AbstractResourceTest {
          assertNotNull(proofFile);
          assertTrue(proofFile.exists());
          assertEquals(Boolean.FALSE, KeYResourcesUtil.isProofClosed(proofFile));
-         assertNull(KeYResourcesUtil.isProofInRecursionCycle(proofFile));
+         assertNull(KeYResourcesUtil.getProofRecursionCycle(proofFile));
       }
    }
    
@@ -604,7 +604,7 @@ public class MarkerTests extends AbstractResourceTest {
          assertNotNull(proofFile);
          assertTrue(proofFile.exists());
          assertEquals(Boolean.TRUE, KeYResourcesUtil.isProofClosed(proofFile));
-         assertEquals(Boolean.TRUE, KeYResourcesUtil.isProofInRecursionCycle(proofFile));
+         assertEquals(Boolean.TRUE, KeYResourcesUtil.getProofRecursionCycle(proofFile));
       }
    }
    

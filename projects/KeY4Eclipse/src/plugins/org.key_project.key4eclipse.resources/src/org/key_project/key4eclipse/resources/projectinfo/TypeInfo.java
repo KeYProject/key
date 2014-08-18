@@ -329,6 +329,43 @@ public class TypeInfo extends AbstractTypeContainer implements IStatusInfo {
     * {@inheritDoc}
     */
    @Override
+   public boolean isPartOfRecursionCycle() {
+      boolean partOfCycle = false;
+      MethodInfo[] methods = getMethods();
+      int i = 0;
+      while (!partOfCycle && i < methods.length) {
+         if (methods[i].isPartOfRecursionCycle()) {
+            partOfCycle = true;
+         }
+         i++;
+      }
+      if (!partOfCycle) {
+         ObserverFunctionInfo[] observerFunctions = getObserverFunctions();
+         i = 0;
+         while (!partOfCycle && i < observerFunctions.length) {
+            if (observerFunctions[i].isPartOfRecursionCycle()) {
+               partOfCycle = true;
+            }
+            i++;
+         }
+      }
+      if (!partOfCycle) {
+         TypeInfo[] types = getTypes();
+         i = 0;
+         while (!partOfCycle && i < types.length) {
+            if (types[i].isPartOfRecursionCycle()) {
+               partOfCycle = true;
+            }
+            i++;
+         }
+      }
+      return partOfCycle;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public boolean hasUnprovenDependencies() {
       boolean allDependeniesProven = true;
       MethodInfo[] methods = getMethods();

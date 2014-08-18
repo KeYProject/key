@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -661,10 +660,12 @@ public class ProofManager {
     */
    private void setInRecursionCycleProofFileProperty() throws CoreException {
       // Compute all proof files which are part of at least one cycle
-      final Set<IFile> proofFilesInCycles = new HashSet<IFile>();
+      final Map<IFile, List<IFile>> cycleMap = new HashMap<IFile, List<IFile>>();
       for (LinkedList<ProofElement> cycle : cycles) {
+         List<IFile> cycleFiles = new LinkedList<IFile>();
          for (ProofElement pe : cycle) {
-            proofFilesInCycles.add(pe.getProofFile());
+            cycleFiles.add(pe.getProofFile());
+            cycleMap.put(pe.getProofFile(), cycleFiles);
          }
       }
       // Update resource persistent property.
@@ -673,11 +674,12 @@ public class ProofManager {
          public boolean visit(IResource resource) throws CoreException {
             if (resource instanceof IFile) {
                IFile file = (IFile) resource;
-               if (proofFilesInCycles.contains(file)) {
-                  KeYResourcesUtil.setProofInRecursionCycle(file, Boolean.TRUE);
+               List<IFile> cycles = cycleMap.get(file);
+               if (cycles != null) {
+                  KeYResourcesUtil.setProofRecursionCycle(file, cycles);
                }
                else {
-                  KeYResourcesUtil.setProofInRecursionCycle(file, null);
+                  KeYResourcesUtil.setProofRecursionCycle(file, null);
                }
             }
             return true;

@@ -113,6 +113,23 @@ public class PackageInfo extends AbstractTypeContainer implements IStatusInfo {
     * {@inheritDoc}
     */
    @Override
+   public boolean isPartOfRecursionCycle() {
+      boolean partOfCycle = false;
+      TypeInfo[] types = getTypes();
+      int i = 0;
+      while (!partOfCycle && i < types.length) {
+         if (types[i].isPartOfRecursionCycle()) {
+            partOfCycle = true;
+         }
+         i++;
+      }
+      return partOfCycle;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public boolean hasUnprovenDependencies() {
       boolean allDependeniesProven = true;
       TypeInfo[] types = getTypes();

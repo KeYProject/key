@@ -3,7 +3,6 @@ package org.key_project.key4eclipse.resources.projectinfo;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -306,11 +305,13 @@ public class ProjectInfo implements IStatusInfo {
    @Override
    public boolean isUnspecified() {
       boolean specified = true;
-      Iterator<PackageInfo> typeIter = packageList.iterator();
-      while (specified && typeIter.hasNext()) {
-         if (typeIter.next().isUnspecified()) {
+      PackageInfo[] packages = getPackages();
+      int i = 0;
+      while (specified && i < packages.length) {
+         if (packages[i].isUnspecified()) {
             specified = false;
          }
+         i++;
       }
       return !specified;
    }
@@ -321,11 +322,13 @@ public class ProjectInfo implements IStatusInfo {
    @Override
    public boolean hasOpenProof() {
       boolean allClosed = true;
-      Iterator<PackageInfo> typeIter = packageList.iterator();
-      while (allClosed && typeIter.hasNext()) {
-         if (typeIter.next().hasOpenProof()) {
+      PackageInfo[] packages = getPackages();
+      int i = 0;
+      while (allClosed && i < packages.length) {
+         if (packages[i].hasOpenProof()) {
             allClosed = false;
          }
+         i++;
       }
       return !allClosed;
    }
@@ -334,13 +337,32 @@ public class ProjectInfo implements IStatusInfo {
     * {@inheritDoc}
     */
    @Override
+   public boolean isPartOfRecursionCycle() {
+      boolean partOfCycle = false;
+      PackageInfo[] packages = getPackages();
+      int i = 0;
+      while (!partOfCycle && i < packages.length) {
+         if (packages[i].isPartOfRecursionCycle()) {
+            partOfCycle = true;
+         }
+         i++;
+      }
+      return partOfCycle;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public boolean hasUnprovenDependencies() {
       boolean allDependeniesProven = true;
-      Iterator<PackageInfo> typeIter = packageList.iterator();
-      while (allDependeniesProven && typeIter.hasNext()) {
-         if (typeIter.next().hasUnprovenDependencies()) {
+      PackageInfo[] packages = getPackages();
+      int i = 0;
+      while (allDependeniesProven && i < packages.length) {
+         if (packages[i].hasUnprovenDependencies()) {
             allDependeniesProven = false;
          }
+         i++;
       }
       return !allDependeniesProven;
    }

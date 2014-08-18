@@ -13,6 +13,8 @@
 
 package org.key_project.key4eclipse.resources.decorator;
 
+import java.util.List;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.BaseLabelProvider;
@@ -24,6 +26,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * Decorates the proof folder of KeY projects.
@@ -62,8 +65,8 @@ public class ProofFileLightweightLabelDecorator extends BaseLabelProvider implem
       try {
          if (element instanceof IFile) {
             IFile file = (IFile) element;
-            Boolean inCycle = KeYResourcesUtil.isProofInRecursionCycle(file);
-            if (inCycle != null && inCycle.booleanValue()) {
+            List<IFile> cycle = KeYResourcesUtil.getProofRecursionCycle(file);
+            if (!CollectionUtil.isEmpty(cycle)) {
                decoration.addOverlay(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_DEC_FIELD_ERROR), IDecoration.TOP_RIGHT);
             }
             else {

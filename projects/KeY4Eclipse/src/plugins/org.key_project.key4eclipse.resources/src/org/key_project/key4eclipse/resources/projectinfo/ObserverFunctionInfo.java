@@ -6,7 +6,7 @@ import org.eclipse.core.runtime.Assert;
  * Represents an observer function as known by KeY.
  * @author Martin Hentschel
  */
-public class ObserverFunctionInfo extends AbstractContractContainer {
+public class ObserverFunctionInfo extends AbstractContractContainer implements IStatusInfo {
    /**
     * The {@link TypeInfo} in which this {@link ObserverFunctionInfo} is contained in.
     */
@@ -45,5 +45,13 @@ public class ObserverFunctionInfo extends AbstractContractContainer {
     */
    public String getDisplayName() {
       return displayName;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isUnspecified() {
+      return false;
    }
 }

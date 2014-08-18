@@ -14,7 +14,6 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.events.TreeEvent;
 import org.eclipse.swt.events.TreeListener;
 import org.eclipse.swt.graphics.Color;
@@ -33,7 +32,8 @@ import org.key_project.key4eclipse.resources.projectinfo.PackageInfo;
 import org.key_project.key4eclipse.resources.projectinfo.ProjectInfo;
 import org.key_project.key4eclipse.resources.projectinfo.ProjectInfoManager;
 import org.key_project.key4eclipse.resources.projectinfo.TypeInfo;
-import org.key_project.key4eclipse.resources.ui.util.LogUtil;
+import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
+import org.key_project.key4eclipse.resources.util.event.IKeYResourcePropertyListener;
 import org.key_project.util.eclipse.swt.viewer.ObservableTreeViewer;
 import org.key_project.util.eclipse.swt.viewer.event.IViewerUpdateListener;
 import org.key_project.util.eclipse.swt.viewer.event.ViewerUpdateEvent;
@@ -57,12 +57,17 @@ public class ProjectInfoColorTreeSynchronizer extends AbstractProjectInfoBasedCo
    /**
     * The color used for open proofs.
     */
-   public static final RGB COLOR_OPEN_PROOF = new RGB(133, 52, 52); // JUnit red: 159, 63, 63
+   public static final RGB COLOR_PROOF_IN_RECURSION_CYCLE = new RGB(133, 52, 52); // JUnit red: 159, 63, 63
+   
+   /**
+    * The color used for open proofs.
+    */
+   public static final RGB COLOR_OPEN_PROOF = new RGB(137, 108, 7); // Eclipse warning border: 246, 211, 87
    
    /**
     * The color used for unspecified methods.
     */
-   public static final RGB COLOR_UNSPECIFIED = new RGB(137, 108, 7); // Eclipse warning border: 246, 211, 87
+   public static final RGB COLOR_UNSPECIFIED = new RGB(0, 0, 0);
    
    /**
     * Maps an {@link RGB} to the used {@link Color}.
@@ -110,6 +115,21 @@ public class ProjectInfoColorTreeSynchronizer extends AbstractProjectInfoBasedCo
    };
    
    /**
+    * Listens for changes made by {@link KeYResourcesUtil}.
+    */
+   private final IKeYResourcePropertyListener resourcePropertyListener = new IKeYResourcePropertyListener() {
+      @Override
+      public void proofClosedChanged(IFile proofFile, Boolean closed) {
+         handleProofClosedChanged(proofFile, closed);
+      }
+
+      @Override
+      public void proofRecursionCycleChanged(IFile proofFile, List<IFile> cycle) {
+         handlProofRecursionCycleChanged(proofFile, cycle);
+      }
+   };
+   
+   /**
     * Constructor.
     * @param viewer The {@link ObservableTreeViewer} to show colors in.
     */
@@ -124,6 +144,7 @@ public class ProjectInfoColorTreeSynchronizer extends AbstractProjectInfoBasedCo
       }
       addProjectInfoListener(input);
       ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceChangeListener);
+      KeYResourcesUtil.addKeYResourcePropertyListener(resourcePropertyListener);
    }
 
    /**
@@ -133,6 +154,7 @@ public class ProjectInfoColorTreeSynchronizer extends AbstractProjectInfoBasedCo
    public void dispose() {
       super.dispose();
       ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceChangeListener);
+      KeYResourcesUtil.removeKeYResourcePropertyListener(resourcePropertyListener);
       viewer.removeViewerUpdateListener(updateListener);
       if (!viewer.getTree().isDisposed()) {
          viewer.getTree().getDisplay().syncExec(new Runnable() {
@@ -211,54 +233,12 @@ public class ProjectInfoColorTreeSynchronizer extends AbstractProjectInfoBasedCo
       if (data instanceof IProject) {
          data = ProjectInfoManager.getInstance().getProjectInfo((IProject)data);
       }
-      if (data instanceof ContractInfo) {
-         ContractInfo info = (ContractInfo) data;
-         Boolean closed;
-         try {
-            closed = info.checkProofClosed();
-         }
-         catch (CoreException e) {
-            LogUtil.getLogger().logError(e);
-            closed = null;
-         }
-         if (closed != null && closed.booleanValue()) {
-            boolean unprovenDependency;
-            try {
-               List<IFile> unprovenProofs = info.checkUnprovenDependencies();
-               unprovenDependency = unprovenProofs != null && !unprovenProofs.isEmpty();
-            }
-            catch (Exception e) {
-               LogUtil.getLogger().logError(e);
-               unprovenDependency = false;
-            }
-            if (unprovenDependency) {
-               item.setForeground(createColor(COLOR_UNPROVEN_DEPENDENCY, viewer.getControl().getDisplay()));
-            }
-            else {
-               item.setForeground(createColor(COLOR_CLOSED_PROOF, viewer.getControl().getDisplay()));
-            }
-         }
-         else {
-            item.setForeground(createColor(COLOR_OPEN_PROOF, viewer.getControl().getDisplay()));
-         }
-      }
-      else if (data instanceof ObserverFunctionInfo) {
-         ObserverFunctionInfo info = (ObserverFunctionInfo) data;
-         if (info.hasOpenProof()) {
-            item.setForeground(createColor(COLOR_OPEN_PROOF, viewer.getControl().getDisplay()));
-         }
-         else {
-            if (info.hasUnprovenDependencies()) {
-               item.setForeground(createColor(COLOR_UNPROVEN_DEPENDENCY, viewer.getControl().getDisplay()));
-            }
-            else {
-               item.setForeground(createColor(COLOR_CLOSED_PROOF, viewer.getControl().getDisplay()));
-            }
-         }
-      }
-      else if (data instanceof IStatusInfo) {
+      if (data instanceof IStatusInfo) {
          IStatusInfo info = (IStatusInfo) data;
-         if (info.hasOpenProof()) {
+         if (info.isPartOfRecursionCycle()) {
+            item.setForeground(createColor(COLOR_PROOF_IN_RECURSION_CYCLE, viewer.getControl().getDisplay()));
+         }
+         else if (info.hasOpenProof()) {
             item.setForeground(createColor(COLOR_OPEN_PROOF, viewer.getControl().getDisplay()));
          }
          else if (info.isUnspecified()) {
@@ -382,15 +362,42 @@ public class ProjectInfoColorTreeSynchronizer extends AbstractProjectInfoBasedCo
     */
    protected void handleResourceDelta(IResourceDelta delta) {
       if (delta != null) {
-         IResource resource = delta.getResource();
-         Set<Object> elements = getModelElements(resource);
-         if (elements != null) {
-            for (Object element : elements) {
-               updateObjectAndParents(element);
-            }
-         }
+         updateModelElementsOfResource(delta.getResource());
          for (IResourceDelta childDelta : delta.getAffectedChildren()) {
             handleResourceDelta(childDelta);
+         }
+      }
+   }
+
+   /**
+    * The proof closed persistent property has changed via
+    * {@link KeYResourcesUtil#setProofClosed(IFile, Boolean)}.
+    * @param proofFile The changed proof file.
+    * @param closed The new closed state.
+    */
+   protected void handleProofClosedChanged(IFile proofFile, Boolean closed) {
+      updateModelElementsOfResource(proofFile);
+   }
+
+   /**
+    * The proof recursion cycle persistent property has changed via
+    * {@link KeYResourcesUtil#setProofRecursionCycle(IFile, List)}.
+    * @param proofFile The changed proof file.
+    * @param cycle The new recursion cycle or {@code null} if not part of a cycle.
+    */
+   protected void handlProofRecursionCycleChanged(IFile proofFile, List<IFile> cycle) {
+      updateModelElementsOfResource(proofFile);
+   }
+   
+   /**
+    * When a resource has changed.
+    * @param resource The changed {@link IResource}.
+    */
+   protected void updateModelElementsOfResource(IResource resource) {
+      Set<Object> elements = getModelElements(resource);
+      if (elements != null) {
+         for (Object element : elements) {
+            updateObjectAndParents(element);
          }
       }
    }
