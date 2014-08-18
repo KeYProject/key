@@ -81,6 +81,9 @@ public class ProjectInfoLazyTreeContentProvider extends AbstractProjectInfoBased
          viewer.replace(parent, index, element);
          updateChildCount(element, -1);
       }
+      else {
+         updateChildCount(parent, -1);
+      }
    }
 
    /**

@@ -13,7 +13,8 @@
 
 package org.key_project.key4eclipse.resources.io;
 
-import java.io.File;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -28,7 +29,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
@@ -81,20 +81,19 @@ public class ProofMetaFileWriter {
       TransformerFactory transFactory = TransformerFactory.newInstance();
       Transformer transformer = transFactory.newTransformer();
       DOMSource source = new DOMSource(doc);
-      if(!metaIFile.exists()){
-         metaIFile.create(null, true, null);
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      StreamResult result = new StreamResult(out);
+      transformer.transform(source, result);
+      if (!metaIFile.exists()) {
+         metaIFile.create(new ByteArrayInputStream(out.toByteArray()), true, null);
       }
-      else{
-         metaIFile.refreshLocal(IResource.DEPTH_ZERO, null);
+      else {
          ResourceAttributes resAttr = metaIFile.getResourceAttributes();
          resAttr.setReadOnly(false);
          metaIFile.setResourceAttributes(resAttr);
-      }
-      File metaFile = metaIFile.getLocation().toFile();
-      StreamResult result = new StreamResult(metaFile);
-      transformer.transform(source, result);
+         metaIFile.setContents(new ByteArrayInputStream(out.toByteArray()), true, true, null);
+      }      
       metaIFile.setHidden(KeYProjectProperties.isHideMetaFiles(metaIFile.getProject()));
-      metaIFile.refreshLocal(IResource.DEPTH_ZERO, null);
       ResourceAttributes resAttr = metaIFile.getResourceAttributes();
       resAttr.setReadOnly(true);
       metaIFile.setResourceAttributes(resAttr);

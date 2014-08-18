@@ -107,7 +107,7 @@ public abstract class AbstractContractContainer {
     * @return The {@link ContractInfo} at the given index.
     */
    public ContractInfo getContract(int index) {
-      return contractsList.get(index);
+      return index >= 0 && index < contractsList.size() ? contractsList.get(index) : null;
    }
 
    /**

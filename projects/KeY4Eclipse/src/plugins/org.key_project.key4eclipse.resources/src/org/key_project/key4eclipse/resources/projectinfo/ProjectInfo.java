@@ -134,7 +134,7 @@ public class ProjectInfo implements IStatusInfo {
     * @return The {@link PackageInfo} at the given index.
     */
    public PackageInfo getPackage(int index) {
-      return packageList.get(index);
+      return index >= 0 && index < packageList.size() ? packageList.get(index) : null;
    }
 
    /**

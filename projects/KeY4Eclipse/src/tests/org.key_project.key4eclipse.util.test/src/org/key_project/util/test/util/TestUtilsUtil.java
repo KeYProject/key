@@ -14,9 +14,9 @@
 package org.key_project.util.test.util;
 
 import static org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable.syncExec;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -53,6 +53,7 @@ import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jdt.ui.wizards.JavaCapabilityConfigurationPage;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Control;
@@ -70,6 +71,7 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.results.ArrayResult;
 import org.eclipse.swtbot.swt.finder.results.BoolResult;
+import org.eclipse.swtbot.swt.finder.results.Result;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.results.WidgetResult;
 import org.eclipse.swtbot.swt.finder.utils.MessageFormat;
@@ -1801,5 +1803,32 @@ public class TestUtilsUtil {
       else {
          assertNull(actual);
       }
+   }
+
+   /**
+    * Performs {@link WorkbenchUtil#selectAndReveal(IResource)} thread save.
+    * @param file The {@link IFile} to select.
+    */
+   public static void selectAndReveal(final IFile file) {
+      Display.getDefault().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            WorkbenchUtil.selectAndReveal(file);
+         }
+      });
+   }
+
+   /**
+    * Returns the foreground {@link Color}.
+    * @param item The {@link SWTBotTreeItem}.
+    * @return The foreground {@link Color} of the given {@link SWTBotTreeItem}.
+    */
+   public static Color getForeground(final SWTBotTreeItem item) {
+      return syncExec(new Result<Color>() {
+         @Override
+         public Color run() {
+            return item.widget.getForeground();
+         }
+      });
    }
 }

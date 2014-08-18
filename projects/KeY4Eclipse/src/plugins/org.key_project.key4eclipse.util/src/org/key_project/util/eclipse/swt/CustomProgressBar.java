@@ -32,7 +32,7 @@ public class CustomProgressBar extends Canvas {
    private boolean fError;
    private boolean fStopped= false;
 
-   public CustomProgressBar(Composite parent, RGB normalRGB, RGB failureRGB) {
+   public CustomProgressBar(Composite parent, RGB normalRGB, RGB failureRGB, RGB stoppedRGB) {
       super(parent, SWT.NONE);
 
       addControlListener(new ControlAdapter() {
@@ -57,7 +57,7 @@ public class CustomProgressBar extends Canvas {
       Display display= parent.getDisplay();
       fFailureColor= new Color(display, failureRGB);
       fOKColor= new Color(display, normalRGB);
-      fStoppedColor= new Color(display, 120, 120, 120);
+      fStoppedColor= new Color(display, stoppedRGB);
    }
 
    public void setMaximum(int max) {
@@ -82,6 +82,22 @@ public class CustomProgressBar extends Canvas {
       fColorBarWidth= scale(ticksDone);
       if (! noChange)
          redraw();
+   }
+   
+   public boolean hasErrors() {
+      return fError;
+   }
+   
+   public boolean isStopped() {
+      return fStopped;
+   }
+   
+   public int getTicksDone() {
+      return fCurrentTickCount;
+   }
+   
+   public int getMaximum() {
+      return fMaxTickCount;
    }
 
    private void paintStep(int startX, int endX) {

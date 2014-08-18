@@ -205,7 +205,7 @@ public class TypeInfo extends AbstractTypeContainer implements IStatusInfo {
     * @return The {@link MethodInfo} at the given index.
     */
    public MethodInfo getMethod(int index) {
-      return methodsList.get(index);
+      return index >= 0 && index < methodsList.size() ? methodsList.get(index) : null;
    }
 
    /**
@@ -214,7 +214,7 @@ public class TypeInfo extends AbstractTypeContainer implements IStatusInfo {
     * @return The {@link ObserverFunctionInfo} at the given index.
     */
    public ObserverFunctionInfo getObserverFunction(int index) {
-      return observerFunctionsList.get(index);
+      return index >= 0 && index < observerFunctionsList.size() ? observerFunctionsList.get(index) : null;
    }
 
    /**

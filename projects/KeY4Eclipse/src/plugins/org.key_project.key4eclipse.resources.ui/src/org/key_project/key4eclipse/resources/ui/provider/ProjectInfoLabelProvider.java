@@ -34,6 +34,7 @@ import org.key_project.key4eclipse.resources.projectinfo.ProjectInfoManager;
 import org.key_project.key4eclipse.resources.projectinfo.TypeInfo;
 import org.key_project.key4eclipse.resources.ui.util.LogUtil;
 import org.key_project.key4eclipse.resources.ui.util.ResourcesUiImages;
+import org.key_project.util.java.CollectionUtil;
 
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector.ChoiceEntry;
@@ -256,12 +257,20 @@ public class ProjectInfoLabelProvider extends ColumnLabelProvider {
          try {
             StringBuffer sb = new StringBuffer();
             ContractInfo info = (ContractInfo) element;
+            // Add information about cyclic specification use
+            List<IFile> cycle = info.checkProofRecursionCycle();
+            if (!CollectionUtil.isEmpty(cycle)) {
+               sb.append("Cyclic use of specifications:\n");
+               for (IFile file : cycle) {
+                  sb.append("- " + file.getFullPath() + "\n");
+               }
+            }
             // Add information about unproven proof dependencies
             List<IFile> unprovenProofs = info.checkUnprovenDependencies();
             if (unprovenProofs != null && !unprovenProofs.isEmpty()) {
                sb.append("Unproven Dependency:\n");
                for (IFile unprovenProof : unprovenProofs) {
-                  sb.append("- " + unprovenProof.getFullPath());
+                  sb.append("- " + unprovenProof.getFullPath() + "\n");
                }
             }
             // Add information about taclet options
@@ -269,7 +278,7 @@ public class ProjectInfoLabelProvider extends ColumnLabelProvider {
             if (tacletIssues != null && 
                 (!tacletIssues.getIncompleteOptions().isEmpty() || !tacletIssues.getUnsoundOptions().isEmpty() || !tacletIssues.getInformationOptions().isEmpty())) {
                if (sb.length() >= 1) {
-                  sb.append("\n\n");
+                  sb.append("\n");
                }
                sb.append("Taclet Options:");
                for (String value : tacletIssues.getUnsoundOptions()) {

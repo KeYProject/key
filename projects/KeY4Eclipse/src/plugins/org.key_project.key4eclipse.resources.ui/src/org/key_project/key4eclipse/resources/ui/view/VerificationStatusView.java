@@ -129,6 +129,11 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 @SuppressWarnings("restriction")
 public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
    /**
+    * The unique ID of this view.
+    */
+   public static final String ID = "org.key_project.key4eclipse.resources.ui.view.VerificationStatusView";
+   
+   /**
     * The protocol used to link {@link ResourcesPlugin}s in the Eclipse workspace.
     */
    private static final String PROTOCOL_RESOURCE = "resource:";
@@ -136,7 +141,7 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
    /**
     * The protocol used to link to {@link File}s in the local file system.
     */
-   protected static final String PROTOCOL_FILE_PREFIX = "file:/";
+   private static final String PROTOCOL_FILE_PREFIX = "file:/";
 
    /**
     * The root {@link Composite} which contains all shown content.
@@ -357,7 +362,7 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
       if (basePart instanceof EditorPart) {
          ((EditorPart) basePart).addPropertyListener(basePartListener);
       }
-      if (basePart != null) {
+      if (basePart != null && basePart.getSite() != null && basePart.getSite().getSelectionProvider() != null) {
          basePart.getSite().getSelectionProvider().addSelectionChangedListener(basePartSelectionChangedListener);
       }
    }
@@ -375,11 +380,11 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
       progressComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       Label proofLabel = new Label(progressComposite, SWT.NONE);
       proofLabel.setText("Proofs");
-      proofProgressBar = new CustomProgressBar(progressComposite, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF, ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
+      proofProgressBar = new CustomProgressBar(progressComposite, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF, ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF, ProjectInfoColorTreeSynchronizer.COLOR_PROOF_IN_RECURSION_CYCLE);
       proofProgressBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       Label specificationLabel = new Label(progressComposite, SWT.NONE);
       specificationLabel.setText("Specifications");
-      specificationProgressBar = new CustomProgressBar(progressComposite, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF, ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
+      specificationProgressBar = new CustomProgressBar(progressComposite, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF, ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED, ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
       specificationProgressBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       // tabFolder
       CTabFolder tabFolder = new CTabFolder(rootComposite, SWT.FLAT | SWT.BOTTOM);
@@ -773,7 +778,7 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
     */
    protected void updateProgressBarsAndReport() {
       AbstractDependingOnObjectsJob.cancelJobs(VerificationStatusView.this);
-      Job job = new AbstractDependingOnObjectsJob("Computing verification status", VerificationStatusView.this) {
+      Job job = new AbstractDependingOnObjectsJob("Computing verification status", new Object[] {VerificationStatusView.this}, projects.toArray()) {
          @Override
          protected IStatus run(IProgressMonitor monitor) {
             try {
@@ -791,8 +796,8 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
                      @Override
                      public void run() {
                         if (!proofProgressBar.isDisposed()) {
-                           proofProgressBar.setToolTipText(status.numOfProvenContracts + " of " + status.numOfContracts + " proof obligations are proven.");
-                           proofProgressBar.reset(status.numOfProvenContracts != status.numOfContracts, false, status.numOfProvenContracts, status.numOfContracts);
+                           proofProgressBar.setToolTipText(status.numOfProvenContracts + " of " + status.numOfContracts + " proof obligations are proven" + (!status.cycles.isEmpty() ? ", but cyclic use of specifications detected" : "") + ".");
+                           proofProgressBar.reset(status.numOfProvenContracts != status.numOfContracts, !status.cycles.isEmpty(), status.numOfProvenContracts, status.numOfContracts);
                            specificationProgressBar.setToolTipText(status.numOfSpecifiedMethods + " of " + status.numOfMethods + " methods are specified.");
                            specificationProgressBar.reset(status.numOfSpecifiedMethods != status.numOfMethods, false, status.numOfSpecifiedMethods, status.numOfMethods);
                         }
@@ -1531,14 +1536,14 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
             if (basePart instanceof EditorPart) {
                ((EditorPart) basePart).removePropertyListener(basePartListener);
             }
-            if (basePart != null) {
+            if (basePart != null && basePart.getSite() != null && basePart.getSite().getSelectionProvider() != null) {
                basePart.getSite().getSelectionProvider().removeSelectionChangedListener(basePartSelectionChangedListener);
             }
             basePart = activePart;
             if (basePart instanceof EditorPart) {
                ((EditorPart) basePart).addPropertyListener(basePartListener);
             }
-            if (basePart != null) {
+            if (basePart != null && basePart.getSite() != null && basePart.getSite().getSelectionProvider() != null) {
                basePart.getSite().getSelectionProvider().addSelectionChangedListener(basePartSelectionChangedListener);
             }
             if (isLinkWithBasePart()) {
@@ -1576,7 +1581,7 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
             }
          }
       }
-      if (basePart != null) {
+      if (basePart != null && basePart.getSite() != null && basePart.getSite().getSelectionProvider() != null) {
          ISelection selection = basePart.getSite().getSelectionProvider().getSelection();
          Object[] elements = SWTUtil.toArray(selection);
          for (Object element : elements) {
@@ -1617,13 +1622,14 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
     */
    @Override
    public void dispose() {
+      AbstractDependingOnObjectsJob.cancelJobs(VerificationStatusView.this);
       ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceChangeListener);
       KeYResourcesUtil.removeKeYResourcePropertyListener(resourcePropertyListener);
       removeProjectInfoListener();
       if (basePart instanceof EditorPart) {
          ((EditorPart) basePart).removePropertyListener(basePartListener);
       }
-      if (basePart != null) {
+      if (basePart != null && basePart.getSite() != null && basePart.getSite().getSelectionProvider() != null) {
          basePart.getSite().getSelectionProvider().removeSelectionChangedListener(basePartSelectionChangedListener);
       }
       if (linkState != null) {

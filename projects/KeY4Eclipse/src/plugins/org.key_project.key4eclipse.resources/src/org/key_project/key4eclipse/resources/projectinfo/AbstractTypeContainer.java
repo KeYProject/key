@@ -97,7 +97,7 @@ public abstract class AbstractTypeContainer {
     * @return The {@link TypeInfo} at the given index.
     */
    public TypeInfo getType(int index) {
-      return typesList.get(index);
+      return index >= 0 && index < typesList.size() ? typesList.get(index) : null;
    }
 
    /**
