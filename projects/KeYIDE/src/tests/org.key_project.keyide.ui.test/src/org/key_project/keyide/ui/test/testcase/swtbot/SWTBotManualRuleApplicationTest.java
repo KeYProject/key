@@ -240,7 +240,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                    contractId,
                    5,
                    false, 
-                   steps);
+                   steps); 
    }
    
    /**
