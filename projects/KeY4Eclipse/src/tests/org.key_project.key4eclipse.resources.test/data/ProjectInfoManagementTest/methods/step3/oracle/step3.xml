@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="windows-1252"?>
-<project>
+<project name="ProjectInfoManagementTest_testMethods">
    <package name="(default package)" path="/ProjectInfoManagementTest_testMethods/src">
       <type name="ClassWithoutPackage" path="/ProjectInfoManagementTest_testMethods/src/ClassWithoutPackage.java">
          <method displayName="d()" name="d" parameterTypes="">
