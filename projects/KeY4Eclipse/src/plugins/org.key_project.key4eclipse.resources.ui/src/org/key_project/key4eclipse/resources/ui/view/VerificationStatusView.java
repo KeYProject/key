@@ -377,7 +377,9 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
    @Override
    public void createPartControl(Composite parent) {
       rootComposite = new Composite(parent, SWT.NONE);
-      rootComposite.setLayout(new GridLayout(1, false));
+      GridLayout rootLayout = new GridLayout(1, false);
+      rootLayout.verticalSpacing = 0;
+      rootComposite.setLayout(rootLayout);
       // progressComposite
       Composite progressComposite = new Composite(rootComposite, SWT.NONE);
       progressComposite.setLayout(new GridLayout(4, false));
@@ -395,7 +397,15 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
       tabFolder.setLayoutData(new GridData(GridData.FILL_BOTH));
       // treeViewrLegendComposite
       Composite treeViewrLegendComposite = new Composite(tabFolder, SWT.NONE);
-      treeViewrLegendComposite.setLayout(new GridLayout(1, false));
+      GridLayout treeViewrLegendCompositeLayout = new GridLayout(1, false);
+      treeViewrLegendCompositeLayout.verticalSpacing = 0;
+      treeViewrLegendCompositeLayout.marginTop = 0;
+      treeViewrLegendCompositeLayout.marginBottom = 0;
+      treeViewrLegendCompositeLayout.marginLeft = 0;
+      treeViewrLegendCompositeLayout.marginRight = 0;
+      treeViewrLegendCompositeLayout.horizontalSpacing = 0;
+      treeViewrLegendCompositeLayout.marginWidth = 0;
+      treeViewrLegendComposite.setLayout(treeViewrLegendCompositeLayout);
       // proofAndSpecsTabItem
       CTabItem proofAndSpecsTabItem = new CTabItem(tabFolder, SWT.NONE);
       proofAndSpecsTabItem.setText("&Proofs and Specifications");
@@ -427,7 +437,15 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
       treeViewer.getTree().setMenu(treeViewerMenuManager.createContextMenu(treeViewer.getTree()));
       // legendComposite
       Composite legendComposite = new Composite(treeViewrLegendComposite, SWT.NONE);
-      legendComposite.setLayout(new GridLayout(6, false));
+      legendComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      GridLayout legendLayout = new GridLayout(6, false);
+      legendLayout.marginBottom = 0;
+      legendLayout.marginHeight = 0;
+      legendLayout.marginLeft = 0;
+      legendLayout.marginRight = 0;
+      legendLayout.marginWidth = 0;
+      legendLayout.verticalSpacing = 0;
+      legendComposite.setLayout(legendLayout);
       Label legendLabel = new Label(legendComposite, SWT.NONE);
       legendLabel.setText("Colors: ");
       legendLabel.setToolTipText("Colors indicate the verification status and parents are colored according to the worst verification stati of their children.");
