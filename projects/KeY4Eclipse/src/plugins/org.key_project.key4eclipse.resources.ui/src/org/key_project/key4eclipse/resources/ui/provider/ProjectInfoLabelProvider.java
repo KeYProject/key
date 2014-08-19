@@ -145,41 +145,42 @@ public class ProjectInfoLabelProvider extends ColumnLabelProvider {
    @Override
    public Image getImage(Object element) {
       try {
+         Image image;
          if (element instanceof IProject) {
-            return WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider().getImage(element);
+            image = WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider().getImage(element);
          }
          else if (element instanceof PackageInfo) {
             PackageInfo packageInfo = (PackageInfo) element; 
             IPackageFragment packageFragment = packageInfo.findJDTPackage();
             if (packageFragment != null && packageFragment.exists()) {
-               return WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider().getImage(packageFragment);
+               image = WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider().getImage(packageFragment);
             }
             else {
-               return WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider().getImage(packageInfo.getContainer());
+               image = WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider().getImage(packageInfo.getContainer());
             }
          }
          else if (element instanceof TypeInfo) {
             TypeInfo typeInfo = (TypeInfo) element; 
             IType javaType = typeInfo.findJDTType();
             if (javaType != null && javaType.exists()) {
-               return WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider().getImage(javaType);
+               image = WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider().getImage(javaType);
             }
             else {
-               return WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider().getImage(typeInfo.getFile());
+               image = WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider().getImage(typeInfo.getFile());
             }
          }
          else if (element instanceof MethodInfo) {
             MethodInfo methodInfo = (MethodInfo) element; 
             IMethod javaMethod = methodInfo.findJDTMethod();
             if (javaMethod != null && javaMethod.exists()) {
-               return WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider().getImage(javaMethod);
+               image = WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider().getImage(javaMethod);
             }
             else {
-               return null;
+               image = null;
             }
          }
          else if (element instanceof ObserverFunctionInfo) {
-            return ResourcesUiImages.getImage(ResourcesUiImages.OBSERVER_FUNCTION);
+            image = ResourcesUiImages.getImage(ResourcesUiImages.OBSERVER_FUNCTION);
          }
          else if (element instanceof ContractInfo) {
             ContractInfo ci = (ContractInfo) element;
@@ -194,52 +195,58 @@ public class ProjectInfoLabelProvider extends ColumnLabelProvider {
             if (ci.getParent() instanceof MethodInfo) {
                if (tacletIssues != null && !tacletIssues.getUnsoundOptions().isEmpty()) {
                   if (ContractModality.BOX.equals(ci.getModality())) {
-                     return ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_BOX_WARNING);
+                     image = ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_BOX_WARNING);
                   }
                   else if (ContractModality.DIAMOND.equals(ci.getModality())) {
-                     return ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_DIAMOND_WARNING);
+                     image = ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_DIAMOND_WARNING);
                   }
                   else {
-                     return ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_WARNING);
+                     image = ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_WARNING);
                   }
                }
                else if (tacletIssues != null && !tacletIssues.getIncompleteOptions().isEmpty()) {
                   if (ContractModality.BOX.equals(ci.getModality())) {
-                     return ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_BOX_INFO);
+                     image = ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_BOX_INFO);
                   }
                   else if (ContractModality.DIAMOND.equals(ci.getModality())) {
-                     return ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_DIAMOND_INFO);
+                     image = ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_DIAMOND_INFO);
                   }
                   else {
-                     return ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_INFO);
+                     image = ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_INFO);
                   }
                }
                else {
                   if (ContractModality.BOX.equals(ci.getModality())) {
-                     return ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_BOX);
+                     image = ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_BOX);
                   }
                   else if (ContractModality.DIAMOND.equals(ci.getModality())) {
-                     return ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_DIAMOND);
+                     image = ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT_DIAMOND);
                   }
                   else {
-                     return ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT);
+                     image = ResourcesUiImages.getImage(ResourcesUiImages.METHOD_CONTRACT);
                   }
                }
             }
             else {
                if (tacletIssues != null && !tacletIssues.getUnsoundOptions().isEmpty()) {
-                  return ResourcesUiImages.getImage(ResourcesUiImages.OBSERVER_FUNCTION_CONTRACT_WARNING);
+                  image = ResourcesUiImages.getImage(ResourcesUiImages.OBSERVER_FUNCTION_CONTRACT_WARNING);
                }
                else if (tacletIssues != null && !tacletIssues.getIncompleteOptions().isEmpty()) {
-                  return ResourcesUiImages.getImage(ResourcesUiImages.OBSERVER_FUNCTION_CONTRACT_INFO);
+                  image = ResourcesUiImages.getImage(ResourcesUiImages.OBSERVER_FUNCTION_CONTRACT_INFO);
                }
                else {
-                  return ResourcesUiImages.getImage(ResourcesUiImages.OBSERVER_FUNCTION_CONTRACT);
+                  image = ResourcesUiImages.getImage(ResourcesUiImages.OBSERVER_FUNCTION_CONTRACT);
                }
             }
          }
          else {
-            return null;
+            image = null;
+         }
+         if (image != null) {
+            return image;
+         }
+         else {
+            return ResourcesUiImages.getImage(ResourcesUiImages.UNKNOWN_ELEMENT);
          }
       }
       catch (JavaModelException e) {

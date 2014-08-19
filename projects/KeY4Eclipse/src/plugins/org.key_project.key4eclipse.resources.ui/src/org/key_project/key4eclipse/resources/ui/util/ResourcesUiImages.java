@@ -112,6 +112,10 @@ public final class ResourcesUiImages {
      */
     public static final String DECORATION_INFO = "org.key_project.key4eclipse.resources.ui.infoDecoration";
 
+    /**
+     * The key for the image that is used if something is not available.
+     */
+    public static final String UNKNOWN_ELEMENT = "org.key_project.key4eclipse.resources.ui.unknownElement";
 
     /**
      * Forbid instances.
@@ -190,6 +194,9 @@ public final class ResourcesUiImages {
         }
         else if (DECORATION_INFO.equals(key)) {
            path = "icons/DEC_FIELD_INFO.png";
+        }
+        else if (UNKNOWN_ELEMENT.equals(key)) {
+           path = "icons/UnknownElement.gif";
         }
         else if (METHOD_CONTRACT_WARNING.equals(key)) {
            return decorateImage(getImage(METHOD_CONTRACT), PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEC_FIELD_WARNING));
