@@ -1250,17 +1250,17 @@ public class LogicPrinter {
             final Term heapTerm = t.sub(0);
             final Term objectTerm = t.sub(1);
             final Term fieldTerm = t.sub(2);
-
+            
             if (objectTerm.equals(services.getTermBuilder().NULL()) && isFieldConstant(fieldTerm)) {
                 // static field access
-                printSelectStatic(objectTerm, fieldTerm, heapLDT);
+                printSelectStatic(fieldTerm, heapLDT);
             } else if (fieldTerm.arity() == 0) {
 
-        		// TODO @Kai this checks too little.
-                Sort sort = objectTerm.sort();
-                KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(sort);
-                ClassType type = (ClassType) kjt.getJavaType();
-                ImmutableList<Field> fields = type.getFields(services);
+                  // TODO @Kai this checks too little.
+//                Sort sort = objectTerm.sort();
+//                KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(sort);
+//                ClassType type = (ClassType) kjt.getJavaType();
+//                ImmutableList<Field> fields = type.getFields(services);
 
                 // field constant, skolemised field, field variable, ...
                 markStartSub(1);
@@ -1325,14 +1325,19 @@ public class LogicPrinter {
      * Print out a select on a static field.
      * (separated from {@link #printSelect(Term, Term) printSelect}, to improve code readability)
      */
-    private void printSelectStatic(Term objectTerm, Term fieldTerm, HeapLDT heapLDT) throws IOException {
+    private void printSelectStatic(Term fieldTerm, HeapLDT heapLDT) throws IOException {
+        
+        /*
+        * Is consideration for static arrays missing in this?
+        * (Kai Wallisch 08/2014)
+        */
 
         String className = heapLDT.getClassName((Function) fieldTerm.op());
 
         if (className == null) {
             // if the class name cannot be determined, print "null"
             markStartSub(1);
-            printTerm(objectTerm);
+            printTerm(services.getTermBuilder().NULL());
             markEndSub();
         } else {
             markStartSub(1);
