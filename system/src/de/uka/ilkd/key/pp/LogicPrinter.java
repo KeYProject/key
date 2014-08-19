@@ -1238,11 +1238,11 @@ public class LogicPrinter {
         assert t.boundVars().isEmpty();
         assert t.arity() == 3;
         HeapLDT heapLDT = services == null ? null : services.getTypeConverter().getHeapLDT();
-        
-        if(NotationInfo.PRETTY_SYNTAX && heapLDT != null) {
+
+        if (NotationInfo.PRETTY_SYNTAX && heapLDT != null) {
 
             // if tacitHeap is null, use default heap as tacitHeap
-            if(tacitHeap == null) {
+            if (tacitHeap == null) {
                 tacitHeap = services.getTermFactory().createTerm(heapLDT.getHeap());
             }
 
@@ -1250,21 +1250,19 @@ public class LogicPrinter {
 
             final Term heapTerm = t.sub(0);
             final Term objectTerm = t.sub(1);
-            final Term fieldTerm  = t.sub(2);
+            final Term fieldTerm = t.sub(2);
 
             if (objectTerm.equals(services.getTermBuilder().NULL()) && isFieldConstant(fieldTerm)) {
                 // static field access
                 printSelectStatic(objectTerm, fieldTerm, heapLDT);
             } else if (fieldTerm.arity() == 0) {
-        		
+
         		// TODO @Kai this checks too little.
-        		
-        		Sort sort = objectTerm.sort();
-        		KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(sort);
-        		ClassType type = (ClassType)kjt.getJavaType();
-        		ImmutableList<Field> fields = type.getFields(services);
-        		
-        		
+                Sort sort = objectTerm.sort();
+                KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(sort);
+                ClassType type = (ClassType) kjt.getJavaType();
+                ImmutableList<Field> fields = type.getFields(services);
+
                 // field constant, skolemised field, field variable, ...
                 markStartSub(1);
                 printEmbeddedObserver(heapTerm, objectTerm);
@@ -1277,11 +1275,11 @@ public class LogicPrinter {
                 // is this right at all? // startTerm(0);
                 printTerm(fieldTerm);
                 markEndSub();
-            } else if(fieldTerm.op() == heapLDT.getArr()) {
+            } else if (fieldTerm.op() == heapLDT.getArr()) {
                 // array access
                 printSelectArray(heapTerm, objectTerm, fieldTerm);
             } else {
-        	printFunctionTerm(t.op().name().toString(), t);
+                printFunctionTerm(t.op().name().toString(), t);
             }
             //only print heap term if it is not the standard heap
             final boolean printHeap = !heapTerm.equals(tacitHeap);
@@ -1298,7 +1296,6 @@ public class LogicPrinter {
                 // heap not printed
                 markEndSub();
             }
-    //        layouter.end();
 
         } else {
             printFunctionTerm(t.op().name().toString(), t);
