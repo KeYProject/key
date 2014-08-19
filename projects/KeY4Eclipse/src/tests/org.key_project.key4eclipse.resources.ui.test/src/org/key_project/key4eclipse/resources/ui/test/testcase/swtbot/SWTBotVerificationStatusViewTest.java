@@ -10,6 +10,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.swt.graphics.Color;
@@ -20,6 +21,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorPart;
+import org.junit.Before;
 import org.junit.Test;
 import org.key_project.key4eclipse.resources.projectinfo.ContractInfo;
 import org.key_project.key4eclipse.resources.projectinfo.MethodInfo;
@@ -47,6 +49,22 @@ import org.key_project.util.test.util.TestUtilsUtil;
  */
 public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
    /**
+    * {@inheritDoc}
+    */
+   @Before
+   @Override
+   public void setUp() throws Exception {
+      super.setUp();
+      // Ensure that no other KeY project is open
+      IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+      for (IProject project : projects) {
+         if (KeYResourcesUtil.isKeYProject(project)) {
+            project.close(null);
+         }
+      }
+   }
+
+   /**
     * Tests the information about taclet options
     * <ol>
     *    <li>Proof with just informations about taclet options</li>
@@ -55,6 +73,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
     * </ol>
     * @throws Exception
     */
+   @Test
    public void testTacletOptions() throws Exception {
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       SWTBotView view = null;
@@ -120,6 +139,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
     * Tests the priority of colors.
     * @throws Exception
     */
+   @Test
    public void testColorPriorization() throws Exception {
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       SWTBotView view = null;
@@ -238,6 +258,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
     * </ol>
     * @throws Exception
     */
+   @Test
    public void testSpecificationAndProofProgress() throws Exception {
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       SWTBotView view = null;
@@ -723,9 +744,8 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          secondEditor.show();
          assertSelection(tree, secondFile);
          assertProjectShown(tree, secondKeyProject);
-         projectExplorer.show();
-         assertProjectShown(tree, firstKeyProject, secondKeyProject);
          // Select different content in project explorer
+         projectExplorer.show();
          TestUtilsUtil.selectAndReveal(firstFile);
          assertSelection(tree, firstFile);
          assertProjectShown(tree, firstKeyProject);
