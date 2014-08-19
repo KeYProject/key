@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferencePage;
@@ -47,8 +46,8 @@ import org.key_project.util.eclipse.swt.viewer.ButtonViewer;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
-import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector.ChoiceEntry;
+import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
 
 /**
  * Provides a basic {@link IPreferencePage} implementation to edit
@@ -240,8 +239,9 @@ public abstract class AbstractChoicePreferencePage extends PreferencePage implem
       for (Entry<String, ButtonViewer> entry : entries) {
          ISelection selection = entry.getValue().getSelection();
          Object selectedElement = SWTUtil.getFirstElement(selection);
-         Assert.isTrue(selectedElement instanceof ChoiceEntry);
-         category2DefaultChoice.put(entry.getKey(), ((ChoiceEntry)selectedElement).getChoice());
+         if (selectedElement instanceof ChoiceEntry) {
+            category2DefaultChoice.put(entry.getKey(), ((ChoiceEntry)selectedElement).getChoice());
+         }
       }
       choiceSettings.setDefaultChoices(category2DefaultChoice);
    }
