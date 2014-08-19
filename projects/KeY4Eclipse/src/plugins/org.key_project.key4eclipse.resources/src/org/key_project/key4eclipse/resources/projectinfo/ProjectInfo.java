@@ -27,8 +27,6 @@ import org.key_project.key4eclipse.resources.projectinfo.event.IProjectInfoListe
  * </ul>
  * </p>
  * <p>
- * All content of all model objects are designed unmodifiable.
- * Only new members can be added or existing can be removed. 
  * Changes can be observed at the root {@link ProjectInfo} via an {@link IProjectInfoListener}.
  * </p>
  * @author Martin Hentschel

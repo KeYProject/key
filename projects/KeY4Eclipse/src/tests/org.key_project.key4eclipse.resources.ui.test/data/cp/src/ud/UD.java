@@ -4,6 +4,12 @@ import op.OP;
 
 public class UD {
 	/*@ normal_behavior
+	  @ ensures true;
+	  @*/
+	public UD() {
+	}
+	
+	/*@ normal_behavior
 	  @ ensures \result == 42;
 	  @*/
 	public int correct() {

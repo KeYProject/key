@@ -32,6 +32,23 @@ import org.key_project.util.test.util.TestUtilsUtil;
  */
 public class ProjectInfoManagementTest extends AbstractResourceTest {
    /**
+    * Tests in particular declaring types of methods.
+    * @throws Exception Occurred Exception.
+    */
+   @Test
+   public void testDeclaringTypes() throws Exception {
+      // Test empty project (step 0)
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("ProjectInfoManagementTest_testDeclaringTypes", true, true, false, 1, true, true);
+      assertProjectInfo(project, "data/ProjectInfoManagementTest/delaringType/step0/oracle/step0.xml");
+      IFolder srcFolder = project.getFolder("src");
+      assertTrue(srcFolder.exists());
+      // Add classes (step 1)
+      doStep(project, srcFolder, "data/ProjectInfoManagementTest/delaringType/step1/test", "data/ProjectInfoManagementTest/delaringType/step1/oracle/step1.xml");
+      // Overwrite methods to force declaring type changes (step 2)
+      doStep(project, srcFolder, "data/ProjectInfoManagementTest/delaringType/step2/test", "data/ProjectInfoManagementTest/delaringType/step2/oracle/step2.xml");
+   }
+   
+   /**
     * Tests in particular packages and types.
     * @throws Exception Occurred Exception.
     */

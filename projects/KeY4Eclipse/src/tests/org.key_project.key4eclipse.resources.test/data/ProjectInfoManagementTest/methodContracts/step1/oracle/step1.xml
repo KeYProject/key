@@ -2,25 +2,31 @@
 <project name="ProjectInfoManagementTest_testMethodContracts">
    <package name="(default package)" path="/ProjectInfoManagementTest_testMethodContracts/src">
       <type name="ClassWithoutPackage" path="/ProjectInfoManagementTest_testMethodContracts/src/ClassWithoutPackage.java">
-         <method displayName="m()" name="m" parameterTypes="">
+         <method displayName="ClassWithoutPackage()" name="ClassWithoutPackage" declaringType="ClassWithoutPackage" declaringFilePath="/ProjectInfoManagementTest_testMethodContracts/src/ClassWithoutPackage.java" parameterTypes="">
          </method>
-         <method displayName="n()" name="n" parameterTypes="">
+         <method displayName="m()" name="m" declaringType="ClassWithoutPackage" declaringFilePath="/ProjectInfoManagementTest_testMethodContracts/src/ClassWithoutPackage.java" parameterTypes="">
+         </method>
+         <method displayName="n()" name="n" declaringType="ClassWithoutPackage" declaringFilePath="/ProjectInfoManagementTest_testMethodContracts/src/ClassWithoutPackage.java" parameterTypes="">
          </method>
       </type>
    </package>
    <package name="hello" path="/ProjectInfoManagementTest_testMethodContracts/src/hello">
       <type name="ClassInHello" path="/ProjectInfoManagementTest_testMethodContracts/src/hello/ClassInHello.java">
-         <method displayName="m()" name="m" parameterTypes="">
+         <method displayName="ClassInHello()" name="ClassInHello" declaringType="hello.ClassInHello" declaringFilePath="/ProjectInfoManagementTest_testMethodContracts/src/hello/ClassInHello.java" parameterTypes="">
          </method>
-         <method displayName="n()" name="n" parameterTypes="">
+         <method displayName="m()" name="m" declaringType="hello.ClassInHello" declaringFilePath="/ProjectInfoManagementTest_testMethodContracts/src/hello/ClassInHello.java" parameterTypes="">
+         </method>
+         <method displayName="n()" name="n" declaringType="hello.ClassInHello" declaringFilePath="/ProjectInfoManagementTest_testMethodContracts/src/hello/ClassInHello.java" parameterTypes="">
          </method>
       </type>
    </package>
    <package name="hello.world" path="/ProjectInfoManagementTest_testMethodContracts/src/hello/world">
       <type name="ClassInHelloWorld" path="/ProjectInfoManagementTest_testMethodContracts/src/hello/world/ClassInHelloWorld.java">
-         <method displayName="m()" name="m" parameterTypes="">
+         <method displayName="ClassInHelloWorld()" name="ClassInHelloWorld" declaringType="hello.world.ClassInHelloWorld" declaringFilePath="/ProjectInfoManagementTest_testMethodContracts/src/hello/world/ClassInHelloWorld.java" parameterTypes="">
          </method>
-         <method displayName="n()" name="n" parameterTypes="">
+         <method displayName="m()" name="m" declaringType="hello.world.ClassInHelloWorld" declaringFilePath="/ProjectInfoManagementTest_testMethodContracts/src/hello/world/ClassInHelloWorld.java" parameterTypes="">
+         </method>
+         <method displayName="n()" name="n" declaringType="hello.world.ClassInHelloWorld" declaringFilePath="/ProjectInfoManagementTest_testMethodContracts/src/hello/world/ClassInHelloWorld.java" parameterTypes="">
          </method>
       </type>
    </package>

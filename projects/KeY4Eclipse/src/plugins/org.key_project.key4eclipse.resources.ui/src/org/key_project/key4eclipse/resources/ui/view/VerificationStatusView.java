@@ -732,10 +732,6 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
             ContractInfo info = (ContractInfo) element;
             element = info.getParent();
          }
-         if (element instanceof ObserverFunctionInfo) {
-            ObserverFunctionInfo info = (ObserverFunctionInfo) element;
-            element = info.getParent();
-         }
          // Try to select element
          if (element instanceof IFile) {
             try {
@@ -777,10 +773,28 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
          else if (element instanceof MethodInfo) {
             try {
                MethodInfo info = (MethodInfo) element;
-               if (info.getParent().getFile() != null) {
-                  IEditorPart editor = WorkbenchUtil.openEditor(info.getParent().getFile());
+               if (info.getDeclaringFile() != null) {
+                  IEditorPart editor = WorkbenchUtil.openEditor(info.getDeclaringFile());
                   if (editor instanceof JavaEditor) {
-                     IMethod type = info.findJDTMethod();
+                     IMethod method = info.findJDTMethod();
+                     if (method != null && method.exists()) {
+                        ((JavaEditor) editor).setSelection(method);
+                     }
+                  }
+               }
+            }
+            catch (Exception e) {
+               LogUtil.getLogger().logError(e);
+               LogUtil.getLogger().openErrorDialog(getSite().getShell(), e);
+            }
+         }
+         else if (element instanceof ObserverFunctionInfo) {
+            try {
+               ObserverFunctionInfo info = (ObserverFunctionInfo) element;
+               if (info.getDeclaringFile() != null) {
+                  IEditorPart editor = WorkbenchUtil.openEditor(info.getDeclaringFile());
+                  if (editor instanceof JavaEditor) {
+                     IType type = info.findJDTDeclaringType();
                      if (type != null && type.exists()) {
                         ((JavaEditor) editor).setSelection(type);
                      }
@@ -925,7 +939,7 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
             // Add open proofs
             if (!status.unprovenContracts.isEmpty()) {
                sb.append("<h1><a name=\"#OpenProofs\">Open Proofs</a></h1>" + StringUtil.NEW_LINE);
-               sb.append((status.numOfContracts - status.numOfProvenContracts) + " of " + status.numOfProvenContracts + " proofs are still open: " + StringUtil.NEW_LINE);
+               sb.append((status.numOfContracts - status.numOfProvenContracts) + " of " + status.numOfContracts + " proof" + ((status.numOfContracts - status.numOfProvenContracts) == 1 ? " is" : "s are") + " still open: " + StringUtil.NEW_LINE);
                sb.append("<ol>" + StringUtil.NEW_LINE);
                for (ContractInfo contractInfo : status.unprovenContracts) {
                   SWTUtil.checkCanceled(monitor);
@@ -951,7 +965,7 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
             // Add unspecified methods
             if (!status.unspecifiedMethods.isEmpty()) {
                sb.append("<h1><a name=\"#UnspecifiedMethods\">Unspecified Methods</a></h1>" + StringUtil.NEW_LINE);
-               sb.append((status.numOfMethods - status.numOfSpecifiedMethods) + " of " + status.numOfMethods + " methods are unspecified and may call methods in a state not satisfying the precondition: " + StringUtil.NEW_LINE);
+               sb.append((status.numOfMethods - status.numOfSpecifiedMethods) + " of " + status.numOfMethods + " method" + ((status.numOfMethods - status.numOfSpecifiedMethods) == 1 ? " is" : "s are") + " unspecified and may call methods in a state not satisfying the precondition: " + StringUtil.NEW_LINE);
                sb.append("<ol>" + StringUtil.NEW_LINE);
                for (Entry<TypeInfo, List<MethodInfo>> entry : status.unspecifiedMethods.entrySet()) {
                   SWTUtil.checkCanceled(monitor);
@@ -1034,7 +1048,7 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
             }
             // Add assumptions
             sb.append("<h1><a name=\"#Assumptions\">Assumptions</a></h1>" + StringUtil.NEW_LINE);
-            sb.append("Proofs are performed under the following assumptions still needs to be proven:" + StringUtil.NEW_LINE);
+            sb.append("Proofs are performed under the following assumptions still need to be proven:" + StringUtil.NEW_LINE);
             sb.append("<ol>" + StringUtil.NEW_LINE);
             for (Entry<ProofMetaFileAssumption, List<IFile>> entry : status.assumptions.entrySet()) {
                SWTUtil.checkCanceled(monitor);
@@ -1050,7 +1064,15 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
                sb.append("</ul>" + StringUtil.NEW_LINE);
                sb.append("</li>" + StringUtil.NEW_LINE);
             }
-            sb.append("<li><i>Java and JML semantics are correctly modeled in KeY.</i></li>" + StringUtil.NEW_LINE);
+            sb.append("<li>Methods are called in a state satisfying the precondition, assumed for:" + StringUtil.NEW_LINE);
+            sb.append("<ol>" + StringUtil.NEW_LINE);
+            if (!status.unspecifiedMethods.isEmpty()) {
+               sb.append("<li><a href=\"#UnspecifiedMethods\">Unspecified methods</a></li>" + StringUtil.NEW_LINE);
+            }
+            sb.append("<li>Methods of used APIs</li>" + StringUtil.NEW_LINE);
+            sb.append("<li>Projects in which the source code will be used</li>" + StringUtil.NEW_LINE);
+            sb.append("</ol>" + StringUtil.NEW_LINE);
+            sb.append("</li>" + StringUtil.NEW_LINE);
             sb.append("<li><i>Source code is compiled using a correct Java compiler.</i></li>" + StringUtil.NEW_LINE);
             sb.append("<li><i>Program is run on a a correct JVM.</i></li>" + StringUtil.NEW_LINE);
             sb.append("</ol>" + StringUtil.NEW_LINE);
@@ -1196,7 +1218,6 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
          }
       };
       activeJob.setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
-      activeJob.setSystem(true);
       activeJob.schedule();
    }
 
@@ -1213,7 +1234,7 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
          if (parent instanceof TypeInfo) {
             sb.insert(0, '.');
             sb.insert(0, ((TypeInfo) parent).getName());
-            parent = ProjectInfoManager.getParent(type);
+            parent = ProjectInfoManager.getParent(parent);
          }
          else if (parent instanceof PackageInfo) {
             String name = ((PackageInfo) parent).getName();
@@ -1225,7 +1246,7 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
          }
          else {
             // Should never be executed, only to ensure endless loops
-            parent = ProjectInfoManager.getParent(type);
+            parent = ProjectInfoManager.getParent(parent);
          }
       }
       return sb.toString();

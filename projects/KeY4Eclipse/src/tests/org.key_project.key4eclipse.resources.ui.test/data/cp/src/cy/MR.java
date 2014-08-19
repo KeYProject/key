@@ -5,6 +5,12 @@ package cy;
  * @author christoph
  */
 public class MR {
+	/*@ normal_behavior
+	  @ ensures true;
+	  @*/
+	public MR() {
+	}
+	
 	public int unspecified() {
 		return 42;
 	}

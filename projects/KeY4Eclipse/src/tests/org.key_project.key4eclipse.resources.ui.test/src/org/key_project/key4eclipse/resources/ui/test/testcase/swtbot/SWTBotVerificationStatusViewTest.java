@@ -35,7 +35,6 @@ import org.key_project.key4eclipse.resources.ui.test.Activator;
 import org.key_project.key4eclipse.resources.ui.view.VerificationStatusView;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.util.eclipse.BundleUtil;
-import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
@@ -84,26 +83,26 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          MethodInfo methodInfo = typeInfo.getMethod("magic()");
          ContractInfo contractInfo = methodInfo.getContract(0);
          Map<Object, RGB> colorMapping = new HashMap<Object, RGB>();
-         colorMapping.put(project, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
-         colorMapping.put(packageInfo, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
-         colorMapping.put(typeInfo, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
+         colorMapping.put(project, ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
+         colorMapping.put(packageInfo, ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
+         colorMapping.put(typeInfo, ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
          colorMapping.put(methodInfo, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
          colorMapping.put(contractInfo, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
          // Ensure initial content
          assertProjectShown(tree, colorMapping, project);
-         assertProgressBars(proofBar, false, false, 1, 1, specificationBar, false, false, 1, 1);
+         assertProgressBars(proofBar, false, false, 1, 1, specificationBar, true, false, 1, 2);
          assertReport(view, "data/tacletOptions/oracle/Report1Info.html");
          // Change proof
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/tacletOptions/incomplete", proofFolder, true);
          KeY4EclipseResourcesTestUtil.build(project);
          assertProjectShown(tree, colorMapping, project);
-         assertProgressBars(proofBar, false, false, 1, 1, specificationBar, false, false, 1, 1);
+         assertProgressBars(proofBar, false, false, 1, 1, specificationBar, true, false, 1, 2);
          assertReport(view, "data/tacletOptions/oracle/Report2Incomplete.html");
          // Change proof
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/tacletOptions/unsound", proofFolder, true);
          KeY4EclipseResourcesTestUtil.build(project);
          assertProjectShown(tree, colorMapping, project);
-         assertProgressBars(proofBar, false, false, 1, 1, specificationBar, false, false, 1, 1);
+         assertProgressBars(proofBar, false, false, 1, 1, specificationBar, true, false, 1, 2);
          assertReport(view, "data/tacletOptions/oracle/Report3Unsound.html");
       }
       finally {
@@ -215,7 +214,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          colorMapping.put(unspecifiedUnspecifiedMethod.getContract(0), ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
          // Ensure initial content
          assertProjectShown(tree, colorMapping, project);
-         assertProgressBars(proofBar, true, true, 11, 13, specificationBar, true, false, 13, 15);
+         assertProgressBars(proofBar, true, true, 16, 18, specificationBar, true, false, 18, 20);
          assertReport(view, "data/cp/oracle/report.html");
       }
       finally {
@@ -268,7 +267,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          colorMapping.put(typeInfo, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
          // Ensure initial content
          assertProjectShown(tree, colorMapping, project);
-         assertProgressBars(proofBar, false, false, 0, 0, specificationBar, false, false, 0, 0);
+         assertProgressBars(proofBar, false, false, 1, 1, specificationBar, false, false, 1, 1);
          assertReport(view, "data/specificationProgress/oracle/Report1NoMethod.html");
          // Add unspecified method
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/specificationProgress/src2Unspecified", srcFolder, true);
@@ -279,7 +278,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          colorMapping.put(typeInfo, ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
          colorMapping.put(methodInfo, ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
          assertProjectShown(tree, colorMapping, project);
-         assertProgressBars(proofBar, false, false, 0, 0, specificationBar, true, false, 0, 1);
+         assertProgressBars(proofBar, false, false, 1, 1, specificationBar, true, false, 1, 2);
          assertReport(view, "data/specificationProgress/oracle/Report2Unspecified.html");
          // Specify method wrongly
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/specificationProgress/src3SpecifiedWrong", srcFolder, true);
@@ -291,7 +290,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          colorMapping.put(methodInfo, ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
          colorMapping.put(contractInfo, ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
          assertProjectShown(tree, colorMapping, project);
-         assertProgressBars(proofBar, true, false, 0, 1, specificationBar, false, false, 1, 1);
+         assertProgressBars(proofBar, true, false, 1, 2, specificationBar, false, false, 2, 2);
          assertReport(view, "data/specificationProgress/oracle/Report3SpecifiedWrong.html");
          // Correct specification
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/specificationProgress/src4SpecifiedCorrect", srcFolder, true);
@@ -302,7 +301,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          colorMapping.put(methodInfo, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
          colorMapping.put(contractInfo, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
          assertProjectShown(tree, colorMapping, project);
-         assertProgressBars(proofBar, false, false, 1, 1, specificationBar, false, false, 1, 1);
+         assertProgressBars(proofBar, false, false, 2, 2, specificationBar, false, false, 2, 2);
          assertReport(view, "data/specificationProgress/oracle/Report4SpecifiedCorrect.html");
       }
       finally {
@@ -363,7 +362,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          colorMapping.put(bContractInfo, ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
          // Ensure that both proofs are open
          assertProjectShown(tree, colorMapping, project);
-         assertProgressBars(proofBar, true, false, 0, 2, specificationBar, false, false, 2, 2);
+         assertProgressBars(proofBar, true, false, 1, 3, specificationBar, false, false, 3, 3);
          assertReport(view, "data/cyclicProofs/oracle/Report1BothOpen.html");
          // Finish first proof
          IFolder proofFolder = project.getFolder(KeYResourcesUtil.PROOF_FOLDER_NAME);
@@ -372,7 +371,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          colorMapping.put(aMethodInfo, ProjectInfoColorTreeSynchronizer.COLOR_UNPROVEN_DEPENDENCY);
          colorMapping.put(aContractInfo, ProjectInfoColorTreeSynchronizer.COLOR_UNPROVEN_DEPENDENCY);
          assertProjectShown(tree, colorMapping, project);
-         assertProgressBars(proofBar, true, false, 1, 2, specificationBar, false, false, 2, 2);
+         assertProgressBars(proofBar, true, false, 2, 3, specificationBar, false, false, 3, 3);
          assertReport(view, "data/cyclicProofs/oracle/Report2FirstClosed.html");
          // Finish second proof
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/cyclicProofs/secondProof", proofFolder, true);
@@ -385,7 +384,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          colorMapping.put(bMethodInfo, ProjectInfoColorTreeSynchronizer.COLOR_PROOF_IN_RECURSION_CYCLE);
          colorMapping.put(bContractInfo, ProjectInfoColorTreeSynchronizer.COLOR_PROOF_IN_RECURSION_CYCLE);
          assertProjectShown(tree, colorMapping, project);
-         assertProgressBars(proofBar, false, true, 2, 2, specificationBar, false, false, 2, 2);
+         assertProgressBars(proofBar, false, true, 3, 3, specificationBar, false, false, 3, 3);
          assertReport(view, "data/cyclicProofs/oracle/Report3BothClosed.html");
       }
       finally {
@@ -787,8 +786,8 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
       ProjectInfo projectInfo = ProjectInfoManager.getInstance().getProjectInfo(resource.getProject());
       Set<Object> modelElements = projectInfo.getModelElements(resource);
       assertNotNull(modelElements);
-      assertEquals(1, modelElements.size());
-      assertSame(objects[0], CollectionUtil.getFirst(modelElements));
+      assertEquals(2, modelElements.size()); // The class and the default constructor.
+      assertTrue(modelElements.contains(objects[0]));
    }
 
    /**

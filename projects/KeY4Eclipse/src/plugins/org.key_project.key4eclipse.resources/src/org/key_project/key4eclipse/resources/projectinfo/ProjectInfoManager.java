@@ -108,6 +108,16 @@ public final class ProjectInfoManager {
     * Attribute name to store a modality.
     */
    private static final String ATTRIBUTE_MODALITY = "modality";
+
+   /**
+    * Attribute name to store the declaring type.
+    */
+   private static final String ATTRIBUTE_DECLARING_TYPE = "declaringType";
+
+   /**
+    * Attribute name to store the path to the file containing the declaring type.
+    */
+   private static final String ATTRIBUTE_DECLARING_FILE_PATH = "declaringFilePath";
    
    /**
     * Maps each {@link IProject} to its {@link ProjectInfo}.
@@ -247,7 +257,7 @@ public final class ProjectInfoManager {
             Object parent = parentStack.peekFirst();
             Assert.isTrue(parent instanceof TypeInfo);
             TypeInfo typeInfo = (TypeInfo) parent;
-            MethodInfo methodInfo = new MethodInfo(projectInfo, typeInfo, getDisplayName(attributes), getName(attributes), getParameterTypes(attributes));
+            MethodInfo methodInfo = new MethodInfo(projectInfo, typeInfo, getDisplayName(attributes), getName(attributes), getDeclaringType(attributes), getDeclaringFile(attributes), getParameterTypes(attributes));
             typeInfo.addMethod(methodInfo, typeInfo.countMethods());
             parentStack.addFirst(methodInfo);
          }
@@ -255,7 +265,7 @@ public final class ProjectInfoManager {
             Object parent = parentStack.peekFirst();
             Assert.isTrue(parent instanceof TypeInfo);
             TypeInfo typeInfo = (TypeInfo) parent;
-            ObserverFunctionInfo observerFunctionInfo = new ObserverFunctionInfo(projectInfo, typeInfo, getDisplayName(attributes));
+            ObserverFunctionInfo observerFunctionInfo = new ObserverFunctionInfo(projectInfo, typeInfo, getDisplayName(attributes), getDeclaringType(attributes), getDeclaringFile(attributes));
             typeInfo.addObserverFunction(observerFunctionInfo, typeInfo.countObserverFunctions());
             parentStack.addFirst(observerFunctionInfo);
          }
@@ -309,6 +319,21 @@ public final class ProjectInfoManager {
       }
 
       /**
+       * Returns the declaring file.
+       * @param attributes The attributes to read from.
+       * @return The read value.
+       */
+      protected IFile getDeclaringFile(Attributes attributes) {
+         String path = attributes.getValue(ATTRIBUTE_DECLARING_FILE_PATH);
+         if (path != null) {
+            return ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(path));
+         }
+         else {
+            return null;
+         }
+      }
+
+      /**
        * Returns the {@link IProject}.
        * @param attributes The attributes to read from.
        * @return The read value.
@@ -330,6 +355,15 @@ public final class ProjectInfoManager {
        */
       protected String getName(Attributes attributes) {
          return attributes.getValue(ATTRIBUTE_NAME);
+      }
+
+      /**
+       * Returns the declaring type.
+       * @param attributes The attributes to read from.
+       * @return The read value.
+       */
+      protected String getDeclaringType(Attributes attributes) {
+         return attributes.getValue(ATTRIBUTE_DECLARING_TYPE);
       }
 
       /**
@@ -532,6 +566,10 @@ public final class ProjectInfoManager {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_DISPLAY_NAME, methodInfo.getDisplayName());
       attributeValues.put(ATTRIBUTE_NAME, methodInfo.getName());
+      attributeValues.put(ATTRIBUTE_DECLARING_TYPE, methodInfo.getDeclaringType());
+      if (methodInfo.getDeclaringFile() != null) {
+         attributeValues.put(ATTRIBUTE_DECLARING_FILE_PATH, methodInfo.getDeclaringFile().getFullPath().toString());
+      }
       attributeValues.put(ATTRIBUTE_PARAMETER_TYPES, ArrayUtil.toString(methodInfo.getParameterTypes(), ";"));
       XMLUtil.appendStartTag(level, TAG_METHOD_INFO, attributeValues, sb);
       for (ContractInfo contractInfo : methodInfo.getContracts()) {
@@ -549,6 +587,10 @@ public final class ProjectInfoManager {
    private void appendObserverFunctionInfo(int level, ObserverFunctionInfo observerFunctionInfo, StringBuffer sb) {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_DISPLAY_NAME, observerFunctionInfo.getDisplayName());
+      attributeValues.put(ATTRIBUTE_DECLARING_TYPE, observerFunctionInfo.getDeclaringType());
+      if (observerFunctionInfo.getDeclaringFile() != null) {
+         attributeValues.put(ATTRIBUTE_DECLARING_FILE_PATH, observerFunctionInfo.getDeclaringFile().getFullPath().toString());
+      }
       XMLUtil.appendStartTag(level, TAG_OBSERVER_FUNCTION_INFO, attributeValues, sb);
       for (ContractInfo contractInfo : observerFunctionInfo.getContracts()) {
          appendContractInfo(level + 1, contractInfo, sb);

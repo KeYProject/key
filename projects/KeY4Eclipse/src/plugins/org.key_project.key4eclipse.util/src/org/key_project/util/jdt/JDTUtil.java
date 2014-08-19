@@ -737,4 +737,21 @@ public class JDTUtil {
          throw (JavaModelException)e.getCause();
       }
    }
+
+   /**
+    * Returns the full qualified type name of the given {@link IType}.
+    * @param type The {@link IType}.
+    * @return The full qualified {@link IType} or {@code null} if no {@link IType} is defined.
+    */
+   public static String getQualifiedTypeName(IType type) {
+      if (type != null) {
+         StringBuffer sb = new StringBuffer();
+         JavaElementLabelComposerHelper c = new JavaElementLabelComposerHelper(sb, type.getDeclaringType());
+         c.appendTypeLabel(type, JavaElementLabels.T_FULLY_QUALIFIED);
+         return sb.toString();
+      }
+      else {
+         return null;
+      }
+   }
 }
