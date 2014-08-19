@@ -47,7 +47,75 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * @author Martin Hentschel
  */
 public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
-   // TODO: Implement tests for Taclet Options
+   /**
+    * Tests the information about taclet options
+    * <ol>
+    *    <li>Proof with just informations about taclet options</li>
+    *    <li>Proof with incomplete taclet options</li>
+    *    <li>Proof with unsound taclet options</li>
+    * </ol>
+    * @throws Exception
+    */
+   public void testTacletOptions() throws Exception {
+      SWTWorkbenchBot bot = new SWTWorkbenchBot();
+      SWTBotView view = null;
+      IProject project = null;
+      try {
+         TestUtilsUtil.closeWelcomeView(bot);
+         // Open view and ensure that no content is shown.
+         TestUtilsUtil.openView(VerificationStatusView.ID);
+         view = bot.viewById(VerificationStatusView.ID);
+         SWTBotTree tree = view.bot().tree();
+         assertProjectShown(tree);
+         SWTBotCustomProgressBar proofBar = SWTBotCustomProgressBar.customProgressBar(bot, 0);
+         SWTBotCustomProgressBar specificationBar = SWTBotCustomProgressBar.customProgressBar(bot, 1);
+         // Test initial project
+         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testTacletOptions", true, true, false, 1, true, true);
+         IFolder srcFolder = project.getFolder("src");
+         assertTrue(srcFolder.exists());
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/tacletOptions/src", srcFolder, true);
+         IFolder proofFolder = project.getFolder(KeYResourcesUtil.PROOF_FOLDER_NAME);
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/tacletOptions/info", proofFolder, true);
+         KeY4EclipseResourcesTestUtil.build(project);
+         // Find content
+         ProjectInfo projectInfo = ProjectInfoManager.getInstance().getProjectInfo(project);
+         PackageInfo packageInfo = projectInfo.getPackage(PackageInfo.DEFAULT_NAME);
+         TypeInfo typeInfo = packageInfo.getType("Magic");
+         MethodInfo methodInfo = typeInfo.getMethod("magic()");
+         ContractInfo contractInfo = methodInfo.getContract(0);
+         Map<Object, RGB> colorMapping = new HashMap<Object, RGB>();
+         colorMapping.put(project, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
+         colorMapping.put(packageInfo, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
+         colorMapping.put(typeInfo, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
+         colorMapping.put(methodInfo, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
+         colorMapping.put(contractInfo, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
+         // Ensure initial content
+         assertProjectShown(tree, colorMapping, project);
+         assertProgressBars(proofBar, false, false, 1, 1, specificationBar, false, false, 1, 1);
+         assertReport(view, "data/tacletOptions/oracle/Report1Info.html");
+         // Change proof
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/tacletOptions/incomplete", proofFolder, true);
+         KeY4EclipseResourcesTestUtil.build(project);
+         assertProjectShown(tree, colorMapping, project);
+         assertProgressBars(proofBar, false, false, 1, 1, specificationBar, false, false, 1, 1);
+         assertReport(view, "data/tacletOptions/oracle/Report2Incomplete.html");
+         // Change proof
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/tacletOptions/unsound", proofFolder, true);
+         KeY4EclipseResourcesTestUtil.build(project);
+         assertProjectShown(tree, colorMapping, project);
+         assertProgressBars(proofBar, false, false, 1, 1, specificationBar, false, false, 1, 1);
+         assertReport(view, "data/tacletOptions/oracle/Report3Unsound.html");
+      }
+      finally {
+         if (view != null) {
+            view.close();
+         }
+         if (project != null) {
+            project.delete(true, true, null);
+            KeY4EclipseResourcesTestUtil.build(project);
+         }
+      }
+   }
    
    /**
     * Tests the priority of colors.
