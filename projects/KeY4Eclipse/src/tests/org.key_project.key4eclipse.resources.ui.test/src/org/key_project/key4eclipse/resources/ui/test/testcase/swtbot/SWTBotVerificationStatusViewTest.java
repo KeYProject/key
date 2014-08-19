@@ -37,6 +37,8 @@ import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.util.SWTBotCustomProgressBar;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -338,7 +340,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
    protected void assertReport(SWTBotView view, String expectedOraclePathInBundle) throws Exception {
       // Get HTML report
       view.bot().cTabItem(1).activate();
-      String htmlReport = view.bot().browser().getText();
+      String htmlReport = ObjectUtil.toString(TestUtilsUtil.getData(view.bot().browser()));
       view.bot().cTabItem(0).activate();
       // Ensure that report is correct.
       if (oracleDirectory != null) {
@@ -352,7 +354,9 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
       }
       else {
          String expectedReport = IOUtil.readFrom(BundleUtil.openInputStream(Activator.PLUGIN_ID, expectedOraclePathInBundle));
-         assertEquals(expectedReport, htmlReport);
+         if (!StringUtil.equalIgnoreWhiteSpace(expectedReport, htmlReport)) {
+            assertEquals(expectedReport, htmlReport);
+         }
       }
    }
 

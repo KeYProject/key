@@ -79,6 +79,7 @@ import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
+import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBotControl;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
@@ -1828,6 +1829,21 @@ public class TestUtilsUtil {
          @Override
          public Color run() {
             return item.widget.getForeground();
+         }
+      });
+   }
+
+   /**
+    * Returns the data of the given {@link AbstractSWTBotControl} meaning
+    * {@link Widget#getData()}.
+    * @param control The {@link AbstractSWTBotControl} to read its data.
+    * @return The read data.
+    */
+   public static Object getData(final AbstractSWTBotControl<?> control) {
+      return syncExec(new Result<Object>() {
+         @Override
+         public Object run() {
+            return control.widget.getData();
          }
       });
    }

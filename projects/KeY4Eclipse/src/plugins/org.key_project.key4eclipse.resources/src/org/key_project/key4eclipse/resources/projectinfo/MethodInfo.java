@@ -104,4 +104,12 @@ public class MethodInfo extends AbstractContractContainer implements IStatusInfo
    public boolean isUnspecified() {
       return countContracts() == 0;
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String toString() {
+      return displayName;
+   }
 }

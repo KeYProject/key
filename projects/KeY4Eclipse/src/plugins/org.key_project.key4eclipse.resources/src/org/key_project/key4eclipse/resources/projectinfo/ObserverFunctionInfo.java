@@ -54,4 +54,12 @@ public class ObserverFunctionInfo extends AbstractContractContainer implements I
    public boolean isUnspecified() {
       return false;
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String toString() {
+      return displayName;
+   }
 }

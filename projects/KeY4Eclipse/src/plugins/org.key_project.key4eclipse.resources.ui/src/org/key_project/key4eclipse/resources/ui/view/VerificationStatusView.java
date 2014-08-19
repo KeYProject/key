@@ -106,7 +106,6 @@ import org.key_project.key4eclipse.resources.util.event.IKeYResourcePropertyList
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
-import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.eclipse.swt.CustomProgressBar;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.view.AbstractWorkbenchPartBasedView;
@@ -343,6 +342,11 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
          handleBasePartSelectionChanged(event);
       }
    };
+   
+   /**
+    * The currently running {@link Job}.
+    */
+   private Job activeJob;
    
    /**
     * {@inheritDoc}
@@ -777,8 +781,10 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
     * Updates the progress bars {@link #proofProgressBar} and {@link #specificationProgressBar}.
     */
    protected void updateProgressBarsAndReport() {
-      AbstractDependingOnObjectsJob.cancelJobs(VerificationStatusView.this);
-      Job job = new AbstractDependingOnObjectsJob("Computing verification status", new Object[] {VerificationStatusView.this}, projects.toArray()) {
+      if (activeJob != null) {
+         activeJob.cancel();
+      }
+      activeJob = new Job("Computing verification status") {
          @Override
          protected IStatus run(IProgressMonitor monitor) {
             try {
@@ -885,7 +891,7 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
                sb.append("<ol>" + StringUtil.NEW_LINE);
                for (List<IFile> cycle : status.cycles) {
                   SWTUtil.checkCanceled(monitor);
-                  sb.append("<li>The following proofs forms a cylic specification use which invalidates all of them:" + StringUtil.NEW_LINE);
+                  sb.append("<li>The following proofs forms a cyclic specification use which invalidates all of them:" + StringUtil.NEW_LINE);
                   sb.append("<ul>" + StringUtil.NEW_LINE);
                   for (IFile file : cycle) {
                      SWTUtil.checkCanceled(monitor);
@@ -933,7 +939,7 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
                   SWTUtil.checkCanceled(monitor);
                   sb.append("<li>" + StringUtil.NEW_LINE);
                   sb.append("<a href=\"" + toURL(entry.getKey().getFile()) + "\">");
-                  sb.append(entry.getKey().getName());
+                  sb.append(computeFullQualifiedName(entry.getKey()));
                   sb.append("</a>" + StringUtil.NEW_LINE);
                   sb.append("<ul>" + StringUtil.NEW_LINE);
                   for (MethodInfo method : entry.getValue()) {
@@ -1171,8 +1177,40 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
             }
          }
       };
-      job.setSystem(true);
-      job.schedule();
+      activeJob.setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
+      activeJob.setSystem(true);
+      activeJob.schedule();
+   }
+
+   /**
+    * Computes the full qualified type name.
+    * @param type The {@link TypeInfo}.
+    * @return The full qualified name of the given {@link TypeInfo}.
+    */
+   protected String computeFullQualifiedName(TypeInfo type) {
+      StringBuffer sb = new StringBuffer();
+      sb.append(type.getName());
+      Object parent = ProjectInfoManager.getParent(type);
+      while (parent != null) {
+         if (parent instanceof TypeInfo) {
+            sb.insert(0, '.');
+            sb.insert(0, ((TypeInfo) parent).getName());
+            parent = ProjectInfoManager.getParent(type);
+         }
+         else if (parent instanceof PackageInfo) {
+            String name = ((PackageInfo) parent).getName();
+            if (!PackageInfo.DEFAULT_NAME.equals(name)) {
+               sb.insert(0, '.');
+               sb.insert(0, name);
+            }
+            parent = null;
+         }
+         else {
+            // Should never be executed, only to ensure endless loops
+            parent = ProjectInfoManager.getParent(type);
+         }
+      }
+      return sb.toString();
    }
 
    /**
@@ -1316,22 +1354,22 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
       /**
        * Maps a used unsound taclet option to the proofs in which it is used.
        */
-      private final Map<String, List<IFile>> unsoundTacletOptions = new HashMap<String, List<IFile>>();
+      private final Map<String, List<IFile>> unsoundTacletOptions = new LinkedHashMap<String, List<IFile>>();
 
       /**
        * Maps a used incomplete taclet option to the proofs in which it is used.
        */
-      private final Map<String, List<IFile>> incomplelteTacletOptions = new HashMap<String, List<IFile>>();
+      private final Map<String, List<IFile>> incomplelteTacletOptions = new LinkedHashMap<String, List<IFile>>();
 
       /**
        * Maps a used taclet option with an information to the proofs in which it is used.
        */
-      private final Map<String, List<IFile>> informationTacletOptions = new HashMap<String, List<IFile>>();
+      private final Map<String, List<IFile>> informationTacletOptions = new LinkedHashMap<String, List<IFile>>();
       
       /**
        * Lists all unspecified {@link MethodInfo}s of a {@link TypeInfo}.
        */
-      private final Map<TypeInfo, List<MethodInfo>> unspecifiedMethods = new HashMap<TypeInfo, List<MethodInfo>>();
+      private final Map<TypeInfo, List<MethodInfo>> unspecifiedMethods = new LinkedHashMap<TypeInfo, List<MethodInfo>>();
       
       /**
        * The made assumptions.
@@ -1622,7 +1660,9 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
     */
    @Override
    public void dispose() {
-      AbstractDependingOnObjectsJob.cancelJobs(VerificationStatusView.this);
+      if (activeJob != null) {
+         activeJob.cancel();
+      }
       ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceChangeListener);
       KeYResourcesUtil.removeKeYResourcePropertyListener(resourcePropertyListener);
       removeProjectInfoListener();

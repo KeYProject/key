@@ -416,4 +416,12 @@ public class ProjectInfo implements IStatusInfo {
    public IProject getProject() {
       return project;
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String toString() {
+      return project.getName();
+   }
 }

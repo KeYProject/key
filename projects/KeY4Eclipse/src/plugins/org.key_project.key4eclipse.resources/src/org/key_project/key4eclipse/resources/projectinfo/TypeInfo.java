@@ -398,4 +398,12 @@ public class TypeInfo extends AbstractTypeContainer implements IStatusInfo {
       }
       return !allDependeniesProven;
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String toString() {
+      return name;
+   }
 }

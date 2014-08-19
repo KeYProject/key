@@ -13,7 +13,6 @@
 
 package org.key_project.util.eclipse.job;
 
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.jobs.Job;
 import org.key_project.util.eclipse.JobUtil;
 import org.key_project.util.java.ArrayUtil;
@@ -38,18 +37,6 @@ public abstract class AbstractDependingOnObjectsJob extends Job {
       super(name);
       this.objects = objects;
       setRule(new ObjectsSchedulingRule(objects));
-   }
-   
-   /**
-    * Constructor.
-    * @param name The name of this {@link Job}.
-    * @param objects The {@link Object}s on which this {@link Job} depends on.
-    * @param conflictingResources The conflicting {@link IResource}s.
-    */
-   public AbstractDependingOnObjectsJob(String name, Object[] objects, IResource... conflictingResources) {
-      super(name);
-      this.objects = objects;
-      setRule(new ObjectsSchedulingRule(objects, conflictingResources));
    }
 
    /**

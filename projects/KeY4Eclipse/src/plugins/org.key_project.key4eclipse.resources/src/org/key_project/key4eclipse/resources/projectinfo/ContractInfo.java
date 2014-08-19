@@ -336,4 +336,12 @@ public class ContractInfo implements IStatusInfo {
          return false;
       }
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String toString() {
+      return name;
+   }
 }

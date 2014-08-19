@@ -13,6 +13,11 @@ import org.eclipse.jdt.core.JavaCore;
  */
 public class PackageInfo extends AbstractTypeContainer implements IStatusInfo {
    /**
+    * The name of the default package.
+    */
+   public static final String DEFAULT_NAME = "(default package)";
+
+   /**
     * The name.
     */
    private final String name;
@@ -141,5 +146,13 @@ public class PackageInfo extends AbstractTypeContainer implements IStatusInfo {
          i++;
       }
       return !allDependeniesProven;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String toString() {
+      return name;
    }
 }

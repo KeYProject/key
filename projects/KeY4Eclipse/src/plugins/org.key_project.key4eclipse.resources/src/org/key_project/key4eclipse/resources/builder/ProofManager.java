@@ -235,7 +235,7 @@ public class ProofManager {
          String parentName = KeYTypeUtil.getParentName(environment.getServices(), type);
          if (!KeYTypeUtil.isType(environment.getServices(), parentName)) {
             if (parentName == null) {
-               parentName = "(default package)";
+               parentName = PackageInfo.DEFAULT_NAME;
             }
             parentTypeContainer = alreadyTreatedPackages.get(parentName);
             if (parentTypeContainer == null) {
