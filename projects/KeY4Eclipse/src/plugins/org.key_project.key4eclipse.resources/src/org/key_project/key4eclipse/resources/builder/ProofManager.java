@@ -245,6 +245,7 @@ public class ProofManager {
                else {
                   removePackagesIfRequired(projectInfo, packageIndex, projectInfo.indexOfPackage(packageInfo));
                }
+               typeIndexMap.put(packageInfo, Integer.valueOf(0));
                parentTypeContainer = packageInfo;
                packageIndex++;
                alreadyTreatedPackages.put(parentName, packageInfo);
@@ -256,9 +257,6 @@ public class ProofManager {
          // Update type and methods
          TypeInfo typeInfo = parentTypeContainer.getType(type.getName());
          Integer typeIndex = typeIndexMap.get(parentTypeContainer);
-         if (typeIndex == null) {
-            typeIndex = Integer.valueOf(0);
-         }
          typeIndexMap.put(parentTypeContainer, typeIndex + 1);
          if (typeInfo == null) {
             typeInfo = new TypeInfo(projectInfo, type.getName(), javaFile, parentTypeContainer);
@@ -267,6 +265,7 @@ public class ProofManager {
          else {
             removeTypesIfRequired(parentTypeContainer, typeIndex.intValue(), parentTypeContainer.indexOfType(typeInfo));
          }
+         typeIndexMap.put(typeInfo, Integer.valueOf(0)); // Ensure that inner types will be updated or removed at all in the end
          typeInfoMap.put(type.getFullName(), typeInfo);
          ImmutableList<IProgramMethod> methods = environment.getJavaInfo().getAllProgramMethods(type);
          methods = methods.prepend(environment.getJavaInfo().getConstructors(type));
