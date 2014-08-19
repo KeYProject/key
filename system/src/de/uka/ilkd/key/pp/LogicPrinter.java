@@ -1233,12 +1233,12 @@ public class LogicPrinter {
             printTerm(objectTerm);
         }
     }
-
+    
     public void printSelect(Term t, Term tacitHeap) throws IOException {
         assert t.boundVars().isEmpty();
         assert t.arity() == 3;
         HeapLDT heapLDT = services == null ? null : services.getTypeConverter().getHeapLDT();
-
+        
         if(NotationInfo.PRETTY_SYNTAX && heapLDT != null) {
 
             // if tacitHeap is null, use default heap as tacitHeap
@@ -1278,21 +1278,8 @@ public class LogicPrinter {
                 printTerm(fieldTerm);
                 markEndSub();
             } else if(fieldTerm.op() == heapLDT.getArr()) {
-                markStartSub(1);
-                printEmbeddedObserver(heapTerm, objectTerm);
-
-                markEndSub();
-
-                layouter.print("[");
-
-                markStartSub();
-                startTerm(2);
-                markStartSub();
-                printTerm(fieldTerm.sub(0));
-                markEndSub();
-                markEndSub();
-
-                layouter.print("]");
+                // array access
+                printSelectArray(heapTerm, objectTerm, fieldTerm);
             } else {
         	printFunctionTerm(t.op().name().toString(), t);
             }
@@ -1319,7 +1306,28 @@ public class LogicPrinter {
     }
     
     /*
-     * Print out a static field access.
+     * Print out a select on an array.
+     * (separated from {@link #printSelect(Term, Term) printSelect}, to improve code readability)
+     */
+    private void printSelectArray(Term heapTerm, Term objectTerm, Term fieldTerm) throws IOException {
+        markStartSub(1);
+        printEmbeddedObserver(heapTerm, objectTerm);
+        markEndSub();
+
+        layouter.print("[");
+
+        markStartSub();
+        startTerm(2);
+        markStartSub();
+        printTerm(fieldTerm.sub(0));
+        markEndSub();
+        markEndSub();
+
+        layouter.print("]");
+    }
+    
+    /*
+     * Print out a select on a static field.
      * (separated from {@link #printSelect(Term, Term) printSelect}, to improve code readability)
      */
     private void printSelectStatic(Term objectTerm, Term fieldTerm, HeapLDT heapLDT) throws IOException {
