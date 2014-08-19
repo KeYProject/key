@@ -987,7 +987,6 @@ public class LogicPrinter {
        }
     }
 
-
     /** Print a term in <code>f(t1,...tn)</code> style.  If the
      * operator has arity 0, no parentheses are printed, i.e.
      * <code>f</code> instead of <code>f()</code>.  If the term
@@ -1281,10 +1280,9 @@ public class LogicPrinter {
             } else {
                 printFunctionTerm(t.op().name().toString(), t);
             }
-            //only print heap term if it is not the standard heap
-            final boolean printHeap = !heapTerm.equals(tacitHeap);
-
-            if (printHeap) {
+            
+            // print heap term if it is not the standard heap
+            if (!heapTerm.equals(tacitHeap)) {
                 layouter./*brk(1, -3).*/print("@");
                 markStartSub(0);
                 // if, one day, there are infix heap expressions, this needs to be
@@ -1292,8 +1290,8 @@ public class LogicPrinter {
                 printTerm(heapTerm);
                 markEndSub();
             } else {
-                markStartSub(0);
                 // heap not printed
+                markStartSub(0);
                 markEndSub();
             }
 
@@ -1302,7 +1300,7 @@ public class LogicPrinter {
         }
     }
     
-    /*
+ /*
      * Print out a select on an array.
      * (separated from {@link #printSelect(Term, Term) printSelect}, to improve code readability)
      */
