@@ -115,6 +115,7 @@ public class JDTUtil {
             if (endIndex == typeRange.getOffset() + typeRange.getLength()) {
                result = types[i];
             }
+            i++;
          }
       }
       return result;
