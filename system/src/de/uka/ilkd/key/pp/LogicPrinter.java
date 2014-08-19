@@ -28,8 +28,6 @@ import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
-import de.uka.ilkd.key.java.abstraction.ClassType;
-import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -1262,18 +1260,7 @@ public class LogicPrinter {
 //                ClassType type = (ClassType) kjt.getJavaType();
 //                ImmutableList<Field> fields = type.getFields(services);
 
-                // field constant, skolemised field, field variable, ...
-                markStartSub(1);
-                printEmbeddedObserver(heapTerm, objectTerm);
-
-                markEndSub();
-
-                layouter.print(".");
-
-                markStartSub(2);
-                // is this right at all? // startTerm(0);
-                printTerm(fieldTerm);
-                markEndSub();
+                printSelectCanonic(heapTerm, objectTerm, fieldTerm);
             } else if (fieldTerm.op() == heapLDT.getArr()) {
                 // array access
                 printSelectArray(heapTerm, objectTerm, fieldTerm);
@@ -1300,7 +1287,26 @@ public class LogicPrinter {
         }
     }
     
- /*
+    /*
+     * Print out a select term in canonic way.
+     * (separated from {@link #printSelect(Term, Term) printSelect}, to improve code readability)
+     */
+    private void printSelectCanonic(Term heapTerm, Term objectTerm, Term fieldTerm) throws IOException {
+        // field constant, skolemised field, field variable, ...
+        markStartSub(1);
+        printEmbeddedObserver(heapTerm, objectTerm);
+
+        markEndSub();
+
+        layouter.print(".");
+
+        markStartSub(2);
+        // is this right at all? // startTerm(0);
+        printTerm(fieldTerm);
+        markEndSub();
+    }
+
+    /*
      * Print out a select on an array.
      * (separated from {@link #printSelect(Term, Term) printSelect}, to improve code readability)
      */
