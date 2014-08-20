@@ -18,8 +18,10 @@
                                  </statement>
                               </branchCondition>
                               <branchCondition name="not(arrayStoreValid(array,o_3))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(arrayStoreValid(array,o_3)),not(equals(array,null))),equals(length(array),Z(1(#)))))" pathConditionChanged="true" branchCondition="not(arrayStoreValid(array,o_3))" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                 <termination name="&lt;uncaught java.lang.ArrayStoreException&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(arrayStoreValid(array,o_3)),not(equals(array,null))),equals(length(array),Z(1(#)))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-                                 </termination>
+                                 <exceptionalMethodReturn name="&lt;throw java.lang.ArrayStoreException&gt;" signature="&lt;exceptional return of ObjectArrayIndexWriteAccess.compute(array);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(arrayStoreValid(array,o_3)),not(equals(array,null))),equals(length(array),Z(1(#)))))" pathConditionChanged="false" methodReturnCondition="imp(geq(length(array),Z(0(#))),and(and(not(arrayStoreValid(array,o_3)),not(equals(array,null))),equals(length(array),Z(1(#)))))">
+                                    <termination name="&lt;uncaught java.lang.ArrayStoreException&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(not(arrayStoreValid(array,o_3)),not(equals(array,null))),equals(length(array),Z(1(#)))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                                    </termination>
+                                 </exceptionalMethodReturn>
                               </branchCondition>
                            </methodReturn>
                         </statement>
@@ -47,11 +49,12 @@
          </branchCondition>
       </branchStatement>
       <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/1/0"/>
       <methodReturnEntry path="/0/0/0/0/1/0/0"/>
       <methodReturnEntry path="/0/0/1/0/0"/>
    </methodCall>
    <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-   <terminationEntry path="/0/0/0/0/0/0/0/0/0/1/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/1/0/0"/>
    <terminationEntry path="/0/0/0/0/1/0/0/0"/>
    <terminationEntry path="/0/0/1/0/0/0"/>
 </start>

@@ -21,14 +21,17 @@
             </branchCondition>
          </branchCondition>
          <branchCondition name="equals(array,null)" pathCondition="equals(array,null)" pathConditionChanged="true" branchCondition="equals(array,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-            </termination>
+            <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of self.compute(array);&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" methodReturnCondition="equals(array,null)">
+               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+               </termination>
+            </exceptionalMethodReturn>
          </branchCondition>
       </branchStatement>
       <methodReturnEntry path="/0/0/0/0/0/0"/>
       <methodReturnEntry path="/0/0/0/1/0/0"/>
+      <methodReturnEntry path="/0/0/1/0"/>
    </methodCall>
    <terminationEntry path="/0/0/0/0/0/0/0"/>
    <terminationEntry path="/0/0/0/1/0/0/0"/>
-   <terminationEntry path="/0/0/1/0"/>
+   <terminationEntry path="/0/0/1/0/0"/>
 </start>

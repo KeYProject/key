@@ -45,11 +45,13 @@ import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.impl.AbstractSEDBaseMethodReturn;
 import org.key_project.sed.core.model.memory.ISEDMemoryDebugNode;
 import org.key_project.sed.core.model.memory.ISEDMemoryStackFrameCompatibleDebugNode;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchStatement;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
+import org.key_project.sed.core.model.memory.SEDMemoryExceptionalMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryExceptionalTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopBodyTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopCondition;
@@ -203,16 +205,24 @@ public class SEDXMLReader {
                }
             }
             // Inject method return conditions
-            Set<Entry<SEDMemoryMethodReturn, String>> returnConditions = handler.getMethodReturnConditionReferences().entrySet();
-            for (Entry<SEDMemoryMethodReturn, String> entry : returnConditions) {
+            Set<Entry<AbstractSEDBaseMethodReturn, String>> returnConditions = handler.getMethodReturnConditionReferences().entrySet();
+            for (Entry<AbstractSEDBaseMethodReturn, String> entry : returnConditions) {
                ISEDDebugElement element = handler.getElementById(entry.getValue());
                if (element == null) {
                   throw new SAXException("Referenced node with ID \"" + entry.getValue() + "\" is not available in model.");
                }
                if (!(element instanceof ISEDBranchCondition)) {
                   throw new SAXException("Referenced node with ID \"" + entry.getValue() + "\" refers to wrong model object \"" + element + "\".");
-               }               
-               entry.getKey().setMethodReturnCondition((ISEDBranchCondition)element);
+               }
+               if (entry.getKey() instanceof SEDMemoryMethodReturn) {
+                  ((SEDMemoryMethodReturn) entry.getKey()).setMethodReturnCondition((ISEDBranchCondition)element);
+               }
+               else if (entry.getKey() instanceof SEDMemoryExceptionalMethodReturn) {
+                  ((SEDMemoryExceptionalMethodReturn) entry.getKey()).setMethodReturnCondition((ISEDBranchCondition)element);
+               }
+               else {
+                  throw new SAXException("Unsupported method return \"" + entry.getKey() + "\".");
+               }
             }
             // Return result
             return handler.getResult();
@@ -285,9 +295,9 @@ public class SEDXMLReader {
       private final Map<ISEDMemoryDebugNode, List<ChildReference>> nodeChildReferences = new HashMap<ISEDMemoryDebugNode, List<ChildReference>>();
       
       /**
-       * Maps {@link SEDMemoryMethodReturn}s to their method return conditions.
+       * Maps {@link AbstractSEDBaseMethodReturn}s to their method return conditions.
        */
-      private final Map<SEDMemoryMethodReturn, String> methodReturnConditionReferences = new HashMap<SEDMemoryMethodReturn, String>();
+      private final Map<AbstractSEDBaseMethodReturn, String> methodReturnConditionReferences = new HashMap<AbstractSEDBaseMethodReturn, String>();
       
       /**
        * {@inheritDoc}
@@ -486,7 +496,7 @@ public class SEDXMLReader {
        * Returns the method return conditions.
        * @return The method return conditions.
        */
-      public Map<SEDMemoryMethodReturn, String> getMethodReturnConditionReferences() {
+      public Map<AbstractSEDBaseMethodReturn, String> getMethodReturnConditionReferences() {
          return methodReturnConditionReferences;
       }
 
@@ -601,7 +611,7 @@ public class SEDXMLReader {
     * @return The created {@link Object}.
     * @throws SAXException Occurred Exception.
     */
-   protected Object createElement(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes, Map<String, ISEDAnnotation> annotationIdMapping, Map<SEDMemoryMethodReturn, String> methodReturnConditionReferences) throws SAXException {
+   protected Object createElement(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes, Map<String, ISEDAnnotation> annotationIdMapping, Map<AbstractSEDBaseMethodReturn, String> methodReturnConditionReferences) throws SAXException {
       if (SEDXMLWriter.TAG_LAUNCH.equals(qName)) {
          return null; // Nothing to do
       }
@@ -635,6 +645,9 @@ public class SEDXMLReader {
       }
       else if (SEDXMLWriter.TAG_METHOD_RETURN.equals(qName)) {
          return createMethodReturn(target, parent, thread, uri, localName, qName, attributes, methodReturnConditionReferences);
+      }
+      else if (SEDXMLWriter.TAG_EXCEPTIONAL_METHOD_RETURN.equals(qName)) {
+         return createExceptionalMethodReturn(target, parent, thread, uri, localName, qName, attributes, methodReturnConditionReferences);
       }
       else if (SEDXMLWriter.TAG_STATEMENT.equals(qName)) {
          return createStatement(target, parent, thread, uri, localName, qName, attributes);
@@ -896,8 +909,32 @@ public class SEDXMLReader {
     * @return The created {@link SEDMemoryMethodReturn}.
     * @throws SAXException Occurred Exception.
     */   
-   protected SEDMemoryMethodReturn createMethodReturn(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes, Map<SEDMemoryMethodReturn, String> methodReturnConditionReferences) throws SAXException {
+   protected SEDMemoryMethodReturn createMethodReturn(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes, Map<AbstractSEDBaseMethodReturn, String> methodReturnConditionReferences) throws SAXException {
       SEDMemoryMethodReturn methodReturn = new SEDMemoryMethodReturn(target, parent, thread);
+      methodReturn.setSourcePath(getSourcePath(attributes));
+      fillDebugNode(methodReturn, attributes);
+      fillStackFrame(methodReturn, attributes);
+      String methodReturnCondition = getMethodReturnCondition(attributes);
+      if (!StringUtil.isEmpty(methodReturnCondition)) {
+         methodReturnConditionReferences.put(methodReturn, methodReturnCondition);
+      }
+      return methodReturn;
+   }
+   
+   /**
+    * Creates a {@link SEDMemoryExceptionalMethodReturn} instance for the content in the given tag.
+    * @param target The parent {@link ISEDDebugTarget} or {@code null} if not available.
+    * @param parent The parent {@link ISEDDebugNode} or {@code null} if not available.
+    * @param thread The parent {@link ISEDThread} or {@code null} if not available.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
+    * @return The created {@link SEDMemoryExceptionalMethodReturn}.
+    * @throws SAXException Occurred Exception.
+    */   
+   protected SEDMemoryExceptionalMethodReturn createExceptionalMethodReturn(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes, Map<AbstractSEDBaseMethodReturn, String> methodReturnConditionReferences) throws SAXException {
+      SEDMemoryExceptionalMethodReturn methodReturn = new SEDMemoryExceptionalMethodReturn(target, parent, thread);
       methodReturn.setSourcePath(getSourcePath(attributes));
       fillDebugNode(methodReturn, attributes);
       fillStackFrame(methodReturn, attributes);

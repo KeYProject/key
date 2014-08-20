@@ -15,8 +15,26 @@
             </value>
          </variable>
          <branchCondition name="equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)" pathCondition="equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)" pathConditionChanged="true" branchCondition="equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-            </termination>
+            <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of self.magic();&gt;" pathCondition="equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)" pathConditionChanged="false" methodReturnCondition="equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)">
+               <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                  <value name="self {true}" typeString="StaticInstanceFieldChanged" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="n" arrayIndex="-1" isArrayIndex="false">
+                  <value name="n {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="n_2" arrayIndex="-1" isArrayIndex="false">
+                  <value name="n_2 {true}" typeString="java.lang.NullPointerException" valueString="n_5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+               </termination>
+            </exceptionalMethodReturn>
          </branchCondition>
          <branchCondition name="not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null))" pathCondition="not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null))" pathConditionChanged="true" branchCondition="not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <methodCall name="DirectValue();" pathCondition="not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null))" pathConditionChanged="false">
@@ -174,8 +192,34 @@
                            </statement>
                         </branchCondition>
                         <branchCondition name="equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null)" pathCondition="and(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null),not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)))" pathConditionChanged="true" branchCondition="equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
-                           <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null),not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-                           </termination>
+                           <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of self.magic();&gt;" pathCondition="and(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null),not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)))" pathConditionChanged="false" methodReturnCondition="and(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null),not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)))">
+                              <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="self {true}" typeString="StaticInstanceFieldChanged" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="StaticInstanceFieldChanged::nextInstance" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="StaticInstanceFieldChanged::nextInstance {true}" typeString="StaticInstanceFieldChanged.NextValue" valueString="StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                    <variable name="dvalue" arrayIndex="-1" isArrayIndex="false">
+                                       <value name="dvalue {true}" typeString="StaticInstanceFieldChanged.DirectValue" valueString="d_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                          <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                             <value name="value {true}" typeString="int" valueString="Z(4(2(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                             </value>
+                                          </variable>
+                                       </value>
+                                    </variable>
+                                 </value>
+                              </variable>
+                              <variable name="n_7" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="n_7 {true}" typeString="java.lang.NullPointerException" valueString="n_10" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null),not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                              </termination>
+                           </exceptionalMethodReturn>
                         </branchCondition>
                      </statement>
                   </statement>
@@ -184,9 +228,11 @@
             </methodCall>
          </branchCondition>
       </statement>
+      <methodReturnEntry path="/0/0/0/0"/>
       <methodReturnEntry path="/0/0/1/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/1/0/0/0/0/1/0"/>
    </methodCall>
-   <terminationEntry path="/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0"/>
    <terminationEntry path="/0/0/1/0/0/0/0/0/0/0/0"/>
-   <terminationEntry path="/0/0/1/0/0/0/0/1/0"/>
+   <terminationEntry path="/0/0/1/0/0/0/0/1/0/0"/>
 </start>

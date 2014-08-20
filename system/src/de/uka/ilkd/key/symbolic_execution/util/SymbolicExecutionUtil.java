@@ -1028,6 +1028,17 @@ public final class SymbolicExecutionUtil {
              "methodCallEmptyReturn".equals(ruleName) ||
              "methodCallReturnIgnoreResult".equals(ruleName);
    }
+   
+   /**
+    * Checks if the given node should be represented as exceptional method return.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @return {@code true} represent node as exceptional method return, {@code false} represent node as something else. 
+    */
+   public static boolean isExceptionalMethodReturnNode(Node node, RuleApp ruleApp) {
+      String ruleName = MiscTools.getRuleName(ruleApp);
+      return "methodCallParamThrow".equals(ruleName);
+   }
 
    /**
     * Checks if the given {@link Node} has a loop condition.

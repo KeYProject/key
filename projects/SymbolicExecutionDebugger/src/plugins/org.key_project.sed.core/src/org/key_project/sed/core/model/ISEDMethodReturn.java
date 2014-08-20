@@ -13,7 +13,6 @@
 
 package org.key_project.sed.core.model;
 
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.key_project.sed.core.model.impl.AbstractSEDMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodReturn;
@@ -34,14 +33,5 @@ import org.key_project.sed.core.model.memory.SEDMemoryMethodReturn;
  * @author Martin Hentschel
  * @see ISEDDebugNode
  */
-public interface ISEDMethodReturn extends ISEDDebugNode, IStackFrame {
-   /**
-    * Returns the condition under which the calling {@link ISEDMethodCall} is returned in this state.
-    * @return
-    * @exception DebugException if this method fails.  Reasons include:
-    * <ul><li>Failure communicating with the VM.  The DebugException's
-    * status code contains the underlying exception responsible for
-    * the failure.</li>
-    */
-   public ISEDBranchCondition getMethodReturnCondition() throws DebugException;
+public interface ISEDMethodReturn extends ISEDBaseMethodReturn {
 }

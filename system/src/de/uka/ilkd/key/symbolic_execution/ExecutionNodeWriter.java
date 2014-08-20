@@ -23,9 +23,11 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
@@ -246,6 +248,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
    public static final String TAG_METHOD_RETURN = "methodReturn";
 
    /**
+    * Tag name to store {@link IExecutionExceptionalMethodReturn}s.
+    */
+   public static final String TAG_EXCEPTIONAL_METHOD_RETURN = "exceptionalMethodReturn";
+
+   /**
     * Tag name to store {@link IExecutionMethodReturnValue}s.
     */
    public static final String TAG_METHOD_RETURN_VALUE = "methodReturnValue";
@@ -406,6 +413,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
       }
       else if (node instanceof IExecutionMethodReturn) {
          appendExecutionMethodReturn(level, (IExecutionMethodReturn)node, saveVariables, saveCallStack, saveReturnValues, sb);
+      }
+      else if (node instanceof IExecutionExceptionalMethodReturn) {
+         appendExecutionExceptionalMethodReturn(level, (IExecutionExceptionalMethodReturn)node, saveVariables, saveCallStack, saveReturnValues, sb);
       }
       else if (node instanceof IExecutionStatement) {
          appendExecutionStatement(level, (IExecutionStatement)node, saveVariables, saveCallStack, saveReturnValues, sb);
@@ -645,6 +655,35 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
       appendEndTag(level, TAG_METHOD_RETURN, sb);
+   }
+
+   /**
+    * Converts the given {@link IExecutionExceptionalMethodReturn} into XML and appends it to the {@link StringBuffer}.
+    * @param level The current child level.
+    * @param node The {@link IExecutionExceptionalMethodReturn} to convert.
+    * @param saveVariables Save variables? 
+    * @param saveCallStack Save method call stack?
+    * @param saveReturnValues Save method return values?
+    * @param sb The {@link StringBuffer} to append to.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected void appendExecutionExceptionalMethodReturn(int level, 
+                                                         IExecutionExceptionalMethodReturn node, 
+                                                         boolean saveVariables,
+                                                         boolean saveCallStack,
+                                                         boolean saveReturnValues,
+                                                         StringBuffer sb) throws ProofInputException {
+      Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+      attributeValues.put(ATTRIBUTE_NAME, node.getName());
+      attributeValues.put(ATTRIBUTE_SIGNATURE, node.getSignature());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
+      attributeValues.put(ATTRIBUTE_METHOD_RETURN_CONDITION, node.getFormatedMethodReturnCondition());
+      appendStartTag(level, TAG_EXCEPTIONAL_METHOD_RETURN, attributeValues, sb);
+      appendVariables(level + 1, node, saveVariables, sb);
+      appendCallStack(level + 1, node, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
+      appendEndTag(level, TAG_EXCEPTIONAL_METHOD_RETURN, sb);
    }
 
    /**
@@ -908,9 +947,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param sb The {@link StringBuffer} to append to.
     */
    protected void appendMethodReturns(int level, IExecutionMethodCall node, StringBuffer sb) {
-      ImmutableList<IExecutionMethodReturn> methodReturns = node.getMethodReturns();
+      ImmutableList<IExecutionBaseMethodReturn<?>> methodReturns = node.getMethodReturns();
       if (methodReturns != null) {
-         for (IExecutionMethodReturn methodReturn : methodReturns) {
+         for (IExecutionBaseMethodReturn<?> methodReturn : methodReturns) {
             Map<String, String> attributeValues = new LinkedHashMap<String, String>();
             attributeValues.put(ATTRIBUTE_PATH_IN_TREE, computePath(methodReturn));
             appendEmptyTag(level, TAG_METHOD_RETURN_ENTRY, attributeValues, sb);

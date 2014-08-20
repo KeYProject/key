@@ -14,8 +14,15 @@
                   <statement name="throw new Exception ();" pathCondition="equals(array,null)" pathConditionChanged="false">
                      <callStackEntry path="/0/0/0"/>
                      <callStackEntry path="/0"/>
-                     <termination name="&lt;uncaught java.lang.Exception&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-                     </termination>
+                     <exceptionalMethodReturn name="&lt;throw java.lang.Exception&gt;" signature="&lt;exceptional return of ArrayAverage.sum(array_1);&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" methodReturnCondition="equals(array,null)">
+                        <callStackEntry path="/0/0/0"/>
+                        <callStackEntry path="/0"/>
+                        <exceptionalMethodReturn name="&lt;throw java.lang.Exception&gt;" signature="&lt;exceptional return of ArrayAverage.average(array);&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" methodReturnCondition="equals(array,null)">
+                           <callStackEntry path="/0"/>
+                           <termination name="&lt;uncaught java.lang.Exception&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                           </termination>
+                        </exceptionalMethodReturn>
+                     </exceptionalMethodReturn>
                   </statement>
                </branchCondition>
                <branchCondition name="not(equals(array,null))" pathCondition="not(equals(array,null))" pathConditionChanged="true" branchCondition="not(equals(array,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -63,8 +70,11 @@ mod: false" pathCondition="not(equals(array,null))" pathConditionChanged="false"
                                        <statement name="return sum_1/array.length;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(i_0,Z(0(#))),not(equals(array,null))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathConditionChanged="false">
                                           <callStackEntry path="/0"/>
                                           <branchCondition name="equals(i_0,Z(0(#)))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(equals(i_0,Z(0(#))),not(equals(array,null))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathConditionChanged="true" branchCondition="equals(i_0,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                             <termination name="&lt;uncaught java.lang.ArithmeticException&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(equals(i_0,Z(0(#))),not(equals(array,null))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-                                             </termination>
+                                             <exceptionalMethodReturn name="&lt;throw java.lang.ArithmeticException&gt;" signature="&lt;exceptional return of ArrayAverage.average(array);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(equals(i_0,Z(0(#))),not(equals(array,null))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathConditionChanged="false" methodReturnCondition="imp(geq(length(array),Z(0(#))),and(and(and(equals(i_0,Z(0(#))),not(equals(array,null))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))">
+                                                <callStackEntry path="/0"/>
+                                                <termination name="&lt;uncaught java.lang.ArithmeticException&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(equals(i_0,Z(0(#))),not(equals(array,null))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                                                </termination>
+                                             </exceptionalMethodReturn>
                                           </branchCondition>
                                           <branchCondition name="not(equals(i_0,Z(0(#))))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(i_0,Z(1(#))),not(equals(array,null))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathConditionChanged="true" branchCondition="not(equals(i_0,Z(0(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
                                              <methodReturn name="&lt;return of average&gt;" signature="&lt;return of ArrayAverage.average(array);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(i_0,Z(1(#))),not(equals(array,null))),equals(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),sum_2_0)))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
@@ -93,13 +103,16 @@ as result of ArrayAverage.average(array);&gt;" isReturnValueComputed="true" meth
                   </statement>
                </branchCondition>
             </branchStatement>
+            <methodReturnEntry path="/0/0/0/0/0/0/0"/>
             <methodReturnEntry path="/0/0/0/0/1/0/0/0/0/1/0/0"/>
          </methodCall>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/1/0/0/0/0/1/0/0/0/0/0"/>
       <methodReturnEntry path="/0/0/0/0/1/0/0/0/0/1/0/0/0/1/0"/>
    </methodCall>
-   <terminationEntry path="/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0"/>
    <terminationEntry path="/0/0/0/0/1/0/0/0/0/0/0/0/0"/>
-   <terminationEntry path="/0/0/0/0/1/0/0/0/0/1/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/1/0/0/0/0/1/0/0/0/0/0/0"/>
    <terminationEntry path="/0/0/0/0/1/0/0/0/0/1/0/0/0/1/0/0"/>
 </start>

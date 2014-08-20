@@ -83,25 +83,31 @@
                   </statement>
                </branchCondition>
                <branchCondition name="equals(algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$right),null)" pathCondition="and(not(equals(current,null)),equals(algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$right),null))" pathConditionChanged="true" branchCondition="equals(algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$right),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(not(equals(current,null)),equals(algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$right),null))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-                  </termination>
+                  <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of self.compute(current);&gt;" pathCondition="and(not(equals(current,null)),equals(algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$right),null))" pathConditionChanged="false" methodReturnCondition="and(not(equals(current,null)),equals(algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$right),null))">
+                     <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(not(equals(current,null)),equals(algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::select(heap,current,algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node::$right),null))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                     </termination>
+                  </exceptionalMethodReturn>
                </branchCondition>
             </statement>
          </branchCondition>
          <branchCondition name="equals(current,null)" pathCondition="equals(current,null)" pathConditionChanged="true" branchCondition="equals(current,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(current,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-            </termination>
+            <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of self.compute(current);&gt;" pathCondition="equals(current,null)" pathConditionChanged="false" methodReturnCondition="equals(current,null)">
+               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(current,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+               </termination>
+            </exceptionalMethodReturn>
          </branchCondition>
       </statement>
       <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
       <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/1/0/0/0/0/0"/>
       <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/1/0/0/0/0/0/0/0"/>
       <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/1/0/1/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/1/0"/>
+      <methodReturnEntry path="/0/0/1/0"/>
    </methodCall>
    <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
    <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/1/0/0/0/0/0/0"/>
    <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/1/0/0/0/0/0/0/0/0"/>
    <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/1/0/1/0/0/0/0/0/0"/>
-   <terminationEntry path="/0/0/0/0/1/0"/>
-   <terminationEntry path="/0/0/1/0"/>
+   <terminationEntry path="/0/0/0/0/1/0/0"/>
+   <terminationEntry path="/0/0/1/0/0"/>
 </start>

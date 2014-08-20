@@ -36,7 +36,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
@@ -53,12 +52,7 @@ import de.uka.ilkd.key.util.MiscTools;
  * The default implementation of {@link IExecutionMethodReturn}.
  * @author Martin Hentschel
  */
-public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElement> implements IExecutionMethodReturn {
-   /**
-    * The {@link IExecutionMethodCall} which is now returned.
-    */
-   private final ExecutionMethodCall methodCall;
-   
+public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceElement> implements IExecutionMethodReturn {
    /**
     * The node name with signature including the return value.
     */
@@ -68,26 +62,11 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
     * The node name including the return value.
     */
    private String nameIncludingReturnValue;
-
-   /**
-    * The signature.
-    */
-   private String signature;
    
    /**
     * The possible return values.
     */
    private IExecutionMethodReturnValue[] returnValues;
-   
-   /**
-    * The method return condition to reach this node from its calling {@link IExecutionMethodCall}.
-    */
-   private Term methodReturnCondition;
-   
-   /**
-    * The human readable method return condition to reach this node from its calling {@link IExecutionMethodCall}.
-    */
-   private String formatedMethodReturnCondition;
    
    /**
     * Constructor.
@@ -100,18 +79,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                                 KeYMediator mediator, 
                                 Node proofNode, 
                                 ExecutionMethodCall methodCall) {
-      super(settings, mediator, proofNode);
-      assert methodCall != null;
-      this.methodCall = methodCall;
-      this.methodCall.addMethodReturn(this);
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public IExecutionMethodCall getMethodCall() {
-      return methodCall;
+      super(settings, mediator, proofNode, methodCall);
    }
 
    /**
@@ -126,19 +94,6 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
     * {@inheritDoc}
     */
    @Override
-   public String getSignature() throws ProofInputException {
-      if (signature == null) {
-         signature = lazyComputeSignature();
-      }
-      return signature;
-   }
-
-   /**
-    * Computes the signature lazily when
-    * {@link #getSignature()} is called the first time.
-    * @return The name including the return value.
-    * @throws Occurred Exception.
-    */
    protected String lazyComputeSignature() throws ProofInputException {
       return createMethodReturnName(null, getMethodCall().getName());
    }
@@ -407,54 +362,5 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
    @Override
    public String getElementType() {
       return "Method Return";
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public Term getMethodReturnCondition() throws ProofInputException {
-      if (methodReturnCondition == null) {
-         lazyComputeMethodReturnCondition();
-      }
-      return methodReturnCondition;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public String getFormatedMethodReturnCondition() throws ProofInputException {
-      if (methodReturnCondition == null) {
-         lazyComputeMethodReturnCondition();
-      }
-      return formatedMethodReturnCondition;
-   }
-
-   /**
-    * Computes the path condition lazily when {@link #getMethodReturnCondition()}
-    * or {@link #getFormatedMethodReturnCondition()} is called the first time.
-    * @throws ProofInputException Occurred Exception
-    */
-   protected void lazyComputeMethodReturnCondition() throws ProofInputException {
-      if (!isDisposed()) {
-         final Services services = getServices();
-         // Collect branch conditions
-         List<Term> bcs = new LinkedList<Term>();
-         AbstractExecutionNode parent = getParent();
-         while (parent != null && parent != methodCall) {
-            if (parent instanceof IExecutionBranchCondition) {
-               bcs.add(((IExecutionBranchCondition)parent).getBranchCondition());
-            }
-            parent = parent.getParent();
-         }
-         // Add current branch condition to path
-         methodReturnCondition = services.getTermBuilder().and(bcs);
-         // Simplify path condition
-         methodReturnCondition = SymbolicExecutionUtil.simplify(getProof(), methodReturnCondition);
-         methodReturnCondition = SymbolicExecutionUtil.improveReadability(methodReturnCondition, services);
-         // Format path condition
-         formatedMethodReturnCondition = formatTerm(methodReturnCondition, services);
-      }
    }
 }

@@ -7,10 +7,13 @@
             </branchStatement>
          </branchCondition>
          <branchCondition name="not(or(equals(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable),null),equals(ClassCastInherit::instance(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable)),TRUE)))" pathCondition="not(or(equals(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable),null),equals(ClassCastInherit::instance(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable)),TRUE)))" pathConditionChanged="true" branchCondition="not(or(equals(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable),null),equals(ClassCastInherit::instance(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable)),TRUE)))" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <termination name="&lt;uncaught java.lang.ClassCastException&gt;" pathCondition="not(or(equals(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable),null),equals(ClassCastInherit::instance(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable)),TRUE)))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-            </termination>
+            <exceptionalMethodReturn name="&lt;throw java.lang.ClassCastException&gt;" signature="&lt;exceptional return of self.main();&gt;" pathCondition="not(or(equals(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable),null),equals(ClassCastInherit::instance(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable)),TRUE)))" pathConditionChanged="false" methodReturnCondition="not(or(equals(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable),null),equals(ClassCastInherit::instance(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable)),TRUE)))">
+               <termination name="&lt;uncaught java.lang.ClassCastException&gt;" pathCondition="not(or(equals(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable),null),equals(ClassCastInherit::instance(ClassCastAndNullpointerExceptions::select(heap,self,ClassCastAndNullpointerExceptions::$castable)),TRUE)))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+               </termination>
+            </exceptionalMethodReturn>
          </branchCondition>
       </statement>
+      <methodReturnEntry path="/0/0/1/0"/>
    </methodCall>
-   <terminationEntry path="/0/0/1/0"/>
+   <terminationEntry path="/0/0/1/0/0"/>
 </start>

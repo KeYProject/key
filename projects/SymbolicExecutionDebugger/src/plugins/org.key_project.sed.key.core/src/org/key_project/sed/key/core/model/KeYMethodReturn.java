@@ -34,7 +34,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * based on KeY.
  * @author Martin Hentschel
  */
-public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDDebugNode<IExecutionMethodReturn> {
+public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDDebugNode<IExecutionMethodReturn>, IKeYBaseMethodReturn {
    /**
     * The {@link IExecutionMethodReturn} to represent by this debug node.
     */
@@ -228,9 +228,9 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
    }
    
    /**
-    * Returns the method call node if available in debug model.
-    * @return The {@link KeYMethodCall} node or {@code null} if not available.
+    * {@inheritDoc}
     */
+   @Override
    public KeYMethodCall getMethodCall() {
       return methodCall;
    }

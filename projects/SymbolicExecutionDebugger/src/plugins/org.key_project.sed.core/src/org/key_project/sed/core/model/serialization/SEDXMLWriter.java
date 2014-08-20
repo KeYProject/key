@@ -35,10 +35,12 @@ import org.eclipse.jface.resource.StringConverter;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.model.ISEDBaseMethodReturn;
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchStatement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDExceptionalMethodReturn;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
 import org.key_project.sed.core.model.ISEDIDElement;
 import org.key_project.sed.core.model.ISEDLoopBodyTermination;
@@ -134,6 +136,11 @@ public class SEDXMLWriter {
     * Tag name to store {@link ISEDMethodReturn}s.
     */
    public static final String TAG_METHOD_RETURN = "sedMethodReturn";
+
+   /**
+    * Tag name to store {@link ISEDExceptionalMethodReturn}s.
+    */
+   public static final String TAG_EXCEPTIONAL_METHOD_RETURN = "sedExceptionalMethodReturn";
 
    /**
     * Tag name to store {@link ISEDStatement}s.
@@ -639,6 +646,9 @@ public class SEDXMLWriter {
       else if (node instanceof ISEDMethodReturn) {
          return toXML(level, (ISEDMethodReturn)node, saveVariables, saveCallStack, monitor);
       }
+      else if (node instanceof ISEDExceptionalMethodReturn) {
+         return toXML(level, (ISEDExceptionalMethodReturn)node, saveVariables, saveCallStack, monitor);
+      }
       else if (node instanceof ISEDStatement) {
          return toXML(level, (ISEDStatement)node, saveVariables, saveCallStack, monitor);
       }
@@ -824,6 +834,26 @@ public class SEDXMLWriter {
    }
    
    /**
+    * Serializes the given {@link ISEDExceptionalMethodReturn} into a {@link String}.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param methodReturn The {@link ISEDExceptionalMethodReturn} to serialize.
+    * @param saveVariables Save variables?
+    * @param saveCallStack Save call stack?
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @return The serialized {@link String}.
+    * @throws DebugException Occurred Exception.
+    */
+   protected String toXML(int level, 
+                          ISEDExceptionalMethodReturn methodReturn, 
+                          boolean saveVariables,
+                          boolean saveCallStack,
+                          IProgressMonitor monitor) throws DebugException {
+      StringBuffer sb = new StringBuffer();
+      appendNode(level, TAG_EXCEPTIONAL_METHOD_RETURN, methodReturn, saveVariables, saveCallStack, false, sb, monitor);
+      return sb.toString();
+   }
+   
+   /**
     * Serializes the given {@link ISEDStatement} into a {@link String}.
     * @param level The level in the tree used for leading white space (formating).
     * @param statement The {@link ISEDStatement} to serialize.
@@ -974,8 +1004,8 @@ public class SEDXMLWriter {
          if (node instanceof ISourcePathProvider) {
             attributeValues.put(ATTRIBUTE_SOURCE_PATH, ((ISourcePathProvider)node).getSourcePath());
          }
-         if (node instanceof ISEDMethodReturn) {
-            ISEDBranchCondition returnCondition = ((ISEDMethodReturn)node).getMethodReturnCondition();
+         if (node instanceof ISEDBaseMethodReturn) {
+            ISEDBranchCondition returnCondition = ((ISEDBaseMethodReturn)node).getMethodReturnCondition();
             if (returnCondition != null) {
                attributeValues.put(ATTRIBUTE_METHOD_RETURN_CONDITION, returnCondition.getId());
             }

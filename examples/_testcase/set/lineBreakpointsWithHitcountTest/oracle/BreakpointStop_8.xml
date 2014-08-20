@@ -62,13 +62,16 @@
                </methodCall>
             </branchCondition>
             <branchCondition name="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" pathCondition="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" pathConditionChanged="true" branchCondition="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
-               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-               </termination>
+               <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of self.main(a);&gt;" pathCondition="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" pathConditionChanged="false" methodReturnCondition="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)">
+                  <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                  </termination>
+               </exceptionalMethodReturn>
             </branchCondition>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/1/0"/>
       <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
-   <terminationEntry path="/0/0/0/1/0"/>
+   <terminationEntry path="/0/0/0/1/0/0"/>
    <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
 </start>

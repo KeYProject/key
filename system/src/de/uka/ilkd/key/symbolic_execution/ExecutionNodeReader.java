@@ -45,6 +45,7 @@ import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -56,9 +57,11 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
@@ -135,10 +138,10 @@ public class ExecutionNodeReader {
                   if (returnEntry == null) {
                      throw new SAXException("Can't find method return entry \"" + path + "\" in parsed symbolic execution tree.");
                   }
-                  if (!(returnEntry instanceof IExecutionMethodReturn)) {
-                     throw new SAXException("Expected method return on \"" + path + "\" but is " + returnEntry.getElementType() + ".");
+                  if (!(returnEntry instanceof IExecutionBaseMethodReturn<?>)) {
+                     throw new SAXException("Expected basemethod return on \"" + path + "\" but is " + returnEntry.getElementType() + ".");
                   }
-                  entry.getKey().addMethodReturn((IExecutionMethodReturn)returnEntry);
+                  entry.getKey().addMethodReturn((IExecutionBaseMethodReturn<?>)returnEntry);
                }
             }
             // Construct terminations
@@ -527,6 +530,9 @@ public class ExecutionNodeReader {
       }
       else if (ExecutionNodeWriter.TAG_METHOD_RETURN.equals(qName)) {
          return new KeYlessMethodReturn(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getNameIncludingReturnValue(attributes), getSignature(attributes), getSignatureIncludingReturnValue(attributes), isReturnValueComputed(attributes), getMethodReturnCondition(attributes));
+      }
+      else if (ExecutionNodeWriter.TAG_EXCEPTIONAL_METHOD_RETURN.equals(qName)) {
+         return new KeYlessExceptionalMethodReturn(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getSignature(attributes), getMethodReturnCondition(attributes));
       }
       else if (ExecutionNodeWriter.TAG_START.equals(qName)) {
          return new KeYlessStart(getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
@@ -1489,9 +1495,9 @@ public class ExecutionNodeReader {
     */
    public static class KeYlessMethodCall extends AbstractKeYlessStateNode<MethodBodyStatement> implements IExecutionMethodCall {
       /**
-       * The up to now discovered {@link IExecutionMethodReturn}s.
+       * The up to now discovered {@link IExecutionBaseMethodReturn<?>}s.
        */
-      private ImmutableList<IExecutionMethodReturn> methodReturns = ImmutableSLList.nil();
+      private ImmutableList<IExecutionBaseMethodReturn<?>> methodReturns = ImmutableSLList.nil();
       
       /**
        * Constructor.
@@ -1559,18 +1565,95 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public ImmutableList<IExecutionMethodReturn> getMethodReturns() {
+      public ImmutableList<IExecutionBaseMethodReturn<?>> getMethodReturns() {
          return methodReturns;
       }
       
       /**
-       * Adds the given {@link IExecutionMethodReturn}.
-       * @param methodReturn The {@link IExecutionMethodReturn} to add.
+       * Adds the given {@link IExecutionBaseMethodReturn<?>}.
+       * @param methodReturn The {@link IExecutionBaseMethodReturn<?>} to add.
        */
-      public void addMethodReturn(IExecutionMethodReturn methodReturn) {
+      public void addMethodReturn(IExecutionBaseMethodReturn<?> methodReturn) {
          if (methodReturn != null) {
             methodReturns = methodReturns.prepend(methodReturn);
          }
+      }
+   }
+
+   /**
+    * An implementation of {@link IExecutionExceptionalMethodReturn} which is independent
+    * from KeY and provides such only children and default attributes.
+    * @author Martin Hentschel
+    */
+   public static class KeYlessExceptionalMethodReturn extends AbstractKeYlessStateNode<Throw> implements IExecutionExceptionalMethodReturn {
+      /**
+       * The signature.
+       */
+      private final String signature;
+
+      /**
+       * The formated method return condition.
+       */
+      private final String formatedMethodReturn;
+
+      /**
+       * Constructor.
+       * @param parent The parent {@link IExecutionNode}.
+       * @param name The name of this node.
+       * @param formatedPathCondition The formated path condition.
+       * @param pathConditionChanged Is the path condition changed compared to parent?
+       * @param signature The signature.
+       * @param formatedMethodReturn The formated method return condition.
+       */
+      public KeYlessExceptionalMethodReturn(IExecutionNode parent, 
+                                            String name, 
+                                            String formatedPathCondition, 
+                                            boolean pathConditionChanged,
+                                            String signature,
+                                            String formatedMethodReturn) {
+         super(parent, name, formatedPathCondition, pathConditionChanged);
+         this.signature = signature;
+         this.formatedMethodReturn = formatedMethodReturn;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IExecutionMethodCall getMethodCall() {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getSignature() throws ProofInputException {
+         return signature;
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getElementType() {
+         return "Exceptional Method Return";
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Term getMethodReturnCondition() throws ProofInputException {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getFormatedMethodReturnCondition() throws ProofInputException {
+         return formatedMethodReturn;
       }
    }
 
