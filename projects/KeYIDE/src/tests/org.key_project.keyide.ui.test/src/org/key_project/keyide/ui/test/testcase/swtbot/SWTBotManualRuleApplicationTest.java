@@ -107,6 +107,150 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                        false);
    }
    
+   /**
+    * Tests the applying of one contract out of the "Use Operation Contract"-rule dialog.
+    * @throws Exception
+    */
+   @Test
+   public void testUseOperationContract_applyOneContract() throws Exception {
+      IAppliedRuleTest appliedRuleTest = new IAppliedRuleTest() {
+         
+         @Override
+         public void test(IJavaProject project,
+               KeYEnvironment<CustomUserInterface> environment, Proof proof,
+               SWTWorkbenchBot bot, SWTBotEditor editor, KeYEditor keyEditor,
+               Node nodeOnWhichRuleIsApplied) {
+            SWTBotShell shell = bot.shell("Contracts for charge");
+            shell.bot().table().select(2);
+            TestUtilsUtil.clickDirectly(shell.bot().button("Finish"));
+            SWTBotStyledText styledText = editor.bot().styledText();
+            int index = styledText.getText().indexOf("java.lang.Throwable");
+            assertTrue(index != -1);
+         }
+      };
+      
+      doStartProofTest("SWTBotManualRuleApplicationTest_testUseOperationContract_applyOneContract",
+            "data/paycard",
+            TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "chargeAndRecord(int)", "0", "normal_behavior"), 
+            new IStopCondition() {
+               
+               @Override
+               public boolean shouldStop(int maxApplications, long timeout, Proof proof,
+                     IGoalChooser goalChooser, long startTime, int countApplied,
+                     SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                  return false;
+               }
+               
+               @Override
+               public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof,
+                     IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+                  RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+                  return !"Use Operation Contract".equals(MiscTools.getRuleName(ruleApp));
+               }
+               
+               @Override
+               public String getStopMessage(int maxApplications, long timeout, Proof proof,
+                     IGoalChooser goalChooser, long startTime, int countApplied,
+                     SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                  return null;
+               }
+               
+               @Override
+               public int getMaximalWork(int maxApplications, long timeout, Proof proof,
+                     IGoalChooser goalChooser) {
+                  return 0;
+               }
+               
+               @Override
+               public String getGoalNotAllowedMessage(int maxApplications, long timeout,
+                     Proof proof, IGoalChooser goalChooser, long startTime,
+                     int countApplied, Goal goal) {
+                  return null;
+               }
+            }, 
+            true, 
+            "exc:=null}", 
+            "Use Operation Contract", 
+            appliedRuleTest, 
+            3, 
+            false);
+   }
+   
+   /**
+    * Tests the applying of multiple contracts out of the "Use Operation Contract"-rule dialog.
+    * @throws Exception
+    */
+   @Test
+   public void testUseOperationContract_applyMultipleContracts() throws Exception {
+      IAppliedRuleTest appliedRuleTest = new IAppliedRuleTest() {
+         
+         @Override
+         public void test(IJavaProject project,
+               KeYEnvironment<CustomUserInterface> environment, Proof proof,
+               SWTWorkbenchBot bot, SWTBotEditor editor, KeYEditor keyEditor,
+               Node nodeOnWhichRuleIsApplied) {
+            SWTBotShell shell = bot.shell("Contracts for charge");
+            shell.bot().table().select(0,1,2);
+            TestUtilsUtil.clickDirectly(shell.bot().button("Finish"));
+            SWTBotStyledText styledText = editor.bot().styledText();
+            int indexFirstContractApplied = styledText.getText().indexOf("java.lang.Throwable");
+            int indexSecondContractApplied = styledText.getText().indexOf("= javaAddInt(self.unsuccessfulOperations");
+            int indexThirdContractApplied = styledText.getText().indexOf("self.balance@heapBefore_charge)");
+            assertTrue(indexFirstContractApplied != -1 && indexSecondContractApplied != -1 && indexThirdContractApplied != -1);
+         }
+      };
+      
+      doStartProofTest("SWTBotManualRuleApplicationTest_testUseOperationContract_applyMultipleContracts",
+            "data/paycard",
+            TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "chargeAndRecord(int)", "0", "normal_behavior"), 
+            new IStopCondition() {
+               
+               @Override
+               public boolean shouldStop(int maxApplications, long timeout, Proof proof,
+                     IGoalChooser goalChooser, long startTime, int countApplied,
+                     SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                  return false;
+               }
+               
+               @Override
+               public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof,
+                     IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+                  RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+                  return !"Use Operation Contract".equals(MiscTools.getRuleName(ruleApp));
+               }
+               
+               @Override
+               public String getStopMessage(int maxApplications, long timeout, Proof proof,
+                     IGoalChooser goalChooser, long startTime, int countApplied,
+                     SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                  return null;
+               }
+               
+               @Override
+               public int getMaximalWork(int maxApplications, long timeout, Proof proof,
+                     IGoalChooser goalChooser) {
+                  return 0;
+               }
+               
+               @Override
+               public String getGoalNotAllowedMessage(int maxApplications, long timeout,
+                     Proof proof, IGoalChooser goalChooser, long startTime,
+                     int countApplied, Goal goal) {
+                  return null;
+               }
+            }, 
+            true, 
+            "exc:=null}", 
+            "Use Operation Contract", 
+            appliedRuleTest, 
+            3, 
+            false);
+   }
+   
+   /**
+    * Tests the canceling of the "Use Operation Contract" dialog.
+    * @throws Exception
+    */
    @Test
    public void testUseOperationContract_Cancel() throws Exception {
       IAppliedRuleTest appliedRuleTest =  new IAppliedRuleTest() {
