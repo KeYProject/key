@@ -719,7 +719,8 @@ public final class SymbolicExecutionUtil {
          if (term.op() == heapLDT.getStore()) {
             ImmutableArray<Term> subs = term.subs();
             if (subs.size() == 4) {
-               Term locationTerm = subs.get(2);
+               Term innerMostSelect = findInnerMostSelect(subs.get(1), services);
+               Term locationTerm = innerMostSelect != null ? innerMostSelect.sub(2) : subs.get(2);
                ProgramVariable attribute = getProgramVariable(services, heapLDT, locationTerm);
                if (attribute != null && attribute.isStatic()) {
                   result.add(attribute);
@@ -732,6 +733,18 @@ public final class SymbolicExecutionUtil {
       }
       for (Term sub : term.subs()) {
          internalCollectStaticProgramVariablesOnHeap(services, result, sub);
+      }
+   }
+   
+   private static Term findInnerMostSelect(Term term, Services services) {
+      if (isSelect(services, term)) {
+         while (isSelect(services, term.sub(1))) {
+            term = term.sub(1);
+         }
+         return term;
+      }
+      else {
+         return null;
       }
    }
    

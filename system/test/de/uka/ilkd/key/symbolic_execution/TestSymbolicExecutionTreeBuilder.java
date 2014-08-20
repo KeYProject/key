@@ -39,6 +39,29 @@ import de.uka.ilkd.key.ui.CustomUserInterface;
  */
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: examples/_testcase/set/staticInstanceFieldChanged
+    */
+   public void testStaticInstanceFieldChanged() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticInstanceFieldChanged/test/StaticInstanceFieldChanged.java", 
+                "StaticInstanceFieldChanged", 
+                "magic", 
+                null,
+                "examples/_testcase/set/staticInstanceFieldChanged/oracle/StaticInstanceFieldChanged.xml",
+                true,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/useOperationContractVariableNestedOperationContractUse
     */
    public void testUseOperationContractVariableNestedOperationContractUse() throws Exception {
