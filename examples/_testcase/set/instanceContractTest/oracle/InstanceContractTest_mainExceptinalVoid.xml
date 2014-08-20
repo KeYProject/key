@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.mainExceptinalVoid(x);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.mainExceptinalVoid(x)&gt;" pathCondition="true" pathConditionChanged="false">
       <operationContract name="self.exceptinalVoid(x) catch(exc_0)
 pre: self.&lt;inv&gt;
 post: !exc_0 = null

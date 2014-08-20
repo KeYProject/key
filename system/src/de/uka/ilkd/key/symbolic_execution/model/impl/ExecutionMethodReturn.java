@@ -24,6 +24,7 @@ import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
@@ -87,7 +88,19 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
     */
    @Override
    protected String lazyComputeName() throws ProofInputException {
-      return createMethodReturnName(null, getMethodCall().getProgramMethod().getName());
+      
+      return createMethodReturnName(null, computeCalledMethodName());
+   }
+   
+   /**
+    * Computes the name of the called method.
+    * @return The name of the called method.
+    */
+   protected String computeCalledMethodName() {
+      MethodReference explicitConstructorMR = getMethodCall().getExplicitConstructorMethodReference();
+      return explicitConstructorMR != null ?
+             explicitConstructorMR.getMethodName().toString() :
+             getMethodCall().getProgramMethod().getName();
    }
 
    /**
@@ -95,7 +108,22 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
     */
    @Override
    protected String lazyComputeSignature() throws ProofInputException {
-      return createMethodReturnName(null, getMethodCall().getName());
+      return createMethodReturnName(null, computeCalledMethodSignature());
+   }
+   
+   /**
+    * Computes the signature of the called method.
+    * @return The signature of the called method.
+    */
+   protected String computeCalledMethodSignature() throws ProofInputException {
+      MethodReference explicitConstructorMR = getMethodCall().getExplicitConstructorMethodReference();
+      String call = explicitConstructorMR != null ?
+                    explicitConstructorMR.toString() :
+                    getMethodCall().getMethodReference().toString();
+      if (call.endsWith(";")) {
+         call = call.substring(0, call.length() - 1);
+      }
+      return call;
    }
 
    /**
@@ -118,10 +146,10 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
    protected String lazyComputeNameIncludingReturnValue() throws ProofInputException {
       IExecutionMethodReturnValue[] returnValues = getReturnValues();
       if (returnValues.length == 0) {
-         return createMethodReturnName(null, getMethodCall().getProgramMethod().getName());
+         return createMethodReturnName(null, computeCalledMethodName());
       }
       else if (returnValues.length == 1) {
-         return createMethodReturnName(returnValues[0].getName() + " ", getMethodCall().getProgramMethod().getName());
+         return createMethodReturnName(returnValues[0].getName() + " ", computeCalledMethodName());
       }
       else {
          StringBuilder sb = new StringBuilder();
@@ -138,7 +166,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
             sb.append(value.getName());
          }
          sb.append('\n');
-         return createMethodReturnName(sb.toString(), getMethodCall().getProgramMethod().getName());
+         return createMethodReturnName(sb.toString(), computeCalledMethodName());
       }
    }
 
@@ -162,10 +190,10 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
    protected String lazyComputeSigntureIncludingReturnValue() throws ProofInputException {
       IExecutionMethodReturnValue[] returnValues = getReturnValues();
       if (returnValues.length == 0) {
-         return createMethodReturnName(null, getMethodCall().getName());
+         return createMethodReturnName(null, computeCalledMethodSignature());
       }
       else if (returnValues.length == 1) {
-         return createMethodReturnName(returnValues[0].getName() + " ", getMethodCall().getName());
+         return createMethodReturnName(returnValues[0].getName() + " ", computeCalledMethodSignature());
       }
       else {
          StringBuilder sb = new StringBuilder();
@@ -182,7 +210,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
             sb.append(value.getName());
          }
          sb.append('\n');
-         return createMethodReturnName(sb.toString(), getMethodCall().getName());
+         return createMethodReturnName(sb.toString(), computeCalledMethodSignature());
       }
    }
 

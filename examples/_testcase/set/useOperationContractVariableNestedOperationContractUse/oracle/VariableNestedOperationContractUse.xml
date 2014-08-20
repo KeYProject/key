@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="VariableNestedOperationContractUse.main(x);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call VariableNestedOperationContractUse.main(x)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="return doubleMagic(magic(x));" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_0 = magic(x) catch(exc_0)
 pre: true
@@ -12,7 +12,7 @@ pre: true
 post: result_1 = javaAddInt(var, var) &amp; exc_1 = null
 mod: empty, creates no new objects
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_1" exceptionTerm="exc_1" contractParameters="var" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of VariableNestedOperationContractUse.main(x);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of VariableNestedOperationContractUse.main(x)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                   <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="OperationContractAppliedTwiceTest.doubleMagic();" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call OperationContractAppliedTwiceTest.doubleMagic()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int first = magic();" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_0 = magic() catch(exc_0)
 pre: true
@@ -15,7 +15,7 @@ mod: empty, creates no new objects
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_1" exceptionTerm="exc_1" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                   <branchStatement name="if (first_1==42)" pathCondition="true" pathConditionChanged="false">
                      <statement name="return first_1+second_1;" pathCondition="true" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of doubleMagic&gt;" signature="&lt;return of OperationContractAppliedTwiceTest.doubleMagic();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                        <methodReturn name="&lt;return of doubleMagic&gt;" signature="&lt;return of OperationContractAppliedTwiceTest.doubleMagic()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                            <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>

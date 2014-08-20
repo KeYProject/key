@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.mainExceptionalConstructor();" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.mainExceptionalConstructor()&gt;" pathCondition="true" pathConditionChanged="false">
       <operationContract name="self_0 = new IntWrapper() catch(exc_0)
 pre: true
 post: !exc_0 = null

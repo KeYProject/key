@@ -55,10 +55,24 @@ public class ExecutionMethodCall extends AbstractExecutionStateNode<MethodBodySt
     */
    @Override
    protected String lazyComputeName() {
+      return INTERNAL_NODE_NAME_START + 
+             "call " + getMethodCallText() + 
+             INTERNAL_NODE_NAME_END;
+   }
+   
+   /**
+    * Computes the method call text.
+    * @return The method call text.
+    */
+   protected String getMethodCallText() {
       MethodReference explicitConstructorMR = getExplicitConstructorMethodReference();
-      return explicitConstructorMR != null ?
-             explicitConstructorMR.toString() :
-             getMethodReference().toString();
+      String call = explicitConstructorMR != null ?
+                    explicitConstructorMR.toString() :
+                    getMethodReference().toString();
+      if (call.endsWith(";")) {
+         call = call.substring(0, call.length() - 1);
+      }
+      return call;
    }
 
    /**

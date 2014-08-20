@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="StaticContractTest.mainExceptinalUnused(x);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call StaticContractTest.mainExceptinalUnused(x)&gt;" pathCondition="true" pathConditionChanged="false">
       <operationContract name="result_0 = exceptinal(x) catch(exc_0)
 pre: true
 post: !exc_0 = null
