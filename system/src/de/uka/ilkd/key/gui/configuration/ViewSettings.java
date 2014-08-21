@@ -39,6 +39,8 @@ public class ViewSettings implements Settings, Cloneable {
     private static final String SHOW_JAVA_WARNING = "[View]ShowJavaWarning";
     private static final String PRETTY_SYNTAX = "[View]PrettySyntax";
     private static final String USE_UNICODE = "[View]UseUnicodeSymbols";
+    private static final String SHOW_ORIGINAL_TACLET ="[View]ShowOriginalTaclet";
+
     private static final String HIDE_PACKAGE_PREFIX = "[View]HidePackagePrefix";
     private static final String CONFIRM_EXIT = "[View]ConfirmExit";
 
@@ -62,6 +64,7 @@ public class ViewSettings implements Settings, Cloneable {
     private boolean usePretty = true;
     private boolean useUnicode = false;
     private boolean hidePackagePrefix = false;
+    private boolean showOriginalTaclet = false;
     /** confirm exiting by default */
     private boolean confirmExit = true;
 
@@ -96,6 +99,13 @@ public class ViewSettings implements Settings, Cloneable {
     public boolean getShowWholeTaclet() {
         return showWholeTaclet;
     }
+    /**
+     * returns whether the uninstantiated taclet should be shown in tooltips
+     * @return true iff uninstantiated taclet should be shown in tooltips
+     */
+    public boolean getShowOriginalTaclet(){
+	    return showOriginalTaclet;
+    }
 
     /**
      * Sets whether the Find and VarCond part of Taclets should be
@@ -111,6 +121,14 @@ public class ViewSettings implements Settings, Cloneable {
             showWholeTaclet = b;
             fireSettingsChanged();
         }
+    }
+    
+    //Using KeY
+    public void setShowOriginalTAclet(boolean b){
+	    if(b != showOriginalTaclet) {
+	        showOriginalTaclet = b;
+	        fireSettingsChanged();
+	    }
     }
 
     /**
@@ -231,6 +249,7 @@ public class ViewSettings implements Settings, Cloneable {
 		String val7 = props.getProperty(SHOW_JAVA_WARNING);
 		String val8 = props.getProperty(PRETTY_SYNTAX);
 		String val9 = props.getProperty(USE_UNICODE);
+		String val10 = props.getProperty(SHOW_ORIGINAL_TACLET);
 		String hidePackage = props.getProperty(HIDE_PACKAGE_PREFIX);
 		String confirmExit = props.getProperty(CONFIRM_EXIT);
 		if (val1 != null) {
@@ -265,6 +284,9 @@ public class ViewSettings implements Settings, Cloneable {
 		if (val9 != null) {
 		    useUnicode = Boolean.valueOf(val9).booleanValue();
 		}
+		if (val10 != null){
+		   showOriginalTaclet = Boolean.valueOf(val10).booleanValue();
+		}
 		if (hidePackage != null) {
 		    hidePackagePrefix = Boolean.valueOf(hidePackage);
 		}
@@ -297,6 +319,7 @@ public class ViewSettings implements Settings, Cloneable {
     	props.setProperty(SHOW_JAVA_WARNING, "" + notifyLoadBehaviour);
     	props.setProperty(PRETTY_SYNTAX, ""+ usePretty);
     	props.setProperty(USE_UNICODE, "" + useUnicode);
+    	props.setProperty(SHOW_ORIGINAL_TACLET, "" +showOriginalTaclet);
         props.setProperty(HIDE_PACKAGE_PREFIX, "" + hidePackagePrefix);
     	props.setProperty(CONFIRM_EXIT, ""+confirmExit);
     }
