@@ -22,6 +22,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
+import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.util.java.StringUtil;
@@ -36,7 +37,6 @@ public class MarkerManager {
    public final static String NOTCLOSEDMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker";
    public final static String PROBLEMLOADEREXCEPTIONMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.problemLoaderExceptionMarker";
    public final static String RECURSIONMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.cycleDetectedMarker";
-   public final static String OVERDUEPROOFMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.overdueProofMarker";
    
    
    /**
@@ -45,43 +45,34 @@ public class MarkerManager {
     * @throws CoreException
     */
    public void setMarker(ProofElement pe) throws CoreException {
-      List<IMarker> oldMarker = pe.getMarker();
-      List<IMarker> toBeRemoved = new LinkedList<IMarker>();
-      for(IMarker marker : oldMarker){
-         if(marker != null){
-            toBeRemoved.add(marker);
-         }
+      IMarker proofMarker = pe.getProofMarker();
+      if(proofMarker != null){
+         proofMarker.delete();
       }
-      removeMarker(toBeRemoved, pe);
-      pe.setMarker(new LinkedList<IMarker>());
+      pe.setProofMarker(null);
       SourceLocation scl = pe.getSourceLocation();
       if(scl != null){
+         IMarker marker = null;
          if (pe.getProofClosed()) {
-            IMarker marker = pe.getJavaFile().createMarker(CLOSEDMARKER_ID);
+            marker = pe.getJavaFile().createMarker(CLOSEDMARKER_ID);
             if (marker.exists()) {
-               marker.setAttribute(IMarker.MESSAGE, pe.getMarkerMsg());
                marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO);
-               marker.setAttribute(IMarker.LINE_NUMBER, scl.getLineNumber()); // Required for compatibility with other tools like FeatureIDE even if char start and end is defined.
-               marker.setAttribute(IMarker.LOCATION, "line " + scl.getLineNumber()); // Otherwise value "Unknown" is shown in Problems-View
-               marker.setAttribute(IMarker.CHAR_START, scl.getCharStart());
-               marker.setAttribute(IMarker.CHAR_END, scl.getCharEnd());
-               marker.setAttribute(IMarker.SOURCE_ID, pe.getProofFile().getFullPath().toString());
-               pe.addMarker(marker);
             }
          }
          else {
-            IMarker marker = pe.getJavaFile().createMarker(NOTCLOSEDMARKER_ID);
+            marker = pe.getJavaFile().createMarker(NOTCLOSEDMARKER_ID);
             if (marker.exists()) {
-               marker.setAttribute(IMarker.MESSAGE, pe.getMarkerMsg());
                marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
-               marker.setAttribute(IMarker.LINE_NUMBER, scl.getLineNumber()); // Required for compatibility with other tools like FeatureIDE even if char start and end is defined.
-               marker.setAttribute(IMarker.LOCATION, "line " + scl.getLineNumber()); // Otherwise value "Unknown" is shown in Problems-View
-               marker.setAttribute(IMarker.CHAR_START, scl.getCharStart());
-               marker.setAttribute(IMarker.CHAR_END, scl.getCharEnd());
-               marker.setAttribute(IMarker.SOURCE_ID, pe.getProofFile().getFullPath().toString());
-               pe.addMarker(marker);
             }
          }
+         marker.setAttribute(IMarker.MESSAGE, pe.getMarkerMsg());
+         marker.setAttribute(IMarker.LINE_NUMBER, scl.getLineNumber()); // Required for compatibility with other tools like FeatureIDE even if char start and end is defined.
+         marker.setAttribute(IMarker.LOCATION, "line " + scl.getLineNumber()); // Otherwise value "Unknown" is shown in Problems-View
+         marker.setAttribute(IMarker.CHAR_START, scl.getCharStart());
+         marker.setAttribute(IMarker.CHAR_END, scl.getCharEnd());
+         marker.setAttribute(IMarker.SOURCE_ID, pe.getProofFile().getFullPath().toString());
+         pe.setProofMarker(marker);
+         setOutdated(pe, false);
       }
    }
    
@@ -93,14 +84,12 @@ public class MarkerManager {
     */
    public void setRecursionMarker(List<ProofElement> cycle) throws CoreException{
       ProofElement pe = cycle.get(0);
-      List<IMarker> oldMarker = pe.getMarker();
-      List<IMarker> toBeRemoved = new LinkedList<IMarker>();
-      for(IMarker marker : oldMarker){
-         if(marker != null && !RECURSIONMARKER_ID.equals(marker.getType()) && !OVERDUEPROOFMARKER_ID.equals(marker.getType())){
-            toBeRemoved.add(marker);
-         }
+      IMarker proofMarker = pe.getProofMarker();
+      if(proofMarker != null){
+         proofMarker.delete();
       }
-      removeMarker(toBeRemoved, pe);
+      pe.setProofMarker(null);
+
       IMarker marker = pe.getJavaFile().createMarker(RECURSIONMARKER_ID);
       if (marker.exists()) {
          marker.setAttribute(IMarker.MESSAGE, generateCycleDetectedMarkerMessage(cycle));
@@ -110,37 +99,54 @@ public class MarkerManager {
          marker.setAttribute(IMarker.CHAR_START, pe.getSourceLocation().getCharStart());
          marker.setAttribute(IMarker.CHAR_END, pe.getSourceLocation().getCharEnd());
          marker.setAttribute(IMarker.SOURCE_ID, pe.getProofFile().getFullPath().toString());
-         pe.addMarker(marker);
+         marker.setAttribute("OUTDATED", String.valueOf(pe.getOutdated()));
+         pe.addRecursionMarker(marker);
       }
    }
    
    
-   public void setOverdueProofMarker(ProofElement pe){
-      IMarker overdueProofMarker = pe.getOverdueProofMarker();
-      try{
-         if(overdueProofMarker != null){
-            overdueProofMarker.delete();
+   public void setOutdated(ProofElement pe, boolean outdated){
+      pe.setOutdated(outdated);
+      IMarker proofMarker = pe.getProofMarker();
+      if(proofMarker != null && proofMarker.exists()){
+         try {
+            proofMarker.setAttribute("OUTDATED", String.valueOf(outdated));
+            updateOutdatedProofMessage(proofMarker, outdated);
          }
-         SourceLocation scl = pe.getSourceLocation();
-         if(scl != null){
-            IMarker marker = pe.getJavaFile().createMarker(OVERDUEPROOFMARKER_ID);
-            if (marker.exists()) {
-               marker.setAttribute(IMarker.MESSAGE, "Overdue proof");
-               marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
-               marker.setAttribute(IMarker.LINE_NUMBER, scl.getLineNumber()); // Required for compatibility with other tools like FeatureIDE even if char start and end is defined.
-               marker.setAttribute(IMarker.LOCATION, "line " + scl.getLineNumber()); // Otherwise value "Unknown" is shown in Problems-View
-               marker.setAttribute(IMarker.CHAR_START, scl.getCharStart());
-               marker.setAttribute(IMarker.CHAR_END, scl.getCharEnd());
-               marker.setAttribute(IMarker.SOURCE_ID, pe.getProofFile().getFullPath().toString());
-               pe.setOverdueProofMarker(marker);
+         catch (CoreException e) {
+            LogUtil.getLogger().logError(e);
+         }
+      }
+      List<IMarker> recursionMarker = pe.getRecursionMarker();
+      for(IMarker marker : recursionMarker){
+         if(marker != null && marker.exists()){
+            try {
+               marker.setAttribute("OUTDATED", String.valueOf(outdated));
+               updateOutdatedProofMessage(proofMarker, outdated);
+            }
+            catch (CoreException e) {
+               LogUtil.getLogger().logError(e);
             }
          }
       }
-      catch(CoreException e){
-         LogUtil.getLogger().logError(e);
-      }
    }
+      
    
+   private void updateOutdatedProofMessage(IMarker marker, boolean outdated) throws CoreException{
+      String message = marker.getAttribute(IMarker.MESSAGE, "");
+      String appendix = StringUtil.NEW_LINE + StringUtil.NEW_LINE + "Outdated proof - new build required!";
+      StringBuilder sb = new StringBuilder(message);
+      if(outdated){
+         sb.append(appendix);
+      }
+      else{
+         int appendixIndex = sb.indexOf(appendix);
+         if(appendixIndex != -1){
+            sb.delete(appendixIndex, sb.length()-1);
+         }
+      }
+      marker.setAttribute(IMarker.MESSAGE, sb.toString());
+   }
    
    /** 
     * Generates the message for the cyclemarker of the given cycle,
@@ -156,22 +162,7 @@ public class MarkerManager {
       }
       return sb.toString();
    }
-   
-   private void removeMarker(List<IMarker> toBeRemoved, ProofElement pe) throws CoreException{
-      while(!toBeRemoved.isEmpty()){
-         IMarker marker = toBeRemoved.get(0);
-         if(marker != null){
-            pe.removeMarker(marker);
-            marker.delete();
-            toBeRemoved.remove(marker);
-         }
-         else{
-            pe.removeMarker(0);
-            toBeRemoved.remove(0);
-         }
-      }
-   }
-   
+      
    
    /**
     * Creates the ProofLoaderException{@link IMarker} for the given {@link IResource}.
@@ -187,59 +178,63 @@ public class MarkerManager {
    }
    
    
-   /**
-    * Searches the {@link IMarker} for the given {@link ProofElement}.
-    * @param scl - the {@link ProofElement} to use
-    * @return the {@link IMarker} if found. null otherwise
-    * @throws CoreException
-    */
-   public LinkedList<IMarker> getOldProofMarker(IFile javaFile, SourceLocation scl, IFile proofFile) throws CoreException{
-      LinkedList<IMarker> oldMarker = new LinkedList<IMarker>();
-      LinkedList<IMarker> allFileKeYMarker = getAllkeYMarkerForSclByType(javaFile, scl, CLOSEDMARKER_ID, NOTCLOSEDMARKER_ID, PROBLEMLOADEREXCEPTIONMARKER_ID, RECURSIONMARKER_ID);
-      for(IMarker marker : allFileKeYMarker){
-         String source = marker.getAttribute(IMarker.SOURCE_ID, "");
-         if(source.equals(proofFile.getFullPath().toString())){
-            oldMarker.add(marker);
-         }
+   public IMarker getProofMarker(IFile javaFile, SourceLocation scl, IFile proofFile){
+      IMarker proofMarker = null;
+      List<IMarker> markerList = null;
+      try {
+         markerList = getKeYMarkerByType(javaFile, IResource.DEPTH_ZERO, CLOSEDMARKER_ID, NOTCLOSEDMARKER_ID);
+      } catch (CoreException e) {
+         LogUtil.getLogger().logError(e);
+         return null;
       }
-      return oldMarker;
-   }
-   
-   public IMarker getOverdueProofMarker(IFile javaFile, SourceLocation scl, IFile proofFile) throws CoreException{
-      LinkedList<IMarker> allFileKeYMarker = getAllkeYMarkerForSclByType(javaFile, scl, OVERDUEPROOFMARKER_ID);
-      for(IMarker marker : allFileKeYMarker){
-         String source = marker.getAttribute(IMarker.SOURCE_ID, "");
-         if(source.equals(proofFile.getFullPath().toString())){
-            return marker;
-         }
-      }
-      return null;
-   }
-   
-   
-   /**
-    * Returns all {@link IMarker} for the given {@link SourceLocation}.
-    * @param res - the {@link IResource} to use
-    * @param scl - the {@link SourceLocation} to use
-    * @return all {@link IMarker} for the {@link SourceLocation}
-    * @throws CoreException
-    */
-   private LinkedList<IMarker> getAllkeYMarkerForSclByType(IResource res, SourceLocation scl, String... types) throws CoreException{
-      LinkedList<IMarker> newMarkerList = new LinkedList<IMarker>();
-      LinkedList<IMarker> markerList = getKeYMarkerByType(res, IResource.DEPTH_ZERO, types);
       for(IMarker marker : markerList){
          if(marker != null && marker.exists()){
-            Integer startChar = (Integer) marker.getAttribute(IMarker.CHAR_START);
-            Integer endChar = (Integer) marker.getAttribute(IMarker.CHAR_END);
-            if(scl.getCharStart() == startChar && scl.getCharEnd() == endChar){
-               newMarkerList.add(marker);
+            try{
+               Integer startChar = (Integer) marker.getAttribute(IMarker.CHAR_START);
+               Integer endChar = (Integer) marker.getAttribute(IMarker.CHAR_END);
+               String source = marker.getAttribute(IMarker.SOURCE_ID, "");
+               if(scl.getCharStart() == startChar && scl.getCharEnd() == endChar && source.equals(proofFile.getFullPath().toString())){
+                  if(proofMarker != null){
+                     return null;
+                  }
+                  proofMarker = marker;
+               }
+            } catch(CoreException e){
+               LogUtil.getLogger().logError(e);
             }
          }
       }
-      return newMarkerList;
+      return proofMarker;
    }
    
    
+   public List<IMarker> getRecursionMarker(IFile javaFile, SourceLocation scl, IFile proofFile){
+      List<IMarker> recursionMarker = new LinkedList<IMarker>();
+      List<IMarker> markerList = null;
+      try {
+         markerList = getKeYMarkerByType(javaFile, IResource.DEPTH_ZERO, RECURSIONMARKER_ID);
+      } catch (CoreException e) {
+         LogUtil.getLogger().logError(e);
+         return null;
+      }
+      for(IMarker marker : markerList){
+         if(marker != null && marker.exists()){
+            try{
+               Integer startChar = (Integer) marker.getAttribute(IMarker.CHAR_START);
+               Integer endChar = (Integer) marker.getAttribute(IMarker.CHAR_END);
+               String source = marker.getAttribute(IMarker.SOURCE_ID, "");
+               if(scl.getCharStart() == startChar && scl.getCharEnd() == endChar && source.equals(proofFile.getFullPath().toString())){
+                  recursionMarker.add(marker);
+               }
+            } catch (CoreException e) {
+               return new LinkedList<IMarker>();
+            }
+         }
+      }
+      return recursionMarker;
+   }
+
+
    /**
     * Collects all KeY{@link IMarker} for the given {@link IResource}.
     * @param res - the {@link IResource} to use
@@ -247,7 +242,7 @@ public class MarkerManager {
     * @throws CoreException
     */
    public LinkedList<IMarker> getAllKeYMarker(IResource res, int depth) throws CoreException{
-      return getKeYMarkerByType(res, depth, CLOSEDMARKER_ID, NOTCLOSEDMARKER_ID, PROBLEMLOADEREXCEPTIONMARKER_ID, RECURSIONMARKER_ID, OVERDUEPROOFMARKER_ID);
+      return getKeYMarkerByType(res, depth, CLOSEDMARKER_ID, NOTCLOSEDMARKER_ID, PROBLEMLOADEREXCEPTIONMARKER_ID, RECURSIONMARKER_ID);
    }
    
    
@@ -262,30 +257,16 @@ public class MarkerManager {
    public LinkedList<IMarker> getKeYMarkerByType(IResource res, int depth, String... types) throws CoreException{
       LinkedList<IMarker> markerList = new LinkedList<IMarker>();
       for(String type : types){
-         if(CLOSEDMARKER_ID.equals(type) || NOTCLOSEDMARKER_ID.equals(type) || PROBLEMLOADEREXCEPTIONMARKER_ID.equals(type) || RECURSIONMARKER_ID.equals(type) || OVERDUEPROOFMARKER_ID.equals(type)){
-            markerList.addAll(markerArrayToList(res.findMarkers(type, true, depth)));
+         if(CLOSEDMARKER_ID.equals(type) || NOTCLOSEDMARKER_ID.equals(type) || PROBLEMLOADEREXCEPTIONMARKER_ID.equals(type) || RECURSIONMARKER_ID.equals(type)){
+            markerList.addAll(KeYResourcesUtil.arrayToList(res.findMarkers(type, true, depth)));
          }
       }
       return markerList;
    }
    
    
-   /**
-    * Converts the given {@link IMarker[]} into a {@link LinkedList}.
-    * @param markerArr - the {@link IMarker[]} to use
-    * @return the {@link LinkedList} with all {@link IMarker} from the array
-    */
-   private LinkedList<IMarker> markerArrayToList(IMarker[] markerArr){
-      LinkedList<IMarker> markerList = new LinkedList<IMarker>();
-      for(IMarker marker : markerArr){
-         markerList.add(marker);
-      }
-      return markerList;
-   }
-   
-   
    public void deleteAllKeYMarker(IResource res, int depth) throws CoreException{
-      deleteKeYMarkerByType(res, depth, CLOSEDMARKER_ID, NOTCLOSEDMARKER_ID, PROBLEMLOADEREXCEPTIONMARKER_ID, RECURSIONMARKER_ID, OVERDUEPROOFMARKER_ID);
+      deleteKeYMarkerByType(res, depth, CLOSEDMARKER_ID, NOTCLOSEDMARKER_ID, PROBLEMLOADEREXCEPTIONMARKER_ID, RECURSIONMARKER_ID);
    }
    
    
@@ -308,15 +289,5 @@ public class MarkerManager {
             res.deleteMarkers(RECURSIONMARKER_ID, true, depth);
          }
       }
-   }
-
-
-   public void deleteOverdueProofMarker(ProofElement pe) throws CoreException {
-      IMarker overdueProofMarker = pe.getOverdueProofMarker();
-      if(overdueProofMarker != null){
-         pe.setOverdueProofMarker(null);
-         overdueProofMarker.delete();
-      }
-      
    }
 }

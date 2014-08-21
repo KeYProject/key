@@ -71,7 +71,7 @@ public class ProofRunnable implements Runnable {
             if(monitor.isCanceled()){
                monitor.worked(1);
             }
-            else if(pe.getOverdueProofMarker() != null){
+            else if(pe.getOutdated()){
             
                pe.setKeYEnvironment(environment);
                pe.setProofObl(pe.getContract().createProofObl(environment.getInitConfig(), pe.getContract()));
@@ -86,7 +86,6 @@ public class ProofRunnable implements Runnable {
                   pe.setMarkerMsg(generateProofMarkerMessage(pe, proof, proofDuration));
                   markerManager.setMarker(pe);
                   save(proof,pe);
-                  markerManager.deleteOverdueProofMarker(pe);
                   proof.dispose();
                }
             }

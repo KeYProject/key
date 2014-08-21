@@ -37,8 +37,9 @@ public class ProofElement {
 
    private IFile javaFile;
    private SourceLocation scl;
-   private List<IMarker> marker;
-   private IMarker overdueProofMarker;
+   private IMarker proofMarker;
+   private boolean outdated;
+   private List<IMarker> recursionMarker;
    private String markerMsg;
    
    private IFolder proofFolder;
@@ -64,29 +65,36 @@ public class ProofElement {
       return scl;
    }
    
-   public List<IMarker> getMarker(){
-      return marker;
+   public IMarker getProofMarker(){
+      return proofMarker;
    }
-   public void setMarker(LinkedList<IMarker> marker){
-      this.marker = marker;
-   }
-   public void addMarker(IMarker marker){
-      this.marker.add(marker);
-   }
-   public void removeMarker(IMarker marker){
-      this.marker.remove(marker);
-   }
-   public void removeMarker(int index){
-      this.marker.remove(index);
+   public void setProofMarker(IMarker proofMarker){
+      this.proofMarker = proofMarker;
    }
    
-   public IMarker getOverdueProofMarker(){
-      return overdueProofMarker;
+   public boolean getOutdated(){
+      return outdated;
    }
-   public void setOverdueProofMarker(IMarker overdueProofMarker){
-      this.overdueProofMarker = overdueProofMarker;
+   public void setOutdated(boolean outdated){
+      this.outdated = outdated;
    }
    
+   public List<IMarker> getRecursionMarker(){
+      return recursionMarker;
+   }
+   public void setRecursionMarker(LinkedList<IMarker> recursionMarker){
+      this.recursionMarker = recursionMarker;
+   }
+   public void addRecursionMarker(IMarker recursionMarker){
+      this.recursionMarker.add(recursionMarker);
+   }
+   public void removeRecursionMarker(IMarker recursionMarker){
+      this.recursionMarker.remove(recursionMarker);
+   }
+   public void removeRecursionMarker(int index){
+      this.recursionMarker.remove(index);
+   }
+      
    public String getMarkerMsg() {
       return markerMsg;
    }
@@ -144,11 +152,20 @@ public class ProofElement {
       this.usedContracts = usedContracts;
    }
    
-   public ProofElement(IFile javaFile, SourceLocation scl , KeYEnvironment<CustomUserInterface> environment, IFolder proofFolder, IFile proofFile, IFile metaFile, List<IMarker> marker, IMarker overdueProofMarker, Contract contract){
+   public ProofElement(IFile javaFile, SourceLocation scl , KeYEnvironment<CustomUserInterface> environment, IFolder proofFolder, IFile proofFile, IFile metaFile, IMarker proofMarker, List<IMarker> recursionMarker, Contract contract){
       this.javaFile = javaFile;
       this.scl = scl;
-      this.marker = marker;
-      this.overdueProofMarker = overdueProofMarker;
+      this.proofMarker = proofMarker;
+      if(proofMarker != null && proofMarker.exists()){
+         outdated = Boolean.valueOf(proofMarker.getAttribute("OUTDATED", String.valueOf(true)));
+      }
+      else if(recursionMarker != null && !recursionMarker.isEmpty()){
+         outdated = Boolean.valueOf(recursionMarker.get(0).getAttribute("OUTDATED", String.valueOf(true)));
+      }
+      else{
+         outdated = true;
+      }
+      this.recursionMarker = recursionMarker;
       
       this.proofFolder = proofFolder;
       this.proofFile = proofFile;

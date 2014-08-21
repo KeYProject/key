@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.key_project.key4eclipse.resources.test.Activator;
 import org.key_project.key4eclipse.resources.test.util.KeY4EclipseResourcesTestUtil;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 public class BuilderTests extends AbstractResourceTest {
    
@@ -501,7 +502,7 @@ public class BuilderTests extends AbstractResourceTest {
       IFile javaFile0 = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("src").append("file").append("to").append("change").append("TrivealChangeFile.java"));
       IFile javaFile1 = KeY4EclipseResourcesTestUtil.getFile(
-            project.getFullPath().append("src").append("file").append("to").append("change").append("TrivealChangeFile.java"));
+            project.getFullPath().append("src").append("file").append("to").append("change").append("AnotherFile.java"));
       IFile proofFile0 = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("proofs").append("file").append("to").append("change").append("TrivealChangeFile.java").append("file_to_change_TrivealChangeFile[file_to_change_TrivealChangeFile__add(int,int)]_JML_operation_contract_0.proof"));
       IFile proofFile1 = KeY4EclipseResourcesTestUtil.getFile(
@@ -520,7 +521,6 @@ public class BuilderTests extends AbstractResourceTest {
       assertTrue(javaFile0.exists() && javaFile1.exists());
       
       KeY4EclipseResourcesTestUtil.build(project);
-      
       assertTrue(javaFile0.exists() && javaFile1.exists());
       assertTrue(proofFolder.exists());
       assertTrue(proofFile0.exists() && metaFile0.exists());

@@ -31,8 +31,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.EditorSelection;
@@ -120,8 +118,8 @@ public class ProofManager {
       keyDelta.reset();
       markerManager.deleteKeYMarkerByType(project, IResource.DEPTH_ZERO, MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID);
       proofElements = getAllProofElements();
-      sortProofElements(editorSelection);
-      setOverdueMarker();
+//      sortProofElements(editorSelection);
+      setOutdated();
       //set up monitor
       monitor.beginTask("Build all proofs", proofElements.size());
       initThreads(monitor);
@@ -134,20 +132,20 @@ public class ProofManager {
    }
    
    
-   private void sortProofElements(EditorSelection editorSelection) {
-      List<ProofElement> sortedProofs = new LinkedList<ProofElement>();
-      
-      List<ProofElement> activeEditorProofs = new LinkedList<ProofElement>();
-      if(editorSelection.getActiveEditor() != null){
-         ITextEditor activeEditor = editorSelection.getActiveEditor();
-         IFile file = ((IFileEditorInput) activeEditor.getEditorInput()).getFile();
-         for(ProofElement pe : proofElements){
-            if(pe.getJavaFile() != null && pe.getJavaFile().equals(file)){
-               activeEditorProofs.add(pe);
-            }
-         }
-         sortedProofs.addAll(activeEditorProofs);
-      }
+//   private void sortProofElements(EditorSelection editorSelection) {
+//      List<ProofElement> sortedProofs = new LinkedList<ProofElement>();
+//      
+//      List<ProofElement> activeEditorProofs = new LinkedList<ProofElement>();
+//      if(editorSelection.getActiveEditor() != null){
+//         ITextEditor activeEditor = editorSelection.getActiveEditor();
+//         IFile file = ((IFileEditorInput) activeEditor.getEditorInput()).getFile();
+//         for(ProofElement pe : proofElements){
+//            if(pe.getJavaFile() != null && pe.getJavaFile().equals(file)){
+//               activeEditorProofs.add(pe);
+//            }
+//         }
+//         sortedProofs.addAll(activeEditorProofs);
+//      }
       
 //      file = ((IFileEditorInput) activeEditor.getEditorInput()).getFile();
 //      IJavaElement javaElement = JavaCore.create(file);
@@ -175,46 +173,46 @@ public class ProofManager {
 //         }
 //      }
 
-      List<ProofElement> openEditorProofs = new LinkedList<ProofElement>();
-      if(editorSelection.getOpenEditors() != null){
-         for(ITextEditor editor : editorSelection.getOpenEditors()){
-            IFile file = ((IFileEditorInput) editor.getEditorInput()).getFile();
-            for(ProofElement pe : proofElements){
-               if(pe.getJavaFile() != null && pe.getJavaFile().equals(file)){
-                  openEditorProofs.add(pe);
-               }
-            }
-         }
-         sortedProofs.addAll(openEditorProofs);
-      }
-
-      List<ProofElement> overdueProofs = new LinkedList<ProofElement>();
-      
-      for(ProofElement pe : proofElements){
-         if(pe.getOverdueProofMarker() != null && !activeEditorProofs.contains(pe) && !openEditorProofs.contains(pe)){
-            overdueProofs.add(pe);
-         }
-         sortedProofs.addAll(overdueProofs);
-      }
-      
-      List<ProofElement> otherProofs = new LinkedList<ProofElement>();
-      
-      for(ProofElement pe : proofElements){
-         if(!activeEditorProofs.contains(pe) && !openEditorProofs.contains(pe) && !overdueProofs.contains(pe)){
-            otherProofs.add(pe);
-         }
-         sortedProofs.addAll(otherProofs);
-      }
-      proofElements = sortedProofs;
-   }
+//      List<ProofElement> openEditorProofs = new LinkedList<ProofElement>();
+//      if(editorSelection.getOpenEditors() != null){
+//         for(ITextEditor editor : editorSelection.getOpenEditors()){
+//            IFile file = ((IFileEditorInput) editor.getEditorInput()).getFile();
+//            for(ProofElement pe : proofElements){
+//               if(pe.getJavaFile() != null && pe.getJavaFile().equals(file)){
+//                  openEditorProofs.add(pe);
+//               }
+//            }
+//         }
+//         sortedProofs.addAll(openEditorProofs);
+//      }
+//
+//      List<ProofElement> outdatedProofs = new LinkedList<ProofElement>();
+//      
+//      for(ProofElement pe : proofElements){
+//         if(pe.getOutdated = true && !activeEditorProofs.contains(pe) && !openEditorProofs.contains(pe)){
+//            outdatedProofs.add(pe);
+//         }
+//         sortedProofs.addAll(outdatedProofs);
+//      }
+//      
+//      List<ProofElement> otherProofs = new LinkedList<ProofElement>();
+//      
+//      for(ProofElement pe : proofElements){
+//         if(!activeEditorProofs.contains(pe) && !openEditorProofs.contains(pe) && !outdatedProofs.contains(pe)){
+//            otherProofs.add(pe);
+//         }
+//         sortedProofs.addAll(otherProofs);
+//      }
+//      proofElements = sortedProofs;
+//   }
    
    
-   private void setOverdueMarker(){
-      ProofOverdueChecker poc = new ProofOverdueChecker(project, proofElements, changedJavaFiles, environment);
-      List<ProofElement> overdueProofs = poc.getOverdueProofs();
+   private void setOutdated(){
+      OutdatedChecker poc = new OutdatedChecker(project, proofElements, changedJavaFiles, environment);
+      List<ProofElement> outdatedProofs = poc.getOutdatedProofs();
       
-      for(ProofElement pe : overdueProofs){
-         markerManager.setOverdueProofMarker(pe);
+      for(ProofElement pe : outdatedProofs){
+         markerManager.setOutdated(pe, true);
       }
    }
    
@@ -257,9 +255,9 @@ public class ProofManager {
                IFolder proofFolder = getProofFolder(javaFile);
                IFile proofFile = getProofFile(contract.getName(), proofFolder.getFullPath());
                IFile metaFile = getProofMetaFile(proofFile);
-               LinkedList<IMarker> oldMarker = markerManager.getOldProofMarker(javaFile, scl, proofFile);
-               IMarker overdueProofMarker = markerManager.getOverdueProofMarker(javaFile, scl, proofFile);
-               proofElements.add(new ProofElement(javaFile, scl, environment, proofFolder, proofFile, metaFile, oldMarker, overdueProofMarker, contract));
+               IMarker proofMarker = markerManager.getProofMarker(javaFile, scl, proofFile);
+               List<IMarker> recursionMarker = markerManager.getRecursionMarker(javaFile, scl, proofFile);
+               proofElements.add(new ProofElement(javaFile, scl, environment, proofFolder, proofFile, metaFile, proofMarker, recursionMarker, contract));
             }
          }
       }
@@ -401,7 +399,7 @@ public class ProofManager {
     */
    private void checkContractRecursion() throws CoreException{
       findCycles();
-      removeAllRecursiveMarker();
+      removeAllRecursionMarker();
       for(List<ProofElement> cycle : cycles){
          markerManager.setRecursionMarker(cycle);
       }
@@ -410,7 +408,7 @@ public class ProofManager {
    
    private void restoreOldMarkerForRemovedCycles() throws CoreException{
       for(ProofElement pe : proofElements){
-         if(pe.getMarker().isEmpty()){
+         if(pe.getProofMarker() == null){
             markerManager.setMarker(pe);
          }
       }
@@ -445,20 +443,9 @@ public class ProofManager {
    }
    
    
-   private void removeAllRecursiveMarker() throws CoreException{
+   private void removeAllRecursionMarker() throws CoreException{
       for(ProofElement pe : proofElements){
-         List<IMarker> peMarker = pe.getMarker();
-         List<IMarker> toBeRemoved = new LinkedList<IMarker>();
-         for(IMarker marker : peMarker){
-            if(marker != null && MarkerManager.RECURSIONMARKER_ID.equals(marker.getType())){
-               toBeRemoved.add(marker);
-            }
-         }
-         while(!toBeRemoved.isEmpty()){
-            IMarker marker = toBeRemoved.remove(0);
-            pe.removeMarker(marker);
-            marker.delete();
-         }
+         pe.setRecursionMarker(new LinkedList<IMarker>());
       }
       markerManager.deleteKeYMarkerByType(project, IResource.DEPTH_INFINITE, MarkerManager.RECURSIONMARKER_ID);
    }
@@ -467,11 +454,14 @@ public class ProofManager {
    private void cleanMarker() throws CoreException{
       List<IMarker> peMarker = new LinkedList<IMarker>();
       for(ProofElement pe : proofElements){
-         if(pe.getMarker() != null){
-            peMarker.addAll(pe.getMarker());
-            IMarker overdueMarker = pe.getOverdueProofMarker();
-            if(overdueMarker != null){
-               peMarker.add(overdueMarker);
+         IMarker proofMarker = pe.getProofMarker();
+         if(proofMarker != null && proofMarker.exists()){
+            peMarker.add(proofMarker);
+         }
+         List<IMarker> recursionMarker = pe.getRecursionMarker();
+         for(IMarker marker : recursionMarker){
+            if(marker != null && marker.exists()){
+               peMarker.add(marker);
             }
          }
       }

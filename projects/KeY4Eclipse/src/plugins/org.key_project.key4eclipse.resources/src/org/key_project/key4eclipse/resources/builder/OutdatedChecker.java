@@ -27,40 +27,44 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomUserInterface;
 
-public class ProofOverdueChecker {
+public class OutdatedChecker {
    
    private IProject project;
    private List<ProofElement> proofElements;
    private List<IFile> changedJavaFiles;
    private KeYEnvironment<CustomUserInterface> environment;
    
-   public ProofOverdueChecker(IProject project, List<ProofElement> proofElements, List<IFile> changedJavaFiles, KeYEnvironment<CustomUserInterface> environment){
+   public OutdatedChecker(IProject project, List<ProofElement> proofElements, List<IFile> changedJavaFiles, KeYEnvironment<CustomUserInterface> environment){
       this.project = project;
       this.proofElements = proofElements;
       this.changedJavaFiles = changedJavaFiles;
       this.environment = environment;
    }
    
-   public List<ProofElement> getOverdueProofs() {
-      List<ProofElement> overdueProofElements = new LinkedList<ProofElement>();
+   public List<ProofElement> getOutdatedProofs() {
+      List<ProofElement> outdatedProofElements = new LinkedList<ProofElement>();
       for(ProofElement pe : proofElements){
          
-         boolean overdue = false;
+         boolean outdated = false;
          
          try{
             if(!KeYProjectProperties.isEnableBuildRequiredProofsOnly(project)){
-               overdue = true;
+               outdated = true;
             }
             else{
                IFile metaFile = pe.getMetaFile();
-               if(pe.getMarker().isEmpty() || pe.getOverdueProofMarker() != null){
-                  overdue = true;
+               if(pe.getOutdated() == true){
+                  outdated = true;
+               }
+               else if((pe.getProofMarker() == null || !pe.getProofMarker().exists()) 
+                  && (pe.getRecursionMarker() == null || pe.getRecursionMarker().isEmpty())){
+                  outdated = true;
                }
                else if(metaFile.exists()){
                   ProofMetaFileReader pmfr = new ProofMetaFileReader(metaFile);
                   LinkedList<IType> javaTypes = collectAllJavaITypes();
                   if(MD5changed(pe.getProofFile(), pmfr) || typeOrSubTypeChanged(pe, pmfr, javaTypes) || superTypeChanged(pe, javaTypes)){
-                     overdue = true;
+                     outdated = true;
                   }
                   else{
                      pe.setProofClosed(pmfr.getProofClosed());
@@ -69,19 +73,19 @@ public class ProofOverdueChecker {
                   }
                }
                else{
-                  overdue = true;
+                  outdated = true;
                }
             }
          }
          catch(Exception e){
-            overdue = true;
+            outdated = true;
          }
          
-         if(overdue){
-            overdueProofElements.add(pe);
+         if(outdated){
+            outdatedProofElements.add(pe);
          }            
       }
-      return overdueProofElements;
+      return outdatedProofElements;
    }
    
    /**

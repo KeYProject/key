@@ -138,27 +138,30 @@ public class KeY4EclipseResourcesTestUtil {
     * @param project - the {@link IProject} to use
     * @throws CoreException
     */
-   public static void build(IProject project) throws CoreException{      
+   public static void build(IProject project) throws CoreException{
       project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, null);
-      IJobManager jobMan = Job.getJobManager();
-      Job[] jobs = jobMan.find("KeYProjectBuildJob");
-      if (jobs != null) {
-         for (Job job : jobs) {
-             TestUtilsUtil.waitForJob(job);
-         }
+      waitBuild();
+   }
+   
+   private static void waitBuild(){
+      IJobManager manager = Job.getJobManager();
+      Job[] jobs = manager.find("KeYProjectBuildJob");
+      if(jobs != null && jobs.length > 0){
+         TestUtilsUtil.sleep(100);
+         waitBuild();
       }
-      project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, null);
-      jobs = jobMan.find("KeYProjectBuildJob");
-      if (jobs != null) {
-         for (Job job : jobs) {
-             TestUtilsUtil.waitForJob(job);
-         }
-      }
+      //TODO: Is not working. Example is the test "testEfficientBuildMultipleThreadsChangeJavaFileTriveal". After the first build a Proof and meta file are missing.
+      //TODO: Strange things are going on. When debugging the Build, everything works well. When running the test without debugging, the second proof is missing in its folder.
    }
    
    public static void cleanBuild(IProject project) throws CoreException{
       project.build(IncrementalProjectBuilder.CLEAN_BUILD, null);
-      TestUtilsUtil.waitForBuild();
+      IJobManager jobMan = Job.getJobManager();
+      Job[] jobs = jobMan.find("KeYProjectBuildJob");
+      while(jobs.length > 0){
+         jobs = jobMan.find("KeYProjectBuildJob");
+      }
+      //TODO: wait for the new builds. like above - when fixed
    }
    
    
