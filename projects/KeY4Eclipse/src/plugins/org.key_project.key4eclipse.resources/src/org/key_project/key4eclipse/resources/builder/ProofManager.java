@@ -31,10 +31,18 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.ISourceRange;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.text.ITextSelection;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.EditorSelection;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
+import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
@@ -118,7 +126,7 @@ public class ProofManager {
       keyDelta.reset();
       markerManager.deleteKeYMarkerByType(project, IResource.DEPTH_ZERO, MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID);
       proofElements = getAllProofElements();
-//      sortProofElements(editorSelection);
+      sortProofElements(editorSelection);
       setOutdated();
       //set up monitor
       monitor.beginTask("Build all proofs", proofElements.size());
@@ -132,79 +140,114 @@ public class ProofManager {
    }
    
    
-//   private void sortProofElements(EditorSelection editorSelection) {
-//      List<ProofElement> sortedProofs = new LinkedList<ProofElement>();
-//      
-//      List<ProofElement> activeEditorProofs = new LinkedList<ProofElement>();
-//      if(editorSelection.getActiveEditor() != null){
-//         ITextEditor activeEditor = editorSelection.getActiveEditor();
-//         IFile file = ((IFileEditorInput) activeEditor.getEditorInput()).getFile();
-//         for(ProofElement pe : proofElements){
-//            if(pe.getJavaFile() != null && pe.getJavaFile().equals(file)){
-//               activeEditorProofs.add(pe);
-//            }
-//         }
-//         sortedProofs.addAll(activeEditorProofs);
-//      }
+   private void sortProofElements(EditorSelection editorSelection) {
+      List<ProofElement> sortedProofs = new LinkedList<ProofElement>();
       
-//      file = ((IFileEditorInput) activeEditor.getEditorInput()).getFile();
-//      IJavaElement javaElement = JavaCore.create(file);
-//      ITextSelection selection = (ITextSelection) editorSelection.getActiveSelection();
-//      if(javaElement instanceof ICompilationUnit){
-//         try{
-//            ICompilationUnit compUnit = (ICompilationUnit) javaElement;
-//            IJavaElement selected = compUnit.getElementAt(selection.getOffset());
-//            if(selected != null && selected.getElementType() == IJavaElement.METHOD){
-//               IMethod method = (IMethod) selected;
-//               ISourceRange range = method.getSourceRange();
-//               int offset = range.getOffset();
-//               int length = range.getLength();
-//               int end = offset+length;
-//
-//               for(ProofElement pe : activeEditorProofs){
-//                  SourceLocation scl = pe.getSourceLocation();
-//                  int startScl = scl.getCharStart();
-//                  int endScl = scl.getCharEnd();
-//               }
-//            }
-//         }
-//         catch(JavaModelException e){
-//            LogUtil.getLogger().logError(e);
-//         }
-//      }
-
-//      List<ProofElement> openEditorProofs = new LinkedList<ProofElement>();
-//      if(editorSelection.getOpenEditors() != null){
-//         for(ITextEditor editor : editorSelection.getOpenEditors()){
-//            IFile file = ((IFileEditorInput) editor.getEditorInput()).getFile();
-//            for(ProofElement pe : proofElements){
-//               if(pe.getJavaFile() != null && pe.getJavaFile().equals(file)){
-//                  openEditorProofs.add(pe);
-//               }
-//            }
-//         }
-//         sortedProofs.addAll(openEditorProofs);
-//      }
-//
-//      List<ProofElement> outdatedProofs = new LinkedList<ProofElement>();
-//      
-//      for(ProofElement pe : proofElements){
-//         if(pe.getOutdated = true && !activeEditorProofs.contains(pe) && !openEditorProofs.contains(pe)){
-//            outdatedProofs.add(pe);
-//         }
-//         sortedProofs.addAll(outdatedProofs);
-//      }
-//      
-//      List<ProofElement> otherProofs = new LinkedList<ProofElement>();
-//      
-//      for(ProofElement pe : proofElements){
-//         if(!activeEditorProofs.contains(pe) && !openEditorProofs.contains(pe) && !outdatedProofs.contains(pe)){
-//            otherProofs.add(pe);
-//         }
-//         sortedProofs.addAll(otherProofs);
-//      }
-//      proofElements = sortedProofs;
-//   }
+      //Active selection
+      List<ProofElement> activeMethodProofs = new LinkedList<ProofElement>();
+      ITextSelection selection = editorSelection.getActiveSelection();
+      if(selection != null){
+         IFile activeFile = editorSelection.getActiveFile();
+         int selOffset = selection.getOffset();
+         int selLength = selection.getLength();
+         if(activeFile != null){
+            IJavaElement javaElement = JavaCore.create(activeFile);
+            if(javaElement instanceof ICompilationUnit){
+               ICompilationUnit compUnit = (ICompilationUnit) javaElement;
+               try{
+                  String src = compUnit.getSource();
+                  IMethod method = null;
+                  for(int i = selOffset; i <= selOffset+selLength; i++){
+                     IJavaElement selected = compUnit.getElementAt(i);
+                     if(selected != null && selected.getElementType() == IJavaElement.METHOD){
+                        method = (IMethod) selected;
+                        break;
+                     }
+                  }
+                  if(method != null){
+                     ISourceRange range = method.getSourceRange();
+                     int offset = range.getOffset();
+                     int length = range.getLength();
+                     int methodStartLine = KeYResourcesUtil.getLineForOffset(src, offset)+1;
+                     int methodEndLine = KeYResourcesUtil.getLineForOffset(src, offset+length)+1;
+                     for(ProofElement pe : proofElements){
+                        int sclLine = pe.getSourceLocation().getLineNumber();
+                        if(methodStartLine <= sclLine && methodEndLine >= sclLine){
+                           activeMethodProofs.add(pe);
+                        }
+                     }
+                  }
+               } catch (JavaModelException e){
+                  LogUtil.getLogger().logError(e);
+               }
+            }
+         }
+      }
+      sortedProofs.addAll(activeMethodProofs);
+      
+      //Proofs of active file
+      IFile activeFile = editorSelection.getActiveFile();
+      List<ProofElement> activeFileProofs = getProofsForFile(activeFile);
+      for(ProofElement pe : activeFileProofs){
+         if(!activeMethodProofs.contains(pe)){
+            sortedProofs.add(pe);
+         }
+      }
+      
+      //Open file proofs
+      List<IFile> openFiles = editorSelection.getOpenFiles();
+      List<ProofElement> openFilesProofs = new LinkedList<ProofElement>();
+      for(IFile openFile : openFiles){
+         openFilesProofs.addAll(getProofsForFile(openFile));
+      }
+      sortedProofs.addAll(openFilesProofs);
+      
+      //Outdated proofs
+      List<ProofElement> outdatedProofs = new LinkedList<ProofElement>();
+      for(ProofElement pe : proofElements){
+         if(pe.getOutdated() && !activeFileProofs.contains(pe) && !openFilesProofs.contains(pe)){
+            outdatedProofs.add(pe);
+         }
+      }
+      sortedProofs.addAll(outdatedProofs);
+      
+      //Other proofs
+      List<ProofElement> otherProofs = new LinkedList<ProofElement>();
+      for(ProofElement pe : proofElements){
+         if(!activeFileProofs.contains(pe) && !openFilesProofs.contains(pe) && !outdatedProofs.contains(pe)){
+            otherProofs.add(pe);
+         }
+      }
+      sortedProofs.addAll(otherProofs);
+      
+      proofElements = sortedProofs;      
+   }
+   
+   
+   public List<ProofElement> getProofsForFile(IFile file){         
+      List<ProofElement> fileProofs = new LinkedList<ProofElement>();
+      IJavaElement javaElement = JavaCore.create(file);
+      if(file != null && javaElement != null){
+         for(ProofElement pe : proofElements){
+            if(pe != null && file.equals(pe.getJavaFile())){
+               fileProofs.add(pe);
+            }
+         }
+      }
+      else if(file != null && ("proof".equals(file.getFileExtension()) || "proofmeta".equals(file.getFileExtension()))){
+         for(ProofElement pe : proofElements){
+            if(pe != null && file.equals(pe.getProofFile())){
+               fileProofs.add(pe);
+               break;
+            }
+            else if(pe != null && file.equals(pe.getMetaFile())){
+               fileProofs.add(pe);
+               break;
+            }
+         }
+      }
+      return fileProofs;
+   }
    
    
    private void setOutdated(){

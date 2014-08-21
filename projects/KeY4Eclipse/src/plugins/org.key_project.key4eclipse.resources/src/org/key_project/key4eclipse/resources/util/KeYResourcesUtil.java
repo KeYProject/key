@@ -235,6 +235,35 @@ public class KeYResourcesUtil {
              isKeYProject(element.getProject());
    }
    
+   
+
+   
+   
+   public static int getLineForOffset(String str, int offset){
+      StringBuilder sb = new StringBuilder(str);
+      int index = 0;
+      int lineCount = -1;
+      while(index <= offset){
+         int indexRN = sb.indexOf("\r\n", index);
+         int indexR = sb.indexOf("\r", index);
+         int indexN = sb.indexOf("\n", index);
+         if(indexRN <= indexR && indexRN < indexN){
+            index = indexRN + 2;
+         }
+         else if(indexR < indexRN && indexR < indexN){
+            index = indexR + 1;
+         }
+         else if(indexN < indexRN & indexN < indexR){
+            index = indexN + 1;
+         }
+         else return -1;
+         
+         lineCount++;
+      }
+      return lineCount;
+   }
+   
+   
    /**
     * Checks if the given {@link IProject} is a KeY project.
     * @param project The {@link IProject} to check.

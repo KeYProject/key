@@ -3,35 +3,35 @@ package org.key_project.key4eclipse.resources.util;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ui.texteditor.ITextEditor;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.jface.text.ITextSelection;
 
 public class EditorSelection {
    
-   private ISelection activeSelection = null;
-   private ITextEditor activeEditor = null;
-   private List<ITextEditor> openEditors = new LinkedList<ITextEditor>();
    
-   public ISelection getActiveSelection() {
+   private ITextSelection activeSelection = null;
+   private IFile activeFile = null;
+   private List<IFile> openFiles = new LinkedList<IFile>();
+   
+   public ITextSelection getActiveSelection() {
       return activeSelection;
    }
-   public void setActiveSelection(ISelection activeSelection) {
+   public void setActiveSelection(ITextSelection activeSelection) {
       this.activeSelection = activeSelection;
    }
-   public ITextEditor getActiveEditor() {
-      return activeEditor;
+   
+   public IFile getActiveFile(){
+      return activeFile;
    }
-   public void setActiveEditor(ITextEditor activeEditor) {
-      this.activeEditor = activeEditor;
+   public void setActiveFile(IFile activeFile){
+      this.activeFile = activeFile;
    }
-   public List<ITextEditor> getOpenEditors() {
-      return openEditors;
+   
+   public List<IFile> getOpenFiles() {
+      return openFiles;
    }
-   public void setOpenEditors(List<ITextEditor> openEditors) {
-      this.openEditors = openEditors;
-   }
-   public void addOpenEditor(ITextEditor openEditor) {
-      openEditors.add(openEditor);
+   public void addOpenFile(IFile openFile) {
+      openFiles.add(openFile);
    }
    
 }
