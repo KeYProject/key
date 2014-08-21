@@ -1074,7 +1074,7 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
             sb.append("</ol>" + StringUtil.NEW_LINE);
             sb.append("</li>" + StringUtil.NEW_LINE);
             sb.append("<li><i>Source code is compiled using a correct Java compiler.</i></li>" + StringUtil.NEW_LINE);
-            sb.append("<li><i>Program is run on a a correct JVM.</i></li>" + StringUtil.NEW_LINE);
+            sb.append("<li><i>Program is run on a correct JVM.</i></li>" + StringUtil.NEW_LINE);
             sb.append("</ol>" + StringUtil.NEW_LINE);
             // Add footer
             sb.append("</body>" + StringUtil.NEW_LINE);
