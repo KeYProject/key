@@ -895,7 +895,7 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
             sb.append("</style>" + StringUtil.NEW_LINE);
             sb.append("</header>" + StringUtil.NEW_LINE);
             sb.append("<body>" + StringUtil.NEW_LINE);
-            sb.append("<h1><a name=\"#Contents\">List of Contents</a></h1>" + StringUtil.NEW_LINE);
+            sb.append("<h1><a name=\"Contents\">List of Contents</a></h1>" + StringUtil.NEW_LINE);
             sb.append("<ol>" + StringUtil.NEW_LINE);
             if (!status.cycles.isEmpty()) {
                sb.append("<li><a href=\"#CyclicProofs\">Cyclic Specification use in Proofs</a></li>" + StringUtil.NEW_LINE);
@@ -919,7 +919,7 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
             sb.append("</ol>" + StringUtil.NEW_LINE);
             // Add cyclic proofs
             if (!status.cycles.isEmpty()) {
-               sb.append("<h1><a name=\"#CyclicProofs\">Cyclic Specification use in Proofs</a></h1>" + StringUtil.NEW_LINE);
+               sb.append("<h1><a name=\"CyclicProofs\">Cyclic Specification use in Proofs</a></h1>" + StringUtil.NEW_LINE);
                sb.append("<ol>" + StringUtil.NEW_LINE);
                for (List<IFile> cycle : status.cycles) {
                   SWTUtil.checkCanceled(monitor);
@@ -938,7 +938,7 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
             }
             // Add open proofs
             if (!status.unprovenContracts.isEmpty()) {
-               sb.append("<h1><a name=\"#OpenProofs\">Open Proofs</a></h1>" + StringUtil.NEW_LINE);
+               sb.append("<h1><a name=\"OpenProofs\">Open Proofs</a></h1>" + StringUtil.NEW_LINE);
                sb.append((status.numOfContracts - status.numOfProvenContracts) + " of " + status.numOfContracts + " proof" + ((status.numOfContracts - status.numOfProvenContracts) == 1 ? " is" : "s are") + " still open: " + StringUtil.NEW_LINE);
                sb.append("<ol>" + StringUtil.NEW_LINE);
                for (ContractInfo contractInfo : status.unprovenContracts) {
@@ -964,7 +964,7 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
             }
             // Add unspecified methods
             if (!status.unspecifiedMethods.isEmpty()) {
-               sb.append("<h1><a name=\"#UnspecifiedMethods\">Unspecified Methods</a></h1>" + StringUtil.NEW_LINE);
+               sb.append("<h1><a name=\"UnspecifiedMethods\">Unspecified Methods</a></h1>" + StringUtil.NEW_LINE);
                sb.append((status.numOfMethods - status.numOfSpecifiedMethods) + " of " + status.numOfMethods + " method" + ((status.numOfMethods - status.numOfSpecifiedMethods) == 1 ? " is" : "s are") + " unspecified and may call methods in a state not satisfying the precondition: " + StringUtil.NEW_LINE);
                sb.append("<ol>" + StringUtil.NEW_LINE);
                for (Entry<TypeInfo, List<MethodInfo>> entry : status.unspecifiedMethods.entrySet()) {
@@ -985,7 +985,7 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
             }
             // Add unsound taclet options
             if (!status.unsoundTacletOptions.isEmpty()) {
-               sb.append("<h1><a name=\"#TacletOptionsUnsound\">" + ChoiceEntry.UNSOUND_TEXT + " Taclet Options</a></h1>" + StringUtil.NEW_LINE);
+               sb.append("<h1><a name=\"TacletOptionsUnsound\">" + ChoiceEntry.UNSOUND_TEXT + " Taclet Options</a></h1>" + StringUtil.NEW_LINE);
                sb.append("Proofs using a listed taclet options are " + ChoiceEntry.UNSOUND_TEXT + ":" + StringUtil.NEW_LINE);
                sb.append("<ol>" + StringUtil.NEW_LINE);
                SWTUtil.checkCanceled(monitor);
@@ -1006,7 +1006,7 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
             }
             // Add incomplete taclet options
             if (!status.incomplelteTacletOptions.isEmpty()) {
-               sb.append("<h1><a name=\"#TacletOptionsIncomplete\">" + ChoiceEntry.INCOMPLETE_TEXT + " Taclet Options</a></h1>" + StringUtil.NEW_LINE);
+               sb.append("<h1><a name=\"TacletOptionsIncomplete\">" + ChoiceEntry.INCOMPLETE_TEXT + " Taclet Options</a></h1>" + StringUtil.NEW_LINE);
                sb.append("Proofs using a listed taclet options are " + ChoiceEntry.INCOMPLETE_TEXT + ":" + StringUtil.NEW_LINE);
                sb.append("<ol>" + StringUtil.NEW_LINE);
                for (Entry<String, List<IFile>> entry : status.incomplelteTacletOptions.entrySet()) {
@@ -1027,7 +1027,7 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
             }
             // Add information taclet options
             if (!status.informationTacletOptions.isEmpty()) {
-               sb.append("<h1><a name=\"#TacletOptionsInformation\">Taclet Options with additional Information</a></h1>" + StringUtil.NEW_LINE);
+               sb.append("<h1><a name=\"TacletOptionsInformation\">Taclet Options with additional Information</a></h1>" + StringUtil.NEW_LINE);
                sb.append("Proofs using a taclet option with some additional information:" + StringUtil.NEW_LINE);
                sb.append("<ol>" + StringUtil.NEW_LINE);
                for (Entry<String, List<IFile>> entry : status.informationTacletOptions.entrySet()) {
@@ -1047,7 +1047,7 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
                sb.append("</ol>" + StringUtil.NEW_LINE);
             }
             // Add assumptions
-            sb.append("<h1><a name=\"#Assumptions\">Assumptions</a></h1>" + StringUtil.NEW_LINE);
+            sb.append("<h1><a name=\"Assumptions\">Assumptions</a></h1>" + StringUtil.NEW_LINE);
             sb.append("Proofs are performed under the following assumptions still need to be proven:" + StringUtil.NEW_LINE);
             sb.append("<ol>" + StringUtil.NEW_LINE);
             for (Entry<ProofMetaFileAssumption, List<IFile>> entry : status.assumptions.entrySet()) {
