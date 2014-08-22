@@ -251,4 +251,14 @@
             </viewShortcut>
          </perspectiveExtension>
       </extension>
+      <extension
+            point="org.eclipse.ui.ide.resourceFilters">
+         <filter
+               pattern="*.proofmeta"
+               selected="true">
+            <description>
+               description body text
+            </description>
+         </filter>
+      </extension>
 </plugin>
