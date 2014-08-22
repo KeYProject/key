@@ -19,6 +19,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.key4eclipse.resources.builder,
  org.key_project.key4eclipse.resources.io,
+ org.key_project.key4eclipse.resources.log,
  org.key_project.key4eclipse.resources.marker,
  org.key_project.key4eclipse.resources.nature,
  org.key_project.key4eclipse.resources.projectinfo,

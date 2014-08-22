@@ -182,6 +182,14 @@
                name="Verification Status"
                restorable="true">
          </view>
+         <view
+               category="org.key_project.key4eclipse.resources.ui.view.category"
+               class="org.key_project.key4eclipse.resources.ui.view.VerificationLogView"
+               icon="icons/resource_log.gif"
+               id="org.key_project.key4eclipse.resources.ui.view.VerificationLogView"
+               name="Verification Log"
+               restorable="true">
+         </view>
       </extension>
       <extension
             point="org.eclipse.ui.commands">
