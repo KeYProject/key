@@ -15,6 +15,7 @@ package org.key_project.key4eclipse.resources.ui.propertypages;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.ui.IPackagesViewPart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -28,10 +29,14 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.navigator.CommonNavigator;
+import org.eclipse.ui.navigator.CommonViewer;
 import org.key_project.key4eclipse.common.ui.property.AbstractProjectPropertyPage;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.ui.util.LogUtil;
-import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 
 public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
    
@@ -295,15 +300,8 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
     * Sets the selection for the HideMetaFilesButton CheckBox.
     */
    private void setSelectionForHideMetaFilesButton(){
-      try {
-         IProject project = getProject();
-         hideMefaFiles.setSelection(KeYProjectProperties.isHideMetaFiles(project));
-      }
-      catch (CoreException e) {
-         LogUtil.getLogger().logError(e);
-         LogUtil.getLogger().openErrorDialog(getShell(), e);
-         hideMefaFiles.setEnabled(false);
-      }
+      IProject project = getProject();
+      hideMefaFiles.setSelection(KeYProjectProperties.isHideMetaFiles(project));
    }
    
    
@@ -321,7 +319,7 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
          KeYProjectProperties.setNumberOfThreads(project, String.valueOf(setNumberOfThreadsSpinner.getSelection()));
          KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFilesButton.getSelection());
          KeYProjectProperties.setHideMetaFiles(project, hideMefaFiles.getSelection());
-         KeYResourcesUtil.hideMetaFiles(project);
+         updateNavigators();
          return super.performOk();
       }
       catch (CoreException e) {
@@ -332,6 +330,22 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
    }
    
    
+   private void updateNavigators() {
+      IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+      IViewPart packageExplorer = activePage.findView("org.eclipse.jdt.ui.PackageExplorer");
+      if(packageExplorer != null && packageExplorer instanceof IPackagesViewPart){
+         ((IPackagesViewPart) packageExplorer).getTreeViewer().refresh();
+      }
+      IViewPart projectExplorer = activePage.findView("org.eclipse.ui.navigator.ProjectExplorer");
+      if(projectExplorer != null && projectExplorer instanceof CommonNavigator){
+         CommonViewer viewer = ((CommonNavigator) projectExplorer).getCommonViewer();
+         if(viewer != null){
+            viewer.refresh();
+         }
+      }
+   }
+
+
    /**
     * {@inheritDoc}
     */

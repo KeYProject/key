@@ -8,7 +8,6 @@ import org.eclipse.jface.text.ITextSelection;
 
 public class EditorSelection {
    
-   
    private ITextSelection activeSelection = null;
    private IFile activeFile = null;
    private List<IFile> openFiles = new LinkedList<IFile>();

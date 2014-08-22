@@ -25,7 +25,6 @@ import org.junit.Test;
 import org.key_project.key4eclipse.resources.test.Activator;
 import org.key_project.key4eclipse.resources.test.util.KeY4EclipseResourcesTestUtil;
 import org.key_project.util.eclipse.BundleUtil;
-import org.key_project.util.test.util.TestUtilsUtil;
 
 public class BuilderTests extends AbstractResourceTest {
    

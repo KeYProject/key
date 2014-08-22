@@ -126,8 +126,8 @@ public class ProofManager {
       keyDelta.reset();
       markerManager.deleteKeYMarkerByType(project, IResource.DEPTH_ZERO, MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID);
       proofElements = getAllProofElements();
-      sortProofElements(editorSelection);
       setOutdated();
+      sortProofElements(editorSelection);
       //set up monitor
       monitor.beginTask("Build all proofs", proofElements.size());
       initThreads(monitor);
@@ -140,6 +140,23 @@ public class ProofManager {
    }
    
    
+   /**
+    * Marks all {@link ProofElement}s that require a build as outdated.
+    */
+   private void setOutdated(){
+      OutdatedChecker poc = new OutdatedChecker(project, proofElements, changedJavaFiles, environment);
+      List<ProofElement> outdatedProofs = poc.getOutdatedProofs();
+      
+      for(ProofElement pe : outdatedProofs){
+         markerManager.setOutdated(pe, true);
+      }
+   }
+   
+   
+   /**
+    * Sorts all {@link ProofElement}s in the following order: Selected method, active editor proofs, open editor proofs, affected/outdated proofs, other proofs.
+    * @param editorSelection - the current workbench state of the editor windows.
+    */
    private void sortProofElements(EditorSelection editorSelection) {
       List<ProofElement> sortedProofs = new LinkedList<ProofElement>();
       
@@ -155,7 +172,7 @@ public class ProofManager {
             if(javaElement instanceof ICompilationUnit){
                ICompilationUnit compUnit = (ICompilationUnit) javaElement;
                try{
-                  String src = compUnit.getSource();
+                  String src = compUnit.getSource();                  
                   IMethod method = null;
                   for(int i = selOffset; i <= selOffset+selLength; i++){
                      IJavaElement selected = compUnit.getElementAt(i);
@@ -168,8 +185,8 @@ public class ProofManager {
                      ISourceRange range = method.getSourceRange();
                      int offset = range.getOffset();
                      int length = range.getLength();
-                     int methodStartLine = KeYResourcesUtil.getLineForOffset(src, offset)+1;
-                     int methodEndLine = KeYResourcesUtil.getLineForOffset(src, offset+length)+1;
+                     int methodStartLine = KeYResourcesUtil.getLineForOffset(src, offset);
+                     int methodEndLine = KeYResourcesUtil.getLineForOffset(src, offset+length);
                      for(ProofElement pe : proofElements){
                         int sclLine = pe.getSourceLocation().getLineNumber();
                         if(methodStartLine <= sclLine && methodEndLine >= sclLine){
@@ -224,6 +241,11 @@ public class ProofManager {
    }
    
    
+   /**
+    * Collects all {@link ProofElement}s associatiated with the given {@link IFile}.
+    * @param file - the {@link IFile} to use
+    * @return a {@link List<ProofElement>} with al associated {@link ProofElement}s
+    */
    public List<ProofElement> getProofsForFile(IFile file){         
       List<ProofElement> fileProofs = new LinkedList<ProofElement>();
       IJavaElement javaElement = JavaCore.create(file);
@@ -250,14 +272,6 @@ public class ProofManager {
    }
    
    
-   private void setOutdated(){
-      OutdatedChecker poc = new OutdatedChecker(project, proofElements, changedJavaFiles, environment);
-      List<ProofElement> outdatedProofs = poc.getOutdatedProofs();
-      
-      for(ProofElement pe : outdatedProofs){
-         markerManager.setOutdated(pe, true);
-      }
-   }
    
    
    /**

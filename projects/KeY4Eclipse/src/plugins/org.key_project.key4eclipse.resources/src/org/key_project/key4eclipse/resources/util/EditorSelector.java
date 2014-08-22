@@ -2,8 +2,7 @@ package org.key_project.key4eclipse.resources.util;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
+import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Display;
@@ -13,6 +12,7 @@ import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 public class EditorSelector {
    
@@ -27,18 +27,17 @@ public class EditorSelector {
             IEditorPart activeEditorPart = activePage.getActiveEditor();
             if(isJavaFile(activeEditorPart)){
                editorSelection.setActiveFile(((IFileEditorInput) activeEditorPart.getEditorInput()).getFile());
-               if(isJavaEditor(activeEditorPart)){
-                  JavaEditor javaEditor = (JavaEditor) activeEditorPart;
-                  ISelection selection = javaEditor.getSelectionProvider().getSelection();
+               if(isJavaFile(activeEditorPart) && activeEditorPart instanceof ITextEditor){
+                  ITextEditor textEditor = (ITextEditor) activeEditorPart;
+                  ISelection selection = textEditor.getSelectionProvider().getSelection();
                   if(selection instanceof ITextSelection){
-                     editorSelection.setActiveSelection((ITextSelection) javaEditor.getSelectionProvider().getSelection());
+                     editorSelection.setActiveSelection((ITextSelection) selection);
                   }
                }
             }
             else if(isKeYFile(activeEditorPart)){
                editorSelection.setActiveFile(((IFileEditorInput) activeEditorPart.getEditorInput()).getFile());
             }
-            
             IEditorReference[] editorRefs = activePage.getEditorReferences();
             for(IEditorReference editorRef : editorRefs){
                IEditorPart editorPart = editorRef.getEditor(true);
@@ -55,21 +54,11 @@ public class EditorSelector {
             if(editorPart != null){
                IEditorInput editorInput = editorPart.getEditorInput();
                if(editorInput instanceof IFileEditorInput){
-                  IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
-                  IFile file = fileEditorInput.getFile();
-                  IJavaElement javaElement = JavaCore.create(file);
+                  IJavaElement javaElement = JavaUI.getEditorInputJavaElement(editorInput);
                   if(javaElement != null){
                      return true;
                   }
-                  
                }
-            }
-            return false;
-         }
-
-         private boolean isJavaEditor(IEditorPart editorPart) {
-            if(editorPart != null && editorPart instanceof JavaEditor){
-               return true;
             }
             return false;
          }

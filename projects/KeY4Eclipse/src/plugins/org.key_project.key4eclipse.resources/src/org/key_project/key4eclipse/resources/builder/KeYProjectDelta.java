@@ -7,6 +7,10 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 
+/**
+ * Delta for KeY Projects. Required to track changes between interruptible builds.
+ * @author Stefan Käsdorf
+ */
 public class KeYProjectDelta {
 
    private List<IFile> changedJavaFiles;
@@ -54,6 +58,10 @@ public class KeYProjectDelta {
       }
    }
    
+   /**
+    * Returns iff a new Build is required, dependent on the changed Java-, Proof-, and Meta-Files.
+    * @return true if a new Build is required
+    */
    public boolean isBuildRequired(){
       if(!changedJavaFiles.isEmpty() || !changedProofAndMetaFiles.isEmpty()){
          return true;
@@ -61,9 +69,12 @@ public class KeYProjectDelta {
       return false;
    }
 
+   /**
+    * Resets the {@link KeYProjectDelta}. Always called when a new Build starts.
+    */
    public void reset() {
       changedJavaFiles = new LinkedList<IFile>();
       changedProofAndMetaFiles = new LinkedList<IFile>();
-//      jobChangedFiles = Collections.synchronizedList(new LinkedList<IFile>());
+      jobChangedFiles = Collections.synchronizedList(new LinkedList<IFile>());
    }
 }

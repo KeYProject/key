@@ -17,8 +17,15 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
+/**
+ * Rule to avoid multiple {@link KeYProjectBuildJob}s run simultaneously.
+ * @author Stefan Käsdorf
+ */
 public class MutexRule implements ISchedulingRule{
-      
+   
+   /**
+    * {@inheritDoc}
+    */
    @Override
    public boolean contains(ISchedulingRule rule) {
       if(rule != null){
@@ -39,6 +46,10 @@ public class MutexRule implements ISchedulingRule{
       return (rule == this);
    }
 
+   
+   /**
+    * {@inheritDoc}
+    */
    @Override
    public boolean isConflicting(ISchedulingRule rule) {
       return (rule == this);

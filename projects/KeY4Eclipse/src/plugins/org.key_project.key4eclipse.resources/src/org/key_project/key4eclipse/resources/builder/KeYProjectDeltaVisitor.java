@@ -28,7 +28,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 
 /**
- * DeltaVisitor to visit every child of the given delta.
+ * DeltaVisitor to visit every child of the given delta and extract KeY Project relevant changes.
  * @author Stefan Käsdorf
  */
 public class KeYProjectDeltaVisitor implements IResourceDeltaVisitor{
@@ -73,18 +73,13 @@ public class KeYProjectDeltaVisitor implements IResourceDeltaVisitor{
       }
       return true;
    }
-   
-
-   private boolean isInSourceFolder(IResource res, List<IPath> srcFolders){
-      for(IPath path : srcFolders){
-         if(path.isPrefixOf(res.getFullPath())){
-            return true;
-         }
-      }
-      return false;
-   }
 
    
+   /**
+    * Checks if the given {@link IResource} is a java file and if it is stored in a source folder.
+    * @param res - the {@link IResource} to be checked
+    * @return true if the given {@link IResource} is a java file and is stored in a source folder.
+    */
    private boolean isJavaFileAndInSrcFolder(IResource res){
       if(res.exists() && IResource.FILE == res.getType() && isInSourceFolder(res, srcFolders)){
          IJavaElement element = JavaCore.create(res);
@@ -96,10 +91,31 @@ public class KeYProjectDeltaVisitor implements IResourceDeltaVisitor{
    }
    
    
+   /**
+    * Checks if the given {@link IResource} is a proof or a meta file and if it is stored in the proof folder of the project.
+    * @param res - the {@link IResource} to be checked
+    * @return true if the given {@link IResource} is a proof or a meta file and if it is stored in the proof folder of the project.
+    */
    private boolean isProofOrMetaFile(IResource res){
       if(IResource.FILE == res.getType()){
          IPath proofFolder = res.getProject().getFullPath().append("proofs");
          return proofFolder.isPrefixOf(res.getFullPath());
+      }
+      return false;
+   }
+   
+
+   /**
+    * Checks if the given {@link IResource} is stored in a source folder.
+    * @param res - the {@link IResource} to be checked
+    * @param srcFolders - the source folders
+    * @return true if the given {@link IResource} is stored in a source folder.
+    */
+   private boolean isInSourceFolder(IResource res, List<IPath> srcFolders){
+      for(IPath path : srcFolders){
+         if(path.isPrefixOf(res.getFullPath())){
+            return true;
+         }
       }
       return false;
    }

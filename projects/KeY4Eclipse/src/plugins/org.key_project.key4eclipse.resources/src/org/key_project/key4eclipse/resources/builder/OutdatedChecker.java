@@ -27,6 +27,10 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomUserInterface;
 
+/**
+ * Class for checking the actuality of proofs.
+ * @author Stefan Käsdorf
+ */
 public class OutdatedChecker {
    
    private IProject project;
@@ -41,12 +45,15 @@ public class OutdatedChecker {
       this.environment = environment;
    }
    
+   
+   /**
+    * Checks for every {@link ProofElement} if it is outdated.
+    * @return a {@link List<ProofElement>} that contains all outdated proofs.
+    */
    public List<ProofElement> getOutdatedProofs() {
       List<ProofElement> outdatedProofElements = new LinkedList<ProofElement>();
       for(ProofElement pe : proofElements){
-         
          boolean outdated = false;
-         
          try{
             if(!KeYProjectProperties.isEnableBuildRequiredProofsOnly(project)){
                outdated = true;
@@ -87,6 +94,7 @@ public class OutdatedChecker {
       }
       return outdatedProofElements;
    }
+   
    
    /**
     * Collects all {@link IType}s of the project.
@@ -152,7 +160,6 @@ public class OutdatedChecker {
       }
    }
    
-   
 
    /**
     * Checks if a type or a subtype from the metafile were changed.  
@@ -174,6 +181,7 @@ public class OutdatedChecker {
       return false;
    }
    
+   
    /**
     * Checks if the given type was changed.
     * @param type - the type to check
@@ -192,8 +200,9 @@ public class OutdatedChecker {
       }
    }
    
+   
    /**
-    * Chacks if any subTypes of the given {@link ProofMetaFileTypeElement} were changed.
+    * Checks if any subTypes of the given {@link ProofMetaFileTypeElement} were changed.
     * @param te - the {@link ProofMetaFileTypeElement} to use
     * @param javaTypes - all {@link IType}s of the project
     * @return true if any subTypes were changed. false otherwise
@@ -202,8 +211,7 @@ public class OutdatedChecker {
    private boolean subTypeChanged(ProofElement pe, ProofMetaFileTypeElement te, LinkedList<IType> javaTypes) throws JavaModelException{
       String type = te.getType();
       KeYJavaType kjt = getkeYJavaType(environment, type);
-//    ImmutableList<KeYJavaType> envSubKjts = environment.getJavaInfo().getAllSubtypes(kjt);
-    ImmutableList<KeYJavaType> envSubKjts = environment.getJavaInfo().getAllSubtypes(kjt);
+      ImmutableList<KeYJavaType> envSubKjts = environment.getJavaInfo().getAllSubtypes(kjt);
       
       LinkedList<String> subTypes = te.getSubTypes();
       
@@ -219,6 +227,7 @@ public class OutdatedChecker {
       }
       return false;
    }
+   
    
    /**
     * Checks if any superTypes of the given {@link KeYJavaType} were changed.

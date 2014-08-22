@@ -16,7 +16,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.key_project.key4eclipse.resources.io.ProofMetaFileException;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileWriter;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
@@ -235,7 +234,7 @@ public class ProofRunnable implements Runnable {
       return sb.toString();
    }
    
-   private void save(Proof proof, ProofElement pe) throws CoreException, ProofMetaFileException {
+   private void save(Proof proof, ProofElement pe) throws CoreException {
       ByteArrayOutputStream out = generateSaveProof(proof, pe.getProofFile());
       IFile proofFile = pe.getProofFile();
       KeYProjectDelta keyDelta = KeYProjectDeltaManager.getInstance().getDelta(project);

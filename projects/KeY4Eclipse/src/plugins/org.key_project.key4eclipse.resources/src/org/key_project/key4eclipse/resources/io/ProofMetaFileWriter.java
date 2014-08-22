@@ -32,8 +32,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
+import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
-import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.w3c.dom.Document;
@@ -75,7 +75,7 @@ public class ProofMetaFileWriter {
     * @param pe - the {@link ProofElement} to use
     * @throws ProofMetaFileException
     */
-   public void writeMetaFile() throws ProofMetaFileException {
+   public void writeMetaFile() {
       try{
          IFile metaIFile = pe.getMetaFile();
          this.addedTypes = new LinkedHashSet<String>();
@@ -96,13 +96,12 @@ public class ProofMetaFileWriter {
          File metaFile = metaIFile.getLocation().toFile();
          StreamResult result = new StreamResult(metaFile);
          transformer.transform(source, result);
-         metaIFile.setHidden(KeYProjectProperties.isHideMetaFiles(metaIFile.getProject()));
          metaIFile.refreshLocal(IResource.DEPTH_ZERO, null);
          ResourceAttributes resAttr = metaIFile.getResourceAttributes();
          resAttr.setReadOnly(true);
          metaIFile.setResourceAttributes(resAttr);
       } catch (Exception e){
-         throw new ProofMetaFileException("Problem creating the meta file " + pe.getMetaFile());
+         LogUtil.getLogger().logError(e);
       }
    }
    

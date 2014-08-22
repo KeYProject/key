@@ -160,14 +160,18 @@ public final class KeYProjectProperties {
    }
    
    
-   public static boolean isHideMetaFiles(IProject project) throws CoreException {
+   public static boolean isHideMetaFiles(IProject project) {
       if (project != null) {
-         String value = project.getPersistentProperty(PROP_HIDE_META_FILES);
-         if(value == null){
+         try{
+            String value = project.getPersistentProperty(PROP_HIDE_META_FILES);
+            if(value == null){
+               return false;
+            }
+            else{
+               return Boolean.parseBoolean(value);
+            }
+         } catch (CoreException e){
             return false;
-         }
-         else{
-            return Boolean.parseBoolean(value);
          }
       }
       else {

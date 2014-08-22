@@ -17,7 +17,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -42,7 +41,6 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.resources.nature.KeYProjectNature;
-import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -98,19 +96,6 @@ public class KeYResourcesUtil {
             
          }.schedule();
       }
-   }
-
-
-   /**
-    * Collects all meta{@link IFile}s in the given {@link IFolder} and all subfolders.
-    * @param folder - the {@link IFolder} to use
-    * @return a {@link LinkedList} with all meta{@link IFile}s
-    * @throws CoreException
-    */
-   private static LinkedList<IFile> collectAllMetaFiles(IFolder folder) throws CoreException{
-      MetaFileVisitor mfv = new MetaFileVisitor();
-      folder.accept(mfv, IResource.DEPTH_INFINITE, IContainer.INCLUDE_HIDDEN);
-      return mfv.getMetaFileList();
    }
    
    
@@ -176,27 +161,6 @@ public class KeYResourcesUtil {
    
    
    /**
-    * Applies the {@link KeYProjectProperties#PROP_HIDE_META_FILES} to all metaFiles in the given {@link IProject}.
-    * @param project - the {@link IProject} to use
-    * @throws CoreException
-    */
-   public static void hideMetaFiles(IProject project) throws CoreException{
-      boolean hide = KeYProjectProperties.isHideMetaFiles(project);
-      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-      IPath proofFolderPath = project.getFullPath().append(KeYResourcesUtil.PROOF_FOLDER_NAME);
-      IFolder proofFolder = root.getFolder(proofFolderPath);
-      if(proofFolder.exists()){
-         LinkedList<IFile> metaFiles = collectAllMetaFiles(proofFolder);
-         for(IFile metaFile : metaFiles){
-            metaFile.setHidden(hide);
-            metaFile.refreshLocal(IResource.DEPTH_ZERO, null);
-         }
-      }
-      project.refreshLocal(IResource.DEPTH_INFINITE, null);
-   }
-   
-   
-   /**
     * Returns a {@link LinkedList} with all Java source folders ais {@link IPath}.
     * @param project - the project to search the source folders for.
     * @return the {@link LinkedList} with the source folders
@@ -242,7 +206,7 @@ public class KeYResourcesUtil {
    public static int getLineForOffset(String str, int offset){
       StringBuilder sb = new StringBuilder(str);
       int index = 0;
-      int lineCount = -1;
+      int lineCount = 0;
       while(index <= offset){
          int indexRN = sb.indexOf("\r\n", index);
          int indexR = sb.indexOf("\r", index);

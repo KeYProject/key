@@ -163,11 +163,4 @@
             state="true">
       </decorator>
    </extension>
-   <extension
-         id="id1"
-         point="org.eclipse.core.resources.markers">
-      <super
-            type="org.eclipse.core.resources.textmarker">
-      </super>
-   </extension>
 </plugin>

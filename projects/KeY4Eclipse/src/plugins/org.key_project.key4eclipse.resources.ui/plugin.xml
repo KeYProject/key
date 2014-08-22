@@ -168,4 +168,35 @@
             name="Proof Meta Text Editor">
       </editor>
    </extension>
+      <extension
+            point="org.eclipse.jdt.ui.javaElementFilters">
+         <filter
+               class="org.key_project.key4eclipse.resources.ui.propertypages.ProofmetaFilter"
+               enabled="true"
+               id="org.key_project.key4eclipse.resources.propertypages.proofmetafilter.packageexplorer"
+               name="Proofmeta Filter"
+               targetId="org.eclipse.jdt.ui.PackageExplorer">
+         </filter>
+      </extension>
+      <extension
+            point="org.eclipse.ui.navigator.navigatorContent">
+         <commonFilter
+               activeByDefault="true"
+               class="org.key_project.key4eclipse.resources.ui.propertypages.ProofmetaFilter"
+               id="org.key_project.key4eclipse.resources.propertypages.proofmetafilter.projectexplorer"
+               name="Proofmeta Filter"
+               visibleInUI="true">
+         </commonFilter>
+      </extension>
+      <extension
+            point="org.eclipse.ui.navigator.viewer">
+         <viewerContentBinding
+               viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+            <includes>
+               <contentExtension
+                     pattern="org.key_project.key4eclipse.resources.propertypages.proofmetafilter.projectexplorer">
+               </contentExtension>
+            </includes>
+         </viewerContentBinding>
+      </extension>
 </plugin>
