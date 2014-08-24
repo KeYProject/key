@@ -247,7 +247,7 @@ public class SEDDebugTargetProxy extends DebugTargetProxy {
          debugView.getSite().getShell().getDisplay().asyncExec(new Runnable() {
             @Override
             public void run() {
-//               SEDUIUtil.selectInDebugView(debugView, debugView, toSelect);
+               SEDUIUtil.selectInDebugView(debugView, debugView, toSelect);
             }
          });
       }

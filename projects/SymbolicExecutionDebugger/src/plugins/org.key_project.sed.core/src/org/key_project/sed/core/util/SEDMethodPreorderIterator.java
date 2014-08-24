@@ -14,15 +14,16 @@
 package org.key_project.sed.core.util;
 
 import org.eclipse.debug.core.DebugException;
+import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEDMethodCall;
+import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.util.java.ArrayUtil;
 
 /**
  * <p>
- * Iterates preorder over the whole sub tree of a given {@link ISEDDebugElement}.
+ * Iterates preorder over the whole sub tree of a given {@link ISEDMethodCall}.
  * </p>
  * <p>
  * Instances of this class should always be used instead of recursive method
@@ -37,12 +38,12 @@ import org.key_project.util.java.ArrayUtil;
  * @author Martin Hentschel
  * @see ISEDIterator
  */
-public class SEDPreorderIterator implements ISEDIterator {
+public class SEDMethodPreorderIterator implements ISEDIterator {
    /**
     * The element at that the iteration has started used as end condition
     * to make sure that only over the subtree of the element is iterated.
     */
-   private ISEDDebugElement start;
+   private ISEDDebugNode start;
 
    /**
     * The next element or {@code null} if no more elements exists.
@@ -50,12 +51,29 @@ public class SEDPreorderIterator implements ISEDIterator {
    private ISEDDebugElement next;
    
    /**
-    * Constructor.
-    * @param start The {@link ISEDDebugElement} to iterate over its sub tree.
+    * The Method we iterate over
     */
-   public SEDPreorderIterator(ISEDDebugElement start) {      
+   private ISEDMethodCall mc;
+   
+   /**
+    * Constructor.
+    * @param start The {@link ISEDMethodCall} to iterate over its sub tree.
+    */
+   public SEDMethodPreorderIterator(ISEDMethodCall start) {      
       this.start = start;
       this.next = start;
+      this.mc = start;
+   }
+   
+   /**
+    * Constructor.
+    * @param start The {@link ISEDDebugNode} to iterate over its sub tree.
+    * @param mc The Method in which we iterate
+    */
+   public SEDMethodPreorderIterator(ISEDMethodCall mc, ISEDDebugNode start) {      
+      this.start = start;
+      this.next = start;
+      this.mc = mc;
    }
    
    /**
@@ -72,7 +90,18 @@ public class SEDPreorderIterator implements ISEDIterator {
    @Override
    public ISEDDebugElement next() throws DebugException {
       ISEDDebugElement oldNext = next;
-      updateNext();
+      boolean methodEndReached = false;
+      
+      if(oldNext instanceof ISEDMethodReturn)
+      {
+         ISEDMethodReturn nextMR = (ISEDMethodReturn) oldNext; 
+         ISEDDebugNode nextMC = nextMR.getCallStack()[0];
+         if(nextMC.equals(mc)) {
+            methodEndReached = true;
+         }
+      }
+      
+      updateNext(methodEndReached);
       return oldNext;
    }
 
@@ -80,20 +109,18 @@ public class SEDPreorderIterator implements ISEDIterator {
     * Computes the next element and updates {@link #next()}.
     * @throws DebugException Occurred Exception.
     */
-   protected void updateNext() throws DebugException {
+   protected void updateNext(boolean methodEndReached) throws DebugException {
       ISEDDebugElement newNext = null;
-      if (next instanceof ISEDDebugTarget) {
-         ISEDDebugTarget target = (ISEDDebugTarget)next;
-         ISEDThread[] threads = target.getSymbolicThreads();
-         if (!ArrayUtil.isEmpty(threads)) {
-            newNext = threads[0];
-         }
-      }
-      else if (next instanceof ISEDDebugNode) {
+      if (next instanceof ISEDDebugNode) {
          ISEDDebugNode node = (ISEDDebugNode)next;
-         ISEDDebugNode[] children = NodeUtil.getChildren(node);//node.getChildren();
-         if (!ArrayUtil.isEmpty(children)) {
-            newNext = children[0];
+         ISEDDebugNode[] children = NodeUtil.getChildren(node);
+         if (!ArrayUtil.isEmpty(children) && !methodEndReached) {
+//            if(ArrayUtil.isEmpty(children[0].getCallStack()) && !(children[0] instanceof ISEDBranchCondition)) {
+//               newNext = getNextOnParent(node);
+//            }
+//            else {
+               newNext = children[0];
+//            }
          }
          else {
             newNext = getNextOnParent(node);
@@ -110,10 +137,10 @@ public class SEDPreorderIterator implements ISEDIterator {
     * @throws DebugException Occurred Exception.
     */
    protected ISEDDebugElement getNextOnParent(ISEDDebugNode node) throws DebugException {
-      ISEDDebugNode parent = NodeUtil.getParent(node);//node.getParent();
+      ISEDDebugNode parent = NodeUtil.getParent(node);
       // Search next debug node
       while (parent instanceof ISEDDebugNode) {
-         ISEDDebugNode[] parentChildren = NodeUtil.getChildren(parent);//parent.getChildren();
+         ISEDDebugNode[] parentChildren = NodeUtil.getChildren(parent);
          int nodeIndex = ArrayUtil.indexOf(parentChildren, node);
          if (nodeIndex < 0) {
             throw new DebugException(LogUtil.getLogger().createErrorStatus("Parent node \"" + parent + "\" does not contain child \"" + node + "."));
@@ -129,34 +156,14 @@ public class SEDPreorderIterator implements ISEDIterator {
          else {
             if (parentChildren[parentChildren.length - 1] != start) {
                node = parent;
-               parent = NodeUtil.getParent(parent);//parent.getParent(); // Continue search on parent without recursive call!
+               parent = NodeUtil.getParent(parent); // Continue search on parent without recursive call!
             }
             else {
                return null;
             }
          }
       }
-      // Search of debug node failed, try to search next thread
-      if (node instanceof ISEDThread) {
-         ISEDThread[] parentChildren = node.getDebugTarget().getSymbolicThreads();
-         int nodeIndex = ArrayUtil.indexOf(parentChildren, node);
-         if (nodeIndex < 0) {
-            throw new DebugException(LogUtil.getLogger().createErrorStatus("Debug target \"" + parent + "\" does not contain thread \"" + node + "."));
-         }
-         if (nodeIndex + 1 < parentChildren.length) {
-            if (parentChildren[nodeIndex] != start) {
-               return parentChildren[nodeIndex + 1];
-            }
-            else {
-               return null;
-            }
-         }
-         else {
-            return null; // End of model reached.
-         }
-      }
-      else {
-         return null; // Search failed, no more elements available.
-      }
+      
+      return null;
    }
 }

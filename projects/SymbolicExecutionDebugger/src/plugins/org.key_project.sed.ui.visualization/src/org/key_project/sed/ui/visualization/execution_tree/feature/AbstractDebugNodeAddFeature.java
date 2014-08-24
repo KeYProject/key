@@ -23,12 +23,10 @@ import org.eclipse.graphiti.internal.ExternalPictogramLink;
 import org.eclipse.graphiti.mm.GraphicsAlgorithmContainer;
 import org.eclipse.graphiti.mm.algorithms.Image;
 import org.eclipse.graphiti.mm.algorithms.Polyline;
-import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.Font;
 import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
-import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
 import org.eclipse.graphiti.mm.pictograms.ChopboxAnchor;
 import org.eclipse.graphiti.mm.pictograms.Connection;
@@ -40,14 +38,11 @@ import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
-import org.eclipse.graphiti.util.ColorConstant;
-import org.eclipse.graphiti.util.IColorConstant;
+
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
-import org.key_project.sed.core.model.ISEDMethodReturn;
-import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.model.impl.AbstractSEDMethodCall;
+import org.key_project.sed.core.util.NodeUtil;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeStyleUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
@@ -154,60 +149,10 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
       int width = context.getWidth() <= 0 ? computeInitialWidth(targetDiagram, text.getValue(), text.getFont()) : context.getWidth();
       int height = context.getHeight() <= 0 ? computeInitialHeight(targetDiagram, text.getValue(), text.getFont()) : context.getHeight();
       gaService.setLocationAndSize(roundedRectangle, context.getX(), context.getY(), width, height);
-      
-//      try {
-//         ChopboxAnchor anchor = peCreateService.createChopboxAnchor(nodeContainer);
-//         
-//         ISEDDebugNode parentNode = ((ISEDDebugNode) getBusinessObjectForPictogramElement(nodeContainer)).getParent();//addedNode.getParent();
-//         if(parentNode != null)
-//         {
-//            PictogramElement pe = parentNode instanceof ISEDMethodCall ? 
-//                  getFeatureProvider().getAllPictogramElementsForBusinessObject(parentNode)[1] :
-//                  getFeatureProvider().getPictogramElementForBusinessObject(parentNode);
-//               
-//            if (pe == null) {
-//               throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't find PictogramElement for \"" + pe + "\"."));
-//            }
-//            if (!(pe instanceof AnchorContainer)) {
-//               throw new DebugException(LogUtil.getLogger().createErrorStatus("Parent PictogramElement \"" + pe + "\" is no AnchorContainer."));
-//            }
-//            AnchorContainer anchorContainer = (AnchorContainer)pe;
-//            if (anchorContainer.getAnchors() == null || anchorContainer.getAnchors().isEmpty()) {
-//               throw new DebugException(LogUtil.getLogger().createErrorStatus("Parent AnchorContainer \"" + pe + "\" has no Anchors."));
-//            }
-//            Connection connection = peCreateService.createFreeFormConnection(getDiagram());
-//            connection.setStart(anchorContainer.getAnchors().get(0));
-//            connection.setEnd(anchor);
-//            
-//            ConnectionDecorator cd = peCreateService.createConnectionDecorator(connection, false, 1.0, true);
-//            createArrow(gaService, cd);
-//     
-//            Polyline polyline = gaService.createPolyline(connection);
-//            polyline.setStyle(ExecutionTreeStyleUtil.getStyleForParentConnection(getDiagram()));
-//         }
-//      }
-//      catch (DebugException e) {
-//         LogUtil.getLogger().logError(e);
-//      }
-//      ContainerShape nodeContainer = createNodeDesign(addedNode, context);
 
       try
       {
          createAnchor(nodeContainer);
-         
-//         ISEDDebugNode[] children = addedNode.getChildren();
-//         
-//         for(ISEDDebugNode child : children)
-//         {
-//            PictogramElement childPE = child instanceof ISEDMethodCall ? 
-//                  getFeatureProvider().getAllPictogramElementsForBusinessObject(child)[1] :
-//                  getFeatureProvider().getPictogramElementForBusinessObject(child);
-//                  
-//            if(childPE != null) {
-//               System.out.println("PE: " + childPE.getGraphicsAlgorithm());
-//               createAnchor((ContainerShape) childPE);
-//            }
-//         }
       }
       catch (DebugException e) {
          LogUtil.getLogger().logError(e);
@@ -217,255 +162,6 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
 
       return nodeContainer;
    }
-   /*
-   public PictogramElement add(IAddContext context) {
-      ISEDDebugNode addedNode = (ISEDDebugNode) context.getNewObject();
-
-      Diagram targetDiagram = (Diagram) context.getTargetContainer();
-      IPeCreateService peCreateService = Graphiti.getPeCreateService();
-      // Create main container shape
-      ContainerShape nodeContainer = peCreateService.createContainerShape(targetDiagram, true);
-      
-      // define a default size for the shape
-      // check whether the context has a size (e.g. from a create feature)
-      // otherwise define a default size for the shape
-      IGaService gaService = Graphiti.getGaService();
-      
-      // create and set graphics algorithm
-      ISEDAnnotation[] annotations = addedNode.computeUsedAnnotations();
-      RoundedRectangle roundedRectangle = gaService.createRoundedRectangle(nodeContainer, 20, 20);
-      roundedRectangle.setStyle(ExecutionTreeStyleUtil.getStyleForDebugNode(annotations, getDiagram()));
-
-      // create link and wire it
-      link(nodeContainer, addedNode);
-
-      // create shape for image
-      Shape imageShape = peCreateService.createShape(nodeContainer, false);
-
-      // create and set image graphics algorithm
-      int dummyHeight = 20; // Real height is defined via layout feature
-      Image image = gaService.createImage(imageShape, getImageId(addedNode));
-      gaService.setLocationAndSize(image, MARGIN, 0, IMAGE_WIDTH, dummyHeight);
-      
-      // create link and wire it
-      link(imageShape, addedNode);
-      
-      // create shape for text
-      Shape textShape = peCreateService.createShape(nodeContainer, false);
-      
-      Text text = gaService.createDefaultText(getDiagram(), textShape);
-      try {
-         text.setValue(addedNode.getName());
-      }
-      catch (DebugException e) {
-         text.setValue(e.getMessage());
-      }
-      text.setStyle(ExecutionTreeStyleUtil.getStyleForDebugNodeText(annotations, getDiagram()));
-      text.setHorizontalAlignment(Orientation.ALIGNMENT_LEFT);
-      text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
-      int dummyWidth = 100; // Real width is defined via layout feature
-      gaService.setLocationAndSize(text, MARGIN + IMAGE_WIDTH + MARGIN, 0, dummyWidth, dummyHeight);
-      // create link and wire it
-      link(textShape, addedNode);
-
-//      Graphiti.getPeService().setPropertyValue(pictogramElement, "", "");
-      
-      
-      int width = context.getWidth() <= 0 ? computeInitialWidth(targetDiagram, text.getValue(), text.getFont()) : context.getWidth();
-      int height = context.getHeight() <= 0 ? computeInitialHeight(targetDiagram, text.getValue(), text.getFont()) : context.getHeight();
-      
-      ContainerShape invisContainer = null;
-      boolean isMethodCall = addedNode instanceof ISEDMethodCall; 
-
-      if(isMethodCall)
-      {
-         invisContainer = peCreateService.createContainerShape(targetDiagram, true);
-         ContainerShape methodContainer = peCreateService.createContainerShape(invisContainer, false);
-         nodeContainer.setContainer(invisContainer);
-         
-         Rectangle inv = gaService.createInvisibleRectangle(invisContainer);
-         link(invisContainer, addedNode);
-         
-         Rectangle rect = gaService.createRectangle(methodContainer);
-         rect.setForeground(manageColor(new ColorConstant(255, 102, 0)));
-         rect.setLineWidth(1);
-         rect.setFilled(false);
-         link(methodContainer, addedNode);
-         
-         int padding = 5;
-         
-         gaService.setLocationAndSize(inv, context.getX(), context.getY(), width + 2 * padding, height);
-         gaService.setLocationAndSize(rect, 0, height / 2, width + 2 * padding, height);
-         gaService.setLocationAndSize(roundedRectangle, padding, 0, width, height);
-         
-         Graphiti.getPeService().setPropertyValue(invisContainer, "collapsed", "false");
-         Graphiti.getPeService().setPropertyValue(invisContainer, "width", "0");
-         Graphiti.getPeService().setPropertyValue(invisContainer, "height", "0");
-         
-         try {
-            PictogramElement pe = getFeatureProvider().getPictogramElementForBusinessObject(addedNode.getParent());
-            boolean isInMethod = Boolean.parseBoolean(Graphiti.getPeService().getPropertyValue(pe, "isInMethod"));
-            Graphiti.getPeService().setPropertyValue(invisContainer, "isInMethod", Boolean.toString(isInMethod));
-         }
-         catch (DebugException e1) {
-            e1.printStackTrace();
-         }
-      }
-      else
-      {
-         try {
-            ISEDDebugNode parentNode = addedNode.getParent();
-            PictogramElement pe = getFeatureProvider().getPictogramElementForBusinessObject(parentNode);
-            boolean isInMethod;
-            
-            if(parentNode instanceof ISEDMethodCall)
-               isInMethod = true;
-            else if(parentNode instanceof ISEDMethodReturn)
-            {
-               int toCheck = 1;
-               while(toCheck > 0)
-               {
-                  parentNode = parentNode.getParent();
-                  if(parentNode instanceof ISEDMethodReturn)
-                     toCheck++;
-                  else if(parentNode instanceof ISEDMethodCall)
-                     toCheck--;
-               }
-               
-               pe = getFeatureProvider().getPictogramElementForBusinessObject(parentNode);
-               isInMethod = Boolean.parseBoolean(Graphiti.getPeService().getPropertyValue(pe, "isInMethod"));
-            }
-//            else if(addedNode instanceof ISEDMethodReturn)
-//               isInMethod = false;
-            else
-               isInMethod = Boolean.parseBoolean(Graphiti.getPeService().getPropertyValue(pe, "isInMethod"));
-
-            Graphiti.getPeService().setPropertyValue(nodeContainer, "isInMethod", Boolean.toString(isInMethod));
-            
-            if(isInMethod)
-            {
-               while(!(parentNode instanceof ISEDMethodCall))
-                  parentNode = parentNode.getParent();
-               
-               pe = getFeatureProvider().getPictogramElementForBusinessObject(parentNode);
-               Rectangle r = (Rectangle) pe.getGraphicsAlgorithm();
-               ContainerShape parentContainer = (ContainerShape) r.eContainer();
-               ContainerShape methodContainer = (ContainerShape) parentContainer.getChildren().get(0);
-               nodeContainer.setContainer(methodContainer);
-               
-               gaService.setLocationAndSize(roundedRectangle, context.getX() - r.getX(), context.getY() - r.getY(), width, height);
-            }
-            else
-               gaService.setLocationAndSize(roundedRectangle, context.getX(), context.getY(), width, height);
-         }
-         catch (DebugException e1) {
-            e1.printStackTrace();
-         }
-      }
-      
-      // add a chopbox anchor to the shape
-      ChopboxAnchor anchor = peCreateService.createChopboxAnchor(nodeContainer);
-      
-      // add reference to parent if required
-      try {
-         
-         ISEDDebugNode parentNode = addedNode.getParent();
-         if(parentNode != null)
-         {
-            PictogramElement pe = getFeatureProvider().getPictogramElementForBusinessObject(parentNode);
-            if(parentNode instanceof ISEDMethodCall)
-            {
-               Rectangle r = (Rectangle) pe.getGraphicsAlgorithm();
-               ContainerShape parentContainer = (ContainerShape) r.eContainer();
-               
-               pe = parentContainer.getChildren().get(1);
-            }
-               
-            if (pe == null) {
-               throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't find PictogramElement for \"" + pe + "\"."));
-            }
-            if (!(pe instanceof AnchorContainer)) {
-               throw new DebugException(LogUtil.getLogger().createErrorStatus("Parent PictogramElement \"" + pe + "\" is no AnchorContainer."));
-            }
-            AnchorContainer anchorContainer = (AnchorContainer)pe;
-            if (anchorContainer.getAnchors() == null || anchorContainer.getAnchors().isEmpty()) {
-               throw new DebugException(LogUtil.getLogger().createErrorStatus("Parent AnchorContainer \"" + pe + "\" has no Anchors."));
-            }
-            Connection connection = peCreateService.createFreeFormConnection(getDiagram());
-            connection.setStart(anchorContainer.getAnchors().get(0));
-            connection.setEnd(anchor);
-            
-            ConnectionDecorator cd = peCreateService.createConnectionDecorator(connection, false, 1.0, true);
-            createArrow(gaService, cd);
-     
-            Polyline polyline = gaService.createPolyline(connection);
-            polyline.setStyle(ExecutionTreeStyleUtil.getStyleForParentConnection(getDiagram()));
-         }
-      }
-      catch (DebugException e) {
-         LogUtil.getLogger().logError(e);
-      }
-      
-      // call the layout feature to compute real heights and widths
-      layoutPictogramElement(isMethodCall ? invisContainer : nodeContainer);
-      System.out.println("A");
-      return isMethodCall ? invisContainer : nodeContainer;
-   }
-   */
-//   protected ContainerShape createNodeDesign(ISEDDebugNode addedNode, IAddContext context) {
-//      Diagram targetDiagram = (Diagram) context.getTargetContainer();
-//      IPeCreateService peCreateService = Graphiti.getPeCreateService();
-//      // Create main container shape
-//      ContainerShape nodeContainer = peCreateService.createContainerShape(targetDiagram, true);
-//      
-//      // define a default size for the shape
-//      // check whether the context has a size (e.g. from a create feature)
-//      // otherwise define a default size for the shape
-//      IGaService gaService = Graphiti.getGaService();
-//      
-//      // create and set graphics algorithm
-//      ISEDAnnotation[] annotations = addedNode.computeUsedAnnotations();
-//      RoundedRectangle roundedRectangle = gaService.createRoundedRectangle(nodeContainer, 20, 20);
-//      roundedRectangle.setStyle(ExecutionTreeStyleUtil.getStyleForDebugNode(annotations, getDiagram()));
-//
-//      // create link and wire it
-//      link(nodeContainer, addedNode);
-//
-//      // create shape for image
-//      Shape imageShape = peCreateService.createShape(nodeContainer, false);
-//
-//      // create and set image graphics algorithm
-//      int dummyHeight = 20; // Real height is defined via layout feature
-//      Image image = gaService.createImage(imageShape, getImageId(addedNode));
-//      gaService.setLocationAndSize(image, MARGIN, 0, IMAGE_WIDTH, dummyHeight);
-//      
-//      // create link and wire it
-//      link(imageShape, addedNode);
-//      
-//      // create shape for text
-//      Shape textShape = peCreateService.createShape(nodeContainer, false);
-//      
-//      Text text = gaService.createDefaultText(getDiagram(), textShape);
-//      try {
-//         text.setValue(addedNode.getName());
-//      }
-//      catch (DebugException e) {
-//         text.setValue(e.getMessage());
-//      }
-//      text.setStyle(ExecutionTreeStyleUtil.getStyleForDebugNodeText(annotations, getDiagram()));
-//      text.setHorizontalAlignment(Orientation.ALIGNMENT_LEFT);
-//      text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
-//      int dummyWidth = 100; // Real width is defined via layout feature
-//      gaService.setLocationAndSize(text, MARGIN + IMAGE_WIDTH + MARGIN, 0, dummyWidth, dummyHeight);
-//      // create link and wire it
-//      link(textShape, addedNode);
-//
-//      int width = context.getWidth() <= 0 ? computeInitialWidth(targetDiagram, text.getValue(), text.getFont()) : context.getWidth();
-//      int height = context.getHeight() <= 0 ? computeInitialHeight(targetDiagram, text.getValue(), text.getFont()) : context.getHeight();
-//      gaService.setLocationAndSize(roundedRectangle, context.getX(), context.getY(), width, height);
-//      
-//      return nodeContainer;
-//   }
    
    protected void createAnchor(ContainerShape nodeContainer) throws DebugException {
       IPeCreateService peCreateService = Graphiti.getPeCreateService();
@@ -473,7 +169,7 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
       
       ChopboxAnchor anchor = peCreateService.createChopboxAnchor(nodeContainer);
       
-      ISEDDebugNode parentNode = ((ISEDDebugNode) getBusinessObjectForPictogramElement(nodeContainer)).getParent();//addedNode.getParent();
+      ISEDDebugNode parentNode = NodeUtil.getParent((ISEDDebugNode) getBusinessObjectForPictogramElement(nodeContainer));
       if(parentNode != null)
       {
          PictogramElement pe = parentNode instanceof ISEDMethodCall ? 
