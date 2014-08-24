@@ -168,4 +168,87 @@
             name="Proof Meta Text Editor">
       </editor>
    </extension>
+      <extension
+            point="org.eclipse.ui.views">
+         <category
+               id="org.key_project.key4eclipse.resources.ui.view.category"
+               name="KeY Resources">
+         </category>
+         <view
+               category="org.key_project.key4eclipse.resources.ui.view.category"
+               class="org.key_project.key4eclipse.resources.ui.view.VerificationStatusView"
+               icon="icons/logo16.gif"
+               id="org.key_project.key4eclipse.resources.ui.view.VerificationStatusView"
+               name="Verification Status"
+               restorable="true">
+         </view>
+      </extension>
+      <extension
+            point="org.eclipse.ui.commands">
+         <category
+               id="org.key_project.key4eclipse.resources.ui.category"
+               name="KeY Resources">
+         </category>
+         <command
+               categoryId="org.key_project.key4eclipse.resources.ui.category"
+               id="org.key_project.key4eclipse.resources.ui.LinkWithWorkbenchPartCommand"
+               name="Link with Editor/View">
+            <state
+                  id="org.eclipse.ui.commands.toggleState">
+               <class
+                     class="org.eclipse.ui.handlers.RegistryToggleState">
+                  <parameter
+                        name="default"
+                        value="false">
+                  </parameter>
+                  <parameter
+                        name="persisted"
+                        value="true">
+                  </parameter>
+               </class>
+            </state>
+         </command>
+      </extension>
+      <extension
+            point="org.eclipse.ui.commandImages">
+         <image
+               commandId="org.key_project.key4eclipse.resources.ui.LinkWithWorkbenchPartCommand"
+               icon="icons/synced.gif">
+         </image>
+      </extension>
+      <extension
+            point="org.eclipse.ui.handlers">
+         <handler
+               class="org.key_project.key4eclipse.resources.ui.handler.LinkWithWorkbenchPartHandler"
+               commandId="org.key_project.key4eclipse.resources.ui.LinkWithWorkbenchPartCommand">
+         </handler>
+      </extension>
+      <extension
+            point="org.eclipse.ui.menus">
+         <menuContribution
+               locationURI="toolbar:org.key_project.key4eclipse.resources.ui.view.VerificationStatusView?after=additions">
+            <command
+                  commandId="org.key_project.key4eclipse.resources.ui.LinkWithWorkbenchPartCommand"
+                  icon="icons/synced.gif"
+                  id="org.key_project.key4eclipse.resources.ui.LinkWithWorkbenchPart"
+                  style="toggle"
+                  tooltip="Link with Editor/View">
+            </command>
+         </menuContribution>
+      </extension>
+      <extension
+            point="org.eclipse.ui.perspectiveExtensions">
+         <perspectiveExtension
+               targetID="org.eclipse.jdt.ui.JavaPerspective">
+            <viewShortcut
+                  id="org.key_project.key4eclipse.resources.ui.view.VerificationStatusView">
+            </viewShortcut>
+         </perspectiveExtension>
+         <perspectiveExtension
+               targetID="org.key_project.keyide.ui.perspectives">
+            <viewShortcut
+                  id="org.key_project.key4eclipse.resources.ui.view.VerificationStatusView">
+            </viewShortcut>
+         </perspectiveExtension>
+      </extension>
 </plugin>

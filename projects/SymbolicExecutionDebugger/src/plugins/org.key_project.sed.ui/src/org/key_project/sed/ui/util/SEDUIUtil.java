@@ -476,14 +476,19 @@ public final class SEDUIUtil {
                      JobUtil.waitFor(job, 10);
                   }
                   // Wait until the element is known by the viewer since sometimes waiting for jobs is not enough.
+                  int numOfTries = 0;
                   while (!treeViewer.getControl().isDisposed() &&
-                         SWTUtil.testFindItem(treeViewer, toInject) == null) {
+                         SWTUtil.testFindItem(treeViewer, toInject) == null &&
+                         numOfTries < 200) { // Try at most for two seconds
                      SWTUtil.checkCanceled(monitor);
                      try {
                         Thread.sleep(10);
                      }
                      catch (InterruptedException e) {
-                     // Nothing to do.
+                        // Nothing to do.
+                     }
+                     finally {
+                        numOfTries++;
                      }
                   }
                   // Update tree path for next loop iteration

@@ -14,6 +14,7 @@
 package org.key_project.key4eclipse.resources.io;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -42,6 +43,7 @@ public class ProofMetaFileReader {
    private String markerMessage;
    private LinkedList<ProofMetaFileTypeElement> typeElemens = new LinkedList<ProofMetaFileTypeElement>();
    private LinkedList<IFile> usedContracts = new LinkedList<IFile>();
+   private List<ProofMetaFileAssumption> assumptions = new LinkedList<ProofMetaFileAssumption>();
    
    /**
     * The Constructor that automatically reads the given meta{@link IFile} and Provides the content.
@@ -63,13 +65,14 @@ public class ProofMetaFileReader {
          this.proofClosed = readProofStatus(rootElement);
          this.typeElemens = readAllTypeElements(rootElement);
          this.usedContracts = readUsedContracts(rootElement);
+         this.assumptions = readAssumptions(rootElement);
          
       } catch (SAXException e){
          throw new ProofMetaFileContentException("Invalid XML File");
       }
    }
-   
-   
+
+
    /**
     * Returns the read MD5 Sum.
     * @return - the MD5 Sum
@@ -101,6 +104,10 @@ public class ProofMetaFileReader {
       return usedContracts;
    }
    
+   public List<ProofMetaFileAssumption> getAssumptions() {
+      return assumptions;
+   }
+
    private void checkMetaFileFormat(Document doc) throws ProofMetaFileContentException{
       NodeList documentNodes = doc.getChildNodes();
       Element rootElement = null;;
@@ -113,7 +120,7 @@ public class ProofMetaFileReader {
       //check if rootElement has 5 childeren
       if("proofMetaFile".equals(rootElement.getTagName())){
          NodeList rootNodeList = rootElement.getChildNodes();
-         if(rootNodeList.getLength() == 5){
+         if(rootNodeList.getLength() == 6){
             //check md5Format
             Node md5Node = rootNodeList.item(0);
             if(!"proofFileMD5".equals(md5Node.getNodeName())){
@@ -165,6 +172,20 @@ public class ProofMetaFileReader {
             }
             else{
                throw new ProofMetaFileContentException("Missing root entries. Found " + usedContracts.getNodeName() + " | Expected usedContracts");
+            }
+            //check assumptions format
+            Node assumptions = rootNodeList.item(5);
+            if("assumptions".equals(assumptions.getNodeName())){
+               NodeList assumptionsNodeList = assumptions.getChildNodes();
+               for(int i = 0; i < assumptionsNodeList.getLength(); i++){
+                  Node usedContract = assumptionsNodeList.item(i);
+                  if(!"assumption".equals(usedContract.getNodeName())){
+                     throw new ProofMetaFileContentException("Invalid assumption entry. Found " + usedContract.getNodeName() + " | Expected assumption");
+                  }
+               }
+            }
+            else{
+               throw new ProofMetaFileContentException("Missing root entries. Found " + assumptions.getNodeName() + " | Expected assumptions");
             }
          }
          else{
@@ -324,5 +345,29 @@ public class ProofMetaFileReader {
          }
       }
       return usedContracts;
+   }
+   
+   
+   private List<ProofMetaFileAssumption> readAssumptions(Element rootElement) {
+      List<ProofMetaFileAssumption> assumptions = new LinkedList<ProofMetaFileAssumption>();
+      NodeList rootNodeList = rootElement.getChildNodes();
+      Node assumptionsNode = rootNodeList.item(5);
+      NodeList assumptionsNodeList = assumptionsNode.getChildNodes();
+      for(int i = 0; i < assumptionsNodeList.getLength(); i++){
+         Node node = assumptionsNodeList.item(i);
+         NamedNodeMap attrMap = node.getAttributes();
+         ProofMetaFileAssumption assumption = new ProofMetaFileAssumption(getNodeValue(attrMap, "kind"), getNodeValue(attrMap, "name"), getNodeValue(attrMap, "target"), getNodeValue(attrMap, "type"));
+         assumptions.add(assumption);
+      }
+      return assumptions;
+   }
+   
+   private String getNodeValue(NamedNodeMap attrMap, String key) {
+      try {
+         return attrMap.getNamedItem(key).getNodeValue();
+      }
+      catch (Exception e) {
+         return null;
+      }
    }
 }
