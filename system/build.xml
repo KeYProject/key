@@ -122,6 +122,18 @@
 	    <include name="KeYJMLPreLexer.g"/>
 	  </srcfiles>
 	</uptodate>
+	
+	<uptodate property="jmllexer.notRequired"
+		  targetFile="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation/KeYJMLLexer.java"
+		  srcFile="${src.dir}/de/uka/ilkd/key/speclang/jml/translation/jmllexer.g"/>
+		  
+	<uptodate property="jmlparser.notRequired"
+		  targetFile="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation/KeYJMLParser.java">
+	  <srcfiles dir="${src.dir}/de/uka/ilkd/key/speclang/jml/translation">
+	    <include name="jmllexer.g"/>
+	    <include name="jmlparser.g"/>
+	  </srcfiles>
+	</uptodate>
 
 	<!-- no uptodate checks are needed for the javacc/antlr tasks, it is built-in there -->
   </target>
@@ -224,7 +236,7 @@
     </java>
   </target>
   
-    <target name="jmllexer">
+    <target name="jmllexer" unless="jmllexer.notRequired">
         <java classpath="${ext.dir}/antlr.jar" fork="true" failonerror="true" classname="antlr.Tool">
             <arg value="-o" />
             <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation" />
@@ -232,7 +244,7 @@
         </java>
     </target>
 
-    <target name="jmlparser"  depends="jmllexer">
+    <target name="jmlparser"  depends="jmllexer" unless="jmlparser.notRequired">
         <java classpath="${ext.dir}/antlr.jar" fork="true" failonerror="true" classname="antlr.Tool">
             <arg value="-o" />
             <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation" />
