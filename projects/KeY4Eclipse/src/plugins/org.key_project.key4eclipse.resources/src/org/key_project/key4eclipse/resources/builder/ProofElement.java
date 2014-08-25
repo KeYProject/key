@@ -39,6 +39,7 @@ public class ProofElement {
    private SourceLocation scl;
    private IMarker proofMarker;
    private boolean outdated;
+   private boolean build;
    private List<IMarker> recursionMarker;
    private String markerMsg;
    
@@ -77,6 +78,13 @@ public class ProofElement {
    }
    public void setOutdated(boolean outdated){
       this.outdated = outdated;
+   }
+   
+   public boolean getBuild(){
+      return build;
+   }
+   public void setBuild(boolean build){
+      this.build = build;
    }
    
    public List<IMarker> getRecursionMarker(){
@@ -157,14 +165,15 @@ public class ProofElement {
       this.scl = scl;
       this.proofMarker = proofMarker;
       if(proofMarker != null && proofMarker.exists()){
-         outdated = Boolean.valueOf(proofMarker.getAttribute("OUTDATED", String.valueOf(true)));
+         outdated = proofMarker.getAttribute("OUTDATED", true);
       }
       else if(recursionMarker != null && !recursionMarker.isEmpty()){
-         outdated = Boolean.valueOf(recursionMarker.get(0).getAttribute("OUTDATED", String.valueOf(true)));
+         outdated = recursionMarker.get(0).getAttribute("OUTDATED", true);
       }
       else{
          outdated = true;
       }
+      this.build = false;
       this.recursionMarker = recursionMarker;
       
       this.proofFolder = proofFolder;

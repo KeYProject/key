@@ -12,12 +12,20 @@ public class KeYProjectBuildJob extends Job{
 
    private IProject project;
    private EditorSelection editorSelection;
+   private KeYProjectBuildInstruction inst;
       
-   public KeYProjectBuildJob(String name, IProject project){
+   public KeYProjectBuildJob(String name, IProject project, KeYProjectBuildInstruction inst){
       super(name);
       this.project = project;
       editorSelection = new EditorSelector().getEditorSelection();
+      this.inst = inst;
    }
+   
+   
+   public IProject getProject(){
+      return project;
+   }
+   
    
    /**
     * {@inheritDoc}
@@ -35,7 +43,7 @@ public class KeYProjectBuildJob extends Job{
       ProofManager proofManager = null;
       try{
          proofManager = new ProofManager(project);
-         proofManager.runProofs(monitor, editorSelection);
+         proofManager.runProofs(monitor, editorSelection, inst);
       } catch (Exception e){
          //TODO
          System.out.println("Error");

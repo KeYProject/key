@@ -145,23 +145,17 @@ public class KeY4EclipseResourcesTestUtil {
    
    private static void waitBuild(){
       IJobManager manager = Job.getJobManager();
-      Job[] jobs = manager.find("KeYProjectBuildJob");
-      if(jobs != null && jobs.length > 0){
+      Job[] keyJobs = manager.find("KeYProjectBuildJob");
+      Job[] buildJobs = manager.find(ResourcesPlugin.FAMILY_AUTO_BUILD);
+      if((keyJobs != null && keyJobs.length > 0) || (buildJobs != null && buildJobs.length > 0)){
          TestUtilsUtil.sleep(100);
          waitBuild();
       }
-      //TODO: Is not working. Example is the test "testEfficientBuildMultipleThreadsChangeJavaFileTriveal". After the first build a Proof and meta file are missing.
-      //TODO: Strange things are going on. When debugging the Build, everything works well. When running the test without debugging, the second proof is missing in its folder.
    }
    
    public static void cleanBuild(IProject project) throws CoreException{
       project.build(IncrementalProjectBuilder.CLEAN_BUILD, null);
-      IJobManager jobMan = Job.getJobManager();
-      Job[] jobs = jobMan.find("KeYProjectBuildJob");
-      while(jobs.length > 0){
-         jobs = jobMan.find("KeYProjectBuildJob");
-      }
-      //TODO: wait for the new builds. like above - when fixed
+      waitBuild();
    }
    
    
@@ -232,7 +226,7 @@ public class KeY4EclipseResourcesTestUtil {
    
    
    public static void setKeYProjectProperties(IProject project, boolean buildProofs, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean hideMetaFiles, boolean autoDeleteProofFiles) throws CoreException{
-      KeYProjectProperties.setEnableBuildProofs(project, buildProofs);
+      KeYProjectProperties.setEnableKeYResourcesBuilds(project, buildProofs);
       KeYProjectProperties.setEnableBuildProofsEfficient(project, buildProofsEfficient);
       KeYProjectProperties.setEnableMultiThreading(project, enableMultiThreading);
       KeYProjectProperties.setNumberOfThreads(project, String.valueOf(numberOfThreads));
@@ -240,7 +234,7 @@ public class KeY4EclipseResourcesTestUtil {
       KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFiles);
    }
    
-   public static IProject initializeTest(String projectName, boolean buildProofs, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean autoDeleteProofFiles, boolean hideMetaFiles) throws CoreException, InterruptedException{
+   public static IProject initializeTest(String projectName, boolean buildProofs, boolean startupBuilds, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean autoDeleteProofFiles, boolean hideMetaFiles) throws CoreException, InterruptedException{
       //turn off autobuild
 //      enableAutoBuild(false);
       //create a KeYProject

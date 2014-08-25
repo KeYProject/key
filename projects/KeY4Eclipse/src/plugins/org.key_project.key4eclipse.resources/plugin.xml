@@ -163,4 +163,10 @@
             state="true">
       </decorator>
    </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="org.key_project.key4eclipse.resources.builder.KeYResourcesStartup">
+      </startup>
+   </extension>
 </plugin>

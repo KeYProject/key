@@ -32,15 +32,22 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.resources.nature.KeYProjectNature;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.util.eclipse.ResourceUtil;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -86,7 +93,7 @@ public class KeYResourcesUtil {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                try {
-                  project.build(IncrementalProjectBuilder.CLEAN_BUILD, monitor);
+                  project.build(IncrementalProjectBuilder.FULL_BUILD, new NullProgressMonitor());
                   return Status.OK_STATUS;
                }
                catch (CoreException e) {
@@ -266,5 +273,181 @@ public class KeYResourcesUtil {
          list.add(t);
       }
       return list;
+   }
+   
+   /**
+    * Creates the folder for the given {@link IFile}
+    * @param file - the {@link IFile} to use
+    * @return the created {@link IFolder}
+    * @throws CoreException
+    */
+   public static synchronized IFolder createFolder(IFile file) {
+      IFolder folder = null;
+      IPath folderPath = file.getFullPath().removeLastSegments(1);
+      IPath currentFolderPath = new Path(folderPath.segment(0));
+      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+      for(int i = 1; i < folderPath.segmentCount(); i++){
+         currentFolderPath = currentFolderPath.append(folderPath.segment(i));
+         folder = root.getFolder(currentFolderPath);
+         if(!folder.exists()){
+            try {
+               folder.create(true, true, null);
+            }
+            catch (CoreException e) {
+               if(folder.exists()){
+                  createFolder(file);
+               }
+               else{
+                  return null;
+               }
+            }
+         }
+      }
+      return folder;
+   }
+   
+   
+   public static List<ProofElement> getProofElementsForMethod(List<ProofElement> proofElements, IMethod method){
+      List<ProofElement> methodProofElements = new LinkedList<ProofElement>();
+      if(method != null){
+         ICompilationUnit compUnit = method.getCompilationUnit();
+         if(compUnit != null){
+            try{
+               IResource res = compUnit.getResource();
+               if(res != null){
+                  String src = compUnit.getSource();
+                  ISourceRange range = method.getSourceRange();
+                  int offset = range.getOffset();
+                  int length = range.getLength();
+                  int methodStartLine = KeYResourcesUtil.getLineForOffset(src, offset);
+                  int methodEndLine = KeYResourcesUtil.getLineForOffset(src, offset+length);
+                  for(ProofElement pe : proofElements){
+                     IFile peJavaFile = pe.getJavaFile();
+                     if(peJavaFile != null && res.equals(peJavaFile)){
+                        int sclLine = pe.getSourceLocation().getLineNumber();
+                        if(methodStartLine <= sclLine && methodEndLine >= sclLine){
+                           methodProofElements.add(pe);
+                        }
+                     }
+                  }
+               }
+            } catch (JavaModelException e){
+               return new LinkedList<ProofElement>();
+            }
+         }
+      }
+      return methodProofElements;
+   }
+   
+   
+   /**
+    * Checks if the given {@link IResource} is a java file and if it is stored in a source folder.
+    * @param res - the {@link IResource} to be checked
+    * @return true if the given {@link IResource} is a java file and is stored in a source folder.
+    */
+   public static boolean isJavaFileAndInSrcFolder(IResource res){
+      if(IResource.FILE == res.getType() && isInSourceFolder(res)){
+         IJavaElement element = JavaCore.create(res);
+         if (element instanceof ICompilationUnit) {
+            return true;
+         }
+      }
+      return false;
+   }
+   
+
+   /**
+    * Checks if the given {@link IResource} is stored in a source folder.
+    * @param res - the {@link IResource} to be checked
+    * @param srcFolders - the source folders
+    * @return true if the given {@link IResource} is stored in a source folder.
+    */
+   public static boolean isInSourceFolder(IResource res){
+      for(IPath path : KeYResourcesUtil.getAllJavaSrcFolders(res.getProject())){
+         if(path.isPrefixOf(res.getFullPath())){
+            return true;
+         }
+      }
+      return false;
+   }
+
+      
+   /**
+    * Checks if the given {@link IResource} is a proof or a meta file and if it is stored in the proof folder of the project.
+    * @param res - the {@link IResource} to be checked
+    * @return true if the given {@link IResource} is a proof or a meta file and if it is stored in the proof folder of the project.
+    */
+   public static boolean isInProofFolder(IResource res){
+      if(IResource.FILE == res.getType()){
+         IPath proofFolder = res.getProject().getFullPath().append("proofs");
+         return proofFolder.isPrefixOf(res.getFullPath());
+      }
+      return false;
+   }
+
+   /**
+    * Returns the proofFolder for the given java{@link IFile}.
+    * @param javaFile - the java{@link IFile} to use
+    * @return the proof{@link IFolder}
+    */
+   public static IFolder getProofFolder(IFile javaFile){
+      IProject project = javaFile.getProject();
+      IFolder mainProofFolder = project.getFolder("proofs");
+      IPath proofFolderPath = mainProofFolder.getFullPath();
+      IPath javaToProofPath = javaToProofPath(javaFile.getFullPath());
+      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+      IFolder proofFolder = root.getFolder(proofFolderPath.append(javaToProofPath));
+      return proofFolder;
+   }
+   
+   
+   /**
+    * Converts a javaFiles {@link IPath} to a proofFolder {@link Path}.
+    * @param path - the JavaFile {@link IPath}.
+    * @return
+    */
+   private static IPath javaToProofPath(IPath path){
+      while(path.segmentCount() > 0){
+         if(!path.segment(0).equals("src")){
+            path = path.removeFirstSegments(1);
+         }
+         else{
+            path = path.removeFirstSegments(1);
+            break;
+         }
+      }
+      return path;
+   }
+   
+   
+   /**
+    * Returns the proof{@link IFile} for the given {@link String} and {@link IPath}.
+    * @param name - the name for the {@link IFile}
+    * @param path - the {@link IPath} for the {@link IFile} 
+    * @return - the {@link IFile} for the Proof
+    */
+   public static IFile getProofFile(String name, IPath path) {
+      if (path != null && name != null) {
+         name = ResourceUtil.validateWorkspaceFileName(name);
+         name = name + "." + KeYUtil.PROOF_FILE_EXTENSION;
+         path = path.append(name);
+         IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
+         return file;
+      }
+      else return null;
+   }
+   
+   
+   /**
+    * Returns the metaFile of the given proof{@link IFile}
+    * @param proofFile - the proof{@link IFile} to use
+    * @return the meta{@link IFile}
+    */
+   public static IFile getProofMetaFile(IFile proofFile){
+      IPath proofFilePath = proofFile.getFullPath();
+      IPath proofMetaFilePath = proofFilePath.removeFileExtension().addFileExtension(KeYResourcesUtil.META_FILE_EXTENSION);
+      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+      IFile proofMetaFile = root.getFile(proofMetaFilePath);
+      return proofMetaFile;
    }
 }

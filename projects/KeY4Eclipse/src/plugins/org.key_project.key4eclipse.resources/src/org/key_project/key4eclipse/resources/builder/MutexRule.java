@@ -23,6 +23,16 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
  */
 public class MutexRule implements ISchedulingRule{
    
+   private IProject project;
+   
+   public MutexRule(IProject project){
+      this.project = project;
+   }
+   
+   public IProject getProject(){
+      return project;
+   }
+   
    /**
     * {@inheritDoc}
     */
@@ -52,7 +62,15 @@ public class MutexRule implements ISchedulingRule{
     */
    @Override
    public boolean isConflicting(ISchedulingRule rule) {
-      return (rule == this);
+//      if(rule != null && rule instanceof MutexRule){
+//         MutexRule mutexRule = (MutexRule) rule;
+//         IProject mutexRuleProject = mutexRule.getProject();
+//         if(mutexRuleProject != null && mutexRuleProject.equals(project)){
+//            return true;
+//         }
+//      }
+//      return false;
+      return (rule instanceof MutexRule);
    }
 
 }

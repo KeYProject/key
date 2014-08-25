@@ -9,13 +9,10 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
+import org.key_project.key4eclipse.resources.io.ProofMetaFileException;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileWriter;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
@@ -62,15 +59,15 @@ public class ProofRunnable implements Runnable {
    
    @Override
    public void run() {
-      try{
+//      try{
          ProofElement pe;
          while ((pe = getProofToDo()) != null) {
-            monitor.subTask("Building " + pe.getContract().getName());
+            monitor.subTask(pe.getContract().getName());
          
             if(monitor.isCanceled()){
                monitor.worked(1);
             }
-            else if(pe.getOutdated()){
+            else if(pe.getBuild()){
             
                pe.setKeYEnvironment(environment);
                pe.setProofObl(pe.getContract().createProofObl(environment.getInitConfig(), pe.getContract()));
@@ -83,17 +80,20 @@ public class ProofRunnable implements Runnable {
                   pe.setProofReferences(ProofReferenceUtil.computeProofReferences(proof));
                   pe.setUsedContracts(KeYResourcesUtil.getUsedContractsProofElements(pe, proofElements));
                   pe.setMarkerMsg(generateProofMarkerMessage(pe, proof, proofDuration));
-                  markerManager.setMarker(pe);
-                  save(proof,pe);
+                  try{
+                     save(proof,pe);
+                     pe.setOutdated(false);
+                     pe.setBuild(false);
+                     markerManager.setMarker(pe);
+                  } catch (Exception e){
+                     LogUtil.getLogger().logError(e);
+                  }
                   proof.dispose();
                }
             }
             monitor.worked(1);
          }
          environment.dispose();
-      } catch(Exception e){
-         LogUtil.getLogger().logError(e);
-      }
    }
    
    private ProofElement getProofToDo() {
@@ -114,17 +114,22 @@ public class ProofRunnable implements Runnable {
     * @param ProofElement - the {@link ProofElement} for the {@link Proof}
     * @throws Exception
     */
-   private Proof processProof(ProofElement pe) throws Exception{
+   private Proof processProof(ProofElement pe){
       IFile file = pe.getProofFile();
       Proof proof = null;
-      if(!file.exists()){
-         proof = createProof(pe);
-      }
-      else {
-         proof = loadProof(pe);
-         if(proof == null){
+      try{
+         if(!file.exists()){
             proof = createProof(pe);
          }
+         else {
+            proof = loadProof(pe);
+            if(proof == null){
+               proof = createProof(pe);
+            }
+         }
+      } catch (ProofInputException e){
+         LogUtil.getLogger().logError(e);
+         return proof;
       }
       return proof;
    }
@@ -234,7 +239,7 @@ public class ProofRunnable implements Runnable {
       return sb.toString();
    }
    
-   private void save(Proof proof, ProofElement pe) throws CoreException {
+   private void save(Proof proof, ProofElement pe) throws CoreException, ProofMetaFileException {
       ByteArrayOutputStream out = generateSaveProof(proof, pe.getProofFile());
       IFile proofFile = pe.getProofFile();
       KeYProjectDelta keyDelta = KeYProjectDeltaManager.getInstance().getDelta(project);
@@ -251,7 +256,7 @@ public class ProofRunnable implements Runnable {
     * @return the {@link ByteOutputStream} for the given {@link Proof}
     * @throws CoreException
     */
-   private ByteArrayOutputStream generateSaveProof(Proof proof, IFile file) throws CoreException {
+   private ByteArrayOutputStream generateSaveProof(Proof proof, IFile file) {
       Assert.isNotNull(proof);
       try {
          File location = ResourceUtil.getLocation(file);
@@ -260,14 +265,14 @@ public class ProofRunnable implements Runnable {
          ByteArrayOutputStream out = new ByteArrayOutputStream();
          String errorMessage = saver.save(out);
          if (errorMessage != null) {
-            throw new CoreException(LogUtil.getLogger().createErrorStatus(errorMessage));
+            return null;
          }
          else {
             return out;
          }
       }
       catch (IOException e) {
-         throw new CoreException(LogUtil.getLogger().createErrorStatus(e.getMessage(), e));
+         return null;
       }
    }
    
@@ -279,39 +284,14 @@ public class ProofRunnable implements Runnable {
     */
    private void saveProof(ByteArrayOutputStream out, IFile proofFile) throws CoreException{
       // Save proof file content
-      createProofFolder(proofFile);
-      if (proofFile.exists()) {
-         proofFile.setContents(new ByteArrayInputStream(out.toByteArray()), true, true, null);
-      }
-      else {
-         proofFile.create(new ByteArrayInputStream(out.toByteArray()), true, null);
-      }
-   }
-   
-   /**
-    * Creates the proofFolder for the given proof{@link IFile}
-    * @param proofFile - the proof{@link IFile} to use
-    * @return the created {@link IFolder}
-    * @throws CoreException
-    */
-   private IFolder createProofFolder(IFile proofFile) throws CoreException{
-      IFolder proofFolder = null;
-      IPath proofFolderPath = proofFile.getFullPath().removeLastSegments(1);
-      IPath currentProofFolderPath = null;
-      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-      for(int i = 0; i < proofFolderPath.segmentCount(); i++){
-         if(currentProofFolderPath == null){
-            currentProofFolderPath = new Path(proofFolderPath.segment(i));
+      IFolder proofFolder = KeYResourcesUtil.createFolder(proofFile);
+      if(proofFolder != null && proofFolder.exists()){
+         if (proofFile.exists()) {
+            proofFile.setContents(new ByteArrayInputStream(out.toByteArray()), true, true, null);
          }
-         else{
-            currentProofFolderPath = currentProofFolderPath.append(proofFolderPath.segment(i));
-            proofFolder = root.getFolder(currentProofFolderPath);
-            if(!proofFolder.exists()){
-               proofFolder.create(true, true, null);
-            }
+         else {
+            proofFile.create(new ByteArrayInputStream(out.toByteArray()), true, null);
          }
-         
       }
-      return proofFolder;
    }
 }

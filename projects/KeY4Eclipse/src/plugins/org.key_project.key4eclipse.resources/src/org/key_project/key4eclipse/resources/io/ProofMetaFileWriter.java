@@ -32,7 +32,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
-import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -75,7 +74,7 @@ public class ProofMetaFileWriter {
     * @param pe - the {@link ProofElement} to use
     * @throws ProofMetaFileException
     */
-   public void writeMetaFile() {
+   public void writeMetaFile() throws ProofMetaFileException {
       try{
          IFile metaIFile = pe.getMetaFile();
          this.addedTypes = new LinkedHashSet<String>();
@@ -101,7 +100,7 @@ public class ProofMetaFileWriter {
          resAttr.setReadOnly(true);
          metaIFile.setResourceAttributes(resAttr);
       } catch (Exception e){
-         LogUtil.getLogger().logError(e);
+         throw new ProofMetaFileException("Prolem creating the meta file " + pe.getMetaFile().getFullPath().toString());
       }
    }
    

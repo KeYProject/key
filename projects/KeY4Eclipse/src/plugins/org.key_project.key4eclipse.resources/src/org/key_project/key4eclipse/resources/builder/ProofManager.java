@@ -25,7 +25,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -34,7 +33,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.ITextSelection;
@@ -46,7 +44,6 @@ import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
-import org.key_project.util.eclipse.ResourceUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -120,38 +117,26 @@ public class ProofManager {
     * @param monitor - the {@link IProgressMonitor}
     * @throws Exception
     */
-   public void runProofs(IProgressMonitor monitor, EditorSelection editorSelection) throws Exception{
+   public void runProofs(IProgressMonitor monitor, EditorSelection editorSelection, KeYProjectBuildInstruction inst) throws Exception{
       KeYProjectDelta keyDelta = KeYProjectDeltaManager.getInstance().getDelta(project);
       changedJavaFiles = keyDelta.getChangedJavaFiles();
       keyDelta.reset();
       markerManager.deleteKeYMarkerByType(project, IResource.DEPTH_ZERO, MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID);
       proofElements = getAllProofElements();
-      setOutdated();
+      BuildProofSelector bps = new BuildProofSelector(project, proofElements, changedJavaFiles, environment, inst);
+      bps.updateProofElements();
       sortProofElements(editorSelection);
-      //set up monitor
-      monitor.beginTask("Build all proofs", proofElements.size());
-      initThreads(monitor);
-      checkContractRecursion();
       cleanMarker();
       if(KeYProjectProperties.isAutoDeleteProofFiles(project)){
          cleanProofFolder(getAllFiles(), mainProofFolder);
       }
+      //set up monitor
+      monitor.beginTask("Building proofs for " + project.getName(), proofElements.size());
+      initThreads(monitor);
+      checkContractRecursion();
       monitor.done();
    }
-   
-   
-   /**
-    * Marks all {@link ProofElement}s that require a build as outdated.
-    */
-   private void setOutdated(){
-      OutdatedChecker poc = new OutdatedChecker(project, proofElements, changedJavaFiles, environment);
-      List<ProofElement> outdatedProofs = poc.getOutdatedProofs();
       
-      for(ProofElement pe : outdatedProofs){
-         markerManager.setOutdated(pe, true);
-      }
-   }
-   
    
    /**
     * Sorts all {@link ProofElement}s in the following order: Selected method, active editor proofs, open editor proofs, affected/outdated proofs, other proofs.
@@ -165,34 +150,15 @@ public class ProofManager {
       ITextSelection selection = editorSelection.getActiveSelection();
       if(selection != null){
          IFile activeFile = editorSelection.getActiveFile();
-         int selOffset = selection.getOffset();
-         int selLength = selection.getLength();
          if(activeFile != null){
             IJavaElement javaElement = JavaCore.create(activeFile);
             if(javaElement instanceof ICompilationUnit){
                ICompilationUnit compUnit = (ICompilationUnit) javaElement;
-               try{
-                  String src = compUnit.getSource();                  
-                  IMethod method = null;
-                  for(int i = selOffset; i <= selOffset+selLength; i++){
-                     IJavaElement selected = compUnit.getElementAt(i);
-                     if(selected != null && selected.getElementType() == IJavaElement.METHOD){
-                        method = (IMethod) selected;
-                        break;
-                     }
-                  }
-                  if(method != null){
-                     ISourceRange range = method.getSourceRange();
-                     int offset = range.getOffset();
-                     int length = range.getLength();
-                     int methodStartLine = KeYResourcesUtil.getLineForOffset(src, offset);
-                     int methodEndLine = KeYResourcesUtil.getLineForOffset(src, offset+length);
-                     for(ProofElement pe : proofElements){
-                        int sclLine = pe.getSourceLocation().getLineNumber();
-                        if(methodStartLine <= sclLine && methodEndLine >= sclLine){
-                           activeMethodProofs.add(pe);
-                        }
-                     }
+               try{   
+                  IJavaElement selected = compUnit.getElementAt(selection.getOffset());
+                  if(selected != null && selected.getElementType() == IJavaElement.METHOD){
+                     IMethod method = (IMethod) selected;
+                     activeMethodProofs = KeYResourcesUtil.getProofElementsForMethod(proofElements, method);
                   }
                } catch (JavaModelException e){
                   LogUtil.getLogger().logError(e);
@@ -242,9 +208,9 @@ public class ProofManager {
    
    
    /**
-    * Collects all {@link ProofElement}s associatiated with the given {@link IFile}.
+    * Collects all {@link ProofElement}s associated with the given {@link IFile}.
     * @param file - the {@link IFile} to use
-    * @return a {@link List<ProofElement>} with al associated {@link ProofElement}s
+    * @return a {@link List<ProofElement>} with all associated {@link ProofElement}s
     */
    public List<ProofElement> getProofsForFile(IFile file){         
       List<ProofElement> fileProofs = new LinkedList<ProofElement>();
@@ -309,9 +275,9 @@ public class ProofManager {
             }
             ImmutableSet<Contract> contracts = environment.getSpecificationRepository().getContracts(type, target);
             for (Contract contract : contracts) {
-               IFolder proofFolder = getProofFolder(javaFile);
-               IFile proofFile = getProofFile(contract.getName(), proofFolder.getFullPath());
-               IFile metaFile = getProofMetaFile(proofFile);
+               IFolder proofFolder = KeYResourcesUtil.getProofFolder(javaFile);
+               IFile proofFile = KeYResourcesUtil.getProofFile(contract.getName(), proofFolder.getFullPath());
+               IFile metaFile = KeYResourcesUtil.getProofMetaFile(proofFile);
                IMarker proofMarker = markerManager.getProofMarker(javaFile, scl, proofFile);
                List<IMarker> recursionMarker = markerManager.getRecursionMarker(javaFile, scl, proofFile);
                proofElements.add(new ProofElement(javaFile, scl, environment, proofFolder, proofFile, metaFile, proofMarker, recursionMarker, contract));
@@ -319,38 +285,6 @@ public class ProofManager {
          }
       }
       return proofElements;
-   }
-
-   /**
-    * Returns the proofFolder for the given java{@link IFile}.
-    * @param javaFile - the java{@link IFile} to use
-    * @return the proof{@link IFolder}
-    */
-   private IFolder getProofFolder(IFile javaFile){
-      IPath proofFolderPath = mainProofFolder.getFullPath();
-      IPath javaToProofPath = javaToProofPath(javaFile.getFullPath());
-      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-      IFolder proofFolder = root.getFolder(proofFolderPath.append(javaToProofPath));
-      return proofFolder;
-   }
-   
-   
-   /**
-    * Converts a javaFiles {@link IPath} to a proofFolder {@link Path}.
-    * @param path - the JavaFile {@link IPath}.
-    * @return
-    */
-   private IPath javaToProofPath(IPath path){
-      while(path.segmentCount() > 0){
-         if(!path.segment(0).equals("src")){
-            path = path.removeFirstSegments(1);
-         }
-         else{
-            path = path.removeFirstSegments(1);
-            break;
-         }
-      }
-      return path;
    }
    
    
@@ -465,7 +399,7 @@ public class ProofManager {
    
    private void restoreOldMarkerForRemovedCycles() throws CoreException{
       for(ProofElement pe : proofElements){
-         if(pe.getProofMarker() == null){
+         if(pe.getProofMarker() == null && (pe.getRecursionMarker() == null || pe.getRecursionMarker().isEmpty())){
             markerManager.setMarker(pe);
          }
       }
@@ -568,37 +502,5 @@ public class ProofManager {
       markerManager.deleteAllKeYMarker(project, IResource.DEPTH_INFINITE);
       //add the ProblemExceptionMarker
       markerManager.setProblemLoaderExceptionMarker(project, e.getMessage());
-   }
-   
-   
-   /**
-    * Returns the proof{@link IFile} for the given {@link String} and {@link IPath}.
-    * @param name - the name for the {@link IFile}
-    * @param path - the {@link IPath} for the {@link IFile} 
-    * @return - the {@link IFile} for the Proof
-    */
-   private IFile getProofFile(String name, IPath path) {
-      if (path != null && name != null) {
-         name = ResourceUtil.validateWorkspaceFileName(name);
-         name = name + "." + KeYUtil.PROOF_FILE_EXTENSION;
-         path = path.append(name);
-         IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
-         return file;
-      }
-      else return null;
-   }
-   
-   
-   /**
-    * Returns the metaFile of the given proof{@link IFile}
-    * @param proofFile - the proof{@link IFile} to use
-    * @return the meta{@link IFile}
-    */
-   private IFile getProofMetaFile(IFile proofFile){
-      IPath proofFilePath = proofFile.getFullPath();
-      IPath proofMetaFilePath = proofFilePath.removeFileExtension().addFileExtension(KeYResourcesUtil.META_FILE_EXTENSION);
-      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-      IFile proofMetaFile = root.getFile(proofMetaFilePath);
-      return proofMetaFile;
    }
 }

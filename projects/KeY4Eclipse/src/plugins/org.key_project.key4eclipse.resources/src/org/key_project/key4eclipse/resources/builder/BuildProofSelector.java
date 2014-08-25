@@ -12,12 +12,14 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileReader;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileTypeElement;
+import org.key_project.key4eclipse.resources.marker.MarkerManager;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -31,47 +33,50 @@ import de.uka.ilkd.key.ui.CustomUserInterface;
  * Class for checking the actuality of proofs.
  * @author Stefan Käsdorf
  */
-public class OutdatedChecker {
+public class BuildProofSelector {
    
    private IProject project;
    private List<ProofElement> proofElements;
    private List<IFile> changedJavaFiles;
    private KeYEnvironment<CustomUserInterface> environment;
+   private KeYProjectBuildInstruction inst;
    
-   public OutdatedChecker(IProject project, List<ProofElement> proofElements, List<IFile> changedJavaFiles, KeYEnvironment<CustomUserInterface> environment){
+   public BuildProofSelector(IProject project, List<ProofElement> proofElements, List<IFile> changedJavaFiles, KeYEnvironment<CustomUserInterface> environment, KeYProjectBuildInstruction inst){
       this.project = project;
       this.proofElements = proofElements;
       this.changedJavaFiles = changedJavaFiles;
       this.environment = environment;
+      this.inst = inst;
    }
    
    
    /**
     * Checks for every {@link ProofElement} if it is outdated.
-    * @return a {@link List<ProofElement>} that contains all outdated proofs.
+    * @return a {@link List<ProofElement>} that contains the updated {@link ProofElements}.
     */
-   public List<ProofElement> getOutdatedProofs() {
-      List<ProofElement> outdatedProofElements = new LinkedList<ProofElement>();
-      for(ProofElement pe : proofElements){
-         boolean outdated = false;
+   public void updateProofElements() {
+      List<ProofElement> proofElementsToCheck = getProofsToCheck();
+      MarkerManager markerManager = new MarkerManager();
+      for(ProofElement pe : proofElementsToCheck){
+         boolean build = false;
          try{
-            if(!KeYProjectProperties.isEnableBuildRequiredProofsOnly(project)){
-               outdated = true;
+            if((!KeYProjectProperties.isEnableBuildRequiredProofsOnly(project)) || inst.getClean() || inst.getElementsToBuild() != null){
+               build = true;
             }
             else{
                IFile metaFile = pe.getMetaFile();
-               if(pe.getOutdated() == true){
-                  outdated = true;
+               if(pe.getOutdated()){
+                  build = true;
                }
                else if((pe.getProofMarker() == null || !pe.getProofMarker().exists()) 
                   && (pe.getRecursionMarker() == null || pe.getRecursionMarker().isEmpty())){
-                  outdated = true;
+                  build = true;
                }
                else if(metaFile.exists()){
                   ProofMetaFileReader pmfr = new ProofMetaFileReader(metaFile);
                   LinkedList<IType> javaTypes = collectAllJavaITypes();
                   if(MD5changed(pe.getProofFile(), pmfr) || typeOrSubTypeChanged(pe, pmfr, javaTypes) || superTypeChanged(pe, javaTypes)){
-                     outdated = true;
+                     build = true;
                   }
                   else{
                      pe.setProofClosed(pmfr.getProofClosed());
@@ -80,19 +85,46 @@ public class OutdatedChecker {
                   }
                }
                else{
-                  outdated = true;
+                  build = true;
                }
             }
          }
          catch(Exception e){
-            outdated = true;
+            build = true;
          }
          
-         if(outdated){
-            outdatedProofElements.add(pe);
+         if(build){
+            markerManager.setOutdated(pe);
          }            
       }
-      return outdatedProofElements;
+   }
+   
+   
+   private List<ProofElement> getProofsToCheck(){
+      if(inst.getClean() || inst.getElementsToBuild() == null){
+         return proofElements;
+      }
+      else{
+         List<ProofElement> elementsToCheck = new LinkedList<ProofElement>();
+         List<Object> elementsToBuild = inst.getElementsToBuild();
+         for(Object obj : elementsToBuild){
+            if(obj instanceof IFile){
+               IFile file = (IFile) obj;
+               for(ProofElement pe : proofElements){
+                  if(pe != null){
+                     if(file.equals(pe.getJavaFile()) || file.equals(pe.getProofFile())){
+                        elementsToCheck.add(pe);
+                     }
+                  }
+               }
+            }
+            else if(obj instanceof IMethod){
+               IMethod method = (IMethod) obj;
+               elementsToCheck.addAll(KeYResourcesUtil.getProofElementsForMethod(proofElements, method));
+            }
+         }
+         return elementsToCheck;
+      }
    }
    
    

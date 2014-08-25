@@ -40,21 +40,23 @@ import org.key_project.key4eclipse.resources.ui.util.LogUtil;
 
 public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
    
-   private Button enableBuildProofsButton;
+   private Button enableKeYResourcesBuildsButton;
+   
+   private Button enableBuildOnStartupButton;
 
    private Button enableBuildRequiredProofsOnlyButton;
    
    private Button enableAutoInterruptBuildButton;
    
-   private Spinner setNumberOfThreadsSpinner;
+   private Spinner numberOfThreadsSpinner;
    
-   private Text setNumberOfThreadsText;
+   private Text numberOfThreadsText;
    
    private Button enableMultiThreadingButton;
    
    private Button autoDeleteProofFilesButton;
    
-   private Button hideMefaFiles;
+   private Button hideMefaFilesButton;
    
    private Text fillText;
 
@@ -63,19 +65,19 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       
       @Override
       public void widgetSelected(SelectionEvent e) {
-         boolean isSelected = enableBuildProofsButton.getSelection();
-         if(isSelected){
-            enableBuildRequiredProofsOnlyButton.setEnabled(true);
-            enableAutoInterruptBuildButton.setEnabled(true);
-         }
-         else{
-            enableBuildRequiredProofsOnlyButton.setEnabled(false);
-            enableAutoInterruptBuildButton.setEnabled(false);
-         }
+         boolean selected = enableKeYResourcesBuildsButton.getSelection();
+         enableBuildOnStartupButton.setEnabled(selected);
+         enableBuildRequiredProofsOnlyButton.setEnabled(selected);
+         enableAutoInterruptBuildButton.setEnabled(selected);
+         enableMultiThreadingButton.setEnabled(selected);
+         numberOfThreadsText.setEnabled(selected);
+         numberOfThreadsSpinner.setEnabled(selected);
+         autoDeleteProofFilesButton.setEnabled(selected);
       }
       
       @Override
       public void widgetDefaultSelected(SelectionEvent e) {
+         
       }
    };
    
@@ -84,14 +86,9 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       
       @Override
       public void widgetSelected(SelectionEvent e) {
-         boolean isSelected = enableMultiThreadingButton.getSelection();
-         if(isSelected){
-            setNumberOfThreadsSpinner.setEnabled(true);
-         }
-         else{
-            setNumberOfThreadsSpinner.setEnabled(false);
-         }
-         
+         boolean selected = enableMultiThreadingButton.getSelection();
+         numberOfThreadsText.setEnabled(selected);
+         numberOfThreadsSpinner.setEnabled(selected); 
       }
 
       @Override
@@ -107,7 +104,12 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
    protected Control createContents(Composite parent) {
       initializeDialogUnits(parent);
       Composite root = new Composite(parent, SWT.NONE);
-      root.setLayout(new GridLayout(1, false));
+      root.setLayout(new GridLayout(1, false));    
+
+      enableKeYResourcesBuildsButton = new Button(root, SWT.CHECK);
+      enableKeYResourcesBuildsButton.setText("Enable KeY Resources builds");
+      enableKeYResourcesBuildsButton.addSelectionListener(buildProofButtonSelectionListener);
+      setSelectionForKeYResourcesBuildsButton();
       
       Group builderSettings = new Group(root, SWT.NONE);
       builderSettings.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -116,11 +118,11 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       Composite builderSettingsComposite = new Composite(builderSettings, SWT.NONE);
       builderSettingsComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       builderSettingsComposite.setLayout(new GridLayout(1, false));
-      
-      enableBuildProofsButton = new Button(builderSettingsComposite, SWT.CHECK);
-      enableBuildProofsButton.setText("Build proofs");
-      enableBuildProofsButton.addSelectionListener(buildProofButtonSelectionListener);
-      setSelectionForBuildProofsButton();
+
+      enableBuildOnStartupButton = new Button(builderSettingsComposite, SWT.CHECK);
+      enableBuildOnStartupButton.setText("Start builds on startup");
+      setSelectionForEnableBuildOnStartupButton();
+      setEnabledForBuildOnStartupButton();
       
       enableBuildRequiredProofsOnlyButton = new Button(builderSettingsComposite, SWT.CHECK);
       enableBuildRequiredProofsOnlyButton.setText("Build required proofs only");
@@ -132,7 +134,7 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       setSelectionForEnableBuildJobButton();
       setEnabledForBuildJobButton();
       
-      Group multiThreadingSettings = new Group(root, SWT.NONE);
+      Group multiThreadingSettings = new Group(builderSettingsComposite, SWT.NONE);
       multiThreadingSettings.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       multiThreadingSettings.setLayout(new GridLayout(1, false));
       multiThreadingSettings.setText("Multi Threading");
@@ -144,6 +146,7 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       enableMultiThreadingButton.setText("Enable multithreading");
       enableMultiThreadingButton.addSelectionListener(enableMultiThreadingButtonSelectionListener);
       setSelectionForEnableMultiThreadingButton();
+      setEnabledForEnableMultiThreadingButton();
       
       fillText = new Text(multiThreadingComposite, SWT.SINGLE);
       fillText.setText("");
@@ -151,16 +154,22 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       Color backgroundColor = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
       fillText.setBackground(backgroundColor);
       
-      setNumberOfThreadsText = new Text(multiThreadingComposite, SWT.SINGLE);
-      setNumberOfThreadsText.setText("Number of threads:");
-      setNumberOfThreadsText.setBackground(backgroundColor);
+      numberOfThreadsText = new Text(multiThreadingComposite, SWT.SINGLE);
+      numberOfThreadsText.setText("Number of threads:");
+      numberOfThreadsText.setBackground(backgroundColor);
 
-      setNumberOfThreadsSpinner = new Spinner(multiThreadingComposite, SWT.NONE);
-      setNumberOfThreadsSpinner.setMinimum(1);
-      setNumberOfThreadsSpinner.setMaximum(100);
-      setNumberOfThreadsSpinner.setIncrement(1);
+      numberOfThreadsSpinner = new Spinner(multiThreadingComposite, SWT.NONE);
+      numberOfThreadsSpinner.setMinimum(1);
+      numberOfThreadsSpinner.setMaximum(100);
+      numberOfThreadsSpinner.setIncrement(1);
       setSelectionForSetNumberOfThreads();
       setEnabledForSetNumberOfThreads();
+      
+
+      autoDeleteProofFilesButton = new Button(builderSettingsComposite, SWT.CHECK);
+      autoDeleteProofFilesButton.setText("Delete unnecessary proof files automatically");
+      setSelectionForAutoDeleteProofFilesButton();
+      setEnabledForAutoDeleteProofFilesButton();
       
       Group folderSettings = new Group(root, SWT.NONE);
       folderSettings.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -169,29 +178,31 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       Composite folderSettingsComposite = new Composite(folderSettings, SWT.NONE);
       folderSettingsComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       folderSettingsComposite.setLayout(new GridLayout(1, false));
-      
-      autoDeleteProofFilesButton = new Button(folderSettingsComposite, SWT.CHECK);
-      autoDeleteProofFilesButton.setText("Delete unnecessary proof files automatically");
-      setSelectionForAutoDeleteProofFilesButton();
-      
-      hideMefaFiles = new Button(folderSettingsComposite, SWT.CHECK);
-      hideMefaFiles.setText("Hide meta files (Refresh the project afterwards)");
+            
+      hideMefaFilesButton = new Button(folderSettingsComposite, SWT.CHECK);
+      hideMefaFilesButton.setText("Hide meta files");
       setSelectionForHideMetaFilesButton();
       
       return root;
    }
    
    
-   private void setSelectionForBuildProofsButton(){
-      try{
-         IProject project = getProject();
-         enableBuildProofsButton.setSelection(KeYProjectProperties.isEnableBuildProofs(project));
-      }
-      catch (CoreException e) {
-         LogUtil.getLogger().logError(e);
-         LogUtil.getLogger().openErrorDialog(getShell(), e);
-         enableBuildProofsButton.setEnabled(false);
-      }      
+   private void setSelectionForKeYResourcesBuildsButton(){
+      enableKeYResourcesBuildsButton.setSelection(KeYProjectProperties.isEnableKeYResourcesBuilds(getProject()));    
+   }
+   
+   
+   /**
+    * Sets the selection for the EnableEfficientProofManagementButton CheckBox.
+    */
+   private void setSelectionForEnableBuildOnStartupButton(){
+      enableBuildOnStartupButton.setSelection(KeYProjectProperties.isEnableBuildOnStartup(getProject()));
+      
+   }
+   
+   
+   private void setEnabledForBuildOnStartupButton(){
+      enableBuildOnStartupButton.setEnabled(enableKeYResourcesBuildsButton.getSelection());
    }
 
    
@@ -199,20 +210,13 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
     * Sets the selection for the EnableEfficientProofManagementButton CheckBox.
     */
    private void setSelectionForEnableBuildRequiredProofsOnlyButton(){
-      try {
-         IProject project = getProject();
-         enableBuildRequiredProofsOnlyButton.setSelection(KeYProjectProperties.isEnableBuildRequiredProofsOnly(project));
-      }
-      catch (CoreException e) {
-         LogUtil.getLogger().logError(e);
-         LogUtil.getLogger().openErrorDialog(getShell(), e);
-         enableBuildRequiredProofsOnlyButton.setEnabled(false);
-      }
+      enableBuildRequiredProofsOnlyButton.setSelection(KeYProjectProperties.isEnableBuildRequiredProofsOnly(getProject()));
+      
    }
    
    
    private void setEnabledForBuildProofsEfficientButton(){
-      enableBuildRequiredProofsOnlyButton.setEnabled(enableBuildProofsButton.getSelection());
+      enableBuildRequiredProofsOnlyButton.setEnabled(enableKeYResourcesBuildsButton.getSelection());
    }
    
    
@@ -220,20 +224,12 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
     * Sets the selection for the EnableBuildJobButton CheckBox.
     */
    private void setSelectionForEnableBuildJobButton(){
-      try {
-         IProject project = getProject();
-         enableAutoInterruptBuildButton.setSelection(KeYProjectProperties.isEnableAutoInterruptBuild(project));
-      }
-      catch (CoreException e) {
-         LogUtil.getLogger().logError(e);
-         LogUtil.getLogger().openErrorDialog(getShell(), e);
-         enableAutoInterruptBuildButton.setEnabled(false);
-      }
+      enableAutoInterruptBuildButton.setSelection(KeYProjectProperties.isEnableAutoInterruptBuild(getProject()));
    }
    
    
    private void setEnabledForBuildJobButton(){
-      enableAutoInterruptBuildButton.setEnabled(enableBuildProofsButton.getSelection());
+      enableAutoInterruptBuildButton.setEnabled(enableKeYResourcesBuildsButton.getSelection());
    }
    
    
@@ -241,15 +237,12 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
     * Sets the selection for the EnableMultiThreadingButton CheckBox.
     */
    private void setSelectionForEnableMultiThreadingButton(){
-      try {
-         IProject project = getProject();
-         enableMultiThreadingButton.setSelection(KeYProjectProperties.isEnableMultiThreading(project));
-      }
-      catch (CoreException e) {
-         LogUtil.getLogger().logError(e);
-         LogUtil.getLogger().openErrorDialog(getShell(), e);
-         enableMultiThreadingButton.setEnabled(false);
-      }
+      enableMultiThreadingButton.setSelection(KeYProjectProperties.isEnableMultiThreading(getProject()));
+   }
+   
+   
+   private void setEnabledForEnableMultiThreadingButton(){
+      enableMultiThreadingButton.setEnabled(enableKeYResourcesBuildsButton.getSelection());
    }
    
    
@@ -258,25 +251,17 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
     * Sets the selection for the setNumberOfThreads DropDown Menu.
     */
    private void setSelectionForSetNumberOfThreads(){
-      try {
-         IProject project = getProject();
-         int index = KeYProjectProperties.getNumberOfThreads(project);
-         if(index < 0 || index > 100){
-            setNumberOfThreadsSpinner.setSelection(1);
-         }
-         else{
-            setNumberOfThreadsSpinner.setSelection(index);
-         }
+      int index = KeYProjectProperties.getNumberOfThreads(getProject());
+      if(index < 0 || index > 100){
+         numberOfThreadsSpinner.setSelection(1);
       }
-      catch (CoreException e) {
-         LogUtil.getLogger().logError(e);
-         LogUtil.getLogger().openErrorDialog(getShell(), e);
-         setNumberOfThreadsSpinner.setEnabled(false);
+      else{
+         numberOfThreadsSpinner.setSelection(index);
       }
    }
    
    private void setEnabledForSetNumberOfThreads(){
-      setNumberOfThreadsSpinner.setEnabled(enableMultiThreadingButton.getSelection());
+      numberOfThreadsSpinner.setEnabled(enableMultiThreadingButton.isEnabled() && enableMultiThreadingButton.getSelection());
    }
    
 
@@ -284,15 +269,12 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
     * Sets the selection for the AutoDeleteProofFilesButton CheckBox.
     */
    private void setSelectionForAutoDeleteProofFilesButton(){
-      try {
-         IProject project = getProject();
-         autoDeleteProofFilesButton.setSelection(KeYProjectProperties.isAutoDeleteProofFiles(project));
-      }
-      catch (CoreException e) {
-         LogUtil.getLogger().logError(e);
-         LogUtil.getLogger().openErrorDialog(getShell(), e);
-         autoDeleteProofFilesButton.setEnabled(false);
-      }
+      autoDeleteProofFilesButton.setSelection(KeYProjectProperties.isAutoDeleteProofFiles(getProject()));
+   }
+   
+   
+   private void setEnabledForAutoDeleteProofFilesButton(){
+      autoDeleteProofFilesButton.setEnabled(enableKeYResourcesBuildsButton.getSelection());
    }
    
    
@@ -301,7 +283,7 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
     */
    private void setSelectionForHideMetaFilesButton(){
       IProject project = getProject();
-      hideMefaFiles.setSelection(KeYProjectProperties.isHideMetaFiles(project));
+      hideMefaFilesButton.setSelection(KeYProjectProperties.isHideMetaFiles(project));
    }
    
    
@@ -312,13 +294,14 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
    public boolean performOk() {
       try {
          IProject project = getProject();
-         KeYProjectProperties.setEnableBuildProofs(project, enableBuildProofsButton.getSelection());
+         KeYProjectProperties.setEnableKeYResourcesBuilds(project, enableKeYResourcesBuildsButton.getSelection());
+         KeYProjectProperties.setEnableBuildOnStartup(project, enableBuildOnStartupButton.getSelection());
          KeYProjectProperties.setEnableBuildProofsEfficient(project, enableBuildRequiredProofsOnlyButton.getSelection());
          KeYProjectProperties.setEnableAutoInterruptBuild(project, enableAutoInterruptBuildButton.getSelection());
          KeYProjectProperties.setEnableMultiThreading(project, enableMultiThreadingButton.getSelection());
-         KeYProjectProperties.setNumberOfThreads(project, String.valueOf(setNumberOfThreadsSpinner.getSelection()));
+         KeYProjectProperties.setNumberOfThreads(project, String.valueOf(numberOfThreadsSpinner.getSelection()));
          KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFilesButton.getSelection());
-         KeYProjectProperties.setHideMetaFiles(project, hideMefaFiles.getSelection());
+         KeYProjectProperties.setHideMetaFiles(project, hideMefaFilesButton.getSelection());
          updateNavigators();
          return super.performOk();
       }
@@ -327,6 +310,23 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
          LogUtil.getLogger().openErrorDialog(getShell(), e);
          return false;
       }
+   }
+
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void performDefaults() {
+      enableKeYResourcesBuildsButton.setSelection(true);
+      enableBuildOnStartupButton.setSelection(true);
+      enableBuildRequiredProofsOnlyButton.setSelection(true);
+      enableAutoInterruptBuildButton.setSelection(true);
+      enableMultiThreadingButton.setSelection(true);
+      numberOfThreadsSpinner.setSelection(2);
+      autoDeleteProofFilesButton.setSelection(true);
+      hideMefaFilesButton.setSelection(false);
+      super.performDefaults();
    }
    
    
@@ -343,21 +343,5 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
             viewer.refresh();
          }
       }
-   }
-
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected void performDefaults() {
-      enableBuildProofsButton.setSelection(true);
-      enableBuildRequiredProofsOnlyButton.setSelection(true);
-      enableAutoInterruptBuildButton.setSelection(true);
-      enableMultiThreadingButton.setSelection(true);
-      setNumberOfThreadsSpinner.setSelection(2);
-      autoDeleteProofFilesButton.setSelection(true);
-      hideMefaFiles.setSelection(false);
-      super.performDefaults();
    }
 }
