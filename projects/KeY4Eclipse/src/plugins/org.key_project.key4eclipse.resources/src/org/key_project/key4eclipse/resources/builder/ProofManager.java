@@ -68,10 +68,10 @@ import de.uka.ilkd.key.ui.CustomUserInterface;
  */
 public class ProofManager {
 
-   private KeYEnvironment<CustomUserInterface> environment;
-   private MarkerManager markerManager;
-   private IFolder mainProofFolder;
-   private IProject project;
+   private final KeYEnvironment<CustomUserInterface> environment;
+   private final MarkerManager markerManager;
+   private final IFolder mainProofFolder;
+   private final IProject project;
    private List<ProofElement> proofElements;
    private List<IFile> changedJavaFiles;
    private List<ProofElement> proofsToDo = Collections.synchronizedList(new LinkedList<ProofElement>());
@@ -222,7 +222,9 @@ public class ProofManager {
             }
          }
       }
-      else if(file != null && ("proof".equals(file.getFileExtension()) || "proofmeta".equals(file.getFileExtension()))){
+      else if (file != null && 
+               (KeYResourcesUtil.PROOF_FILE_EXTENSION.equals(file.getFileExtension()) || 
+                KeYResourcesUtil.META_FILE_EXTENSION.equals(file.getFileExtension()))) {
          for(ProofElement pe : proofElements){
             if(pe != null && file.equals(pe.getProofFile())){
                fileProofs.add(pe);
@@ -326,7 +328,7 @@ public class ProofManager {
       }
       
       while(threadsAlive(threads)){
-//         ObjectUtil.sleep(1000);
+//         ObjectUtil.sleep(1000); // TODO: Without sleeping the thread wastes CPU usage. Let him sleep for a short time. e.g. 100 ms. Is it guaranteed that this terminates. May check for monitor.isCanceled()?
       }
    }
    

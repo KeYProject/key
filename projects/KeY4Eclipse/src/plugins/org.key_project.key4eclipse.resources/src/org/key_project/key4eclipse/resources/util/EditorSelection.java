@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.ITextSelection;
 
+// TODO: Getters are used, setter never. How does it work?
 public class EditorSelection {
    
    private ITextSelection activeSelection = null;

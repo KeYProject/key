@@ -39,6 +39,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
     * The builder id.
     */
    public final static String BUILDER_ID = "org.key_project.key4eclipse.resources.KeYProjectBuilder";
+   // TODO: Collections.synchronizedList without access within a synchronized block is not thread ave. Make attribute private and define thread save access methods (add, remove, get, ...)
    public static List<KeYProjectBuildInstruction> buildsToDo = Collections.synchronizedList(new LinkedList<KeYProjectBuildInstruction>());
    
    /**

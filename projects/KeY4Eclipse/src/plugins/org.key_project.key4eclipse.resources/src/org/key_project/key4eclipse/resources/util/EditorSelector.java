@@ -14,7 +14,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-
+// TOOD: Do not understand this class. May remove it?
 public class EditorSelector {
    
    private final EditorSelection editorSelection = new EditorSelection();
@@ -70,7 +70,7 @@ public class EditorSelector {
 //               if(editorInput instanceof IFileEditorInput){
 //                  IFileEditorInput fileEditorInput = (IFileEditorInput) editorInput;
 //                  IFile file = fileEditorInput.getFile();
-//                  if("proof".equals(file.getFileExtension()) || "proofmeta".equals(file.getFileExtension())){
+//                  if(KeYResourcesUtil.PROOF_FILE_EXTENSION.equals(file.getFileExtension()) || KeYResourcesUtil.META_FILE_EXTENSION.equals(file.getFileExtension())){
 //                     return true;
 //                  }
 //               }

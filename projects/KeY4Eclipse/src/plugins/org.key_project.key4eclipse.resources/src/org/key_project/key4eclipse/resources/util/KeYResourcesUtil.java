@@ -243,6 +243,8 @@ public class KeYResourcesUtil {
     */
    public static boolean isKeYProject(IProject project) throws CoreException {
       return project != null &&
+             project.exists() &&
+             project.isOpen() &&
              project.hasNature(KeYProjectNature.NATURE_ID);
    }
    
