@@ -73,6 +73,9 @@ public class LogManager {
          if (project != null && record != null) {
             String content = toCSV(record);
             IFolder proofFolder = project.getFolder(KeYResourcesUtil.PROOF_FOLDER_NAME);
+            if (!proofFolder.exists()) {
+               proofFolder.create(true, true, null);
+            }
             IFile logFile = proofFolder.getFile(LOG_FILE_NAME);
             if (logFile.exists()) {
                logFile.appendContents(new ByteArrayInputStream(content.getBytes(CHARSET)), true, false, null);
