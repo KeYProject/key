@@ -139,6 +139,7 @@ public class VerificationLogView extends AbstractLinkableViewPart {
             tabItem = new CTabItem(tabFolder, SWT.NONE, index);
             tabItem.setText(project.getName());
             tabItem.setControl(viewerComposite);
+            tabItem.setData(project);
             tabItems.put(project, tabItem);
             viewers.put(project, viewer);
             scrollToEnd(viewer);
@@ -224,8 +225,11 @@ public class VerificationLogView extends AbstractLinkableViewPart {
     */
    protected void scrollToEnd(TableViewer viewer) {
       Table table = viewer.getTable();
-      TableItem item = table.getItem(table.getItemCount() - 1);
-      table.showItem(item);
+      int itemCount = table.getItemCount();
+      if (itemCount >= 1) {
+         TableItem item = table.getItem(itemCount - 1);
+         table.showItem(item);
+      }
    }
 
    /**
@@ -274,6 +278,20 @@ public class VerificationLogView extends AbstractLinkableViewPart {
       }
       else {
          return false;
+      }
+   }
+
+   /**
+    * Returns the currently shown {@link IProject}.
+    * @return The currently shown {@link IProject}.
+    */
+   public IProject getShownProject() {
+      CTabItem item = tabFolder.getSelection();
+      if (item != null && item.getData() instanceof IProject) {
+         return (IProject) item.getData();
+      }
+      else {
+         return null;
       }
    }
 }

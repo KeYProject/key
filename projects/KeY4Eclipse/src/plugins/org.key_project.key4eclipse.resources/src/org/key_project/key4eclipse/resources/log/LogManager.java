@@ -34,7 +34,7 @@ public class LogManager {
    /**
     * The name of the log file within a proof folder.
     */
-   private static final String LOG_FILE_NAME = ".log";
+   public static final String LOG_FILE_NAME = ".log";
 
    /**
     * The separator between values of a {@link LogRecord}.
