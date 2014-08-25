@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call OperationContractAppliedTwiceTest.doubleMagic()&gt;" pathCondition="true" pathConditionChanged="false">
+      <statement name="int first = magic();" pathCondition="true" pathConditionChanged="false">
+         <operationContract name="result_0 = magic() catch(exc_0)
+pre: true
+post: result_0 = 42 &amp; exc_0 = null
+mod: empty, creates no new objects
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+            <statement name="int second = magic();" pathCondition="true" pathConditionChanged="false">
+               <operationContract name="result_1 = magic() catch(exc_1)
+pre: true
+post: result_1 = 42 &amp; exc_1 = null
+mod: empty, creates no new objects
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_1" exceptionTerm="exc_1" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+                  <branchStatement name="if (first_1==42)" pathCondition="true" pathConditionChanged="false">
+                     <statement name="return first_1+second_1;" pathCondition="true" pathConditionChanged="false">
+                        <methodReturn name="&lt;return of doubleMagic&gt;" signature="&lt;return of OperationContractAppliedTwiceTest.doubleMagic()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                           <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                           </termination>
+                        </methodReturn>
+                     </statement>
+                  </branchStatement>
+               </operationContract>
+            </statement>
+         </operationContract>
+      </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0"/>
+</start>

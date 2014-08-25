@@ -719,7 +719,8 @@ public final class SymbolicExecutionUtil {
          if (term.op() == heapLDT.getStore()) {
             ImmutableArray<Term> subs = term.subs();
             if (subs.size() == 4) {
-               Term locationTerm = subs.get(2);
+               Term innerMostSelect = findInnerMostSelect(subs.get(1), services);
+               Term locationTerm = innerMostSelect != null ? innerMostSelect.sub(2) : subs.get(2);
                ProgramVariable attribute = getProgramVariable(services, heapLDT, locationTerm);
                if (attribute != null && attribute.isStatic()) {
                   result.add(attribute);
@@ -732,6 +733,18 @@ public final class SymbolicExecutionUtil {
       }
       for (Term sub : term.subs()) {
          internalCollectStaticProgramVariablesOnHeap(services, result, sub);
+      }
+   }
+   
+   private static Term findInnerMostSelect(Term term, Services services) {
+      if (isSelect(services, term)) {
+         while (isSelect(services, term.sub(1))) {
+            term = term.sub(1);
+         }
+         return term;
+      }
+      else {
+         return null;
       }
    }
    
@@ -1014,6 +1027,17 @@ public final class SymbolicExecutionUtil {
       return "methodCallEmpty".equals(displayName) ||
              "methodCallEmptyReturn".equals(ruleName) ||
              "methodCallReturnIgnoreResult".equals(ruleName);
+   }
+   
+   /**
+    * Checks if the given node should be represented as exceptional method return.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @return {@code true} represent node as exceptional method return, {@code false} represent node as something else. 
+    */
+   public static boolean isExceptionalMethodReturnNode(Node node, RuleApp ruleApp) {
+      String ruleName = MiscTools.getRuleName(ruleApp);
+      return "methodCallParamThrow".equals(ruleName);
    }
 
    /**
@@ -1708,41 +1732,41 @@ public final class SymbolicExecutionUtil {
       }
       workingTerm = workingTerm.sub(1); // First part is heap equality, use second part which is the combination of all normal and exceptional preconditon postcondition implications
       workingTerm = TermBuilder.goBelowUpdates(workingTerm);
-      if (workingTerm.op() != Junctor.AND) {
-         throw new ProofInputException("And operation expected, implementation of UseOperationContractRule might has changed!"); 
-      }
       // Find Term exc_n = null which is added (maybe negated) to all exceptional preconditions
-      Term exceptionDefinitionParent = null;
-      Term exceptionDefinition = workingTerm;
-      while (exceptionDefinition.op() == Junctor.AND) {
-         exceptionDefinitionParent = exceptionDefinition;
-         Term firstSub = exceptionDefinition.sub(0);
-         if (firstSub.op() == node.proof().getServices().getJavaInfo().getInv()) { 
-            exceptionDefinition = exceptionDefinition.sub(1);
-         }
-         else {
-            exceptionDefinition = firstSub;
-         }
+      Term exceptionDefinition = searchExceptionDefinition(workingTerm, services);
+      if (exceptionDefinition == null) {
+         throw new ProofInputException("Exception definition not found, implementation of UseOperationContractRule might has changed!"); 
       }
       // Make sure that exception equality was found
-      Term exceptionEquality;
-      if (exceptionDefinition.op() == Junctor.NOT) {
-         exceptionEquality = exceptionDefinition.sub(0);
+      Term exceptionEquality = exceptionDefinition.op() == Junctor.NOT ?
+                               exceptionDefinition.sub(0) :
+                               exceptionDefinition;
+      return new ContractPostOrExcPostExceptionVariableResult(workingTerm, updatesAndTerm, exceptionDefinition, exceptionEquality);
+   }
+   
+   /**
+    * Searches the exception definition.
+    * @param term The {@link Term} to start search in.
+    * @param services the {@link Services} to use.
+    * @return The found exception definition or {@code null} if not available.
+    */
+   private static Term searchExceptionDefinition(Term term, Services services) {
+      if (term.op() == Equality.EQUALS && 
+          term.sub(0).op() instanceof LocationVariable && 
+          term.sub(0).toString().startsWith("exc_") &&
+          isNullSort(term.sub(1).sort(), services) &&
+          services.getJavaInfo().isSubtype(services.getJavaInfo().getKeYJavaType(term.sub(0).sort()), services.getJavaInfo().getKeYJavaType("java.lang.Throwable"))) {
+         return term;
       }
       else {
-         exceptionEquality = exceptionDefinition;
+         Term result = null;
+         int i = term.arity() - 1;
+         while (result == null && i >= 0) {
+            result = searchExceptionDefinition(term.sub(i), services);
+            i--;
+         }
+         return result;
       }
-      if (exceptionEquality.op() != Equality.EQUALS || exceptionEquality.arity() != 2) {
-         throw new ProofInputException("Equality expected, implementation of UseOperationContractRule might has changed!"); 
-      }
-      if (!isNullSort(exceptionEquality.sub(1).sort(), services)) {
-         throw new ProofInputException("Null expected, implementation of UseOperationContractRule might has changed!"); 
-      }
-      KeYJavaType exceptionType = services.getJavaInfo().getKeYJavaType(exceptionEquality.sub(0).sort());
-      if (!services.getJavaInfo().isSubtype(exceptionType, services.getJavaInfo().getKeYJavaType("java.lang.Throwable"))) {
-         throw new ProofInputException("Throwable expected, implementation of UseOperationContractRule might has changed!"); 
-      }
-      return new ContractPostOrExcPostExceptionVariableResult(workingTerm, updatesAndTerm, exceptionDefinition, exceptionDefinitionParent, exceptionEquality);
    }
    
    /**
@@ -1766,11 +1790,6 @@ public final class SymbolicExecutionUtil {
       private Term exceptionDefinition;
       
       /**
-       * The found parent of {@link #exceptionDefinition}.
-       */
-      private Term exceptionDefinitionParent;
-      
-      /**
        * The equality which contains the equality.
        */
       private Term exceptionEquality;
@@ -1780,18 +1799,15 @@ public final class SymbolicExecutionUtil {
        * @param workingTerm The working {@link Term}.
        * @param updatesAndTerm The updates.
        * @param exceptionDefinition The exception definition.
-       * @param exceptionDefinitionParent The found parent of the given exception definition.
        * @param exceptionEquality The equality which contains the equality.
        */
       public ContractPostOrExcPostExceptionVariableResult(Term workingTerm, 
                                                           Pair<ImmutableList<Term>, Term> updatesAndTerm, 
                                                           Term exceptionDefinition,
-                                                          Term exceptionDefinitionParent,
                                                           Term exceptionEquality) {
          this.workingTerm = workingTerm;
          this.updatesAndTerm = updatesAndTerm;
          this.exceptionDefinition = exceptionDefinition;
-         this.exceptionDefinitionParent = exceptionDefinitionParent;
          this.exceptionEquality = exceptionEquality;
       }
       
@@ -1817,14 +1833,6 @@ public final class SymbolicExecutionUtil {
        */
       public Term getExceptionDefinition() {
          return exceptionDefinition;
-      }
-      
-      /**
-       * Returns the found parent of {@link #getExceptionDefinition()}.
-       * @return The found parent of {@link #getExceptionDefinition()}.
-       */
-      public Term getExceptionDefinitionParent() {
-         return exceptionDefinitionParent;
       }
       
       /**

@@ -70,8 +70,10 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
@@ -449,6 +451,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             assertReturnValues(((IExecutionMethodReturn)expected).getReturnValues(), ((IExecutionMethodReturn)current).getReturnValues());
          }
       }
+      else if (expected instanceof IExecutionExceptionalMethodReturn) {
+         assertTrue("Expected IExecutionExceptionalMethodReturn but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionExceptionalMethodReturn);
+         assertTrue(((IExecutionExceptionalMethodReturn)expected).getSignature() + " does not match " + ((IExecutionExceptionalMethodReturn)current).getSignature(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionExceptionalMethodReturn)expected).getSignature(), ((IExecutionExceptionalMethodReturn)current).getSignature()));
+         assertTrue(((IExecutionExceptionalMethodReturn)expected).getFormatedMethodReturnCondition() + " does not match " + ((IExecutionExceptionalMethodReturn)current).getFormatedMethodReturnCondition(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionExceptionalMethodReturn)expected).getFormatedMethodReturnCondition(), ((IExecutionExceptionalMethodReturn)current).getFormatedMethodReturnCondition()));
+         assertVariables((IExecutionExceptionalMethodReturn)expected, (IExecutionExceptionalMethodReturn)current, compareVariables);
+      }
       else if (expected instanceof IExecutionStatement) {
          assertTrue("Expected IExecutionStatement but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionStatement);
          assertVariables((IExecutionStatement)expected, (IExecutionStatement)current, compareVariables);
@@ -458,6 +466,10 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertEquals(((IExecutionOperationContract)expected).isPreconditionComplied(), ((IExecutionOperationContract)current).isPreconditionComplied());
          assertEquals(((IExecutionOperationContract)expected).hasNotNullCheck(), ((IExecutionOperationContract)current).hasNotNullCheck());
          assertEquals(((IExecutionOperationContract)expected).isNotNullCheckComplied(), ((IExecutionOperationContract)current).isNotNullCheckComplied());
+         assertEquals(((IExecutionOperationContract)expected).getFormatedResultTerm(), ((IExecutionOperationContract)current).getFormatedResultTerm());
+         assertEquals(((IExecutionOperationContract)expected).getFormatedExceptionTerm(), ((IExecutionOperationContract)current).getFormatedExceptionTerm());
+         assertEquals(((IExecutionOperationContract)expected).getFormatedSelfTerm(), ((IExecutionOperationContract)current).getFormatedSelfTerm());
+         assertEquals(((IExecutionOperationContract)expected).getFormatedContractParams(), ((IExecutionOperationContract)current).getFormatedContractParams());
          assertVariables((IExecutionOperationContract)expected, (IExecutionOperationContract)current, compareVariables);
       }
       else if (expected instanceof IExecutionLoopInvariant) {
@@ -496,13 +508,13 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ProofInputException Occurred Exception.
     */
    protected static void assertMethodReturns(IExecutionMethodCall expected, IExecutionMethodCall current) throws ProofInputException {
-      ImmutableList<IExecutionMethodReturn> expectedEntries = expected.getMethodReturns();
-      ImmutableList<IExecutionMethodReturn> currentEntries = current.getMethodReturns();
+      ImmutableList<IExecutionBaseMethodReturn<?>> expectedEntries = expected.getMethodReturns();
+      ImmutableList<IExecutionBaseMethodReturn<?>> currentEntries = current.getMethodReturns();
       if (expectedEntries != null) {
          assertNotNull("Method return of \"" + current + "\" should not be null.", currentEntries);
          assertEquals("Node: " + expected, expectedEntries.size(), currentEntries.size());
-         Iterator<IExecutionMethodReturn> expectedIter = expectedEntries.iterator();
-         Iterator<IExecutionMethodReturn> currentIter = currentEntries.iterator();
+         Iterator<IExecutionBaseMethodReturn<?>> expectedIter = expectedEntries.iterator();
+         Iterator<IExecutionBaseMethodReturn<?>> currentIter = currentEntries.iterator();
          while (expectedIter.hasNext() && currentIter.hasNext()) {
             assertExecutionNode(expectedIter.next(), currentIter.next(), false, false, false, false);
          }
@@ -656,8 +668,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertNull(current);
       }
    }
-
-
    
    /**
     * Makes sure that the given values are the same.
