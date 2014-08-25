@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="VerifyMin.min(_x,_y);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call VerifyMin.min(_x,_y)&gt;" pathCondition="true" pathConditionChanged="false">
       <variable name="heapAtPre" arrayIndex="-1" isArrayIndex="false">
          <value name="heapAtPre {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
@@ -55,7 +55,7 @@
                   </value>
                </variable>
                <callStackEntry path="/0"/>
-               <methodReturn name="&lt;return of min&gt;" signature="&lt;return of VerifyMin.min(_x,_y);&gt;" pathCondition="gt(y,x)" pathConditionChanged="false" nameIncludingReturnValue="&lt;return x as result of min&gt;" signatureIncludingReturnValue="&lt;return x as result of VerifyMin.min(_x,_y);&gt;" isReturnValueComputed="true" methodReturnCondition="gt(y,x)">
+               <methodReturn name="&lt;return of min&gt;" signature="&lt;return of VerifyMin.min(_x,_y)&gt;" pathCondition="gt(y,x)" pathConditionChanged="false" nameIncludingReturnValue="&lt;return x as result of min&gt;" signatureIncludingReturnValue="&lt;return x as result of VerifyMin.min(_x,_y)&gt;" isReturnValueComputed="true" methodReturnCondition="gt(y,x)">
                   <methodReturnValue name="x" returnValueString="x" hasCondition="false">
                   </methodReturnValue>
                   <variable name="_x" arrayIndex="-1" isArrayIndex="false">
@@ -104,7 +104,7 @@
                   </value>
                </variable>
                <callStackEntry path="/0"/>
-               <methodReturn name="&lt;return of min&gt;" signature="&lt;return of VerifyMin.min(_x,_y);&gt;" pathCondition="leq(y,x)" pathConditionChanged="false" nameIncludingReturnValue="&lt;return y as result of min&gt;" signatureIncludingReturnValue="&lt;return y as result of VerifyMin.min(_x,_y);&gt;" isReturnValueComputed="true" methodReturnCondition="leq(y,x)">
+               <methodReturn name="&lt;return of min&gt;" signature="&lt;return of VerifyMin.min(_x,_y)&gt;" pathCondition="leq(y,x)" pathConditionChanged="false" nameIncludingReturnValue="&lt;return y as result of min&gt;" signatureIncludingReturnValue="&lt;return y as result of VerifyMin.min(_x,_y)&gt;" isReturnValueComputed="true" methodReturnCondition="leq(y,x)">
                   <methodReturnValue name="y" returnValueString="y" hasCondition="false">
                   </methodReturnValue>
                   <variable name="_x" arrayIndex="-1" isArrayIndex="false">

@@ -120,6 +120,14 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
          return name;
       }
    }
+   
+   /**
+    * Checks if the value of {@link #getName()} is already computed.
+    * @return {@code ture} name is computed, {@code false} name is not computed yet.
+    */
+   protected boolean isNameComputed() {
+      return name != null;
+   }
 
    /**
     * Computes the name of this node lazily when {@link #getName()}

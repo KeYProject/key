@@ -28,6 +28,7 @@ import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.sed.key.core.model.KeYBranchCondition;
 import org.key_project.sed.key.core.model.KeYBranchStatement;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
+import org.key_project.sed.key.core.model.KeYExceptionalMethodReturn;
 import org.key_project.sed.key.core.model.KeYExceptionalTermination;
 import org.key_project.sed.key.core.model.KeYLoopBodyTermination;
 import org.key_project.sed.key.core.model.KeYLoopCondition;
@@ -44,6 +45,7 @@ import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
@@ -157,6 +159,13 @@ public final class KeYModelUtil {
          KeYMethodCall keyCall = (KeYMethodCall)callNode;
          result = createMethodReturn(target, thread, parent, keyCall, executionReturn);
       }
+      else if (executionNode instanceof IExecutionExceptionalMethodReturn) {
+         IExecutionExceptionalMethodReturn executionReturn = ((IExecutionExceptionalMethodReturn)executionNode);
+         IKeYSEDDebugNode<?> callNode = target.getDebugNode(executionReturn.getMethodCall());
+         Assert.isTrue(callNode instanceof KeYMethodCall);
+         KeYMethodCall keyCall = (KeYMethodCall)callNode;
+         result = createExceptionalMethodReturn(target, thread, parent, keyCall, executionReturn);
+      }
       else if (executionNode instanceof IExecutionStatement) {
          result = new KeYStatement(target, parent, thread, (IExecutionStatement)executionNode);
       }
@@ -192,7 +201,7 @@ public final class KeYModelUtil {
                                                     KeYMethodCall keyCall, 
                                                     IExecutionMethodReturn executionReturn) throws DebugException {
       synchronized (keyCall) {
-         KeYMethodReturn resultReturn = keyCall.getMethodReturn(executionReturn);
+         KeYMethodReturn resultReturn = (KeYMethodReturn)keyCall.getMethodReturn(executionReturn);
          if (resultReturn != null) {
             // Reuse method return created by the method call and set its parent now
             if (resultReturn.getParent() == null) {
@@ -206,6 +215,40 @@ public final class KeYModelUtil {
          else {
             // Create new method return
             return new KeYMethodReturn(target, parent, thread, keyCall, executionReturn);
+         }
+      }
+   }
+   
+   /**
+    * Creates the {@link KeYExceptionalMethodReturn} for the given {@link IExecutionExceptionalMethodReturn}.
+    * @param target The {@link KeYDebugTarget} to use.
+    * @param thread The parent {@link KeYThread}.
+    * @param parent The parent {@link IKeYSEDDebugNode} in the debug model.
+    * @param keyCall The {@link KeYMethodCall} which is returned by the given {@link IExecutionExceptionalMethodReturn}.
+    * @param executionReturn The {@link IExecutionExceptionalMethodReturn} of the execution tree.
+    * @return The {@link KeYExceptionalMethodReturn} for the given {@link IExecutionTermination}.
+    * @throws DebugException Occurred Exception.
+    */
+   public static KeYExceptionalMethodReturn createExceptionalMethodReturn(KeYDebugTarget target, 
+                                                                          KeYThread thread, 
+                                                                          IKeYSEDDebugNode<?> parent, 
+                                                                          KeYMethodCall keyCall, 
+                                                                          IExecutionExceptionalMethodReturn executionReturn) throws DebugException {
+      synchronized (keyCall) {
+         KeYExceptionalMethodReturn resultReturn = (KeYExceptionalMethodReturn)keyCall.getMethodReturn(executionReturn);
+         if (resultReturn != null) {
+            // Reuse exceptional method return created by the method call and set its parent now
+            if (resultReturn.getParent() == null) {
+               resultReturn.setParent(parent);
+            }
+            else {
+               Assert.isTrue(resultReturn.getParent() == parent);
+            }
+            return resultReturn;
+         }
+         else {
+            // Create new exceptional method return
+            return new KeYExceptionalMethodReturn(target, parent, thread, keyCall, executionReturn);
          }
       }
    }

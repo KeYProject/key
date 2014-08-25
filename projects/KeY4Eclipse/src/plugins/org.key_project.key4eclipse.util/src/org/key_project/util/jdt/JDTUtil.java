@@ -43,11 +43,13 @@ import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.internal.corext.util.CodeFormatterUtil;
+import org.eclipse.jdt.internal.corext.util.JavaModelUtil;
 import org.eclipse.jdt.internal.ui.javaeditor.ASTProvider;
 import org.eclipse.jdt.internal.ui.viewsupport.JavaElementLabelComposer;
 import org.eclipse.jdt.ui.JavaElementLabels;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 
 /**
@@ -87,6 +89,31 @@ public class JDTUtil {
                   result = methods[j];
                }
                j++;
+            }
+            i++;
+         }
+      }
+      return result;
+   }
+   
+   /**
+    * Searches the {@link IType} as JDT representation which ends
+    * at the given index.
+    * @param cu The {@link ICompilationUnit} to search in.
+    * @param endIndex The index in the file at that the required method ends.
+    * @return The found {@link IType} or {@code null} if the JDT representation is not available.
+    * @throws JavaModelException Occurred Exception.
+    * @throws IOException Occurred Exception.
+    */
+   public static IType findJDTType(ICompilationUnit cu, int endIndex) throws JavaModelException, IOException {
+      IType result = null;
+      if (cu != null) {
+         IType[] types = cu.getAllTypes();
+         int i = 0;
+         while (result == null && i < types.length) {
+            ISourceRange typeRange = types[i].getSourceRange();
+            if (endIndex == typeRange.getOffset() + typeRange.getLength()) {
+               result = types[i];
             }
             i++;
          }
@@ -655,6 +682,76 @@ public class JDTUtil {
        */
       public Block getResult() {
          return result;
+      }
+   }
+
+   /**
+    * Searches the {@link IMethod} with the given name and full qualified parameter types.
+    * @param jdtType The {@link IType} which provides the available methods.
+    * @param name The name of the methods.
+    * @param parameterTypes The full qualified parameter types.
+    * @return The found {@link IMethod} if available or {@code null} otherwise.
+    * @throws JavaModelException Occurred Exception.
+    */
+   public static IMethod findJDTMethod(final IType jdtType, final String name, final String[] parameterTypes) throws JavaModelException {
+      try {
+         if (jdtType != null) {
+            IMethod[] methods = jdtType.getMethods();
+            return ArrayUtil.search(methods, new IFilter<IMethod>() {
+               @Override
+               public boolean select(IMethod element) {
+                  try {
+                     if (ObjectUtil.equals(name, element.getElementName())) {
+                        String[] parameters = element.getParameterTypes();
+                        if (parameters.length == parameterTypes.length) {
+                           boolean parametersMatches = true;
+                           int i = 0;
+                           while (parametersMatches && i < parameters.length) {
+                              String resolvedType = JavaModelUtil.getResolvedTypeName(parameters[i], jdtType);
+                              if (!ObjectUtil.equals(resolvedType, parameterTypes[i])) {
+                                 parametersMatches = false;
+                              }
+                              i++;
+                           }
+                           return parametersMatches;
+                        }
+                        else {
+                           return false;
+                        }
+                     }
+                     else {
+                        return false;
+                     }
+                  }
+                  catch (JavaModelException e) {
+                     throw new RuntimeException(e);
+                  }
+               }
+            });
+         }
+         else {
+            return null;
+         }
+      }
+      catch (RuntimeException e) {
+         throw (JavaModelException)e.getCause();
+      }
+   }
+
+   /**
+    * Returns the full qualified type name of the given {@link IType}.
+    * @param type The {@link IType}.
+    * @return The full qualified {@link IType} or {@code null} if no {@link IType} is defined.
+    */
+   public static String getQualifiedTypeName(IType type) {
+      if (type != null) {
+         StringBuffer sb = new StringBuffer();
+         JavaElementLabelComposerHelper c = new JavaElementLabelComposerHelper(sb, type.getDeclaringType());
+         c.appendTypeLabel(type, JavaElementLabels.T_FULLY_QUALIFIED);
+         return sb.toString();
+      }
+      else {
+         return null;
       }
    }
 }

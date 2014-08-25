@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferencePage;
@@ -47,6 +46,7 @@ import org.key_project.util.eclipse.swt.viewer.ButtonViewer;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
+import de.uka.ilkd.key.gui.configuration.ChoiceSelector.ChoiceEntry;
 import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
 
 /**
@@ -153,8 +153,9 @@ public abstract class AbstractChoicePreferencePage extends PreferencePage implem
          settingsGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
          ButtonViewer settingsViewer = new ButtonViewer(settingsGroup, SWT.RADIO);
          settingsViewer.setContentProvider(ArrayContentProvider.getInstance());
-         settingsViewer.setInput(category2Choices.get(category));
-         settingsViewer.setSelection(SWTUtil.createSelection(category2DefaultChoice.get(category)));
+         ChoiceEntry[] choices = ChoiceSelector.createChoiceEntries(category2Choices.get(category));
+         settingsViewer.setInput(choices);
+         settingsViewer.setSelection(SWTUtil.createSelection(ChoiceSelector.findChoice(choices, category2DefaultChoice.get(category))));
          category2ChoiceViewerMapping.put(category, settingsViewer);
          
          Group explanationGroup = new Group(tabComposite, SWT.NONE);
@@ -198,7 +199,10 @@ public abstract class AbstractChoicePreferencePage extends PreferencePage implem
       if (defaults != null) {
          for (Entry<String, String> entry : defaults.entrySet()) {
             ButtonViewer viewer = category2ChoiceViewerMapping.get(entry.getKey());
-            viewer.setSelection(SWTUtil.createSelection(entry.getValue()));
+            if (viewer != null) { // Otherwise default value for not existing choice
+               ChoiceEntry[] choices = (ChoiceEntry[])viewer.getInput();
+               viewer.setSelection(SWTUtil.createSelection(ChoiceSelector.findChoice(choices, entry.getValue())));
+            }
          }
       }
    }
@@ -235,8 +239,9 @@ public abstract class AbstractChoicePreferencePage extends PreferencePage implem
       for (Entry<String, ButtonViewer> entry : entries) {
          ISelection selection = entry.getValue().getSelection();
          Object selectedElement = SWTUtil.getFirstElement(selection);
-         Assert.isTrue(selectedElement instanceof String);
-         category2DefaultChoice.put(entry.getKey(), (String)selectedElement);
+         if (selectedElement instanceof ChoiceEntry) {
+            category2DefaultChoice.put(entry.getKey(), ((ChoiceEntry)selectedElement).getChoice());
+         }
       }
       choiceSettings.setDefaultChoices(category2DefaultChoice);
    }

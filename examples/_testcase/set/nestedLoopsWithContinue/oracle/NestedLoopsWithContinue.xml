@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="NestedLoopsWithContinue.main();" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call NestedLoopsWithContinue.main()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int[] array = {1,2,3,4 };" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
          <statement name="return sum(array);" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <methodCall name="NestedLoopsWithContinue.sum(array_1);" pathCondition="true" pathConditionChanged="false">
+            <methodCall name="&lt;call NestedLoopsWithContinue.sum(array_1)&gt;" pathCondition="true" pathConditionChanged="false">
                <callStackEntry path="/0"/>
                <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
                   <callStackEntry path="/0/0/0/0"/>
@@ -190,10 +190,10 @@
                                                                                                                                                                                                    <statement name="return result_1;" pathCondition="true" pathConditionChanged="false">
                                                                                                                                                                                                       <callStackEntry path="/0/0/0/0"/>
                                                                                                                                                                                                       <callStackEntry path="/0"/>
-                                                                                                                                                                                                      <methodReturn name="&lt;return of sum&gt;" signature="&lt;return of NestedLoopsWithContinue.sum(array_1);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                                                                                                                                                                                      <methodReturn name="&lt;return of sum&gt;" signature="&lt;return of NestedLoopsWithContinue.sum(array_1)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                                                                                                                                                                          <callStackEntry path="/0/0/0/0"/>
                                                                                                                                                                                                          <callStackEntry path="/0"/>
-                                                                                                                                                                                                         <methodReturn name="&lt;return of main&gt;" signature="&lt;return of NestedLoopsWithContinue.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                                                                                                                                                                                         <methodReturn name="&lt;return of main&gt;" signature="&lt;return of NestedLoopsWithContinue.main()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                                                                                                                                                                             <callStackEntry path="/0"/>
                                                                                                                                                                                                             <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                                                                                                                                                                             </termination>
