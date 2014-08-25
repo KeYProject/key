@@ -61,6 +61,10 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
 
     /**
      * Rule sets to capture.
+     * Automated performance tests showed that including more rule sets
+     * here would not improve prover performance.
+     * I tested it for "simplify_literals", "cast_del", and "evaluate_instanceof";
+     * in any case there was a measurable slowdown. -- DB 03/06/14
      */
     private static final ImmutableList<String> ruleSets
     = ImmutableSLList.<String>nil().append("concrete")
@@ -85,6 +89,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
     //-------------------------------------------------------------------------
 
     public OneStepSimplifier() { // Visibility must be public because it is no longer a singleton in general. Side proofs use own OneStepSimplifier instances for parallelization. This is required thanks to the internal state of this rule.
+        assert bottomUp.length == ruleSets.size();
     }
 
 
@@ -115,7 +120,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
                             .tacletIndex()
                             .allNoPosTacletApps());
         }
-
+        
         //identify those apps suitable for the one step simplifier;
         //store them in appsTakenOver and their taclets in result
         for(NoPosTacletApp app : allApps) {
@@ -128,7 +133,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
                             || !tac.varsNew().isEmpty()
                             || tac.varsNewDependingOn().hasNext()
                             || ((RewriteTaclet)tac).getApplicationRestriction()!= RewriteTaclet.NONE
-                            || !proof.mgt().getJustification(app).isAxiomJustification()) {
+                            || !proof.getInitConfig().getJustifInfo().getJustification(tac).isAxiomJustification()) {
                 continue;
             }
 
@@ -190,7 +195,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
      * Deactivate one-step simplification: clear caches, restore taclets to
      * the goals' taclet indices.
      */
-    private void shutdownIndices() {
+    public void shutdownIndices() {
         if (lastProof != null) {
             if (!lastProof.isDisposed()) {
                 for(Goal g : lastProof.openGoals()) {
@@ -370,9 +375,9 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
     private RuleApp makeReplaceKnownTacletApp(Term formula, PosInOccurrence pio) {
         FindTaclet taclet;
         if(pio.isInAntec()) {
-            taclet = (FindTaclet) lastProof.env().getInitConfig().lookupActiveTaclet(new Name("replace_known_left"));
+            taclet = (FindTaclet) lastProof.getInitConfig().lookupActiveTaclet(new Name("replace_known_left"));
         } else {
-            taclet = (FindTaclet) lastProof.env().getInitConfig().lookupActiveTaclet(new Name("replace_known_right"));
+            taclet = (FindTaclet) lastProof.getInitConfig().lookupActiveTaclet(new Name("replace_known_right"));
         }
 
         SVInstantiations svi = SVInstantiations.EMPTY_SVINSTANTIATIONS;

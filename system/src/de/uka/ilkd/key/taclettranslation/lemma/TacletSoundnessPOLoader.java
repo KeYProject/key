@@ -55,9 +55,11 @@ public class TacletSoundnessPOLoader {
         private ImmutableSet<Taclet> resultingTacletsForOriginalProof = DefaultImmutableSet.<Taclet>nil();
 
 
+        private final boolean isOnlyUsedForProvingTaclets;
 
         private final TacletLoader       tacletLoader;
         private TacletFilter tacletFilter;
+
 
         static public interface LoaderListener {
                 public void started();
@@ -118,29 +120,21 @@ public class TacletSoundnessPOLoader {
 
         }
 
-
-
+        
         public TacletSoundnessPOLoader(
-
-                        LoaderListener listener,
-                        TacletFilter filter,
-                        boolean loadAsLemmata,
-                        TacletLoader loader) {
-                this(listener, filter, loadAsLemmata, loader, null);
-        }
-
-        public TacletSoundnessPOLoader(
-
                         LoaderListener listener,
                         TacletFilter filter,
                         boolean loadAsLemmata,
                         TacletLoader loader,
-                        InitConfig originalConfig) {
+                        InitConfig originalConfig,
+                        boolean isOnlyUsedForProvingTaclets) {
                 super();
                 this.tacletLoader = loader;
                 this.tacletFilter = filter;
                 this.loadAsLemmata = loadAsLemmata;
                 this.originalConfig = originalConfig;
+
+                this.isOnlyUsedForProvingTaclets = isOnlyUsedForProvingTaclets;
 
                 if (listener != null) {
                         listeners.add(listener);
@@ -327,29 +321,34 @@ public class TacletSoundnessPOLoader {
          * and are not added to an already existing proof obligation. 
          */
         private boolean isUsedOnlyForProvingTaclets(){
-                return originalConfig == null;
+                return isOnlyUsedForProvingTaclets;
         }
 
         private ProofAggregate createProof(ProofEnvironment proofEnvForTaclets,
                         ImmutableSet<Taclet> tacletsToProve,
                         ImmutableSet<Taclet> axioms, 
                         ImmutableSet<Taclet> loadedTaclets) {
-                tacletLoader.manageAvailableTaclets(proofEnvForTaclets.getInitConfig(), 
+
+              tacletLoader.manageAvailableTaclets(originalConfig, 
                         loadedTaclets, tacletsToProve);
+
                 ProofObligationCreator creator = new ProofObligationCreator();
-                ProofAggregate p = creator.create(tacletsToProve,
-                                proofEnvForTaclets.getInitConfig(), axioms,
-                                listeners);
+
+                InitConfig[] proofConfigs = new InitConfig[tacletsToProve.size()];
+                for (int i = 0; i<proofConfigs.length; i++) {
+                   proofConfigs[i] = originalConfig.deepCopy();
+                   proofConfigs[i].registerRules(tacletsToProve, AxiomJustification.INSTANCE);
+                }
                 
-                proofEnvForTaclets.registerRules(tacletsToProve,
-                                AxiomJustification.INSTANCE);
+                ProofAggregate p = creator.create(tacletsToProve, proofConfigs, axioms, listeners);
+                
 
                 if(isUsedOnlyForProvingTaclets()){
-                        for(Taclet taclet : proofEnvForTaclets.getInitConfig().getTaclets()){
-                                proofEnvForTaclets.getJustifInfo().addJustification(taclet, AxiomJustification.INSTANCE);
+                   for (InitConfig proofConfig : proofConfigs)
+                        for(Taclet taclet : proofConfig.getTaclets()){
+                           proofConfig.getJustifInfo().addJustification(taclet, AxiomJustification.INSTANCE);
                         }
                 }
-
 
                 registerProofs(p, proofEnvForTaclets);
                 return p;

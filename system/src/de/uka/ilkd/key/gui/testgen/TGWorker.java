@@ -13,8 +13,9 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.InterruptListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.ProverTaskListener;
+import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
@@ -24,6 +25,8 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
+import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -49,7 +52,8 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 	@Override
 	public Void doInBackground() {
 
-		TestGenerationSettings settings = ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings();
+		TestGenerationSettings settings =
+		        ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings();
 
 
 		if (!SolverType.Z3_CE_SOLVER.isInstalled(true)) {
@@ -90,22 +94,33 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 			final MainWindow mw = MainWindow.getInstance();
 			mw.addProblem(pa);
 			final SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
+			TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
+			final ProverTaskListener ptl = mediator.getUI().getListener();
 			try {
 				if (stop) {
 					return null;
 				}
 				mediator.setProof(proof);
-				macro.applyTo(mediator, null, null);
+
+				ptl.taskStarted(macro.getName(), 0);
+				synchronized(macro) {
+			                info = macro.applyTo(mediator, null, ptl);
+				}
 				problems.addAll(SMTProblem.createSMTProblems(mediator
 						.getSelectedProof()));
 				// mediator.getUI().removeProof(mediator.getSelectedProof());
 			} catch (final InterruptedException e) {
 				Debug.out("Semantics blasting interrupted");
 				tgInfoDialog
-				.writeln("\n Warning: semantics blasting was interrupted. A test case will not be generated.");
+				.writeln("\n Warning: semantics blasting was interrupted. "
+				         + "A test case will not be generated.");
 			} catch (final Exception e) {
 				tgInfoDialog.writeln(e.getLocalizedMessage());
 				System.err.println(e);
+			} finally {
+			    ptl.taskFinished(info);
+			    getMediator().setInteractive(true);
+			    getMediator().startInterface(true);
 			}
 		}
 		tgInfoDialog.writeln("\nDone applying semantic blasting.");
@@ -137,6 +152,8 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 			return null;
 		}
 		launcher.launch(solvers, problems, proof.getServices());
+//		ModelGenerator mg = new ModelGenerator(proofs.get(0).root().sequent(), 3, getMediator());
+//		mg.launch();
 		return null;
 	}
 
@@ -224,13 +241,12 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 					return null;
 				}
 			}
-		}
+		}		
 		final Proof proof = new Proof("Test Case for NodeNr: "
-				+ node.serialNr(), newSequent, "", oldProof.env()
-				.getInitConfig().createTacletIndex(), oldProof.env()
-				.getInitConfig().createBuiltInRuleIndex(),
-				oldProof.getServices(), oldProof.getSettings());
-		proof.setProofEnv(oldProof.env());
+				+ node.serialNr(), newSequent, "", oldProof.getInitConfig().createTacletIndex(), 
+				oldProof.getInitConfig().createBuiltInRuleIndex(),
+				oldProof.getInitConfig() );
+		proof.setEnv(oldProof.getEnv());
 		proof.setNamespaces(oldProof.getNamespaces());
 		return proof;
 	}

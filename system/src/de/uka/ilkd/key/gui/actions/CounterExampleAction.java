@@ -12,30 +12,33 @@
 //
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.util.LinkedList;
-import java.util.List;
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
+import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.util.Debug;
-import javax.swing.SwingWorker;
+import java.awt.event.ActionEvent;
+import java.util.*;
+import javax.swing.*;
 
 @SuppressWarnings("serial")
 public class CounterExampleAction extends MainWindowAction {
 
-    private static final String NAME = "CE";
+    private static final String NAME = "Generate Counterexample";
     private static final String TOOLTIP = "Search for a counterexample for the selected goal";
 
     public CounterExampleAction(MainWindow mainWindow) {
         super(mainWindow);
         setName(NAME);
         setTooltip(TOOLTIP);
+        Icon icon = IconFactory.counterExample(MainWindow.TOOLBAR_ICON_SIZE);
+        putValue(SMALL_ICON, icon);
         init();
     }
 
@@ -56,7 +59,10 @@ public class CounterExampleAction extends MainWindowAction {
                 } else {
                     final Node selNode = getMediator().getSelectedNode();
                     //Can be applied only to root nodes
-                    setEnabled(selNode.childrenCount() == 0);
+                    
+                    
+                    
+                    setEnabled(selNode.childrenCount() == 0 && !selNode.isClosed());
                 }
             }
 
@@ -88,14 +94,14 @@ public class CounterExampleAction extends MainWindowAction {
         Proof oldProof = node.proof();
         Sequent oldSequent = node.sequent();
         Sequent newSequent = Sequent.createSequent(oldSequent.antecedent(), oldSequent.succedent());
+        InitConfig newInitConfig = oldProof.getInitConfig().deepCopy();
         Proof proof = new Proof("Semantics Blasting: " + oldProof.name(),
                 newSequent, "",
-                oldProof.env().getInitConfig().createTacletIndex(),
-                oldProof.env().getInitConfig().createBuiltInRuleIndex(),
-                oldProof.getServices(),
-                oldProof.getSettings());
+                newInitConfig.createTacletIndex(),
+                newInitConfig.createBuiltInRuleIndex(),
+                newInitConfig );
 
-        proof.setProofEnv(oldProof.env());
+        proof.setEnv(oldProof.getEnv());
         proof.setNamespaces(oldProof.getNamespaces());
 
         ProofAggregate pa = new SingleProof(proof, "XXX");
@@ -123,18 +129,25 @@ public class CounterExampleAction extends MainWindowAction {
 
         @Override
         protected Void doInBackground() throws Exception {
-            KeYMediator mediator = getMediator();
-            Proof proof = mediator.getSelectedProof();
-            SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
+            final KeYMediator mediator = getMediator();
+            final Proof proof = mediator.getSelectedProof();
+            final SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
+            TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
+            final ProverTaskListener ptl = mediator.getUI().getListener();
+            ptl.taskStarted(macro.getName(), 0);
 
             try {
-                macro.applyTo(mediator, null, null);
+                synchronized(macro) {
+                    // wait for macro to terminate
+                    info = macro.applyTo(mediator, null, ptl);
+                }
             } catch (InterruptedException e) {
                 Debug.out("Semantics blasting interrupted");
+            } finally {
+                ptl.taskFinished(info);
+                getMediator().setInteractive(true);
+                getMediator().startInterface(true);
             }
-
-            getMediator().setInteractive(true);
-            getMediator().startInterface(true);
 
             //invoke z3 for counterexamples
             SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),

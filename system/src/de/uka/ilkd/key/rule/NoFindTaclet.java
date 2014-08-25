@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.rule.tacletbuilder.NoFindTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -25,9 +23,12 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.tacletbuilder.NoFindTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 /** 
  * Used to implement a Taclet that has no <I>find</I> part. This kind of taclet
@@ -60,20 +61,25 @@ public class NoFindTaclet extends Taclet {
 	cacheMatchInfo();
     } 
 
-    /**
-     * adds the sequent of the add part of the Taclet to the goal sequent
-     * @param add the Sequent to be added
-     * @param goal the Goal to be updated
-     * @param services the Services encapsulating all java information
-     * @param matchCond the MatchConditions with all required instantiations 
-     */
-    protected void applyAdd(Sequent add, Goal goal, 
-			    Services services,
-			    MatchConditions matchCond) {
-	addToAntec(add.antecedent(), goal, null, services, matchCond);
-	addToSucc (add.succedent(),  goal, null, services, matchCond);
-    }
-    
+   /**
+    * adds the sequent of the add part of the Taclet to the goal sequent
+    * 
+    * @param add
+    *           the Sequent to be added
+    * @param currentSequent
+    *           the Sequent which is the current (intermediate) result of
+    *           applying the taclet
+    * @param services
+    *           the Services encapsulating all java information
+    * @param matchCond
+    *           the MatchConditions with all required instantiations
+    */   
+   protected void applyAdd(Sequent add,
+         SequentChangeInfo currentSequent, Services services,
+         MatchConditions matchCond) {
+      addToAntec(add.antecedent(), currentSequent, null, services, matchCond, null);
+      addToSucc(add.succedent(), currentSequent, null, services, matchCond, null);
+   }    
 
     /**
      * the rule is applied on the given goal using the
@@ -92,37 +98,46 @@ public class NoFindTaclet extends Taclet {
 	TacletApp                    tacletApp        = (TacletApp) ruleApp;
 	MatchConditions              mc               = tacletApp.matchConditions ();
 
-	ImmutableList<Goal>                   newGoals         =
+	ImmutableList<SequentChangeInfo> newSequentsForGoals         =
 	    checkIfGoals ( goal,
 			   tacletApp.ifFormulaInstantiations (),
 			   mc,
 			   numberOfNewGoals );
 	
-	Iterator<TacletGoalTemplate> it               = goalTemplates().iterator();
-	Iterator<Goal>               goalIt           = newGoals.iterator();
+	ImmutableList<Goal> newGoals = goal.split(newSequentsForGoals.size());
+   
+   Iterator<TacletGoalTemplate> it               = goalTemplates().iterator();
+   Iterator<Goal>               goalIt           = newGoals.iterator();
+   Iterator<SequentChangeInfo> newSequentsIt     = newSequentsForGoals.iterator();	
 
 	while (it.hasNext()) {
 	    TacletGoalTemplate gt          = it    .next();
 	    Goal               currentGoal = goalIt.next();
 	    // add first because we want to use pos information that
 	    // is lost applying replacewith
-	    applyAdd(         gt.sequent(),
-			      currentGoal,
-			      services,
-			      mc);
-
+	    
+	    SequentChangeInfo currentSequent = newSequentsIt.next();
+	    
+	    applyAdd(   gt.sequent(),
+	                currentSequent,
+	                services,
+	                mc);
+	    
 	    applyAddrule(     gt.rules(),
 			      currentGoal,
 			      services,
 			      mc);
 
 	    applyAddProgVars( gt.addedProgVars(),
-			      currentGoal,
-                              tacletApp.posInOccurrence(),
-                              services,
+	          currentSequent,  
+	          currentGoal,
+	          tacletApp.posInOccurrence(),
+	          services,
 			      mc);
-                              
-            currentGoal.setBranchLabel(gt.name());
+
+       currentGoal.setSequent(currentSequent);
+
+	    currentGoal.setBranchLabel(gt.name());
 	}
 
 	return newGoals;

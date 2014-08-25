@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="SimpleIntQuery.mainWithSymbolicUpdates(x);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call SimpleIntQuery.mainWithSymbolicUpdates(x)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="x=x+11;" pathCondition="true" pathConditionChanged="false">
          <statement name="int magicValue = magic(x);" pathCondition="true" pathConditionChanged="false">
             <operationContract name="result_0 = magic(x) catch(exc_0)
 pre: true
 post: result_0 = subMagic(x) &amp; exc_0 = null
 mod: empty
-termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="x" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of SimpleIntQuery.mainWithSymbolicUpdates(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
+                  <methodReturn name="&lt;return of mainWithSymbolicUpdates&gt;" signature="&lt;return of SimpleIntQuery.mainWithSymbolicUpdates(x)&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
 	Z(2(4(#))) {gt(x,Z(neglit(2(1(#)))))}, 
 	Z(neglit(1(1(7(4(#)))))) {lt(x,Z(neglit(1(1(#)))))}
-as result of SimpleIntQuery.mainWithSymbolicUpdates(x);&gt;" isReturnValueComputed="true">
+as result of mainWithSymbolicUpdates&gt;" signatureIncludingReturnValue="&lt;return 
+	Z(2(4(#))) {gt(x,Z(neglit(2(1(#)))))}, 
+	Z(neglit(1(1(7(4(#)))))) {lt(x,Z(neglit(1(1(#)))))}
+as result of SimpleIntQuery.mainWithSymbolicUpdates(x)&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                      <methodReturnValue name="Z(2(4(#))) {gt(x,Z(neglit(2(1(#)))))}" returnValueString="Z(2(4(#)))" hasCondition="true" conditionString="gt(x,Z(neglit(2(1(#)))))">
                      </methodReturnValue>
                      <methodReturnValue name="Z(neglit(1(1(7(4(#)))))) {lt(x,Z(neglit(1(1(#)))))}" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="true" conditionString="lt(x,Z(neglit(1(1(#)))))">
@@ -24,5 +27,7 @@ as result of SimpleIntQuery.mainWithSymbolicUpdates(x);&gt;" isReturnValueComput
             </operationContract>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0"/>
 </start>

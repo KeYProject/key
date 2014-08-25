@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="SimpleBooleanQuery.main(x);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call SimpleBooleanQuery.main(x)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicValue = magic(x);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_0 = magic(x) catch(exc_0)
 pre: true
 post: result_0 = subMagic(x) &amp; exc_0 = null
 mod: empty
-termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="x" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
-               <methodReturn name="&lt;return of SimpleBooleanQuery.main(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
+               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of SimpleBooleanQuery.main(x)&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
 	Z(2(4(#))) {equals(x,TRUE)}, 
 	Z(neglit(1(1(7(4(#)))))) {not(equals(x,TRUE))}
-as result of SimpleBooleanQuery.main(x);&gt;" isReturnValueComputed="true">
+as result of main&gt;" signatureIncludingReturnValue="&lt;return 
+	Z(2(4(#))) {equals(x,TRUE)}, 
+	Z(neglit(1(1(7(4(#)))))) {not(equals(x,TRUE))}
+as result of SimpleBooleanQuery.main(x)&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                   <methodReturnValue name="Z(2(4(#))) {equals(x,TRUE)}" returnValueString="Z(2(4(#)))" hasCondition="true" conditionString="equals(x,TRUE)">
                   </methodReturnValue>
                   <methodReturnValue name="Z(neglit(1(1(7(4(#)))))) {not(equals(x,TRUE))}" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="true" conditionString="not(equals(x,TRUE))">
@@ -22,5 +25,7 @@ as result of SimpleBooleanQuery.main(x);&gt;" isReturnValueComputed="true">
             </statement>
          </operationContract>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0"/>
 </start>

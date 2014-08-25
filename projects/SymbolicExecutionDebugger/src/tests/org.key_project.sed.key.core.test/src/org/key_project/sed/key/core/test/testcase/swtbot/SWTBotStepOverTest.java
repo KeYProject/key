@@ -50,21 +50,31 @@ public class SWTBotStepOverTest extends AbstractKeYDebugTargetTestCase {
             assertStep(target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension);
             // Step into
             assertStepInto(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // main method
+            item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0);
             assertStepInto(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // if
+            item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0);
             assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // i = 2
             item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1, 0, 0); // Select first i = 2 statement
             assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // j = 3 on first branch
+            item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1, 0, 0); // Select first i = 2 statement
             assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // x = valueLonger(i) on first branch
+            item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1, 0, 0); // Select first i = 2 statement
             assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // y = value(j) on first branch
             item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1, 1, 0); // Select second i = 2 statement
             assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // j = 3 on second branch
+            item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1, 1, 0); // Select second i = 2 statement
             assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // x = valueLonger(i) on second branch
+            item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1, 1, 0); // Select second i = 2 statement
             assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // y = value(j) on second branch
             item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
             assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // z
+            item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
             assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // zz
+            item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
             assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // return statement
+            item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
             assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // method return -2
+            item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
             assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // end
          }
       };
@@ -80,8 +90,9 @@ public class SWTBotStepOverTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.FALSE,
-                           14, 
-                           executor);
+                           Boolean.FALSE,
+                           Boolean.TRUE, 
+                           14, executor);
    }
 
    /**
@@ -101,15 +112,25 @@ public class SWTBotStepOverTest extends AbstractKeYDebugTargetTestCase {
             assertStep(target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension);
             // Step into
             assertStepInto(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // main method
+            item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select first thread
             assertStepInto(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // if
+            item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select first thread
             assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // i = 2
+            item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select first thread
             assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // j = 3
+            item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select first thread
             assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // x = valueLonger(i)
+            item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select first thread
             assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // y = value(j)
+            item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select first thread
             assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // z
+            item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select first thread
             assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // zz
+            item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select first thread
             assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // return statement
+            item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select first thread
             assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // method return -2
+            item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select first thread
             assertStepOver(bot, item, target, Activator.PLUGIN_ID, expectedModelPathInBundle, ++modelIndex, expectedModelFileExtension); // end
          }
       };
@@ -125,7 +146,8 @@ public class SWTBotStepOverTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE, 
                            Boolean.FALSE,
                            Boolean.FALSE,
-                           4, 
-                           executor);
+                           Boolean.FALSE,
+                           Boolean.TRUE, 
+                           4, executor);
    }
 }

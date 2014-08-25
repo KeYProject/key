@@ -11,10 +11,15 @@ import javax.swing.tree.DefaultTreeModel;
  */
 public class InfoTree extends JTree {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 2018185104131516569L;
+
     InfoTree() {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode();
-        root.add(new InfoTreeNode("No proof loaded", 
-        "In this pane, the available logical rules will be displayed and/or explained."));
+        root.add(new InfoTreeNode("No proof loaded",
+                "In this pane, the available logical rules will be displayed and/or explained."));
         setModel(new DefaultTreeModel(root));
         setShowsRootHandles(true);
         setRootVisible(false);

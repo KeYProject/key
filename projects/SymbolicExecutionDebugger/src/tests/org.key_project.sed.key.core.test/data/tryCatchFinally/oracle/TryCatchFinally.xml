@@ -1,27 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_cb791772-ddea-4ee8-b3a2-f6c98baf4ec3" name="tryCatchFinally(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_3eb65f54-0f4c-4178-8578-dd46fa0b40f8" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_a740d4dc-794d-4fee-a2b3-3aeaabe00cee" name="self.tryCatchFinally(input);" pathCondition="true" lineNumber="-1" charStart="97" charEnd="112">
-            <sedStatement xml:id="_fc852a3d-0916-42ab-8b04-5195bf401e61" name="int result = 0;" pathCondition="true" lineNumber="-1" charStart="129" charEnd="144">
-               <sedStatement xml:id="_9427ce0a-2b2c-40d4-9ff9-b9d0e1d05978" name="result_1=1/input;" pathCondition="true" lineNumber="-1" charStart="158" charEnd="177">
-                  <sedBranchCondition xml:id="_17f38fd1-a3b3-444d-98b7-37fd1b1edd70" name="equals(input,Z(0(#)))" pathCondition="equals(input,Z(0(#)))">
-                     <sedStatement xml:id="_edaf98d0-92bd-4c92-8e0e-7cfe8f456855" name="result_1=2;" pathCondition="equals(input,Z(0(#)))" lineNumber="-1" charStart="222" charEnd="233">
-                        <sedStatement xml:id="_c073f886-05df-4e4c-860a-72c1deeaec88" name="result_1=result_1*2;" pathCondition="equals(input,Z(0(#)))" lineNumber="-1" charStart="256" charEnd="276">
-                           <sedStatement xml:id="_90c4180a-2371-4b66-b256-f427fa46187d" name="return result_1;" pathCondition="equals(input,Z(0(#)))" lineNumber="-1" charStart="285" charEnd="299">
-                              <sedMethodReturn xml:id="_d4e8d52c-2464-4e05-a7ea-b45fb6efae37" name="&lt;return Z(4(#)) as result of self.tryCatchFinally(input);&gt;" pathCondition="equals(input,Z(0(#)))" lineNumber="-1" charStart="97" charEnd="112">
-                                 <sedTermination xml:id="_e8fc6ae1-81a6-4ee5-9cb6-cbc0ddddd83d" name="&lt;end&gt;" pathCondition="equals(input,Z(0(#)))" verified="true">
+   <sedTarget xml:id="_5b726fd0-085e-49a9-80ad-e6326ff6bb75" name="tryCatchFinally(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_282f6ccf-cbfb-4f7b-9777-a950f599b748" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_aadb9835-f803-4bf2-a753-d88e80ad650f" name="&lt;call self.tryCatchFinally(input)&gt;" pathCondition="true" lineNumber="-1" charStart="97" charEnd="112" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testTryCatchFinally\src\TryCatchFinally.java">
+            <sedStatement xml:id="_dc06ec63-7744-4467-ad3f-368df3a5ca25" name="int result = 0;" pathCondition="true" lineNumber="-1" charStart="129" charEnd="144" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testTryCatchFinally\src\TryCatchFinally.java">
+               <sedStatement xml:id="_66ceed65-0aca-4b38-bbbd-5b0a2095688d" name="result_1=1/input;" pathCondition="true" lineNumber="-1" charStart="158" charEnd="177" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testTryCatchFinally\src\TryCatchFinally.java">
+                  <sedBranchCondition xml:id="_4988a9db-ced8-4e14-bbc0-b945d6f7436c" name="equals(input,Z(0(#)))" pathCondition="equals(input,Z(0(#)))">
+                     <sedStatement xml:id="_8a4b306e-a06c-4eda-ab24-9b96663d429b" name="result_1=2;" pathCondition="equals(input,Z(0(#)))" lineNumber="-1" charStart="222" charEnd="233" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testTryCatchFinally\src\TryCatchFinally.java">
+                        <sedStatement xml:id="_6b2a576e-6211-4158-a948-78767f09a76c" name="result_1=result_1*2;" pathCondition="equals(input,Z(0(#)))" lineNumber="-1" charStart="256" charEnd="276" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testTryCatchFinally\src\TryCatchFinally.java">
+                           <sedStatement xml:id="_a7c91bf5-c3ee-4003-aa4f-5b36adf371d1" name="return result_1;" pathCondition="equals(input,Z(0(#)))" lineNumber="-1" charStart="285" charEnd="299" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testTryCatchFinally\src\TryCatchFinally.java">
+                              <sedMethodReturn xml:id="_a310eaf3-5a26-4f2c-bd00-1723fb8f6be4" name="&lt;return Z(4(#)) as result of self.tryCatchFinally(input)&gt;" pathCondition="equals(input,Z(0(#)))" lineNumber="-1" charStart="97" charEnd="112" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testTryCatchFinally\src\TryCatchFinally.java" methodReturnConditionRef="_5e15d8f3-46a6-42c1-99aa-5254895b3dca">
+                                 <sedTermination xml:id="_dc453aae-d908-4ac1-b804-47e87824dfb6" name="&lt;end&gt;" pathCondition="equals(input,Z(0(#)))" verified="true">
                                  </sedTermination>
                               </sedMethodReturn>
                            </sedStatement>
                         </sedStatement>
                      </sedStatement>
                   </sedBranchCondition>
-                  <sedBranchCondition xml:id="_0b95d2b0-cfff-4776-99f5-a73c0a6e1794" name="not(equals(input,Z(0(#))))" pathCondition="not(equals(input,Z(0(#))))">
-                     <sedStatement xml:id="_d6077842-e9f1-4202-bf95-75c8a6248a72" name="result_1=result_1*2;" pathCondition="not(equals(input,Z(0(#))))" lineNumber="-1" charStart="256" charEnd="276">
-                        <sedStatement xml:id="_7e1da0ec-7708-41c3-bcac-f6fa7fbb50c1" name="return result_1;" pathCondition="not(equals(input,Z(0(#))))" lineNumber="-1" charStart="285" charEnd="299">
-                           <sedMethodReturn xml:id="_2f0123cc-ca92-4b1b-9856-a38d7f62f80b" name="&lt;return mul(quotient_1,Z(2(#))) as result of self.tryCatchFinally(input);&gt;" pathCondition="not(equals(input,Z(0(#))))" lineNumber="-1" charStart="97" charEnd="112">
-                              <sedTermination xml:id="_d2daf1ec-f028-47a6-af7c-161e3fb9f6ad" name="&lt;end&gt;" pathCondition="not(equals(input,Z(0(#))))" verified="true">
+                  <sedBranchCondition xml:id="_9363ca39-0b99-4e44-bff8-4b946b2164b5" name="not(equals(input,Z(0(#))))" pathCondition="not(equals(input,Z(0(#))))">
+                     <sedStatement xml:id="_6178ed43-991a-49eb-91e3-6627608b0082" name="result_1=result_1*2;" pathCondition="not(equals(input,Z(0(#))))" lineNumber="-1" charStart="256" charEnd="276" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testTryCatchFinally\src\TryCatchFinally.java">
+                        <sedStatement xml:id="_98190aab-f11e-4244-a06e-852eb901fb7d" name="return result_1;" pathCondition="not(equals(input,Z(0(#))))" lineNumber="-1" charStart="285" charEnd="299" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testTryCatchFinally\src\TryCatchFinally.java">
+                           <sedMethodReturn xml:id="_950394e0-8ea4-413c-9d21-2b71eb9bb1ad" name="&lt;return 
+	mul(quotient_2,Z(2(#))) {gt(input,Z(neglit(1(#))))}, 
+	mul(quotient_1,Z(2(#))) {lt(input,Z(1(#)))}
+as result of self.tryCatchFinally(input)&gt;" pathCondition="not(equals(input,Z(0(#))))" lineNumber="-1" charStart="97" charEnd="112" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testTryCatchFinally\src\TryCatchFinally.java" methodReturnConditionRef="_ec00f4ee-9d7a-479b-8a8e-a8c1c88d4774">
+                              <sedTermination xml:id="_4e54aa38-cf8e-4518-a6e1-a3fd36bd4a37" name="&lt;end&gt;" pathCondition="not(equals(input,Z(0(#))))" verified="true">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedStatement>
@@ -29,7 +32,15 @@
                   </sedBranchCondition>
                </sedStatement>
             </sedStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_5e15d8f3-46a6-42c1-99aa-5254895b3dca" name="equals(input,Z(0(#)))" pathCondition="true">
+               <sedChildReference nodeIdRef="_a310eaf3-5a26-4f2c-bd00-1723fb8f6be4"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedMethodCallMethodReturnCondition xml:id="_ec00f4ee-9d7a-479b-8a8e-a8c1c88d4774" name="not(equals(input,Z(0(#))))" pathCondition="true">
+               <sedChildReference nodeIdRef="_950394e0-8ea4-413c-9d21-2b71eb9bb1ad"/>
+            </sedMethodCallMethodReturnCondition>
          </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_dc453aae-d908-4ac1-b804-47e87824dfb6"/>
+         <sedTerminationEntry nodeIdRef="_4e54aa38-cf8e-4518-a6e1-a3fd36bd4a37"/>
       </sedThread>
    </sedTarget>
 </launch>

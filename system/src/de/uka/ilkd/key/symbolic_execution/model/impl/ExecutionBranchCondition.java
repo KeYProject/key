@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -52,7 +53,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
    private Term pathCondition;
    
    /**
-    * The human readable path condition to reach this term.
+    * The human readable path condition to reach this node.
     */
    private String formatedPathCondition;
    
@@ -133,19 +134,25 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
     * @throws ProofInputException Occurred Exception
     */
    protected void lazyComputeBranchCondition() throws ProofInputException {
-      // Compute branch condition
-      if (isMergedBranchCondition()) {
-         // Add all merged branch conditions
-         branchCondition = getServices().getTermBuilder().and(getMergedBranchCondtions());
-         // Simplify merged branch conditions
-         branchCondition = SymbolicExecutionUtil.simplify(getProof(), branchCondition);
-         branchCondition = SymbolicExecutionUtil.improveReadability(branchCondition, getServices());
+      if (!isDisposed()) {
+         final Services services = getServices();
+         // Compute branch condition
+         if (isMergedBranchCondition()) {
+            // Add all merged branch conditions
+            Term[] mergedConditions = getMergedBranchCondtions();
+            branchCondition = services.getTermBuilder().and(mergedBranchCondtions);
+            // Simplify merged branch conditions
+            if (mergedConditions.length >= 2) {
+               branchCondition = SymbolicExecutionUtil.simplify(getProof(), branchCondition);
+               branchCondition = SymbolicExecutionUtil.improveReadability(branchCondition, services);
+            }
+         }
+         else {
+            branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(), true);
+         }
+         // Format branch condition
+         formatedBranchCondition = formatTerm(branchCondition, services);
       }
-      else {
-         branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(), true);
-      }
-      // Format branch condition
-      formatedBranchCondition = formatTerm(branchCondition);
    }
 
    /**
@@ -184,21 +191,24 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
     * @throws ProofInputException Occurred Exception
     */
    protected void lazyComputePathCondition() throws ProofInputException {
-      // Get path to parent
-      Term parentPath;
-      if (getParent() != null) {
-         parentPath = getParent().getPathCondition();
+      if (!isDisposed()) {
+         final Services services = getServices();
+         // Get path to parent
+         Term parentPath;
+         if (getParent() != null) {
+            parentPath = getParent().getPathCondition();
+         }
+         else {
+            parentPath = services.getTermBuilder().tt();
+         }
+         // Add current branch condition to path
+         pathCondition = services.getTermBuilder().and(parentPath, getBranchCondition());
+         // Simplify path condition
+         pathCondition = SymbolicExecutionUtil.simplify(getProof(), pathCondition);
+         pathCondition = SymbolicExecutionUtil.improveReadability(pathCondition, services);
+         // Format path condition
+         formatedPathCondition = formatTerm(pathCondition, services);
       }
-      else {
-         parentPath = getServices().getTermBuilder().tt();
-      }
-      // Add current branch condition to path
-      pathCondition = getServices().getTermBuilder().and(parentPath, getBranchCondition());
-      // Simplify path condition
-      pathCondition = SymbolicExecutionUtil.simplify(getProof(), pathCondition);
-      pathCondition = SymbolicExecutionUtil.improveReadability(pathCondition, getServices());
-      // Format path condition
-      formatedPathCondition = formatTerm(pathCondition);
    }
 
    /**

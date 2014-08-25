@@ -25,7 +25,8 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.collection.TestLeftistHeapOfInteger.class,
         de.uka.ilkd.key.util.TestLexicographicComparator.class,
         de.uka.ilkd.key.util.TestMiscTools.class,
-        de.uka.ilkd.key.util.pp.TestLayouter.class
+        de.uka.ilkd.key.util.pp.TestLayouter.class,
+        de.uka.ilkd.key.util.TestProofStarter.class
     }; 
 
 
@@ -95,14 +96,15 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.smt.test.TestSimplify.class,
         de.uka.ilkd.key.smt.test.TestZ3.class,
         de.uka.ilkd.key.smt.test.TestYices.class,
-        de.uka.ilkd.key.smt.test.TestCvc3.class,
-
+        de.uka.ilkd.key.smt.test.TestCvc3.class
+        //, de.uka.ilkd.key.smt.test.TestCvc4.class  //commented out as test take too long
     };
 
     static Class<? extends TestCase>[] setTests = new Class[] {
         de.uka.ilkd.key.util.TestNodePreorderIterator.class,
         de.uka.ilkd.key.symbolic_execution.TestExecutionNodePreorderIterator.class,
         de.uka.ilkd.key.symbolic_execution.TestExecutionNodeWriterAndReader.class,
+        de.uka.ilkd.key.symbolic_execution.TestParallelSiteProofs.class,
         de.uka.ilkd.key.symbolic_execution.TestSymbolicLayoutExtractor.class,
         de.uka.ilkd.key.symbolic_execution.TestSymbolicLayoutWriterAndReader.class,
         de.uka.ilkd.key.symbolic_execution.TestSymbolicExecutionTreeBuilder.class,
@@ -118,6 +120,7 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.symbolic_execution.util.TestProofUserManager.class,
         de.uka.ilkd.key.symbolic_execution.util.TestSideProofStore.class,
         de.uka.ilkd.key.symbolic_execution.util.TestSymbolicExecutionUtil.class
+        
     };
     
     static Class<? extends TestCase>[] breakpointTests = new Class[] {

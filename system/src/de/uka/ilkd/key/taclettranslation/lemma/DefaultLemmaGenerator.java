@@ -84,10 +84,6 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         }
         
        public static String checkTaclet(final Taclet taclet){
-           // This restriction no longer applies
-           //    if(!(taclet instanceof FindTaclet)){
-           //           return "Taclet is not of type FindTaclet";
-           //    }
                String result = checkForIllegalConditions(taclet);
                if(result!=null) return result;
                TacletVisitor visitor = new TacletVisitor() {

@@ -119,6 +119,8 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
 
                 TacletLoader tacletLoader = new TacletLoader.KeYsTacletsLoader(mainWindow.getUserInterface(),mainWindow.getUserInterface(),
                                 mainWindow.getMediator().getProfile());
+                
+                
                 LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                         @Override
                         public void stopped(Throwable exception) {
@@ -140,7 +142,9 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                     
                     TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
                                  listener,
-                                new LemmaSelectionDialog(),true,tacletLoader);
+                                new LemmaSelectionDialog(),true, tacletLoader, 
+                                tacletLoader.getProofEnvForTaclets().getInitConfigForEnvironment(), 
+                                true);
                     loader.start();
 
             }
@@ -225,7 +229,9 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 
                 TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
                              listener,
-                            new LemmaSelectionDialog(),loadAsLemmata,tacletLoader);
+                            new LemmaSelectionDialog(),loadAsLemmata,tacletLoader,
+                            tacletLoader.getProofEnvForTaclets().getInitConfigForEnvironment(),
+                            true);
                 loader.start();
 
             }
@@ -278,7 +284,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                                                       fileForDefinitions ,
                                                       fileForLemmata,
                                                       filesForAxioms,
-                                                      proof.env());
+                                                      proof.getInitConfig());
                
 
                 
@@ -301,10 +307,10 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                             // add only the taclets to the goals if
                             // the proof obligations were added successfully.
                             ImmutableSet<Taclet> base =
-                                                        proof.env().getInitConfig()
+                                                        proof.getInitConfig()
                                                                 .getTaclets();
                             base = base.union(taclets);
-                            proof.env().getInitConfig().setTaclets(base);
+                            proof.getInitConfig().setTaclets(base);
                             for (Taclet taclet : taclets) {
                                 for (Goal goal : proof.openGoals()) {
                                     goal
@@ -321,19 +327,21 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 
                 TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
                             listener,
-                            new LemmaSelectionDialog(),loadAsLemmata,tacletLoader,proof.env().getInitConfig());
+                            new LemmaSelectionDialog(),
+                            loadAsLemmata,tacletLoader,
+                            proof.getInitConfig(), false);
                 loader.start();
 
             }
 
         @Override
         protected String getTitle() {
-                 return "Load User-Defined Taclets...";
+                 return "Load User-Defined Taclets";
         }
 
         @Override
         protected String getDescription() {
-                return "Loads additional taclets and creates the corresponding proof...";
+                return "Loads additional taclets and creates the corresponding proof.";
         }
 
         @Override

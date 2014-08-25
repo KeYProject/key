@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="UseOperationContractQueryTest.main(value);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call UseOperationContractQueryTest.main(value)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="return magicTransformation(value);" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
          <operationContract name="result_0 = magicTransformation(value) catch(exc_0)
 pre: true
 post: result_0 = javaMulInt(value, 2) &amp; exc_0 = null
 mod: allLocs
-termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="value" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <callStackEntry path="/0"/>
-            <methodReturn name="&lt;return of UseOperationContractQueryTest.main(value);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+            <methodReturn name="&lt;return of main&gt;" signature="&lt;return of UseOperationContractQueryTest.main(value)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                <callStackEntry path="/0"/>
                <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                </termination>
             </methodReturn>
          </operationContract>
       </statement>
+      <methodReturnEntry path="/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0"/>
 </start>

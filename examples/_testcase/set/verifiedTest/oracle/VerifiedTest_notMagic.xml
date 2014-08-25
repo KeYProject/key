@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="VerifiedTest.notMagic();" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call VerifiedTest.notMagic()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="return 66;" pathCondition="true" pathConditionChanged="false">
-         <methodReturn name="&lt;return of VerifiedTest.notMagic();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+         <methodReturn name="&lt;return of notMagic&gt;" signature="&lt;return of VerifiedTest.notMagic()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
             <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="false">
             </termination>
          </methodReturn>
       </statement>
+      <methodReturnEntry path="/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0"/>
 </start>

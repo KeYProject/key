@@ -60,13 +60,17 @@ public final class SLMethodResolver extends SLExpressionResolver {
         if(containingType == null) {
             return null;
         }
+        ImmutableList<SLExpression> ps = parameters.getParameters();
+    	for(LocationVariable h : HeapContext.getModHeaps(services, false)) {
+    		while(ps.size() > 0 && ps.head().getTerm().op().name().toString().startsWith(h.name().toString()))
+    		  ps = ps.tail();
+    	}
         
         ImmutableList<KeYJavaType> signature =
-                new SLParameters(parameters.getParameters().tail()).getSignature(javaInfo.getServices());
+                new SLParameters(ps).getSignature(javaInfo.getServices());
         
         IProgramMethod pm = null;
         Term recTerm = receiver.getTerm(); 
-        
         
         while (true) {
             pm = javaInfo.getToplevelPM(containingType, methodName, signature);

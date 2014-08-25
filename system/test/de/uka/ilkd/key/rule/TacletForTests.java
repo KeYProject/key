@@ -59,6 +59,7 @@ public class TacletForTests {
     public static NamespaceSet nss = new NamespaceSet();
     public static TacletIndex rules = null;
     public static Services services;
+    public static InitConfig initConfig;
     public static File lastFile = null;
 
     public static Namespace variables = null;
@@ -75,6 +76,7 @@ public class TacletForTests {
     public static void clear() {
         lastFile = null;
         services = null;
+        initConfig = null;
         rules = null;
         variables = null;
         scm = new AbbrevMap();
@@ -86,10 +88,10 @@ public class TacletForTests {
 	    if (!file.equals(lastFile)) {
 		KeYFileForTests envInput = new KeYFileForTests("Test", file, profile);	
 		ProblemInitializer pi = new ProblemInitializer(envInput.getProfile()); 
-		InitConfig ic = pi.prepare(envInput);
-              	nss      = ic.namespaces(); 
-                rules    = ic.createTacletIndex();
-                services = ic.getServices();
+		initConfig = pi.prepare(envInput);
+              	nss      = initConfig.namespaces(); 
+                rules    = initConfig.createTacletIndex();
+                services = initConfig.getServices();
 		lastFile = file;
 		variables = envInput.variables();
 	    }
@@ -100,9 +102,14 @@ public class TacletForTests {
 	}
     }
 
+    public static InitConfig initConfig() {
+	if (initConfig == null) parse();
+	return initConfig.deepCopy();
+    }
+
     public static Services services() {
-	if (services == null) parse();
-	return services;
+   if (services == null) parse();
+   return services;
     }
 
     public static JavaInfo javaInfo() {
@@ -114,7 +121,7 @@ public class TacletForTests {
     }
 
     public static void setStandardFile(String filename) {
-	standardFile=filename;
+        standardFile = filename;
     }
 
     public static ProofAggregate problems() {

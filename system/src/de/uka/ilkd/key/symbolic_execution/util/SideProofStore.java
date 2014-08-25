@@ -10,7 +10,7 @@ import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.event.ISideProofStoreListener;
 import de.uka.ilkd.key.symbolic_execution.util.event.SideProofStoreEvent;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * <p>
@@ -86,11 +86,13 @@ public final class SideProofStore {
     * @param proof The {@link Proof} to add.
     */
    public void addProof(String description, Proof proof) {
-      if (!containsEntry(proof)) {
-         Entry entry = new Entry(description, proof);
-         ProofUserManager.getInstance().addUser(entry.getProof(), entry.getEnvironment(), this);
-         entries.add(entry);
-         fireEntriesAdded(new SideProofStoreEvent(this, new Entry[] {entry}));
+      synchronized (entries) {
+         if (!containsEntry(proof)) {
+            Entry entry = new Entry(description, proof);
+            ProofUserManager.getInstance().addUser(entry.getProof(), entry.getEnvironment(), this);
+            entries.add(entry);
+            fireEntriesAdded(new SideProofStoreEvent(this, new Entry[] {entry}));
+         }
       }
    }
    
@@ -99,11 +101,13 @@ public final class SideProofStore {
     * @param entries The {@link Entry}s to remove.
     */
    public void removeEntries(Collection<Entry> entries) {
-      if (this.entries.removeAll(entries)) {
-         for (Entry entry : entries) {
-            ProofUserManager.getInstance().removeUserAndDispose(entry.getProof(), this);
+      synchronized (entries) {
+         if (this.entries.removeAll(entries)) {
+            for (Entry entry : entries) {
+               ProofUserManager.getInstance().removeUserAndDispose(entry.getProof(), this);
+            }
+            fireEntriesRemoved(new SideProofStoreEvent(this, entries.toArray(new Entry[entries.size()])));
          }
-         fireEntriesRemoved(new SideProofStoreEvent(this, entries.toArray(new Entry[entries.size()])));
       }
    }
    
@@ -268,7 +272,7 @@ public final class SideProofStore {
       /**
        * The {@link KeYEnvironment}.
        */
-      private final KeYEnvironment<CustomConsoleUserInterface> environment;
+      private final KeYEnvironment<CustomUserInterface> environment;
 
       /**
        * Constructor.
@@ -278,8 +282,8 @@ public final class SideProofStore {
       public Entry(String description, Proof proof) {
          this.description = description;
          this.proof = proof;
-         CustomConsoleUserInterface ui = new CustomConsoleUserInterface(false);
-         this.environment = new KeYEnvironment<CustomConsoleUserInterface>(ui, proof.env().getInitConfig(), proof);
+         CustomUserInterface ui = new CustomUserInterface(false);
+         this.environment = new KeYEnvironment<CustomUserInterface>(ui, proof.getInitConfig(), proof);
       }
 
       /**
@@ -302,7 +306,7 @@ public final class SideProofStore {
        * Returns the {@link KeYEnvironment}.
        * @return The {@link KeYEnvironment}.
        */
-      public KeYEnvironment<CustomConsoleUserInterface> getEnvironment() {
+      public KeYEnvironment<CustomUserInterface> getEnvironment() {
          return environment;
       }
 

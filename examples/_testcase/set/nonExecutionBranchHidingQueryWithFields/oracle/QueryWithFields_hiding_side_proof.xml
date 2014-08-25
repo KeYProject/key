@@ -1,21 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.main(x);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.main(x)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicValue = magic(x);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_0 = self.magic(x) catch(exc_0)
 pre: self.&lt;inv&gt;
 post: result_0 = self.subMagic(x) &amp; self.&lt;inv&gt; &amp; exc_0 = null
 mod: empty
-termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" selfTerm="self" contractParameters="x" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
-               <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
-	Z(2(4(#))) {or(and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#))))),and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),not(equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#)))))))}, 
-	Z(6(6(1(1(2(4(#))))))) {and(not(equals(result_0,Z(2(4(#))))),geq(x,Z(0(#))))}, 
+               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main(x)&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
+	Z(2(4(#))) {or(and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),equals(int::select(heap,null,QueryWithFields::$classField),Z(6(6(#))))),and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),not(equals(int::select(heap,null,QueryWithFields::$classField),Z(6(6(#)))))))}, 
+	Z(6(6(1(1(2(4(#))))))) {and(gt(x,Z(neglit(1(#)))),and(equals(int::select(heap,null,QueryWithFields::$classField),Z(6(6(#)))),not(equals(result_0,Z(2(4(#)))))))}, 
 	Z(neglit(1(1(7(4(#)))))) {lt(x,Z(0(#)))}
-as result of self.main(x);&gt;" isReturnValueComputed="true">
-                  <methodReturnValue name="Z(2(4(#))) {or(and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#))))),and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),not(equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#)))))))}" returnValueString="Z(2(4(#)))" hasCondition="true" conditionString="or(and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#))))),and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),not(equals(int::select(heap,self,QueryWithFields::$instanceField),Z(1(1(#)))))))">
+as result of main&gt;" signatureIncludingReturnValue="&lt;return 
+	Z(2(4(#))) {or(and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),equals(int::select(heap,null,QueryWithFields::$classField),Z(6(6(#))))),and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),not(equals(int::select(heap,null,QueryWithFields::$classField),Z(6(6(#)))))))}, 
+	Z(6(6(1(1(2(4(#))))))) {and(gt(x,Z(neglit(1(#)))),and(equals(int::select(heap,null,QueryWithFields::$classField),Z(6(6(#)))),not(equals(result_0,Z(2(4(#)))))))}, 
+	Z(neglit(1(1(7(4(#)))))) {lt(x,Z(0(#)))}
+as result of self.main(x)&gt;" isReturnValueComputed="true" methodReturnCondition="true">
+                  <methodReturnValue name="Z(2(4(#))) {or(and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),equals(int::select(heap,null,QueryWithFields::$classField),Z(6(6(#))))),and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),not(equals(int::select(heap,null,QueryWithFields::$classField),Z(6(6(#)))))))}" returnValueString="Z(2(4(#)))" hasCondition="true" conditionString="or(and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),equals(int::select(heap,null,QueryWithFields::$classField),Z(6(6(#))))),and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),not(equals(int::select(heap,null,QueryWithFields::$classField),Z(6(6(#)))))))">
                   </methodReturnValue>
-                  <methodReturnValue name="Z(6(6(1(1(2(4(#))))))) {and(not(equals(result_0,Z(2(4(#))))),geq(x,Z(0(#))))}" returnValueString="Z(6(6(1(1(2(4(#)))))))" hasCondition="true" conditionString="and(not(equals(result_0,Z(2(4(#))))),geq(x,Z(0(#))))">
+                  <methodReturnValue name="Z(6(6(1(1(2(4(#))))))) {and(gt(x,Z(neglit(1(#)))),and(equals(int::select(heap,null,QueryWithFields::$classField),Z(6(6(#)))),not(equals(result_0,Z(2(4(#)))))))}" returnValueString="Z(6(6(1(1(2(4(#)))))))" hasCondition="true" conditionString="and(gt(x,Z(neglit(1(#)))),and(equals(int::select(heap,null,QueryWithFields::$classField),Z(6(6(#)))),not(equals(result_0,Z(2(4(#)))))))">
                   </methodReturnValue>
                   <methodReturnValue name="Z(neglit(1(1(7(4(#)))))) {lt(x,Z(0(#)))}" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="true" conditionString="lt(x,Z(0(#)))">
                   </methodReturnValue>
@@ -25,5 +29,7 @@ as result of self.main(x);&gt;" isReturnValueComputed="true">
             </statement>
          </operationContract>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0"/>
 </start>

@@ -31,7 +31,7 @@ public class TacletOptionsAction extends MainWindowAction {
 
     public TacletOptionsAction(MainWindow mainWindow) {
 	super(mainWindow);
-	setName("Taclet Options...");
+	setName("Taclet Options");
         setIcon(IconFactory.configure(16));
 	setAcceleratorLetter(KeyEvent.VK_T);
 	

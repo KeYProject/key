@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="MethodPOTest.returnMethod(param);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call MethodPOTest.returnMethod(param)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="return param.x;" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="not(equals(param,null))" pathCondition="not(equals(param,null))" pathConditionChanged="true" branchCondition="not(equals(param,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <methodReturn name="&lt;return of MethodPOTest.returnMethod(param);&gt;" pathCondition="not(equals(param,null))" pathConditionChanged="false" isReturnValueComputed="false">
+            <methodReturn name="&lt;return of returnMethod&gt;" signature="&lt;return of MethodPOTest.returnMethod(param)&gt;" pathCondition="not(equals(param,null))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="not(equals(param,null))">
                <termination name="&lt;end&gt;" pathCondition="not(equals(param,null))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                </termination>
             </methodReturn>
          </branchCondition>
          <branchCondition name="equals(param,null)" pathCondition="equals(param,null)" pathConditionChanged="true" branchCondition="equals(param,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(param,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-            </termination>
+            <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call MethodPOTest.returnMethod(param)&gt;&gt;" pathCondition="equals(param,null)" pathConditionChanged="false" methodReturnCondition="equals(param,null)">
+               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(param,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+               </termination>
+            </exceptionalMethodReturn>
          </branchCondition>
       </statement>
+      <methodReturnEntry path="/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/1/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/0"/>
 </start>

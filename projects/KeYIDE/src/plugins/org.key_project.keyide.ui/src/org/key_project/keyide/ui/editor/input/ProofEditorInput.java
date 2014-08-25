@@ -20,7 +20,6 @@ import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * This {@link IEditorInput} is used to open an existing {@link Proof}.
@@ -63,7 +62,7 @@ public class ProofEditorInput extends AbstractProofEditorInput {
     * @param canStartSMTSolver {@code true} can start SMT solver, {@code false} is not allowed to start SMT solver.
     */
    public ProofEditorInput(Proof proof, 
-                           KeYEnvironment<CustomConsoleUserInterface> environment, 
+                           KeYEnvironment<?> environment, 
                            IMethod method,
                            boolean canStartAutomode,
                            boolean canApplyRules,

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.main()&gt;" pathCondition="true" pathConditionChanged="false">
       <variable name="exc" arrayIndex="-1" isArrayIndex="false">
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
@@ -39,11 +39,11 @@
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <methodCall name="UnknownTest();" pathCondition="true" pathConditionChanged="false">
+            <methodCall name="&lt;call UnknownTest()&gt;" pathCondition="true" pathConditionChanged="false">
                <variable name="self" arrayIndex="-1" isArrayIndex="false">
                   <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                        <value name="next {or(and(not(equals(u_3,self)),or(not(or(equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null),equals(boolean::select(heap,endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),java.lang.Object::&lt;created&gt;),TRUE))),equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null))),and(not(equals(u_3,self)),or(not(or(equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null),equals(boolean::select(heap,endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),java.lang.Object::&lt;created&gt;),TRUE))),not(equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null)))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(and(not(equals(u_3,self)),or(not(or(equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null),equals(boolean::select(heap,endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),java.lang.Object::&lt;created&gt;),TRUE))),equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null))),and(not(equals(u_3,self)),or(not(or(equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null),equals(boolean::select(heap,endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),java.lang.Object::&lt;created&gt;),TRUE))),not(equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null)))))">
+                        <value name="next {or(and(not(equals(u_3,self)),or(equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null),not(equals(boolean::select(heap,endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),java.lang.Object::&lt;created&gt;),TRUE)))),and(not(equals(u_3,self)),not(equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(and(not(equals(u_3,self)),or(equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null),not(equals(boolean::select(heap,endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),java.lang.Object::&lt;created&gt;),TRUE)))),and(not(equals(u_3,self)),not(equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null))))">
                         </value>
                      </variable>
                      <variable name="previous" arrayIndex="-1" isArrayIndex="false">
@@ -68,7 +68,7 @@
                      </variable>
                   </value>
                </variable>
-               <methodReturn name="&lt;return of UnknownTest();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+               <methodReturn name="&lt;return of UnknownTest&gt;" signature="&lt;return of UnknownTest()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                   <variable name="u_1" arrayIndex="-1" isArrayIndex="false">
                      <value name="u_1 {true}" typeString="endless.UnknownTest" valueString="u_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="next" arrayIndex="-1" isArrayIndex="false">
@@ -110,7 +110,7 @@
                         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <methodCall name="UnknownTest();" pathCondition="true" pathConditionChanged="false">
+                     <methodCall name="&lt;call UnknownTest()&gt;" pathCondition="true" pathConditionChanged="false">
                         <variable name="self" arrayIndex="-1" isArrayIndex="false">
                            <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               <variable name="next" arrayIndex="-1" isArrayIndex="false">
@@ -159,7 +159,7 @@
                               </variable>
                            </value>
                         </variable>
-                        <methodReturn name="&lt;return of UnknownTest();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                        <methodReturn name="&lt;return of UnknownTest&gt;" signature="&lt;return of UnknownTest()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                            <variable name="u_7" arrayIndex="-1" isArrayIndex="false">
                               <value name="u_7 {true}" typeString="endless.UnknownTest" valueString="u_9" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  <variable name="next" arrayIndex="-1" isArrayIndex="false">
@@ -221,7 +221,7 @@
                                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
-                              <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                              <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                     <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                        <variable name="next" arrayIndex="-1" isArrayIndex="false">
@@ -259,11 +259,15 @@
                               </methodReturn>
                            </statement>
                         </methodReturn>
+                        <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
                      </methodCall>
                   </statement>
                </methodReturn>
+               <methodReturnEntry path="/0/0/0/0/0"/>
             </methodCall>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
 </start>

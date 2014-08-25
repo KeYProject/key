@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.model;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -63,4 +64,10 @@ public interface IExecutionMethodCall extends IExecutionStateNode<MethodBodyStat
     * @return The explicit constructor or {@code null} if no constructor is called.
     */
    public IProgramMethod getExplicitConstructorProgramMethod();
+   
+   /**
+    * Returns the up to now discovered {@link IExecutionBaseMethodReturn}s.
+    * @return The up to now discovered {@link IExecutionBaseMethodReturn}s.
+    */
+   public ImmutableList<IExecutionBaseMethodReturn<?>> getMethodReturns();
 }

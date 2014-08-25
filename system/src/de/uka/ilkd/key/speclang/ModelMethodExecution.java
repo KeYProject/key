@@ -58,9 +58,26 @@ public final class ModelMethodExecution extends ClassAxiom {
     }
 
     @Override
+    public boolean equals(Object o) {
+       if (o == null || this.getClass() != o.getClass()) return false;
+       final ModelMethodExecution other = (ModelMethodExecution) o;
+       
+       if (!name.equals(other.name)) return false;
+       if (!target.equals(other.target)) return false;
+       if (!kjt.equals(other.kjt)) return false;
+       
+       return true;
+    }
+    
+    @Override
+    public int hashCode() {
+       return 17*(name.hashCode() + 17 * target.hashCode());
+    }
+    
+    @Override
     public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, Services services) {
 
-		Name tacletName = MiscTools.toValidTacletName(name);
+        Name tacletName = MiscTools.toValidTacletName(name);
         TacletGenerator TG = TacletGenerator.getInstance();
         return null;
 //            return TG.generateModelMethodExecutionTaclets(tacletName,

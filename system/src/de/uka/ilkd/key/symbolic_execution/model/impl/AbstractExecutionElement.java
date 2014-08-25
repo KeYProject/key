@@ -80,7 +80,8 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
     */
    @Override
    public Services getServices() {
-      return getProof().getServices();
+      Proof proof = getProof();
+      return proof != null && !proof.isDisposed() ? proof.getServices() : null;
    }
 
    /**
@@ -119,6 +120,14 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
          return name;
       }
    }
+   
+   /**
+    * Checks if the value of {@link #getName()} is already computed.
+    * @return {@code ture} name is computed, {@code false} name is not computed yet.
+    */
+   protected boolean isNameComputed() {
+      return name != null;
+   }
 
    /**
     * Computes the name of this node lazily when {@link #getName()}
@@ -130,10 +139,14 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
    /**
     * Converts the given {@link Term} into a {@link String} respecting {@link #isUsePretty()}.
     * @param term The {@link Term} to convert.
+    * @param services The {@link Services} to use.
     * @return The {@link String} representation of the given {@link Term}.
     */
-   protected String formatTerm(Term term) {
-      return SymbolicExecutionUtil.formatTerm(term, getServices(), settings.isUsePrettyPrinting());
+   protected String formatTerm(Term term, Services services) {
+      return SymbolicExecutionUtil.formatTerm(term, 
+                                              services, 
+                                              settings.isUseUnicode(),
+                                              settings.isUsePrettyPrinting());
    }
 
    /**

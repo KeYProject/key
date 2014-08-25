@@ -262,17 +262,14 @@ class TermImpl implements Term {
     
 
     @Override
-    public boolean equalsModRenaming(Object o) {
-        if(o == this) {
-            return true;
-        }       
-        if (!(o instanceof Term)) {
-	    return false;
-	}
-	return unifyHelp ( this, ((Term) o),
-           ImmutableSLList.<QuantifiableVariable>nil(), 
-           ImmutableSLList.<QuantifiableVariable>nil(),
-           null);
+    public final boolean equalsModRenaming(Term o) {
+       if(o == this) {
+          return true;
+       }       
+       return unifyHelp ( this, o,
+             ImmutableSLList.<QuantifiableVariable>nil(), 
+             ImmutableSLList.<QuantifiableVariable>nil(),
+             null);
     }
     
     // 
@@ -411,40 +408,40 @@ class TermImpl implements Term {
     }
 
     private boolean descendRecursively(Term t0, Term t1,
-	    ImmutableList<QuantifiableVariable> ownBoundVars,
-	    ImmutableList<QuantifiableVariable> cmpBoundVars,
-	    NameAbstractionTable nat) {
+          ImmutableList<QuantifiableVariable> ownBoundVars,
+          ImmutableList<QuantifiableVariable> cmpBoundVars,
+          NameAbstractionTable nat) {
 
-	for (int i = 0; i < t0.arity(); i++) {
-	    ImmutableList<QuantifiableVariable> subOwnBoundVars = ownBoundVars;
-	    ImmutableList<QuantifiableVariable> subCmpBoundVars = cmpBoundVars;
+       for (int i = 0; i < t0.arity(); i++) {
+          ImmutableList<QuantifiableVariable> subOwnBoundVars = ownBoundVars;
+          ImmutableList<QuantifiableVariable> subCmpBoundVars = cmpBoundVars;
 
-	    if (t0.varsBoundHere(i).size() != t1.varsBoundHere(i).size())
-		return false;
-	    for (int j = 0; j < t0.varsBoundHere(i).size(); j++) {
-		final QuantifiableVariable ownVar = t0.varsBoundHere(i).get(j);
-		final QuantifiableVariable cmpVar = t1.varsBoundHere(i).get(j);
-		if (ownVar.sort() != cmpVar.sort())
-		    return false;
+          if (t0.varsBoundHere(i).size() != t1.varsBoundHere(i).size())
+             return false;
+          for (int j = 0; j < t0.varsBoundHere(i).size(); j++) {
+             final QuantifiableVariable ownVar = t0.varsBoundHere(i).get(j);
+             final QuantifiableVariable cmpVar = t1.varsBoundHere(i).get(j);
+             if (ownVar.sort() != cmpVar.sort())
+                return false;
 
-		subOwnBoundVars = subOwnBoundVars.prepend(ownVar);
-		subCmpBoundVars = subCmpBoundVars.prepend(cmpVar);
-	    }
+             subOwnBoundVars = subOwnBoundVars.prepend(ownVar);
+             subCmpBoundVars = subCmpBoundVars.prepend(cmpVar);
+          }
 
-	    boolean newConstraint = unifyHelp(t0.sub(i), t1.sub(i),
-		    subOwnBoundVars, subCmpBoundVars, nat);
+          boolean newConstraint = unifyHelp(t0.sub(i), t1.sub(i),
+                subOwnBoundVars, subCmpBoundVars, nat);
 
-	    if (!newConstraint)
-		return false;
-	}
+          if (!newConstraint)
+             return false;
+       }
 
-	return true;
+       return true;
     }
 
     private static NameAbstractionTable checkNat(NameAbstractionTable nat) {
-	if (nat == null)
-	    return new NameAbstractionTable();
-	return nat;
+       if (nat == null)
+          return new NameAbstractionTable();
+       return nat;
     }
     
     // end of equals modulo renaming logic
@@ -455,21 +452,23 @@ class TermImpl implements Term {
      */
     @Override
     public boolean equals(Object o) {
-	if(o == this) {
-	    return true;
-	}
-	
-	if(!(o instanceof Term)
-	    || hashCode() != o.hashCode()) {
-	    return false;	
-	}
-	final Term t = (Term) o;
-	
-	return op().equals(t.op())
-	       && t.hasLabels() == hasLabels()
-		   && subs().equals(t.subs())
-	       && boundVars().equals(t.boundVars())
-	       && javaBlock().equals(t.javaBlock());
+       if(o == this) {
+          return true;
+       }
+       
+
+       if(o == null || o.getClass() != getClass()
+             || hashCode() != o.hashCode()) {
+          return false;	
+       }
+       
+       final TermImpl t = (TermImpl) o;
+
+       return op.equals(t.op)
+             && t.hasLabels() == hasLabels()
+             && subs.equals(t.subs)
+             && boundVars.equals(t.boundVars)
+             && javaBlock.equals(t.javaBlock);
     }
 
 

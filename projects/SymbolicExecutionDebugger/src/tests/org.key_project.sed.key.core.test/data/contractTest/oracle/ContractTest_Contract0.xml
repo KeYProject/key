@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_ce46b35e-4867-4cc0-8482-5d7336d085ae" name="ContractTest[ContractTest::returnValue(int)].JML operation contract.0" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_b065bf7a-ec2d-4ba9-b743-718bc5544632" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_08f87a7a-52e1-48d6-978e-0a23f69cd925" name="self.returnValue(_value);" pathCondition="true" lineNumber="-1" charStart="122" charEnd="133">
-            <sedStatement xml:id="_78afa83c-13a3-4921-91cc-8a548f18c472" name="return _value;" pathCondition="true" lineNumber="-1" charStart="150" charEnd="163">
-               <sedMethodReturn xml:id="_6832b6b7-f4ba-4b0a-89a1-f71bca224116" name="&lt;return Z(2(#)) as result of self.returnValue(_value);&gt;" pathCondition="true" lineNumber="-1" charStart="122" charEnd="133">
-                  <sedTermination xml:id="_50bf4396-d9a2-4bff-9d51-632138ce9a8b" name="&lt;end&gt;" pathCondition="true" verified="true">
+   <sedTarget xml:id="_bb6ab09a-c125-459f-8bfd-e380b7440f20" name="ContractTest[ContractTest::returnValue(int)].JML operation contract.0" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_bfaef396-cb14-4ea2-9e56-b0db119898c6" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_9de41e61-f3df-42bb-abb8-c790ac2eeb35" name="&lt;call self.returnValue(_value)&gt;" pathCondition="true" lineNumber="-1" charStart="122" charEnd="133" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotContractTest_testGeneratedContract_Contract0\src\ContractTest.java">
+            <sedStatement xml:id="_d6b6a27f-2ffa-4611-9ac5-2d0aad2b53bb" name="return _value;" pathCondition="true" lineNumber="-1" charStart="150" charEnd="163" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotContractTest_testGeneratedContract_Contract0\src\ContractTest.java">
+               <sedMethodReturn xml:id="_59d891b6-ad47-461c-926b-08eea7807513" name="&lt;return Z(2(#)) as result of self.returnValue(_value)&gt;" pathCondition="true" lineNumber="-1" charStart="122" charEnd="133" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotContractTest_testGeneratedContract_Contract0\src\ContractTest.java" methodReturnConditionRef="_edd74f47-3512-4885-9971-1fff617e75bf">
+                  <sedTermination xml:id="_c15cd2ba-8994-4df7-8f6d-83711cb442fc" name="&lt;end&gt;" pathCondition="true" verified="true">
                   </sedTermination>
                </sedMethodReturn>
             </sedStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_edd74f47-3512-4885-9971-1fff617e75bf" name="true" pathCondition="true">
+               <sedChildReference nodeIdRef="_59d891b6-ad47-461c-926b-08eea7807513"/>
+            </sedMethodCallMethodReturnCondition>
          </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_c15cd2ba-8994-4df7-8f6d-83711cb442fc"/>
       </sedThread>
    </sedTarget>
 </launch>

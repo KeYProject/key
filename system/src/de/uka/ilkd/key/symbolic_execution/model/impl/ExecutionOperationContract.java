@@ -32,7 +32,6 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -58,6 +57,26 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.ContractPos
  */
 public class ExecutionOperationContract extends AbstractExecutionStateNode<SourceElement> implements IExecutionOperationContract {
    /**
+    * The exception {@link Term} used by the applied {@link Contract}.
+    */
+   private Term exceptionTerm;
+
+   /**
+    * The result {@link Term} used by the applied {@link Contract}.
+    */
+   private Term resultTerm;
+
+   /**
+    * The self {@link Term} or {@code null} if not available.
+    */
+   private Term selfTerm;
+   
+   /**
+    * The current contract parameters.
+    */
+   private ImmutableList<Term> contractParams;
+   
+   /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
     * @param mediator The used {@link KeYMediator} during proof.
@@ -74,90 +93,209 @@ public class ExecutionOperationContract extends AbstractExecutionStateNode<Sourc
     */
    @Override
    protected String lazyComputeName() throws ProofInputException {
-      // Make sure that the contract is compatible
-      if (!(getContract() instanceof FunctionalOperationContract)) {
-         throw new ProofInputException("Unsupported contract: " + getContract());
-      }
-      FunctionalOperationContract contract = (FunctionalOperationContract)getContract();
-      // Compute instantiation
-      Instantiation inst = UseOperationContractRule.computeInstantiation(getProofNode().getAppliedRuleApp().posInOccurrence().subTerm(), getServices());
-      // Extract used result and exception variable from proof nodes
-      ProgramVariable resultVar = null;
-      Term resultTerm = null;
-      if (contract.hasResultVar()) {
-         resultVar = extractResultVariableFromPostBranch(getProofNode(), getServices());
-         if (resultVar == null) {
-            // Result variable not found in child, create a temporary variable to use in specification
-            resultVar = UseOperationContractRule.computeResultVar(inst, getServices());
+      if (!isDisposed()) {
+         final Services services = getServices();
+         // Make sure that the contract is compatible
+         if (!(getContract() instanceof FunctionalOperationContract)) {
+            throw new ProofInputException("Unsupported contract: " + getContract());
          }
-         resultTerm = getServices().getTermBuilder().var(resultVar);
-      }
-      ContractPostOrExcPostExceptionVariableResult search =
-              SymbolicExecutionUtil.searchContractPostOrExcPostExceptionVariable(
-                      getProofNode().child(0), getServices()); // Post branch
-      // Rename variables in contract to the current one
-      List<LocationVariable> heapContext = HeapContext.getModHeaps(getServices(), inst.transaction);
-      Map<LocationVariable,LocationVariable> atPreVars = UseOperationContractRule.computeAtPreVars(heapContext, getServices(), inst);
-      Map<LocationVariable,Term> atPres = HeapContext.getAtPres(atPreVars, getServices());
-      LocationVariable baseHeap = getServices().getTypeConverter().getHeapLDT().getHeap();
-      Term baseHeapTerm = getServices().getTermBuilder().getBaseHeap();
-      
-      Term contractSelf = null;
-      if (contract.hasSelfVar()) {
-         if (inst.pm.isConstructor()) {
-            Term selfDefinition = search.getExceptionDefinitionParent();
-            selfDefinition = selfDefinition.sub(1);
-            while (selfDefinition.op() == Junctor.AND) {
-               selfDefinition = selfDefinition.sub(0);
-            }
-            // Make sure that self equality was found
-            Term selfEquality;
-            if (selfDefinition.op() == Junctor.NOT) {
-               selfEquality = selfDefinition.sub(0);
+         FunctionalOperationContract contract = (FunctionalOperationContract)getContract();
+         // Compute instantiation
+         Instantiation inst = UseOperationContractRule.computeInstantiation(getProofNode().getAppliedRuleApp().posInOccurrence().subTerm(), services);
+         // Extract used result and exception variable from proof nodes
+         resultTerm = searchResultTerm(contract, inst, services);
+         ContractPostOrExcPostExceptionVariableResult search = SymbolicExecutionUtil.searchContractPostOrExcPostExceptionVariable(getProofNode().child(0), services); // Post branch
+         exceptionTerm = search.getExceptionEquality().sub(0);
+         // Rename variables in contract to the current one
+         List<LocationVariable> heapContext = HeapContext.getModHeaps(services, inst.transaction);
+         Map<LocationVariable,LocationVariable> atPreVars = UseOperationContractRule.computeAtPreVars(heapContext, services, inst);
+         Map<LocationVariable,Term> atPres = HeapContext.getAtPres(atPreVars, services);
+         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+         Term baseHeapTerm = services.getTermBuilder().getBaseHeap();
+         if (contract.hasSelfVar()) {
+            if (inst.pm.isConstructor()) {
+               selfTerm = searchConstructorSelfDefinition(search.getWorkingTerm(), inst.staticType, services);
+               if (selfTerm == null) {
+                  throw new ProofInputException("Can't find self term, implementation of UseOperationContractRule might has changed!"); 
+               }
+               KeYJavaType selfType = services.getJavaInfo().getKeYJavaType(selfTerm.sort());
+               if (inst.staticType != selfType) {
+                  throw new ProofInputException("Type \"" + inst.staticType + "\" expected but found \"" + selfType + "\", implementation of UseOperationContractRule might has changed!"); 
+               }
             }
             else {
-               selfEquality = selfDefinition;
-            }
-            if (selfEquality.op() != Equality.EQUALS || selfEquality.arity() != 2) {
-               throw new ProofInputException("Equality expected, implementation of UseOperationContractRule might has changed!"); 
-            }
-            if (!SymbolicExecutionUtil.isNullSort(selfEquality.sub(1).sort(), getServices())) {
-               throw new ProofInputException("Null expected, implementation of UseOperationContractRule might has changed!"); 
-            }
-            contractSelf = selfEquality.sub(0);
-            KeYJavaType selfType = getServices().getJavaInfo().getKeYJavaType(contractSelf.sort());
-            if (inst.staticType != selfType) {
-               throw new ProofInputException("Type \"" + inst.staticType + "\" expected but found \"" + selfType + "\", implementation of UseOperationContractRule might has changed!"); 
+               selfTerm = UseOperationContractRule.computeSelf(baseHeapTerm, atPres, baseHeap, inst, resultTerm, services.getTermFactory());
             }
          }
-         else {
-            contractSelf = UseOperationContractRule.computeSelf(baseHeapTerm, atPres, baseHeap, 
-                    inst, resultTerm, getServices().getTermFactory());
-         }
+         contractParams = UseOperationContractRule.computeParams(baseHeapTerm, atPres, baseHeap, inst, services.getTermFactory());
+         // Compute contract text
+         return FunctionalOperationContractImpl.getText(contract, 
+                                                        contractParams, 
+                                                        resultTerm, 
+                                                        selfTerm, 
+                                                        exceptionTerm, 
+                                                        baseHeap, 
+                                                        baseHeapTerm, 
+                                                        heapContext, 
+                                                        atPres, 
+                                                        false, 
+                                                        services,
+                                                        getSettings().isUsePrettyPrinting(),
+                                                        getSettings().isUseUnicode()).trim();
       }
-      ImmutableList<Term> contractParams = UseOperationContractRule.computeParams(baseHeapTerm, atPres, 
-              baseHeap, inst, getServices().getTermFactory());
-      // Compute contract text
-      synchronized (NotationInfo.class) {
-         boolean originalPrettySyntax = NotationInfo.PRETTY_SYNTAX;
-         try {
-            NotationInfo.PRETTY_SYNTAX = true;
-            return FunctionalOperationContractImpl.getText(contract, 
-                                                           contractParams, 
-                                                           resultTerm, 
-                                                           contractSelf, 
-                                                           search.getExceptionEquality().sub(0), 
-                                                           baseHeap, 
-                                                           baseHeapTerm, 
-                                                           heapContext, 
-                                                           atPres, 
-                                                           false, 
-                                                           getServices()).trim();
-         }
-         finally {
-            NotationInfo.PRETTY_SYNTAX = originalPrettySyntax;
-         }
+      else {
+         return null;
       }
+   }
+   
+   /**
+    * Tries to find the self {@link Term} of the given {@link KeYJavaType}.
+    * @param term The {@link Term} to start search in.
+    * @param staticType The expected {@link KeYJavaType}.
+    * @param services The {@link Services} to use.
+    * @return The found self {@link Term} or {@code null} if not available.
+    */
+   protected Term searchConstructorSelfDefinition(Term term, KeYJavaType staticType, Services services) {
+      if (term.op() == Junctor.NOT &&
+          term.sub(0).op() == Equality.EQUALS && 
+          term.sub(0).sub(0).op() instanceof LocationVariable && 
+          SymbolicExecutionUtil.isNullSort(term.sub(0).sub(1).sort(), services) &&
+          services.getJavaInfo().getKeYJavaType(term.sub(0).sub(0).sort()) == staticType) {
+         return term.sub(0).sub(0);
+      }
+      else {
+         Term result = null;
+         int i = term.arity() - 1;
+         while (result == null && i >= 0) {
+            result = searchConstructorSelfDefinition(term.sub(i), staticType, services);
+            i--;
+         }
+         return result;
+      }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Term getResultTerm() throws ProofInputException {
+      synchronized (this) {
+         if (!isNameComputed()) {
+            getName(); // Compute name and result term
+         }
+         return resultTerm;
+      }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Term getExceptionTerm() throws ProofInputException {
+      synchronized (this) {
+         if (!isNameComputed()) {
+            getName(); // Compute name and exception term
+         }
+         return exceptionTerm;
+      }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Term getSelfTerm() throws ProofInputException {
+      synchronized (this) {
+         if (!isNameComputed()) {
+            getName(); // Compute name and self term
+         }
+         return selfTerm;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ImmutableList<Term> getContractParams() throws ProofInputException {
+      synchronized (this) {
+         if (!isNameComputed()) {
+            getName(); // Compute name and contract term
+         }
+         return contractParams;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getFormatedResultTerm() throws ProofInputException {
+      Term resultTerm = getResultTerm();            
+      return resultTerm != null ? formatTerm(resultTerm, getServices()) : null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getFormatedExceptionTerm() throws ProofInputException {
+      Term exceptionTerm = getExceptionTerm();
+      return exceptionTerm != null ? formatTerm(exceptionTerm, getServices()) : null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getFormatedSelfTerm() throws ProofInputException {
+      Term selfTerm = getSelfTerm();
+      return selfTerm != null ? formatTerm(selfTerm, getServices()) : null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getFormatedContractParams() throws ProofInputException {
+      ImmutableList<Term> contractParams = getContractParams();
+      if (contractParams != null && !contractParams.isEmpty()) {
+         StringBuffer sb = new StringBuffer();
+         boolean afterFirst = false;
+         for (Term term : contractParams) {
+            if (afterFirst) {
+               sb.append(", ");
+            }
+            else {
+               afterFirst = true;
+            }
+            sb.append(formatTerm(term, getServices()));
+         }
+         return sb.toString();
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Searches the result {@link Term}.
+    * @param contract The {@link FunctionalOperationContract}.
+    * @param inst The {@link Instantiation}.
+    * @param services The {@link Services}.
+    * @return The found result {@link Term} or {@code null} otherwise.
+    */
+   protected Term searchResultTerm(FunctionalOperationContract contract, Instantiation inst, Services services) {
+      Term resultTerm = null;
+      if (contract.hasResultVar()) {
+         ProgramVariable resultVar = extractResultVariableFromPostBranch(getProofNode(), services);
+         if (resultVar == null) {
+            // Result variable not found in child, create a temporary variable to use in specification
+            resultVar = UseOperationContractRule.computeResultVar(inst, services);
+         }
+         resultTerm = services.getTermBuilder().var(resultVar);
+      }
+      return resultTerm;
    }
    
    /**

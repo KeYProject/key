@@ -23,11 +23,12 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.sed.key.core.model.KeYBranchCondition;
 import org.key_project.sed.key.core.model.KeYBranchStatement;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
+import org.key_project.sed.key.core.model.KeYExceptionalMethodReturn;
 import org.key_project.sed.key.core.model.KeYExceptionalTermination;
 import org.key_project.sed.key.core.model.KeYLoopBodyTermination;
 import org.key_project.sed.key.core.model.KeYLoopCondition;
@@ -38,11 +39,13 @@ import org.key_project.sed.key.core.model.KeYMethodContract;
 import org.key_project.sed.key.core.model.KeYMethodReturn;
 import org.key_project.sed.key.core.model.KeYStatement;
 import org.key_project.sed.key.core.model.KeYTermination;
+import org.key_project.sed.key.core.model.KeYThread;
 import org.key_project.sed.key.core.model.KeYVariable;
 import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
@@ -132,7 +135,7 @@ public final class KeYModelUtil {
     */
    protected static IKeYSEDDebugNode<?> createChild(IKeYSEDDebugNode<?> parent, IExecutionNode executionNode) throws DebugException {
       KeYDebugTarget target = parent.getDebugTarget();
-      ISEDThread thread = parent.getThread();
+      KeYThread thread = parent.getThread();
       IKeYSEDDebugNode<?> result;
       if (executionNode instanceof IExecutionBranchCondition) {
          result = new KeYBranchCondition(target, parent, thread, (IExecutionBranchCondition)executionNode);
@@ -150,7 +153,18 @@ public final class KeYModelUtil {
          result = new KeYMethodCall(target, parent, thread, (IExecutionMethodCall)executionNode);
       }
       else if (executionNode instanceof IExecutionMethodReturn) {
-         result = new KeYMethodReturn(target, parent, thread, (IExecutionMethodReturn)executionNode);
+         IExecutionMethodReturn executionReturn = ((IExecutionMethodReturn)executionNode);
+         IKeYSEDDebugNode<?> callNode = target.getDebugNode(executionReturn.getMethodCall());
+         Assert.isTrue(callNode instanceof KeYMethodCall);
+         KeYMethodCall keyCall = (KeYMethodCall)callNode;
+         result = createMethodReturn(target, thread, parent, keyCall, executionReturn);
+      }
+      else if (executionNode instanceof IExecutionExceptionalMethodReturn) {
+         IExecutionExceptionalMethodReturn executionReturn = ((IExecutionExceptionalMethodReturn)executionNode);
+         IKeYSEDDebugNode<?> callNode = target.getDebugNode(executionReturn.getMethodCall());
+         Assert.isTrue(callNode instanceof KeYMethodCall);
+         KeYMethodCall keyCall = (KeYMethodCall)callNode;
+         result = createExceptionalMethodReturn(target, thread, parent, keyCall, executionReturn);
       }
       else if (executionNode instanceof IExecutionStatement) {
          result = new KeYStatement(target, parent, thread, (IExecutionStatement)executionNode);
@@ -163,24 +177,134 @@ public final class KeYModelUtil {
       }
       else if (executionNode instanceof IExecutionTermination) {
          IExecutionTermination terminationExecutionNode = (IExecutionTermination)executionNode;
-         if (terminationExecutionNode.getTerminationKind() == TerminationKind.EXCEPTIONAL) {
-            result = new KeYExceptionalTermination(target, parent, thread, (IExecutionTermination)executionNode);
-         }
-         else if (terminationExecutionNode.getTerminationKind() == TerminationKind.NORMAL) {
-            result = new KeYTermination(target, parent, thread, (IExecutionTermination)executionNode);
-         }
-         else if (terminationExecutionNode.getTerminationKind() == TerminationKind.LOOP_BODY) {
-            result = new KeYLoopBodyTermination(target, parent, thread, (IExecutionTermination)executionNode);
-         }
-         else {
-            throw new DebugException(LogUtil.getLogger().createErrorStatus("Not supported termination kind \"" + terminationExecutionNode.getTerminationKind() + "\"."));
-         }
+         result = createTermination(target, thread, parent, terminationExecutionNode);
       }
       else {
          throw new DebugException(LogUtil.getLogger().createErrorStatus("Not supported execution node \"" + executionNode + "\"."));
       }
-      target.registerDebugNode(result);
       return result;
+   }
+   
+   /**
+    * Creates the {@link KeYMethodReturn} for the given {@link IExecutionMethodReturn}.
+    * @param target The {@link KeYDebugTarget} to use.
+    * @param thread The parent {@link KeYThread}.
+    * @param parent The parent {@link IKeYSEDDebugNode} in the debug model.
+    * @param keyCall The {@link KeYMethodCall} which is returned by the given {@link IExecutionMethodReturn}.
+    * @param executionReturn The {@link IExecutionMethodReturn} of the execution tree.
+    * @return The {@link KeYMethodReturn} for the given {@link IExecutionTermination}.
+    * @throws DebugException Occurred Exception.
+    */
+   public static KeYMethodReturn createMethodReturn(KeYDebugTarget target, 
+                                                    KeYThread thread, 
+                                                    IKeYSEDDebugNode<?> parent, 
+                                                    KeYMethodCall keyCall, 
+                                                    IExecutionMethodReturn executionReturn) throws DebugException {
+      synchronized (keyCall) {
+         KeYMethodReturn resultReturn = (KeYMethodReturn)keyCall.getMethodReturn(executionReturn);
+         if (resultReturn != null) {
+            // Reuse method return created by the method call and set its parent now
+            if (resultReturn.getParent() == null) {
+               resultReturn.setParent(parent);
+            }
+            else {
+               Assert.isTrue(resultReturn.getParent() == parent);
+            }
+            return resultReturn;
+         }
+         else {
+            // Create new method return
+            return new KeYMethodReturn(target, parent, thread, keyCall, executionReturn);
+         }
+      }
+   }
+   
+   /**
+    * Creates the {@link KeYExceptionalMethodReturn} for the given {@link IExecutionExceptionalMethodReturn}.
+    * @param target The {@link KeYDebugTarget} to use.
+    * @param thread The parent {@link KeYThread}.
+    * @param parent The parent {@link IKeYSEDDebugNode} in the debug model.
+    * @param keyCall The {@link KeYMethodCall} which is returned by the given {@link IExecutionExceptionalMethodReturn}.
+    * @param executionReturn The {@link IExecutionExceptionalMethodReturn} of the execution tree.
+    * @return The {@link KeYExceptionalMethodReturn} for the given {@link IExecutionTermination}.
+    * @throws DebugException Occurred Exception.
+    */
+   public static KeYExceptionalMethodReturn createExceptionalMethodReturn(KeYDebugTarget target, 
+                                                                          KeYThread thread, 
+                                                                          IKeYSEDDebugNode<?> parent, 
+                                                                          KeYMethodCall keyCall, 
+                                                                          IExecutionExceptionalMethodReturn executionReturn) throws DebugException {
+      synchronized (keyCall) {
+         KeYExceptionalMethodReturn resultReturn = (KeYExceptionalMethodReturn)keyCall.getMethodReturn(executionReturn);
+         if (resultReturn != null) {
+            // Reuse exceptional method return created by the method call and set its parent now
+            if (resultReturn.getParent() == null) {
+               resultReturn.setParent(parent);
+            }
+            else {
+               Assert.isTrue(resultReturn.getParent() == parent);
+            }
+            return resultReturn;
+         }
+         else {
+            // Create new exceptional method return
+            return new KeYExceptionalMethodReturn(target, parent, thread, keyCall, executionReturn);
+         }
+      }
+   }
+   
+   /**
+    * Creates the termination node for the given {@link IExecutionTermination}.
+    * @param target The {@link KeYDebugTarget} to use.
+    * @param thread The parent {@link KeYThread}.
+    * @param parent The parent {@link IKeYSEDDebugNode} in the debug model.
+    * @param terminationExecutionNode The {@link IExecutionTermination} of the execution tree.
+    * @return The termination node for the given {@link IExecutionTermination}.
+    * @throws DebugException Occurred Exception.
+    */
+   public static IKeYSEDDebugNode<?> createTermination(KeYDebugTarget target, 
+                                                       KeYThread thread, 
+                                                       IKeYSEDDebugNode<?> parent, 
+                                                       IExecutionTermination terminationExecutionNode) throws DebugException {
+      synchronized (thread) {
+         ISEDTermination terminationNode = thread.getTermination(terminationExecutionNode);
+         if (terminationNode != null) {
+            // Reuse method return created by the method call and set its parent now
+            if (terminationNode.getParent() == null) {
+               if (terminationNode instanceof KeYExceptionalTermination) {
+                  ((KeYExceptionalTermination)terminationNode).setParent(parent);
+               }
+               else if (terminationNode instanceof KeYTermination) {
+                  ((KeYTermination)terminationNode).setParent(parent);
+               }
+               else if (terminationNode instanceof KeYLoopBodyTermination) {
+                  ((KeYLoopBodyTermination)terminationNode).setParent(parent);
+               }
+               else {
+                  throw new DebugException(LogUtil.getLogger().createErrorStatus("Not supported termination \"" + terminationNode + "\"."));
+               }
+            }
+            else {
+               Assert.isTrue(terminationNode.getParent() == parent);
+            }
+            return (IKeYSEDDebugNode<?>)terminationNode;
+         }
+         else {
+            // Create new termination
+            if (terminationExecutionNode.getTerminationKind() == TerminationKind.EXCEPTIONAL) {
+               return new KeYExceptionalTermination(target, parent, thread, terminationExecutionNode);
+            }
+            else if (terminationExecutionNode.getTerminationKind() == TerminationKind.NORMAL) {
+               return new KeYTermination(target, parent, thread, terminationExecutionNode);
+            }
+            else if (terminationExecutionNode.getTerminationKind() == TerminationKind.LOOP_BODY) {
+               return new KeYLoopBodyTermination(target, parent, thread, terminationExecutionNode);
+            }
+            else {
+               throw new DebugException(LogUtil.getLogger().createErrorStatus("Not supported termination kind \"" + terminationExecutionNode.getTerminationKind() + "\"."));
+            }
+         }
+      }
    }
    
    /**

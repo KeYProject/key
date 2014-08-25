@@ -56,7 +56,6 @@ import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.UseDependencyContractApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
@@ -311,7 +310,7 @@ public class ProofSaver {
         if (appliedRuleApp.rule() instanceof UseOperationContractRule 
             || appliedRuleApp.rule() instanceof UseDependencyContractRule) {
             RuleJustification ruleJusti = 
-                            proof.env().getJustifInfo()
+                            proof.getInitConfig().getJustifInfo()
                                        .getJustification(appliedRuleApp, 
                                                          proof.getServices());
             

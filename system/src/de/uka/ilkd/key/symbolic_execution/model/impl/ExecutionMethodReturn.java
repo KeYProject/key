@@ -22,7 +22,9 @@ import java.util.Map.Entry;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
@@ -51,11 +53,11 @@ import de.uka.ilkd.key.util.MiscTools;
  * The default implementation of {@link IExecutionMethodReturn}.
  * @author Martin Hentschel
  */
-public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElement> implements IExecutionMethodReturn {
+public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceElement> implements IExecutionMethodReturn {
    /**
-    * The {@link IExecutionMethodCall} which is now returned.
+    * The node name with signature including the return value.
     */
-   private final IExecutionMethodCall methodCall;
+   private String signatureIncludingReturnValue;
    
    /**
     * The node name including the return value.
@@ -77,18 +79,8 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
    public ExecutionMethodReturn(ITreeSettings settings,
                                 KeYMediator mediator, 
                                 Node proofNode, 
-                                IExecutionMethodCall methodCall) {
-      super(settings, mediator, proofNode);
-      assert methodCall != null;
-      this.methodCall = methodCall;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public IExecutionMethodCall getMethodCall() {
-      return methodCall;
+                                ExecutionMethodCall methodCall) {
+      super(settings, mediator, proofNode, methodCall);
    }
 
    /**
@@ -96,7 +88,42 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
     */
    @Override
    protected String lazyComputeName() throws ProofInputException {
-      return createMethodReturnName(null, getMethodCall().getName());
+      
+      return createMethodReturnName(null, computeCalledMethodName());
+   }
+   
+   /**
+    * Computes the name of the called method.
+    * @return The name of the called method.
+    */
+   protected String computeCalledMethodName() {
+      MethodReference explicitConstructorMR = getMethodCall().getExplicitConstructorMethodReference();
+      return explicitConstructorMR != null ?
+             explicitConstructorMR.getMethodName().toString() :
+             getMethodCall().getProgramMethod().getName();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected String lazyComputeSignature() throws ProofInputException {
+      return createMethodReturnName(null, computeCalledMethodSignature());
+   }
+   
+   /**
+    * Computes the signature of the called method.
+    * @return The signature of the called method.
+    */
+   protected String computeCalledMethodSignature() throws ProofInputException {
+      MethodReference explicitConstructorMR = getMethodCall().getExplicitConstructorMethodReference();
+      String call = explicitConstructorMR != null ?
+                    explicitConstructorMR.toString() :
+                    getMethodCall().getMethodReference().toString();
+      if (call.endsWith(";")) {
+         call = call.substring(0, call.length() - 1);
+      }
+      return call;
    }
 
    /**
@@ -119,10 +146,10 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
    protected String lazyComputeNameIncludingReturnValue() throws ProofInputException {
       IExecutionMethodReturnValue[] returnValues = getReturnValues();
       if (returnValues.length == 0) {
-         return createMethodReturnName(null, getMethodCall().getName());
+         return createMethodReturnName(null, computeCalledMethodName());
       }
       else if (returnValues.length == 1) {
-         return createMethodReturnName(returnValues[0].getName() + " ", getMethodCall().getName());
+         return createMethodReturnName(returnValues[0].getName() + " ", computeCalledMethodName());
       }
       else {
          StringBuilder sb = new StringBuilder();
@@ -139,7 +166,51 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
             sb.append(value.getName());
          }
          sb.append('\n');
-         return createMethodReturnName(sb.toString(), getMethodCall().getName());
+         return createMethodReturnName(sb.toString(), computeCalledMethodName());
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getSignatureIncludingReturnValue() throws ProofInputException {
+      if (signatureIncludingReturnValue == null) {
+         signatureIncludingReturnValue = lazyComputeSigntureIncludingReturnValue();
+      }
+      return signatureIncludingReturnValue;
+   }
+
+   /**
+    * Computes the signature including the return value lazily when
+    * {@link #getNameIncludingReturnValue()} is called the first time.
+    * @return The name including the return value.
+    * @throws Occurred Exception.
+    */
+   protected String lazyComputeSigntureIncludingReturnValue() throws ProofInputException {
+      IExecutionMethodReturnValue[] returnValues = getReturnValues();
+      if (returnValues.length == 0) {
+         return createMethodReturnName(null, computeCalledMethodSignature());
+      }
+      else if (returnValues.length == 1) {
+         return createMethodReturnName(returnValues[0].getName() + " ", computeCalledMethodSignature());
+      }
+      else {
+         StringBuilder sb = new StringBuilder();
+         sb.append('\n');
+         boolean afterFirst = false;
+         for (IExecutionMethodReturnValue value : returnValues) {
+            if (afterFirst) {
+               sb.append(", \n");
+            }
+            else {
+               afterFirst = true;
+            }
+            sb.append('\t');
+            sb.append(value.getName());
+         }
+         sb.append('\n');
+         return createMethodReturnName(sb.toString(), computeCalledMethodSignature());
       }
    }
 
@@ -169,82 +240,91 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
     * @throws ProofInputException Occurred Exception.
     */
    protected IExecutionMethodReturnValue[] lazyComputeReturnValues() throws ProofInputException {
-      // Check if a result variable is available
-      MethodBodyStatement mbs = getMethodCall().getActiveStatement();
-      IProgramVariable resultVar = mbs.getResultVariable();
-      // Create a temporary result variable for non void methods in case that it is missing in method frame
-      if (resultVar == null) {
-         IProgramMethod pm = mbs.getProgramMethod(getServices());
-         if (!pm.isVoid()) {
-            resultVar = new LocationVariable(new ProgramElementName(getServices().getTermBuilder().newName("TmpResultVar")), pm.getReturnType());
+      if (!isDisposed()) {
+         final Services services = getServices();
+         // Check if a result variable is available
+         MethodBodyStatement mbs = getMethodCall().getActiveStatement();
+         IProgramVariable resultVar = mbs.getResultVariable();
+         // Create a temporary result variable for non void methods in case that it is missing in method frame
+         if (resultVar == null) {
+            IProgramMethod pm = mbs.getProgramMethod(services);
+            if (!pm.isVoid()) {
+               resultVar = new LocationVariable(new ProgramElementName(services.getTermBuilder().newName("TmpResultVar")), pm.getReturnType());
+            }
          }
-      }
-      if (resultVar != null) {
-         // Search the node with applied rule "methodCallReturn" which provides the required updates
-         Node methodReturnNode = findMethodReturnNode(getProofNode());
-         if (methodReturnNode != null) {
-            // Start site proof to extract the value of the result variable.
-            SiteProofVariableValueInput input = SymbolicExecutionUtil.createExtractReturnVariableValueSequent(getServices(),
-                                                                                                              mbs.getBodySourceAsTypeReference(),
-                                                                                                              mbs.getProgramMethod(getServices()),
-                                                                                                              mbs.getDesignatedContext(), 
-                                                                                                              methodReturnNode,
-                                                                                                              getProofNode(),
-                                                                                                              resultVar);
-            ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
-                                                                                input.getSequentToProve(), 
-                                                                                StrategyProperties.METHOD_NONE,
-                                                                                StrategyProperties.LOOP_NONE,
-                                                                                StrategyProperties.QUERY_OFF,
-                                                                                StrategyProperties.SPLITTING_NORMAL);
-            try {
-               if (info.getProof().openGoals().size() == 1) {
-                  Goal goal = info.getProof().openGoals().head();
-                  Term returnValue = SideProofUtil.extractOperatorValue(goal, input.getOperator());
-                  assert returnValue != null;
-                  returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), returnValue, getServices());
-                  return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), returnValue, null)};
-               }
-               else {
-                  // Group equal values of different branches
-                  Map<Term, List<Node>> valueNodeMap = new LinkedHashMap<Term, List<Node>>();
-                  for (Goal goal : info.getProof().openGoals()) {
+         if (resultVar != null) {
+            // Search the node with applied rule "methodCallReturn" which provides the required updates
+            Node methodReturnNode = findMethodReturnNode(getProofNode());
+            if (methodReturnNode != null) {
+               // Start site proof to extract the value of the result variable.
+               SiteProofVariableValueInput input = SymbolicExecutionUtil.createExtractReturnVariableValueSequent(services,
+                                                                                                                 mbs.getBodySourceAsTypeReference(),
+                                                                                                                 mbs.getProgramMethod(services),
+                                                                                                                 mbs.getDesignatedContext(), 
+                                                                                                                 methodReturnNode,
+                                                                                                                 getProofNode(),
+                                                                                                                 resultVar);
+               ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
+                                                                                   input.getSequentToProve(), 
+                                                                                   StrategyProperties.METHOD_NONE,
+                                                                                   StrategyProperties.LOOP_NONE,
+                                                                                   StrategyProperties.QUERY_OFF,
+                                                                                   StrategyProperties.SPLITTING_NORMAL,
+                                                                                   true);
+               try {
+                  if (info.getProof().openGoals().size() == 1) {
+                     Goal goal = info.getProof().openGoals().head();
                      Term returnValue = SideProofUtil.extractOperatorValue(goal, input.getOperator());
                      assert returnValue != null;
-                     returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.node().sequent(), returnValue, getServices());
-                     List<Node> nodeList = valueNodeMap.get(returnValue);
-                     if (nodeList == null) {
-                        nodeList = new LinkedList<Node>();
-                        valueNodeMap.put(returnValue, nodeList);
-                     }
-                     nodeList.add(goal.node());
-                  }
-                  // Create result
-                  if (valueNodeMap.size() == 1) {
-                     Term returnValue = valueNodeMap.keySet().iterator().next();
+                     returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), returnValue, services);
                      return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), returnValue, null)};
                   }
                   else {
-                     IExecutionMethodReturnValue[] result = new IExecutionMethodReturnValue[valueNodeMap.size()];
-                     int i = 0;
-                     for (Entry<Term, List<Node>> entry : valueNodeMap.entrySet()) {
-                        List<Term> conditions = new LinkedList<Term>();
-                        for (Node node : entry.getValue()) {
-                           Term condition = SymbolicExecutionUtil.computePathCondition(node, false);
-                           conditions.add(condition);
+                     // Group equal values of different branches
+                     Map<Term, List<Node>> valueNodeMap = new LinkedHashMap<Term, List<Node>>();
+                     for (Goal goal : info.getProof().openGoals()) {
+                        Term returnValue = SideProofUtil.extractOperatorValue(goal, input.getOperator());
+                        assert returnValue != null;
+                        returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.node().sequent(), returnValue, services);
+                        List<Node> nodeList = valueNodeMap.get(returnValue);
+                        if (nodeList == null) {
+                           nodeList = new LinkedList<Node>();
+                           valueNodeMap.put(returnValue, nodeList);
                         }
-                        Term condition = getServices().getTermBuilder().or(conditions);
-                        condition = SymbolicExecutionUtil.simplify(info.getProof(), condition);
-                        condition = SymbolicExecutionUtil.improveReadability(condition, info.getProof().getServices());
-                        result[i] = new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), entry.getKey(), condition);
-                        i++;
+                        nodeList.add(goal.node());
                      }
-                     return result;
+                     // Create result
+                     if (valueNodeMap.size() == 1) {
+                        Term returnValue = valueNodeMap.keySet().iterator().next();
+                        return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), returnValue, null)};
+                     }
+                     else {
+                        IExecutionMethodReturnValue[] result = new IExecutionMethodReturnValue[valueNodeMap.size()];
+                        int i = 0;
+                        for (Entry<Term, List<Node>> entry : valueNodeMap.entrySet()) {
+                           List<Term> conditions = new LinkedList<Term>();
+                           for (Node node : entry.getValue()) {
+                              Term condition = SymbolicExecutionUtil.computePathCondition(node, false);
+                              conditions.add(condition);
+                           }
+                           Term condition = services.getTermBuilder().or(conditions);
+                           if (conditions.size() >= 2) {
+                              condition = SymbolicExecutionUtil.simplify(info.getProof(), condition);
+                           }
+                           condition = SymbolicExecutionUtil.improveReadability(condition, info.getProof().getServices());
+                           result[i] = new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), entry.getKey(), condition);
+                           i++;
+                        }
+                        return result;
+                     }
                   }
                }
+               finally {
+                  SideProofUtil.disposeOrStore("Return value computation on method return node " + methodReturnNode.serialNr() + ".", info);
+               }
             }
-            finally {
-               SideProofUtil.disposeOrStore("Return value computation on method return node " + methodReturnNode.serialNr() + ".", info);
+            else {
+               return new IExecutionMethodReturnValue[0];
             }
          }
          else {

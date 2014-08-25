@@ -58,41 +58,17 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LRUCache;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * an instance serves as representation of a Java model underlying a DL
  * formula. This class provides calls to access the elements of the Java
- * model using the KeY datastructures only. Implementation specific
+ * model using the KeY data structures only. Implementation specific
  * details like the use of Recoder is hidden in the field of type
  * {@link KeYProgModelInfo}. This class can be extended to provide further
  * services.
  */
 public final class JavaInfo {
-
-
-    public static class CacheKey {
-        Object o1;
-        Object o2;
-
-        public CacheKey(KeYJavaType k1, KeYJavaType k2) {
-            assert k1 != null && k2 != null;
-            o1 = k1;
-            o2 = k2;
-        }
-
-        public boolean equals(Object o) {
-            if (o instanceof CacheKey) {
-                final CacheKey snd = (CacheKey)o;
-                return snd.o1.equals(o1) && snd.o2.equals(o2);
-            }
-            return false;
-        }
-
-        public int hashCode() {
-            return o1.hashCode() + o2.hashCode();
-        }
-
-    }
 
 
     protected Services services;
@@ -117,8 +93,8 @@ public final class JavaInfo {
     private HashMap<String, KeYJavaType> name2KJTCache = null;
 
 
-    private LRUCache<CacheKey, ImmutableList<KeYJavaType>> commonSubtypeCache
-    	= new LRUCache<CacheKey, ImmutableList<KeYJavaType>>(200);
+    private LRUCache<Pair<KeYJavaType,KeYJavaType>, ImmutableList<KeYJavaType>> commonSubtypeCache
+    	= new LRUCache<Pair<KeYJavaType,KeYJavaType>, ImmutableList<KeYJavaType>>(200);
 
     private int nameCachedSize = 0;
     private int sortCachedSize = 0;
@@ -1238,7 +1214,7 @@ public final class JavaInfo {
      * @return the list of common subtypes of types <tt>k1</tt> and <tt>k2</tt>
      */
     public ImmutableList<KeYJavaType> getCommonSubtypes(KeYJavaType k1, KeYJavaType k2) {
-        final CacheKey ck = new CacheKey(k1, k2);
+        final Pair<KeYJavaType,KeYJavaType> ck = new Pair<KeYJavaType, KeYJavaType>(k1, k2);
         ImmutableList<KeYJavaType> result = commonSubtypeCache.get(ck);
 
         if (result != null) {
@@ -1287,18 +1263,23 @@ public final class JavaInfo {
      * @see #getInvProgramVar()
      */
     public IObserverFunction getInv() {
-	if(inv == null || inv.getHeapCount(services) != HeapContext.getModHeaps(services, false).size()) {
-	    inv = new ObserverFunction("<inv>",
-        			       Sort.FORMULA,
-        			       null,
-        			       services.getTypeConverter().getHeapLDT().targetSort(),
-        			       getJavaLangObject(),
-        			       false,
-        			       new ImmutableArray<KeYJavaType>(),
-        			       HeapContext.getModHeaps(services, false).size(),
-        			       1);
-	}
-	return inv;
+       // TODO: Create function when source code is parsed and register it in namespace. Return only function from namespace here. No lazy creation to ensure that all proofs of the same proof environment have the same <inv> symbol.
+       if(inv == null || inv.getHeapCount(services) != HeapContext.getModHeaps(services, false).size()) { // TODO: Why is the initial check with the heaps needed?
+          inv = (IObserverFunction) services.getNamespaces().functions().lookup(ObserverFunction.createName("<inv>", getJavaLangObject()));
+          if (inv == null) {
+             inv = new ObserverFunction("<inv>",
+                          Sort.FORMULA,
+                          null,
+                          services.getTypeConverter().getHeapLDT().targetSort(),
+                          getJavaLangObject(),
+                          false,
+                          new ImmutableArray<KeYJavaType>(),
+                          HeapContext.getModHeaps(services, false).size(),
+                          1);
+             services.getNamespaces().functions().add(inv);
+          }
+       }
+       return inv;
     }
 
     /**
@@ -1321,17 +1302,25 @@ public final class JavaInfo {
      * Returns the special symbol <code>&lt;staticInv&gt;</code> which stands for the static invariant of a type.
      */
     public IObserverFunction getStaticInv(KeYJavaType target) {
-        if (!staticInvs.containsKey(target))
-            staticInvs.put(target, new ObserverFunction("<$inv>",
-                           Sort.FORMULA,
-                           null,
-                           services.getTypeConverter().getHeapLDT().targetSort(),
-                           target,
-                           true,
-                           new ImmutableArray<KeYJavaType>(),
-        			       HeapContext.getModHeaps(services, false).size(),
-                           1));
-        return staticInvs.get(target);
+       // TODO: Create functions when source code is parsed and register them in namespace. Return only functions from namespace here. No lazy creation to ensure that all proofs of the same proof environment have the same <$inv> symbols.
+       IObserverFunction inv = staticInvs.get(target);
+        if (inv == null) {
+           inv = (IObserverFunction) services.getNamespaces().functions().lookup(ObserverFunction.createName("<$inv>", target));
+           if (inv == null) {
+              inv = new ObserverFunction("<$inv>",
+                    Sort.FORMULA,
+                    null,
+                    services.getTypeConverter().getHeapLDT().targetSort(),
+                    target,
+                    true,
+                    new ImmutableArray<KeYJavaType>(),
+               HeapContext.getModHeaps(services, false).size(),
+                    1);
+              services.getNamespaces().functions().add(inv);
+           }
+           staticInvs.put(target, inv);
+        }
+        return inv;
     }
 
     /**

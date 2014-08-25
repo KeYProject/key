@@ -16,6 +16,7 @@ my $path_to_examples = $path_to_key . "/examples/";
 my $path_to_automated = "index/";
 my $path_to_header = $path_to_examples . $path_to_automated . "headerJavaDL.txt";
 my $path_to_index = $path_to_examples . $path_to_automated . "automaticJAVADL.txt";
+#my $path_to_index = $path_to_examples . $path_to_automated . "big.txt";
 
 # time out set to 30 minutes
 my $time_limit = 30*60; 
@@ -382,7 +383,7 @@ sub runAuto {
   my $verbosity = "";
   if ($option{'silent'}) { $verbosity = "--verbose 0"; }
   if ($option{'verbose'}) { $verbosity = "--verbose 2"; }
-  my $command = "'" . $path_to_key . "/bin/key' --K-headless --auto $verbosity $statisticsCmd '$dk'";
+  my $command = "'" . $path_to_key . "/bin/key' --auto $verbosity $statisticsCmd '$dk'";
   print "Command is: $command\n" unless $option{'silent'};
   my $starttime = time();
   my $result = &system_timeout($time_limit, $command);
@@ -416,7 +417,7 @@ sub reloadFile {
 	return;
     }
 
-    my $command = "'" . $path_to_key . "/bin/key' --K-headless --auto-loadonly '$dk'";
+    my $command = "'" . $path_to_key . "/bin/key' --auto-loadonly '$dk'";
     # print "Command is: $command\n";
     my $result = &system_timeout($time_limit, $command);
 #    print "\nReturn value: $result\n";

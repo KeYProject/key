@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.main()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="a();" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
-         <methodCall name="self.a();" pathCondition="true" pathConditionChanged="false">
+         <methodCall name="&lt;call self.a()&gt;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
             <statement name="b();" pathCondition="true" pathConditionChanged="false">
-               <callStackEntry path="/0"/>
                <callStackEntry path="/0/0/0"/>
-               <methodCall name="self.b();" pathCondition="true" pathConditionChanged="false">
-                  <callStackEntry path="/0"/>
+               <callStackEntry path="/0"/>
+               <methodCall name="&lt;call self.b()&gt;" pathCondition="true" pathConditionChanged="false">
                   <callStackEntry path="/0/0/0"/>
+                  <callStackEntry path="/0"/>
                   <statement name="c();" pathCondition="true" pathConditionChanged="false">
-                     <callStackEntry path="/0"/>
-                     <callStackEntry path="/0/0/0"/>
                      <callStackEntry path="/0/0/0/0/0"/>
-                     <methodCall name="self.c();" pathCondition="true" pathConditionChanged="false">
-                        <callStackEntry path="/0"/>
-                        <callStackEntry path="/0/0/0"/>
+                     <callStackEntry path="/0/0/0"/>
+                     <callStackEntry path="/0"/>
+                     <methodCall name="&lt;call self.c()&gt;" pathCondition="true" pathConditionChanged="false">
                         <callStackEntry path="/0/0/0/0/0"/>
+                        <callStackEntry path="/0/0/0"/>
+                        <callStackEntry path="/0"/>
                         <statement name="throw new RuntimeException ();" pathCondition="true" pathConditionChanged="false">
-                           <callStackEntry path="/0"/>
-                           <callStackEntry path="/0/0/0"/>
-                           <callStackEntry path="/0/0/0/0/0"/>
                            <callStackEntry path="/0/0/0/0/0/0/0"/>
+                           <callStackEntry path="/0/0/0/0/0"/>
+                           <callStackEntry path="/0/0/0"/>
+                           <callStackEntry path="/0"/>
                            <statement name="int ae = -1;" pathCondition="true" pathConditionChanged="false">
-                              <callStackEntry path="/0"/>
                               <callStackEntry path="/0/0/0"/>
+                              <callStackEntry path="/0"/>
                               <statement name="int a1 = 1;" pathCondition="true" pathConditionChanged="false">
-                                 <callStackEntry path="/0"/>
                                  <callStackEntry path="/0/0/0"/>
-                                 <methodReturn name="&lt;return of self.a();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of self.a();&gt;" isReturnValueComputed="true">
-                                    <callStackEntry path="/0"/>
+                                 <callStackEntry path="/0"/>
+                                 <methodReturn name="&lt;return of a&gt;" signature="&lt;return of self.a()&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of a&gt;" signatureIncludingReturnValue="&lt;return of self.a()&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                     <callStackEntry path="/0/0/0"/>
-                                    <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of self.main();&gt;" isReturnValueComputed="true">
+                                    <callStackEntry path="/0"/>
+                                    <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main()&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of main&gt;" signatureIncludingReturnValue="&lt;return of self.main()&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                                        <callStackEntry path="/0"/>
                                        <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                        </termination>
@@ -46,7 +46,10 @@
                   </statement>
                </methodCall>
             </statement>
+            <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
          </methodCall>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
 </start>

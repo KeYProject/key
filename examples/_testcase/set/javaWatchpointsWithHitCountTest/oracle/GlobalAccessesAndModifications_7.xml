@@ -1,45 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.main()&gt;" pathCondition="true" pathConditionChanged="false">
       <loopStatement name="for ( int i = 0; i&lt;2; i++ )" pathCondition="true" pathConditionChanged="false">
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <loopCondition name="i&lt;2" pathCondition="true" pathConditionChanged="false">
                <statement name="doAccessesAndModifications();" pathCondition="true" pathConditionChanged="false">
-                  <methodCall name="self.doAccessesAndModifications();" pathCondition="true" pathConditionChanged="false">
+                  <methodCall name="&lt;call self.doAccessesAndModifications()&gt;" pathCondition="true" pathConditionChanged="false">
                      <statement name="this.modification=5;" pathCondition="true" pathConditionChanged="false">
                         <statement name="int x = this.access;" pathCondition="true" pathConditionChanged="false">
                            <statement name="x_1=someAccessMethod(this.access);" pathCondition="true" pathConditionChanged="false">
-                              <methodCall name="self.someAccessMethod(access);" pathCondition="true" pathConditionChanged="false">
+                              <methodCall name="&lt;call self.someAccessMethod(access)&gt;" pathCondition="true" pathConditionChanged="false">
                                  <statement name="return 5;" pathCondition="true" pathConditionChanged="false">
-                                    <methodReturn name="&lt;return of self.someAccessMethod(access);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                    <methodReturn name="&lt;return of someAccessMethod&gt;" signature="&lt;return of self.someAccessMethod(access)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                        <statement name="x_1=someInternalAccessMethod(this.access).doNothing();" pathCondition="true" pathConditionChanged="false">
-                                          <methodCall name="self.someInternalAccessMethod(x_3);" pathCondition="true" pathConditionChanged="false">
+                                          <methodCall name="&lt;call self.someInternalAccessMethod(x_3)&gt;" pathCondition="true" pathConditionChanged="false">
                                              <statement name="return new GlobalAccessesAndModifications ();" pathCondition="true" pathConditionChanged="false">
-                                                <methodCall name="GlobalAccessesAndModifications();" pathCondition="true" pathConditionChanged="false">
-                                                   <methodReturn name="&lt;return of GlobalAccessesAndModifications();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                      <methodReturn name="&lt;return of self.someInternalAccessMethod(x_3);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                         <methodCall name="g.doNothing();" pathCondition="true" pathConditionChanged="false">
+                                                <methodCall name="&lt;call GlobalAccessesAndModifications()&gt;" pathCondition="true" pathConditionChanged="false">
+                                                   <methodReturn name="&lt;return of GlobalAccessesAndModifications&gt;" signature="&lt;return of GlobalAccessesAndModifications()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                                      <methodReturn name="&lt;return of someInternalAccessMethod&gt;" signature="&lt;return of self.someInternalAccessMethod(x_3)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                                         <methodCall name="&lt;call g.doNothing()&gt;" pathCondition="true" pathConditionChanged="false">
                                                             <statement name="return 5;" pathCondition="true" pathConditionChanged="false">
-                                                               <methodReturn name="&lt;return of g.doNothing();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                               <methodReturn name="&lt;return of doNothing&gt;" signature="&lt;return of g.doNothing()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                                   <statement name="this.accessAndModification=this.accessAndModification;" pathCondition="true" pathConditionChanged="false">
                                                                      <statement name="this.accessAndModification=someAccessMethod(this.accessAndModification);" pathCondition="true" pathConditionChanged="false">
-                                                                        <methodCall name="self.someAccessMethod(access_1);" pathCondition="true" pathConditionChanged="false">
+                                                                        <methodCall name="&lt;call self.someAccessMethod(access_1)&gt;" pathCondition="true" pathConditionChanged="false">
                                                                            <statement name="return 5;" pathCondition="true" pathConditionChanged="false">
-                                                                              <methodReturn name="&lt;return of self.someAccessMethod(access_1);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                                              <methodReturn name="&lt;return of someAccessMethod&gt;" signature="&lt;return of self.someAccessMethod(access_1)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                                                  <statement name="this.accessAndModification=someInternalAccessMethod(this.accessAndModification).doNothing();" pathCondition="true" pathConditionChanged="false">
-                                                                                    <methodCall name="self.someInternalAccessMethod(x_9);" pathCondition="true" pathConditionChanged="false">
+                                                                                    <methodCall name="&lt;call self.someInternalAccessMethod(x_9)&gt;" pathCondition="true" pathConditionChanged="false">
                                                                                        <statement name="return new GlobalAccessesAndModifications ();" pathCondition="true" pathConditionChanged="false">
-                                                                                          <methodCall name="GlobalAccessesAndModifications();" pathCondition="true" pathConditionChanged="false">
-                                                                                             <methodReturn name="&lt;return of GlobalAccessesAndModifications();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                                                                <methodReturn name="&lt;return of self.someInternalAccessMethod(x_9);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                                                                   <methodCall name="g_6.doNothing();" pathCondition="true" pathConditionChanged="false">
+                                                                                          <methodCall name="&lt;call GlobalAccessesAndModifications()&gt;" pathCondition="true" pathConditionChanged="false">
+                                                                                             <methodReturn name="&lt;return of GlobalAccessesAndModifications&gt;" signature="&lt;return of GlobalAccessesAndModifications()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                                                                                <methodReturn name="&lt;return of someInternalAccessMethod&gt;" signature="&lt;return of self.someInternalAccessMethod(x_9)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                                                                                   <methodCall name="&lt;call g_6.doNothing()&gt;" pathCondition="true" pathConditionChanged="false">
                                                                                                       <statement name="return 5;" pathCondition="true" pathConditionChanged="false">
-                                                                                                         <methodReturn name="&lt;return of g_6.doNothing();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                                                                                            <methodReturn name="&lt;return of self.doAccessesAndModifications();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                                                                         <methodReturn name="&lt;return of doNothing&gt;" signature="&lt;return of g_6.doNothing()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                                                                                            <methodReturn name="&lt;return of doAccessesAndModifications&gt;" signature="&lt;return of self.doAccessesAndModifications()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                                                                                <statement name="i++;" pathCondition="true" pathConditionChanged="false">
                                                                                                                   <loopCondition name="i&lt;2" pathCondition="true" pathConditionChanged="false">
                                                                                                                      <statement name="doAccessesAndModifications();" pathCondition="true" pathConditionChanged="false">
-                                                                                                                        <methodCall name="self.doAccessesAndModifications();" pathCondition="true" pathConditionChanged="false">
+                                                                                                                        <methodCall name="&lt;call self.doAccessesAndModifications()&gt;" pathCondition="true" pathConditionChanged="false">
                                                                                                                            <statement name="this.modification=5;" pathCondition="true" pathConditionChanged="false">
                                                                                                                               <statement name="int x = this.access;" pathCondition="true" pathConditionChanged="false">
                                                                                                                               </statement>
@@ -51,33 +51,42 @@
                                                                                                             </methodReturn>
                                                                                                          </methodReturn>
                                                                                                       </statement>
+                                                                                                      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                    </methodCall>
                                                                                                 </methodReturn>
                                                                                              </methodReturn>
+                                                                                             <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                           </methodCall>
                                                                                        </statement>
+                                                                                       <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                     </methodCall>
                                                                                  </statement>
                                                                               </methodReturn>
                                                                            </statement>
+                                                                           <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                         </methodCall>
                                                                      </statement>
                                                                   </statement>
                                                                </methodReturn>
                                                             </statement>
+                                                            <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                          </methodCall>
                                                       </methodReturn>
                                                    </methodReturn>
+                                                   <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                 </methodCall>
                                              </statement>
+                                             <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                           </methodCall>
                                        </statement>
                                     </methodReturn>
                                  </statement>
+                                 <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
                               </methodCall>
                            </statement>
                         </statement>
                      </statement>
+                     <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                   </methodCall>
                </statement>
             </loopCondition>

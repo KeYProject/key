@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="IndexOf.indexOf(array,toSearch,comperator);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call IndexOf.indexOf(array,toSearch,comperator)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int index = -1;" pathCondition="true" pathConditionChanged="false">
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <loopInvariant name="invariant: i &gt;= 0 &amp; i &lt;= array.length;
@@ -14,7 +14,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
 pre: var.&lt;inv&gt; &amp; (!var_1 = null &amp; !var_2 = null)
 post: var.&lt;inv&gt; &amp; exc_5 = null
 mod: empty, creates no new objects
-termination: diamond" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(and(and(leq(index_1_0,Z(neglit(1(#)))),not(equals(array,null))),gt(length(array),i_0)),or(geq(i_0,Z(0(#))),geq(index_1_0,Z(0(#))))),or(geq(index_1_0,Z(0(#))),not(equals(array,null)))),or(geq(index_1_0,Z(0(#))),geq(length(array),i_0))))" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
+termination: diamond" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(and(and(leq(index_1_0,Z(neglit(1(#)))),not(equals(array,null))),gt(length(array),i_0)),or(geq(i_0,Z(0(#))),geq(index_1_0,Z(0(#))))),or(geq(index_1_0,Z(0(#))),not(equals(array,null)))),or(geq(index_1_0,Z(0(#))),geq(length(array),i_0))))" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_5" selfTerm="var" contractParameters="var_1, var_2" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
                               <branchCondition name="not(equals(comperator,null))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(and(and(and(leq(index_1_0,Z(neglit(1(#)))),not(equals(array,null))),gt(length(array),i_0)),not(equals(comperator,null))),or(geq(i_0,Z(0(#))),geq(index_1_0,Z(0(#))))),or(geq(index_1_0,Z(0(#))),not(equals(array,null)))),or(geq(index_1_0,Z(0(#))),geq(length(array),i_0))))" pathConditionChanged="true" branchCondition="not(equals(comperator,null))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (equals)">
                                  <branchCondition name="not(equals(result_0,TRUE))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(and(and(and(and(not(equals(result_0,TRUE)),leq(index_1_0,Z(neglit(1(#))))),not(equals(array,null))),gt(length(array),i_0)),not(equals(comperator,null))),or(geq(i_0,Z(0(#))),geq(index_1_0,Z(0(#))))),or(geq(index_1_0,Z(0(#))),not(equals(array,null)))),or(geq(index_1_0,Z(0(#))),geq(length(array),i_0))))" pathConditionChanged="true" branchCondition="not(equals(result_0,TRUE))" mergedBranchCondition="false" isBranchConditionComputed="true">
                                     <statement name="index_1=i;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(and(and(and(and(not(equals(result_0,TRUE)),leq(index_1_0,Z(neglit(1(#))))),not(equals(array,null))),gt(length(array),i_0)),not(equals(comperator,null))),or(geq(i_0,Z(0(#))),geq(index_1_0,Z(0(#))))),or(geq(index_1_0,Z(0(#))),not(equals(array,null)))),or(geq(index_1_0,Z(0(#))),geq(length(array),i_0))))" pathConditionChanged="false">
@@ -34,19 +34,23 @@ termination: diamond" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(
                            </operationContract>
                         </branchCondition>
                         <branchCondition name="leq(length(array),i_0)" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(and(and(leq(index_1_0,Z(neglit(1(#)))),not(equals(array,null))),leq(length(array),i_0)),or(geq(i_0,Z(0(#))),geq(index_1_0,Z(0(#))))),or(geq(index_1_0,Z(0(#))),not(equals(array,null)))),or(geq(index_1_0,Z(0(#))),geq(length(array),i_0))))" pathConditionChanged="true" branchCondition="leq(length(array),i_0)" mergedBranchCondition="false" isBranchConditionComputed="true">
-                           <termination name="&lt;uncaught java.lang.ArrayIndexOutOfBoundsException&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(and(and(leq(index_1_0,Z(neglit(1(#)))),not(equals(array,null))),leq(length(array),i_0)),or(geq(i_0,Z(0(#))),geq(index_1_0,Z(0(#))))),or(geq(index_1_0,Z(0(#))),not(equals(array,null)))),or(geq(index_1_0,Z(0(#))),geq(length(array),i_0))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-                           </termination>
+                           <exceptionalMethodReturn name="&lt;throw java.lang.Throwable&gt;" signature="&lt;exceptional return of &lt;call IndexOf.indexOf(array,toSearch,comperator)&gt;&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(and(and(leq(index_1_0,Z(neglit(1(#)))),not(equals(array,null))),leq(length(array),i_0)),or(geq(i_0,Z(0(#))),geq(index_1_0,Z(0(#))))),or(geq(index_1_0,Z(0(#))),not(equals(array,null)))),or(geq(index_1_0,Z(0(#))),geq(length(array),i_0))))" pathConditionChanged="false" methodReturnCondition="imp(geq(length(array),Z(0(#))),and(and(and(and(and(leq(index_1_0,Z(neglit(1(#)))),not(equals(array,null))),leq(length(array),i_0)),or(geq(i_0,Z(0(#))),geq(index_1_0,Z(0(#))))),or(geq(index_1_0,Z(0(#))),not(equals(array,null)))),or(geq(index_1_0,Z(0(#))),geq(length(array),i_0))))">
+                              <termination name="&lt;uncaught java.lang.ArrayIndexOutOfBoundsException&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(and(and(leq(index_1_0,Z(neglit(1(#)))),not(equals(array,null))),leq(length(array),i_0)),or(geq(i_0,Z(0(#))),geq(index_1_0,Z(0(#))))),or(geq(index_1_0,Z(0(#))),not(equals(array,null)))),or(geq(index_1_0,Z(0(#))),geq(length(array),i_0))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                              </termination>
+                           </exceptionalMethodReturn>
                         </branchCondition>
                      </branchStatement>
                   </branchCondition>
                   <branchCondition name="equals(array,null)" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(and(leq(index_1_0,Z(neglit(1(#)))),equals(array,null)),or(geq(i_0,Z(0(#))),geq(index_1_0,Z(0(#))))),or(geq(index_1_0,Z(0(#))),not(equals(array,null)))),or(geq(index_1_0,Z(0(#))),geq(length(array),i_0))))" pathConditionChanged="true" branchCondition="equals(array,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(and(leq(index_1_0,Z(neglit(1(#)))),equals(array,null)),or(geq(i_0,Z(0(#))),geq(index_1_0,Z(0(#))))),or(geq(index_1_0,Z(0(#))),not(equals(array,null)))),or(geq(index_1_0,Z(0(#))),geq(length(array),i_0))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-                     </termination>
+                     <exceptionalMethodReturn name="&lt;throw java.lang.Throwable&gt;" signature="&lt;exceptional return of &lt;call IndexOf.indexOf(array,toSearch,comperator)&gt;&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(and(leq(index_1_0,Z(neglit(1(#)))),equals(array,null)),or(geq(i_0,Z(0(#))),geq(index_1_0,Z(0(#))))),or(geq(index_1_0,Z(0(#))),not(equals(array,null)))),or(geq(index_1_0,Z(0(#))),geq(length(array),i_0))))" pathConditionChanged="false" methodReturnCondition="imp(geq(length(array),Z(0(#))),and(and(and(and(leq(index_1_0,Z(neglit(1(#)))),equals(array,null)),or(geq(i_0,Z(0(#))),geq(index_1_0,Z(0(#))))),or(geq(index_1_0,Z(0(#))),not(equals(array,null)))),or(geq(index_1_0,Z(0(#))),geq(length(array),i_0))))">
+                        <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(and(leq(index_1_0,Z(neglit(1(#)))),equals(array,null)),or(geq(i_0,Z(0(#))),geq(index_1_0,Z(0(#))))),or(geq(index_1_0,Z(0(#))),not(equals(array,null)))),or(geq(index_1_0,Z(0(#))),geq(length(array),i_0))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                        </termination>
+                     </exceptionalMethodReturn>
                   </branchCondition>
                </branchCondition>
                <branchCondition name="and(and(or(or(lt(length(array),Z(0(#))),lt(index_1_0,Z(0(#)))),and(geq(i_0,Z(0(#))),geq(length(array),i_0))),gt(index_1_0,Z(neglit(1(#))))),or(not(equals(array,null)),gt(index_1_0,Z(neglit(1(#))))))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(index_1_0,Z(0(#))),or(geq(i_0,Z(0(#))),leq(index_1_0,Z(neglit(1(#)))))),or(geq(index_1_0,Z(0(#))),not(equals(array,null)))),or(leq(index_1_0,Z(neglit(1(#)))),geq(length(array),i_0))))" pathConditionChanged="true" branchCondition="and(and(or(or(lt(length(array),Z(0(#))),lt(index_1_0,Z(0(#)))),and(geq(i_0,Z(0(#))),geq(length(array),i_0))),gt(index_1_0,Z(neglit(1(#))))),or(not(equals(array,null)),gt(index_1_0,Z(neglit(1(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
                   <statement name="return i;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(index_1_0,Z(0(#))),or(geq(i_0,Z(0(#))),leq(index_1_0,Z(neglit(1(#)))))),or(geq(index_1_0,Z(0(#))),not(equals(array,null)))),or(leq(index_1_0,Z(neglit(1(#)))),geq(length(array),i_0))))" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of IndexOf.indexOf(array,toSearch,comperator);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(index_1_0,Z(0(#))),or(geq(i_0,Z(0(#))),leq(index_1_0,Z(neglit(1(#)))))),or(geq(index_1_0,Z(0(#))),not(equals(array,null)))),or(leq(index_1_0,Z(neglit(1(#)))),geq(length(array),i_0))))" pathConditionChanged="false" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of indexOf&gt;" signature="&lt;return of IndexOf.indexOf(array,toSearch,comperator)&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(index_1_0,Z(0(#))),or(geq(i_0,Z(0(#))),leq(index_1_0,Z(neglit(1(#)))))),or(geq(index_1_0,Z(0(#))),not(equals(array,null)))),or(leq(index_1_0,Z(neglit(1(#)))),geq(length(array),i_0))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(index_1_0,Z(0(#))),or(geq(i_0,Z(0(#))),leq(index_1_0,Z(neglit(1(#)))))),or(geq(index_1_0,Z(0(#))),not(equals(array,null)))),or(leq(index_1_0,Z(neglit(1(#)))),geq(length(array),i_0))))">
                         <termination name="&lt;end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(index_1_0,Z(0(#))),or(geq(i_0,Z(0(#))),leq(index_1_0,Z(neglit(1(#)))))),or(geq(index_1_0,Z(0(#))),not(equals(array,null)))),or(leq(index_1_0,Z(neglit(1(#)))),geq(length(array),i_0))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
@@ -55,5 +59,13 @@ termination: diamond" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(
             </loopInvariant>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/1/0"/>
+      <methodReturnEntry path="/0/0/0/0/0/1/0"/>
+      <methodReturnEntry path="/0/0/0/0/1/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/1/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/0/1/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/1/0/0"/>
+   <terminationEntry path="/0/0/0/0/1/0/0/0"/>
 </start>

@@ -47,10 +47,17 @@ import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.Throws;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.declaration.modifier.Abstract;
 import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
+import de.uka.ilkd.key.java.declaration.modifier.Final;
 import de.uka.ilkd.key.java.declaration.modifier.Ghost;
 import de.uka.ilkd.key.java.declaration.modifier.Model;
 import de.uka.ilkd.key.java.declaration.modifier.NoState;
+import de.uka.ilkd.key.java.declaration.modifier.Private;
+import de.uka.ilkd.key.java.declaration.modifier.Protected;
+import de.uka.ilkd.key.java.declaration.modifier.Public;
+import de.uka.ilkd.key.java.declaration.modifier.Static;
+import de.uka.ilkd.key.java.declaration.modifier.StrictFp;
 import de.uka.ilkd.key.java.declaration.modifier.TwoState;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.Literal;
@@ -131,6 +138,7 @@ import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.MethodReference;
+import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.SuperConstructorReference;
 import de.uka.ilkd.key.java.reference.SuperReference;
@@ -145,6 +153,7 @@ import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.statement.Do;
 import de.uka.ilkd.key.java.statement.Else;
+import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.java.statement.EnhancedFor;
 import de.uka.ilkd.key.java.statement.Finally;
 import de.uka.ilkd.key.java.statement.For;
@@ -634,6 +643,7 @@ public class Recoder2KeYConverter {
      *         there has been an exception
      */
     public ProgramElement convert(recoder.java.JavaProgramElement pe) {
+        ProgramElement result = null;
         ExtList parameter;
 
         if (pe instanceof recoder.java.JavaNonTerminalProgramElement) {
@@ -647,7 +657,8 @@ public class Recoder2KeYConverter {
         final Class<? extends recoder.java.JavaProgramElement> class_ = pe.getClass();
 
         try {
-            return (ProgramElement) getKeYClassConstructor(class_).newInstance(parameter);
+            result = (ProgramElement) getKeYClassConstructor(class_).newInstance(parameter);
+            return result;
         } catch (Exception e) {
             final String className = class_.toString().substring(6);
             final StringBuffer sb = new StringBuffer(className);
@@ -1388,10 +1399,11 @@ public class Recoder2KeYConverter {
                 final Literal compileTimeConstant = getCompileTimeConstantInitializer(recoderVarSpec);
 
                 boolean isModel = false;
+                boolean isFinal = recoderVarSpec.isFinal();
                 for(recoder.java.declaration.Modifier mod : recoderVarSpec.getParent().getModifiers()) {
                     if(mod instanceof de.uka.ilkd.key.java.recoderext.Model) {
-                	isModel = true;
-                	break;
+                        isModel = true;
+                        break;
                     }
                 }
 
@@ -1399,7 +1411,7 @@ public class Recoder2KeYConverter {
                     pv = new LocationVariable(pen, getKeYJavaType(recoderType),
                             getKeYJavaType(recContainingClassType),
                             recoderVarSpec.isStatic(),
-                            isModel);
+                            isModel, false, isFinal);
                 } else {
                     pv = new ProgramConstant(pen, getKeYJavaType(recoderType),
                             getKeYJavaType(recContainingClassType),
@@ -1558,11 +1570,12 @@ public class Recoder2KeYConverter {
                     fr.getIdentifier());
 
             final boolean isModel = false; // bytecode-only fields are no model fields
+            final boolean isFinal = fs.isFinal();
 
             pv = new LocationVariable(new ProgramElementName(makeAdmissibleName(fs.getName()),
                     makeAdmissibleName(recField.getContainingClassType().getFullName())),
                     getKeYJavaType(recoderType), getKeYJavaType(recField
-                            .getContainingClassType()), recField.isStatic(), isModel);
+                            .getContainingClassType()), recField.isStatic(), isModel, false, isFinal);
             insertToMap(fs, new FieldSpecification(pv));
             return new FieldReference(pv, prefix);
         }
@@ -2200,6 +2213,45 @@ public class Recoder2KeYConverter {
 
     public NoState convert(de.uka.ilkd.key.java.recoderext.NoState m) {
         return new NoState(collectComments(m));
+    }
+
+    public EmptyStatement convert(recoder.java.statement.EmptyStatement m) {
+        return new EmptyStatement(collectChildrenAndComments(m));
+    }   
+    
+    //modifiers
+    
+    public Abstract convert(recoder.java.declaration.modifier.Abstract m) {
+        return new Abstract(collectChildrenAndComments(m));
+    }
+    
+    public Public convert(recoder.java.declaration.modifier.Public m) {
+        return new Public(collectChildrenAndComments(m));
+    }
+
+    public Protected convert(recoder.java.declaration.modifier.Protected m) {
+        return new Protected(collectChildrenAndComments(m));
+    }
+
+    public Private convert(recoder.java.declaration.modifier.Private m) {
+        return new Private(collectChildrenAndComments(m));
+    }
+
+    public Static convert(recoder.java.declaration.modifier.Static m) {
+        return new Static(collectChildrenAndComments(m));
+    }
+
+    public Final convert(recoder.java.declaration.modifier.Final m) {
+        return new Final(collectChildrenAndComments(m));
+    }
+    
+    public StrictFp convert(recoder.java.declaration.modifier.StrictFp m) {
+        return new StrictFp(collectChildrenAndComments(m));
+    }
+
+    // package reference
+    public PackageReference convert(recoder.java.reference.PackageReference m) {
+        return new PackageReference(collectChildrenAndComments(m));
     }
 
 }

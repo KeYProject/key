@@ -50,43 +50,30 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
+import org.key_project.sed.core.model.impl.AbstractSEDDebugTarget;
 import org.key_project.sed.key.core.breakpoints.KeYBreakpointManager;
 import org.key_project.sed.key.core.breakpoints.KeYWatchpoint;
 import org.key_project.sed.key.core.launch.KeYLaunchSettings;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
-import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.jdt.JDTUtil;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.TermProgramVariableCollector;
-import de.uka.ilkd.key.proof.TermProgramVariableCollectorKeepUpdatesForBreakpointconditions;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.StepOverSymbolicExecutionTreeNodesStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.StepReturnSymbolicExecutionTreeNodesStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.util.ProofUserManager;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * Implementation if {@link ISEDDebugTarget} which uses KeY to symbolically
@@ -94,7 +81,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * @author Martin Hentschel
  */
 @SuppressWarnings("restriction")
-public class KeYDebugTarget extends SEDMemoryDebugTarget {
+public class KeYDebugTarget extends AbstractSEDDebugTarget {
    /**
     * The {@link KeYBreakpointManager} that manages breakpoints for this target.
     */
@@ -111,24 +98,9 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    private final KeYLaunchSettings launchSettings;
    
    /**
-    * The only contained child thread.
+    * The contained child threads.
     */
-   private final KeYThread thread;
-   
-   /**
-    * Listens for changes on the auto mode of KeY Main Frame,.
-    */
-   private final AutoModeListener autoModeListener = new AutoModeListener() {
-      @Override
-      public void autoModeStarted(ProofEvent e) {
-         handleAutoModeStarted(e);
-      }
-
-      @Override
-      public void autoModeStopped(ProofEvent e) {
-         handleAutoModeStopped(e);
-      }
-   };
+   private final KeYThread[] threads;
    
    /**
     * Listens for changed resources.
@@ -152,6 +124,16 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    private final Map<IExecutionNode, IKeYSEDDebugNode<?>> executionToDebugMapping = new HashMap<IExecutionNode, IKeYSEDDebugNode<?>>();
    
    /**
+    * Observes the proof.
+    */
+   private final ProofDisposedListener proofDisposedListener = new ProofDisposedListener() {
+      @Override
+      public void proofDisposed(ProofDisposedEvent e) {
+         handleProofDisposed(e);
+      }
+   };
+   
+   /**
     * Constructor.
     * @param launch The parent {@link ILaunch}.
     * @param mediator the used {@link KeYMediator} during proof.
@@ -172,18 +154,18 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       this.launchSettings = launchSettings; 
       this.environment = environment;
       Proof proof = environment.getProof();
+      proof.addProofDisposedListener(proofDisposedListener);
       ProofUserManager.getInstance().addUser(proof, environment, this);
       // Update initial model
       setModelIdentifier(MODEL_IDENTIFIER);
       setName(proof.name() != null ? proof.name().toString() : "Unnamed");
-      thread = new KeYThread(this, environment.getBuilder().getStartNode());
-      registerDebugNode(thread);
-      addSymbolicThread(thread);
-      // Observe frozen state of KeY Main Frame
-      environment.getBuilder().getMediator().addAutoModeListener(autoModeListener);
+      // Init breakpoints
+      initBreakpoints();
+      // Add thread
+      KeYThread thread = new KeYThread(this, environment.getBuilder().getStartNode());
+      threads = new KeYThread[] {thread};
       // Initialize proof to use the symbolic execution strategy
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun());
-      addBreakpoints();
       ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener, IResourceChangeEvent.POST_CHANGE);
    }
 
@@ -191,142 +173,38 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * {@inheritDoc}
     */
    @Override
-   public boolean canResume() {
-      return super.canResume() && 
-             !environment.getBuilder().getMediator().autoMode() && // Only one proof completion per time is possible
-             environment.getUi().isAutoModeSupported(environment.getBuilder().getProof()); // Otherwise Auto Mode is not available.
+   public KeYThread[] getSymbolicThreads() throws DebugException {
+      return threads;
    }
    
    /**
-    * Checks if resuming on the given {@link IKeYSEDDebugNode} is possible.
-    * @param keyNode The {@link IKeYSEDDebugNode} to check.
-    * @return {@code true} possible, {@code false} not possible.
+    * Returns the used {@link KeYBreakpointManager}.
+    * @return The used {@link KeYBreakpointManager}.
     */
-   public boolean canResume(IKeYSEDDebugNode<?> keyNode) {
-      return canResume();
+   public KeYBreakpointManager getBreakpointManager() {
+      return breakpointManager;
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public void resume() throws DebugException {
-      Object element = KeySEDUtil.getSelectedDebugElement(); // To ask the UI for the selected element is a little bit ugly, but the only way because the Eclipse API does not provide the selected element.
-      resume(element instanceof IKeYSEDDebugNode<?> ? (IKeYSEDDebugNode<?>)element : null);
-   }
-   
-   /**
-    * Resumes the given {@link IKeYSEDDebugNode}.
-    * @param keyNode The {@link IKeYSEDDebugNode} to resume.
-    * @throws DebugException Occurred Exception.
-    */
-   public void resume(IKeYSEDDebugNode<?> keyNode) throws DebugException {
-      if (canResume()) {
-         // Inform UI that the process is resumed
-         super.resume();
-         // Run auto mode
-         runAutoMode(KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), 
-                     keyNode != null ? SymbolicExecutionUtil.collectGoalsInSubtree(keyNode.getExecutionNode()) : environment.getBuilder().getProof().openEnabledGoals(),
-                     false,
-                     false);
-      }
-   }
-   
-   /**
-    * Runs the auto mode in KeY until the maximal number of set nodes are executed.
-    * @param maximalNumberOfSetNodesToExecute The maximal number of set nodes to execute.
-    * @param gaols The {@link Goal}s to work with.
-    * @param stepOver Include step over stop condition?
-    * @param stepReturn Include step return condition?
-    */
-   protected void runAutoMode(int maximalNumberOfSetNodesToExecute, 
-                              ImmutableList<Goal> goals, 
-                              boolean stepOver,
-                              boolean stepReturn) {
-      Proof proof = environment.getBuilder().getProof();
-      // Set strategy to use
-      StrategyProperties strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-      proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
-      // Update stop condition
-      CompoundStopCondition stopCondition = new CompoundStopCondition();
-      stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfSetNodesToExecute));
-      SymbolicExecutionBreakpointStopCondition breakpointParentStopCondition = breakpointManager.getBreakpointStopCondition();
-      stopCondition.addChildren(breakpointParentStopCondition);
-      proof.getServices().setFactory(createNewFactory(breakpointParentStopCondition));
-      if (stepOver) {
-         stopCondition.addChildren(new StepOverSymbolicExecutionTreeNodesStopCondition());
-      }
-      if (stepReturn) {
-         stopCondition.addChildren(new StepReturnSymbolicExecutionTreeNodesStopCondition());
-      }
-      proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
-      // Run proof
-      environment.getUi().startAutoMode(proof, goals);
-   }
-
-
-   /**
-    * creates a new factory that should be used by others afterwards
-    * @return 
-    */
-   private ITermProgramVariableCollectorFactory createNewFactory(final SymbolicExecutionBreakpointStopCondition breakpointParentStopCondition) {
-      ITermProgramVariableCollectorFactory programVariableCollectorFactory = new ITermProgramVariableCollectorFactory() {
-         @Override
-         public TermProgramVariableCollector create(Services services) {
-            return new TermProgramVariableCollectorKeepUpdatesForBreakpointconditions(services, breakpointParentStopCondition);
-         }
-      };
-      return programVariableCollectorFactory;
+   public IBreakpoint[] getBreakpoints() {
+      return breakpointManager.getBreakpoints();
    }
    
    /**
     * {@inheritDoc}
     */
+   @SuppressWarnings("unchecked")
    @Override
-   public boolean canSuspend() {
-      return super.canSuspend() && 
-             environment.getBuilder().getMediator().autoMode() && // Only if the auto mode is in progress
-             environment.getBuilder().getMediator().getSelectedProof() == environment.getBuilder().getProof(); // And the auto mode handles this proof
-   }
-   
-   /**
-    * Checks if suspending on the given {@link IKeYSEDDebugNode} is possible.
-    * @param keyNode The {@link IKeYSEDDebugNode} to check.
-    * @return {@code true} possible, {@code false} not possible.
-    */
-   public boolean canSuspend(IKeYSEDDebugNode<?> keyNode) {
-      return canSuspend();
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void suspend() throws DebugException {
-      if (canSuspend()) {
-         environment.getUi().stopAutoMode();
+   protected boolean checkBreakpointHit(IBreakpoint breakpoint, ISEDDebugNode node) {
+      if (node instanceof IKeYSEDDebugNode) {
+         return breakpointManager.checkBreakpointHit(breakpoint, ((IKeYSEDDebugNode<IExecutionNode>)node));
       }
-   }
-   
-   /**
-    * Suspends the given {@link IKeYSEDDebugNode}.
-    * @param keyNode The {@link IKeYSEDDebugNode} to suspend.
-    * @throws DebugException Occurred Exception.
-    */
-   public void suspend(IKeYSEDDebugNode<?> keyNode) throws DebugException {
-      suspend();
-   }
-
-   /**
-    * <p>
-    * Updates the symbolic execution tree of the given {@link SymbolicExecutionTreeBuilder}
-    * by calling {@link SymbolicExecutionTreeBuilder#analyse()}.
-    * </p>
-    * @param builder The {@link SymbolicExecutionTreeBuilder} to update.
-    */
-   protected void updateExecutionTree(SymbolicExecutionTreeBuilder builder) {
-      // Update the symbolic execution tree, debug model is updated lazily via getters
-      environment.getBuilder().analyse();
+      else {
+         return false;
+      }
    }
 
    /**
@@ -338,18 +216,16 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
          // Remove Eclipse listeners
          ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceListener);
          DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
-         // Remove auto mode listener
-         environment.getBuilder().getMediator().removeAutoModeListener(autoModeListener);
          // Suspend first to stop the automatic mode
          if (!isSuspended()) {
             suspend();
             environment.getUi().waitWhileAutoMode();
          }
          // Remove proof from user interface
+         environment.getProof().removeProofDisposedListener(proofDisposedListener);
          ProofUserManager.getInstance().removeUserAndDispose(environment.getProof(), this);
          // Clear cache
-         environment.getBuilder().dispose();
-         environment = null;
+         environment.dispose();
       }
       // Inform UI that the process is terminated
       super.terminate();
@@ -360,63 +236,28 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     */
    @Override
    public void disconnect() throws DebugException {
-      // Remove auto mode listener
-      environment.getBuilder().getMediator().removeAutoModeListener(autoModeListener);
+      environment.getProof().removeProofDisposedListener(proofDisposedListener);
+      // Perform disconnect on threads
+      for (KeYThread thread : threads) {
+         thread.disconnect();
+      }
       // Remove Eclipse listeners
       ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceListener);
       DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
       // Inform UI that the process is disconnected
       super.disconnect();
    }
-
-   /**
-    * When the auto mode is started.
-    * @param e The event.
-    */
-   protected void handleAutoModeStarted(ProofEvent e) {
-      if (e.getSource() == environment.getBuilder().getProof()) {
-         try {
-            // Inform UI that the process is resumed
-            super.resume();
-         }
-         catch (DebugException exception) {
-            LogUtil.getLogger().logError(exception);
-         }
-      }
-   }
-
-   /**
-    * When the auto mode has stopped.
-    * @param e The event.
-    */
-   protected void handleAutoModeStopped(ProofEvent e) {
-      if (e.getSource() == environment.getBuilder().getProof()) {
-         try {
-            updateExecutionTree(environment.getBuilder());
-         }
-         catch (Exception exception) {
-            LogUtil.getLogger().logError(exception);
-            LogUtil.getLogger().openErrorDialog(null, exception);
-         }
-         finally {
-            try {
-               super.suspend();
-            }
-            catch (DebugException e1) {
-               LogUtil.getLogger().logError(e1);
-               LogUtil.getLogger().openErrorDialog(null, e1);
-            }
-         }
-      }
-   }
    
    /**
     * Registers the given {@link IKeYSEDDebugNode} as child of this {@link KeYDebugTarget}.
     * @param node The {@link IKeYSEDDebugNode} to register as child.
+    * @throws DebugException Occurred Exception
     */
-   public void registerDebugNode(IKeYSEDDebugNode<?> node) {
+   public void registerDebugNode(IKeYSEDDebugNode<?> node) throws DebugException {
       if (node != null) {
-         executionToDebugMapping.put(node.getExecutionNode(), node);
+         IKeYSEDDebugNode<?> oldNode = executionToDebugMapping.put(node.getExecutionNode(), node);
+         Assert.isTrue(oldNode == null);
+         addToSourceModel(node);
       }
    }
    
@@ -446,63 +287,11 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    }
 
    /**
-    * Checks if step into is possible.
-    * @param keyNode The {@link IKeYSEDDebugNode} which requests the step into action.
-    * @return {@code true} can step into, {@code false} can not step into.
+    * Checks if the signature is shown on {@link KeYMethodCall}s.
+    * @return {@code true} show signature, {@code false} show only name.
     */
-   public boolean canStepInto(IKeYSEDDebugNode<?> keyNode) {
-      return canResume(keyNode);
-   }
-
-   /**
-    * Executes the step into for the given {@link IKeYSEDDebugNode}.
-    * @param keyNode The {@link IKeYSEDDebugNode} which requests the step into.
-    */
-   public void stepInto(IKeYSEDDebugNode<?> keyNode) {
-      runAutoMode(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_FOR_ONE_STEP, 
-                  SymbolicExecutionUtil.collectGoalsInSubtree(keyNode.getExecutionNode()),
-                  false,
-                  false);
-   }
-
-   /**
-    * Checks if step over is possible.
-    * @param keyNode The {@link IKeYSEDDebugNode} which requests the step over action.
-    * @return {@code true} can step over, {@code false} can not step over.
-    */
-   public boolean canStepOver(IKeYSEDDebugNode<?> keyNode) {
-      return canResume(keyNode);
-   }
-
-   /**
-    * Executes the step over for the given {@link IKeYSEDDebugNode}.
-    * @param keyNode The {@link IKeYSEDDebugNode} which requests the step over.
-    */
-   public void stepOver(IKeYSEDDebugNode<?> keyNode) {
-      runAutoMode(KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), 
-                  SymbolicExecutionUtil.collectGoalsInSubtree(keyNode.getExecutionNode()),
-                  true,
-                  false);
-   }
-
-   /**
-    * Checks if step return is possible.
-    * @param keyNode The {@link IKeYSEDDebugNode} which requests the step return action.
-    * @return {@code true} can step return, {@code false} can not step return.
-    */
-   public boolean canStepReturn(IKeYSEDDebugNode<?> keyNode) {
-      return canResume(keyNode);
-   }
-
-   /**
-    * Executes the step return for the given {@link IKeYSEDDebugNode}.
-    * @param keyNode The {@link IKeYSEDDebugNode} which requests the step return.
-    */
-   public void stepReturn(IKeYSEDDebugNode<?> keyNode) {
-      runAutoMode(KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), 
-                  SymbolicExecutionUtil.collectGoalsInSubtree(keyNode.getExecutionNode()),
-                  false,
-                  true);
+   public boolean isShowSignatureOnMethodReturnNodes() {
+      return launchSettings.isShowSignatureOnMethodReturnNodes();
    }
    
    /**
@@ -529,15 +318,12 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       return launchSettings.getMethod();
    }
    
-   
    /**
-    * Adds all Breakpoints to this DebugTarget. Is called only when the DebugTarget is initially created.
+    * {@inheritDoc}
     */
-   private void addBreakpoints(){ 
-      IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager().getBreakpoints();      
-      for(int i = 0; i < breakpoints.length; i++){
-         breakpointAdded(breakpoints[i]);
-      }
+   @Override
+   protected void initBreakpoint(IBreakpoint breakpoint) {
+      breakpointAdded(breakpoint);
    }
    
    /**
@@ -589,6 +375,9 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       catch(TermCreationException e){
          handleFailedToParse(e, breakpoint);
       }
+      finally {
+         super.breakpointAdded(breakpoint);
+      }
    }
 
 
@@ -598,6 +387,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    @Override
    public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
       breakpointManager.breakpointRemoved(breakpoint, delta);
+      super.breakpointRemoved(breakpoint, delta);
    }
 
    /**
@@ -663,15 +453,15 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
             handleFailedToParse(e, breakpoint);
          }
       }
+      super.breakpointChanged(breakpoint, delta);
    }
-
  
    /**
     * Opens a dialog to tell the user that the hot code replace failed and gives options to handle that.
     * 
     * @param target the target on which the replace failed
     */
-   private void openHotCodeReplaceDialog() {
+   protected void openHotCodeReplaceDialog() {
       if (!isTerminated() &&
           !isDisconnected() &&
           JDIDebugUIPlugin.getDefault().getPreferenceStore().getBoolean(IJDIPreferencesConstants.PREF_ALERT_HCR_NOT_SUPPORTED)) {
@@ -712,7 +502,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @param e the Exception that caused the failure
     * @param breakpoint the breakpoint, for which the condition could not be parsed
     */
-   private void handleFailedToParse(final Exception e, final IBreakpoint breakpoint) {
+   protected void handleFailedToParse(final Exception e, final IBreakpoint breakpoint) {
       Runnable run = new Runnable() {
          @Override
          public void run() {
@@ -725,7 +515,8 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
                action.selectionChanged(null, new StructuredSelection(breakpoint));
                action.run(null);
                DebugPlugin.getDefault().getBreakpointManager().fireBreakpointChanged(breakpoint);
-            }else{
+            }
+            else{
                if(breakpoint instanceof JavaLineBreakpoint){
                   JavaLineBreakpoint lineBreakpoint = (JavaLineBreakpoint) breakpoint;
                   try {
@@ -741,6 +532,19 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
          }
       };
       Display.getDefault().asyncExec(run);
+   }
+
+   /**
+    * When the proof is disposed.
+    * @param e The event.
+    */
+   protected void handleProofDisposed(ProofDisposedEvent e) {
+      try {
+         disconnect();
+      }
+      catch (DebugException exc) {
+         LogUtil.getLogger().logError(exc);
+      }
    }
 
    /**

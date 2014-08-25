@@ -38,7 +38,85 @@ import de.uka.ilkd.key.gui.MainWindow;
  */
 public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTestCase {
    /**
-    * Tests the launch where branch conditions are merged.
+    * Tests the launch where unicode signs are used.
+    */
+   @Test
+   public void testUseUnicode() throws Exception {
+      doTestUseUnicode("SWTBotLaunchDefaultPreferencesTest_testUseUnicode", true);
+   }
+
+   /**
+    * Tests the launch where unicode signs are not used.
+    */
+   @Test
+   public void testDoNotUseUnicode() throws Exception {
+      doTestUseUnicode("SWTBotLaunchDefaultPreferencesTest_testDoNotUseUnicode", false);
+   }
+   
+   /**
+    * Does the test steps of {@link #testUseUnicode()}
+    * and {@link #testDoNotUseUnicode()}.
+    * @param projectName The project name to use.
+    * @param useUnicode Use unicode signs?
+    * @throws Exception Occurred Exception
+    */
+   protected void doTestUseUnicode(String projectName, 
+                                   final boolean useUnicode) throws Exception {
+      boolean originalUseUnicode = KeYSEDPreferences.isUseUnicode();
+      try {
+         KeYSEDPreferences.setUsePrettyPrinting(true);
+         // Set preference
+         SWTWorkbenchBot bot = new SWTWorkbenchBot();
+         SWTBotShell preferenceShell = TestUtilsUtil.openPreferencePage(bot, "Run/Debug", "Symbolic Execution Debugger (SED)", "KeY Launch Defaults");
+         if (useUnicode) {
+            preferenceShell.bot().checkBox("Use unicode symbols").select();
+         }
+         else {
+            preferenceShell.bot().checkBox("Use unicode symbols").deselect();
+         }
+         preferenceShell.bot().button("OK").click();
+         assertEquals(useUnicode, KeYSEDPreferences.isUseUnicode());
+         // Launch something
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
+            @Override
+            public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+               // Get debug target TreeItem
+               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
+               // Do run
+               resume(bot, item, target);
+               if (useUnicode) {
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/unicodeTest/oracle/UnicodeTest_Enabled.xml", false, false);
+               }
+               else {
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/unicodeTest/oracle/UnicodeTest_Disabled.xml", false, false);
+               }
+            }
+         };
+         doKeYDebugTargetTest(projectName,
+                              "data/unicodeTest/test",
+                              true,
+                              true,
+                              createMethodSelector("UnicodeTest", "magic", "Z", "Z"),
+                              null,
+                              null,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              null,
+                              Boolean.TRUE,
+                              Boolean.TRUE,
+                              8, executor);
+      }
+      finally {
+         // Restore original value
+         KeYSEDPreferences.setUseUnicode(originalUseUnicode);
+         assertEquals(originalUseUnicode, KeYSEDPreferences.isUseUnicode());
+      }
+   }
+   
+   /**
+    * Tests the launch where pretty printing is used.
     */
    @Test
    public void testUsePrettyPrinting() throws Exception {
@@ -46,7 +124,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
    }
 
    /**
-    * Tests the launch where branch conditions are not merged.
+    * Tests the launch where pretty printing is not used.
     */
    @Test
    public void testDoNotUsePrettyPrinting() throws Exception {
@@ -102,9 +180,10 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.FALSE,
+                              Boolean.FALSE,
                               null,
-                              8,
-                              executor);
+                              Boolean.TRUE,
+                              8, executor);
       }
       finally {
          // Restore original value
@@ -179,8 +258,9 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               null,
                               Boolean.FALSE,
-                              8,
-                              executor);
+                              Boolean.FALSE,
+                              Boolean.TRUE,
+                              8, executor);
       }
       finally {
          // Restore original value
@@ -258,8 +338,9 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.FALSE,
-                              8,
-                              executor);
+                              Boolean.FALSE,
+                              Boolean.TRUE,
+                              8, executor);
       }
       finally {
          // Restore original value
@@ -339,8 +420,9 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               null,
                               Boolean.FALSE,
                               Boolean.FALSE,
-                              8,
-                              executor);
+                              Boolean.FALSE,
+                              Boolean.TRUE,
+                              8, executor);
       }
       finally {
          // Restore original value
@@ -353,16 +435,32 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
     * Tests the launch where return values are shown in tree.
     */
    @Test
-   public void testShowMethodReturnValuesInDebugNodes() throws Exception {
-      doTestShowMethodReturnValuesInDebugNodes("SWTBotLaunchDefaultPreferencesTest_testShowMethodReturnValuesInDebugNodes", true);
+   public void testShowMethodReturnValuesInDebugNodes_Signature() throws Exception {
+      doTestShowMethodReturnValuesInDebugNodes("SWTBotLaunchDefaultPreferencesTest_testShowMethodReturnValuesInDebugNodesWithSignature", true, true);
    }
 
    /**
     * Tests the launch where return values are not shown in tree.
     */
    @Test
-   public void testDoNotShowMethodReturnValuesInDebugNodes() throws Exception {
-      doTestShowMethodReturnValuesInDebugNodes("SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes", false);
+   public void testDoNotShowMethodReturnValuesInDebugNodes_Signature() throws Exception {
+      doTestShowMethodReturnValuesInDebugNodes("SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodesWithSignature", false, true);
+   }
+   
+   /**
+    * Tests the launch where return values are shown in tree.
+    */
+   @Test
+   public void testShowMethodReturnValuesInDebugNodes_NameOnly() throws Exception {
+      doTestShowMethodReturnValuesInDebugNodes("SWTBotLaunchDefaultPreferencesTest_testShowMethodReturnValuesInDebugNodes", true, false);
+   }
+
+   /**
+    * Tests the launch where return values are not shown in tree.
+    */
+   @Test
+   public void testDoNotShowMethodReturnValuesInDebugNodes_NameOnly() throws Exception {
+      doTestShowMethodReturnValuesInDebugNodes("SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes", false, false);
    }
    
    /**
@@ -373,7 +471,8 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
     * @throws Exception Occurred Exception
     */
    protected void doTestShowMethodReturnValuesInDebugNodes(String projectName, 
-                                                           final boolean showMethodReturnValuesInDebugNodes) throws Exception {
+                                                           final boolean showMethodReturnValuesInDebugNodes,
+                                                           final boolean showSignature) throws Exception {
       boolean originalShowMethodReturnValuesInDebugNodes = KeYSEDPreferences.isShowMethodReturnValuesInDebugNode();
       try {
          // Set preference
@@ -385,6 +484,12 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          else {
             preferenceShell.bot().checkBox("Show method return values in debug nodes").deselect();
          }
+         if (showSignature) {
+            preferenceShell.bot().checkBox("Show signature instead of only the name on method return nodes").select();
+         }
+         else {
+            preferenceShell.bot().checkBox("Show signature instead of only the name on method return nodes").deselect();
+         }
          preferenceShell.bot().button("OK").click();
          assertEquals(showMethodReturnValuesInDebugNodes, KeYSEDPreferences.isShowMethodReturnValuesInDebugNode());
          // Launch something
@@ -394,7 +499,17 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Get debug target TreeItem
                SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
                // Do resume and test created tree
-               String expectedModelPathInBundle = showMethodReturnValuesInDebugNodes ? "data/simpleIf/oracle/SimpleIf.xml" : "data/simpleIf/oracle_noMethodReturnValues/SimpleIf.xml";
+               String expectedModelPathInBundle;
+               if (showSignature) {
+                  expectedModelPathInBundle = showMethodReturnValuesInDebugNodes ? 
+                                              "data/simpleIf/oracle/SimpleIf.xml" : 
+                                              "data/simpleIf/oracle_noMethodReturnValues/SimpleIf.xml";
+               }
+               else {
+                  expectedModelPathInBundle = showMethodReturnValuesInDebugNodes ? 
+                                              "data/simpleIf/oracle/SimpleIf_NoSignature.xml" : 
+                                              "data/simpleIf/oracle_noMethodReturnValues/SimpleIf_NoSignature.xml";
+               }
                resume(bot, item, target);
                assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false);
             }
@@ -411,8 +526,9 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.FALSE,
-                              8,
-                              executor);
+                              Boolean.FALSE,
+                              null,
+                              8, executor);
       }
       finally {
          // Restore original value

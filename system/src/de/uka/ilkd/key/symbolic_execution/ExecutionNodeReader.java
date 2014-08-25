@@ -35,6 +35,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -44,6 +45,7 @@ import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -55,9 +57,11 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
@@ -74,8 +78,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.Terminatio
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 
 /**
  * Allows to read XML files which contains an symbolic execution tree
@@ -124,6 +128,34 @@ public class ExecutionNodeReader {
                      throw new SAXException("Can't find call stack entry \"" + path + "\" in parsed symbolic execution tree.");
                   }
                   entry.getKey().addCallStackEntry(stackEntry);
+               }
+            }
+            // Construct method returns
+            Set<Entry<KeYlessMethodCall, List<String>>> methodReturnEntries = handler.getMethodReturnPathEntries().entrySet();
+            for (Entry<KeYlessMethodCall, List<String>> entry : methodReturnEntries) {
+               for (String path : entry.getValue()) {
+                  IExecutionNode returnEntry = findNode(root, path);
+                  if (returnEntry == null) {
+                     throw new SAXException("Can't find method return entry \"" + path + "\" in parsed symbolic execution tree.");
+                  }
+                  if (!(returnEntry instanceof IExecutionBaseMethodReturn<?>)) {
+                     throw new SAXException("Expected basemethod return on \"" + path + "\" but is " + returnEntry.getElementType() + ".");
+                  }
+                  entry.getKey().addMethodReturn((IExecutionBaseMethodReturn<?>)returnEntry);
+               }
+            }
+            // Construct terminations
+            Set<Entry<KeYlessStart, List<String>>> terminationEntries = handler.getTerminationPathEntries().entrySet();
+            for (Entry<KeYlessStart, List<String>> entry : terminationEntries) {
+               for (String path : entry.getValue()) {
+                  IExecutionNode terminationEntry = findNode(root, path);
+                  if (terminationEntry == null) {
+                     throw new SAXException("Can't find termination entry \"" + path + "\" in parsed symbolic execution tree.");
+                  }
+                  if (!(terminationEntry instanceof IExecutionTermination)) {
+                     throw new SAXException("Expected termination on \"" + path + "\" but is " + terminationEntry.getElementType() + ".");
+                  }
+                  entry.getKey().addTermination((IExecutionTermination)terminationEntry);
                }
             }
             // Return result
@@ -184,18 +216,28 @@ public class ExecutionNodeReader {
        * The parent hierarchy filled by {@link #startElement(String, String, String, Attributes)}
        * and emptied by {@link #endElement(String, String, String)}.
        */
-      private Deque<AbstractKeYlessExecutionNode> parentNodeStack = new LinkedList<AbstractKeYlessExecutionNode>();
+      private final Deque<AbstractKeYlessExecutionNode> parentNodeStack = new LinkedList<AbstractKeYlessExecutionNode>();
 
       /**
        * The parent hierarchy of {@link IExecutionVariable} and {@link IExecutionValue} filled by {@link #startElement(String, String, String, Attributes)}
        * and emptied by {@link #endElement(String, String, String)}. 
        */
-      private Deque<Object> parentVariableValueStack = new LinkedList<Object>();
+      private final Deque<Object> parentVariableValueStack = new LinkedList<Object>();
       
       /**
        * Maps an {@link AbstractKeYlessExecutionNode} to the path entries of its call stack.
        */
-      private Map<AbstractKeYlessExecutionNode, List<String>> callStackPathEntries = new LinkedHashMap<ExecutionNodeReader.AbstractKeYlessExecutionNode, List<String>>();
+      private final Map<AbstractKeYlessExecutionNode, List<String>> callStackPathEntries = new LinkedHashMap<AbstractKeYlessExecutionNode, List<String>>();
+      
+      /**
+       * Maps an {@link KeYlessMethodCall} to the path entries of its method returns.
+       */
+      private final Map<KeYlessMethodCall, List<String>> methodReturnPathEntries = new LinkedHashMap<KeYlessMethodCall, List<String>>();
+      
+      /**
+       * Maps an {@link KeYlessStart} to the path entries of its terminations.
+       */
+      private final Map<KeYlessStart, List<String>> terminationPathEntries = new LinkedHashMap<KeYlessStart, List<String>>();
       
       /**
        * {@inheritDoc}
@@ -236,6 +278,22 @@ public class ExecutionNodeReader {
             }
             callStackEntries.add(getPathInTree(attributes));
          }
+         else if (isMethodReturnEntry(uri, localName, qName)) {
+            List<String> methodReturnEntries = methodReturnPathEntries.get(parent);
+            if (methodReturnEntries == null) {
+               methodReturnEntries = new LinkedList<String>();
+               methodReturnPathEntries.put((KeYlessMethodCall)parent, methodReturnEntries);
+            }
+            methodReturnEntries.add(0, getPathInTree(attributes));
+         }
+         else if (isTerminationEntry(uri, localName, qName)) {
+            List<String> terminationEntries = terminationPathEntries.get(parent);
+            if (terminationEntries == null) {
+               terminationEntries = new LinkedList<String>();
+               terminationPathEntries.put((KeYlessStart)parent, terminationEntries);
+            }
+            terminationEntries.add(0, getPathInTree(attributes));
+         }
          else if (isMethodReturnValue(uri, localName, qName)) {
             Object parentValue = parentNodeStack.peekFirst();
             if (!(parentValue instanceof KeYlessMethodReturn)) {
@@ -270,6 +328,12 @@ public class ExecutionNodeReader {
          else if (isCallStackEntry(uri, localName, qName)) {
             // Nothing to do.
          }
+         else if (isMethodReturnEntry(uri, localName, qName)) {
+            // Nothing to do.
+         }
+         else if (isTerminationEntry(uri, localName, qName)) {
+            // Nothing to do.
+         }
          else if (isMethodReturnValue(uri, localName, qName)) {
             // Nothing to do.
          }
@@ -293,6 +357,22 @@ public class ExecutionNodeReader {
       public Map<AbstractKeYlessExecutionNode, List<String>> getCallStackPathEntries() {
          return callStackPathEntries;
       }
+
+      /**
+       * Returns the mapping of a {@link KeYlessMethodCall} to its method return entries.
+       * @return The mapping of a {@link KeYlessMethodCall} to its method return entries.
+       */
+      public Map<KeYlessMethodCall, List<String>> getMethodReturnPathEntries() {
+         return methodReturnPathEntries;
+      }
+
+      /**
+       * Returns the mapping of a {@link KeYlessStart} to its termination entries.
+       * @return The mapping of a {@link KeYlessStart} to its termination entries.
+       */
+      public Map<KeYlessStart, List<String>> getTerminationPathEntries() {
+         return terminationPathEntries;
+      }
    }
    
    /**
@@ -313,7 +393,7 @@ public class ExecutionNodeReader {
     * @param qName The qName.
     * @return {@code true} represents an {@link IExecutionMethodReturnValue}, {@code false} is something else.
     */
-   public boolean isMethodReturnValue(String uri, String localName, String qName) {
+   protected boolean isMethodReturnValue(String uri, String localName, String qName) {
       return ExecutionNodeWriter.TAG_METHOD_RETURN_VALUE.equals(qName);
    }
 
@@ -337,6 +417,28 @@ public class ExecutionNodeReader {
     */
    protected boolean isCallStackEntry(String uri, String localName, String qName) {
       return ExecutionNodeWriter.TAG_CALL_STACK_ENTRY.equals(qName);
+   }
+
+   /**
+    * Checks if the currently parsed tag represents an entry of {@link IExecutionMethodCall#getMethodReturns()}.
+    * @param uri The URI.
+    * @param localName THe local name.
+    * @param qName The qName.
+    * @return {@code true} represents method return entry, {@code false} is something else.
+    */
+   protected boolean isMethodReturnEntry(String uri, String localName, String qName) {
+      return ExecutionNodeWriter.TAG_METHOD_RETURN_ENTRY.equals(qName);
+   }
+
+   /**
+    * Checks if the currently parsed tag represents an entry of {@link IExecutionStart#getTerminations()}.
+    * @param uri The URI.
+    * @param localName THe local name.
+    * @param qName The qName.
+    * @return {@code true} represents termination entry, {@code false} is something else.
+    */
+   protected boolean isTerminationEntry(String uri, String localName, String qName) {
+      return ExecutionNodeWriter.TAG_TERMINATION_ENTRY.equals(qName);
    }
 
    /**
@@ -427,7 +529,10 @@ public class ExecutionNodeReader {
          return new KeYlessMethodCall(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
       }
       else if (ExecutionNodeWriter.TAG_METHOD_RETURN.equals(qName)) {
-         return new KeYlessMethodReturn(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getNameIncludingReturnValue(attributes), isReturnValueComputed(attributes));
+         return new KeYlessMethodReturn(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getNameIncludingReturnValue(attributes), getSignature(attributes), getSignatureIncludingReturnValue(attributes), isReturnValueComputed(attributes), getMethodReturnCondition(attributes));
+      }
+      else if (ExecutionNodeWriter.TAG_EXCEPTIONAL_METHOD_RETURN.equals(qName)) {
+         return new KeYlessExceptionalMethodReturn(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getSignature(attributes), getMethodReturnCondition(attributes));
       }
       else if (ExecutionNodeWriter.TAG_START.equals(qName)) {
          return new KeYlessStart(getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
@@ -439,7 +544,7 @@ public class ExecutionNodeReader {
          return new KeYlessTermination(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getTerminationKind(attributes), getBranchVerified(attributes));
       }
       else if (ExecutionNodeWriter.TAG_OPERATION_CONTRACT.equals(qName)) {
-         return new KeYlessOperationContract(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isPreconditionComplied(attributes), isHasNotNullCheck(attributes), isNotNullCheckComplied(attributes));
+         return new KeYlessOperationContract(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isPreconditionComplied(attributes), isHasNotNullCheck(attributes), isNotNullCheckComplied(attributes), getResultTerm(attributes), getExceptionTerm(attributes), getSelfTerm(attributes), getContractParameters(attributes));
       }
       else if (ExecutionNodeWriter.TAG_LOOP_INVARIANT.equals(qName)) {
          return new KeYlessLoopInvariant(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isInitiallyValid(attributes));
@@ -483,6 +588,24 @@ public class ExecutionNodeReader {
     */
    protected String getNameIncludingReturnValue(Attributes attributes) {
       return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_NAME_INCLUDING_RETURN_VALUE);
+   }
+   
+   /**
+    * Returns the signature value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getSignature(Attributes attributes) {
+      return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_SIGNATURE);
+   }
+   
+   /**
+    * Returns the signature value including return value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getSignatureIncludingReturnValue(Attributes attributes) {
+      return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_SIGNATURE_INCLUDING_RETURN_VALUE);
    }
    
    /**
@@ -621,6 +744,42 @@ public class ExecutionNodeReader {
    }
 
    /**
+    * Returns the exception term value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getExceptionTerm(Attributes attributes) {
+      return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_EXCEPTION_TERM);
+   }
+
+   /**
+    * Returns the result term value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getResultTerm(Attributes attributes) {
+      return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_RESULT_TERM);
+   }
+
+   /**
+    * Returns the self term value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getSelfTerm(Attributes attributes) {
+      return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_SELF_TERM);
+   }
+
+   /**
+    * Returns the contract parameters value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getContractParameters(Attributes attributes) {
+      return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_CONTRACT_PARAMETERS);
+   }
+
+   /**
     * Returns the array index value.
     * @param attributes The {@link Attributes} which provides the content.
     * @return The value.
@@ -657,6 +816,15 @@ public class ExecutionNodeReader {
    }
 
    /**
+    * Returns the method return condition value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getMethodReturnCondition(Attributes attributes) {
+      return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_METHOD_RETURN_CONDITION);
+   }
+
+   /**
     * Returns the path condition changed value.
     * @param attributes The {@link Attributes} which provides the content.
     * @return The value.
@@ -683,7 +851,7 @@ public class ExecutionNodeReader {
       /**
        * The name.
        */
-      private String name;
+      private final String name;
       
       /**
        * Constructor.
@@ -775,27 +943,27 @@ public class ExecutionNodeReader {
       /**
        * The parent {@link IExecutionNode}.
        */
-      private IExecutionNode parent;
+      private final IExecutionNode parent;
       
       /**
        * The children.
        */
-      private List<IExecutionNode> children = new LinkedList<IExecutionNode>();
+      private final List<IExecutionNode> children = new LinkedList<IExecutionNode>();
 
       /**
        * The formated path condition.
        */
-      private String formatedPathCondition;
+      private final String formatedPathCondition;
       
       /**
        * Is the path condition changed compared to parent?
        */
-      private boolean pathConditionChanged;
+      private final boolean pathConditionChanged;
       
       /**
        * The call stack.
        */
-      private List<IExecutionNode> callStack = new LinkedList<IExecutionNode>();
+      private final List<IExecutionNode> callStack = new LinkedList<IExecutionNode>();
       
       /**
        * Constructor.
@@ -888,22 +1056,22 @@ public class ExecutionNodeReader {
       /**
        * The formated branch condition.
        */
-      private String formatedBranchCondition;
+      private final String formatedBranchCondition;
       
       /**
        * Merged branch condition?
        */
-      private boolean mergedBranchCondition;
+      private final boolean mergedBranchCondition;
       
       /**
        * Indicates if branch condition is computed or not.
        */
-      private boolean branchConditionComputed;
+      private final boolean branchConditionComputed;
 
       /**
        * The optional additional branch label.
        */
-      private String additionalBranchLabel;
+      private final String additionalBranchLabel;
       
       /**
        * Constructor.
@@ -1003,6 +1171,11 @@ public class ExecutionNodeReader {
     */
    public static class KeYlessStart extends AbstractKeYlessExecutionNode implements IExecutionStart {
       /**
+       * The up to now discovered {@link IExecutionTermination}s.
+       */
+      private ImmutableList<IExecutionTermination> terminations = ImmutableSLList.nil();
+      
+      /**
        * Constructor.
        * @param name The name of this node.
        * @param formatedPathCondition The formated path condition.
@@ -1021,6 +1194,24 @@ public class ExecutionNodeReader {
       public String getElementType() {
          return "Start";
       }
+      
+      /**
+       * Adds the given {@link IExecutionTermination}.
+       * @param termination The {@link IExecutionTermination} to add.
+       */
+      public void addTermination(IExecutionTermination termination) {
+         if (termination != null) {
+            terminations = terminations.prepend(termination);
+         }
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ImmutableList<IExecutionTermination> getTerminations() {
+         return terminations;
+      }
    }
    
    /**
@@ -1032,12 +1223,12 @@ public class ExecutionNodeReader {
       /**
        * The {@link TerminationKind}.
        */
-      private TerminationKind terminationKind;
+      private final TerminationKind terminationKind;
       
       /**
        * The branch verified flag.
        */
-      private boolean branchVerified;
+      private final boolean branchVerified;
       
       /**
        * Constructor.
@@ -1113,7 +1304,7 @@ public class ExecutionNodeReader {
       /**
        * The contained variables.
        */
-      private List<IExecutionVariable> variables = new LinkedList<IExecutionVariable>();
+      private final List<IExecutionVariable> variables = new LinkedList<IExecutionVariable>();
       
       /**
        * Constructor.
@@ -1304,6 +1495,11 @@ public class ExecutionNodeReader {
     */
    public static class KeYlessMethodCall extends AbstractKeYlessStateNode<MethodBodyStatement> implements IExecutionMethodCall {
       /**
+       * The up to now discovered {@link IExecutionBaseMethodReturn<?>}s.
+       */
+      private ImmutableList<IExecutionBaseMethodReturn<?>> methodReturns = ImmutableSLList.nil();
+      
+      /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
@@ -1364,6 +1560,101 @@ public class ExecutionNodeReader {
       public IProgramMethod getExplicitConstructorProgramMethod() {
          return null;
       }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ImmutableList<IExecutionBaseMethodReturn<?>> getMethodReturns() {
+         return methodReturns;
+      }
+      
+      /**
+       * Adds the given {@link IExecutionBaseMethodReturn<?>}.
+       * @param methodReturn The {@link IExecutionBaseMethodReturn<?>} to add.
+       */
+      public void addMethodReturn(IExecutionBaseMethodReturn<?> methodReturn) {
+         if (methodReturn != null) {
+            methodReturns = methodReturns.prepend(methodReturn);
+         }
+      }
+   }
+
+   /**
+    * An implementation of {@link IExecutionExceptionalMethodReturn} which is independent
+    * from KeY and provides such only children and default attributes.
+    * @author Martin Hentschel
+    */
+   public static class KeYlessExceptionalMethodReturn extends AbstractKeYlessStateNode<Throw> implements IExecutionExceptionalMethodReturn {
+      /**
+       * The signature.
+       */
+      private final String signature;
+
+      /**
+       * The formated method return condition.
+       */
+      private final String formatedMethodReturn;
+
+      /**
+       * Constructor.
+       * @param parent The parent {@link IExecutionNode}.
+       * @param name The name of this node.
+       * @param formatedPathCondition The formated path condition.
+       * @param pathConditionChanged Is the path condition changed compared to parent?
+       * @param signature The signature.
+       * @param formatedMethodReturn The formated method return condition.
+       */
+      public KeYlessExceptionalMethodReturn(IExecutionNode parent, 
+                                            String name, 
+                                            String formatedPathCondition, 
+                                            boolean pathConditionChanged,
+                                            String signature,
+                                            String formatedMethodReturn) {
+         super(parent, name, formatedPathCondition, pathConditionChanged);
+         this.signature = signature;
+         this.formatedMethodReturn = formatedMethodReturn;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IExecutionMethodCall getMethodCall() {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getSignature() throws ProofInputException {
+         return signature;
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getElementType() {
+         return "Exceptional Method Return";
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Term getMethodReturnCondition() throws ProofInputException {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getFormatedMethodReturnCondition() throws ProofInputException {
+         return formatedMethodReturn;
+      }
    }
 
    /**
@@ -1375,17 +1666,32 @@ public class ExecutionNodeReader {
       /**
        * The name including the return value.
        */
-      private String nameIncludingReturnValue;
+      private final String nameIncludingReturnValue;
+      
+      /**
+       * The signature including the return value.
+       */
+      private final String signatureIncludingReturnValue;
       
       /**
        * Defines if the return value is computed or not.
        */
-      private boolean returnValueComputed;
+      private final boolean returnValueComputed;
+      
+      /**
+       * The signature.
+       */
+      private final String signature;
 
       /**
        * The possible return values.
        */
-      private List<IExecutionMethodReturnValue> returnValues = new LinkedList<IExecutionMethodReturnValue>();
+      private final List<IExecutionMethodReturnValue> returnValues = new LinkedList<IExecutionMethodReturnValue>();
+
+      /**
+       * The formated method return condition.
+       */
+      private final String formatedMethodReturn;
 
       /**
        * Constructor.
@@ -1394,17 +1700,26 @@ public class ExecutionNodeReader {
        * @param formatedPathCondition The formated path condition.
        * @param pathConditionChanged Is the path condition changed compared to parent?
        * @param nameIncludingReturnValue The name including the return value.
+       * @param signature The signature.
+       * @param signatureIncludingReturnValue The signature including return value.
        * @param returnValueComputed Is the return value computed?
+       * @param formatedMethodReturn The formated method return condition.
        */
       public KeYlessMethodReturn(IExecutionNode parent, 
                                  String name, 
                                  String formatedPathCondition, 
                                  boolean pathConditionChanged,
                                  String nameIncludingReturnValue,
-                                 boolean returnValueComputed) {
+                                 String signature,
+                                 String signatureIncludingReturnValue,
+                                 boolean returnValueComputed,
+                                 String formatedMethodReturn) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
          this.nameIncludingReturnValue = nameIncludingReturnValue;
+         this.signatureIncludingReturnValue = signatureIncludingReturnValue;
          this.returnValueComputed = returnValueComputed;
+         this.signature = signature;
+         this.formatedMethodReturn = formatedMethodReturn;
       }
 
       /**
@@ -1421,6 +1736,22 @@ public class ExecutionNodeReader {
       @Override
       public String getNameIncludingReturnValue() throws ProofInputException {
          return nameIncludingReturnValue;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getSignature() throws ProofInputException {
+         return signature;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getSignatureIncludingReturnValue() throws ProofInputException {
+         return signatureIncludingReturnValue;
       }
       
       /**
@@ -1454,6 +1785,22 @@ public class ExecutionNodeReader {
       public void addReturnValue(IExecutionMethodReturnValue returnValue) {
          returnValues.add(returnValue);
       }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Term getMethodReturnCondition() throws ProofInputException {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getFormatedMethodReturnCondition() throws ProofInputException {
+         return formatedMethodReturn;
+      }
    }
    
    /**
@@ -1465,17 +1812,17 @@ public class ExecutionNodeReader {
       /**
        * The human readable return value.
        */
-      private String returnValueString;
+      private final String returnValueString;
       
       /**
        * Is a condition available?
        */
-      private boolean hasCondition;
+      private final boolean hasCondition;
       
       /**
        * The optional human readable condition.
        */
-      private String conditionString;
+      private final String conditionString;
 
       /**
        * Constructor.
@@ -1581,17 +1928,37 @@ public class ExecutionNodeReader {
       /**
        * Is precondition complied?
        */
-      private boolean preconditionComplied;
+      private final boolean preconditionComplied;
       
       /**
        * Has not null check?
        */
-      private boolean hasNotNullCheck;
+      private final boolean hasNotNullCheck;
       
       /**
        * Is not null check complied?
        */
-      private boolean notNullCheckComplied;
+      private final boolean notNullCheckComplied;
+
+      /**
+       * The formated result term.
+       */
+      private final String formatedResultTerm;
+
+      /**
+       * The formated exception term.
+       */
+      private final String formatedExceptionTerm;
+
+      /**
+       * The formated self term.
+       */
+      private final String formatedSelfTerm;
+
+      /**
+       * The formated contract parameters.
+       */
+      private final String formatedContractParams;
 
       /**
        * Constructor.
@@ -1602,6 +1969,10 @@ public class ExecutionNodeReader {
        * @param preconditionComplied Is precondition complied?
        * @param hasNotNullCheck Has not null check?
        * @param notNullCheckComplied Is not null check complied?
+       * @param formatedResultTerm The formated result term.
+       * @param formatedExceptionTerm The formated exception term.
+       * @param formatedSelfTerm The formated self term.
+       * @param formatedContractParams The formated contract parameters.
        */
       public KeYlessOperationContract(IExecutionNode parent, 
                                       String name, 
@@ -1609,11 +1980,19 @@ public class ExecutionNodeReader {
                                       boolean pathConditionChanged,
                                       boolean preconditionComplied,
                                       boolean hasNotNullCheck,
-                                      boolean notNullCheckComplied) {
+                                      boolean notNullCheckComplied,
+                                      String formatedResultTerm,
+                                      String formatedExceptionTerm,
+                                      String formatedSelfTerm,
+                                      String formatedContractParams) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
          this.preconditionComplied = preconditionComplied;
          this.hasNotNullCheck = hasNotNullCheck;
          this.notNullCheckComplied = notNullCheckComplied;
+         this.formatedResultTerm = formatedResultTerm;
+         this.formatedExceptionTerm = formatedExceptionTerm;
+         this.formatedSelfTerm = formatedSelfTerm;
+         this.formatedContractParams = formatedContractParams;
       }
       
       /**
@@ -1663,6 +2042,70 @@ public class ExecutionNodeReader {
       public boolean isNotNullCheckComplied() {
          return notNullCheckComplied;
       }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Term getResultTerm() throws ProofInputException {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Term getExceptionTerm() throws ProofInputException {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getFormatedResultTerm() throws ProofInputException {
+         return formatedResultTerm;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getFormatedExceptionTerm() throws ProofInputException {
+         return formatedExceptionTerm;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Term getSelfTerm() throws ProofInputException {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ImmutableList<Term> getContractParams() throws ProofInputException {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getFormatedSelfTerm() throws ProofInputException {
+         return formatedSelfTerm;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getFormatedContractParams() throws ProofInputException {
+         return formatedContractParams;
+      }
    }
 
    /**
@@ -1674,7 +2117,7 @@ public class ExecutionNodeReader {
       /**
        * Initially valid?
        */
-      private boolean initiallyValid;
+      private final boolean initiallyValid;
 
       /**
        * Constructor.
@@ -1735,22 +2178,22 @@ public class ExecutionNodeReader {
       /**
        * The parent {@link IExecutionValue} if available.
        */
-      private IExecutionValue parentValue;
+      private final IExecutionValue parentValue;
       
       /**
        * The is array flag.
        */
-      private boolean isArrayIndex;
+      private final boolean isArrayIndex;
 
       /**
        * The array index.
        */
-      private int arrayIndex;
+      private final int arrayIndex;
       
       /**
        * The contained values.
        */
-      private List<IExecutionValue> values = new LinkedList<IExecutionValue>();
+      private final List<IExecutionValue> values = new LinkedList<IExecutionValue>();
       
       /**
        * Constructor.
@@ -1835,37 +2278,37 @@ public class ExecutionNodeReader {
       /**
        * The parent {@link IExecutionVariable} if available.
        */
-      private IExecutionVariable variable;
+      private final IExecutionVariable variable;
       
       /**
        * The type string.
        */
-      private String typeString;
+      private final String typeString;
       
       /**
        * The value string.
        */
-      private String valueString;
+      private final String valueString;
       
       /**
        * Is the value unknown?
        */
-      private boolean valueUnknown;
+      private final boolean valueUnknown;
 
       /**
        * Is the value an object?
        */
-      private boolean valueAnObject;
+      private final boolean valueAnObject;
       
       /**
        * The child variables.
        */
-      private List<IExecutionVariable> childVariables = new LinkedList<IExecutionVariable>();
+      private final List<IExecutionVariable> childVariables = new LinkedList<IExecutionVariable>();
 
       /**
        * The condition as {@link String}.
        */
-      private String conditionString;
+      private final String conditionString;
       
       /**
        * Constructor.

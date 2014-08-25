@@ -82,6 +82,8 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
                            Boolean.FALSE, 
                            Boolean.FALSE,
                            Boolean.FALSE,
+                           Boolean.FALSE,
+                           Boolean.TRUE,
                            8, 
                            executor);
    }

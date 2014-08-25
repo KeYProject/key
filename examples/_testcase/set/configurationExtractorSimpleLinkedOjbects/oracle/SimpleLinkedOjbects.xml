@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="SimpleLinkedOjbects.compute(x);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call SimpleLinkedOjbects.compute(x)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="x.value=1;" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="not(equals(x,null))" pathCondition="not(equals(x,null))" pathConditionChanged="true" branchCondition="not(equals(x,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="x.next.value=2;" pathCondition="not(equals(x,null))" pathConditionChanged="false">
@@ -8,28 +8,42 @@
                   <statement name="x.next.next.value=3;" pathCondition="and(not(equals(x,null)),not(equals(SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),null)))" pathConditionChanged="false">
                      <branchCondition name="not(equals(SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next),null))" pathCondition="and(and(not(equals(x,null)),not(equals(SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),null))),not(equals(SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next),null)))" pathConditionChanged="true" branchCondition="not(equals(SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
                         <statement name="return x.value+x.next.value+x.next.next.value;" pathCondition="and(and(not(equals(x,null)),not(equals(SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),null))),not(equals(SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next),null)))" pathConditionChanged="false">
-                           <methodReturn name="&lt;return of SimpleLinkedOjbects.compute(x);&gt;" pathCondition="and(and(not(equals(x,null)),not(equals(SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),null))),not(equals(SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next),null)))" pathConditionChanged="false" isReturnValueComputed="false">
+                           <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of SimpleLinkedOjbects.compute(x)&gt;" pathCondition="and(and(not(equals(x,null)),not(equals(SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),null))),not(equals(SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next),null)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(and(not(equals(x,null)),not(equals(SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),null))),not(equals(SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next),null)))">
                               <termination name="&lt;end&gt;" pathCondition="and(and(not(equals(x,null)),not(equals(SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),null))),not(equals(SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next),null)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                               </termination>
                            </methodReturn>
                         </statement>
                      </branchCondition>
                      <branchCondition name="equals(SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next),null)" pathCondition="and(and(not(equals(x,null)),not(equals(SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),null))),equals(SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next),null))" pathConditionChanged="true" branchCondition="equals(SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
-                        <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(and(not(equals(x,null)),not(equals(SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),null))),equals(SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next),null))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-                        </termination>
+                        <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call SimpleLinkedOjbects.compute(x)&gt;&gt;" pathCondition="and(and(not(equals(x,null)),not(equals(SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),null))),equals(SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next),null))" pathConditionChanged="false" methodReturnCondition="and(and(not(equals(x,null)),not(equals(SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),null))),equals(SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next),null))">
+                           <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(and(not(equals(x,null)),not(equals(SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),null))),equals(SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next),null))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                           </termination>
+                        </exceptionalMethodReturn>
                      </branchCondition>
                   </statement>
                </branchCondition>
                <branchCondition name="equals(SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),null)" pathCondition="and(not(equals(x,null)),equals(SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),null))" pathConditionChanged="true" branchCondition="equals(SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
-                  <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(not(equals(x,null)),equals(SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),null))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-                  </termination>
+                  <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call SimpleLinkedOjbects.compute(x)&gt;&gt;" pathCondition="and(not(equals(x,null)),equals(SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),null))" pathConditionChanged="false" methodReturnCondition="and(not(equals(x,null)),equals(SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),null))">
+                     <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(not(equals(x,null)),equals(SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),null))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                     </termination>
+                  </exceptionalMethodReturn>
                </branchCondition>
             </statement>
          </branchCondition>
          <branchCondition name="equals(x,null)" pathCondition="equals(x,null)" pathConditionChanged="true" branchCondition="equals(x,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(x,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-            </termination>
+            <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call SimpleLinkedOjbects.compute(x)&gt;&gt;" pathCondition="equals(x,null)" pathConditionChanged="false" methodReturnCondition="equals(x,null)">
+               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(x,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+               </termination>
+            </exceptionalMethodReturn>
          </branchCondition>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/0/0/1/0"/>
+      <methodReturnEntry path="/0/0/0/0/1/0"/>
+      <methodReturnEntry path="/0/0/1/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/1/0/0"/>
+   <terminationEntry path="/0/0/0/0/1/0/0"/>
+   <terminationEntry path="/0/0/1/0/0"/>
 </start>

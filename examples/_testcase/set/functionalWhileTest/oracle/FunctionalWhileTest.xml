@@ -1,61 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.main()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <loopStatement name="while ( invert(i)&gt;-3 )" pathCondition="true" pathConditionChanged="false">
                <loopCondition name="invert(i)&gt;-3" pathCondition="true" pathConditionChanged="false">
-                  <methodCall name="self.invert(i_1);" pathCondition="true" pathConditionChanged="false">
+                  <methodCall name="&lt;call self.invert(i_1)&gt;" pathCondition="true" pathConditionChanged="false">
                      <statement name="return i_1*-1;" pathCondition="true" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of self.invert(i_1);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                        <methodReturn name="&lt;return of invert&gt;" signature="&lt;return of self.invert(i_1)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                            <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
                               <statement name="i++;" pathCondition="true" pathConditionChanged="false">
                                  <loopCondition name="invert(i)&gt;-3" pathCondition="true" pathConditionChanged="false">
-                                    <methodCall name="self.invert(i_2);" pathCondition="true" pathConditionChanged="false">
+                                    <methodCall name="&lt;call self.invert(i_2)&gt;" pathCondition="true" pathConditionChanged="false">
                                        <statement name="return i_2*-1;" pathCondition="true" pathConditionChanged="false">
-                                          <methodReturn name="&lt;return of self.invert(i_2);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                          <methodReturn name="&lt;return of invert&gt;" signature="&lt;return of self.invert(i_2)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                              <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
                                                 <statement name="i++;" pathCondition="true" pathConditionChanged="false">
                                                    <loopCondition name="invert(i)&gt;-3" pathCondition="true" pathConditionChanged="false">
-                                                      <methodCall name="self.invert(i_3);" pathCondition="true" pathConditionChanged="false">
+                                                      <methodCall name="&lt;call self.invert(i_3)&gt;" pathCondition="true" pathConditionChanged="false">
                                                          <statement name="return i_3*-1;" pathCondition="true" pathConditionChanged="false">
-                                                            <methodReturn name="&lt;return of self.invert(i_3);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                            <methodReturn name="&lt;return of invert&gt;" signature="&lt;return of self.invert(i_3)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                                <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
                                                                   <statement name="i++;" pathCondition="true" pathConditionChanged="false">
                                                                      <loopCondition name="invert(i)&gt;-3" pathCondition="true" pathConditionChanged="false">
-                                                                        <methodCall name="self.invert(i_4);" pathCondition="true" pathConditionChanged="false">
+                                                                        <methodCall name="&lt;call self.invert(i_4)&gt;" pathCondition="true" pathConditionChanged="false">
                                                                            <statement name="return i_4*-1;" pathCondition="true" pathConditionChanged="false">
-                                                                              <methodReturn name="&lt;return of self.invert(i_4);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                                              <methodReturn name="&lt;return of invert&gt;" signature="&lt;return of self.invert(i_4)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                                                  <statement name="return result_1;" pathCondition="true" pathConditionChanged="false">
-                                                                                    <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                                                    <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                                                        <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                                                        </termination>
                                                                                     </methodReturn>
                                                                                  </statement>
                                                                               </methodReturn>
                                                                            </statement>
+                                                                           <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                         </methodCall>
                                                                      </loopCondition>
                                                                   </statement>
                                                                </statement>
                                                             </methodReturn>
                                                          </statement>
+                                                         <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                       </methodCall>
                                                    </loopCondition>
                                                 </statement>
                                              </statement>
                                           </methodReturn>
                                        </statement>
+                                       <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                     </methodCall>
                                  </loopCondition>
                               </statement>
                            </statement>
                         </methodReturn>
                      </statement>
+                     <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
                   </methodCall>
                </loopCondition>
             </loopStatement>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
 </start>

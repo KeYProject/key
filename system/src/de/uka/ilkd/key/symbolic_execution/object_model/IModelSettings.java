@@ -19,6 +19,12 @@ package de.uka.ilkd.key.symbolic_execution.object_model;
  */
 public interface IModelSettings {
    /**
+    * Checks if unicode characters are used.
+    * @return {@code true} use unicode characters, {@code false} do not use unicode characters.
+    */
+   public boolean isUseUnicode();
+   
+   /**
     * Checks if pretty printing is used or not.
     * @return {@code true} use pretty printing, {@code false} do not use pretty printing.
     */

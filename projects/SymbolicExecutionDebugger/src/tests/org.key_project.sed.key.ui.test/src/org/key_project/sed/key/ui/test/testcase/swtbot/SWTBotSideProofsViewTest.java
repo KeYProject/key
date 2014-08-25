@@ -73,6 +73,8 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
                               Boolean.FALSE, 
                               Boolean.FALSE,
                               Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.TRUE,
                               8, 
                               new SideProofsViewTestExecutor(false, false, 0, -1, new int[][] {}));
          // Test with collecting side proofs
@@ -89,6 +91,8 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
                               Boolean.FALSE, 
                               Boolean.FALSE,
                               Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.TRUE,
                               8, 
                               new SideProofsViewTestExecutor(true, true, 4, 0, new int[][] {{1}, {0, 2}, {0}}));
          // Test without collecting side proofs again
@@ -105,6 +109,8 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
                               Boolean.FALSE, 
                               Boolean.FALSE,
                               Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.TRUE,
                               8, 
                               new SideProofsViewTestExecutor(true, false, 0, -1, new int[][] {}));
       }
@@ -192,7 +198,7 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
          // Expand debug tree to initiate side proofs
          TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1, 0, 0, 2);
          TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1, 0, 1, 2);
-         TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1, 1, 0);
+         TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1, 1, 1);
          // Test collected side proofs
          SWTBotView view = bot.viewById(SideProofsView.VIEW_ID);
          view.setFocus();

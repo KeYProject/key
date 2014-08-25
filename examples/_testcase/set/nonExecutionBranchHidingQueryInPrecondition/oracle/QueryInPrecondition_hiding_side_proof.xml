@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="QueryInPrecondition.main(x,y);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call QueryInPrecondition.main(x,y)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicValue = magic(x,y);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_0 = magic(x, y) catch(exc_0)
 pre: xPre(x) = TRUE &amp; y &lt; 0 | !(xPre(x) = TRUE &amp; y &lt; 0)
@@ -12,15 +12,18 @@ mod: \if (true)  \then (empty)  \else (allLocs)
 \cap \if (!(xPre(x) = TRUE &amp; y &lt; 0))
          \then (empty)
          \else (allLocs)
-termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="x, y" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue;" pathCondition="true" pathConditionChanged="false">
-               <methodReturn name="&lt;return of QueryInPrecondition.main(x,y);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
-	Z(2(4(#))) {and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),leq(y,Z(neglit(1(#)))))}, 
-	Z(neglit(1(1(7(4(#)))))) {not(and(leq(y,Z(neglit(1(#)))),geq(x,Z(0(#)))))}
-as result of QueryInPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
-                  <methodReturnValue name="Z(2(4(#))) {and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),leq(y,Z(neglit(1(#)))))}" returnValueString="Z(2(4(#)))" hasCondition="true" conditionString="and(and(equals(result_0,Z(2(4(#)))),geq(x,Z(0(#)))),leq(y,Z(neglit(1(#)))))">
-                  </methodReturnValue>
+               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of QueryInPrecondition.main(x,y)&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
+	Z(neglit(1(1(7(4(#)))))) {not(and(leq(y,Z(neglit(1(#)))),geq(x,Z(0(#)))))}, 
+	Z(2(4(#))) {and(gt(x,Z(neglit(1(#)))),and(lt(y,Z(0(#))),equals(QueryResult_0,TRUE)))}
+as result of main&gt;" signatureIncludingReturnValue="&lt;return 
+	Z(neglit(1(1(7(4(#)))))) {not(and(leq(y,Z(neglit(1(#)))),geq(x,Z(0(#)))))}, 
+	Z(2(4(#))) {and(gt(x,Z(neglit(1(#)))),and(lt(y,Z(0(#))),equals(QueryResult_0,TRUE)))}
+as result of QueryInPrecondition.main(x,y)&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                   <methodReturnValue name="Z(neglit(1(1(7(4(#)))))) {not(and(leq(y,Z(neglit(1(#)))),geq(x,Z(0(#)))))}" returnValueString="Z(neglit(1(1(7(4(#))))))" hasCondition="true" conditionString="not(and(leq(y,Z(neglit(1(#)))),geq(x,Z(0(#)))))">
+                  </methodReturnValue>
+                  <methodReturnValue name="Z(2(4(#))) {and(gt(x,Z(neglit(1(#)))),and(lt(y,Z(0(#))),equals(QueryResult_0,TRUE)))}" returnValueString="Z(2(4(#)))" hasCondition="true" conditionString="and(gt(x,Z(neglit(1(#)))),and(lt(y,Z(0(#))),equals(QueryResult_0,TRUE)))">
                   </methodReturnValue>
                   <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
@@ -28,5 +31,7 @@ as result of QueryInPrecondition.main(x,y);&gt;" isReturnValueComputed="true">
             </statement>
          </operationContract>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0"/>
 </start>

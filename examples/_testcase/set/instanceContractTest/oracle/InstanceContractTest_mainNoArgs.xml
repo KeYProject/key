@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.mainNoArgs();" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.mainNoArgs()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="return noArgs();" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_0 = self.noArgs() catch(exc_0)
 pre: self.&lt;inv&gt;
 post: result_0 = 42 &amp; self.&lt;inv&gt; &amp; exc_0 = null
 mod: allLocs
-termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-            <methodReturn name="&lt;return of self.mainNoArgs();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of self.mainNoArgs();&gt;" isReturnValueComputed="true">
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" selfTerm="self" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+            <methodReturn name="&lt;return of mainNoArgs&gt;" signature="&lt;return of self.mainNoArgs()&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of mainNoArgs&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of self.mainNoArgs()&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
                </methodReturnValue>
                <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
@@ -15,5 +15,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
             </methodReturn>
          </operationContract>
       </statement>
+      <methodReturnEntry path="/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0"/>
 </start>

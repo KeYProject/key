@@ -19,6 +19,8 @@ import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import java.io.File;
 import java.util.List;
+import java.util.Properties;
+
 import javax.swing.SwingWorker;
 
 /**
@@ -33,8 +35,12 @@ public final class ProblemLoader extends DefaultProblemLoader {
 
     private ProverTaskListener ptl;
 
-    public ProblemLoader(File file, List<File> classPath, File bootClassPath, Profile profileOfNewProofs, KeYMediator mediator) {
-        super(file, classPath, bootClassPath, profileOfNewProofs, mediator);
+    public ProblemLoader(File file, List<File> classPath, File bootClassPath,
+                         Profile profileOfNewProofs, KeYMediator mediator,
+                         boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
+                         Properties poPropertiesToForce) {
+        super(file, classPath, bootClassPath, profileOfNewProofs, mediator,
+              askUiToSelectAProofObligationIfNotDefinedByLoadedFile, poPropertiesToForce);
     }
 
     public void addTaskListener(final ProverTaskListener ptl) {
@@ -63,6 +69,7 @@ public final class ProblemLoader extends DefaultProblemLoader {
             getMediator().getUI().reportStatus(this, errorMessage);
             return exception;
         } catch (final Throwable throwable) {
+        	throwable.printStackTrace();
             reportException(throwable);
             return throwable;
         }
@@ -94,7 +101,8 @@ public final class ProblemLoader extends DefaultProblemLoader {
     }
 
     public void runAsynchronously() {
-        final SwingWorker worker = new SwingWorker<Throwable, Void>() {
+        final SwingWorker<Throwable, Void> worker =
+                new SwingWorker<Throwable, Void>() {
 
             private long runTime;
 
@@ -127,13 +135,4 @@ public final class ProblemLoader extends DefaultProblemLoader {
         worker.execute();
     }
 
-    @Override
-    protected ProblemLoaderException selectProofObligation() {
-        ProofManagementDialog.showInstance(getInitConfig());
-        if (ProofManagementDialog.startedProof()) {
-            return null;
-        } else {
-            return new ProblemLoaderException(this, "Aborted.");
-        }
-    }
 }

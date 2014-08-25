@@ -153,5 +153,14 @@
             objectClass="org.eclipse.core.resources.IFolder"
             state="true">
       </decorator>
+      <decorator
+            adaptable="true"
+            class="org.key_project.key4eclipse.resources.decorator.ProofFileLightweightLabelDecorator"
+            id="org.key_project.key4eclipse.resources.proofFilesDecorator"
+            label="Proof Files"
+            lightweight="true"
+            objectClass="org.eclipse.core.resources.IFile"
+            state="true">
+      </decorator>
    </extension>
 </plugin>

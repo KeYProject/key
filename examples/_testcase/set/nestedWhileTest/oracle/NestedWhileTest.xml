@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.mainNested();" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.mainNested()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <loopStatement name="while ( i&lt;3 )" pathCondition="true" pathConditionChanged="false">
@@ -22,7 +22,7 @@
                                                             <statement name="i++;" pathCondition="true" pathConditionChanged="false">
                                                                <loopCondition name="i&lt;3" pathCondition="true" pathConditionChanged="false">
                                                                   <statement name="return result_1;" pathCondition="true" pathConditionChanged="false">
-                                                                     <methodReturn name="&lt;return of self.mainNested();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                                                     <methodReturn name="&lt;return of mainNested&gt;" signature="&lt;return of self.mainNested()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                                         <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                                         </termination>
                                                                      </methodReturn>
@@ -47,5 +47,7 @@
             </loopStatement>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
 </start>

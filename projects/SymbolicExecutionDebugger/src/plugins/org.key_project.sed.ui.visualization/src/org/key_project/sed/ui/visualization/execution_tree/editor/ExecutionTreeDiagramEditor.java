@@ -50,6 +50,7 @@ import org.eclipse.graphiti.notification.INotificationService;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.annotation.event.ISEDAnnotationLinkListener;
@@ -69,7 +70,7 @@ import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.sed.ui.visualization.util.PaletteHideableDiagramEditor;
 import org.key_project.sed.ui.visualization.util.VisualizationPreferences;
-import org.key_project.util.eclipse.job.AbstractWorkbenchPartJob;
+import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ArrayUtil;
 
@@ -81,7 +82,7 @@ import org.key_project.util.java.ArrayUtil;
 @SuppressWarnings("restriction")
 public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
    /**
-    * Indicates that this editor is read-onl or editable otherwise.
+    * Indicates that this editor is read-only or editable otherwise.
     */
    private boolean readOnly;
 
@@ -249,8 +250,8 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
       boolean updateRequired = false;
       int i = 0;
       while (!updateRequired && i < events.length) {
-         if (DebugEvent.SUSPEND == events[i].getDetail() ||
-             DebugEvent.SUSPEND == events[i].getDetail()) {
+         if (DebugEvent.SUSPEND == events[i].getKind() ||
+             DebugEvent.SUSPEND == events[i].getKind()) {
             if (events[i].getSource() instanceof IDebugElement) {
                IDebugTarget target = ((IDebugElement)events[i].getSource()).getDebugTarget();
                if (target instanceof ISEDDebugTarget) {
@@ -263,8 +264,8 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
       // Update diagram content if required.
       if (updateRequired) {
          // Do an asynchronous update in the UI thread (same behavior as DomainModelChangeListener which is responsible for changes in EMF objects)
-         AbstractWorkbenchPartJob.cancelJobs(this);
-         new AbstractWorkbenchPartJob("Updating Symbolic Execution Tree", this) {
+         AbstractDependingOnObjectsJob.cancelJobs(this);
+         new AbstractDependingOnObjectsJob("Updating Symbolic Execution Tree", this, PlatformUI.getWorkbench()) {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                return updateDiagramInJob(monitor);

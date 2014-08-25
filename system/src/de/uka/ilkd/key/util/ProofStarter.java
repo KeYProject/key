@@ -17,13 +17,13 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -79,17 +79,14 @@ public class ProofStarter {
 
         private Proof createProof(String proofName) {
 
-            final InitConfig initConfig = env.getInitConfig();
+            final InitConfig initConfig = env.getInitConfigForEnvironment().deepCopy();
 
             return new Proof(proofName,
                     seq,
                     EMPTY_PROOF_HEADER,
                     initConfig.createTacletIndex(),
                     initConfig.createBuiltInRuleIndex(),
-                    initConfig.getServices(),
-                    initConfig.getSettings() != null
-                    ? initConfig.getSettings()
-                            : new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
+                    initConfig );
         }
 
 
@@ -98,7 +95,8 @@ public class ProofStarter {
             final Proof proof = createProof("Proof object for "+
                     ProofSaver.printAnything(seq, null));
 
-            return ProofAggregate.createProofAggregate(proof, "ProofAggregate for claim: "+proof.name());
+            return ProofAggregate.createProofAggregate(proof,
+                                                       "ProofAggregate for claim: "+proof.name());
         }
 
         @Override
@@ -140,7 +138,6 @@ public class ProofStarter {
       }
     }
 
-
     /**
      * creates a new proof object for formulaToProve and registers it in the given environment
      *
@@ -149,7 +146,7 @@ public class ProofStarter {
     public void init(Term formulaToProve, ProofEnvironment env) throws ProofInputException {
         final ProofOblInput input = new UserProvidedInput(formulaToProve, env);
         proof = input.getPO().getFirstProof();
-        proof.setProofEnv(env);
+        proof.setEnv(env);
     }
 
     /**
@@ -160,7 +157,7 @@ public class ProofStarter {
     public void init(Sequent sequentToProve, ProofEnvironment env) throws ProofInputException {
        final ProofOblInput input = new UserProvidedInput(sequentToProve, env);
        proof = input.getPO().getFirstProof();
-       proof.setProofEnv(env);
+       proof.setEnv(env);
     }
 
     /**
@@ -206,12 +203,12 @@ public class ProofStarter {
     */
     public ApplyStrategyInfo start(ImmutableList<Goal> goals) {
         try {
-           final Profile profile = proof.env().getInitConfig().getProfile();
+           final Profile profile = proof.getInitConfig().getProfile();
            final StrategyFactory factory = profile.getDefaultStrategyFactory();
            if (strategyProperties == null) {
               strategyProperties = factory.getSettingsDefinition().getDefaultPropertiesFactory().createDefaultStrategyProperties();
            }
-           
+
            if (proof.getProofIndependentSettings().getGeneralSettings().oneStepSimplification()) {
               OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(proof);
               if (simplifier != null) {
@@ -222,7 +219,8 @@ public class ProofStarter {
 
            profile.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);
 
-           ApplyStrategy prover = new ApplyStrategy(profile.getSelectedGoalChooserBuilder().create());
+           IGoalChooser goalChooser = profile.getSelectedGoalChooserBuilder().create();
+           ApplyStrategy prover = new ApplyStrategy(goalChooser);
            if (ptl != null) {
               prover.addProverTaskObserver(ptl);
            }
@@ -231,14 +229,16 @@ public class ProofStarter {
               prover.addProverTaskObserver(autoSaver);
            }
 
-           boolean stopMode = strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY).equals(StrategyProperties.STOPMODE_NONCLOSE);
+           boolean stopMode = strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
+                                                       .equals(StrategyProperties.STOPMODE_NONCLOSE);
            ApplyStrategy.ApplyStrategyInfo result;
            proof.setRuleAppIndexToAutoMode();
            result = prover.start(proof, goals, maxSteps, timeout, stopMode);
            
            if (result.isError()) {
-               throw new RuntimeException("Proof attempt failed due to exception:"+result.getException(),
-                       result.getException());
+               throw new RuntimeException("Proof attempt failed due to exception:"
+                                           + result.getException(),
+                                          result.getException());
            }
 
            if (ptl != null) {

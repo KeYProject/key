@@ -70,7 +70,8 @@ public class SWTBotInitialAnnotationLinkTest extends AbstractKeYDebugTargetTestC
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.FALSE,
-                           14, 
-                           executor);
+                           Boolean.FALSE,
+                           Boolean.TRUE, 
+                           14, executor);
    }
 }

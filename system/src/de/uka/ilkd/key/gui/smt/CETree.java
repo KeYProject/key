@@ -13,27 +13,39 @@
 
 package de.uka.ilkd.key.gui.smt;
 
-import java.awt.BorderLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import de.uka.ilkd.key.smt.model.Location;
 import de.uka.ilkd.key.smt.model.Heap;
+import de.uka.ilkd.key.smt.model.Location;
 import de.uka.ilkd.key.smt.model.LocationSet;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.model.ObjectVal;
 import de.uka.ilkd.key.smt.model.Sequence;
 
-@SuppressWarnings("serial")
-public class CETree extends JPanel {
+public class CETree {
+
+    /**
+     * A comparator that sort ignoRiNG cASe.
+     * Used to sort labels.
+     */
+    private static final Comparator<? super String> IGNORECASE_COMPARATOR =
+            new Comparator<String>() {
+        public int compare(String o1, String o2) {
+            return o1.compareToIgnoreCase(o2);
+        }
+    };
 
 	/**
 	 * The JTree to be shown.
@@ -62,9 +74,14 @@ public class CETree extends JPanel {
 		tree.setModel(tm);
 		CEMouseAdapter adapter = new CEMouseAdapter();
 		tree.addMouseListener(adapter);
-		this.setLayout(new BorderLayout());
-		this.add(tree, BorderLayout.CENTER);		
+//		this.setLayout(new BorderLayout());
+//		this.add(tree, BorderLayout.CENTER);
 	}
+
+    public JTree getTreeComponent() {
+        return tree;
+    };
+
 
 	private DefaultMutableTreeNode constructTree(){
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Model");
@@ -129,11 +146,18 @@ public class CETree extends JPanel {
 		//Fields
 		DefaultMutableTreeNode fields = new DefaultMutableTreeNode("Fields");
 		object.add(fields);
-		for(Entry<String,String> e : ov.getFieldvalues().entrySet()){
-			DefaultMutableTreeNode field = new DefaultMutableTreeNode(Model.removePipes(e.getKey())+"="+e.getValue());
-			//DefaultMutableTreeNode fieldValue = new DefaultMutableTreeNode(e.getValue());
-			//field.add(fieldValue);
-			fields.add(field);
+        List<String> labels = new ArrayList<String>();
+
+        for(Entry<String,String> e : ov.getFieldvalues().entrySet()) {
+            labels.add(Model.removePipes(e.getKey())+"="+e.getValue());
+        }
+
+        // sort the labels alphabetically
+        Collections.sort(labels, IGNORECASE_COMPARATOR);
+
+        for(String label : labels){
+            DefaultMutableTreeNode name = new DefaultMutableTreeNode(label);
+            fields.add(name);
 		}
 
 		//Array Fields
@@ -217,11 +241,17 @@ public class CETree extends JPanel {
 	private void fillConstants(DefaultMutableTreeNode constants) {
 
 		Map<String, String> map = model.getConstants();
+        List<String> labels = new ArrayList<String>();
 
-		for(Entry<String,String> e : map.entrySet()){
-			DefaultMutableTreeNode name = new DefaultMutableTreeNode(Model.removePipes(e.getKey())+"="+e.getValue());
-			//			DefaultMutableTreeNode value = new DefaultMutableTreeNode(e.getValue());
-			//			name.add(value);
+        for(Entry<String,String> e : map.entrySet()) {
+            labels.add(Model.removePipes(e.getKey())+"="+e.getValue());
+        }
+
+        // sort the labels alphabetically
+        Collections.sort(labels, IGNORECASE_COMPARATOR);
+
+        for(String label : labels){
+            DefaultMutableTreeNode name = new DefaultMutableTreeNode(label);
 			constants.add(name);
 		}
 
@@ -335,13 +365,6 @@ public class CETree extends JPanel {
 				}
 			}
 		}
-	};
-
-
-
-
-
-
-
+        }
 
 }

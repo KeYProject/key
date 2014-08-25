@@ -29,7 +29,7 @@ public class ShowUsedContractsAction extends MainWindowAction {
 
     public ShowUsedContractsAction(MainWindow mainWindow) {
 	super(mainWindow);
-	setName("Show Used Contracts...");
+	setName("Show Used Contracts");
 	
 	getMediator().enableWhenProofLoaded(this);
 
@@ -51,7 +51,7 @@ public class ShowUsedContractsAction extends MainWindowAction {
 		                            + "for a proof you have to load one first"));
 	} else {
             ProofManagementDialog.showInstance
-                    (getMediator().getSelectedProof().env().getInitConfig(), getMediator().getSelectedProof());
+                    (getMediator().getSelectedProof().getInitConfig(), getMediator().getSelectedProof());
 	}
     }
 

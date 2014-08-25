@@ -136,7 +136,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     @Override
     protected ImmutableList<StatementBlock> buildOperationBlocks(ImmutableList<LocationVariable> formalParVars,
                                                  ProgramVariable selfVar,
-                                                 ProgramVariable resultVar) {
+                                                 ProgramVariable resultVar, Services services) {
         final StatementBlock[] result = new StatementBlock[4];
         final ImmutableArray<Expression> formalArray = new ImmutableArray<Expression>(formalParVars.toArray(
              new ProgramVariable[formalParVars.size()]));
@@ -177,7 +177,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      */
     @Override
     protected Term generateMbyAtPreDef(ProgramVariable selfVar,
-                                       ImmutableList<ProgramVariable> paramVars) {
+                                       ImmutableList<ProgramVariable> paramVars, Services services) {
         final Term mbyAtPreDef;
         if (contract.hasMby()) {
 /*
@@ -233,17 +233,17 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      */
     @Override
     protected Term buildFrameClause(List<LocationVariable> modHeaps,
-                                    Map<LocationVariable, Map<Term, Term>> heapToAtPre,
+                                    Map<Term, Term> heapToAtPre,
                                     ProgramVariable selfVar,
-                                    ImmutableList<ProgramVariable> paramVars) {
+                                    ImmutableList<ProgramVariable> paramVars, Services services) {
        Term frameTerm = null;
        for(LocationVariable heap : modHeaps) {
           final Term ft;
           if(!getContract().hasModifiesClause(heap)) {
             // strictly pure have a different contract.
-            ft = tb.frameStrictlyEmpty(tb.var(heap), heapToAtPre.get(heap));
+            ft = tb.frameStrictlyEmpty(tb.var(heap), heapToAtPre);
           }else{
-            ft = tb.frame(tb.var(heap), heapToAtPre.get(heap),
+            ft = tb.frame(tb.var(heap), heapToAtPre,
                  getContract().getMod(heap, selfVar,
                          paramVars, services));
           }
@@ -270,11 +270,11 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     @Override
     protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars,
                                ImmutableList<LocationVariable> formalParamVars,
-                               Map<LocationVariable,LocationVariable> atPreVars) {
+                               Map<LocationVariable,LocationVariable> atPreVars, Services services) {
        Term update = null;
        for(Entry<LocationVariable, LocationVariable> atPreEntry : atPreVars.entrySet()) {
           final LocationVariable heap = atPreEntry.getKey();
-          final Term u = tb.elementary(atPreEntry.getValue(), heap == getSavedHeap() ?
+          final Term u = tb.elementary(atPreEntry.getValue(), heap == getSavedHeap(services) ?
                   tb.getBaseHeap() : tb.var(heap));
           if(update == null) {
              update = u;
@@ -390,13 +390,15 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
        }
        else {
            ProofOblInput po;
-           if (isAddUninterpretedPredicate(properties)) {
+           boolean addUninterpretedPredicate = isAddUninterpretedPredicate(properties);
+           boolean addSymbolicExecutionLabel = isAddSymbolicExecutionLabel(properties);
+           if (addUninterpretedPredicate || addSymbolicExecutionLabel) {
                if (!(contract instanceof FunctionalOperationContract)) {
                    throw new IOException("Found contract \"" + contract +
                                          "\" is no FunctionalOperationContract.");
                }
                po = new FunctionalOperationContractPO(
-                       initConfig, (FunctionalOperationContract)contract, true, true);
+                       initConfig, (FunctionalOperationContract)contract, addUninterpretedPredicate, addSymbolicExecutionLabel);
            }
            else {
                po = contract.createProofObl(initConfig, contract);

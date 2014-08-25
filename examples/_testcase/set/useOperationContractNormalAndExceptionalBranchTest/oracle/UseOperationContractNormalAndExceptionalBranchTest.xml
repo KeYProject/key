@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="UseOperationContractNormalAndExceptionalBranchTest.main(value);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call UseOperationContractNormalAndExceptionalBranchTest.main(value)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicNumber = magic(value);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_0 = magic(value) catch(exc_0)
 pre: value &lt; 0 &amp; value &gt;= javaUnaryMinusInt(10)
@@ -34,20 +34,20 @@ mod: \if (true)
 \cap \if (value &gt;= 10)
          \then (allLocs)
          \else (allLocs)
-termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-            <branchCondition name="geq(value,Z(0(#)))" pathCondition="gt(value,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="geq(value,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="value" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+            <branchCondition name="gt(value,Z(neglit(1(#))))" pathCondition="gt(value,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(value,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
                <statement name="int magicNumberCopy = magicNumber;" pathCondition="gt(value,Z(neglit(1(#))))" pathConditionChanged="false">
                   <statement name="return magicNumber+magicNumberCopy;" pathCondition="gt(value,Z(neglit(1(#))))" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of UseOperationContractNormalAndExceptionalBranchTest.main(value);&gt;" pathCondition="gt(value,Z(neglit(1(#))))" pathConditionChanged="false" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of UseOperationContractNormalAndExceptionalBranchTest.main(value)&gt;" pathCondition="gt(value,Z(neglit(1(#))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="gt(value,Z(neglit(1(#))))">
                         <termination name="&lt;end&gt;" pathCondition="gt(value,Z(neglit(1(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
                   </statement>
                </statement>
             </branchCondition>
-            <branchCondition name="leq(value,Z(neglit(1(#))))" pathCondition="lt(value,Z(0(#)))" pathConditionChanged="true" branchCondition="leq(value,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (magic)">
+            <branchCondition name="lt(value,Z(0(#)))" pathCondition="lt(value,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(value,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (magic)">
                <statement name="return -1;" pathCondition="lt(value,Z(0(#)))" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of UseOperationContractNormalAndExceptionalBranchTest.main(value);&gt;" pathCondition="lt(value,Z(0(#)))" pathConditionChanged="false" isReturnValueComputed="false">
+                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of UseOperationContractNormalAndExceptionalBranchTest.main(value)&gt;" pathCondition="lt(value,Z(0(#)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="lt(value,Z(0(#)))">
                      <termination name="&lt;end&gt;" pathCondition="lt(value,Z(0(#)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
@@ -55,5 +55,9 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
             </branchCondition>
          </operationContract>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/1/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/1/0/0/0"/>
 </start>

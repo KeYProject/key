@@ -13,11 +13,20 @@
 
 package org.key_project.sed.core.model.impl;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IStackFrame;
+import org.key_project.sed.core.model.ISEDDebugElement;
+import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.util.ISEDIterator;
+import org.key_project.sed.core.util.SEDBreadthFirstIterator;
+import org.key_project.util.java.ArrayUtil;
 
 /**
  * Provides a basic implementation of {@link ISEDThread}.
@@ -26,16 +35,29 @@ import org.key_project.sed.core.model.ISEDThread;
  */
 public abstract class AbstractSEDThread extends AbstractSEDDebugNode implements ISEDThread {
    /**
+    * Is this {@link ISEDThread} executable meaning that
+    * suspend, resume, step operations and disconnect are supported?;
+    */
+   private final boolean executable;
+   
+   /**
     * The priority of this thread.
     */
    private int priority = 0;
+
+   /**
+    * Indicates that the process is currently suspended or not.
+    */
+   private boolean suspended = true;
    
    /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this thread is contained.
+    * @param executable {@code true} Support suspend, resume, etc.; {@code false} Do not support suspend, resume, etc.
     */
-   public AbstractSEDThread(ISEDDebugTarget target) {
+   public AbstractSEDThread(ISEDDebugTarget target, boolean executable) {
       super(target, null, null);
+      this.executable = executable;
    }
 
    /**
@@ -100,7 +122,7 @@ public abstract class AbstractSEDThread extends AbstractSEDDebugNode implements 
     */
    @Override
    public boolean canResume() {
-      return getDebugTarget().canResume();
+      return executable && isSuspended() && !isTerminated() && !getDebugTarget().isDisconnected();
    }
 
    /**
@@ -108,7 +130,7 @@ public abstract class AbstractSEDThread extends AbstractSEDDebugNode implements 
     */
    @Override
    public boolean canSuspend() {
-      return getDebugTarget().canSuspend();
+      return executable && !isSuspended() && !isTerminated() && !getDebugTarget().isDisconnected();
    }
 
    /**
@@ -116,7 +138,7 @@ public abstract class AbstractSEDThread extends AbstractSEDDebugNode implements 
     */
    @Override
    public boolean isSuspended() {
-      return getDebugTarget().isSuspended();
+      return suspended;
    }
 
    /**
@@ -124,7 +146,8 @@ public abstract class AbstractSEDThread extends AbstractSEDDebugNode implements 
     */
    @Override
    public void resume() throws DebugException {
-      getDebugTarget().resume();
+      suspended = false;
+      fireResumeEvent(DebugEvent.CLIENT_REQUEST);
    }
 
    /**
@@ -132,7 +155,8 @@ public abstract class AbstractSEDThread extends AbstractSEDDebugNode implements 
     */
    @Override
    public void suspend() throws DebugException {
-      getDebugTarget().suspend();
+      suspended = true;
+      fireSuspendEvent(DebugEvent.CLIENT_REQUEST);
    }
 
    /**
@@ -231,5 +255,44 @@ public abstract class AbstractSEDThread extends AbstractSEDDebugNode implements 
    @Override
    public String getNodeType() {
       return "Start";
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDDebugNode[] getLeafsToSelect() throws DebugException {
+      return collectLeafs(this);
+   }
+   
+   /**
+    * Collects all leaf nodes starting at the given node. If at some leafs
+    * breakpoints are hit only nodes were breakpoints are hit are returned.
+    * @param start The {@link ISEDDebugNode} to start at.
+    * @return The found leafs.
+    * @throws DebugException Occurred Exception.
+    */
+   protected ISEDDebugNode[] collectLeafs(ISEDDebugNode start) throws DebugException {
+      List<ISEDDebugNode> leafs = new LinkedList<ISEDDebugNode>();
+      List<ISEDDebugNode> leafsWithBreakpointHit = new LinkedList<ISEDDebugNode>();
+      ISEDIterator iter = new SEDBreadthFirstIterator(start);
+      while (iter.hasNext()) {
+         ISEDDebugElement next = iter.next();
+         if (next instanceof ISEDDebugNode) {
+            ISEDDebugNode node = (ISEDDebugNode)next;
+            if (ArrayUtil.isEmpty(node.getChildren())) {
+               leafs.add(node);
+               if (!ArrayUtil.isEmpty(node.computeHitBreakpoints())) {
+                  leafsWithBreakpointHit.add(node);
+               }
+            }
+         }
+      }
+      if (!leafsWithBreakpointHit.isEmpty()) {
+         return leafsWithBreakpointHit.toArray(new ISEDDebugNode[leafsWithBreakpointHit.size()]);
+      }
+      else {
+         return leafs.toArray(new ISEDDebugNode[leafs.size()]);
+      }
    }
 }

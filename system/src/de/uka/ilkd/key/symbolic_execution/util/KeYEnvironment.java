@@ -15,6 +15,7 @@ package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.io.File;
 import java.util.List;
+import java.util.Properties;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -28,7 +29,8 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface.IUserInterfaceCustomization;
 import de.uka.ilkd.key.ui.UserInterface;
 
 /**
@@ -184,7 +186,7 @@ public class KeYEnvironment<U extends UserInterface> {
       if (makeMainWindowVisible && !main.isVisible()) {
           main.setVisible(true);
       }
-      DefaultProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath);
+      DefaultProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, null);
       InitConfig initConfig = loader.getInitConfig();
       return new KeYEnvironment<UserInterface>(main.getUserInterface(), initConfig, loader.getProof());
    }
@@ -198,10 +200,27 @@ public class KeYEnvironment<U extends UserInterface> {
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */
-   public static KeYEnvironment<CustomConsoleUserInterface> load(File location,
-                                                                 List<File> classPaths,
-                                                                 File bootClassPath) throws ProblemLoaderException {
+   public static KeYEnvironment<CustomUserInterface> load(File location,
+                                                          List<File> classPaths,
+                                                          File bootClassPath) throws ProblemLoaderException {
       return load(null, location, classPaths, bootClassPath);
+   }
+   
+   /**
+    * Loads the given location and returns all required references as {@link KeYEnvironment}.
+    * The {@link MainWindow} is not involved in the whole process.
+    * @param location The location to load.
+    * @param classPaths The class path entries to use.
+    * @param bootClassPath The boot class path to use.
+    * @param customization An optional {@link IUserInterfaceCustomization}.
+    * @return The {@link KeYEnvironment} which contains all references to the loaded location.
+    * @throws ProblemLoaderException Occurred Exception
+    */
+   public static KeYEnvironment<CustomUserInterface> load(File location,
+                                                          List<File> classPaths,
+                                                          File bootClassPath,
+                                                          IUserInterfaceCustomization customization) throws ProblemLoaderException {
+      return load(null, location, classPaths, bootClassPath, null, customization);
    }
    
    /**
@@ -214,21 +233,42 @@ public class KeYEnvironment<U extends UserInterface> {
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */
-   public static KeYEnvironment<CustomConsoleUserInterface> load(Profile profile,
-                                                                 File location,
-                                                                 List<File> classPaths,
-                                                                 File bootClassPath) throws ProblemLoaderException {
-      CustomConsoleUserInterface ui = new CustomConsoleUserInterface(false);
-      DefaultProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath); 
+   public static KeYEnvironment<CustomUserInterface> load(Profile profile,
+                                                          File location,
+                                                          List<File> classPaths,
+                                                          File bootClassPath) throws ProblemLoaderException {
+      return load(profile, location, classPaths, bootClassPath, null, null);
+   }
+   
+   /**
+    * Loads the given location and returns all required references as {@link KeYEnvironment}.
+    * The {@link MainWindow} is not involved in the whole process.
+    * @param profile The {@link Profile} to use.
+    * @param location The location to load.
+    * @param classPaths The class path entries to use.
+    * @param bootClassPath The boot class path to use.
+    * @param poPropertiesToForce Some optional PO {@link Properties} to force.
+    * @param customization An optional {@link IUserInterfaceCustomization}.
+    * @return The {@link KeYEnvironment} which contains all references to the loaded location.
+    * @throws ProblemLoaderException Occurred Exception
+    */
+   public static KeYEnvironment<CustomUserInterface> load(Profile profile,
+                                                          File location,
+                                                          List<File> classPaths,
+                                                          File bootClassPath,
+                                                          Properties poPropertiesToForce,
+                                                          IUserInterfaceCustomization customization) throws ProblemLoaderException {
+      CustomUserInterface ui = new CustomUserInterface(false, customization);
+      DefaultProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath, poPropertiesToForce); 
       InitConfig initConfig = loader.getInitConfig();
-      return new KeYEnvironment<CustomConsoleUserInterface>(ui, initConfig, loader.getProof());
+      return new KeYEnvironment<CustomUserInterface>(ui, initConfig, loader.getProof());
    }
 
    /**
     * Disposes this {@link KeYEnvironment}.
     */
    public void dispose() {
-      if (loadedProof != null) {
+      if (loadedProof != null && !loadedProof.isDisposed()) {
          loadedProof.dispose();
       }
       disposed = true;

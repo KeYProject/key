@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.average(array);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.average(array)&gt;" pathCondition="true" pathConditionChanged="false">
       <variable name="exc" arrayIndex="-1" isArrayIndex="false">
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
@@ -52,7 +52,7 @@ post: result_0
 &amp; self.&lt;inv&gt;
 &amp; exc_0 = null
 mod: allLocs
-termination: diamond" pathCondition="not(equals(array,null))" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+termination: diamond" pathCondition="not(equals(array,null))" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" selfTerm="self" contractParameters="array" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                   <variable name="self" arrayIndex="-1" isArrayIndex="false">
                      <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      </value>
@@ -97,17 +97,43 @@ termination: diamond" pathCondition="not(equals(array,null))" pathConditionChang
                      </variable>
                      <callStackEntry path="/0"/>
                      <branchCondition name="equals(length(array),Z(0(#)))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(0(#)))))" pathConditionChanged="true" branchCondition="equals(length(array),Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
-                        <termination name="&lt;uncaught java.lang.ArithmeticException&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(0(#)))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-                        </termination>
+                        <exceptionalMethodReturn name="&lt;throw java.lang.ArithmeticException&gt;" signature="&lt;exceptional return of &lt;call self.average(array)&gt;&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(0(#)))))" pathConditionChanged="false" methodReturnCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(0(#)))))">
+                           <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                              <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="array" arrayIndex="-1" isArrayIndex="false">
+                              <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 <variable name="length" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="length {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </variable>
+                           <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                              <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="a" arrayIndex="-1" isArrayIndex="false">
+                              <value name="a {true}" typeString="java.lang.ArithmeticException" valueString="a_3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <callStackEntry path="/0"/>
+                           <termination name="&lt;uncaught java.lang.ArithmeticException&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(0(#)))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                           </termination>
+                        </exceptionalMethodReturn>
                      </branchCondition>
                      <branchCondition name="not(equals(length(array),Z(0(#))))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(0(#))))))" pathConditionChanged="true" branchCondition="not(equals(length(array),Z(0(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
-                        <methodReturn name="&lt;return of self.average(array);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(0(#))))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
-	quotient_3 {gt(result_0,Z(neglit(1(#))))}, 
-	mul(quotient_2,Z(neglit(1(#)))) {lt(result_0,Z(0(#)))}
-as result of self.average(array);&gt;" isReturnValueComputed="true">
-                           <methodReturnValue name="quotient_3 {gt(result_0,Z(neglit(1(#))))}" returnValueString="quotient_3" hasCondition="true" conditionString="gt(result_0,Z(neglit(1(#))))">
+                        <methodReturn name="&lt;return of average&gt;" signature="&lt;return of self.average(array)&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(0(#))))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
+	quotient_4 {gt(result_0,Z(neglit(1(#))))}, 
+	mul(quotient_3,Z(neglit(1(#)))) {lt(result_0,Z(0(#)))}
+as result of average&gt;" signatureIncludingReturnValue="&lt;return 
+	quotient_4 {gt(result_0,Z(neglit(1(#))))}, 
+	mul(quotient_3,Z(neglit(1(#)))) {lt(result_0,Z(0(#)))}
+as result of self.average(array)&gt;" isReturnValueComputed="true" methodReturnCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(0(#))))))">
+                           <methodReturnValue name="quotient_4 {gt(result_0,Z(neglit(1(#))))}" returnValueString="quotient_4" hasCondition="true" conditionString="gt(result_0,Z(neglit(1(#))))">
                            </methodReturnValue>
-                           <methodReturnValue name="mul(quotient_2,Z(neglit(1(#)))) {lt(result_0,Z(0(#)))}" returnValueString="mul(quotient_2,Z(neglit(1(#))))" hasCondition="true" conditionString="lt(result_0,Z(0(#)))">
+                           <methodReturnValue name="mul(quotient_3,Z(neglit(1(#)))) {lt(result_0,Z(0(#)))}" returnValueString="mul(quotient_3,Z(neglit(1(#))))" hasCondition="true" conditionString="lt(result_0,Z(0(#)))">
                            </methodReturnValue>
                            <variable name="self" arrayIndex="-1" isArrayIndex="false">
                               <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
@@ -154,10 +180,35 @@ as result of self.average(array);&gt;" isReturnValueComputed="true">
                   </value>
                </variable>
                <callStackEntry path="/0"/>
-               <termination name="&lt;uncaught java.lang.IllegalArgumentException&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-               </termination>
+               <exceptionalMethodReturn name="&lt;throw java.lang.IllegalArgumentException&gt;" signature="&lt;exceptional return of &lt;call self.average(array)&gt;&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" methodReturnCondition="equals(array,null)">
+                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                     <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="array" arrayIndex="-1" isArrayIndex="false">
+                     <value name="array {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="i" arrayIndex="-1" isArrayIndex="false">
+                     <value name="i {true}" typeString="java.lang.IllegalArgumentException" valueString="i_3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <callStackEntry path="/0"/>
+                  <termination name="&lt;uncaught java.lang.IllegalArgumentException&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                  </termination>
+               </exceptionalMethodReturn>
             </statement>
          </branchCondition>
       </branchStatement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/0/0/1/0"/>
+      <methodReturnEntry path="/0/0/1/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/1/0/0"/>
+   <terminationEntry path="/0/0/1/0/0/0"/>
 </start>

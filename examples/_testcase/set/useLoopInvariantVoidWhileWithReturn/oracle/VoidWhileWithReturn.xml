@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="VoidWhileWithReturn.sum(array);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call VoidWhileWithReturn.sum(array)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
@@ -17,7 +17,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                      <callStackEntry path="/0"/>
                      <statement name="break inner_label;" pathCondition="equals(array,null)" pathConditionChanged="false">
                         <callStackEntry path="/0"/>
-                        <methodReturn name="&lt;return of VoidWhileWithReturn.sum(array);&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" isReturnValueComputed="false">
+                        <methodReturn name="&lt;return of sum&gt;" signature="&lt;return of VoidWhileWithReturn.sum(array)&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="equals(array,null)">
                            <callStackEntry path="/0"/>
                            <termination name="&lt;end&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
@@ -32,7 +32,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                            <callStackEntry path="/0"/>
                            <statement name="break inner_label;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),i_0)))" pathConditionChanged="false">
                               <callStackEntry path="/0"/>
-                              <methodReturn name="&lt;return of VoidWhileWithReturn.sum(array);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),i_0)))" pathConditionChanged="false" isReturnValueComputed="false">
+                              <methodReturn name="&lt;return of sum&gt;" signature="&lt;return of VoidWhileWithReturn.sum(array)&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),i_0)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),i_0)))">
                                  <callStackEntry path="/0"/>
                                  <termination name="&lt;end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),i_0)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                  </termination>
@@ -56,5 +56,10 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
             </loopInvariant>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/0/1/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/1/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/1/0/1/0/0/0"/>
 </start>

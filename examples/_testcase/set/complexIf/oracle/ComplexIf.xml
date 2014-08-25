@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.min(i,j);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.min(i,j)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int result;" pathCondition="true" pathConditionChanged="false">
          <branchStatement name="if (i&lt;j&amp;&amp;i!=j)" pathCondition="true" pathConditionChanged="false">
             <branchCondition name="leq(j,i)" pathCondition="leq(j,i)" pathConditionChanged="true" branchCondition="leq(j,i)" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="result_1=j;" pathCondition="leq(j,i)" pathConditionChanged="false">
                   <statement name="return result_1;" pathCondition="leq(j,i)" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of self.min(i,j);&gt;" pathCondition="leq(j,i)" pathConditionChanged="false" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of min&gt;" signature="&lt;return of self.min(i,j)&gt;" pathCondition="leq(j,i)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="leq(j,i)">
                         <termination name="&lt;end&gt;" pathCondition="leq(j,i)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
@@ -16,7 +16,7 @@
             <branchCondition name="gt(j,i)" pathCondition="gt(j,i)" pathConditionChanged="true" branchCondition="gt(j,i)" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="result_1=i;" pathCondition="gt(j,i)" pathConditionChanged="false">
                   <statement name="return result_1;" pathCondition="gt(j,i)" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of self.min(i,j);&gt;" pathCondition="gt(j,i)" pathConditionChanged="false" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of min&gt;" signature="&lt;return of self.min(i,j)&gt;" pathCondition="gt(j,i)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="gt(j,i)">
                         <termination name="&lt;end&gt;" pathCondition="gt(j,i)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
@@ -25,5 +25,9 @@
             </branchCondition>
          </branchStatement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/1/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/1/0/0/0/0"/>
 </start>

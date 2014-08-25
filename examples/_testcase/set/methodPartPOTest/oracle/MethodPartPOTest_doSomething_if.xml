@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <branchStatement name="if (asdf&lt;0)" pathCondition="true" pathConditionChanged="false">
-      <branchCondition name="leq(asdf,Z(neglit(1(#))))" pathCondition="lt(asdf,Z(0(#)))" pathConditionChanged="true" branchCondition="leq(asdf,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+      <branchCondition name="lt(asdf,Z(0(#)))" pathCondition="lt(asdf,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(asdf,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
          <statement name="x=x*-1;" pathCondition="lt(asdf,Z(0(#)))" pathConditionChanged="false">
             <statement name="x+=2;" pathCondition="lt(asdf,Z(0(#)))" pathConditionChanged="false">
                <termination name="&lt;end&gt;" pathCondition="lt(asdf,Z(0(#)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
@@ -9,7 +9,7 @@
             </statement>
          </statement>
       </branchCondition>
-      <branchCondition name="geq(asdf,Z(0(#)))" pathCondition="gt(asdf,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="geq(asdf,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+      <branchCondition name="gt(asdf,Z(neglit(1(#))))" pathCondition="gt(asdf,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(asdf,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
          <statement name="x-=42;" pathCondition="gt(asdf,Z(neglit(1(#))))" pathConditionChanged="false">
             <statement name="return x;" pathCondition="gt(asdf,Z(neglit(1(#))))" pathConditionChanged="false">
                <termination name="&lt;end&gt;" pathCondition="gt(asdf,Z(neglit(1(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
@@ -18,4 +18,6 @@
          </statement>
       </branchCondition>
    </branchStatement>
+   <terminationEntry path="/0/0/0/0/0"/>
+   <terminationEntry path="/0/1/0/0/0"/>
 </start>

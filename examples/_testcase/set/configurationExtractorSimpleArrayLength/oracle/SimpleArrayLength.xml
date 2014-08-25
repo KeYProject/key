@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.compute(array);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.compute(array)&gt;" pathCondition="true" pathConditionChanged="false">
       <branchStatement name="if (array.length==1)" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="not(equals(array,null))" pathCondition="not(equals(array,null))" pathConditionChanged="true" branchCondition="not(equals(array,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <branchCondition name="equals(length(array),Z(1(#)))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(1(#)))))" pathConditionChanged="true" branchCondition="equals(length(array),Z(1(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="return 42;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(1(#)))))" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of self.compute(array);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(1(#)))))" pathConditionChanged="false" isReturnValueComputed="false">
+                  <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of self.compute(array)&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(1(#)))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(1(#)))))">
                      <termination name="&lt;end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(1(#)))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
@@ -13,7 +13,7 @@
             </branchCondition>
             <branchCondition name="not(equals(length(array),Z(1(#))))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(1(#))))))" pathConditionChanged="true" branchCondition="not(equals(length(array),Z(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="return -100;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(1(#))))))" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of self.compute(array);&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(1(#))))))" pathConditionChanged="false" isReturnValueComputed="false">
+                  <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of self.compute(array)&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(1(#))))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(1(#))))))">
                      <termination name="&lt;end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(1(#))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
@@ -21,9 +21,17 @@
             </branchCondition>
          </branchCondition>
          <branchCondition name="equals(array,null)" pathCondition="equals(array,null)" pathConditionChanged="true" branchCondition="equals(array,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-            </termination>
+            <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call self.compute(array)&gt;&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" methodReturnCondition="equals(array,null)">
+               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+               </termination>
+            </exceptionalMethodReturn>
          </branchCondition>
       </branchStatement>
+      <methodReturnEntry path="/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/1/0/0"/>
+      <methodReturnEntry path="/0/0/1/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/1/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/0"/>
 </start>

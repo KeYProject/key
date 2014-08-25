@@ -57,6 +57,36 @@
                </dynamic>
             </menu>
          </menuContribution>
+         <menuContribution
+               allPopups="true"
+               locationURI="popup:org.eclipse.debug.ui.DebugView?after=additions">
+            <command
+                  commandId="org.key_project.sed.ui.expandAllCommand"
+                  icon="icons/expandall.gif"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <or>
+                        <instanceof
+                              value="org.key_project.sed.core.model.ISEDDebugElement">
+                        </instanceof>
+                        <and>
+                           <instanceof
+                                 value="org.eclipse.debug.core.ILaunch">
+                           </instanceof>
+                           <test
+                                 forcePluginActivation="true"
+                                 property="org.key_project.sed.core.hasSEDDebugTarget">
+                           </test>
+                        </and>
+                     </or>
+                  </iterate>
+               </visibleWhen>
+            </command>
+         </menuContribution>
       </extension>
       <extension
             point="org.eclipse.core.runtime.adapters">
@@ -72,6 +102,13 @@
                class="org.key_project.sed.ui.adapter.SEDVariableAdapterFactory">
             <adapter
                   type="org.eclipse.debug.internal.ui.viewers.model.provisional.IElementLabelProvider">
+            </adapter>
+         </factory>
+         <factory
+               adaptableType="org.key_project.sed.core.model.ISEDDebugTarget"
+               class="org.key_project.sed.ui.adapter.SEDDebugTargetModelProxyFactoryAdapterFactory">
+            <adapter
+                  type="org.eclipse.debug.internal.ui.viewers.model.provisional.IModelProxyFactory">
             </adapter>
          </factory>
       </extension>
@@ -96,6 +133,12 @@
                     label="Call Stack">
               </propertyTab>
               <propertyTab
+                    afterTab="org.key_project.sed.ui.node.tab"
+                    category="Debug"
+                    id="org.key_project.sed.ui.methodReturns.tab"
+                    label="Method Returns">
+              </propertyTab>
+              <propertyTab
                     afterTab="org.key_project.sed.ui.callStack.tab"
                     category="Debug"
                     id="org.key_project.sed.ui.source.tab"
@@ -111,6 +154,12 @@
                     category="Debug"
                     id="org.key_project.sed.ui.annotationLinks.tab"
                     label="Annotation Links">
+              </propertyTab>
+              <propertyTab
+                    afterTab="org.key_project.sed.ui.annotations.tab"
+                    category="Debug"
+                    id="org.key_project.sed.ui.statistics.tab"
+                    label="Statistics">
               </propertyTab>
           </propertyTabs>
       </extension>
@@ -130,6 +179,12 @@
                     tab="org.key_project.sed.ui.callStack.tab">
               </propertySection>
               <propertySection
+                    class="org.key_project.sed.ui.property.MethodReturnConditionsPropertySection"
+                    filter="org.key_project.sed.ui.property.SEDMethodCallTreeFilter"
+                    id="org.key_project.sed.ui.property.MethodReturnConditionsPropertySection"
+                    tab="org.key_project.sed.ui.methodReturns.tab">
+              </propertySection>
+              <propertySection
                     class="org.key_project.sed.ui.property.SourcePropertySection"
                     filter="org.key_project.sed.ui.property.SourceTreeFilter"
                     id="org.key_project.sed.ui.property.SourcePropertySection"
@@ -146,6 +201,12 @@
                     filter="org.key_project.sed.ui.property.SEDDebugNodeTreeFilter"
                     id="org.key_project.sed.ui.property.AnnotationLinkPropertySection"
                     tab="org.key_project.sed.ui.annotationLinks.tab">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.property.StatisticsPropertySection"
+                    filter="org.key_project.sed.ui.property.SEDDebugTargetTreeFilter"
+                    id="org.key_project.sed.ui.property.StatisticsPropertySection"
+                    tab="org.key_project.sed.ui.statistics.tab">
               </propertySection>
           </propertySections>
       </extension>
@@ -229,5 +290,84 @@
                annotationTypeID="org.key_project.sed.core.annotationType.search"
                icon="icons/search.gif">
          </image>
+      </extension>
+      <extension
+            point="org.eclipse.ui.commands">
+         <command
+               categoryId="org.eclipse.debug.ui.category.run"
+               description="Expand all children of the selected item"
+               id="org.key_project.sed.ui.expandAllCommand"
+               name="Expand All">
+         </command>
+      </extension>
+      <extension
+            point="org.eclipse.ui.commandImages">
+         <image
+               commandId="org.key_project.sed.ui.expandAllCommand"
+               icon="icons/expandall.gif">
+         </image>
+      </extension>
+      <extension
+            point="org.eclipse.ui.handlers">
+         <handler
+               class="org.key_project.sed.ui.command.ExpandAllCommand"
+               commandId="org.key_project.sed.ui.expandAllCommand">
+            <enabledWhen>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <or>
+                     <instanceof
+                           value="org.key_project.sed.core.model.ISEDDebugElement">
+                     </instanceof>
+                     <and>
+                        <instanceof
+                              value="org.eclipse.debug.core.ILaunch">
+                        </instanceof>
+                        <test
+                              forcePluginActivation="true"
+                              property="org.key_project.sed.core.hasSEDDebugTarget">
+                        </test>
+                     </and>
+                  </or>
+               </iterate>
+            </enabledWhen>
+         </handler>
+      </extension>
+      <extension
+            point="org.eclipse.ui.editors.annotationTypes">
+         <type
+               markerType="org.eclipse.core.resources.textmarker"
+               name="org.key_project.sed.ui.SymbolicallyReachedAnnotation">
+         </type>
+      </extension>
+      <extension
+            point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationImageProvider="org.key_project.sed.ui.text.SymbolicallyReachedAnnotationImageProvider"
+            annotationType="org.key_project.sed.ui.SymbolicallyReachedAnnotation"
+            colorPreferenceKey="executedSEDNode_color"
+            colorPreferenceValue="254,248,226"
+            contributesToHeader="false"
+            highlightPreferenceKey="executedSEDNode_highlight"
+            highlightPreferenceValue="true"
+            includeOnPreferencePage="true"
+            isGoToNextNavigationTarget="false"
+            isGoToNextNavigationTargetKey="executedSEDNode_isGoToNextNavigationTargetKey"
+            isGoToPreviousNavigationTarget="false"
+            isGoToPreviousNavigationTargetKey="executedSEDNode_isGoToPreviousNavigationTargetKey"
+            label="Symbolically Reached"
+            overviewRulerPreferenceKey="executedSEDNode_overviewRuler"
+            overviewRulerPreferenceValue="false"
+            presentationLayer="0"
+            showInNextPrevDropdownToolbarAction="false"
+            showInNextPrevDropdownToolbarActionKey="executedSEDNode_showInNextPrevDropdownToolbarAction"
+            textPreferenceKey="executedSEDNode_text"
+            textPreferenceValue="true"
+            textStylePreferenceKey="executedSEDNode_stylePreferences"
+            textStylePreferenceValue="BOX"
+            verticalRulerPreferenceKey="executedSEDNode_verticalRuler"
+            verticalRulerPreferenceValue="true">
+      </specification>
       </extension>
 </plugin>

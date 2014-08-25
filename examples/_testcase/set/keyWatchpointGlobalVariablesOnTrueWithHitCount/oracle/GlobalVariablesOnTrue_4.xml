@@ -1,33 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="GlobalVariablesOnTrue.doSomething();" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call GlobalVariablesOnTrue.doSomething()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="x_global=17;" pathCondition="true" pathConditionChanged="false">
          <statement name="main(x_global);" pathCondition="true" pathConditionChanged="false">
-            <methodCall name="GlobalVariablesOnTrue.main(x_1);" pathCondition="true" pathConditionChanged="false">
+            <methodCall name="&lt;call GlobalVariablesOnTrue.main(x_1)&gt;" pathCondition="true" pathConditionChanged="false">
                <branchStatement name="if (x_1&gt;=0)" pathCondition="true" pathConditionChanged="false">
                   <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of GlobalVariablesOnTrue.main(x_1);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of GlobalVariablesOnTrue.main(x_1)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                         <statement name="x_global=-1;" pathCondition="true" pathConditionChanged="false">
                            <statement name="main(x_global);" pathCondition="true" pathConditionChanged="false">
-                              <methodCall name="GlobalVariablesOnTrue.main(x_4);" pathCondition="true" pathConditionChanged="false">
+                              <methodCall name="&lt;call GlobalVariablesOnTrue.main(x_4)&gt;" pathCondition="true" pathConditionChanged="false">
                                  <branchStatement name="if (x_4&gt;=0)" pathCondition="true" pathConditionChanged="false">
                                     <statement name="return -4711;" pathCondition="true" pathConditionChanged="false">
-                                       <methodReturn name="&lt;return of GlobalVariablesOnTrue.main(x_4);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
-                                          <methodReturn name="&lt;return of GlobalVariablesOnTrue.doSomething();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                                       <methodReturn name="&lt;return of main&gt;" signature="&lt;return of GlobalVariablesOnTrue.main(x_4)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                          <methodReturn name="&lt;return of doSomething&gt;" signature="&lt;return of GlobalVariablesOnTrue.doSomething()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                              <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                              </termination>
                                           </methodReturn>
                                        </methodReturn>
                                     </statement>
                                  </branchStatement>
+                                 <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                               </methodCall>
                            </statement>
                         </statement>
                      </methodReturn>
                   </statement>
                </branchStatement>
+               <methodReturnEntry path="/0/0/0/0/0/0/0"/>
             </methodCall>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
 </start>

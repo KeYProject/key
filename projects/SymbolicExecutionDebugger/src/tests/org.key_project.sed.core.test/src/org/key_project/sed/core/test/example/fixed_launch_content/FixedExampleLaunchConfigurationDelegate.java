@@ -33,6 +33,7 @@ import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchStatement;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
+import org.key_project.sed.core.model.memory.SEDMemoryExceptionalMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryExceptionalTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopBodyTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopCondition;
@@ -97,7 +98,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        target.setModelIdentifier(MODEL_IDENTIFIER);
        launch.addDebugTarget(target);
        
-       SEDMemoryThread thread = new SEDMemoryThread(target);
+       SEDMemoryThread thread = new SEDMemoryThread(target, false);
        thread.setName("Fixed Example Thread");
        thread.setPathCondition("pc1");
        target.addSymbolicThread(thread);
@@ -144,6 +145,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        et.setName("throws DivisionByZeroException()");
        et.setPathCondition("pc9");
        bzero.addChild(et);
+       thread.addTermination(et);
        
        SEDMemoryBranchCondition bnotzero = new SEDMemoryBranchCondition(target, s3, thread);
        bnotzero.setName("z != 0");
@@ -171,12 +173,18 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        returnNegative.setName("return -1");
        returnNegative.setPathCondition("pc14");
        returnNegative.setCallStack(new ISEDDebugNode[] {call});
+       SEDMemoryBranchCondition returnCondition = new SEDMemoryBranchCondition(target, call, thread);
+       returnCondition.setName("A Return Condition");
+       returnCondition.addChild(returnNegative);
+       call.addMethodReturnCondition(returnCondition);
+       returnNegative.setMethodReturnCondition(returnCondition);
        bnegative.addChild(returnNegative);
        
        SEDMemoryTermination terminationNegative = new SEDMemoryTermination(target, returnNegative, thread, true);
        terminationNegative.setName("<end>");
        terminationNegative.setPathCondition("pc15");
        returnNegative.addChild(terminationNegative);
+       thread.addTermination(terminationNegative);
        
        SEDMemoryBranchCondition bpositive = new SEDMemoryBranchCondition(target, branch, thread);
        bpositive.setName("result >= 0");
@@ -184,7 +192,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        bpositive.setCallStack(new ISEDDebugNode[] {call});
        branch.addChild(bpositive);
        
-       SEDMemoryMethodReturn returnPositive = new SEDMemoryMethodReturn(target, bpositive, thread);
+       SEDMemoryExceptionalMethodReturn returnPositive = new SEDMemoryExceptionalMethodReturn(target, bpositive, thread);
        returnPositive.setName("return 1");
        returnPositive.setPathCondition("pc17");
        returnPositive.setCallStack(new ISEDDebugNode[] {call});
@@ -224,5 +232,6 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        terminationPositive.setName("<loop body end>");
        terminationPositive.setPathCondition("pc18");
        returnPositive.addChild(terminationPositive);
+       thread.addTermination(terminationPositive);
     }
 }

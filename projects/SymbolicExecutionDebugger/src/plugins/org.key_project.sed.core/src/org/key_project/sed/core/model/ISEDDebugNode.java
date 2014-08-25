@@ -14,6 +14,7 @@
 package org.key_project.sed.core.model;
 
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
@@ -58,6 +59,13 @@ public interface ISEDDebugNode extends ISEDDebugElement {
     * the failure.</li>
     */
    public ISEDDebugNode[] getChildren() throws DebugException;
+   
+   /**
+    * Checks if children are available.
+    * @return {@code true} children are available, {@code false} children are not available.
+    * @throws DebugException Occurred Exception
+    */
+   public boolean hasChildren() throws DebugException;
    
    /**
     * Returns the {@link ISEDThread} in that this {@link ISEDDebugNode} is contained 
@@ -170,4 +178,10 @@ public interface ISEDDebugNode extends ISEDDebugElement {
     * @param l The {@link ISEDAnnotationLinkListener} to remove.
     */
    public void removeAnnotationLinkListener(ISEDAnnotationLinkListener l);
+   
+   /**
+    * Returns all {@link IBreakpoint}s which are fulfilled in this {@link ISEDDebugNode}.
+    * @return The fulfilled {@link IBreakpoint}s in this {@link ISEDDebugNode}.
+    */
+   public IBreakpoint[] computeHitBreakpoints() throws DebugException;
 }

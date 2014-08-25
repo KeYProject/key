@@ -21,56 +21,28 @@ import org.eclipse.jface.viewers.ILazyTreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.testing.ContributionInfo;
 
-import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
-import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * A class to provide the proofTree transformed to the KeY-Internal representation.
  * 
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
-public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
-
-   private KeYEnvironment<CustomConsoleUserInterface> environment;
-   private Proof proof;
-   private Map<Node, BranchFolder> branchFolders = new HashMap<Node, BranchFolder>();
-
-   private TreeViewer viewer;
-   
+public class LazyProofTreeContentProvider implements ILazyTreeContentProvider {
    /**
-    * Flag which indicates that the viewer is currently refreshed when the auto mode has stopped.
-    */
-   private boolean refreshAfterAutoModeStopped = false;
-   
-   /**
-    * The AutoModeListener
-    */
-   private AutoModeListener autoModeListener = new AutoModeListener() {
-      @Override
-      public void autoModeStopped(ProofEvent e) {
-         handleAutoModeStopped(e);
-      }
-      
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public void autoModeStarted(ProofEvent e) {
-      }
-   };
-   
+    * A mapping from {@link Node}s to {@link BranchFolder}s.
+    */   
+   private final Map<Node, BranchFolder> branchFolders = new HashMap<Node, BranchFolder>();
    
    /**
     * The ProofTreeListener
     */
-   private ProofTreeListener proofTreeListener = new ProofTreeListener() {
+   private final ProofTreeListener proofTreeListener = new ProofTreeListener() {
       /**
        * {@inheritDoc}
        */
@@ -137,26 +109,20 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
       }
    };
 
+   /**
+    * The {@link TreeViewer} in which this {@link ILazyTreeContentProvider} is used.
+    */
+   private TreeViewer viewer;
+   
+   /**
+    * The {@link Proof} as input of {@link #viewer}.
+    */
+   private Proof proof;   
 
    /**
     * The Constructor
-    * @param viewer - the {@link TreeViewer}
-    * @param environment - the {@link KeYEnvironment}
-    * @param proof - the {@link Proof}
     */
-   public LazyProofTreeContentProvider(TreeViewer viewer, KeYEnvironment<CustomConsoleUserInterface> environment, Proof proof){
-      this.viewer=viewer;
-      this.proof = proof;
-      this.environment = environment;
-   }
-   
-   /**
-    * Removes the added listeners.
-    */
-   @Override
-   public void dispose() {
-      proof.removeProofTreeListener(proofTreeListener);
-      environment.getMediator().removeAutoModeListener(autoModeListener);
+   public LazyProofTreeContentProvider() {
    }
 
    /**
@@ -164,21 +130,18 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
     */
    @Override
    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-      if(newInput instanceof Proof){
+      Assert.isTrue(viewer instanceof TreeViewer);
+      this.viewer = (TreeViewer)viewer;
+      if (oldInput != null) {
+         proof.removeProofTreeListener(proofTreeListener);
+      }
+      if (newInput instanceof Proof) {
          this.proof = (Proof) newInput;
-         if(oldInput != null){
-            proof.removeProofTreeListener(proofTreeListener);
-            if (environment != null) {
-               environment.getMediator().removeAutoModeListener(autoModeListener);
-            }
-         }
-          if(newInput != null){
-             proof.addProofTreeListener(proofTreeListener);
-          }
-          if (environment != null) {
-             environment.getMediator().addAutoModeListener(autoModeListener);
-          }
-       }
+         proof.addProofTreeListener(proofTreeListener);
+      }
+      else {
+         this.proof = null;
+      }
    }
    
    /**
@@ -221,15 +184,27 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
     */
    @Override
    public void updateChildCount(Object element, int currentChildCount) {
+      doUpdateChildCount(element, currentChildCount);
+   }
+   
+   /**
+    * Performs the steps of {@link #updateChildCount(Object, int)}.
+    * @param element The element to update its child count.
+    * @param currentChildCount The current number of children.
+    * @return The new updated number of children.
+    */
+   protected int doUpdateChildCount(Object element, int currentChildCount) {
       if (element instanceof Proof){
          Proof proof = (Proof) element;
          Node branchNode = proof.root();
          int childCount = getBranchFolderChildCount(branchNode);
          int folderCount = getFolderCountInBranch(proof);
          viewer.setChildCount(element, childCount + folderCount);
+         return childCount + folderCount;
       }
       if (element instanceof Node){
          viewer.setChildCount(element, 0);
+         return 0;
       }
       if (element instanceof BranchFolder) {
          BranchFolder branchFolder = (BranchFolder) element;
@@ -237,6 +212,10 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
          int childCount = getBranchFolderChildCount(branchNode);
          int folderCount = getFolderCountInBranch(branchFolder);
          viewer.setChildCount(element, childCount + folderCount);
+         return childCount + folderCount;
+      }
+      else {
+         return 0;
       }
    }
    
@@ -250,78 +229,68 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
       updateChildCount(element, -1);
    }
 
-   protected void handleAutoModeStopped(ProofEvent e) {
+   /**
+    * When a {@link Node} was pruned.
+    * @param e The event.
+    */
+   protected void handleProofPruned(final ProofTreeEvent e) {
       Display display = viewer.getControl().getDisplay();
       if (!display.isDisposed()) {
-         display.asyncExec(new Runnable() {
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public void run() {
-               try {
-                  refreshAfterAutoModeStopped = true;
-                  if (!viewer.getControl().isDisposed()) {
-                     viewer.refresh(); // Refresh structure
-                     viewer.refresh(); // Refresh labels and icons                        
-                  }
-               }
-               finally {
-                  refreshAfterAutoModeStopped = false;
-               }
-            }
-         });
-      }
-   }
-
-   protected void handleProofPruned(final ProofTreeEvent e) {
-      if(!environment.getMediator().autoMode()){
-         Display display = viewer.getControl().getDisplay();
-         if (!display.isDisposed()) {
-            display.asyncExec(new Runnable() {
-               @Override
-               public void run() {
-                  if (!viewer.getControl().isDisposed()) {
-                     prune(e.getNode());
-                  }
-               }
-            });
-         }
-      }
-   }
-
-   protected void handleProofExpanded(ProofTreeEvent e) {
-      if(!environment.getMediator().autoMode()){
-         Display display = viewer.getControl().getDisplay();
          display.asyncExec(new Runnable() {
             @Override
             public void run() {
                if (!viewer.getControl().isDisposed()) {
-                  viewer.refresh(); // TODO: Update viewer directly, will increase performance?
+                  doHandleProofPruned(e.getNode());
                }
             }
          });
       }
    }
-   
-   
+
    /**
-    * Refreshes the prooftree after a pruned event was fired.
-    * @param node
+    * Performs the steps required to handle a pruned {@link Node}.
+    * @param node The expanded {@link Node}.
     */
-   private void prune(Node node){
-      Node branchNode = getBranchNode(node);
-      BranchFolder branchFolder = branchFolders.get(branchNode);
-      viewer.refresh(branchFolder);
+   protected void doHandleProofPruned(Node node){
+      doUpdateChildCount(getParent(node), -1);
+   }
+
+   /**
+    * When a {@link Node} was expanded.
+    * @param e The event.
+    */
+   protected void handleProofExpanded(final ProofTreeEvent e) {
+      viewer.getControl().getDisplay().asyncExec(new Runnable() {
+         @Override
+         public void run() {
+            if (!viewer.getControl().isDisposed()) {
+               doHandleProofExpanded(e.getNode());
+            }
+         }
+      });
    }
    
+   /**
+    * Performs the steps required to handle an expanded {@link Node}.
+    * @param node The expanded {@link Node}.
+    */
+   protected void doHandleProofExpanded(Node node) {
+      Object parent = getParent(node);
+      int parentChildCount = doUpdateChildCount(parent, -1);
+      int childIndex = getIndexOf(parent, node);
+      if (childIndex >= 0 && childIndex < parentChildCount) {
+         for (int i = childIndex; i < parentChildCount; i++) {
+            updateElement(parent, i);
+         }
+      }
+   }
    
    /**
     * Returns the number of {@link Node}s in the branch of the given {@link Node}. {@link BranchFolder}s in this branch will not be counted.
     * @param node - any {@link Node} out of the branch.
     * @return the number of {@link Node}s in the branch.
     */
-   private int getBranchFolderChildCount(Node node){
+   protected int getBranchFolderChildCount(Node node){
       Node branchNode = getBranchNode(node);
       int count = 1;
       while(branchNode.childrenCount() == 1){
@@ -331,13 +300,12 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
       return count;
    }
 
-
    /**
     * Returns the branch{@link Node} respectively the first child {@link Node} in its branch.
     * @param node - any {@link Node} out of the branch.
     * @return the branch{@link Node} respectively the first child {@link Node} in its branch.
     */
-   private Node getBranchNode(Node node){
+   protected Node getBranchNode(Node node){
       while(true){
          if(node.equals(node.proof().root())  || node.parent().childrenCount() > 1){
             return node;
@@ -348,16 +316,19 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
       }
    }
    
-   
    /**
     * Returns the element for the given parent and index. This method can handle the inputs iff instanceof {@link Proof} or {@link BranchFolder}.
     * @param parent - the parent object respectively the branches root.
     * @param index - the index of the element in its branch
     * @return the element for the given parent and index.
     */
-   private Object getElementByIndex(Object parent, int index){
+   protected Object getElementByIndex(Object parent, int index){
       Node node = null;
       int childCount = 0;
+      if (parent instanceof ContributionInfo) {
+         node = proof.root();
+         childCount = getBranchFolderChildCount(node);
+      }
       if(parent instanceof Proof){
          Proof proof = (Proof) parent;
          node = proof.root();
@@ -458,8 +429,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
     * @param parent - the parent object respectively the branches root.
     * @return the number of {@link BranchFolder} in Branch
     */
-   //Returns the number of folders in a branch.
-   private int getFolderCountInBranch(Object parent){
+   protected int getFolderCountInBranch(Object parent){
       if(parent instanceof Proof){
          Proof proof = (Proof) parent;
          Node node = proof.root();
@@ -479,12 +449,13 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
       else return -1;
    }
    
-   
    /**
-    * Checks if the viewer is currently refreshed after stopping the auto mode. 
-    * @return {@code true} in refresh phase, {@code false} not in refresh phase.
+    * {@inheritDoc}
     */
-   public boolean isRefreshAfterAutoModeStopped() {
-      return refreshAfterAutoModeStopped;
-   }   
+   @Override
+   public void dispose() {
+      if (proof != null) {
+         proof.removeProofTreeListener(proofTreeListener);
+      }
+   }
 }

@@ -280,80 +280,140 @@ public interface SolverType  {
 	 */
 	static public final SolverType CVC3_SOLVER = new AbstractSolverType() {
 
-		@Override
-		public String getName() {
-			return "CVC3";
-		}
+	    @Override
+	    public String getName() {
+	        return "CVC3";
+	    }
 
-		@Override
-		public SMTSolver createSolver(SMTProblem problem,
-				SolverListener listener, Services services) {
-			return new SMTSolverImplementation(problem, listener,
-					services, this);
-		}
+	    @Override
+	    public SMTSolver createSolver(SMTProblem problem,
+	                    SolverListener listener, Services services) {
+	        return new SMTSolverImplementation(problem, listener,
+	                        services, this);
+	    }
 
-		public String getDefaultSolverCommand() {
-			return "cvc3";
-                }
+	    public String getDefaultSolverCommand() {
+	        return "cvc3";
+	    }
 
-            private boolean useNewVersion () {
-                    final String solverVersion = getRawVersion();
-                    return "version 2.4.1".equals(solverVersion);
-                }
+	    private boolean useNewVersion () {
+	        final String solverVersion = getRawVersion();
+	        return "version 2.4.1".equals(solverVersion);
+	    }
 
-                @Override
-                public String getRawVersion () {
-                    final String tmp = super.getRawVersion();
-                    if (tmp==null) return null;
-                    return tmp.substring(tmp.indexOf("version"));
-                }
+	    @Override
+	    public String getRawVersion () {
+	        final String tmp = super.getRawVersion();
+	        if (tmp==null) return null;
+	        return tmp.substring(tmp.indexOf("version"));
+	    }
 
-		@Override
-		public String getDefaultSolverParameters() {
-                    // version 2.4.1 uses different parameters
-                    if (useNewVersion())
-                        return "-lang smt -interactive";
-//                      return "-lang smt2 -interactive";
-                    else
-			return "+lang smt +model +int";
-		}
+	    @Override
+	    public String getDefaultSolverParameters() {
+	        // version 2.4.1 uses different parameters
+	        if (useNewVersion())
+	            return "-lang smt +model +interactive";
+	        //                      return "-lang smt2 +model +interactive";
+	        else
+	            return "+lang smt +model +int";
+	    }
 
-		public String[] getDelimiters() {
-                    if (useNewVersion())
-                        return new String[]{"\n","\r"};
-                    else
-			return new String [] {"CVC>","C>"};
-                }
+	    public String[] getDelimiters() {
+	        return new String [] {"CVC>","C>"};
+	    }
 
-		public String[] getSupportedVersions() {
-                	return new String[] {"version 2.2", "version 2.4.1"};
-                }
+	    public String[] getSupportedVersions() {
+	        return new String[] {"version 2.2", "version 2.4.1"};
+	    }
 
-		public String getVersionParameter() {
-			return "-version";
-                }
+	    public String getVersionParameter() {
+	        return "-version";
+	    }
 
-		@Override
-		public SMTTranslator createTranslator(Services services) {
-                    final Configuration conf = new Configuration(false, true);
-//                    if (useNewParameterSchema())
-//                        return new SmtLib2Translator(services, conf);
-//                    else
-                        return new SmtLibTranslator(services,conf);
-		}
+	    @Override
+	    public SMTTranslator createTranslator(Services services) {
+	        final Configuration conf = new Configuration(false, true);
+	        //                    if (useNewVersion())
+	        //                        return new SmtLib2Translator(services, conf);
+	        //                    else
+	        return new SmtLibTranslator(services,conf);
+	    }
 
-		public boolean supportsIfThenElse() {
-			return true;
-                }
+	    public boolean supportsIfThenElse() {
+	        return true;
+	    }
 
-		@Override
-		public String getInfo() {
-			return null;
-		}
+	    @Override
+	    public String getInfo() {
+	        return null;
+	    }
 
 
-		
 
+
+	};
+	
+	/**
+	 * CVC4 is the successor to CVC3.
+	 * @author bruns
+	 */
+	static public final SolverType CVC4_SOLVER = new AbstractSolverType() {
+
+	    // TODO move to AbstractSolverType?
+        @Override
+        public SMTSolver createSolver(SMTProblem problem,
+                        SolverListener listener, Services services) {
+            return new SMTSolverImplementation(problem, listener,
+                            services, this);
+        }
+
+        @Override
+        public String getName() {
+            return "CVC4";
+        }
+
+        @Override
+        public String getInfo() {
+            // todo Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public String getDefaultSolverParameters() {
+            return "--no-print-success -m --interactive --lang smt2";
+        }
+
+        @Override
+        public String getDefaultSolverCommand() {
+            return "cvc4";
+        }
+
+        @Override
+        public SMTTranslator createTranslator(Services services) {
+            final Configuration conf = new Configuration(false, true);
+            return new SmtLib2Translator(services, conf);
+        }
+
+        @Override
+        public String[] getDelimiters() {
+            return new String[]{"CVC4>"};
+        }
+
+        @Override
+        public boolean supportsIfThenElse() {
+            return true;
+        }
+
+        @Override
+        public String getVersionParameter() {
+            return "--version";
+        }
+
+        @Override
+        public String[] getSupportedVersions() {
+            return new String[]{"version 1.3"};
+        }
+	    
 	};
 
 

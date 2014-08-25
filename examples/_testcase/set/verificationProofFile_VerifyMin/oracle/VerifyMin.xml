@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call VerifyMin.min(_x,_y)&gt;" pathCondition="true" pathConditionChanged="false">
+      <variable name="heapAtPre" arrayIndex="-1" isArrayIndex="false">
+         <value name="heapAtPre {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+         </value>
+      </variable>
+      <variable name="_x" arrayIndex="-1" isArrayIndex="false">
+         <value name="_x {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+         </value>
+      </variable>
+      <variable name="_y" arrayIndex="-1" isArrayIndex="false">
+         <value name="_y {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+         </value>
+      </variable>
+      <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+         </value>
+      </variable>
+      <branchStatement name="if (_x&lt;_y)" pathCondition="true" pathConditionChanged="false">
+         <variable name="_x" arrayIndex="-1" isArrayIndex="false">
+            <value name="_x {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            </value>
+         </variable>
+         <variable name="_y" arrayIndex="-1" isArrayIndex="false">
+            <value name="_y {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            </value>
+         </variable>
+         <variable name="heapAtPre" arrayIndex="-1" isArrayIndex="false">
+            <value name="heapAtPre {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            </value>
+         </variable>
+         <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            </value>
+         </variable>
+         <callStackEntry path="/0"/>
+         <branchCondition name="gt(y,x)" pathCondition="gt(y,x)" pathConditionChanged="true" branchCondition="gt(y,x)" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <callStackEntry path="/0"/>
+            <statement name="return _x;" pathCondition="gt(y,x)" pathConditionChanged="false">
+               <variable name="_x" arrayIndex="-1" isArrayIndex="false">
+                  <value name="_x {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="_y" arrayIndex="-1" isArrayIndex="false">
+                  <value name="_y {true}" typeString="int" valueString="_y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="heapAtPre" arrayIndex="-1" isArrayIndex="false">
+                  <value name="heapAtPre {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <callStackEntry path="/0"/>
+               <methodReturn name="&lt;return of min&gt;" signature="&lt;return of VerifyMin.min(_x,_y)&gt;" pathCondition="gt(y,x)" pathConditionChanged="false" nameIncludingReturnValue="&lt;return x as result of min&gt;" signatureIncludingReturnValue="&lt;return x as result of VerifyMin.min(_x,_y)&gt;" isReturnValueComputed="true" methodReturnCondition="gt(y,x)">
+                  <methodReturnValue name="x" returnValueString="x" hasCondition="false">
+                  </methodReturnValue>
+                  <variable name="_x" arrayIndex="-1" isArrayIndex="false">
+                     <value name="_x {true}" typeString="int" valueString="_x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="_y" arrayIndex="-1" isArrayIndex="false">
+                     <value name="_y {true}" typeString="int" valueString="_y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="heapAtPre" arrayIndex="-1" isArrayIndex="false">
+                     <value name="heapAtPre {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="result" arrayIndex="-1" isArrayIndex="false">
+                     <value name="result {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <callStackEntry path="/0"/>
+                  <termination name="&lt;end&gt;" pathCondition="gt(y,x)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                  </termination>
+               </methodReturn>
+            </statement>
+         </branchCondition>
+         <branchCondition name="leq(y,x)" pathCondition="leq(y,x)" pathConditionChanged="true" branchCondition="leq(y,x)" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <callStackEntry path="/0"/>
+            <statement name="return _y;" pathCondition="leq(y,x)" pathConditionChanged="false">
+               <variable name="_x" arrayIndex="-1" isArrayIndex="false">
+                  <value name="_x {true}" typeString="int" valueString="_x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="_y" arrayIndex="-1" isArrayIndex="false">
+                  <value name="_y {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="heapAtPre" arrayIndex="-1" isArrayIndex="false">
+                  <value name="heapAtPre {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <callStackEntry path="/0"/>
+               <methodReturn name="&lt;return of min&gt;" signature="&lt;return of VerifyMin.min(_x,_y)&gt;" pathCondition="leq(y,x)" pathConditionChanged="false" nameIncludingReturnValue="&lt;return y as result of min&gt;" signatureIncludingReturnValue="&lt;return y as result of VerifyMin.min(_x,_y)&gt;" isReturnValueComputed="true" methodReturnCondition="leq(y,x)">
+                  <methodReturnValue name="y" returnValueString="y" hasCondition="false">
+                  </methodReturnValue>
+                  <variable name="_x" arrayIndex="-1" isArrayIndex="false">
+                     <value name="_x {true}" typeString="int" valueString="_x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="_y" arrayIndex="-1" isArrayIndex="false">
+                     <value name="_y {true}" typeString="int" valueString="_y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="heapAtPre" arrayIndex="-1" isArrayIndex="false">
+                     <value name="heapAtPre {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="result" arrayIndex="-1" isArrayIndex="false">
+                     <value name="result {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <callStackEntry path="/0"/>
+                  <termination name="&lt;end&gt;" pathCondition="leq(y,x)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                  </termination>
+               </methodReturn>
+            </statement>
+         </branchCondition>
+      </branchStatement>
+      <methodReturnEntry path="/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/1/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/0/0"/>
+</start>

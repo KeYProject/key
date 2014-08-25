@@ -66,8 +66,9 @@ public class SWTBotHotCodeReplaceContinueTestCase extends
             Boolean.FALSE,
             Boolean.FALSE,
             Boolean.FALSE,
-            8,
-            executor);   
+            Boolean.FALSE,
+            Boolean.TRUE,
+            8, executor);   
    
    }
 }

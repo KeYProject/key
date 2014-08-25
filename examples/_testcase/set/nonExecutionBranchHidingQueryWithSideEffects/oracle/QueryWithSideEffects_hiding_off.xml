@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.main(x);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.main(x)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicValue = magic(x);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_0 = self.magic(x) catch(exc_0)
 pre: self.&lt;inv&gt;
@@ -16,10 +16,10 @@ post: result_0 = self.subMagic(x)
             &amp; self.&lt;inv&gt;))))
 &amp; exc_0 = null
 mod: empty
-termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-            <branchCondition name="geq(x,Z(0(#)))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="geq(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" selfTerm="self" contractParameters="x" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+            <branchCondition name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="return magicValue+this.instanceField+classField;" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(0(2(1(#)))) as result of self.main(x);&gt;" isReturnValueComputed="true">
+                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main(x)&gt;" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(0(2(1(#)))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(0(2(1(#)))) as result of self.main(x)&gt;" isReturnValueComputed="true" methodReturnCondition="gt(x,Z(neglit(1(#))))">
                      <methodReturnValue name="Z(0(2(1(#))))" returnValueString="Z(0(2(1(#))))" hasCondition="false">
                      </methodReturnValue>
                      <termination name="&lt;end&gt;" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
@@ -27,9 +27,9 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
                   </methodReturn>
                </statement>
             </branchCondition>
-            <branchCondition name="leq(x,Z(neglit(1(#))))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="leq(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <branchCondition name="lt(x,Z(0(#)))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="return magicValue+this.instanceField+classField;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(7(8(7(4(#)))))) as result of self.main(x);&gt;" isReturnValueComputed="true">
+                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main(x)&gt;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(neglit(7(8(7(4(#)))))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(neglit(7(8(7(4(#)))))) as result of self.main(x)&gt;" isReturnValueComputed="true" methodReturnCondition="lt(x,Z(0(#)))">
                      <methodReturnValue name="Z(neglit(7(8(7(4(#))))))" returnValueString="Z(neglit(7(8(7(4(#))))))" hasCondition="false">
                      </methodReturnValue>
                      <termination name="&lt;end&gt;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
@@ -39,5 +39,9 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
             </branchCondition>
          </operationContract>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/1/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/1/0/0/0"/>
 </start>

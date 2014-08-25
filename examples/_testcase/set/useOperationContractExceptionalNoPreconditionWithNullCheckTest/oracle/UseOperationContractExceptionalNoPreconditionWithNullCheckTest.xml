@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="UseOperationContractExceptionalNoPreconditionWithNullCheckTest.main(obj);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call UseOperationContractExceptionalNoPreconditionWithNullCheckTest.main(obj)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicNumber = obj.magic(123);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_0 = obj.magic(123) catch(exc_0)
 pre: obj.&lt;inv&gt;
@@ -9,10 +9,10 @@ post: !exc_0 = null
       -&gt; obj.&lt;inv&gt;)
    &amp; java.lang.Exception::instance(exc_0) = TRUE)
 mod: allLocs
-termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" selfTerm="obj" contractParameters="Z(3(2(1(#))))" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
             <branchCondition name="not(equals(obj,null))" pathCondition="not(equals(obj,null))" pathConditionChanged="true" branchCondition="not(equals(obj,null))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (magic)">
                <statement name="return -1;" pathCondition="not(equals(obj,null))" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of UseOperationContractExceptionalNoPreconditionWithNullCheckTest.main(obj);&gt;" pathCondition="not(equals(obj,null))" pathConditionChanged="false" isReturnValueComputed="false">
+                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of UseOperationContractExceptionalNoPreconditionWithNullCheckTest.main(obj)&gt;" pathCondition="not(equals(obj,null))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="not(equals(obj,null))">
                      <termination name="&lt;end&gt;" pathCondition="not(equals(obj,null))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                      </termination>
                   </methodReturn>
@@ -20,5 +20,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
             </branchCondition>
          </operationContract>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0"/>
 </start>

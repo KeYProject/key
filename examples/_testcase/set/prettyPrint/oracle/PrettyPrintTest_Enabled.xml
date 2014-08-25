@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="PrettyPrintTest.main(x);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call PrettyPrintTest.main(x)&gt;" pathCondition="true" pathConditionChanged="false">
       <variable name="exc" arrayIndex="-1" isArrayIndex="false">
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
@@ -15,7 +15,7 @@
             </value>
          </variable>
          <callStackEntry path="/0"/>
-         <branchCondition name="x &gt;= 0" pathCondition="x &gt;  -1" pathConditionChanged="true" branchCondition="x &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
+         <branchCondition name="x &gt;  -1" pathCondition="x &gt;  -1" pathConditionChanged="true" branchCondition="x &gt;  -1" mergedBranchCondition="false" isBranchConditionComputed="true">
             <callStackEntry path="/0"/>
             <statement name="return magic();" pathCondition="x &gt;  -1" pathConditionChanged="false">
                <variable name="x" arrayIndex="-1" isArrayIndex="false">
@@ -31,7 +31,7 @@
 pre: true
 post: result_0 = 42 &amp; exc_0 = null
 mod: empty
-termination: diamond" pathCondition="x &gt;  -1" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+termination: diamond" pathCondition="x &gt;  -1" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                   <variable name="x" arrayIndex="-1" isArrayIndex="false">
                      <value name="x {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
@@ -41,7 +41,7 @@ termination: diamond" pathCondition="x &gt;  -1" pathConditionChanged="false" pr
                      </value>
                   </variable>
                   <callStackEntry path="/0"/>
-                  <methodReturn name="&lt;return of PrettyPrintTest.main(x);&gt;" pathCondition="x &gt;  -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of PrettyPrintTest.main(x);&gt;" isReturnValueComputed="true">
+                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of PrettyPrintTest.main(x)&gt;" pathCondition="x &gt;  -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 42 as result of main&gt;" signatureIncludingReturnValue="&lt;return 42 as result of PrettyPrintTest.main(x)&gt;" isReturnValueComputed="true" methodReturnCondition="x &gt;  -1">
                      <methodReturnValue name="42" returnValueString="42" hasCondition="false">
                      </methodReturnValue>
                      <variable name="x" arrayIndex="-1" isArrayIndex="false">
@@ -63,7 +63,7 @@ termination: diamond" pathCondition="x &gt;  -1" pathConditionChanged="false" pr
                </operationContract>
             </statement>
          </branchCondition>
-         <branchCondition name="x &lt;= -1" pathCondition="x &lt; 0" pathConditionChanged="true" branchCondition="x &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true">
+         <branchCondition name="x &lt; 0" pathCondition="x &lt; 0" pathConditionChanged="true" branchCondition="x &lt; 0" mergedBranchCondition="false" isBranchConditionComputed="true">
             <callStackEntry path="/0"/>
             <loopInvariant name="invariant: x &lt;= javaUnaryMinusInt(1);
 variant: javaSubInt(0, x)
@@ -77,7 +77,7 @@ mod: false" pathCondition="x &lt; 0" pathConditionChanged="false" initiallyValid
                   </value>
                </variable>
                <callStackEntry path="/0"/>
-               <branchCondition name="x_0 &lt;= -2" pathCondition="x &lt;= -1 &amp; x_0 &lt;= -2" pathConditionChanged="true" branchCondition="x_0 &lt;= -2" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+               <branchCondition name="x_0 &lt; -1" pathCondition="x &lt;= -1 &amp; x_0 &lt;= -2" pathConditionChanged="true" branchCondition="x_0 &lt; -1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                   <callStackEntry path="/0"/>
                   <statement name="x++;" pathCondition="x &lt;= -1 &amp; x_0 &lt;= -2" pathConditionChanged="false">
                      <variable name="x" arrayIndex="-1" isArrayIndex="false">
@@ -117,7 +117,7 @@ mod: false" pathCondition="x &lt; 0" pathConditionChanged="false" initiallyValid
                         </value>
                      </variable>
                      <callStackEntry path="/0"/>
-                     <methodReturn name="&lt;return of PrettyPrintTest.main(x);&gt;" pathCondition="x &lt;= -1 &amp; x_0 = -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return -1 as result of PrettyPrintTest.main(x);&gt;" isReturnValueComputed="true">
+                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of PrettyPrintTest.main(x)&gt;" pathCondition="x &lt;= -1 &amp; x_0 = -1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return -1 as result of main&gt;" signatureIncludingReturnValue="&lt;return -1 as result of PrettyPrintTest.main(x)&gt;" isReturnValueComputed="true" methodReturnCondition="x &lt;= -1 &amp; x_0 = -1">
                         <methodReturnValue name="-1" returnValueString="-1" hasCondition="false">
                         </methodReturnValue>
                         <variable name="x" arrayIndex="-1" isArrayIndex="false">
@@ -137,5 +137,10 @@ mod: false" pathCondition="x &lt; 0" pathConditionChanged="false" initiallyValid
             </loopInvariant>
          </branchCondition>
       </branchStatement>
+      <methodReturnEntry path="/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/1/0/1/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/1/0/0/0"/>
 </start>

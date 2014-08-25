@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_95091266-9700-4236-9d9f-8f6fe8963461" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_30e63c7e-4a02-46b0-8c58-0a72aa547c20" name="&lt;start&gt;" pathCondition="true">
+   <sedTarget xml:id="_0bd8907e-8a92-4725-affd-3e6568177c31" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_02a2415e-d671-453a-b4a6-a536ed8a8ce1" name="&lt;start&gt;" pathCondition="true">
       </sedThread>
    </sedTarget>
 </launch>

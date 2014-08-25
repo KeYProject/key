@@ -1,42 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.compute();" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.compute()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="InstanceCreationTest.classWrapper=new InstanceCreationTestWrapper (1);" pathCondition="true" pathConditionChanged="false">
-         <methodCall name="InstanceCreationTestWrapper(var);" pathCondition="true" pathConditionChanged="false">
+         <methodCall name="&lt;call InstanceCreationTestWrapper(var)&gt;" pathCondition="true" pathConditionChanged="false">
             <statement name="this.value=var;" pathCondition="true" pathConditionChanged="false">
-               <methodReturn name="&lt;return of InstanceCreationTestWrapper(var);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+               <methodReturn name="&lt;return of InstanceCreationTestWrapper&gt;" signature="&lt;return of InstanceCreationTestWrapper(var)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                   <statement name="this.instanceWrapper=new InstanceCreationTestWrapper (2);" pathCondition="true" pathConditionChanged="false">
-                     <methodCall name="InstanceCreationTestWrapper(var_1);" pathCondition="true" pathConditionChanged="false">
+                     <methodCall name="&lt;call InstanceCreationTestWrapper(var_1)&gt;" pathCondition="true" pathConditionChanged="false">
                         <statement name="this.value=var_1;" pathCondition="true" pathConditionChanged="false">
-                           <methodReturn name="&lt;return of InstanceCreationTestWrapper(var_1);&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                           <methodReturn name="&lt;return of InstanceCreationTestWrapper&gt;" signature="&lt;return of InstanceCreationTestWrapper(var_1)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                               <branchStatement name="if (this.next!=null)" pathCondition="true" pathConditionChanged="false">
                                  <branchCondition name="not(equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null))" pathCondition="not(equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null))" pathConditionChanged="true" branchCondition="not(equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
                                     <statement name="this.next.instanceWrapper=new InstanceCreationTestWrapper (3);" pathCondition="not(equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null))" pathConditionChanged="false">
-                                       <methodCall name="InstanceCreationTestWrapper(var_2);" pathCondition="not(equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null))" pathConditionChanged="false">
+                                       <methodCall name="&lt;call InstanceCreationTestWrapper(var_2)&gt;" pathCondition="not(equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null))" pathConditionChanged="false">
                                           <statement name="this.value=var_2;" pathCondition="not(equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null))" pathConditionChanged="false">
-                                             <methodReturn name="&lt;return of InstanceCreationTestWrapper(var_2);&gt;" pathCondition="not(equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null))" pathConditionChanged="false" isReturnValueComputed="false">
+                                             <methodReturn name="&lt;return of InstanceCreationTestWrapper&gt;" signature="&lt;return of InstanceCreationTestWrapper(var_2)&gt;" pathCondition="not(equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                 <statement name="InstanceCreationTestWrapper localWrapper = new InstanceCreationTestWrapper (4);" pathCondition="not(equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null))" pathConditionChanged="false">
-                                                   <methodCall name="InstanceCreationTestWrapper(var_3);" pathCondition="not(equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null))" pathConditionChanged="false">
+                                                   <methodCall name="&lt;call InstanceCreationTestWrapper(var_3)&gt;" pathCondition="not(equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null))" pathConditionChanged="false">
                                                       <statement name="this.value=var_3;" pathCondition="not(equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null))" pathConditionChanged="false">
-                                                         <methodReturn name="&lt;return of InstanceCreationTestWrapper(var_3);&gt;" pathCondition="not(equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null))" pathConditionChanged="false" isReturnValueComputed="false">
+                                                         <methodReturn name="&lt;return of InstanceCreationTestWrapper&gt;" signature="&lt;return of InstanceCreationTestWrapper(var_3)&gt;" pathCondition="not(equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                             <statement name="return InstanceCreationTest.classWrapper.value+this.instanceWrapper.value+this.next.instanceWrapper.value+localWrapper.value;" pathCondition="not(equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null))" pathConditionChanged="false">
-                                                               <methodReturn name="&lt;return of self.compute();&gt;" pathCondition="not(equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null))" pathConditionChanged="false" isReturnValueComputed="false">
+                                                               <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of self.compute()&gt;" pathCondition="not(equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="not(equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null))">
                                                                   <termination name="&lt;end&gt;" pathCondition="not(equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                                   </termination>
                                                                </methodReturn>
                                                             </statement>
                                                          </methodReturn>
                                                       </statement>
+                                                      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                    </methodCall>
                                                 </statement>
                                              </methodReturn>
                                           </statement>
+                                          <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                        </methodCall>
                                     </statement>
                                  </branchCondition>
                                  <branchCondition name="equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null)" pathCondition="equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null)" pathConditionChanged="true" branchCondition="equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
                                     <statement name="return -100;" pathCondition="equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null)" pathConditionChanged="false">
-                                       <methodReturn name="&lt;return of self.compute();&gt;" pathCondition="equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null)" pathConditionChanged="false" isReturnValueComputed="false">
+                                       <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of self.compute()&gt;" pathCondition="equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null)">
                                           <termination name="&lt;end&gt;" pathCondition="equals(InstanceCreationTest::select(heap,self,InstanceCreationTest::$next),null)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                           </termination>
                                        </methodReturn>
@@ -45,11 +47,17 @@
                               </branchStatement>
                            </methodReturn>
                         </statement>
+                        <methodReturnEntry path="/0/0/0/0/0/0/0/0/0"/>
                      </methodCall>
                   </statement>
                </methodReturn>
             </statement>
+            <methodReturnEntry path="/0/0/0/0/0"/>
          </methodCall>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/1/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/1/0/0/0"/>
 </start>

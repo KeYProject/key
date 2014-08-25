@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_5b1ea9ce-8f14-4e1e-8e32-34d7f479c689" name="doSomething(int, java.lang.String, boolean) from 28 : 9 to 28 : 38" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_88208642-4250-4f58-bbb8-4dee45d05229" name="&lt;start&gt;" pathCondition="true">
-         <sedStatement xml:id="_0cc96eb4-912f-443c-b779-08bfab234a3c" name="int y = 2+CONSTANT+this.field;" pathCondition="true" lineNumber="-1" charStart="421" charEnd="450" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorSingleStatementSelected\src\MethodPartPOTest.java">
-            <sedTermination xml:id="_6a7a55e3-9236-473b-8256-038d3e47c91d" name="&lt;end&gt;" pathCondition="true" verified="true">
+   <sedTarget xml:id="_70c93372-5fe9-4dd9-9053-d7e886ce2d16" name="doSomething(int, java.lang.String, boolean) from 28 : 9 to 28 : 38" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_5b642a95-29ec-4569-8b2e-0744de1e82c1" name="&lt;start&gt;" pathCondition="true">
+         <sedStatement xml:id="_88b700ea-b023-4b36-92b9-52e92081b0bf" name="int y = 2+CONSTANT+this.field;" pathCondition="true" lineNumber="-1" charStart="421" charEnd="450" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorSingleStatementSelected\src\MethodPartPOTest.java">
+            <sedTermination xml:id="_1e802217-db3f-4611-b4b3-4b589423c58c" name="&lt;end&gt;" pathCondition="true" verified="true">
             </sedTermination>
          </sedStatement>
+         <sedTerminationEntry nodeIdRef="_1e802217-db3f-4611-b4b3-4b589423c58c"/>
       </sedThread>
    </sedTarget>
 </launch>

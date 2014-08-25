@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.elseIf(x);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.elseIf(x)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int a;" pathCondition="true" pathConditionChanged="false">
          <branchStatement name="if (x==0)" pathCondition="true" pathConditionChanged="false">
             <branchCondition name="equals(x,Z(0(#)))" pathCondition="equals(x,Z(0(#)))" pathConditionChanged="true" branchCondition="equals(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="a=1;" pathCondition="equals(x,Z(0(#)))" pathConditionChanged="false">
                   <statement name="return a;" pathCondition="equals(x,Z(0(#)))" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of self.elseIf(x);&gt;" pathCondition="equals(x,Z(0(#)))" pathConditionChanged="false" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of elseIf&gt;" signature="&lt;return of self.elseIf(x)&gt;" pathCondition="equals(x,Z(0(#)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="equals(x,Z(0(#)))">
                         <termination name="&lt;end&gt;" pathCondition="equals(x,Z(0(#)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
@@ -20,7 +20,7 @@
                         <statement name="a=-1;" pathCondition="equals(x,Z(1(#)))" pathConditionChanged="false">
                            <statement name="a=x*x;" pathCondition="equals(x,Z(1(#)))" pathConditionChanged="false">
                               <statement name="return a;" pathCondition="equals(x,Z(1(#)))" pathConditionChanged="false">
-                                 <methodReturn name="&lt;return of self.elseIf(x);&gt;" pathCondition="equals(x,Z(1(#)))" pathConditionChanged="false" isReturnValueComputed="false">
+                                 <methodReturn name="&lt;return of elseIf&gt;" signature="&lt;return of self.elseIf(x)&gt;" pathCondition="equals(x,Z(1(#)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="equals(x,Z(1(#)))">
                                     <termination name="&lt;end&gt;" pathCondition="equals(x,Z(1(#)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                     </termination>
                                  </methodReturn>
@@ -34,7 +34,7 @@
                         <statement name="a=-1;" pathCondition="equals(x,Z(2(#)))" pathConditionChanged="false">
                            <statement name="a=x*x;" pathCondition="equals(x,Z(2(#)))" pathConditionChanged="false">
                               <statement name="return a;" pathCondition="equals(x,Z(2(#)))" pathConditionChanged="false">
-                                 <methodReturn name="&lt;return of self.elseIf(x);&gt;" pathCondition="equals(x,Z(2(#)))" pathConditionChanged="false" isReturnValueComputed="false">
+                                 <methodReturn name="&lt;return of elseIf&gt;" signature="&lt;return of self.elseIf(x)&gt;" pathCondition="equals(x,Z(2(#)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="equals(x,Z(2(#)))">
                                     <termination name="&lt;end&gt;" pathCondition="equals(x,Z(2(#)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                     </termination>
                                  </methodReturn>
@@ -47,7 +47,7 @@
                      <branchStatement name="if (x==1||x==2)" pathCondition="equals(x,Z(3(#)))" pathConditionChanged="false">
                         <statement name="a=x*x;" pathCondition="equals(x,Z(3(#)))" pathConditionChanged="false">
                            <statement name="return a;" pathCondition="equals(x,Z(3(#)))" pathConditionChanged="false">
-                              <methodReturn name="&lt;return of self.elseIf(x);&gt;" pathCondition="equals(x,Z(3(#)))" pathConditionChanged="false" isReturnValueComputed="false">
+                              <methodReturn name="&lt;return of elseIf&gt;" signature="&lt;return of self.elseIf(x)&gt;" pathCondition="equals(x,Z(3(#)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="equals(x,Z(3(#)))">
                                  <termination name="&lt;end&gt;" pathCondition="equals(x,Z(3(#)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                  </termination>
                               </methodReturn>
@@ -59,7 +59,7 @@
                      <branchStatement name="if (x==4)" pathCondition="and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#)))))" pathConditionChanged="false">
                         <branchCondition name="equals(x,Z(4(#)))" pathCondition="equals(x,Z(4(#)))" pathConditionChanged="true" branchCondition="equals(x,Z(4(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
                            <statement name="return 42;" pathCondition="equals(x,Z(4(#)))" pathConditionChanged="false">
-                              <methodReturn name="&lt;return of self.elseIf(x);&gt;" pathCondition="equals(x,Z(4(#)))" pathConditionChanged="false" isReturnValueComputed="false">
+                              <methodReturn name="&lt;return of elseIf&gt;" signature="&lt;return of self.elseIf(x)&gt;" pathCondition="equals(x,Z(4(#)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="equals(x,Z(4(#)))">
                                  <termination name="&lt;end&gt;" pathCondition="equals(x,Z(4(#)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                  </termination>
                               </methodReturn>
@@ -68,7 +68,7 @@
                         <branchCondition name="not(equals(x,Z(4(#))))" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" pathConditionChanged="true" branchCondition="not(equals(x,Z(4(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
                            <statement name="a=x;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" pathConditionChanged="false">
                               <statement name="return a;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" pathConditionChanged="false">
-                                 <methodReturn name="&lt;return of self.elseIf(x);&gt;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" pathConditionChanged="false" isReturnValueComputed="false">
+                                 <methodReturn name="&lt;return of elseIf&gt;" signature="&lt;return of self.elseIf(x)&gt;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))">
                                     <termination name="&lt;end&gt;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                     </termination>
                                  </methodReturn>
@@ -81,5 +81,17 @@
             </branchCondition>
          </branchStatement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/1/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/1/0/1/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/1/0/2/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/1/0/3/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/1/0/3/0/1/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/1/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/1/0/1/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/1/0/2/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/1/0/3/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/1/0/3/0/1/0/0/0/0"/>
 </start>

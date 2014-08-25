@@ -31,7 +31,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomUserInterface;
 
 /**
  * Provides static methods that makes testing easier.
@@ -64,7 +64,7 @@ public final class TestStarterCoreUtil {
       final File location = KeYUtil.getSourceLocation(project);
       Assert.isNotNull(location, "The resource \"" + method.getResource() + "\" is not local.");
       // Load environment
-      KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(location, classPaths, bootClassPath);
+      KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(location, classPaths, bootClassPath);
       IProgramMethod pm = KeYUtil.getProgramMethod(method, environment.getJavaInfo());
       ProofOblInput input = new ProgramMethodPO(environment.getInitConfig(), pm.getFullName(), pm, null, addUninterpretedPredicate, false);
       Proof proof = environment.createProof(input);

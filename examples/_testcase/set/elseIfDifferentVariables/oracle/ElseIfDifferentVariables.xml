@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.main(a,b);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.main(a,b)&gt;" pathCondition="true" pathConditionChanged="false">
       <branchStatement name="if (a)" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="equals(a,TRUE)" pathCondition="equals(a,TRUE)" pathConditionChanged="true" branchCondition="equals(a,TRUE)" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return 1;" pathCondition="equals(a,TRUE)" pathConditionChanged="false">
-               <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="equals(a,TRUE)" pathConditionChanged="false" isReturnValueComputed="false">
+               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main(a,b)&gt;" pathCondition="equals(a,TRUE)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="equals(a,TRUE)">
                   <termination name="&lt;end&gt;" pathCondition="equals(a,TRUE)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                   </termination>
                </methodReturn>
@@ -14,7 +14,7 @@
             <branchStatement name="if (b)" pathCondition="not(equals(a,TRUE))" pathConditionChanged="false">
                <branchCondition name="equals(b,TRUE)" pathCondition="and(not(equals(a,TRUE)),equals(b,TRUE))" pathConditionChanged="true" branchCondition="equals(b,TRUE)" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="return 2;" pathCondition="and(not(equals(a,TRUE)),equals(b,TRUE))" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="and(not(equals(a,TRUE)),equals(b,TRUE))" pathConditionChanged="false" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main(a,b)&gt;" pathCondition="and(not(equals(a,TRUE)),equals(b,TRUE))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(not(equals(a,TRUE)),equals(b,TRUE))">
                         <termination name="&lt;end&gt;" pathCondition="and(not(equals(a,TRUE)),equals(b,TRUE))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
@@ -22,7 +22,7 @@
                </branchCondition>
                <branchCondition name="not(equals(b,TRUE))" pathCondition="and(not(equals(a,TRUE)),not(equals(b,TRUE)))" pathConditionChanged="true" branchCondition="not(equals(b,TRUE))" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="return 3;" pathCondition="and(not(equals(a,TRUE)),not(equals(b,TRUE)))" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="and(not(equals(a,TRUE)),not(equals(b,TRUE)))" pathConditionChanged="false" isReturnValueComputed="false">
+                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main(a,b)&gt;" pathCondition="and(not(equals(a,TRUE)),not(equals(b,TRUE)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(not(equals(a,TRUE)),not(equals(b,TRUE)))">
                         <termination name="&lt;end&gt;" pathCondition="and(not(equals(a,TRUE)),not(equals(b,TRUE)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                         </termination>
                      </methodReturn>
@@ -31,5 +31,11 @@
             </branchStatement>
          </branchCondition>
       </branchStatement>
+      <methodReturnEntry path="/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/1/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/1/0/1/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/1/0/0/0"/>
 </start>

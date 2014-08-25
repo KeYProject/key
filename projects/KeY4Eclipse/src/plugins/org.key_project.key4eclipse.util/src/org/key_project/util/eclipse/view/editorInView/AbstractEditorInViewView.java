@@ -358,7 +358,7 @@ public abstract class AbstractEditorInViewView<E extends IEditorPart, C extends 
       Display.getDefault().syncExec(new Runnable() {
          @Override
          public void run() {
-            if (editorComposite != null) {
+            if (editorComposite != null && !editorComposite.isDisposed()) {
                editorComposite.setEnabled(AbstractEditorInViewView.this.editorEnabled);
             }
             updateEditorsGlobalEnablement(AbstractEditorInViewView.this.editorEnabled && isEditorShown());

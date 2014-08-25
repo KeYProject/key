@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.main(x);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.main(x)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicValue = magic(x);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_0 = self.magic(x) catch(exc_0)
 pre: self.&lt;inv&gt;
@@ -16,12 +16,15 @@ post: result_0 = self.subMagic(x)
             &amp; self.&lt;inv&gt;))))
 &amp; exc_0 = null
 mod: empty
-termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" selfTerm="self" contractParameters="x" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="return magicValue+this.instanceField+classField;" pathCondition="true" pathConditionChanged="false">
-               <methodReturn name="&lt;return of self.main(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
+               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main(x)&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
 	Z(0(2(1(#)))) {gt(x,Z(neglit(1(#))))}, 
 	Z(neglit(7(8(7(4(#)))))) {lt(x,Z(0(#)))}
-as result of self.main(x);&gt;" isReturnValueComputed="true">
+as result of main&gt;" signatureIncludingReturnValue="&lt;return 
+	Z(0(2(1(#)))) {gt(x,Z(neglit(1(#))))}, 
+	Z(neglit(7(8(7(4(#)))))) {lt(x,Z(0(#)))}
+as result of self.main(x)&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                   <methodReturnValue name="Z(0(2(1(#)))) {gt(x,Z(neglit(1(#))))}" returnValueString="Z(0(2(1(#))))" hasCondition="true" conditionString="gt(x,Z(neglit(1(#))))">
                   </methodReturnValue>
                   <methodReturnValue name="Z(neglit(7(8(7(4(#)))))) {lt(x,Z(0(#)))}" returnValueString="Z(neglit(7(8(7(4(#))))))" hasCondition="true" conditionString="lt(x,Z(0(#)))">
@@ -32,5 +35,7 @@ as result of self.main(x);&gt;" isReturnValueComputed="true">
             </statement>
          </operationContract>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0"/>
 </start>

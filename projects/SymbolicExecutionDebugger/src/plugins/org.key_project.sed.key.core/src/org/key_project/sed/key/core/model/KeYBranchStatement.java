@@ -16,13 +16,16 @@ package org.key_project.sed.key.core.model;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.IfStatement;
+import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEDBranchStatement;
-import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDBranchStatement;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.java.CollectionUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
@@ -69,19 +72,28 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this branch condition is contained.
     * @param parent The parent in that this node is contained as child.
-    * @param thread The {@link ISEDThread} in that this node is contained.
+    * @param thread The {@link KeYThread} in that this node is contained.
     * @param executionNode The {@link IExecutionBranchStatement} to represent by this debug node.
     */
    public KeYBranchStatement(KeYDebugTarget target, 
                              IKeYSEDDebugNode<?> parent, 
-                             ISEDThread thread, 
+                             KeYThread thread, 
                              IExecutionBranchStatement executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      target.registerDebugNode(this);
       initializeAnnotations();
    }
-   
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYThread getThread() {
+      return (KeYThread)super.getThread();
+   }
+
    /**
     * {@inheritDoc}
     */
@@ -188,7 +200,31 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     */
    protected SourceLocation computeSourceLocation() throws DebugException {
       SourceLocation location = KeYUtil.convertToSourceLocation(executionNode.getActivePositionInfo());
-      return KeYModelUtil.updateLocationFromAST(this, location);
+      ASTNode statementNode = KeYModelUtil.findASTNode(this, location);
+      if (statementNode != null) {
+         if (statementNode instanceof IfStatement) {
+            IfStatement ifStatement = (IfStatement)statementNode;
+            return new SourceLocation(-1, ifStatement.getStartPosition(), ifStatement.getThenStatement().getStartPosition());
+         }
+         else if (statementNode instanceof SwitchStatement) {
+            SwitchStatement switchStatement = (SwitchStatement)statementNode;
+            @SuppressWarnings("unchecked")
+            Object firstCase = CollectionUtil.getFirst(switchStatement.statements());
+            if (firstCase != null) {
+               Assert.isTrue(firstCase instanceof ASTNode);
+               return new SourceLocation(-1, switchStatement.getStartPosition(), ((ASTNode)firstCase).getStartPosition());
+            }
+            else {
+               return KeYModelUtil.updateLocationFromAST(location, statementNode);
+            }
+         }
+         else {
+            return KeYModelUtil.updateLocationFromAST(location, statementNode);
+         }
+      }
+      else {
+         return location;
+      }
    }
 
    /**
@@ -211,6 +247,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
    public boolean hasVariables() throws DebugException {
       try {
          return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
+                !executionNode.isDisposed() && 
                 SymbolicExecutionUtil.canComputeVariables(executionNode, executionNode.getServices()) &&
                 super.hasVariables();
       }
@@ -237,7 +274,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     */
    @Override
    public boolean canStepInto() {
-      return getDebugTarget().canStepInto(this);
+      return getThread().canStepInto(this);
    }
 
    /**
@@ -245,7 +282,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     */
    @Override
    public void stepInto() throws DebugException {
-      getDebugTarget().stepInto(this);
+      getThread().stepInto(this);
    }
 
    /**
@@ -253,7 +290,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     */
    @Override
    public boolean canStepOver() {
-      return getDebugTarget().canStepOver(this);
+      return getThread().canStepOver(this);
    }
 
    /**
@@ -261,7 +298,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     */
    @Override
    public void stepOver() throws DebugException {
-      getDebugTarget().stepOver(this);
+      getThread().stepOver(this);
    }
 
    /**
@@ -269,7 +306,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     */
    @Override
    public boolean canStepReturn() {
-      return getDebugTarget().canStepReturn(this);
+      return getThread().canStepReturn(this);
    }
 
    /**
@@ -277,7 +314,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     */
    @Override
    public void stepReturn() throws DebugException {
-      getDebugTarget().stepReturn(this);
+      getThread().stepReturn(this);
    }
    
    /**
@@ -285,7 +322,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     */
    @Override
    public boolean canResume() {
-      return getDebugTarget().canResume(this);
+      return getThread().canResume(this);
    }
    
    /**
@@ -293,7 +330,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     */
    @Override
    public void resume() throws DebugException {
-      getDebugTarget().resume(this);
+      getThread().resume(this);
    }
 
    /**
@@ -301,7 +338,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     */
    @Override
    public boolean canSuspend() {
-      return getDebugTarget().canSuspend(this);
+      return getThread().canSuspend(this);
    }
 
    /**
@@ -309,7 +346,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     */
    @Override
    public void suspend() throws DebugException {
-      getDebugTarget().suspend(this);
+      getThread().suspend(this);
    }
 
    /**

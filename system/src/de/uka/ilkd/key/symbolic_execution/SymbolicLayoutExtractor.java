@@ -254,11 +254,15 @@ public class SymbolicLayoutExtractor {
    /**
     * Constructor.
     * @param node The {@link Node} of KeY's proof tree to compute memory layouts for.
+    * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
+    * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
     */
-   public SymbolicLayoutExtractor(Node node, boolean usePrettyPrinting) {
+   public SymbolicLayoutExtractor(Node node, 
+                                  boolean useUnicode,
+                                  boolean usePrettyPrinting) {
       assert node != null;
       this.node = node;
-      this.settings = new ModelSettings(usePrettyPrinting);
+      this.settings = new ModelSettings(useUnicode, usePrettyPrinting);
    }
 
    /**
@@ -299,7 +303,7 @@ public class SymbolicLayoutExtractor {
             ApplyStrategyInfo info = null;
             try {
                // Instantiate proof in which equivalent classes of symbolic objects are computed.
-               ProofStarter equivalentClassesProofStarter = SideProofUtil.createSideProof(getProof(), initialConditionsSequent);
+               ProofStarter equivalentClassesProofStarter = SideProofUtil.createSideProof(getProof(), initialConditionsSequent, true);
                // Apply cut rules to compute equivalent classes
                applyCutRules(equivalentClassesProofStarter, symbolicObjectsResultingInCurrentState);
                // Finish proof automatically
@@ -1120,14 +1124,15 @@ public class SymbolicLayoutExtractor {
             additionalUpdates = additionalUpdates.append(evp.createPreUpdate());
          }
          ImmutableList<Term> newUpdates = ImmutableSLList.<Term>nil().append(getServices().getTermBuilder().parallel(additionalUpdates));
-         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, layoutCondition, layoutTerm, newUpdates);
+         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, layoutCondition, layoutTerm, newUpdates, false);
          // Instantiate and run proof
          ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
                                                                              sequent, 
                                                                              StrategyProperties.METHOD_CONTRACT,
                                                                              StrategyProperties.LOOP_INVARIANT,
                                                                              StrategyProperties.QUERY_ON,
-                                                                             StrategyProperties.SPLITTING_NORMAL);
+                                                                             StrategyProperties.SPLITTING_NORMAL,
+                                                                             true);
          try {
             // Extract values and objects from result predicate and store them in variable value pairs
             Set<ExecutionVariableValuePair> pairs = new LinkedHashSet<ExecutionVariableValuePair>();
@@ -1170,7 +1175,7 @@ public class SymbolicLayoutExtractor {
                                                  Set<Term> objectsToIgnore) throws ProofInputException {
       Set<Term> result = new LinkedHashSet<Term>();
       for (SequentFormula sf : sequent) {
-         if (!SymbolicExecutionUtil.isSkolemEquality(sf)) {
+         if (SymbolicExecutionUtil.checkSkolemEquality(sf) == 0) {
             result.addAll(collectSymbolicObjectsFromTerm(sf.formula(), objectsToIgnore));
          }
       }

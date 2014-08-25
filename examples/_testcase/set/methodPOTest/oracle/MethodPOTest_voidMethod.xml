@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="MethodPOTest.voidMethod(param);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call MethodPOTest.voidMethod(param)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int value = param.x;" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="not(equals(param,null))" pathCondition="not(equals(param,null))" pathConditionChanged="true" branchCondition="not(equals(param,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <methodReturn name="&lt;return of MethodPOTest.voidMethod(param);&gt;" pathCondition="not(equals(param,null))" pathConditionChanged="false" isReturnValueComputed="false">
+            <methodReturn name="&lt;return of voidMethod&gt;" signature="&lt;return of MethodPOTest.voidMethod(param)&gt;" pathCondition="not(equals(param,null))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="not(equals(param,null))">
                <termination name="&lt;end&gt;" pathCondition="not(equals(param,null))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                </termination>
             </methodReturn>
@@ -13,5 +13,8 @@
             </termination>
          </branchCondition>
       </statement>
+      <methodReturnEntry path="/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0"/>
 </start>
