@@ -48,6 +48,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileReader;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileTypeElement;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileWriter;
+import org.key_project.key4eclipse.resources.log.LogManager;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
 import org.key_project.key4eclipse.resources.projectinfo.AbstractContractContainer;
 import org.key_project.key4eclipse.resources.projectinfo.AbstractTypeContainer;
@@ -816,7 +817,8 @@ public class ProofManager {
          for(IResource res : members){
             if(res.getType() == IResource.FILE){
                if(!proofFiles.contains(res) && 
-                  !ProjectInfoManager.getInstance().isProjectInfoFile((IFile)res)){
+                  !ProjectInfoManager.getInstance().isProjectInfoFile((IFile)res) &&
+                  !LogManager.getInstance().isLogFile((IFile)res)) {
                   res.delete(true, null);
                }
             }
