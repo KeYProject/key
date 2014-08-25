@@ -1592,9 +1592,14 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         
     |   mapEmpty:MAPEMPTY { result = translator.translateMapExpressionToJDL(mapEmpty,list,services); }
         
-    |   mapExp:(MAPEXPRESSION | SEQ2MAP) LPAREN ( list=expressionlist )? RPAREN
+    |   mapExp:MAPEXPRESSION LPAREN ( list=expressionlist )? RPAREN
 		{
 		    result = translator.translateMapExpressionToJDL(mapExp,list,services);
+		}
+
+    |   s2m:SEQ2MAP LPAREN ( list=expressionlist )? RPAREN
+		{
+		    result = translator.translateMapExpressionToJDL(s2m,list,services);
 		}
 
     |   NOT_MODIFIED LPAREN t=storeRefUnion RPAREN
