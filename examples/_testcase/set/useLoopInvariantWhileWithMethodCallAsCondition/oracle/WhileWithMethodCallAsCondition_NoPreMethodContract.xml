@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="WhileWithMethodCallAsCondition.size(array);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call WhileWithMethodCallAsCondition.size(array)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
          <callStackEntry path="/0"/>
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
@@ -72,7 +72,7 @@ mod: \if (true)
 termination: diamond" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
     b_3=goOnNice(array,i);
   }
-}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))))),equals(array,null)))" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="false" notNullCheckComplied="false">
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))))),equals(array,null)))" pathConditionChanged="false" resultTerm="result_4" exceptionTerm="exc_6" contractParameters="array, i" preconditionComplied="false" hasNotNullCheck="false" notNullCheckComplied="false">
                         <callStackEntry path="/0"/>
                         <branchCondition name="not(equals(array,null))" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
     b_3=goOnNice(array,i);
@@ -119,11 +119,20 @@ termination: diamond" pathCondition="not(or(not(or(equals(array,null),update-app
   }
 }\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))),equals(array,null))),equals(array,null)))" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (goOnNice)">
                            <callStackEntry path="/0"/>
-                           <termination name="&lt;uncaught java.lang.Throwable&gt;" pathCondition="not(or(not(or(update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
+                           <exceptionalMethodReturn name="&lt;throw java.lang.Throwable&gt;" signature="&lt;exceptional return of &lt;call WhileWithMethodCallAsCondition.size(array)&gt;&gt;" pathCondition="not(or(not(or(update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
+    b_3=goOnNice(array,i);
+  }
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))),equals(array,null))),equals(array,null)))" pathConditionChanged="false" methodReturnCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
+    b_3=goOnNice(array,i);
+  }
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))))),equals(array,null)))">
+                              <callStackEntry path="/0"/>
+                              <termination name="&lt;uncaught java.lang.Throwable&gt;" pathCondition="not(or(not(or(update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
     b_3=goOnNice(array,i);
   }
 }\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))),equals(array,null))),equals(array,null)))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-                           </termination>
+                              </termination>
+                           </exceptionalMethodReturn>
                         </branchCondition>
                      </operationContract>
                   </branchCondition>
@@ -179,7 +188,7 @@ mod: \if (true)
 termination: diamond" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
     b_3=goOnNice(array,i);
   }
-}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="false" notNullCheckComplied="false">
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="false" resultTerm="result_5" exceptionTerm="exc_7" contractParameters="array, i" preconditionComplied="false" hasNotNullCheck="false" notNullCheckComplied="false">
                         <callStackEntry path="/0"/>
                         <branchCondition name="true" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
     b_3=goOnNice(array,i);
@@ -226,11 +235,20 @@ termination: diamond" pathCondition="update-application(parallel-upd(elem-update
   }
 }\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (goOnNice)">
                            <callStackEntry path="/0"/>
-                           <termination name="&lt;uncaught java.lang.Throwable&gt;" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
+                           <exceptionalMethodReturn name="&lt;throw java.lang.Throwable&gt;" signature="&lt;exceptional return of &lt;call WhileWithMethodCallAsCondition.size(array)&gt;&gt;" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
+    b_3=goOnNice(array,i);
+  }
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="false" methodReturnCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
+    b_3=goOnNice(array,i);
+  }
+}\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))">
+                              <callStackEntry path="/0"/>
+                              <termination name="&lt;uncaught java.lang.Throwable&gt;" pathCondition="update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\[{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
     b_3=goOnNice(array,i);
   }
 }\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-                           </termination>
+                              </termination>
+                           </exceptionalMethodReturn>
                         </branchCondition>
                      </operationContract>
                   </branchCondition>
@@ -255,7 +273,7 @@ termination: diamond" pathCondition="update-application(parallel-upd(elem-update
     b_3=goOnNice(array,i);
   }
 }\&gt; (and(not(equals(b_3,TRUE)),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))))),equals(array,null)))" pathConditionChanged="true" branchCondition="not(equals(array,null))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (goOnNice)">
-                        <methodReturn name="&lt;return of size&gt;" signature="&lt;return of WhileWithMethodCallAsCondition.size(array);&gt;" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
+                        <methodReturn name="&lt;return of size&gt;" signature="&lt;return of WhileWithMethodCallAsCondition.size(array)&gt;" pathCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
     b_3=goOnNice(array,i);
   }
 }\&gt; (and(not(equals(b_3,TRUE)),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i)))))))),equals(array,null)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="not(or(not(or(equals(array,null),update-application(parallel-upd(elem-update(i)(i_0),elem-update(result_1)(result_1_0)),\&lt;{method-frame(source=size(int[])@WhileWithMethodCallAsCondition): {
@@ -275,13 +293,15 @@ termination: diamond" pathCondition="update-application(parallel-upd(elem-update
             </loopInvariant>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/1/0"/>
+      <methodReturnEntry path="/0/0/0/0/0/1/0/1/0"/>
       <methodReturnEntry path="/0/0/0/0/1/0/0/0"/>
    </methodCall>
    <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
    <terminationEntry path="/0/0/0/0/0/0/0/0/1/0"/>
-   <terminationEntry path="/0/0/0/0/0/0/0/1/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/0/1/0/0"/>
    <terminationEntry path="/0/0/0/0/0/1/0/0/0/0/0/0"/>
    <terminationEntry path="/0/0/0/0/0/1/0/0/1/0"/>
-   <terminationEntry path="/0/0/0/0/0/1/0/1/0"/>
+   <terminationEntry path="/0/0/0/0/0/1/0/1/0/0"/>
    <terminationEntry path="/0/0/0/0/1/0/0/0/0"/>
 </start>

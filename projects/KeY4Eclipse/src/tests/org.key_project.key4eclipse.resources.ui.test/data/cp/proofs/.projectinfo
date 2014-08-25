@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<project name="ColorPriorityTest">
+   <package name="cl" path="/ColorPriorityTest/src/cl">
+      <type name="CP" path="/ColorPriorityTest/src/cl/CP.java">
+         <method displayName="correct()" name="correct" parameterTypes="">
+            <contract name="cl.CP[cl.CP::correct()].JML normal_behavior operation contract.0" modality="DIAMOND" proofFilePath="/ColorPriorityTest/proofs/cl/CP.java/cl_CP[cl_CP__correct()]_JML_normal_behavior_operation_contract_0.proof" metaFilePath="/ColorPriorityTest/proofs/cl/CP.java/cl_CP[cl_CP__correct()]_JML_normal_behavior_operation_contract_0.proofmeta"/>
+         </method>
+      </type>
+   </package>
+   <package name="cy" path="/ColorPriorityTest/src/cy">
+      <type name="MR" path="/ColorPriorityTest/src/cy/MR.java">
+         <method displayName="unspecified()" name="unspecified" parameterTypes="">
+         </method>
+         <method displayName="correct()" name="correct" parameterTypes="">
+            <contract name="cy.MR[cy.MR::correct()].JML normal_behavior operation contract.0" modality="DIAMOND" proofFilePath="/ColorPriorityTest/proofs/cy/MR.java/cy_MR[cy_MR__correct()]_JML_normal_behavior_operation_contract_0.proof" metaFilePath="/ColorPriorityTest/proofs/cy/MR.java/cy_MR[cy_MR__correct()]_JML_normal_behavior_operation_contract_0.proofmeta"/>
+         </method>
+         <method displayName="correctUnprovenDependency()" name="correctUnprovenDependency" parameterTypes="">
+            <contract name="cy.MR[cy.MR::correctUnprovenDependency()].JML normal_behavior operation contract.0" modality="DIAMOND" proofFilePath="/ColorPriorityTest/proofs/cy/MR.java/cy_MR[cy_MR__correctUnprovenDependency()]_JML_normal_behavior_operation_contract_0.proof" metaFilePath="/ColorPriorityTest/proofs/cy/MR.java/cy_MR[cy_MR__correctUnprovenDependency()]_JML_normal_behavior_operation_contract_0.proofmeta"/>
+         </method>
+         <method displayName="wrong()" name="wrong" parameterTypes="">
+            <contract name="cy.MR[cy.MR::wrong()].JML normal_behavior operation contract.0" modality="DIAMOND" proofFilePath="/ColorPriorityTest/proofs/cy/MR.java/cy_MR[cy_MR__wrong()]_JML_normal_behavior_operation_contract_0.proof" metaFilePath="/ColorPriorityTest/proofs/cy/MR.java/cy_MR[cy_MR__wrong()]_JML_normal_behavior_operation_contract_0.proofmeta"/>
+         </method>
+         <method displayName="a()" name="a" parameterTypes="">
+            <contract name="cy.MR[cy.MR::a()].JML normal_behavior operation contract.0" modality="DIAMOND" proofFilePath="/ColorPriorityTest/proofs/cy/MR.java/cy_MR[cy_MR__a()]_JML_normal_behavior_operation_contract_0.proof" metaFilePath="/ColorPriorityTest/proofs/cy/MR.java/cy_MR[cy_MR__a()]_JML_normal_behavior_operation_contract_0.proofmeta"/>
+         </method>
+         <method displayName="b()" name="b" parameterTypes="">
+            <contract name="cy.MR[cy.MR::b()].JML normal_behavior operation contract.0" modality="DIAMOND" proofFilePath="/ColorPriorityTest/proofs/cy/MR.java/cy_MR[cy_MR__b()]_JML_normal_behavior_operation_contract_0.proof" metaFilePath="/ColorPriorityTest/proofs/cy/MR.java/cy_MR[cy_MR__b()]_JML_normal_behavior_operation_contract_0.proofmeta"/>
+         </method>
+      </type>
+   </package>
+   <package name="op" path="/ColorPriorityTest/src/op">
+      <type name="OP" path="/ColorPriorityTest/src/op/OP.java">
+         <method displayName="correct()" name="correct" parameterTypes="">
+            <contract name="op.OP[op.OP::correct()].JML normal_behavior operation contract.0" modality="DIAMOND" proofFilePath="/ColorPriorityTest/proofs/op/OP.java/op_OP[op_OP__correct()]_JML_normal_behavior_operation_contract_0.proof" metaFilePath="/ColorPriorityTest/proofs/op/OP.java/op_OP[op_OP__correct()]_JML_normal_behavior_operation_contract_0.proofmeta"/>
+         </method>
+         <method displayName="correctUnprovenDependency()" name="correctUnprovenDependency" parameterTypes="">
+            <contract name="op.OP[op.OP::correctUnprovenDependency()].JML normal_behavior operation contract.0" modality="DIAMOND" proofFilePath="/ColorPriorityTest/proofs/op/OP.java/op_OP[op_OP__correctUnprovenDependency()]_JML_normal_behavior_operation_contract_0.proof" metaFilePath="/ColorPriorityTest/proofs/op/OP.java/op_OP[op_OP__correctUnprovenDependency()]_JML_normal_behavior_operation_contract_0.proofmeta"/>
+         </method>
+         <method displayName="wrong()" name="wrong" parameterTypes="">
+            <contract name="op.OP[op.OP::wrong()].JML normal_behavior operation contract.0" modality="DIAMOND" proofFilePath="/ColorPriorityTest/proofs/op/OP.java/op_OP[op_OP__wrong()]_JML_normal_behavior_operation_contract_0.proof" metaFilePath="/ColorPriorityTest/proofs/op/OP.java/op_OP[op_OP__wrong()]_JML_normal_behavior_operation_contract_0.proofmeta"/>
+         </method>
+      </type>
+   </package>
+   <package name="ud" path="/ColorPriorityTest/src/ud">
+      <type name="UD" path="/ColorPriorityTest/src/ud/UD.java">
+         <method displayName="correct()" name="correct" parameterTypes="">
+            <contract name="ud.UD[ud.UD::correct()].JML normal_behavior operation contract.0" modality="DIAMOND" proofFilePath="/ColorPriorityTest/proofs/ud/UD.java/ud_UD[ud_UD__correct()]_JML_normal_behavior_operation_contract_0.proof" metaFilePath="/ColorPriorityTest/proofs/ud/UD.java/ud_UD[ud_UD__correct()]_JML_normal_behavior_operation_contract_0.proofmeta"/>
+         </method>
+         <method displayName="correctUnprovenDependency()" name="correctUnprovenDependency" parameterTypes="">
+            <contract name="ud.UD[ud.UD::correctUnprovenDependency()].JML normal_behavior operation contract.0" modality="DIAMOND" proofFilePath="/ColorPriorityTest/proofs/ud/UD.java/ud_UD[ud_UD__correctUnprovenDependency()]_JML_normal_behavior_operation_contract_0.proof" metaFilePath="/ColorPriorityTest/proofs/ud/UD.java/ud_UD[ud_UD__correctUnprovenDependency()]_JML_normal_behavior_operation_contract_0.proofmeta"/>
+         </method>
+      </type>
+   </package>
+   <package name="us" path="/ColorPriorityTest/src/us">
+      <type name="US" path="/ColorPriorityTest/src/us/US.java">
+         <method displayName="unspecified()" name="unspecified" parameterTypes="">
+         </method>
+         <method displayName="correct()" name="correct" parameterTypes="">
+            <contract name="us.US[us.US::correct()].JML normal_behavior operation contract.0" modality="DIAMOND" proofFilePath="/ColorPriorityTest/proofs/us/US.java/us_US[us_US__correct()]_JML_normal_behavior_operation_contract_0.proof" metaFilePath="/ColorPriorityTest/proofs/us/US.java/us_US[us_US__correct()]_JML_normal_behavior_operation_contract_0.proofmeta"/>
+         </method>
+         <method displayName="correctUnprovenDependency()" name="correctUnprovenDependency" parameterTypes="">
+            <contract name="us.US[us.US::correctUnprovenDependency()].JML normal_behavior operation contract.0" modality="DIAMOND" proofFilePath="/ColorPriorityTest/proofs/us/US.java/us_US[us_US__correctUnprovenDependency()]_JML_normal_behavior_operation_contract_0.proof" metaFilePath="/ColorPriorityTest/proofs/us/US.java/us_US[us_US__correctUnprovenDependency()]_JML_normal_behavior_operation_contract_0.proofmeta"/>
+         </method>
+      </type>
+   </package>
+</project>

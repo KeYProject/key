@@ -65,6 +65,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.Terminatio
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchStatement;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionExceptionalMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopStatement;
@@ -781,7 +782,9 @@ public class SymbolicExecutionTreeBuilder {
       AbstractExecutionNode result = null;
       if (SymbolicExecutionUtil.hasSymbolicExecutionLabel(node.getAppliedRuleApp())) {
          if (statement != null && !SymbolicExecutionUtil.isRuleAppToIgnore(node.getAppliedRuleApp())) {
-            if (SymbolicExecutionUtil.isMethodReturnNode(node, node.getAppliedRuleApp())) {
+            boolean methodReturn = SymbolicExecutionUtil.isMethodReturnNode(node, node.getAppliedRuleApp());
+            boolean exceptionalMethodReturn = !methodReturn && SymbolicExecutionUtil.isExceptionalMethodReturnNode(node, node.getAppliedRuleApp());
+            if (methodReturn || exceptionalMethodReturn) {
                // Find the Node in the proof tree of KeY for that this Node is the return
                Node callNode = findMethodCallNode(node, node.getAppliedRuleApp());
                if (callNode != null) {
@@ -791,7 +794,12 @@ public class SymbolicExecutionTreeBuilder {
                      // Find the call Node representation in SED, if not available ignore it.
                      IExecutionNode callSEDNode = keyNodeMapping.get(callNode);
                      if (callSEDNode instanceof ExecutionMethodCall) { // Could be the start node if the initial sequent already contains some method frames.
-                        result = new ExecutionMethodReturn(settings, mediator, node, (ExecutionMethodCall)callSEDNode);
+                        if (methodReturn) {
+                           result = new ExecutionMethodReturn(settings, mediator, node, (ExecutionMethodCall)callSEDNode);
+                        }
+                        else {
+                           result = new ExecutionExceptionalMethodReturn(settings, mediator, node, (ExecutionMethodCall)callSEDNode);
+                        }
                      }
                   }
                }

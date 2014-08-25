@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.symbolic_execution.model;
 
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
@@ -32,20 +31,7 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
  * @see SymbolicExecutionTreeBuilder
  * @see ExecutionMethodReturn
  */
-public interface IExecutionMethodReturn extends IExecutionStateNode<SourceElement> {
-   /**
-    * A reference to the {@link IExecutionMethodCall} which is now returned.
-    * @return The call of the now returned method.
-    */
-   public IExecutionMethodCall getMethodCall();
-   
-   /**
-    * Returns a human readable signature which describes this element.
-    * @return The human readable signature which describes this element.
-    * @throws ProofInputException Occurred Exception.
-    */
-   public String getSignature() throws ProofInputException;
-   
+public interface IExecutionMethodReturn extends IExecutionBaseMethodReturn<SourceElement> {   
    /**
     * Returns the human readable node name including the return value ({@link #getReturnValues()}).
     * @return The human readable node name including the return value.
@@ -72,18 +58,4 @@ public interface IExecutionMethodReturn extends IExecutionStateNode<SourceElemen
     * @throws ProofInputException Occurred Exception.
     */
    public IExecutionMethodReturnValue[] getReturnValues() throws ProofInputException;
-   
-   /**
-    * Returns the condition under which this method return is reached from
-    * the calling {@link IExecutionMethodCall}.
-    * @return The method return condition to reach this node from its {@link IExecutionMethodCall} as {@link Term}.
-    */
-   public Term getMethodReturnCondition() throws ProofInputException;
-   
-   /**
-    * Returns the human readable condition under which this method return is reached from
-    * the calling {@link IExecutionMethodCall}.
-    * @return The human readable method return condition to reach this node from its {@link IExecutionMethodCall}.
-    */
-   public String getFormatedMethodReturnCondition() throws ProofInputException;
 }
