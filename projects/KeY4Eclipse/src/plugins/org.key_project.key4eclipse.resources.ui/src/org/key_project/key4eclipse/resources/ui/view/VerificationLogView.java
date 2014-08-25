@@ -2,6 +2,7 @@ package org.key_project.key4eclipse.resources.ui.view;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,6 @@ import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.ui.part.ViewPart;
 import org.key_project.key4eclipse.resources.log.LogManager;
 import org.key_project.key4eclipse.resources.log.LogRecord;
 import org.key_project.key4eclipse.resources.ui.provider.LogRecordLableProvider;
@@ -38,7 +38,7 @@ import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
  * This view shows the {@link LogRecord}s of KeY projects.
  * @author Martin Hentschel
  */
-public class VerificationLogView extends ViewPart {
+public class VerificationLogView extends AbstractLinkableViewPart {
    /**
     * The ID of this view.
     */
@@ -145,9 +145,10 @@ public class VerificationLogView extends ViewPart {
          }
          index++;
       }
-      if (!projects.isEmpty() &&
-          tabFolder.getSelection() == null) {
-         tabFolder.setSelection(0);
+      if (!updateSelectedTab()) { // Try to select tab based on linking
+         if (!projects.isEmpty() && tabFolder.getSelection() == null) { // Try to select first tab
+            tabFolder.setSelection(0);
+         }
       }
    }
 
@@ -242,5 +243,37 @@ public class VerificationLogView extends ViewPart {
          }
       }
       super.dispose();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void refreshContentCausedByLinking() {
+      updateSelectedTab();
+   }
+   
+   /**
+    * Updates the selected tab if linking is enabled.
+    * @return {@code true} if selection is defined, {@code false} if no selection was set.
+    */
+   protected boolean updateSelectedTab() {
+      if (isLinkWithBasePart()) {
+         CTabItem itemToSelect = null;
+         Iterator<IResource> iter = computeLinkedResources().iterator();
+         while (itemToSelect == null && iter.hasNext()) {
+            itemToSelect = tabItems.get(iter.next().getProject());
+         }
+         if (itemToSelect != null) {
+            tabFolder.setSelection(itemToSelect);
+            return true;
+         }
+         else {
+            return false;
+         }
+      }
+      else {
+         return false;
+      }
    }
 }

@@ -243,6 +243,16 @@
                   tooltip="Link with Editor/View">
             </command>
          </menuContribution>
+         <menuContribution
+               locationURI="toolbar:org.key_project.key4eclipse.resources.ui.view.VerificationLogView?after=additions">
+            <command
+                  commandId="org.key_project.key4eclipse.resources.ui.LinkWithWorkbenchPartCommand"
+                  icon="icons/synced.gif"
+                  id="org.key_project.key4eclipse.resources.ui.LinkWithWorkbenchPart"
+                  style="toggle"
+                  tooltip="Link with Editor/View">
+            </command>
+         </menuContribution>
       </extension>
       <extension
             point="org.eclipse.ui.perspectiveExtensions">
