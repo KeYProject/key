@@ -22,6 +22,7 @@ import org.key_project.key4eclipse.resources.io.ProofMetaFileTypeElement;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
+import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -78,11 +79,6 @@ public class BuildProofSelector {
                   if(MD5changed(pe.getProofFile(), pmfr) || typeOrSubTypeChanged(pe, pmfr, javaTypes) || superTypeChanged(pe, javaTypes)){
                      build = true;
                   }
-                  else{
-                     pe.setProofClosed(pmfr.getProofClosed());
-                     pe.setMarkerMsg(pmfr.getMarkerMessage());
-                     pe.setUsedContracts(KeYResourcesUtil.getProofElementsByProofFiles(pmfr.getUsedContracts(), proofElements));
-                  }
                }
                else{
                   build = true;
@@ -90,12 +86,27 @@ public class BuildProofSelector {
             }
          }
          catch(Exception e){
+            LogUtil.getLogger().logError(e);
             build = true;
          }
          
          if(build){
             markerManager.setOutdated(pe);
          }            
+      }
+      for(ProofElement pe : proofElements){
+         if(pe.getProofFile() != null && pe.getProofFile().exists() 
+               && pe.getMetaFile() != null && pe.getMetaFile().exists()){
+            try{
+               ProofMetaFileReader pmfr = new ProofMetaFileReader(pe.getMetaFile());
+               pe.setProofClosed(pmfr.getProofClosed());
+               pe.setMarkerMsg(pmfr.getMarkerMessage());
+               pe.setUsedContracts(KeYResourcesUtil.getProofElementsByProofFiles(pmfr.getUsedContracts(), proofElements));
+            }
+            catch (Exception e){
+               LogUtil.getLogger().logError(e);
+            }
+         }
       }
    }
    

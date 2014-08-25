@@ -218,16 +218,16 @@ public class KeYResourcesUtil {
          int indexRN = sb.indexOf("\r\n", index);
          int indexR = sb.indexOf("\r", index);
          int indexN = sb.indexOf("\n", index);
-         if(indexRN <= indexR && indexRN < indexN){
+         if(indexRN > -1 && (indexRN <= indexR || indexR == -1) && (indexRN < indexN || indexN == -1)){
             index = indexRN + 2;
          }
-         else if(indexR < indexRN && indexR < indexN){
+         else if(indexR > -1 && (indexR < indexRN || indexRN == -1) && (indexR < indexN || indexN == -1)){
             index = indexR + 1;
          }
-         else if(indexN < indexRN & indexN < indexR){
+         else if(indexN > -1 && (indexN < indexRN || indexRN == -1) && (indexN < indexR || indexR == -1)){
             index = indexN + 1;
          }
-         else return -1;
+         else return 1;
          
          lineCount++;
       }

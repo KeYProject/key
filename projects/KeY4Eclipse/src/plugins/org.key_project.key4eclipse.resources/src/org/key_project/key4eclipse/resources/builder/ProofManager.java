@@ -400,7 +400,9 @@ public class ProofManager {
    private void restoreOldMarkerForRemovedCycles() throws CoreException{
       for(ProofElement pe : proofElements){
          if(pe.getProofMarker() == null && (pe.getRecursionMarker() == null || pe.getRecursionMarker().isEmpty())){
-            markerManager.setMarker(pe);
+            if(pe.getProofFile() != null && pe.getProofFile().exists()){
+               markerManager.setMarker(pe);
+            }
          }
       }
    }
