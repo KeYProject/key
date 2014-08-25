@@ -579,7 +579,7 @@ public class LogicPrinter {
         layouter.brk(1, -2).print(")").end();
     }
 
-    protected void printGoalTemplates(Taclet taclet) throws IOException{
+    protected void printGoalTemplates(Taclet taclet) throws IOException {
         //layouter.beginC(0);
         if (taclet.closeGoal()) {
             layouter.brk().print("\\closegoal").brk();
@@ -1281,7 +1281,6 @@ public class LogicPrinter {
                 markStartSub(0);
                 markEndSub();
             }
-
         } else {
             printFunctionTerm(t.op().name().toString(), t);
         }
@@ -1360,11 +1359,11 @@ public class LogicPrinter {
         markEndSub();
     }
 
-	private boolean isFieldConstant(final Term fieldTerm) {
-		return fieldTerm.op() instanceof Function
-		&& ((Function)fieldTerm.op()).isUnique()
-		&& ((Function)fieldTerm.op()).name().toString().contains("::$");
-	}
+    private static boolean isFieldConstant(final Term fieldTerm) {
+        return fieldTerm.op() instanceof Function
+                && ((Function) fieldTerm.op()).isUnique()
+                && ((Function) fieldTerm.op()).name().toString().contains("::$");
+    }
 
     public void printPostfix(Term t, String postfix) throws IOException {
 	if(NotationInfo.PRETTY_SYNTAX) {
@@ -2222,7 +2221,6 @@ public class LogicPrinter {
             mark(MarkType.MARK_START_TERM, size);
         }
     }
-
 
     /**
      * returns true if an attribute term shall be printed in short form.

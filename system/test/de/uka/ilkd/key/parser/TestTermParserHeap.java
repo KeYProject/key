@@ -47,25 +47,25 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     public void testParsePrettyPrintedSelect() {
-        Term t1, t2;
+        String s1, s2;
 
-        t1 = parseTerm("a.f");
-        t2 = parseTerm("int::select(heap, a, testTermParserHeap.A::$f)");
-        assertEquals(t1, t2);
+        s1="a.f";
+        s2="int::select(heap, a, testTermParserHeap.A::$f)";
+        parsePrintAndCheckEquality(s1, s2);
 
-        t1 = parseTerm("a1.f");
-        t2 = parseTerm("int::select(heap, a1, testTermParserHeap.A1::$f)");
-        assertEquals(t1, t2);
+        s1 = "a1.f";
+        s2 = "int::select(heap, a1, testTermParserHeap.A1::$f)";
+        parsePrintAndCheckEquality(s1, s2);
 
-        t1 = parseTerm("a1.(testTermParserHeap.A::f)");
-        t2 = parseTerm("int::select(heap, a1, testTermParserHeap.A::$f)");
-        assertEquals(t1, t2);
+        s1 = "a1.(testTermParserHeap.A::f)";
+        s2 = "int::select(heap, a1, testTermParserHeap.A::$f)";
+        parsePrintAndCheckEquality(s1, s2);
     }
 
     public void testBracketHeapUpdate() {
-        Term t1 = parseTerm("heap[a.f := 4][create(a)][memset(empty, 1)][anon(allLocs, heap)]");
-        Term t2 = parseTerm("anon(memset(create(store(heap, a, testTermParserHeap.A::$f, 4), a), empty, 1), allLocs, heap)");
-        assertEquals(t1, t2);
+        String s1 = "heap[a.f := 4][create(a)][memset(empty, 1)][anon(allLocs, heap)]";
+        String s2 = "anon(memset(create(store(heap, a, testTermParserHeap.A::$f, 4), a), empty, 1), allLocs, heap)";
+        parsePrintAndCheckEquality(s1, s2);
     }
 
     public void testFieldAtHeapSyntax() {
@@ -137,6 +137,18 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         } catch (Exception e) {
             assertTrue(e.getMessage().contains("Expecting select term before '@', not: "));
         }
+    }
+    /*
+    * The following procedure is applied here:
+    * 1) Take two plaintext inputs
+    * 2) Parse plaintexts and compare for equality
+    * 3) Pretty-print the first parse result
+    * 4) Parse again and check if result did not change (test for equality)
+    */
+    public void parsePrintAndCheckEquality(String s1, String s2){
+        Term t1 = parseTerm(s1);
+        Term t2 = parseTerm(s2);
+        assertEquals(t1, t2);
     }
 
 }
