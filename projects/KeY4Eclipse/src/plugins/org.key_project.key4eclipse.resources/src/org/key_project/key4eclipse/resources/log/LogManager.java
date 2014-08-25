@@ -183,6 +183,9 @@ public class LogManager {
     */
    public synchronized LogRecord readRecord(File file, long index) throws IOException {
       checkFile(file);
+      if (index < 0 || index > countRecords(file)) {
+         throw new IOException("Invalid index '" + index + "'.");
+      }
       RandomAccessFile access = new RandomAccessFile(file, "r");
       try {
          access.seek(index * RECORD_LENGTH);

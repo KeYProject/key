@@ -114,7 +114,7 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
    /**
     * The unique ID of this view.
     */
-   public static final String ID = "org.key_project.key4eclipse.resources.ui.view.VerificationStatusView";
+   public static final String VIEW_ID = "org.key_project.key4eclipse.resources.ui.view.VerificationStatusView";
    
    /**
     * The protocol used to link {@link ResourcesPlugin}s in the Eclipse workspace.

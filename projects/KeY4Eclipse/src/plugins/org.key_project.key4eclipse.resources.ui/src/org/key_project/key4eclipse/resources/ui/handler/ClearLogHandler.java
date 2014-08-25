@@ -34,7 +34,7 @@ public class ClearLogHandler extends AbstractHandler {
                if (proofFolder.exists()) {
                   IFile logFile = proofFolder.getFile(LogManager.LOG_FILE_NAME);
                   if (logFile.exists()) {
-                     if (MessageDialog.openConfirm(HandlerUtil.getActiveShell(event), "Confirm clear log.", "Are you sure you want to clear the log of project \'" + project.getName() + "\'.")) {
+                     if (MessageDialog.openConfirm(HandlerUtil.getActiveShell(event), "Confirm clear log", "Are you sure you want to clear the log of project \'" + project.getName() + "\'.")) {
                         logFile.delete(true, null);
                      }
                   }

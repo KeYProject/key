@@ -84,7 +84,7 @@
       </command>
       <command
             categoryId="org.key_project.key4eclipse.common.ui.category"
-            description="Deletes all entries in the log."
+            description="Deletes the log file with all its entries."
             id="org.key_project.key4eclipse.resources.ui.clearLog"
             name="Clear Log">
       </command>

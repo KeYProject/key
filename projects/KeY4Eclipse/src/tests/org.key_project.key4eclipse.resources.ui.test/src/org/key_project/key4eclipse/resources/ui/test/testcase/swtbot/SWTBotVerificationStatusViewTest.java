@@ -81,8 +81,8 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
       try {
          TestUtilsUtil.closeWelcomeView(bot);
          // Open view and ensure that no content is shown.
-         TestUtilsUtil.openView(VerificationStatusView.ID);
-         view = bot.viewById(VerificationStatusView.ID);
+         TestUtilsUtil.openView(VerificationStatusView.VIEW_ID);
+         view = bot.viewById(VerificationStatusView.VIEW_ID);
          SWTBotTree tree = view.bot().tree();
          assertProjectShown(tree);
          SWTBotCustomProgressBar proofBar = SWTBotCustomProgressBar.customProgressBar(bot, 0);
@@ -147,8 +147,8 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
       try {
          TestUtilsUtil.closeWelcomeView(bot);
          // Open view and ensure that no content is shown.
-         TestUtilsUtil.openView(VerificationStatusView.ID);
-         view = bot.viewById(VerificationStatusView.ID);
+         TestUtilsUtil.openView(VerificationStatusView.VIEW_ID);
+         view = bot.viewById(VerificationStatusView.VIEW_ID);
          SWTBotTree tree = view.bot().tree();
          assertProjectShown(tree);
          SWTBotCustomProgressBar proofBar = SWTBotCustomProgressBar.customProgressBar(bot, 0);
@@ -266,8 +266,8 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
       try {
          TestUtilsUtil.closeWelcomeView(bot);
          // Open view and ensure that no content is shown.
-         TestUtilsUtil.openView(VerificationStatusView.ID);
-         view = bot.viewById(VerificationStatusView.ID);
+         TestUtilsUtil.openView(VerificationStatusView.VIEW_ID);
+         view = bot.viewById(VerificationStatusView.VIEW_ID);
          SWTBotTree tree = view.bot().tree();
          assertProjectShown(tree);
          SWTBotCustomProgressBar proofBar = SWTBotCustomProgressBar.customProgressBar(bot, 0);
@@ -353,8 +353,8 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
       try {
          TestUtilsUtil.closeWelcomeView(bot);
          // Open view and ensure that no content is shown.
-         TestUtilsUtil.openView(VerificationStatusView.ID);
-         view = bot.viewById(VerificationStatusView.ID);
+         TestUtilsUtil.openView(VerificationStatusView.VIEW_ID);
+         view = bot.viewById(VerificationStatusView.VIEW_ID);
          SWTBotTree tree = view.bot().tree();
          assertProjectShown(tree);
          SWTBotCustomProgressBar proofBar = SWTBotCustomProgressBar.customProgressBar(bot, 0);
@@ -493,8 +493,8 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
       try {
          TestUtilsUtil.closeWelcomeView(bot);
          // Open view and ensure that no content is shown.
-         TestUtilsUtil.openView(VerificationStatusView.ID);
-         view = bot.viewById(VerificationStatusView.ID);
+         TestUtilsUtil.openView(VerificationStatusView.VIEW_ID);
+         view = bot.viewById(VerificationStatusView.VIEW_ID);
          SWTBotTree tree = view.bot().tree();
          assertProjectShown(tree);
          // Test empty project (step 0)
@@ -549,8 +549,8 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
       try {
          TestUtilsUtil.closeWelcomeView(bot);
          // Open view and ensure that no content is shown.
-         TestUtilsUtil.openView(VerificationStatusView.ID);
-         view = bot.viewById(VerificationStatusView.ID);
+         TestUtilsUtil.openView(VerificationStatusView.VIEW_ID);
+         view = bot.viewById(VerificationStatusView.VIEW_ID);
          SWTBotTree tree = view.bot().tree();
          assertProjectShown(tree);
          // Test empty project (step 0)
@@ -598,8 +598,8 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
       try {
          TestUtilsUtil.closeWelcomeView(bot);
          // Open view and ensure that no content is shown.
-         TestUtilsUtil.openView(VerificationStatusView.ID);
-         view = bot.viewById(VerificationStatusView.ID);
+         TestUtilsUtil.openView(VerificationStatusView.VIEW_ID);
+         view = bot.viewById(VerificationStatusView.VIEW_ID);
          SWTBotTree tree = view.bot().tree();
          assertProjectShown(tree);
          // Test empty project (step 0)
@@ -647,8 +647,8 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
       try {
          TestUtilsUtil.closeWelcomeView(bot);
          // Open view and ensure that no content is shown.
-         TestUtilsUtil.openView(VerificationStatusView.ID);
-         view = bot.viewById(VerificationStatusView.ID);
+         TestUtilsUtil.openView(VerificationStatusView.VIEW_ID);
+         view = bot.viewById(VerificationStatusView.VIEW_ID);
          SWTBotTree tree = view.bot().tree();
          assertProjectShown(tree);
          // Test empty project (step 0)
@@ -699,8 +699,8 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
       try {
          TestUtilsUtil.closeWelcomeView(bot);
          // Open view and ensure that no content is shown.
-         TestUtilsUtil.openView(VerificationStatusView.ID);
-         view = bot.viewById(VerificationStatusView.ID);
+         TestUtilsUtil.openView(VerificationStatusView.VIEW_ID);
+         view = bot.viewById(VerificationStatusView.VIEW_ID);
          SWTBotTree tree = view.bot().tree();
          assertProjectShown(tree);
          // Create general project not to be shown
