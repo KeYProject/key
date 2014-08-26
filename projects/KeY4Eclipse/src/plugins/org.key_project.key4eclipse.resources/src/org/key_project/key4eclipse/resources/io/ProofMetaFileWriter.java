@@ -92,7 +92,7 @@ public class ProofMetaFileWriter {
          resAttr.setReadOnly(false);
          metaIFile.setResourceAttributes(resAttr);
          metaIFile.setContents(new ByteArrayInputStream(out.toByteArray()), true, true, null);
-      }      
+      }
       metaIFile.setHidden(KeYProjectProperties.isHideMetaFiles(metaIFile.getProject()));
       ResourceAttributes resAttr = metaIFile.getResourceAttributes();
       resAttr.setReadOnly(true);

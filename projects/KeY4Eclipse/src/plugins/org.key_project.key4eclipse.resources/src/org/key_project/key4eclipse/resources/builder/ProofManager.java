@@ -901,7 +901,7 @@ public class ProofManager {
          return file;
       }
       else return null;
-   }   
+   }
    
    /**
     * Collects all {@link IType}s of the project.

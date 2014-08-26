@@ -37,6 +37,7 @@ import org.key_project.key4eclipse.resources.ui.test.Activator;
 import org.key_project.key4eclipse.resources.ui.view.VerificationStatusView;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
@@ -426,6 +427,17 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
     * @throws Exception Occurred Exception
     */
    protected void assertReport(SWTBotView view, String expectedOraclePathInBundle) throws Exception {
+      assertReport(view, expectedOraclePathInBundle, "D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace");
+   }
+
+   /**
+    * Ensures that the correct HTML report is shown.
+    * @param view The {@link SWTBotView} to test.
+    * @param expectedOraclePathInBundle The expected oracle path in bundle.
+    * @param oracleWorkspacePath The path to the workspace used in oracle files.
+    * @throws Exception Occurred Exception
+    */
+   protected void assertReport(SWTBotView view, String expectedOraclePathInBundle, String oracleWorkspacePath) throws Exception {
       // Get HTML report
       view.bot().cTabItem(1).activate();
       String htmlReport = ObjectUtil.toString(TestUtilsUtil.getData(view.bot().browser()));
@@ -442,6 +454,9 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
       }
       else {
          String expectedReport = IOUtil.readFrom(BundleUtil.openInputStream(Activator.PLUGIN_ID, expectedOraclePathInBundle));
+         String workspacePath = ResourceUtil.getWorkspaceLocation().getAbsolutePath();
+         workspacePath = workspacePath.replace(File.separatorChar, '/');
+         expectedReport = expectedReport.replaceAll("D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace", workspacePath);
          if (!StringUtil.equalIgnoreWhiteSpace(expectedReport, htmlReport)) {
             assertEquals(expectedReport, htmlReport);
          }
