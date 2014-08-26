@@ -13,9 +13,9 @@
 
 package org.key_project.key4eclipse.resources.io;
 
-import java.io.File;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,7 +29,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
@@ -39,6 +38,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.gui.ClassTree;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -83,19 +83,18 @@ public class ProofMetaFileWriter {
          TransformerFactory transFactory = TransformerFactory.newInstance();
          Transformer transformer = transFactory.newTransformer();
          DOMSource source = new DOMSource(doc);
-         if(!metaIFile.exists()){
-            metaIFile.create(null, true, null);
+         ByteArrayOutputStream out = new ByteArrayOutputStream();
+         StreamResult result = new StreamResult(out);
+         transformer.transform(source, result);
+         if (!metaIFile.exists()) {
+            metaIFile.create(new ByteArrayInputStream(out.toByteArray()), true, null);
          }
-         else{
-            metaIFile.refreshLocal(IResource.DEPTH_ZERO, null);
+         else {
             ResourceAttributes resAttr = metaIFile.getResourceAttributes();
             resAttr.setReadOnly(false);
             metaIFile.setResourceAttributes(resAttr);
+            metaIFile.setContents(new ByteArrayInputStream(out.toByteArray()), true, true, null);
          }
-         File metaFile = metaIFile.getLocation().toFile();
-         StreamResult result = new StreamResult(metaFile);
-         transformer.transform(source, result);
-         metaIFile.refreshLocal(IResource.DEPTH_ZERO, null);
          ResourceAttributes resAttr = metaIFile.getResourceAttributes();
          resAttr.setReadOnly(true);
          metaIFile.setResourceAttributes(resAttr);
@@ -137,28 +136,37 @@ public class ProofMetaFileWriter {
       markerMessage.setAttribute("message", pe.getMarkerMsg());
       rootElement.appendChild(markerMessage);
       
-      Element usedTypes = createUsedTypes();
+      Element usedTypes = doc.createElement("usedTypes");
+      Element assumptions = doc.createElement("assumptions");
+      analyseDependencies(usedTypes, assumptions);
       rootElement.appendChild(usedTypes);
       
       Element usedContracts = createUsedContracts();
       rootElement.appendChild(usedContracts);
+
+      rootElement.appendChild(assumptions);
    }
    
-   private Element createUsedTypes() throws ProofReferenceException{
-      Element usedTypes = doc.createElement("usedTypes");
-      HashSet<IProofReference<?>> proofReferences = pe.getProofReferences();
+   private void analyseDependencies(Element usedTypes, Element assumptions) throws ProofReferenceException{
+      LinkedHashSet<IProofReference<?>> proofReferences = pe.getProofReferences();
       for(IProofReference<?> proofRef : proofReferences){
          KeYJavaType kjt = getKeYJavaType(proofRef);
-         if(!KeYResourcesUtil.filterKeYJavaType(kjt) && !addedTypes.contains(kjt.getFullName())){
-            Element typElement = createTypeElement(usedTypes, getKeYJavaTypeFromEnv(kjt, pe.getKeYEnvironment()));
-            usedTypes.appendChild(typElement);
+         if(!KeYResourcesUtil.filterKeYJavaType(kjt)){
+            if (!addedTypes.contains(kjt.getFullName())) {
+               Element typElement = createTypeElement(getKeYJavaTypeFromEnv(kjt, pe.getKeYEnvironment()));
+               usedTypes.appendChild(typElement);
+            }
+         }
+         else {
+            Element assumptionElement = createAssumptionElement(proofRef);
+            if (assumptionElement != null) {
+               assumptions.appendChild(assumptionElement);
+            }
          }
       }
-      return usedTypes;
    }
-   
-   
-   private Element createTypeElement(Element usedTypes,KeYJavaType kjt){
+
+   private Element createTypeElement(KeYJavaType kjt){
       addedTypes.add(kjt.getFullName());
       Element typeElement = doc.createElement("type");
       typeElement.setAttribute("name", kjt.getFullName());
@@ -169,6 +177,54 @@ public class ProofMetaFileWriter {
          typeElement.appendChild(subTypeElement);
       }
       return typeElement;
+   }
+   
+   private Element createAssumptionElement(IProofReference<?> proofRef) throws ProofReferenceException {
+      Object target = proofRef.getTarget();
+      if(IProofReference.USE_AXIOM.equals(proofRef.getKind())){
+         if(target instanceof ClassAxiom){
+            ClassAxiom classAx = (ClassAxiom) target;
+            Element assumptionElement = doc.createElement("assumption");
+            assumptionElement.setAttribute("kind", proofRef.getKind());
+            assumptionElement.setAttribute("name", classAx.getDisplayName());
+            assumptionElement.setAttribute("target", ClassTree.getDisplayName(pe.getKeYEnvironment().getServices(), classAx.getTarget()));
+            assumptionElement.setAttribute("type", classAx.getKJT().getFullName());
+            return assumptionElement;
+         }
+         else {
+            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected ClassAxiom");
+         }
+      }
+      else if(IProofReference.USE_CONTRACT.equals(proofRef.getKind())){
+         if(target instanceof Contract){
+            Contract contract = (Contract) target;
+            Element assumptionElement = doc.createElement("assumption");
+            assumptionElement.setAttribute("kind", proofRef.getKind());
+            assumptionElement.setAttribute("name", contract.getDisplayName());
+            assumptionElement.setAttribute("target", ClassTree.getDisplayName(pe.getKeYEnvironment().getServices(), contract.getTarget()));
+            assumptionElement.setAttribute("type", contract.getKJT().getFullName());
+            return assumptionElement;
+         }
+         else {
+            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected Contract");
+         }
+      }
+      else if(IProofReference.USE_INVARIANT.equals(proofRef.getKind())){
+         if(target instanceof ClassInvariant){
+            ClassInvariant classInv = (ClassInvariant) target;
+            Element assumptionElement = doc.createElement("assumption");
+            assumptionElement.setAttribute("kind", proofRef.getKind());
+            assumptionElement.setAttribute("name", classInv.getDisplayName());
+            assumptionElement.setAttribute("type", classInv.getKJT().getFullName());
+            return assumptionElement;
+         }
+         else {
+            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected ClassInvariant");
+         }
+      }
+      else {
+         return null;
+      }
    }
    
    

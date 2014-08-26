@@ -13,7 +13,6 @@
 
 package org.key_project.key4eclipse.resources.builder;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,7 +53,7 @@ public class ProofElement {
    
    private boolean proofClosed;
    
-   private HashSet<IProofReference<?>> proofReferences;
+   private LinkedHashSet<IProofReference<?>> proofReferences;
    private List<ProofElement> usedContracts;
    
    
@@ -147,7 +146,7 @@ public class ProofElement {
    }
    
    
-   public HashSet<IProofReference<?>> getProofReferences(){
+   public LinkedHashSet<IProofReference<?>> getProofReferences(){
       return proofReferences;
    }
    public void setProofReferences(LinkedHashSet<IProofReference<?>> proofReferences){

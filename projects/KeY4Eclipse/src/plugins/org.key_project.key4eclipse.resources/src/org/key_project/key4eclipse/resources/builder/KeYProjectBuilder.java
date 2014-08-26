@@ -24,9 +24,12 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
+import org.key_project.key4eclipse.resources.log.LogManager;
+import org.key_project.key4eclipse.resources.log.LogRecord;
+import org.key_project.key4eclipse.resources.log.LogRecordKind;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
+import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 
 /**
  * The KeYProject builder.
@@ -48,32 +51,43 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
    @Override
    protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor) throws CoreException {
       IProject project = getProject();
-      if(KeYProjectProperties.isEnableKeYResourcesBuilds(project)){
-         IResourceDelta delta = getDelta(project);
-         KeYProjectBuildInstruction inst = getBuildInstruction(project);
-         if(isBuildRequired(project, delta) || inst != null){
-            List<KeYProjectBuildJob> projectBuildJobs = getProjectBuildJobs(project);
-            boolean interrupt = interruptBuild(project, inst);
-            if(interrupt){
-               for(Job job : projectBuildJobs){
-                  if(Job.RUNNING == job.getState()){
-                     job.cancel();
-                     break;
+      
+      final long start = System.currentTimeMillis();
+      final boolean onlyRequiredProofs = KeYProjectProperties.isEnableBuildRequiredProofsOnly(project);
+      final int numberOfThreads = KeYProjectProperties.getNumberOfThreads(project);
+      final boolean enableThreading = KeYProjectProperties.isEnableMultiThreading(project);
+      
+      try {
+         if(KeYProjectProperties.isEnableKeYResourcesBuilds(project)){
+            IResourceDelta delta = getDelta(project);
+            KeYProjectBuildInstruction inst = getBuildInstruction(project);
+            if(kind == FULL_BUILD || isBuildRequired(project, delta) || inst != null){
+               List<KeYProjectBuildJob> projectBuildJobs = getProjectBuildJobs(project);
+               boolean interrupt = interruptBuild(project, inst);
+               if(interrupt){
+                  for(Job job : projectBuildJobs){
+                     if(Job.RUNNING == job.getState()){
+                        job.cancel();
+                        break;
+                     }
                   }
                }
-            }
-            
-            if(projectBuildJobs.size() <= 1 || inst != null){
-               if(inst == null){
-                  inst = new KeYProjectBuildInstruction(project, false);
+               
+               if(projectBuildJobs.size() <= 1 || inst != null){
+                  if(inst == null){
+                     inst = new KeYProjectBuildInstruction(project, false);
+                  }
+                  KeYProjectBuildJob proofManagerJob = new KeYProjectBuildJob("Verifying '" + project.getName() + "'", project, inst);
+                  proofManagerJob.setRule(new MutexRule(project));
+                  proofManagerJob.schedule();
                }
-               KeYProjectBuildJob proofManagerJob = new KeYProjectBuildJob("KeY Resources build", project, inst);
-               proofManagerJob.setRule(new MutexRule(project));
-               proofManagerJob.schedule();
             }
          }
+         return null;
       }
-      return null;
+      finally {
+         LogManager.getInstance().log(project, new LogRecord(LogRecordKind.BUILD, start, System.currentTimeMillis() - start, onlyRequiredProofs, enableThreading, numberOfThreads));
+      }
    }
 
 
@@ -82,7 +96,16 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
     */
    @Override
    protected void clean(IProgressMonitor monitor) throws CoreException {
-      KeYProjectBuilder.buildsToDo.add(new KeYProjectBuildInstruction(getProject(), true));
+      IProject project = getProject();
+      
+      final long start = System.currentTimeMillis();
+      final boolean onlyRequiredProofs = KeYProjectProperties.isEnableBuildRequiredProofsOnly(project);
+      final int numberOfThreads = KeYProjectProperties.getNumberOfThreads(project);
+      final boolean enableThreading = KeYProjectProperties.isEnableMultiThreading(project);      
+
+      KeYProjectBuilder.buildsToDo.add(new KeYProjectBuildInstruction(project, true));
+
+      LogManager.getInstance().log(project, new LogRecord(LogRecordKind.CLEAN, start, System.currentTimeMillis() - start, onlyRequiredProofs, enableThreading, numberOfThreads));
    }
    
    
@@ -134,8 +157,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
    private List<KeYProjectBuildJob> getProjectBuildJobs(IProject project){
       List<KeYProjectBuildJob> projectKeYJobs = new LinkedList<KeYProjectBuildJob>();
       if(project != null){
-         IJobManager jobMan = Job.getJobManager();
-         Job[] jobs = jobMan.find("KeYProjectBuildJob");
+         Job[] jobs = AbstractDependingOnObjectsJob.getJobs(KeYProjectBuildJob.JOB_FAMILY);
          for(Job job : jobs){
             if(job instanceof KeYProjectBuildJob){
                KeYProjectBuildJob keyJob = (KeYProjectBuildJob) job;

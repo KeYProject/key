@@ -60,8 +60,11 @@ public class KeYProjectDeltaVisitor implements IResourceDeltaVisitor{
             }
          }
          else if(KeYResourcesUtil.isInProofFolder(deltaRes)){
-            if(!changedProofAndMetaFiles.contains(deltaRes)){
-               changedProofAndMetaFiles.add((IFile) deltaRes);
+            if (KeYResourcesUtil.PROOF_FILE_EXTENSION.equals(deltaRes.getFileExtension()) ||
+                KeYResourcesUtil.META_FILE_EXTENSION.equals(deltaRes.getFileExtension())) {
+               if(!changedProofAndMetaFiles.contains(deltaRes)){
+                  changedProofAndMetaFiles.add((IFile) deltaRes);
+               }
             }
          }
       }

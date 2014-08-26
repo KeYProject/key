@@ -13,9 +13,12 @@
 
 package org.key_project.key4eclipse.resources.builder;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 
 /**
  * Rule to avoid multiple {@link KeYProjectBuildJob}s run simultaneously.
@@ -39,18 +42,18 @@ public class MutexRule implements ISchedulingRule{
    @Override
    public boolean contains(ISchedulingRule rule) {
       if(rule != null){
-         if(rule instanceof IFolder){
-            IFolder ruleFolder = (IFolder) rule;
-            IFolder proofFolder = ruleFolder.getProject().getFolder("proofs");
+         if(rule instanceof IFolder || rule instanceof IFile){
+            IResource ruleResource = (IResource) rule;
+            IFolder proofFolder = ruleResource.getProject().getFolder(KeYResourcesUtil.PROOF_FOLDER_NAME);
             if(proofFolder.exists()){
-               return proofFolder.getFullPath().isPrefixOf(ruleFolder.getFullPath());
+               return proofFolder.getFullPath().isPrefixOf(ruleResource.getFullPath());
             }
             else{
                return false;
             }
          }
          else if(rule instanceof IProject){
-            return true;
+            return project.equals(rule);
          }
       }
       return (rule == this);
@@ -73,4 +76,11 @@ public class MutexRule implements ISchedulingRule{
       return (rule instanceof MutexRule);
    }
 
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String toString() {
+      return getClass().getSimpleName() + " (" + project + ")";
+   }
 }

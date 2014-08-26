@@ -26,8 +26,6 @@ import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ArrayUtil;
 
 public class ConvertJavaToKeYProjectHandler extends AbstractSaveExecutionHandler {
-
-   
    /**
     * {@inheritDoc}
     */
@@ -35,20 +33,20 @@ public class ConvertJavaToKeYProjectHandler extends AbstractSaveExecutionHandler
    protected Object doExecute(ExecutionEvent event) throws Exception {
       ISelection selection = HandlerUtil.getCurrentSelection(event);
       Object[] elements = SWTUtil.toArray(selection);
-      for(Object obj : elements){
-         if (obj instanceof IJavaProject){
-            IProject project = ((IJavaProject) obj).getProject();
-            if(project != null){
-               IProjectDescription description = project.getDescription();
-               String[] newNatures = ArrayUtil.add(description.getNatureIds(), KeYProjectNature.NATURE_ID);
-               description.setNatureIds(newNatures);
-               project.setDescription(description, null);  
-               KeYResourcesUtil.cleanBuildProject(project);  
-            }        
+      for(Object obj : elements) {
+         IProject project = null;
+         if (obj instanceof IJavaProject) {
+            obj = ((IJavaProject) obj).getProject();
+         }
+         if (obj instanceof IProject) {
+            project = (IProject) obj;
+            IProjectDescription description = project.getDescription();
+            String[] newNatures = ArrayUtil.add(description.getNatureIds(), KeYProjectNature.NATURE_ID);
+            description.setNatureIds(newNatures);
+            project.setDescription(description, null);  
+            KeYResourcesUtil.cleanBuildProject(project);     
          }
       }
       return null;
    }
-
-
 }

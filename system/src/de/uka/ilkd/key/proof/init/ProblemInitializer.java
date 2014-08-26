@@ -456,7 +456,7 @@ public final class ProblemInitializer {
      * Creates an initConfig / a proof environment and reads an EnvInput into it
      */
     public InitConfig prepare(EnvInput envInput) throws ProofInputException {
-//       synchronized (SchemaJavaParser.class) { // The synchronized statement is required for thread save parsing since all JavaCC parser are generated static. For our own parser (ProofJavaParser.jj and SchemaJavaParser.jj) it is possible to generate them non static which is done on branch "hentschelJavaCCInstanceNotStatic". But recoder still uses static methods and the synchronized statement can not be avoided for this reason.
+       synchronized (SchemaJavaParser.class) { // The synchronized statement is required for thread save parsing since all JavaCC parser are generated static. For our own parser (ProofJavaParser.jj and SchemaJavaParser.jj) it is possible to generate them non static which is done on branch "hentschelJavaCCInstanceNotStatic". But recoder still uses static methods and the synchronized statement can not be avoided for this reason.
            InitConfig currentBaseConfig = baseConfig; // It is required to work with a copy to make this method thread save required by the Eclipse plug-ins.
            progressStarted(this);
            alreadyParsed.clear();
@@ -479,7 +479,7 @@ public final class ProblemInitializer {
                baseConfig = currentBaseConfig;
            }
            return prepare(envInput, currentBaseConfig);
-//       }
+       }
     }
     
     public InitConfig prepare(EnvInput envInput, InitConfig referenceConfig)throws ProofInputException{

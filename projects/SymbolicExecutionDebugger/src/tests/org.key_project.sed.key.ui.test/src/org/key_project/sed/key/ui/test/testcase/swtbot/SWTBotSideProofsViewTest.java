@@ -198,7 +198,7 @@ public class SWTBotSideProofsViewTest extends AbstractSWTBotKeYPropertyTabTest {
          // Expand debug tree to initiate side proofs
          TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1, 0, 0, 2);
          TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1, 0, 1, 2);
-         TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1, 1, 0);
+         TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1, 1, 1);
          // Test collected side proofs
          SWTBotView view = bot.viewById(SideProofsView.VIEW_ID);
          view.setFocus();

@@ -1362,6 +1362,40 @@ public final class KeYUtil {
          throw new CoreException(LogUtil.getLogger().createErrorStatus(e));
       }
    }
+
+   /**
+    * Returns for the given {@link SourceLocation} of a type in the given {@link IFile}
+    * the {@link SourceLocation} of the type name if available or the initial location otherwise.
+    * @param file The {@link IFile} which contains the type location.
+    * @param typeLocation The location of the type in the given {@link IFile}.
+    * @return The location of the type name or the initial location if not available.
+    * @throws CoreException Occurred Exception.
+    */
+   public static SourceLocation updateToTypeNameLocation(IFile file, SourceLocation typeLocation) throws CoreException {
+      try {
+         if (file != null && typeLocation.getCharEnd() >= 0) {
+            ICompilationUnit compilationUnit = null;
+            IJavaElement element = JavaCore.create(file);
+            if (element instanceof ICompilationUnit) {
+               compilationUnit = (ICompilationUnit)element;
+            }
+            if (compilationUnit != null) {
+               IType type = JDTUtil.findJDTType(compilationUnit, typeLocation.getCharEnd());
+               if (type != null) {
+                  ISourceRange range = type.getNameRange();
+                  Position cursorStartPosition = getCursorPositionForOffset(element, range.getOffset()); 
+                  typeLocation = new SourceLocation(cursorStartPosition != null ? cursorStartPosition.getLine() : -1, 
+                                                      range.getOffset(), 
+                                                      range.getOffset() + range.getLength());
+               }
+            }
+         }
+         return typeLocation;
+      }
+      catch (IOException e) {
+         throw new CoreException(LogUtil.getLogger().createErrorStatus(e));
+      }
+   }
    
    /**
     * Filters the given {@link Set} of {@link KeYJavaType}s and sorts them.

@@ -244,7 +244,7 @@ public class ProofRunnable implements Runnable {
       IFile proofFile = pe.getProofFile();
       KeYProjectDelta keyDelta = KeYProjectDeltaManager.getInstance().getDelta(project);
       keyDelta.addJobChangedFile(proofFile);
-      saveProof(out, proofFile);
+      saveProof(out, proofFile, pe.getProofClosed());
       keyDelta.addJobChangedFile(pe.getMetaFile());
       ProofMetaFileWriter pmfw = new ProofMetaFileWriter(pe);
       pmfw.writeMetaFile();
@@ -282,7 +282,7 @@ public class ProofRunnable implements Runnable {
     * @param pe - the {@link ProofElement} to use
     * @throws CoreException
     */
-   private void saveProof(ByteArrayOutputStream out, IFile proofFile) throws CoreException{
+   private void saveProof(ByteArrayOutputStream out, IFile proofFile, boolean proofClosed) throws CoreException{
       // Save proof file content
       IFolder proofFolder = KeYResourcesUtil.createFolder(proofFile);
       if(proofFolder != null && proofFolder.exists()){
@@ -292,6 +292,7 @@ public class ProofRunnable implements Runnable {
          else {
             proofFile.create(new ByteArrayInputStream(out.toByteArray()), true, null);
          }
+         KeYResourcesUtil.setProofClosed(proofFile, Boolean.valueOf(proofClosed));
       }
    }
 }
