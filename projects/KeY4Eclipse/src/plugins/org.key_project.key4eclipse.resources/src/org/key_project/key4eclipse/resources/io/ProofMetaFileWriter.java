@@ -55,14 +55,7 @@ import de.uka.ilkd.key.ui.CustomUserInterface;
  * @author Stefan Käsdorf
  */
 public class ProofMetaFileWriter {
-   
-   /**
-    * {@link LinkedHashSet} with the full names of all types already added to the meta file.
-    */
-   private LinkedHashSet<String> addedTypes;
-   private ProofElement pe;
-   private Document doc;
-   
+   private final ProofElement pe;
    
    public ProofMetaFileWriter(ProofElement pe){
       this.pe = pe;
@@ -75,8 +68,8 @@ public class ProofMetaFileWriter {
     */
    public void writeMetaFile() throws Exception {
       IFile metaIFile = pe.getMetaFile();
-      this.addedTypes = new LinkedHashSet<String>();
-      createDoument();
+      LinkedHashSet<String> addedTypes = new LinkedHashSet<String>();
+      Document doc = createDoument(addedTypes);
 
       TransformerFactory transFactory = TransformerFactory.newInstance();
       Transformer transformer = transFactory.newTransformer();
@@ -109,11 +102,11 @@ public class ProofMetaFileWriter {
     * @throws CoreException 
     * @throws IOException 
     */
-   private void createDoument() throws Exception{
+   private Document createDoument(LinkedHashSet<String> addedTypes) throws Exception{
       DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
       DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
       
-      doc = docBuilder.newDocument();
+      Document doc = docBuilder.newDocument();
       
       Element rootElement = doc.createElement("proofMetaFile");
       doc.appendChild(rootElement);
@@ -134,27 +127,28 @@ public class ProofMetaFileWriter {
       
       Element usedTypes = doc.createElement("usedTypes");
       Element assumptions = doc.createElement("assumptions");
-      analyseDependencies(usedTypes, assumptions);
+      analyseDependencies(doc, addedTypes, usedTypes, assumptions);
       rootElement.appendChild(usedTypes);
       
-      Element usedContracts = createUsedContracts();
+      Element usedContracts = createUsedContracts(doc);
       rootElement.appendChild(usedContracts);
 
       rootElement.appendChild(assumptions);
+      return doc;
    }
    
-   private void analyseDependencies(Element usedTypes, Element assumptions) throws ProofReferenceException{
+   private void analyseDependencies(Document doc, LinkedHashSet<String> addedTypes, Element usedTypes, Element assumptions) throws ProofReferenceException{
       LinkedHashSet<IProofReference<?>> proofReferences = pe.getProofReferences();
       for(IProofReference<?> proofRef : proofReferences){
          KeYJavaType kjt = getKeYJavaType(proofRef);
          if(!KeYResourcesUtil.filterKeYJavaType(kjt)){
             if (!addedTypes.contains(kjt.getFullName())) {
-               Element typElement = createTypeElement(getKeYJavaTypeFromEnv(kjt, pe.getKeYEnvironment()));
+               Element typElement = createTypeElement(doc, addedTypes, getKeYJavaTypeFromEnv(kjt, pe.getKeYEnvironment()));
                usedTypes.appendChild(typElement);
             }
          }
          else {
-            Element assumptionElement = createAssumptionElement(proofRef);
+            Element assumptionElement = createAssumptionElement(doc, proofRef);
             if (assumptionElement != null) {
                assumptions.appendChild(assumptionElement);
             }
@@ -162,7 +156,7 @@ public class ProofMetaFileWriter {
       }
    }
 
-   private Element createTypeElement(KeYJavaType kjt){
+   private Element createTypeElement(Document doc, LinkedHashSet<String> addedTypes, KeYJavaType kjt){
       addedTypes.add(kjt.getFullName());
       Element typeElement = doc.createElement("type");
       typeElement.setAttribute("name", kjt.getFullName());
@@ -175,7 +169,7 @@ public class ProofMetaFileWriter {
       return typeElement;
    }
    
-   private Element createAssumptionElement(IProofReference<?> proofRef) throws ProofReferenceException {
+   private Element createAssumptionElement(Document doc, IProofReference<?> proofRef) throws ProofReferenceException {
       Object target = proofRef.getTarget();
       if(IProofReference.USE_AXIOM.equals(proofRef.getKind())){
          if(target instanceof ClassAxiom){
@@ -303,7 +297,7 @@ public class ProofMetaFileWriter {
    }
    
    
-   private Element createUsedContracts() throws ProofReferenceException{
+   private Element createUsedContracts(Document doc) throws ProofReferenceException{
       Element usedContractsElement = doc.createElement("usedContracts");
       LinkedList<ProofElement> usedContractsProofElements = pe.getUsedContracts();
       for(ProofElement usedContractProofElement : usedContractsProofElements){
