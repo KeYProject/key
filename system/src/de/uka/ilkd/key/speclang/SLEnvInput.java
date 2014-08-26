@@ -57,9 +57,7 @@ import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.AbstractEnvInput;
-import de.uka.ilkd.key.proof.io.KeYFile;
-import de.uka.ilkd.key.proof.io.RuleSource;
+import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.util.KeYResourceManager;
@@ -198,13 +196,13 @@ public final class SLEnvInput extends AbstractEnvInput {
                 //external or internal path?
                 File file = new File(filePath);
                 if(file.isFile()) {
-                	rs = RuleSource.initRuleFile(file);
+                	rs = RuleSourceFactory.initRuleFile(file);
                 } else {
                     URL url = KeYResourceManager.getManager().getResourceFile(
                 				Recoder2KeY.class, 
                 				filePath);
                     if(url != null) {
-                	rs = RuleSource.initRuleFile(url);
+                	rs = RuleSourceFactory.initRuleFile(url);
                     }
                 }
                 
