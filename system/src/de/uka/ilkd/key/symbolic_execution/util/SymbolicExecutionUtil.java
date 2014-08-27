@@ -117,10 +117,12 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
 import de.uka.ilkd.key.util.MiscTools;
@@ -598,6 +600,36 @@ public final class SymbolicExecutionUtil {
       return node != null && 
              !node.isDisposed() &&
              !services.getTermBuilder().ff().equals(node.getPathCondition());
+   }
+
+   /**
+    * Creates for the given {@link IExecutionStateNode} the contained
+    * {@link IExecutionConstraint}s.
+    * @param node The {@link IExecutionStateNode} to create constraints for.
+    * @return The created {@link IExecutionConstraint}s.
+    */
+   public static IExecutionConstraint[] createExecutionConstraints(IExecutionStateNode<?> node) {
+      if (node != null && !node.isDisposed()) {
+         TermBuilder tb = node.getServices().getTermBuilder();
+         List<IExecutionConstraint> constraints = new LinkedList<IExecutionConstraint>();
+         Node proofNode = node.getProofNode();
+         Sequent sequent = proofNode.sequent();
+         SequentFormula currentSF = proofNode.getAppliedRuleApp().posInOccurrence().constrainedFormula();
+         for (SequentFormula sf : sequent.antecedent()) {
+            if (currentSF != sf) {
+               constraints.add(new ExecutionConstraint(node.getSettings(), node.getMediator(), proofNode, sf.formula()));
+            }
+         }
+         for (SequentFormula sf : sequent.succedent()) {
+            if (currentSF != sf) {
+               constraints.add(new ExecutionConstraint(node.getSettings(), node.getMediator(), proofNode, tb.not(sf.formula())));
+            }
+         }
+         return constraints.toArray(new IExecutionConstraint[constraints.size()]);
+      }
+      else {
+         return new IExecutionConstraint[0];
+      }
    }
    
    /**
@@ -1356,6 +1388,9 @@ public final class SymbolicExecutionUtil {
          SourceElement statement = NodeInfo.computeActiveStatement(ruleApp);
          PositionInfo posInfo = statement != null ? statement.getPositionInfo() : null;
          if (isMethodReturnNode(node, ruleApp)) {
+            return !isInImplicitMethod(node, ruleApp);
+         }
+         else if (isExceptionalMethodReturnNode(node, ruleApp)) {
             return !isInImplicitMethod(node, ruleApp);
          }
          else if (isLoopStatement(node, ruleApp, statement, posInfo)) { 

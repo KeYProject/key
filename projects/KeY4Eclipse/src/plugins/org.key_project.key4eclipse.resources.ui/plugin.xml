@@ -82,12 +82,45 @@
             id="org.key_project.key4eclipse.resources.ui.convertToKeYProject"
             name="Convert to KeY Project.">
       </command>
+      <command
+            categoryId="org.key_project.key4eclipse.common.ui.category"
+            description="Deletes the log file with all its entries."
+            id="org.key_project.key4eclipse.resources.ui.clearLog"
+            name="Clear Log">
+      </command>
+      <command
+            categoryId="org.key_project.key4eclipse.common.ui.category"
+            id="org.key_project.key4eclipse.resources.ui.LinkWithWorkbenchPartCommand"
+            name="Link with Editor/View">
+         <state
+               id="org.eclipse.ui.commands.toggleState">
+            <class
+                  class="org.eclipse.ui.handlers.RegistryToggleState">
+               <parameter
+                     name="default"
+                     value="false">
+               </parameter>
+               <parameter
+                     name="persisted"
+                     value="true">
+               </parameter>
+            </class>
+         </state>
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.commandImages">
       <image
             commandId="org.key_project.key4eclipse.resources.ui.convertToKeYProject"
             icon="icons/logo16.gif">
+      </image>
+      <image
+            commandId="org.key_project.key4eclipse.resources.ui.clearLog"
+            icon="icons/clear_co.gif">
+      </image>
+      <image
+            commandId="org.key_project.key4eclipse.resources.ui.LinkWithWorkbenchPartCommand"
+            icon="icons/synced.gif">
       </image>
    </extension>
    <extension
@@ -136,6 +169,14 @@
             </iterate>
          </enabledWhen>
       </handler>
+      <handler
+            class="org.key_project.key4eclipse.resources.ui.handler.LinkWithWorkbenchPartHandler"
+            commandId="org.key_project.key4eclipse.resources.ui.LinkWithWorkbenchPartCommand">
+      </handler>
+      <handler
+            class="org.key_project.key4eclipse.resources.ui.handler.ClearLogHandler"
+            commandId="org.key_project.key4eclipse.resources.ui.clearLog">
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.propertyPages">
@@ -182,46 +223,14 @@
                name="Verification Status"
                restorable="true">
          </view>
-      </extension>
-      <extension
-            point="org.eclipse.ui.commands">
-         <category
-               id="org.key_project.key4eclipse.resources.ui.category"
-               name="KeY Resources">
-         </category>
-         <command
-               categoryId="org.key_project.key4eclipse.resources.ui.category"
-               id="org.key_project.key4eclipse.resources.ui.LinkWithWorkbenchPartCommand"
-               name="Link with Editor/View">
-            <state
-                  id="org.eclipse.ui.commands.toggleState">
-               <class
-                     class="org.eclipse.ui.handlers.RegistryToggleState">
-                  <parameter
-                        name="default"
-                        value="false">
-                  </parameter>
-                  <parameter
-                        name="persisted"
-                        value="true">
-                  </parameter>
-               </class>
-            </state>
-         </command>
-      </extension>
-      <extension
-            point="org.eclipse.ui.commandImages">
-         <image
-               commandId="org.key_project.key4eclipse.resources.ui.LinkWithWorkbenchPartCommand"
-               icon="icons/synced.gif">
-         </image>
-      </extension>
-      <extension
-            point="org.eclipse.ui.handlers">
-         <handler
-               class="org.key_project.key4eclipse.resources.ui.handler.LinkWithWorkbenchPartHandler"
-               commandId="org.key_project.key4eclipse.resources.ui.LinkWithWorkbenchPartCommand">
-         </handler>
+         <view
+               category="org.key_project.key4eclipse.resources.ui.view.category"
+               class="org.key_project.key4eclipse.resources.ui.view.VerificationLogView"
+               icon="icons/resource_log.gif"
+               id="org.key_project.key4eclipse.resources.ui.view.VerificationLogView"
+               name="Verification Log"
+               restorable="true">
+         </view>
       </extension>
       <extension
             point="org.eclipse.ui.menus">
@@ -233,6 +242,22 @@
                   id="org.key_project.key4eclipse.resources.ui.LinkWithWorkbenchPart"
                   style="toggle"
                   tooltip="Link with Editor/View">
+            </command>
+         </menuContribution>
+         <menuContribution
+               locationURI="toolbar:org.key_project.key4eclipse.resources.ui.view.VerificationLogView?after=additions">
+            <command
+                  commandId="org.key_project.key4eclipse.resources.ui.LinkWithWorkbenchPartCommand"
+                  icon="icons/synced.gif"
+                  id="org.key_project.key4eclipse.resources.ui.LinkWithWorkbenchPart"
+                  style="toggle"
+                  tooltip="Link with Editor/View">
+            </command>
+            <command
+                  commandId="org.key_project.key4eclipse.resources.ui.clearLog"
+                  icon="icons/clear_co.gif"
+                  id="org.key_project.key4eclipse.resources.ui.clearLog"
+                  tooltip="Clear Log">
             </command>
          </menuContribution>
       </extension>

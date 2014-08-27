@@ -196,7 +196,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     * @param inScope
     */
    private void freeVariablesAfterReturn(Node node, RuleApp ruleApp,boolean inScope) {
-      if(SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp)&&inScope){
+      if ((SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp) ||
+           SymbolicExecutionUtil.isExceptionalMethodReturnNode(node, ruleApp)) &&
+          inScope) {
          toKeep.clear();
       }
    }

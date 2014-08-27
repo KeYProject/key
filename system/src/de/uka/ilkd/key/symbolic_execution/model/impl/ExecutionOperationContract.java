@@ -44,6 +44,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
@@ -356,6 +357,14 @@ public class ExecutionOperationContract extends AbstractExecutionStateNode<Sourc
    @Override
    protected IExecutionVariable[] lazyComputeVariables() {
       return SymbolicExecutionUtil.createExecutionVariables(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected IExecutionConstraint[] lazyComputeConstraints() {
+      return SymbolicExecutionUtil.createExecutionConstraints(this);
    }
 
    /**

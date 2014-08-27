@@ -78,13 +78,13 @@ public class ProofMetaFileContentExceptionTests extends AbstractResourceTest {
       IFile metaFile = KeY4EclipseResourcesTestUtil.getFile(proofFile.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       
       assertTrue(!javaFile.exists());
-      KeY4EclipseResourcesTestUtil.assertNoProofFiles(proofFolder);
+      KeY4EclipseResourcesTestUtil.assertCleanProofFolder(proofFolder);
       assertTrue(!proofFile.exists() && !metaFile.exists());
       
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/ProofMetaFileContentExceptionTests/testEditMetaFile/", project.getFolder("src"));
 
       assertTrue(javaFile.exists());
-      KeY4EclipseResourcesTestUtil.assertNoProofFiles(proofFolder);
+      KeY4EclipseResourcesTestUtil.assertCleanProofFolder(proofFolder);
       assertTrue(!proofFile.exists() && !metaFile.exists());
       
       KeY4EclipseResourcesTestUtil.build(project);
