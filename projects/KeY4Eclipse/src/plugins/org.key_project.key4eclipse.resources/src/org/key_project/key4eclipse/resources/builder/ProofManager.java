@@ -613,8 +613,7 @@ public class ProofManager {
          ByteArrayOutputStream out = pairToSave.first;
          ProofElement pe = pairToSave.second;
          saveProof(out, pe);
-         ProofMetaFileWriter pmfw = new ProofMetaFileWriter(pe);
-         pmfw.writeMetaFile();
+         ProofMetaFileWriter.writeMetaFile(pe);
       }
    }
    
@@ -1134,7 +1133,7 @@ public class ProofManager {
       if(proofFile.exists()){
          String metaFilesProofMD5 = pmfr.getProofFileMD5();
          String proofFileHasCode = ResourceUtil.computeContentMD5(proofFile);
-         if(metaFilesProofMD5.equals(proofFileHasCode)){
+         if(ObjectUtil.equals(metaFilesProofMD5, proofFileHasCode)){
             return false;
          }
          else{
