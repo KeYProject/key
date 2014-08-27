@@ -60,6 +60,7 @@ import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
@@ -245,7 +246,24 @@ public class ExecutionNodeReader {
       @Override
       public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
          AbstractKeYlessExecutionNode parent = parentNodeStack.peekFirst();
-         if (isVariable(uri, localName, qName)) {
+         if (isConstraint(uri, localName, qName)) {
+            Object parentValue = parentVariableValueStack.peekFirst();
+            if (parentValue != null) {
+               if (!(parentValue instanceof KeYlessValue)) {
+                  throw new SAXException("Can't add constraint to variable.");
+               }
+               KeYlessConstraint constraint = new KeYlessConstraint(getName(attributes));
+               ((KeYlessValue) parentValue).addConstraint(constraint);
+            }
+            else {
+               if (!(parent instanceof AbstractKeYlessStateNode<?>)) {
+                  throw new SAXException("Can't add constraint to stateless node.");
+               }
+               KeYlessConstraint constraint = new KeYlessConstraint(getName(attributes));
+               ((AbstractKeYlessStateNode<?>) parent).addConstraint(constraint);
+            }
+         }
+         else if (isVariable(uri, localName, qName)) {
             Object parentValue = parentVariableValueStack.peekFirst();
             KeYlessVariable variable = createVariable(parentValue instanceof KeYlessValue ? (KeYlessValue)parentValue : null, uri, localName, qName, attributes);
             if (parentValue != null) {
@@ -319,7 +337,10 @@ public class ExecutionNodeReader {
        */
       @Override
       public void endElement(String uri, String localName, String qName) throws SAXException {
-         if (isVariable(uri, localName, qName)) {
+         if (isConstraint(uri, localName, qName)) {
+            // Nothing to do.
+         }
+         else if (isVariable(uri, localName, qName)) {
             parentVariableValueStack.removeFirst();
          }
          else if (isValue(uri, localName, qName)) {
@@ -373,6 +394,17 @@ public class ExecutionNodeReader {
       public Map<KeYlessStart, List<String>> getTerminationPathEntries() {
          return terminationPathEntries;
       }
+   }
+   
+   /**
+    * Checks if the currently parsed tag represents an {@link IExecutionConstraint}.
+    * @param uri The URI.
+    * @param localName THe local name.
+    * @param qName The qName.
+    * @return {@code true} represents an {@link IExecutionConstraint}, {@code false} is something else.
+    */
+   protected boolean isConstraint(String uri, String localName, String qName) {
+      return ExecutionNodeWriter.TAG_CONSTRAINT.equals(qName);
    }
    
    /**
@@ -1302,6 +1334,11 @@ public class ExecutionNodeReader {
     */
    public static abstract class AbstractKeYlessStateNode<S extends SourceElement> extends AbstractKeYlessExecutionNode implements IExecutionStateNode<S> {
       /**
+       * The contained constraints.
+       */
+      private final List<IExecutionConstraint> constraints = new LinkedList<IExecutionConstraint>();
+      
+      /**
        * The contained variables.
        */
       private final List<IExecutionVariable> variables = new LinkedList<IExecutionVariable>();
@@ -1318,6 +1355,14 @@ public class ExecutionNodeReader {
                                       String formatedPathCondition,
                                       boolean pathConditionChanged) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
+      }
+
+      /**
+       * Adds the given {@link IExecutionConstraint}.
+       * @param constraint The {@link IExecutionConstraint} to add.
+       */
+      public void addConstraint(IExecutionConstraint constraint) {
+         constraints.add(constraint);
       }
 
       /**
@@ -1342,6 +1387,14 @@ public class ExecutionNodeReader {
       @Override
       public PositionInfo getActivePositionInfo() {
          return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IExecutionConstraint[] getConstraints() {
+         return constraints.toArray(new IExecutionConstraint[constraints.size()]);
       }
 
       /**
@@ -2170,6 +2223,37 @@ public class ExecutionNodeReader {
    }
    
    /**
+    * An implementation of {@link IExecutionConstraint} which is independent
+    * from KeY and provides such only children and default attributes.
+    * @author Martin Hentschel
+    */
+   public static class KeYlessConstraint extends AbstractKeYlessExecutionElement implements IExecutionConstraint {
+      /**
+       * Constructor.
+       * @param name The name.
+       */
+      public KeYlessConstraint(String name) {
+         super(name);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getElementType() {
+         return "Constraint";
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Term getTerm() {
+         return null;
+      }
+   }
+   
+   /**
     * An implementation of {@link IExecutionVariable} which is independent
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
@@ -2311,6 +2395,11 @@ public class ExecutionNodeReader {
       private final String conditionString;
       
       /**
+       * The related {@link IExecutionConstraint}s.
+       */
+      private final List<IExecutionConstraint> constraints = new LinkedList<IExecutionConstraint>();
+      
+      /**
        * Constructor.
        * @param variable The parent {@link IExecutionVariable}.
        * @param typeString The type string.
@@ -2422,6 +2511,22 @@ public class ExecutionNodeReader {
       @Override
       public Term getCondition() throws ProofInputException {
          return null;
+      }
+      
+      /**
+       * Adds the given {@link IExecutionConstraint}.
+       * @param constraint The {@link IExecutionConstraint} to add.
+       */
+      public void addConstraint(IExecutionConstraint constraint) {
+         constraints.add(constraint);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IExecutionConstraint[] getConstraints() throws ProofInputException {
+         return constraints.toArray(new IExecutionConstraint[constraints.size()]);
       }
    }
 }
