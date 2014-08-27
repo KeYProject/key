@@ -14,7 +14,6 @@
 package org.key_project.key4eclipse.resources.io;
 
 import java.io.ByteArrayInputStream;
-import java.nio.charset.Charset;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
@@ -76,7 +75,7 @@ public class ProofMetaFileWriter {
     */
    public static void writeMetaFile(ProofElement pe) throws Exception {
       IFile metaIFile = pe.getMetaFile();
-      String encoding = Charset.defaultCharset().name();
+      String encoding = "UTF-8";
       String xml = toXml(pe, encoding);
       if (!metaIFile.exists()) {
          metaIFile.create(new ByteArrayInputStream(xml.getBytes(encoding)), true, null);
