@@ -12,7 +12,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.key_project.key4eclipse.resources.io.ProofMetaFileException;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileWriter;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
@@ -239,15 +238,14 @@ public class ProofRunnable implements Runnable {
       return sb.toString();
    }
    
-   private void save(Proof proof, ProofElement pe) throws CoreException, ProofMetaFileException {
+   private void save(Proof proof, ProofElement pe) throws Exception {
       ByteArrayOutputStream out = generateSaveProof(proof, pe.getProofFile());
       IFile proofFile = pe.getProofFile();
       KeYProjectDelta keyDelta = KeYProjectDeltaManager.getInstance().getDelta(project);
       keyDelta.addJobChangedFile(proofFile);
       saveProof(out, proofFile, pe.getProofClosed());
       keyDelta.addJobChangedFile(pe.getMetaFile());
-      ProofMetaFileWriter pmfw = new ProofMetaFileWriter(pe);
-      pmfw.writeMetaFile();
+      ProofMetaFileWriter.writeMetaFile(pe);
    }
    
    /**
