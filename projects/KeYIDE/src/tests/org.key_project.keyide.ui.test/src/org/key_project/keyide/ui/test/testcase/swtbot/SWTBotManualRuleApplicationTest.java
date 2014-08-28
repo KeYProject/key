@@ -121,11 +121,13 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                SWTWorkbenchBot bot, SWTBotEditor editor, KeYEditor keyEditor,
                Node nodeOnWhichRuleIsApplied) {
             SWTBotShell shell = bot.shell("Contracts for charge");
-            shell.bot().table().select(2);
+            shell.bot().table().select(0);
             TestUtilsUtil.clickDirectly(shell.bot().button("Finish"));
             SWTBotStyledText styledText = editor.bot().styledText();
-            int index = styledText.getText().indexOf("java.lang.Throwable");
-            assertTrue(index != -1);
+            int indexFirstContractApplied = styledText.getText().indexOf("Throwable::instance");
+            int indexSecondContractApplied = styledText.getText().indexOf("= javaAddInt(self.unsuccessfulOperations");
+            int indexThirdContractApplied = styledText.getText().indexOf("self.balance@heapBefore_charge)");
+            assertTrue(indexFirstContractApplied != -1 && indexSecondContractApplied == -1 && indexThirdContractApplied == -1);
          }
       };
       
@@ -193,7 +195,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             shell.bot().table().select(0,1,2);
             TestUtilsUtil.clickDirectly(shell.bot().button("Finish"));
             SWTBotStyledText styledText = editor.bot().styledText();
-            int indexFirstContractApplied = styledText.getText().indexOf("java.lang.Throwable");
+            int indexFirstContractApplied = styledText.getText().indexOf("Throwable::instance");
             int indexSecondContractApplied = styledText.getText().indexOf("= javaAddInt(self.unsuccessfulOperations");
             int indexThirdContractApplied = styledText.getText().indexOf("self.balance@heapBefore_charge)");
             assertTrue(indexFirstContractApplied != -1 && indexSecondContractApplied != -1 && indexThirdContractApplied != -1);

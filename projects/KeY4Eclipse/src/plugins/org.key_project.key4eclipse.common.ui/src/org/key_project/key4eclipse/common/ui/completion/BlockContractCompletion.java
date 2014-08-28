@@ -1,16 +1,27 @@
 package org.key_project.key4eclipse.common.ui.completion;
 
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.key_project.key4eclipse.common.ui.provider.ContractLabelProvider;
+import org.key_project.key4eclipse.common.ui.provider.ImmutableCollectionContentProvider;
+import org.key_project.util.eclipse.swt.SWTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.ContractSelectionPanel;
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.rule.BlockContractRule.Instantiation;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.Contract;
 
 /**
  * The {@link InteractiveRuleApplicationCompletion} to treat {@link BlockContractRule} in the Eclipse context.
@@ -49,6 +60,21 @@ public class BlockContractCompletion extends AbstractInteractiveRuleApplicationC
       private final ImmutableSet<BlockContract> contracts;
       
       /**
+       * The used {@link Services}.
+       */
+      private final Services services;
+      
+      /**
+       * The {@link TableViewer} which shows the contracts
+       */
+      private TableViewer viewer;
+      
+      /**
+       * The {@link ContractLabelProvider} used in {@link #viewer}
+       */
+      private ContractLabelProvider labelViewer;
+      
+      /**
        * Constructor.
        * @param app The DefaultBuiltInRuleApp to be completed.
        * @param goal The Goal where the app will later be applied to.
@@ -56,7 +82,7 @@ public class BlockContractCompletion extends AbstractInteractiveRuleApplicationC
        */
       public Perform(IBuiltInRuleApp app, Goal goal, boolean forced) {
          super(app, goal, forced);
-         setErrorMessage("Functionality is not available yet.");
+         services = goal.proof().getServices();
          instantiation = BlockContractRule.instantiate(app.posInOccurrence().subTerm(), goal, getServices());
          contracts = BlockContractRule.getApplicableContracts(instantiation, goal, getServices());
       }
@@ -82,16 +108,54 @@ public class BlockContractCompletion extends AbstractInteractiveRuleApplicationC
        */
       @Override
       public void createControl(Composite root) {
-         Label label = new Label(root, SWT.NONE);
-         label.setText("This functionality will be available soon...");
+        viewer = new TableViewer(root);
+        viewer.setContentProvider(ImmutableCollectionContentProvider.getInstance());
+        labelViewer = new ContractLabelProvider(services);
+        viewer.setLabelProvider(labelViewer);
+        viewer.setInput(contracts);
+        viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+         
+            @Override
+            public void selectionChanged(SelectionChangedEvent event) {
+               updateErrorMessage();
+            }
+         });
+        updateErrorMessage();
       }
-
+      
+      /**
+       * 
+       */
+      protected void updateErrorMessage() {
+         ISelection selection = viewer.getSelection();
+         if(!selection.isEmpty()) {
+            setErrorMessage(null);
+         } else {
+            setErrorMessage("Please select at least one contract.");
+         }
+      }
+      
       /**
        * {@inheritDoc}
        */
       @Override
       public IBuiltInRuleApp finish() {
-         return null;
+         Contract contract = getSelectedContract();
+         if(contract != null) {
+            //TODO: return BlockContractRule
+            return null;
+         } else {
+            return getApp();
+         }
+      }
+      
+      /**
+       * Returns the selected {@link Contract}.
+       * @return The selected {@link Contract} or {@code null} if not available.
+       */
+      protected Contract getSelectedContract() {
+         final Object[] selection = SWTUtil.toArray(viewer.getSelection());
+         return ContractSelectionPanel.computeContract(services, selection);
       }
 
       /**
