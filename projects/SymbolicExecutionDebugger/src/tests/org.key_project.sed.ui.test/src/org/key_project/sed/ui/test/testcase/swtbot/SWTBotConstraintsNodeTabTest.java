@@ -29,7 +29,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * Tests the property page tab "Constraints".
  * @author Martin Hentschel
  */
-public class SWTBotConstraintsTabTest extends AbstractSWTBotPropertyTabTest {
+public class SWTBotConstraintsNodeTabTest extends AbstractSWTBotPropertyTabTest {
    /**
     * Tests the shown values and the existence of tab "Node".
     */
@@ -56,7 +56,7 @@ public class SWTBotConstraintsTabTest extends AbstractSWTBotPropertyTabTest {
          @Override
          public void assertStatement(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEDStatement statement) throws Exception {
             assertTrue(tabs.selectTabItem("Constraints"));
-            assertEquals(1, propertiesView.bot().table().rowCount());
+            assertEquals(4, propertiesView.bot().table().rowCount());
             Object itemData = TestUtilsUtil.getTableItemData(propertiesView.bot().table().getTableItem(0));
             assertTrue(itemData instanceof ISEDConstraint);
             assertEquals("int x = 1 Constraint", ((ISEDConstraint) itemData).getName());

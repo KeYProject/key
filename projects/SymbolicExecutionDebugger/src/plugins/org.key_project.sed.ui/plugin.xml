@@ -227,16 +227,22 @@
                     tab="org.key_project.sed.ui.statistics.tab">
               </propertySection>
               <propertySection
-                    class="org.key_project.sed.ui.property.ConstraintsPropertySection"
+                    class="org.key_project.sed.ui.property.ConstraintsNodePropertySection"
                     filter="org.key_project.sed.ui.property.SEDDebugNodeTreeFilter"
                     id="org.key_project.sed.ui.property.ConstraintsPropertySection"
                     tab="org.key_project.sed.ui.constraints.tab">
               </propertySection>
               <propertySection
                     class="org.key_project.sed.ui.property.VariablePropertySection"
-                    filter="org.key_project.sed.ui.property.SEDVariableTreeFilter"
+                    filter="org.key_project.sed.ui.property.VariableTreeFilter"
                     id="org.key_project.sed.ui.property.SEDVariablePropertySection"
                     tab="org.key_project.sed.ui.variablePropertyTab">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.property.ConstraintsVariablePropertySection"
+                    filter="org.key_project.sed.ui.property.SEDVariableTreeFilter"
+                    id="org.key_project.sed.ui.property.ConstraintsPropertySection"
+                    tab="org.key_project.sed.ui.constraints.tab">
               </propertySection>
           </propertySections>
       </extension>

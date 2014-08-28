@@ -114,21 +114,30 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        s1.addConstraint(new SEDMemoryConstraint(target, "int x = 1 Constraint"));
        thread.addChild(s1);
        
-       SEDMemoryValue s1var1value = new SEDMemoryValue(target);
-       s1var1value.setReferenceTypeName("s1var1valueType");
-       s1var1value.setValueString("s1var1value");
-       SEDMemoryVariable s1var1 = new SEDMemoryVariable(target);
+       SEDMemoryConstraint s1Constarint1 = new SEDMemoryConstraint(target, "s1Constarint1");
+       s1.addConstraint(s1Constarint1);
+       SEDMemoryConstraint s1Constarint2 = new SEDMemoryConstraint(target, "s1Constarint2");
+       s1.addConstraint(s1Constarint2);
+       SEDMemoryConstraint s1Constarint3 = new SEDMemoryConstraint(target, "s1Constarint3");
+       s1.addConstraint(s1Constarint3);
+       
+       SEDMemoryVariable s1var1 = new SEDMemoryVariable(target, s1);
        s1var1.setName("var1");
        s1var1.setReferenceTypeName("var1type");
+       SEDMemoryValue s1var1value = new SEDMemoryValue(target, s1var1);
+       s1var1value.setReferenceTypeName("s1var1valueType");
+       s1var1value.setValueString("s1var1value");
+       s1var1value.addRelevantConstraint(s1Constarint1);
        s1var1.setValue(s1var1value);
        s1.addVariable(s1var1);
        
-       SEDMemoryValue s1var2value = new SEDMemoryValue(target);
-       s1var2value.setReferenceTypeName("s1var2valueType");
-       s1var2value.setValueString("s1var2value");
-       SEDMemoryVariable s1var2 = new SEDMemoryVariable(target);
+       SEDMemoryVariable s1var2 = new SEDMemoryVariable(target, s1);
        s1var2.setName("var2");
        s1var2.setReferenceTypeName("var2type");
+       SEDMemoryValue s1var2value = new SEDMemoryValue(target, s1var2);
+       s1var2value.setReferenceTypeName("s1var2valueType");
+       s1var2value.setValueString("s1var2value");
+       s1var2value.addRelevantConstraint(s1Constarint2);
        s1var2.setValue(s1var2value);
        s1.addVariable(s1var2);
        
@@ -219,30 +228,30 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        returnPositive.setCallStack(new ISEDDebugNode[] {call});
        bpositive.addChild(returnPositive);
        
-       SEDMemoryVariable returnPositiveVar1 = new SEDMemoryVariable(target);
+       SEDMemoryVariable returnPositiveVar1 = new SEDMemoryVariable(target, returnPositive);
        returnPositiveVar1.setName("returnPositiveVar1");
        returnPositiveVar1.setReferenceTypeName("returnPositiveVar1type");
-       SEDMemoryValue returnPositiveVar1value = new SEDMemoryValue(target);
+       SEDMemoryValue returnPositiveVar1value = new SEDMemoryValue(target, returnPositiveVar1);
        returnPositiveVar1value.setAllocated(true);
        returnPositiveVar1value.setReferenceTypeName("returnPositiveVar1valueType");
        returnPositiveVar1value.setValueString("returnPositiveVar1value");
        returnPositiveVar1.setValue(returnPositiveVar1value);
        returnPositive.addVariable(returnPositiveVar1);
        
-       SEDMemoryVariable returnPositiveVar1_1 = new SEDMemoryVariable(target);
+       SEDMemoryVariable returnPositiveVar1_1 = new SEDMemoryVariable(target, returnPositive);
        returnPositiveVar1_1.setName("returnPositiveVar1_1");
        returnPositiveVar1_1.setReferenceTypeName("returnPositiveVar1_1type");
-       SEDMemoryValue returnPositiveVar1_1value = new SEDMemoryValue(target);
+       SEDMemoryValue returnPositiveVar1_1value = new SEDMemoryValue(target, returnPositiveVar1_1);
        returnPositiveVar1_1value.setAllocated(true);
        returnPositiveVar1_1value.setReferenceTypeName("returnPositiveVar1_1valueType");
        returnPositiveVar1_1value.setValueString("returnPositiveVar1_1value");
        returnPositiveVar1_1.setValue(returnPositiveVar1_1value);
        returnPositive.addVariable(returnPositiveVar1_1);
        
-       SEDMemoryVariable returnPositiveVar2 = new SEDMemoryVariable(target);
+       SEDMemoryVariable returnPositiveVar2 = new SEDMemoryVariable(target, returnPositive);
        returnPositiveVar2.setName("returnPositiveVar2");
        returnPositiveVar2.setReferenceTypeName("returnPositiveVar2type");
-       SEDMemoryValue returnPositiveVar2value = new SEDMemoryValue(target);
+       SEDMemoryValue returnPositiveVar2value = new SEDMemoryValue(target, returnPositiveVar2);
        returnPositiveVar2value.setAllocated(true);
        returnPositiveVar2value.setReferenceTypeName("returnPositiveVar2valueType");
        returnPositiveVar2value.setValueString("returnPositiveVar2value");

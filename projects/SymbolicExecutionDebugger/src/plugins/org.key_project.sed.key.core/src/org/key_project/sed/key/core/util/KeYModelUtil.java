@@ -400,7 +400,7 @@ public final class KeYModelUtil {
          if (variables != null) {
             KeYVariable[] result = new KeYVariable[variables.length];
             for (int i = 0; i < variables.length; i++) {
-               result[i] = new KeYVariable(debugNode.getDebugTarget(), variables[i]);
+               result[i] = new KeYVariable(debugNode.getDebugTarget(), (IStackFrame)debugNode, variables[i]);
             }
             return result;
          }

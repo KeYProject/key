@@ -32,6 +32,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugElement;
+import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.jface.resource.StringConverter;
@@ -46,6 +47,8 @@ import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEDValue;
+import org.key_project.sed.core.model.ISEDVariable;
 import org.key_project.sed.core.model.impl.AbstractSEDBaseMethodReturn;
 import org.key_project.sed.core.model.memory.ISEDMemoryDebugNode;
 import org.key_project.sed.core.model.memory.ISEDMemoryStackFrameCompatibleDebugNode;
@@ -192,6 +195,20 @@ public class SEDXMLReader {
                   entry.getKey().addTermination((ISEDTermination)element);
                }
             }
+            // Set relevant constraints
+            Set<Entry<SEDMemoryValue, List<String>>> relevantConstraintEntries = handler.getRelevantConstraintsMap().entrySet();
+            for (Entry<SEDMemoryValue, List<String>> entry : relevantConstraintEntries) {
+               for (String constraintRefId : entry.getValue()) {
+                  ISEDDebugElement element = handler.getElementById(constraintRefId);
+                  if (element == null) {
+                     throw new SAXException("Referenced constraint with ID \"" + constraintRefId + "\" is not available in model.");
+                  }
+                  if (!(element instanceof ISEDConstraint)) {
+                     throw new SAXException("Referenced constraint with ID \"" + constraintRefId + "\" refers to wrong model object \"" + element + "\".");
+                  }
+                  entry.getKey().addRelevantConstraint((ISEDConstraint)element);
+               }
+            }
             // Inject child references
             Set<Entry<ISEDMemoryDebugNode, List<ChildReference>>> childReferences = handler.getNodeChildReferences().entrySet();
             for (Entry<ISEDMemoryDebugNode, List<ChildReference>> entry : childReferences) {
@@ -302,11 +319,17 @@ public class SEDXMLReader {
       private final Map<AbstractSEDBaseMethodReturn, String> methodReturnConditionReferences = new HashMap<AbstractSEDBaseMethodReturn, String>();
       
       /**
+       * Maps {@link SEDMemoryValue}d to the IDs of their relevant constraints.
+       */
+      private Map<SEDMemoryValue, List<String>> relevantConstraintsMap = new HashMap<SEDMemoryValue, List<String>>();
+      
+      /**
        * {@inheritDoc}
        */
       @Override
       public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
          ISEDMemoryDebugNode parent = parentStack.peekFirst();
+         IDebugElement parentVariableOrValue = variablesValueStack.peekFirst();
          if (isCallStackEntry(uri, localName, qName)) {
             List<String> callStack = callStackEntriesMap.get(parent);
             if (callStack == null) {
@@ -314,6 +337,19 @@ public class SEDXMLReader {
                callStackEntriesMap.put(parent, callStack);
             }
             callStack.add(getNodeIdRef(attributes));
+         }
+         else if (isRelevantConstraint(uri, localName, qName)) {
+            if (parentVariableOrValue instanceof SEDMemoryValue) {
+               List<String> entriesList = relevantConstraintsMap.get((SEDMemoryValue)parentVariableOrValue);
+               if (entriesList == null) {
+                  entriesList = new LinkedList<String>();
+                  relevantConstraintsMap.put((SEDMemoryValue)parentVariableOrValue, entriesList);
+               }
+               entriesList.add(getConstraintIdRef(attributes));
+            }
+            else {
+               throw new SAXException("Can't add relevant constraint to parent.");
+            }
          }
          else if (isTerminationEntry(uri, localName, qName)) {
             if (parent == null) {
@@ -329,7 +365,7 @@ public class SEDXMLReader {
             }
          }
          else {
-            Object obj = createElement(target, parent != null ? parent : thread, thread, uri, localName, qName, attributes, annotationIdMapping, methodReturnConditionReferences);
+            Object obj = createElement(target, parent != null ? parent : thread, thread, parentVariableOrValue, uri, localName, qName, attributes, annotationIdMapping, methodReturnConditionReferences);
             if (obj instanceof ISEDDebugElement) {
                ISEDDebugElement element = (ISEDDebugElement)obj;
                elementIdMapping.put(element.getId(), element);
@@ -365,7 +401,6 @@ public class SEDXMLReader {
                   }
                }
                else {
-                  IDebugElement parentVariableOrValue = variablesValueStack.peekFirst();
                   if (parentVariableOrValue instanceof SEDMemoryValue) {
                      ((SEDMemoryValue)parentVariableOrValue).addVariable(variable);
                   }
@@ -377,7 +412,6 @@ public class SEDXMLReader {
             }
             else if (obj instanceof IValue) {
                IValue value = (IValue)obj;
-               IDebugElement parentVariableOrValue = variablesValueStack.peekFirst();
                if (parentVariableOrValue instanceof SEDMemoryVariable) {
                   ((SEDMemoryVariable)parentVariableOrValue).setValue(value);
                }
@@ -434,6 +468,9 @@ public class SEDXMLReader {
             variablesValueStack.removeFirst();
          }
          else if (isConstraint(uri, localName, qName)) {
+            // Nothing to do
+         }
+         else if (isRelevantConstraint(uri, localName, qName)) {
             // Nothing to do
          }
          else if (isCallStackEntry(uri, localName, qName)) {
@@ -498,6 +535,14 @@ public class SEDXMLReader {
       }
 
       /**
+       * Returns the mapping of {@link SEDMemoryValue}s to their relevant constraints.
+       * @return The mapping of {@link SEDMemoryValue}s to their relevant constraints.
+       */
+      public Map<SEDMemoryValue, List<String>> getRelevantConstraintsMap() {
+         return relevantConstraintsMap;
+      }
+
+      /**
        * Returns the nod child references.
        * @return The node child references.
        */
@@ -532,6 +577,17 @@ public class SEDXMLReader {
     */
    protected boolean isConstraint(String uri, String localName, String qName) {
       return SEDXMLWriter.TAG_CONSTRAINT.equals(qName);
+   }
+
+   /**
+    * Checks if the given tag name represents a relevant constraint.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @return {@code true} represents a constraint, {@code false} represents something else.
+    */
+   protected boolean isRelevantConstraint(String uri, String localName, String qName) {
+      return SEDXMLWriter.TAG_RELEVANT_CONSTRAINT.equals(qName);
    }
    
    /**
@@ -627,6 +683,7 @@ public class SEDXMLReader {
     * @param target The parent {@link ISEDDebugTarget} or {@code null} if not available.
     * @param parent The parent {@link ISEDDebugNode} or {@code null} if not available.
     * @param thread The parent {@link ISEDThread} or {@code null} if not available.
+    * @param parentVariableOrValue The parent {@link ISEDVariable} / {@link ISEDValue} if available or {@code null} otherwise.
     * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
     * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
     * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
@@ -635,7 +692,7 @@ public class SEDXMLReader {
     * @return The created {@link Object}.
     * @throws SAXException Occurred Exception.
     */
-   protected Object createElement(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes, Map<String, ISEDAnnotation> annotationIdMapping, Map<AbstractSEDBaseMethodReturn, String> methodReturnConditionReferences) throws SAXException {
+   protected Object createElement(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, IDebugElement parentVariableOrValue, String uri, String localName, String qName, Attributes attributes, Map<String, ISEDAnnotation> annotationIdMapping, Map<AbstractSEDBaseMethodReturn, String> methodReturnConditionReferences) throws SAXException {
       if (SEDXMLWriter.TAG_LAUNCH.equals(qName)) {
          return null; // Nothing to do
       }
@@ -683,10 +740,10 @@ public class SEDXMLReader {
          return createThread(target, uri, localName, qName, attributes);
       }
       else if (SEDXMLWriter.TAG_VARIABLE.equals(qName)) {
-         return createVariable(target, uri, localName, qName, attributes);
+         return createVariable(target, (IStackFrame)parent, uri, localName, qName, attributes);
       }
       else if (SEDXMLWriter.TAG_VALUE.equals(qName)) {
-         return createValue(target, uri, localName, qName, attributes);
+         return createValue(target, (ISEDVariable)parentVariableOrValue, uri, localName, qName, attributes);
       }
       else if (SEDXMLWriter.TAG_METHOD_CONTRACT.equals(qName)) {
          return createMethodContract(target, parent, thread, uri, localName, qName, attributes);
@@ -708,7 +765,7 @@ public class SEDXMLReader {
       }
    }
    
-   protected SEDMemoryConstraint createConstraint(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) {
+   protected SEDMemoryConstraint createConstraint(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEDMemoryConstraint constraint = new SEDMemoryConstraint(target, getName(attributes));
       constraint.setId(getId(attributes));
       return constraint;
@@ -765,8 +822,8 @@ public class SEDXMLReader {
       return annotation;
    }
 
-   protected SEDMemoryValue createValue(ISEDDebugTarget target, String uri, String localName, String qName, Attributes attributes) {
-      SEDMemoryValue value = new SEDMemoryValue(target);
+   protected SEDMemoryValue createValue(ISEDDebugTarget target, ISEDVariable parent, String uri, String localName, String qName, Attributes attributes) {
+      SEDMemoryValue value = new SEDMemoryValue(target, parent);
       value.setId(getId(attributes));
       value.setAllocated(isAllocated(attributes));
       value.setReferenceTypeName(getReferenceTypeName(attributes));
@@ -775,8 +832,8 @@ public class SEDXMLReader {
       return value;
    }
    
-   protected SEDMemoryVariable createVariable(ISEDDebugTarget target, String uri, String localName, String qName, Attributes attributes) {
-      SEDMemoryVariable variable = new SEDMemoryVariable(target);
+   protected SEDMemoryVariable createVariable(ISEDDebugTarget target, IStackFrame stackFrame, String uri, String localName, String qName, Attributes attributes) {
+      SEDMemoryVariable variable = new SEDMemoryVariable(target, stackFrame);
       variable.setId(getId(attributes));
       variable.setName(getName(attributes));
       variable.setReferenceTypeName(getReferenceTypeName(attributes));
@@ -1113,6 +1170,15 @@ public class SEDXMLReader {
     */
    protected String getNodeIdRef(Attributes attributes) {
       return attributes.getValue(SEDXMLWriter.ATTRIBUTE_NODE_ID_REF);
+   }
+   
+   /**
+    * Returns the constraint id reference value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getConstraintIdRef(Attributes attributes) {
+      return attributes.getValue(SEDXMLWriter.ATTRIBUTE_CONSTRAINT_ID_REF);
    }
    
    /**

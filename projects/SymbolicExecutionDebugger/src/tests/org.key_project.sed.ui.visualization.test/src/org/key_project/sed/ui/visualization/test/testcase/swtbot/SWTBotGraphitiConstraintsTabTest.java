@@ -16,7 +16,7 @@ package org.key_project.sed.ui.visualization.test.testcase.swtbot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.eclipse.gef.finder.widgets.SWTBotGefEditor;
 import org.junit.Test;
-import org.key_project.sed.ui.test.testcase.swtbot.SWTBotConstraintsTabTest;
+import org.key_project.sed.ui.test.testcase.swtbot.SWTBotConstraintsNodeTabTest;
 import org.key_project.util.test.util.SWTBotTabbedPropertyList;
 
 /**
@@ -29,7 +29,7 @@ public class SWTBotGraphitiConstraintsTabTest extends AbstractSWTBotGraphitiProp
     */
    @Test
    public void testValuesAndTabExistence() throws Exception {
-      doFixedExampleTest(SWTBotConstraintsTabTest.createFixedExampleSteps());
+      doFixedExampleTest(SWTBotConstraintsNodeTabTest.createFixedExampleSteps());
    }
    
    /**

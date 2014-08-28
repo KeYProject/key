@@ -21,7 +21,7 @@ import org.key_project.sed.core.model.ISEDDebugNode;
  * which are provided via {@link ISEDDebugNode#getConstraints()}.
  * @author Martin Hentschel
  */
-public class ConstraintsPropertySection extends AbstractSEDDebugNodePropertySection {
+public class ConstraintsNodePropertySection extends AbstractSEDDebugNodePropertySection {
    /**
     * {@inheritDoc}
     */

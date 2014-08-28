@@ -1,18 +1,18 @@
 package org.key_project.sed.ui.property;
 
+import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.jface.viewers.IFilter;
-import org.key_project.sed.core.model.ISEDVariable;
 
 /**
- * An {@link IFilter} which selects {@link ISEDVariable}s.
+ * An {@link IFilter} which selects {@link IVariable}s.
  * @author Martin Hentschel
  */
-public class SEDVariableTreeFilter implements IFilter {
+public class VariableTreeFilter implements IFilter {
    /**
     * {@inheritDoc}
     */
    @Override
    public boolean select(Object toTest) {
-      return toTest instanceof ISEDVariable;
+      return toTest instanceof IVariable;
    }
 }

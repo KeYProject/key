@@ -59,6 +59,7 @@ import org.key_project.sed.core.model.ISEDVariable;
 import org.key_project.sed.core.model.ISourcePathProvider;
 import org.key_project.sed.core.util.LogUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.XMLUtil;
 
@@ -214,6 +215,12 @@ public class SEDXMLWriter {
    public static final String TAG_CONSTRAINT = "constraint";
 
    /**
+    * Tag name to store relevant {@link ISEDConstraint}s provided by
+    * {@link ISEDValue#getRelevantConstraints()}.
+    */
+   public static final String TAG_RELEVANT_CONSTRAINT = "relevantConstraint";
+
+   /**
     * Attribute name to define namespaces.
     */
    public static final String ATTRIBUTE_NAMESPACE = "xmlns";
@@ -277,6 +284,11 @@ public class SEDXMLWriter {
     * Refers to an existing {@link ISEDDebugNode} with the defined id.
     */
    public static final String ATTRIBUTE_NODE_ID_REF = "nodeIdRef";
+
+   /**
+    * Refers to an existing {@link ISEDConstraint} with the defined id.
+    */
+   public static final String ATTRIBUTE_CONSTRAINT_ID_REF = "constraintIdRef";
 
    /**
     * Attribute name to store {@link ISEDMethodContract#isPreconditionComplied()}.
@@ -1101,7 +1113,7 @@ public class SEDXMLWriter {
          }
          // Append variables
          if (node instanceof IStackFrame) {
-            appendVariables(level + 1, (IStackFrame)node, saveVariables, sb, monitor);
+            appendVariables(level + 1, (IStackFrame)node, saveVariables, saveConstraints, sb, monitor);
          }
          // Append call stack
          appendCallStack(level + 1, node, saveCallStack, sb);
@@ -1231,16 +1243,17 @@ public class SEDXMLWriter {
     * @param level The level in the tree used for leading white space (formating).
     * @param stackFrame The {@link IStackFrame} which contains the variables.
     * @param saveVariables Save variables?
+    * @param saveConstraints Save constraints?
     * @param sb The {@link StringBuffer} to write to.
     * @param monitor The {@link IProgressMonitor} to use.
     * @throws DebugException Occurred Exception.
     */
-   protected void appendVariables(int level, IStackFrame stackFrame, boolean saveVariables, StringBuffer sb, IProgressMonitor monitor) throws DebugException {
+   protected void appendVariables(int level, IStackFrame stackFrame, boolean saveVariables, boolean saveConstraints, StringBuffer sb, IProgressMonitor monitor) throws DebugException {
       if (saveVariables && stackFrame.hasVariables()) {
          IVariable[] variables = stackFrame.getVariables();
          for (IVariable variable : variables) {
             SWTUtil.checkCanceled(monitor);
-            appendVariable(level, variable, sb, monitor);
+            appendVariable(level, variable, saveConstraints, sb, monitor);
             monitor.worked(1);
          }
       }
@@ -1250,11 +1263,12 @@ public class SEDXMLWriter {
     * Appends the given variable to the {@link StringBuffer}.
     * @param level The level in the tree used for leading white space (formating).
     * @param variable The variable to append.
+    * @param saveConstraints Save constraints?
     * @param sb The {@link StringBuffer} to write to.
     * @param monitor The {@link IProgressMonitor} to use.
     * @throws DebugException Occurred Exception.
     */
-   protected void appendVariable(int level, IVariable variable, StringBuffer sb, IProgressMonitor monitor) throws DebugException {
+   protected void appendVariable(int level, IVariable variable, boolean saveConstraints, StringBuffer sb, IProgressMonitor monitor) throws DebugException {
       // Append start tag
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       if (variable instanceof ISEDVariable) {
@@ -1265,7 +1279,7 @@ public class SEDXMLWriter {
       XMLUtil.appendStartTag(level, TAG_VARIABLE, attributeValues, sb);
       // Append children
       if (variable.getValue() != null) {
-         appendValue(level + 1, variable.getValue(), sb, monitor);
+         appendValue(level + 1, variable.getValue(), saveConstraints, sb, monitor);
       }
       // Append end tag
       XMLUtil.appendEndTag(level, TAG_VARIABLE, sb);
@@ -1275,11 +1289,12 @@ public class SEDXMLWriter {
     * Appends the given value to the {@link StringBuffer}.
     * @param level The level in the tree used for leading white space (formating).
     * @param value The value to append.
+    * @param saveConstraints Save constraints?
     * @param sb The {@link StringBuffer} to write to.
     * @param monitor The {@link IProgressMonitor} to use.
     * @throws DebugException Occurred Exception.
     */
-   protected void appendValue(int level, IValue value, StringBuffer sb, IProgressMonitor monitor) throws DebugException {
+   protected void appendValue(int level, IValue value, boolean saveConstraints, StringBuffer sb, IProgressMonitor monitor) throws DebugException {
       // Append start tag
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       if (value instanceof ISEDValue) {
@@ -1292,17 +1307,55 @@ public class SEDXMLWriter {
          attributeValues.put(ATTRIBUTE_MULTI_VALUED, ((ISEDValue)value).isMultiValued() + "");
       }
       XMLUtil.appendStartTag(level, TAG_VALUE, attributeValues, sb);
+      // Append relevant constraints
+      appendRelevantConstraints(level + 1, value, saveConstraints, sb, monitor);
       // Append children
       if (value.hasVariables()) {
          IVariable[] variables = value.getVariables();
          for (IVariable variable : variables) {
             SWTUtil.checkCanceled(monitor);
-            appendVariable(level + 1, variable, sb, monitor);
+            appendVariable(level + 1, variable, saveConstraints, sb, monitor);
             monitor.worked(1);
          }
       }
       // Append end tag
       XMLUtil.appendEndTag(level, TAG_VALUE, sb);
+   }
+
+   /**
+    * Appends all relevant constraints to the {@link StringBuffer}.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param value The {@link IValue} which contains the relevant constraints.
+    * @param saveConstraints Save constraints?
+    * @param sb The {@link StringBuffer} to write to.
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @throws DebugException Occurred Exception.
+    */
+   protected void appendRelevantConstraints(int level, IValue value, boolean saveConstraints, StringBuffer sb, IProgressMonitor monitor) throws DebugException {
+      if (saveConstraints && value instanceof ISEDValue) {
+         ISEDConstraint[] constraints = ((ISEDValue) value).getRelevantConstraints();
+         if (!ArrayUtil.isEmpty(constraints)) {
+            for (ISEDConstraint constraint : constraints) {
+               SWTUtil.checkCanceled(monitor);
+               appendRelevantConstraint(level, constraint, sb, monitor);
+               monitor.worked(1);
+            }
+         }
+      }
+   }
+
+   /**
+    * Appends the given relevant constraint to the {@link StringBuffer}.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param constraint The constraint to append.
+    * @param sb The {@link StringBuffer} to write to.
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @throws DebugException Occurred Exception.
+    */
+   protected void appendRelevantConstraint(int level, ISEDConstraint constraint, StringBuffer sb, IProgressMonitor monitor) throws DebugException {
+      Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+      attributeValues.put(ATTRIBUTE_CONSTRAINT_ID_REF, constraint.getId());
+      XMLUtil.appendEmptyTag(level, TAG_RELEVANT_CONSTRAINT, attributeValues, sb);
    }
 
    /**

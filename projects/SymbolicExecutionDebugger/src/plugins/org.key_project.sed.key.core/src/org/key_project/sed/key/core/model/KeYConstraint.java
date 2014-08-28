@@ -44,4 +44,12 @@ public class KeYConstraint extends AbstractSEDConstraint {
          throw new DebugException(LogUtil.getLogger().createErrorStatus(e));
       }
    }
+
+   /**
+    * Returns the represented {@link IExecutionConstraint}.
+    * @return The represented {@link IExecutionConstraint}.
+    */
+   public IExecutionConstraint getExecutionConstraint() {
+      return executionConstraint;
+   }
 }
