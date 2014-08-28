@@ -24,6 +24,7 @@ import org.key_project.sed.ui.test.testcase.swtbot.SWTBotMethordReturnsTabTest;
 import org.key_project.sed.ui.test.testcase.swtbot.SWTBotNodeTabTest;
 import org.key_project.sed.ui.test.testcase.swtbot.SWTBotSourceTabTest;
 import org.key_project.sed.ui.test.testcase.swtbot.SWTBotStatisticsTabTest;
+import org.key_project.sed.ui.test.testcase.swtbot.SWTBotVariablesTabTest;
 
 /**
  * Run all contained JUnit 4 test cases that requires SWT Bot.
@@ -39,7 +40,8 @@ import org.key_project.sed.ui.test.testcase.swtbot.SWTBotStatisticsTabTest;
     SWTBotMethordReturnsTabTest.class,
     SWTBotNodeTabTest.class,
     SWTBotSourceTabTest.class,
-    SWTBotStatisticsTabTest.class
+    SWTBotStatisticsTabTest.class,
+    SWTBotVariablesTabTest.class
 })
 public class SWTBotAllSEDUITests {
 }

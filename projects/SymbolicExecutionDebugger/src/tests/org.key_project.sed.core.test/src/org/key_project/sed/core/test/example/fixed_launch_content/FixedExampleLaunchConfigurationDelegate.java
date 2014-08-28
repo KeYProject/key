@@ -114,6 +114,24 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        s1.addConstraint(new SEDMemoryConstraint(target, "int x = 1 Constraint"));
        thread.addChild(s1);
        
+       SEDMemoryValue s1var1value = new SEDMemoryValue(target);
+       s1var1value.setReferenceTypeName("s1var1valueType");
+       s1var1value.setValueString("s1var1value");
+       SEDMemoryVariable s1var1 = new SEDMemoryVariable(target);
+       s1var1.setName("var1");
+       s1var1.setReferenceTypeName("var1type");
+       s1var1.setValue(s1var1value);
+       s1.addVariable(s1var1);
+       
+       SEDMemoryValue s1var2value = new SEDMemoryValue(target);
+       s1var2value.setReferenceTypeName("s1var2valueType");
+       s1var2value.setValueString("s1var2value");
+       SEDMemoryVariable s1var2 = new SEDMemoryVariable(target);
+       s1var2.setName("var2");
+       s1var2.setReferenceTypeName("var2type");
+       s1var2.setValue(s1var2value);
+       s1.addVariable(s1var2);
+       
        SEDMemoryLoopStatement ln = new SEDMemoryLoopStatement(target, s1, thread);
        ln.setName("while (x == 1)");
        ln.setPathCondition("pc3");
