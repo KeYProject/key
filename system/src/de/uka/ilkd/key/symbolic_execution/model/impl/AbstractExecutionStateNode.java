@@ -20,13 +20,12 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeSymbolicLayoutExtractor;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
+import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 
 /**
  * Provides a basic implementation of {@link IExecutionStateNode}.
@@ -42,11 +41,6 @@ public abstract class AbstractExecutionStateNode<S extends SourceElement> extend
     * The used {@link ExecutionNodeSymbolicLayoutExtractor}.
     */
    private ExecutionNodeSymbolicLayoutExtractor layoutExtractor;
-   
-   /**
-    * The available {@link IExecutionConstraint}s.
-    */
-   private IExecutionConstraint[] constraints;
    
    /**
     * Constructor.
@@ -152,24 +146,4 @@ public abstract class AbstractExecutionStateNode<S extends SourceElement> extend
    public ImmutableList<ISymbolicEquivalenceClass> getLayoutsEquivalenceClasses(int layoutIndex) throws ProofInputException {
       return getLayoutExtractor().getEquivalenceClasses(layoutIndex);
    }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public IExecutionConstraint[] getConstraints() {
-      synchronized (this) {
-         if (constraints == null) {
-            constraints = lazyComputeConstraints();
-         }
-         return constraints;
-      }
-   }
-
-   /**
-    * Computes the constraints lazily when {@link #getConstraints()} is 
-    * called the first time.
-    * @return The {@link IExecutionConstraint}s of the current state.
-    */
-   protected abstract IExecutionConstraint[] lazyComputeConstraints();
 }

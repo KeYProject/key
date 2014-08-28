@@ -475,6 +475,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_BRANCH_CONDITION_COMPUTED, node.isBranchConditionComputed() + "");
       attributeValues.put(ATTRIBUTE_ADDITIONAL_BRANCH_LABEL, node.getAdditionalBranchLabel());
       appendStartTag(level, TAG_BRANCH_CONDITION, attributeValues, sb);
+      appendConstraints(level + 1, node, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       appendEndTag(level, TAG_BRANCH_CONDITION, sb);
@@ -503,6 +504,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       appendStartTag(level, TAG_START, attributeValues, sb);
+      appendConstraints(level + 1, node, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       appendTerminations(level + 1, node, sb);
@@ -868,6 +870,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_TERMINATION_KIND, node.getTerminationKind().toString());
       attributeValues.put(ATTRIBUTE_BRANCH_VERIFIED, node.isBranchVerified() + "");
       appendStartTag(level, TAG_TERMINATION, attributeValues, sb);
+      appendConstraints(level + 1, node, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       appendEndTag(level, TAG_TERMINATION, sb);
@@ -893,12 +896,12 @@ public class ExecutionNodeWriter extends AbstractWriter {
    /**
     * Appends the contained {@link IExecutionConstraint}s to the given {@link StringBuffer}.
     * @param level The level to use.
-    * @param node The {@link IExecutionStateNode} which provides the {@link IExecutionConstraint}s.
+    * @param node The {@link IExecutionNode} which provides the {@link IExecutionConstraint}s.
     * @param saveConstraints Save constraints? 
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void appendConstraints(int level, IExecutionStateNode<?> node, boolean saveConstraints, StringBuffer sb) throws ProofInputException {
+   protected void appendConstraints(int level, IExecutionNode node, boolean saveConstraints, StringBuffer sb) throws ProofInputException {
       if (saveConstraints) {
          IExecutionConstraint[] constraints = node.getConstraints();
          for (IExecutionConstraint constraint : constraints) {

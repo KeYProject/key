@@ -417,15 +417,18 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertEquals(((IExecutionBranchCondition)expected).isMergedBranchCondition(), ((IExecutionBranchCondition)current).isMergedBranchCondition());
          assertEquals(((IExecutionBranchCondition)expected).isBranchConditionComputed(), ((IExecutionBranchCondition)current).isBranchConditionComputed());
          assertTrue("Expected \"" + ((IExecutionBranchCondition)expected).getAdditionalBranchLabel() + "\" but is \"" + ((IExecutionBranchCondition)current).getAdditionalBranchLabel() + "\".", JavaUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)expected).getAdditionalBranchLabel(), ((IExecutionBranchCondition)current).getAdditionalBranchLabel()));
+         assertConstraints((IExecutionBranchCondition)expected, (IExecutionBranchCondition)current, compareConstraints);
       }
       else if (expected instanceof IExecutionStart) {
          assertTrue("Expected IExecutionStartNode but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionStart);
          assertTerminations((IExecutionStart)expected, (IExecutionStart)current);
+         assertConstraints((IExecutionStart)expected, (IExecutionStart)current, compareConstraints);
       }
       else if (expected instanceof IExecutionTermination) {
          assertTrue("Expected IExecutionTermination but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionTermination);
          assertEquals(((IExecutionTermination)expected).getTerminationKind(), ((IExecutionTermination)current).getTerminationKind());
          assertEquals(((IExecutionTermination)expected).isBranchVerified(), ((IExecutionTermination)current).isBranchVerified());
+         assertConstraints((IExecutionTermination)expected, (IExecutionTermination)current, compareConstraints);
       }
       else if (expected instanceof IExecutionBranchStatement) {
          assertTrue("Expected IExecutionBranchStatement but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionBranchStatement);
@@ -598,13 +601,13 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    }
 
    /**
-    * Makes sure that the given nodes contains the same {@link IExecutionStateNode}s.
+    * Makes sure that the given nodes contains the same {@link IExecutionNode}s.
     * @param expected The expected node.
     * @param current The current node.
     * @param compareConstraints Compare constraints?
     * @throws ProofInputException Occurred Exception.
     */
-   protected static void assertConstraints(IExecutionStateNode<?> expected, IExecutionStateNode<?> current, boolean compareConstraints) throws ProofInputException {
+   protected static void assertConstraints(IExecutionNode expected, IExecutionNode current, boolean compareConstraints) throws ProofInputException {
       if (compareConstraints) {
          assertNotNull(expected);
          assertNotNull(current);

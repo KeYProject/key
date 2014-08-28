@@ -18,6 +18,7 @@ import org.junit.runners.Suite;
 import org.key_project.sed.ui.test.testcase.swtbot.SWTBotAnnotationLinksTabTest;
 import org.key_project.sed.ui.test.testcase.swtbot.SWTBotAnnotationsTabTest;
 import org.key_project.sed.ui.test.testcase.swtbot.SWTBotCallStackTabTest;
+import org.key_project.sed.ui.test.testcase.swtbot.SWTBotConstraintsTabTest;
 import org.key_project.sed.ui.test.testcase.swtbot.SWTBotExpandAllTest;
 import org.key_project.sed.ui.test.testcase.swtbot.SWTBotMethordReturnsTabTest;
 import org.key_project.sed.ui.test.testcase.swtbot.SWTBotNodeTabTest;
@@ -33,6 +34,7 @@ import org.key_project.sed.ui.test.testcase.swtbot.SWTBotStatisticsTabTest;
     SWTBotAnnotationLinksTabTest.class,
     SWTBotAnnotationsTabTest.class,
     SWTBotCallStackTabTest.class,
+    SWTBotConstraintsTabTest.class,
     SWTBotExpandAllTest.class,
     SWTBotMethordReturnsTabTest.class,
     SWTBotNodeTabTest.class,

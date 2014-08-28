@@ -71,6 +71,11 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     * The contained KeY variables.
     */
    private KeYVariable[] variables;
+   
+   /**
+    * The constraints
+    */
+   private KeYConstraint[] constraints;
 
    /**
     * The method call stack.
@@ -246,6 +251,27 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
             variables = KeYModelUtil.createVariables(this, executionNode);
          }
          return variables;
+      }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasConstraints() throws DebugException {
+      return !isTerminated() && super.hasConstraints();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYConstraint[] getConstraints() throws DebugException {
+      synchronized (this) {
+         if (constraints == null) {
+            constraints = KeYModelUtil.createConstraints(this, executionNode);
+         }
+         return constraints;
       }
    }
 

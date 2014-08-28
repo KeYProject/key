@@ -76,10 +76,4 @@ public interface IExecutionStateNode<S extends SourceElement> extends IExecution
     * @throws ProofInputException Occurred Exception.
     */
    public ISymbolicLayout getCurrentLayout(int layoutIndex) throws ProofInputException;
-   
-   /**
-    * Returns all available {@link IExecutionConstraint}s.
-    * @return The available {@link IExecutionConstraint}s.
-    */
-   public IExecutionConstraint[] getConstraints();
 }

@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.debug.core.DebugException;
+import org.key_project.sed.core.model.ISEDConstraint;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
@@ -53,6 +54,11 @@ public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermi
     * Verified?
     */
    private boolean verified;
+   
+   /**
+    * The contained {@link ISEDConstraint}s.
+    */
+   private final List<ISEDConstraint> constraints = new LinkedList<ISEDConstraint>();
    
    /**
     * Constructor.
@@ -187,5 +193,23 @@ public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermi
    @Override
    public boolean isVerified() {
       return verified;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addConstraint(ISEDConstraint constraint) {
+      if (constraint != null) {
+         constraints.add(constraint);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDConstraint[] getConstraints() throws DebugException {
+      return constraints.toArray(new ISEDConstraint[constraints.size()]);
    }
 }

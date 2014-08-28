@@ -32,6 +32,7 @@ import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchStatement;
+import org.key_project.sed.core.model.memory.SEDMemoryConstraint;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryExceptionalMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryExceptionalTermination;
@@ -101,6 +102,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        SEDMemoryThread thread = new SEDMemoryThread(target, false);
        thread.setName("Fixed Example Thread");
        thread.setPathCondition("pc1");
+       thread.addConstraint(new SEDMemoryConstraint(target, "Thread's Constraint"));
        target.addSymbolicThread(thread);
        
        SEDMemoryStatement s1 = new SEDMemoryStatement(target, thread, thread);
@@ -109,6 +111,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        s1.setLineNumber(-1);
        s1.setCharStart(3);
        s1.setCharEnd(5);
+       s1.addConstraint(new SEDMemoryConstraint(target, "int x = 1 Constraint"));
        thread.addChild(s1);
        
        SEDMemoryLoopStatement ln = new SEDMemoryLoopStatement(target, s1, thread);

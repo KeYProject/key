@@ -45,6 +45,11 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYSEDDeb
     * The method call stack.
     */
    private IKeYSEDDebugNode<?>[] callStack;
+   
+   /**
+    * The constraints
+    */
+   private KeYConstraint[] constraints;
 
    /**
     * Constructor.
@@ -167,5 +172,26 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYSEDDeb
    @Override
    public boolean isVerified() {
       return executionNode.isBranchVerified();
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasConstraints() throws DebugException {
+      return !isTerminated() && super.hasConstraints();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYConstraint[] getConstraints() throws DebugException {
+      synchronized (this) {
+         if (constraints == null) {
+            constraints = KeYModelUtil.createConstraints(this, executionNode);
+         }
+         return constraints;
+      }
    }
 }

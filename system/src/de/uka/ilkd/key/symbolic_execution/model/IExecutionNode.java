@@ -89,4 +89,10 @@ public interface IExecutionNode extends IExecutionElement {
     * @return The method call stack. 
     */
    public IExecutionNode[] getCallStack();
+   
+   /**
+    * Returns all available {@link IExecutionConstraint}s.
+    * @return The available {@link IExecutionConstraint}s.
+    */
+   public IExecutionConstraint[] getConstraints();
 }

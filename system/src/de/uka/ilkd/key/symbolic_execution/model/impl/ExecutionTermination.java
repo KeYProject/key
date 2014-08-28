@@ -28,11 +28,13 @@ import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -177,6 +179,14 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
          }
       }
       return result;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected IExecutionConstraint[] lazyComputeConstraints() {
+      return SymbolicExecutionUtil.createExecutionConstraints(this);
    }
    
    /**

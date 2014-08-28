@@ -256,11 +256,11 @@ public class ExecutionNodeReader {
                ((KeYlessValue) parentValue).addConstraint(constraint);
             }
             else {
-               if (!(parent instanceof AbstractKeYlessStateNode<?>)) {
-                  throw new SAXException("Can't add constraint to stateless node.");
+               if (!(parent instanceof AbstractKeYlessExecutionNode)) {
+                  throw new SAXException("Can't add constraint to non execution node.");
                }
                KeYlessConstraint constraint = new KeYlessConstraint(getName(attributes));
-               ((AbstractKeYlessStateNode<?>) parent).addConstraint(constraint);
+               ((AbstractKeYlessExecutionNode) parent).addConstraint(constraint);
             }
          }
          else if (isVariable(uri, localName, qName)) {
@@ -998,6 +998,11 @@ public class ExecutionNodeReader {
       private final List<IExecutionNode> callStack = new LinkedList<IExecutionNode>();
       
       /**
+       * The contained constraints.
+       */
+      private final List<IExecutionConstraint> constraints = new LinkedList<IExecutionConstraint>();
+      
+      /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
@@ -1076,6 +1081,22 @@ public class ExecutionNodeReader {
       @Override
       public IExecutionNode[] getCallStack() {
          return callStack.isEmpty() ? null : callStack.toArray(new IExecutionNode[callStack.size()]);
+      }
+
+      /**
+       * Adds the given {@link IExecutionConstraint}.
+       * @param constraint The {@link IExecutionConstraint} to add.
+       */
+      public void addConstraint(IExecutionConstraint constraint) {
+         constraints.add(constraint);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IExecutionConstraint[] getConstraints() {
+         return constraints.toArray(new IExecutionConstraint[constraints.size()]);
       }
    }
    
@@ -1334,11 +1355,6 @@ public class ExecutionNodeReader {
     */
    public static abstract class AbstractKeYlessStateNode<S extends SourceElement> extends AbstractKeYlessExecutionNode implements IExecutionStateNode<S> {
       /**
-       * The contained constraints.
-       */
-      private final List<IExecutionConstraint> constraints = new LinkedList<IExecutionConstraint>();
-      
-      /**
        * The contained variables.
        */
       private final List<IExecutionVariable> variables = new LinkedList<IExecutionVariable>();
@@ -1355,14 +1371,6 @@ public class ExecutionNodeReader {
                                       String formatedPathCondition,
                                       boolean pathConditionChanged) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
-      }
-
-      /**
-       * Adds the given {@link IExecutionConstraint}.
-       * @param constraint The {@link IExecutionConstraint} to add.
-       */
-      public void addConstraint(IExecutionConstraint constraint) {
-         constraints.add(constraint);
       }
 
       /**
@@ -1387,14 +1395,6 @@ public class ExecutionNodeReader {
       @Override
       public PositionInfo getActivePositionInfo() {
          return null;
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public IExecutionConstraint[] getConstraints() {
-         return constraints.toArray(new IExecutionConstraint[constraints.size()]);
       }
 
       /**

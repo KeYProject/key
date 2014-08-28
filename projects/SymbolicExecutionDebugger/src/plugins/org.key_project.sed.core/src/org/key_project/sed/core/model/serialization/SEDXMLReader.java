@@ -40,6 +40,7 @@ import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.annotation.ISEDAnnotationType;
 import org.key_project.sed.core.model.ISEDBranchCondition;
+import org.key_project.sed.core.model.ISEDConstraint;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
@@ -50,6 +51,7 @@ import org.key_project.sed.core.model.memory.ISEDMemoryDebugNode;
 import org.key_project.sed.core.model.memory.ISEDMemoryStackFrameCompatibleDebugNode;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchStatement;
+import org.key_project.sed.core.model.memory.SEDMemoryConstraint;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryExceptionalMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryExceptionalTermination;
@@ -344,6 +346,14 @@ public class SEDXMLReader {
                target = (SEDMemoryDebugTarget)obj;
                result.add(target);
             }
+            else if (obj instanceof ISEDConstraint) {
+               if (parent != null) {
+                  parent.addConstraint((ISEDConstraint) obj);
+               }
+               else {
+                  thread.addConstraint((ISEDConstraint) obj);
+               }
+            }
             else if (obj instanceof IVariable) {
                IVariable variable = (IVariable)obj;
                if (variablesValueStack.isEmpty()) {
@@ -422,6 +432,9 @@ public class SEDXMLReader {
       public void endElement(String uri, String localName, String qName) throws SAXException {
          if (isVariable(uri, localName, qName) || isValue(uri, localName, qName)) {
             variablesValueStack.removeFirst();
+         }
+         else if (isConstraint(uri, localName, qName)) {
+            // Nothing to do
          }
          else if (isCallStackEntry(uri, localName, qName)) {
             // Nothing to do
@@ -508,6 +521,17 @@ public class SEDXMLReader {
       public ISEDDebugElement getElementById(String id) {
          return elementIdMapping.get(id);
       }
+   }
+   
+   /**
+    * Checks if the given tag name represents a constraint.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @return {@code true} represents a constraint, {@code false} represents something else.
+    */
+   protected boolean isConstraint(String uri, String localName, String qName) {
+      return SEDXMLWriter.TAG_CONSTRAINT.equals(qName);
    }
    
    /**
@@ -676,11 +700,20 @@ public class SEDXMLReader {
       else if (SEDXMLWriter.TAG_ANNOTATION_LINK.equals(qName)) {
          return createAnnotationLink(target, parent, thread, uri, localName, qName, attributes, annotationIdMapping);
       }
+      else if (SEDXMLWriter.TAG_CONSTRAINT.equals(qName)) {
+         return createConstraint(target, parent, thread, uri, localName, qName, attributes);
+      }
       else {
          throw new SAXException("Unknown tag \"" + qName + "\".");
       }
    }
    
+   protected SEDMemoryConstraint createConstraint(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) {
+      SEDMemoryConstraint constraint = new SEDMemoryConstraint(target, getName(attributes));
+      constraint.setId(getId(attributes));
+      return constraint;
+   }
+
    protected ISEDAnnotationLink createAnnotationLink(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes, Map<String, ISEDAnnotation> annotationIdMapping) throws SAXException {
       String sourceId = getAnnotationLinkSource(attributes);
       String targetId = getAnnotationLinkTarget(attributes);
