@@ -2421,7 +2421,9 @@ public final class SymbolicExecutionUtil {
          originalSequentWithoutMethodFrame = labelSkolemConstants(originalSequentWithoutMethodFrame, skolemInNewTerm, factory);
          newSuccedentToProve = addLabelRecursiveToNonSkolem(factory, newSuccedentToProve, ParameterlessTermLabel.RESULT_LABEL);
       }
-      Sequent sequentToProve = originalSequentWithoutMethodFrame.addFormula(new SequentFormula(newSuccedentToProve), false, true).sequent();
+      Sequent sequentToProve = newSuccedentToProve != null ?
+                               originalSequentWithoutMethodFrame.addFormula(new SequentFormula(newSuccedentToProve), false, true).sequent() :
+                               originalSequentWithoutMethodFrame;
       if (additionalAntecedent != null) {
          sequentToProve = sequentToProve.addFormula(new SequentFormula(additionalAntecedent), true, false).sequent();
       }
@@ -2529,23 +2531,28 @@ public final class SymbolicExecutionUtil {
     * @return The found skolem {@link Term}s.
     */
    private static Set<Term> collectSkolemConstants(Sequent sequent, Term term) {
-      // Collect skolem constants in term
-      Set<Term> result = collectSkolemConstantsNonRecursive(term);
-      // Collect all skolem constants used in skolem constants
-      List<Term> toCheck = new LinkedList<Term>(result);
-      while (!toCheck.isEmpty()) {
-         Term skolemConstant = toCheck.remove(0);
-         List<Term> replacements = findSkolemReplacements(sequent, skolemConstant);
-         for (Term replacement : replacements) {
-            Set<Term> checkResult = collectSkolemConstantsNonRecursive(replacement);
-            for (Term checkConstant : checkResult) {
-               if (result.add(checkConstant)) {
-                  toCheck.add(checkConstant);
+      if (term != null) {
+         // Collect skolem constants in term
+         Set<Term> result = collectSkolemConstantsNonRecursive(term);
+         // Collect all skolem constants used in skolem constants
+         List<Term> toCheck = new LinkedList<Term>(result);
+         while (!toCheck.isEmpty()) {
+            Term skolemConstant = toCheck.remove(0);
+            List<Term> replacements = findSkolemReplacements(sequent, skolemConstant);
+            for (Term replacement : replacements) {
+               Set<Term> checkResult = collectSkolemConstantsNonRecursive(replacement);
+               for (Term checkConstant : checkResult) {
+                  if (result.add(checkConstant)) {
+                     toCheck.add(checkConstant);
+                  }
                }
             }
          }
+         return result;
       }
-      return result;
+      else {
+         return new HashSet<Term>();
+      }
    }
 
    /**

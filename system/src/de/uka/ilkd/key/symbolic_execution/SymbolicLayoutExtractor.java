@@ -36,7 +36,6 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -299,7 +298,7 @@ public class SymbolicLayoutExtractor {
             symbolicObjectsResultingInCurrentState = sortTerms(symbolicObjectsResultingInCurrentState); // Sort terms alphabetically. This guarantees that in equivalence classes the representative term is for instance self.next and not self.next.next.
             symbolicObjectsResultingInCurrentState.add(getServices().getTermBuilder().NULL()); // Add null because it can happen that a object is null and this option must be included in equivalence class computation
             // Compute a Sequent with the initial conditions of the proof without modality
-            Sequent initialConditionsSequent = createSequentForEquivalenceClassComputation(pathCondition);
+            Sequent initialConditionsSequent = createSequentForEquivalenceClassComputation();
             ApplyStrategyInfo info = null;
             try {
                // Instantiate proof in which equivalent classes of symbolic objects are computed.
@@ -467,33 +466,18 @@ public class SymbolicLayoutExtractor {
     * Creates a {@link Sequent} which is used to compute equivalence classes.
     * </p>
     * <p>
-    * The created {@link Sequent} is a modified version of the {@link Sequent}
-    * provided by the proofs root node. It contains the given path condition
-    * as additional antecedent and the modality with the java code is removed.
+    * The created {@link Sequent} is the {@link Sequent} of {@link #node}
+    * without the modality.
     * </p>
-    * @param pathCondition The path condition to include.
     * @return The created {@link Sequent} to use for equivalence class computation.
     */
-   protected Sequent createSequentForEquivalenceClassComputation(Term pathCondition) {
-      // Get original sequent
-      Sequent originalSequent = getRoot().sequent();
-      // Add path condition to antecedent
-      Semisequent newAntecedent = originalSequent.antecedent();
-      newAntecedent = newAntecedent.insertLast(new SequentFormula(pathCondition)).semisequent();
-      // Remove everything after modality from sequent
-      Semisequent newSuccedent = Semisequent.EMPTY_SEMISEQUENT;
-      for (SequentFormula sf : originalSequent.succedent()) {
-         Term term = sf.formula();
-         if (Junctor.IMP.equals(term.op())) {
-            Term newImplication = getServices().getTermBuilder().imp(term.sub(0), getServices().getTermBuilder().ff());
-            newSuccedent = newSuccedent.insertLast(new SequentFormula(newImplication)).semisequent();
-            // Updates are not required, because getServices().getTermBuilder().apply(updates, true) is just true
-         }
-         else {
-            newSuccedent = newSuccedent.insertLast(sf).semisequent();
-         }
-      }
-      return Sequent.createSequent(newAntecedent, newSuccedent);
+   protected Sequent createSequentForEquivalenceClassComputation() {
+      return SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, 
+                                                                        node.getAppliedRuleApp(), 
+                                                                        null,
+                                                                        null,
+                                                                        null,
+                                                                        false);
    }
    
    /**
