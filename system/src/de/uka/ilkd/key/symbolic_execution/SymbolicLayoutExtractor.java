@@ -240,11 +240,6 @@ public class SymbolicLayoutExtractor {
    private int preVariableIndex = 0;
    
    /**
-    * The complete path condition which defines how to reach {@link #node} from the root of the proof.
-    */
-   private Term pathCondition;
-   
-   /**
     * Contains objects which should be ignored in the state because they
     * are created during symbolic execution or part of the proof obligation.
     */
@@ -278,7 +273,7 @@ public class SymbolicLayoutExtractor {
       synchronized (this) {
          if (!isAnalysed()) {
             // Get path condition
-            pathCondition = SymbolicExecutionUtil.computePathCondition(node, false);
+            Term pathCondition = SymbolicExecutionUtil.computePathCondition(node, false);
             pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
             // Compute all locations used in path conditions and updates. The values of the locations will be later computed in the state computation (and finally shown in a memory layout).
             Set<ExtractLocationParameter> temporaryCurrentLocations = new LinkedHashSet<ExtractLocationParameter>();
@@ -976,7 +971,7 @@ public class SymbolicLayoutExtractor {
     * @throws ProofInputException Occurred Exception
     */
    public ISymbolicLayout getInitialLayout(int layoutIndex) throws ProofInputException {
-      return getLayout(getRoot(), initialLayouts, layoutIndex, initialLocationTerm, initialLocations, pathCondition, computeInitialStateName());
+      return getLayout(initialLayouts, layoutIndex, initialLocationTerm, initialLocations, computeInitialStateName(), false);
    }
 
    /**
@@ -999,7 +994,7 @@ public class SymbolicLayoutExtractor {
     * @throws ProofInputException Occurred Exception
     */
    public ISymbolicLayout getCurrentLayout(int layoutIndex) throws ProofInputException {
-      return getLayout(node, currentLayouts, layoutIndex, currentLocationTerm, currentLocations, pathCondition, computeCurrentStateName());
+      return getLayout(currentLayouts, layoutIndex, currentLocationTerm, currentLocations, computeCurrentStateName(), true);
    }
    
    /**
@@ -1013,23 +1008,21 @@ public class SymbolicLayoutExtractor {
    /**
     * Helper method of {@link #getInitialLayout(int)} and
     * {@link #getCurrentLayout(int)} to lazily compute and get a memory layout.
-    * @param node The {@link Node} which provides the state.
     * @param confiurationsMap The map which contains already computed memory layouts.
     * @param layoutIndex The index of the memory layout to lazily compute and return.
     * @param layoutTerm The result term to use in side proof.
     * @param locations The locations to compute in side proof.
-    * @param pathCondition An optional path condition to include in the side proof.
     * @param stateName The name of the state.
+    * @param currentLayout {@code true} current layout, {@code false} initial layout.
     * @return The lazily computed memory layout.
     * @throws ProofInputException Occurred Exception.
     */
-   protected ISymbolicLayout getLayout(Node node,
-                                              Map<Integer, ISymbolicLayout> confiurationsMap, 
-                                              int layoutIndex,
-                                              Term layoutTerm,
-                                              Set<ExtractLocationParameter> locations,
-                                              Term pathCondition,
-                                              String stateName) throws ProofInputException {
+   protected ISymbolicLayout getLayout(Map<Integer, ISymbolicLayout> confiurationsMap, 
+                                       int layoutIndex,
+                                       Term layoutTerm,
+                                       Set<ExtractLocationParameter> locations,
+                                       String stateName,
+                                       boolean currentLayout) throws ProofInputException {
       synchronized (this) {
          assert layoutIndex >= 0;
          assert layoutIndex < appliedCutsPerLayout.size();
@@ -1039,7 +1032,7 @@ public class SymbolicLayoutExtractor {
             // Get memory layout
             ImmutableSet<Term> layout = appliedCutsPerLayout.get(layoutIndex);
             ImmutableList<ISymbolicEquivalenceClass> equivalentClasses = getEquivalenceClasses(layoutIndex);
-            result = lazyComputeLayout(node, layout, layoutTerm, locations, equivalentClasses, pathCondition, stateName);
+            result = lazyComputeLayout(layout, layoutTerm, locations, equivalentClasses, stateName, currentLayout);
             confiurationsMap.put(Integer.valueOf(layoutIndex), result);
          }
          return result;
@@ -1049,7 +1042,7 @@ public class SymbolicLayoutExtractor {
    /**
     * <p>
     * Computes a memory layout lazily when it is first time requested via 
-    * {@link #getLayout(Node, Map, int, Term, Set, Term, String)}.
+    * {@link #getLayout(Map, int, Term, Set, String, boolean)}.
     * </p>
     * <p>
     * The method starts a side proof with the given arguments to compute
@@ -1066,32 +1059,33 @@ public class SymbolicLayoutExtractor {
     * Finally, the last step is to create the {@link ISymbolicLayout} instance
     * and to fill it with the values/associations defined by {@link ExecutionVariableValuePair} instances.
     * </p>
-    * @param node The {@link Node} which provides the state.
     * @param layout The memory layout terms.
     * @param layoutTerm The result term to use in side proof.
     * @param locations The locations to compute in side proof.
     * @param equivalentClasses The equivalence classes defined by the memory layout terms.
-    * @param pathCondition An optional path condition to include in the side proof.
     * @param stateName The name of the state.
+    * @param currentLayout {@code true} current layout, {@code false} initial layout.
     * @return The created memory layout.
     * @throws ProofInputException Occurred Exception.
     */
-   protected ISymbolicLayout lazyComputeLayout(Node node,
-                                               ImmutableSet<Term> layout, 
+   protected ISymbolicLayout lazyComputeLayout(ImmutableSet<Term> layout, 
                                                Term layoutTerm,
                                                Set<ExtractLocationParameter> locations,
                                                ImmutableList<ISymbolicEquivalenceClass> equivalentClasses,
-                                               Term pathCondition,
-                                               String stateName) throws ProofInputException {
+                                               String stateName,
+                                               boolean currentLayout) throws ProofInputException {
       if (!locations.isEmpty()) {
          // Get original updates
-         Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-         ImmutableList<Term> originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;
+         ImmutableList<Term> originalUpdates;
+         if (!currentLayout) {
+            originalUpdates = ImmutableSLList.nil();
+         }
+         else {
+            Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+            originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;            
+         }
          // Combine memory layout with original updates
          Term layoutCondition = getServices().getTermBuilder().and(layout);
-         if (pathCondition != null) {
-            layoutCondition = getServices().getTermBuilder().and(layoutCondition, pathCondition);
-         }
          ImmutableList<Term> additionalUpdates = ImmutableSLList.nil();
          for (Term originalUpdate : originalUpdates) {
             if (UpdateJunctor.PARALLEL_UPDATE == originalUpdate.op()) {

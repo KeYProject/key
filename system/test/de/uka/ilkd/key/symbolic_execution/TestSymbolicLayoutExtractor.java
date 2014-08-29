@@ -69,7 +69,6 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * @throws Exception Occurred Exception.
     */
    public void testStaticMember_OnReturnNode() throws Exception {
-      // TODO: Layouts contain multiple values which has to be fixed.
       doTest("examples/_testcase/set/configurationExtractorStaticMember/test/StaticMember.java",
              "StaticMember",
              "examples/_testcase/set/configurationExtractorStaticMember/oracle/",
