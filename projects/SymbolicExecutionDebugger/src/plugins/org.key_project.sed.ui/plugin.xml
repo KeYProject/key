@@ -406,4 +406,10 @@
             verticalRulerPreferenceValue="true">
       </specification>
       </extension>
+      <extension
+            point="org.eclipse.core.runtime.preferences">
+         <initializer
+               class="org.key_project.sed.ui.util.SEDUIPreferenceUtilInitializer">
+         </initializer>
+      </extension>
 </plugin>
