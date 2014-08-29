@@ -1,9 +1,13 @@
 package org.key_project.key4eclipse.common.ui.completion;
 
+import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.key_project.key4eclipse.common.ui.provider.ContractLabelProvider;
 import org.key_project.key4eclipse.common.ui.provider.ImmutableCollectionContentProvider;
@@ -113,7 +117,14 @@ public class FunctionalOperationContractCompletion extends AbstractInteractiveRu
        */
       @Override
       public void createControl(Composite root) {
-         viewer = new TableViewer(root);
+         TableColumnLayout tableLayout = new TableColumnLayout(); // The TableColumnLayout together with the not visible TableViewerColumn ensure that no vertical column lines are shown.
+         Composite viewerComposite = new Composite(root, SWT.NONE);
+         viewerComposite.setLayout(tableLayout);
+         viewer = new TableViewer(viewerComposite);
+         viewer.getTable().setLinesVisible(true);
+         TableViewerColumn contractColumn = new TableViewerColumn(viewer, SWT.NONE);
+         contractColumn.getColumn().setText("Kind");
+         tableLayout.setColumnData(contractColumn.getColumn(), new ColumnWeightData(100));
          viewer.setContentProvider(ImmutableCollectionContentProvider.getInstance());
          labelViewer = new ContractLabelProvider(services);
          viewer.setLabelProvider(labelViewer);
