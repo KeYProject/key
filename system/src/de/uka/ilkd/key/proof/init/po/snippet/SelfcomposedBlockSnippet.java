@@ -1,6 +1,9 @@
 package de.uka.ilkd.key.proof.init.po.snippet;
 
+import java.util.HashSet;
+
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
 
@@ -24,12 +27,16 @@ class SelfcomposedBlockSnippet extends ReplaceAndRegisterMethod
 
         final Term exec1 =
                 f1.create(BasicPOSnippetFactory.Snippet.BLOCK_EXEC_WITH_PRE);
+        final HashSet<QuantifiableVariable> qvsToReplace =
+                collectQuantifiableVariables(exec1);
         final Term updatedExec1 =
                 d.tb.apply(d.tb.elementary(d.tb.getBaseHeap(),
                                            poVars1.pre.heap),
                            exec1);
         final Term exec2 =
-                f2.create(BasicPOSnippetFactory.Snippet.BLOCK_EXEC_WITH_PRE);
+                replaceQuantifiableVariables(
+                        f2.create(BasicPOSnippetFactory.Snippet.BLOCK_EXEC_WITH_PRE),
+                        qvsToReplace, d.services);
         final Term updatedExec2 =
                 d.tb.apply(d.tb.elementary(d.tb.getBaseHeap(),
                                            poVars2.pre.heap),

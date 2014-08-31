@@ -4,20 +4,29 @@
  */
 package de.uka.ilkd.key.proof.init.po.snippet;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.InfFlowSpec;
+import de.uka.ilkd.key.util.LinkedHashMap;
+
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Map;
 
 
 /**
@@ -40,8 +49,7 @@ abstract class ReplaceAndRegisterMethod {
                        StateVars origVars,
                        StateVars poVars,
                        TermBuilder tb) {
-        de.uka.ilkd.key.util.LinkedHashMap<Term, Term> map =
-                new de.uka.ilkd.key.util.LinkedHashMap<Term, Term>();
+        LinkedHashMap<Term, Term> map = new LinkedHashMap<Term, Term>();
 
         Iterator<Term> origVarsIt;
         Iterator<Term> poVarsIt;
@@ -119,8 +127,7 @@ abstract class ReplaceAndRegisterMethod {
                        Term[] origVars,
                        Term[] poVars,
                        TermBuilder tb) {
-        de.uka.ilkd.key.util.LinkedHashMap<Term, Term> map =
-                new de.uka.ilkd.key.util.LinkedHashMap<Term, Term>();
+        LinkedHashMap<Term, Term> map = new LinkedHashMap<Term, Term>();
 
         assert origVars.length == poVars.length;
         for (int i = 0; i < origVars.length; i++) {
@@ -163,5 +170,41 @@ abstract class ReplaceAndRegisterMethod {
             assert f.sort() != Sort.UPDATE;
             functionNames.addSafely(f);
         }
+    }
+
+    final static Term replaceQuantifiableVariables(Term term,
+                                             HashSet<QuantifiableVariable> qvs,
+                                             Services services) {
+        Map<QuantifiableVariable, QuantifiableVariable> replaceMap =
+                new LinkedHashMap<QuantifiableVariable, QuantifiableVariable>();
+        for (QuantifiableVariable qv: qvs) {
+            replaceMap.put(qv, new LogicVariable(qv.name(), qv.sort()));
+        }
+        final OpReplacer op = new OpReplacer(replaceMap, services.getTermFactory());
+        return op.replace(term);
+    }
+
+    final static HashSet<QuantifiableVariable> collectQuantifiableVariables(Term term) {
+        QuantifiableVariableVisitor qvVisitor = new QuantifiableVariableVisitor();
+        term.execPreOrder(qvVisitor);
+        return qvVisitor.getResult();
+    }
+
+    final private static class QuantifiableVariableVisitor implements Visitor {
+        private HashSet<QuantifiableVariable> vars = new LinkedHashSet<QuantifiableVariable>();
+
+        @Override
+        public void visit(Term visited) {
+            final ImmutableArray<QuantifiableVariable> boundVars = visited.boundVars();
+            for (QuantifiableVariable var : boundVars) vars.add(var);
+        }
+
+        @Override
+        public void subtreeEntered(Term subtreeRoot) { /* nothing to do */ }
+
+        @Override
+        public void subtreeLeft(Term subtreeRoot) { /* nothing to do */ }
+
+        public HashSet<QuantifiableVariable> getResult() { return vars; }
     }
 }
