@@ -98,6 +98,13 @@
             </adapter>
          </factory>
          <factory
+               adaptableType="org.eclipse.debug.internal.ui.views.variables.VariablesView"
+               class="org.key_project.sed.ui.adapter.AdapterFactory">
+            <adapter
+                  type="org.eclipse.ui.views.properties.IPropertySheetPage">
+            </adapter>
+         </factory>
+         <factory
                adaptableType="org.key_project.sed.core.model.ISEDVariable"
                class="org.key_project.sed.ui.adapter.SEDVariableAdapterFactory">
             <adapter
@@ -129,17 +136,23 @@
               <propertyTab
                     afterTab="org.key_project.sed.ui.node.tab"
                     category="Debug"
-                    id="org.key_project.sed.ui.callStack.tab"
-                    label="Call Stack">
-              </propertyTab>
-              <propertyTab
-                    afterTab="org.key_project.sed.ui.node.tab"
-                    category="Debug"
                     id="org.key_project.sed.ui.methodReturns.tab"
                     label="Method Returns">
               </propertyTab>
               <propertyTab
+                    afterTab="org.key_project.sed.ui.node.tab"
+                    category="Debug"
+                    id="org.key_project.sed.ui.callStack.tab"
+                    label="Call Stack">
+              </propertyTab>
+              <propertyTab
                     afterTab="org.key_project.sed.ui.callStack.tab"
+                    category="Debug"
+                    id="org.key_project.sed.ui.constraints.tab"
+                    label="Constraints">
+              </propertyTab>
+              <propertyTab
+                    afterTab="org.key_project.sed.ui.constraints.tab"
                     category="Debug"
                     id="org.key_project.sed.ui.source.tab"
                     label="Source">
@@ -160,6 +173,11 @@
                     category="Debug"
                     id="org.key_project.sed.ui.statistics.tab"
                     label="Statistics">
+              </propertyTab>
+              <propertyTab
+                    category="Debug"
+                    id="org.key_project.sed.ui.variablePropertyTab"
+                    label="Variable">
               </propertyTab>
           </propertyTabs>
       </extension>
@@ -207,6 +225,24 @@
                     filter="org.key_project.sed.ui.property.SEDDebugTargetTreeFilter"
                     id="org.key_project.sed.ui.property.StatisticsPropertySection"
                     tab="org.key_project.sed.ui.statistics.tab">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.property.ConstraintsNodePropertySection"
+                    filter="org.key_project.sed.ui.property.SEDDebugNodeTreeFilter"
+                    id="org.key_project.sed.ui.property.ConstraintsPropertySection"
+                    tab="org.key_project.sed.ui.constraints.tab">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.property.VariablePropertySection"
+                    filter="org.key_project.sed.ui.property.VariableTreeFilter"
+                    id="org.key_project.sed.ui.property.SEDVariablePropertySection"
+                    tab="org.key_project.sed.ui.variablePropertyTab">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.property.ConstraintsVariablePropertySection"
+                    filter="org.key_project.sed.ui.property.SEDVariableTreeFilter"
+                    id="org.key_project.sed.ui.property.ConstraintsPropertySection"
+                    tab="org.key_project.sed.ui.constraints.tab">
               </propertySection>
           </propertySections>
       </extension>
@@ -369,5 +405,11 @@
             verticalRulerPreferenceKey="executedSEDNode_verticalRuler"
             verticalRulerPreferenceValue="true">
       </specification>
+      </extension>
+      <extension
+            point="org.eclipse.core.runtime.preferences">
+         <initializer
+               class="org.key_project.sed.ui.util.SEDUIPreferenceUtilInitializer">
+         </initializer>
       </extension>
 </plugin>

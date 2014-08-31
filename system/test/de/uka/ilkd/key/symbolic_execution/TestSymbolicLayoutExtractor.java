@@ -68,6 +68,26 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
     * Tests "configurationExtractorInstanceCreationTest" without precondition.
     * @throws Exception Occurred Exception.
     */
+   public void testStaticMember_OnReturnNode() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorStaticMember/test/StaticMember.java",
+             "StaticMember",
+             "examples/_testcase/set/configurationExtractorStaticMember/oracle/",
+             "StaticMember.xml",
+             "testInstanceCreationTest_staticMember_initial",
+             ".xml",
+             "testInstanceCreationTest_staticMember_current",
+             ".xml",
+             null,
+             1,
+             2,
+             false,
+             false);
+   }
+   
+   /**
+    * Tests "configurationExtractorInstanceCreationTest" without precondition.
+    * @throws Exception Occurred Exception.
+    */
    public void testInstanceCreationTest_OnReturnNode() throws Exception {
       doTest("examples/_testcase/set/configurationExtractorInstanceCreationTest/test/InstanceCreationTest.java",
              "InstanceCreationTest",

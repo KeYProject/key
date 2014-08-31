@@ -584,13 +584,13 @@ options {
             }
             File path=new File(getSourceName().substring(start,end+1)+filename);
             try{ 
-                source = RuleSource.initRuleFile(path.toURL()); 
+                source = RuleSourceFactory.initRuleFile(path.toURL()); 
             }catch(java.net.MalformedURLException e){
                 System.err.println("Exception due to malformed URL of file "+
                                    filename+"\n " +e);
             }
         } else {
-            source = RuleSource.initRuleFile(filename+".key"); 
+            source = RuleSourceFactory.fromBuildInRule(filename+".key"); 
         }
         if (ldt) {
             includes.putLDT(filename, source);

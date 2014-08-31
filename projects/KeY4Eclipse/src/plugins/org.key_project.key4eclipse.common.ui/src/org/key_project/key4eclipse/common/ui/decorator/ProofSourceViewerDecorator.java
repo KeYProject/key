@@ -211,12 +211,14 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    
    protected void setGreenBackground(PosInOccurrence pos){
       initializeValuesForGreenBackground();
-      ImmutableList<Integer> path = printer.getPositionTable().pathForPosition(pos, filter);
-      Range range = printer.getPositionTable().rangeForPath(path);
-      marked1.start = range.start();
-      marked1.length = range.end()-range.start();
-      TextPresentation.applyTextPresentation(textPresentation, viewerText);
-      viewer.changeTextPresentation(textPresentation, true);
+      if (pos != null) {
+         ImmutableList<Integer> path = printer.getPositionTable().pathForPosition(pos, filter);
+         Range range = printer.getPositionTable().rangeForPath(path);
+         marked1.start = range.start();
+         marked1.length = range.end()-range.start();
+         TextPresentation.applyTextPresentation(textPresentation, viewerText);
+         viewer.changeTextPresentation(textPresentation, true);
+      }
    }
    
    protected void initializeValuesForGreenBackground(){

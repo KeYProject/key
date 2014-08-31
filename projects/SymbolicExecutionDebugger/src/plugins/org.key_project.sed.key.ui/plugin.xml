@@ -652,4 +652,18 @@
                label="Symbolically Reached Text Hover">
          </hover>
       </extension>
+   <extension
+         point="org.eclipse.ui.ide.markerResolution">
+      <markerResolutionGenerator
+            class="org.key_project.sed.key.ui.marker.SEDProofMarkerResolutionGenerator"
+            markerType="org.key_project.key4eclipse.resources.ui.marker.proofClosedMarker">
+      </markerResolutionGenerator>
+   </extension>
+   <extension
+         point="org.eclipse.ui.ide.markerResolution">
+      <markerResolutionGenerator
+            class="org.key_project.sed.key.ui.marker.SEDProofMarkerResolutionGenerator"
+            markerType="org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker">
+      </markerResolutionGenerator>
+   </extension>
 </plugin>

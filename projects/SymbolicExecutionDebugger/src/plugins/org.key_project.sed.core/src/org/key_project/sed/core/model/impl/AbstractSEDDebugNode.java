@@ -33,6 +33,7 @@ import org.eclipse.debug.internal.ui.viewers.update.DefaultSelectionPolicy;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.model.ISEDConstraint;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
@@ -332,9 +333,19 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
     * {@inheritDoc}
     */
    @Override
+   public boolean hasConstraints() throws DebugException {
+      ISEDConstraint[] constraints = getConstraints();
+      return !ArrayUtil.isEmpty(constraints);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public IBreakpoint[] computeHitBreakpoints() throws DebugException {
       return getDebugTarget().computeHitBreakpoints(this);
    }
+   
    /**
     * {@inheritDoc}
     */

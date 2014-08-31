@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
+import org.key_project.sed.core.model.ISEDConstraint;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDTermination;
@@ -56,6 +57,11 @@ public class SEDMemoryThread extends AbstractSEDThread implements ISEDMemoryDebu
     * The known {@link ISEDTermination}s of this {@link ISEDThread}.
     */
    private final Set<ISEDTermination> knownTerminations = new LinkedHashSet<ISEDTermination>();
+   
+   /**
+    * The contained {@link ISEDConstraint}s.
+    */
+   private final List<ISEDConstraint> constraints = new LinkedList<ISEDConstraint>();
    
    /**
     * Constructor.
@@ -207,5 +213,23 @@ public class SEDMemoryThread extends AbstractSEDThread implements ISEDMemoryDebu
    @Override
    public ISEDTermination[] getTerminations() throws DebugException {
       return knownTerminations.toArray(new ISEDTermination[knownTerminations.size()]);
-   } 
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addConstraint(ISEDConstraint constraint) {
+      if (constraint != null) {
+         constraints.add(constraint);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDConstraint[] getConstraints() throws DebugException {
+      return constraints.toArray(new ISEDConstraint[constraints.size()]);
+   }
 }

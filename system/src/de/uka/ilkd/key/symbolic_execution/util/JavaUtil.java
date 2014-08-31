@@ -256,6 +256,26 @@ public final class JavaUtil {
       }
       return result;
    }
+   
+   /**
+    * Searches an element in the given {@link Iterable} instance.
+    * @param array The instance to search in.
+    * @param filter The filter to select an element.
+    * @return The found element or {@code null} if no element was found.
+    */
+   public static <T> T search(T[] array, IFilter<T> filter) {
+      T result = null;
+      if (array != null && filter != null) {
+         int i = 0;
+         while (result == null && i < array.length) {
+            if (filter.select(array[i])) {
+               result = array[i];
+            }
+            i++;
+         }
+      }
+      return result;
+   }
 
    /**
     * Searches an element in the given {@link Iterable} instance and removes

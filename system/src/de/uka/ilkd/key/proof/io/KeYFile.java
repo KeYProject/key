@@ -104,7 +104,7 @@ public class KeYFile implements EnvInput {
                    File file, 
                    ProgressMonitor monitor,
                    Profile profile) {
-	this(name, RuleSource.initRuleFile(file), monitor, profile);
+	this(name, RuleSourceFactory.initRuleFile(file), monitor, profile);
     }
     
 
@@ -135,27 +135,31 @@ public class KeYFile implements EnvInput {
     
     protected ProofSettings getPreferences() throws ProofInputException {
         if (initConfig.getSettings() == null) {
-            if (file.isDirectory()) {
-                return null;
-            }
-            try {
-               KeYParserF problemParser
-                    = new KeYParserF(ParserMode.PROBLEM,
-                                    new KeYLexerF(getNewStream(), file.toString(), null));
-               problemParser.profile();
-               ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
-               settings.loadSettingsFromString(problemParser.preferences());
-                return settings;                
-            } catch (antlr.ANTLRException e) {
-                throw new ProofInputException(e);
-            } catch (FileNotFoundException fnfe) {
-                throw new ProofInputException(fnfe);
-            } catch (de.uka.ilkd.key.util.ExceptionHandlerException ehe) {
-                throw new ProofInputException(ehe.getCause().getMessage());
-            }
+            return readPreferences();
         } else {
             return initConfig.getSettings();
         }
+    }
+    
+    public ProofSettings readPreferences() throws ProofInputException {
+       if (file.isDirectory()) {
+          return null;
+      }
+      try {
+         KeYParserF problemParser
+              = new KeYParserF(ParserMode.PROBLEM,
+                              new KeYLexerF(getNewStream(), file.toString(), null));
+         problemParser.profile();
+         ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
+         settings.loadSettingsFromString(problemParser.preferences());
+          return settings;                
+      } catch (antlr.ANTLRException e) {
+          throw new ProofInputException(e);
+      } catch (FileNotFoundException fnfe) {
+          throw new ProofInputException(fnfe);
+      } catch (de.uka.ilkd.key.util.ExceptionHandlerException ehe) {
+          throw new ProofInputException(ehe.getCause().getMessage());
+      }
     }
     
     
@@ -172,7 +176,7 @@ public class KeYFile implements EnvInput {
     
     @Override
     public int getNumberOfChars() {
-	return file.getNumberOfChars();
+	return file.getNumberOfBytes();
     }
     
     

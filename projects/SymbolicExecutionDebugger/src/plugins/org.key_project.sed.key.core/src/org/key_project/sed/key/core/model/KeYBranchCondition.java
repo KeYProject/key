@@ -46,6 +46,11 @@ public class KeYBranchCondition extends AbstractSEDBranchCondition implements IK
    private IKeYSEDDebugNode<?>[] callStack;
    
    /**
+    * The constraints
+    */
+   private KeYConstraint[] constraints;
+   
+   /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this branch condition is contained.
     * @param parent The parent in that this node is contained as child.
@@ -159,6 +164,27 @@ public class KeYBranchCondition extends AbstractSEDBranchCondition implements IK
             callStack = KeYModelUtil.createCallStack(getDebugTarget(), executionNode.getCallStack()); 
          }
          return callStack;
+      }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasConstraints() throws DebugException {
+      return !isTerminated() && super.hasConstraints();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYConstraint[] getConstraints() throws DebugException {
+      synchronized (this) {
+         if (constraints == null) {
+            constraints = KeYModelUtil.createConstraints(this, executionNode);
+         }
+         return constraints;
       }
    }
 }

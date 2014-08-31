@@ -34,7 +34,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * based on KeY.
  * @author Martin Hentschel
  */
-public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDDebugNode<IExecutionMethodReturn> {
+public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDDebugNode<IExecutionMethodReturn>, IKeYBaseMethodReturn {
    /**
     * The {@link IExecutionMethodReturn} to represent by this debug node.
     */
@@ -59,6 +59,11 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
     * The contained KeY variables.
     */
    private KeYVariable[] variables;
+   
+   /**
+    * The constraints
+    */
+   private KeYConstraint[] constraints;
 
    /**
     * The method call stack.
@@ -228,9 +233,9 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
    }
    
    /**
-    * Returns the method call node if available in debug model.
-    * @return The {@link KeYMethodCall} node or {@code null} if not available.
+    * {@inheritDoc}
     */
+   @Override
    public KeYMethodCall getMethodCall() {
       return methodCall;
    }
@@ -245,6 +250,27 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
             variables = KeYModelUtil.createVariables(this, executionNode);
          }
          return variables;
+      }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasConstraints() throws DebugException {
+      return !isTerminated() && super.hasConstraints();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYConstraint[] getConstraints() throws DebugException {
+      synchronized (this) {
+         if (constraints == null) {
+            constraints = KeYModelUtil.createConstraints(this, executionNode);
+         }
+         return constraints;
       }
    }
 

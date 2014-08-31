@@ -27,6 +27,51 @@ import junit.framework.TestCase;
  * @author Martin Hentschel
  */
 public class TestJavaUtil extends TestCase {
+   
+   /**
+    * Tests for {@link ArrayUtil#search(Object[], IFilter)}.
+    */
+   public void testSearch_Array() {
+      String[] array = {"A", "B", "C", "D"};
+       assertEquals("A", JavaUtil.search(array, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "A".equals(element);
+          }
+       }));
+       assertEquals("B", JavaUtil.search(array, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "B".equals(element);
+          }
+       }));
+       assertEquals("C", JavaUtil.search(array, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "C".equals(element);
+          }
+       }));
+       assertEquals("D", JavaUtil.search(array, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "D".equals(element);
+          }
+       }));
+       assertNull(JavaUtil.search(array, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "E".equals(element);
+          }
+       }));
+       assertNull(JavaUtil.search(array, null));
+       assertNull(JavaUtil.search((String[])null, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "E".equals(element);
+          }
+       }));
+   }
+   
    /**
     * Tests {@link JavaUtil#contains(Object[], Object)}
     */
@@ -358,7 +403,7 @@ public class TestJavaUtil extends TestCase {
    /**
     * Tests for {@link JavaUtil#search(Iterable, IFilter)}.
     */
-   public void testSearch() {
+   public void testSearch_Iterable() {
        List<String> collection = new LinkedList<String>();
        collection.add("A");
        collection.add("B");
@@ -395,7 +440,7 @@ public class TestJavaUtil extends TestCase {
           }
        }));
        assertNull(JavaUtil.search(collection, null));
-       assertNull(JavaUtil.search(null, new IFilter<String>() {
+       assertNull(JavaUtil.search((Iterable<String>)null, new IFilter<String>() {
           @Override
           public boolean select(String element) {
              return "E".equals(element);

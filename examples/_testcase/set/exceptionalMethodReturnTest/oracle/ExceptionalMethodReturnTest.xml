@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call ExceptionalMethodReturnTest.main(x)&gt;" pathCondition="true" pathConditionChanged="false">
+      <statement name="return first(x);" pathCondition="true" pathConditionChanged="false">
+         <callStackEntry path="/0"/>
+         <methodCall name="&lt;call ExceptionalMethodReturnTest.first(x_3)&gt;" pathCondition="true" pathConditionChanged="false">
+            <callStackEntry path="/0"/>
+            <statement name="return second(x_3);" pathCondition="true" pathConditionChanged="false">
+               <callStackEntry path="/0/0/0"/>
+               <callStackEntry path="/0"/>
+               <methodCall name="&lt;call ExceptionalMethodReturnTest.second(x_6)&gt;" pathCondition="true" pathConditionChanged="false">
+                  <callStackEntry path="/0/0/0"/>
+                  <callStackEntry path="/0"/>
+                  <statement name="return x_6.value;" pathCondition="true" pathConditionChanged="false">
+                     <callStackEntry path="/0/0/0/0/0"/>
+                     <callStackEntry path="/0/0/0"/>
+                     <callStackEntry path="/0"/>
+                     <branchCondition name="not(equals(x,null))" pathCondition="not(equals(x,null))" pathConditionChanged="true" branchCondition="not(equals(x,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <callStackEntry path="/0/0/0/0/0"/>
+                        <callStackEntry path="/0/0/0"/>
+                        <callStackEntry path="/0"/>
+                        <methodReturn name="&lt;return of second&gt;" signature="&lt;return of ExceptionalMethodReturnTest.second(x_6)&gt;" pathCondition="not(equals(x,null))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return int::select(heap,x,ExceptionalMethodReturnTest.IntWrapper::$value) as result of second&gt;" signatureIncludingReturnValue="&lt;return int::select(heap,x,ExceptionalMethodReturnTest.IntWrapper::$value) as result of ExceptionalMethodReturnTest.second(x_6)&gt;" isReturnValueComputed="true" methodReturnCondition="not(equals(x,null))">
+                           <methodReturnValue name="int::select(heap,x,ExceptionalMethodReturnTest.IntWrapper::$value)" returnValueString="int::select(heap,x,ExceptionalMethodReturnTest.IntWrapper::$value)" hasCondition="false">
+                           </methodReturnValue>
+                           <callStackEntry path="/0/0/0/0/0"/>
+                           <callStackEntry path="/0/0/0"/>
+                           <callStackEntry path="/0"/>
+                           <methodReturn name="&lt;return of first&gt;" signature="&lt;return of ExceptionalMethodReturnTest.first(x_3)&gt;" pathCondition="not(equals(x,null))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return int::select(heap,x,ExceptionalMethodReturnTest.IntWrapper::$value) as result of first&gt;" signatureIncludingReturnValue="&lt;return int::select(heap,x,ExceptionalMethodReturnTest.IntWrapper::$value) as result of ExceptionalMethodReturnTest.first(x_3)&gt;" isReturnValueComputed="true" methodReturnCondition="not(equals(x,null))">
+                              <methodReturnValue name="int::select(heap,x,ExceptionalMethodReturnTest.IntWrapper::$value)" returnValueString="int::select(heap,x,ExceptionalMethodReturnTest.IntWrapper::$value)" hasCondition="false">
+                              </methodReturnValue>
+                              <callStackEntry path="/0/0/0"/>
+                              <callStackEntry path="/0"/>
+                              <methodReturn name="&lt;return of main&gt;" signature="&lt;return of ExceptionalMethodReturnTest.main(x)&gt;" pathCondition="not(equals(x,null))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return int::select(heap,x,ExceptionalMethodReturnTest.IntWrapper::$value) as result of main&gt;" signatureIncludingReturnValue="&lt;return int::select(heap,x,ExceptionalMethodReturnTest.IntWrapper::$value) as result of ExceptionalMethodReturnTest.main(x)&gt;" isReturnValueComputed="true" methodReturnCondition="not(equals(x,null))">
+                                 <methodReturnValue name="int::select(heap,x,ExceptionalMethodReturnTest.IntWrapper::$value)" returnValueString="int::select(heap,x,ExceptionalMethodReturnTest.IntWrapper::$value)" hasCondition="false">
+                                 </methodReturnValue>
+                                 <callStackEntry path="/0"/>
+                                 <termination name="&lt;end&gt;" pathCondition="not(equals(x,null))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                                 </termination>
+                              </methodReturn>
+                           </methodReturn>
+                        </methodReturn>
+                     </branchCondition>
+                     <branchCondition name="equals(x,null)" pathCondition="equals(x,null)" pathConditionChanged="true" branchCondition="equals(x,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <callStackEntry path="/0/0/0/0/0"/>
+                        <callStackEntry path="/0/0/0"/>
+                        <callStackEntry path="/0"/>
+                        <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call ExceptionalMethodReturnTest.second(x_6)&gt;&gt;" pathCondition="equals(x,null)" pathConditionChanged="false" methodReturnCondition="equals(x,null)">
+                           <callStackEntry path="/0/0/0/0/0"/>
+                           <callStackEntry path="/0/0/0"/>
+                           <callStackEntry path="/0"/>
+                           <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call ExceptionalMethodReturnTest.first(x_3)&gt;&gt;" pathCondition="equals(x,null)" pathConditionChanged="false" methodReturnCondition="equals(x,null)">
+                              <callStackEntry path="/0/0/0"/>
+                              <callStackEntry path="/0"/>
+                              <statement name="return 42;" pathCondition="equals(x,null)" pathConditionChanged="false">
+                                 <callStackEntry path="/0"/>
+                                 <methodReturn name="&lt;return of main&gt;" signature="&lt;return of ExceptionalMethodReturnTest.main(x)&gt;" pathCondition="equals(x,null)" pathConditionChanged="false" nameIncludingReturnValue="&lt;return Z(2(4(#))) as result of main&gt;" signatureIncludingReturnValue="&lt;return Z(2(4(#))) as result of ExceptionalMethodReturnTest.main(x)&gt;" isReturnValueComputed="true" methodReturnCondition="equals(x,null)">
+                                    <methodReturnValue name="Z(2(4(#)))" returnValueString="Z(2(4(#)))" hasCondition="false">
+                                    </methodReturnValue>
+                                    <callStackEntry path="/0"/>
+                                    <termination name="&lt;end&gt;" pathCondition="equals(x,null)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                                    </termination>
+                                 </methodReturn>
+                              </statement>
+                           </exceptionalMethodReturn>
+                        </exceptionalMethodReturn>
+                     </branchCondition>
+                  </statement>
+                  <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
+                  <methodReturnEntry path="/0/0/0/0/0/0/1/0"/>
+               </methodCall>
+            </statement>
+            <methodReturnEntry path="/0/0/0/0/0/0/0/0/0"/>
+            <methodReturnEntry path="/0/0/0/0/0/0/1/0/0"/>
+         </methodCall>
+      </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/0/0/1/0/0/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/1/0/0/0/0/0"/>
+</start>

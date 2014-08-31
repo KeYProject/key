@@ -20,6 +20,7 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 
@@ -42,6 +43,11 @@ public abstract class AbstractExecutionNode extends AbstractExecutionElement imp
     * The contained call stack.
     */
    private IExecutionNode[] callStack;
+   
+   /**
+    * The available {@link IExecutionConstraint}s.
+    */
+   private IExecutionConstraint[] constraints;
    
    /**
     * Constructor.
@@ -157,4 +163,24 @@ public abstract class AbstractExecutionNode extends AbstractExecutionElement imp
    public void setCallStack(IExecutionNode[] callStack) {
       this.callStack = callStack;
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IExecutionConstraint[] getConstraints() {
+      synchronized (this) {
+         if (constraints == null) {
+            constraints = lazyComputeConstraints();
+         }
+         return constraints;
+      }
+   }
+
+   /**
+    * Computes the constraints lazily when {@link #getConstraints()} is 
+    * called the first time.
+    * @return The {@link IExecutionConstraint}s of the current state.
+    */
+   protected abstract IExecutionConstraint[] lazyComputeConstraints();
 }

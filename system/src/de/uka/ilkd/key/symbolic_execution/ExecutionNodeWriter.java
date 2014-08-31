@@ -23,9 +23,12 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
@@ -189,6 +192,26 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Attribute name to store {@link IExecutionMethodReturn#getMethodReturnCondition()}.
     */
    public static final String ATTRIBUTE_METHOD_RETURN_CONDITION = "methodReturnCondition";
+
+   /**
+    * Attribute name to store {@link IExecutionOperationContract#getFormatedResultTerm()}.
+    */
+   public static final String ATTRIBUTE_RESULT_TERM = "resultTerm";
+
+   /**
+    * Attribute name to store {@link IExecutionOperationContract#getFormatedExceptionTerm()}.
+    */
+   public static final String ATTRIBUTE_EXCEPTION_TERM = "exceptionTerm";
+
+   /**
+    * Attribute name to store {@link IExecutionOperationContract#getFormatedSelfTerm()}.
+    */
+   public static final String ATTRIBUTE_SELF_TERM = "selfTerm";
+
+   /**
+    * Attribute name to store {@link IExecutionOperationContract#getFormatedContractParams()}.
+    */
+   public static final String ATTRIBUTE_CONTRACT_PARAMETERS = "contractParameters";
    
    /**
     * Tag name to store {@link IExecutionBranchCondition}s.
@@ -226,6 +249,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
    public static final String TAG_METHOD_RETURN = "methodReturn";
 
    /**
+    * Tag name to store {@link IExecutionExceptionalMethodReturn}s.
+    */
+   public static final String TAG_EXCEPTIONAL_METHOD_RETURN = "exceptionalMethodReturn";
+
+   /**
     * Tag name to store {@link IExecutionMethodReturnValue}s.
     */
    public static final String TAG_METHOD_RETURN_VALUE = "methodReturnValue";
@@ -249,6 +277,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Tag name to store {@link IExecutionLoopInvariant}s.
     */
    public static final String TAG_LOOP_INVARIANT = "loopInvariant";
+
+   /**
+    * Tag name to store {@link IExecutionConstraint}s.
+    */
+   public static final String TAG_CONSTRAINT = "constraint";
 
    /**
     * Tag name to store {@link IExecutionVariable}s.
@@ -288,6 +321,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param saveVariables Save variables?
     * @param saveCallStack Save method call stack?
     * @param saveReturnValues Save method return values?
+    * @param saveConstraints Save constraints?
     * @throws IOException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
     */
@@ -296,8 +330,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
                      File file, 
                      boolean saveVariables,
                      boolean saveCallStack,
-                     boolean saveReturnValues) throws IOException, ProofInputException {
-      write(node, encoding, new FileOutputStream(file), saveVariables, saveCallStack, saveReturnValues);
+                     boolean saveReturnValues,
+                     boolean saveConstraints) throws IOException, ProofInputException {
+      write(node, encoding, new FileOutputStream(file), saveVariables, saveCallStack, saveReturnValues, saveConstraints);
    }
    
    /**
@@ -308,6 +343,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
     * @param saveReturnValues Save method return values?
+    * @param saveConstraints Save constraints?
     * @throws IOException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
     */
@@ -316,11 +352,12 @@ public class ExecutionNodeWriter extends AbstractWriter {
                      OutputStream out, 
                      boolean saveVariables,
                      boolean saveCallStack,
-                     boolean saveReturnValues) throws IOException, ProofInputException {
+                     boolean saveReturnValues,
+                     boolean saveConstraints) throws IOException, ProofInputException {
       if (out != null) {
          try {
             Charset charset = encoding != null ? Charset.forName(encoding) : Charset.defaultCharset();
-            String xml = toXML(node, charset.displayName(), saveVariables, saveCallStack, saveReturnValues);
+            String xml = toXML(node, charset.displayName(), saveVariables, saveCallStack, saveReturnValues, saveConstraints);
             out.write(xml.getBytes(charset));
          }
          finally {
@@ -336,6 +373,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
     * @param saveReturnValues Save method return values?
+    * @param saveConstraints Save constraints?
     * @return The created XML content.
     * @throws ProofInputException Occurred Exception.
     */
@@ -343,10 +381,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
                        String encoding, 
                        boolean saveVariables,
                        boolean saveCallStack,
-                       boolean saveReturnValues) throws ProofInputException {
+                       boolean saveReturnValues,
+                       boolean saveConstraints) throws ProofInputException {
       StringBuffer sb = new StringBuffer();
       appendXmlHeader(encoding, sb);
-      appendExecutionNode(0, node, saveVariables, saveCallStack, saveReturnValues, sb);
+      appendExecutionNode(0, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       return sb.toString();
    }
    
@@ -357,6 +396,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
     * @param saveReturnValues Save method return values?
+    * @param saveConstraints Save constraints?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
@@ -365,39 +405,43 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                       boolean saveVariables, 
                                       boolean saveCallStack,
                                       boolean saveReturnValues,
+                                      boolean saveConstraints,
                                       StringBuffer sb) throws ProofInputException {
       if (node instanceof IExecutionBranchCondition) {
-         appendExecutionBranchCondition(level, (IExecutionBranchCondition)node, saveVariables, saveCallStack, saveReturnValues, sb);
+         appendExecutionBranchCondition(level, (IExecutionBranchCondition)node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       }
       else if (node instanceof IExecutionStart) {
-         appendExecutionStart(level, (IExecutionStart)node, saveVariables, saveCallStack, saveReturnValues, sb);
+         appendExecutionStart(level, (IExecutionStart)node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       }
       else if (node instanceof IExecutionBranchStatement) {
-         appendExecutionBranchStatement(level, (IExecutionBranchStatement)node, saveVariables, saveCallStack, saveReturnValues, sb);
+         appendExecutionBranchStatement(level, (IExecutionBranchStatement)node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       }
       else if (node instanceof IExecutionLoopCondition) {
-         appendExecutionLoopCondition(level, (IExecutionLoopCondition)node, saveVariables, saveCallStack, saveReturnValues, sb);
+         appendExecutionLoopCondition(level, (IExecutionLoopCondition)node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       }
       else if (node instanceof IExecutionLoopStatement) {
-         appendExecutionLoopStatement(level, (IExecutionLoopStatement)node, saveVariables, saveCallStack, saveReturnValues, sb);
+         appendExecutionLoopStatement(level, (IExecutionLoopStatement)node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       }
       else if (node instanceof IExecutionMethodCall) {
-         appendExecutionMethodCall(level, (IExecutionMethodCall)node, saveVariables, saveCallStack, saveReturnValues, sb);
+         appendExecutionMethodCall(level, (IExecutionMethodCall)node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       }
       else if (node instanceof IExecutionMethodReturn) {
-         appendExecutionMethodReturn(level, (IExecutionMethodReturn)node, saveVariables, saveCallStack, saveReturnValues, sb);
+         appendExecutionMethodReturn(level, (IExecutionMethodReturn)node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
+      }
+      else if (node instanceof IExecutionExceptionalMethodReturn) {
+         appendExecutionExceptionalMethodReturn(level, (IExecutionExceptionalMethodReturn)node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       }
       else if (node instanceof IExecutionStatement) {
-         appendExecutionStatement(level, (IExecutionStatement)node, saveVariables, saveCallStack, saveReturnValues, sb);
+         appendExecutionStatement(level, (IExecutionStatement)node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       }
       else if (node instanceof IExecutionTermination) {
-         appendExecutionTermination(level, (IExecutionTermination)node, saveVariables, saveCallStack, saveReturnValues, sb);
+         appendExecutionTermination(level, (IExecutionTermination)node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       }
       else if (node instanceof IExecutionOperationContract) {
-         appendExecutionOperationContract(level, (IExecutionOperationContract)node, saveVariables, saveCallStack, saveReturnValues, sb);
+         appendExecutionOperationContract(level, (IExecutionOperationContract)node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       }
       else if (node instanceof IExecutionLoopInvariant) {
-         appendExecutionLoopInvariant(level, (IExecutionLoopInvariant)node, saveVariables, saveCallStack, saveReturnValues, sb);
+         appendExecutionLoopInvariant(level, (IExecutionLoopInvariant)node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       }
       else {
          throw new IllegalArgumentException("Not supported node \"" + node + "\".");
@@ -411,6 +455,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
     * @param saveReturnValues Save method return values?
+    * @param saveConstraints Save constraints?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
@@ -419,6 +464,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                                  boolean saveVariables, 
                                                  boolean saveCallStack, 
                                                  boolean saveReturnValues,
+                                                 boolean saveConstraints,
                                                  StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
@@ -429,8 +475,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_BRANCH_CONDITION_COMPUTED, node.isBranchConditionComputed() + "");
       attributeValues.put(ATTRIBUTE_ADDITIONAL_BRANCH_LABEL, node.getAdditionalBranchLabel());
       appendStartTag(level, TAG_BRANCH_CONDITION, attributeValues, sb);
+      appendConstraints(level + 1, node, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
-      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       appendEndTag(level, TAG_BRANCH_CONDITION, sb);
    }
 
@@ -441,6 +488,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
     * @param saveReturnValues Save method return values?
+    * @param saveConstraints Save constraints?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
@@ -449,14 +497,16 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                            boolean saveVariables, 
                                            boolean saveCallStack,
                                            boolean saveReturnValues,
+                                           boolean saveConstraints,
                                            StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       appendStartTag(level, TAG_START, attributeValues, sb);
+      appendConstraints(level + 1, node, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
-      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       appendTerminations(level + 1, node, sb);
       appendEndTag(level, TAG_START, sb);
    }
@@ -485,6 +535,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
     * @param saveReturnValues Save method return values?
+    * @param saveConstraints Save constraints?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
@@ -493,15 +544,17 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                                  boolean saveVariables, 
                                                  boolean saveCallStack, 
                                                  boolean saveReturnValues,
+                                                 boolean saveConstraints,
                                                  StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       appendStartTag(level, TAG_BRANCH_STATEMENT, attributeValues, sb);
-      appendVariables(level + 1, node, saveVariables, sb);
+      appendConstraints(level + 1, node, saveConstraints, sb);
+      appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
-      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       appendEndTag(level, TAG_BRANCH_STATEMENT, sb);
    }
 
@@ -512,6 +565,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
     * @param saveReturnValues Save method return values?
+    * @param saveConstraints Save constraints?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
@@ -520,15 +574,17 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                                boolean saveVariables, 
                                                boolean saveCallStack, 
                                                boolean saveReturnValues,
+                                               boolean saveConstraints,
                                                StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       appendStartTag(level, TAG_LOOP_CONDITION, attributeValues, sb);
-      appendVariables(level + 1, node, saveVariables, sb);
+      appendConstraints(level + 1, node, saveConstraints, sb);
+      appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
-      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       appendEndTag(level, TAG_LOOP_CONDITION, sb);
    }
 
@@ -539,6 +595,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
     * @param saveReturnValues Save method return values?
+    * @param saveConstraints Save constraints?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
@@ -547,15 +604,17 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                                boolean saveVariables, 
                                                boolean saveCallStack,
                                                boolean saveReturnValues,
+                                               boolean saveConstraints,
                                                StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       appendStartTag(level, TAG_LOOP_STATEMENT, attributeValues, sb);
-      appendVariables(level + 1, node, saveVariables, sb);
+      appendConstraints(level + 1, node, saveConstraints, sb);
+      appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
-      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       appendEndTag(level, TAG_LOOP_STATEMENT, sb);
    }
 
@@ -566,6 +625,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
     * @param saveReturnValues Save method return values?
+    * @param saveConstraints Save constraints?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
@@ -574,15 +634,17 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                             boolean saveVariables, 
                                             boolean saveCallStack,
                                             boolean saveReturnValues,
+                                            boolean saveConstraints,
                                             StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       appendStartTag(level, TAG_METHOD_CALL, attributeValues, sb);
-      appendVariables(level + 1, node, saveVariables, sb);
+      appendConstraints(level + 1, node, saveConstraints, sb);
+      appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
-      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       appendMethodReturns(level + 1, node, sb);
       appendEndTag(level, TAG_METHOD_CALL, sb);
    }
@@ -594,6 +656,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
     * @param saveReturnValues Save method return values?
+    * @param saveConstraints Save constraints?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
@@ -602,6 +665,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                               boolean saveVariables,
                                               boolean saveCallStack,
                                               boolean saveReturnValues,
+                                              boolean saveConstraints,
                                               StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
@@ -621,10 +685,43 @@ public class ExecutionNodeWriter extends AbstractWriter {
             appendExecutionMethodReturnValue(level + 1, returnValue, sb);
          }
       }
-      appendVariables(level + 1, node, saveVariables, sb);
+      appendConstraints(level + 1, node, saveConstraints, sb);
+      appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
-      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       appendEndTag(level, TAG_METHOD_RETURN, sb);
+   }
+
+   /**
+    * Converts the given {@link IExecutionExceptionalMethodReturn} into XML and appends it to the {@link StringBuffer}.
+    * @param level The current child level.
+    * @param node The {@link IExecutionExceptionalMethodReturn} to convert.
+    * @param saveVariables Save variables? 
+    * @param saveCallStack Save method call stack?
+    * @param saveReturnValues Save method return values?
+    * @param saveConstraints Save constraints?
+    * @param sb The {@link StringBuffer} to append to.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected void appendExecutionExceptionalMethodReturn(int level, 
+                                                         IExecutionExceptionalMethodReturn node, 
+                                                         boolean saveVariables,
+                                                         boolean saveCallStack,
+                                                         boolean saveReturnValues,
+                                                         boolean saveConstraints,
+                                                         StringBuffer sb) throws ProofInputException {
+      Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+      attributeValues.put(ATTRIBUTE_NAME, node.getName());
+      attributeValues.put(ATTRIBUTE_SIGNATURE, node.getSignature());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
+      attributeValues.put(ATTRIBUTE_METHOD_RETURN_CONDITION, node.getFormatedMethodReturnCondition());
+      appendStartTag(level, TAG_EXCEPTIONAL_METHOD_RETURN, attributeValues, sb);
+      appendConstraints(level + 1, node, saveConstraints, sb);
+      appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
+      appendCallStack(level + 1, node, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
+      appendEndTag(level, TAG_EXCEPTIONAL_METHOD_RETURN, sb);
    }
 
    /**
@@ -653,6 +750,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
     * @param saveReturnValues Save method return values?
+    * @param saveConstraints Save constraints?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
@@ -661,15 +759,17 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                            boolean saveVariables, 
                                            boolean saveCallStack, 
                                            boolean saveReturnValues,
+                                           boolean saveConstraints,
                                            StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       appendStartTag(level, TAG_STATEMENT, attributeValues, sb);
-      appendVariables(level + 1, node, saveVariables, sb);
+      appendConstraints(level + 1, node, saveConstraints, sb);
+      appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
-      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       appendEndTag(level, TAG_STATEMENT, sb);
    }
 
@@ -680,6 +780,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
     * @param saveReturnValues Save method return values?
+    * @param saveConstraints Save constraints?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
@@ -688,20 +789,26 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                                    boolean saveVariables, 
                                                    boolean saveCallStack, 
                                                    boolean saveReturnValues,
+                                                   boolean saveConstraints,
                                                    StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
+      attributeValues.put(ATTRIBUTE_RESULT_TERM, node.getFormatedResultTerm());
+      attributeValues.put(ATTRIBUTE_EXCEPTION_TERM, node.getFormatedExceptionTerm());
+      attributeValues.put(ATTRIBUTE_SELF_TERM, node.getFormatedSelfTerm());
+      attributeValues.put(ATTRIBUTE_CONTRACT_PARAMETERS, node.getFormatedContractParams());
 
       attributeValues.put(ATTRIBUTE_PRECONDITION_COMPLIED, node.isPreconditionComplied() + "");
       attributeValues.put(ATTRIBUTE_HAS_NOT_NULL_CHECK, node.hasNotNullCheck() + "");
       attributeValues.put(ATTRIBUTE_NOT_NULL_CHECK_COMPLIED, node.isNotNullCheckComplied() + "");
       
       appendStartTag(level, TAG_OPERATION_CONTRACT, attributeValues, sb);
-      appendVariables(level + 1, node, saveVariables, sb);
+      appendConstraints(level + 1, node, saveConstraints, sb);
+      appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
-      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       appendEndTag(level, TAG_OPERATION_CONTRACT, sb);
    }
 
@@ -712,6 +819,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
     * @param saveReturnValues Save method return values?
+    * @param saveConstraints Save constraints?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
@@ -720,6 +828,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                               boolean saveVariables, 
                                               boolean saveCallStack, 
                                               boolean saveReturnValues,
+                                              boolean saveConstraints,
                                               StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
@@ -729,9 +838,10 @@ public class ExecutionNodeWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_INITIALLY_VALID, node.isInitiallyValid() + "");
 
       appendStartTag(level, TAG_LOOP_INVARIANT, attributeValues, sb);
-      appendVariables(level + 1, node, saveVariables, sb);
+      appendConstraints(level + 1, node, saveConstraints, sb);
+      appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
-      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       appendEndTag(level, TAG_LOOP_INVARIANT, sb);
    }
 
@@ -742,6 +852,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
     * @param saveReturnValues Save method return values?
+    * @param saveConstraints Save constraints?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
@@ -750,6 +861,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                              boolean saveVariables,
                                              boolean saveCallStack,
                                              boolean saveReturnValues,
+                                             boolean saveConstraints,
                                              StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
@@ -758,9 +870,57 @@ public class ExecutionNodeWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_TERMINATION_KIND, node.getTerminationKind().toString());
       attributeValues.put(ATTRIBUTE_BRANCH_VERIFIED, node.isBranchVerified() + "");
       appendStartTag(level, TAG_TERMINATION, attributeValues, sb);
+      appendConstraints(level + 1, node, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
-      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       appendEndTag(level, TAG_TERMINATION, sb);
+   }
+
+   /**
+    * Appends the contained {@link IExecutionConstraint}s to the given {@link StringBuffer}.
+    * @param level The level to use.
+    * @param value The {@link IExecutionValue} which provides the {@link IExecutionConstraint}s.
+    * @param saveConstraints Save constraints? 
+    * @param sb The {@link StringBuffer} to append to.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected void appendConstraints(int level, IExecutionValue value, boolean saveConstraints, StringBuffer sb) throws ProofInputException {
+      if (saveConstraints) {
+         IExecutionConstraint[] constraints = value.getConstraints();
+         for (IExecutionConstraint constraint : constraints) {
+            appendConstraint(level, constraint, sb);
+         }
+      }
+   }
+
+   /**
+    * Appends the contained {@link IExecutionConstraint}s to the given {@link StringBuffer}.
+    * @param level The level to use.
+    * @param node The {@link IExecutionNode} which provides the {@link IExecutionConstraint}s.
+    * @param saveConstraints Save constraints? 
+    * @param sb The {@link StringBuffer} to append to.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected void appendConstraints(int level, IExecutionNode node, boolean saveConstraints, StringBuffer sb) throws ProofInputException {
+      if (saveConstraints) {
+         IExecutionConstraint[] constraints = node.getConstraints();
+         for (IExecutionConstraint constraint : constraints) {
+            appendConstraint(level, constraint, sb);
+         }
+      }
+   }
+
+   /**
+    * Appends the given {@link IExecutionConstraint} with its children to the given {@link StringBuffer}.
+    * @param level The level to use.
+    * @param constraint The {@link IExecutionConstraint} to append.
+    * @param sb The {@link StringBuffer} to append to.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected void appendConstraint(int level, IExecutionConstraint constraint, StringBuffer sb) throws ProofInputException {
+      Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+      attributeValues.put(ATTRIBUTE_NAME, constraint.getName());
+      appendEmptyTag(level, TAG_CONSTRAINT, attributeValues, sb);
    }
 
    /**
@@ -768,14 +928,15 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param level The level to use.
     * @param node The {@link IExecutionStateNode} which provides the {@link IExecutionVariable}s.
     * @param saveVariables Save variables? 
+    * @param saveConstraints Save constraints?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void appendVariables(int level, IExecutionStateNode<?> node, boolean saveVariables, StringBuffer sb) throws ProofInputException {
+   protected void appendVariables(int level, IExecutionStateNode<?> node, boolean saveVariables, boolean saveConstraints, StringBuffer sb) throws ProofInputException {
       if (saveVariables) {
          IExecutionVariable[] variables = node.getVariables();
          for (IExecutionVariable variable : variables) {
-            appendVariable(level, variable, sb);
+            appendVariable(level, variable, saveConstraints, sb);
          }
       }
    }
@@ -784,16 +945,17 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Appends the given {@link IExecutionVariable} with its children to the given {@link StringBuffer}.
     * @param level The level to use.
     * @param variable The {@link IExecutionVariable} to append.
+    * @param saveConstraints Save constraints?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void appendVariable(int level, IExecutionVariable variable, StringBuffer sb) throws ProofInputException {
+   protected void appendVariable(int level, IExecutionVariable variable, boolean saveConstraints, StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, variable.getName());
       attributeValues.put(ATTRIBUTE_ARRAY_INDEX, variable.getArrayIndex() + "");
       attributeValues.put(ATTRIBUTE_IS_ARRAY_INDEX, variable.isArrayIndex() + "");
       appendStartTag(level, TAG_VARIABLE, attributeValues, sb);
-      appendValues(level + 1, variable, sb);
+      appendValues(level + 1, variable, saveConstraints, sb);
       appendEndTag(level, TAG_VARIABLE, sb);
    }
 
@@ -801,13 +963,14 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Appends the contained {@link IExecutionValue}s to the given {@link StringBuffer}.
     * @param level The level to use.
     * @param variable The {@link IExecutionVariable} which provides the {@link IExecutionValue}s.
+    * @param saveConstraints Save constraints?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void appendValues(int level, IExecutionVariable variable, StringBuffer sb) throws ProofInputException {
+   protected void appendValues(int level, IExecutionVariable variable, boolean saveConstraints, StringBuffer sb) throws ProofInputException {
       IExecutionValue[] values = variable.getValues();
       for (IExecutionValue value : values) {
-         appendValue(level, value, sb);
+         appendValue(level, value, saveConstraints, sb);
       }
    }
 
@@ -815,10 +978,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Appends the given {@link IExecutionValue} with its children to the given {@link StringBuffer}.
     * @param level The level to use.
     * @param value The {@link IExecutionValue} to append.
+    * @param saveConstraints Save constraints?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void appendValue(int level, IExecutionValue value, StringBuffer sb) throws ProofInputException {
+   protected void appendValue(int level, IExecutionValue value, boolean saveConstraints, StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, value.getName());
       attributeValues.put(ATTRIBUTE_TYPE_STRING, value.getTypeString());
@@ -827,10 +991,12 @@ public class ExecutionNodeWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_IS_VALUE_UNKNOWN, value.isValueUnknown() + "");
       attributeValues.put(ATTRIBUTE_CONDITION_STRING, value.getConditionString());
       appendStartTag(level, TAG_VALUE, attributeValues, sb);
-
+      // Constraints
+      appendConstraints(level + 1, value, saveConstraints, sb);
+      // Children
       IExecutionVariable[] childVariables = value.getChildVariables();
       for (IExecutionVariable childVariable : childVariables) {
-         appendVariable(level + 1, childVariable, sb);
+         appendVariable(level + 1, childVariable, saveConstraints, sb);
       }
       appendEndTag(level, TAG_VALUE, sb);
    }
@@ -842,6 +1008,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param saveVariables Save variables? 
     * @param saveCallStack Save method call stack?
     * @param saveReturnValues Save method return values?
+    * @param saveConstraints Save constraints?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
@@ -850,10 +1017,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
                                  boolean saveVariables, 
                                  boolean saveCallStack,
                                  boolean saveReturnValues,
+                                 boolean saveConstraints,
                                  StringBuffer sb) throws ProofInputException {
       IExecutionNode[] children = parent.getChildren();
       for (IExecutionNode child : children) {
-         appendExecutionNode(childLevel, child, saveVariables, saveCallStack, saveReturnValues, sb);
+         appendExecutionNode(childLevel, child, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       }
    }
 
@@ -884,9 +1052,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param sb The {@link StringBuffer} to append to.
     */
    protected void appendMethodReturns(int level, IExecutionMethodCall node, StringBuffer sb) {
-      ImmutableList<IExecutionMethodReturn> methodReturns = node.getMethodReturns();
+      ImmutableList<IExecutionBaseMethodReturn<?>> methodReturns = node.getMethodReturns();
       if (methodReturns != null) {
-         for (IExecutionMethodReturn methodReturn : methodReturns) {
+         for (IExecutionBaseMethodReturn<?> methodReturn : methodReturns) {
             Map<String, String> attributeValues = new LinkedHashMap<String, String>();
             attributeValues.put(ATTRIBUTE_PATH_IN_TREE, computePath(methodReturn));
             appendEmptyTag(level, TAG_METHOD_RETURN_ENTRY, attributeValues, sb);

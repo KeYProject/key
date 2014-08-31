@@ -85,10 +85,10 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Do run
                resume(bot, item, target);
                if (useUnicode) {
-                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/unicodeTest/oracle/UnicodeTest_Enabled.xml", false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/unicodeTest/oracle/UnicodeTest_Enabled.xml", false, false, false);
                }
                else {
-                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/unicodeTest/oracle/UnicodeTest_Disabled.xml", false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/unicodeTest/oracle/UnicodeTest_Disabled.xml", false, false, false);
                }
             }
          };
@@ -162,10 +162,10 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Do run
                resume(bot, item, target);
                if (usePrettyPrinting) {
-                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/prettyPrintSimpleTest/oracleUsePrettyPrinting/PrettyPrintSimpleTest.xml", false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/prettyPrintSimpleTest/oracleUsePrettyPrinting/PrettyPrintSimpleTest.xml", false, false, false);
                }
                else {
-                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/prettyPrintSimpleTest/oracleUsePrettyPrinting/NotPrettyPrintedPrettyPrintSimpleTest.xml", false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/prettyPrintSimpleTest/oracleUsePrettyPrinting/NotPrettyPrintedPrettyPrintSimpleTest.xml", false, false, false);
                }
             }
          };
@@ -239,10 +239,10 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Do run
                resume(bot, item, target);
                if (mergeBranchConditions) {
-                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/switchCaseTest/oracleMergeBranchConditions/MergedSwitchCaseTest.xml", false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/switchCaseTest/oracleMergeBranchConditions/MergedSwitchCaseTest.xml", false, false, false);
                }
                else {
-                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/switchCaseTest/oracleMergeBranchConditions/NotMergedSwitchCaseTest.xml", false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/switchCaseTest/oracleMergeBranchConditions/NotMergedSwitchCaseTest.xml", false, false, false);
                }
             }
          };
@@ -511,7 +511,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                                               "data/simpleIf/oracle_noMethodReturnValues/SimpleIf_NoSignature.xml";
                }
                resume(bot, item, target);
-               assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false);
+               assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false, false);
             }
          };
          doKeYDebugTargetTest(projectName,

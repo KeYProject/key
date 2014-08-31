@@ -116,10 +116,12 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
 import de.uka.ilkd.key.util.MiscTools;
@@ -599,7 +601,58 @@ public final class SymbolicExecutionUtil {
              !node.isDisposed() &&
              !services.getTermBuilder().ff().equals(node.getPathCondition());
    }
+
+   /**
+    * Creates for the given {@link IExecutionNode} the contained
+    * {@link IExecutionConstraint}s.
+    * @param node The {@link IExecutionNode} to create constraints for.
+    * @return The created {@link IExecutionConstraint}s.
+    */
+   public static IExecutionConstraint[] createExecutionConstraints(IExecutionNode node) {
+      if (node != null && !node.isDisposed()) {
+         TermBuilder tb = node.getServices().getTermBuilder();
+         List<IExecutionConstraint> constraints = new LinkedList<IExecutionConstraint>();
+         Node proofNode = node.getProofNode();
+         Sequent sequent = proofNode.sequent();
+         for (SequentFormula sf : sequent.antecedent()) {
+            if (!containsSymbolicExecutionLabel(sf.formula())) {
+               constraints.add(new ExecutionConstraint(node.getSettings(), node.getMediator(), proofNode, sf.formula()));
+            }
+         }
+         for (SequentFormula sf : sequent.succedent()) {
+            if (!containsSymbolicExecutionLabel(sf.formula())) {
+               constraints.add(new ExecutionConstraint(node.getSettings(), node.getMediator(), proofNode, tb.not(sf.formula())));
+            }
+         }
+         return constraints.toArray(new IExecutionConstraint[constraints.size()]);
+      }
+      else {
+         return new IExecutionConstraint[0];
+      }
+   }
    
+   /**
+    * Checks if the {@link Term} or one of its sub terms contains
+    * a symbolic execution label.
+    * @param term The {@link Term} to check.
+    * @return {@code true} SE label is somewhere contained, {@code false} SE label is not contained at all.
+    */
+   public static boolean containsSymbolicExecutionLabel(Term term) {
+      term = TermBuilder.goBelowUpdates(term);
+      if (term.op() instanceof Modality) {
+         return hasSymbolicExecutionLabel(term);
+      }
+      else {
+         boolean hasModality = false;
+         int i = 0;
+         while (!hasModality && i < term.arity()) {
+            hasModality = containsSymbolicExecutionLabel(term.sub(i));
+            i++;
+         }
+         return hasModality;
+      }
+   }
+
    /**
     * Creates for the given {@link IExecutionStateNode} the contained
     * root {@link IExecutionVariable}s.
@@ -719,7 +772,8 @@ public final class SymbolicExecutionUtil {
          if (term.op() == heapLDT.getStore()) {
             ImmutableArray<Term> subs = term.subs();
             if (subs.size() == 4) {
-               Term locationTerm = subs.get(2);
+               Term innerMostSelect = findInnerMostSelect(subs.get(1), services);
+               Term locationTerm = innerMostSelect != null ? innerMostSelect.sub(2) : subs.get(2);
                ProgramVariable attribute = getProgramVariable(services, heapLDT, locationTerm);
                if (attribute != null && attribute.isStatic()) {
                   result.add(attribute);
@@ -732,6 +786,18 @@ public final class SymbolicExecutionUtil {
       }
       for (Term sub : term.subs()) {
          internalCollectStaticProgramVariablesOnHeap(services, result, sub);
+      }
+   }
+   
+   private static Term findInnerMostSelect(Term term, Services services) {
+      if (isSelect(services, term)) {
+         while (isSelect(services, term.sub(1))) {
+            term = term.sub(1);
+         }
+         return term;
+      }
+      else {
+         return null;
       }
    }
    
@@ -1014,6 +1080,17 @@ public final class SymbolicExecutionUtil {
       return "methodCallEmpty".equals(displayName) ||
              "methodCallEmptyReturn".equals(ruleName) ||
              "methodCallReturnIgnoreResult".equals(ruleName);
+   }
+   
+   /**
+    * Checks if the given node should be represented as exceptional method return.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @return {@code true} represent node as exceptional method return, {@code false} represent node as something else. 
+    */
+   public static boolean isExceptionalMethodReturnNode(Node node, RuleApp ruleApp) {
+      String ruleName = MiscTools.getRuleName(ruleApp);
+      return "methodCallParamThrow".equals(ruleName);
    }
 
    /**
@@ -1332,6 +1409,9 @@ public final class SymbolicExecutionUtil {
          SourceElement statement = NodeInfo.computeActiveStatement(ruleApp);
          PositionInfo posInfo = statement != null ? statement.getPositionInfo() : null;
          if (isMethodReturnNode(node, ruleApp)) {
+            return !isInImplicitMethod(node, ruleApp);
+         }
+         else if (isExceptionalMethodReturnNode(node, ruleApp)) {
             return !isInImplicitMethod(node, ruleApp);
          }
          else if (isLoopStatement(node, ruleApp, statement, posInfo)) { 
@@ -1708,41 +1788,41 @@ public final class SymbolicExecutionUtil {
       }
       workingTerm = workingTerm.sub(1); // First part is heap equality, use second part which is the combination of all normal and exceptional preconditon postcondition implications
       workingTerm = TermBuilder.goBelowUpdates(workingTerm);
-      if (workingTerm.op() != Junctor.AND) {
-         throw new ProofInputException("And operation expected, implementation of UseOperationContractRule might has changed!"); 
-      }
       // Find Term exc_n = null which is added (maybe negated) to all exceptional preconditions
-      Term exceptionDefinitionParent = null;
-      Term exceptionDefinition = workingTerm;
-      while (exceptionDefinition.op() == Junctor.AND) {
-         exceptionDefinitionParent = exceptionDefinition;
-         Term firstSub = exceptionDefinition.sub(0);
-         if (firstSub.op() == node.proof().getServices().getJavaInfo().getInv()) { 
-            exceptionDefinition = exceptionDefinition.sub(1);
-         }
-         else {
-            exceptionDefinition = firstSub;
-         }
+      Term exceptionDefinition = searchExceptionDefinition(workingTerm, services);
+      if (exceptionDefinition == null) {
+         throw new ProofInputException("Exception definition not found, implementation of UseOperationContractRule might has changed!"); 
       }
       // Make sure that exception equality was found
-      Term exceptionEquality;
-      if (exceptionDefinition.op() == Junctor.NOT) {
-         exceptionEquality = exceptionDefinition.sub(0);
+      Term exceptionEquality = exceptionDefinition.op() == Junctor.NOT ?
+                               exceptionDefinition.sub(0) :
+                               exceptionDefinition;
+      return new ContractPostOrExcPostExceptionVariableResult(workingTerm, updatesAndTerm, exceptionDefinition, exceptionEquality);
+   }
+   
+   /**
+    * Searches the exception definition.
+    * @param term The {@link Term} to start search in.
+    * @param services the {@link Services} to use.
+    * @return The found exception definition or {@code null} if not available.
+    */
+   private static Term searchExceptionDefinition(Term term, Services services) {
+      if (term.op() == Equality.EQUALS && 
+          term.sub(0).op() instanceof LocationVariable && 
+          term.sub(0).toString().startsWith("exc_") &&
+          isNullSort(term.sub(1).sort(), services) &&
+          services.getJavaInfo().isSubtype(services.getJavaInfo().getKeYJavaType(term.sub(0).sort()), services.getJavaInfo().getKeYJavaType("java.lang.Throwable"))) {
+         return term;
       }
       else {
-         exceptionEquality = exceptionDefinition;
+         Term result = null;
+         int i = term.arity() - 1;
+         while (result == null && i >= 0) {
+            result = searchExceptionDefinition(term.sub(i), services);
+            i--;
+         }
+         return result;
       }
-      if (exceptionEquality.op() != Equality.EQUALS || exceptionEquality.arity() != 2) {
-         throw new ProofInputException("Equality expected, implementation of UseOperationContractRule might has changed!"); 
-      }
-      if (!isNullSort(exceptionEquality.sub(1).sort(), services)) {
-         throw new ProofInputException("Null expected, implementation of UseOperationContractRule might has changed!"); 
-      }
-      KeYJavaType exceptionType = services.getJavaInfo().getKeYJavaType(exceptionEquality.sub(0).sort());
-      if (!services.getJavaInfo().isSubtype(exceptionType, services.getJavaInfo().getKeYJavaType("java.lang.Throwable"))) {
-         throw new ProofInputException("Throwable expected, implementation of UseOperationContractRule might has changed!"); 
-      }
-      return new ContractPostOrExcPostExceptionVariableResult(workingTerm, updatesAndTerm, exceptionDefinition, exceptionDefinitionParent, exceptionEquality);
    }
    
    /**
@@ -1766,11 +1846,6 @@ public final class SymbolicExecutionUtil {
       private Term exceptionDefinition;
       
       /**
-       * The found parent of {@link #exceptionDefinition}.
-       */
-      private Term exceptionDefinitionParent;
-      
-      /**
        * The equality which contains the equality.
        */
       private Term exceptionEquality;
@@ -1780,18 +1855,15 @@ public final class SymbolicExecutionUtil {
        * @param workingTerm The working {@link Term}.
        * @param updatesAndTerm The updates.
        * @param exceptionDefinition The exception definition.
-       * @param exceptionDefinitionParent The found parent of the given exception definition.
        * @param exceptionEquality The equality which contains the equality.
        */
       public ContractPostOrExcPostExceptionVariableResult(Term workingTerm, 
                                                           Pair<ImmutableList<Term>, Term> updatesAndTerm, 
                                                           Term exceptionDefinition,
-                                                          Term exceptionDefinitionParent,
                                                           Term exceptionEquality) {
          this.workingTerm = workingTerm;
          this.updatesAndTerm = updatesAndTerm;
          this.exceptionDefinition = exceptionDefinition;
-         this.exceptionDefinitionParent = exceptionDefinitionParent;
          this.exceptionEquality = exceptionEquality;
       }
       
@@ -1817,14 +1889,6 @@ public final class SymbolicExecutionUtil {
        */
       public Term getExceptionDefinition() {
          return exceptionDefinition;
-      }
-      
-      /**
-       * Returns the found parent of {@link #getExceptionDefinition()}.
-       * @return The found parent of {@link #getExceptionDefinition()}.
-       */
-      public Term getExceptionDefinitionParent() {
-         return exceptionDefinitionParent;
       }
       
       /**
@@ -2357,7 +2421,9 @@ public final class SymbolicExecutionUtil {
          originalSequentWithoutMethodFrame = labelSkolemConstants(originalSequentWithoutMethodFrame, skolemInNewTerm, factory);
          newSuccedentToProve = addLabelRecursiveToNonSkolem(factory, newSuccedentToProve, ParameterlessTermLabel.RESULT_LABEL);
       }
-      Sequent sequentToProve = originalSequentWithoutMethodFrame.addFormula(new SequentFormula(newSuccedentToProve), false, true).sequent();
+      Sequent sequentToProve = newSuccedentToProve != null ?
+                               originalSequentWithoutMethodFrame.addFormula(new SequentFormula(newSuccedentToProve), false, true).sequent() :
+                               originalSequentWithoutMethodFrame;
       if (additionalAntecedent != null) {
          sequentToProve = sequentToProve.addFormula(new SequentFormula(additionalAntecedent), true, false).sequent();
       }
@@ -2465,23 +2531,28 @@ public final class SymbolicExecutionUtil {
     * @return The found skolem {@link Term}s.
     */
    private static Set<Term> collectSkolemConstants(Sequent sequent, Term term) {
-      // Collect skolem constants in term
-      Set<Term> result = collectSkolemConstantsNonRecursive(term);
-      // Collect all skolem constants used in skolem constants
-      List<Term> toCheck = new LinkedList<Term>(result);
-      while (!toCheck.isEmpty()) {
-         Term skolemConstant = toCheck.remove(0);
-         List<Term> replacements = findSkolemReplacements(sequent, skolemConstant);
-         for (Term replacement : replacements) {
-            Set<Term> checkResult = collectSkolemConstantsNonRecursive(replacement);
-            for (Term checkConstant : checkResult) {
-               if (result.add(checkConstant)) {
-                  toCheck.add(checkConstant);
+      if (term != null) {
+         // Collect skolem constants in term
+         Set<Term> result = collectSkolemConstantsNonRecursive(term);
+         // Collect all skolem constants used in skolem constants
+         List<Term> toCheck = new LinkedList<Term>(result);
+         while (!toCheck.isEmpty()) {
+            Term skolemConstant = toCheck.remove(0);
+            List<Term> replacements = findSkolemReplacements(sequent, skolemConstant);
+            for (Term replacement : replacements) {
+               Set<Term> checkResult = collectSkolemConstantsNonRecursive(replacement);
+               for (Term checkConstant : checkResult) {
+                  if (result.add(checkConstant)) {
+                     toCheck.add(checkConstant);
+                  }
                }
             }
          }
+         return result;
       }
-      return result;
+      else {
+         return new HashSet<Term>();
+      }
    }
 
    /**
