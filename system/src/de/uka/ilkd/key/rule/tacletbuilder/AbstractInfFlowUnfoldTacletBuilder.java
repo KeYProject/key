@@ -21,6 +21,7 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.Pair;
 import java.util.Iterator;
 import java.util.Map;
@@ -207,8 +208,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
                                 StateVars origVars,
                                 StateVars schemaVars,
                                 Services services) {
-        de.uka.ilkd.key.util.LinkedHashMap<Term, Term> map =
-                new de.uka.ilkd.key.util.LinkedHashMap<Term, Term>();
+        LinkedHashMap<Term, Term> map = new LinkedHashMap<Term, Term>();
 
         Pair<StateVars, StateVars> vars = filter(origVars, schemaVars);
         origVars = vars.first;

@@ -80,7 +80,6 @@ public class RewriteTacletBuilder extends FindTacletBuilder{
     public RewriteTaclet getRewriteTaclet(){
 	if (find==null) {
 	    throw new TacletBuilderException(this, "No find part specified");
-	    
 	}
 	checkBoundInIfAndFind();
 	TacletPrefixBuilder prefixBuilder=new TacletPrefixBuilder(this);

@@ -59,7 +59,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
             this.replaceMap = preInitialisedReplaceMap;
         }
 
-        // the built-in heap symbol has to be handled with care; it is saver
+        // the built-in heap symbol has to be handled with care; it is safer
         // not to replace it
         this.replaceMap.put(getBaseHeap(), getBaseHeap());
     }
@@ -85,7 +85,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private Term renameVariablesAndSkolemConstants(Term term) {
         final Term temp = renameFormulasWithoutPrograms(term);
         final Map<ProgramVariable, ProgramVariable> progVarReplaceMap =
-                restrictToProgramVarariables(replaceMap);
+                restrictToProgramVariables(replaceMap);
         return applyRenamingsToPrograms(temp, progVarReplaceMap);
     }
 
@@ -109,7 +109,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
                    ((Function) term.op()).isSkolemConstant()) {
             renameSkolemConstant(term);
         } else if (term.op() instanceof ElementaryUpdate) {
-            applyRenamingsOnUpade(term);
+            applyRenamingsOnUpdate(term);
         } else {
             applyRenamingsOnSubterms(term);
         }
@@ -151,7 +151,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     }
 
 
-    private void applyRenamingsOnUpade(Term term) {
+    private void applyRenamingsOnUpdate(Term term) {
         final ElementaryUpdate u = (ElementaryUpdate) term.op();
         final Term lhsTerm = var(u.lhs());
         final Term renamedLhs = renameFormulasWithoutPrograms(lhsTerm);
@@ -233,7 +233,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
 
 
     private Map<ProgramVariable, ProgramVariable>
-                        restrictToProgramVarariables(Map<Term, Term> replaceMap) {
+                        restrictToProgramVariables(Map<Term, Term> replaceMap) {
         Map<ProgramVariable, ProgramVariable> progVarReplaceMap =
                 new HashMap<ProgramVariable, ProgramVariable>();
         for (final Term t : replaceMap.keySet()) {

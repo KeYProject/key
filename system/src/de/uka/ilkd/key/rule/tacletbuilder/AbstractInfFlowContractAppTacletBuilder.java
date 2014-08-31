@@ -184,11 +184,16 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
             // collect quantifiable variables of the post term and replace them
             // by schema variables
             Map<QuantifiableVariable, SchemaVariable> quantifiableVarsToSchemaVars =
-                    collectQuantifiableVariables(replaceWithTerm, services);
+                    collectQuantifiableVariables(schemaFind, services);
+            quantifiableVarsToSchemaVars.putAll(
+                    collectQuantifiableVariables(schemaAssumes, services));
+            quantifiableVarsToSchemaVars.putAll(
+                    collectQuantifiableVariables(replaceWithTerm, services));
             final OpReplacer or = new OpReplacer(quantifiableVarsToSchemaVars,
                                                  services.getTermFactory());
+            schemaFind = or.replace(schemaFind);
+            schemaAssumes = or.replace(schemaAssumes);
             replaceWithTerm = or.replace(replaceWithTerm);
-            //TODO: replace also quantifiable variables in find and assumes terms
 
             //create sequents
             Sequent assumesSeq = Sequent.createAnteSequent(

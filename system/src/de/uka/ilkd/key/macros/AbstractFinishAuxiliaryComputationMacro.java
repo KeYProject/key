@@ -60,7 +60,7 @@ abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractProofMacr
 
     private static Term[] buildExecution(ProofObligationVars c,
                                          Map<Term, Term> vsMap,
-                                         ImmutableList<de.uka.ilkd.key.proof.Goal> symbExecGoals,
+                                         ImmutableList<Goal> symbExecGoals,
                                          Goal initGoal) {
         Services services = initGoal.proof().getServices();
         final Term[] goalFormulas = buildFormulasFromGoals(symbExecGoals);
