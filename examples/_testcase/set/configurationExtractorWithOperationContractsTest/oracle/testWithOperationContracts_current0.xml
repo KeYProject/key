@@ -2,15 +2,15 @@
 <model>
    <state name="return add_1;">
       <value name="exc_2" programVariable="exc_2" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
-      <value name="result_0" programVariable="result_0" isArrayIndex="false" arrayIndex="-1" value="result_0" type="int"/>
-      <value name="add_1" programVariable="add_1" isArrayIndex="false" arrayIndex="-1" value="result_0" type="int"/>
+      <value name="result_0" programVariable="result_0" isArrayIndex="false" arrayIndex="-1" value="Z(5(#))" type="int"/>
+      <value name="add_1" programVariable="add_1" isArrayIndex="false" arrayIndex="-1" value="Z(5(#))" type="int"/>
       <association name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" target="o1"/>
       <association name="y" programVariable="y" isArrayIndex="false" arrayIndex="-1" target="o2"/>
    </state>
    <object xml:id="o1" name="x" type="ConfigurationExtractorWithOperationContractsTest.IntWrapper">
-      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="int::select(anon_heap_sub&lt;&lt;anonHeapFunction&gt;&gt;,x,ConfigurationExtractorWithOperationContractsTest.IntWrapper::$value)" type="int"/>
+      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="Z(2(#))" type="int"/>
    </object>
    <object xml:id="o2" name="y" type="ConfigurationExtractorWithOperationContractsTest.IntWrapper">
-      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="add(result_0,mul(int::select(anon_heap_sub&lt;&lt;anonHeapFunction&gt;&gt;,x,ConfigurationExtractorWithOperationContractsTest.IntWrapper::$value),Z(neglit(1(#)))))" type="int"/>
+      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="Z(3(#))" type="int"/>
    </object>
 </model>

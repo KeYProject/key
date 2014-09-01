@@ -17,10 +17,12 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * The default implementation of {@link IExecutionStart}.
@@ -50,6 +52,14 @@ public class ExecutionStart extends AbstractExecutionNode implements IExecutionS
    @Override
    protected String lazyComputeName() {
       return DEFAULT_START_NODE_NAME;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected IExecutionConstraint[] lazyComputeConstraints() {
+      return SymbolicExecutionUtil.createExecutionConstraints(this);
    }
    
    /**

@@ -27,6 +27,7 @@ import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.sed.key.core.model.KeYBranchCondition;
 import org.key_project.sed.key.core.model.KeYBranchStatement;
+import org.key_project.sed.key.core.model.KeYConstraint;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.model.KeYExceptionalMethodReturn;
 import org.key_project.sed.key.core.model.KeYExceptionalTermination;
@@ -45,6 +46,7 @@ import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
@@ -398,7 +400,7 @@ public final class KeYModelUtil {
          if (variables != null) {
             KeYVariable[] result = new KeYVariable[variables.length];
             for (int i = 0; i < variables.length; i++) {
-               result[i] = new KeYVariable(debugNode.getDebugTarget(), variables[i]);
+               result[i] = new KeYVariable(debugNode.getDebugTarget(), (IStackFrame)debugNode, variables[i]);
             }
             return result;
          }
@@ -432,6 +434,33 @@ public final class KeYModelUtil {
       }
       else {
          return new IKeYSEDDebugNode<?>[0];
+      }
+   }
+
+   /**
+    * Creates debug model representations for the {@link IExecutionConstraint}s
+    * contained in the given {@link IExecutionNode}.
+    * @param debugNode The {@link IKeYSEDDebugNode} which should be used as parent.
+    * @param executionNode The {@link IExecutionNode} to return its constraints.
+    * @return The contained {@link KeYConstraint}s as debug model representation.
+    */
+   public static KeYConstraint[] createConstraints(IKeYSEDDebugNode<?> debugNode, 
+                                                   IExecutionNode executionNode) {
+      if (executionNode != null && !executionNode.isDisposed() && debugNode != null) {
+         IExecutionConstraint[] constraints = executionNode.getConstraints();
+         if (constraints != null) {
+            KeYConstraint[] result = new KeYConstraint[constraints.length];
+            for (int i = 0; i < constraints.length; i++) {
+               result[i] = new KeYConstraint(debugNode.getDebugTarget(), constraints[i]);
+            }
+            return result;
+         }
+         else {
+            return new KeYConstraint[0];
+         }
+      }
+      else {
+         return new KeYConstraint[0];
       }
    }
 }

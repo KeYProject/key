@@ -40,7 +40,7 @@ public class SWTBotKeYDebugTargetProofFileTest extends AbstractKeYDebugTargetTes
       IKeYDebugTargetProofFileTestExecutor executor = new IKeYDebugTargetProofFileTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IFile file, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
-            assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/verificationProofFile_VerifyMin/oracle/VerifyMin.xml", true, false);
+            assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/verificationProofFile_VerifyMin/oracle/VerifyMin.xml", true, false, false);
          }
       };
       doKeYDebugTargetTest("SWTBotKeYDebugTargetProofFileTest_testVerifyMin", 
@@ -72,7 +72,7 @@ public class SWTBotKeYDebugTargetProofFileTest extends AbstractKeYDebugTargetTes
       IKeYDebugTargetProofFileTestExecutor executor = new IKeYDebugTargetProofFileTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IFile file, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
-            assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/magic42/oracle/Magic42ProofFile.xml", true, false);
+            assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/magic42/oracle/Magic42ProofFile.xml", true, false, false);
          }
       };
       doKeYDebugTargetTest("SWTBotKeYDebugTargetProofFileTest_testMagic42", 

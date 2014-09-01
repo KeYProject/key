@@ -14,6 +14,7 @@
 package org.key_project.sed.key.core.model;
 
 import org.eclipse.debug.core.DebugException;
+import org.key_project.sed.core.model.ISEDConstraint;
 import org.key_project.sed.core.model.ISEDDebugNode;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -53,4 +54,10 @@ public interface IKeYSEDDebugNode<E extends IExecutionNode> extends ISEDDebugNod
     */
    @Override
    public IKeYSEDDebugNode<?>[] getChildren() throws DebugException;
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYConstraint[] getConstraints() throws DebugException;
 }

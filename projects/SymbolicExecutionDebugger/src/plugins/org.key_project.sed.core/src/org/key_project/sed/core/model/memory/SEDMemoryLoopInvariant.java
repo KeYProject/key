@@ -18,10 +18,11 @@ import java.util.List;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
+import org.key_project.sed.core.model.ISEDConstraint;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.ISEDLoopInvariant;
+import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDLoopInvariant;
 
 /**
@@ -79,6 +80,11 @@ public class SEDMemoryLoopInvariant extends AbstractSEDLoopInvariant implements 
     * Initially valid?
     */
    private boolean initiallyValid;
+   
+   /**
+    * The contained {@link ISEDConstraint}s.
+    */
+   private final List<ISEDConstraint> constraints = new LinkedList<ISEDConstraint>();
    
    /**
     * Constructor.
@@ -298,5 +304,23 @@ public class SEDMemoryLoopInvariant extends AbstractSEDLoopInvariant implements 
     */
    public void setInitiallyValid(boolean initiallyValid) {
       this.initiallyValid = initiallyValid;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addConstraint(ISEDConstraint constraint) {
+      if (constraint != null) {
+         constraints.add(constraint);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDConstraint[] getConstraints() throws DebugException {
+      return constraints.toArray(new ISEDConstraint[constraints.size()]);
    }
 }

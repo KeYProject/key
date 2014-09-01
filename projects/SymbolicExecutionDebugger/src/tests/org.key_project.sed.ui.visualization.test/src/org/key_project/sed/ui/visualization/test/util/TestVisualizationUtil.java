@@ -61,7 +61,7 @@ public final class TestVisualizationUtil {
       TestCase.assertNotNull(modelFile);
       // Create model file
       SEDXMLWriter writer = new SEDXMLWriter();
-      String modelContent = writer.toXML(new ISEDDebugTarget[0], "UTF-8", false, false, null);
+      String modelContent = writer.toXML(new ISEDDebugTarget[0], "UTF-8", false, false, false, null);
       if (!modelFile.exists()) {
          modelFile.create(new ByteArrayInputStream(modelContent.getBytes(Charset.forName("UTF-8"))), true, null);
       }

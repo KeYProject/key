@@ -80,6 +80,11 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    private IKeYSEDDebugNode<?> lastResumedKeyNode;
    
    /**
+    * The constraints
+    */
+   private KeYConstraint[] constraints;
+   
+   /**
     * Listens for auto mode start and stop events.
     */
    private final AutoModeListener autoModeListener = new AutoModeListener() {
@@ -609,5 +614,26 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     */
    public ISEDTermination getTermination(final IExecutionTermination executionTermination) {
       return knownTerminations.get(executionTermination);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasConstraints() throws DebugException {
+      return !isTerminated() && super.hasConstraints();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYConstraint[] getConstraints() throws DebugException {
+      synchronized (this) {
+         if (constraints == null) {
+            constraints = KeYModelUtil.createConstraints(this, executionNode);
+         }
+         return constraints;
+      }
    }
 }
