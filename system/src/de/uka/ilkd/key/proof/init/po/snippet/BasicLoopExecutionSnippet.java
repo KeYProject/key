@@ -88,6 +88,11 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
                     d.tb.elementary(origParamIt.next(), paramIt.next());
             update = tb.parallel(update, paramUpdate);
         }
+        if (vs.post.self != null) {
+            Term selfUpdate =
+                    d.tb.elementary(d.origVars.self, vs.pre.self);
+            update = tb.parallel(selfUpdate, update);
+        }
         return tb.apply(update, programTerm);
     }
 
