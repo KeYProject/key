@@ -17,6 +17,7 @@ import org.key_project.key4eclipse.resources.marker.MarkerManager;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.StringUtil;
 
 import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 
@@ -192,13 +193,12 @@ public class ProofRunnable implements Runnable {
    private String generateProofMarkerMessage(ProofElement pe, Proof proof, long time){
       StringBuffer sb = new StringBuffer();
       boolean closed = pe.getProofClosed();
-      String newLine ="\n";
       
       sb.append(closed? "Closed Proof:" : "Open Proof:");
-      sb.append(newLine);
+      sb.append(StringUtil.NEW_LINE);
       sb.append(pe.getContract().getName());
-      sb.append(newLine);
-      sb.append(newLine);
+      sb.append(StringUtil.NEW_LINE);
+      sb.append(StringUtil.NEW_LINE);
       if(!proof.closed()){
          boolean uncloseable = false;
          OneStepSimplifier oss = MiscTools.findOneStepSimplifier(proof);
@@ -214,26 +214,26 @@ public class ProofRunnable implements Runnable {
          }
          if(uncloseable){
             sb.append("Reason: Goal can't be closed automatically");
-            sb.append(newLine);
+            sb.append(StringUtil.NEW_LINE);
             sb.append("Hint: Check code and specifications for bugs or continue proof interactively");
-            sb.append(newLine);
-            sb.append(newLine);
+            sb.append(StringUtil.NEW_LINE);
+            sb.append(StringUtil.NEW_LINE);
          }
          else{
             sb.append("Reason: Max. Rule Applications reached");
-            sb.append(newLine);
+            sb.append(StringUtil.NEW_LINE);
             sb.append("Hint: Continue proof automatic- or interactively");
-            sb.append(newLine);
-            sb.append(newLine);
+            sb.append(StringUtil.NEW_LINE);
+            sb.append(StringUtil.NEW_LINE);
          }
       }
       
       sb.append("Time: " + time / 1000 + "." + time % 1000 + " s");
-      sb.append(newLine);
+      sb.append(StringUtil.NEW_LINE);
       sb.append("Nodes: " + proof.countNodes());
-      sb.append(newLine);
+      sb.append(StringUtil.NEW_LINE);
       sb.append("Branches: " + proof.countBranches());
-      sb.append(newLine);
+      sb.append(StringUtil.NEW_LINE);
       
       return sb.toString();
    }

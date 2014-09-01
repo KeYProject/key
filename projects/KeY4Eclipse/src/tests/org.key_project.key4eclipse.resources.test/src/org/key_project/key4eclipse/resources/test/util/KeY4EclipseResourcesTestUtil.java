@@ -153,13 +153,14 @@ public class KeY4EclipseResourcesTestUtil {
    }
    
    private static void waitBuild(){
+      TestUtilsUtil.waitForBuild();
       IJobManager manager = Job.getJobManager();
-      Job[] keyJobs = manager.find(KeYProjectBuildJob.JOB_FAMILY);
-      Job[] buildJobs = manager.find(ResourcesPlugin.FAMILY_AUTO_BUILD);
-      if((keyJobs != null && keyJobs.length > 0) || (buildJobs != null && buildJobs.length > 0)){
+      Job[] keyJobs = manager.find(KeYProjectBuildJob.KEY_PROJECT_BUILD_JOB);
+      if(keyJobs != null && keyJobs.length > 0){
          TestUtilsUtil.sleep(100);
          waitBuild();
       }
+      TestUtilsUtil.waitForBuild();
    }
    
    public static void cleanBuild(IProject project) throws CoreException{
@@ -193,7 +194,7 @@ public class KeY4EclipseResourcesTestUtil {
     */
    public static IFolder getProofFolder(IProject project){
       IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-      IPath proofFolderPath = project.getFullPath().append("proofs");
+      IPath proofFolderPath = project.getFullPath().append(KeYResourcesUtil.PROOF_FOLDER_NAME);
       return root.getFolder(proofFolderPath);
    }
    
@@ -234,22 +235,21 @@ public class KeY4EclipseResourcesTestUtil {
    }
    
    
-   public static void setKeYProjectProperties(IProject project, boolean buildProofs, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean hideMetaFiles, boolean autoDeleteProofFiles) throws CoreException{
+   public static void setKeYProjectProperties(IProject project, boolean buildProofs, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean autoDeleteProofFiles) throws CoreException{
       KeYProjectProperties.setEnableKeYResourcesBuilds(project, buildProofs);
       KeYProjectProperties.setEnableBuildProofsEfficient(project, buildProofsEfficient);
       KeYProjectProperties.setEnableMultiThreading(project, enableMultiThreading);
       KeYProjectProperties.setNumberOfThreads(project, String.valueOf(numberOfThreads));
-      KeYProjectProperties.setHideMetaFiles(project, hideMetaFiles);
       KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFiles);
    }
    
-   public static IProject initializeTest(String projectName, boolean buildProofs, boolean startupBuilds, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean autoDeleteProofFiles, boolean hideMetaFiles) throws CoreException, InterruptedException{
+   public static IProject initializeTest(String projectName, boolean buildProofs, boolean startupBuilds, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean autoDeleteProofFiles) throws CoreException, InterruptedException{
       //turn off autobuild
 //      enableAutoBuild(false);
       //create a KeYProject
       IJavaProject keyProject = createKeYProject(projectName);
       IProject project = keyProject.getProject();
-      setKeYProjectProperties(project, buildProofs, buildProofsEfficient, enableMultiThreading, numberOfThreads, hideMetaFiles, autoDeleteProofFiles);
+      setKeYProjectProperties(project, buildProofs, buildProofsEfficient, enableMultiThreading, numberOfThreads, autoDeleteProofFiles);
       //build
       KeY4EclipseResourcesTestUtil.build(project);
       return project;

@@ -15,7 +15,6 @@ package org.key_project.key4eclipse.resources.ui.propertypages;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.ui.IPackagesViewPart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -29,11 +28,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.navigator.CommonNavigator;
-import org.eclipse.ui.navigator.CommonViewer;
 import org.key_project.key4eclipse.common.ui.property.AbstractProjectPropertyPage;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.ui.util.LogUtil;
@@ -55,8 +49,6 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
    private Button enableMultiThreadingButton;
    
    private Button autoDeleteProofFilesButton;
-   
-   private Button hideMefaFilesButton;
    
    private Text fillText;
 
@@ -120,7 +112,7 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       builderSettingsComposite.setLayout(new GridLayout(1, false));
 
       enableBuildOnStartupButton = new Button(builderSettingsComposite, SWT.CHECK);
-      enableBuildOnStartupButton.setText("Start builds on startup");
+      enableBuildOnStartupButton.setText("Continue build on startup");
       setSelectionForEnableBuildOnStartupButton();
       setEnabledForBuildOnStartupButton();
       
@@ -170,19 +162,7 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       autoDeleteProofFilesButton.setText("Delete unnecessary proof files automatically");
       setSelectionForAutoDeleteProofFilesButton();
       setEnabledForAutoDeleteProofFilesButton();
-      
-      Group folderSettings = new Group(root, SWT.NONE);
-      folderSettings.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-      folderSettings.setLayout(new GridLayout(1, false));
-      folderSettings.setText("Proof folder settings");
-      Composite folderSettingsComposite = new Composite(folderSettings, SWT.NONE);
-      folderSettingsComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-      folderSettingsComposite.setLayout(new GridLayout(1, false));
             
-      hideMefaFilesButton = new Button(folderSettingsComposite, SWT.CHECK);
-      hideMefaFilesButton.setText("Hide meta files");
-      setSelectionForHideMetaFilesButton();
-      
       return root;
    }
    
@@ -279,15 +259,6 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
    
    
    /**
-    * Sets the selection for the HideMetaFilesButton CheckBox.
-    */
-   private void setSelectionForHideMetaFilesButton(){
-      IProject project = getProject();
-      hideMefaFilesButton.setSelection(KeYProjectProperties.isHideMetaFiles(project));
-   }
-   
-   
-   /**
     * {@inheritDoc}
     */
    @Override
@@ -301,8 +272,6 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
          KeYProjectProperties.setEnableMultiThreading(project, enableMultiThreadingButton.getSelection());
          KeYProjectProperties.setNumberOfThreads(project, String.valueOf(numberOfThreadsSpinner.getSelection()));
          KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFilesButton.getSelection());
-         KeYProjectProperties.setHideMetaFiles(project, hideMefaFilesButton.getSelection());
-         updateNavigators();
          return super.performOk();
       }
       catch (CoreException e) {
@@ -325,23 +294,6 @@ public class ProofManagementPropertyPage extends AbstractProjectPropertyPage {
       enableMultiThreadingButton.setSelection(true);
       numberOfThreadsSpinner.setSelection(2);
       autoDeleteProofFilesButton.setSelection(true);
-      hideMefaFilesButton.setSelection(false);
       super.performDefaults();
-   }
-   
-   
-   private void updateNavigators() {
-      IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-      IViewPart packageExplorer = activePage.findView("org.eclipse.jdt.ui.PackageExplorer");
-      if(packageExplorer != null && packageExplorer instanceof IPackagesViewPart){
-         ((IPackagesViewPart) packageExplorer).getTreeViewer().refresh();
-      }
-      IViewPart projectExplorer = activePage.findView("org.eclipse.ui.navigator.ProjectExplorer");
-      if(projectExplorer != null && projectExplorer instanceof CommonNavigator){
-         CommonViewer viewer = ((CommonNavigator) projectExplorer).getCommonViewer();
-         if(viewer != null){
-            viewer.refresh();
-         }
-      }
    }
 }

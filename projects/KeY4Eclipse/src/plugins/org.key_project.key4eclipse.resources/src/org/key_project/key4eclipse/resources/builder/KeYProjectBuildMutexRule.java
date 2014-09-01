@@ -24,11 +24,11 @@ import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
  * Rule to avoid multiple {@link KeYProjectBuildJob}s run simultaneously.
  * @author Stefan Käsdorf
  */
-public class MutexRule implements ISchedulingRule{
+public class KeYProjectBuildMutexRule implements ISchedulingRule{
    
    private IProject project;
    
-   public MutexRule(IProject project){
+   public KeYProjectBuildMutexRule(IProject project){
       this.project = project;
    }
    
@@ -65,15 +65,7 @@ public class MutexRule implements ISchedulingRule{
     */
    @Override
    public boolean isConflicting(ISchedulingRule rule) {
-//      if(rule != null && rule instanceof MutexRule){
-//         MutexRule mutexRule = (MutexRule) rule;
-//         IProject mutexRuleProject = mutexRule.getProject();
-//         if(mutexRuleProject != null && mutexRuleProject.equals(project)){
-//            return true;
-//         }
-//      }
-//      return false;
-      return (rule instanceof MutexRule);
+      return (rule instanceof KeYProjectBuildMutexRule);
    }
 
    /**

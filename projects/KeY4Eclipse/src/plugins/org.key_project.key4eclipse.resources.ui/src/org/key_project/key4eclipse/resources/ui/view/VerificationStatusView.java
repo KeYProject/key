@@ -534,15 +534,10 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
    protected List<IProject> computeProjectsToShow(Set<IProject> linkedProjects) {
       List<IProject> result = new LinkedList<IProject>();
       for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
-         try {
-            if (project.exists() && project.isOpen() && KeYResourcesUtil.isKeYProject(project)) {
-               if (linkedProjects == null || linkedProjects.contains(project)) {
-                  result.add(project);
-               }
+         if (project.exists() && project.isOpen() && KeYResourcesUtil.isKeYProject(project)) {
+            if (linkedProjects == null || linkedProjects.contains(project)) {
+               result.add(project);
             }
-         }
-         catch (CoreException e) {
-            LogUtil.getLogger().logError(e);
          }
       }
       return result;

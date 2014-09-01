@@ -23,7 +23,6 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
-import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.XMLUtil;
@@ -87,7 +86,6 @@ public class ProofMetaFileWriter {
          metaIFile.setResourceAttributes(resAttr);
          metaIFile.setContents(new ByteArrayInputStream(xml.getBytes(encoding)), true, true, null);
       }
-      metaIFile.setHidden(KeYProjectProperties.isHideMetaFiles(metaIFile.getProject()));
       ResourceAttributes resAttr = metaIFile.getResourceAttributes();
       resAttr.setReadOnly(true);
       metaIFile.setResourceAttributes(resAttr);
@@ -190,7 +188,7 @@ public class ProofMetaFileWriter {
    private static void appendMarkerMessage(ProofElement pe, int level, StringBuffer sb) {
       if (pe.getMarkerMsg() != null) {
          XMLUtil.appendStartTag(level, TAG_MARKER_MESSAGE, null, sb);
-         sb.append(pe.getMarkerMsg());
+         sb.append(XMLUtil.encodeText(pe.getMarkerMsg()));
          XMLUtil.appendEndTag(level, TAG_MARKER_MESSAGE, sb);
       }
    }

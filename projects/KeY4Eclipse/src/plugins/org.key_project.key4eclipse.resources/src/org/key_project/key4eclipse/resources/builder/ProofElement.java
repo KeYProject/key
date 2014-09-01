@@ -20,6 +20,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
+import org.key_project.key4eclipse.resources.marker.MarkerManager;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -33,7 +34,7 @@ import de.uka.ilkd.key.ui.CustomUserInterface;
  * @author Stefan Käsdorf
  */
 public class ProofElement {
-
+   
    private IFile javaFile;
    private SourceLocation scl;
    private IMarker proofMarker;
@@ -164,10 +165,10 @@ public class ProofElement {
       this.scl = scl;
       this.proofMarker = proofMarker;
       if(proofMarker != null && proofMarker.exists()){
-         outdated = proofMarker.getAttribute("OUTDATED", true);
+         outdated = proofMarker.getAttribute(MarkerManager.MARKER_ATTRIBUTE_OUTDATED, true);
       }
       else if(recursionMarker != null && !recursionMarker.isEmpty()){
-         outdated = recursionMarker.get(0).getAttribute("OUTDATED", true);
+         outdated = recursionMarker.get(0).getAttribute(MarkerManager.MARKER_ATTRIBUTE_OUTDATED, true);
       }
       else{
          outdated = true;

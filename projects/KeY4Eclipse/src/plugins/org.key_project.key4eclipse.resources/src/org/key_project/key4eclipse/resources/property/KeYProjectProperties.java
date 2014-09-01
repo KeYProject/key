@@ -29,7 +29,6 @@ public final class KeYProjectProperties {
    public static final QualifiedName PROP_ENABLE_MULTITHREADING = new QualifiedName("org.key_project.key4eclipse.resources", "enableMultiThreading");
    public static final QualifiedName PROP_NUMBER_OF_THREADS = new QualifiedName("org.key_project.key4eclipse.resources", "numberOfThreads");
    public static final QualifiedName PROP_AUTO_DELETE_PROOFFILES = new QualifiedName("org.key_project.key4eclipse.resources", "autoDeleteProofFiles");
-   public static final QualifiedName PROP_HIDE_META_FILES = new QualifiedName("org.key_project.key4eclipse.resources", "hideMetaFiles");
    public static final QualifiedName PROP_ENABLE_AUTO_INTERRUPT_BUILD = new QualifiedName("org.key_project.key4eclipse.resources", "autoInterruptBuild");
    
    public static boolean isEnableKeYResourcesBuilds(IProject project) {
@@ -213,33 +212,6 @@ public final class KeYProjectProperties {
    public static void setAutoDeleteProofFiles(IProject project,  boolean enabled) throws CoreException {
       if (project != null) {
          project.setPersistentProperty(PROP_AUTO_DELETE_PROOFFILES, enabled + "");
-      }
-   }
-   
-   
-   public static boolean isHideMetaFiles(IProject project) {
-      if (project != null) {
-         try{
-            String value = project.getPersistentProperty(PROP_HIDE_META_FILES);
-            if(value == null){
-               return false;
-            }
-            else{
-               return Boolean.parseBoolean(value);
-            }
-         } catch (CoreException e){
-            return false;
-         }
-      }
-      else {
-         return false;
-      }
-   }
-   
-   
-   public static void setHideMetaFiles(IProject project,  boolean enabled) throws CoreException {
-      if (project != null) {
-         project.setPersistentProperty(PROP_HIDE_META_FILES, enabled + "");
       }
    }
 }

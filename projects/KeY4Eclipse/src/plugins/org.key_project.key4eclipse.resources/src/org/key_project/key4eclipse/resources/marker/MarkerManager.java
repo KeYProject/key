@@ -37,6 +37,7 @@ public class MarkerManager {
    public final static String NOTCLOSEDMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker";
    public final static String PROBLEMLOADEREXCEPTIONMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.problemLoaderExceptionMarker";
    public final static String RECURSIONMARKER_ID = "org.key_project.key4eclipse.resources.ui.marker.cycleDetectedMarker";
+   public final static String MARKER_ATTRIBUTE_OUTDATED = "org.key_project.key4eclipse.resources.ui.marker.attribute.outdated";
    
    
    /**
@@ -51,11 +52,6 @@ public class MarkerManager {
          if(proofMarker != null){
             proofMarker.delete();
          }
-      }catch (CoreException e){
-         LogUtil.getLogger().logError(e);
-      }
-
-      try{
          pe.setProofMarker(null);
          SourceLocation scl = pe.getSourceLocation();
          if(scl != null){
@@ -78,7 +74,7 @@ public class MarkerManager {
             marker.setAttribute(IMarker.CHAR_START, scl.getCharStart());
             marker.setAttribute(IMarker.CHAR_END, scl.getCharEnd());
             marker.setAttribute(IMarker.SOURCE_ID, pe.getProofFile().getFullPath().toString());
-            marker.setAttribute("OUTDATED", false);
+            marker.setAttribute(MarkerManager.MARKER_ATTRIBUTE_OUTDATED, false);
             pe.setProofMarker(marker);
          }
       } catch(CoreException e){
@@ -92,58 +88,65 @@ public class MarkerManager {
     * @param pe - the {@link ProofElement} to use
     * @throws CoreException
     */
-   public void setRecursionMarker(List<ProofElement> cycle) throws CoreException{
-      ProofElement pe = cycle.get(0);
-      IMarker proofMarker = pe.getProofMarker();
-      if(proofMarker != null){
-         proofMarker.delete();
+   public void setRecursionMarker(List<ProofElement> cycle) {
+      try{
+         ProofElement pe = cycle.get(0);
+         IMarker proofMarker = pe.getProofMarker();
+         if(proofMarker != null){
+            proofMarker.delete();
+         }
+         pe.setProofMarker(null);
+   
+         IMarker marker = pe.getJavaFile().createMarker(RECURSIONMARKER_ID);
+         if (marker.exists()) {
+            marker.setAttribute(IMarker.MESSAGE, generateCycleDetectedMarkerMessage(cycle));
+            marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+            marker.setAttribute(IMarker.LINE_NUMBER, pe.getSourceLocation().getLineNumber()); // Required for compatibility with other tools like FeatureIDE even if char start and end is defined.
+            marker.setAttribute(IMarker.LOCATION, "line " + pe.getSourceLocation().getLineNumber()); // Otherwise value "Unknown" is shown in Problems-View
+            marker.setAttribute(IMarker.CHAR_START, pe.getSourceLocation().getCharStart());
+            marker.setAttribute(IMarker.CHAR_END, pe.getSourceLocation().getCharEnd());
+            marker.setAttribute(IMarker.SOURCE_ID, pe.getProofFile().getFullPath().toString());
+            marker.setAttribute(MarkerManager.MARKER_ATTRIBUTE_OUTDATED, pe.getOutdated());
+            updateOutdatedProofMessage(marker, pe.getOutdated());
+            pe.addRecursionMarker(marker);
+         }
       }
-      pe.setProofMarker(null);
-
-      IMarker marker = pe.getJavaFile().createMarker(RECURSIONMARKER_ID);
-      if (marker.exists()) {
-         marker.setAttribute(IMarker.MESSAGE, generateCycleDetectedMarkerMessage(cycle));
-         marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
-         marker.setAttribute(IMarker.LINE_NUMBER, pe.getSourceLocation().getLineNumber()); // Required for compatibility with other tools like FeatureIDE even if char start and end is defined.
-         marker.setAttribute(IMarker.LOCATION, "line " + pe.getSourceLocation().getLineNumber()); // Otherwise value "Unknown" is shown in Problems-View
-         marker.setAttribute(IMarker.CHAR_START, pe.getSourceLocation().getCharStart());
-         marker.setAttribute(IMarker.CHAR_END, pe.getSourceLocation().getCharEnd());
-         marker.setAttribute(IMarker.SOURCE_ID, pe.getProofFile().getFullPath().toString());
-         marker.setAttribute("OUTDATED", pe.getOutdated());
-         updateOutdatedProofMessage(marker, pe.getOutdated());
-         pe.addRecursionMarker(marker);
+      catch(CoreException e){
+         LogUtil.getLogger().logError(e);
       }
    }
    
    
    public void setOutdated(ProofElement pe){
-      pe.setOutdated(true);
       pe.setBuild(true);
-      IMarker proofMarker = pe.getProofMarker();
-      if(proofMarker != null && proofMarker.exists()){
-         try {
-            proofMarker.setAttribute("OUTDATED", true);
-            updateOutdatedProofMessage(proofMarker, true);
-         }
-         catch (CoreException e) {
-            LogUtil.getLogger().logError(e);
-         }
-      }
-      List<IMarker> recursionMarker = pe.getRecursionMarker();
-      for(IMarker marker : recursionMarker){
-         if(marker != null && marker.exists()){
+      if(!pe.getOutdated()){
+         pe.setOutdated(true);
+         IMarker proofMarker = pe.getProofMarker();
+         if(proofMarker != null && proofMarker.exists()){
             try {
-               marker.setAttribute("OUTDATED", true);
-               updateOutdatedProofMessage(marker, true);
+               proofMarker.setAttribute(MarkerManager.MARKER_ATTRIBUTE_OUTDATED, true);
+               updateOutdatedProofMessage(proofMarker, true);
             }
             catch (CoreException e) {
                LogUtil.getLogger().logError(e);
             }
          }
+         List<IMarker> recursionMarker = pe.getRecursionMarker();
+         for(IMarker marker : recursionMarker){
+            if(marker != null && marker.exists()){
+               try {
+                  marker.setAttribute(MarkerManager.MARKER_ATTRIBUTE_OUTDATED, true);
+                  updateOutdatedProofMessage(marker, true);
+               }
+               catch (CoreException e) {
+                  LogUtil.getLogger().logError(e);
+               }
+            }
+         }
       }
    }
+         
       
-   
    private void updateOutdatedProofMessage(IMarker marker, boolean outdated) throws CoreException{
       String message = marker.getAttribute(IMarker.MESSAGE, "");
       String appendix = StringUtil.NEW_LINE + StringUtil.NEW_LINE + "Outdated proof - new build required!";
@@ -169,7 +172,7 @@ public class MarkerManager {
    public boolean hasOutdatedMarker(IProject project){
       List<IMarker> markerList = getKeYMarkerByType(project, IResource.DEPTH_INFINITE, MarkerManager.CLOSEDMARKER_ID, MarkerManager.NOTCLOSEDMARKER_ID, MarkerManager.RECURSIONMARKER_ID);
       for(IMarker marker : markerList){
-         boolean outdated = Boolean.valueOf(marker.getAttribute("OUTDATED", true));
+         boolean outdated = Boolean.valueOf(marker.getAttribute(MarkerManager.MARKER_ATTRIBUTE_OUTDATED, true));
          if(outdated){
             return true;
          }

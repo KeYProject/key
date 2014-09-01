@@ -16,10 +16,6 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 public class IsMethodSelectedTester extends PropertyTester {
 
-   public IsMethodSelectedTester() {
-      // TODO Auto-generated constructor stub
-   }
-
    @Override
    public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
       if(receiver instanceof ITextSelection){

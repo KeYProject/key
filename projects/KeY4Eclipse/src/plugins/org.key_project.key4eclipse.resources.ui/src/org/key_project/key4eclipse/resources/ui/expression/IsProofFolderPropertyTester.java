@@ -1,15 +1,15 @@
 package org.key_project.key4eclipse.resources.ui.expression;
 
 import org.eclipse.core.expressions.PropertyTester;
-import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 
-public class IsProofFilePropertyTester extends PropertyTester {
+public class IsProofFolderPropertyTester extends PropertyTester {
    @Override
    public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
-      if(receiver instanceof IFile){
-         IFile file = (IFile) receiver;
-         return (KeYResourcesUtil.isKeYProject(file.getProject()) && KeYResourcesUtil.isProofFile(file));
+      if(receiver instanceof IFolder){
+         IFolder folder = (IFolder) receiver;
+         return (KeYResourcesUtil.isKeYProject(folder.getProject()) && KeYResourcesUtil.isInProofFolder(folder));
       }
       return false;
    }

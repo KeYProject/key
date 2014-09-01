@@ -89,7 +89,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          SWTBotCustomProgressBar proofBar = SWTBotCustomProgressBar.customProgressBar(bot, 0);
          SWTBotCustomProgressBar specificationBar = SWTBotCustomProgressBar.customProgressBar(bot, 1);
          // Test initial project
-         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testTacletOptions", true, false, true, false, 1, true, true);
+         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testTacletOptions", true, false, true, false, 1, true);
          IFolder srcFolder = project.getFolder("src");
          assertTrue(srcFolder.exists());
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/tacletOptions/src", srcFolder, true);
@@ -155,7 +155,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          SWTBotCustomProgressBar proofBar = SWTBotCustomProgressBar.customProgressBar(bot, 0);
          SWTBotCustomProgressBar specificationBar = SWTBotCustomProgressBar.customProgressBar(bot, 1);
          // Test initial project
-         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testColorPriorization", true, false, true, false, 1, true, true);
+         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testColorPriorization", true, false, true, false, 1, true);
          IFolder srcFolder = project.getFolder("src");
          assertTrue(srcFolder.exists());
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/cp/src", srcFolder, true);
@@ -274,7 +274,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          SWTBotCustomProgressBar proofBar = SWTBotCustomProgressBar.customProgressBar(bot, 0);
          SWTBotCustomProgressBar specificationBar = SWTBotCustomProgressBar.customProgressBar(bot, 1);
          // Test initial project
-         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testSpecificationAndProofProgress", true, false, true, false, 1, true, true);
+         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testSpecificationAndProofProgress", true, false, true, false, 1, true);
          IFolder srcFolder = project.getFolder("src");
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/specificationProgress/src1NoMethod", srcFolder, true);
          assertTrue(srcFolder.exists());
@@ -361,7 +361,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          SWTBotCustomProgressBar proofBar = SWTBotCustomProgressBar.customProgressBar(bot, 0);
          SWTBotCustomProgressBar specificationBar = SWTBotCustomProgressBar.customProgressBar(bot, 1);
          // Test initial project
-         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testColorOfCyclicProofs", true, false, true, false, 1, true, true);
+         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testColorOfCyclicProofs", true, false, true, false, 1, true);
          IFolder srcFolder = project.getFolder("src");
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/cyclicProofs/src", srcFolder, true);
          assertTrue(srcFolder.exists());
@@ -513,7 +513,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          SWTBotTree tree = view.bot().tree();
          assertProjectShown(tree);
          // Test empty project (step 0)
-         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testPackagesAndTypes", true, false, true, false, 1, true, true);
+         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testPackagesAndTypes", true, false, true, false, 1, true);
          assertProjectShown(tree, project);
          IFolder srcFolder = project.getFolder("src");
          assertTrue(srcFolder.exists());
@@ -569,7 +569,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          SWTBotTree tree = view.bot().tree();
          assertProjectShown(tree);
          // Test empty project (step 0)
-         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testObserverFunctionsAndContracts", true, false, true, false, 1, true, true);
+         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testObserverFunctionsAndContracts", true, false, true, false, 1, true);
          assertProjectShown(tree, project);
          IFolder srcFolder = project.getFolder("src");
          assertTrue(srcFolder.exists());
@@ -618,7 +618,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          SWTBotTree tree = view.bot().tree();
          assertProjectShown(tree);
          // Test empty project (step 0)
-         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testMethodContracts", true, false, true, false, 1, true, true);
+         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testMethodContracts", true, false, true, false, 1, true);
          assertProjectShown(tree, project);
          IFolder srcFolder = project.getFolder("src");
          assertTrue(srcFolder.exists());
@@ -667,7 +667,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          SWTBotTree tree = view.bot().tree();
          assertProjectShown(tree);
          // Test empty project (step 0)
-         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testMethods", true, false, true, false, 1, true, true);
+         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testMethods", true, false, true, false, 1, true);
          assertProjectShown(tree, project);
          IFolder srcFolder = project.getFolder("src");
          assertTrue(srcFolder.exists());
@@ -724,7 +724,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          KeY4EclipseResourcesTestUtil.build(generalProject);
          assertProjectShown(tree);
          // Create first key project to show
-         firstKeyProject = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testShownContentWithAndWithoutLinking_key1", true, false, true, false, 1, true, true);
+         firstKeyProject = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testShownContentWithAndWithoutLinking_key1", true, false, true, false, 1, true);
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/classWithoutMethods", firstKeyProject.getFolder("src"));
          KeY4EclipseResourcesTestUtil.build(firstKeyProject);
          assertProjectShown(tree, firstKeyProject);
@@ -734,7 +734,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          KeY4EclipseResourcesTestUtil.build(javaProject.getProject());
          assertProjectShown(tree, firstKeyProject);
          // Create second key project to show
-         secondKeyProject = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testShownContentWithAndWithoutLinking_key2", true, false, true, false, 1, true, true);
+         secondKeyProject = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testShownContentWithAndWithoutLinking_key2", true, false, true, false, 1, true);
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/classWithoutMethods", secondKeyProject.getFolder("src"));
          KeY4EclipseResourcesTestUtil.build(secondKeyProject);
          assertProjectShown(tree, firstKeyProject, secondKeyProject);
