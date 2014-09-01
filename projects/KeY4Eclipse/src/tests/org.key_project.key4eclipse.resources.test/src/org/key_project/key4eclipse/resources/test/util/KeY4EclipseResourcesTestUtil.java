@@ -41,6 +41,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.swt.widgets.Display;
 import org.key_project.key4eclipse.resources.builder.KeYProjectBuildJob;
 import org.key_project.key4eclipse.resources.builder.KeYProjectBuilder;
 import org.key_project.key4eclipse.resources.log.LogManager;
@@ -152,15 +153,26 @@ public class KeY4EclipseResourcesTestUtil {
       waitBuild();
    }
    
-   private static void waitBuild(){
-      TestUtilsUtil.waitForBuild();
+   private static void waitBuild() {
       IJobManager manager = Job.getJobManager();
+      // Wait for jobs and builds.
       Job[] keyJobs = manager.find(KeYProjectBuildJob.KEY_PROJECT_BUILD_JOB);
-      if(keyJobs != null && keyJobs.length > 0){
-         TestUtilsUtil.sleep(100);
-         waitBuild();
+      Job[] buildJobs = manager.find(ResourcesPlugin.FAMILY_AUTO_BUILD);
+      while (!ArrayUtil.isEmpty(keyJobs) || !ArrayUtil.isEmpty(buildJobs)) {
+         // Sleep some time but allow the UI to do its tasks
+         if (Display.getDefault().getThread() == Thread.currentThread()) {
+            int i = 0;
+            while (Display.getDefault().readAndDispatch() && i < 1000) {
+               i++;
+            }
+         }
+         else {
+            TestUtilsUtil.sleep(100);
+         }
+         // Check if jobs are still running
+         keyJobs = manager.find(KeYProjectBuildJob.KEY_PROJECT_BUILD_JOB);
+         buildJobs = manager.find(ResourcesPlugin.FAMILY_AUTO_BUILD);
       }
-      TestUtilsUtil.waitForBuild();
    }
    
    public static void cleanBuild(IProject project) throws CoreException{

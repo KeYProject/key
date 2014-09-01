@@ -69,7 +69,7 @@ public class KeYProjectBuildJob extends Job{
       this.proofsToDo = proofsToDo;
       this.editorSelection = null;
       if(buildType != KeYProjectBuildJob.CLEAN_BUILD && KeYProjectProperties.isEnableKeYResourcesBuilds(project)){
-//         this.editorSelection = getEditorSelection();
+         this.editorSelection = getEditorSelection();
       }
    }
    
