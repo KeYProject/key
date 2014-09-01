@@ -191,7 +191,7 @@ public class ProofMetaFileWriterAndReaderTest extends TestCase {
          assertTrue(metaFile.exists());
          // Read meta file
          ProofMetaFileReader reader = new ProofMetaFileReader(metaFile);
-         assertEquals("fdd29cb66ec24594f459bfed14761137", reader.getProofFileMD5());
+         assertEquals(ResourceUtil.computeContentMD5(proofFile), reader.getProofFileMD5());
          assertEquals(proofClosed, reader.getProofClosed());
          if (withMarkerMessage) {
             assertEquals("Hello\nWorld\n!", reader.getMarkerMessage());

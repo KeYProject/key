@@ -189,7 +189,7 @@ public class ProofMetaFileWriter {
    private static void appendMarkerMessage(ProofElement pe, int level, StringBuffer sb) {
       if (pe.getMarkerMsg() != null) {
          XMLUtil.appendStartTag(level, TAG_MARKER_MESSAGE, null, sb);
-         sb.append(pe.getMarkerMsg());
+         sb.append(XMLUtil.encodeText(pe.getMarkerMsg()));
          XMLUtil.appendEndTag(level, TAG_MARKER_MESSAGE, sb);
       }
    }
