@@ -22,18 +22,14 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -44,11 +40,13 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.key_project.key4eclipse.resources.builder.KeYProjectBuildJob;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.resources.nature.KeYProjectNature;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
@@ -65,44 +63,14 @@ public class KeYResourcesUtil {
    public static final String PROOF_FILE_EXTENSION = "proof";
    public static final String META_FILE_EXTENSION = "proofmeta";
    
+   
    /**
     * Runs an {@link IncrementalProjectBuilder}s INCREMENTAL_BUILD for the given {@link IProject} and waits for the build to finish.
     * @param project - the {@link IProject} to use
     * @throws CoreException
     */
-   public static void cleanBuildProject(final IProject project) throws CoreException{
-      IWorkspace workspace = ResourcesPlugin.getWorkspace();
-      IWorkspaceDescription desc = workspace.getDescription();
-      boolean autoBuilding = desc.isAutoBuilding();
-      if(autoBuilding){
-         try {
-            desc.setAutoBuilding(false);
-            workspace.setDescription(desc);
-            //build
-            project.build(IncrementalProjectBuilder.CLEAN_BUILD, new NullProgressMonitor());
-         }
-         finally {
-            desc.setAutoBuilding(autoBuilding);
-            workspace.setDescription(desc);
-         }
-      }
-      else{
-         //build
-         new Job("Converting into KeY project") {
-
-            @Override
-            protected IStatus run(IProgressMonitor monitor) {
-               try {
-                  project.build(IncrementalProjectBuilder.FULL_BUILD, new NullProgressMonitor());
-                  return Status.OK_STATUS;
-               }
-               catch (CoreException e) {
-                  return LogUtil.getLogger().createErrorStatus(e);
-               }
-            }
-            
-         }.schedule();
-      }
+   public static void buildProject(IProject project, int buildType) throws CoreException{
+      project.build(buildType, new NullProgressMonitor());
    }
    
    
@@ -241,11 +209,33 @@ public class KeYResourcesUtil {
     * @return {@code true} is KeY project, {@code false} is something else.
     * @throws CoreException Occurred Exception.
     */
-   public static boolean isKeYProject(IProject project) throws CoreException {
-      return project != null &&
-             project.exists() &&
-             project.isOpen() &&
-             project.hasNature(KeYProjectNature.NATURE_ID);
+   public static boolean isJavaProject(IProject project) {
+      try{
+         return project != null &&
+                project.exists() &&
+                project.isOpen() &&
+                project.hasNature(JavaCore.NATURE_ID);
+      } catch (CoreException e){
+         return false;
+      }
+   }
+   
+   
+   /**
+    * Checks if the given {@link IProject} is a KeY project.
+    * @param project The {@link IProject} to check.
+    * @return {@code true} is KeY project, {@code false} is something else.
+    * @throws CoreException Occurred Exception.
+    */
+   public static boolean isKeYProject(IProject project) {
+      try{
+         return project != null &&
+                project.exists() &&
+                project.isOpen() &&
+                project.hasNature(KeYProjectNature.NATURE_ID);
+      } catch (CoreException e){
+         return false;
+      }
    }
    
    public static IProject getProject(IResourceDelta delta){
@@ -309,7 +299,7 @@ public class KeYResourcesUtil {
    }
    
    
-   public static List<ProofElement> getProofElementsForMethod(List<ProofElement> proofElements, IMethod method){
+   public static List<ProofElement> getProofElementsForMethod(List<ProofElement> proofElements, IMethod method) {
       List<ProofElement> methodProofElements = new LinkedList<ProofElement>();
       if(method != null){
          ICompilationUnit compUnit = method.getCompilationUnit();
@@ -317,23 +307,16 @@ public class KeYResourcesUtil {
             try{
                IResource res = compUnit.getResource();
                if(res != null){
-                  String src = compUnit.getSource();
-                  ISourceRange range = method.getSourceRange();
-                  int offset = range.getOffset();
-                  int length = range.getLength();
-                  int methodStartLine = KeYResourcesUtil.getLineForOffset(src, offset);
-                  int methodEndLine = KeYResourcesUtil.getLineForOffset(src, offset+length);
+                  ISourceRange nameRange = method.getNameRange();
+                  Position pos = KeYUtil.getCursorPositionForOffset(compUnit, nameRange.getOffset());
                   for(ProofElement pe : proofElements){
                      IFile peJavaFile = pe.getJavaFile();
-                     if(peJavaFile != null && res.equals(peJavaFile)){
-                        int sclLine = pe.getSourceLocation().getLineNumber();
-                        if(methodStartLine <= sclLine && methodEndLine >= sclLine){
-                           methodProofElements.add(pe);
-                        }
+                     if(peJavaFile != null && res.equals(peJavaFile) && pe.getSourceLocation().getLineNumber() == pos.getLine()){
+                        methodProofElements.add(pe);
                      }
                   }
                }
-            } catch (JavaModelException e){
+            } catch (Exception e){
                return new LinkedList<ProofElement>();
             }
          }
@@ -380,7 +363,7 @@ public class KeYResourcesUtil {
     * @return true if the given {@link IResource} is a proof or a meta file and if it is stored in the proof folder of the project.
     */
    public static boolean isInProofFolder(IResource res){
-      if(IResource.FILE == res.getType()){
+      if(IResource.FILE == res.getType() || IResource.FOLDER == res.getType()){
          IPath proofFolder = res.getProject().getFullPath().append("proofs");
          return proofFolder.isPrefixOf(res.getFullPath());
       }
@@ -431,7 +414,7 @@ public class KeYResourcesUtil {
    public static IFile getProofFile(String name, IPath path) {
       if (path != null && name != null) {
          name = ResourceUtil.validateWorkspaceFileName(name);
-         name = name + "." + KeYUtil.PROOF_FILE_EXTENSION;
+         name = name + "." + KeYResourcesUtil.PROOF_FILE_EXTENSION;
          path = path.append(name);
          IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
          return file;
@@ -451,5 +434,82 @@ public class KeYResourcesUtil {
       IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
       IFile proofMetaFile = root.getFile(proofMetaFilePath);
       return proofMetaFile;
+   }
+   
+   
+   public static List<KeYProjectBuildJob> getProjectBuildJobs(IProject project){
+      List<KeYProjectBuildJob> projectKeYJobs = new LinkedList<KeYProjectBuildJob>();
+      if(project != null){
+         IJobManager jobMan = Job.getJobManager();
+         Job[] jobs = jobMan.find(KeYProjectBuildJob.KEY_PROJECT_BUILD_JOB);
+         for(Job job : jobs){
+            if(job instanceof KeYProjectBuildJob){
+               KeYProjectBuildJob keyJob = (KeYProjectBuildJob) job;
+               if(project.equals(keyJob.getProject())){
+                  projectKeYJobs.add(keyJob);
+               }
+            }
+         }
+      }
+      return projectKeYJobs;
+   }
+   
+   
+   public static int getNumberOfAutoBuildsInQueue(IProject project){
+      int num = 0;
+      List<KeYProjectBuildJob> projectBuildJobs = KeYResourcesUtil.getProjectBuildJobs(project);
+      for(KeYProjectBuildJob job : projectBuildJobs){
+         if(KeYProjectBuildJob.AUTO_BUILD == job.getBuildType() && Job.WAITING == job.getState()){
+            num++;
+         }
+      }
+      return num;
+   }
+   
+   
+   public static boolean isProofFile(IFile file){
+      if(file != null && file.exists()){
+         IProject project = file.getProject();
+         if(KeYResourcesUtil.isKeYProject(project) && isInProofFolder(file) && KeYResourcesUtil.PROOF_FILE_EXTENSION.equals(file.getFileExtension())){
+            return true;
+         }
+      }
+      return false;
+   }
+   
+   
+   public static List<IFile> getAllProofFiles(IResource res){
+      if(res != null && res.exists()){
+         if(res.getType() == IResource.PROJECT){
+            IProject project = (IProject) res;
+            if(KeYResourcesUtil.isKeYProject(project)){
+               return getAllProofFiles(project.getFolder(KeYResourcesUtil.PROOF_FOLDER_NAME));
+            }
+         }
+         else if(res.getType() == IResource.FOLDER){
+            IFolder folder = (IFolder) res;
+            if(KeYResourcesUtil.isKeYProject(folder.getProject()) && KeYResourcesUtil.isInProofFolder(folder)){
+               try{
+                  List<IFile> files = new LinkedList<IFile>();
+                  for(IResource subRes : folder.members()){
+                     files.addAll(KeYResourcesUtil.getAllProofFiles(subRes));
+                  }
+                  return files;
+               }
+               catch(CoreException e){
+                  LogUtil.getLogger().logError(e);
+               }
+            }
+         }
+         else if(res.getType() == IResource.FILE){
+            IFile file = (IFile) res;
+            if(KeYResourcesUtil.isKeYProject(file.getProject()) && KeYResourcesUtil.isInProofFolder(file) && KeYResourcesUtil.isProofFile(file)){
+               List<IFile> files = new LinkedList<IFile>();
+               files.add(file);
+               return files;
+            }
+         }
+      }
+      return new LinkedList<IFile>();
    }
 }

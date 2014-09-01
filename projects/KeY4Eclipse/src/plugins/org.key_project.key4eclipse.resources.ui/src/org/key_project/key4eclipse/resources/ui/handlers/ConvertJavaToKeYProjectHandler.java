@@ -16,6 +16,7 @@ package org.key_project.key4eclipse.resources.ui.handlers;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -36,16 +37,20 @@ public class ConvertJavaToKeYProjectHandler extends AbstractSaveExecutionHandler
       ISelection selection = HandlerUtil.getCurrentSelection(event);
       Object[] elements = SWTUtil.toArray(selection);
       for(Object obj : elements){
-         if (obj instanceof IJavaProject){
-            IProject project = ((IJavaProject) obj).getProject();
-            if(project != null){
-               IProjectDescription description = project.getDescription();
-               String[] newNatures = ArrayUtil.add(description.getNatureIds(), KeYProjectNature.NATURE_ID);
-               description.setNatureIds(newNatures);
-               project.setDescription(description, null);  
-               KeYResourcesUtil.cleanBuildProject(project);  
-            }        
+         IProject project = null;
+         if(obj instanceof IProject && KeYResourcesUtil.isJavaProject((IProject) obj)){
+            project = (IProject) obj;
          }
+         else if (obj instanceof IJavaProject){
+            project = ((IJavaProject) obj).getProject();
+         }
+         if(project != null){
+            IProjectDescription description = project.getDescription();
+            String[] newNatures = ArrayUtil.insert(description.getNatureIds(), KeYProjectNature.NATURE_ID, 0);
+            description.setNatureIds(newNatures);
+            project.setDescription(description, null);  
+            KeYResourcesUtil.buildProject(project, IncrementalProjectBuilder.FULL_BUILD);  
+         }       
       }
       return null;
    }

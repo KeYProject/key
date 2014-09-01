@@ -16,16 +16,17 @@ package org.key_project.key4eclipse.resources.builder;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 
 /**
  * Rule to avoid multiple {@link KeYProjectBuildJob}s run simultaneously.
  * @author Stefan Käsdorf
  */
-public class MutexRule implements ISchedulingRule{
+public class KeYProjectBuildMutexRule implements ISchedulingRule{
    
    private IProject project;
    
-   public MutexRule(IProject project){
+   public KeYProjectBuildMutexRule(IProject project){
       this.project = project;
    }
    
@@ -41,7 +42,7 @@ public class MutexRule implements ISchedulingRule{
       if(rule != null){
          if(rule instanceof IFolder){
             IFolder ruleFolder = (IFolder) rule;
-            IFolder proofFolder = ruleFolder.getProject().getFolder("proofs");
+            IFolder proofFolder = ruleFolder.getProject().getFolder(KeYResourcesUtil.PROOF_FOLDER_NAME);
             if(proofFolder.exists()){
                return proofFolder.getFullPath().isPrefixOf(ruleFolder.getFullPath());
             }
@@ -62,15 +63,7 @@ public class MutexRule implements ISchedulingRule{
     */
    @Override
    public boolean isConflicting(ISchedulingRule rule) {
-//      if(rule != null && rule instanceof MutexRule){
-//         MutexRule mutexRule = (MutexRule) rule;
-//         IProject mutexRuleProject = mutexRule.getProject();
-//         if(mutexRuleProject != null && mutexRuleProject.equals(project)){
-//            return true;
-//         }
-//      }
-//      return false;
-      return (rule instanceof MutexRule);
+      return (rule instanceof KeYProjectBuildMutexRule);
    }
 
 }

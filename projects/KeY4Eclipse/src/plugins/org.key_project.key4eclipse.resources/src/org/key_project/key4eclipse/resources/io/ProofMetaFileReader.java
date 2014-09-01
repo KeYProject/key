@@ -13,7 +13,10 @@
 
 package org.key_project.key4eclipse.resources.io;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -23,12 +26,12 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  * Reader for the meta files.
@@ -40,8 +43,8 @@ public class ProofMetaFileReader {
    private String proofFileMD5;
    private boolean proofClosed;
    private String markerMessage;
-   private LinkedList<ProofMetaFileTypeElement> typeElemens = new LinkedList<ProofMetaFileTypeElement>();
-   private LinkedList<IFile> usedContracts = new LinkedList<IFile>();
+   private HashMap<String, List<String>> typeElemens = new LinkedHashMap<String, List<String>>();
+   private List<IFile> usedContracts = new LinkedList<IFile>();
    
    /**
     * The Constructor that automatically reads the given meta{@link IFile} and Provides the content.
@@ -49,23 +52,26 @@ public class ProofMetaFileReader {
     * @throws ParserConfigurationException 
     * @throws Exception
     */
-   public ProofMetaFileReader(IFile metaIFile) throws Exception{ //No there are more --> Change Exception to ProofMetaFileContentException. Other exceptions are never thrown. It is legal for me to throw SAXException 
+   public ProofMetaFileReader(IFile metaIFile) throws ProofMetaFileException {
       DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-      DocumentBuilder dBuilder = docFactory.newDocumentBuilder();
-      try{
-         Document doc = dBuilder.parse(metaIFile.getContents());
-         
-         checkMetaFileFormat(doc);
-         
-         Element rootElement = doc.getDocumentElement();
-         this.proofFileMD5 = readMD5(rootElement);
-         this.markerMessage = readMarkerMessage(rootElement);
-         this.proofClosed = readProofStatus(rootElement);
-         this.typeElemens = readAllTypeElements(rootElement);
-         this.usedContracts = readUsedContracts(rootElement);
-         
-      } catch (SAXException e){
-         throw new ProofMetaFileException("Invalid XML File");
+    try{
+         DocumentBuilder dBuilder = docFactory.newDocumentBuilder();
+         if(metaIFile != null && metaIFile.exists()){
+            Document doc = dBuilder.parse(metaIFile.getContents());
+            
+            checkMetaFileFormat(doc);
+            
+            Element rootElement = doc.getDocumentElement();
+            this.proofFileMD5 = readMD5(rootElement);
+            this.markerMessage = readMarkerMessage(rootElement);
+            this.proofClosed = readProofStatus(rootElement);
+            this.typeElemens = readAllTypeElements(rootElement);
+            this.usedContracts = readUsedContracts(rootElement);
+         }
+         else throw new ProofMetaFileException("No meta file found");
+      } catch (Exception e){
+         LogUtil.getLogger().logError(e);
+         throw new ProofMetaFileException("Error reading the meta file: " + e.getMessage());
       }
    }
    
@@ -92,12 +98,12 @@ public class ProofMetaFileReader {
     * Return the {@link LinkedList} with all {@link ProofMetaFileTypeElement}s.
     * @return the {@link ProofMetaFileTypeElement}s
     */
-   public LinkedList<ProofMetaFileTypeElement> getTypeElements() {
+   public HashMap<String, List<String>> getTypeElements() {
       return typeElemens;
    }
    
    
-   public LinkedList<IFile> getUsedContracts(){
+   public List<IFile> getUsedContracts(){
       return usedContracts;
    }
    
@@ -244,8 +250,8 @@ public class ProofMetaFileReader {
     * @return a {@link LinkedList} with all read types
     * @throws ProofMetaFileException
     */
-   private LinkedList<ProofMetaFileTypeElement> readAllTypeElements(Element rootElement) throws ProofMetaFileException{
-      LinkedList<ProofMetaFileTypeElement> typeElements = new LinkedList<ProofMetaFileTypeElement>();
+   private HashMap<String, List<String>> readAllTypeElements(Element rootElement) throws ProofMetaFileException{
+      HashMap<String, List<String>> types = new LinkedHashMap<String, List<String>>();
       NodeList rootNodeList = rootElement.getChildNodes();
       Node usedTypes = rootNodeList.item(3);
       NodeList usedTypesNodeList = usedTypes.getChildNodes();
@@ -256,7 +262,9 @@ public class ProofMetaFileReader {
             Node attrNode = attrMap.item(0);
             if("name".equals(attrNode.getNodeName())){
                String name = attrNode.getNodeValue();
-               typeElements.add(new ProofMetaFileTypeElement(name, readAllSubTypes(type)));
+               if(types.get(name) == null){
+                  types.put(name, readAllSubTypes(type));
+               }
             }
             else{
                throw new ProofMetaFileException("No type attribute found for this type");
@@ -266,7 +274,7 @@ public class ProofMetaFileReader {
             throw new ProofMetaFileException("To many attributes for this type");
          }
       }
-      return typeElements;
+      return types;
    }
    
    
@@ -276,8 +284,8 @@ public class ProofMetaFileReader {
     * @return - a {@link LinkedList} with all subTypes
     * @throws ProofMetaFileException
     */
-   private LinkedList<String> readAllSubTypes(Node type) throws ProofMetaFileException{
-      LinkedList<String> subTypeList = new LinkedList<String>();
+   private List<String> readAllSubTypes(Node type) throws ProofMetaFileException{
+      List<String> subTypeList = new LinkedList<String>();
       NodeList nodeList = type.getChildNodes();
       for(int i = 0; i < nodeList.getLength(); i++){
          Node subType = nodeList.item(i);
@@ -299,8 +307,8 @@ public class ProofMetaFileReader {
       return subTypeList;
    }
    
-   private LinkedList<IFile> readUsedContracts(Element rootElement) throws ProofMetaFileException{
-      LinkedList<IFile> usedContracts = new LinkedList<IFile>();
+   private List<IFile> readUsedContracts(Element rootElement) throws ProofMetaFileException{
+      List<IFile> usedContracts = new LinkedList<IFile>();
       NodeList rootNodeList = rootElement.getChildNodes();
       Node usedContractsNode = rootNodeList.item(4);
       NodeList usedContractsNodeList = usedContractsNode.getChildNodes();

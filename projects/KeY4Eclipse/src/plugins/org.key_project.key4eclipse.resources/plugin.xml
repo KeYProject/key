@@ -42,7 +42,7 @@
             value="true">
       </persistent>
       <attribute
-            name="OUTDATED">
+            name="org.key_project.key4eclipse.resources.ui.marker.attribute.outdated">
       </attribute>
    </extension>
    <extension
@@ -59,7 +59,7 @@
             value="true">
       </persistent>
       <attribute
-            name="OUTDATED">
+            name="org.key_project.key4eclipse.resources.ui.marker.attribute.outdated">
       </attribute>
    </extension>
    <extension
@@ -87,7 +87,7 @@
             value="true">
       </persistent>
       <attribute
-            name="OUTDATED">
+            name="org.key_project.key4eclipse.resources.ui.marker.attribute.outdated">
       </attribute>
    </extension>
    <extension

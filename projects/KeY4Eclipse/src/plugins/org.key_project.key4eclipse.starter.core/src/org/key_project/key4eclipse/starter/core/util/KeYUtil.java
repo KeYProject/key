@@ -1368,7 +1368,7 @@ public final class KeYUtil {
     * @param kjts - the {@link KeYJavaType}s to filter and sort
     * @return the filtered and sorted {@link KeYJavaType[]}
     */
-   public static KeYJavaType[] sortKeYJavaTypes(Set<KeYJavaType> kjts){ // TODO: Move to KeYUtil.sortKeYJavaTypes(Set<KeYJavaType>)
+   public static KeYJavaType[] sortKeYJavaTypes(Set<KeYJavaType> kjts){
       Iterator<KeYJavaType> it = kjts.iterator();
       while (it.hasNext()) {
          KeYJavaType kjt = it.next();
@@ -1386,4 +1386,6 @@ public final class KeYUtil {
       });
       return kjtsarr;
    }
+   
+   
 }
