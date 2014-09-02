@@ -7,7 +7,6 @@ import java.util.Map;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
-import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 
 /**
@@ -40,7 +39,7 @@ public class KeYProjectDeltaManager {
     */
    public void update(IResourceDelta delta){
       if(delta != null){
-         IProject project = KeYResourcesUtil.getProject(delta);
+         IProject project = delta.getResource().getProject();
          KeYProjectDeltaVisitor visitor = new KeYProjectDeltaVisitor(project);
          try{
             delta.accept(visitor);

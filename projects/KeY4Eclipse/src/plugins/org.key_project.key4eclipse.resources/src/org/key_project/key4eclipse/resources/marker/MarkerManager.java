@@ -202,11 +202,15 @@ public class MarkerManager {
     * @param res - the {@link IResource} to use
     * @throws CoreException
     */
-   public void setProblemLoaderExceptionMarker(IProject project, String msg) throws CoreException{
-      IMarker marker = project.createMarker(PROBLEMLOADEREXCEPTIONMARKER_ID);
+   public void setProblemLoaderExceptionMarker(IResource res, int lineNumber, String msg) throws CoreException{
+      deleteKeYMarkerByType(res.getProject(), IResource.DEPTH_INFINITE, MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID);
+      IMarker marker = res.createMarker(PROBLEMLOADEREXCEPTIONMARKER_ID);
       if (marker.exists()) {
          marker.setAttribute(IMarker.MESSAGE, msg);
          marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+         if(res instanceof IFile && lineNumber != -1){
+            marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+         }
       }
    }
    

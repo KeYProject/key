@@ -24,7 +24,6 @@ import org.key_project.key4eclipse.resources.log.LogManager;
 import org.key_project.key4eclipse.resources.log.LogRecord;
 import org.key_project.key4eclipse.resources.log.LogRecordKind;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
-import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 
 /**
  * The KeYProject builder.
@@ -37,7 +36,6 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
     * The builder id.
     */
    public final static String BUILDER_ID = "org.key_project.key4eclipse.resources.KeYProjectBuilder";
-   private int buildType = KeYProjectBuildJob.AUTO_BUILD;
    /**
     * {@inheritDoc}
     */
@@ -51,22 +49,13 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
       
       try {
          IResourceDelta delta = getDelta(project);
-         if(IncrementalProjectBuilder.FULL_BUILD == kind){
-            buildType = KeYProjectBuildJob.CLEAN_BUILD;
-         }
          if(KeYProjectProperties.isEnableKeYResourcesBuilds(project)){
             KeYProjectDeltaManager deltaManager = KeYProjectDeltaManager.getInstance();
             deltaManager.update(delta);
             KeYProjectDelta keyDelta = deltaManager.getDelta(getProject());
-            if(IncrementalProjectBuilder.FULL_BUILD == kind || buildType == KeYProjectBuildJob.CLEAN_BUILD || keyDelta.isBuildRequired()){
-               if(!KeYProjectProperties.isEnableAutoInterruptBuild(project)){
-                  int autoBuilds = KeYResourcesUtil.getNumberOfAutoBuildsInQueue(project);
-                  if(autoBuilds > 0){
-                     return null;
-                  }
-               }
+            if(IncrementalProjectBuilder.FULL_BUILD == kind || keyDelta.isBuildRequired()){
+               int buildType = IncrementalProjectBuilder.FULL_BUILD == kind ? KeYProjectBuildJob.FULL_BUILD : KeYProjectBuildJob.AUTO_BUILD;
                KeYProjectBuildJob proofManagerJob = new KeYProjectBuildJob(project, buildType);
-               buildType = KeYProjectBuildJob.AUTO_BUILD;
                proofManagerJob.setRule(new KeYProjectBuildMutexRule(project));
                proofManagerJob.schedule();
             }
@@ -89,12 +78,6 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
       final boolean onlyRequiredProofs = KeYProjectProperties.isEnableBuildRequiredProofsOnly(project);
       final int numberOfThreads = KeYProjectProperties.getNumberOfThreads(project);
       final boolean enableThreading = KeYProjectProperties.isEnableMultiThreading(project);
-      
-      try {
-         buildType = KeYProjectBuildJob.CLEAN_BUILD;
-      }
-      finally {
-         LogManager.getInstance().log(project, new LogRecord(LogRecordKind.CLEAN, start, System.currentTimeMillis() - start, onlyRequiredProofs, enableThreading, numberOfThreads));
-      }
+      LogManager.getInstance().log(project, new LogRecord(LogRecordKind.CLEAN, start, System.currentTimeMillis() - start, onlyRequiredProofs, enableThreading, numberOfThreads));
    }
 }

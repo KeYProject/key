@@ -74,169 +74,37 @@
             </visibleWhen>
          </command>
          <command
-               commandId="org.key_project.key4eclipse.resources.ui.buildAllProofsCommand"
-               icon="icons/logo16.gif"
-               label="Build all proofs"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <or>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <adapt
-                           type="org.eclipse.core.resources.IResource">
-                        <test
-                              forcePluginActivation="true"
-                              property="org.eclipse.core.resources.projectNature"
-                              value="org.eclipse.jdt.core.javanature">
-                        </test>
-                        <test
-                              forcePluginActivation="true"
-                              property="org.eclipse.core.resources.projectNature"
-                              value="org.key_project.key4eclipse.resources.KeYProjectNature">
-                        </test>
-                     </adapt>
-                     <or>
-                        <instanceof
-                              value="org.eclipse.jdt.core.IJavaProject">
-                        </instanceof>
-                        <instanceof
-                              value="org.eclipse.jdt.core.IPackageFragmentRoot">
-                        </instanceof>
-                        <instanceof
-                              value="org.eclipse.jdt.core.IPackageFragment">
-                        </instanceof>
-                        <instanceof
-                              value="org.eclipse.jdt.core.ICompilationUnit">
-                        </instanceof>
-                        <instanceof
-                              value="org.eclipse.jdt.core.IType">
-                        </instanceof>
-                        <instanceof
-                              value="org.eclipse.jdt.core.IMethod">
-                        </instanceof>
-                        <test
-                              forcePluginActivation="true"
-                              property="org.key_project.key4eclipse.resources.ui.isProofFile">
-                        </test>
-                        <test
-                              forcePluginActivation="true"
-                              property="org.key_project.key4eclipse.resources.ui.isProofFolder">
-                        </test>
-                     </or>
-                  </iterate>
-                  <iterate>
-                     <with
-                           variable="activePartId">
-                        <equals
-                              value="org.eclipse.jdt.ui.CompilationUnitEditor">
-                        </equals>
-                     </with>
-                     <with
-                           variable="activeEditorInput">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 forcePluginActivation="true"
-                                 property="org.eclipse.core.resources.projectNature"
-                                 value="org.eclipse.jdt.core.javanature">
-                           </test>
-                        </adapt>
-                     </with>
-                     <with
-                           variable="selection">
-                        <and>
-                           <instanceof
-                                 value="org.eclipse.jface.text.ITextSelection">
-                           </instanceof>
-                        </and>
-                     </with>
-                  </iterate>
-               </or>
-            </visibleWhen>
-         </command>
-         <command
                commandId="org.key_project.key4eclipse.resources.ui.buildOutdatedProofsCommand"
                icon="icons/logo16.gif"
                label="Build outdated proofs"
                style="push">
             <visibleWhen
                   checkEnabled="false">
-               <or>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <adapt
-                           type="org.eclipse.core.resources.IResource">
-                        <test
-                              forcePluginActivation="true"
-                              property="org.eclipse.core.resources.projectNature"
-                              value="org.eclipse.jdt.core.javanature">
-                        </test>
-                        <test
-                              forcePluginActivation="true"
-                              property="org.eclipse.core.resources.projectNature"
-                              value="org.key_project.key4eclipse.resources.KeYProjectNature">
-                        </test>
-                     </adapt>
-                     <or>
-                        <instanceof
-                              value="org.eclipse.jdt.core.IJavaProject">
-                        </instanceof>
-                        <instanceof
-                              value="org.eclipse.jdt.core.IPackageFragmentRoot">
-                        </instanceof>
-                        <instanceof
-                              value="org.eclipse.jdt.core.IPackageFragment">
-                        </instanceof>
-                        <instanceof
-                              value="org.eclipse.jdt.core.ICompilationUnit">
-                        </instanceof>
-                        <instanceof
-                              value="org.eclipse.jdt.core.IType">
-                        </instanceof>
-                        <instanceof
-                              value="org.eclipse.jdt.core.IMethod">
-                        </instanceof>
-                        <test
-                              forcePluginActivation="true"
-                              property="org.key_project.key4eclipse.resources.ui.isProofFile">
-                        </test>
-                        <test
-                              forcePluginActivation="true"
-                              property="org.key_project.key4eclipse.resources.ui.isProofFolder">
-                        </test>
-                     </or>
-                  </iterate>
-                  <iterate>
-                     <with
-                           variable="activePartId">
-                        <equals
-                              value="org.eclipse.jdt.ui.CompilationUnitEditor">
-                        </equals>
-                     </with>
-                     <with
-                           variable="activeEditorInput">
-                        <adapt
-                              type="org.eclipse.core.resources.IResource">
-                           <test
-                                 forcePluginActivation="true"
-                                 property="org.eclipse.core.resources.projectNature"
-                                 value="org.eclipse.jdt.core.javanature">
-                           </test>
-                        </adapt>
-                     </with>
-                     <with
-                           variable="selection">
-                        <and>
-                           <instanceof
-                                 value="org.eclipse.jface.text.ITextSelection">
-                           </instanceof>
-                        </and>
-                     </with>
-                  </iterate>
-               </or>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <adapt
+                        type="org.eclipse.core.resources.IResource">
+                     <test
+                           forcePluginActivation="true"
+                           property="org.eclipse.core.resources.projectNature"
+                           value="org.eclipse.jdt.core.javanature">
+                     </test>
+                     <test
+                           forcePluginActivation="true"
+                           property="org.eclipse.core.resources.projectNature"
+                           value="org.key_project.key4eclipse.resources.KeYProjectNature">
+                     </test>
+                  </adapt>
+                  <or>
+                     <instanceof
+                           value="org.eclipse.jdt.core.IJavaProject">
+                     </instanceof>
+                     <instanceof
+                           value="org.eclipse.core.resources.IProject">
+                     </instanceof>
+                  </or>
+               </iterate>
             </visibleWhen>
          </command>
       </menuContribution>
@@ -251,11 +119,6 @@
             categoryId="org.key_project.key4eclipse.resources.ui.category"
             id="org.key_project.key4eclipse.resources.ui.convertToKeYProjectCommand"
             name="Convert to KeY Project.">
-      </command>
-      <command
-            categoryId="org.key_project.key4eclipse.resources.ui.category"
-            id="org.key_project.key4eclipse.resources.ui.buildAllProofsCommand"
-            name="Build all proofs">
       </command>
       <command
             categoryId="org.key_project.key4eclipse.resources.ui.category"
@@ -295,10 +158,6 @@
             icon="icons/logo16.gif">
       </image>
       <image
-            commandId="org.key_project.key4eclipse.resources.ui.buildAllProofsCommand"
-            icon="icons/logo16.gif">
-      </image>
-      <image
             commandId="org.key_project.key4eclipse.resources.ui.buildOutdatedProofsCommand"
             icon="icons/logo16.gif">
       </image>
@@ -314,7 +173,7 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="org.key_project.key4eclipse.resources.ui.handlers.ConvertJavaToKeYProjectHandler"
+            class="org.key_project.key4eclipse.resources.ui.handler.ConvertJavaToKeYProjectHandler"
             commandId="org.key_project.key4eclipse.resources.ui.convertToKeYProjectCommand">
          <enabledWhen>
             <iterate
@@ -358,169 +217,34 @@
          </enabledWhen>
       </handler>
       <handler
-            class="org.key_project.key4eclipse.resources.ui.handlers.ManualBuildHandler"
-            commandId="org.key_project.key4eclipse.resources.ui.buildAllProofsCommand">
-         <enabledWhen>
-            <or>
-               <iterate
-                     ifEmpty="false"
-                     operator="and">
-                  <adapt
-                        type="org.eclipse.core.resources.IResource">
-                     <test
-                           forcePluginActivation="true"
-                           property="org.eclipse.core.resources.projectNature"
-                           value="org.eclipse.jdt.core.javanature">
-                     </test>
-                     <test
-                           forcePluginActivation="true"
-                           property="org.eclipse.core.resources.projectNature"
-                           value="org.key_project.key4eclipse.resources.KeYProjectNature">
-                     </test>
-                  </adapt>
-                  <or>
-                     <instanceof
-                           value="org.eclipse.jdt.core.IJavaProject">
-                     </instanceof>
-                     <instanceof
-                           value="org.eclipse.jdt.core.IPackageFragmentRoot">
-                     </instanceof>
-                     <instanceof
-                           value="org.eclipse.jdt.core.IPackageFragment">
-                     </instanceof>
-                     <instanceof
-                           value="org.eclipse.jdt.core.ICompilationUnit">
-                     </instanceof>
-                     <instanceof
-                           value="org.eclipse.jdt.core.IType">
-                     </instanceof>
-                     <instanceof
-                           value="org.eclipse.jdt.core.IMethod">
-                     </instanceof>
-                     <test
-                           forcePluginActivation="true"
-                           property="org.key_project.key4eclipse.resources.ui.isProofFile">
-                     </test>
-                     <test
-                           forcePluginActivation="true"
-                           property="org.key_project.key4eclipse.resources.ui.isProofFolder">
-                     </test>
-                  </or>
-               </iterate>
-               <iterate>
-                  <with
-                        variable="activePartId">
-                     <equals
-                           value="org.eclipse.jdt.ui.CompilationUnitEditor">
-                     </equals>
-                  </with>
-                  <with
-                        variable="activeEditorInput">
-                     <adapt
-                           type="org.eclipse.core.resources.IResource">
-                        <test
-                              forcePluginActivation="true"
-                              property="org.eclipse.core.resources.projectNature"
-                              value="org.eclipse.jdt.core.javanature">
-                        </test>
-                     </adapt>
-                  </with>
-                  <with
-                        variable="selection">
-                     <and>
-                        <instanceof
-                              value="org.eclipse.jface.text.ITextSelection">
-                        </instanceof>
-                        <test
-                              property="org.key_project.key4eclipse.resources.ui.isMethodSelected">
-                        </test>
-                     </and>
-                  </with>
-               </iterate>
-            </or>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="org.key_project.key4eclipse.resources.ui.handlers.ManualBuildHandler"
+            class="org.key_project.key4eclipse.resources.ui.handler.ManualBuildHandler"
             commandId="org.key_project.key4eclipse.resources.ui.buildOutdatedProofsCommand">
          <enabledWhen>
-            <or>
-               <iterate
-                     ifEmpty="false"
-                     operator="and">
-                  <adapt
-                        type="org.eclipse.core.resources.IResource">
-                     <test
-                           forcePluginActivation="true"
-                           property="org.eclipse.core.resources.projectNature"
-                           value="org.eclipse.jdt.core.javanature">
-                     </test>
-                     <test
-                           forcePluginActivation="true"
-                           property="org.eclipse.core.resources.projectNature"
-                           value="org.key_project.key4eclipse.resources.KeYProjectNature">
-                     </test>
-                  </adapt>
-                  <or>
-                     <instanceof
-                           value="org.eclipse.jdt.core.IJavaProject">
-                     </instanceof>
-                     <instanceof
-                           value="org.eclipse.jdt.core.IPackageFragmentRoot">
-                     </instanceof>
-                     <instanceof
-                           value="org.eclipse.jdt.core.IPackageFragment">
-                     </instanceof>
-                     <instanceof
-                           value="org.eclipse.jdt.core.ICompilationUnit">
-                     </instanceof>
-                     <instanceof
-                           value="org.eclipse.jdt.core.IType">
-                     </instanceof>
-                     <instanceof
-                           value="org.eclipse.jdt.core.IMethod">
-                     </instanceof>
-                     <test
-                           forcePluginActivation="true"
-                           property="org.key_project.key4eclipse.resources.ui.isProofFile">
-                     </test>
-                     <test
-                           forcePluginActivation="true"
-                           property="org.key_project.key4eclipse.resources.ui.isProofFolder">
-                     </test>
-                  </or>
-               </iterate>
-               <iterate>
-                  <with
-                        variable="activePartId">
-                     <equals
-                           value="org.eclipse.jdt.ui.CompilationUnitEditor">
-                     </equals>
-                  </with>
-                  <with
-                        variable="activeEditorInput">
-                     <adapt
-                           type="org.eclipse.core.resources.IResource">
-                        <test
-                              forcePluginActivation="true"
-                              property="org.eclipse.core.resources.projectNature"
-                              value="org.eclipse.jdt.core.javanature">
-                        </test>
-                     </adapt>
-                  </with>
-                  <with
-                        variable="selection">
-                     <and>
-                        <instanceof
-                              value="org.eclipse.jface.text.ITextSelection">
-                        </instanceof>
-                        <test
-                              property="org.key_project.key4eclipse.resources.ui.isMethodSelected">
-                        </test>
-                     </and>
-                  </with>
-               </iterate>
-            </or>
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <adapt
+                     type="org.eclipse.core.resources.IResource">
+                  <test
+                        forcePluginActivation="true"
+                        property="org.eclipse.core.resources.projectNature"
+                        value="org.eclipse.jdt.core.javanature">
+                  </test>
+                  <test
+                        forcePluginActivation="true"
+                        property="org.eclipse.core.resources.projectNature"
+                        value="org.key_project.key4eclipse.resources.KeYProjectNature">
+                  </test>
+               </adapt>
+               <or>
+                  <instanceof
+                        value="org.eclipse.jdt.core.IJavaProject">
+                  </instanceof>
+                  <instanceof
+                        value="org.eclipse.core.resources.IProject">
+                  </instanceof>
+               </or>
+            </iterate>
          </enabledWhen>
       </handler>
       <handler

@@ -192,4 +192,30 @@ public class ProofElement {
    public String toString(){
       return contract.getName();
    }
+   
+   
+   public boolean hasProofFile(){
+      return (proofFile != null && proofFile.exists());
+   }
+   
+   
+   public boolean hasMetaFile(){
+      return (metaFile != null && metaFile.exists());
+   }
+   
+   public boolean hasMarker(){
+      if(proofMarker != null && proofMarker.exists()){
+         return true;
+      }
+      else{
+         if(recursionMarker != null && !recursionMarker.isEmpty()){
+            for(IMarker marker : recursionMarker){
+               if(marker != null && marker.exists()){
+                  return true;
+               }
+            }
+         }
+      }
+      return false;
+   }
 }

@@ -28,7 +28,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -159,9 +158,7 @@ public class KeYResourcesUtil {
    
    public static <T> List<T> cloneList(List<T> list){
       List<T> clone = new LinkedList<T>();
-      for(T t : list){
-         clone.add(t);
-      }
+      clone.addAll(list);
       return clone;
    }
    
@@ -269,18 +266,6 @@ public class KeYResourcesUtil {
       }
    }
    
-   public static IProject getProject(IResourceDelta delta){ // TODO: Why not just delta.getResource().getProject()?
-      IResource res = delta.getResource();
-      if(res instanceof IWorkspaceRoot){
-         return null;
-      }
-      else{
-         while(!(res instanceof IProject)){
-            res = res.getParent();
-         }
-         return (IProject) res;
-      }
-   }
    
    public static <T> void mergeLists(List<T> dest, List<T> inserts){ // TODO: Move to CollectionUtil
       for(T t : inserts){
@@ -514,11 +499,11 @@ public class KeYResourcesUtil {
             return Boolean.valueOf(property);
          }
          else {
-            return null;
+            return false;
          }
       }
       else {
-         return null;
+         return false;
       }
    }
    

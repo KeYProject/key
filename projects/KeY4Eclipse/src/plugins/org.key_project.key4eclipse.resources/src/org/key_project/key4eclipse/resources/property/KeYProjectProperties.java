@@ -29,8 +29,7 @@ public final class KeYProjectProperties {
    public static final QualifiedName PROP_ENABLE_MULTITHREADING = new QualifiedName("org.key_project.key4eclipse.resources", "enableMultiThreading");
    public static final QualifiedName PROP_NUMBER_OF_THREADS = new QualifiedName("org.key_project.key4eclipse.resources", "numberOfThreads");
    public static final QualifiedName PROP_AUTO_DELETE_PROOFFILES = new QualifiedName("org.key_project.key4eclipse.resources", "autoDeleteProofFiles");
-   public static final QualifiedName PROP_ENABLE_AUTO_INTERRUPT_BUILD = new QualifiedName("org.key_project.key4eclipse.resources", "autoInterruptBuild");
-   
+    
    public static boolean isEnableKeYResourcesBuilds(IProject project) {
       if (project != null) {
          String value;
@@ -103,34 +102,6 @@ public final class KeYProjectProperties {
    public static void setEnableBuildProofsEfficient(IProject project,  boolean enabled) throws CoreException {
       if (project != null) {
          project.setPersistentProperty(PROP_ENABLE_BUILD_REQUIRED_PROOFS_ONLY, enabled + "");
-      }
-   }
-   
-   
-   public static boolean isEnableAutoInterruptBuild(IProject project) {
-      if (project != null) {
-         try {
-            String value = project.getPersistentProperty(PROP_ENABLE_AUTO_INTERRUPT_BUILD);
-            if(value == null){
-               return true;
-            }
-            else{
-               return Boolean.parseBoolean(value);
-            }
-         }
-         catch (CoreException e) {
-            return true;
-         }
-      }
-      else {
-         return false;
-      }
-   }
-   
-   
-   public static void setEnableAutoInterruptBuild(IProject project,  boolean enabled) throws CoreException {
-      if (project != null) {
-         project.setPersistentProperty(PROP_ENABLE_AUTO_INTERRUPT_BUILD, enabled + "");
       }
    }
    

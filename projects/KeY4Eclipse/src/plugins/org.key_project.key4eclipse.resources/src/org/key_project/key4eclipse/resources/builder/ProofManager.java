@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -102,7 +103,6 @@ public class ProofManager {
    private final IFolder mainProofFolder;
    private List<ProofElement> proofElements;
    private List<IFile> changedJavaFiles;
-   private List<Object> outdatedCheckElements;
    private EditorSelection editorSelection;
    private final MarkerManager markerManager;
    private final KeYEnvironment<CustomUserInterface> environment;
@@ -115,16 +115,15 @@ public class ProofManager {
     * @throws CoreException
     * @throws ProblemLoaderException 
     */
-   public ProofManager(IProject project, int buildType, List<Object> outdatedCheckElements, EditorSelection editorSelection) throws CoreException, ProblemLoaderException{
+   public ProofManager(IProject project, int buildType, EditorSelection editorSelection) throws CoreException, ProblemLoaderException{
       this.project = project;
       this.buildType = buildType;
       this.mainProofFolder = ResourcesPlugin.getWorkspace().getRoot().getFolder(project.getFullPath().append(KeYResourcesUtil.PROOF_FOLDER_NAME));
       KeYProjectDelta keyDelta = KeYProjectDeltaManager.getInstance().getDelta(project);
       this.changedJavaFiles = keyDelta.getChangedJavaFiles();
       keyDelta.reset();
-      this.outdatedCheckElements = outdatedCheckElements;
       this.editorSelection = editorSelection;
-      this.markerManager = new MarkerManager();markerManager.deleteKeYMarkerByType(project, IResource.DEPTH_ZERO, MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID);     
+      this.markerManager = new MarkerManager();    
       try {
          File location = KeYUtil.getSourceLocation(project);
          File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
@@ -135,6 +134,7 @@ public class ProofManager {
          handleProblemLoaderException(e);
          throw e;
       }
+      this.markerManager.deleteKeYMarkerByType(project, IResource.DEPTH_INFINITE, MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID); 
    }
    
    
@@ -154,10 +154,36 @@ public class ProofManager {
     * @throws CoreException
     */
    private void handleProblemLoaderException(ProblemLoaderException e) throws CoreException{
-      //remove all KeYMarker in the whole project
-      markerManager.deleteAllKeYMarker(project, IResource.DEPTH_INFINITE);
-      //add the ProblemExceptionMarker
-      markerManager.setProblemLoaderExceptionMarker(project, e.getMessage());
+      IResource res = project;
+      int lineNumber = -1;
+      if(e.getOrigin() != null){
+         String originPath = e.getOrigin().getFile().getAbsolutePath();
+         StringBuffer sb = new StringBuffer(e.getMessage());
+         int indexOfOriginPath = sb.indexOf(originPath);
+         if(indexOfOriginPath != -1){
+            sb.delete(0, indexOfOriginPath);
+            StringBuffer tmpSb = new StringBuffer(sb.toString().toLowerCase(Locale.US));
+            int indexOfOriginPathEnd = tmpSb.indexOf(".java") + 5;
+            if(indexOfOriginPathEnd != -1){
+               String errorFilePath = sb.substring(0, indexOfOriginPathEnd);
+               IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(errorFilePath));
+               if(file != null && file.exists()){
+                  sb.delete(0, indexOfOriginPathEnd);
+                  int indexOfLine = sb.indexOf("line ");
+                  int indexOfColumn = sb.indexOf(", column");
+                  if(indexOfLine != -1 && indexOfColumn != -1 && indexOfLine < indexOfColumn){
+                     String lineNumberStr = sb.substring(indexOfLine+5, indexOfColumn);
+                     int lineNumberInt = Integer.parseInt(lineNumberStr);
+                     if(lineNumberInt != -1){
+                        res = file;
+                        lineNumber = lineNumberInt;
+                     }
+                  }
+               }
+            }
+         }
+      }
+      markerManager.setProblemLoaderExceptionMarker(res, lineNumber, e.getMessage());
    }
    
 
@@ -478,36 +504,21 @@ public class ProofManager {
     * @return a {@link List<ProofElement>} that contains the updated {@link ProofElements}.
     */
    private void setProofElementsOutdated() {
-      List<ProofElement> proofsToCheck = getProofsToCheck();
       for(ProofElement pe : proofElements){
-         if(buildType == KeYProjectBuildJob.CLEAN_BUILD 
+         if(buildType == KeYProjectBuildJob.FULL_BUILD 
                || (buildType == KeYProjectBuildJob.AUTO_BUILD && !KeYProjectProperties.isEnableBuildRequiredProofsOnly(project))){
             markerManager.setOutdated(pe);
          }
-         else if(buildType == KeYProjectBuildJob.STARTUP_BUILD){
-            buildOutdatedAndMissingProof(pe);
-         }
-         else if(buildType == KeYProjectBuildJob.MANUAL_BUILD_ALL_PROOFS){
-               if(outdatedCheckElements == null){
-                  markerManager.setOutdated(pe);
-               }
-               else if(outdatedCheckElements != null && proofsToCheck != null && proofsToCheck.contains(pe)){
-                  markerManager.setOutdated(pe);
-               }
-         }
-         else if(buildType == KeYProjectBuildJob.MANUAL_BUILD_OUTDATED_PROOFS){
-            if(outdatedCheckElements == null){
-               buildOutdatedAndMissingProof(pe);
-            }
-            else if(outdatedCheckElements != null && proofsToCheck != null && proofsToCheck.contains(pe)){
-               buildOutdatedAndMissingProof(pe);
+         else if(buildType == KeYProjectBuildJob.STARTUP_BUILD || buildType == KeYProjectBuildJob.MANUAL_BUILD){
+            if(pe.getOutdated() || !pe.hasProofFile() || !pe.hasMetaFile() || !pe.hasMarker()){
+               markerManager.setOutdated(pe);
             }
          }
          else if(buildType == KeYProjectBuildJob.AUTO_BUILD){
-            if(pe.getOutdated() || !hasProofFile(pe) || !hasMetaFile(pe) || !hasMarker(pe)){
+            if(pe.getOutdated() || !pe.hasProofFile() || !pe.hasMetaFile() || !pe.hasMarker()){
                markerManager.setOutdated(pe);
             }
-            else if(hasMetaFile(pe)){
+            else {
                try{
                   ProofMetaFileReader pmfr = new ProofMetaFileReader(pe.getMetaFile());
                   LinkedList<IType> javaTypes = collectAllJavaITypes();
@@ -520,7 +531,19 @@ public class ProofManager {
                   LogUtil.getLogger().logError(e);
                }
             }
-         }        
+         }
+         if(!pe.getBuild()) {
+            try{
+               ProofMetaFileReader pmfr = new ProofMetaFileReader(pe.getMetaFile());
+               pe.setProofClosed(pmfr.getProofClosed());
+               pe.setMarkerMsg(pmfr.getMarkerMessage());
+               pe.setUsedContracts(KeYResourcesUtil.getProofElementsByProofFiles(pmfr.getUsedContracts(), proofElements));
+            }
+            catch (Exception e){
+               markerManager.setOutdated(pe);
+               LogUtil.getLogger().logError(e);
+            }
+         }
       }
    }
    
@@ -585,7 +608,7 @@ public class ProofManager {
     * @param file - the {@link IFile} to use
     * @return a {@link List<ProofElement>} with all associated {@link ProofElement}s
     */
-   public List<ProofElement> getProofsForFile(IFile file){         
+   private List<ProofElement> getProofsForFile(IFile file){         
       List<ProofElement> fileProofs = new LinkedList<ProofElement>();
       IJavaElement javaElement = JavaCore.create(file);
       if(file != null && javaElement != null){
@@ -708,7 +731,7 @@ public class ProofManager {
       }
       
       while(threadsAlive(threads)){
-         ObjectUtil.sleep(100); // TODO: Is it guaranteed that this terminates. May check for monitor.isCanceled()?
+         ObjectUtil.sleep(10);
       }
    }
    
@@ -826,40 +849,6 @@ public class ProofManager {
          proofFiles.add(pe.getMetaFile());
       }
       return proofFiles;
-   }
-   
-   
-   private void buildOutdatedAndMissingProof(ProofElement pe){
-      if(!hasProofFile(pe) || !hasMetaFile(pe) || !hasMarker(pe) || pe.getOutdated()){
-         markerManager.setOutdated(pe);
-      }
-   }
-   
-   
-   private List<ProofElement> getProofsToCheck(){
-      if(outdatedCheckElements == null || !(buildType == KeYProjectBuildJob.MANUAL_BUILD_ALL_PROOFS || buildType == KeYProjectBuildJob.MANUAL_BUILD_OUTDATED_PROOFS)){
-         return null;
-      }
-      else{
-         List<ProofElement> proofsToCheck = new LinkedList<ProofElement>();
-         for(Object obj : outdatedCheckElements){
-            if(obj instanceof IFile){
-               IFile file = (IFile) obj;
-               for(ProofElement pe : proofElements){
-                  if(pe != null){
-                     if(file.equals(pe.getJavaFile()) || file.equals(pe.getProofFile())){
-                        proofsToCheck.add(pe);
-                     }
-                  }
-               }
-            }
-            else if(obj instanceof IMethod){
-               IMethod method = (IMethod) obj;
-               proofsToCheck.addAll(KeYResourcesUtil.getProofElementsForMethod(proofElements, method));
-            }
-         }
-         return proofsToCheck;
-      }
    }
    
    
@@ -1055,32 +1044,7 @@ public class ProofManager {
       }
       return null;
    }
-
    
-   private boolean hasProofFile(ProofElement pe){
-      return (pe.getProofFile() != null && pe.getProofFile().exists());
-   }
-   
-   
-   private boolean hasMetaFile(ProofElement pe){
-      return (pe.getMetaFile() != null && pe.getMetaFile().exists());
-   }
-   
-   private boolean hasMarker(ProofElement pe){
-      if(pe.getProofMarker() != null && pe.getProofMarker().exists()){
-         return true;
-      }
-      else{
-         if(pe.getRecursionMarker() != null && !pe.getRecursionMarker().isEmpty()){
-            for(IMarker marker : pe.getRecursionMarker()){
-               if(marker != null && marker.exists()){
-                  return true;
-               }
-            }
-         }
-      }
-      return false;
-   }
    
    private void restoreOldMarkerForRemovedCycles() {
       for(ProofElement pe : proofElements){

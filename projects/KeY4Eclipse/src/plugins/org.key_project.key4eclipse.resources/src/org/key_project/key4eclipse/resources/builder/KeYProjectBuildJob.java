@@ -41,35 +41,21 @@ public class KeYProjectBuildJob extends Job{
    public final static String KEY_PROJECT_BUILD_JOB = "KeYProjectBuildJob";
    public final static String KEY_PROJECT_BUILD_JOB_NAME = "KeY Resources build";
    public final static int AUTO_BUILD = 0;
-   public final static int CLEAN_BUILD = 1;
+   public final static int FULL_BUILD = 1;
    public final static int STARTUP_BUILD = 2;
-   public final static int MANUAL_BUILD_ALL_PROOFS = 3;
-   public final static int MANUAL_BUILD_OUTDATED_PROOFS = 4;
-   public static final String BUILD_ALL_PROOFS_COMMAND_ID = "org.key_project.key4eclipse.resources.ui.buildAllProofsCommand";
-   public static final String BUILD_OUTDATED_PROOFS_COMMAND_ID = "org.key_project.key4eclipse.resources.ui.buildOutdatedProofsCommand";
+   public final static int MANUAL_BUILD = 3;
 
    private IProject project;
    private int buildType;
-   private List<Object> proofsToDo;
    private EditorSelection editorSelection;
 
    public KeYProjectBuildJob(IProject project, int buildType){
       super(KeYProjectBuildJob.KEY_PROJECT_BUILD_JOB_NAME);
-      init(project, buildType, null);
-   }
-   
-   public KeYProjectBuildJob(IProject project, int buildType, List<Object> proofsToDo){
-      super(KeYProjectBuildJob.KEY_PROJECT_BUILD_JOB_NAME);
-      init(project, buildType, proofsToDo);
-   }
-   
-   private void init(IProject project, int buildType, List<Object> proofsToDo){
       this.project = project;
       this.buildType = buildType;
-      this.proofsToDo = proofsToDo;
       this.editorSelection = null;
-      if(buildType != KeYProjectBuildJob.CLEAN_BUILD && KeYProjectProperties.isEnableKeYResourcesBuilds(project)){
-         this.editorSelection = getEditorSelection();
+      if(buildType != KeYProjectBuildJob.FULL_BUILD){
+//         this.editorSelection = getEditorSelection();
       }
    }
    
@@ -102,41 +88,34 @@ public class KeYProjectBuildJob extends Job{
       final int numberOfThreads = KeYProjectProperties.getNumberOfThreads(project);
       final boolean enableThreading = KeYProjectProperties.isEnableMultiThreading(project);     
       
-      if(KeYProjectProperties.isEnableKeYResourcesBuilds(project)){ // TODO: BuildJob should not be started if disabled and user command should always do it.
-         if(KeYProjectProperties.isEnableAutoInterruptBuild(project)){
-            List<KeYProjectBuildJob> projectBuildJobs = KeYResourcesUtil.getProjectBuildJobs(project);
-            for(KeYProjectBuildJob job : projectBuildJobs){
-               if(Job.RUNNING == job.getState() && job.getBuildType() != KeYProjectBuildJob.CLEAN_BUILD && !this.equals(job)){
-                  job.cancel();
-               }
-            }
-         }
-         ProofManager proofManager = null;
-         try{
-            proofManager = new ProofManager(project, buildType, proofsToDo, editorSelection);
-            proofManager.runProofs(monitor);
-            return Status.OK_STATUS;
-         }
-         catch (OperationCanceledException e) {
-            return Status.CANCEL_STATUS;
-         }
-         catch (Exception e){
-            return LogUtil.getLogger().createErrorStatus(e);
-         }
-         finally{
-            if(proofManager != null){
-               proofManager.dispose();
-            }
-            try {
-               LogManager.getInstance().log(project, new LogRecord(LogRecordKind.CLEAN, start, System.currentTimeMillis() - start, onlyRequiredProofs, enableThreading, numberOfThreads));
-            }
-            catch (CoreException e) {
-               LogUtil.getLogger().logError(e);
-            }
+      List<KeYProjectBuildJob> projectBuildJobs = KeYResourcesUtil.getProjectBuildJobs(project);
+      for(KeYProjectBuildJob job : projectBuildJobs){
+         if(Job.RUNNING == job.getState() && !this.equals(job)){
+            job.cancel();
          }
       }
-      else {
+      ProofManager proofManager = null;
+      try{
+         proofManager = new ProofManager(project, buildType, editorSelection);
+         proofManager.runProofs(monitor);
          return Status.OK_STATUS;
+      }
+      catch (OperationCanceledException e) {
+         return Status.CANCEL_STATUS;
+      }
+      catch (Exception e){
+         return LogUtil.getLogger().createErrorStatus(e);
+      }
+      finally{
+         if(proofManager != null){
+            proofManager.dispose();
+         }
+         try {
+            LogManager.getInstance().log(project, new LogRecord(LogRecordKind.CLEAN, start, System.currentTimeMillis() - start, onlyRequiredProofs, enableThreading, numberOfThreads));
+         }
+         catch (CoreException e) {
+            LogUtil.getLogger().logError(e);
+         }
       }
    }
    
