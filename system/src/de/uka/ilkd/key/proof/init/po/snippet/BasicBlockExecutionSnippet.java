@@ -86,8 +86,9 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
             update = tb.parallel(update, paramUpdate);
         }
         if (vs.post.self != null) {
-            Term selfUpdate =
-                    d.tb.elementary(d.origVars.self, vs.pre.self);
+            final Term selfTerm = (Term) d.get(BasicSnippetData.Key.BLOCK_SELF);
+            final Term selfUpdate =
+                    d.tb.elementary(selfTerm, vs.pre.self);
             update = tb.parallel(selfUpdate, update);
         }
         return tb.apply(update, programTerm);
@@ -96,25 +97,23 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
 
     private JavaBlock buildJavaBlock(BasicSnippetData d,
                                      ProofObligationVars poVars) {
-        ExecutionContext context =
+        final ExecutionContext context =
                 (ExecutionContext) d.get(BasicSnippetData.Key.EXECUTION_CONTEXT);
-        ProgramVariable exceptionParameter =
+        final ProgramVariable exceptionParameter =
                 poVars.exceptionParameter.op(ProgramVariable.class);
 
         //create block call
-        Label[] labelsArray = (Label[]) d.get(BasicSnippetData.Key.LABELS);
-        ImmutableArray<Label> labels = new ImmutableArray<Label>(labelsArray);
-        Variables variables =
-                (Variables) d.get(BasicSnippetData.Key.BLOCK_VARS);
-        StatementBlock block =
-                (StatementBlock) d.get(BasicSnippetData.Key.TARGET_BLOCK);
+        final Label[] labelsArray = (Label[]) d.get(BasicSnippetData.Key.LABELS);
+        final ImmutableArray<Label> labels = new ImmutableArray<Label>(labelsArray);
+        final Variables variables = (Variables) d.get(BasicSnippetData.Key.BLOCK_VARS);
+        final StatementBlock block = (StatementBlock) d.get(BasicSnippetData.Key.TARGET_BLOCK);
         final StatementBlock sb =
                 new BlockContractRule.ValidityProgramConstructor(labels, block,
                                                                  variables,
                                                                  exceptionParameter,
                                                                  d.services).construct();
-        Statement s = new MethodFrame(null, context, sb);
-        JavaBlock result = JavaBlock.createJavaBlock(new StatementBlock(s));
+        final Statement s = new MethodFrame(null, context, sb);
+        final JavaBlock result = JavaBlock.createJavaBlock(new StatementBlock(s));
 
         return result;
     }

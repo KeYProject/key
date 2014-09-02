@@ -522,8 +522,18 @@ public final class SimpleBlockContract implements BlockContract {
         return false;
     }
 
+    @Override
     public boolean hasInfFlowSpecs() {
         return infFlowSpecs != null;
+    }
+
+    @Override
+    public Term getInternalSelfTerm(TermServices services) {
+        if (variables.self != null) {
+            return services.getTermBuilder().var(variables.self);
+        } else {
+            return null;
+        }
     }
 
     @Override

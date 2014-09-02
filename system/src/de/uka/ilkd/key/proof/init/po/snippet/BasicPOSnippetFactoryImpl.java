@@ -76,7 +76,10 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
                               ProofObligationVars poVars,
                               ExecutionContext context,
                               Services services) {
-        this.data = new BasicSnippetData(contract, context, services);
+        this.data =
+                new BasicSnippetData(contract, context,
+                                     contract.getInternalSelfTerm(services),
+                                     services);
         this.poVars = poVars;
         registerFactoryMethods();
     }

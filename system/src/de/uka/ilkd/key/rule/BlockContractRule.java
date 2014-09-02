@@ -427,6 +427,7 @@ public class BlockContractRule implements BuiltInRule {
         InfFlowPOSnippetFactory infFlowFactory =
             POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2,
                                                instantiation.context,
+                                               instantiation.self,
                                                services);
 
         final SequentFormula poFormula = buildBodyPreservesSequent(infFlowFactory, proof);

@@ -82,8 +82,10 @@ public class POSnippetFactory {
             ProofObligationVars vars1,
             ProofObligationVars vars2,
             ExecutionContext context,
+            Term selfTerm,
             Services services) {
-        return new InfFlowPOSnippetFactoryImpl(contract, vars1, vars2, context, services);
+        return new InfFlowPOSnippetFactoryImpl(contract, vars1, vars2, context,
+                                               selfTerm, services);
     }
 
     static InfFlowPOSnippetFactory getInfFlowFactory(

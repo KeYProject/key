@@ -96,6 +96,7 @@ public final class InfFlowBlockContractTacletBuilder
                     POSnippetFactory.getInfFlowFactory(cont, contAppData,
                                                        contAppData2,
                                                        executionContext,
+                                                       cont.getInternalSelfTerm(services),
                                                        services);
             contractsApplications =
                     contractsApplications.append(

@@ -116,6 +116,13 @@ public interface BlockContract extends SpecificationElement {
 
 
     /**
+     * Returns the term internally used for self.
+     * Use with care - it is likely that this is *not* the right "self" for you.
+     */
+    public Term getInternalSelfTerm(TermServices services);
+
+
+    /**
      * Returns the original precondition of the contract.
      */
     Term getPre(Services services);

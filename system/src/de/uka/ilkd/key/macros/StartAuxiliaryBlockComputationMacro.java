@@ -81,6 +81,7 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro {
                                                    ifVars.c1,
                                                    ifVars.c2,
                                                    blockRuleApp.getExecutionContext(),
+                                                   contract.getInternalSelfTerm(services),
                                                    services);
         final Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);

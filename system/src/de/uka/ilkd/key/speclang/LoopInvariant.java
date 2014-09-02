@@ -83,7 +83,7 @@ public interface LoopInvariant extends SpecificationElement {
             		   Services services);
 
     /**
-     * Returns the term internally used for self. 
+     * Returns the term internally used for self.
      * Use with care - it is likely that this is *not* the right "self" for you.
      */
     public Term getInternalSelfTerm();
