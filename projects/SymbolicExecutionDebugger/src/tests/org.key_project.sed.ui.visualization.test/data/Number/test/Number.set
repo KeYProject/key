@@ -85,7 +85,7 @@
                               </sedValue>
                            </sedVariable>
                            <sedCallStackEntry nodeIdRef="_2665da05-b3c1-4fe5-b0ca-31ef160252ae"/>
-                           <sedTermination xml:id="_257e85c5-bbfc-4398-8761-09c68c2f863a" name="&lt;end&gt;" pathCondition="!n = null &amp; self.content = n.content" verified="true">
+                           <sedTermination xml:id="_257e85c5-bbfc-4398-8761-09c68c2f863a" name="&lt;end&gt;" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1" verified="true">
                            </sedTermination>
                         </sedMethodReturn>
                      </sedStatement>
@@ -136,7 +136,7 @@
                               </sedValue>
                            </sedVariable>
                            <sedCallStackEntry nodeIdRef="_2665da05-b3c1-4fe5-b0ca-31ef160252ae"/>
-                           <sedTermination xml:id="_a6326ac8-dc5e-40bf-af00-7a9e13b6f830" name="&lt;end&gt;" pathCondition="!n = null &amp; !self.content = n.content" verified="true">
+                           <sedTermination xml:id="_a6326ac8-dc5e-40bf-af00-7a9e13b6f830" name="&lt;end&gt;" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1" verified="true">
                            </sedTermination>
                         </sedMethodReturn>
                      </sedStatement>
@@ -144,7 +144,7 @@
                </sedBranchCondition>
                <sedBranchCondition xml:id="_b13498fb-eee7-499d-8772-ad74648f8c52" name="n = null" pathCondition="n = null">
                   <sedCallStackEntry nodeIdRef="_2665da05-b3c1-4fe5-b0ca-31ef160252ae"/>
-                  <sedExceptionalTermination xml:id="_bb80f334-5a0d-4b30-9726-cab9620fcb37" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="n = null" verified="true">
+                  <sedExceptionalTermination xml:id="_bb80f334-5a0d-4b30-9726-cab9620fcb37" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="n = null" lineNumber="-1" charStart="-1" charEnd="-1" verified="true">
                   </sedExceptionalTermination>
                </sedBranchCondition>
             </sedBranchStatement>

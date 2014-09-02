@@ -189,6 +189,10 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                            <constraint name="equals(exc_0,null)"/>
                            <constraint name="equals(mul(int::select(heap,self,MethodContract::$h2),k_0),add(mul(result,Z(neglit(1(#)))),int::select(heap,self,MethodContract::$h1)))"/>
                            <constraint name="not(equals(self,null))"/>
+                           <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                              <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
                         </termination>
                      </methodReturn>
                   </branchCondition>
@@ -275,6 +279,10 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                      <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                      <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
                      <constraint name="not(equals(self,null))"/>
+                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
                   </termination>
                </methodReturn>
             </statement>

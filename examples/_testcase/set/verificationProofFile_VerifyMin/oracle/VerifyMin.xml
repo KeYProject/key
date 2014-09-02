@@ -80,6 +80,18 @@
                   </variable>
                   <callStackEntry path="/0"/>
                   <termination name="&lt;end&gt;" pathCondition="gt(y,x)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                     <variable name="heapAtPre" arrayIndex="-1" isArrayIndex="false">
+                        <value name="heapAtPre {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="result" arrayIndex="-1" isArrayIndex="false">
+                        <value name="result {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
                   </termination>
                </methodReturn>
             </statement>
@@ -129,6 +141,18 @@
                   </variable>
                   <callStackEntry path="/0"/>
                   <termination name="&lt;end&gt;" pathCondition="leq(y,x)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                     <variable name="heapAtPre" arrayIndex="-1" isArrayIndex="false">
+                        <value name="heapAtPre {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="result" arrayIndex="-1" isArrayIndex="false">
+                        <value name="result {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
                   </termination>
                </methodReturn>
             </statement>

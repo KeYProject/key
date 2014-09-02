@@ -108,6 +108,7 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
             //expectedResources.add(dFile); // API files are not included in symbolic execution tree.
             expectedResources.add(mainFile);
             expectedResources.add(mainFile);
+            expectedResources.add(mainFile);
             // Configure method contract usage
             SWTBotView symbolicSettingsView = bot.viewById(SymbolicExecutionSettingsView.VIEW_ID);
             TestUtilsUtil.clickDirectly(symbolicSettingsView.bot().radio(SymbolicExecutionStrategy.Factory.METHOD_TREATMENT_CONTRACT));

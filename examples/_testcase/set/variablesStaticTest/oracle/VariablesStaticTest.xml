@@ -87,6 +87,22 @@
                         </value>
                      </variable>
                      <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="StaticFields::b" arrayIndex="-1" isArrayIndex="false">
+                           <value name="StaticFields::b {true}" typeString="int" valueString="Z(8(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="StaticFields::a" arrayIndex="-1" isArrayIndex="false">
+                           <value name="StaticFields::a {true}" typeString="int" valueString="Z(4(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="VariablesStaticTest::z" arrayIndex="-1" isArrayIndex="false">
+                           <value name="VariablesStaticTest::z {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
                      </termination>
                   </methodReturn>
                </statement>

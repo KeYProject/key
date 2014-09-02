@@ -1272,7 +1272,7 @@ public class ExecutionNodeReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessTermination extends AbstractKeYlessExecutionNode implements IExecutionTermination {
+   public static class KeYlessTermination extends AbstractKeYlessStateNode<SourceElement> implements IExecutionTermination {
       /**
        * The {@link TerminationKind}.
        */

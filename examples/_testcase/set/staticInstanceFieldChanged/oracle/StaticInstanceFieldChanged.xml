@@ -33,6 +33,10 @@
                   </value>
                </variable>
                <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {true}" typeString="java.lang.NullPointerException" valueString="n_5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
                </termination>
             </exceptionalMethodReturn>
          </branchCondition>
@@ -187,6 +191,30 @@
                                     </value>
                                  </variable>
                                  <termination name="&lt;end&gt;" pathCondition="and(not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null)),not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                                    <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                       <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </variable>
+                                    <variable name="StaticInstanceFieldChanged::instance" arrayIndex="-1" isArrayIndex="false">
+                                       <value name="StaticInstanceFieldChanged::instance {true}" typeString="StaticInstanceFieldChanged.DirectValue" valueString="StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                          <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                             <value name="value {true}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                             </value>
+                                          </variable>
+                                       </value>
+                                    </variable>
+                                    <variable name="StaticInstanceFieldChanged::nextInstance" arrayIndex="-1" isArrayIndex="false">
+                                       <value name="StaticInstanceFieldChanged::nextInstance {true}" typeString="StaticInstanceFieldChanged.NextValue" valueString="StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                          <variable name="dvalue" arrayIndex="-1" isArrayIndex="false">
+                                             <value name="dvalue {true}" typeString="StaticInstanceFieldChanged.DirectValue" valueString="d_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                   <value name="value {not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),d_3))}" typeString="int" valueString="Z(4(2(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),d_3))">
+                                                   </value>
+                                                </variable>
+                                             </value>
+                                          </variable>
+                                       </value>
+                                    </variable>
                                  </termination>
                               </methodReturn>
                            </statement>
@@ -218,6 +246,22 @@
                                  </value>
                               </variable>
                               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(equals(StaticInstanceFieldChanged.DirectValue::select(heap,null,StaticInstanceFieldChanged::$instance),null),not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null)))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                                 <variable name="StaticInstanceFieldChanged::nextInstance" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="StaticInstanceFieldChanged::nextInstance {true}" typeString="StaticInstanceFieldChanged.NextValue" valueString="StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                       <variable name="dvalue" arrayIndex="-1" isArrayIndex="false">
+                                          <value name="dvalue {true}" typeString="StaticInstanceFieldChanged.DirectValue" valueString="d_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                             <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                <value name="value {true}" typeString="int" valueString="Z(4(2(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                </value>
+                                             </variable>
+                                          </value>
+                                       </variable>
+                                    </value>
+                                 </variable>
+                                 <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="exc {true}" typeString="java.lang.NullPointerException" valueString="n_10" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
                               </termination>
                            </exceptionalMethodReturn>
                         </branchCondition>

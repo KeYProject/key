@@ -428,6 +428,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertTrue("Expected IExecutionTermination but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionTermination);
          assertEquals(((IExecutionTermination)expected).getTerminationKind(), ((IExecutionTermination)current).getTerminationKind());
          assertEquals(((IExecutionTermination)expected).isBranchVerified(), ((IExecutionTermination)current).isBranchVerified());
+         assertVariables((IExecutionTermination)expected, (IExecutionTermination)current, compareVariables, compareConstraints);
          assertConstraints((IExecutionTermination)expected, (IExecutionTermination)current, compareConstraints);
       }
       else if (expected instanceof IExecutionBranchStatement) {

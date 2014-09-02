@@ -111,6 +111,10 @@
                         </value>
                      </variable>
                      <termination name="&lt;end&gt;" pathCondition="not(equals(b,a))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
                      </termination>
                   </methodReturn>
                </statement>
@@ -169,6 +173,10 @@
                         </value>
                      </variable>
                      <termination name="&lt;end&gt;" pathCondition="equals(b,a)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
                      </termination>
                   </methodReturn>
                </statement>

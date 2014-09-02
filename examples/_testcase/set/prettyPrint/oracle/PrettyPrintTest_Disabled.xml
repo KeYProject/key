@@ -58,6 +58,14 @@ termination: diamond" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged
                      </variable>
                      <callStackEntry path="/0"/>
                      <termination name="&lt;end&gt;" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="heap" arrayIndex="-1" isArrayIndex="false">
+                           <value name="heap {true}" typeString="Heap" valueString="heapAfter_magic" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
                      </termination>
                   </methodReturn>
                </operationContract>
@@ -102,6 +110,26 @@ mod: false" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initially
                      </variable>
                      <callStackEntry path="/0"/>
                      <termination name="&lt;loop body end&gt;" pathCondition="and(leq(x,Z(neglit(1(#)))),leq(x_0,Z(neglit(2(#)))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
+                        <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="heapBeforeLoop" arrayIndex="-1" isArrayIndex="false">
+                           <value name="heapBeforeLoop {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="variant" arrayIndex="-1" isArrayIndex="false">
+                           <value name="variant {true}" typeString="int" valueString="mul(x_0,Z(neglit(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="exc_1" arrayIndex="-1" isArrayIndex="false">
+                           <value name="exc_1 {true}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                           <value name="x {true}" typeString="int" valueString="add(Z(1(#)),x_0)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
                      </termination>
                   </statement>
                </branchCondition>
@@ -130,6 +158,14 @@ mod: false" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initially
                         </variable>
                         <callStackEntry path="/0"/>
                         <termination name="&lt;end&gt;" pathCondition="and(leq(x,Z(neglit(1(#)))),equals(x_0,Z(neglit(1(#)))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                           <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                              <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                              <value name="x {true}" typeString="int" valueString="Z(neglit(1(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
                         </termination>
                      </methodReturn>
                   </statement>

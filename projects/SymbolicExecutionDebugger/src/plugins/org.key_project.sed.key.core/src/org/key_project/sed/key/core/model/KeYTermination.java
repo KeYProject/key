@@ -13,17 +13,22 @@
 
 package org.key_project.sed.key.core.model;
 
+import java.io.File;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.jdt.core.IMethod;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.impl.AbstractSEDTermination;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.eclipse.ResourceUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * Implementation of {@link ISEDTermination} for the symbolic execution debugger (SED)
@@ -50,6 +55,11 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYSEDDeb
     * The constraints
     */
    private KeYConstraint[] constraints;
+   
+   /**
+    * The contained KeY variables.
+    */
+   private KeYVariable[] variables;
 
    /**
     * Constructor.
@@ -192,6 +202,74 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYSEDDeb
             constraints = KeYModelUtil.createConstraints(this, executionNode);
          }
          return constraints;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasVariables() throws DebugException {
+      try {
+         return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
+                !executionNode.isDisposed() && 
+                SymbolicExecutionUtil.canComputeVariables(executionNode, executionNode.getServices()) &&
+                super.hasVariables();
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus(e));
+      }
+   }   
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYVariable[] getVariables() throws DebugException {
+      synchronized (this) {
+         if (variables == null) {
+            variables = KeYModelUtil.createVariables(this, executionNode);
+         }
+         return variables;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getLineNumber() throws DebugException {
+      return -1;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getCharStart() throws DebugException {
+      return -1;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getCharEnd() throws DebugException {
+      return -1;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getSourcePath() {
+      IMethod method = getDebugTarget().getLaunchSettings().getMethod();
+      if (method != null) {
+         File localFile = ResourceUtil.getLocation(method.getResource());
+         return localFile != null ? localFile.getAbsolutePath() : null;
+      }
+      else {
+         return null;
       }
    }
 }

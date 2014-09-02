@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.model;
 
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -34,7 +35,7 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionTermination;
  * @see SymbolicExecutionTreeBuilder
  * @see ExecutionTermination
  */
-public interface IExecutionTermination extends IExecutionNode {
+public interface IExecutionTermination extends IExecutionStateNode<SourceElement> {
    /**
     * The default name of a termination node with {@link TerminationKind#NORMAL}.
     */

@@ -18,6 +18,7 @@ import java.util.Iterator;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -31,6 +32,7 @@ import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
@@ -41,7 +43,7 @@ import de.uka.ilkd.key.util.Pair;
  * The default implementation of {@link IExecutionTermination}.
  * @author Martin Hentschel
  */
-public class ExecutionTermination extends AbstractExecutionNode implements IExecutionTermination {
+public class ExecutionTermination extends AbstractExecutionStateNode<SourceElement> implements IExecutionTermination {
    /**
     * Contains the exception variable which is used to check if the executed program in proof terminates normally.
     */
@@ -248,5 +250,13 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
       else {
          return false;
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected IExecutionVariable[] lazyComputeVariables() {
+      return SymbolicExecutionUtil.createExecutionVariables(this);
    }
 }

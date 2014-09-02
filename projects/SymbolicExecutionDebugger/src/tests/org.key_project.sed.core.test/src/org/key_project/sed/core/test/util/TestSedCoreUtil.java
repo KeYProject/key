@@ -1768,6 +1768,7 @@ public final class TestSedCoreUtil {
                                             boolean compareCallStack,
                                             boolean compareConstraints) throws DebugException {
       compareNode(expected, current, compareReferences, compareId, compareVariables, compareCallStack, compareConstraints);
+      compareStackFrame(expected, current, compareVariables, compareConstraints);
       assertEquals(expected.isVerified(), current.isVerified());
    }
    
