@@ -39,6 +39,30 @@ import de.uka.ilkd.key.ui.CustomUserInterface;
  */
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: examples/_testcase/set/constraintsAfterUsedLoopInvariant
+    */
+   public void testConstraintsAfterUsedLoopInvariant() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/constraintsAfterUsedLoopInvariant/test/E_Loop.java", 
+                "E_Loop", 
+                "calculate", 
+                null,
+                "examples/_testcase/set/constraintsAfterUsedLoopInvariant/oracle/E_Loop.xml",
+                true,
+                true,
+                false,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                true,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/constraintsOfAppliedMethodContract
     */
    public void testConstraintsOfAppliedMethodContract() throws Exception {

@@ -638,19 +638,19 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} SE label is somewhere contained, {@code false} SE label is not contained at all.
     */
    public static boolean containsSymbolicExecutionLabel(Term term) {
+      boolean hasModality = false;
       term = TermBuilder.goBelowUpdates(term);
       if (term.op() instanceof Modality) {
-         return hasSymbolicExecutionLabel(term);
+         hasModality = hasSymbolicExecutionLabel(term);
       }
-      else {
-         boolean hasModality = false;
+      if (!hasModality) {
          int i = 0;
          while (!hasModality && i < term.arity()) {
             hasModality = containsSymbolicExecutionLabel(term.sub(i));
             i++;
          }
-         return hasModality;
       }
+      return hasModality;
    }
 
    /**
@@ -2673,26 +2673,34 @@ public final class SymbolicExecutionUtil {
       if (skolemCheck == -1) {
          TermBuilder tb = services.getTermBuilder();
          List<Term> replacements = findSkolemReplacements(sequent, term);
-         assert !replacements.isEmpty();
-         Term other = term.sub(1);
-         List<Term> newTerms = new LinkedList<Term>();
-         for (Term replacement : replacements) {
-            newTerms.add(tb.equals(replacement, other));
+         if (!replacements.isEmpty()) {
+            Term other = term.sub(1);
+            List<Term> newTerms = new LinkedList<Term>();
+            for (Term replacement : replacements) {
+               newTerms.add(tb.equals(replacement, other));
+            }
+            term = tb.and(newTerms);
+            return replaceSkolemConstants(sequent, term, services);
          }
-         term = tb.and(newTerms);
-         return replaceSkolemConstants(sequent, term, services);
+         else {
+            return services.getTermBuilder().tt(); // If no other term is available the quality is jsut true.
+         }
       }
       else if (skolemCheck == 1) {
          TermBuilder tb = services.getTermBuilder();
          List<Term> replacements = findSkolemReplacements(sequent, term);
-         assert !replacements.isEmpty();
-         Term other = term.sub(0);
-         List<Term> newTerms = new LinkedList<Term>();
-         for (Term replacement : replacements) {
-            newTerms.add(tb.equals(other, replacement));
+         if (!replacements.isEmpty()) {
+            Term other = term.sub(0);
+            List<Term> newTerms = new LinkedList<Term>();
+            for (Term replacement : replacements) {
+               newTerms.add(tb.equals(other, replacement));
+            }
+            term = tb.and(newTerms);
+            return replaceSkolemConstants(sequent, term, services);
          }
-         term = tb.and(newTerms);
-         return replaceSkolemConstants(sequent, term, services);
+         else {
+            return services.getTermBuilder().tt(); // If no other term is available the quality is jsut true.
+         }
       }
       else {
          List<Term> newChildren = new LinkedList<Term>();
@@ -2705,12 +2713,57 @@ public final class SymbolicExecutionUtil {
             }
             newChildren.add(newChild);
          }
-         return changed ? services.getTermFactory().createTerm(term.op(),
-                                                               new ImmutableArray<Term>(newChildren),
-                                                               term.boundVars(),
-                                                               term.javaBlock(),
-                                                               term.getLabels()) :
-                          term;
+         if (changed) {
+            if (term.op() == Junctor.NOT) {
+               // Create new NOT term using build in simplification of TermBuilder.
+               assert newChildren.size() == 1;
+               assert term.boundVars().isEmpty();
+               assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
+               Term result = services.getTermBuilder().not(newChildren.get(0));
+               if (term.hasLabels()) {
+                  result = services.getTermBuilder().label(result, term.getLabels());
+               }
+               return result;
+            }
+            else if (term.op() == Junctor.OR) {
+               // Create new OR term using build in simplification of TermBuilder.
+               assert term.boundVars().isEmpty();
+               assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
+               Term result = services.getTermBuilder().or(newChildren);
+               if (term.hasLabels()) {
+                  result = services.getTermBuilder().label(result, term.getLabels());
+               }
+               return result;
+            }
+            else if (term.op() == Junctor.AND) {
+               // Create new AND term using build in simplification of TermBuilder.
+               assert term.boundVars().isEmpty();
+               assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
+               Term result = services.getTermBuilder().and(newChildren);
+               if (term.hasLabels()) {
+                  result = services.getTermBuilder().label(result, term.getLabels());
+               }
+               return result;
+            }
+            else if (term.op() == Junctor.IMP) {
+               // Create new IMP term using build in simplification of TermBuilder.
+               assert newChildren.size() == 2;
+               assert term.boundVars().isEmpty();
+               assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
+               return services.getTermBuilder().imp(newChildren.get(0), newChildren.get(1), term.getLabels());
+            }
+            else {
+               // Create new term in general.
+               return services.getTermFactory().createTerm(term.op(),
+                                                           new ImmutableArray<Term>(newChildren),
+                                                           term.boundVars(),
+                                                           term.javaBlock(),
+                                                           term.getLabels());
+            }
+         }
+         else {
+            return term;
+         }
       }
    }
 
