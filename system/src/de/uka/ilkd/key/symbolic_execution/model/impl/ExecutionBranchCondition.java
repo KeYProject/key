@@ -180,7 +180,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
     */
    @Override
    public String getFormatedPathCondition() throws ProofInputException {
-      if (pathCondition == null) {
+      if (formatedPathCondition == null) {
          lazyComputePathCondition();
       }
       return formatedPathCondition;
