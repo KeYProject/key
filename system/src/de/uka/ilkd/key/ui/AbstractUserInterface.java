@@ -33,12 +33,12 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
 public abstract class AbstractUserInterface implements UserInterface {
 
-	protected ProblemLoader getProblemLoader(File file, List<File> classPath,
+	public void loadProblem(File file, List<File> classPath,
 	        File bootClassPath, KeYMediator mediator) {
 		final ProblemLoader pl = new ProblemLoader(file, classPath,
 		        bootClassPath, AbstractProfile.getDefaultProfile(), mediator);
 		pl.addTaskListener(this);
-		return pl;
+		pl.run();
 	}
 
     @Override
