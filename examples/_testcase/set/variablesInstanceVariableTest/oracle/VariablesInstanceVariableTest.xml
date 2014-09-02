@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <variable name="heapAtPre" arrayIndex="-1" isArrayIndex="false">
+      <value name="heapAtPre {true}" typeString="Heap" valueString="heapAtPre" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+      </value>
+   </variable>
    <methodCall name="&lt;call self.main(param)&gt;" pathCondition="true" pathConditionChanged="false">
       <variable name="exc" arrayIndex="-1" isArrayIndex="false">
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">

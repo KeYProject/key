@@ -39,6 +39,7 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -826,7 +827,8 @@ public class SymbolicExecutionTreeBuilder {
     * @param node The {@link Node} on which the loop invariant rule is applied.
     */
    protected void initNewLoopBodyMethodCallStack(Node node) {
-      Term newModality = SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(node.child(1).sequent());
+      PosInOccurrence newModalityPIO = SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(node.child(1).sequent());
+      Term newModality = newModalityPIO != null ? newModalityPIO.subTerm() : null;
       assert newModality != null;
       SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(newModality);
       assert label != null;

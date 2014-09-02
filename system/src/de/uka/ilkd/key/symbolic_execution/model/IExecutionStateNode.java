@@ -16,6 +16,7 @@ package de.uka.ilkd.key.symbolic_execution.model;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
@@ -27,6 +28,12 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
  * @author Martin Hentschel
  */
 public interface IExecutionStateNode<S extends SourceElement> extends IExecutionNode {
+   /**
+    * Returns the {@link PosInOccurrence} of the modality of interest including updates.
+    * @return The {@link PosInOccurrence} of the modality of interest including updates.
+    */
+   public PosInOccurrence getModalityPIO();
+   
    /**
     * Returns the active statement which is executed in the code.
     * @return The active statement which is executed in the code.

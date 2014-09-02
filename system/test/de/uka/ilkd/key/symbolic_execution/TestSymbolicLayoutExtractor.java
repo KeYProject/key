@@ -24,6 +24,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
@@ -689,7 +690,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
             nodeToTest = returnNode;
          }
          // Extract possible heaps
-         SymbolicLayoutExtractor extractor = new SymbolicLayoutExtractor(nodeToTest.getProofNode(), false, false);
+         SymbolicLayoutExtractor extractor = new SymbolicLayoutExtractor(nodeToTest.getProofNode(), ((IExecutionStateNode<?>) nodeToTest).getModalityPIO(), false, false);
          extractor.analyse();
          // Test the initial memory layouts (first time with lazy computation)
          List<ISymbolicLayout> initialLayoutsFirstTime = new ArrayList<ISymbolicLayout>(extractor.getLayoutsCount());

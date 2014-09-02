@@ -505,6 +505,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       appendStartTag(level, TAG_START, attributeValues, sb);
       appendConstraints(level + 1, node, saveConstraints, sb);
+      appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       appendTerminations(level + 1, node, sb);

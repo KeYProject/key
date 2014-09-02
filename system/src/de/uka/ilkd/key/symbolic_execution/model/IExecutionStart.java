@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.symbolic_execution.model;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStart;
 
@@ -29,7 +30,7 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStart;
  * @see SymbolicExecutionTreeBuilder
  * @see ExecutionStart
  */
-public interface IExecutionStart extends IExecutionNode {
+public interface IExecutionStart extends IExecutionStateNode<SourceElement> {
    /**
     * The default name of an {@link IExecutionStart}.
     */

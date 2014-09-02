@@ -15,6 +15,7 @@ package de.uka.ilkd.key.symbolic_execution;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -23,16 +24,17 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  */
 public class ExecutionNodeSymbolicLayoutExtractor extends SymbolicLayoutExtractor {
    /**
-    * The {@link IExecutionNode} to extract memory layouts from.
+    * The {@link IExecutionStateNode} to extract memory layouts from.
     */
-   private final IExecutionNode executionNode;
+   private final IExecutionStateNode<?> executionNode;
 
    /**
     * Constructor.
-    * @param executionNode The {@link IExecutionNode} to extract memory layouts from.
+    * @param executionNode The {@link IExecutionStateNode} to extract memory layouts from.
     */
-   public ExecutionNodeSymbolicLayoutExtractor(IExecutionNode executionNode) {
+   public ExecutionNodeSymbolicLayoutExtractor(IExecutionStateNode<?> executionNode) {
       super(executionNode.getProofNode(), 
+            executionNode.getModalityPIO(),
             executionNode.getSettings().isUseUnicode(), 
             executionNode.getSettings().isUsePrettyPrinting());
       this.executionNode = executionNode;

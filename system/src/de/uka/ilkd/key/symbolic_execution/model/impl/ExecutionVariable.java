@@ -176,7 +176,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
             sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(services, getProofNode(), siteProofCondition, siteProofSelectTerm, true); 
          }
          else {
-            sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(services, getProofNode(), siteProofCondition, getProgramVariable());
+            sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(services, getProofNode(), getParentNode().getModalityPIO(), siteProofCondition, getProgramVariable());
          }
          ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
                                                                              sequentToProve.getSequentToProve(), 

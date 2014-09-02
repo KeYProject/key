@@ -17,6 +17,9 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeSymbolicLayoutExtractor;
@@ -41,6 +44,11 @@ public abstract class AbstractExecutionStateNode<S extends SourceElement> extend
     * The used {@link ExecutionNodeSymbolicLayoutExtractor}.
     */
    private ExecutionNodeSymbolicLayoutExtractor layoutExtractor;
+   
+   /**
+    * The {@link PosInOccurrence} of the modality or ints updates.
+    */
+   private PosInOccurrence modalityPIO;
    
    /**
     * Constructor.
@@ -145,5 +153,36 @@ public abstract class AbstractExecutionStateNode<S extends SourceElement> extend
    @Override
    public ImmutableList<ISymbolicEquivalenceClass> getLayoutsEquivalenceClasses(int layoutIndex) throws ProofInputException {
       return getLayoutExtractor().getEquivalenceClasses(layoutIndex);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public PosInOccurrence getModalityPIO() {
+      if (modalityPIO == null) {
+         modalityPIO = lazyComputeModalityPIO();
+      }
+      return modalityPIO;
+   }
+
+   /**
+    * Computes the {@link PosInOccurrence} lazily when {@link #getModalityPIO()} is 
+    * called the first time.
+    * @return The {@link PosInOccurrence}s of the modality or its updates.
+    */
+   protected PosInOccurrence lazyComputeModalityPIO() {
+      PosInOccurrence originalPio = getProofNode().getAppliedRuleApp().posInOccurrence();
+      // Try to go back to the parent which provides the updates
+      PosInOccurrence pio = originalPio;
+      Term term = pio.subTerm();
+      if (!pio.isTopLevel() && term.op() != UpdateApplication.UPDATE_APPLICATION) {
+         pio = pio.up();
+         term = pio.subTerm();
+      }
+      // Return found updates or the original pio otherwise
+      return term.op() == UpdateApplication.UPDATE_APPLICATION ? 
+             pio : 
+             originalPio;
    }
 }

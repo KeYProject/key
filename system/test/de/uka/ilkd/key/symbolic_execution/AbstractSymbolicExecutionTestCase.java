@@ -422,6 +422,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       else if (expected instanceof IExecutionStart) {
          assertTrue("Expected IExecutionStartNode but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionStart);
          assertTerminations((IExecutionStart)expected, (IExecutionStart)current);
+         assertVariables((IExecutionStart)expected, (IExecutionStart)current, compareVariables, compareConstraints);
          assertConstraints((IExecutionStart)expected, (IExecutionStart)current, compareConstraints);
       }
       else if (expected instanceof IExecutionTermination) {

@@ -47,6 +47,7 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -1222,7 +1223,7 @@ public class ExecutionNodeReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessStart extends AbstractKeYlessExecutionNode implements IExecutionStart {
+   public static class KeYlessStart extends AbstractKeYlessStateNode<SourceElement> implements IExecutionStart {
       /**
        * The up to now discovered {@link IExecutionTermination}s.
        */
@@ -1434,6 +1435,14 @@ public class ExecutionNodeReader {
        */
       @Override
       public ImmutableList<ISymbolicEquivalenceClass> getLayoutsEquivalenceClasses(int configurationIndex) throws ProofInputException {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public PosInOccurrence getModalityPIO() {
          return null;
       }
    }
