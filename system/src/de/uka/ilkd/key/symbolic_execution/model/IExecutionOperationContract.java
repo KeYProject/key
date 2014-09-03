@@ -34,7 +34,7 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionOperationContract;
  * @see SymbolicExecutionTreeBuilder
  * @see ExecutionOperationContract
  */
-public interface IExecutionOperationContract extends IExecutionStateNode<SourceElement> {
+public interface IExecutionOperationContract extends IExecutionNode<SourceElement> {
    /**
     * Returns the applied {@link Contract}.
     * @return The applied {@link Contract}.

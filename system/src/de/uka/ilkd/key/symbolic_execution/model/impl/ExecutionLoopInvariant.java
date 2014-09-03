@@ -30,7 +30,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * The default implementation of {@link IExecutionLoopInvariant}.
  * @author Martin Hentschel
  */
-public class ExecutionLoopInvariant extends AbstractExecutionStateNode<SourceElement> implements IExecutionLoopInvariant {
+public class ExecutionLoopInvariant extends AbstractExecutionNode<SourceElement> implements IExecutionLoopInvariant {
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.

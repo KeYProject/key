@@ -35,6 +35,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -186,6 +187,11 @@ public class SymbolicLayoutExtractor {
    private final Node node;
    
    /**
+    * The {@link PosInOccurrence} of the modality or its updates.
+    */
+   private final PosInOccurrence modalityPio;
+   
+   /**
     * The used {@link IModelSettings}.
     */
    private final IModelSettings settings;
@@ -248,14 +254,18 @@ public class SymbolicLayoutExtractor {
    /**
     * Constructor.
     * @param node The {@link Node} of KeY's proof tree to compute memory layouts for.
+    * @param modalityPio The {@link PosInOccurrence} of the modality or its updates.
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
     */
    public SymbolicLayoutExtractor(Node node, 
+                                  PosInOccurrence modalityPio,
                                   boolean useUnicode,
                                   boolean usePrettyPrinting) {
       assert node != null;
+      assert modalityPio != null;
       this.node = node;
+      this.modalityPio = modalityPio;
       this.settings = new ModelSettings(useUnicode, usePrettyPrinting);
    }
 
@@ -468,7 +478,7 @@ public class SymbolicLayoutExtractor {
     */
    protected Sequent createSequentForEquivalenceClassComputation() {
       return SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, 
-                                                                        node.getAppliedRuleApp(), 
+                                                                        modalityPio, 
                                                                         null,
                                                                         null,
                                                                         null,
@@ -593,14 +603,8 @@ public class SymbolicLayoutExtractor {
    protected Set<ExtractLocationParameter> extractLocationsFromSequent(Sequent sequent, 
                                                                        Set<Term> objectsToIgnore) throws ProofInputException {
       Set<ExtractLocationParameter> result = new LinkedHashSet<ExtractLocationParameter>();
-      for (SequentFormula sf : sequent.antecedent()) {
+      for (SequentFormula sf : sequent) {
          result.addAll(extractLocationsFromTerm(sf.formula(), objectsToIgnore));
-      }
-      for (SequentFormula sf : sequent.succedent()) {
-         Term term = sf.formula();
-         if (Junctor.IMP != term.op()) {
-            result.addAll(extractLocationsFromTerm(term, objectsToIgnore));
-         }
       }
       return result;
    }
@@ -713,30 +717,9 @@ public class SymbolicLayoutExtractor {
                                               Set<Term> updateCreatedObjectsToFill, 
                                               Set<Term> updateValueObjectsToFill, 
                                               Set<Term> objectsToIgnore) throws ProofInputException {
-      Term updateApplication = findUpdates(sequent);
-      if (updateApplication == null) {
-         throw new ProofInputException("Can't find update application in \"" + sequent + "\".");
-      }
+      Term updateApplication = modalityPio.subTerm();
       Term topUpdate = UpdateApplication.getUpdate(updateApplication);
       collectLocationsFromTerm(topUpdate, locationsToFill, updateCreatedObjectsToFill, updateValueObjectsToFill, objectsToIgnore);
-   }
-   
-   /**
-    * Searches the {@link Term} with the updates in the given {@link Sequent}.
-    * @param sequent The {@link Sequent} to search update {@link Term} in.
-    * @return The found {@link Term} with the {@link UpdateApplication} or {@code null} if not found.
-    */
-   protected Term findUpdates(Sequent sequent) {
-      Term result = null;
-      Iterator<SequentFormula> sucIter = sequent.succedent().iterator();
-      while (result == null && sucIter.hasNext()) {
-         SequentFormula sf = sucIter.next();
-         Term term = sf.formula();
-         if (UpdateApplication.UPDATE_APPLICATION == term.op()) {
-            result = term;
-         }
-      }
-      return result;
    }
 
    /**
@@ -1081,7 +1064,7 @@ public class SymbolicLayoutExtractor {
             originalUpdates = ImmutableSLList.nil();
          }
          else {
-            Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+            Term originalModifiedFormula = modalityPio.constrainedFormula().formula();
             originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;            
          }
          // Combine memory layout with original updates
@@ -1102,7 +1085,7 @@ public class SymbolicLayoutExtractor {
             additionalUpdates = additionalUpdates.append(evp.createPreUpdate());
          }
          ImmutableList<Term> newUpdates = ImmutableSLList.<Term>nil().append(getServices().getTermBuilder().parallel(additionalUpdates));
-         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, layoutCondition, layoutTerm, newUpdates, false);
+         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, modalityPio, layoutCondition, layoutTerm, newUpdates, false);
          // Instantiate and run proof
          ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
                                                                              sequent, 

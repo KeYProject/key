@@ -14,7 +14,6 @@
 package org.key_project.sed.key.core.model;
 
 import org.eclipse.debug.core.DebugException;
-import org.key_project.sed.core.model.ISEDConstraint;
 import org.key_project.sed.core.model.ISEDDebugNode;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -24,7 +23,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
  * based on KeY must have.
  * @author Martin Hentschel
  */
-public interface IKeYSEDDebugNode<E extends IExecutionNode> extends ISEDDebugNode {
+public interface IKeYSEDDebugNode<E extends IExecutionNode<?>> extends ISEDDebugNode {
    /**
     * Returns the represented {@link IExecutionNode}.
     * @return The reprsented {@link IExecutionNode}.

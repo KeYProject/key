@@ -1447,6 +1447,7 @@ public final class TestSedCoreUtil {
                                        boolean compareCallStack,
                                        boolean compareConstraints) throws DebugException {
       compareThread((IThread)expected, (IThread)current, compareReferences, compareVariables, compareConstraints);
+      compareStackFrame(expected, current, compareVariables, compareConstraints);
       compareNode(expected, current, compareReferences, compareId, compareVariables, compareCallStack, compareConstraints);
       compareTerminations(expected.getTerminations(), current.getTerminations());
    }
@@ -1469,6 +1470,7 @@ public final class TestSedCoreUtil {
                                                 boolean compareVariables,
                                                 boolean compareCallStack,
                                                 boolean compareConstraints) throws DebugException {
+      compareStackFrame(expected, current, compareVariables, compareConstraints);
       compareNode(expected, current, compareReferences, compareId, compareVariables, compareCallStack, compareConstraints);
    }
 
@@ -1768,6 +1770,7 @@ public final class TestSedCoreUtil {
                                             boolean compareCallStack,
                                             boolean compareConstraints) throws DebugException {
       compareNode(expected, current, compareReferences, compareId, compareVariables, compareCallStack, compareConstraints);
+      compareStackFrame(expected, current, compareVariables, compareConstraints);
       assertEquals(expected.isVerified(), current.isVerified());
    }
    

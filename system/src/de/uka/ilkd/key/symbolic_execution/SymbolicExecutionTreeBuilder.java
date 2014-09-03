@@ -39,6 +39,7 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -173,7 +174,7 @@ public class SymbolicExecutionTreeBuilder {
     * e.g. a return statement and a method return, the last node is returned.
     * </p>
     */
-   private Map<Node, AbstractExecutionNode> keyNodeMapping = new LinkedHashMap<Node, AbstractExecutionNode>();
+   private Map<Node, AbstractExecutionNode<?>> keyNodeMapping = new LinkedHashMap<Node, AbstractExecutionNode<?>>();
    
    /**
     * Maps a loop condition of a {@link Node} of KeY's proof tree to his 
@@ -465,7 +466,7 @@ public class SymbolicExecutionTreeBuilder {
       /**
        * Maps the {@link Node} in KeY's proof tree to the {@link IExecutionNode} of the symbolic execution tree where the {@link Node}s children should be added to.
        */
-      private Map<Node, AbstractExecutionNode> addToMapping = new LinkedHashMap<Node, AbstractExecutionNode>();
+      private Map<Node, AbstractExecutionNode<?>> addToMapping = new LinkedHashMap<Node, AbstractExecutionNode<?>>();
       
       /**
        * Branch conditions ({@link ExecutionBranchCondition}) are only applied to the 
@@ -478,13 +479,13 @@ public class SymbolicExecutionTreeBuilder {
        * The contained {@link List} makes sure that the children are applied
        * in the same order as they occur in KeY's proof tree.
        */
-      private Deque<Entry<AbstractExecutionNode, List<ExecutionBranchCondition>>> branchConditionsStack = new LinkedList<Entry<AbstractExecutionNode, List<ExecutionBranchCondition>>>();
+      private Deque<Entry<AbstractExecutionNode<?>, List<ExecutionBranchCondition>>> branchConditionsStack = new LinkedList<Entry<AbstractExecutionNode<?>, List<ExecutionBranchCondition>>>();
 
       /**
        * This utility {@link Map} helps to find a {@link List} in {@link #branchConditionsStack}
        * for the given parent node to that elements in the {@link List} should be added.
        */
-      private Map<AbstractExecutionNode, List<ExecutionBranchCondition>> parentToBranchConditionMapping = new LinkedHashMap<AbstractExecutionNode, List<ExecutionBranchCondition>>();
+      private Map<AbstractExecutionNode<?>, List<ExecutionBranchCondition>> parentToBranchConditionMapping = new LinkedHashMap<AbstractExecutionNode<?>, List<ExecutionBranchCondition>>();
       
       /**
        * {@inheritDoc}
@@ -492,7 +493,7 @@ public class SymbolicExecutionTreeBuilder {
       @Override
       public void visit(Proof proof, Node visitedNode) {
          // Find the parent node (IExecutionNode) to that the execution tree model representation of the given KeY's proof tree node should be added.
-         AbstractExecutionNode parentToAddTo = keyNodeBranchConditionMapping.get(visitedNode);
+         AbstractExecutionNode<?> parentToAddTo = keyNodeBranchConditionMapping.get(visitedNode);
          if (parentToAddTo == null) {
             Node parent = visitedNode.parent(); 
             if (parent != null) {
@@ -523,7 +524,7 @@ public class SymbolicExecutionTreeBuilder {
                      List<ExecutionBranchCondition> list = parentToBranchConditionMapping.get(parentToAddTo);
                      if (list == null) {
                         list = new LinkedList<ExecutionBranchCondition>();
-                        branchConditionsStack.addFirst(new DefaultEntry<AbstractExecutionNode, List<ExecutionBranchCondition>>(parentToAddTo, list));
+                        branchConditionsStack.addFirst(new DefaultEntry<AbstractExecutionNode<?>, List<ExecutionBranchCondition>>(parentToAddTo, list));
                         parentToBranchConditionMapping.put(parentToAddTo, list);
                      }
                      list.add(condition);
@@ -549,14 +550,14 @@ public class SymbolicExecutionTreeBuilder {
        * </p>
        */
       public void completeTree() {
-          for (Entry<AbstractExecutionNode, List<ExecutionBranchCondition>> entry : branchConditionsStack) {
+          for (Entry<AbstractExecutionNode<?>, List<ExecutionBranchCondition>> entry : branchConditionsStack) {
              for (ExecutionBranchCondition condition : entry.getValue()) {
-                AbstractExecutionNode[] conditionsChildren = condition.getChildren(); 
+                AbstractExecutionNode<?>[] conditionsChildren = condition.getChildren(); 
                 if (!JavaUtil.isEmpty(conditionsChildren)) {
                    if (settings.isMergeBranchConditions()) {
                       // Merge branch conditions if possible
                       boolean addingToParentRequired = false;
-                      for (AbstractExecutionNode child : conditionsChildren) {
+                      for (AbstractExecutionNode<?> child : conditionsChildren) {
                          if (child instanceof ExecutionBranchCondition) {
                             ExecutionBranchCondition bcChild = (ExecutionBranchCondition)child;
                             bcChild.addMergedProofNode(condition.getProofNode());
@@ -600,7 +601,7 @@ public class SymbolicExecutionTreeBuilder {
     * @param parentToAddTo The parent {@link IExecutionNode} to add the created execution tree model representation ({@link IExecutionNode}) of the given {@link Node} to.
     * @return The {@link IExecutionNode} to which children of the current {@link Node} should be added. If no execution tree model representation was created the return value is identical to the given one (parentToAddTo).
     */
-   protected AbstractExecutionNode analyzeNode(Node node, AbstractExecutionNode parentToAddTo) {
+   protected AbstractExecutionNode<?> analyzeNode(Node node, AbstractExecutionNode<?> parentToAddTo) {
       // Analyze node
       if (!shouldPrune(node)) { // Prune closed branches because they are invalid
          // Get required information
@@ -609,7 +610,7 @@ public class SymbolicExecutionTreeBuilder {
          // Update call stack
          updateCallStack(node, statement);
          // Check if the node is already contained in the symbolic execution tree
-         AbstractExecutionNode executionNode = keyNodeMapping.get(node);
+         AbstractExecutionNode<?> executionNode = keyNodeMapping.get(node);
          if (executionNode == null) {
             // Try to create a new node
             executionNode = createExecutionTreeModelRepresentation(parentToAddTo, node, statement);
@@ -658,9 +659,9 @@ public class SymbolicExecutionTreeBuilder {
     * @param executionNode The new child {@link AbstractExecutionNode}.
     * @return The new parent {@link AbstractExecutionNode}.
     */
-   protected AbstractExecutionNode addNodeToTreeAndUpdateParent(Node node, 
-                                                                AbstractExecutionNode parentToAddTo, 
-                                                                AbstractExecutionNode executionNode) {
+   protected AbstractExecutionNode<?> addNodeToTreeAndUpdateParent(Node node, 
+                                                                   AbstractExecutionNode<?> parentToAddTo, 
+                                                                   AbstractExecutionNode<?> executionNode) {
       // Check if a new node was created
       if (executionNode != null) {
          // Add new node to symbolic execution tree
@@ -719,10 +720,10 @@ public class SymbolicExecutionTreeBuilder {
     * @param statement The actual statement ({@link SourceElement}).
     * @return The created {@link IExecutionNode} or {@code null} if the {@link Node} should be ignored in the symbolic execution tree.
     */
-   protected AbstractExecutionNode createExecutionTreeModelRepresentation(AbstractExecutionNode parent,
-                                                                          Node node, 
-                                                                          SourceElement statement) {
-      AbstractExecutionNode result = null;
+   protected AbstractExecutionNode<?> createExecutionTreeModelRepresentation(AbstractExecutionNode<?> parent,
+                                                                             Node node, 
+                                                                             SourceElement statement) {
+      AbstractExecutionNode<?> result = null;
       // Make sure that a statement (SourceElement) is available.
       if (SymbolicExecutionUtil.hasSymbolicExecutionLabel(node.getAppliedRuleApp())) {
          if (statement != null && !SymbolicExecutionUtil.isRuleAppToIgnore(node.getAppliedRuleApp())) {
@@ -776,10 +777,10 @@ public class SymbolicExecutionTreeBuilder {
       return result;
    }
    
-   protected AbstractExecutionNode createMehtodReturn(AbstractExecutionNode parent,
-                                                      Node node, 
-                                                      SourceElement statement) {
-      AbstractExecutionNode result = null;
+   protected AbstractExecutionNode<?> createMehtodReturn(AbstractExecutionNode<?> parent,
+                                                         Node node, 
+                                                         SourceElement statement) {
+      AbstractExecutionNode<?> result = null;
       if (SymbolicExecutionUtil.hasSymbolicExecutionLabel(node.getAppliedRuleApp())) {
          if (statement != null && !SymbolicExecutionUtil.isRuleAppToIgnore(node.getAppliedRuleApp())) {
             boolean methodReturn = SymbolicExecutionUtil.isMethodReturnNode(node, node.getAppliedRuleApp());
@@ -792,7 +793,7 @@ public class SymbolicExecutionTreeBuilder {
                   Set<Node> methodReturnsToIgnore = getMethodReturnsToIgnore(node.getAppliedRuleApp()); 
                   if (!methodReturnsToIgnore.contains(callNode)) {
                      // Find the call Node representation in SED, if not available ignore it.
-                     IExecutionNode callSEDNode = keyNodeMapping.get(callNode);
+                     IExecutionNode<?> callSEDNode = keyNodeMapping.get(callNode);
                      if (callSEDNode instanceof ExecutionMethodCall) { // Could be the start node if the initial sequent already contains some method frames.
                         if (methodReturn) {
                            result = new ExecutionMethodReturn(settings, mediator, node, (ExecutionMethodCall)callSEDNode);
@@ -826,7 +827,8 @@ public class SymbolicExecutionTreeBuilder {
     * @param node The {@link Node} on which the loop invariant rule is applied.
     */
    protected void initNewLoopBodyMethodCallStack(Node node) {
-      Term newModality = SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(node.child(1).sequent());
+      PosInOccurrence newModalityPIO = SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(node.child(1).sequent());
+      Term newModality = newModalityPIO != null ? newModalityPIO.subTerm() : null;
       assert newModality != null;
       SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(newModality);
       assert label != null;
@@ -901,12 +903,12 @@ public class SymbolicExecutionTreeBuilder {
     * @param node The {@link Node}.
     * @return The computed method call stack.
     */
-   protected IExecutionNode[] createCallStack(Node node) {
+   protected IExecutionNode<?>[] createCallStack(Node node) {
       // Compute number of call stack size
       int size = SymbolicExecutionUtil.computeStackSize(node.getAppliedRuleApp());
       if (size >= 1) {
          // Add call stack entries
-         List<IExecutionNode> callStack = new LinkedList<IExecutionNode>();
+         List<IExecutionNode<?>> callStack = new LinkedList<IExecutionNode<?>>();
          Map<Node, ImmutableList<Node>> methodCallStack = getMethodCallStack(node.getAppliedRuleApp());
          ImmutableList<Node> stack = findMethodCallStack(methodCallStack, node);
          stack = stack.take(stack.size() - size);
@@ -914,9 +916,8 @@ public class SymbolicExecutionTreeBuilder {
          for (int i = 0; i < size; i++) {
             Node stackEntry = stackIter.next();
             if (stackEntry != proof.root()) { // Ignore call stack entries provided by the initial sequent
-               IExecutionNode executionNode = getExecutionNode(stackEntry);
-               assert executionNode != null :
-                   "Can't find execution node for KeY's proof node " + stackEntry.serialNr() + ": " + ProofSaver.printAnything(stackEntry, proof.getServices()) + ".";
+               IExecutionNode<?> executionNode = getExecutionNode(stackEntry);
+               assert executionNode != null : "Can't find execution node for KeY's proof node " + stackEntry.serialNr() + ": " + ProofSaver.printAnything(stackEntry, proof.getServices()) + ".";
                callStack.add(executionNode);
             }
          }
@@ -1001,7 +1002,7 @@ public class SymbolicExecutionTreeBuilder {
     * @param parent The parent to add to.
     * @param child The child to add.
     */
-   protected void addChild(AbstractExecutionNode parent, AbstractExecutionNode child) {
+   protected void addChild(AbstractExecutionNode<?> parent, AbstractExecutionNode<?> child) {
       child.setParent(parent);
       parent.addChild(child);
    }
@@ -1016,8 +1017,8 @@ public class SymbolicExecutionTreeBuilder {
     * @param proofNode The {@link Node} in KeY's proof tree.
     * @return The {@link IExecutionNode} representation or {@code null} if no one is available.
     */
-   protected IExecutionNode getExecutionNode(Node proofNode) {
-      IExecutionNode result = keyNodeMapping.get(proofNode);
+   protected IExecutionNode<?> getExecutionNode(Node proofNode) {
+      IExecutionNode<?> result = keyNodeMapping.get(proofNode);
       if (result == null) {
          result = keyNodeBranchConditionMapping.get(proofNode);
       }

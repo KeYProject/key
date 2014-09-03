@@ -84,7 +84,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
@@ -228,7 +227,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws IOException Occurred Exception
     * @throws ProofInputException Occurred Exception
     */
-   protected static void createOracleFile(IExecutionNode node, 
+   protected static void createOracleFile(IExecutionNode<?> node, 
                                           String oraclePathInBaseDirFile, 
                                           boolean saveConstraints,
                                           boolean saveVariables,
@@ -275,8 +274,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param compareConstraints Compare constraints?
     * @throws ProofInputException Occurred Exception.
     */
-   public static void assertExecutionNodes(IExecutionNode expected, 
-                                           IExecutionNode current,
+   public static void assertExecutionNodes(IExecutionNode<?> expected, 
+                                           IExecutionNode<?> current,
                                            boolean compareVariables,
                                            boolean compareCallStack,
                                            boolean compareChildOrder,
@@ -287,8 +286,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          ExecutionNodePreorderIterator expectedIter = new ExecutionNodePreorderIterator(expected);
          ExecutionNodePreorderIterator currentIter = new ExecutionNodePreorderIterator(current);
          while (expectedIter.hasNext() && currentIter.hasNext()) {
-            IExecutionNode expectedNext = expectedIter.next();
-            IExecutionNode currentNext = currentIter.next();
+            IExecutionNode<?> expectedNext = expectedIter.next();
+            IExecutionNode<?> currentNext = currentIter.next();
             assertExecutionNode(expectedNext, currentNext, true, compareVariables, compareCallStack, compareReturnValues, compareConstraints);
          }
          assertFalse(expectedIter.hasNext());
@@ -297,10 +296,10 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       else {
          // Order of children is not relevant.
          ExecutionNodePreorderIterator expectedIter = new ExecutionNodePreorderIterator(expected);
-         Set<IExecutionNode> currentVisitedNodes = new LinkedHashSet<IExecutionNode>();
+         Set<IExecutionNode<?>> currentVisitedNodes = new LinkedHashSet<IExecutionNode<?>>();
          while (expectedIter.hasNext()) {
-            IExecutionNode expectedNext = expectedIter.next();
-            IExecutionNode currentNext = searchExecutionNode(current, expectedNext);
+            IExecutionNode<?> expectedNext = expectedIter.next();
+            IExecutionNode<?> currentNext = searchExecutionNode(current, expectedNext);
             if (!currentVisitedNodes.add(currentNext)) {
                fail("Node " + currentNext + " visited twice.");
             }
@@ -309,7 +308,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          // Make sure that each current node was visited
          ExecutionNodePreorderIterator currentIter = new ExecutionNodePreorderIterator(current);
          while (currentIter.hasNext()) {
-            IExecutionNode currentNext = currentIter.next();
+            IExecutionNode<?> currentNext = currentIter.next();
             if (!currentVisitedNodes.remove(currentNext)) {
                fail("Node " + currentNext + " is not in expected model.");
             }
@@ -325,20 +324,20 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @return The found node.
     * @throws ProofInputException Occurred Exception.
     */
-   protected static IExecutionNode searchExecutionNode(IExecutionNode toSearchIn, IExecutionNode childToSearch) throws ProofInputException {
+   protected static IExecutionNode<?> searchExecutionNode(IExecutionNode<?> toSearchIn, IExecutionNode<?> childToSearch) throws ProofInputException {
       // Make sure that parameters are valid
       assertNotNull(toSearchIn);
       assertNotNull(childToSearch);
       // Collect parents
-      Deque<IExecutionNode> parents = new LinkedList<IExecutionNode>();
-      IExecutionNode parent = childToSearch;
+      Deque<IExecutionNode<?>> parents = new LinkedList<IExecutionNode<?>>();
+      IExecutionNode<?> parent = childToSearch;
       while (parent != null) {
          parents.addFirst(parent);
          parent = parent.getParent();
       }
       // Search children in parent order
       boolean afterFirst = false;
-      for (IExecutionNode currentParent : parents) {
+      for (IExecutionNode<?> currentParent : parents) {
          if (afterFirst) {
             toSearchIn = searchDirectChildNode(toSearchIn, currentParent);
          }
@@ -357,14 +356,14 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @return The found child.
     * @throws ProofInputException Occurred Exception.
     */
-   protected static IExecutionNode searchDirectChildNode(IExecutionNode parentToSearchIn, IExecutionNode directChildToSearch) throws ProofInputException {
+   protected static IExecutionNode<?> searchDirectChildNode(IExecutionNode<?> parentToSearchIn, IExecutionNode<?> directChildToSearch) throws ProofInputException {
       // Make sure that parameters are valid
       assertNotNull(parentToSearchIn);
       assertNotNull(directChildToSearch);
       // Search child
-      IExecutionNode result = null;
+      IExecutionNode<?> result = null;
       int i = 0;
-      IExecutionNode[] children = parentToSearchIn.getChildren();
+      IExecutionNode<?>[] children = parentToSearchIn.getChildren();
       while (result == null && i < children.length) {
          if (children[i] instanceof IExecutionBranchCondition && directChildToSearch instanceof IExecutionBranchCondition) {
             if (JavaUtil.equalIgnoreWhiteSpace(children[i].getName(), directChildToSearch.getName()) &&
@@ -398,8 +397,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param compareConstraints Compare constraints?
     * @throws ProofInputException Occurred Exception.
     */
-   protected static void assertExecutionNode(IExecutionNode expected, 
-                                             IExecutionNode current, 
+   protected static void assertExecutionNode(IExecutionNode<?> expected, 
+                                             IExecutionNode<?> current, 
                                              boolean compareParent,
                                              boolean compareVariables,
                                              boolean compareCallStack,
@@ -417,17 +416,20 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertEquals(((IExecutionBranchCondition)expected).isMergedBranchCondition(), ((IExecutionBranchCondition)current).isMergedBranchCondition());
          assertEquals(((IExecutionBranchCondition)expected).isBranchConditionComputed(), ((IExecutionBranchCondition)current).isBranchConditionComputed());
          assertTrue("Expected \"" + ((IExecutionBranchCondition)expected).getAdditionalBranchLabel() + "\" but is \"" + ((IExecutionBranchCondition)current).getAdditionalBranchLabel() + "\".", JavaUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)expected).getAdditionalBranchLabel(), ((IExecutionBranchCondition)current).getAdditionalBranchLabel()));
+         assertVariables((IExecutionBranchCondition)expected, (IExecutionBranchCondition)current, compareVariables, compareConstraints);
          assertConstraints((IExecutionBranchCondition)expected, (IExecutionBranchCondition)current, compareConstraints);
       }
       else if (expected instanceof IExecutionStart) {
          assertTrue("Expected IExecutionStartNode but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionStart);
          assertTerminations((IExecutionStart)expected, (IExecutionStart)current);
+         assertVariables((IExecutionStart)expected, (IExecutionStart)current, compareVariables, compareConstraints);
          assertConstraints((IExecutionStart)expected, (IExecutionStart)current, compareConstraints);
       }
       else if (expected instanceof IExecutionTermination) {
          assertTrue("Expected IExecutionTermination but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionTermination);
          assertEquals(((IExecutionTermination)expected).getTerminationKind(), ((IExecutionTermination)current).getTerminationKind());
          assertEquals(((IExecutionTermination)expected).isBranchVerified(), ((IExecutionTermination)current).isBranchVerified());
+         assertVariables((IExecutionTermination)expected, (IExecutionTermination)current, compareVariables, compareConstraints);
          assertConstraints((IExecutionTermination)expected, (IExecutionTermination)current, compareConstraints);
       }
       else if (expected instanceof IExecutionBranchStatement) {
@@ -501,8 +503,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       }
       // Optionally compare call stack
       if (compareCallStack) {
-         IExecutionNode[] expectedStack = expected.getCallStack();
-         IExecutionNode[] currentStack = current.getCallStack();
+         IExecutionNode<?>[] expectedStack = expected.getCallStack();
+         IExecutionNode<?>[] currentStack = current.getCallStack();
          if (expectedStack != null) {
             assertNotNull("Call stack of \"" + current + "\" should not be null.", currentStack);
             assertEquals("Node: " + expected, expectedStack.length, currentStack.length);
@@ -607,7 +609,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param compareConstraints Compare constraints?
     * @throws ProofInputException Occurred Exception.
     */
-   protected static void assertConstraints(IExecutionNode expected, IExecutionNode current, boolean compareConstraints) throws ProofInputException {
+   protected static void assertConstraints(IExecutionNode<?> expected, IExecutionNode<?> current, boolean compareConstraints) throws ProofInputException {
       if (compareConstraints) {
          assertNotNull(expected);
          assertNotNull(current);
@@ -677,7 +679,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param compareConstraints Compare constraints?
     * @throws ProofInputException Occurred Exception.
     */
-   protected static void assertVariables(IExecutionStateNode<?> expected, IExecutionStateNode<?> current, boolean compareVariables, boolean compareConstraints) throws ProofInputException {
+   protected static void assertVariables(IExecutionNode<?> expected, IExecutionNode<?> current, boolean compareVariables, boolean compareConstraints) throws ProofInputException {
       if (compareVariables) {
          assertNotNull(expected);
          assertNotNull(current);
@@ -1032,7 +1034,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          // Read oracle file
          File oracleFile = new File(baseDir, oraclePathInBaseDirFile);
          ExecutionNodeReader reader = new ExecutionNodeReader();
-         IExecutionNode oracleRoot = reader.read(oracleFile);
+         IExecutionNode<?> oracleRoot = reader.read(oracleFile);
          assertNotNull(oracleRoot);
          // Make sure that the created symbolic execution tree matches the expected one.
          assertExecutionNodes(oracleRoot, builder.getStartNode(), false, false, false, false, false);
@@ -1611,7 +1613,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          createOracleFile(env.getBuilder().getStartNode(), oraclePathInBaseDirFile, includeConstraints, includeVariables, includeCallStack, includeReturnValues);
          // Read oracle file
          ExecutionNodeReader reader = new ExecutionNodeReader();
-         IExecutionNode oracleRoot = reader.read(oracleFile);
+         IExecutionNode<?> oracleRoot = reader.read(oracleFile);
          assertNotNull(oracleRoot);
          // Make sure that the created symbolic execution tree matches the expected one.
          assertExecutionNodes(oracleRoot, env.getBuilder().getStartNode(), includeVariables, includeCallStack, false, includeReturnValues, includeConstraints);
@@ -1810,7 +1812,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       createOracleFile(env.getBuilder().getStartNode(), oraclePathInBaseDirFile, includeConstraints, includeVariables, includeCallStack, includeReturnValues);
       // Read oracle file
       ExecutionNodeReader reader = new ExecutionNodeReader();
-      IExecutionNode oracleRoot = reader.read(oracleFile);
+      IExecutionNode<?> oracleRoot = reader.read(oracleFile);
       assertNotNull(oracleRoot);
       // Make sure that the created symbolic execution tree matches the expected one.
       assertExecutionNodes(oracleRoot, env.getBuilder().getStartNode(), includeVariables, includeCallStack, false, includeReturnValues, includeConstraints);

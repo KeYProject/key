@@ -40,7 +40,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.FieldWatchpoint;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.LineBreakpoint;
@@ -355,18 +354,12 @@ public class KeYBreakpointManager {
       return keys.toArray(new IBreakpoint[keys.size()]);
    }
 
-   public boolean checkBreakpointHit(IBreakpoint breakpoint, IKeYSEDDebugNode<IExecutionNode> node) {
+   public boolean checkBreakpointHit(IBreakpoint breakpoint, IKeYSEDDebugNode<IExecutionNode<?>> node) {
       de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint keyBreakpoint = breakpointMap.get(breakpoint);
       if (keyBreakpoint != null) {
-         IExecutionNode enode = node.getExecutionNode();
+         IExecutionNode<?> enode = node.getExecutionNode();
          Node proofNode = enode.getProofNode();
-         if (enode instanceof IExecutionStateNode<?>) {
-            IExecutionStateNode<?> senode = (IExecutionStateNode<?>)enode;
-            return keyBreakpoint.isBreakpointHit(senode.getActiveStatement(), proofNode.getAppliedRuleApp(), enode.getProof(), proofNode);
-         }
-         else {
-            return keyBreakpoint.isBreakpointHit(null, proofNode.getAppliedRuleApp(), enode.getProof(), proofNode);
-         }
+         return keyBreakpoint.isBreakpointHit(enode.getActiveStatement(), proofNode.getAppliedRuleApp(), enode.getProof(), proofNode);
       }
       else {
          return false;

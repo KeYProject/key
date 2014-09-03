@@ -675,7 +675,7 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
          else if (element instanceof TypeInfo) {
             try {
                TypeInfo info = (TypeInfo) element;
-               if (info.getFile() != null) {
+               if (info.getFile() != null && info.getFile().exists()) {
                   IEditorPart editor = WorkbenchUtil.openEditor(info.getFile());
                   if (editor instanceof JavaEditor) {
                      IType type = info.findJDTType();
@@ -693,13 +693,19 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
          else if (element instanceof MethodInfo) {
             try {
                MethodInfo info = (MethodInfo) element;
-               if (info.getDeclaringFile() != null) {
+               if (info.getDeclaringFile() != null && info.getDeclaringFile().exists()) {
                   IEditorPart editor = WorkbenchUtil.openEditor(info.getDeclaringFile());
                   if (editor instanceof JavaEditor) {
                      IMethod method = info.findJDTMethod();
                      if (method != null && method.exists()) {
                         ((JavaEditor) editor).setSelection(method);
                      }
+                  }
+               }
+               else {
+                  IFile file = info.getParent().getFile();
+                  if (file != null && file.exists()) {
+                     WorkbenchUtil.openEditor(file);
                   }
                }
             }
@@ -711,13 +717,19 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
          else if (element instanceof ObserverFunctionInfo) {
             try {
                ObserverFunctionInfo info = (ObserverFunctionInfo) element;
-               if (info.getDeclaringFile() != null) {
+               if (info.getDeclaringFile() != null && info.getDeclaringFile().exists()) {
                   IEditorPart editor = WorkbenchUtil.openEditor(info.getDeclaringFile());
                   if (editor instanceof JavaEditor) {
                      IType type = info.findJDTDeclaringType();
                      if (type != null && type.exists()) {
                         ((JavaEditor) editor).setSelection(type);
                      }
+                  }
+               }
+               else {
+                  IFile file = info.getParent().getFile();
+                  if (file != null && file.exists()) {
+                     WorkbenchUtil.openEditor(file);
                   }
                }
             }
