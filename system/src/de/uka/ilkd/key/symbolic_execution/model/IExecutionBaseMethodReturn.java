@@ -9,7 +9,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
  * and {@link IExecutionExceptionalMethodReturn}.
  * @author Martin Hentschel
  */
-public interface IExecutionBaseMethodReturn<S extends SourceElement> extends IExecutionStateNode<S> {
+public interface IExecutionBaseMethodReturn<S extends SourceElement> extends IExecutionNode<S> {
    /**
     * A reference to the {@link IExecutionMethodCall} which is now returned.
     * @return The call of the now returned method.

@@ -33,7 +33,7 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
  * @see SymbolicExecutionTreeBuilder
  * @see ExecutionBranchCondition
  */
-public interface IExecutionBranchCondition extends IExecutionStateNode<SourceElement> {
+public interface IExecutionBranchCondition extends IExecutionNode<SourceElement> {
    /**
     * Returns the optional additional branch label.
     * @return The additional branch label if available or {@code null} if not available.

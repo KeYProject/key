@@ -43,7 +43,7 @@ import de.uka.ilkd.key.util.Pair;
  * The default implementation of {@link IExecutionTermination}.
  * @author Martin Hentschel
  */
-public class ExecutionTermination extends AbstractExecutionStateNode<SourceElement> implements IExecutionTermination {
+public class ExecutionTermination extends AbstractExecutionNode<SourceElement> implements IExecutionTermination {
    /**
     * Contains the exception variable which is used to check if the executed program in proof terminates normally.
     */

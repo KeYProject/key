@@ -33,7 +33,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * The default implementation of {@link IExecutionMethodCall}.
  * @author Martin Hentschel
  */
-public class ExecutionMethodCall extends AbstractExecutionStateNode<MethodBodyStatement> implements IExecutionMethodCall {
+public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStatement> implements IExecutionMethodCall {
    /**
     * The up to know discovered {@link IExecutionBaseMethodReturn}s.
     */

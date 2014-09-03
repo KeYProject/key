@@ -36,7 +36,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * The default implementation of {@link IExecutionBranchCondition}.
  * @author Martin Hentschel
  */
-public class ExecutionBranchCondition extends AbstractExecutionStateNode<SourceElement> implements IExecutionBranchCondition {
+public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElement> implements IExecutionBranchCondition {
    /**
     * The optional additional branch label.
     */

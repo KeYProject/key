@@ -30,7 +30,7 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStart;
  * @see SymbolicExecutionTreeBuilder
  * @see ExecutionStart
  */
-public interface IExecutionStart extends IExecutionStateNode<SourceElement> {
+public interface IExecutionStart extends IExecutionNode<SourceElement> {
    /**
     * The default name of an {@link IExecutionStart}.
     */

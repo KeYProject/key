@@ -33,7 +33,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * The default implementation of {@link IExecutionStart}.
  * @author Martin Hentschel
  */
-public class ExecutionStart extends AbstractExecutionStateNode<SourceElement> implements IExecutionStart {
+public class ExecutionStart extends AbstractExecutionNode<SourceElement> implements IExecutionStart {
    /**
     * The up to know discovered {@link IExecutionTermination}s.
     */

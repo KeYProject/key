@@ -9,11 +9,11 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionConstraint;
  * </p>
  * <p>
  * The default implementation is {@link ExecutionConstraint} which
- * is instantiated lazily by the {@link IExecutionStateNode} and
+ * is instantiated lazily by the {@link IExecutionNode} and
  * {@link IExecutionValue} implementations.
  * </p>
  * @author Martin Hentschel
- * @see IExecutionStateNode
+ * @see IExecutionNode
  * @see IExecutionValue
  * @see ExecutionConstraint
  */

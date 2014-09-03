@@ -121,7 +121,6 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
@@ -594,14 +593,14 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Checks if it is right now possible to compute the variables of the given {@link IExecutionStateNode}
-    * via {@link IExecutionStateNode#getVariables()}. 
-    * @param node The {@link IExecutionStateNode} to check.
+    * Checks if it is right now possible to compute the variables of the given {@link IExecutionNode}
+    * via {@link IExecutionNode#getVariables()}. 
+    * @param node The {@link IExecutionNode} to check.
     * @param services The {@link Services} to use.
     * @return {@code true} right now it is possible to compute variables, {@code false} it is not possible to compute variables.
     * @throws ProofInputException Occurred Exception.
     */
-   public static boolean canComputeVariables(IExecutionStateNode<?> node, Services services) throws ProofInputException {
+   public static boolean canComputeVariables(IExecutionNode<?> node, Services services) throws ProofInputException {
       return node != null && 
              !node.isDisposed() &&
              !services.getTermBuilder().ff().equals(node.getPathCondition());
@@ -613,7 +612,7 @@ public final class SymbolicExecutionUtil {
     * @param node The {@link IExecutionNode} to create constraints for.
     * @return The created {@link IExecutionConstraint}s.
     */
-   public static IExecutionConstraint[] createExecutionConstraints(IExecutionNode node) {
+   public static IExecutionConstraint[] createExecutionConstraints(IExecutionNode<?> node) {
       if (node != null && !node.isDisposed()) {
          TermBuilder tb = node.getServices().getTermBuilder();
          List<IExecutionConstraint> constraints = new LinkedList<IExecutionConstraint>();
@@ -659,12 +658,12 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Creates for the given {@link IExecutionStateNode} the contained
+    * Creates for the given {@link IExecutionNode} the contained
     * root {@link IExecutionVariable}s.
-    * @param node The {@link IExecutionStateNode} to create variables for.
+    * @param node The {@link IExecutionNode} to create variables for.
     * @return The created {@link IExecutionVariable}s.
     */
-   public static IExecutionVariable[] createExecutionVariables(IExecutionStateNode<?> node) {
+   public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node) {
       if (node != null) {
          Node proofNode = node.getProofNode();
          List<IProgramVariable> variables = new LinkedList<IProgramVariable>();
@@ -2982,7 +2981,7 @@ public final class SymbolicExecutionUtil {
     * @param executionNode The {@link IExecutionNode} to get the root of its symbolic execution tree.
     * @return The root of the given {@link IExecutionNode}.
     */
-   public static IExecutionNode getRoot(IExecutionNode executionNode) {
+   public static IExecutionNode<?> getRoot(IExecutionNode<?> executionNode) {
       if (executionNode != null) {
          while (executionNode.getParent() != null) {
             executionNode = executionNode.getParent();

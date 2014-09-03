@@ -38,7 +38,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
@@ -325,7 +324,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @throws IOException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
     */
-   public void write(IExecutionNode node, 
+   public void write(IExecutionNode<?> node, 
                      String encoding, 
                      File file, 
                      boolean saveVariables,
@@ -347,7 +346,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @throws IOException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
     */
-   public void write(IExecutionNode node, 
+   public void write(IExecutionNode<?> node, 
                      String encoding, 
                      OutputStream out, 
                      boolean saveVariables,
@@ -377,7 +376,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @return The created XML content.
     * @throws ProofInputException Occurred Exception.
     */
-   public String toXML(IExecutionNode node, 
+   public String toXML(IExecutionNode<?> node, 
                        String encoding, 
                        boolean saveVariables,
                        boolean saveCallStack,
@@ -401,7 +400,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @throws ProofInputException Occurred Exception.
     */
    protected void appendExecutionNode(int level, 
-                                      IExecutionNode node, 
+                                      IExecutionNode<?> node, 
                                       boolean saveVariables, 
                                       boolean saveCallStack,
                                       boolean saveReturnValues,
@@ -904,7 +903,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void appendConstraints(int level, IExecutionNode node, boolean saveConstraints, StringBuffer sb) throws ProofInputException {
+   protected void appendConstraints(int level, IExecutionNode<?> node, boolean saveConstraints, StringBuffer sb) throws ProofInputException {
       if (saveConstraints) {
          IExecutionConstraint[] constraints = node.getConstraints();
          for (IExecutionConstraint constraint : constraints) {
@@ -929,13 +928,13 @@ public class ExecutionNodeWriter extends AbstractWriter {
    /**
     * Appends the contained {@link IExecutionVariable}s to the given {@link StringBuffer}.
     * @param level The level to use.
-    * @param node The {@link IExecutionStateNode} which provides the {@link IExecutionVariable}s.
+    * @param node The {@link IExecutionNode} which provides the {@link IExecutionVariable}s.
     * @param saveVariables Save variables? 
     * @param saveConstraints Save constraints?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void appendVariables(int level, IExecutionStateNode<?> node, boolean saveVariables, boolean saveConstraints, StringBuffer sb) throws ProofInputException {
+   protected void appendVariables(int level, IExecutionNode<?> node, boolean saveVariables, boolean saveConstraints, StringBuffer sb) throws ProofInputException {
       if (saveVariables) {
          IExecutionVariable[] variables = node.getVariables();
          for (IExecutionVariable variable : variables) {
@@ -1016,14 +1015,14 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @throws ProofInputException Occurred Exception.
     */
    protected void appendChildren(int childLevel, 
-                                 IExecutionNode parent, 
+                                 IExecutionNode<?> parent, 
                                  boolean saveVariables, 
                                  boolean saveCallStack,
                                  boolean saveReturnValues,
                                  boolean saveConstraints,
                                  StringBuffer sb) throws ProofInputException {
-      IExecutionNode[] children = parent.getChildren();
-      for (IExecutionNode child : children) {
+      IExecutionNode<?>[] children = parent.getChildren();
+      for (IExecutionNode<?> child : children) {
          appendExecutionNode(childLevel, child, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       }
    }
@@ -1035,11 +1034,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param saveCallStack Defines if the call stack should be saved or not.
     * @param sb The {@link StringBuffer} to append to.
     */
-   protected void appendCallStack(int level, IExecutionNode node, boolean saveCallStack, StringBuffer sb) {
+   protected void appendCallStack(int level, IExecutionNode<?> node, boolean saveCallStack, StringBuffer sb) {
       if (saveCallStack) {
-         IExecutionNode[] callStack = node.getCallStack();
+         IExecutionNode<?>[] callStack = node.getCallStack();
          if (callStack != null) {
-            for (IExecutionNode stackNode : callStack) {
+            for (IExecutionNode<?> stackNode : callStack) {
                Map<String, String> attributeValues = new LinkedHashMap<String, String>();
                attributeValues.put(ATTRIBUTE_PATH_IN_TREE, computePath(stackNode));
                appendEmptyTag(level, TAG_CALL_STACK_ENTRY, attributeValues, sb);
@@ -1070,11 +1069,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param node The {@link IExecutionNode} to compute path to.
     * @return The computed path.
     */
-   protected String computePath(IExecutionNode node) {
+   protected String computePath(IExecutionNode<?> node) {
       StringBuffer sb = new StringBuffer();
       boolean afterFirst = false;
       while (node != null) {
-         IExecutionNode parent = node.getParent();
+         IExecutionNode<?> parent = node.getParent();
          if (parent != null) {
             if (afterFirst) {
                sb.insert(0, PATH_SEPARATOR);

@@ -35,7 +35,7 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionTermination;
  * @see SymbolicExecutionTreeBuilder
  * @see ExecutionTermination
  */
-public interface IExecutionTermination extends IExecutionStateNode<SourceElement> {
+public interface IExecutionTermination extends IExecutionNode<SourceElement> {
    /**
     * The default name of a termination node with {@link TerminationKind#NORMAL}.
     */

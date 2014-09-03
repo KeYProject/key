@@ -33,7 +33,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * The default implementation of {@link IExecutionBranchStatement}.
  * @author Martin Hentschel
  */
-public class ExecutionBranchStatement extends AbstractExecutionStateNode<BranchStatement> implements IExecutionBranchStatement {
+public class ExecutionBranchStatement extends AbstractExecutionNode<BranchStatement> implements IExecutionBranchStatement {
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.

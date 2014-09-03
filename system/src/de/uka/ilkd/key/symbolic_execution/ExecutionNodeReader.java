@@ -73,7 +73,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
@@ -98,7 +97,7 @@ public class ExecutionNodeReader {
     * @throws SAXException Occurred Exception.
     * @throws IOException Occurred Exception.
     */
-   public IExecutionNode read(File file) throws ParserConfigurationException, SAXException, IOException {
+   public IExecutionNode<?> read(File file) throws ParserConfigurationException, SAXException, IOException {
       return read(new FileInputStream(file));
    }
    
@@ -110,7 +109,7 @@ public class ExecutionNodeReader {
     * @throws SAXException Occurred Exception.
     * @throws IOException Occurred Exception.
     */
-   public IExecutionNode read(InputStream in) throws ParserConfigurationException, SAXException, IOException {
+   public IExecutionNode<?> read(InputStream in) throws ParserConfigurationException, SAXException, IOException {
       if (in != null) {
          try {
             // Parse XML file
@@ -120,12 +119,12 @@ public class ExecutionNodeReader {
             SEDSAXHandler handler = new SEDSAXHandler();
             saxParser.parse(in, handler);
             // Get root 
-            IExecutionNode root = handler.getRoot();
+            IExecutionNode<?> root = handler.getRoot();
             // Construct call stacks
-            Set<Entry<AbstractKeYlessExecutionNode, List<String>>> entries = handler.getCallStackPathEntries().entrySet();
-            for (Entry<AbstractKeYlessExecutionNode, List<String>> entry : entries) {
+            Set<Entry<AbstractKeYlessExecutionNode<?>, List<String>>> entries = handler.getCallStackPathEntries().entrySet();
+            for (Entry<AbstractKeYlessExecutionNode<?>, List<String>> entry : entries) {
                for (String path : entry.getValue()) {
-                  IExecutionNode stackEntry = findNode(root, path);
+                  IExecutionNode<?> stackEntry = findNode(root, path);
                   if (stackEntry == null) {
                      throw new SAXException("Can't find call stack entry \"" + path + "\" in parsed symbolic execution tree.");
                   }
@@ -136,7 +135,7 @@ public class ExecutionNodeReader {
             Set<Entry<KeYlessMethodCall, List<String>>> methodReturnEntries = handler.getMethodReturnPathEntries().entrySet();
             for (Entry<KeYlessMethodCall, List<String>> entry : methodReturnEntries) {
                for (String path : entry.getValue()) {
-                  IExecutionNode returnEntry = findNode(root, path);
+                  IExecutionNode<?> returnEntry = findNode(root, path);
                   if (returnEntry == null) {
                      throw new SAXException("Can't find method return entry \"" + path + "\" in parsed symbolic execution tree.");
                   }
@@ -150,7 +149,7 @@ public class ExecutionNodeReader {
             Set<Entry<KeYlessStart, List<String>>> terminationEntries = handler.getTerminationPathEntries().entrySet();
             for (Entry<KeYlessStart, List<String>> entry : terminationEntries) {
                for (String path : entry.getValue()) {
-                  IExecutionNode terminationEntry = findNode(root, path);
+                  IExecutionNode<?> terminationEntry = findNode(root, path);
                   if (terminationEntry == null) {
                      throw new SAXException("Can't find termination entry \"" + path + "\" in parsed symbolic execution tree.");
                   }
@@ -180,7 +179,7 @@ public class ExecutionNodeReader {
     * @return The found {@link IExecutionNode}.
     * @throws SAXException If it was not possible to find the node.
     */
-   protected IExecutionNode findNode(IExecutionNode root, String path) throws SAXException {
+   protected IExecutionNode<?> findNode(IExecutionNode<?> root, String path) throws SAXException {
       if (path != null && !path.isEmpty()) {
          StringTokenizer tokenizer = new StringTokenizer(path, ExecutionNodeWriter.PATH_SEPARATOR + "");
          while (tokenizer.hasMoreTokens()) {
@@ -190,7 +189,7 @@ public class ExecutionNodeReader {
                if (childIndex < 0) {
                   throw new SAXException("Path segment \"" + next + "\" of path \"" + path + "\" is a negative integer.");
                }
-               IExecutionNode[] children = root.getChildren();
+               IExecutionNode<?>[] children = root.getChildren();
                if (childIndex >= children.length) {
                   throw new SAXException("Path segment \"" + next + "\" of path \"" + path + "\" is outside of the child array range.");
                }
@@ -212,13 +211,13 @@ public class ExecutionNodeReader {
       /**
        * The root of the read symbolic execution tree.
        */
-      private IExecutionNode root;
+      private IExecutionNode<?> root;
 
       /**
        * The parent hierarchy filled by {@link #startElement(String, String, String, Attributes)}
        * and emptied by {@link #endElement(String, String, String)}.
        */
-      private final Deque<AbstractKeYlessExecutionNode> parentNodeStack = new LinkedList<AbstractKeYlessExecutionNode>();
+      private final Deque<AbstractKeYlessExecutionNode<?>> parentNodeStack = new LinkedList<AbstractKeYlessExecutionNode<?>>();
 
       /**
        * The parent hierarchy of {@link IExecutionVariable} and {@link IExecutionValue} filled by {@link #startElement(String, String, String, Attributes)}
@@ -229,7 +228,7 @@ public class ExecutionNodeReader {
       /**
        * Maps an {@link AbstractKeYlessExecutionNode} to the path entries of its call stack.
        */
-      private final Map<AbstractKeYlessExecutionNode, List<String>> callStackPathEntries = new LinkedHashMap<AbstractKeYlessExecutionNode, List<String>>();
+      private final Map<AbstractKeYlessExecutionNode<?>, List<String>> callStackPathEntries = new LinkedHashMap<AbstractKeYlessExecutionNode<?>, List<String>>();
       
       /**
        * Maps an {@link KeYlessMethodCall} to the path entries of its method returns.
@@ -246,7 +245,7 @@ public class ExecutionNodeReader {
        */
       @Override
       public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-         AbstractKeYlessExecutionNode parent = parentNodeStack.peekFirst();
+         AbstractKeYlessExecutionNode<?> parent = parentNodeStack.peekFirst();
          if (isConstraint(uri, localName, qName)) {
             Object parentValue = parentVariableValueStack.peekFirst();
             if (parentValue != null) {
@@ -261,7 +260,7 @@ public class ExecutionNodeReader {
                   throw new SAXException("Can't add constraint to non execution node.");
                }
                KeYlessConstraint constraint = new KeYlessConstraint(getName(attributes));
-               ((AbstractKeYlessExecutionNode) parent).addConstraint(constraint);
+               ((AbstractKeYlessExecutionNode<?>) parent).addConstraint(constraint);
             }
          }
          else if (isVariable(uri, localName, qName)) {
@@ -271,8 +270,8 @@ public class ExecutionNodeReader {
                ((KeYlessValue)parentValue).addChildVariable(variable);
             }
             else {
-               if (parent instanceof AbstractKeYlessStateNode<?>) {
-                  ((AbstractKeYlessStateNode<?>)parent).addVariable(variable);
+               if (parent != null) {
+                  parent.addVariable(variable);
                }
                else {
                   throw new SAXException("Can't add variable to parent execution node.");
@@ -322,7 +321,7 @@ public class ExecutionNodeReader {
             ((KeYlessMethodReturn)parentValue).addReturnValue(returnValue);
          }
          else {
-            AbstractKeYlessExecutionNode child = createExecutionNode(parent, uri, localName, qName, attributes);
+            AbstractKeYlessExecutionNode<?> child = createExecutionNode(parent, uri, localName, qName, attributes);
             if (root == null) {
                root = child;
             }
@@ -368,7 +367,7 @@ public class ExecutionNodeReader {
        * Returns the root of the read symbolic execution tree.
        * @return The root of the read symbolic execution tree.
        */
-      public IExecutionNode getRoot() {
+      public IExecutionNode<?> getRoot() {
          return root;
       }
 
@@ -376,7 +375,7 @@ public class ExecutionNodeReader {
        * Returns the mapping of an {@link AbstractKeYlessExecutionNode} to its call stack entries.
        * @return The mapping of an {@link AbstractKeYlessExecutionNode} to its call stack entries.
        */
-      public Map<AbstractKeYlessExecutionNode, List<String>> getCallStackPathEntries() {
+      public Map<AbstractKeYlessExecutionNode<?>, List<String>> getCallStackPathEntries() {
          return callStackPathEntries;
       }
 
@@ -545,7 +544,7 @@ public class ExecutionNodeReader {
     * @return The created {@link IExecutionNode}.
     * @throws SAXException Occurred Exception.
     */
-   protected AbstractKeYlessExecutionNode createExecutionNode(IExecutionNode parent, String uri, String localName, String qName, Attributes attributes) throws SAXException {
+   protected AbstractKeYlessExecutionNode<?> createExecutionNode(IExecutionNode<?> parent, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       if (ExecutionNodeWriter.TAG_BRANCH_CONDITION.equals(qName)) {
          return new KeYlessBranchCondition(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getBranchCondition(attributes), isMergedBranchCondition(attributes), isBranchConditionComputed(attributes), getAdditionalBranchLabel(attributes));
       }
@@ -972,16 +971,16 @@ public class ExecutionNodeReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static abstract class AbstractKeYlessExecutionNode extends AbstractKeYlessExecutionElement implements IExecutionNode {
+   public static abstract class AbstractKeYlessExecutionNode<S extends SourceElement> extends AbstractKeYlessExecutionElement implements IExecutionNode<S> {
       /**
        * The parent {@link IExecutionNode}.
        */
-      private final IExecutionNode parent;
+      private final IExecutionNode<?> parent;
       
       /**
        * The children.
        */
-      private final List<IExecutionNode> children = new LinkedList<IExecutionNode>();
+      private final List<IExecutionNode<?>> children = new LinkedList<IExecutionNode<?>>();
 
       /**
        * The formated path condition.
@@ -996,12 +995,17 @@ public class ExecutionNodeReader {
       /**
        * The call stack.
        */
-      private final List<IExecutionNode> callStack = new LinkedList<IExecutionNode>();
+      private final List<IExecutionNode<?>> callStack = new LinkedList<IExecutionNode<?>>();
       
       /**
        * The contained constraints.
        */
       private final List<IExecutionConstraint> constraints = new LinkedList<IExecutionConstraint>();
+      
+      /**
+       * The contained variables.
+       */
+      private final List<IExecutionVariable> variables = new LinkedList<IExecutionVariable>();
       
       /**
        * Constructor.
@@ -1010,7 +1014,7 @@ public class ExecutionNodeReader {
        * @param formatedPathCondition The formated path condition.
        * @param pathConditionChanged Is the path condition changed compared to parent?
        */
-      public AbstractKeYlessExecutionNode(IExecutionNode parent, 
+      public AbstractKeYlessExecutionNode(IExecutionNode<?> parent, 
                                           String name, 
                                           String formatedPathCondition, 
                                           boolean pathConditionChanged) {
@@ -1024,7 +1028,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public IExecutionNode getParent() {
+      public IExecutionNode<?> getParent() {
          return parent;
       }
       
@@ -1032,7 +1036,7 @@ public class ExecutionNodeReader {
        * Adds the given child.
        * @param child The child to add.
        */
-      public void addChild(IExecutionNode child) {
+      public void addChild(IExecutionNode<?> child) {
          children.add(child);
       }
 
@@ -1040,7 +1044,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public IExecutionNode[] getChildren() {
+      public IExecutionNode<?>[] getChildren() {
          return children.toArray(new IExecutionNode[children.size()]);
       }
 
@@ -1072,7 +1076,7 @@ public class ExecutionNodeReader {
        * Adds the given entry to the call stack.
        * @param entry The entry to add to the call stack.
        */
-      public void addCallStackEntry(IExecutionNode entry) {
+      public void addCallStackEntry(IExecutionNode<?> entry) {
          callStack.add(entry);
       }
 
@@ -1080,7 +1084,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public IExecutionNode[] getCallStack() {
+      public IExecutionNode<?>[] getCallStack() {
          return callStack.isEmpty() ? null : callStack.toArray(new IExecutionNode[callStack.size()]);
       }
 
@@ -1099,6 +1103,78 @@ public class ExecutionNodeReader {
       public IExecutionConstraint[] getConstraints() {
          return constraints.toArray(new IExecutionConstraint[constraints.size()]);
       }
+      
+      /**
+       * Adds the given {@link IExecutionVariable}.
+       * @param variable The {@link IExecutionVariable} to add.
+       */
+      public void addVariable(IExecutionVariable variable) {
+         variables.add(variable);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public S getActiveStatement() {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public PositionInfo getActivePositionInfo() {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IExecutionVariable[] getVariables() {
+         return variables.toArray(new IExecutionVariable[variables.size()]);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public int getLayoutsCount() throws ProofInputException {
+         return 0;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ISymbolicLayout getInitialLayout(int configurationIndex) throws ProofInputException {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ISymbolicLayout getCurrentLayout(int configurationIndex) throws ProofInputException {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ImmutableList<ISymbolicEquivalenceClass> getLayoutsEquivalenceClasses(int configurationIndex) throws ProofInputException {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public PosInOccurrence getModalityPIO() {
+         return null;
+      }
    }
    
    /**
@@ -1106,7 +1182,7 @@ public class ExecutionNodeReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessBranchCondition extends AbstractKeYlessStateNode<SourceElement> implements IExecutionBranchCondition {
+   public static class KeYlessBranchCondition extends AbstractKeYlessExecutionNode<SourceElement> implements IExecutionBranchCondition {
       /**
        * The formated branch condition.
        */
@@ -1138,7 +1214,7 @@ public class ExecutionNodeReader {
        * @param branchConditionComputed Is branch condition computed?
        * @param additionalBranchLabel The optional additional branch label.
        */
-      public KeYlessBranchCondition(IExecutionNode parent, 
+      public KeYlessBranchCondition(IExecutionNode<?> parent, 
                                     String name, 
                                     String formatedPathCondition, 
                                     boolean pathConditionChanged,
@@ -1223,7 +1299,7 @@ public class ExecutionNodeReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessStart extends AbstractKeYlessStateNode<SourceElement> implements IExecutionStart {
+   public static class KeYlessStart extends AbstractKeYlessExecutionNode<SourceElement> implements IExecutionStart {
       /**
        * The up to now discovered {@link IExecutionTermination}s.
        */
@@ -1273,7 +1349,7 @@ public class ExecutionNodeReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessTermination extends AbstractKeYlessStateNode<SourceElement> implements IExecutionTermination {
+   public static class KeYlessTermination extends AbstractKeYlessExecutionNode<SourceElement> implements IExecutionTermination {
       /**
        * The {@link TerminationKind}.
        */
@@ -1293,7 +1369,7 @@ public class ExecutionNodeReader {
        * @param exceptionalTermination Exceptional termination?
        * @param branchVerified The branch verified flag.
        */
-      public KeYlessTermination(IExecutionNode parent, 
+      public KeYlessTermination(IExecutionNode<?> parent, 
                                 String name, 
                                 String formatedPathCondition, 
                                 boolean pathConditionChanged, 
@@ -1348,111 +1424,13 @@ public class ExecutionNodeReader {
          return branchVerified;
       }
    }
-
-   /**
-    * An abstract implementation of {@link IExecutionStateNode} which is independent
-    * from KeY and provides such only children and default attributes.
-    * @author Martin Hentschel
-    */
-   public static abstract class AbstractKeYlessStateNode<S extends SourceElement> extends AbstractKeYlessExecutionNode implements IExecutionStateNode<S> {
-      /**
-       * The contained variables.
-       */
-      private final List<IExecutionVariable> variables = new LinkedList<IExecutionVariable>();
-      
-      /**
-       * Constructor.
-       * @param parent The parent {@link IExecutionNode}.
-       * @param name The name of this node.
-       * @param formatedPathCondition The formated path condition.
-       * @param pathConditionChanged Is the path condition changed compared to parent?
-       */
-      public AbstractKeYlessStateNode(IExecutionNode parent, 
-                                      String name, 
-                                      String formatedPathCondition,
-                                      boolean pathConditionChanged) {
-         super(parent, name, formatedPathCondition, pathConditionChanged);
-      }
-
-      /**
-       * Adds the given {@link IExecutionVariable}.
-       * @param variable The {@link IExecutionVariable} to add.
-       */
-      public void addVariable(IExecutionVariable variable) {
-         variables.add(variable);
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public S getActiveStatement() {
-         return null;
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public PositionInfo getActivePositionInfo() {
-         return null;
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public IExecutionVariable[] getVariables() {
-         return variables.toArray(new IExecutionVariable[variables.size()]);
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public int getLayoutsCount() throws ProofInputException {
-         return 0;
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public ISymbolicLayout getInitialLayout(int configurationIndex) throws ProofInputException {
-         return null;
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public ISymbolicLayout getCurrentLayout(int configurationIndex) throws ProofInputException {
-         return null;
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public ImmutableList<ISymbolicEquivalenceClass> getLayoutsEquivalenceClasses(int configurationIndex) throws ProofInputException {
-         return null;
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public PosInOccurrence getModalityPIO() {
-         return null;
-      }
-   }
    
    /**
     * An implementation of {@link IExecutionBranchStatement} which is independent
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessBranchStatement extends AbstractKeYlessStateNode<BranchStatement> implements IExecutionBranchStatement {
+   public static class KeYlessBranchStatement extends AbstractKeYlessExecutionNode<BranchStatement> implements IExecutionBranchStatement {
       /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
@@ -1460,7 +1438,7 @@ public class ExecutionNodeReader {
        * @param formatedPathCondition The formated path condition.
        * @param pathConditionChanged Is the path condition changed compared to parent?
        */
-      public KeYlessBranchStatement(IExecutionNode parent, 
+      public KeYlessBranchStatement(IExecutionNode<?> parent, 
                                     String name, 
                                     String formatedPathCondition,
                                     boolean pathConditionChanged) {
@@ -1481,7 +1459,7 @@ public class ExecutionNodeReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessLoopCondition extends AbstractKeYlessStateNode<LoopStatement> implements IExecutionLoopCondition {
+   public static class KeYlessLoopCondition extends AbstractKeYlessExecutionNode<LoopStatement> implements IExecutionLoopCondition {
       /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
@@ -1489,7 +1467,7 @@ public class ExecutionNodeReader {
        * @param formatedPathCondition The formated path condition.
        * @param pathConditionChanged Is the path condition changed compared to parent?
        */
-      public KeYlessLoopCondition(IExecutionNode parent, 
+      public KeYlessLoopCondition(IExecutionNode<?> parent, 
                                   String name, 
                                   String formatedPathCondition,
                                   boolean pathConditionChanged) {
@@ -1526,7 +1504,7 @@ public class ExecutionNodeReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessLoopStatement extends AbstractKeYlessStateNode<LoopStatement> implements IExecutionLoopStatement {
+   public static class KeYlessLoopStatement extends AbstractKeYlessExecutionNode<LoopStatement> implements IExecutionLoopStatement {
       /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
@@ -1534,7 +1512,7 @@ public class ExecutionNodeReader {
        * @param formatedPathCondition The formated path condition.
        * @param pathConditionChanged Is the path condition changed compared to parent?
        */
-      public KeYlessLoopStatement(IExecutionNode parent, 
+      public KeYlessLoopStatement(IExecutionNode<?> parent, 
                                   String name, 
                                   String formatedPathCondition, 
                                   boolean pathConditionChanged) {
@@ -1555,7 +1533,7 @@ public class ExecutionNodeReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessMethodCall extends AbstractKeYlessStateNode<MethodBodyStatement> implements IExecutionMethodCall {
+   public static class KeYlessMethodCall extends AbstractKeYlessExecutionNode<MethodBodyStatement> implements IExecutionMethodCall {
       /**
        * The up to now discovered {@link IExecutionBaseMethodReturn<?>}s.
        */
@@ -1568,7 +1546,7 @@ public class ExecutionNodeReader {
        * @param formatedPathCondition The formated path condition.
        * @param pathConditionChanged Is the path condition changed compared to parent?
        */
-      public KeYlessMethodCall(IExecutionNode parent, 
+      public KeYlessMethodCall(IExecutionNode<?> parent, 
                                String name, 
                                String formatedPathCondition,
                                boolean pathConditionChanged) {
@@ -1647,7 +1625,7 @@ public class ExecutionNodeReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessExceptionalMethodReturn extends AbstractKeYlessStateNode<Throw> implements IExecutionExceptionalMethodReturn {
+   public static class KeYlessExceptionalMethodReturn extends AbstractKeYlessExecutionNode<Throw> implements IExecutionExceptionalMethodReturn {
       /**
        * The signature.
        */
@@ -1667,7 +1645,7 @@ public class ExecutionNodeReader {
        * @param signature The signature.
        * @param formatedMethodReturn The formated method return condition.
        */
-      public KeYlessExceptionalMethodReturn(IExecutionNode parent, 
+      public KeYlessExceptionalMethodReturn(IExecutionNode<?> parent, 
                                             String name, 
                                             String formatedPathCondition, 
                                             boolean pathConditionChanged,
@@ -1724,7 +1702,7 @@ public class ExecutionNodeReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessMethodReturn extends AbstractKeYlessStateNode<SourceElement> implements IExecutionMethodReturn {
+   public static class KeYlessMethodReturn extends AbstractKeYlessExecutionNode<SourceElement> implements IExecutionMethodReturn {
       /**
        * The name including the return value.
        */
@@ -1767,7 +1745,7 @@ public class ExecutionNodeReader {
        * @param returnValueComputed Is the return value computed?
        * @param formatedMethodReturn The formated method return condition.
        */
-      public KeYlessMethodReturn(IExecutionNode parent, 
+      public KeYlessMethodReturn(IExecutionNode<?> parent, 
                                  String name, 
                                  String formatedPathCondition, 
                                  boolean pathConditionChanged,
@@ -1957,7 +1935,7 @@ public class ExecutionNodeReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessStatement extends AbstractKeYlessStateNode<SourceElement> implements IExecutionStatement {
+   public static class KeYlessStatement extends AbstractKeYlessExecutionNode<SourceElement> implements IExecutionStatement {
       /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
@@ -1965,7 +1943,7 @@ public class ExecutionNodeReader {
        * @param pathConditionChanged Is the path condition changed compared to parent?
        * @param formatedPathCondition The formated path condition.
        */
-      public KeYlessStatement(IExecutionNode parent, 
+      public KeYlessStatement(IExecutionNode<?> parent, 
                               String name, 
                               String formatedPathCondition,
                               boolean pathConditionChanged) {
@@ -1986,7 +1964,7 @@ public class ExecutionNodeReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessOperationContract extends AbstractKeYlessStateNode<SourceElement> implements IExecutionOperationContract {
+   public static class KeYlessOperationContract extends AbstractKeYlessExecutionNode<SourceElement> implements IExecutionOperationContract {
       /**
        * Is precondition complied?
        */
@@ -2036,7 +2014,7 @@ public class ExecutionNodeReader {
        * @param formatedSelfTerm The formated self term.
        * @param formatedContractParams The formated contract parameters.
        */
-      public KeYlessOperationContract(IExecutionNode parent, 
+      public KeYlessOperationContract(IExecutionNode<?> parent, 
                                       String name, 
                                       String formatedPathCondition,
                                       boolean pathConditionChanged,
@@ -2175,7 +2153,7 @@ public class ExecutionNodeReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessLoopInvariant extends AbstractKeYlessStateNode<SourceElement> implements IExecutionLoopInvariant {
+   public static class KeYlessLoopInvariant extends AbstractKeYlessExecutionNode<SourceElement> implements IExecutionLoopInvariant {
       /**
        * Initially valid?
        */
@@ -2189,7 +2167,7 @@ public class ExecutionNodeReader {
        * @param formatedPathCondition The formated path condition.
        * @param initiallyValid Initially valid?
        */
-      public KeYlessLoopInvariant(IExecutionNode parent, 
+      public KeYlessLoopInvariant(IExecutionNode<?> parent, 
                                   String name, 
                                   String formatedPathCondition,
                                   boolean pathConditionChanged,

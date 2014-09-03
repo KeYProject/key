@@ -27,7 +27,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * The default implementation of {@link IExecutionStatement}.
  * @author Martin Hentschel
  */
-public class ExecutionStatement extends AbstractExecutionStateNode<SourceElement> implements IExecutionStatement {
+public class ExecutionStatement extends AbstractExecutionNode<SourceElement> implements IExecutionStatement {
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.

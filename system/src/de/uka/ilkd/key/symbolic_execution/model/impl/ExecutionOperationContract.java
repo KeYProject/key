@@ -56,7 +56,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.ContractPos
  * The default implementation of {@link IExecutionOperationContract}.
  * @author Martin Hentschel
  */
-public class ExecutionOperationContract extends AbstractExecutionStateNode<SourceElement> implements IExecutionOperationContract {
+public class ExecutionOperationContract extends AbstractExecutionNode<SourceElement> implements IExecutionOperationContract {
    /**
     * The exception {@link Term} used by the applied {@link Contract}.
     */
