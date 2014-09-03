@@ -3,10 +3,10 @@ package org.key_project.sed.core.util;
 import java.util.LinkedList;
 
 import org.eclipse.debug.core.DebugException;
+import org.key_project.sed.core.model.ISEDBaseMethodReturn;
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
-import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.util.java.ArrayUtil;
 
 public final class NodeUtil {
@@ -15,11 +15,11 @@ public final class NodeUtil {
    }
    
    public static ISEDDebugNode getParent(ISEDDebugNode node) throws DebugException {
-      if(node instanceof ISEDMethodReturn)
+      if(node instanceof ISEDBaseMethodReturn)
       {
          ISEDMethodCall mc = (ISEDMethodCall) node.getCallStack()[0];
          if(mc.isCollapsed()) {
-            return ((ISEDMethodReturn)node).getMethodReturnCondition();
+            return ((ISEDBaseMethodReturn)node).getMethodReturnCondition();
          }
       }
       else if(node instanceof ISEDBranchCondition && ArrayUtil.isEmpty(node.getCallStack())) {
@@ -53,9 +53,9 @@ public final class NodeUtil {
       {
          boolean methodReturnReached = false;
          
-         if(next instanceof ISEDMethodReturn)
+         if(next instanceof ISEDBaseMethodReturn)
          {
-            ISEDMethodReturn nextMR = (ISEDMethodReturn) next; 
+            ISEDBaseMethodReturn nextMR = (ISEDBaseMethodReturn) next; 
             ISEDDebugNode nextMC = nextMR.getCallStack()[0];
             if(nextMC.equals(mc)) {
                orderedBCs.add(nextMR.getMethodReturnCondition());

@@ -392,6 +392,35 @@ public final class ArrayUtil {
          return null;
       }
    }
+   
+   /**
+    * Returns the following element if available from the array.
+    * @param array The array to search in.
+    * @param toSearch The element for that the following one is needed.
+    * @return The following element or {@code null} if no element was found.
+    */
+   public static <T> T getFollowing(T[] array, T toSearch) {
+      return getFollowing(array, toSearch, ObjectUtil.<T>createEqualsComparator());
+   }
+
+   /**
+    * Returns the following element if available from the array. The equality is
+    * computed via the comparator. Objects are equal if the comparison result is {@code 0}.
+    * @param array The array to search in.
+    * @param toSearch The element for that the following one is needed.
+    * @param comparator the {@link Comparator} to use.
+    * @return The following element or {@code null} if no element was found.
+    * @throws IllegalArgumentException If the comparator is {@code null}.
+    */
+   public static <T> T getFollowing(T[] array, T toSearch, Comparator<T> comparator) throws IllegalArgumentException {
+      int index = indexOf(array, toSearch, comparator);
+      if (index < array.length - 1) {
+         return array[index + 1];
+      }
+      else {
+         return null;
+      }
+   }
 
    /**
     * Checks if the given element is the last element in the array.
