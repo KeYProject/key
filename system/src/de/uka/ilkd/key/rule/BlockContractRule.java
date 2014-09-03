@@ -224,7 +224,7 @@ public class BlockContractRule implements BuiltInRule {
                                                final Goal goal) {
         ImmutableSet<BlockContract> result = DefaultImmutableSet.<BlockContract>nil();
         for (BlockContract contract : collectedContracts) {
-            if (!contractApplied(contract, goal)) {
+            if (!contractApplied(contract, goal) || InfFlowCheckInfo.isInfFlow(goal)) {
                 result = result.add(contract);
             }
         }
