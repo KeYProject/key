@@ -53,7 +53,6 @@ public class BlockInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTaclet
                 POSnippetFactory.getInfFlowFactory(contract,
                                                    ifVars.c1, ifVars.c2,
                                                    executionContext,
-                                                   contract.getInternalSelfTerm(services),
                                                    services);
         return f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
     }

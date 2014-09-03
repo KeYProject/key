@@ -47,6 +47,7 @@ public final class SimpleBlockContract implements BlockContract {
     private final List<Label> labels;
     private final IProgramMethod method;
     private final Modality modality;
+    private Term instantiationSelf;
 
     private final Map<LocationVariable, Term> preconditions;
     private final Map<LocationVariable, Term> postconditions;
@@ -528,8 +529,15 @@ public final class SimpleBlockContract implements BlockContract {
     }
 
     @Override
-    public Term getInternalSelfTerm(TermServices services) {
-        if (variables.self != null) {
+    public void setInstantiationSelf(Term selfInstantiation) {
+        this.instantiationSelf = selfInstantiation;
+    }
+
+    @Override
+    public Term getInstantiationSelfTerm(TermServices services) {
+        if (instantiationSelf != null) {
+            return instantiationSelf;
+        } else if (variables.self != null) {
             return services.getTermBuilder().var(variables.self);
         } else {
             return null;

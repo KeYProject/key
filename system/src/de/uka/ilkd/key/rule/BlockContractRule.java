@@ -426,9 +426,7 @@ public class BlockContractRule implements BuiltInRule {
         // create proof obligation
         InfFlowPOSnippetFactory infFlowFactory =
             POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2,
-                                               instantiation.context,
-                                               instantiation.self,
-                                               services);
+                                               instantiation.context, services);
 
         final SequentFormula poFormula = buildBodyPreservesSequent(infFlowFactory, proof);
 
@@ -461,6 +459,7 @@ public class BlockContractRule implements BuiltInRule {
         final Instantiation instantiation =
                 instantiate(application.posInOccurrence().subTerm(), goal, services);
         final BlockContract contract = application.getContract();
+        contract.setInstantiationSelf(instantiation.self);
         assert contract.getBlock().equals(instantiation.block);
         final Term contextUpdate = instantiation.update;
 

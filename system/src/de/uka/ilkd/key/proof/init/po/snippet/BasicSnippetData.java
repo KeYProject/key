@@ -212,7 +212,6 @@ class BasicSnippetData {
 
     BasicSnippetData(BlockContract contract,
                      ExecutionContext context,
-                     Term selfTerm,
                      Services services) {
         this.hasMby = contract.hasMby();
         this.services = services;
@@ -222,7 +221,7 @@ class BasicSnippetData {
         contractContents.put(Key.FOR_CLASS, contract.getKJT());
         contractContents.put(Key.TARGET_BLOCK, contract.getBlock());
         contractContents.put(Key.BLOCK_VARS, contract.getVariables());
-        contractContents.put(Key.BLOCK_SELF, selfTerm);
+        contractContents.put(Key.BLOCK_SELF, contract.getInstantiationSelfTerm(services));
         contractContents.put(Key.PRECONDITION, contract.getPre(services));
         contractContents.put(Key.POSTCONDITION, contract.getPost(services));
         contractContents.put(Key.MODIFIES, contract.getMod(services));

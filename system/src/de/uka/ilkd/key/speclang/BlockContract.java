@@ -115,11 +115,14 @@ public interface BlockContract extends SpecificationElement {
     public boolean hasInfFlowSpecs();
 
 
+    public void setInstantiationSelf(Term selfInstantiation);
+
+
     /**
-     * Returns the term internally used for self.
+     * Returns the term internally used for self or a newly instantiated one.
      * Use with care - it is likely that this is *not* the right "self" for you.
      */
-    public Term getInternalSelfTerm(TermServices services);
+    public Term getInstantiationSelfTerm(TermServices services);
 
 
     /**
