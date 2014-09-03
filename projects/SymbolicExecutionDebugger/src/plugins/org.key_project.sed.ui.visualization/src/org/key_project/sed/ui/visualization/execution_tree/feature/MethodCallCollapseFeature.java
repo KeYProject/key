@@ -7,9 +7,15 @@ import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.impl.UpdateContext;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.platform.IPlatformImageConstants;
+import org.eclipse.graphiti.util.ColorConstant;
+import org.key_project.sed.core.model.ISEDDebugElement;
+import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
+import org.key_project.sed.core.util.ISEDIterator;
+import org.key_project.sed.core.util.SEDMethodPreorderIterator;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
+import org.key_project.util.java.ArrayUtil;
 
 public class MethodCallCollapseFeature extends AbstractDebugNodeCollapseFeature {
    /**
@@ -43,13 +49,20 @@ public class MethodCallCollapseFeature extends AbstractDebugNodeCollapseFeature 
             MethodCallUpdateFeature uf = (MethodCallUpdateFeature) getFeatureProvider().getUpdateFeature(uc);
 
             IProgressMonitor monitor = GraphitiUtil.getProgressMonitor(context);
+            ColorConstant color;
             
             if(!mc.isCollapsed()) {
+               SEDMethodPreorderIterator iter = new SEDMethodPreorderIterator(mc);
+               color = iter.allBranchesFinished() ? new ColorConstant(102, 180, 0) : new ColorConstant(255, 102, 0);
+
                uf.updateCollapse(mc, monitor);
             }
             else {
+               color = new ColorConstant(102, 80, 180);
                uf.updateExpand(mc, monitor);
             }
+            
+            pes[0].getGraphicsAlgorithm().setForeground(manageColor(color));
          }
          catch (DebugException e) {
             LogUtil.getLogger().logError(e);

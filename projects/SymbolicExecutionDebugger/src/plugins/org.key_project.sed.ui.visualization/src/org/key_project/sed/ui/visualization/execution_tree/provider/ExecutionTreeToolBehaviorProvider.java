@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.IPictogramElementContext;
@@ -107,12 +108,19 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
          // collapse
          ISEDDebugNode node = (ISEDDebugNode) getFeatureProvider().getBusinessObjectForPictogramElement(context.getPictogramElement());
          if(node instanceof ISEDMethodCall) {
-            if(((ISEDMethodCall) node).isCollapsed()) {
+            ISEDMethodCall mc = (ISEDMethodCall) node; 
+            if(mc.isCollapsed()) {
                data.getGenericContextButtons().add(createCustomContextButtonEntry(new MethodCallCollapseFeature(getFeatureProvider()), context, "Expand", null, IPlatformImageConstants.IMG_EDIT_EXPAND));
             }
-            else {
-               data.getGenericContextButtons().add(createCustomContextButtonEntry(new MethodCallCollapseFeature(getFeatureProvider()), context, "Collapse", null, IPlatformImageConstants.IMG_EDIT_COLLAPSE));
-            }
+            else
+               try {
+                  if(mc.getMethodReturnConditions().length > 0){
+                     data.getGenericContextButtons().add(createCustomContextButtonEntry(new MethodCallCollapseFeature(getFeatureProvider()), context, "Collapse", null, IPlatformImageConstants.IMG_EDIT_COLLAPSE));
+                  }
+               }
+               catch (DebugException e) {
+                  LogUtil.getLogger().logError(e);
+               }
          }
          
          List<IContextButtonEntry> epEntries = collectContextButtonEntriesFromExtensionPoint(isReadOnly(), context);

@@ -14,11 +14,10 @@
 package org.key_project.sed.core.util;
 
 import org.eclipse.debug.core.DebugException;
-import org.key_project.sed.core.model.ISEDBranchCondition;
+import org.key_project.sed.core.model.ISEDBaseMethodReturn;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
-import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.util.java.ArrayUtil;
 
 /**
@@ -54,6 +53,11 @@ public class SEDMethodPreorderIterator implements ISEDIterator {
     * The Method we iterate over
     */
    private ISEDMethodCall mc;
+   
+   /**
+    * States if all Methodbranches are finished or not
+    */
+   boolean allBranchesFinished = true;
    
    /**
     * Constructor.
@@ -92,9 +96,9 @@ public class SEDMethodPreorderIterator implements ISEDIterator {
       ISEDDebugElement oldNext = next;
       boolean methodEndReached = false;
       
-      if(oldNext instanceof ISEDMethodReturn)
+      if(oldNext instanceof ISEDBaseMethodReturn)
       {
-         ISEDMethodReturn nextMR = (ISEDMethodReturn) oldNext; 
+         ISEDBaseMethodReturn nextMR = (ISEDBaseMethodReturn) oldNext; 
          ISEDDebugNode nextMC = nextMR.getCallStack()[0];
          if(nextMC.equals(mc)) {
             methodEndReached = true;
@@ -123,6 +127,10 @@ public class SEDMethodPreorderIterator implements ISEDIterator {
 //            }
          }
          else {
+            if(!methodEndReached) {
+               allBranchesFinished = false;
+            }
+
             newNext = getNextOnParent(node);
          }
       }
@@ -165,5 +173,17 @@ public class SEDMethodPreorderIterator implements ISEDIterator {
       }
       
       return null;
+   }
+   
+   public boolean allBranchesFinished() throws DebugException {
+      while(hasNext()) {
+         next();
+         // No need to visit the rest of the method
+         if(!allBranchesFinished) {
+            return allBranchesFinished;
+         }
+      }
+      
+      return true;
    }
 }

@@ -55,14 +55,14 @@ public class MethodCallAddFeature extends AbstractDebugNodeAddFeature {
       ContainerShape container = peCreateService.createContainerShape(targetDiagram, true);
 
       Rectangle rect = gaService.createRectangle(container);
-      rect.setForeground(manageColor(new ColorConstant(255, 102, 0)));
+      rect.setForeground(manageColor(new ColorConstant(102, 80, 180)));
       rect.setLineWidth(2);
       rect.setFilled(false);
       link(container, addedNode);
       
       GraphicsAlgorithm ga = super.add(context).getGraphicsAlgorithm();
 
-      gaService.setLocationAndSize(rect, context.getX(), context.getY() + ga.getHeight() / 2, ga.getWidth() + 16, ga.getHeight());
+      gaService.setLocationAndSize(rect, context.getX(), context.getY() + ga.getHeight() / 2, ga.getWidth(), ga.getHeight());
 
       return container;
    }
