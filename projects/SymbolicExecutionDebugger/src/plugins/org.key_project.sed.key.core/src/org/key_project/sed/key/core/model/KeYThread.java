@@ -13,11 +13,13 @@
 
 package org.key_project.sed.key.core.model;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.jdt.core.IMethod;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
@@ -26,6 +28,7 @@ import org.key_project.sed.key.core.breakpoints.KeYBreakpointManager;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.eclipse.ResourceUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.AutoModeListener;
@@ -83,6 +86,11 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * The constraints
     */
    private KeYConstraint[] constraints;
+   
+   /**
+    * The contained KeY variables.
+    */
+   private KeYVariable[] variables;
    
    /**
     * Listens for auto mode start and stop events.
@@ -634,6 +642,58 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
             constraints = KeYModelUtil.createConstraints(this, executionNode);
          }
          return constraints;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYVariable[] getVariables() throws DebugException {
+      synchronized (this) {
+         if (variables == null) {
+            variables = KeYModelUtil.createVariables(this, executionNode);
+         }
+         return variables;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getLineNumber() throws DebugException {
+      return -1;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getCharStart() throws DebugException {
+      return -1;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getCharEnd() throws DebugException {
+      return -1;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getSourcePath() {
+      IMethod method = getDebugTarget().getLaunchSettings().getMethod();
+      if (method != null) {
+         File localFile = ResourceUtil.getLocation(method.getResource());
+         return localFile != null ? localFile.getAbsolutePath() : null;
+      }
+      else {
+         return null;
       }
    }
 }

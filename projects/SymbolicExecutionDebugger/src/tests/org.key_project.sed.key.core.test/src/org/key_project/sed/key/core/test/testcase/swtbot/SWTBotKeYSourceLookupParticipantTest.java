@@ -85,6 +85,7 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
             List<IFile> expectedResources = new LinkedList<IFile>();
             expectedResources.add(mainFile);
             expectedResources.add(mainFile);
+            expectedResources.add(mainFile);
             expectedResources.add(defaultFile);
             expectedResources.add(defaultFile);
             expectedResources.add(defaultFile);
