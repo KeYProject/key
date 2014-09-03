@@ -62,6 +62,30 @@
                </value>
             </variable>
             <branchCondition name="not(equals(b,a))" pathCondition="not(equals(b,a))" pathConditionChanged="true" branchCondition="not(equals(b,a))" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                  <value name="self {true}" typeString="AliasTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="a" arrayIndex="-1" isArrayIndex="false">
+                  <value name="a {true}" typeString="AliasTest.IntWrapper" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                        <value name="value {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="b" arrayIndex="-1" isArrayIndex="false">
+                  <value name="b {true}" typeString="AliasTest.IntWrapper" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                        <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
                <statement name="return a.value+b.value;" pathCondition="not(equals(b,a))" pathConditionChanged="false">
                   <variable name="self" arrayIndex="-1" isArrayIndex="false">
                      <value name="self {true}" typeString="AliasTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
@@ -124,6 +148,30 @@
                </statement>
             </branchCondition>
             <branchCondition name="equals(b,a)" pathCondition="equals(b,a)" pathConditionChanged="true" branchCondition="equals(b,a)" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                  <value name="self {true}" typeString="AliasTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="a" arrayIndex="-1" isArrayIndex="false">
+                  <value name="a {true}" typeString="AliasTest.IntWrapper" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                        <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="b" arrayIndex="-1" isArrayIndex="false">
+                  <value name="b {true}" typeString="AliasTest.IntWrapper" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                        <value name="value {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
                <statement name="return a.value+b.value;" pathCondition="equals(b,a)" pathConditionChanged="false">
                   <variable name="self" arrayIndex="-1" isArrayIndex="false">
                      <value name="self {true}" typeString="AliasTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">

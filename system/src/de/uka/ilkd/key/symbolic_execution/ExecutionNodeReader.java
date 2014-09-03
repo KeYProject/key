@@ -1106,7 +1106,7 @@ public class ExecutionNodeReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessBranchCondition extends AbstractKeYlessExecutionNode implements IExecutionBranchCondition {
+   public static class KeYlessBranchCondition extends AbstractKeYlessStateNode<SourceElement> implements IExecutionBranchCondition {
       /**
        * The formated branch condition.
        */

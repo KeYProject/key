@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
    <sedTarget xml:id="_1fb53e22-623c-46fe-9e3d-dccb3de44e60" name="equals(Number)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_35610221-6779-4503-9ee4-484311de1af1" name="&lt;start&gt;" pathCondition="true">
+      <sedThread xml:id="_35610221-6779-4503-9ee4-484311de1af1" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
          <sedMethodCall xml:id="_2665da05-b3c1-4fe5-b0ca-31ef160252ae" name="self.equals(n);" pathCondition="true" lineNumber="-1" charStart="1343" charEnd="1349" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\runtime-SymbolicExecutionDebugger.product\SED Examples\src\Number.java">
             <sedVariable xml:id="_7c17bd39-2f2a-4755-9305-c6168d47d091" name="exc" referenceTypeName="Null">
                <sedValue xml:id="_00ddbfd7-bb08-449b-a2d8-f5d3a9dc5d96" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
@@ -37,9 +37,9 @@
                   </sedValue>
                </sedVariable>
                <sedCallStackEntry nodeIdRef="_2665da05-b3c1-4fe5-b0ca-31ef160252ae"/>
-               <sedBranchCondition xml:id="_9421520c-4b67-4dbf-a7c0-04f5ae232c6d" name="!n = null" pathCondition="!n = null">
+               <sedBranchCondition xml:id="_9421520c-4b67-4dbf-a7c0-04f5ae232c6d" name="!n = null" pathCondition="!n = null" lineNumber="-1" charStart="-1" charEnd="-1">
                   <sedCallStackEntry nodeIdRef="_2665da05-b3c1-4fe5-b0ca-31ef160252ae"/>
-                  <sedBranchCondition xml:id="_9295f176-0fed-403f-afa0-691e4af894b1" name="self.content = n.content" pathCondition="!n = null &amp; self.content = n.content">
+                  <sedBranchCondition xml:id="_9295f176-0fed-403f-afa0-691e4af894b1" name="self.content = n.content" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1">
                      <sedCallStackEntry nodeIdRef="_2665da05-b3c1-4fe5-b0ca-31ef160252ae"/>
                      <sedStatement xml:id="_d2cce5df-8732-4c7f-8fae-65f75cc149cc" name="return true;" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="1395" charEnd="1407" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\runtime-SymbolicExecutionDebugger.product\SED Examples\src\Number.java">
                         <sedVariable xml:id="_79e37517-48a8-43b3-9b5a-7432a75d8844" name="self" referenceTypeName="Number">
@@ -90,7 +90,7 @@
                         </sedMethodReturn>
                      </sedStatement>
                   </sedBranchCondition>
-                  <sedBranchCondition xml:id="_dbcec85e-1b70-4f31-807a-40134c8b63c0" name="!self.content = n.content" pathCondition="!n = null &amp; !self.content = n.content">
+                  <sedBranchCondition xml:id="_dbcec85e-1b70-4f31-807a-40134c8b63c0" name="!self.content = n.content" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1">
                      <sedCallStackEntry nodeIdRef="_2665da05-b3c1-4fe5-b0ca-31ef160252ae"/>
                      <sedStatement xml:id="_475c1f0e-28d1-4cd3-8fbf-e5124c3091d7" name="return false;" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="1424" charEnd="1437" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\runtime-SymbolicExecutionDebugger.product\SED Examples\src\Number.java">
                         <sedVariable xml:id="_9093e0d2-2b46-4296-8358-39b8d35c416f" name="self" referenceTypeName="Number">
@@ -142,7 +142,7 @@
                      </sedStatement>
                   </sedBranchCondition>
                </sedBranchCondition>
-               <sedBranchCondition xml:id="_b13498fb-eee7-499d-8772-ad74648f8c52" name="n = null" pathCondition="n = null">
+               <sedBranchCondition xml:id="_b13498fb-eee7-499d-8772-ad74648f8c52" name="n = null" pathCondition="n = null" lineNumber="-1" charStart="-1" charEnd="-1">
                   <sedCallStackEntry nodeIdRef="_2665da05-b3c1-4fe5-b0ca-31ef160252ae"/>
                   <sedExceptionalTermination xml:id="_bb80f334-5a0d-4b30-9726-cab9620fcb37" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="n = null" lineNumber="-1" charStart="-1" charEnd="-1" verified="true">
                   </sedExceptionalTermination>

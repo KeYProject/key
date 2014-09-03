@@ -499,6 +499,7 @@ public final class SymbolicExecutionUtil {
     * sequent of the given {@link Node}.
     * @param services The {@link Services} to use.
     * @param node The original {@link Node} which provides the sequent to extract from.
+    * @param pio The {@link PosInOccurrence} of the modality or its updates.
     * @param additionalConditions Additional conditions to add to the antecedent.
     * @param term The new succedent term.
     * @param keepUpdates {@code true} keep updates, {@code false} throw updates away.
@@ -506,6 +507,7 @@ public final class SymbolicExecutionUtil {
     */
    public static SiteProofVariableValueInput createExtractTermSequent(Services services,
                                                                       Node node,
+                                                                      PosInOccurrence pio,
                                                                       Term additionalConditions,
                                                                       Term term,
                                                                       boolean keepUpdates) {
@@ -518,8 +520,8 @@ public final class SymbolicExecutionUtil {
       Term newTerm = services.getTermBuilder().func(newPredicate, term);
       // Create Sequent to prove with new succedent.
       Sequent sequentToProve = keepUpdates ? 
-                               createSequentToProveWithNewSuccedent(node, additionalConditions, newTerm, false) :
-                               createSequentToProveWithNewSuccedent(node, additionalConditions, newTerm, null, false);
+                               createSequentToProveWithNewSuccedent(node, pio, additionalConditions, newTerm, false) :
+                               createSequentToProveWithNewSuccedent(node, pio, additionalConditions, newTerm, null, false);
       // Return created sequent and the used predicate to identify the value interested in.
       return new SiteProofVariableValueInput(sequentToProve, newPredicate);
    }
@@ -672,7 +674,7 @@ public final class SymbolicExecutionUtil {
             variables.add(selfVar);
          }
          // Add method parameters
-         Node callNode = findMethodCallNode(node.getProofNode());
+         Node callNode = findMethodCallNode(node.getProofNode(), node.getModalityPIO());
          if (callNode != null
                  && callNode.getNodeInfo().getActiveStatement() instanceof MethodBodyStatement) {
             MethodBodyStatement mbs =
@@ -1614,12 +1616,13 @@ public final class SymbolicExecutionUtil {
     * which also represents a symbolic execution tree node
     * (checked via {@link #isSymbolicExecutionTreeNode(Node, RuleApp)}).
     * @param node The {@link Node} to start search in.
+    * @param pio The {@link PosInOccurrence} of the modality.
     * @return The parent {@link Node} of the given {@link Node} which is also a set node or {@code null} if no parent node was found.
     */
-   public static Node findMethodCallNode(Node node) {
-      if (node != null && node.getAppliedRuleApp() != null) {
+   public static Node findMethodCallNode(Node node, PosInOccurrence pio) {
+      if (node != null && pio != null) {
          // Get current program method
-         Term term = node.getAppliedRuleApp().posInOccurrence().subTerm();
+         Term term = pio.subTerm();
          term = TermBuilder.goBelowUpdates(term);
          Services services = node.proof().getServices();
          MethodFrame mf = JavaTools.getInnermostMethodFrame(term.javaBlock(), services);
@@ -1630,8 +1633,7 @@ public final class SymbolicExecutionUtil {
             while (parent != null && result == null) {
                SourceElement activeStatement = parent.getNodeInfo().getActiveStatement();
                if (activeStatement instanceof MethodBodyStatement && 
-                   ((MethodBodyStatement)activeStatement).getProgramMethod(services)
-                       == mf.getProgramMethod()) {
+                   ((MethodBodyStatement)activeStatement).getProgramMethod(services) == mf.getProgramMethod()) {
                   result = parent;
                }
                else {

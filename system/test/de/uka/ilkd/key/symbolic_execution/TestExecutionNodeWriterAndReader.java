@@ -142,7 +142,7 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
          tempFile.delete();
          writer.write(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, tempFile, saveVariabes, saveCallStack, saveReturnValues, saveConstraints);
          assertTrue(tempFile.isFile());
-         // Read from tempoary file
+         // Read from temporary file
          currentNode = reader.read(tempFile);
          TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode, saveVariabes, saveCallStack, true, saveReturnValues, saveConstraints);
       }

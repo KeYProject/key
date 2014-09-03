@@ -24,6 +24,22 @@
          </variable>
          <callStackEntry path="/0"/>
          <branchCondition name="x = TRUE ∧ y = TRUE" pathCondition="x = TRUE ∧ y = TRUE" pathConditionChanged="true" branchCondition="x = TRUE ∧ y = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <variable name="x" arrayIndex="-1" isArrayIndex="false">
+               <value name="x {true}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="y" arrayIndex="-1" isArrayIndex="false">
+               <value name="y {true}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="x_1" arrayIndex="-1" isArrayIndex="false">
+               <value name="x_1 {true}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
             <callStackEntry path="/0"/>
             <statement name="return 1;" pathCondition="x = TRUE ∧ y = TRUE" pathConditionChanged="false">
                <variable name="x" arrayIndex="-1" isArrayIndex="false">
@@ -65,6 +81,26 @@
             </statement>
          </branchCondition>
          <branchCondition name="¬x = TRUE ∨ ¬y = TRUE" pathCondition="¬(x = TRUE ∧ y = TRUE)" pathConditionChanged="true" branchCondition="¬x = TRUE ∨ ¬y = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <variable name="x" arrayIndex="-1" isArrayIndex="false">
+               <value name="x {x = TRUE}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="x = TRUE">
+               </value>
+               <value name="x {¬x = TRUE}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="¬x = TRUE">
+               </value>
+            </variable>
+            <variable name="y" arrayIndex="-1" isArrayIndex="false">
+               <value name="y {x = TRUE}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="x = TRUE">
+               </value>
+               <value name="y {¬x = TRUE}" typeString="boolean" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="¬x = TRUE">
+               </value>
+            </variable>
+            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="x_1" arrayIndex="-1" isArrayIndex="false">
+               <value name="x_1 {true}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
             <callStackEntry path="/0"/>
             <statement name="return -1;" pathCondition="¬(x = TRUE ∧ y = TRUE)" pathConditionChanged="false">
                <variable name="x" arrayIndex="-1" isArrayIndex="false">

@@ -20,6 +20,18 @@
          </variable>
          <callStackEntry path="/0"/>
          <branchCondition name="x &gt;  -1" pathCondition="x &gt;  -1" pathConditionChanged="true" branchCondition="x &gt;  -1" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <variable name="x" arrayIndex="-1" isArrayIndex="false">
+               <value name="x {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="x_1" arrayIndex="-1" isArrayIndex="false">
+               <value name="x_1 {true}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
             <callStackEntry path="/0"/>
             <statement name="return magic();" pathCondition="x &gt;  -1" pathConditionChanged="false">
                <variable name="x" arrayIndex="-1" isArrayIndex="false">
@@ -76,6 +88,18 @@ termination: diamond" pathCondition="x &gt;  -1" pathConditionChanged="false" re
             </statement>
          </branchCondition>
          <branchCondition name="x &lt; 0" pathCondition="x &lt; 0" pathConditionChanged="true" branchCondition="x &lt; 0" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <variable name="x" arrayIndex="-1" isArrayIndex="false">
+               <value name="x {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="x_1" arrayIndex="-1" isArrayIndex="false">
+               <value name="x_1 {true}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
             <callStackEntry path="/0"/>
             <loopInvariant name="invariant: x &lt;= javaUnaryMinusInt(1);
 variant: javaSubInt(0, x)
@@ -90,6 +114,26 @@ mod: false" pathCondition="x &lt; 0" pathConditionChanged="false" initiallyValid
                </variable>
                <callStackEntry path="/0"/>
                <branchCondition name="x_0 &lt; -1" pathCondition="x &lt;= -1 &amp; x_0 &lt;= -2" pathConditionChanged="true" branchCondition="x_0 &lt; -1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+                  <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                     <value name="x {true}" typeString="int" valueString="x_0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="heapBeforeLoop" arrayIndex="-1" isArrayIndex="false">
+                     <value name="heapBeforeLoop {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="xBeforeLoop" arrayIndex="-1" isArrayIndex="false">
+                     <value name="xBeforeLoop {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="variant" arrayIndex="-1" isArrayIndex="false">
+                     <value name="variant {true}" typeString="int" valueString="x_0 * -1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
                   <callStackEntry path="/0"/>
                   <statement name="x++;" pathCondition="x &lt;= -1 &amp; x_0 &lt;= -2" pathConditionChanged="false">
                      <variable name="x" arrayIndex="-1" isArrayIndex="false">
@@ -138,6 +182,14 @@ mod: false" pathCondition="x &lt; 0" pathConditionChanged="false" initiallyValid
                   </statement>
                </branchCondition>
                <branchCondition name="x_0 = -1" pathCondition="x &lt;= -1 &amp; x_0 = -1" pathConditionChanged="true" branchCondition="x_0 = -1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+                  <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                     <value name="x {true}" typeString="int" valueString="-1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
                   <callStackEntry path="/0"/>
                   <statement name="return -1;" pathCondition="x &lt;= -1 &amp; x_0 = -1" pathConditionChanged="false">
                      <variable name="x" arrayIndex="-1" isArrayIndex="false">

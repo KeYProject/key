@@ -48,6 +48,26 @@
          </variable>
          <callStackEntry path="/0"/>
          <branchCondition name="gt(y,x)" pathCondition="gt(y,x)" pathConditionChanged="true" branchCondition="gt(y,x)" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <variable name="_x" arrayIndex="-1" isArrayIndex="false">
+               <value name="_x {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="_y" arrayIndex="-1" isArrayIndex="false">
+               <value name="_y {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="heapAtPre" arrayIndex="-1" isArrayIndex="false">
+               <value name="heapAtPre {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="x_1" arrayIndex="-1" isArrayIndex="false">
+               <value name="x_1 {true}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
             <callStackEntry path="/0"/>
             <statement name="return _x;" pathCondition="gt(y,x)" pathConditionChanged="false">
                <variable name="_x" arrayIndex="-1" isArrayIndex="false">
@@ -109,6 +129,26 @@
             </statement>
          </branchCondition>
          <branchCondition name="leq(y,x)" pathCondition="leq(y,x)" pathConditionChanged="true" branchCondition="leq(y,x)" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <variable name="_x" arrayIndex="-1" isArrayIndex="false">
+               <value name="_x {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="_y" arrayIndex="-1" isArrayIndex="false">
+               <value name="_y {true}" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="heapAtPre" arrayIndex="-1" isArrayIndex="false">
+               <value name="heapAtPre {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="x_1" arrayIndex="-1" isArrayIndex="false">
+               <value name="x_1 {true}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
             <callStackEntry path="/0"/>
             <statement name="return _y;" pathCondition="leq(y,x)" pathConditionChanged="false">
                <variable name="_x" arrayIndex="-1" isArrayIndex="false">

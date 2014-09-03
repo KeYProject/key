@@ -396,6 +396,9 @@ public class SEDXMLReader {
                   if (parent instanceof ISEDMemoryStackFrameCompatibleDebugNode) {
                      ((ISEDMemoryStackFrameCompatibleDebugNode)parent).addVariable(variable);
                   }
+                  else if (parent == null && thread != null) {
+                     thread.addVariable(variable);
+                  }
                   else {
                      throw new SAXException("Can't add variable to parent.");
                   }
