@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.io.IOException;
+
 import java.util.HashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -28,6 +29,7 @@ import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.SymbolicExecutionExceptionBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.ui.CustomUserInterface;
+
 /**
  * Tests whether caught and uncaught ExceptionBreakpoints are handled correctly
  * 

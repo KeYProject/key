@@ -17,6 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,6 +28,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -34,12 +36,16 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaProject;
 import org.key_project.key4eclipse.resources.builder.KeYProjectBuilder;
+import org.key_project.key4eclipse.resources.log.LogManager;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
 import org.key_project.key4eclipse.resources.nature.KeYProjectNature;
-import org.key_project.key4eclipse.resources.projectinfo.ProjectInfoManager;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
+import org.key_project.key4eclipse.resources.test.Activator;
+import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.ArrayUtil;
@@ -250,11 +256,48 @@ public class KeY4EclipseResourcesTestUtil {
       return root.getFolder(path);
    }
 
-   public static void assertNoProofFiles(IFolder proofFolder) throws CoreException {
-      if (proofFolder.exists()) {
-         IFile infoFile = proofFolder.getFile(ProjectInfoManager.PROJECT_INFO_FILE);
-         assertTrue(infoFile.exists());
-         assertEquals(1, proofFolder.members().length);
+   public static void assertCleanProofFolder(IFolder proofFolder) throws CoreException {
+      try {
+         if (proofFolder.exists()) {
+            ProofFileCountVisitor visitor = new ProofFileCountVisitor();
+            proofFolder.accept(visitor, IResource.DEPTH_INFINITE, true);
+            assertEquals(0, visitor.getProofFileCount());
+            assertEquals(0, visitor.getMetaFileCount());
+            IFile logFile = proofFolder.getFile(LogManager.LOG_FILE_NAME);
+            if (logFile.exists()) {
+               assertTrue(LogManager.getInstance().countRecords(logFile.getProject()) >= 1);
+            }
+         }
+      }
+      catch (IOException e) {
+         throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
+      }
+   }
+   
+   private static class ProofFileCountVisitor implements IResourceVisitor {
+      private int proofFileCount = 0;
+      
+      private int metaFileCount = 0;
+
+      @Override
+      public boolean visit(IResource resource) throws CoreException {
+         if (resource instanceof IFile) {
+            if (KeYResourcesUtil.PROOF_FILE_EXTENSION.equals(resource.getFileExtension())) {
+               proofFileCount ++;
+            }
+            else if (KeYResourcesUtil.META_FILE_EXTENSION.equals(resource.getFileExtension())) {
+               metaFileCount ++;
+            }
+         }
+         return true;
+      }
+
+      public int getProofFileCount() {
+         return proofFileCount;
+      }
+
+      public int getMetaFileCount() {
+         return metaFileCount;
       }
    }
 }

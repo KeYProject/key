@@ -40,7 +40,7 @@ public class TestParser extends TestCase {
 	final File include = new File("include.key");
 	final Includes expected = new Includes();
 	expected.put(include.toString(),
-		RuleSource.initRuleFile(include.toURL()));
+		RuleSourceFactory.initRuleFile(include.toURL()));
 
 	final String keyFile = "\\include \"" + include.getPath() + "\";";
 	final KeYLexerF lexer = new KeYLexerF(keyFile,

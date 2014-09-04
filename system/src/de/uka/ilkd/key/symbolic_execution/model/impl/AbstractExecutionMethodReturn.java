@@ -20,7 +20,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * The default implementation of {@link IExecutionBaseMethodReturn}.
  * @author Martin Hentschel
  */
-public abstract class AbstractExecutionMethodReturn<S extends SourceElement> extends AbstractExecutionStateNode<S> implements IExecutionBaseMethodReturn<S> {
+public abstract class AbstractExecutionMethodReturn<S extends SourceElement> extends AbstractExecutionNode<S> implements IExecutionBaseMethodReturn<S> {
    /**
     * The {@link IExecutionMethodCall} which is now returned.
     */
@@ -118,7 +118,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement> ext
          final Services services = getServices();
          // Collect branch conditions
          List<Term> bcs = new LinkedList<Term>();
-         AbstractExecutionNode parent = getParent();
+         AbstractExecutionNode<?> parent = getParent();
          while (parent != null && parent != methodCall) {
             if (parent instanceof IExecutionBranchCondition) {
                bcs.add(((IExecutionBranchCondition)parent).getBranchCondition());

@@ -477,8 +477,8 @@ public final class ProjectInfoManager {
             }
             else {
                file.create(in, true, null);
+               file.setCharset(charset.displayName(), null);
             }
-            file.setCharset(charset.displayName(), null);
          }
          finally {
             try {

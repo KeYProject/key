@@ -40,8 +40,7 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.RuleCollection;
-import de.uka.ilkd.key.proof.io.KeYFileForTests;
-import de.uka.ilkd.key.proof.io.RuleSource;
+import de.uka.ilkd.key.proof.io.*;
 import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 
 public class TacletForTests {
@@ -57,21 +56,21 @@ public class TacletForTests {
     public static AbbrevMap scm = new AbbrevMap();
 
     public static NamespaceSet nss = new NamespaceSet();
-    public static TacletIndex rules = null;
+    public static TacletIndex rules= null;
     public static Services services;
     public static InitConfig initConfig;
-    public static File lastFile = null;
+    public static File lastFile=null;
 
     public static Namespace variables = null;
 
     public static Profile profile = new JavaProfile() {
-        @Override
-        public RuleCollection getStandardRules() {
-            return new RuleCollection(
-                    RuleSource.initRuleFile(ldtFile),
-                    ImmutableSLList.<BuiltInRule>nil());
-        }
-    };
+            //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
+            public RuleCollection getStandardRules() {
+                return new RuleCollection(
+                                RuleSourceFactory.fromBuildInRule(ldtFile), 
+                                ImmutableSLList.<BuiltInRule>nil());
+            }
+        };
         
     public static void clear() {
         lastFile = null;
@@ -112,6 +111,7 @@ public class TacletForTests {
    return services;
     }
 
+    
     public static JavaInfo javaInfo() {
 	return services ().getJavaInfo ();
     }
@@ -121,7 +121,7 @@ public class TacletForTests {
     }
 
     public static void setStandardFile(String filename) {
-        standardFile = filename;
+	standardFile=filename;
     }
 
     public static ProofAggregate problems() {

@@ -81,7 +81,7 @@ public class KeYFileForTests extends KeYFile {
 //	//add test LDTs
 //        if(result.getLDTIncludes().isEmpty()) {
 //            result.put("ldtsForTests", 
-//        	       RuleSource.initRuleFile("ldt.key"));
+//        	       RuleSourceFactory.initRuleFile("ldt.key"));
 //        }
 //        
 //        return result;

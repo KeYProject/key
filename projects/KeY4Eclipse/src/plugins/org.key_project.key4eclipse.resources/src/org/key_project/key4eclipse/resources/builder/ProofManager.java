@@ -48,6 +48,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileReader;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileTypeElement;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileWriter;
+import org.key_project.key4eclipse.resources.log.LogManager;
 import org.key_project.key4eclipse.resources.marker.MarkerManager;
 import org.key_project.key4eclipse.resources.projectinfo.AbstractContractContainer;
 import org.key_project.key4eclipse.resources.projectinfo.AbstractTypeContainer;
@@ -612,8 +613,7 @@ public class ProofManager {
          ByteArrayOutputStream out = pairToSave.first;
          ProofElement pe = pairToSave.second;
          saveProof(out, pe);
-         ProofMetaFileWriter pmfw = new ProofMetaFileWriter(pe);
-         pmfw.writeMetaFile();
+         ProofMetaFileWriter.writeMetaFile(pe);
       }
    }
    
@@ -816,7 +816,8 @@ public class ProofManager {
          for(IResource res : members){
             if(res.getType() == IResource.FILE){
                if(!proofFiles.contains(res) && 
-                  !ProjectInfoManager.getInstance().isProjectInfoFile((IFile)res)){
+                  !ProjectInfoManager.getInstance().isProjectInfoFile((IFile)res) &&
+                  !LogManager.getInstance().isLogFile((IFile)res)) {
                   res.delete(true, null);
                }
             }
@@ -899,7 +900,7 @@ public class ProofManager {
          return file;
       }
       else return null;
-   }   
+   }
    
    /**
     * Collects all {@link IType}s of the project.
@@ -1132,7 +1133,7 @@ public class ProofManager {
       if(proofFile.exists()){
          String metaFilesProofMD5 = pmfr.getProofFileMD5();
          String proofFileHasCode = ResourceUtil.computeContentMD5(proofFile);
-         if(metaFilesProofMD5.equals(proofFileHasCode)){
+         if(ObjectUtil.equals(metaFilesProofMD5, proofFileHasCode)){
             return false;
          }
          else{

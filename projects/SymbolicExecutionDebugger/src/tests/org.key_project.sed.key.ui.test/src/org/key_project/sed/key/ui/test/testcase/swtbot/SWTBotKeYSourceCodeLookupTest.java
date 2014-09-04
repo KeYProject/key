@@ -66,6 +66,8 @@ public class SWTBotKeYSourceCodeLookupTest extends AbstractSetupTestCase {
       // Close welcome view
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       TestUtilsUtil.closeWelcomeView(bot);
+      // Make sure that all editors are closed
+      bot.closeAllEditors();
    }
    
    /**
@@ -109,7 +111,8 @@ public class SWTBotKeYSourceCodeLookupTest extends AbstractSetupTestCase {
          // Test the execution tree
          TestSEDKeyCoreUtil.assertFlatStepsExample(target);
          // Make sure that no editor is opened
-         assertEquals(0, bot.editors().size());
+         assertEquals(1, bot.editors().size());
+         assertEquals("FlatSteps.java", bot.activeEditor().getTitle());
          // Test statements
          assertSelectedStatement(bot, debugTree, new int[] {0, 0, 0, 1}, method, target, true);
          assertSelectedStatement(bot, debugTree, new int[] {0, 0, 0, 2}, method, target, false);

@@ -30,6 +30,9 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.key_project.key4eclipse.resources.log.LogManager;
+import org.key_project.key4eclipse.resources.log.LogRecord;
+import org.key_project.key4eclipse.resources.log.LogRecordKind;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
@@ -53,6 +56,12 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
    @Override
    protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor) throws CoreException {
       IProject project = getProject();
+
+      final long start = System.currentTimeMillis();
+      final boolean onlyRequiredProofs = KeYProjectProperties.isEnableBuildRequiredProofsOnly(project);
+      final int numberOfThreads = KeYProjectProperties.getNumberOfThreads(project);
+      final boolean enableThreading = KeYProjectProperties.isEnableMultiThreading(project);
+      
       IResourceDelta delta = getDelta(project);
       ProofManager proofManager = null;
       try{
@@ -80,6 +89,7 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
          if (proofManager != null) {
             proofManager.dispose();
          }
+         LogManager.getInstance().log(project, new LogRecord(LogRecordKind.BUILD, start, System.currentTimeMillis() - start, onlyRequiredProofs, enableThreading, numberOfThreads));
       }
       return null;
    }
@@ -91,11 +101,19 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
    @Override
    protected void clean(IProgressMonitor monitor) throws CoreException {
       IProject project = getProject();
+      
+      final long start = System.currentTimeMillis();
+      final boolean onlyRequiredProofs = KeYProjectProperties.isEnableBuildRequiredProofsOnly(project);
+      final int numberOfThreads = KeYProjectProperties.getNumberOfThreads(project);
+      final boolean enableThreading = KeYProjectProperties.isEnableMultiThreading(project);      
+      
       IFolder mainProofFolder = ResourcesPlugin.getWorkspace().getRoot().getFolder(project.getFullPath().append(KeYResourcesUtil.PROOF_FOLDER_NAME));
       if(mainProofFolder != null){
          mainProofFolder.delete(true, null);
       }
       super.clean(monitor);
+
+      LogManager.getInstance().log(project, new LogRecord(LogRecordKind.CLEAN, start, System.currentTimeMillis() - start, onlyRequiredProofs, enableThreading, numberOfThreads));
    }
    
    
