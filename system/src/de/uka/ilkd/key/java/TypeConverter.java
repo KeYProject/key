@@ -42,8 +42,10 @@ public final class TypeConverter {
     private final TermBuilder tb;
 
     private final Services services;
-    
+
+    // Maps LDT names to LDT instances.
     private Map<Name,LDT> LDTs = null;
+    
     private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
     
     private HeapLDT heapLDT = null;
@@ -58,11 +60,13 @@ public final class TypeConverter {
         init(LDT.getNewLDTInstances(services));
     }
     
-    private void init(Map<Name, LDT> map){
+    private void init(Map<Name, LDT> map) {
         LDTs = map;
         models = ImmutableSLList.<LDT>nil();
-        for (LDT ldt : LDTs.values()) {
-            models = models.prepend(ldt);
+        if (LDTs != null) {
+            for (LDT ldt : LDTs.values()) {
+                models = models.prepend(ldt);
+            }
         }
         heapLDT = getHeapLDT();
         integerLDT = getIntegerLDT();
@@ -81,9 +85,12 @@ public final class TypeConverter {
         Debug.out("No LDT found for ", s);
         return null;
     }
-
+    
     public IntegerLDT getIntegerLDT() {
-        return (IntegerLDT)LDTs.get(IntegerLDT.NAME);
+        if (LDTs == null) {
+            return null;
+        }
+        return (IntegerLDT) LDTs.get(IntegerLDT.NAME);
     }
 
     public BooleanLDT getBooleanLDT() {
@@ -95,7 +102,10 @@ public final class TypeConverter {
     }
 
     public HeapLDT getHeapLDT() {
-	return (HeapLDT)LDTs.get(HeapLDT.NAME);
+        if (LDTs == null) {
+            return null;
+        }
+        return (HeapLDT) LDTs.get(HeapLDT.NAME);
     }
 
     public SeqLDT getSeqLDT() {
