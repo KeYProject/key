@@ -13,6 +13,7 @@
 
 package org.key_project.sed.core.model.memory;
 
+import org.key_project.sed.core.model.ISEDConstraint;
 import org.key_project.sed.core.model.ISEDDebugNode;
 
 /**
@@ -70,4 +71,10 @@ public interface ISEDMemoryDebugNode extends ISEDDebugNode {
     * @param callStack The call stack to use.
     */
    public void setCallStack(ISEDDebugNode[] callStack);
+   
+   /**
+    * Adds a new {@link ISEDConstraint}.
+    * @param constraint The {@link ISEDConstraint} to add.
+    */
+   public void addConstraint(ISEDConstraint constraint);
 }

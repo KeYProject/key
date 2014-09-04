@@ -26,6 +26,7 @@ import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;
 import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.io.RuleSource;
+import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -66,8 +67,8 @@ public abstract class AbstractProfile implements Profile {
 
     protected AbstractProfile(String standardRuleFilename,
             ImmutableSet<GoalChooserBuilder> supportedGCB) {
-        standardRules = new RuleCollection(RuleSource
-                .initRuleFile(standardRuleFilename),
+        standardRules = new RuleCollection(RuleSourceFactory
+                .fromBuildInRule(standardRuleFilename),
                 initBuiltInRules());
         strategies = getStrategyFactories();
         this.supportedGCB = supportedGCB;

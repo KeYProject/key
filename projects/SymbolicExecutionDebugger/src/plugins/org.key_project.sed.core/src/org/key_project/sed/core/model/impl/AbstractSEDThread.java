@@ -33,7 +33,7 @@ import org.key_project.util.java.ArrayUtil;
  * @author Martin Hentschel
  * @see ISEDThread
  */
-public abstract class AbstractSEDThread extends AbstractSEDDebugNode implements ISEDThread {
+public abstract class AbstractSEDThread extends AbstractSEDStackFrameCompatibleDebugNode implements ISEDThread {
    /**
     * Is this {@link ISEDThread} executable meaning that
     * suspend, resume, step operations and disconnect are supported?;

@@ -22,6 +22,7 @@ import org.key_project.key4eclipse.resources.test.testcase.junit.KeYResourcesUti
 import org.key_project.key4eclipse.resources.test.testcase.junit.MarkerTests;
 import org.key_project.key4eclipse.resources.test.testcase.junit.ProjectInfoManagementTest;
 import org.key_project.key4eclipse.resources.test.testcase.junit.ProofMetaFileContentExceptionTests;
+import org.key_project.key4eclipse.resources.test.testcase.junit.ProofMetaFileWriterAndReaderTest;
 
 /**
  * Run all contained JUnit 4 test cases.
@@ -35,7 +36,8 @@ import org.key_project.key4eclipse.resources.test.testcase.junit.ProofMetaFileCo
    KeYResourcesUtilTest.class,
    MarkerTests.class,
    ProjectInfoManagementTest.class,
-   ProofMetaFileContentExceptionTests.class
+   ProofMetaFileContentExceptionTests.class,
+   ProofMetaFileWriterAndReaderTest.class
 })
 public class AllResourcesTests {
 }

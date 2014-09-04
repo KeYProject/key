@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.compute(k)&gt;" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (this.h*2&gt;k)" pathCondition="true" pathConditionChanged="false">
+         <branchCondition name="gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k)" pathCondition="gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k)" pathConditionChanged="true" branchCondition="gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k)" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="this.l=r.nl.m+r.x;" pathCondition="gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k)" pathConditionChanged="false">
+               <branchCondition name="not(equals(Refer::select(heap,null,StaticMember::$r),null))" pathCondition="and(gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),not(equals(Refer::select(heap,null,StaticMember::$r),null)))" pathConditionChanged="true" branchCondition="not(equals(Refer::select(heap,null,StaticMember::$r),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <statement name="s=this.h;" pathCondition="and(gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),not(equals(Refer::select(heap,null,StaticMember::$r),null)))" pathConditionChanged="false">
+                     <statement name="r.nl.m=1;" pathCondition="and(gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),not(equals(Refer::select(heap,null,StaticMember::$r),null)))" pathConditionChanged="false">
+                        <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of self.compute(k)&gt;" pathCondition="and(gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),not(equals(Refer::select(heap,null,StaticMember::$r),null)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),not(equals(Refer::select(heap,null,StaticMember::$r),null)))">
+                           <termination name="&lt;end&gt;" pathCondition="and(gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),not(equals(Refer::select(heap,null,StaticMember::$r),null)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                           </termination>
+                        </methodReturn>
+                     </statement>
+                  </statement>
+               </branchCondition>
+               <branchCondition name="equals(Refer::select(heap,null,StaticMember::$r),null)" pathCondition="and(gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),equals(Refer::select(heap,null,StaticMember::$r),null))" pathConditionChanged="true" branchCondition="equals(Refer::select(heap,null,StaticMember::$r),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),equals(Refer::select(heap,null,StaticMember::$r),null))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                  </termination>
+               </branchCondition>
+            </statement>
+         </branchCondition>
+         <branchCondition name="leq(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k)" pathCondition="leq(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k)" pathConditionChanged="true" branchCondition="leq(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k)" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="this.l=s;" pathCondition="leq(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k)" pathConditionChanged="false">
+               <statement name="s=this.h+1;" pathCondition="leq(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k)" pathConditionChanged="false">
+                  <statement name="r.nl.m=1;" pathCondition="leq(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k)" pathConditionChanged="false">
+                     <branchCondition name="not(equals(Refer::select(heap,null,StaticMember::$r),null))" pathCondition="and(leq(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),not(equals(Refer::select(heap,null,StaticMember::$r),null)))" pathConditionChanged="true" branchCondition="not(equals(Refer::select(heap,null,StaticMember::$r),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of self.compute(k)&gt;" pathCondition="and(leq(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),not(equals(Refer::select(heap,null,StaticMember::$r),null)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(leq(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),not(equals(Refer::select(heap,null,StaticMember::$r),null)))">
+                           <termination name="&lt;end&gt;" pathCondition="and(leq(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),not(equals(Refer::select(heap,null,StaticMember::$r),null)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                           </termination>
+                        </methodReturn>
+                     </branchCondition>
+                     <branchCondition name="equals(Refer::select(heap,null,StaticMember::$r),null)" pathCondition="and(leq(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),equals(Refer::select(heap,null,StaticMember::$r),null))" pathConditionChanged="true" branchCondition="equals(Refer::select(heap,null,StaticMember::$r),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(leq(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),equals(Refer::select(heap,null,StaticMember::$r),null))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                        </termination>
+                     </branchCondition>
+                  </statement>
+               </statement>
+            </statement>
+         </branchCondition>
+      </branchStatement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/1/0/0/0/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/1/0"/>
+   <terminationEntry path="/0/0/1/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/0/0/1/0"/>
+</start>

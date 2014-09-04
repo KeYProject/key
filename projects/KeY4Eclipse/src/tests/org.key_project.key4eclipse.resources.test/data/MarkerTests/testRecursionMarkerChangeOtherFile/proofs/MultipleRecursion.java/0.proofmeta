@@ -1,1 +1,18 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><proofMetaFile><proofFileMD5 md5="c694d8270d06917518659081a2a6303d"/><proofStatus proofClosed="true"/><usedTypes><type name="MultipleRecursion"/></usedTypes><usedContracts><usedContract proofFile="/KeY Project/proofs/MultipleRecursion.java/MultipleRecursion[MultipleRecursion__b()]_JML_normal_behavior_operation_contract_0.proof"/></usedContracts></proofMetaFile>
+<?xml version="1.0" encoding="windows-1252"?>
+<proofMetaFile proofFileMD5="bb27c614c41283d71075bec57dab79e9" proofClosed="true">
+   <markerMessage>
+Closed Proof:
+MultipleRecursion[MultipleRecursion::a()].JML normal_behavior operation contract.0
+
+Time: 6.9 s
+Nodes: 22
+Branches: 3
+   </markerMessage>
+   <usedTypes>
+      <type name="MultipleRecursion">
+      </type>
+   </usedTypes>
+   <usedContracts>
+      <usedContract proofFile="/Test/proofs/MultipleRecursion.java/MultipleRecursion[MultipleRecursion__b()]_JML_normal_behavior_operation_contract_0.proof"/>
+   </usedContracts>
+</proofMetaFile>
