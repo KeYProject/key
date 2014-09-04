@@ -20,6 +20,7 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.io.RuleSource;
+import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import org.antlr.runtime.RecognitionException;
 
 public class TestParser extends TestCase {
