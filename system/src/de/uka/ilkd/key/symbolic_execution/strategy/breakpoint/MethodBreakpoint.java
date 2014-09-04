@@ -131,7 +131,8 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     * @return true if the node represents a method return
     */
    private boolean isMethodReturnNode(Node node, RuleApp ruleApp){
-      if (SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp) && isCorrectMethodReturn(node, ruleApp)) {
+      if ((SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp) || SymbolicExecutionUtil.isExceptionalMethodReturnNode(node, ruleApp)) && 
+          isCorrectMethodReturn(node, ruleApp)) {
          return true;
       } 
       else if(ruleApp instanceof ContractRuleApp) {

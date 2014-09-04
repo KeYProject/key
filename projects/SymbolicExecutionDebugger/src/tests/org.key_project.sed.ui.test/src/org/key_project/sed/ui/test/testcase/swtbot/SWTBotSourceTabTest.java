@@ -44,7 +44,7 @@ public class SWTBotSourceTabTest extends AbstractSWTBotPropertyTabTest {
       return new AbstractTestSteps() {
          @Override
          public void assertThread(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs, ISEDThread thread) throws Exception {
-            assertFalse(tabs.selectTabItem("Source"));
+            assertTrue(tabs.selectTabItem("Source"));
          }
          
          @Override

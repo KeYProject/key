@@ -2,6 +2,7 @@
 <model>
    <equivalenceClass representativeTerm="null">
       <term term="x"/>
+      <term term="OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y)"/>
       <term term="null"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in return this.first.value+this.second.value+tempX.value+tempY.value;">
@@ -9,8 +10,6 @@
       <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>
    </state>
    <object xml:id="o1" name="self" type="OneAssignmentTest">
-      <association name="y" programVariable="y" isArrayIndex="false" arrayIndex="-1" target="o2"/>
-   </object>
-   <object xml:id="o2" name="OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y)" type="OneAssignmentTestValueWrapper">
+      <value name="y" programVariable="y" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
    </object>
 </model>

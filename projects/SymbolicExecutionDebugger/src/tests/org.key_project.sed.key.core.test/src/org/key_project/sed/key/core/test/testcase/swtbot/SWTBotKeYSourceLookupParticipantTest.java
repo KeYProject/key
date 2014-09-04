@@ -85,6 +85,7 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
             List<IFile> expectedResources = new LinkedList<IFile>();
             expectedResources.add(mainFile);
             expectedResources.add(mainFile);
+            expectedResources.add(mainFile);
             expectedResources.add(defaultFile);
             expectedResources.add(defaultFile);
             expectedResources.add(defaultFile);
@@ -106,6 +107,7 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
             //expectedResources.add(cFile); // API files are not included in symbolic execution tree.
             expectedResources.add(mainFile);
             //expectedResources.add(dFile); // API files are not included in symbolic execution tree.
+            expectedResources.add(mainFile);
             expectedResources.add(mainFile);
             expectedResources.add(mainFile);
             // Configure method contract usage

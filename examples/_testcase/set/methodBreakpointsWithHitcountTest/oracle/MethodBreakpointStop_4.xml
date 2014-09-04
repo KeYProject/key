@@ -13,8 +13,6 @@
                                  <statement name="this.x=a_2+4;" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false">
                                     <statement name="return a_2*this.x;" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false">
                                        <methodReturn name="&lt;return of main&gt;" signature="&lt;return of b_1.main(a_2)&gt;" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
-                                          <statement name="this.x++;" pathCondition="not(equals(BreakpointStopCallee::select(heap,self,BreakpointStopCallerAndLoop::$callee),null))" pathConditionChanged="false">
-                                          </statement>
                                        </methodReturn>
                                     </statement>
                                  </statement>

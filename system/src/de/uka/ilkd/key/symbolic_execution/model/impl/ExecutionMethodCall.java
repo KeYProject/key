@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
@@ -32,7 +33,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * The default implementation of {@link IExecutionMethodCall}.
  * @author Martin Hentschel
  */
-public class ExecutionMethodCall extends AbstractExecutionStateNode<MethodBodyStatement> implements IExecutionMethodCall {
+public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStatement> implements IExecutionMethodCall {
    /**
     * The up to know discovered {@link IExecutionBaseMethodReturn}s.
     */
@@ -161,5 +162,13 @@ public class ExecutionMethodCall extends AbstractExecutionStateNode<MethodBodySt
          assert methodReturn.getMethodCall() == this;
          methodReturns = methodReturns.append(methodReturn);
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected IExecutionConstraint[] lazyComputeConstraints() {
+      return SymbolicExecutionUtil.createExecutionConstraints(this);
    }
 }

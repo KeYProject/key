@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -31,6 +32,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
@@ -80,6 +82,11 @@ public class ExecutionValue extends AbstractExecutionElement implements IExecuti
     * The child {@link IExecutionVariable}s.
     */
    private ExecutionVariable[] childVariables;
+   
+   /**
+    * The {@link IExecutionConstraint}s.
+    */
+   private IExecutionConstraint[] constraints;
 
    /**
     * Constructor.
@@ -271,5 +278,93 @@ public class ExecutionValue extends AbstractExecutionElement implements IExecuti
    @Override
    public String getConditionString() throws ProofInputException {
       return conditionString;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IExecutionConstraint[] getConstraints() throws ProofInputException {
+      synchronized (this) {
+         if (constraints == null) {
+            constraints = lazyComputeConstraints();
+         }
+         return constraints;
+      }
+   }
+   
+   /**
+    * Computes the related constraints lazily when {@link #getConstraints()} is called the first time.
+    * @return The related {@link IExecutionConstraint}s.
+    * @throws ProofInputException Occurred Exception
+    */
+   protected IExecutionConstraint[] lazyComputeConstraints() throws ProofInputException {
+      if (!isDisposed() && !isValueUnknown()) {
+         List<IExecutionConstraint> constraints = new LinkedList<IExecutionConstraint>();
+         IExecutionConstraint[] allConstraints = getVariable().getParentNode().getConstraints();
+         Set<Term> relevantTerms = collectRelevantTerms(getServices(), getValue());
+         for (IExecutionConstraint constraint : allConstraints) {
+            if (containsTerm(constraint.getTerm(), relevantTerms)) {
+               constraints.add(constraint);
+            }
+         }
+         return constraints.toArray(new IExecutionConstraint[constraints.size()]);
+      }
+      else {
+         return new IExecutionConstraint[0];
+      }
+   }
+   
+   /**
+    * Collects all {@link Term}s contained in relevant constraints.
+    * @param services The {@link Services} to use.
+    * @param term The initial {@link Term}.
+    * @return The relevant {@link Term}s.
+    */
+   protected Set<Term> collectRelevantTerms(Services services, Term term) {
+      final Set<Term> terms = new HashSet<Term>();
+      fillRelevantTerms(services, term, terms);
+      return terms;
+   }
+   
+   /**
+    * Utility method used by {@link #collectRelevantTerms(Services, Term)}.
+    * @param services The {@link Services} to use.
+    * @param term The initial {@link Term}.
+    * @param toFill The {@link Set} of relevant {@link Term}s to fill.
+    */
+   protected void fillRelevantTerms(Services services, Term term, Set<Term> toFill) {
+      if (term != null) {
+         if (term.op() instanceof ProgramVariable ||
+             SymbolicExecutionUtil.isSelect(services, term)) {
+            toFill.add(term);
+         }
+         else {
+            for (int i = 0; i < term.arity(); i++) {
+               fillRelevantTerms(services, term.sub(i), toFill);
+            }
+         }
+      }
+   }
+
+   /**
+    * Checks if the given {@link Term} contains at least one of the given once.
+    * @param term The {@link Term} to search in.
+    * @param toSearch The {@link Term}s to search.
+    * @return {@code true} at least one {@link Term} is contained, {@code false} none of the {@link Term}s is contained.
+    */
+   protected boolean containsTerm(Term term, Set<Term> toSearch) {
+      if (toSearch.contains(term)) {
+         return true;
+      }
+      else {
+         boolean contained = false;
+         int i = 0;
+         while (!contained && i < term.arity()) {
+            contained = containsTerm(term.sub(i), toSearch);
+            i++;
+         }
+         return contained;
+      }
    }
 }

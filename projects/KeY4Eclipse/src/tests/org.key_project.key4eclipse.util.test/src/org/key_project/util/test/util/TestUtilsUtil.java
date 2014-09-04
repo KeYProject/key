@@ -1847,4 +1847,28 @@ public class TestUtilsUtil {
          }
       });
    }
+
+   /**
+    * Waits until the {@link SWTBotTable} contains at least some rows.
+    * @param bot The {@link SWTBot} to use.
+    * @param table The {@link SWTBotTable} to test.
+    * @param minRowCount The epected minimal number of rows to wait for.
+    */
+   public static void waitUntilTableHasAtLeastRows(SWTBot bot, final SWTBotTable table, final int minRowCount) {
+      bot.waitUntil(new ICondition() {
+         @Override
+         public boolean test() throws Exception {
+            return table.rowCount() >= minRowCount;
+         }
+         
+         @Override
+         public void init(SWTBot bot) {
+         }
+         
+         @Override
+         public String getFailureMessage() {
+            return "Timed out waiting for " + table + " to contain at least " + minRowCount + " rows.";
+         }
+      });
+   }
 }

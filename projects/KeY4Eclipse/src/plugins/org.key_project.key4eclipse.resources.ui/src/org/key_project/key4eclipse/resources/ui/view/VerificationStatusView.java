@@ -12,9 +12,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.eclipse.core.commands.Command;
-import org.eclipse.core.commands.IStateListener;
-import org.eclipse.core.commands.State;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -22,7 +19,6 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -44,9 +40,6 @@ import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationEvent;
@@ -68,21 +61,13 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.commands.ICommandService;
-import org.eclipse.ui.handlers.RegistryToggleState;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
-import org.eclipse.ui.part.EditorPart;
 import org.key_project.key4eclipse.common.ui.util.KeYImages;
 import org.key_project.key4eclipse.common.ui.util.StarterUtil;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileAssumption;
@@ -108,7 +93,6 @@ import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.CustomProgressBar;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.util.eclipse.swt.view.AbstractWorkbenchPartBasedView;
 import org.key_project.util.eclipse.swt.viewer.ObservableTreeViewer;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
@@ -126,11 +110,11 @@ import de.uka.ilkd.key.util.LinkedHashMap;
  * @author Martin Hentschel
  */
 @SuppressWarnings("restriction")
-public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
+public class VerificationStatusView extends AbstractLinkableViewPart {
    /**
     * The unique ID of this view.
     */
-   public static final String ID = "org.key_project.key4eclipse.resources.ui.view.VerificationStatusView";
+   public static final String VIEW_ID = "org.key_project.key4eclipse.resources.ui.view.VerificationStatusView";
    
    /**
     * The protocol used to link {@link ResourcesPlugin}s in the Eclipse workspace.
@@ -301,75 +285,11 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
     * The currently selected text in {@link #reportBrowser}.
     */
    private String selectedReportBrowserText;
-
-   /**
-    * The link with editor/view state.
-    */
-   private State linkState;
-   
-   /**
-    * Listens for changes on {@link #linkState}.
-    */
-   private final IStateListener stateListener = new IStateListener() {
-      @Override
-      public void handleStateChange(State state, Object oldValue) {
-         updateShownContent();
-      }
-   };
-   
-   /**
-    * The base {@link IWorkbenchPart} for which the content will be shown
-    * if {@link #linkState} is selected.
-    */
-   private IWorkbenchPart basePart;
-   
-   /**
-    * Listens for changes on {@link #basePart}.
-    */
-   private final IPropertyListener basePartListener = new IPropertyListener() {
-      @Override
-      public void propertyChanged(Object source, int propId) {
-         handleBasePartPropertyChanged(source, propId);
-      }
-   };
-
-   /**
-    * Listens for changes on {@link #basePart}.
-    */
-   private final ISelectionChangedListener basePartSelectionChangedListener = new ISelectionChangedListener() {
-      @Override
-      public void selectionChanged(SelectionChangedEvent event) {
-         handleBasePartSelectionChanged(event);
-      }
-   };
    
    /**
     * The currently running {@link Job}.
     */
    private Job activeJob;
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void init(IViewSite site) throws PartInitException {
-      super.init(site);
-      ICommandService service = (ICommandService)PlatformUI.getWorkbench().getService(ICommandService.class);
-      Command linkCmd = service.getCommand("org.key_project.key4eclipse.resources.ui.LinkWithWorkbenchPartCommand");
-      if (linkCmd != null) {
-         linkState = linkCmd.getState(RegistryToggleState.STATE_ID);
-         if (linkState != null) {
-            linkState.addListener(stateListener);
-         }
-      }
-      basePart = site.getPage().getActivePart();
-      if (basePart instanceof EditorPart) {
-         ((EditorPart) basePart).addPropertyListener(basePartListener);
-      }
-      if (basePart != null && basePart.getSite() != null && basePart.getSite().getSelectionProvider() != null) {
-         basePart.getSite().getSelectionProvider().addSelectionChangedListener(basePartSelectionChangedListener);
-      }
-   }
 
    /**
     * {@inheritDoc}
@@ -755,7 +675,7 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
          else if (element instanceof TypeInfo) {
             try {
                TypeInfo info = (TypeInfo) element;
-               if (info.getFile() != null) {
+               if (info.getFile() != null && info.getFile().exists()) {
                   IEditorPart editor = WorkbenchUtil.openEditor(info.getFile());
                   if (editor instanceof JavaEditor) {
                      IType type = info.findJDTType();
@@ -773,13 +693,19 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
          else if (element instanceof MethodInfo) {
             try {
                MethodInfo info = (MethodInfo) element;
-               if (info.getDeclaringFile() != null) {
+               if (info.getDeclaringFile() != null && info.getDeclaringFile().exists()) {
                   IEditorPart editor = WorkbenchUtil.openEditor(info.getDeclaringFile());
                   if (editor instanceof JavaEditor) {
                      IMethod method = info.findJDTMethod();
                      if (method != null && method.exists()) {
                         ((JavaEditor) editor).setSelection(method);
                      }
+                  }
+               }
+               else {
+                  IFile file = info.getParent().getFile();
+                  if (file != null && file.exists()) {
+                     WorkbenchUtil.openEditor(file);
                   }
                }
             }
@@ -791,13 +717,19 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
          else if (element instanceof ObserverFunctionInfo) {
             try {
                ObserverFunctionInfo info = (ObserverFunctionInfo) element;
-               if (info.getDeclaringFile() != null) {
+               if (info.getDeclaringFile() != null && info.getDeclaringFile().exists()) {
                   IEditorPart editor = WorkbenchUtil.openEditor(info.getDeclaringFile());
                   if (editor instanceof JavaEditor) {
                      IType type = info.findJDTDeclaringType();
                      if (type != null && type.exists()) {
                         ((JavaEditor) editor).setSelection(type);
                      }
+                  }
+               }
+               else {
+                  IFile file = info.getParent().getFile();
+                  if (file != null && file.exists()) {
+                     WorkbenchUtil.openEditor(file);
                   }
                }
             }
@@ -1567,113 +1499,11 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
    }
 
    /**
-    * When a property on {@link #basePart} has changed.
-    * @param source The source {@link Object}.
-    * @param propId The ID of the changed property.
-    */
-   protected void handleBasePartPropertyChanged(Object source, int propId) {
-      if (propId == EditorPart.PROP_INPUT) {
-         updateShownContent();
-      }
-   }
-
-   /**
-    * When the selection on {@link #basePart} has changed.
-    * @param event The {@link SelectionChangedEvent}.
-    */
-   protected void handleBasePartSelectionChanged(SelectionChangedEvent event) {
-      if (event.getSelection() instanceof IStructuredSelection) {
-         updateShownContent();
-      }
-   }
-
-   /**
     * {@inheritDoc}
     */
    @Override
-   protected void handlePartActivated(IWorkbenchPart part) {
-      updateBasePart();
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected void handlePartDeactivated(IWorkbenchPart part) {
-      updateBasePart();
-   }
-   
-   /**
-    * Updates {@link #basePart} and if required the shown content.
-    */
-   protected void updateBasePart() {
-      IWorkbenchPart activePart = getSite().getPage().getActivePart();
-      if (activePart != this) {
-         if (activePart != basePart) {
-            if (basePart instanceof EditorPart) {
-               ((EditorPart) basePart).removePropertyListener(basePartListener);
-            }
-            if (basePart != null && basePart.getSite() != null && basePart.getSite().getSelectionProvider() != null) {
-               basePart.getSite().getSelectionProvider().removeSelectionChangedListener(basePartSelectionChangedListener);
-            }
-            basePart = activePart;
-            if (basePart instanceof EditorPart) {
-               ((EditorPart) basePart).addPropertyListener(basePartListener);
-            }
-            if (basePart != null && basePart.getSite() != null && basePart.getSite().getSelectionProvider() != null) {
-               basePart.getSite().getSelectionProvider().addSelectionChangedListener(basePartSelectionChangedListener);
-            }
-            if (isLinkWithBasePart()) {
-               updateShownContent();
-            }
-         }
-      }
-   }
-
-   /**
-    * Checks if the shown content is linked with the selected {@link IWorkbenchPart}.
-    * @return {@code true} is linked, {@code false} is independent.
-    */
-   public boolean isLinkWithBasePart() {
-      boolean linkWith = false;
-      if (linkState != null) {
-         Object value = linkState.getValue();
-         linkWith = value instanceof Boolean && ((Boolean) value).booleanValue();
-      }
-      return linkWith;
-   }
-   
-   /**
-    * Computes the {@link IResource} linked with.
-    * @return The {@link IResource}s linked with.
-    */
-   protected Set<IResource> computeLinkedResources() {
-      Set<IResource> result = new HashSet<IResource>();
-      if (basePart instanceof IEditorPart) {
-         IEditorInput input = ((IEditorPart) basePart).getEditorInput();
-         if (input instanceof IFileEditorInput) {
-            IFile file = ((IFileEditorInput) input).getFile();
-            if (file != null) {
-               result.add(file);
-            }
-         }
-      }
-      if (basePart != null && basePart.getSite() != null && basePart.getSite().getSelectionProvider() != null) {
-         ISelection selection = basePart.getSite().getSelectionProvider().getSelection();
-         Object[] elements = SWTUtil.toArray(selection);
-         for (Object element : elements) {
-            if (element instanceof IResource) {
-               result.add((IResource) element);
-            }
-            else if (element instanceof IAdaptable) {
-               Object adapted = ((IAdaptable) element).getAdapter(IResource.class);
-               if (adapted instanceof IResource) {
-                  result.add((IResource) adapted);
-               }
-            }
-         }
-      }
-      return result;
+   protected void refreshContentCausedByLinking() {
+      updateShownContent();
    }
    
    /**
@@ -1705,15 +1535,6 @@ public class VerificationStatusView extends AbstractWorkbenchPartBasedView {
       ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceChangeListener);
       KeYResourcesUtil.removeKeYResourcePropertyListener(resourcePropertyListener);
       removeProjectInfoListener();
-      if (basePart instanceof EditorPart) {
-         ((EditorPart) basePart).removePropertyListener(basePartListener);
-      }
-      if (basePart != null && basePart.getSite() != null && basePart.getSite().getSelectionProvider() != null) {
-         basePart.getSite().getSelectionProvider().removeSelectionChangedListener(basePartSelectionChangedListener);
-      }
-      if (linkState != null) {
-         linkState.removeListener(stateListener);
-      }
       if (colorSynchronizer != null) {
          colorSynchronizer.dispose();
       }

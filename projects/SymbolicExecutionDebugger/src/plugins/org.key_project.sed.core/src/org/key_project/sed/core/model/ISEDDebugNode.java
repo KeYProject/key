@@ -184,4 +184,18 @@ public interface ISEDDebugNode extends ISEDDebugElement {
     * @return The fulfilled {@link IBreakpoint}s in this {@link ISEDDebugNode}.
     */
    public IBreakpoint[] computeHitBreakpoints() throws DebugException;
+   
+   /**
+    * Checks if constraints are considered at this symbolic execution tree node.
+    * @return {@code true} constraints available, {@code false} constraints are not available.
+    * @throws DebugException Occurred Exception.
+    */
+   public boolean hasConstraints() throws DebugException;
+   
+   /**
+    * Returns all constraints which are considered at this symbolic execution tree node.
+    * @return All constraints which are considered at this symbolic execution tree node.
+    * @throws DebugException Occurred Exception.
+    */
+   public ISEDConstraint[] getConstraints() throws DebugException;
 }
