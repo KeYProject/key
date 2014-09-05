@@ -111,6 +111,7 @@ public abstract class AbstractSWTBotSetFileTest extends TestCase {
                                                (ISEDDebugTarget)currentTargets[i], 
                                                true,
                                                true,
+                                               true,
                                                true);
             i++;
          }

@@ -85,10 +85,10 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Do run
                resume(bot, item, target);
                if (useUnicode) {
-                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/unicodeTest/oracle/UnicodeTest_Enabled.xml", false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/unicodeTest/oracle/UnicodeTest_Enabled.xml", false, false, false);
                }
                else {
-                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/unicodeTest/oracle/UnicodeTest_Disabled.xml", false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/unicodeTest/oracle/UnicodeTest_Disabled.xml", false, false, false);
                }
             }
          };
@@ -162,10 +162,10 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Do run
                resume(bot, item, target);
                if (usePrettyPrinting) {
-                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/prettyPrintSimpleTest/oracleUsePrettyPrinting/PrettyPrintSimpleTest.xml", false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/prettyPrintSimpleTest/oracleUsePrettyPrinting/PrettyPrintSimpleTest.xml", false, false, false);
                }
                else {
-                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/prettyPrintSimpleTest/oracleUsePrettyPrinting/NotPrettyPrintedPrettyPrintSimpleTest.xml", false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/prettyPrintSimpleTest/oracleUsePrettyPrinting/NotPrettyPrintedPrettyPrintSimpleTest.xml", false, false, false);
                }
             }
          };
@@ -239,10 +239,10 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Do run
                resume(bot, item, target);
                if (mergeBranchConditions) {
-                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/switchCaseTest/oracleMergeBranchConditions/MergedSwitchCaseTest.xml", false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/switchCaseTest/oracleMergeBranchConditions/MergedSwitchCaseTest.xml", false, false, false);
                }
                else {
-                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/switchCaseTest/oracleMergeBranchConditions/NotMergedSwitchCaseTest.xml", false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/switchCaseTest/oracleMergeBranchConditions/NotMergedSwitchCaseTest.xml", false, false, false);
                }
             }
          };
@@ -311,6 +311,8 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+               // Get variables view
+               SWTBotView variablesView = TestSedCoreUtil.getVariablesView(bot);
                // Get debug target TreeItem
                SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
                // Do run
@@ -318,9 +320,10 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Select statement int result;
                item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0, 1); 
                // Wait for jobs
+               variablesView.show();
+               TestUtilsUtil.sleep(1000); // Give the UI the chance to show variables.
                TestUtilsUtil.waitForJobs();
-               // Get variables view
-               SWTBotView variablesView = TestSedCoreUtil.getVariablesView(bot);
+               // Get variables
                SWTBotTree variablesTree = variablesView.bot().tree();
                SWTBotTreeItem[] items = variablesTree.getAllItems();
                assertEquals(items != null ? "items found: " + items.length : "items are null", showVariableValues, !ArrayUtil.isEmpty(items));
@@ -511,7 +514,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                                               "data/simpleIf/oracle_noMethodReturnValues/SimpleIf_NoSignature.xml";
                }
                resume(bot, item, target);
-               assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false);
+               assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false, false);
             }
          };
          doKeYDebugTargetTest(projectName,

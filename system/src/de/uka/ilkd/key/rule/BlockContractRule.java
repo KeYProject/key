@@ -818,9 +818,8 @@ public class BlockContractRule implements BuiltInRule {
                                       final Term[] assumptions, final Term[] postconditions)
         {
             goal.setBranchLabel("Validity");
-            goal.addFormulaToAntecedent(new SequentFormula(
-                  services.getTermBuilder().applySequential(updates, services.getTermBuilder().and(assumptions))),
-                    false);
+            goal.addFormula(new SequentFormula(
+            services.getTermBuilder().applySequential(updates, services.getTermBuilder().and(assumptions))), true, false);
 
             final StatementBlock block =
                     new ValidityProgramConstructor(labels, instantiation.block,

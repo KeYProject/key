@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
@@ -22,6 +23,8 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
+import de.uka.ilkd.key.util.LRUCache;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * This class is used to prove some simple arithmetic problem which are 
@@ -33,6 +36,8 @@ public class HandleArith {
 		
 	private HandleArith() {}
     
+
+	
 	/**
      * try to prove atom by using polynomial
      * 
@@ -42,20 +47,35 @@ public class HandleArith {
      *         cann't be proved.
      */
     public static Term provedByArith(Term problem, Services services) {
-       final Term trueT = services.getTermBuilder().tt(); 
-       final Term falseT = services.getTermBuilder().ff(); 
+       final LRUCache<Term, Term> provedByArithCache = services.getCaches().getProvedByArithFstCache();
+       Term result = provedByArithCache.get(problem);
+       if (result != null) {
+          return result;
+       }
+       
+       TermBuilder tb = services.getTermBuilder();
+       IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+       
+       final Term trueT = tb.tt(); 
+       final Term falseT = tb.ff(); 
 
-       Term arithTerm = formatArithTerm ( problem, services );
-        if ( arithTerm.equals ( falseT ) )
-            return provedArithEqual ( problem, services );
+       final Term arithTerm = formatArithTerm ( problem, tb, integerLDT, services.getCaches());
+       if ( arithTerm.equals ( falseT ) ) {
+          result = provedArithEqual ( problem, tb, services );
+          provedByArithCache.put(problem, result);
+          return result;
+       }
         Polynomial poly1 = Polynomial.create ( arithTerm.sub ( 0 ), services );
         Polynomial poly2 = Polynomial.create ( arithTerm.sub ( 1 ), services );
         if ( poly2.valueLeq ( poly1 ) ) {
+            provedByArithCache.put(problem, trueT);
             return trueT;
         }
         if ( poly1.valueLess ( poly2 ) ) {
+            provedByArithCache.put(problem, falseT);
             return falseT;
         }
+        provedByArithCache.put(problem, problem);
         return problem;
     }
         
@@ -64,9 +84,9 @@ public class HandleArith {
      * @return true if atom.sub(0) is euqual to atom.sub(1), false if not
      *         equal, else return atom
      */
-    public static Term provedArithEqual(Term problem, Services services) {
-       final Term trueT = services.getTermBuilder().tt(); 
-       final Term falseT = services.getTermBuilder().ff(); 
+    private static Term provedArithEqual(Term problem, TermBuilder tb, Services services) {
+       final Term trueT = tb.tt(); 
+       final Term falseT = tb.ff(); 
 
         boolean temp = true;
         Term pro = problem;
@@ -78,8 +98,8 @@ public class HandleArith {
             temp = !temp;
         }
         if ( op == Equality.EQUALS ) {
-            Term sub0 = problem.sub ( 0 );
-            Term sub1 = problem.sub ( 1 );
+            Term sub0 = pro.sub ( 0 );
+            Term sub1 = pro.sub ( 1 );
             Polynomial poly1 = Polynomial.create ( sub0, services );
             Polynomial poly2 = Polynomial.create ( sub1, services );
             boolean gt = poly2.valueLeq ( poly1 );
@@ -89,6 +109,7 @@ public class HandleArith {
         }
         return problem;
     }
+    
 
     /**
      * Try to prove problem by know that axiom is true. The idea is that we
@@ -101,26 +122,48 @@ public class HandleArith {
      * @return trueT if true, falseT if false, and atom if can't be prove;
      */
     public static Term provedByArith(Term problem, Term axiom, Services services) {
-        Term cd = formatArithTerm ( problem, services );
-        Term ab = formatArithTerm ( axiom, services );
+        final Pair<Term, Term> key = new Pair<Term, Term>(problem, axiom);
+        final LRUCache<Pair<Term, Term>, Term> provedByArithCache = 
+              services.getCaches().getProvedByArithSndCache();
+        Term result = provedByArithCache.get(key);
+        if (result != null) {
+           return result;
+        }
+       
         final TermBuilder tb = services.getTermBuilder();
-        final Term trueT = services.getTermBuilder().tt(); 
-        final Term falseT = services.getTermBuilder().ff(); 
+        final IntegerLDT integerLDT = services.getTypeConverter ().getIntegerLDT ();
+        final ServiceCaches caches = services.getCaches();
+        
+        final Term cd = formatArithTerm ( problem, tb, integerLDT, caches );
+        final Term ab = formatArithTerm ( axiom, tb, integerLDT, caches );
+        final Term trueT = tb.tt(); 
+        final Term falseT = tb.ff(); 
 
-        if ( cd.op() == Junctor.FALSE || ab.op() == Junctor.FALSE ) return problem;
-        Function addfun = services.getTypeConverter ().getIntegerLDT ().getAdd();
+        if ( cd.op() == Junctor.FALSE || ab.op() == Junctor.FALSE ) {
+           provedByArithCache.put(key, problem);
+           return problem;
+        }
+        Function addfun = integerLDT.getAdd();
         Term arithTerm = tb.geq ( tb.func ( addfun, cd.sub ( 0 ), ab.sub ( 1 ) ),
                                   tb.func ( addfun, ab.sub ( 0 ), cd.sub ( 1 ) ) );
         Term res = provedByArith ( arithTerm, services );
-        if ( res.op() == Junctor.TRUE ) return trueT;
-        Term t0 = formatArithTerm ( tb.not ( problem ), services );
+        if ( res.op() == Junctor.TRUE ) {
+           provedByArithCache.put(key, trueT);
+           return trueT;
+        }
+        Term t0 = formatArithTerm ( tb.not ( problem ), tb, integerLDT, caches );
         arithTerm = tb.geq ( tb.func ( addfun, t0.sub ( 0 ), ab.sub ( 1 ) ),
                              tb.func ( addfun, ab.sub ( 0 ), t0.sub ( 1 ) ) );
         res = provedByArith ( arithTerm, services );
-        if ( res.op() == Junctor.TRUE ) return falseT;
+        if ( res.op() == Junctor.TRUE ) {
+           provedByArithCache.put(key, falseT);
+           return falseT;
+        }
+        provedByArithCache.put(key, problem);
         return problem;
     }
 
+    
     /**
      * Format literal to a form of "geq",linke a>=b;For example, a <=b to
      * b>=a;a>b to a>=b+1;!(a>=b) to b>=a+1..
@@ -128,8 +171,14 @@ public class HandleArith {
      * @param problem
      * @return falseT if <code>term</code>'s operator is not >= or <=
      */
-    private static Term formatArithTerm(Term problem, Services services) {
-        Term pro = problem;
+    private static Term formatArithTerm(final Term problem, TermBuilder tb, IntegerLDT ig, ServiceCaches caches) {
+       final LRUCache<Term, Term> formattedTermCache = caches.getFormattedTermCache();
+       Term pro = formattedTermCache.get(problem); 
+       if (pro != null) {
+          return pro;
+       }
+       
+        pro = problem;
         Operator op = pro.op ();
         boolean opNot = false;
         while ( op == Junctor.NOT ) {
@@ -137,11 +186,9 @@ public class HandleArith {
             pro = pro.sub ( 0 );
             op = pro.op ();
         }
-        IntegerLDT ig = services.getTypeConverter ().getIntegerLDT ();
         Function geq = ig.getGreaterOrEquals ();
         Function leq = ig.getLessOrEquals ();
-        final TermBuilder tb = services.getTermBuilder();
-        final Term falseT = services.getTermBuilder().ff(); 
+        final Term falseT = tb.ff(); 
 
         if ( op == geq ) {
             if ( opNot )
@@ -161,6 +208,8 @@ public class HandleArith {
             } else
                 pro = falseT;
         }
+        
+        formattedTermCache.put(problem, pro);
         return pro;
     }
     

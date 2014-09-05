@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.main()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="throw new RuntimeException ();" pathCondition="true" pathConditionChanged="false">
          <termination name="&lt;uncaught java.lang.RuntimeException&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
          </termination>
       </statement>
    </methodCall>
+   <terminationEntry path="/0/0/0"/>
 </start>

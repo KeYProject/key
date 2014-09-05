@@ -29,9 +29,14 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.BuiltInRuleIndex;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.TacletIndex;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.proof.mgt.RuleJustification;
+import de.uka.ilkd.key.proof.mgt.RuleJustificationByAddRules;
+import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 
@@ -48,10 +53,7 @@ public class InitConfig {
      */
     private final Services services;
 
-    /**
-     * the proof environment this init config belongs to
-     */
-    private final ProofEnvironment env;
+    private RuleJustificationInfo justifInfo = new RuleJustificationInfo();
 
 
     private ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil();
@@ -97,7 +99,6 @@ public class InitConfig {
 
     public InitConfig(Services services) {
        this.services  = services;
-       this.env       = new ProofEnvironment(this);       
        
        category2DefaultChoice = ProofSettings.DEFAULT_SETTINGS
              .getChoiceSettings()
@@ -127,16 +128,6 @@ public class InitConfig {
 
     public Profile getProfile() {
 	return services.getProfile();
-    }
-
-
-    /**
-     * returns the proof environment using this initial configuration
-     * @return the ProofEnvironment using this configuration
-     */
-    public ProofEnvironment getProofEnv() {
-	assert env.getInitConfig() == this;
-        return env;
     }
 
 
@@ -284,6 +275,52 @@ public class InitConfig {
         	? ImmutableSLList.<BuiltInRule>nil()
         	: profile.getStandardRules().getStandardBuiltInRules());
     }
+    
+    
+    /** registers a rule with the given justification at the
+     * justification managing {@link RuleJustification} object of this
+     * environment. 
+     */
+    public void registerRule(Rule r, RuleJustification j) {
+   justifInfo.addJustification(r, j);
+    }
+
+    public void registerRuleIntroducedAtNode(RuleApp r, 
+                                             Node node, 
+                                             boolean isAxiom) {
+        justifInfo.addJustification(r.rule(), 
+                                    new RuleJustificationByAddRules(node, 
+                                                                    isAxiom));
+    }
+
+    /** registers a set of rules with the given justification at the
+     * justification managing {@link RuleJustification} object of this
+     * environment. All rules of the set are given the same
+     * justification. 
+     */
+    public void registerRules(ImmutableSet<Taclet> s, RuleJustification j) {
+       for (Taclet r : s) {
+          registerRule(r, j);          
+       }
+    }
+
+    /** registers a list of rules with the given justification at the
+     * justification managing {@link RuleJustification} object of this
+     * environment. All rules of the list are given the same
+     * justification. 
+     */
+    public void registerRules(ImmutableList<BuiltInRule> s, RuleJustification j) {
+       for (BuiltInRule r : s) {
+          registerRule(r, j);          
+       }
+    }
+
+    /** returns the object managing the rules in this environment and
+     * their justifications. The object is unique to this environment. 
+     */
+    public RuleJustificationInfo getJustifInfo() {
+       return justifInfo;
+    }
 
 
     /** returns a newly created taclet index for the set of activated
@@ -353,10 +390,8 @@ public class InitConfig {
     }
 
     
-    public void setSettings(ProofSettings settings) {
-	  this.settings = settings;
-	  // replace the <inv> symbol as it may have changed arity
-	  namespaces().functions().add(services.getJavaInfo().getInv());
+    public void setSettings(ProofSettings newSettings) {
+      this.settings = newSettings;	  
 	}
     
     
@@ -369,36 +404,40 @@ public class InitConfig {
      * the contained JavaInfo while using the immutable set of taclets in the
      * copy
      */
-    @SuppressWarnings("unchecked")
     public InitConfig copy() {
-        InitConfig ic = new InitConfig(services.copyPreservesLDTInformation());
-        ic.setActivatedChoices(activatedChoices);
-        ic.category2DefaultChoice = ((HashMap<String,String>) category2DefaultChoice.clone());
-        ic.setTaclet2Builder(
-                (HashMap<Taclet, TacletBuilder>) taclet2Builder.clone());
-        ic.setTaclets(taclets);
-        ic.originalKeYFileName = originalKeYFileName;
-        return ic;
+        return copyWithServices(services.copyPreservesLDTInformation());
     }
-    
-    
 
     /** returns a copy of this initial configuration copying the namespaces,
      * the contained JavaInfo while using the immutable set of taclets in the
      * copy
      */
-    @SuppressWarnings("unchecked")
     public InitConfig deepCopy() {
-        InitConfig ic = new InitConfig(services.copy(false));
+       return copyWithServices(services.copy(false));
+    }
+
+    
+    /** returns a copy of this initial configuration copying the namespaces,
+     * the contained JavaInfo while using the immutable set of taclets in the
+     * copy
+     */
+    @SuppressWarnings("unchecked")
+    public InitConfig copyWithServices(Services services) {
+        InitConfig ic = new InitConfig(services);
+        if (settings != null) {
+           ic.setSettings(new ProofSettings(settings));
+        }
         ic.setActivatedChoices(activatedChoices);
         ic.category2DefaultChoice = ((HashMap<String,String>) category2DefaultChoice.clone());
         ic.setTaclet2Builder(
                 (HashMap<Taclet, TacletBuilder>) taclet2Builder.clone());
         ic.setTaclets(taclets);
         ic.originalKeYFileName = originalKeYFileName;
-        ic.env.setJavaModel(env.getJavaModel());
+        ic.justifInfo = justifInfo.copy();
         return ic;
     }
+    
+    
 
     public String toString() {
         return

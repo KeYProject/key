@@ -156,11 +156,23 @@
               <propertyTab
                     afterTab="org.key_project.sed.ui.visualization.node.tab"
                     category="Graphiti"
+                    id="org.key_project.sed.ui.visualization.methodReturns.tab"
+                    label="Method Returns">
+              </propertyTab>
+              <propertyTab
+                    afterTab="org.key_project.sed.ui.visualization.node.tab"
+                    category="Graphiti"
                     id="org.key_project.sed.ui.visualization.callStack.tab"
                     label="Call Stack">
               </propertyTab>
               <propertyTab
                     afterTab="org.key_project.sed.ui.visualization.callStack.tab"
+                    category="Graphiti"
+                    id="org.key_project.sed.ui.visualization.constraints.tab"
+                    label="Constraints">
+              </propertyTab>
+              <propertyTab
+                    afterTab="org.key_project.sed.ui.visualization.constraints.tab"
                     category="Graphiti"
                     id="org.key_project.sed.ui.visualization.source.tab"
                     label="Source">
@@ -189,6 +201,12 @@
                     tab="org.key_project.sed.ui.visualization.callStack.tab">
               </propertySection>
               <propertySection
+                    class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiMethodReturnConditionsPropertySection"
+                    filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiReadonlyMethodCallTreeFilter"
+                    id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiMethodReturnConditionsPropertySection"
+                    tab="org.key_project.sed.ui.visualization.methodReturns.tab">
+              </propertySection>
+              <propertySection
                     class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiSourcePropertySection"
                     filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiSourceTreeFilter"
                     id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiSourcePropertySection"
@@ -199,6 +217,12 @@
                     filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiReadonlyDebugNodeTreeFilter"
                     id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiAnnotationLinkPropertySection"
                     tab="org.key_project.sed.ui.visualization.annotationLinks.tab">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiConstraintsPropertySection"
+                    filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiReadonlyDebugNodeTreeFilter"
+                    id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiConstraintsPropertySection"
+                    tab="org.key_project.sed.ui.visualization.constraints.tab">
               </propertySection>
           </propertySections>
       </extension>    

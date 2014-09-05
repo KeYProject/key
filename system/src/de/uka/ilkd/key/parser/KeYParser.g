@@ -584,13 +584,13 @@ options {
             }
             File path=new File(getSourceName().substring(start,end+1)+filename);
             try{ 
-                source = RuleSource.initRuleFile(path.toURL()); 
+                source = RuleSourceFactory.initRuleFile(path.toURL()); 
             }catch(java.net.MalformedURLException e){
                 System.err.println("Exception due to malformed URL of file "+
                                    filename+"\n " +e);
             }
         } else {
-            source = RuleSource.initRuleFile(filename+".key"); 
+            source = RuleSourceFactory.fromBuildInRule(filename+".key"); 
         }
         if (ldt) {
             includes.putLDT(filename, source);
@@ -3642,8 +3642,8 @@ varexp[TacletBuilder b]
         | varcond_referencearray[b, negated]
         | varcond_static[b,negated]
         | varcond_staticmethod[b,negated]  
+        | varcond_final[b,negated]
         | varcond_typecheck[b, negated]
-        | varcond_induction_variable[b, negated]
         | varcond_constant[b, negated]
         | varcond_label[b, negated]
         | varcond_static_field[b, negated]
@@ -3960,6 +3960,14 @@ varcond_enum_const [TacletBuilder b]
    }
 ;
 
+varcond_final [TacletBuilder b, boolean negated]
+:
+   FINAL LPAREN x=varId RPAREN {
+      b.addVariableCondition(new FinalReferenceCondition(
+  (SchemaVariable) x, negated));     
+   }
+;
+
 varcond_static [TacletBuilder b, boolean negated]
 :
    STATIC LPAREN x=varId RPAREN {
@@ -4029,14 +4037,6 @@ varcond_freeLabelIn [TacletBuilder b, boolean negated]
     	b.addVariableCondition(new FreeLabelInVariableCondition((SchemaVariable) l, 
     	(SchemaVariable) statement, negated ));
     }
-;
-
-varcond_induction_variable [TacletBuilder b, boolean negated]
-:
-   ISINDUCTVAR LPAREN x=varId RPAREN {
-     b.addVariableCondition(new InductionVariableCondition (
-       (SchemaVariable)x, negated ));
-   }
 ;
 
 varcond_constant [TacletBuilder b, boolean negated]

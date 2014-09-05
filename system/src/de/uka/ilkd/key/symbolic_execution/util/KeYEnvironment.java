@@ -15,6 +15,7 @@ package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.io.File;
 import java.util.List;
+import java.util.Properties;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -185,7 +186,7 @@ public class KeYEnvironment<U extends UserInterface> {
       if (makeMainWindowVisible && !main.isVisible()) {
           main.setVisible(true);
       }
-      DefaultProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath);
+      DefaultProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, null);
       InitConfig initConfig = loader.getInitConfig();
       return new KeYEnvironment<UserInterface>(main.getUserInterface(), initConfig, loader.getProof());
    }
@@ -219,7 +220,7 @@ public class KeYEnvironment<U extends UserInterface> {
                                                           List<File> classPaths,
                                                           File bootClassPath,
                                                           IUserInterfaceCustomization customization) throws ProblemLoaderException {
-      return load(null, location, classPaths, bootClassPath, customization);
+      return load(null, location, classPaths, bootClassPath, null, customization);
    }
    
    /**
@@ -236,7 +237,7 @@ public class KeYEnvironment<U extends UserInterface> {
                                                           File location,
                                                           List<File> classPaths,
                                                           File bootClassPath) throws ProblemLoaderException {
-      return load(profile, location, classPaths, bootClassPath, null);
+      return load(profile, location, classPaths, bootClassPath, null, null);
    }
    
    /**
@@ -246,6 +247,7 @@ public class KeYEnvironment<U extends UserInterface> {
     * @param location The location to load.
     * @param classPaths The class path entries to use.
     * @param bootClassPath The boot class path to use.
+    * @param poPropertiesToForce Some optional PO {@link Properties} to force.
     * @param customization An optional {@link IUserInterfaceCustomization}.
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
@@ -254,9 +256,10 @@ public class KeYEnvironment<U extends UserInterface> {
                                                           File location,
                                                           List<File> classPaths,
                                                           File bootClassPath,
+                                                          Properties poPropertiesToForce,
                                                           IUserInterfaceCustomization customization) throws ProblemLoaderException {
       CustomUserInterface ui = new CustomUserInterface(false, customization);
-      DefaultProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath); 
+      DefaultProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath, poPropertiesToForce); 
       InitConfig initConfig = loader.getInitConfig();
       return new KeYEnvironment<CustomUserInterface>(ui, initConfig, loader.getProof());
    }
@@ -265,7 +268,7 @@ public class KeYEnvironment<U extends UserInterface> {
     * Disposes this {@link KeYEnvironment}.
     */
    public void dispose() {
-      if (loadedProof != null) {
+      if (loadedProof != null && !loadedProof.isDisposed()) {
          loadedProof.dispose();
       }
       disposed = true;

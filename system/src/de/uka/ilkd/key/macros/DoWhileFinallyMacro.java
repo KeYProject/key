@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.macros;
 
-import javax.swing.KeyStroke;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
@@ -41,8 +39,8 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
 
     @Override
 	public boolean canApplyTo(KeYMediator mediator,
-							  ImmutableList<Goal> goals,
-							  PosInOccurrence posInOcc) {
+	                          ImmutableList<Goal> goals,
+	                          PosInOccurrence posInOcc) {
         if (getCondition()) {
             return getProofMacro().canApplyTo(mediator, goals, posInOcc);
         } else {
@@ -51,20 +49,42 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
     }
 
     @Override
-    public void applyTo(KeYMediator mediator,
-                        ImmutableList<Goal> goals,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) throws InterruptedException {
-        int steps = getMaxSteps(mediator);
-        while (steps > 0 && getCondition() && canApplyTo(mediator, goals, posInOcc)) {
-            getProofMacro().applyTo(mediator, goals, posInOcc, listener);
+    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+                                          ImmutableList<Goal> goals,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) throws InterruptedException {
+        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
+        setMaxSteps(mediator);
+        int steps = getNumberSteps();
+        final ProofMacro macro = getProofMacro();
+        while (getNumberSteps() > 0 && getCondition() && macro.canApplyTo(mediator, goals, posInOcc)) {
+            final ProverTaskListener pml =
+                    new ProofMacroListener(this, listener);
+            pml.taskStarted(macro.getName(), 0);
+            synchronized(macro) {
+                // wait for macro to terminate
+                info = macro.applyTo(mediator, goals, posInOcc, pml);
+            }
+            pml.taskFinished(info);
+            steps -= info.getAppliedRules();
+            setNumberSteps(steps);
+            info = new ProofMacroFinishedInfo(this, info);
+            goals = info.getGoals();
             posInOcc = null;
-            steps--;
         }
-        if (steps > 0 && getAltProofMacro().canApplyTo(mediator, goals, posInOcc)) {
-            getAltProofMacro().applyTo(mediator, goals, posInOcc, listener);
+        final ProofMacro altMacro = getAltProofMacro();
+        if (steps > 0 && altMacro.canApplyTo(mediator, goals, posInOcc)) {
+            final ProverTaskListener pml =
+                    new ProofMacroListener(this, listener);
+            pml.taskStarted(altMacro.getName(), 0);
+            info = altMacro.applyTo(mediator, goals, posInOcc, pml);
+            synchronized(altMacro) {
+                // wait for macro to terminate
+                info = new ProofMacroFinishedInfo(this, info);
+            }
+            pml.taskFinished(info);
         }
-
+        return info;
     }
 
     /**
@@ -84,22 +104,21 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
     abstract boolean getCondition();
 
     /**
-     * Returns the maximum number of rule applications allowed for
+     * Sets the maximum number of rule applications allowed for
      * this macro. The default implementation is the maximum amount
      * of proof steps for automatic mode.
      * @return the maximum number of rule applications allowed for
      * this macro
      */
-    static int getMaxSteps(KeYMediator mediator) {
-		if (mediator.getSelectedProof() != null) {
-			return mediator.getSelectedProof().getSettings().getStrategySettings().getMaxSteps();
-		} else {
-			return ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getMaxSteps();
-		}
-	}
-
-    @Override
-    public KeyStroke getKeyStroke() {
-        return null; // default implementation
+    void setMaxSteps(KeYMediator mediator) {
+        final int steps;
+        if (mediator.getSelectedProof() != null) {
+            steps = mediator.getSelectedProof().getSettings()
+                         .getStrategySettings().getMaxSteps();
+        } else {
+            steps = ProofSettings.DEFAULT_SETTINGS
+                    .getStrategySettings().getMaxSteps();
+        }
+        setNumberSteps(steps);
     }
 }

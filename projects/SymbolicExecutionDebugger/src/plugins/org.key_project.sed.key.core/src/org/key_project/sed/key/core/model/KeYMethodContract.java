@@ -62,6 +62,11 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
     * The contained KeY variables.
     */
    private KeYVariable[] variables;
+   
+   /**
+    * The constraints
+    */
+   private KeYConstraint[] constraints;
 
    /**
     * The method call stack.
@@ -82,6 +87,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
       this.executionNode = executionNode;
+      target.registerDebugNode(this);
       initializeAnnotations();
    }
 
@@ -115,7 +121,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
    @Override
    public IKeYSEDDebugNode<?>[] getChildren() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
-         IExecutionNode[] executionChildren = executionNode.getChildren();
+         IExecutionNode<?>[] executionChildren = executionNode.getChildren();
          if (children == null) {
             children = KeYModelUtil.createChildren(this, executionChildren);
          }
@@ -230,6 +236,27 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
          return variables;
       }
    }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasConstraints() throws DebugException {
+      return !isTerminated() && super.hasConstraints();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYConstraint[] getConstraints() throws DebugException {
+      synchronized (this) {
+         if (constraints == null) {
+            constraints = KeYModelUtil.createConstraints(this, executionNode);
+         }
+         return constraints;
+      }
+   }
 
    /**
     * {@inheritDoc}
@@ -238,6 +265,7 @@ public class KeYMethodContract extends AbstractSEDMethodContract implements IKeY
    public boolean hasVariables() throws DebugException {
       try {
          return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
+                !executionNode.isDisposed() && 
                 SymbolicExecutionUtil.canComputeVariables(executionNode, executionNode.getServices()) &&
                 super.hasVariables();
       }

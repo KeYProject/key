@@ -25,7 +25,8 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.collection.TestLeftistHeapOfInteger.class,
         de.uka.ilkd.key.util.TestLexicographicComparator.class,
         de.uka.ilkd.key.util.TestMiscTools.class,
-        de.uka.ilkd.key.util.pp.TestLayouter.class
+        de.uka.ilkd.key.util.pp.TestLayouter.class,
+        de.uka.ilkd.key.util.TestProofStarter.class
     }; 
 
 
@@ -95,8 +96,8 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.smt.test.TestSimplify.class,
         de.uka.ilkd.key.smt.test.TestZ3.class,
         de.uka.ilkd.key.smt.test.TestYices.class,
-        de.uka.ilkd.key.smt.test.TestCvc3.class,
-
+        de.uka.ilkd.key.smt.test.TestCvc3.class
+        //, de.uka.ilkd.key.smt.test.TestCvc4.class  //commented out as test take too long
     };
 
     static Class<? extends TestCase>[] setTests = new Class[] {

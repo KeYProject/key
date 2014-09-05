@@ -22,6 +22,7 @@ import java.util.Vector;
 
 import recoder.io.PathList;
 import recoder.io.ProjectSettings;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -59,7 +60,7 @@ import de.uka.ilkd.key.proof.io.LDTInput;
 import de.uka.ilkd.key.proof.io.LDTInput.LDTInputListener;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
@@ -76,9 +77,9 @@ public final class ProblemInitializer {
         public void reportStatus(Object sender, String status);
         public void resetStatus(Object sender);
         public void reportException(Object sender, ProofOblInput input, Exception e);
-    }    
+    }
     private static InitConfig baseConfig;
- 
+
     private final Services services;
     private final ProgressMonitor progMon;
     private final HashSet<EnvInput> alreadyParsed = new LinkedHashSet<EnvInput>();
@@ -109,11 +110,30 @@ public final class ProblemInitializer {
     //internal methods
     //-------------------------------------------------------------------------
 
+    private void progressStarted(Object sender) {
+        if (listener != null) {
+            listener.progressStarted(sender);
+        }
+    }
+
+    private void progressStopped(Object sender) {
+        if (listener != null) {
+            listener.progressStopped(sender);
+        }
+    }
+
+    private void proofCreated(ProofAggregate proofAggregate) {
+        if (listener != null) {
+            listener.proofCreated(this, proofAggregate);
+        }
+    }
+
     /** 
      * displays the status report in the status line
      */
     private void reportStatus(String status) {
-        if(listener != null){
+        if (listener != null) {
+            listener.resetStatus(this);
             listener.reportStatus(this,status);
         }
 
@@ -127,14 +147,25 @@ public final class ProblemInitializer {
      * @param progressMax an int describing what is 100 per cent
      */
     private void reportStatus(String status, int progressMax) {
-        if(listener != null){
-            listener.reportStatus(this,status,progressMax);
+        if (listener != null) {
+            listener.resetStatus(this);
+            listener.reportStatus(this, status, progressMax);
         }
     }
-    
 
-  
-    
+    private void reportException(ProofOblInput input, Exception e) {
+        if (listener != null) {
+            listener.reportException(this, input, e);
+        }
+    }
+
+    private void setProgress(int progress) {
+        if (progMon != null) {
+            progMon.setProgress(progress);
+        }
+    }
+
+
     /**
      * Helper for readIncludes().
      */
@@ -150,16 +181,17 @@ public final class ProblemInitializer {
         KeYFile[] keyFile = new KeYFile[in.getLDTIncludes().size()];
 
         int i = 0;
+        reportStatus("Read LDT Includes", in.getIncludes().size());
         for (String name : in.getLDTIncludes()) {
             keyFile[i++] = new KeYFile(name, in.get(name), progMon, initConfig.getProfile());
+            setProgress(i);
         }
 
         LDTInput ldtInp = new LDTInput(keyFile, new LDTInputListener() {
             @Override
-            public void reportStatus(String status, int progress) {
-                if(listener != null){
-                    listener.reportStatus(ProblemInitializer.this, status, progress);
-                }
+            public void reportStatus(String status, final int progress) {
+                ProblemInitializer.this.reportStatus(status);
+                ProblemInitializer.this.setProgress(progress);
             }
         }, initConfig.getProfile());
 
@@ -182,9 +214,12 @@ public final class ProblemInitializer {
         readLDTIncludes(in, initConfig);
         
         //read normal includes
+        reportStatus("Read Includes", in.getIncludes().size());
+        int i = 0;
         for (String fileName : in.getIncludes()) {
             KeYFile keyFile = new KeYFile(fileName, in.get(fileName), progMon, envInput.getProfile());
             readEnvInput(keyFile, initConfig);
+            setProgress(++i);
         }
     }
     
@@ -221,30 +256,6 @@ public final class ProblemInitializer {
     
     
     /**
-     * Helper for readJava().
-     */
-    private JavaModel createJavaModel(String javaPath,
-                                      List<File> classPath,
-                                      File bootClassPath)
-                throws ProofInputException {
-        JavaModel result;
-        if(javaPath == null) {
-            result = JavaModel.NO_MODEL;
-        } else if (javaPath.equals(System.getProperty("user.home"))) {
-            throw new ProofInputException("You do not want to have "+
-            "your home directory as the program model.");
-        } else {
-            String modelTag = "KeY_" + Long.valueOf((new java.util.Date()).getTime());
-            result = new JavaModel(javaPath,
-                                   modelTag,
-                                   classPath,
-                                   bootClassPath);
-        }
-        return result;
-    }
-         
-    
-    /**
      * Helper for readEnvInput().
      */
     private void readJava(EnvInput envInput, InitConfig initConfig) 
@@ -254,7 +265,7 @@ public final class ProblemInitializer {
                           .getJavaInfo()
                           .rec2key()
                           .parsedSpecial();
-        assert initConfig.getProofEnv().getJavaModel() == null;
+        assert initConfig.getServices().getJavaModel() == null;
 
         //read Java source and classpath settings
         envInput.setInitConfig(initConfig);
@@ -287,9 +298,11 @@ public final class ProblemInitializer {
             reportStatus("Reading Java libraries");
             r2k.parseSpecialClasses();
         }
-        initConfig.getProofEnv().setJavaModel(createJavaModel(javaPath,
-                                                              classPath,
-                                                              bootClassPath));
+        File initialFile = envInput.getInitialFile();
+        initConfig.getServices().setJavaModel(JavaModel.createJavaModel(javaPath,
+                                                                        classPath,
+                                                                        bootClassPath,
+                                                                        initialFile));
     }
     
     /**
@@ -332,8 +345,7 @@ public final class ProblemInitializer {
             }
 
             // read envInput itself
-            reportStatus("Reading "+envInput.name(),
-                         envInput.getNumberOfChars());
+            reportStatus("Reading "+envInput.name());
             envInput.setInitConfig(initConfig);
             envInput.read();
 
@@ -404,7 +416,7 @@ public final class ProblemInitializer {
     }
 
 
-    private void setUpProofHelper(ProofOblInput problem,ProofAggregate pl, InitConfig initConfig) 
+    private void setUpProofHelper(ProofOblInput problem, ProofAggregate pl) 
         throws ProofInputException {
         //ProofAggregate pl = problem.getPO();
         if(pl == null) {
@@ -412,20 +424,29 @@ public final class ProblemInitializer {
         }
 
         //register non-built-in rules
-        reportStatus("Registering rules");        
-        initConfig.getProofEnv().registerRules(initConfig.getTaclets(), 
-                                               AxiomJustification.INSTANCE);
-
         Proof[] proofs = pl.getProofs();
+        reportStatus("Registering rules", proofs.length * 10);
         for(int i = 0; i < proofs.length; i++) {
+           proofs[i].getInitConfig().registerRules(proofs[i].getInitConfig().getTaclets(), 
+                 AxiomJustification.INSTANCE);
+           setProgress(3 + i * proofs.length);
+           //register built in rules
+           Profile profile = proofs[i].getInitConfig().getProfile();
+           final ImmutableList<BuiltInRule> rules = profile.getStandardRules().getStandardBuiltInRules();
+           int j = 0;
+           final int step = rules.size() != 0 ? (7 / rules.size()) : 0;
+           for(Rule r : rules) {
+              proofs[i].getInitConfig().registerRule(r, profile.getJustification(r));
+              setProgress((++j) * step + 3 + i * proofs.length);
+           }
+           if (step == 0) {
+               setProgress(10 + i * proofs.length);
+           }
+
             proofs[i].setNamespaces(proofs[i].getNamespaces());//TODO: refactor Proof.setNamespaces() so this becomes unnecessary
             populateNamespaces(proofs[i]);
         }
-        initConfig.getProofEnv().registerProof(problem, pl);
-
     }
-    
-    
     
     //-------------------------------------------------------------------------
     //public interface
@@ -436,43 +457,35 @@ public final class ProblemInitializer {
      */
     public InitConfig prepare(EnvInput envInput) throws ProofInputException {
        synchronized (SchemaJavaParser.class) { // The synchronized statement is required for thread save parsing since all JavaCC parser are generated static. For our own parser (ProofJavaParser.jj and SchemaJavaParser.jj) it is possible to generate them non static which is done on branch "hentschelJavaCCInstanceNotStatic". But recoder still uses static methods and the synchronized statement can not be avoided for this reason.
-          InitConfig currentBaseConfig = baseConfig; // It is required to work with a copy to make this method thread save required by the Eclipse plug-ins.
-          if(listener != null){
-             listener.progressStarted(this);
-         }
-         alreadyParsed.clear();
+           InitConfig currentBaseConfig = baseConfig; // It is required to work with a copy to make this method thread save required by the Eclipse plug-ins.
+           progressStarted(this);
+           alreadyParsed.clear();
 
-              //the first time, read in standard rules
-         Profile profile = envInput.getProfile();
-         if(currentBaseConfig == null || profile != currentBaseConfig.getProfile()) {            
-            currentBaseConfig = new InitConfig(services);
+           //the first time, read in standard rules
+           Profile profile = envInput.getProfile();
+           if(currentBaseConfig == null || profile != currentBaseConfig.getProfile()) {
+               currentBaseConfig = new InitConfig(services);
                RuleSource tacletBase = profile.getStandardRules().getTacletBase();
                if(tacletBase != null) {
-                  KeYFile tacletBaseFile
-                  = new KeYFile("taclet base", 
-                        profile.getStandardRules().getTacletBase(),
-                        progMon,
-                        profile);
-                  readEnvInput(tacletBaseFile, currentBaseConfig);
+                   KeYFile tacletBaseFile
+                   = new KeYFile("taclet base",
+                                 profile.getStandardRules().getTacletBase(),
+                                 progMon,
+                                 profile);
+                   readEnvInput(tacletBaseFile, currentBaseConfig);
                }
                // remove traces of the generic sorts within the base configuration
                cleanupNamespaces(currentBaseConfig);
                baseConfig = currentBaseConfig;
-         }
-         return prepare(envInput, currentBaseConfig);
+           }
+           return prepare(envInput, currentBaseConfig);
        }
-        }
+    }
     
     public InitConfig prepare(EnvInput envInput, InitConfig referenceConfig)throws ProofInputException{
         //create initConfig
-         InitConfig initConfig = referenceConfig.copy();
+    	InitConfig initConfig = referenceConfig.copy();
         
-        //register built in rules
-        Profile profile = envInput.getProfile();
-        for(Rule r : profile.getStandardRules().getStandardBuiltInRules()) {
-            initConfig.getProofEnv().registerRule(r, 
-                    profile.getJustification(r));
-        }
 
         //read Java
         readJava(envInput, initConfig);
@@ -485,7 +498,6 @@ public final class ProblemInitializer {
         = initConfig.getServices().getTypeConverter().getHeapLDT();
         assert heapLDT != null;
         if (javaInfo != null) {
-            functions.add(javaInfo.getInv());
             for(KeYJavaType kjt : javaInfo.getAllKeYJavaTypes()) {
                 final Type type = kjt.getJavaType();
                 if(type instanceof ClassDeclaration 
@@ -516,19 +528,15 @@ public final class ProblemInitializer {
         cleanupNamespaces(initConfig);
 
         //done
-        if(listener !=null){
-           listener.progressStopped(this); 
-        }
+        progressStopped(this);
         return initConfig;
     }
 
     
-    public Proof startProver(InitConfig initConfig, ProofOblInput po, int proofNum) 
-                throws ProofInputException {
+    public ProofAggregate startProver(InitConfig initConfig, ProofOblInput po) 
+            throws ProofInputException {
         assert initConfig != null;
-        if(listener!= null){
-            listener.progressStarted(this);
-        }
+        progressStarted(this);
         try {
             //determine environment
             initConfig = determineEnvironment(po, initConfig);
@@ -538,45 +546,25 @@ public final class ProblemInitializer {
             po.readProblem();
             ProofAggregate pa = po.getPO();
             //final work
-            setUpProofHelper(po, pa, initConfig);
+            setUpProofHelper(po, pa);
 
             //done
-            if(listener != null){
-                listener.proofCreated(this, pa);
-            }
-          return pa.getProofs()[proofNum];
+            proofCreated(pa);
+          return pa;
 
         } catch (ProofInputException e) {    
-            if(listener != null){
-                listener.reportException(this, po, e);
-            }
+            reportException(po, e);
            
             throw e;            
         } finally {
-            if(listener != null){
-                listener.progressStopped(this);
-            }
-                   
+            progressStopped(this);
         }    
     }
     
     
-    public void startProver(ProofEnvironment env, ProofOblInput po) 
+    public ProofAggregate startProver(EnvInput envInput, ProofOblInput po) 
                 throws ProofInputException {
-        assert env.getInitConfig().getProofEnv() == env;
-        startProver(env.getInitConfig(), po, 0);
-    }
-    
-    
-    public void startProver(EnvInput envInput, ProofOblInput po) 
-                throws ProofInputException {
-        try {
-            InitConfig initConfig = prepare(envInput);
-            startProver(initConfig, po, 0);
-        } catch(ProofInputException e) {
-            reportStatus(envInput.name() + " failed");
-            throw e;
-        }
+       return startProver(prepare(envInput), po);
     }
     
     
@@ -585,9 +573,11 @@ public final class ProblemInitializer {
         reportStatus("Loading proof", kupf.getNumberOfChars());
         try {
            kupf.readProof(pfp);
+           setProgress(kupf.getNumberOfChars() / 2);
         }
         finally {
            kupf.close();
+           setProgress(kupf.getNumberOfChars());
         }
     }
 }

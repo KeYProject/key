@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
+   <variable name="heapAtPre" arrayIndex="-1" isArrayIndex="false">
+      <value name="heapAtPre {true}" typeString="Heap" valueString="heapAtPre" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+      </value>
+   </variable>
+   <methodCall name="&lt;call self.main()&gt;" pathCondition="true" pathConditionChanged="false">
       <variable name="exc" arrayIndex="-1" isArrayIndex="false">
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
@@ -65,7 +69,7 @@
                      <value name="VariablesStaticTest::z {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false">
+                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                      <variable name="self" arrayIndex="-1" isArrayIndex="false">
                         <value name="self {true}" typeString="VariablesStaticTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         </value>
@@ -87,11 +91,29 @@
                         </value>
                      </variable>
                      <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="StaticFields::b" arrayIndex="-1" isArrayIndex="false">
+                           <value name="StaticFields::b {true}" typeString="int" valueString="Z(8(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="StaticFields::a" arrayIndex="-1" isArrayIndex="false">
+                           <value name="StaticFields::a {true}" typeString="int" valueString="Z(4(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="VariablesStaticTest::z" arrayIndex="-1" isArrayIndex="false">
+                           <value name="VariablesStaticTest::z {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
                      </termination>
                   </methodReturn>
                </statement>
             </statement>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0"/>
 </start>

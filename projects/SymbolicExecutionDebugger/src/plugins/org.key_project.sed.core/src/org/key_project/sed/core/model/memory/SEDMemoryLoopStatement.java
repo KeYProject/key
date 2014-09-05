@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
+import org.key_project.sed.core.model.ISEDConstraint;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDLoopStatement;
@@ -74,6 +75,11 @@ public class SEDMemoryLoopStatement extends AbstractSEDLoopStatement implements 
     * The method call stack.
     */
    private ISEDDebugNode[] callStack;
+   
+   /**
+    * The contained {@link ISEDConstraint}s.
+    */
+   private final List<ISEDConstraint> constraints = new LinkedList<ISEDConstraint>();
    
    /**
     * Constructor.
@@ -277,5 +283,23 @@ public class SEDMemoryLoopStatement extends AbstractSEDLoopStatement implements 
    @Override
    public void setCallStack(ISEDDebugNode[] callStack) {
       this.callStack = callStack;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addConstraint(ISEDConstraint constraint) {
+      if (constraint != null) {
+         constraints.add(constraint);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDConstraint[] getConstraints() throws DebugException {
+      return constraints.toArray(new ISEDConstraint[constraints.size()]);
    }
 }

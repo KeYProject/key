@@ -18,6 +18,8 @@ import java.util.List;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
+import org.key_project.sed.core.model.ISEDBranchCondition;
+import org.key_project.sed.core.model.ISEDConstraint;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDMethodReturn;
@@ -74,6 +76,16 @@ public class SEDMemoryMethodReturn extends AbstractSEDMethodReturn implements IS
     * The method call stack.
     */
    private ISEDDebugNode[] callStack;
+
+   /**
+    * The method return condition.
+    */
+   private ISEDBranchCondition methodReturnCondition;
+   
+   /**
+    * The contained {@link ISEDConstraint}s.
+    */
+   private final List<ISEDConstraint> constraints = new LinkedList<ISEDConstraint>();
    
    /**
     * Constructor.
@@ -277,5 +289,39 @@ public class SEDMemoryMethodReturn extends AbstractSEDMethodReturn implements IS
    @Override
    public void setCallStack(ISEDDebugNode[] callStack) {
       this.callStack = callStack;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDBranchCondition getMethodReturnCondition() throws DebugException {
+      return methodReturnCondition;
+   }
+
+   /**
+    * Sets the method return condition.
+    * @param methodReturnCondition The method return condition to set.
+    */
+   public void setMethodReturnCondition(ISEDBranchCondition methodReturnCondition) {
+      this.methodReturnCondition = methodReturnCondition;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addConstraint(ISEDConstraint constraint) {
+      if (constraint != null) {
+         constraints.add(constraint);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDConstraint[] getConstraints() throws DebugException {
+      return constraints.toArray(new ISEDConstraint[constraints.size()]);
    }
 }

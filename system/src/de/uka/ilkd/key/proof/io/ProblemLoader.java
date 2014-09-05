@@ -15,11 +15,12 @@ package de.uka.ilkd.key.proof.io;
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import java.io.File;
 import java.util.List;
+import java.util.Properties;
+
 import javax.swing.SwingWorker;
 
 /**
@@ -34,8 +35,12 @@ public final class ProblemLoader extends DefaultProblemLoader {
 
     private ProverTaskListener ptl;
 
-    public ProblemLoader(File file, List<File> classPath, File bootClassPath, Profile profileOfNewProofs, KeYMediator mediator, boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
-        super(file, classPath, bootClassPath, profileOfNewProofs, mediator, askUiToSelectAProofObligationIfNotDefinedByLoadedFile);
+    public ProblemLoader(File file, List<File> classPath, File bootClassPath,
+                         Profile profileOfNewProofs, KeYMediator mediator,
+                         boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
+                         Properties poPropertiesToForce) {
+        super(file, classPath, bootClassPath, profileOfNewProofs, mediator,
+              askUiToSelectAProofObligationIfNotDefinedByLoadedFile, poPropertiesToForce);
     }
 
     public void addTaskListener(final ProverTaskListener ptl) {
@@ -81,13 +86,7 @@ public final class ProblemLoader extends DefaultProblemLoader {
             final TaskFinishedInfo tfi = new DefaultTaskFinishedInfo(ProblemLoader.this, message,
                     getProof(), runningTime, (getProof() != null ? getProof().countNodes() : 0),
                     (getProof() != null ? getProof().countBranches() - getProof().openGoals().size() : 0));
-            final UserInterface ui = getMediator().getUI();
             ptl.taskFinished(tfi);
-            if (ui.macroChosen()) {
-    			ui.applyMacro();
-    		} else if (ptl instanceof UserInterface) {
-    			((UserInterface)ptl).finish(getProof());
-    		}
         }
     }
 

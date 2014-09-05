@@ -67,6 +67,10 @@ import de.uka.ilkd.key.proof.Node;
  */
 public interface ProofMacro {
 
+    public void setNumberSteps(int numberSteps);
+
+    public int getNumberSteps();
+
     /**
      * Gets the name of this macro.
      *
@@ -171,8 +175,9 @@ public interface ProofMacro {
      * @throws InterruptedException
      *             if the application of the macro has been interrupted.
      */
-    public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc, 
-                        ProverTaskListener listener) throws InterruptedException;
+    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) throws InterruptedException;
 
     /**
      * Apply this macro on the given goals.
@@ -200,10 +205,10 @@ public interface ProofMacro {
      * @throws InterruptedException
      *             if the application of the macro has been interrupted.
      */
-    public void applyTo(KeYMediator mediator,
-                        ImmutableList<Goal> goals,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) throws InterruptedException;
+    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+                                          ImmutableList<Goal> goals,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) throws InterruptedException;
 
     /**
      * Apply this macro on the given node.
@@ -231,10 +236,10 @@ public interface ProofMacro {
      * @throws InterruptedException
      *             if the application of the macro has been interrupted.
      */
-    public void applyTo(KeYMediator mediator,
-                        Node node,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) throws InterruptedException;
+    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+                                          Node node,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) throws InterruptedException;
 
     /**
      * Gets the keyboard shortcut to invoke the macro (optional).
@@ -244,12 +249,44 @@ public interface ProofMacro {
     public javax.swing.KeyStroke getKeyStroke();
 
     /**
-     * Used to determine whether {@link ProverTaskListener#taskFinished(TaskFinishedInfo)}
-     * can be called after applying the macro. For the state being, this is only important
-     * for invoking a macro from the command line. When creating a composite macro, which
-     * consists of more than one macro applied after another, this method should be redefined
-     * for all macros preceding the last macro application.
-     * @return <code>true</code>, if the macro is not being directly followed by another macro
+     * This observer acts as intermediate instance between the reports by the
+     * strategy and the UI reporting progress.
+     *
+     * The number of total steps is computed and all local reports are
+     * translated in termini of the total number of steps such that a continuous
+     * progress is reported.
+     *
+     * fixes #1356
      */
-    public boolean finishAfterMacro();
+    class ProgressBarListener extends ProofMacroListener {
+        private int numberGoals;
+        private int numberSteps;
+        private int completedGoals;
+
+        ProgressBarListener(ProofMacro macro, int numberGoals,
+                            int numberSteps, ProverTaskListener l) {
+            super(macro, l);
+            this.numberGoals = numberGoals;
+            this.numberSteps = numberSteps;
+        }
+
+        @Override
+        public void taskStarted(String message, int size) {
+            //assert size == numberSteps;
+            String suffix = " [" + (completedGoals + 1) + "/" + numberGoals + "]";
+            super.taskStarted(message + suffix, numberGoals * numberSteps);
+            super.taskProgress(completedGoals * numberSteps);
+        }
+
+        @Override
+        public void taskProgress(int position) {
+            super.taskProgress(completedGoals * numberSteps + position);
+        }
+
+        @Override
+        public void taskFinished(TaskFinishedInfo info) {
+            super.taskFinished(info);
+            completedGoals ++;
+        }
+    }
 }

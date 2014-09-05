@@ -16,10 +16,10 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.While;
-import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
@@ -30,7 +30,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * The default implementation of {@link IExecutionLoopInvariant}.
  * @author Martin Hentschel
  */
-public class ExecutionLoopInvariant extends AbstractExecutionStateNode<SourceElement> implements IExecutionLoopInvariant {
+public class ExecutionLoopInvariant extends AbstractExecutionNode<SourceElement> implements IExecutionLoopInvariant {
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
@@ -48,16 +48,7 @@ public class ExecutionLoopInvariant extends AbstractExecutionStateNode<SourceEle
     */
    @Override
    protected String lazyComputeName() {
-      synchronized (NotationInfo.class) {
-         boolean originalPrettySyntax = NotationInfo.PRETTY_SYNTAX;
-         try {
-            NotationInfo.PRETTY_SYNTAX = true;
-            return getLoopInvariant().getPlainText(getServices()).trim();
-         }
-         finally {
-            NotationInfo.PRETTY_SYNTAX = originalPrettySyntax;
-         }
-      }
+      return getLoopInvariant().getPlainText(getServices(), getSettings().isUsePrettyPrinting(), getSettings().isUseUnicode()).trim();
    }
    
    /**
@@ -74,6 +65,14 @@ public class ExecutionLoopInvariant extends AbstractExecutionStateNode<SourceEle
    @Override
    protected IExecutionVariable[] lazyComputeVariables() {
       return SymbolicExecutionUtil.createExecutionVariables(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected IExecutionConstraint[] lazyComputeConstraints() {
+      return SymbolicExecutionUtil.createExecutionConstraints(this);
    }
 
    /**
