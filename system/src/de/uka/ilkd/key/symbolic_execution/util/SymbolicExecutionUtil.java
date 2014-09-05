@@ -3294,7 +3294,7 @@ public final class SymbolicExecutionUtil {
     */
    public static void setUsePrettyPrinting(boolean usePrettyPrinting) {
       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(usePrettyPrinting);
-      NotationInfo.PRETTY_SYNTAX = usePrettyPrinting;
+      NotationInfo.DEFAULT_PRETTY_SYNTAX = usePrettyPrinting;
    }
 
    /**
