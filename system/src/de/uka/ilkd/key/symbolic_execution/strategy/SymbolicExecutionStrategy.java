@@ -108,7 +108,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
       Feature result = super.setupApprovalF();
       // Make sure that cuts are only applied if the cut term is not already part of the sequent. This check is performed exactly before the rule is applied because the sequent might has changed in the time after the schema variable instantiation was instantiated.
       SetRuleFilter depFilter = new SetRuleFilter();
-      depFilter.addRuleToSet(getProof().env().getInitConfig().lookupActiveTaclet(new Name("cut")));
+      depFilter.addRuleToSet(getProof().getInitConfig().lookupActiveTaclet(new Name("cut")));
       result = add(result, ConditionalFeature.createConditional(depFilter, new CutHeapObjectsFeature()));
       return result;
    }

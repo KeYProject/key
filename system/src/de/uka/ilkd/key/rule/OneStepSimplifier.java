@@ -120,7 +120,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
                             .tacletIndex()
                             .allNoPosTacletApps());
         }
-
+        
         //identify those apps suitable for the one step simplifier;
         //store them in appsTakenOver and their taclets in result
         for(NoPosTacletApp app : allApps) {
@@ -133,7 +133,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
                             || !tac.varsNew().isEmpty()
                             || tac.varsNewDependingOn().hasNext()
                             || ((RewriteTaclet)tac).getApplicationRestriction()!= RewriteTaclet.NONE
-                            || !proof.mgt().getJustification(app).isAxiomJustification()) {
+                            || !proof.getInitConfig().getJustifInfo().getJustification(tac).isAxiomJustification()) {
                 continue;
             }
 
@@ -375,9 +375,9 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
     private RuleApp makeReplaceKnownTacletApp(Term formula, PosInOccurrence pio) {
         FindTaclet taclet;
         if(pio.isInAntec()) {
-            taclet = (FindTaclet) lastProof.env().getInitConfig().lookupActiveTaclet(new Name("replace_known_left"));
+            taclet = (FindTaclet) lastProof.getInitConfig().lookupActiveTaclet(new Name("replace_known_left"));
         } else {
-            taclet = (FindTaclet) lastProof.env().getInitConfig().lookupActiveTaclet(new Name("replace_known_right"));
+            taclet = (FindTaclet) lastProof.getInitConfig().lookupActiveTaclet(new Name("replace_known_right"));
         }
 
         SVInstantiations svi = SVInstantiations.EMPTY_SVINSTANTIATIONS;

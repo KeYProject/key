@@ -33,7 +33,9 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.SemisequentChangeInfo;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
@@ -869,22 +871,22 @@ public abstract class Taclet implements Rule, Named {
      * position information or the boolean antec 
      * contrary to "addToPos" frm will not be modified
      * @param frm the formula that should be added
-     * @param goal the Goal that knows the node the formulae have to be added
+     * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
      * @param pos the PosInOccurrence describing the place in the sequent
      * @param antec boolean true(false) if elements have to be added to the
      * antecedent(succedent) (only looked at if pos == null)
      */
     private void addToPosWithoutInst(SequentFormula frm,
-				     Goal goal,			  
+				     SequentChangeInfo currentSequent,			  
 				     PosInOccurrence pos,
 				     boolean antec) {
-	if (pos != null) {
-	    goal.addFormula(frm, pos);
-	} else {
-	    // cf : formula to be added , 1. true/false: antec/succ,
-	    // 2. true: at head 
-	    goal.addFormula(frm, antec, true);		
-	}	    
+       if (pos != null) {
+          currentSequent.combine(currentSequent.sequent().addFormula(frm, pos));
+       } else {
+          // cf : formula to be added , 1. true/false: antec/succ,
+          // 2. true: at head 
+          currentSequent.combine(currentSequent.sequent().addFormula(frm, antec, true));
+       }	    
     }
 
 
@@ -904,19 +906,17 @@ public abstract class Taclet implements Rule, Named {
 			       MatchConditions    matchCond,
 			       PosInOccurrence applicationPosInOccurrence) { 
 
-	final SVInstantiations svInst = matchCond.getInstantiations ();
-	
-        Term instantiatedFormula = syntacticalReplace(schemaFormula.formula(), 
-                    services, matchCond, applicationPosInOccurrence);
-                
-        if (!svInst.getUpdateContext().isEmpty()) {
-            instantiatedFormula = services.getTermBuilder().applyUpdatePairsSequential(svInst.getUpdateContext(), 
-            		           	             instantiatedFormula);         
-	     }
-        
-        
-	        
-	return new SequentFormula(instantiatedFormula);
+       final SVInstantiations svInst = matchCond.getInstantiations ();
+
+       Term instantiatedFormula = syntacticalReplace(schemaFormula.formula(), 
+             services, matchCond, applicationPosInOccurrence);
+
+       if (!svInst.getUpdateContext().isEmpty()) {
+          instantiatedFormula = services.getTermBuilder().applyUpdatePairsSequential(svInst.getUpdateContext(), 
+                instantiatedFormula);         
+       }
+
+       return new SequentFormula(instantiatedFormula);
     }
 		
     /**
@@ -932,45 +932,45 @@ public abstract class Taclet implements Rule, Named {
     private ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi, Services services, 
             MatchConditions matchCond, PosInOccurrence applicationPosInOccurrence) {       
         
+       // TODO: use mutable list
         ImmutableList<SequentFormula> replacements = ImmutableSLList.<SequentFormula>nil();
-        final Iterator<SequentFormula> it = semi.iterator();        
-        
-        while (it.hasNext()) {
+
+        for (SequentFormula sf : semi) {
             replacements = replacements.append
-                (instantiateReplacement(it.next(), services, matchCond, applicationPosInOccurrence));           
+                (instantiateReplacement(sf, services, matchCond, applicationPosInOccurrence));           
         }
+        
         return replacements;
     }
     
 
+    
     /**
      * replaces the constrained formula at the given position with the first
      * formula in the given semisequent and adds possible other formulas of the
      * semisequent starting at the position
      * @param semi the Semisequent with the the ConstrainedFormulae to be added
-     * @param goal the Goal that knows the node the formulae have to be added
+     * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
      * @param pos the PosInOccurrence describing the place in the sequent
      * @param services the Services encapsulating all java information
      * @param matchCond the MatchConditions containing in particular
      * the instantiations of the schemavariables
-     */
+     */   
     protected void replaceAtPos(Semisequent semi,
-				Goal goal,
-				PosInOccurrence pos,
-				Services services, 
-				MatchConditions matchCond) {
-	goal.changeFormula(instantiateSemisequent(semi, services, matchCond, pos),
-                pos);
+            SequentChangeInfo currentSequent,
+            PosInOccurrence pos,
+            Services services, 
+            MatchConditions matchCond) {
+       final ImmutableList<SequentFormula> replacements = instantiateSemisequent(semi, services, matchCond, pos);
+       currentSequent.combine(currentSequent.sequent().changeFormula(replacements, pos));
     }
-
- 
 
     /**
      * instantiates the constrained formulas of semisequent
      *  <code>semi</code> and adds the instantiatied formulas at the specified
      *   position to <code>goal</code>   
      * @param semi the Semisequent with the the ConstrainedFormulae to be added
-     * @param goal the Goal that knows the node the formulae have to be added
+     * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
      * @param pos the PosInOccurrence describing the place in the sequent
      * @param antec boolean true(false) if elements have to be added to the
      * antecedent(succedent) (only looked at if pos == null)
@@ -980,20 +980,20 @@ public abstract class Taclet implements Rule, Named {
      * the instantiations of the schemavariables
      */
     private void addToPos ( Semisequent semi,
-			    Goal goal,			  
-			    PosInOccurrence pos,
-			    boolean antec,
-			    Services services, 
-			    MatchConditions matchCond,
-			    PosInOccurrence applicationPosInOccurrence) {
-	final ImmutableList<SequentFormula> replacements = 
-            instantiateSemisequent(semi, services, matchCond, applicationPosInOccurrence);
-	
-	if (pos != null) {
-	    goal.addFormula(replacements, pos);
-	} else {
-	    goal.addFormula(replacements, antec, true);
-	}
+             SequentChangeInfo currentSequent,         
+             PosInOccurrence pos,
+             boolean antec,
+             Services services, 
+             MatchConditions matchCond,
+             PosInOccurrence applicationPosInOccurrence) {
+       final ImmutableList<SequentFormula> replacements = 
+             instantiateSemisequent(semi, services, matchCond, applicationPosInOccurrence);
+       
+       if (pos != null) {
+          currentSequent.combine(currentSequent.sequent().addFormula(replacements, pos));
+       } else {
+          currentSequent.combine(currentSequent.sequent().addFormula(replacements, antec, true));
+       }
     }
 
     /**
@@ -1003,7 +1003,7 @@ public abstract class Taclet implements Rule, Named {
      * the position information describes one occurrence in the
      * antecedent of the sequent.
      * @param semi the Semisequent with the the ConstrainedFormulae to be added
-     * @param goal the Goal that knows the node the formulae have to be added
+     * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
      * @param pos the PosInOccurrence describing the place in the
      * sequent or null for head of antecedent
      * @param services the Services encapsulating all java information
@@ -1012,12 +1012,12 @@ public abstract class Taclet implements Rule, Named {
      * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is rewritten
      */
     protected void addToAntec(Semisequent semi,
-			      Goal goal,
+			      SequentChangeInfo currentSequent,
 			      PosInOccurrence pos,
 			      Services services, 
 			      MatchConditions matchCond,
 			      PosInOccurrence applicationPosInOccurrence) { 
-	addToPos(semi, goal, pos, true, services, matchCond, applicationPosInOccurrence);
+	    addToPos(semi, currentSequent, pos, true, services, matchCond, applicationPosInOccurrence);
     }
 
     /**
@@ -1036,12 +1036,12 @@ public abstract class Taclet implements Rule, Named {
      * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is rewritten
      */
     protected void addToSucc(Semisequent semi,
-			     Goal goal,
+			     SequentChangeInfo currentSequent,
 			     PosInOccurrence pos,
 			     Services services, 
 			     MatchConditions matchCond,
 			     PosInOccurrence applicationPosInOccurrence) {
-	addToPos(semi, goal, pos, false, services, matchCond, applicationPosInOccurrence);
+       addToPos(semi, currentSequent, pos, false, services, matchCond, applicationPosInOccurrence);
     }
 
     protected abstract Taclet setName(String s);
@@ -1115,10 +1115,9 @@ public abstract class Taclet implements Rule, Named {
        }
     }
 
-
-
-
-    protected void applyAddProgVars(ImmutableSet<SchemaVariable> pvs, Goal goal,
+    protected void applyAddProgVars(ImmutableSet<SchemaVariable> pvs, 
+                                    SequentChangeInfo currentSequent,
+                                    Goal goal,
                                     PosInOccurrence posOfFind,
                                     Services services, 
                                     MatchConditions matchCond) {
@@ -1142,9 +1141,19 @@ public abstract class Taclet implements Rule, Named {
           if (!renamingMap.isEmpty()) {        
              //execute renaming
              final ProgVarReplacer pvr = new ProgVarReplacer(vn.getRenamingMap(), services);
-             pvr.replace(goal);
+             
+             //globals
+             goal.setGlobalProgVars(pvr.replace(goal.getGlobalProgVars()));
+
+             //taclet apps
+             pvr.replace(goal.ruleAppIndex().tacletIndex());
+
+             //sequent
+             currentSequent.combine(pvr.replace(currentSequent.sequent()));
+
              final RenamingTable rt = 
                    RenamingTable.getRenamingTable(vn.getRenamingMap());
+             
              renamings = renamings.append(rt);
           }
        }
@@ -1174,76 +1183,86 @@ public abstract class Taclet implements Rule, Named {
      * second goal is the if goal), otherwise an array consisting of
      * the single element p_goal
      */
-    protected ImmutableList<Goal> checkIfGoals ( Goal                         p_goal,
-					ImmutableList<IfFormulaInstantiation> p_list,
-					MatchConditions              p_matchCond,
-					int                          p_numberOfNewGoals ) {
-	ImmutableList<Goal>     res    = null;
-	Iterator<Goal> itGoal;
+    protected ImmutableList<SequentChangeInfo> checkIfGoals ( Goal                         p_goal,
+          ImmutableList<IfFormulaInstantiation> p_list,
+          MatchConditions              p_matchCond,
+          int                          p_numberOfNewGoals ) {
+       ImmutableList<SequentChangeInfo>     res    = null;
+       Iterator<SequentChangeInfo> itNewGoalSequents;
 
-	// proof obligation for the if formulas
-	Term           ifObl  = null;
+       // proof obligation for the if formulas
+       Term           ifObl  = null;
 
-	// always create at least one new goal
-	if ( p_numberOfNewGoals == 0 )
-	    p_numberOfNewGoals = 1;
+       // always create at least one new goal
+       if ( p_numberOfNewGoals == 0 )
+          p_numberOfNewGoals = 1;
 
-	if ( p_list != null ) {
-	    int i = ifSequent ().antecedent ().size ();
-	    Term ifPart;
+       if ( p_list != null ) {
+          int i = ifSequent ().antecedent ().size ();
+          Term ifPart;
 
-	    for (final IfFormulaInstantiation inst : p_list) {
-		if ( !( inst instanceof IfFormulaInstSeq ) ) {
-		    // build the if obligation formula
-		    ifPart = inst.getConstrainedFormula ().formula ();
+          for (final IfFormulaInstantiation inst : p_list) {
+             if ( !( inst instanceof IfFormulaInstSeq ) ) {
+                // build the if obligation formula
+                ifPart = inst.getConstrainedFormula ().formula ();
 
-		    // negate formulas of the if succedent
-		    final TermServices services = p_goal.proof().getServices();
-            if ( i <= 0 )
-			ifPart = services.getTermBuilder().not(ifPart);		    
+                // negate formulas of the if succedent
+                final TermServices services = p_goal.proof().getServices();
+                if ( i <= 0 )
+                   ifPart = services.getTermBuilder().not(ifPart);		    
 
-		    if ( res == null ) {
-			res   = p_goal.split( p_numberOfNewGoals + 1 );
-			ifObl = ifPart;
-		    } else
-			ifObl = services.getTermFactory().createTerm
-			    ( Junctor.AND, ifObl, ifPart );
-		    
-		    // UGLY: We create a flat structure of the new
-		    // goals, thus the if formulas have to be added to
-		    // every new goal
-		    itGoal = res.iterator ();
-		    p_goal = itGoal.next ();
-		    while ( itGoal.hasNext () ) {
-			addToPosWithoutInst ( inst.getConstrainedFormula (),
-					      p_goal,
-					      null,
-				   ( i > 0 ) ); // ( i > 0 ) iff inst is formula
-			                        // of the antecedent
-			p_goal = itGoal.next ();
-		    }
-		}
+                if ( res == null ) {
+                   res = ImmutableSLList.<SequentChangeInfo>nil();
+                   for (int j = 0; j< p_numberOfNewGoals + 1; j++) {
+                    res = res.prepend(SequentChangeInfo.createSequentChangeInfo((SemisequentChangeInfo)null, 
+                         (SemisequentChangeInfo)null, p_goal.sequent(), p_goal.sequent()));
+                   }
+                   ifObl = ifPart;
+                } else {
+                   ifObl = services.getTermFactory().createTerm
+                   ( Junctor.AND, ifObl, ifPart );
+                }
+                
+                // UGLY: We create a flat structure of the new
+                // goals, thus the if formulas have to be added to
+                // every new goal
+                itNewGoalSequents = res.iterator ();
+                SequentChangeInfo seq = itNewGoalSequents.next ();
+                while ( itNewGoalSequents.hasNext () ) {
+                   addToPosWithoutInst ( inst.getConstrainedFormula (),
+                         seq,
+                         null,
+                         ( i > 0 ) ); // ( i > 0 ) iff inst is formula
+                   // of the antecedent
+                   seq = itNewGoalSequents.next ();
+                }
+             }
 
-		--i;
-	    }
-	}
+             --i;
+          }
+       }
 
-	if ( res == null )
-	    res = p_goal.split ( p_numberOfNewGoals );
-	else {
-	    // find the sequent the if obligation has to be added to
-	    itGoal = res.iterator ();
-	    p_goal = itGoal.next ();
-	    while ( itGoal.hasNext () )
-		p_goal = itGoal.next ();
+       if ( res == null ) {
+          res = ImmutableSLList.<SequentChangeInfo>nil();
+          for (int j = 0; j< p_numberOfNewGoals; j++) {
+             res = res.prepend(SequentChangeInfo.createSequentChangeInfo((SemisequentChangeInfo)null, 
+                  (SemisequentChangeInfo)null, p_goal.sequent(), p_goal.sequent()));
+            }      
+       } else {
+          // find the sequent the if obligation has to be added to
+          itNewGoalSequents = res.iterator ();
+          SequentChangeInfo seq = itNewGoalSequents.next ();
+          while ( itNewGoalSequents.hasNext () ) {
+             seq = itNewGoalSequents.next ();
+          }
 
-	    addToPosWithoutInst ( new SequentFormula ( ifObl ),
-				  p_goal,
-				  null,
-				  false );
-	}
-	
-	return res;
+          addToPosWithoutInst ( new SequentFormula ( ifObl ),
+                seq,
+                null,
+                false );
+       }
+
+       return res;
     }
 
     /**

@@ -11,6 +11,11 @@ import javax.swing.tree.DefaultTreeModel;
  */
 public class InfoTree extends JTree {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 2018185104131516569L;
+
     InfoTree() {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode();
         root.add(new InfoTreeNode("No proof loaded",

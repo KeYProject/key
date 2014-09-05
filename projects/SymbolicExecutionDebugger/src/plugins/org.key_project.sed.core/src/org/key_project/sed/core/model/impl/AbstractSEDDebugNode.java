@@ -33,6 +33,7 @@ import org.eclipse.debug.internal.ui.viewers.update.DefaultSelectionPolicy;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.model.ISEDConstraint;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
@@ -60,7 +61,7 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
    /**
     * The parent in that this node is contained as child.
     */
-   private final ISEDDebugNode parent;
+   private ISEDDebugNode parent;
    
    /**
     * The thread.
@@ -105,6 +106,16 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
    @Override
    public ISEDDebugNode getParent() throws DebugException {
       return parent;
+   }
+   
+   /**
+    * It is valid to set the parent as long it was not defined before.
+    * So a parent might be set lazily later but can never be changed.
+    * @param parent The new parent to set.
+    */
+   protected void setParent(ISEDDebugNode parent) {
+      Assert.isTrue(this.parent == null || this.parent == parent);
+      this.parent = parent;
    }
 
    /**
@@ -316,6 +327,15 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
    public boolean hasChildren() throws DebugException {
       ISEDDebugNode[] children = getChildren();
       return !ArrayUtil.isEmpty(children);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasConstraints() throws DebugException {
+      ISEDConstraint[] constraints = getConstraints();
+      return !ArrayUtil.isEmpty(constraints);
    }
 
    /**

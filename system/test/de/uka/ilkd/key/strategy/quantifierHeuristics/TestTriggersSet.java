@@ -189,7 +189,7 @@ public class TestTriggersSet extends TestCase {
 		functions.add(prst);
 		//functions.add(pi);
 		
-		proof = new Proof(TacletForTests.services());
+		proof = new Proof("TestTriggersSet", TacletForTests.initConfig());
 		g = new Goal(new Node(proof, Sequent.EMPTY_SEQUENT),
 				new RuleAppIndex(new TacletAppIndex(new TacletIndex(), proof.getServices()),
 						new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices()));

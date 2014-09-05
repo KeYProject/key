@@ -109,13 +109,12 @@ class MainStatusLine extends JPanel {
      * Set the value the progress bar currently displays
      */
     public void setProgress(final int value){
-	         SwingUtilities.invokeLater(new Runnable() {
-                
-                @Override
-                public void run() {
-                        progressBar.setValue(value);
-                  
-                }
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                progressBar.setValue(value);
+            }
         });
     }
 

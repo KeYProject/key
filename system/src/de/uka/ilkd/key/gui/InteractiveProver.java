@@ -12,24 +12,39 @@
 //
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
-import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
-import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.strategy.*;
-import de.uka.ilkd.key.util.Debug;
-
 import java.util.Iterator;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
+import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.RuleAppIndex;
+import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.IfFormulaInstSeq;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
+import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
+import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.util.Debug;
 
 public class InteractiveProver implements InterruptListener {
 
@@ -50,23 +65,13 @@ public class InteractiveProver implements InterruptListener {
     private final ProverTaskListener focussedAutoModeTaskListener
             = new FocussedAutoModeTaskListener();
 
-    /**
-     * list of proof listeners and interactive proof listeners. We use an
-     * immutable list to store listeners to allow for addition/removal within
-     * listener code
-     */
-    private ImmutableList<AutoModeListener> listenerList = ImmutableSLList.nil();
 
     /**
      * the mediator
      */
     private final KeYMediator mediator;
 
-    private boolean resumeAutoMode = false;
-
     private AutoModeWorker worker;
-
-    private boolean autoMode; // autoModeStarted has been fired
 
     /**
      * creates a new interactive prover object
@@ -79,7 +84,7 @@ public class InteractiveProver implements InterruptListener {
         mediator.getProfile().setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);//XXX
 
         applyStrategy =
-                new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create(), true);
+                new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
         applyStrategy.addProverTaskObserver(mediator().getUI());
 
         if (mediator.getAutoSaver() != null) {
@@ -104,42 +109,6 @@ public class InteractiveProver implements InterruptListener {
         if (mediator.getAutoSaver() != null) {
             mediator.getAutoSaver().setProof(p);
         }
-    }
-
-    public void addAutoModeListener(AutoModeListener p) {
-        listenerList = listenerList.prepend(p);
-    }
-
-    public void removeAutoModeListener(AutoModeListener p) {
-        listenerList = listenerList.removeAll(p);
-    }
-
-    /**
-     * fires the event that automatic execution has started
-     */
-    protected void fireAutoModeStarted(ProofEvent e) {
-        autoMode = true; // Must be set before listeners are informed because they might like to check the auto mode state via isAutoMode()
-        for (AutoModeListener aListenerList : listenerList) {
-            aListenerList.autoModeStarted(e);
-        }
-    }
-
-    /**
-     * fires the event that automatic execution has stopped
-     */
-    public void fireAutoModeStopped(ProofEvent e) {
-        autoMode = false; // Must be set before listeners are informed because they might like to check the auto mode state via isAutoMode()
-        for (AutoModeListener aListenerList : listenerList) {
-            aListenerList.autoModeStopped(e);
-        }
-    }
-
-    void setResumeAutoMode(boolean b) {
-        resumeAutoMode = b;
-    }
-
-    public boolean resumeAutoMode() {
-        return resumeAutoMode;
     }
 
     /**
@@ -168,16 +137,6 @@ public class InteractiveProver implements InterruptListener {
     }
 
     /**
-     * Checks if the auto mode is currently running.
-     *
-     * @return {@code true} auto mode is running, {@code false} auto mode is not
-     * running.
-     */
-    public boolean isAutoMode() {
-        return autoMode;
-    }
-
-    /**
      * starts the execution of rules with active strategy. The strategy will
      * only be applied on the goals of the list that is handed over and on the
      * new goals an applied rule adds
@@ -187,9 +146,9 @@ public class InteractiveProver implements InterruptListener {
             mediator().notify(new GeneralInformationEvent("No enabled goals available."));
             return;
         }
+        worker = new AutoModeWorker(goals);
         mediator().stopInterface(true);
         mediator().setInteractive(false);
-        worker = new AutoModeWorker(goals);
         worker.execute();
     }
 
@@ -550,24 +509,6 @@ public class InteractiveProver implements InterruptListener {
         return result;
     }
 
-    /**
-     * adds a proverTaskListener to apply strategy.
-     *
-     * @param ptl the ProverTaskListener to be added
-     */
-    public void addProverTaskListener(ProverTaskListener ptl) {
-        applyStrategy.addProverTaskObserver(ptl);
-    }
-
-    /**
-     * removes <code>ptl</code> from the list of proverTaskListeners
-     *
-     * @param ptl the proverTaskListener to be removed
-     */
-    public void removeProverTaskListener(ProverTaskListener ptl) {
-        applyStrategy.removeProverTaskObserver(ptl);
-    }
-
     /* <p>
      * Invoking start() on the SwingWorker causes a new Thread
      * to be created that will call construct(), and then
@@ -605,12 +546,12 @@ public class InteractiveProver implements InterruptListener {
             }
 
             synchronized(applyStrategy) {
+                // make it possible to free memory and falsify the isAutoMode() property
+                worker = null;
                 // wait for apply Strategy to terminate
                 mediator().setInteractive(true);
                 mediator().startInterface(true);
             }
-            // make it possible to free memory
-            worker = null;
         }
 
         private void notifyException(final Exception exception) {

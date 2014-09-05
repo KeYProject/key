@@ -137,7 +137,7 @@ public interface Term extends SVSubstitute, Sorted {
      * operator, sort, arity, varsBoundHere and javaBlock as this object
      * modulo bound renaming
      */  
-    public boolean equalsModRenaming(Object o);  
+    public boolean equalsModRenaming(Term o);  
     
     /**
      * returns true if the term is labeled

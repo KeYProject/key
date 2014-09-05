@@ -29,7 +29,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -780,8 +779,7 @@ public final class SpecificationRepository {
         for (FunctionalOperationContract contract : result) {
             if (!contract.getModality().equals(matchModality)
                     || (transactionModality
-                            && !contract.transactionApplicableContract() && !contract
-                                .isReadOnlyContract(services))) {
+                            && !contract.transactionApplicableContract())) {
                 result = result.remove(contract);
             }
         }

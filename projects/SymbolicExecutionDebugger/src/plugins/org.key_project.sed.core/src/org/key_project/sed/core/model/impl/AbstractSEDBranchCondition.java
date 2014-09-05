@@ -23,7 +23,7 @@ import org.key_project.sed.core.model.ISEDThread;
  * @author Martin Hentschel
  * @see ISEDBranchCondition
  */
-public abstract class AbstractSEDBranchCondition extends AbstractSEDTerminateCompatibleDebugNode implements ISEDBranchCondition {
+public abstract class AbstractSEDBranchCondition extends AbstractSEDStackFrameCompatibleDebugNode implements ISEDBranchCondition {
    /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this branch condition is contained.

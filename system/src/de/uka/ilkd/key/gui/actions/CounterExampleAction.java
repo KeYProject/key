@@ -17,8 +17,10 @@ import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.util.Debug;
 import java.awt.event.ActionEvent;
@@ -92,14 +94,14 @@ public class CounterExampleAction extends MainWindowAction {
         Proof oldProof = node.proof();
         Sequent oldSequent = node.sequent();
         Sequent newSequent = Sequent.createSequent(oldSequent.antecedent(), oldSequent.succedent());
+        InitConfig newInitConfig = oldProof.getInitConfig().deepCopy();
         Proof proof = new Proof("Semantics Blasting: " + oldProof.name(),
                 newSequent, "",
-                oldProof.env().getInitConfig().createTacletIndex(),
-                oldProof.env().getInitConfig().createBuiltInRuleIndex(),
-                oldProof.getServices(),
-                oldProof.getSettings());
+                newInitConfig.createTacletIndex(),
+                newInitConfig.createBuiltInRuleIndex(),
+                newInitConfig );
 
-        proof.setProofEnv(oldProof.env());
+        proof.setEnv(oldProof.getEnv());
         proof.setNamespaces(oldProof.getNamespaces());
 
         ProofAggregate pa = new SingleProof(proof, "XXX");
@@ -127,18 +129,25 @@ public class CounterExampleAction extends MainWindowAction {
 
         @Override
         protected Void doInBackground() throws Exception {
-            KeYMediator mediator = getMediator();
-            Proof proof = mediator.getSelectedProof();
-            SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
+            final KeYMediator mediator = getMediator();
+            final Proof proof = mediator.getSelectedProof();
+            final SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
+            TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
+            final ProverTaskListener ptl = mediator.getUI().getListener();
+            ptl.taskStarted(macro.getName(), 0);
 
             try {
-                macro.applyTo(mediator, null, null);
+                synchronized(macro) {
+                    // wait for macro to terminate
+                    info = macro.applyTo(mediator, null, ptl);
+                }
             } catch (InterruptedException e) {
                 Debug.out("Semantics blasting interrupted");
+            } finally {
+                ptl.taskFinished(info);
+                getMediator().setInteractive(true);
+                getMediator().startInterface(true);
             }
-
-            getMediator().setInteractive(true);
-            getMediator().startInterface(true);
 
             //invoke z3 for counterexamples
             SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),

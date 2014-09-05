@@ -136,7 +136,7 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
          if (editor != null) {
             editor.close();
          }
-         if (proof != null) {
+         if (proof != null && !proof.isDisposed()) {
             proof.dispose();
          }
          if (environment != null) {

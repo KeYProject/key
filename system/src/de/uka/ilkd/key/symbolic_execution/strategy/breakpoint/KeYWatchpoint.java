@@ -106,7 +106,7 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint{
             Term termForSideProof = replacer.replace(negatedCondition);
             //start side proof
             Term toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
-            Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, ruleApp, toProof);
+            Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, pio, toProof);
             info = SideProofUtil.startSideProof(proof, 
                                                 sequent, 
                                                 StrategyProperties.METHOD_CONTRACT,

@@ -26,15 +26,16 @@ import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchStatement;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDExceptionalMethodReturn;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
 import org.key_project.sed.core.model.ISEDLoopBodyTermination;
 import org.key_project.sed.core.model.ISEDLoopCondition;
+import org.key_project.sed.core.model.ISEDLoopInvariant;
 import org.key_project.sed.core.model.ISEDLoopStatement;
 import org.key_project.sed.core.model.ISEDMethodCall;
+import org.key_project.sed.core.model.ISEDMethodContract;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDTermination;
-import org.key_project.sed.core.model.ISEDLoopInvariant;
-import org.key_project.sed.core.model.ISEDMethodContract;
 import org.key_project.sed.ui.Activator;
 import org.key_project.util.eclipse.BundleUtil;
 
@@ -59,6 +60,11 @@ public final class SEDImages {
      * The key for the image that is used for method return.
      */
     public static final String METHOD_RETURN = "org.key_project.sed.ui.images.methodReturn";
+    
+    /**
+     * The key for the image that is used for exceptional method return.
+     */
+    public static final String EXCEPTIONAL_METHOD_RETURN = "org.key_project.sed.ui.images.exceptionalMethodReturn";
     
     /**
      * The key for the image that is used for termination.
@@ -174,6 +180,16 @@ public final class SEDImages {
      * The key for the image that is used to follow an {@link ISEDAnnotationLink}.
      */
     public static final String ANNOTATION_GO_TO = "org.key_project.sed.ui.images.annotation.goTo";
+
+    /**
+     * The key for the image that is used for symbolic debugging.
+     */
+    public static final String SYMBOLIC_DEBUG = "org.key_project.sed.ui.images.symbolicDebug";
+
+    /**
+     * The key for the image that is used for symbolic debugging.
+     */
+    public static final String SHOW_ALL_CONSTRAINTS = "org.key_project.sed.ui.images.showAllConstraints";
     
     /**
      * Forbid instances.
@@ -240,6 +256,9 @@ public final class SEDImages {
         }
         else if (METHOD_RETURN.equals(key)) {
            path = "icons/method_return.gif";
+        }
+        else if (EXCEPTIONAL_METHOD_RETURN.equals(key)) {
+           path = "icons/exceptional_method_return.gif";
         }
         else if (TERMINATION.equals(key)) {
            path = "icons/termination.gif";
@@ -309,6 +328,12 @@ public final class SEDImages {
         else if (ANNOTATION_GO_TO.equals(key)) {
            path = "icons/follow_annotation_link.gif";
         }
+        else if (SYMBOLIC_DEBUG.equals(key)) {
+           path = "icons/symbolic_debug.gif";
+        }
+        else if (SHOW_ALL_CONSTRAINTS.equals(key)) {
+           path = "icons/show_all_constraints.gif";
+        }
         // Load image if possible
         if (path != null) {
            InputStream in = null;
@@ -356,6 +381,7 @@ public final class SEDImages {
                registry.remove(ANNOTATION_MOVE_UP);
                registry.remove(BRANCH_CONDITION);
                registry.remove(BRANCH_STATEMENT);
+               registry.remove(EXCEPTIONAL_METHOD_RETURN);
                registry.remove(EXCEPTIONAL_TERMINATION);
                registry.remove(EXCEPTIONAL_TERMINATION_NOT_VERIFIED);
                registry.remove(KEY_WATCHPOINT);
@@ -371,8 +397,10 @@ public final class SEDImages {
                registry.remove(METHOD_CONTRACT_NOT_PRE);
                registry.remove(METHOD_CONTRACT_NOT_PRE_NOT_NPC);
                registry.remove(METHOD_RETURN);
+               registry.remove(SHOW_ALL_CONSTRAINTS);
                registry.remove(TERMINATION);
                registry.remove(TERMINATION_NOT_VERIFIED);
+               registry.remove(SYMBOLIC_DEBUG);
             }
          });
        }
@@ -389,6 +417,9 @@ public final class SEDImages {
        }
        else if (element instanceof ISEDMethodReturn) {
           return getImage(SEDImages.METHOD_RETURN);
+       }
+       else if (element instanceof ISEDExceptionalMethodReturn) {
+          return getImage(SEDImages.EXCEPTIONAL_METHOD_RETURN);
        }
        else if (element instanceof ISEDExceptionalTermination) {
           ISEDExceptionalTermination node = (ISEDExceptionalTermination)element;

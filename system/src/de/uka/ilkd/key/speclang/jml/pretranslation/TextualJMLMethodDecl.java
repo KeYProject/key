@@ -35,6 +35,7 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
         this.decl = decl;
         this.methodName = methodName;
         this.methodDefinition = methodDefinition;
+        setPosition(decl);
     }
     
     

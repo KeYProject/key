@@ -224,7 +224,7 @@ public interface BlockContract extends SpecificationElement {
         {
             createAndStoreFlags();
             return new Variables(
-                selfVar(method.getContainerType(), false),
+                selfVar(method, method.getContainerType(), false),
                 breakFlags,
                 continueFlags,
                 returnFlag,

@@ -213,7 +213,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
         
         final ProgramVariable paramLength = new LocationVariable(
-                new ProgramElementName("length"), integerType);
+                new ProgramElementName("length"), integerType, true);
 
         final ParameterDeclaration param = new ParameterDeclaration(
                 new Modifier[0], new TypeRef(integerType),

@@ -39,6 +39,10 @@ import de.uka.ilkd.key.util.MiscTools;
  */
 public class InfoTreeModel extends DefaultTreeModel {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 2093787874117871875L;
     private static final String LEMMAS = "Lemmas";
     private static final String TACLET_BASE = "Taclet Base";
 
@@ -55,6 +59,10 @@ public class InfoTreeModel extends DefaultTreeModel {
 
     private class FunctionsNode extends InfoTreeNode {
 
+        /**
+         *
+         */
+        private static final long serialVersionUID = -5546552277804988834L;
         private static final String COLLECTION = 
                 "This node stands for a category of symbols; expand it to browse the symbols " +
                 "in the category.";
@@ -91,6 +99,11 @@ public class InfoTreeModel extends DefaultTreeModel {
 
     private class TermLabelsNode extends InfoTreeNode {
 
+        /**
+         *
+         */
+        private static final long serialVersionUID = 7447092361863294242L;
+
         TermLabelsNode(MainWindow mainWindow, Properties termLabelExplanations) {
             super("Term Labels", "Show descriptions for currently available term labels.");
 
@@ -102,6 +115,11 @@ public class InfoTreeModel extends DefaultTreeModel {
     }
 
     private class RulesNode extends InfoTreeNode {
+
+        /**
+         *
+         */
+        private static final long serialVersionUID = 7622830441420768861L;
 
         RulesNode(Properties ruleExplanations, Goal goal) {
             super("Rules", "Browse descriptions for currently available rules.");

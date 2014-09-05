@@ -111,7 +111,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
     * @return The human readable return value.
     */
    protected String lazyComputeReturnValueString() throws ProofInputException {
-      return formatTerm(returnValue);
+      return !isDisposed() ? formatTerm(returnValue, getServices()) : null;
    }
 
    /**
@@ -148,7 +148,7 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
     */
    protected String lazyComputeConditionString() throws ProofInputException {
       if (hasCondition()) {
-         return formatTerm(condition);
+         return !isDisposed() ? formatTerm(condition, getServices()) : null;
       }
       else {
          return null;

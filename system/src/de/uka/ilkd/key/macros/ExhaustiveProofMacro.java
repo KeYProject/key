@@ -12,7 +12,6 @@
 //
 package de.uka.ilkd.key.macros;
 
-import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -24,6 +23,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,7 +52,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
         } else if (macro.canApplyTo(mediator, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc)) {
             return posInOcc;
         } else {
-            Term subTerm = posInOcc.subTerm();
+            final Term subTerm = posInOcc.subTerm();
             PosInOccurrence res = null;
             for (int i = 0; i < subTerm.arity() && res == null; i++) {
                 res = getApplicablePosInOcc(mediator, goal, posInOcc.down(i), macro);
@@ -86,7 +86,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
         Sequent seq = null;
         boolean applicable = false;
         final ProofMacro macro = getProofMacro();
-        for (Goal goal: goals) {
+        for (final Goal goal: goals) {
             seq = goal.sequent();
             if (!applicableOnNodeAtPos.containsKey(goal.node())) {
                 // node has not been checked before, so do it
@@ -105,29 +105,39 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
     }
 
     @Override
-	public void applyTo(KeYMediator mediator,
-						ImmutableList<Goal> goals,
-						PosInOccurrence posInOcc,
-						ProverTaskListener listener) throws InterruptedException {
-		for (Goal goal : goals) {
-			final ProofMacro macro = getProofMacro();
-			if (!applicableOnNodeAtPos.containsKey(goal.node())) {
-				// node has not been checked before, so do it
-				boolean canBeApplied =
-						canApplyTo(mediator, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc);
-				if (!canBeApplied) {
-					// canApplyTo checks all open goals. thus, if it returns
-					// false, then this macro is not applicable at all and
-					// we can return
-					return;
-				}
-			}
-			PosInOccurrence applicableAt =
-					applicableOnNodeAtPos.get(goal.node());
-			if (applicableAt != null) {
-				macro.applyTo(mediator, ImmutableSLList.<Goal>nil().prepend(goal), applicableAt, listener);
-			}
-		}
+    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+                                          ImmutableList<Goal> goals,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) throws InterruptedException {
+        ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
+        final ProofMacro macro = getProofMacro();
+        for (final Goal goal : goals) {
+            if (!applicableOnNodeAtPos.containsKey(goal.node())) {
+                // node has not been checked before, so do it
+                boolean canBeApplied =
+                        canApplyTo(mediator, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc);
+                if (!canBeApplied) {
+                    // canApplyTo checks all open goals. thus, if it returns
+                    // false, then this macro is not applicable at all and
+                    // we can return
+                    return new ProofMacroFinishedInfo(this, goal);
+                }
+            }
+            PosInOccurrence applicableAt = applicableOnNodeAtPos.get(goal.node());
+            if (applicableAt != null) {
+                final ProverTaskListener pml =
+                        new ProofMacroListener(macro, listener);
+                pml.taskStarted(getName(), 0);
+                synchronized(macro) {
+                    // wait for macro to terminate
+                    info = macro.applyTo(mediator, ImmutableSLList.<Goal>nil().prepend(goal),
+                                         applicableAt, pml);
+                }
+                pml.taskFinished(info);
+                info = new ProofMacroFinishedInfo(this, info);
+            }
+        }
+        return info;
     }
 
     /**
@@ -136,9 +146,4 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
      * @return the proofMacro.
      */
     abstract ProofMacro getProofMacro();
-
-    @Override
-    public KeyStroke getKeyStroke() {
-        return null; // default implementation
-    }
 }

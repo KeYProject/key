@@ -65,8 +65,8 @@ import de.uka.ilkd.key.speclang.WellDefinednessCheck.TermAndFunc;
 public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     private final WellDefinednessCheck check;
-    private final Variables vars;
     private Term mbyAtPre;
+    private InitConfig proofConfig;
 
     /**
      * Constructor
@@ -76,7 +76,6 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     public WellDefinednessPO(InitConfig initConfig, WellDefinednessCheck check) {
         super(initConfig, check.getName());
         this.check = check;
-        this.vars = buildVariables(check, services);
     }
 
     //-------------------------------------------------------------------------
@@ -204,13 +203,13 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
      * Registers the new variables
      * @param vars variables to be used in the check
      */
-    private void register(Variables vars) {
-        register((Function)vars.anonHeap.op());
-        register(vars.self);
-        register(vars.result);
-        register(vars.exception);
-        register(vars.atPres.get(vars.heap));
-        register(vars.params);
+    private void register(Variables vars, Services proofServices) {
+        register((Function)vars.anonHeap.op(), proofServices);
+        register(vars.self, proofServices);
+        register(vars.result, proofServices);
+        register(vars.exception, proofServices);
+        register(vars.atPres.get(vars.heap), proofServices);
+        register(vars.params, proofServices);
     }
 
     @Override
@@ -247,19 +246,26 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     @Override
     public void readProblem() throws ProofInputException {
-        register(this.vars);
+        assert proofConfig == null;
+        
+        proofConfig = environmentConfig.deepCopy();
+        final Services proofServices = proofConfig.getServices();
+       
+        final Variables vars = buildVariables(check, proofServices);
+
+        register(vars, proofServices);
         final POTerms po = check.replace(check.createPOTerms(), vars);
         final TermAndFunc preCond =
-                check.getPre(po.pre, vars.self, vars.heap, vars.params, false, services);
+                check.getPre(po.pre, vars.self, vars.heap, vars.params, false, proofServices);
         final Term wdPre = tb.wd(preCond.term);
         final Term wdMod = tb.wd(po.mod);
         final Term wdRest = tb.and(tb.wd(po.rest));
-        register(preCond.func);
+        register(preCond.func, proofServices);
         mbyAtPre = preCond.func != null ? check.replace(tb.func(preCond.func), vars) : null;
-        final Term post = check.getPost(po.post, vars.result, services);
+        final Term post = check.getPost(po.post, vars.result, proofServices);
         final Term pre = preCond.term;
         final Term updates = check.getUpdates(po.mod, vars.heap, vars.heapAtPre,
-                                              vars.anonHeap, services);
+                                              vars.anonHeap, proofServices);
         final Term wfAnon = tb.wellFormed(vars.anonHeap);
         final Term uPost = check instanceof ClassWellDefinedness ?
                 tb.tt() : tb.apply(updates, tb.wd(post));
@@ -268,9 +274,9 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         final Term poTerms = tb.and(wdPre, imp);
         assignPOTerms(poTerms);
         // add axioms
-        collectClassAxioms(getKJT());
+        collectClassAxioms(getKJT(), proofConfig);
 
-        generateWdTaclets();
+        generateWdTaclets(proofConfig);
     }
 
     @Override
@@ -371,4 +377,9 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
                   services.getTermBuilder().label(services.getTermBuilder().func(anonHeap), ParameterlessTermLabel.ANON_HEAP_LABEL));
         }
     }
+
+   @Override
+   protected InitConfig getCreatedInitConfigForSingleProof() {
+      return proofConfig;
+   }
 }

@@ -13,7 +13,9 @@
 
 package org.key_project.sed.core.model.impl;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IValue;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDVariable;
@@ -26,11 +28,19 @@ import org.key_project.sed.core.util.LogUtil;
  */
 public abstract class AbstractSEDVariable extends AbstractSEDDebugElement implements ISEDVariable {
    /**
+    * The parent {@link IStackFrame} in which this {@link ISEDVariable} is shown.
+    */
+   private final IStackFrame stackFrame; 
+
+   /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this element is contained.
+    * @param stackFrame The parent {@link IStackFrame} in which this {@link ISEDVariable} is shown.
     */
-   public AbstractSEDVariable(ISEDDebugTarget target) {
+   public AbstractSEDVariable(ISEDDebugTarget target, IStackFrame stackFrame) {
       super(target);
+      Assert.isNotNull(stackFrame);
+      this.stackFrame = stackFrame;
    }
 
    /**
@@ -71,5 +81,13 @@ public abstract class AbstractSEDVariable extends AbstractSEDDebugElement implem
    @Override
    public boolean verifyValue(String expression) throws DebugException {
       return false;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IStackFrame getStackFrame() {
+      return stackFrame;
    }
 }

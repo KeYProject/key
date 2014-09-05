@@ -38,11 +38,14 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.util.Debug;
 
 public class ConsoleUserInterface extends AbstractUserInterface {
     private static final int PROGRESS_BAR_STEPS = 50;
     private static final String PROGRESS_MARK = ">";
+    private int numOfInvokedMacros;
+
 
     // Substitute for TaskTree (GUI) to facilitate side proofs in console mode
     private ImmutableList<Proof> proofStack = ImmutableSLList.<Proof>nil();
@@ -54,78 +57,79 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     // for a progress bar
     private int progressMax = 0;
 
-   public ConsoleUserInterface(BatchMode batchMode, byte verbosity) {
-    	this.batchMode = batchMode;
-    	this.verbosity = verbosity;
+    public ConsoleUserInterface(BatchMode batchMode, byte verbosity) {
+        this.batchMode = batchMode;
+        this.verbosity = verbosity;
         this.mediator  = new KeYMediator(this);
-   }
+        this.numOfInvokedMacros = 0;
+    }
 
-   public ConsoleUserInterface(BatchMode batchMode, boolean verbose) {
-       this(batchMode, verbose? DEBUG: NORMAL);
-   }
+    public ConsoleUserInterface(BatchMode batchMode, boolean verbose) {
+        this(batchMode, verbose? DEBUG: NORMAL);
+    }
 
-   protected String getMacroConsoleOutput() {
-       return "[ APPLY " + getMacro().getClass().getSimpleName() + " ]";
-   }
+    protected String getMacroConsoleOutput() {
+        return "[ APPLY " + getMacro().getClass().getSimpleName() + " ]";
+    }
 
-   public void finish(Proof proof) {
-       // setInteractive(false) has to be called because the ruleAppIndex
-       // has to be notified that we work in auto mode (CS)
-       mediator.setInteractive(false);
-       startAndWaitForAutoMode(proof);
-       if (verbosity >= HIGH) { // WARNING: Is never executed since application terminates via System.exit() before.
-       	System.out.println(proof.statistics());
-       }
-   }
+    private void finish(Proof proof) {
+        // setInteractive(false) has to be called because the ruleAppIndex
+        // has to be notified that we work in auto mode (CS)
+        mediator.setInteractive(false);
+        startAndWaitForAutoMode(proof);
+        if (verbosity >= HIGH) { // WARNING: Is never executed since application terminates via System.exit() before.
+            System.out.println(proof.statistics());
+        }
+    }
 
-   public void taskFinished(TaskFinishedInfo info) {
-       progressMax = 0; // reset progress bar marker
-       final Proof proof = info.getProof();
-       if (proof==null) {
-           if (verbosity > SILENT) System.out.println("Proof loading failed");
-           System.exit(1);
-       }
-       final int openGoals = proof.openGoals().size();
-       final Object result2 = info.getResult();
-       if (info.getSource() instanceof ApplyStrategy || info.getSource() instanceof ProofMacro) {
-           if (verbosity >= HIGH) {
-               System.out.println("]"); // end progress bar
-           }
-           if (verbosity > SILENT) {
-               System.out.println("[ DONE  ... rule application ]");
-               if (verbosity >= HIGH) {
-                   System.out.println("\n== Proof "+ (openGoals > 0 ? "open": "closed")+ " ==");
-                   final Proof.Statistics stat = info.getProof().statistics();
-                   System.out.println("Proof steps: "+stat.nodes);
-                   System.out.println("Branches: "+stat.branches);
-                   System.out.println("Automode Time: "+stat.autoModeTime+"ms");
-                   System.out.println("Time per step: "+stat.timePerStep+"ms");
-               }
-               System.out.println("Number of goals remaining open: " +
-                       openGoals);
-               System.out.flush();
-           }
-           batchMode.finishedBatchMode ( result2, info.getProof() );
-           Debug.fail ( "Control flow should not reach this point." );
-       } else if (info.getSource() instanceof ProblemLoader) {
-           if (verbosity > SILENT) System.out.println("[ DONE ... loading ]");
-           if (result2 != null) {
-               if (verbosity > SILENT) System.out.println(result2);
-               if (verbosity >= HIGH && result2 instanceof Throwable) {
-                   ((Throwable) result2).printStackTrace();
-               }
-               System.exit(-1);
-           }
-           if(batchMode.isLoadOnly() ||  openGoals==0) {
-               if (verbosity > SILENT)
-                   System.out.println("Number of open goals after loading: " +
-                           openGoals);
-               System.exit(0);
-           }
-       }
-   }
+    @Override
+    public void taskFinished(TaskFinishedInfo info) {
+        progressMax = 0; // reset progress bar marker
+        final Proof proof = info.getProof();
+        if (proof==null) {
+            if (verbosity > SILENT) System.out.println("Proof loading failed");
+            System.exit(1);
+        }
+        final int openGoals = proof.openGoals().size();
+        final Object result2 = info.getResult();
+        if (info.getSource() instanceof ApplyStrategy ||
+                info.getSource() instanceof ProofMacro) {
+            if (numOfInvokedMacros == 0) {
+                finalizeBatchMode(openGoals, info, result2);
+            } else if (!macroChosen()) {
+                finish(proof);
+            }
+        } else if (info.getSource() instanceof ProblemLoader) {
+            if (verbosity > SILENT) System.out.println("[ DONE ... loading ]");
+            if (result2 != null) {
+                if (verbosity > SILENT) System.out.println(result2);
+                if (verbosity >= HIGH && result2 instanceof Throwable) {
+                    ((Throwable) result2).printStackTrace();
+                }
+                System.exit(-1);
+            }
+            if(batchMode.isLoadOnly() ||  openGoals==0) {
+                if (verbosity > SILENT)
+                    System.out.println("Number of open goals after loading: " +
+                            openGoals);
+                System.exit(0);
+            }
+            if (macroChosen()) {
+                applyMacro();
+            } else {
+                finish(proof);
+            }
+        }
+    }
 
-   @Override
+
+    @Override
+    protected void macroFinished(TaskFinishedInfo info) {
+        numOfInvokedMacros--;
+    }
+
+
+    @Override
     public void progressStarted(Object sender) {
         // TODO Implement ProblemInitializerListener.progressStarted
         if(verbosity >= DEBUG) {
@@ -143,10 +147,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     @Override
     public void proofCreated(ProblemInitializer sender,
             ProofAggregate proofAggregate) {
-        // TODO Implement ProblemInitializerListener.proofCreated
-        // XXX WHY AT THE MAINWINDOW?!?!
-        mediator.setProof(proofAggregate.getFirstProof());
-        proofStack = proofStack.prepend(proofAggregate.getFirstProof());
     }
 
     @Override
@@ -204,6 +204,12 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     }
 
     @Override
+    protected void macroStarted(String message,
+                                int size) {
+        numOfInvokedMacros++;
+    }
+
+    @Override
     public void setMaximum(int maximum) {
         // TODO Implement ProgressMonitor.setMaximum
         if(verbosity >= DEBUG) {
@@ -240,50 +246,50 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
     @Override
     public void loadProblem(File file) {
-		super.getProblemLoader(file, null, null, mediator).runSynchronously();
-	}
+        super.getProblemLoader(file, null, null, mediator).runSynchronously();
+    }
 
-   @Override
-   public void loadProblem(File file, List<File> classPath, File bootClassPath) {
-      super.getProblemLoader(file, classPath, bootClassPath, mediator).runSynchronously();
-   }
+    @Override
+    public void loadProblem(File file, List<File> classPath, File bootClassPath) {
+        super.getProblemLoader(file, classPath, bootClassPath, mediator).runSynchronously();
+    }
 
-   @Override
-   public void openExamples() {
-       System.out.println("Open Examples not suported by console UI.");
-   }
+    @Override
+    public void openExamples() {
+        System.out.println("Open Examples not suported by console UI.");
+    }
 
-   @Override
-   public ProblemInitializer createProblemInitializer(Profile profile) {
-      ProblemInitializer pi = new ProblemInitializer(this,
-            new Services(profile, mediator.getExceptionHandler()),
-            this);
-      return pi;
-   }
+    @Override
+    public ProblemInitializer createProblemInitializer(Profile profile) {
+        ProblemInitializer pi = new ProblemInitializer(this,
+                new Services(profile, mediator.getExceptionHandler()),
+                this);
+        return pi;
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public KeYMediator getMediator() {
-     return mediator;
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public KeYMediator getMediator() {
+        return mediator;
+    }
 
-   /**
-    * Checks if the verbose is active or not.
-    * @return {@code true} verbose is active, {@code false} verbose is deactivated.
-    */
-   public boolean isVerbose() {
-      return verbosity >= DEBUG;
-   }
+    /**
+     * Checks if the verbose is active or not.
+     * @return {@code true} verbose is active, {@code false} verbose is deactivated.
+     */
+    public boolean isVerbose() {
+        return verbosity >= DEBUG;
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isAutoModeSupported(Proof proof) {
-      return true; // All proofs are supported.
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isAutoModeSupported(Proof proof) {
+        return true; // All proofs are supported.
+    }
 
     /**
      * {@inheritDoc}
@@ -305,11 +311,43 @@ public class ConsoleUserInterface extends AbstractUserInterface {
         }
     }
 
-   @Override
-   public boolean selectProofObligation(InitConfig initConfig) {
-      if(verbosity >= DEBUG) {
-         System.out.println("Proof Obligation selection not supported by console.");
+    @Override
+    public boolean selectProofObligation(InitConfig initConfig) {
+        if(verbosity >= DEBUG) {
+            System.out.println("Proof Obligation selection not supported by console.");
         }
-      return false;
-   }
+        return false;
+    }
+
+    private void finalizeBatchMode(final int openGoals,
+                                   TaskFinishedInfo info,
+                                   final Object result2) {
+        if (verbosity >= HIGH) {
+            System.out.println("]"); // end progress bar
+        }
+        if (verbosity > SILENT) {
+            System.out.println("[ DONE  ... rule application ]");
+            if (verbosity >= HIGH) {
+                System.out.println("\n== Proof "+ (openGoals > 0 ? "open": "closed")+ " ==");
+                final Proof.Statistics stat = info.getProof().statistics();
+                System.out.println("Proof steps: "+stat.nodes);
+                System.out.println("Branches: "+stat.branches);
+                System.out.println("Automode Time: "+stat.autoModeTime+"ms");
+                System.out.println("Time per step: "+stat.timePerStep+"ms");
+            }
+            System.out.println("Number of goals remaining open: " +
+                    openGoals);
+            System.out.flush();
+        }
+        // this seems to be a good place to free some memory
+        Runtime.getRuntime().gc();
+        batchMode.finishedBatchMode ( result2, info.getProof() );
+        Debug.fail ( "Control flow should not reach this point." );
+    }
+
+    @Override
+    public void proofRegistered(ProofEnvironmentEvent event) {
+        mediator.setProof(event.getProofList().getFirstProof());
+        proofStack = proofStack.prepend(event.getProofList().getFirstProof());
+    }
 }

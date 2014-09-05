@@ -28,7 +28,7 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.RuleCollection;
-import de.uka.ilkd.key.proof.io.RuleSource;
+import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.rule.BuiltInRule;
 
 /**
@@ -43,7 +43,7 @@ public class HelperClassForTests {
             //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
 	    public RuleCollection getStandardRules() {
                 return new RuleCollection(
-                                RuleSource.initRuleFile("LDTsForTestsOnly.key"), 
+                                RuleSourceFactory.fromBuildInRule("LDTsForTestsOnly.key"), 
                                 ImmutableSLList.<BuiltInRule>nil());
             }
         };
@@ -65,8 +65,7 @@ public class HelperClassForTests {
             	= new KeYUserProblemFile("UpdatetermTest", file, null, profile); 
             pi = new ProblemInitializer(profile);
            
-            pi.startProver(po, po);
-            result = po.getPO();                            
+            result = pi.startProver(po, po);
 
         } catch (Exception e) {
             System.err.println("Exception occurred while parsing "+file+"\n");
@@ -85,8 +84,7 @@ public class HelperClassForTests {
 	KeYUserProblemFile po 
 		= new KeYUserProblemFile("UpdatetermTest", file, null, profile); 
         ProblemInitializer pi = new ProblemInitializer(profile);
-        pi.startProver(po, po);
-        return po.getPO();        
+        return pi.startProver(po, po);
     }
        
     public Term extractProblemTerm(Proof p) {

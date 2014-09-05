@@ -25,6 +25,17 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public final class LocationVariable extends ProgramVariable
 			            implements UpdateableOperator {
 
+
+    public LocationVariable(ProgramElementName name,
+                        KeYJavaType        t,
+                        KeYJavaType        containingType,
+                        boolean            isStatic,
+                        boolean            isModel,
+                        boolean isGhost,
+                        boolean isFinal) {
+        super(name, t.getSort(), t, containingType, isStatic, isModel, isGhost, isFinal);
+    }
+    
     public LocationVariable(ProgramElementName name,
             		    KeYJavaType        t,
             		    KeYJavaType        containingType,

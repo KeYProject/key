@@ -14,6 +14,7 @@
 package org.key_project.sed.core.model.memory;
 
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IValue;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDVariable;
@@ -43,9 +44,10 @@ public class SEDMemoryVariable extends AbstractSEDVariable {
    /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this element is contained.
+    * @param stackFrame The parent {@link IStackFrame} in which this {@link ISEDVariable} is shown.
     */
-   public SEDMemoryVariable(ISEDDebugTarget target) {
-      super(target);
+   public SEDMemoryVariable(ISEDDebugTarget target, IStackFrame stackFrame) {
+      super(target, stackFrame);
    }
    
    /**

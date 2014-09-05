@@ -88,6 +88,7 @@ public abstract class ProgramVariable extends AbstractSortedOperator
 	this.isStatic = isStatic;
 	this.isModel = isModel;
 	this.isGhost = isGhost;
+	    assert !(isModel && isGhost) : "Program variable cannot be model and ghost";
 	this.isFinal = isFinal;
 	
 	assert sort() != Sort.FORMULA;

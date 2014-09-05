@@ -17,7 +17,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
@@ -57,7 +56,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
     public boolean canApplyTo(KeYMediator mediator,
                               ImmutableList<Goal> goals,
                               PosInOccurrence posInOcc) {
-        return true;
+        return goals != null && !goals.isEmpty();
     }
 
     /**
@@ -76,17 +75,34 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
      * If the automation is interrupted, report the interruption as an exception.
      */
     @Override
-    public void applyTo(KeYMediator mediator,
-                        ImmutableList<Goal> goals,
-                        PosInOccurrence posInOcc,
-                        ProverTaskListener listener) throws InterruptedException {
-        IGoalChooser goalChooser = mediator.getProfile().getSelectedGoalChooserBuilder().create();
-        final ApplyStrategy applyStrategy = new ApplyStrategy(goalChooser, false);
-
-        if(listener != null) {
-            applyStrategy.addProverTaskObserver(listener);
+    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+                                          ImmutableList<Goal> goals,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) throws InterruptedException {
+        if (goals == null || goals.isEmpty()) {
+            // should not happen, because in this case canApplyTo returns
+            // false
+            return null;
         }
 
+        final Proof proof = goals.head().proof();
+        final IGoalChooser goalChooser = mediator.getProfile().getSelectedGoalChooserBuilder().create();
+        final ApplyStrategy applyStrategy = new ApplyStrategy(goalChooser);
+        final ImmutableList<Goal> ignoredOpenGoals =
+                setDifference(proof.openGoals(), goals);
+
+        final ProofMacro macroAdapter = new SkipMacro() {
+            @Override
+            public String getName() { return ""; }
+            @Override
+            public String getDescription() { return "Anonymous macro"; }
+        };
+        macroAdapter.setNumberSteps(getNumberSteps());
+        //
+        // The observer to handle the progress bar
+        final ProofMacroListener pml =  new ProgressBarListener(macroAdapter, goals.size(),
+                                                                getNumberSteps(), listener);
+        applyStrategy.addProverTaskObserver(pml);
         // add a focus manager if there is a focus
         if(posInOcc != null && goals != null) {
             AutomatedRuleApplicationManager realManager = null;
@@ -100,14 +116,20 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         }
 
         // set a new strategy.
-        Proof proof = mediator.getSelectedProof();
         Strategy oldStrategy = proof.getActiveStrategy();
         proof.setActiveStrategy(createStrategy(mediator, posInOcc));
 
+        ProofMacroFinishedInfo info =
+                new ProofMacroFinishedInfo(this, goals, proof);
         try {
             // find the relevant goals
             // and start
-            applyStrategy.start(proof, proof.getSubtreeEnabledGoals(mediator.getSelectedNode()));
+            applyStrategy.start(proof, goals);
+            synchronized(applyStrategy) { // wait for applyStrategy to finish its last rule application
+                if(applyStrategy.hasBeenInterrupted()) { // reraise interrupted exception if necessary
+                    throw new InterruptedException();
+                }
+            }
         } finally {
             // this resets the proof strategy and the managers after the automation
             // has run
@@ -122,20 +144,22 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
                     openGoal.setRuleAppManager(manager);
                 }
             }
-
+            final ImmutableList<Goal> resultingGoals =
+                    setDifference(proof.openGoals(), ignoredOpenGoals);
+            info = new ProofMacroFinishedInfo(this, resultingGoals);
             proof.setActiveStrategy(oldStrategy);
+            doPostProcessing(proof);
+            applyStrategy.removeProverTaskObserver(pml);
         }
-        
-        synchronized(applyStrategy) { // wait for applyStrategy to finish it last rule application
-           if(applyStrategy.hasBeenInterrupted()) { // reraise interrupted exception if necessary
-              throw new InterruptedException();
-           }
-        }
+        return info;
     }
 
-    @Override
-    public final javax.swing.KeyStroke getKeyStroke () {
-	return KeyStrokeManager.get(this);
+    private static ImmutableList<Goal> setDifference(ImmutableList<Goal> goals1,
+                                                     ImmutableList<Goal> goals2) {
+        ImmutableList<Goal> difference = goals1;
+        for (Goal goal : goals2) {
+            difference = difference.removeFirst(goal);
+        }
+        return difference;
     }
-
 }
