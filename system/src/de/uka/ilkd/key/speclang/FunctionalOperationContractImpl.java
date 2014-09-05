@@ -561,25 +561,25 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     private String getText(boolean includeHtmlMarkup, Services services) {
-       return getText(pm, 
-                      originalResultVar, 
-                      originalSelfVar, 
-                      originalParamVars, 
-                      originalExcVar, 
-                      hasMby(), 
-                      originalMby, 
-                      originalMods, 
-                      hasRealModifiesClause, 
-                      globalDefs, 
-                      originalPres, 
-                      originalPosts, 
-                      originalAxioms, 
-                      getModality(), 
-                      transactionApplicableContract(), 
-                      includeHtmlMarkup, 
+       return getText(pm,
+                      originalResultVar,
+                      originalSelfVar,
+                      originalParamVars,
+                      originalExcVar,
+                      hasMby(),
+                      originalMby,
+                      originalMods,
+                      hasRealModifiesClause,
+                      globalDefs,
+                      originalPres,
+                      originalPosts,
+                      originalAxioms,
+                      getModality(),
+                      transactionApplicableContract(),
+                      includeHtmlMarkup,
                       services,
-                      NotationInfo.PRETTY_SYNTAX, 
-                      NotationInfo.UNICODE_ENABLED);
+                      NotationInfo.DEFAULT_PRETTY_SYNTAX,
+                      NotationInfo.DEFAULT_UNICODE_ENABLED);
     }
     
     public static String getText(FunctionalOperationContract contract,
