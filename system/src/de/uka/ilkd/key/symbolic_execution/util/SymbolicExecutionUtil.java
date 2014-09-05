@@ -843,7 +843,7 @@ public final class SymbolicExecutionUtil {
          Term sub = arrayIndexTerm.sub(0);
          // Make sure that the defined index is an integer
          if (services.getTypeConverter().getIntegerLDT().getNumberSymbol() == sub.op()) {
-            return Integer.parseInt(ProofSaver.printAnything(sub, services));
+            return Integer.parseInt(SymbolicExecutionUtil.formatTerm(sub, services, false, true));
          }
          else {
             return -1;
