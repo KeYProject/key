@@ -84,6 +84,7 @@ public class SaveSetAsWizard extends BasicNewResourceWizard {
       try {
          final boolean saveVariables = optionsPage.isSaveVariables();
          final boolean saveCallStack = optionsPage.isSaveCallStack();
+         final boolean saveConstraints = optionsPage.isSaveConstraints();
          IRunnableWithProgressAndResult<String> run = new AbstractRunnableWithProgressAndResult<String>() {
             @Override
             public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
@@ -93,6 +94,7 @@ public class SaveSetAsWizard extends BasicNewResourceWizard {
                                                 SEDXMLWriter.DEFAULT_ENCODING, 
                                                 saveVariables, 
                                                 saveCallStack,
+                                                saveConstraints,
                                                 monitor);
                   setResult(content);
                }

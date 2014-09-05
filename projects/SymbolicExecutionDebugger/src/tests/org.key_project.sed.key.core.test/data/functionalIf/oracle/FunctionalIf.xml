@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_6bc1e0ba-bdc2-4ae1-893e-a697c4cfdd36" name="min(int, int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_42a580b5-e771-4e08-9209-7439d37e9403" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_f24805ee-fed5-4d45-af92-cc4ba206f0b1" name="self.min(i,j);" pathCondition="true" lineNumber="-1" charStart="661" charEnd="664" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
-            <sedStatement xml:id="_8720f6e5-cf3e-4e02-bc84-53da11355a81" name="int result;" pathCondition="true" lineNumber="-1" charStart="684" charEnd="695" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
-               <sedBranchStatement xml:id="_0d5df87b-1449-46e1-876e-c29a0ac16aca" name="if (invert(i)&lt;invert(j))" pathCondition="true" lineNumber="-1" charStart="699" charEnd="726" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
-                  <sedMethodCall xml:id="_254720ef-0f9e-46a3-8733-867b0c27b382" name="self.invert(a);" pathCondition="true" lineNumber="-1" charStart="818" charEnd="824" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
-                     <sedStatement xml:id="_daf5ff6b-7c27-4c22-928e-dbf78a44489a" name="return a*-1;" pathCondition="true" lineNumber="-1" charStart="837" charEnd="851" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
-                        <sedMethodReturn xml:id="_dcb9742b-f2fb-4583-870c-757fde79eeca" name="&lt;return mul(i,Z(neglit(1(#)))) as result of self.invert(a);&gt;" pathCondition="true" lineNumber="-1" charStart="818" charEnd="824" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
-                           <sedMethodCall xml:id="_933bc4a4-ecf1-4746-b937-73723ccd7159" name="self.invert(a_1);" pathCondition="true" lineNumber="-1" charStart="818" charEnd="824" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
-                              <sedStatement xml:id="_08bb7189-6ea4-4efa-8ae8-196cf54b490f" name="return a_1*-1;" pathCondition="true" lineNumber="-1" charStart="837" charEnd="851" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
-                                 <sedMethodReturn xml:id="_012c2cc2-0c54-49e8-850c-1e73f99515cc" name="&lt;return mul(j,Z(neglit(1(#)))) as result of self.invert(a_1);&gt;" pathCondition="true" lineNumber="-1" charStart="818" charEnd="824" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
-                                    <sedBranchCondition xml:id="_8c5c9067-9afd-44d2-ab24-2f2e68515750" name="lt(j,i)" pathCondition="lt(j,i)">
-                                       <sedStatement xml:id="_9876ae80-9a73-49cc-a4be-875aaec6fe03" name="result_1=i;" pathCondition="lt(j,i)" lineNumber="-1" charStart="732" charEnd="743" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
-                                          <sedStatement xml:id="_4ab96763-943d-4d9f-b441-64ba3e34694a" name="return result_1;" pathCondition="lt(j,i)" lineNumber="-1" charStart="783" charEnd="797" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
-                                             <sedMethodReturn xml:id="_e7c0f5e1-0520-4d60-afb4-2ce2064c73e3" name="&lt;return i as result of self.min(i,j);&gt;" pathCondition="lt(j,i)" lineNumber="-1" charStart="661" charEnd="664" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
-                                                <sedTermination xml:id="_32de2fc1-5de6-41b2-a7f1-7eef82c6f665" name="&lt;end&gt;" pathCondition="lt(j,i)" verified="true">
+   <sedTarget xml:id="_c18e9f4a-0f00-43ca-8589-120ef17599a3" name="min(int, int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_871f4a4d-883e-4bb7-a0ab-17f919e68f7d" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_7560ee18-dae9-401e-a371-338e92caa965" name="&lt;call self.min(i,j)&gt;" pathCondition="true" lineNumber="-1" charStart="661" charEnd="664" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
+            <sedStatement xml:id="_95d1d572-f07d-4f6c-960d-edfd116f4973" name="int result;" pathCondition="true" lineNumber="-1" charStart="684" charEnd="695" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
+               <sedBranchStatement xml:id="_0c505acc-cf77-4e27-972f-553a39300adc" name="if (invert(i)&lt;invert(j))" pathCondition="true" lineNumber="-1" charStart="699" charEnd="726" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
+                  <sedMethodCall xml:id="_e6ef887d-e1fc-4cc8-857f-6dcbe34396f1" name="&lt;call self.invert(a)&gt;" pathCondition="true" lineNumber="-1" charStart="818" charEnd="824" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
+                     <sedStatement xml:id="_570c8d2c-4b51-44c4-ad79-0746ac4bc1e5" name="return a*-1;" pathCondition="true" lineNumber="-1" charStart="837" charEnd="851" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
+                        <sedMethodReturn xml:id="_ebec6c72-69e4-468a-9838-ba4eb819e0ae" name="&lt;return mul(i,Z(neglit(1(#)))) as result of self.invert(a)&gt;" pathCondition="true" lineNumber="-1" charStart="818" charEnd="824" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java" methodReturnConditionRef="_4aa758e7-0eeb-403f-acf5-0a772d39d7af">
+                           <sedMethodCall xml:id="_a134fa1d-2b59-40ee-b81e-b383ee743c82" name="&lt;call self.invert(a_1)&gt;" pathCondition="true" lineNumber="-1" charStart="818" charEnd="824" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
+                              <sedStatement xml:id="_926f43d8-a2a8-4325-b460-c6c96d10ebcf" name="return a_1*-1;" pathCondition="true" lineNumber="-1" charStart="837" charEnd="851" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
+                                 <sedMethodReturn xml:id="_ecd537fa-6b65-4b6c-8415-5b284fdf841c" name="&lt;return mul(j,Z(neglit(1(#)))) as result of self.invert(a_1)&gt;" pathCondition="true" lineNumber="-1" charStart="818" charEnd="824" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java" methodReturnConditionRef="_fc106084-e745-45ef-afb7-0d59426d8586">
+                                    <sedBranchCondition xml:id="_a5cc7d31-9b2e-4a76-8668-e07139e81242" name="lt(j,i)" pathCondition="lt(j,i)">
+                                       <sedStatement xml:id="_e0ead45e-d931-461a-a232-48de37098961" name="result_1=i;" pathCondition="lt(j,i)" lineNumber="-1" charStart="732" charEnd="743" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
+                                          <sedStatement xml:id="_cb97e474-dd2d-4070-b5fe-c3258766134e" name="return result_1;" pathCondition="lt(j,i)" lineNumber="-1" charStart="783" charEnd="797" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
+                                             <sedMethodReturn xml:id="_0f4ecb53-44ef-4ca7-91b2-ae8ec02216a7" name="&lt;return i as result of self.min(i,j)&gt;" pathCondition="lt(j,i)" lineNumber="-1" charStart="661" charEnd="664" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java" methodReturnConditionRef="_1ff83f4f-ff99-4be9-a6eb-e1ee30dcbac9">
+                                                <sedTermination xml:id="_024efaea-8243-42e1-aeea-3e0006069623" name="&lt;end&gt;" pathCondition="lt(j,i)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java" verified="true">
                                                 </sedTermination>
                                              </sedMethodReturn>
                                           </sedStatement>
                                        </sedStatement>
                                     </sedBranchCondition>
-                                    <sedBranchCondition xml:id="_d449be2c-374e-4627-9664-9f6933548f27" name="geq(j,i)" pathCondition="geq(j,i)">
-                                       <sedStatement xml:id="_2a4a6d7d-4982-49e9-8052-ab5148fee602" name="result_1=j;" pathCondition="geq(j,i)" lineNumber="-1" charStart="763" charEnd="774" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
-                                          <sedStatement xml:id="_2af196e0-8d43-4e40-8d5a-c3d6611de3aa" name="return result_1;" pathCondition="geq(j,i)" lineNumber="-1" charStart="783" charEnd="797" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
-                                             <sedMethodReturn xml:id="_1718eab9-f984-4773-b39f-518938ee7fcd" name="&lt;return j as result of self.min(i,j);&gt;" pathCondition="geq(j,i)" lineNumber="-1" charStart="661" charEnd="664" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
-                                                <sedTermination xml:id="_07b9efc1-09aa-4fa0-b0e2-70eec08c6806" name="&lt;end&gt;" pathCondition="geq(j,i)" verified="true">
+                                    <sedBranchCondition xml:id="_24d7ccfa-71f2-4f85-b02c-a806d4a8bc2f" name="geq(j,i)" pathCondition="geq(j,i)">
+                                       <sedStatement xml:id="_6617feca-ae05-429c-a11f-727cc0562e05" name="result_1=j;" pathCondition="geq(j,i)" lineNumber="-1" charStart="763" charEnd="774" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
+                                          <sedStatement xml:id="_3362a0cb-b9ca-4a5b-8145-29884600e034" name="return result_1;" pathCondition="geq(j,i)" lineNumber="-1" charStart="783" charEnd="797" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java">
+                                             <sedMethodReturn xml:id="_1f0a9329-611b-4689-9c7f-de26fd49bbf4" name="&lt;return j as result of self.min(i,j)&gt;" pathCondition="geq(j,i)" lineNumber="-1" charStart="661" charEnd="664" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java" methodReturnConditionRef="_f37976d5-4b26-4c02-9253-0343b071cd1a">
+                                                <sedTermination xml:id="_b1d5479c-80ca-4004-8b93-abffa96e3002" name="&lt;end&gt;" pathCondition="geq(j,i)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf\src\FunctionalIf.java" verified="true">
                                                 </sedTermination>
                                              </sedMethodReturn>
                                           </sedStatement>
@@ -33,13 +33,27 @@
                                     </sedBranchCondition>
                                  </sedMethodReturn>
                               </sedStatement>
+                              <sedMethodCallMethodReturnCondition xml:id="_fc106084-e745-45ef-afb7-0d59426d8586" name="true" pathCondition="true">
+                                 <sedChildReference nodeIdRef="_ecd537fa-6b65-4b6c-8415-5b284fdf841c"/>
+                              </sedMethodCallMethodReturnCondition>
                            </sedMethodCall>
                         </sedMethodReturn>
                      </sedStatement>
+                     <sedMethodCallMethodReturnCondition xml:id="_4aa758e7-0eeb-403f-acf5-0a772d39d7af" name="true" pathCondition="true">
+                        <sedChildReference nodeIdRef="_ebec6c72-69e4-468a-9838-ba4eb819e0ae"/>
+                     </sedMethodCallMethodReturnCondition>
                   </sedMethodCall>
                </sedBranchStatement>
             </sedStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_1ff83f4f-ff99-4be9-a6eb-e1ee30dcbac9" name="lt(j,i)" pathCondition="true">
+               <sedChildReference nodeIdRef="_0f4ecb53-44ef-4ca7-91b2-ae8ec02216a7"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedMethodCallMethodReturnCondition xml:id="_f37976d5-4b26-4c02-9253-0343b071cd1a" name="geq(j,i)" pathCondition="true">
+               <sedChildReference nodeIdRef="_1f0a9329-611b-4689-9c7f-de26fd49bbf4"/>
+            </sedMethodCallMethodReturnCondition>
          </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_024efaea-8243-42e1-aeea-3e0006069623"/>
+         <sedTerminationEntry nodeIdRef="_b1d5479c-80ca-4004-8b93-abffa96e3002"/>
       </sedThread>
    </sedTarget>
 </launch>

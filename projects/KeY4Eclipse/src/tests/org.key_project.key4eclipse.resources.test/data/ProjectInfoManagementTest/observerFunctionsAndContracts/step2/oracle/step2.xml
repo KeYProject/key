@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<project name="ProjectInfoManagementTest_testObserverFunctionsAndContracts">
+   <package name="(default package)" path="/ProjectInfoManagementTest_testObserverFunctionsAndContracts/src">
+      <type name="ClassWithoutPackage" path="/ProjectInfoManagementTest_testObserverFunctionsAndContracts/src/ClassWithoutPackage.java">
+         <method displayName="ClassWithoutPackage()" name="ClassWithoutPackage" declaringType="ClassWithoutPackage" declaringFilePath="/ProjectInfoManagementTest_testObserverFunctionsAndContracts/src/ClassWithoutPackage.java" parameterTypes="">
+         </method>
+         <obsererFunction displayName="ofm" declaringType="ClassWithoutPackage" declaringFilePath="/ProjectInfoManagementTest_testObserverFunctionsAndContracts/src/ClassWithoutPackage.java">
+            <contract name="ClassWithoutPackage[ClassWithoutPackage::$ofm()].JML accessible clause.0" proofFilePath="/ProjectInfoManagementTest_testObserverFunctionsAndContracts/proofs/ClassWithoutPackage.java/ClassWithoutPackage[ClassWithoutPackage__$ofm()]_JML_accessible_clause_0.proof" metaFilePath="/ProjectInfoManagementTest_testObserverFunctionsAndContracts/proofs/ClassWithoutPackage.java/ClassWithoutPackage[ClassWithoutPackage__$ofm()]_JML_accessible_clause_0.proofmeta"/>
+         </obsererFunction>
+      </type>
+   </package>
+   <package name="hello" path="/ProjectInfoManagementTest_testObserverFunctionsAndContracts/src/hello">
+      <type name="ClassInHello" path="/ProjectInfoManagementTest_testObserverFunctionsAndContracts/src/hello/ClassInHello.java">
+         <method displayName="ClassInHello()" name="ClassInHello" declaringType="hello.ClassInHello" declaringFilePath="/ProjectInfoManagementTest_testObserverFunctionsAndContracts/src/hello/ClassInHello.java" parameterTypes="">
+         </method>
+         <obsererFunction displayName="ofm" declaringType="hello.ClassInHello" declaringFilePath="/ProjectInfoManagementTest_testObserverFunctionsAndContracts/src/hello/ClassInHello.java">
+            <contract name="hello.ClassInHello[hello.ClassInHello::$ofm()].JML accessible clause.0" proofFilePath="/ProjectInfoManagementTest_testObserverFunctionsAndContracts/proofs/hello/ClassInHello.java/hello_ClassInHello[hello_ClassInHello__$ofm()]_JML_accessible_clause_0.proof" metaFilePath="/ProjectInfoManagementTest_testObserverFunctionsAndContracts/proofs/hello/ClassInHello.java/hello_ClassInHello[hello_ClassInHello__$ofm()]_JML_accessible_clause_0.proofmeta"/>
+         </obsererFunction>
+      </type>
+   </package>
+   <package name="hello.world" path="/ProjectInfoManagementTest_testObserverFunctionsAndContracts/src/hello/world">
+      <type name="ClassInHelloWorld" path="/ProjectInfoManagementTest_testObserverFunctionsAndContracts/src/hello/world/ClassInHelloWorld.java">
+         <method displayName="ClassInHelloWorld()" name="ClassInHelloWorld" declaringType="hello.world.ClassInHelloWorld" declaringFilePath="/ProjectInfoManagementTest_testObserverFunctionsAndContracts/src/hello/world/ClassInHelloWorld.java" parameterTypes="">
+         </method>
+         <obsererFunction displayName="ofm" declaringType="hello.world.ClassInHelloWorld" declaringFilePath="/ProjectInfoManagementTest_testObserverFunctionsAndContracts/src/hello/world/ClassInHelloWorld.java">
+            <contract name="hello.world.ClassInHelloWorld[hello.world.ClassInHelloWorld::$ofm()].JML accessible clause.0" proofFilePath="/ProjectInfoManagementTest_testObserverFunctionsAndContracts/proofs/hello/world/ClassInHelloWorld.java/hello_world_ClassInHelloWorld[hello_world_ClassInHelloWorld__$ofm()]_JML_accessible_clause_0.proof" metaFilePath="/ProjectInfoManagementTest_testObserverFunctionsAndContracts/proofs/hello/world/ClassInHelloWorld.java/hello_world_ClassInHelloWorld[hello_world_ClassInHelloWorld__$ofm()]_JML_accessible_clause_0.proofmeta"/>
+         </obsererFunction>
+      </type>
+   </package>
+</project>

@@ -17,7 +17,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -80,17 +79,14 @@ public class ProofStarter {
 
         private Proof createProof(String proofName) {
 
-            final InitConfig initConfig = env.getInitConfig();
+            final InitConfig initConfig = env.getInitConfigForEnvironment().deepCopy();
 
             return new Proof(proofName,
                     seq,
                     EMPTY_PROOF_HEADER,
                     initConfig.createTacletIndex(),
                     initConfig.createBuiltInRuleIndex(),
-                    initConfig.getServices(),
-                    initConfig.getSettings() != null
-                    ? initConfig.getSettings()
-                            : new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
+                    initConfig );
         }
 
 
@@ -150,7 +146,7 @@ public class ProofStarter {
     public void init(Term formulaToProve, ProofEnvironment env) throws ProofInputException {
         final ProofOblInput input = new UserProvidedInput(formulaToProve, env);
         proof = input.getPO().getFirstProof();
-        proof.setProofEnv(env);
+        proof.setEnv(env);
     }
 
     /**
@@ -161,7 +157,7 @@ public class ProofStarter {
     public void init(Sequent sequentToProve, ProofEnvironment env) throws ProofInputException {
        final ProofOblInput input = new UserProvidedInput(sequentToProve, env);
        proof = input.getPO().getFirstProof();
-       proof.setProofEnv(env);
+       proof.setEnv(env);
     }
 
     /**
@@ -197,17 +193,17 @@ public class ProofStarter {
      * starts proof attempt
      * @return the proof after the attempt terminated
      */
-     public ApplyStrategyInfo start(boolean finishAfterProof) {
-        return start(proof.openGoals(), finishAfterProof);
+     public ApplyStrategyInfo start() {
+        return start(proof.openGoals());
      }
 
    /**
     * starts proof attempt
     * @return the proof after the attempt terminated
     */
-    public ApplyStrategyInfo start(ImmutableList<Goal> goals, boolean finishAfterStrategy) {
+    public ApplyStrategyInfo start(ImmutableList<Goal> goals) {
         try {
-           final Profile profile = proof.env().getInitConfig().getProfile();
+           final Profile profile = proof.getInitConfig().getProfile();
            final StrategyFactory factory = profile.getDefaultStrategyFactory();
            if (strategyProperties == null) {
               strategyProperties = factory.getSettingsDefinition().getDefaultPropertiesFactory().createDefaultStrategyProperties();
@@ -224,7 +220,7 @@ public class ProofStarter {
            profile.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);
 
            IGoalChooser goalChooser = profile.getSelectedGoalChooserBuilder().create();
-           ApplyStrategy prover = new ApplyStrategy(goalChooser, finishAfterStrategy);
+           ApplyStrategy prover = new ApplyStrategy(goalChooser);
            if (ptl != null) {
               prover.addProverTaskObserver(ptl);
            }

@@ -13,10 +13,12 @@
 
 package org.key_project.sed.core.model.impl;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDValue;
+import org.key_project.sed.core.model.ISEDVariable;
 
 /**
  * Provides a basic implementation of {@link ISEDValue}.
@@ -25,11 +27,19 @@ import org.key_project.sed.core.model.ISEDValue;
  */
 public abstract class AbstractSEDValue extends AbstractSEDDebugElement implements ISEDValue {
    /**
+    * The parent {@link ISEDVariable}.
+    */
+   private final ISEDVariable parent;
+   
+   /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this element is contained.
+    * @param parent The parent {@link ISEDVariable}.
     */
-   public AbstractSEDValue(ISEDDebugTarget target) {
+   public AbstractSEDValue(ISEDDebugTarget target, ISEDVariable parent) {
       super(target);
+      Assert.isNotNull(parent);
+      this.parent = parent;
    }
 
    /**
@@ -39,5 +49,13 @@ public abstract class AbstractSEDValue extends AbstractSEDDebugElement implement
    public boolean hasVariables() throws DebugException {
       IVariable[] variables = getVariables();
       return variables != null && variables.length >= 1;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDVariable getParent() {
+      return parent;
    }
 }

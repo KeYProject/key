@@ -100,7 +100,7 @@ public class ProofMacroMenu extends JMenu {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (mediator.autoMode()) return;
+                if (mediator.isInAutoMode()) return;
                 final ProofMacroWorker worker = new ProofMacroWorker(macro, mediator, posInOcc);
                 mediator.stopInterface(true);
                 mediator.setInteractive(false);

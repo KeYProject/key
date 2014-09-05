@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="VerifiedTest.magicException();" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call VerifiedTest.magicException()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="throw new Exception ();" pathCondition="true" pathConditionChanged="false">
-         <termination name="&lt;uncaught java.lang.Exception&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-         </termination>
+         <exceptionalMethodReturn name="&lt;throw java.lang.Exception&gt;" signature="&lt;exceptional return of &lt;call VerifiedTest.magicException()&gt;&gt;" pathCondition="true" pathConditionChanged="false" methodReturnCondition="true">
+            <termination name="&lt;uncaught java.lang.Exception&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+            </termination>
+         </exceptionalMethodReturn>
       </statement>
+      <methodReturnEntry path="/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0"/>
 </start>

@@ -14,7 +14,7 @@
 package org.key_project.key4eclipse.starter.core.job;
 
 import org.eclipse.core.runtime.jobs.Job;
-import org.key_project.util.eclipse.job.ObjectSchedulingRule;
+import org.key_project.util.eclipse.job.ObjectsSchedulingRule;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
@@ -26,7 +26,7 @@ import de.uka.ilkd.key.gui.MainWindow;
  * <p>
  * It is not possible to execute multiple {@link AbstractKeYMainWindowJob}
  * instances at the same time. It is ensured thanks to an
- * {@link ObjectSchedulingRule} that uses the class of {@link MainWindow}
+ * {@link ObjectsSchedulingRule} that uses the class of {@link MainWindow}
  * as conflicting {@link Object}.
  * </p>
  * @author Martin Hentschel
@@ -38,6 +38,6 @@ public abstract class AbstractKeYMainWindowJob extends Job {
     */
    public AbstractKeYMainWindowJob(String name) {
       super(name);
-      setRule(new ObjectSchedulingRule(MainWindow.class));
+      setRule(new ObjectsSchedulingRule(new Object[] {MainWindow.class}));
    }
 }

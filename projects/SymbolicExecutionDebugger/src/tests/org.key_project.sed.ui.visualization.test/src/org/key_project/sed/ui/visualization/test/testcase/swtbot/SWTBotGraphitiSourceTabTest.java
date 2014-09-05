@@ -53,6 +53,11 @@ public class SWTBotGraphitiSourceTabTest extends AbstractSWTBotGraphitiPropertyT
          public void assertDiagram(SWTBotGefEditor editor, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
             assertFalse(tabs.hasTabItem("Source"));
          }
+
+         @Override
+         public void assertMethodCall(SWTBotGefEditor editor, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertFalse(tabs.hasTabItem("Source"));
+         }
       });
    }
 }

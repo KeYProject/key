@@ -425,7 +425,7 @@ public final class DependencyContractImpl implements DependencyContract {
             for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
                 if(atPreVars.get(h) != null && originalAtPreVar != null) {
-                    map.put(services.getTermBuilder().var(originalAtPreVar), services.getTermBuilder().var(atPreVars.get(h)));
+                    map.put(services.getTermBuilder().var(atPre ? h : originalAtPreVar), services.getTermBuilder().var(atPreVars.get(h)));
                 }
             }
         }

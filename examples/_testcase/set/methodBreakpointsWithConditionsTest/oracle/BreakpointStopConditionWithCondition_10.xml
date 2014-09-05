@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="SimpleConditionExample.somethingLocalMain();" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call SimpleConditionExample.somethingLocalMain()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int y = 42;" pathCondition="true" pathConditionChanged="false">
          <statement name="int x = somethingLocal(y);" pathCondition="true" pathConditionChanged="false">
-            <methodCall name="SimpleConditionExample.somethingLocal(x_2);" pathCondition="true" pathConditionChanged="false">
+            <methodCall name="&lt;call SimpleConditionExample.somethingLocal(x_2)&gt;" pathCondition="true" pathConditionChanged="false">
             </methodCall>
          </statement>
       </statement>

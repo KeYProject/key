@@ -36,7 +36,7 @@ import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListene
 import org.key_project.key4eclipse.starter.core.util.event.ProofProviderAdapter;
 import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
 import org.key_project.util.eclipse.WorkbenchUtil;
-import org.key_project.util.eclipse.job.ObjectSchedulingRule;
+import org.key_project.util.eclipse.job.ObjectsSchedulingRule;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.view.editorInView.AbstractEditorInViewView;
 import org.key_project.util.java.ArrayUtil;
@@ -472,7 +472,7 @@ public class ProofDependenciesViewPart extends AbstractEditorInViewView<DbCDiagr
                }
             }
          };
-         activeJob.setRule(new ObjectSchedulingRule(this));
+         activeJob.setRule(new ObjectsSchedulingRule(new Object[] {this}));
          activeJob.schedule();
       }
       else {

@@ -121,7 +121,7 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
    /**
     * Maps an {@link IExecutionNode} to its representation in the debug model.
     */
-   private final Map<IExecutionNode, IKeYSEDDebugNode<?>> executionToDebugMapping = new HashMap<IExecutionNode, IKeYSEDDebugNode<?>>();
+   private final Map<IExecutionNode<?>, IKeYSEDDebugNode<?>> executionToDebugMapping = new HashMap<IExecutionNode<?>, IKeYSEDDebugNode<?>>();
    
    /**
     * Observes the proof.
@@ -163,7 +163,6 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
       initBreakpoints();
       // Add thread
       KeYThread thread = new KeYThread(this, environment.getBuilder().getStartNode());
-      registerDebugNode(thread);
       threads = new KeYThread[] {thread};
       // Initialize proof to use the symbolic execution strategy
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun());
@@ -201,7 +200,7 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
    @Override
    protected boolean checkBreakpointHit(IBreakpoint breakpoint, ISEDDebugNode node) {
       if (node instanceof IKeYSEDDebugNode) {
-         return breakpointManager.checkBreakpointHit(breakpoint, ((IKeYSEDDebugNode<IExecutionNode>)node));
+         return breakpointManager.checkBreakpointHit(breakpoint, ((IKeYSEDDebugNode<IExecutionNode<?>>)node));
       }
       else {
          return false;
@@ -256,7 +255,8 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
     */
    public void registerDebugNode(IKeYSEDDebugNode<?> node) throws DebugException {
       if (node != null) {
-         executionToDebugMapping.put(node.getExecutionNode(), node);
+         IKeYSEDDebugNode<?> oldNode = executionToDebugMapping.put(node.getExecutionNode(), node);
+         Assert.isTrue(oldNode == null);
          addToSourceModel(node);
       }
    }
@@ -266,7 +266,7 @@ public class KeYDebugTarget extends AbstractSEDDebugTarget {
     * @param executionNode The {@link IExecutionNode} for that the debug model representation is needed.
     * @return The found {@link IKeYSEDDebugNode} representation of the given {@link IExecutionNode} or {@code null} if no one is available.
     */
-   public IKeYSEDDebugNode<?> getDebugNode(IExecutionNode executionNode) {
+   public IKeYSEDDebugNode<?> getDebugNode(IExecutionNode<?> executionNode) {
       return executionToDebugMapping.get(executionNode);
    }
    

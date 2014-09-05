@@ -196,7 +196,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     * @param inScope
     */
    private void freeVariablesAfterReturn(Node node, RuleApp ruleApp,boolean inScope) {
-      if(SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp)&&inScope){
+      if ((SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp) ||
+           SymbolicExecutionUtil.isExceptionalMethodReturnNode(node, ruleApp)) &&
+          inScope) {
          toKeep.clear();
       }
    }
@@ -362,7 +364,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
          Term termForSideProof = replacer.replace(condition);
          //start side proof
          Term toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
-         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, ruleApp, toProof);
+         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, pio, toProof);
          info = SideProofUtil.startSideProof(proof, 
                                              sequent, 
                                              StrategyProperties.METHOD_CONTRACT,

@@ -75,8 +75,10 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         
         //read activated choices
         try {
-            ProofSettings settings = getPreferences();
-            
+
+        	ProofSettings settings = getPreferences();
+            initConfig.setSettings(settings);	
+        	
             ParserConfig pc = new ParserConfig
                 (initConfig.getServices(), 
                  initConfig.namespaces());
@@ -91,6 +93,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             
             initConfig.setActivatedChoices(settings.getChoiceSettings()
         	      		                   .getDefaultChoicesAsSet());
+            
         
         } catch (antlr.ANTLRException e) {
             throw new ProofInputException(e);      
@@ -175,14 +178,14 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         assert problemTerm != null;
         String name = name();
         ProofSettings settings = getPreferences();
+        initConfig.setSettings(settings);
         return ProofAggregate.createProofAggregate(
                 new Proof(name, 
                           problemTerm, 
                           problemHeader,
                           initConfig.createTacletIndex(), 
                           initConfig.createBuiltInRuleIndex(),
-                          initConfig.getServices(), 
-                          settings), 
+                          initConfig), 
                 name);
     }
     

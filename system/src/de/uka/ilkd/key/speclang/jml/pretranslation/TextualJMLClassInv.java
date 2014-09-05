@@ -30,6 +30,7 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
         super(mods);
         assert inv != null;
         this.inv = inv;
+        setPosition(inv);
     }
 
     public TextualJMLClassInv(ImmutableList<String> mods, 
@@ -38,6 +39,7 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
         assert inv != null;
         this.inv = inv;
         this.name = name;
+        setPosition(inv);
     }
 
     public PositionedString getInv() {

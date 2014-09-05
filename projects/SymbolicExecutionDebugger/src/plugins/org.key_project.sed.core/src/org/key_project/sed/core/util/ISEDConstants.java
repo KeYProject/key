@@ -16,6 +16,7 @@ package org.key_project.sed.core.util;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.PresentationContext;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.TreeModelViewer;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDMethodCall;
 
 /**
  * Provides Symbolic Execution Debugger (SED) specific constants.
@@ -27,6 +28,11 @@ public interface ISEDConstants {
     * The ID used for the call stack, accessible via {@link ISEDDebugNode#getCallStack()}.
     */
    public static final String ID_CALL_STACK = "org.key_project.sed.core.callStack";
+
+   /**
+    * The ID used for the method return conditions, accessible via {@link ISEDMethodCall#getMethodReturnConditions()}.
+    */
+   public static final String ID_METHOD_RETURN_CONDITIONS = "org.key_project.sed.core.methodReturnConditions";
    
    /**
     * Property key used in {@link PresentationContext} to define the input of the {@link TreeModelViewer} in which the {@link PresentationContext} is used.

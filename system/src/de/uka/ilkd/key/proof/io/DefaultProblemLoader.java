@@ -25,6 +25,7 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
@@ -86,6 +87,11 @@ public class DefaultProblemLoader {
     * {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
     */
    private final boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
+   
+   /**
+    * Some optional additional {@link Properties} for the PO.
+    */
+   private final Properties poPropertiesToForce;
 
    /**
     * The instantiated {@link EnvInput} which describes the file to load.
@@ -121,7 +127,8 @@ public class DefaultProblemLoader {
                                File bootClassPath,
                                Profile profileOfNewProofs, 
                                KeYMediator mediator,
-                               boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
+                               boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
+                               Properties poPropertiesToForce) {
       assert mediator != null;
       this.file = file;
       this.classPath = classPath;
@@ -129,6 +136,7 @@ public class DefaultProblemLoader {
       this.mediator = mediator;
       this.profileOfNewProofs = profileOfNewProofs != null ? profileOfNewProofs : AbstractProfile.getDefaultProfile();
       this.askUiToSelectAProofObligationIfNotDefinedByLoadedFile = askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
+      this.poPropertiesToForce = poPropertiesToForce;
    }
 
    /**
@@ -240,7 +248,8 @@ public class DefaultProblemLoader {
    protected ProblemInitializer createProblemInitializer() {
       UserInterface ui = mediator.getUI();
       return new ProblemInitializer(ui,
-                                    new Services(envInput.getProfile(), mediator.getExceptionHandler()),
+                                    new Services(envInput.getProfile(), 
+                                          mediator.getExceptionHandler()),
                                     ui);
    }
 
@@ -305,7 +314,10 @@ public class DefaultProblemLoader {
          // Load proof obligation settings
          Properties properties = new Properties();
          properties.load(new ByteArrayInputStream(proofObligation.getBytes()));
-         properties.put(IPersistablePO.PROPERTY_FILENAME, file.getAbsolutePath());
+         properties.setProperty(IPersistablePO.PROPERTY_FILENAME, file.getAbsolutePath());
+         if (poPropertiesToForce != null) {
+            properties.putAll(poPropertiesToForce);
+         }
          String poClass = properties.getProperty(IPersistablePO.PROPERTY_CLASS);
          if (poClass == null || poClass.isEmpty()) {
             throw new IOException("Proof obligation class property \"" + IPersistablePO.PROPERTY_CLASS + "\" is not defiend or empty.");
@@ -333,7 +345,11 @@ public class DefaultProblemLoader {
     * @throws ProofInputException Occurred Exception.
     */
    protected Proof createProof(LoadedPOContainer poContainer) throws ProofInputException {
-      return problemInitializer.startProver(initConfig, poContainer.getProofOblInput(), poContainer.getProofNum());
+      ProofAggregate proofList = problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
+      
+      mediator.getUI().createProofEnvironmentAndRegisterProof(poContainer.getProofOblInput(), proofList, initConfig);
+
+      return proofList.getProof(poContainer.getProofNum());
    }
 
    protected void replayProof(Proof proof) throws ProofInputException {

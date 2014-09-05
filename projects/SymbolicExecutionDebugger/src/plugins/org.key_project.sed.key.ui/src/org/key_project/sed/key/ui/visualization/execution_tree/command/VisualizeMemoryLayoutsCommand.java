@@ -29,7 +29,6 @@ import org.key_project.util.eclipse.swt.SWTUtil;
 
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 
 /**
  * This {@link IHandler} visualizes the memory layouts of selected {@link IKeYSEDDebugNode}s.
@@ -68,7 +67,6 @@ public class VisualizeMemoryLayoutsCommand extends AbstractHandler {
          if (element instanceof IKeYSEDDebugNode<?>) {
             IKeYSEDDebugNode<?> node = (IKeYSEDDebugNode<?>)element;
             return !node.getExecutionNode().isDisposed() &&
-                   node.getExecutionNode() instanceof IExecutionStateNode<?> &&
                    node.getExecutionNode().getPathCondition().op() != Junctor.FALSE;
          }
          else {

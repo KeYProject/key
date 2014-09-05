@@ -120,4 +120,11 @@ public interface IExecutionValue extends IExecutionElement {
     * @return The contained child variables.
     */
    public IExecutionVariable[] getChildVariables() throws ProofInputException;
+   
+   /**
+    * Returns all available {@link IExecutionConstraint}s.
+    * @return The available {@link IExecutionConstraint}s.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public IExecutionConstraint[] getConstraints() throws ProofInputException;
 }

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.main(a);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.main(a)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="firstLevel(a);" pathCondition="true" pathConditionChanged="false">
-         <methodCall name="self.firstLevel(a_1);" pathCondition="true" pathConditionChanged="false">
+         <methodCall name="&lt;call self.firstLevel(a_1)&gt;" pathCondition="true" pathConditionChanged="false">
             <statement name="secondLevel(a_1);" pathCondition="true" pathConditionChanged="false">
-               <methodCall name="self.secondLevel(a_2);" pathCondition="true" pathConditionChanged="false">
+               <methodCall name="&lt;call self.secondLevel(a_2)&gt;" pathCondition="true" pathConditionChanged="false">
                </methodCall>
             </statement>
          </methodCall>

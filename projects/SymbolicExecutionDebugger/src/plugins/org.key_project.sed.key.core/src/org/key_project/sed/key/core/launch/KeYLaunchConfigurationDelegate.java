@@ -223,7 +223,8 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                    MainWindow main = MainWindow.getInstance();
                    Assert.isNotNull(main, "KeY main window is not available.");
                    // Load proof in user interface
-                   setResult(instantiateProof(main.getUserInterface(), launchConfigurationName, settings));
+                   SymbolicExecutionEnvironment<?> env = instantiateProof(main.getUserInterface(), launchConfigurationName, settings); 
+                   setResult(env);
                }
                catch (Exception e) {
                    setException(e);
@@ -241,7 +242,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                                                String launchConfigurationName, 
                                                                KeYLaunchSettings settings) throws Exception {
        // Load location
-       DefaultProblemLoader loader = ui.load(SymbolicExecutionJavaProfile.getDefaultInstance(), settings.getLocation(), settings.getClassPaths(), settings.getBootClassPath()); 
+       DefaultProblemLoader loader = ui.load(SymbolicExecutionJavaProfile.getDefaultInstance(), settings.getLocation(), settings.getClassPaths(), settings.getBootClassPath(), SymbolicExecutionTreeBuilder.createPoPropertiesToForce()); 
        InitConfig initConfig = loader.getInitConfig();
        // Try to reuse already instantiated proof
        Proof proof = loader.getProof();

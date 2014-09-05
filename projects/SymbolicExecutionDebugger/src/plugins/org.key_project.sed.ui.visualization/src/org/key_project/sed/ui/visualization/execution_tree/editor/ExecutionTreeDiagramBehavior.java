@@ -58,7 +58,7 @@ import org.key_project.sed.ui.visualization.util.EmptyDiagramPersistencyBehavior
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.sed.ui.visualization.util.VisualizationPreferences;
-import org.key_project.util.eclipse.job.AbstractDependingOnObjectJob;
+import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ArrayUtil;
 
@@ -281,8 +281,8 @@ public class ExecutionTreeDiagramBehavior extends DiagramBehavior {
       // Update diagram content if required.
       if (updateRequired) {
          // Do an asynchronous update in the UI thread (same behavior as DomainModelChangeListener which is responsible for changes in EMF objects)
-         AbstractDependingOnObjectJob.cancelJobs(diagramEditor);
-         new AbstractDependingOnObjectJob("Updating Symbolic Execution Tree", diagramEditor) {
+         AbstractDependingOnObjectsJob.cancelJobs(diagramEditor);
+         new AbstractDependingOnObjectsJob("Updating Symbolic Execution Tree", diagramEditor) {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                return updateDiagramInJob(monitor);

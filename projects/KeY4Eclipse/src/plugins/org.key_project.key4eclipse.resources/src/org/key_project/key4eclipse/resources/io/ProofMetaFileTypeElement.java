@@ -20,13 +20,12 @@ import java.util.LinkedList;
  * @author Stefan Käsdorf
  */
 public class ProofMetaFileTypeElement {
-//TODO remove this class an extend the reader.
-   private String type;
-   private LinkedList<String> subTypes;
+   private final String type;
+   private final LinkedList<String> subTypes;
    
-   public ProofMetaFileTypeElement(String type, LinkedList<String> subTypes){
+   public ProofMetaFileTypeElement(String type){
       this.type = type;
-      this.subTypes = subTypes;
+      this.subTypes = new LinkedList<String>();
    }
 
    public String getType() {
@@ -37,4 +36,7 @@ public class ProofMetaFileTypeElement {
       return subTypes;
    }
    
+   protected void addSubType(String subType) {
+      subTypes.add(subType);
+   }
 }
