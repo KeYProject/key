@@ -60,6 +60,10 @@ public class BlockContractBuiltInRuleApp extends AbstractBuiltInRuleApp {
     {
         return contract;
     }
+    
+    public BlockContractBuiltInRuleApp setContract(BlockContract contract) {
+       return new BlockContractBuiltInRuleApp(builtInRule, posInOccurrence(), null, block, contract, heaps);
+    }
 
     @Override
     public List<LocationVariable> getHeapContext()

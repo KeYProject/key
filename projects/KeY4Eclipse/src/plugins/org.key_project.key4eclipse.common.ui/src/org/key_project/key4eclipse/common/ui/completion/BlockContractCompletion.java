@@ -14,10 +14,11 @@ import org.key_project.key4eclipse.common.ui.provider.ImmutableCollectionContent
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.ContractSelectionPanel;
+import de.uka.ilkd.key.gui.BlockContractSelectionPanel;
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.rule.BlockContractRule.Instantiation;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -147,10 +148,9 @@ public class BlockContractCompletion extends AbstractInteractiveRuleApplicationC
        */
       @Override
       public IBuiltInRuleApp finish() {
-         Contract contract = getSelectedContract();
+         BlockContract contract = getSelectedContract();
          if(contract != null) {
-            //TODO: return BlockContractRule
-            return null;
+            return ((BlockContractBuiltInRuleApp) getApp().rule().createApp(getApp().posInOccurrence(), services)).setContract(contract);
          } else {
             return getApp();
          }
@@ -160,9 +160,9 @@ public class BlockContractCompletion extends AbstractInteractiveRuleApplicationC
        * Returns the selected {@link Contract}.
        * @return The selected {@link Contract} or {@code null} if not available.
        */
-      protected Contract getSelectedContract() {
+      protected BlockContract getSelectedContract() {
          final Object[] selection = SWTUtil.toArray(viewer.getSelection());
-         return ContractSelectionPanel.computeContract(services, selection);
+         return BlockContractSelectionPanel.computeContract(services, selection);
       }
 
       /**
