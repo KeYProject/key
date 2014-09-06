@@ -86,38 +86,40 @@ public final class TypeConverter {
         return null;
     }
     
-    public IntegerLDT getIntegerLDT() {
+    private LDT getLDT(Name ldtName) {
         if (LDTs == null) {
             return null;
+        } else {
+            return LDTs.get(ldtName);
         }
-        return (IntegerLDT) LDTs.get(IntegerLDT.NAME);
+    }
+    
+    public IntegerLDT getIntegerLDT() {
+        return (IntegerLDT) getLDT(IntegerLDT.NAME);
     }
 
     public BooleanLDT getBooleanLDT() {
-	return (BooleanLDT)LDTs.get(BooleanLDT.NAME);
+        return (BooleanLDT) getLDT(BooleanLDT.NAME);
     }
 
     public LocSetLDT getLocSetLDT() {
-	return (LocSetLDT)LDTs.get(LocSetLDT.NAME);
+	return (LocSetLDT) getLDT(LocSetLDT.NAME);
     }
 
     public HeapLDT getHeapLDT() {
-        if (LDTs == null) {
-            return null;
-        }
-        return (HeapLDT) LDTs.get(HeapLDT.NAME);
+        return (HeapLDT) getLDT(HeapLDT.NAME);
     }
 
     public SeqLDT getSeqLDT() {
-	return (SeqLDT)LDTs.get(SeqLDT.NAME);
+	return (SeqLDT) getLDT(SeqLDT.NAME);
     }
     
     public MapLDT getMapLDT() {
-	return (MapLDT)LDTs.get(MapLDT.NAME);
+	return (MapLDT) getLDT(MapLDT.NAME);
     }
 
     public CharListLDT getCharListLDT() {
-	return (CharListLDT)LDTs.get(CharListLDT.NAME);
+	return (CharListLDT) getLDT(CharListLDT.NAME);
     }
 
     private Term translateOperator(de.uka.ilkd.key.java.expression.Operator op, ExecutionContext ec) {
