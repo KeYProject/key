@@ -36,39 +36,28 @@
                <iterate
                      ifEmpty="false"
                      operator="and">
-                  <or>
-                     <and>
-                        <instanceof
-                              value="org.eclipse.core.resources.IProject">
-                        </instanceof>
+                  <adapt
+                        type="org.eclipse.core.resources.IResource">
+                     <test
+                           forcePluginActivation="true"
+                           property="org.eclipse.core.resources.projectNature"
+                           value="org.eclipse.jdt.core.javanature">
+                     </test>
+                     <not>
                         <test
                               forcePluginActivation="true"
                               property="org.eclipse.core.resources.projectNature"
-                              value="org.eclipse.jdt.core.javanature">
+                              value="org.key_project.key4eclipse.resources.KeYProjectNature">
                         </test>
-                        <not>
-                           <test
-                                 forcePluginActivation="true"
-                                 property="org.eclipse.core.resources.projectNature"
-                                 value="org.key_project.key4eclipse.resources.KeYProjectNature">
-                           </test>
-                        </not>
-                     </and>
-                     <and>
-                        <instanceof
-                              value="org.eclipse.jdt.core.IJavaProject">
-                        </instanceof>
-                        <adapt
-                              type="org.eclipse.core.resources.IProject">
-                           <not>
-                              <test
-                                    forcePluginActivation="true"
-                                    property="org.eclipse.core.resources.projectNature"
-                                    value="org.key_project.key4eclipse.resources.KeYProjectNature">
-                              </test>
-                           </not>
-                        </adapt>
-                     </and>
+                     </not>
+                  </adapt>
+                  <or>
+                     <instanceof
+                           value="org.eclipse.jdt.core.IJavaProject">
+                     </instanceof>
+                     <instanceof
+                           value="org.eclipse.core.resources.IProject">
+                     </instanceof>
                   </or>
                </iterate>
             </visibleWhen>
@@ -179,39 +168,28 @@
             <iterate
                   ifEmpty="false"
                   operator="and">
-               <or>
-                  <and>
-                     <instanceof
-                           value="org.eclipse.core.resources.IProject">
-                     </instanceof>
+               <adapt
+                     type="org.eclipse.core.resources.IResource">
+                  <test
+                        forcePluginActivation="true"
+                        property="org.eclipse.core.resources.projectNature"
+                        value="org.eclipse.jdt.core.javanature">
+                  </test>
+                  <not>
                      <test
                            forcePluginActivation="true"
                            property="org.eclipse.core.resources.projectNature"
-                           value="org.eclipse.jdt.core.javanature">
+                           value="org.key_project.key4eclipse.resources.KeYProjectNature">
                      </test>
-                     <not>
-                        <test
-                              forcePluginActivation="true"
-                              property="org.eclipse.core.resources.projectNature"
-                              value="org.key_project.key4eclipse.resources.KeYProjectNature">
-                        </test>
-                     </not>
-                  </and>
-                  <and>
-                     <instanceof
-                           value="org.eclipse.jdt.core.IJavaProject">
-                     </instanceof>
-                     <adapt
-                           type="org.eclipse.core.resources.IProject">
-                        <not>
-                           <test
-                                 forcePluginActivation="true"
-                                 property="org.eclipse.core.resources.projectNature"
-                                 value="org.key_project.key4eclipse.resources.KeYProjectNature">
-                           </test>
-                        </not>
-                     </adapt>
-                  </and>
+                  </not>
+               </adapt>
+               <or>
+                  <instanceof
+                        value="org.eclipse.jdt.core.IJavaProject">
+                  </instanceof>
+                  <instanceof
+                        value="org.eclipse.core.resources.IProject">
+                  </instanceof>
                </or>
             </iterate>
          </enabledWhen>
@@ -275,30 +253,6 @@
          </enabledWhen>
       </page>
    </extension>
-   <extension
-         point="org.eclipse.core.expressions.propertyTesters">
-      <propertyTester
-            class="org.key_project.key4eclipse.resources.ui.expression.IsMethodSelectedTester"
-            id="org.key_project.key4eclipse.resources.ui.propertyTester.isMethodSelected"
-            namespace="org.key_project.key4eclipse.resources.ui"
-            properties="isMethodSelected"
-            type="java.lang.Object">
-      </propertyTester>
-      <propertyTester
-            class="org.key_project.key4eclipse.resources.ui.expression.IsProofFilePropertyTester"
-            id="org.key_project.key4eclipse.resources.ui.propertyTester.isProofFile"
-            namespace="org.key_project.key4eclipse.resources.ui"
-            properties="isProofFile"
-            type="java.lang.Object">
-      </propertyTester>
-      <propertyTester
-            class="org.key_project.key4eclipse.resources.ui.expression.IsProofFolderPropertyTester"
-            id="org.key_project.key4eclipse.resources.ui.propertyTester.isProofFolder"
-            namespace="org.key_project.key4eclipse.resources.ui"
-            properties="isProofFolder"
-            type="java.lang.Object">
-      </propertyTester>
-   </extension>
       <extension
          point="org.eclipse.ui.editors">
       <editor
@@ -340,23 +294,6 @@
                </contentExtension>
             </includes>
          </viewerContentBinding>
-      </extension>
-      <extension
-            point="org.eclipse.core.expressions.propertyTesters">
-         <propertyTester
-               class="org.key_project.key4eclipse.resources.ui.expression.IsProofFilePropertyTester"
-               id="org.key_project.key4eclipse.resources.ui.propertyTester.isProofFile"
-               namespace="org.key_project.key4eclipse.resources.ui"
-               properties="isProofFile"
-               type="java.lang.Object">
-         </propertyTester>
-         <propertyTester
-               class="org.key_project.key4eclipse.resources.ui.expression.IsMethodSelectedTester"
-               id="org.key_project.key4eclipse.resources.ui.propertyTester.isMethodSelected"
-               namespace="org.key_project.key4eclipse.resources.ui"
-               properties="isMethodSelected"
-               type="java.lang.Object">
-         </propertyTester>
       </extension>
       <extension
             point="org.eclipse.ui.views">

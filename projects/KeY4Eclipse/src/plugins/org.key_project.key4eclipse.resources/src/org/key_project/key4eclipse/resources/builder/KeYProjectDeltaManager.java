@@ -5,9 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.runtime.CoreException;
-import org.key_project.key4eclipse.resources.util.LogUtil;
 
 /**
  * Manages the {@link KeYProjectDelta}, updates and creates them.
@@ -34,35 +31,18 @@ public class KeYProjectDeltaManager {
    }
    
    /**
-    * Updates the {@link KeYProjectDelta} associated with given {@link IResourceDelta}.
-    * @param delta - the {@link IResourceDelta} to use
-    */
-   public void update(IResourceDelta delta){
-      if(delta != null){
-         IProject project = delta.getResource().getProject();
-         KeYProjectDeltaVisitor visitor = new KeYProjectDeltaVisitor(project);
-         try{
-            delta.accept(visitor);
-            KeYProjectDelta keyDelta = getDelta(project);
-            keyDelta.addChangedJavaFiles(visitor.getChangedJavaFiles());
-            keyDelta.addChangedProofAndMetaFiles(visitor.getChangedProofAndMetaFiles());
-         } catch (CoreException e){
-            LogUtil.getLogger().logError(e);
-         }
-      }
-   }
-   
-   /**
     * Returns the {@link KeYProjectDelta} for the given {@link IProject}. If there is no {@link KeYProjectDelta} yet, a new one will be created.
     * @param project
     * @return
     */
    public KeYProjectDelta getDelta(IProject project){
-      KeYProjectDelta keyDelta = projectDeltas.get(project);
-      if(keyDelta == null){
-         projectDeltas.put(project, new KeYProjectDelta());
-         keyDelta = projectDeltas.get(project);
+      synchronized(projectDeltas){
+         KeYProjectDelta keyDelta = projectDeltas.get(project);
+         if(keyDelta == null){
+            keyDelta = new KeYProjectDelta(project);
+            projectDeltas.put(project, keyDelta);
+         }
+         return keyDelta;
       }
-      return keyDelta;
    }
 }

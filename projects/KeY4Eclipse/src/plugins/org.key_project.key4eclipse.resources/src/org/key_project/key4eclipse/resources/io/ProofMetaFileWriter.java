@@ -56,6 +56,7 @@ public class ProofMetaFileWriter {
    public static final String TAG_MARKER_MESSAGE = "markerMessage";
    public static final String ATTRIBUTE_MD5 = "proofFileMD5";
    public static final String ATTRIBUTE_PROOF_CLOSED = "proofClosed";
+   public static final String ATTRIBUTE_PROOF_OUTDATED = "proofOutdated";
    public static final String ATTRIBUTE_NAME = "name";
    public static final String ATTRIBUTE_PROOF_FILE = "proofFile";
    public static final String ATTRIBUTE_KIND = "kind";
@@ -100,6 +101,7 @@ public class ProofMetaFileWriter {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_MD5, ResourceUtil.computeContentMD5(pe.getProofFile()));
       attributeValues.put(ATTRIBUTE_PROOF_CLOSED, String.valueOf(pe.getProofClosed()));
+      attributeValues.put(ATTRIBUTE_PROOF_OUTDATED, String.valueOf(pe.getOutdated()));
       XMLUtil.appendStartTag(0, TAG_PROOF_META_FILE, attributeValues, sb);
       appendMarkerMessage(pe, 1, sb);
       appendUsedTypes(pe, 1, types, sb);
@@ -214,12 +216,12 @@ public class ProofMetaFileWriter {
    }
    
    private static void appendUsedContracts(ProofElement pe, int level, StringBuffer sb) {
-      List<ProofElement> usedContractsProofElements = pe.getUsedContracts();
+      List<IFile> usedContractsProofElements = pe.getUsedContracts();
       if (!usedContractsProofElements.isEmpty()) {
          XMLUtil.appendStartTag(level, TAG_USED_CONTRACTS, null, sb);
-         for (ProofElement usedContractProofElement : usedContractsProofElements) {
+         for (IFile usedContractProofElement : usedContractsProofElements) {
             Map<String, String> attributeValues = new LinkedHashMap<String, String>();
-            attributeValues.put(ATTRIBUTE_PROOF_FILE, usedContractProofElement.getProofFile().getFullPath().toString());
+            attributeValues.put(ATTRIBUTE_PROOF_FILE, usedContractProofElement.getFullPath().toString());
             XMLUtil.appendEmptyTag(level + 1, TAG_USED_CONTRACT, attributeValues, sb);
          }
          XMLUtil.appendEndTag(level, TAG_USED_CONTRACTS, sb);

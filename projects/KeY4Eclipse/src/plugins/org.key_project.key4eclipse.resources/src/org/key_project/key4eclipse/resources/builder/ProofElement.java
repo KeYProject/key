@@ -20,7 +20,9 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
-import org.key_project.key4eclipse.resources.marker.MarkerManager;
+import org.key_project.key4eclipse.resources.io.ProofMetaFileReader;
+import org.key_project.key4eclipse.resources.io.ProofMetaFileTypeElement;
+import org.key_project.key4eclipse.resources.marker.MarkerUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -37,26 +39,80 @@ public class ProofElement {
    
    private IFile javaFile;
    private SourceLocation scl;
-   private IMarker proofMarker;
-   private boolean outdated;
-   private boolean build;
-   private List<IMarker> recursionMarker;
-   private String markerMsg;
    
    private IFolder proofFolder;
    private IFile proofFile;
    private IFile metaFile;
+   private String proofFileMD5;
+
+   private boolean build;
+   private boolean outdated;
+   
+   private IMarker proofMarker;
+   private List<IMarker> recursionMarker;
+   private String markerMsg;
    
    private KeYEnvironment<CustomUserInterface> environment;
-   
    private Contract contract;
    private ProofOblInput proofObl;
-   
    private boolean proofClosed;
-   
    private LinkedHashSet<IProofReference<?>> proofReferences;
-   private List<ProofElement> usedContracts;
+   private List<IFile> usedContracts;
+
+   private List<ProofMetaFileTypeElement> typeElements;
    
+   public ProofElement(IFile javaFile, SourceLocation scl , KeYEnvironment<CustomUserInterface> environment, IFolder proofFolder, IFile proofFile, IFile metaFile, IMarker proofMarker, List<IMarker> recursionMarker, Contract contract){
+      this.javaFile = javaFile;
+      this.scl = scl;
+
+      this.proofFolder = proofFolder;
+      this.proofFile = proofFile;
+      this.metaFile = metaFile;
+      
+      this.build = false;
+      this.outdated = false;
+      
+      this.proofMarker = proofMarker;
+      this.recursionMarker = recursionMarker;
+      
+      this.environment = environment;
+      this.contract = contract;
+      this.proofObl = null;
+      
+      this.proofReferences = new LinkedHashSet<IProofReference<?>>();
+      
+      this.proofFileMD5 = null;
+      this.markerMsg = null;
+      this.proofClosed = false;
+      this.usedContracts = new LinkedList<IFile>();
+      this.typeElements = new LinkedList<ProofMetaFileTypeElement>();
+      init();
+   }
+   
+   
+   private void init() {
+      if(hasMetaFile()){
+         try{
+            ProofMetaFileReader pmfr = new ProofMetaFileReader(metaFile);
+            this.proofFileMD5 = pmfr.getProofFileMD5();
+            this.outdated = pmfr.getProofOutdated();
+            this.markerMsg = pmfr.getMarkerMessage();
+            this.proofClosed = pmfr.getProofClosed();
+            this.usedContracts = pmfr.getUsedContracts();
+            this.typeElements = pmfr.getTypeElements();
+
+            if(!hasMarker()){
+               MarkerUtil.setMarker(this);
+            }
+         }
+         catch(Exception e){
+            outdated = true;
+         }
+      }
+      else{
+         outdated = !hasProofFile() || !hasMetaFile() || !hasMarker();
+      }
+   }
    
 
    public IFile getJavaFile() {
@@ -66,49 +122,6 @@ public class ProofElement {
       return scl;
    }
    
-   public IMarker getProofMarker(){
-      return proofMarker;
-   }
-   public void setProofMarker(IMarker proofMarker){
-      this.proofMarker = proofMarker;
-   }
-   
-   public boolean getOutdated(){
-      return outdated;
-   }
-   public void setOutdated(boolean outdated){
-      this.outdated = outdated;
-   }
-   
-   public boolean getBuild(){
-      return build;
-   }
-   public void setBuild(boolean build){
-      this.build = build;
-   }
-   
-   public List<IMarker> getRecursionMarker(){
-      return recursionMarker;
-   }
-   public void setRecursionMarker(LinkedList<IMarker> recursionMarker){
-      this.recursionMarker = recursionMarker;
-   }
-   public void addRecursionMarker(IMarker recursionMarker){
-      this.recursionMarker.add(recursionMarker);
-   }
-   public void removeRecursionMarker(IMarker recursionMarker){
-      this.recursionMarker.remove(recursionMarker);
-   }
-   public void removeRecursionMarker(int index){
-      this.recursionMarker.remove(index);
-   }
-      
-   public String getMarkerMsg() {
-      return markerMsg;
-   }
-   public void setMarkerMsg(String markerMsg) {
-      this.markerMsg = markerMsg;
-   }
    
    public IFolder getProofFolder(){
       return proofFolder;
@@ -119,6 +132,46 @@ public class ProofElement {
    public IFile getMetaFile(){
       return metaFile;
    }
+   public String getMD5() {
+      return proofFileMD5;
+   }
+
+   public boolean getBuild(){
+      return build;
+   }
+   public void setBuild(boolean build){
+      this.build = build;
+   }
+   public boolean getOutdated(){
+      return outdated;
+   }
+   public void setOutdated(boolean outdated){
+      this.outdated = outdated;
+   }
+   
+   
+   public IMarker getProofMarker(){
+      return proofMarker;
+   }
+   public void setProofMarker(IMarker proofMarker){
+      this.proofMarker = proofMarker;
+   }
+   public List<IMarker> getRecursionMarker(){
+      return recursionMarker;
+   }
+   public void setRecursionMarker(LinkedList<IMarker> recursionMarker){
+      this.recursionMarker = recursionMarker;
+   }
+   public void addRecursionMarker(IMarker recursionMarker){
+      this.recursionMarker.add(recursionMarker);
+   }
+   public String getMarkerMsg() {
+      return markerMsg;
+   }
+   public void setMarkerMsg(String markerMsg) {
+      this.markerMsg = markerMsg;
+   }
+   
    
    public KeYEnvironment<CustomUserInterface> getKeYEnvironment(){
       return environment;
@@ -126,8 +179,6 @@ public class ProofElement {
    public void setKeYEnvironment(KeYEnvironment<CustomUserInterface> environment){
       this.environment = environment;
    }
-
-   
    public Contract getContract(){
       return contract;
    }
@@ -137,56 +188,31 @@ public class ProofElement {
    public void setProofObl(ProofOblInput proofObl){
       this.proofObl = proofObl;
    }
-
-   
    public boolean getProofClosed(){
       return proofClosed;
    }
    public void setProofClosed(boolean proofStatus){
       this.proofClosed = proofStatus;
    }
-   
-   
    public LinkedHashSet<IProofReference<?>> getProofReferences(){
       return proofReferences;
    }
    public void setProofReferences(LinkedHashSet<IProofReference<?>> proofReferences){
       this.proofReferences = proofReferences;
    }
-   public List<ProofElement> getUsedContracts() {
+   public List<IFile> getUsedContracts() {
       return usedContracts;
    }
-   public void setUsedContracts(List<ProofElement> usedContracts) {
+   public void setUsedContracts(List<IFile> usedContracts) {
       this.usedContracts = usedContracts;
    }
+
    
-   public ProofElement(IFile javaFile, SourceLocation scl , KeYEnvironment<CustomUserInterface> environment, IFolder proofFolder, IFile proofFile, IFile metaFile, IMarker proofMarker, List<IMarker> recursionMarker, Contract contract){
-      this.javaFile = javaFile;
-      this.scl = scl;
-      this.proofMarker = proofMarker;
-      if(proofMarker != null && proofMarker.exists()){
-         outdated = proofMarker.getAttribute(MarkerManager.MARKER_ATTRIBUTE_OUTDATED, true);
-      }
-      else if(recursionMarker != null && !recursionMarker.isEmpty()){
-         outdated = recursionMarker.get(0).getAttribute(MarkerManager.MARKER_ATTRIBUTE_OUTDATED, true);
-      }
-      else{
-         outdated = true;
-      }
-      this.build = false;
-      this.recursionMarker = recursionMarker;
-      
-      this.proofFolder = proofFolder;
-      this.proofFile = proofFile;
-      this.metaFile = metaFile;
-      
-      this.environment = environment;
-      
-      this.contract = contract;
-      
-      this.proofReferences = new LinkedHashSet<IProofReference<?>>();
-      this.usedContracts = new LinkedList<ProofElement>();
+   public List<ProofMetaFileTypeElement> getTypeElements() {
+      return typeElements;
    }
+   
+   
    
    @Override
    public String toString(){
@@ -203,16 +229,35 @@ public class ProofElement {
       return (metaFile != null && metaFile.exists());
    }
    
+   
    public boolean hasMarker(){
       if(proofMarker != null && proofMarker.exists()){
          return true;
       }
-      else{
-         if(recursionMarker != null && !recursionMarker.isEmpty()){
-            for(IMarker marker : recursionMarker){
-               if(marker != null && marker.exists()){
-                  return true;
-               }
+      if(recursionMarker != null && !recursionMarker.isEmpty()){
+         for(IMarker marker : recursionMarker){
+            if(marker != null && marker.exists()){
+               return true;
+            }
+         }
+      }
+      return false;
+   }
+   
+   
+   public boolean hasProofMarker(){
+      if(proofMarker != null && proofMarker.exists()){
+         return true;
+      }
+      return false;
+   }
+   
+   
+   public boolean hasRecursionMarker(){
+      if(recursionMarker != null && !recursionMarker.isEmpty()){
+         for(IMarker marker : recursionMarker){
+            if(marker != null && marker.exists()){
+               return true;
             }
          }
       }

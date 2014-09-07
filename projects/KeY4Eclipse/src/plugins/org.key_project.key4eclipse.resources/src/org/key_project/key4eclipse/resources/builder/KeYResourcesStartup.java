@@ -25,6 +25,7 @@ public class KeYResourcesStartup implements IStartup {
          }
       }
       for(IProject keyProject : keyProjects){
+         KeYResourcesUtil.synchronizeProject(keyProject);
          KeYProjectBuildJob proofManagerJob = new KeYProjectBuildJob(keyProject, KeYProjectBuildJob.STARTUP_BUILD);
          proofManagerJob.setRule(new KeYProjectBuildMutexRule(keyProject));
          proofManagerJob.schedule();

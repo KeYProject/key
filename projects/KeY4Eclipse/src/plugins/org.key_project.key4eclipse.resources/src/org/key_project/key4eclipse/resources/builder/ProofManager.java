@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -45,10 +46,12 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.key_project.key4eclipse.resources.io.LastChangesFileWriter;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileReader;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileTypeElement;
+import org.key_project.key4eclipse.resources.io.ProofMetaFileWriter;
 import org.key_project.key4eclipse.resources.log.LogManager;
-import org.key_project.key4eclipse.resources.marker.MarkerManager;
+import org.key_project.key4eclipse.resources.marker.MarkerUtil;
 import org.key_project.key4eclipse.resources.projectinfo.AbstractContractContainer;
 import org.key_project.key4eclipse.resources.projectinfo.AbstractTypeContainer;
 import org.key_project.key4eclipse.resources.projectinfo.ContractInfo;
@@ -102,9 +105,9 @@ public class ProofManager {
    private int buildType;
    private final IFolder mainProofFolder;
    private List<ProofElement> proofElements;
-   private List<IFile> changedJavaFiles;
+   private KeYProjectDelta keyDelta;
+   private Set<IFile> changedJavaFiles;
    private EditorSelection editorSelection;
-   private final MarkerManager markerManager;
    private final KeYEnvironment<CustomUserInterface> environment;
    private List<ProofElement> proofQueue = Collections.synchronizedList(new LinkedList<ProofElement>());
 
@@ -119,11 +122,8 @@ public class ProofManager {
       this.project = project;
       this.buildType = buildType;
       this.mainProofFolder = ResourcesPlugin.getWorkspace().getRoot().getFolder(project.getFullPath().append(KeYResourcesUtil.PROOF_FOLDER_NAME));
-      KeYProjectDelta keyDelta = KeYProjectDeltaManager.getInstance().getDelta(project);
-      this.changedJavaFiles = keyDelta.getChangedJavaFiles();
-      keyDelta.reset();
+      this.keyDelta = KeYProjectDeltaManager.getInstance().getDelta(project);
       this.editorSelection = editorSelection;
-      this.markerManager = new MarkerManager();    
       try {
          File location = KeYUtil.getSourceLocation(project);
          File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
@@ -134,7 +134,7 @@ public class ProofManager {
          handleProblemLoaderException(e);
          throw e;
       }
-      this.markerManager.deleteKeYMarkerByType(project, IResource.DEPTH_INFINITE, MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID); 
+      MarkerUtil.deleteKeYMarkerByType(project, IResource.DEPTH_INFINITE, MarkerUtil.PROBLEMLOADEREXCEPTIONMARKER_ID); 
    }
    
    
@@ -183,7 +183,9 @@ public class ProofManager {
             }
          }
       }
-      markerManager.setProblemLoaderExceptionMarker(res, lineNumber, e.getMessage());
+      keyDelta.resetDelta();
+      LastChangesFileWriter.resetLastChangesFiles(project);
+      MarkerUtil.setProblemLoaderExceptionMarker(res, lineNumber, e.getMessage());
    }
    
 
@@ -195,7 +197,12 @@ public class ProofManager {
     */
    public void runProofs(IProgressMonitor monitor) throws CoreException{
       proofElements = computeProofElementsAndUpdateProjectInfo();
-      setProofElementsOutdated();
+      synchronized (keyDelta.lock) {
+         changedJavaFiles = keyDelta.getChangedJavaFiles();
+         keyDelta.resetDelta();
+         selectProofElementsForBuild();
+         LastChangesFileWriter.resetLastChangesFiles(project);
+      }
       sortProofElements(editorSelection);
       cleanMarker();
       if(KeYProjectProperties.isAutoDeleteProofFiles(project)){
@@ -349,8 +356,8 @@ public class ProofManager {
                   IFolder proofFolder = KeYResourcesUtil.getProofFolder(javaFile);
                   IFile proofFile = KeYResourcesUtil.getProofFile(contract.getName(), proofFolder.getFullPath());
                   IFile metaFile = KeYResourcesUtil.getProofMetaFile(proofFile);
-                  IMarker proofMarker = markerManager.getProofMarker(javaFile, targetLocation, proofFile);
-                  List<IMarker> recursionMarker = markerManager.getRecursionMarker(javaFile, targetLocation, proofFile);
+                  IMarker proofMarker = MarkerUtil.getProofMarker(javaFile, targetLocation, proofFile);
+                  List<IMarker> recursionMarker = MarkerUtil.getRecursionMarker(javaFile, targetLocation, proofFile);
                   proofElements.add(new ProofElement(javaFile, targetLocation, environment, proofFolder, proofFile, metaFile, proofMarker, recursionMarker, contract));
                   ContractInfo contractInfo = targetInfo.getContract(contract.getName());
                   if (contractInfo == null) {
@@ -414,9 +421,7 @@ public class ProofManager {
          IPath relatviePath = location.makeRelativeTo(project.getLocation().removeLastSegments(1));
          return ResourcesPlugin.getWorkspace().getRoot().getFile(relatviePath);
       }
-      else {
-         return null;
-      }
+      return null;
    }
 
    /**
@@ -499,49 +504,52 @@ public class ProofManager {
       }
    }
    
+   
    /**
     * Checks for every {@link ProofElement} if it is outdated.
     * @return a {@link List<ProofElement>} that contains the updated {@link ProofElements}.
     */
-   private void setProofElementsOutdated() {
+   private void selectProofElementsForBuild() {
       for(ProofElement pe : proofElements){
+         boolean build = false;
          if(buildType == KeYProjectBuildJob.FULL_BUILD 
                || (buildType == KeYProjectBuildJob.AUTO_BUILD && !KeYProjectProperties.isEnableBuildRequiredProofsOnly(project))){
-            markerManager.setOutdated(pe);
+            build = true;
          }
          else if(buildType == KeYProjectBuildJob.STARTUP_BUILD || buildType == KeYProjectBuildJob.MANUAL_BUILD){
-            if(pe.getOutdated() || !pe.hasProofFile() || !pe.hasMetaFile() || !pe.hasMarker()){
-               markerManager.setOutdated(pe);
-            }
+            build = pe.getOutdated();
          }
          else if(buildType == KeYProjectBuildJob.AUTO_BUILD){
-            if(pe.getOutdated() || !pe.hasProofFile() || !pe.hasMetaFile() || !pe.hasMarker()){
-               markerManager.setOutdated(pe);
+            if(pe.getOutdated()){
+               build = true;
             }
-            else {
+            else{
                try{
-                  ProofMetaFileReader pmfr = new ProofMetaFileReader(pe.getMetaFile());
                   LinkedList<IType> javaTypes = collectAllJavaITypes();
-                  if(MD5changed(pe.getProofFile(), pmfr) || typeOrSubTypeChanged(pe, pmfr, javaTypes) || superTypeChanged(pe, javaTypes)){
-                     markerManager.setOutdated(pe);
+                  if(MD5changed(pe) || typeOrSubTypeChanged(pe.getTypeElements(), javaTypes) || superTypeChanged(pe, javaTypes)){
+                     build = true;
                   }
                }
-               catch (Exception e){
-                  markerManager.setOutdated(pe);
+               catch (JavaModelException e){
+                  build = true;
                   LogUtil.getLogger().logError(e);
                }
             }
          }
-         if(!pe.getBuild()) {
-            try{
-               ProofMetaFileReader pmfr = new ProofMetaFileReader(pe.getMetaFile());
-               pe.setProofClosed(pmfr.getProofClosed());
-               pe.setMarkerMsg(pmfr.getMarkerMessage());
-               pe.setUsedContracts(KeYResourcesUtil.getProofElementsByProofFiles(pmfr.getUsedContracts(), proofElements));
-            }
-            catch (Exception e){
-               markerManager.setOutdated(pe);
-               LogUtil.getLogger().logError(e);
+         if(build){
+            pe.setBuild(true);
+            if(!pe.getOutdated()){
+               pe.setOutdated(true);
+               MarkerUtil.setOutdated(pe, true);
+               if(pe.hasMetaFile() && pe.hasProofFile()){
+                  try {
+                     keyDelta.addJobChangedFile(pe.getMetaFile());
+                     ProofMetaFileWriter.writeMetaFile(pe);
+                  }
+                  catch (Exception e) {
+                     LogUtil.getLogger().logError(e);
+                  }
+               }
             }
          }
       }
@@ -650,7 +658,7 @@ public class ProofManager {
             }
          }
       }
-      LinkedList<IMarker> allMarker = markerManager.getAllKeYMarker(project, IResource.DEPTH_INFINITE);
+      LinkedList<IMarker> allMarker = MarkerUtil.getAllKeYMarker(project, IResource.DEPTH_INFINITE);
       for(IMarker marker : allMarker){
          if(!peMarker.contains(marker)){
             try{
@@ -678,7 +686,8 @@ public class ProofManager {
             if(res.getType() == IResource.FILE){
                if(!proofFiles.contains(res) && 
                   !ProjectInfoManager.getInstance().isProjectInfoFile((IFile)res) &&
-                  !LogManager.getInstance().isLogFile((IFile)res)) {
+                  !LogManager.getInstance().isLogFile((IFile)res) && !KeYResourcesUtil.isLastChangesFile((IFile) res)) {
+                  keyDelta.addJobChangedFile((IFile) res);
                   res.delete(true, null);
                }
             }
@@ -714,7 +723,7 @@ public class ProofManager {
          threads = new Thread[numOfThreads];
          for (int i = 0; i < numOfThreads; i++) {
 
-            ProofRunnable run = new ProofRunnable(project, proofElements, proofQueue, cloneEnvironment(), monitor);
+            ProofRunnable run = new ProofRunnable(project, KeYResourcesUtil.cloneList(proofElements), proofQueue, cloneEnvironment(), monitor);
             Thread thread = new Thread(run);
             threads[i] = thread;
          }
@@ -795,7 +804,7 @@ public class ProofManager {
       findCycles(cycles);
       removeAllRecursionMarker();
       for(List<ProofElement> cycle : cycles){
-         markerManager.setRecursionMarker(cycle);
+         MarkerUtil.setRecursionMarker(cycle);
       }
       restoreOldMarkerForRemovedCycles();
       setInRecursionCycleProofFileProperty(cycles);
@@ -900,20 +909,22 @@ public class ProofManager {
     * @throws CoreException 
     * @throws IOException 
     */
-   private static boolean MD5changed(IFile proofFile, ProofMetaFileReader pmfr) throws IOException, CoreException{
-      if(proofFile.exists()){
-         String metaFilesProofMD5 = pmfr.getProofFileMD5();
-         String proofFileHasCode = ResourceUtil.computeContentMD5(proofFile);
-         if(metaFilesProofMD5.equals(proofFileHasCode)){
-            return false;
-         }
-         else{
-            return true;
+   private static boolean MD5changed(ProofElement pe) {
+      if(pe.getMD5() != null){
+         if(pe.getProofFile().exists()){
+            String proofFileHasCode;
+            try {
+               proofFileHasCode = ResourceUtil.computeContentMD5(pe.getProofFile());
+            }
+            catch (Exception e) {
+               return true;
+            }
+            if(pe.getMD5().equals(proofFileHasCode)){
+               return false;
+            }
          }
       }
-      else{
-         return true;
-      }
+      return true;
    }
    
 
@@ -924,14 +935,13 @@ public class ProofManager {
     * @return true if a type or a subtype was changed. false otherwise
     * @throws JavaModelException
     */
-   private boolean typeOrSubTypeChanged(ProofElement pe, ProofMetaFileReader pmfr, LinkedList<IType> javaTypes) throws JavaModelException{
-      LinkedList<ProofMetaFileTypeElement> types = pmfr.getTypeElements();
+   private boolean typeOrSubTypeChanged(List<ProofMetaFileTypeElement> types, LinkedList<IType> javaTypes) {
       for(ProofMetaFileTypeElement type : types){
          List<String> subTypes = type.getSubTypes();
          if(typeChanged(type.getType(), javaTypes)){
             return true;
          }
-         else if(subTypeChanged(pe, type.getType(), subTypes, javaTypes)){
+         else if(subTypeChanged(type.getType(), subTypes, javaTypes)){
             return true;
          }
       }
@@ -946,15 +956,13 @@ public class ProofManager {
     * @return true if the type was changed. false otherwise
     * @throws JavaModelException
     */
-   private boolean typeChanged(String type, List<IType> javaTypes) throws JavaModelException{
+   private boolean typeChanged(String type, List<IType> javaTypes) {
       IFile javaFile = getJavaFileForType(type, javaTypes);
       //check if type has changed itself
       if(changedJavaFiles.contains(javaFile)){
          return true;
       }
-      else {
-         return false;
-      }
+      return false;
    }
    
    
@@ -965,17 +973,15 @@ public class ProofManager {
     * @return true if any subTypes were changed. false otherwise
     * @throws JavaModelException
     */
-   private boolean subTypeChanged(ProofElement pe, String type, List<String> subTypes, List<IType> javaTypes) throws JavaModelException{
+   private boolean subTypeChanged(String type, List<String> subTypes, List<IType> javaTypes) {
       KeYJavaType kjt = getkeYJavaType(environment, type);
       ImmutableList<KeYJavaType> envSubKjts = environment.getJavaInfo().getAllSubtypes(kjt);      
       if(envSubKjts.size() != subTypes.size()){
          return true;
       }
-      else {
-         for(String subType : subTypes){
-            if(typeChanged(subType, javaTypes)){
-               return true;
-            }
+      for(String subType : subTypes){
+         if(typeChanged(subType, javaTypes)){
+            return true;
          }
       }
       return false;
@@ -990,7 +996,7 @@ public class ProofManager {
     * @return true if any superTypes were changed. false otherwise
     * @throws JavaModelException
     */
-   private boolean superTypeChanged(ProofElement pe, LinkedList<IType> javaTypes) throws JavaModelException{
+   private boolean superTypeChanged(ProofElement pe, LinkedList<IType> javaTypes) {
       KeYJavaType kjt = pe.getContract().getKJT();
       KeYJavaType envKjt = getkeYJavaType(environment, kjt.getFullName());
       if(envKjt != null){
@@ -1003,9 +1009,7 @@ public class ProofManager {
          }
          return false;
       }
-      else{
-         return true;
-      }
+      return true;
    }
 
    
@@ -1016,7 +1020,7 @@ public class ProofManager {
     * @return the java{@link IFile} for the given type
     * @throws JavaModelException
     */
-   private IFile getJavaFileForType(String metaType, List<IType> typeList) throws JavaModelException{
+   private IFile getJavaFileForType(String metaType, List<IType> typeList) {
       for(IType iType : typeList){
          String typeName = iType.getFullyQualifiedName('.');
          if(typeName.equalsIgnoreCase(metaType)){
@@ -1049,8 +1053,8 @@ public class ProofManager {
    private void restoreOldMarkerForRemovedCycles() {
       for(ProofElement pe : proofElements){
          if(pe.getProofMarker() == null && (pe.getRecursionMarker() == null || pe.getRecursionMarker().isEmpty())){
-            if(pe.getProofFile() != null && pe.getProofFile().exists()){
-               markerManager.setMarker(pe);
+            if(pe.getMetaFile() != null && pe.getMetaFile().exists()){
+               MarkerUtil.setMarker(pe);
             }
          }
       }
@@ -1058,15 +1062,19 @@ public class ProofManager {
 
 
    private void findCycles(HashSet<List<ProofElement>> cycles){
+      Map<ProofElement, List<ProofElement>> usedContracts = new LinkedHashMap<ProofElement, List<ProofElement>>();
+      for(ProofElement pe : proofElements){
+         usedContracts.put(pe, KeYResourcesUtil.getProofElementsByProofFiles(pe.getUsedContracts(), proofElements));
+      }
       for(ProofElement pe : proofElements){
          LinkedList<ProofElement> cycle = new LinkedList<ProofElement>();
          cycle.add(pe);
-         searchCycle(cycle, cycles);
+         searchCycle(cycle, cycles, usedContracts);
       }
    }
    
-   private void searchCycle(List<ProofElement> cycle, HashSet<List<ProofElement>> cycles){
-      List<ProofElement> succs = cycle.get(cycle.size()-1).getUsedContracts();
+   private void searchCycle(List<ProofElement> cycle, HashSet<List<ProofElement>> cycles, Map<ProofElement, List<ProofElement>> usedContracts){
+      List<ProofElement> succs = usedContracts.get(cycle.get(cycle.size()-1));
       for(ProofElement pe : succs){
          if(pe.equals(cycle.get(0))){
             //cycle found
@@ -1078,7 +1086,7 @@ public class ProofManager {
          else{
             List<ProofElement> tmpCycle = KeYResourcesUtil.cloneList(cycle);
             tmpCycle.add(pe);
-            searchCycle(tmpCycle, cycles); 
+            searchCycle(tmpCycle, cycles, usedContracts); 
          }
       }
    }
@@ -1088,6 +1096,6 @@ public class ProofManager {
       for(ProofElement pe : proofElements){
          pe.setRecursionMarker(new LinkedList<IMarker>());
       }
-      markerManager.deleteKeYMarkerByType(project, IResource.DEPTH_INFINITE, MarkerManager.RECURSIONMARKER_ID);
+      MarkerUtil.deleteKeYMarkerByType(project, IResource.DEPTH_INFINITE, MarkerUtil.RECURSIONMARKER_ID);
    }
 }

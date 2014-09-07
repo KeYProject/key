@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Display;
 import org.key_project.key4eclipse.resources.builder.KeYProjectBuildJob;
 import org.key_project.key4eclipse.resources.builder.KeYProjectBuilder;
 import org.key_project.key4eclipse.resources.log.LogManager;
-import org.key_project.key4eclipse.resources.marker.MarkerManager;
+import org.key_project.key4eclipse.resources.marker.MarkerUtil;
 import org.key_project.key4eclipse.resources.nature.KeYProjectNature;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.test.Activator;
@@ -115,7 +115,7 @@ public class KeY4EclipseResourcesTestUtil {
       if(keyBuilder != null){
          return keyBuilder.getBuilderName().equals(builderId);
       }
-      else return false;
+      return false;
    }
    
    
@@ -235,10 +235,10 @@ public class KeY4EclipseResourcesTestUtil {
     * @throws CoreException
     */
    public static LinkedList<IMarker> getAllKeYMarker(IResource res) throws CoreException{
-      LinkedList<IMarker> allMarkerList = getKeYMarkerByType(MarkerManager.CLOSEDMARKER_ID, res);
-      allMarkerList.addAll(getKeYMarkerByType(MarkerManager.NOTCLOSEDMARKER_ID, res));
-      allMarkerList.addAll(getKeYMarkerByType(MarkerManager.RECURSIONMARKER_ID, res));
-      allMarkerList.addAll(getKeYMarkerByType(MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID, res));
+      LinkedList<IMarker> allMarkerList = getKeYMarkerByType(MarkerUtil.CLOSEDMARKER_ID, res);
+      allMarkerList.addAll(getKeYMarkerByType(MarkerUtil.NOTCLOSEDMARKER_ID, res));
+      allMarkerList.addAll(getKeYMarkerByType(MarkerUtil.RECURSIONMARKER_ID, res));
+      allMarkerList.addAll(getKeYMarkerByType(MarkerUtil.PROBLEMLOADEREXCEPTIONMARKER_ID, res));
       return allMarkerList;
    }
    
@@ -247,8 +247,9 @@ public class KeY4EclipseResourcesTestUtil {
    }
    
    
-   public static void setKeYProjectProperties(IProject project, boolean buildProofs, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean autoDeleteProofFiles) throws CoreException{
+   public static void setKeYProjectProperties(IProject project, boolean buildProofs, boolean startupBuilds, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean autoDeleteProofFiles) throws CoreException{
       KeYProjectProperties.setEnableKeYResourcesBuilds(project, buildProofs);
+      KeYProjectProperties.setEnableBuildOnStartup(project, startupBuilds);
       KeYProjectProperties.setEnableBuildProofsEfficient(project, buildProofsEfficient);
       KeYProjectProperties.setEnableMultiThreading(project, enableMultiThreading);
       KeYProjectProperties.setNumberOfThreads(project, String.valueOf(numberOfThreads));
@@ -261,7 +262,7 @@ public class KeY4EclipseResourcesTestUtil {
       //create a KeYProject
       IJavaProject keyProject = createKeYProject(projectName);
       IProject project = keyProject.getProject();
-      setKeYProjectProperties(project, buildProofs, buildProofsEfficient, enableMultiThreading, numberOfThreads, autoDeleteProofFiles);
+      setKeYProjectProperties(project, buildProofs, startupBuilds, buildProofsEfficient, enableMultiThreading, numberOfThreads, autoDeleteProofFiles);
       //build
       KeY4EclipseResourcesTestUtil.build(project);
       return project;

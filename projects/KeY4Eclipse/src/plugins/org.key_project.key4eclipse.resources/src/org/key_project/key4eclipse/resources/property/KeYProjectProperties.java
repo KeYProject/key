@@ -38,15 +38,13 @@ public final class KeYProjectProperties {
             if(value == null){
                return true;
             }
-            else return Boolean.parseBoolean(value);
+            return Boolean.parseBoolean(value);
          }
          catch (CoreException e) {
             return true;
          }
       }
-      else {
-         return false;
-      }
+      return false;
    }
    
    public static void setEnableKeYResourcesBuilds(IProject project,  boolean enabled) throws CoreException {
@@ -64,15 +62,13 @@ public final class KeYProjectProperties {
             if(value == null){
                return true;
             }
-            else return Boolean.parseBoolean(value);
+            return Boolean.parseBoolean(value);
          }
          catch (CoreException e) {
             return true;
          }
       }
-      else {
-         return false;
-      }
+      return false;
    }
    
    public static void setEnableBuildOnStartup(IProject project, boolean enabled) throws CoreException{
@@ -89,14 +85,12 @@ public final class KeYProjectProperties {
             if(value == null){
                return true;
             }
-            else return Boolean.parseBoolean(value);
+            return Boolean.parseBoolean(value);
          } catch (CoreException e){
             return true;
          }
       }
-      else {
-         return false;
-      }
+      return false;
    }
    
    public static void setEnableBuildProofsEfficient(IProject project,  boolean enabled) throws CoreException {
@@ -114,17 +108,13 @@ public final class KeYProjectProperties {
             if(value == null){
                return true;
             }
-            else{
-               return Boolean.parseBoolean(value);
-            }
+            return Boolean.parseBoolean(value);
          }
          catch (CoreException e) {
             return true;
          }
       }
-      else {
-         return false;
-      }
+      return false;
    }
    
    public static void setEnableMultiThreading(IProject project,  boolean enabled) throws CoreException {
@@ -146,9 +136,7 @@ public final class KeYProjectProperties {
             return 2;
          }
       }
-      else {
-         return 0;
-      }
+      return 0;
    }
    
    public static void setNumberOfThreads(IProject project,  String number) throws CoreException {
@@ -166,17 +154,13 @@ public final class KeYProjectProperties {
             if(value == null){
                return true;
             }
-            else{
-               return Boolean.parseBoolean(value); 
-            }
+            return Boolean.parseBoolean(value);
          }
          catch (CoreException e) {
             return true;
          }
       }
-      else {
-         return false;
-      }
+      return false;
    }
    
    

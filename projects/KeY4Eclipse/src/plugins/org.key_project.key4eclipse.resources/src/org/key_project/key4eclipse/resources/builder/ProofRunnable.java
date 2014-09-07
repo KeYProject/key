@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -12,9 +13,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.key_project.key4eclipse.resources.io.ProofMetaFileReader;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileWriter;
-import org.key_project.key4eclipse.resources.marker.MarkerManager;
+import org.key_project.key4eclipse.resources.marker.MarkerUtil;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -45,26 +45,22 @@ public class ProofRunnable implements Runnable {
    private List<ProofElement> proofElements;
    private List<ProofElement> proofsToDo;
    private final KeYEnvironment<CustomUserInterface> environment;
-   private MarkerManager markerManager;
    private final IProgressMonitor monitor;
    
    public ProofRunnable(IProject project, List<ProofElement> proofElements, List<ProofElement> proofsToDo, KeYEnvironment<CustomUserInterface> environment, IProgressMonitor monitor){
       this.project = project;
-      this.proofsToDo = proofsToDo;
+      this.proofsToDo = Collections.synchronizedList(proofsToDo);
       this.proofElements = proofElements;
-      this.proofsToDo = proofsToDo;
       this.environment = environment;
-      this.markerManager = new MarkerManager();
       this.monitor = monitor;
    }
    
    @Override
    public void run() {
-//      try{
          ProofElement pe;
          while ((pe = getProofToDo()) != null) {
             monitor.subTask(pe.getContract().getName());
-         
+
             if(monitor.isCanceled()){
                monitor.worked(1);
             }
@@ -78,14 +74,13 @@ public class ProofRunnable implements Runnable {
                long proofDuration = System.currentTimeMillis()-proofStart;
                if(proof != null){
                   pe.setProofClosed(proof.closed());
+                  pe.setOutdated(false);
                   pe.setProofReferences(ProofReferenceUtil.computeProofReferences(proof));
                   pe.setUsedContracts(KeYResourcesUtil.getUsedContractsProofElements(pe, proofElements));
                   pe.setMarkerMsg(generateProofMarkerMessage(pe, proof, proofDuration));
                   try{
                      save(proof,pe);
-                     pe.setOutdated(false);
-                     pe.setBuild(false);
-                     markerManager.setMarker(pe);
+                     MarkerUtil.setMarker(pe);
                   } catch (Exception e){
                      LogUtil.getLogger().logError(e);
                   }
@@ -266,9 +261,7 @@ public class ProofRunnable implements Runnable {
          if (errorMessage != null) {
             return null;
          }
-         else {
-            return out;
-         }
+         return out;
       }
       catch (IOException e) {
          return null;

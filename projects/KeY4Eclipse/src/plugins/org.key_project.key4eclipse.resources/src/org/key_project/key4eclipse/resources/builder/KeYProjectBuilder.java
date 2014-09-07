@@ -24,6 +24,7 @@ import org.key_project.key4eclipse.resources.log.LogManager;
 import org.key_project.key4eclipse.resources.log.LogRecord;
 import org.key_project.key4eclipse.resources.log.LogRecordKind;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
+import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 
 /**
  * The KeYProject builder.
@@ -42,29 +43,29 @@ public class KeYProjectBuilder extends IncrementalProjectBuilder {
    @Override
    protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor) throws CoreException {
       IProject project = getProject();
+      IResourceDelta delta = getDelta(project);
       final long start = System.currentTimeMillis();
       final boolean onlyRequiredProofs = KeYProjectProperties.isEnableBuildRequiredProofsOnly(project);
       final int numberOfThreads = KeYProjectProperties.getNumberOfThreads(project);
       final boolean enableThreading = KeYProjectProperties.isEnableMultiThreading(project);
-      
+      KeYResourcesUtil.synchronizeProject(project);
+      KeYProjectDelta keyDelta = KeYProjectDeltaManager.getInstance().getDelta(project);
+      keyDelta.update(delta);
       try {
-         IResourceDelta delta = getDelta(project);
-         if(KeYProjectProperties.isEnableKeYResourcesBuilds(project)){
-            KeYProjectDeltaManager deltaManager = KeYProjectDeltaManager.getInstance();
-            deltaManager.update(delta);
-            KeYProjectDelta keyDelta = deltaManager.getDelta(getProject());
-            if(IncrementalProjectBuilder.FULL_BUILD == kind || keyDelta.isBuildRequired()){
+         if(KeYProjectProperties.isEnableKeYResourcesBuilds(project)){ 
+            if((IncrementalProjectBuilder.FULL_BUILD == kind || keyDelta.isBuildRequired()) && !keyDelta.isBuilding()){
+               keyDelta.setIsBuilding(true);
                int buildType = IncrementalProjectBuilder.FULL_BUILD == kind ? KeYProjectBuildJob.FULL_BUILD : KeYProjectBuildJob.AUTO_BUILD;
                KeYProjectBuildJob proofManagerJob = new KeYProjectBuildJob(project, buildType);
                proofManagerJob.setRule(new KeYProjectBuildMutexRule(project));
                proofManagerJob.schedule();
             }
          }
-         return null;
       }
       finally {
          LogManager.getInstance().log(project, new LogRecord(LogRecordKind.BUILD, start, System.currentTimeMillis() - start, onlyRequiredProofs, enableThreading, numberOfThreads));
       }
+      return null;
    }
 
 

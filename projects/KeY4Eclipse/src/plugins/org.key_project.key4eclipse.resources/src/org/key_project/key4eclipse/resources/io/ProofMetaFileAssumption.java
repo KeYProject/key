@@ -102,9 +102,7 @@ public class ProofMetaFileAssumption {
                 ObjectUtil.equals(target, other.getTarget()) &&
                 ObjectUtil.equals(type, other.getType());
       }
-      else {
-         return false;
-      }
+      return false;
    }
 
    /**

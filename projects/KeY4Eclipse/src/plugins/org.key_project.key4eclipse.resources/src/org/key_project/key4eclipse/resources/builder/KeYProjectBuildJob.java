@@ -49,13 +49,29 @@ public class KeYProjectBuildJob extends Job{
    private int buildType;
    private EditorSelection editorSelection;
 
-   public KeYProjectBuildJob(IProject project, int buildType){
+   public KeYProjectBuildJob(IProject project, int buildType) {
       super(KeYProjectBuildJob.KEY_PROJECT_BUILD_JOB_NAME);
       this.project = project;
       this.buildType = buildType;
       this.editorSelection = null;
       if(buildType != KeYProjectBuildJob.FULL_BUILD){
 //         this.editorSelection = getEditorSelection();
+      }
+      if(buildType != KeYProjectBuildJob.AUTO_BUILD && buildType != KeYProjectBuildJob.FULL_BUILD ){
+         KeYProjectDelta keyDelta = KeYProjectDeltaManager.getInstance().getDelta(project);
+         keyDelta.update(null);
+         keyDelta.setIsBuilding(true);
+      }
+      cancelProjectJobs();
+   }
+   
+   
+   private void cancelProjectJobs(){
+      List<KeYProjectBuildJob> projectBuildJobs = KeYResourcesUtil.getProjectBuildJobs(project);
+      for(KeYProjectBuildJob job : projectBuildJobs){
+         if(Job.RUNNING == job.getState() && !this.equals(job)){
+            job.cancel();
+         }
       }
    }
    
@@ -88,12 +104,6 @@ public class KeYProjectBuildJob extends Job{
       final int numberOfThreads = KeYProjectProperties.getNumberOfThreads(project);
       final boolean enableThreading = KeYProjectProperties.isEnableMultiThreading(project);     
       
-      List<KeYProjectBuildJob> projectBuildJobs = KeYResourcesUtil.getProjectBuildJobs(project);
-      for(KeYProjectBuildJob job : projectBuildJobs){
-         if(Job.RUNNING == job.getState() && !this.equals(job)){
-            job.cancel();
-         }
-      }
       ProofManager proofManager = null;
       try{
          proofManager = new ProofManager(project, buildType, editorSelection);

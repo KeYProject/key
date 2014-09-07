@@ -43,10 +43,10 @@ public abstract class AbstractProofMarkerResolution implements IMarkerResolution
    public AbstractProofMarkerResolution(IMarker marker) throws CoreException {
       IFile proofFile = KeYResourcesUtil.getProofFile(marker);
       String proofFileName = proofFile != null ? proofFile.getName() : "";
-      if (MarkerManager.CLOSEDMARKER_ID.equals(marker.getType())) {
+      if (MarkerUtil.CLOSEDMARKER_ID.equals(marker.getType())) {
          description = getClosedMarkerDescriptionPrefix() + proofFileName;
       }
-      else if (MarkerManager.NOTCLOSEDMARKER_ID.equals(marker.getType())) {
+      else if (MarkerUtil.NOTCLOSEDMARKER_ID.equals(marker.getType())) {
          description = getNotClosedMarkerDescriptionPrefix() + proofFileName;
       }
       else {

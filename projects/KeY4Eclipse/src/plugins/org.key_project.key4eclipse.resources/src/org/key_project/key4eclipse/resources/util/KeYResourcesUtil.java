@@ -16,9 +16,11 @@ package org.key_project.key4eclipse.resources.util;
 import java.io.ByteArrayInputStream;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -77,6 +79,7 @@ public class KeYResourcesUtil {
    public static final String PROOF_FOLDER_NAME = "proofs";
    public static final String PROOF_FILE_EXTENSION = "proof";
    public static final String META_FILE_EXTENSION = "proofmeta";
+   public static final String LAST_CHANGES_FILE = ".lastChanges";
    
    
    /**
@@ -119,8 +122,8 @@ public class KeYResourcesUtil {
    }
    
    
-   public static LinkedList<ProofElement> getUsedContractsProofElements(ProofElement pe, List<ProofElement> proofElements){
-      LinkedList<ProofElement> usedContracts = new LinkedList<ProofElement>();
+   public static List<IFile> getUsedContractsProofElements(ProofElement pe, List<ProofElement> proofElements){
+      LinkedList<IFile> usedContracts = new LinkedList<IFile>();
       HashSet<IProofReference<?>> proofReferences = pe.getProofReferences();
       if(proofReferences != null && !proofReferences.isEmpty()){
          for(IProofReference<?> proofRef : proofReferences){
@@ -129,7 +132,7 @@ public class KeYResourcesUtil {
                Contract contract = (Contract) target;
                for(ProofElement proofElement : proofElements){
                   if(contract.getName().equals(proofElement.getContract().getName())){
-                     usedContracts.add(proofElement);
+                     usedContracts.add(proofElement.getProofFile());
                      break;
                   }
                }
@@ -159,6 +162,20 @@ public class KeYResourcesUtil {
    public static <T> List<T> cloneList(List<T> list){
       List<T> clone = new LinkedList<T>();
       clone.addAll(list);
+      return clone;
+   }
+   
+   
+   public static <K,V> Map<K, V> cloneMap(Map<K, V> map){
+      Map<K,V> clone = new LinkedHashMap<K, V>();
+      clone.putAll(map);
+      return clone;
+   }
+   
+   
+   public static <T> Set<T> cloneSet(Set<T> set){
+      Set<T> clone = new HashSet<T>();
+      clone.addAll(set);
       return clone;
    }
    
@@ -195,7 +212,7 @@ public class KeYResourcesUtil {
     * @return {@code true} is proof folder of a KeY project, {@code false} is something else.
     * @throws CoreException Occurred Exception.
     */
-   public static boolean isProofFolder(IFolder element) throws CoreException {
+   public static boolean isProofFolder(IFolder element) {
       return element != null &&
              PROOF_FOLDER_NAME.equals(element.getName()) &&
              element.getParent() instanceof IProject &&
@@ -274,6 +291,17 @@ public class KeYResourcesUtil {
          }
       }
    }
+   
+   public static <K,V> void mergeMaps(Map<K,V> dest, Map<K,V> inserts){
+      for(Map.Entry<K, V> entry : inserts.entrySet()){
+         K key = entry.getKey();
+         V value = entry.getValue();
+         if(!dest.containsKey(key) || (dest.containsKey(key) && dest.get(key) != value)){
+            dest.put(key, value);
+         }
+      }
+   }
+   
    
    public static <T> List<T> arrayToList(T[] array){ // TODO: Move to CollectionUtil
       List<T> list = new LinkedList<T>();
@@ -385,6 +413,15 @@ public class KeYResourcesUtil {
       }
       return false;
    }
+   
+   
+   public static IFolder getProofFolder(IProject project){
+      if(isKeYProject(project)){
+         return project.getFolder(PROOF_FOLDER_NAME);
+      }
+      return null;
+   }
+   
 
    /**
     * Returns the proofFolder for the given java{@link IFile}.
@@ -435,7 +472,7 @@ public class KeYResourcesUtil {
          IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
          return file;
       }
-      else return null;
+      return null;
    }
    
    
@@ -466,9 +503,7 @@ public class KeYResourcesUtil {
          IFile proofFile = root.getFile(proofFilePath);
          return proofFile;
       }
-      else {
-         return null;
-      }
+      return null;
    }
    
    /**
@@ -498,13 +533,8 @@ public class KeYResourcesUtil {
          if (property != null) {
             return Boolean.valueOf(property);
          }
-         else {
-            return false;
-         }
       }
-      else {
-         return false;
-      }
+      return false;
    }
    
    /**
@@ -569,13 +599,8 @@ public class KeYResourcesUtil {
                throw new CoreException(LogUtil.getLogger().createErrorStatus(e));
             }
          }
-         else {
-            return null;
-         }
       }
-      else {
-         return null;
-      }
+      return null;
    }
    
    /**
@@ -629,6 +654,12 @@ public class KeYResourcesUtil {
          l.proofRecursionCycleChanged(proofFile, cycle);
       }
    }
+   
+   
+//   public static List<Job> getProjectWorkspaceBuildJobs(IProject project){
+//      
+//   }
+   
    
    public static List<KeYProjectBuildJob> getProjectBuildJobs(IProject project){
       List<KeYProjectBuildJob> projectKeYJobs = new LinkedList<KeYProjectBuildJob>();
@@ -704,5 +735,27 @@ public class KeYResourcesUtil {
          }
       }
       return new LinkedList<IFile>();
+   }
+   
+
+   public static boolean isLastChangesFile(IFile file) {
+      if (file != null) {
+         return LAST_CHANGES_FILE.equals(file.getName()) &&
+                file.getParent() instanceof IFolder &&
+                KeYResourcesUtil.isProofFolder((IFolder)file.getParent());
+      }
+      return false;
+   }
+   
+   
+   public static void synchronizeProject(IProject project){
+      if(!project.isSynchronized(IResource.DEPTH_INFINITE)){
+         try {
+            project.refreshLocal(IResource.DEPTH_INFINITE, null);
+         }
+         catch (CoreException e) {
+            LogUtil.getLogger().logError(e);
+         }
+      }
    }
 }

@@ -48,9 +48,7 @@ public class KeYProjectBuildMutexRule implements ISchedulingRule{
             if(proofFolder.exists()){
                return proofFolder.getFullPath().isPrefixOf(ruleResource.getFullPath());
             }
-            else{
-               return false;
-            }
+            return false;
          }
          else if(rule instanceof IProject){
             return project.equals(rule);

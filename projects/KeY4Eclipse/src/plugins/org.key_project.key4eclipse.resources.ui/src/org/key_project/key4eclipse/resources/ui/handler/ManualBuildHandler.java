@@ -31,6 +31,7 @@ public class ManualBuildHandler extends AbstractSaveExecutionHandler {
                project = (IProject) obj;
             }
             if(project != null && KeYResourcesUtil.isKeYProject(project)){
+               KeYResourcesUtil.synchronizeProject(project);
                KeYProjectBuildJob buildJob = new KeYProjectBuildJob(project, KeYProjectBuildJob.MANUAL_BUILD);
                buildJob.setRule(new KeYProjectBuildMutexRule(project));
                buildJob.schedule();

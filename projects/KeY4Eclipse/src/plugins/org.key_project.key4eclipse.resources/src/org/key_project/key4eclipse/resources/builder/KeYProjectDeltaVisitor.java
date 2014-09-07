@@ -13,11 +13,10 @@
 
 package org.key_project.key4eclipse.resources.builder;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
@@ -29,19 +28,19 @@ import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
  */
 public class KeYProjectDeltaVisitor implements IResourceDeltaVisitor{
 
-   private List<IFile> changedJavaFiles;
-   private List<IFile> changedProofAndMetaFiles;
+   private Set<IFile> changedJavaFiles;
+   private Set<IFile> changedProofAndMetaFiles;
    
-   public KeYProjectDeltaVisitor(IProject project) {
-      this.changedJavaFiles = new LinkedList<IFile>();
-      this.changedProofAndMetaFiles = new LinkedList<IFile>();
+   public KeYProjectDeltaVisitor() {
+      this.changedJavaFiles = new LinkedHashSet<IFile>();
+      this.changedProofAndMetaFiles = new LinkedHashSet<IFile>();
    }
-
-   public List<IFile> getChangedJavaFiles(){
+   
+   public Set<IFile> getChangedJavaFiles(){
       return changedJavaFiles;
    }
-   
-   public List<IFile> getChangedProofAndMetaFiles(){
+
+   public Set<IFile> getChangedProofAndMetaFiles(){
       return changedProofAndMetaFiles;
    }
    
@@ -51,21 +50,14 @@ public class KeYProjectDeltaVisitor implements IResourceDeltaVisitor{
    @Override
    public boolean visit(IResourceDelta delta) {
       IResource deltaRes = delta.getResource();
-      if(IResource.FILE == deltaRes.getType()){
-         if(KeYResourcesUtil.isJavaFileAndInSrcFolder(deltaRes)){
-            if(IResourceDelta.ADDED == delta.getKind() || IResourceDelta.CHANGED == delta.getKind() || IResourceDelta.REMOVED == delta.getKind()){
-               if(!changedJavaFiles.contains(deltaRes)){
-                  changedJavaFiles.add((IFile) deltaRes);
-               }
-            }
+      if(deltaRes != null && IResource.FILE == deltaRes.getType()){
+         IFile deltaFile = (IFile) deltaRes;
+         if(KeYResourcesUtil.isJavaFileAndInSrcFolder(deltaFile)){
+            changedJavaFiles.add(deltaFile);
          }
-         else if(KeYResourcesUtil.isInProofFolder(deltaRes)){
-            if (KeYResourcesUtil.PROOF_FILE_EXTENSION.equals(deltaRes.getFileExtension()) ||
-                KeYResourcesUtil.META_FILE_EXTENSION.equals(deltaRes.getFileExtension())) {
-               if(!changedProofAndMetaFiles.contains(deltaRes)){
-                  changedProofAndMetaFiles.add((IFile) deltaRes);
-               }
-            }
+         else if(KeYResourcesUtil.isInProofFolder(deltaRes) 
+               && KeYResourcesUtil.PROOF_FILE_EXTENSION.equals(deltaRes.getFileExtension()) || KeYResourcesUtil.META_FILE_EXTENSION.equals(deltaRes.getFileExtension())){
+            changedProofAndMetaFiles.add(deltaFile);
          }
       }
       return true;
