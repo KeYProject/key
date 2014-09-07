@@ -794,7 +794,7 @@ public class JMLSpecFactory {
             // create two contracts for each diamond and box modality
             for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
               if(clauses.requires.get(heap) != null) {
-                pres.put(heap, TB.and(pres.get(heap),
+                pres.put(heap, TB.andSC(pres.get(heap),
                          TB.not(TB.convertToFormula(clauses.diverges))));
                 break;
               }

@@ -16,7 +16,6 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.While;
-import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.LoopInvariant;

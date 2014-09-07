@@ -16,6 +16,7 @@ package de.uka.ilkd.key.gui;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.swing.JOptionPane;
 
@@ -303,11 +304,11 @@ public class WindowUserInterface extends AbstractUserInterface {
     */
    @Override
    public DefaultProblemLoader load(Profile profile, File file, List<File> classPath,
-                                    File bootClassPath) throws ProblemLoaderException {
+                                    File bootClassPath, Properties poPropertiesToForce) throws ProblemLoaderException {
       if (file != null) {
          mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());
       }
-      return super.load(profile, file, classPath, bootClassPath);
+      return super.load(profile, file, classPath, bootClassPath, poPropertiesToForce);
    }
 
    /**

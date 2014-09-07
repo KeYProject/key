@@ -33,6 +33,7 @@ import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchStatement;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
+import org.key_project.sed.core.model.memory.SEDMemoryExceptionalMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryExceptionalTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopBodyTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopCondition;
@@ -191,7 +192,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        bpositive.setCallStack(new ISEDDebugNode[] {call});
        branch.addChild(bpositive);
        
-       SEDMemoryMethodReturn returnPositive = new SEDMemoryMethodReturn(target, bpositive, thread);
+       SEDMemoryExceptionalMethodReturn returnPositive = new SEDMemoryExceptionalMethodReturn(target, bpositive, thread);
        returnPositive.setName("return 1");
        returnPositive.setPathCondition("pc17");
        returnPositive.setCallStack(new ISEDDebugNode[] {call});

@@ -91,7 +91,7 @@ public class SEDPreorderIterator implements ISEDIterator {
       }
       else if (next instanceof ISEDDebugNode) {
          ISEDDebugNode node = (ISEDDebugNode)next;
-         ISEDDebugNode[] children = node.getChildren();
+         ISEDDebugNode[] children = NodeUtil.getChildren(node);//node.getChildren();
          if (!ArrayUtil.isEmpty(children)) {
             newNext = children[0];
          }
@@ -110,10 +110,10 @@ public class SEDPreorderIterator implements ISEDIterator {
     * @throws DebugException Occurred Exception.
     */
    protected ISEDDebugElement getNextOnParent(ISEDDebugNode node) throws DebugException {
-      ISEDDebugNode parent = node.getParent();
+      ISEDDebugNode parent = NodeUtil.getParent(node);//node.getParent();
       // Search next debug node
       while (parent instanceof ISEDDebugNode) {
-         ISEDDebugNode[] parentChildren = parent.getChildren();
+         ISEDDebugNode[] parentChildren = NodeUtil.getChildren(parent);//parent.getChildren();
          int nodeIndex = ArrayUtil.indexOf(parentChildren, node);
          if (nodeIndex < 0) {
             throw new DebugException(LogUtil.getLogger().createErrorStatus("Parent node \"" + parent + "\" does not contain child \"" + node + "."));
@@ -129,7 +129,7 @@ public class SEDPreorderIterator implements ISEDIterator {
          else {
             if (parentChildren[parentChildren.length - 1] != start) {
                node = parent;
-               parent = parent.getParent(); // Continue search on parent without recursive call!
+               parent = NodeUtil.getParent(parent);//parent.getParent(); // Continue search on parent without recursive call!
             }
             else {
                return null;

@@ -27,19 +27,18 @@ import org.key_project.key4eclipse.resources.util.LogUtil;
  * @author Stefan Käsdorf
  */
 public class ProofMarkerResolutionGenerator implements IMarkerResolutionGenerator {
-
-   
    /**
     * {@inheritDoc}
     */
    @Override
    public IMarkerResolution[] getResolutions(IMarker marker) {
       LinkedList<IMarkerResolution> resolutions = new LinkedList<IMarkerResolution>();
-      try{
+      try {
          if (StarterUtil.areFileStartersAvailable()) {
             resolutions.add(new ProofMarkerResolution(marker));
          }
-      } catch (CoreException e){
+      }
+      catch (CoreException e) {
          LogUtil.getLogger().logError(e);
       }
       return (IMarkerResolution[])resolutions.toArray(new IMarkerResolution[resolutions.size()]);

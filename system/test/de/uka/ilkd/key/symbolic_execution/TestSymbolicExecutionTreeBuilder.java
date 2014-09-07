@@ -39,6 +39,155 @@ import de.uka.ilkd.key.ui.CustomUserInterface;
  */
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: examples/_testcase/set/exceptionalMethodReturnTest
+    */
+   public void testExceptionalMethodReturnTest() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/exceptionalMethodReturnTest/test/ExceptionalMethodReturnTest.java", 
+                "ExceptionalMethodReturnTest", 
+                "main", 
+                null,
+                "examples/_testcase/set/exceptionalMethodReturnTest/oracle/ExceptionalMethodReturnTest.xml",
+                false,
+                true,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/staticInstanceFieldChanged
+    */
+   public void testStaticInstanceFieldChanged() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/staticInstanceFieldChanged/test/StaticInstanceFieldChanged.java", 
+                "StaticInstanceFieldChanged", 
+                "magic", 
+                null,
+                "examples/_testcase/set/staticInstanceFieldChanged/oracle/StaticInstanceFieldChanged.xml",
+                true,
+                false,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/useOperationContractVariableNestedOperationContractUse
+    */
+   public void testUseOperationContractVariableNestedOperationContractUse() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useOperationContractVariableNestedOperationContractUse/test/VariableNestedOperationContractUse.java", 
+                "VariableNestedOperationContractUse", 
+                "main", 
+                null,
+                "examples/_testcase/set/useOperationContractVariableNestedOperationContractUse/oracle/VariableNestedOperationContractUse.xml",
+                false,
+                false,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/useOperationContractApplyContractTwice
+    */
+   public void testUseOperationContractApplyContractTwice() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/useOperationContractApplyContractTwice/test/OperationContractAppliedTwiceTest.java", 
+                "OperationContractAppliedTwiceTest", 
+                "doubleMagic", 
+                null,
+                "examples/_testcase/set/useOperationContractApplyContractTwice/oracle/OperationContractAppliedTwiceTest.xml",
+                false,
+                false,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/verificationProofFile_VerifyNumber
+    */
+   public void testVerifyNumberNormal() throws Exception {
+      doSETTest(keyRepDirectory,
+                "examples/_testcase/set/verificationProofFile_VerifyNumber/test/VerifyNumberNormal.proof",
+                "examples/_testcase/set/verificationProofFile_VerifyNumber/oracle/VerifyNumberNormal.xml",
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/verificationProofFile_VerifyMin
+    */
+   public void testVerifyMinTrueBranch() throws Exception {
+      doSETTest(keyRepDirectory,
+                "examples/_testcase/set/verificationProofFile_VerifyMin/test/VerifyMinTrueBranch.proof",
+                "examples/_testcase/set/verificationProofFile_VerifyMin/oracle/VerifyMinTrueBranch.xml",
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/verificationProofFile_VerifyMin
+    */
+   public void testVerifyMin() throws Exception {
+      doSETTest(keyRepDirectory,
+                "examples/_testcase/set/verificationProofFile_VerifyMin/test/VerifyMin.proof",
+                "examples/_testcase/set/verificationProofFile_VerifyMin/oracle/VerifyMin.xml",
+                true,
+                true,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/simpleMethodCallStackTest
     */
    public void testSimpleMethodCallStack() throws Exception {

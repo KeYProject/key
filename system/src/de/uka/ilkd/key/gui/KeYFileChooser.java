@@ -79,18 +79,20 @@ public class KeYFileChooser {
 		                         ? JFileChooser.FILES_ONLY 
 		                         : JFileChooser.FILES_AND_DIRECTORIES);        
     }
-
-    public boolean showSaveDialog(Component parent, String defaultName) {
-	if(defaultName != null) {
-	    File file = new File(fileChooser.getCurrentDirectory(), 
-		    		 defaultName);
-	    fileChooser.setSelectedFile(file);
-	}
-	
-        setSaveDialog(true);
-	int result = fileChooser.showSaveDialog(parent);
-	return (result == JFileChooser.APPROVE_OPTION);
+    
+    public File getCurrentDirectory() {
+       return fileChooser.getCurrentDirectory();
     }
+
+   public boolean showSaveDialog(Component parent, File selectedFile) {
+      if (selectedFile != null) {
+         fileChooser.setSelectedFile(selectedFile);
+      }
+
+      setSaveDialog(true);
+      int result = fileChooser.showSaveDialog(parent);
+      return (result == JFileChooser.APPROVE_OPTION);
+   }
 
     public boolean showOpenDialog(Component component) {
         setSaveDialog(false);

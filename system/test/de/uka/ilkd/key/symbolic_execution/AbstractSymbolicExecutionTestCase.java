@@ -70,8 +70,10 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
@@ -449,6 +451,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             assertReturnValues(((IExecutionMethodReturn)expected).getReturnValues(), ((IExecutionMethodReturn)current).getReturnValues());
          }
       }
+      else if (expected instanceof IExecutionExceptionalMethodReturn) {
+         assertTrue("Expected IExecutionExceptionalMethodReturn but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionExceptionalMethodReturn);
+         assertTrue(((IExecutionExceptionalMethodReturn)expected).getSignature() + " does not match " + ((IExecutionExceptionalMethodReturn)current).getSignature(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionExceptionalMethodReturn)expected).getSignature(), ((IExecutionExceptionalMethodReturn)current).getSignature()));
+         assertTrue(((IExecutionExceptionalMethodReturn)expected).getFormatedMethodReturnCondition() + " does not match " + ((IExecutionExceptionalMethodReturn)current).getFormatedMethodReturnCondition(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionExceptionalMethodReturn)expected).getFormatedMethodReturnCondition(), ((IExecutionExceptionalMethodReturn)current).getFormatedMethodReturnCondition()));
+         assertVariables((IExecutionExceptionalMethodReturn)expected, (IExecutionExceptionalMethodReturn)current, compareVariables);
+      }
       else if (expected instanceof IExecutionStatement) {
          assertTrue("Expected IExecutionStatement but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionStatement);
          assertVariables((IExecutionStatement)expected, (IExecutionStatement)current, compareVariables);
@@ -458,6 +466,10 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertEquals(((IExecutionOperationContract)expected).isPreconditionComplied(), ((IExecutionOperationContract)current).isPreconditionComplied());
          assertEquals(((IExecutionOperationContract)expected).hasNotNullCheck(), ((IExecutionOperationContract)current).hasNotNullCheck());
          assertEquals(((IExecutionOperationContract)expected).isNotNullCheckComplied(), ((IExecutionOperationContract)current).isNotNullCheckComplied());
+         assertEquals(((IExecutionOperationContract)expected).getFormatedResultTerm(), ((IExecutionOperationContract)current).getFormatedResultTerm());
+         assertEquals(((IExecutionOperationContract)expected).getFormatedExceptionTerm(), ((IExecutionOperationContract)current).getFormatedExceptionTerm());
+         assertEquals(((IExecutionOperationContract)expected).getFormatedSelfTerm(), ((IExecutionOperationContract)current).getFormatedSelfTerm());
+         assertEquals(((IExecutionOperationContract)expected).getFormatedContractParams(), ((IExecutionOperationContract)current).getFormatedContractParams());
          assertVariables((IExecutionOperationContract)expected, (IExecutionOperationContract)current, compareVariables);
       }
       else if (expected instanceof IExecutionLoopInvariant) {
@@ -496,13 +508,13 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ProofInputException Occurred Exception.
     */
    protected static void assertMethodReturns(IExecutionMethodCall expected, IExecutionMethodCall current) throws ProofInputException {
-      ImmutableList<IExecutionMethodReturn> expectedEntries = expected.getMethodReturns();
-      ImmutableList<IExecutionMethodReturn> currentEntries = current.getMethodReturns();
+      ImmutableList<IExecutionBaseMethodReturn<?>> expectedEntries = expected.getMethodReturns();
+      ImmutableList<IExecutionBaseMethodReturn<?>> currentEntries = current.getMethodReturns();
       if (expectedEntries != null) {
          assertNotNull("Method return of \"" + current + "\" should not be null.", currentEntries);
          assertEquals("Node: " + expected, expectedEntries.size(), currentEntries.size());
-         Iterator<IExecutionMethodReturn> expectedIter = expectedEntries.iterator();
-         Iterator<IExecutionMethodReturn> currentIter = currentEntries.iterator();
+         Iterator<IExecutionBaseMethodReturn<?>> expectedIter = expectedEntries.iterator();
+         Iterator<IExecutionBaseMethodReturn<?>> currentIter = currentEntries.iterator();
          while (expectedIter.hasNext() && currentIter.hasNext()) {
             assertExecutionNode(expectedIter.next(), currentIter.next(), false, false, false, false);
          }
@@ -656,8 +668,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertNull(current);
       }
    }
-
-
    
    /**
     * Makes sure that the given values are the same.
@@ -1107,7 +1117,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       File proofFile = new File(baseDir, proofPathInBaseDir);
       assertTrue(proofFile.exists());
       // Load java file
-      KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), proofFile, null, null);
+      KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), proofFile, null, null, SymbolicExecutionTreeBuilder.createPoPropertiesToForce(), null);
       Proof proof = environment.getLoadedProof();
       assertNotNull(proof);
       // Set strategy and goal chooser to use for auto mode
@@ -1429,6 +1439,81 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       env.dispose();
    }
 
+   /**
+    * Executes a test with the following steps:
+    * <ol>
+    *    <li>Load java file</li>
+    *    <li>Instantiate proof for method in container type</li>
+    *    <li>Try to close proof in auto mode</li>
+    *    <li>Create symbolic execution tree</li>
+    *    <li>Create new oracle file in temporary directory {@link #tempNewOracleDirectory} if it is defined</li>
+    *    <li>Load oracle file</li>
+    *    <li>Compare created symbolic execution tree with oracle model</li>
+    * </ol>
+    * @param baseDir The base directory which contains test and oracle file.
+    * @param proofFilePathInBaseDir The path to the proof file inside the base directory.
+    * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
+    * @param includeVariables Include variables?
+    * @param includeCallStack Include call stack?
+    * @param includeReturnValues Include method return values?
+    * @param mergeBranchConditions Merge branch conditions?
+    * @param useOperationContracts Use operation contracts?
+    * @param useLoopInvariants Use loop invariants?
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
+    * @param aliasChecks Do alias checks?
+    * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
+    * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
+    * @return The tested {@link SymbolicExecutionEnvironment}.
+    * @throws ProofInputException Occurred Exception
+    * @throws IOException Occurred Exception
+    * @throws ParserConfigurationException Occurred Exception
+    * @throws SAXException Occurred Exception
+    * @throws ProblemLoaderException Occurred Exception
+    */
+   protected void doSETTest(File baseDir,
+                            String proofFilePathInBaseDir,
+                            String oraclePathInBaseDirFile,
+                            boolean includeVariables,
+                            boolean includeCallStack,
+                            boolean includeReturnValues,
+                            boolean mergeBranchConditions,
+                            boolean useOperationContracts,
+                            boolean useLoopInvariants,
+                            boolean nonExecutionBranchHidingSideProofs,
+                            boolean aliasChecks,
+                            boolean useUnicode,
+                            boolean usePrettyPrinting) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+      boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
+      SymbolicExecutionEnvironment<CustomUserInterface> env = null;
+      try {
+         // Make sure that parameter are valid.
+         assertNotNull(proofFilePathInBaseDir);
+         assertNotNull(oraclePathInBaseDirFile);
+         File oracleFile = new File(baseDir, oraclePathInBaseDirFile);
+         if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
+            assertTrue("Oracle file does not exist. Set \"CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY\" to true to create an oracle file.", oracleFile.exists());
+         }
+         // Make sure that the correct taclet options are defined.
+         setOneStepSimplificationEnabled(null, true);
+         // Create proof environment for symbolic execution
+         env = createSymbolicExecutionEnvironment(baseDir, proofFilePathInBaseDir, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting);
+         // Create new oracle file if required in a temporary directory
+         createOracleFile(env.getBuilder().getStartNode(), oraclePathInBaseDirFile, includeVariables, includeCallStack, includeReturnValues);
+         // Read oracle file
+         ExecutionNodeReader reader = new ExecutionNodeReader();
+         IExecutionNode oracleRoot = reader.read(oracleFile);
+         assertNotNull(oracleRoot);
+         // Make sure that the created symbolic execution tree matches the expected one.
+         assertExecutionNodes(oracleRoot, env.getBuilder().getStartNode(), includeVariables, includeCallStack, false, includeReturnValues);
+      }
+      finally {
+         // Restore original options
+         setOneStepSimplificationEnabled(null, originalOneStepSimplification);
+         if (env != null) {
+            env.dispose();
+         }
+      }
+   }
    
    /**
     * Executes a test with the following steps:
@@ -1509,6 +1594,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          restoreTacletOptions(originalTacletOptions);
       }
    }
+   
    /**
     * Executes a test with the following steps:
     * <ol>
