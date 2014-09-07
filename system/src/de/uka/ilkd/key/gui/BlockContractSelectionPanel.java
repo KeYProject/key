@@ -137,19 +137,7 @@ public class BlockContractSelectionPanel extends JPanel {
     public BlockContract getContract()
     {
         final Object[] selection = contractList.getSelectedValues();
-        if (selection.length == 0) {
-            return null;
-        }
-        else if (selection.length == 1) {
-            return (BlockContract) selection[0];
-        }
-        else {
-            ImmutableSet<BlockContract> contracts = DefaultImmutableSet.nil();
-            for (Object contract : selection) {
-                contracts = contracts.add((BlockContract) contract);
-            }
-            return SimpleBlockContract.combine(contracts, services);
-        }
+        return computeContract(services, selection);
     }
 
     /**
@@ -164,17 +152,18 @@ public class BlockContractSelectionPanel extends JPanel {
      * @return The selected {@link BlockContract} or {@code null} if not available.
      */
     public static BlockContract computeContract(Services services, Object[] selection) {
-       if(selection.length == 0) {
-          return null;
-       } else if (selection.length == 1) {
-          return (BlockContract) selection[0];
-       } else {
-          ImmutableSet<BlockContract> contracts
-             = DefaultImmutableSet.<BlockContract>nil();
-          for(Object contract : selection) {
-             contracts = contracts.add((BlockContract) contract);
-          }
-          return SimpleBlockContract.combine(contracts, services);
+       if (selection.length == 0) {
+           return null;
+       }
+       else if (selection.length == 1) {
+           return (BlockContract) selection[0];
+       }
+       else {
+           ImmutableSet<BlockContract> contracts = DefaultImmutableSet.nil();
+           for (Object contract : selection) {
+               contracts = contracts.add((BlockContract) contract);
+           }
+           return SimpleBlockContract.combine(contracts, services);
        }
     }
 }

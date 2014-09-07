@@ -1,5 +1,7 @@
 package org.key_project.key4eclipse.common.ui.completion;
 
+import java.util.List;
+
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ISelection;
@@ -17,6 +19,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.BlockContractSelectionPanel;
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BlockContractRule;
@@ -24,6 +27,7 @@ import de.uka.ilkd.key.rule.BlockContractRule.Instantiation;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.HeapContext;
 
 /**
  * The {@link InteractiveRuleApplicationCompletion} to treat {@link BlockContractRule} in the Eclipse context.
@@ -150,7 +154,10 @@ public class BlockContractCompletion extends AbstractInteractiveRuleApplicationC
       public IBuiltInRuleApp finish() {
          BlockContract contract = getSelectedContract();
          if(contract != null) {
-            return ((BlockContractBuiltInRuleApp) getApp().rule().createApp(getApp().posInOccurrence(), services)).setContract(contract);
+            BlockContractBuiltInRuleApp result = (BlockContractBuiltInRuleApp) getApp();
+            final List<LocationVariable> heaps = HeapContext.getModHeaps(services, instantiation.isTransactional());
+            result.update(instantiation.block, contract, heaps);
+            return result;
          } else {
             return getApp();
          }

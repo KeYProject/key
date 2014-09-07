@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.*;
+import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -22,7 +22,9 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.speclang.SimpleBlockContract;
 
 public class BlockContractBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
@@ -60,10 +62,6 @@ public class BlockContractBuiltInRuleApp extends AbstractBuiltInRuleApp {
     {
         return contract;
     }
-    
-    public BlockContractBuiltInRuleApp setContract(BlockContract contract) {
-       return new BlockContractBuiltInRuleApp(builtInRule, posInOccurrence(), null, block, contract, heaps);
-    }
 
     @Override
     public List<LocationVariable> getHeapContext()
@@ -73,7 +71,7 @@ public class BlockContractBuiltInRuleApp extends AbstractBuiltInRuleApp {
 	
 	@Override
 	public BlockContractBuiltInRuleApp replacePos(final PosInOccurrence newOccurrence)
-    {
+   {
 		return new BlockContractBuiltInRuleApp(builtInRule, newOccurrence, ifInsts, block, contract, heaps);
 	}
 
