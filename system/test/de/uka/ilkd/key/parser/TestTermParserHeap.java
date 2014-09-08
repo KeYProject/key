@@ -6,7 +6,9 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import java.io.IOException;
 
 /**
  * Parser tests for heap terms.
@@ -46,23 +48,23 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         return tf.createTerm(op, params);
     }
 
-    public void testParsePrettyPrintedSelect() {
-        String s1, s2;
+    public void testParsePrettyPrintedSelect() throws IOException {
+        String prettySyntax, verboseSyntax;
 
-        s1="a.f";
-        s2="int::select(heap, a, testTermParserHeap.A::$f)";
-        parsePrintAndCheckEquality(s1, s2);
+        prettySyntax = "a.f";
+        verboseSyntax = "int::select(heap, a, testTermParserHeap.A::$f)";
+        parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
 
-        s1 = "a1.f";
-        s2 = "int::select(heap, a1, testTermParserHeap.A1::$f)";
-        parsePrintAndCheckEquality(s1, s2);
+        prettySyntax = "a1.f";
+        verboseSyntax = "int::select(heap, a1, testTermParserHeap.A1::$f)";
+        parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
 
-        s1 = "a1.(testTermParserHeap.A::f)";
-        s2 = "int::select(heap, a1, testTermParserHeap.A::$f)";
-        parsePrintAndCheckEquality(s1, s2);
+        prettySyntax = "a1.(testTermParserHeap.A::f)";
+        verboseSyntax = "int::select(heap, a1, testTermParserHeap.A::$f)";
+        parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
     }
 
-    public void testBracketHeapUpdate() {
+    public void testBracketHeapUpdate() throws IOException {
         String s1 = "heap[a.f := 4][create(a)][memset(empty, 1)][anon(allLocs, heap)]";
         String s2 = "anon(memset(create(store(heap, a, testTermParserHeap.A::$f, 4), a), empty, 1), allLocs, heap)";
         parsePrintAndCheckEquality(s1, s2);
@@ -139,16 +141,23 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         }
     }
     /*
-    * The following procedure is applied here:
-    * 1) Take two plaintext inputs
-    * 2) Parse plaintexts and compare for equality
-    * 3) Pretty-print the first parse result
-    * 4) Parse again and check if result did not change (test for equality)
-    */
-    public void parsePrintAndCheckEquality(String s1, String s2){
-        Term t1 = parseTerm(s1);
-        Term t2 = parseTerm(s2);
+     * The following procedure is applied here:
+     * 1) Take two plaintext inputs
+     * 2) Parse plaintexts and compare for equality
+     * 3) Pretty-print the first parse result
+     * 4) Parse again and check if result did not change (test for equality)
+     */
+
+    public void parsePrintAndCheckEquality(String prettySyntax, String verboseSyntax) throws IOException {
+        Term t1 = parseTerm(prettySyntax);
+        Term t2 = parseTerm(verboseSyntax);
         assertEquals(t1, t2);
+
+        LogicPrinter lp = new LogicPrinter(services);
+        lp.printTerm(t2);
+        String printedSyntax = lp.toString();
+        Term t3 = parseTerm(printedSyntax);
+        assertEquals(t1, t3);
     }
 
 }

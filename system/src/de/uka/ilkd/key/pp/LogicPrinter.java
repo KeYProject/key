@@ -252,7 +252,10 @@ public class LogicPrinter {
                 services,
                 purePrint);
     }
-
+    
+    public LogicPrinter(Services services){
+        this(new ProgramPrinter(), new NotationInfo(), services);
+    }
 
     /**
      * @return the notationInfo associated with this LogicPrinter
