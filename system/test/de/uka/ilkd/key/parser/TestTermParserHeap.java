@@ -49,19 +49,19 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     public void testParsePrettyPrintedSelect() throws IOException {
-        String prettySyntax, verboseSyntax;
+        String s1, s2;
 
-        prettySyntax = "a.f";
-        verboseSyntax = "int::select(heap, a, testTermParserHeap.A::$f)";
-        parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
+        s1 = "a.f";
+        s2 = "int::select(heap, a, testTermParserHeap.A::$f)";
+        parsePrintAndCheckEquality(s1, s2);
 
-        prettySyntax = "a1.f";
-        verboseSyntax = "int::select(heap, a1, testTermParserHeap.A1::$f)";
-        parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
+        s1 = "a1.f";
+        s2 = "int::select(heap, a1, testTermParserHeap.A1::$f)";
+        parsePrintAndCheckEquality(s1, s2);
 
-        prettySyntax = "a1.(testTermParserHeap.A::f)";
-        verboseSyntax = "int::select(heap, a1, testTermParserHeap.A::$f)";
-        parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
+        s1 = "a1.(testTermParserHeap.A::f)";
+        s2 = "int::select(heap, a1, testTermParserHeap.A::$f)";
+        parsePrintAndCheckEquality(s1, s2);
     }
 
     public void testBracketHeapUpdate() throws IOException {
@@ -148,9 +148,9 @@ public class TestTermParserHeap extends AbstractTestTermParser {
      * 4) Parse again and check if result did not change (test for equality)
      */
 
-    public void parsePrintAndCheckEquality(String prettySyntax, String verboseSyntax) throws IOException {
-        Term t1 = parseTerm(prettySyntax);
-        Term t2 = parseTerm(verboseSyntax);
+    public void parsePrintAndCheckEquality(String s1, String s2) throws IOException {
+        Term t1 = parseTerm(s1);
+        Term t2 = parseTerm(s2);
         assertEquals(t1, t2);
 
         LogicPrinter lp = new LogicPrinter(services);
