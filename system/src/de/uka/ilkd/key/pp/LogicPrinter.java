@@ -1035,6 +1035,13 @@ public class LogicPrinter {
            && t.sort() == services.getTypeConverter().getHeapLDT().getFieldSort()
            && t.arity() == 0
            && t.boundVars().isEmpty()) {
+            
+            /*
+            * This block causes errors when trying to parse printed terms.
+            * Maybe this should be removed?
+            * (Kai Wallisch 09/2014)
+            */
+            
             startTerm(0);
             final String prettyFieldName
             	= services.getTypeConverter()
