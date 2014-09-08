@@ -24,6 +24,7 @@ import java.util.StringTokenizer;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -128,6 +129,37 @@ public class LogicPrinter {
 
     private SVInstantiations instantiations
     	= SVInstantiations.EMPTY_SVINSTANTIATIONS;
+
+    /*
+     * Determine whether class can be omitted when printing a field
+     * in a select term. A field can be omitted, if it is canonic for
+     * the associated object.
+     * 
+     * For more information on canonic, see
+     * {@link de.uka.ilkd.key.java.JavaInfo#getCanonicalFieldProgramVariable(String,KeYJavaType)}
+     * 
+     * (Kai Wallisch 09/2014)
+     */
+    private boolean isCanonicField(Term objectTerm, Term fieldTerm) {
+        Sort sort = objectTerm.sort();
+        JavaInfo javaInfo = services.getJavaInfo();
+        KeYJavaType kjt = javaInfo.getKeYJavaType(sort);
+        String fieldName = services.getTypeConverter().getHeapLDT().getPrettyFieldName(fieldTerm.op());
+        ProgramVariable pv = javaInfo.getCanonicalFieldProgramVariable(fieldName, kjt);
+        
+        /*
+         * Compare originTypeAndName and pvTypeAndName based on their String
+         * representation. I did not find a better solution to this yet.
+         * (Kai Wallisch 09/2014)
+        */
+        String[] originTypeAndName = fieldTerm.toString().split("::\\$");
+        assert originTypeAndName.length == 2;
+        String[] pvTypeAndName = pv.toString().split("::");
+        assert pvTypeAndName.length == 2;
+        
+        return (pvTypeAndName[0].equals(originTypeAndName[0])
+                && pvTypeAndName[1].equals(originTypeAndName[1]));
+    }
 
     private enum QuantifiableVariablePrintMode {NORMAL, WITH_OUT_DECLARATION}
     private QuantifiableVariablePrintMode quantifiableVariablePrintMode =
@@ -997,7 +1029,6 @@ public class LogicPrinter {
      * @param name the name to be printed before the parentheses.
      * @param t the term to be printed.  */
     public void printFunctionTerm(String name, Term t) throws IOException {
-	//XXX
 	if(NotationInfo.PRETTY_SYNTAX
            && services != null
            && t.op() instanceof Function
@@ -1214,7 +1245,6 @@ public class LogicPrinter {
         }
     }
 
-
     private void printEmbeddedObserver(final Term heapTerm, final Term objectTerm)
             throws IOException {
         Notation notation = notationInfo.getNotation(objectTerm.op());
@@ -1256,14 +1286,11 @@ public class LogicPrinter {
                 // static field access
                 printSelectStatic(fieldTerm, heapLDT);
             } else if (fieldTerm.arity() == 0) {
-
-                  // TODO @Kai this checks too little.
-//                Sort sort = objectTerm.sort();
-//                KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(sort);
-//                ClassType type = (ClassType) kjt.getJavaType();
-//                ImmutableList<Field> fields = type.getFields(services);
-
-                printSelectCanonic(heapTerm, objectTerm, fieldTerm);
+                if (isCanonicField(objectTerm, fieldTerm)) {
+                    printSelectCanonic(heapTerm, objectTerm, fieldTerm);
+                } else {
+                    printFunctionTerm(t.op().name().toString(), t);
+                }
             } else if (fieldTerm.op() == heapLDT.getArr()) {
                 // array access
                 printSelectArray(heapTerm, objectTerm, fieldTerm);
