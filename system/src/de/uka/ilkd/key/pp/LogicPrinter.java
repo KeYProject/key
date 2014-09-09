@@ -1029,7 +1029,8 @@ public class LogicPrinter {
      *
      * @param name the name to be printed before the parentheses.
      * @param t the term to be printed.  */
-    public void printFunctionTerm(String name, Term t) throws IOException {
+    public void printFunctionTerm(Term t) throws IOException {
+        String name = t.op().name().toString();
 	if(NotationInfo.PRETTY_SYNTAX
            && services != null
            && t.op() instanceof Function
@@ -1150,7 +1151,7 @@ public class LogicPrinter {
             }
 
         } else {
-            printFunctionTerm(t.op().name().toString(), t);
+            printFunctionTerm(t);
         }
     }
 
@@ -1232,7 +1233,7 @@ public class LogicPrinter {
 
                 layouter.print("]");
             } else {
-                printFunctionTerm(t.op().name().toString(), t);
+                printFunctionTerm(t);
             }
 
             layouter.print(" := ");
@@ -1247,7 +1248,7 @@ public class LogicPrinter {
             }
 
         } else {
-            printFunctionTerm(t.op().name().toString(), t);
+            printFunctionTerm(t);
         }
     }
 
@@ -1295,13 +1296,13 @@ public class LogicPrinter {
                 if (isCanonicField(objectTerm, fieldTerm)) {
                     printSelectCanonic(heapTerm, objectTerm, fieldTerm);
                 } else {
-                    printFunctionTerm(t.op().name().toString(), t);
+                    printFunctionTerm(t);
                 }
             } else if (fieldTerm.op() == heapLDT.getArr()) {
                 // array access
                 printSelectArray(heapTerm, objectTerm, fieldTerm);
             } else {
-                printFunctionTerm(t.op().name().toString(), t);
+                printFunctionTerm(t);
             }
             
             // print heap term if it is not the standard heap
@@ -1318,7 +1319,7 @@ public class LogicPrinter {
                 markEndSub();
             }
         } else {
-            printFunctionTerm(t.op().name().toString(), t);
+            printFunctionTerm(t);
         }
     }
     
@@ -1410,7 +1411,7 @@ public class LogicPrinter {
 	    markEndSub();
 	    layouter.print(postfix);
 	} else {
-	    printFunctionTerm(t.op().name().toString(), t);
+	    printFunctionTerm(t);
 	}
     }
 
@@ -1495,7 +1496,7 @@ public class LogicPrinter {
             layouter.end();
 
         } else {
-            printFunctionTerm(t.op().name().toString(), t);
+            printFunctionTerm(t);
         }
     }
 
