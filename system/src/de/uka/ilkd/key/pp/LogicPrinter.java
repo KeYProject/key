@@ -1293,11 +1293,19 @@ public class LogicPrinter {
                 // static field access
                 printSelectStatic(fieldTerm, heapLDT);
             } else if (fieldTerm.arity() == 0) {
+                markStartSub(1);
+                printEmbeddedObserver(heapTerm, objectTerm);
+                markEndSub();
+                layouter.print(".");
+                markStartSub(2);
                 if (isCanonicField(objectTerm, fieldTerm)) {
-                    printSelectCanonic(heapTerm, objectTerm, fieldTerm);
+                    printTerm(fieldTerm);
                 } else {
-                    printFunctionTerm(t);
+                    layouter.print("(");
+                    layouter.print(fieldTerm.toString().replace("::$", "::"));
+                    layouter.print(")");
                 }
+                markEndSub();
             } else if (fieldTerm.op() == heapLDT.getArr()) {
                 // array access
                 printSelectArray(heapTerm, objectTerm, fieldTerm);
@@ -1321,25 +1329,6 @@ public class LogicPrinter {
         } else {
             printFunctionTerm(t);
         }
-    }
-    
-    /*
-     * Print out a select term in canonic way.
-     * (separated from {@link #printSelect(Term, Term) printSelect}, to improve code readability)
-     */
-    private void printSelectCanonic(Term heapTerm, Term objectTerm, Term fieldTerm) throws IOException {
-        // field constant, skolemised field, field variable, ...
-        markStartSub(1);
-        printEmbeddedObserver(heapTerm, objectTerm);
-
-        markEndSub();
-
-        layouter.print(".");
-
-        markStartSub(2);
-        // is this right at all? // startTerm(0);
-        printTerm(fieldTerm);
-        markEndSub();
     }
 
     /*
