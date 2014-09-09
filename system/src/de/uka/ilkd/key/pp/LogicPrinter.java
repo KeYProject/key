@@ -150,6 +150,7 @@ public class LogicPrinter {
         /*
          * Compare originTypeAndName and pvTypeAndName based on their String
          * representation. I did not find a better solution to this yet.
+         * But it seems to be standard, as it is done similary in method HeapLDT.getPrettyFieldName().
          * (Kai Wallisch 09/2014)
         */
         String[] originTypeAndName = fieldTerm.toString().split("::\\$");
@@ -1038,15 +1039,13 @@ public class LogicPrinter {
             
             /*
             * This block causes errors when trying to parse printed terms.
+            * Information is lost when using result of method getPrettyFieldName().
             * Maybe this should be removed?
             * (Kai Wallisch 09/2014)
             */
             
             startTerm(0);
-            final String prettyFieldName
-            	= services.getTypeConverter()
-                          .getHeapLDT()
-                          .getPrettyFieldName(t.op());
+            String prettyFieldName = HeapLDT.getPrettyFieldName(t.op());
             layouter.print(prettyFieldName);
         }
 
