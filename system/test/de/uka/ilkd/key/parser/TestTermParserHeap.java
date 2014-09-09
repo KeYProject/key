@@ -106,17 +106,12 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h2, expectedParseResult, next);
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
         expectedParseResult = getSelectTerm("int", h, expectedParseResult, f);
+        parsePrintAndCheckEquality("(a.next.next@h2).next.f@h", expectedParseResult);
 
-        t2 = parseTerm("(a.next.next@h2).next.f@h");
-        assertEquals(expectedParseResult, t2);
-
-        expectedParseResult = parseTerm("a.array[a.f]@h");
-
-        Term x = getSelectTerm("int", tb.getBaseHeap(), a, f);
-        Term idx = tb.arr(x);
-        Term y = getSelectTerm("int[]", h, a, parseTerm("testTermParserHeap.A::$array"));
-        Term z = getSelectTerm("int", h, y, idx);
-        assertEquals(z, expectedParseResult);
+        Term aDotF = getSelectTerm("int", tb.getBaseHeap(), a, f); // a.f
+        Term aDotArray = getSelectTerm("int[]", h, a, parseTerm("testTermParserHeap.A::$array")); // a.array
+        expectedParseResult = getSelectTerm("int", h, aDotArray, tb.arr(aDotF));
+        parsePrintAndCheckEquality("a.array[a.f]@h", expectedParseResult);
 
         expectedParseResult = getSelectTerm("testTermParserHeap.A", tb.getBaseHeap(), a, next);
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
@@ -148,10 +143,10 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         parsePrintAndCheckEquality(prettySyntax, expectedParseResult);
     }
 
-    private void parsePrintAndCheckEquality(String prettySyntax,
+    private void parsePrintAndCheckEquality(String expectedPrettySyntax,
             Term expectedParseResult,
             String... optionalStringRepresentations) throws IOException {
-        Term parsedPrettySyntax = parseTerm(prettySyntax);
+        Term parsedPrettySyntax = parseTerm(expectedPrettySyntax);
         assertEquals(parsedPrettySyntax, expectedParseResult);
 
         LogicPrinter lp = new LogicPrinter(services);
@@ -161,7 +156,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         assertEquals(parsedPrettySyntax, parsedPrintedSyntax);
 
         // compare the string representations, but remove whitespaces
-        assertEquals(prettySyntax.replaceAll("\\s+", ""), printedSyntax.replaceAll("\\s+", ""));
+        assertEquals(expectedPrettySyntax.replaceAll("\\s+", ""), printedSyntax.replaceAll("\\s+", ""));
 
         for (int i = 0; i < optionalStringRepresentations.length; i++) {
             assertEquals(parseTerm(optionalStringRepresentations[i]), expectedParseResult);
