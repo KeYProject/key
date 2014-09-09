@@ -6,6 +6,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
+import static de.uka.ilkd.key.parser.KeYParserF.noHeapExpressionBeforeAtExceptionMessage;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import java.io.IOException;
@@ -41,7 +42,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
                 new File(javaPath)).getFirstProof().getJavaInfo();
         return javaInfo.getServices();
     }
-
+    
     private Term getSelectTerm(String sort, Term heap, Term object, Term field) {
         Operator op = lookup_func(sort + "::select");
         Term[] params = new Term[]{heap, object, field};
@@ -72,7 +73,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     public void testFieldAtHeapSyntax() throws IOException {
-        Term expectedParseResult, t2;
+        Term expectedParseResult;
         String prettySyntax, verboseSyntax;
 
         prettySyntax = "a.f@h";
@@ -116,18 +117,22 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         expectedParseResult = getSelectTerm("testTermParserHeap.A", tb.getBaseHeap(), a, next);
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
         expectedParseResult = getSelectTerm("int", h, expectedParseResult, f);
-        t2 = parseTerm("(a.next@heap).next.f@h");
-        assertEquals(expectedParseResult, t2);
-        t2 = parseTerm("((a.next@heap)).next.f@h");
-        assertEquals(expectedParseResult, t2);
+        parsePrintAndCheckEquality("(a.next@heap).next.f@h",
+                expectedParseResult,
+                "((a.next@heap)).next.f@h");
     }
 
-    public void testSyntax() {
+    /*
+     * In this test, the @-Operator is applied on a non-select term.
+     * This should cause a parser error. This test verifies that the correct
+     * Exception is thrown.
+     */
+    public void testVerifyExceptionIfAtNotPreceededBySelectTerm() {
         try {
             stringTermParser("(a.f + a.f)@h2").term();
             fail();
         } catch (Exception e) {
-            assertTrue(e.getMessage().contains("Expecting select term before '@', not: "));
+            assertTrue(e.getMessage().contains(noHeapExpressionBeforeAtExceptionMessage));
         }
     }
 
@@ -143,6 +148,16 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         parsePrintAndCheckEquality(prettySyntax, expectedParseResult);
     }
 
+    /**
+     * Test for a specific input whether parsing and printing are inverse to
+     * each other.
+     * 
+     * @param expectedPrettySyntax This is the expected result after printing {@code expectedParseResult}.
+     * @param expectedParseResult This is the expected result after parsing {@code expectedPrettySyntax}.
+     * @param optionalStringRepresentations Optionally, additional String representations
+     *              can be checked for the desired input as well.
+     * @throws IOException This does not make sense at all here. It should be removed.
+     */
     private void parsePrintAndCheckEquality(String expectedPrettySyntax,
             Term expectedParseResult,
             String... optionalStringRepresentations) throws IOException {
@@ -153,7 +168,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         lp.printTerm(expectedParseResult);
         String printedSyntax = lp.toString();
         Term parsedPrintedSyntax = parseTerm(printedSyntax);
-        assertEquals(parsedPrettySyntax, parsedPrintedSyntax);
+        assertEquals(parsedPrintedSyntax, expectedParseResult);
 
         // compare the string representations, but remove whitespaces
         assertEquals(expectedPrettySyntax.replaceAll("\\s+", ""), printedSyntax.replaceAll("\\s+", ""));

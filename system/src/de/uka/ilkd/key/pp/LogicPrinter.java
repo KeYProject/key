@@ -286,7 +286,7 @@ public class LogicPrinter {
                 purePrint);
     }
     
-    public LogicPrinter(Services services){
+    public LogicPrinter(Services services) {
         this(new ProgramPrinter(), new NotationInfo(), services);
     }
 

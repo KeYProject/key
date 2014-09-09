@@ -38,12 +38,16 @@ public class KeYParserF extends KeYParser {
     private boolean isImplicitHeap(Term t) {
         return getServices().getTermBuilder().getBaseHeap().equals(t);
     }
+    
+    // This is also used in TestTermParserHeap.java
+    public static final String noHeapExpressionBeforeAtExceptionMessage =
+            "Expecting select term before '@', not: ";
 
     private Term replaceHeap(Term term, Term heap, int depth) throws RecognitionException {
         if (depth > 0) {
 
             if (!isSelectTerm(term)) {
-                semanticError("Expecting select term before '@', not: " + term);
+                semanticError(noHeapExpressionBeforeAtExceptionMessage + term);
             }
 
             if (!isImplicitHeap(term.sub(0))) {
