@@ -20,8 +20,13 @@ import java.io.Writer;
  * The {@link #mark(Object o)} method does nothing in this implementation.
  * There is a method {@link #count()} which returns the number of characters
  * written by this so far.
+ * 
+ * This class is the cause for numerous unnecessary "throws IOException" clauses
+ * throughout the entire project. It should be removed and replaced by StringBackend.
+ * (Kai Wallisch 09/2014)
  */
 
+@Deprecated
 public class WriterBackend implements Backend {
 
     protected Writer out;

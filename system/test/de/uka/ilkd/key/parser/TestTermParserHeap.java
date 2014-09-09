@@ -42,7 +42,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
                 new File(javaPath)).getFirstProof().getJavaInfo();
         return javaInfo.getServices();
     }
-    
+
     private Term getSelectTerm(String sort, Term heap, Term object, Term field) {
         Operator op = lookup_func(sort + "::select");
         Term[] params = new Term[]{heap, object, field};
@@ -136,13 +136,6 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         }
     }
 
-    /*
-     * The following procedure is applied here:
-     * 1) Take two plaintext inputs.
-     * 2) Parse plaintexts and compare the results for equality.
-     * 3) Pretty-print the one of the parsed plaintexts.
-     * 4) Parse again and check if result did not change.
-     */
     private void parsePrintAndCheckEquality(String prettySyntax, String verboseSyntax) throws IOException {
         Term expectedParseResult = parseTerm(verboseSyntax);
         parsePrintAndCheckEquality(prettySyntax, expectedParseResult);
@@ -151,12 +144,15 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     /**
      * Test for a specific input whether parsing and printing are inverse to
      * each other.
-     * 
-     * @param expectedPrettySyntax This is the expected result after printing {@code expectedParseResult}.
-     * @param expectedParseResult This is the expected result after parsing {@code expectedPrettySyntax}.
-     * @param optionalStringRepresentations Optionally, additional String representations
-     *              can be checked for the desired input as well.
-     * @throws IOException This does not make sense at all here. It should be removed.
+     *
+     * @param expectedPrettySyntax This is the expected result after printing
+     * {@code expectedParseResult}.
+     * @param expectedParseResult This is the expected result after parsing
+     * {@code expectedPrettySyntax}.
+     * @param optionalStringRepresentations Optionally, additional String
+     * representations can be checked for the desired input as well.
+     * @throws IOException This does not make sense at all here. It should be
+     * removed. See class {@link WriterBackend} for further information.
      */
     private void parsePrintAndCheckEquality(String expectedPrettySyntax,
             Term expectedParseResult,
