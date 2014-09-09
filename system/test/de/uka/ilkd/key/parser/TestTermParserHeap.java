@@ -49,19 +49,19 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     public void testParsePrettyPrintedSelect() throws IOException {
-        String s1, s2;
+        String prettySyntax, verboseSyntax;
 
-        s1 = "a.f";
-        s2 = "int::select(heap, a, testTermParserHeap.A::$f)";
-        parsePrintAndCheckEquality(s1, s2);
+        prettySyntax = "a.f";
+        verboseSyntax = "int::select(heap, a, testTermParserHeap.A::$f)";
+        parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
 
-        s1 = "a1.f";
-        s2 = "int::select(heap, a1, testTermParserHeap.A1::$f)";
-        parsePrintAndCheckEquality(s1, s2);
+        prettySyntax = "a1.f";
+        verboseSyntax = "int::select(heap, a1, testTermParserHeap.A1::$f)";
+        parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
 
-        s1 = "a1.(testTermParserHeap.A::f)";
-        s2 = "int::select(heap, a1, testTermParserHeap.A::$f)";
-        parsePrintAndCheckEquality(s1, s2);
+        prettySyntax = "a1.(testTermParserHeap.A::f)";
+        verboseSyntax = "int::select(heap, a1, testTermParserHeap.A::$f)";
+        parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
     }
 
     public void testBracketHeapUpdate() throws IOException {
@@ -141,6 +141,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
             assertTrue(e.getMessage().contains("Expecting select term before '@', not: "));
         }
     }
+    
     /*
      * The following procedure is applied here:
      * 1) Take two plaintext inputs.
@@ -148,17 +149,19 @@ public class TestTermParserHeap extends AbstractTestTermParser {
      * 3) Pretty-print the one of the parsed plaintexts.
      * 4) Parse again and check if result did not change.
      */
-
-    public void parsePrintAndCheckEquality(String s1, String s2) throws IOException {
-        Term t1 = parseTerm(s1);
-        Term t2 = parseTerm(s2);
+    public void parsePrintAndCheckEquality(String prettySyntax, String verboseSyntax) throws IOException {
+        Term t1 = parseTerm(prettySyntax);
+        Term t2 = parseTerm(verboseSyntax);
         assertEquals(t1, t2);
 
         LogicPrinter lp = new LogicPrinter(services);
         lp.printTerm(t2);
         String printedSyntax = lp.toString();
-//        Term t3 = parseTerm(printedSyntax);
-//        assertEquals(t1, t3);
+        Term t3 = parseTerm(printedSyntax);
+        assertEquals(t1, t3);
+        
+        // compare the string representations, but remove whitespaces
+        assertEquals(prettySyntax.replaceAll("\\s+",""), printedSyntax.replaceAll("\\s+",""));
     }
 
 }
