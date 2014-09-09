@@ -1299,8 +1299,22 @@ public class LogicPrinter {
                 layouter.print(".");
                 markStartSub(2);
                 if (isCanonicField(objectTerm, fieldTerm)) {
+                    /*
+                    * Class name can be omitted if the field is canonic, i.e.
+                    * correct field can be determined without explicit mentioning
+                    * of corresponding class name.
+                    *  
+                    * Example syntax: object.field
+                    */
                     printTerm(fieldTerm);
                 } else {
+                    /*
+                    * There is another field of the same name that would be selected
+                    * if class name is omitted. In this case class name must be mentioned
+                    * explicitly.
+                    * 
+                    * Example syntax: object.(package.class::field)
+                    */
                     layouter.print("(");
                     layouter.print(fieldTerm.toString().replace("::$", "::"));
                     layouter.print(")");
