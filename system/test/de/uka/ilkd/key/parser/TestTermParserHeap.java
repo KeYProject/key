@@ -65,72 +65,66 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     public void testBracketHeapUpdate() throws IOException {
-        String s1 = "heap[a.f := 4][create(a)][memset(empty, 1)][anon(allLocs, heap)]";
-        String s2 = "anon(memset(create(store(heap, a, testTermParserHeap.A::$f, 4), a), empty, 1), allLocs, heap)";
-//        parsePrintAndCheckEquality(s1, s2);
-        assertEquals(parseTerm(s1), parseTerm(s2));
+        String prettySyntax = "heap[a.f := 4][create(a)][memset(empty, 1)][anon(allLocs, heap)]";
+        String verboseSyntax = "anon(memset(create(store(heap, a, testTermParserHeap.A::$f, 4), a), empty, 1), allLocs, heap)";
+//        parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
+        assertEquals(parseTerm(prettySyntax), parseTerm(verboseSyntax));
     }
 
-    public void testFieldAtHeapSyntax() {
-        Term t1, t2;
+    public void testFieldAtHeapSyntax() throws IOException {
+        Term expectedParseResult, t2;
+        String prettySyntax, verboseSyntax;
 
-        t1 = parseTerm("a.f@h");
-        t2 = parseTerm("int::select(h, a, testTermParserHeap.A::$f)");
-        assertEquals(t1, t2);
+        prettySyntax = "a.f@h";
+        verboseSyntax = "int::select(h, a, testTermParserHeap.A::$f)";
+        parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
 
-        t1 = parseTerm("a1.f@h");
-        t2 = parseTerm("int::select(h, a1, testTermParserHeap.A1::$f)");
-        assertEquals(t1, t2);
+        prettySyntax = "a1.f@h";
+        verboseSyntax = "int::select(h, a1, testTermParserHeap.A1::$f)";
+        parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
 
-        t1 = parseTerm("a1.(testTermParserHeap.A::f)@h");
-        t2 = parseTerm("int::select(h, a1, testTermParserHeap.A::$f)");
-        assertEquals(t1, t2);
+        prettySyntax = "a1.(testTermParserHeap.A::f)@h";
+        verboseSyntax = "int::select(h, a1, testTermParserHeap.A::$f)";
+        parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
 
         Term h = parseTerm("h");
         Term a = parseTerm("a");
         Term next = parseTerm("testTermParserHeap.A::$next");
         Term f = parseTerm("testTermParserHeap.A::$f");
-        t1 = getSelectTerm("testTermParserHeap.A", h, a, next);
-        t1 = getSelectTerm("testTermParserHeap.A", h, t1, next);
-        t1 = getSelectTerm("testTermParserHeap.A", h, t1, next);
-        t1 = getSelectTerm("int", h, t1, f);
-
-        t2 = parseTerm("a.next.next.next.f@h");
-        assertEquals(t1, t2);
-
-        t2 = parseTerm("(a.next).next.next.f@h");
-        assertEquals(t1, t2);
-
-        t2 = parseTerm("(a.next.next).next.f@h");
-        assertEquals(t1, t2);
-
-        t2 = parseTerm("(a.next.next.next).f@h");
-        assertEquals(t1, t2);
+        expectedParseResult = getSelectTerm("testTermParserHeap.A", h, a, next);
+        expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
+        expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
+        expectedParseResult = getSelectTerm("int", h, expectedParseResult, f);
+        parsePrintAndCheckEquality("a.next.next.next.f@h",
+                expectedParseResult,
+                "(a.next).next.next.f@h",
+                "(a.next.next).next.f@h",
+                "(a.next.next.next).f@h");
 
         Term h2 = parseTerm("h2");
-        t1 = getSelectTerm("testTermParserHeap.A", h2, a, next);
-        t1 = getSelectTerm("testTermParserHeap.A", h2, t1, next);
-        t1 = getSelectTerm("testTermParserHeap.A", h, t1, next);
-        t1 = getSelectTerm("int", h, t1, f);
+        expectedParseResult = getSelectTerm("testTermParserHeap.A", h2, a, next);
+        expectedParseResult = getSelectTerm("testTermParserHeap.A", h2, expectedParseResult, next);
+        expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
+        expectedParseResult = getSelectTerm("int", h, expectedParseResult, f);
 
         t2 = parseTerm("(a.next.next@h2).next.f@h");
-        assertEquals(t1, t2);
+        assertEquals(expectedParseResult, t2);
 
-        t1 = parseTerm("a.array[a.f]@h");
+        expectedParseResult = parseTerm("a.array[a.f]@h");
 
         Term x = getSelectTerm("int", tb.getBaseHeap(), a, f);
         Term idx = tb.arr(x);
         Term y = getSelectTerm("int[]", h, a, parseTerm("testTermParserHeap.A::$array"));
         Term z = getSelectTerm("int", h, y, idx);
-        assertEquals(z, t1);
+        assertEquals(z, expectedParseResult);
 
-        t1 = getSelectTerm("testTermParserHeap.A", tb.getBaseHeap(), a, next);
-        t1 = getSelectTerm("testTermParserHeap.A", h, t1, next);
-        t1 = getSelectTerm("int", h, t1, f);
+        expectedParseResult = getSelectTerm("testTermParserHeap.A", tb.getBaseHeap(), a, next);
+        expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
+        expectedParseResult = getSelectTerm("int", h, expectedParseResult, f);
         t2 = parseTerm("(a.next@heap).next.f@h");
-        assertEquals(t1, t2);
+        assertEquals(expectedParseResult, t2);
         t2 = parseTerm("((a.next@heap)).next.f@h");
-        assertEquals(t1, t2);
+        assertEquals(expectedParseResult, t2);
     }
 
     public void testSyntax() {
@@ -141,7 +135,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
             assertTrue(e.getMessage().contains("Expecting select term before '@', not: "));
         }
     }
-    
+
     /*
      * The following procedure is applied here:
      * 1) Take two plaintext inputs.
@@ -149,19 +143,29 @@ public class TestTermParserHeap extends AbstractTestTermParser {
      * 3) Pretty-print the one of the parsed plaintexts.
      * 4) Parse again and check if result did not change.
      */
-    public void parsePrintAndCheckEquality(String prettySyntax, String verboseSyntax) throws IOException {
-        Term t1 = parseTerm(prettySyntax);
-        Term t2 = parseTerm(verboseSyntax);
-        assertEquals(t1, t2);
+    private void parsePrintAndCheckEquality(String prettySyntax, String verboseSyntax) throws IOException {
+        Term expectedParseResult = parseTerm(verboseSyntax);
+        parsePrintAndCheckEquality(prettySyntax, expectedParseResult);
+    }
+
+    private void parsePrintAndCheckEquality(String prettySyntax,
+            Term expectedParseResult,
+            String... optionalStringRepresentations) throws IOException {
+        Term parsedPrettySyntax = parseTerm(prettySyntax);
+        assertEquals(parsedPrettySyntax, expectedParseResult);
 
         LogicPrinter lp = new LogicPrinter(services);
-        lp.printTerm(t2);
+        lp.printTerm(expectedParseResult);
         String printedSyntax = lp.toString();
-        Term t3 = parseTerm(printedSyntax);
-        assertEquals(t1, t3);
-        
+        Term parsedPrintedSyntax = parseTerm(printedSyntax);
+        assertEquals(parsedPrettySyntax, parsedPrintedSyntax);
+
         // compare the string representations, but remove whitespaces
-        assertEquals(prettySyntax.replaceAll("\\s+",""), printedSyntax.replaceAll("\\s+",""));
+        assertEquals(prettySyntax.replaceAll("\\s+", ""), printedSyntax.replaceAll("\\s+", ""));
+
+        for (int i = 0; i < optionalStringRepresentations.length; i++) {
+            assertEquals(parseTerm(optionalStringRepresentations[i]), expectedParseResult);
+        }
     }
 
 }
