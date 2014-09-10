@@ -144,7 +144,7 @@ public class LogicPrinter {
         Sort sort = objectTerm.sort();
         JavaInfo javaInfo = services.getJavaInfo();
         KeYJavaType kjt = javaInfo.getKeYJavaType(sort);
-        String fieldName = services.getTypeConverter().getHeapLDT().getPrettyFieldName(fieldTerm.op());
+        String fieldName = HeapLDT.getPrettyFieldName(fieldTerm.op());
         ProgramVariable pv = javaInfo.getCanonicalFieldProgramVariable(fieldName, kjt);
         
         /*
@@ -1288,7 +1288,7 @@ public class LogicPrinter {
             final Term heapTerm = t.sub(0);
             final Term objectTerm = t.sub(1);
             final Term fieldTerm = t.sub(2);
-            
+
             if (objectTerm.equals(services.getTermBuilder().NULL()) && isFieldConstant(fieldTerm)) {
                 // static field access
                 printSelectStatic(fieldTerm, heapLDT);
@@ -1300,21 +1300,21 @@ public class LogicPrinter {
                 markStartSub(2);
                 if (isCanonicField(objectTerm, fieldTerm)) {
                     /*
-                    * Class name can be omitted if the field is canonic, i.e.
-                    * correct field can be determined without explicit mentioning
-                    * of corresponding class name.
-                    *  
-                    * Example syntax: object.field
-                    */
+                     * Class name can be omitted if the field is canonic, i.e.
+                     * correct field can be determined without explicit mentioning
+                     * of corresponding class name.
+                     *  
+                     * Example syntax: object.field
+                     */
                     printTerm(fieldTerm);
                 } else {
                     /*
-                    * There is another field of the same name that would be selected
-                    * if class name is omitted. In this case class name must be mentioned
-                    * explicitly.
-                    * 
-                    * Example syntax: object.(package.class::field)
-                    */
+                     * There is another field of the same name that would be selected
+                     * if class name is omitted. In this case class name must be mentioned
+                     * explicitly.
+                     * 
+                     * Example syntax: object.(package.class::field)
+                     */
                     layouter.print("(");
                     layouter.print(fieldTerm.toString().replace("::$", "::"));
                     layouter.print(")");
@@ -1326,7 +1326,7 @@ public class LogicPrinter {
             } else {
                 printFunctionTerm(t);
             }
-            
+
             // print heap term if it is not the standard heap
             if (!heapTerm.equals(tacitHeap)) {
                 layouter./*brk(1, -3).*/print("@");
