@@ -129,7 +129,7 @@ public class LogicPrinter {
 
     private SVInstantiations instantiations
     	= SVInstantiations.EMPTY_SVINSTANTIATIONS;
-
+    
     /*
      * Determine whether class can be omitted when printing a field
      * in a select term. A field can be omitted, if it is canonic for
@@ -146,6 +146,9 @@ public class LogicPrinter {
         KeYJavaType kjt = javaInfo.getKeYJavaType(sort);
         String fieldName = HeapLDT.getPrettyFieldName(fieldTerm.op());
         ProgramVariable pv = javaInfo.getCanonicalFieldProgramVariable(fieldName, kjt);
+        if (pv == null) {
+            return false;
+        }
         
         /*
          * Compare originTypeAndName and pvTypeAndName based on their String
@@ -160,6 +163,17 @@ public class LogicPrinter {
         
         return (pvTypeAndName[0].equals(originTypeAndName[0])
                 && pvTypeAndName[1].equals(originTypeAndName[1]));
+    }
+    
+    /*
+     * Check whether there is a field with the same name as a variable.
+     */
+    private boolean isFieldName(String variableName, Term objectTerm) {
+        Sort sort = objectTerm.sort();
+        JavaInfo javaInfo = services.getJavaInfo();
+        KeYJavaType kjt = javaInfo.getKeYJavaType(sort);
+        ProgramVariable pv = javaInfo.getCanonicalFieldProgramVariable(variableName, kjt);
+        return pv != null;
     }
 
     private enum QuantifiableVariablePrintMode {NORMAL, WITH_OUT_DECLARATION}
@@ -615,7 +629,7 @@ public class LogicPrinter {
         layouter.brk(1, -2).print(")").end();
     }
 
-    protected void printGoalTemplates(Taclet taclet) throws IOException {
+    protected void printGoalTemplates(Taclet taclet) throws IOException{
         //layouter.beginC(0);
         if (taclet.closeGoal()) {
             layouter.brk().print("\\closegoal").brk();
@@ -1021,6 +1035,7 @@ public class LogicPrinter {
        }
     }
 
+
     /** Print a term in <code>f(t1,...tn)</code> style.  If the
      * operator has arity 0, no parentheses are printed, i.e.
      * <code>f</code> instead of <code>f()</code>.  If the term
@@ -1031,20 +1046,8 @@ public class LogicPrinter {
      * @param t the term to be printed.  */
     public void printFunctionTerm(Term t) throws IOException {
         String name = t.op().name().toString();
-	if(NotationInfo.PRETTY_SYNTAX
-           && services != null
-           && t.op() instanceof Function
-           && t.sort() == services.getTypeConverter().getHeapLDT().getFieldSort()
-           && t.arity() == 0
-           && t.boundVars().isEmpty()) {
-            
-            /*
-            * This block causes errors when trying to parse printed terms.
-            * Information is lost when using result of method getPrettyFieldName().
-            * Maybe this should be removed?
-            * (Kai Wallisch 09/2014)
-            */
-            
+        if (NotationInfo.PRETTY_SYNTAX && !NotationInfo.ENSURE_PARSABILITY
+                && services != null && isFieldConstant(t)) {
             startTerm(0);
             String prettyFieldName = HeapLDT.getPrettyFieldName(t.op());
             layouter.print(prettyFieldName);
@@ -1252,6 +1255,7 @@ public class LogicPrinter {
         }
     }
 
+
     private void printEmbeddedObserver(final Term heapTerm, final Term objectTerm)
             throws IOException {
         Notation notation = notationInfo.getNotation(objectTerm.op());
@@ -1270,7 +1274,7 @@ public class LogicPrinter {
             printTerm(objectTerm);
         }
     }
-    
+
     public void printSelect(Term t, Term tacitHeap) throws IOException {
         assert t.boundVars().isEmpty();
         assert t.arity() == 3;
@@ -1293,33 +1297,55 @@ public class LogicPrinter {
                 // static field access
                 printSelectStatic(fieldTerm, heapLDT);
             } else if (fieldTerm.arity() == 0) {
-                markStartSub(1);
-                printEmbeddedObserver(heapTerm, objectTerm);
-                markEndSub();
-                layouter.print(".");
-                markStartSub(2);
-                if (isCanonicField(objectTerm, fieldTerm)) {
-                    /*
-                     * Class name can be omitted if the field is canonic, i.e.
-                     * correct field can be determined without explicit mentioning
-                     * of corresponding class name.
-                     *  
-                     * Example syntax: object.field
-                     */
-                    printTerm(fieldTerm);
+                if (isFieldConstant(fieldTerm)) {
+                    if (t.sort().equals(objectTerm.sort())) {
+                        markStartSub(1);
+                        printEmbeddedObserver(heapTerm, objectTerm);
+                        markEndSub();
+                        layouter.print(".");
+                        markStartSub(2);
+                        if (isCanonicField(objectTerm, fieldTerm)) {
+                            /*
+                             * Class name can be omitted if the field is canonic, i.e.
+                             * correct field can be determined without explicit mentioning
+                             * of corresponding class name.
+                             *  
+                             * Example syntax: object.field
+                             */
+                            printTerm(fieldTerm);
+                        } else {
+                            /*
+                             * There is another field of the same name that would be selected
+                             * if class name is omitted. In this case class name must be mentioned
+                             * explicitly.
+                             * 
+                             * Example syntax: object.(package.class::field)
+                             */
+                            layouter.print("(");
+                            layouter.print(fieldTerm.toString().replace("::$", "::"));
+                            layouter.print(")");
+                        }
+                        markEndSub();
+                    } else {
+                        printFunctionTerm(t);
+                    }
                 } else {
-                    /*
-                     * There is another field of the same name that would be selected
-                     * if class name is omitted. In this case class name must be mentioned
-                     * explicitly.
-                     * 
-                     * Example syntax: object.(package.class::field)
-                     */
-                    layouter.print("(");
-                    layouter.print(fieldTerm.toString().replace("::$", "::"));
-                    layouter.print(")");
+                    if (t.sort() == Sort.ANY) {
+                        if (isFieldName(fieldTerm.op().toString(), objectTerm)) {
+                            printFunctionTerm(t);
+                        } else {
+                            markStartSub(1);
+                            printEmbeddedObserver(heapTerm, objectTerm);
+                            markEndSub();
+                            layouter.print(".");
+                            markStartSub(2);
+                            printTerm(fieldTerm);
+                            markEndSub();
+                        }
+                    } else {
+                        printFunctionTerm(t);
+                    }
                 }
-                markEndSub();
             } else if (fieldTerm.op() == heapLDT.getArr()) {
                 // array access
                 printSelectArray(heapTerm, objectTerm, fieldTerm);
@@ -1394,15 +1420,22 @@ public class LogicPrinter {
         layouter.print(".");
 
         markStartSub(2);
-        // is this right at all? // startTerm(0);
         printTerm(fieldTerm);
         markEndSub();
     }
 
-    private static boolean isFieldConstant(final Term fieldTerm) {
+    /**
+    * Find out whether a {@link Term} represents a field symbol, declared
+    * in a Java class.
+    */
+    private boolean isFieldConstant(final Term fieldTerm) {
+        assert services != null;
         return fieldTerm.op() instanceof Function
                 && ((Function) fieldTerm.op()).isUnique()
-                && ((Function) fieldTerm.op()).name().toString().contains("::$");
+                && ((Function) fieldTerm.op()).name().toString().contains("::$")
+                && fieldTerm.sort() == services.getTypeConverter().getHeapLDT().getFieldSort()
+                && fieldTerm.arity() == 0
+                && fieldTerm.boundVars().isEmpty();
     }
 
     public void printPostfix(Term t, String postfix) throws IOException {
@@ -2261,6 +2294,7 @@ public class LogicPrinter {
             mark(MarkType.MARK_START_TERM, size);
         }
     }
+
 
     /**
      * returns true if an attribute term shall be printed in short form.

@@ -152,6 +152,17 @@ public final class NotationInfo {
     
     public static boolean HIDE_PACKAGE_PREFIX = false;
     
+    /*
+     * Set this flag to false, if parsability of LogicPrinter output is not
+     * required to be parsable. If set to true, every LogicPrinter should be
+     * parseable.
+     * 
+     * It is planned to add a GUI option that enables the user to toggle this.
+     * For now, it is only for testing on branch wallischKeYParser
+     * (Kai Wallisch 09/2014)
+     */
+    static boolean ENSURE_PARSABILITY = true;
+    
     /** This maps operators and classes of operators to {@link
      * Notation}s.  The idea is that we first look whether the operator has
      * a Notation registered.  Otherwise, we see if there is one for the
