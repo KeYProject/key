@@ -1155,8 +1155,12 @@ public class LogicPrinter {
             layouter.print("[" + opName + "(").beginC(0);
 
             for(int i = 1; i < t.arity(); i++) {
-                // do not print anon_heap
-                if ("anon".equals(opName) && i == 2) break;
+                if (!NotationInfo.ENSURE_PARSABILITY) {
+                    // do not print anon_heap
+                    if ("anon".equals(opName) && i == 2) {
+                        break;
+                    }
+                }
                 
                 if(i > 1) {
                     layouter.print(",").brk(1,0);
@@ -1359,6 +1363,7 @@ public class LogicPrinter {
                 }
             }
             if (t.sort() == Sort.ANY && !isFieldName(fieldTerm.op().toString(), objectTerm)) {
+                startTerm(3);
                 markStartSub(1);
                 printEmbeddedObserver(heapTerm, objectTerm);
                 markEndSub();
