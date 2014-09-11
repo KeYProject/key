@@ -176,6 +176,25 @@ public class LogicPrinter {
         return pv != null;
     }
 
+    /*
+     * Add heap term after a pretty-printed select, using @-Operator.
+     */
+    private void printSelectAddHeap(Term heapTerm, Term tacitHeap) throws IOException {
+        // print heap term if it is not the standard heap
+        if (!heapTerm.equals(tacitHeap)) {
+            layouter./*brk(1, -3).*/print("@");
+            markStartSub(0);
+            // if, one day, there are infix heap expressions, this needs to be
+            // maybeParens(...):
+            printTerm(heapTerm);
+            markEndSub();
+        } else {
+            // heap not printed
+            markStartSub(0);
+            markEndSub();
+        }
+    }
+
     private enum QuantifiableVariablePrintMode {NORMAL, WITH_OUT_DECLARATION}
     private QuantifiableVariablePrintMode quantifiableVariablePrintMode =
             QuantifiableVariablePrintMode.NORMAL;
@@ -1287,18 +1306,20 @@ public class LogicPrinter {
                 tacitHeap = services.getTermFactory().createTerm(heapLDT.getHeap());
             }
 
-            startTerm(3);
-
             final Term heapTerm = t.sub(0);
             final Term objectTerm = t.sub(1);
             final Term fieldTerm = t.sub(2);
 
-            if (objectTerm.equals(services.getTermBuilder().NULL()) && isFieldConstant(fieldTerm)) {
-                // static field access
-                printSelectStatic(fieldTerm, heapLDT);
-            } else if (fieldTerm.arity() == 0) {
+            if (t.sort().equals(fieldTerm.sort())) {
                 if (isFieldConstant(fieldTerm)) {
-                    if (t.sort().equals(objectTerm.sort())) {
+                    if (objectTerm.equals(services.getTermBuilder().NULL())) {
+                        // static field access
+                        startTerm(3);
+                        printSelectStatic(fieldTerm, heapLDT);
+                        printSelectAddHeap(heapTerm, tacitHeap);
+                    } else {
+                        // non-static field access
+                        startTerm(3);
                         markStartSub(1);
                         printEmbeddedObserver(heapTerm, objectTerm);
                         markEndSub();
@@ -1326,45 +1347,28 @@ public class LogicPrinter {
                             layouter.print(")");
                         }
                         markEndSub();
-                    } else {
-                        printFunctionTerm(t);
+                        printSelectAddHeap(heapTerm, tacitHeap);
                     }
+                } else if (fieldTerm.op() == heapLDT.getArr()) {
+                    // array access
+                    startTerm(3);
+                    printSelectArray(heapTerm, objectTerm, fieldTerm);
+                    printSelectAddHeap(heapTerm, tacitHeap);
                 } else {
-                    if (t.sort() == Sort.ANY) {
-                        if (isFieldName(fieldTerm.op().toString(), objectTerm)) {
-                            printFunctionTerm(t);
-                        } else {
-                            markStartSub(1);
-                            printEmbeddedObserver(heapTerm, objectTerm);
-                            markEndSub();
-                            layouter.print(".");
-                            markStartSub(2);
-                            printTerm(fieldTerm);
-                            markEndSub();
-                        }
-                    } else {
-                        printFunctionTerm(t);
-                    }
+                    printFunctionTerm(t);
                 }
-            } else if (fieldTerm.op() == heapLDT.getArr()) {
-                // array access
-                printSelectArray(heapTerm, objectTerm, fieldTerm);
+            }
+            if (t.sort() == Sort.ANY && !isFieldName(fieldTerm.op().toString(), objectTerm)) {
+                markStartSub(1);
+                printEmbeddedObserver(heapTerm, objectTerm);
+                markEndSub();
+                layouter.print(".");
+                markStartSub(2);
+                printTerm(fieldTerm);
+                markEndSub();
+                printSelectAddHeap(heapTerm, tacitHeap);
             } else {
                 printFunctionTerm(t);
-            }
-
-            // print heap term if it is not the standard heap
-            if (!heapTerm.equals(tacitHeap)) {
-                layouter./*brk(1, -3).*/print("@");
-                markStartSub(0);
-                // if, one day, there are infix heap expressions, this needs to be
-                // maybeParens(...):
-                printTerm(heapTerm);
-                markEndSub();
-            } else {
-                // heap not printed
-                markStartSub(0);
-                markEndSub();
             }
         } else {
             printFunctionTerm(t);
