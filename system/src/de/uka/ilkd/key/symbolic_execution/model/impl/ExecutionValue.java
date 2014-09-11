@@ -211,7 +211,9 @@ public class ExecutionValue extends AbstractExecutionElement implements IExecuti
                         ExecutionValue[] lengthValues = lengthVariable.getValues();
                         for (ExecutionValue lengthValue : lengthValues) {
                            try {
-                              int length = Integer.valueOf(lengthValue.getValueString());
+                              int length = getSettings().isUsePrettyPrinting() ?
+                                           Integer.valueOf(lengthValue.getValueString()) :
+                                           Integer.valueOf(SymbolicExecutionUtil.formatTerm(lengthValue.getValue(), services, false, true));
                               for (int i = 0; i < length; i++) {
                                  ExecutionVariable childI = new ExecutionVariable(getVariable().getParentNode(), this, i, lengthValue);
                                  children.add(childI);
