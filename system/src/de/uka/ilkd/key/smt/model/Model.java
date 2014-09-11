@@ -14,10 +14,13 @@
 package de.uka.ilkd.key.smt.model;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.Stack;
 
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.ProblemTypeInformation;
@@ -564,6 +567,106 @@ public class Model {
 
 	}
 	
+	public void removeUnnecessaryObjects(){
+		System.out.println("Removing objects...");
+		String self = constants.get("self");
+		System.out.println("self is: "+self);
+		if(self == null){
+			return;
+		}
+		
+		
+		for(Heap h : heaps){
+			
+			Set<ObjectVal> reachable = getReachableObjects(self, h);			
+			h.getObjects().clear();
+			h.getObjects().addAll(reachable);			
+			
+		}
+		
+	}
+	
+	public Set<ObjectVal> getReachableObjects(String name, Heap heap){
+		
+		Set<ObjectVal> result = new HashSet<ObjectVal>();		
+		Stack<ObjectVal> scheduled = new Stack<ObjectVal>();
+		
+		
+		
+		ObjectVal init = getObject(name, heap);
+		
+		if(init == null){
+			return null;
+		}
+		
+		scheduled.push(init);
+		
+		
+		while(!scheduled.isEmpty()){
+			ObjectVal o = scheduled.pop();
+			
+			if(result.contains(o)){
+				continue;
+			}
+			
+			result.add(o);
+			
+			Set<ObjectVal> pointed = pointsTo(o.getName(), heap);
+			
+			for(ObjectVal p : pointed){
+				
+				if(result.contains(p)){
+					continue;
+				}
+				
+				scheduled.push(p);
+				
+			}	
+			
+		}		
+		
+		return result;
+		
+		
+	}
+	
+	public Set<ObjectVal> pointsTo(String name, Heap heap){
+		
+		Set<ObjectVal> result = new HashSet<ObjectVal>();
+		
+		ObjectVal o = getObject(name, heap);
+		
+		if(o == null){
+			return result;
+		}
+		
+		for(Entry<String, String> e : o.getFieldvalues().entrySet()){
+			
+			String val = e.getValue();
+			ObjectVal pointed = getObject(val, heap);
+			
+			if(pointed !=null){
+				result.add(pointed);
+			}			
+		}	
+		
+		return result;
+	}
+	
+	public ObjectVal getObject(String name, Heap heap){
+		
+		for(ObjectVal o : heap.getObjects()){
+			
+			if(o.getName().startsWith(name)){
+				return o;
+			}
+			
+		}
+		
+		return null;
+		
+		
+	}
 	
 	
 	

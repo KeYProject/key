@@ -17,6 +17,14 @@ public class OracleConstant implements OracleTerm {
 		return value;
 	}
 	
+	public Sort getSort() {
+	    return sort;
+    }
+
+	public void setSort(Sort sort) {
+	    this.sort = sort;
+    }
+
 	public String toString(){
 		return value;
 	}

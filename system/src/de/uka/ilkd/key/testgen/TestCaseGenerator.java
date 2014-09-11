@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.actions.TestGenerationAction;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.testgen.TGInfoDialog;
 import de.uka.ilkd.key.gui.testgen.TestGenerationSettings;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -38,6 +38,13 @@ import de.uka.ilkd.key.smt.model.ObjectVal;
  * @author herda
  */
 public class TestCaseGenerator {
+	public static final String ALL_OBJECTS = "allObjects";
+	public static final String ALL_INTS = "allInts";
+	public static final String ALL_BOOLS = "allBools";
+	public static final String ALL_HEAPS = "allHeaps";
+	public static final String ALL_FIELDS = "allFields";
+	public static final String ALL_SEQ = "allSeq";
+	public static final String ALL_LOCSETS = "allLocSets";
 	private Services services;
 	private Proof proof;
 	static int fileCounter = 0;
@@ -618,6 +625,12 @@ public class TestCaseGenerator {
 			result.append("\n   ");
 			result.append(a.toString(useRFL));
 		}
+		
+		result.append("\n");
+		result.append(createBoolSet()+"\n");
+		result.append(createIntSet()+"\n");
+		result.append(createObjSet()+"\n");
+		
 		return result.toString();
 	}
 	
@@ -699,6 +712,55 @@ public class TestCaseGenerator {
 		}
 		return null;
 	}
+	
+	private String createBoolSet(){
+		
+		StringBuffer res = new StringBuffer();		
+		//bool
+		String allbool = ALL_BOOLS;
+		res.append("List<Boolean> "+allbool +"= new LinkedList<Boolean>();\n");
+		res.append(allbool+".add(true);\n");
+		res.append(allbool+".add(false);\n");
+		return res.toString();		
+	}
+	
+	private String createIntSet(){
+		
+		StringBuffer res  = new StringBuffer();
+		long size = ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().intBound;
+		
+		long low = (long) - Math.pow(2, size-1);
+		long hi = (long) (Math.pow(2, size-1)-1);
+		
+		String allint = ALL_INTS;
+		res.append("List<Integer> "+allint +"= new LinkedList<Integer>();\n");
+		
+		for(long i = low; i <= hi; i++ ){			
+			res.append(allint+".add("+i+");\n");			
+		}	
+		
+		return res.toString();		
+	}
+	
+	private String createObjSet(){
+		
+		StringBuffer res  = new StringBuffer();
+		long size = ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().objectBound;
+		
+		long low = (long) - Math.pow(2, size-1);
+		long hi = (long) (Math.pow(2, size-1)-1);
+		
+		String allobj = ALL_OBJECTS;
+		res.append("List<Object> "+allobj +"= new LinkedList<Object>();\n");
+		
+		for(long i = low; i <= hi; i++ ){			
+			res.append(allobj+".add(_o"+i+");\n");			
+		}		
+		
+		return res.toString();		
+	}
+	
+	
 
 	public String getSafeType(Sort sort) {
 		if (sort == null) {
