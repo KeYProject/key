@@ -68,8 +68,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     public void testBracketHeapUpdate() throws IOException {
         String prettySyntax = "heap[a.f := 4][create(a)][memset(empty, 1)][anon(allLocs, heap)]";
         String verboseSyntax = "anon(memset(create(store(heap, a, testTermParserHeap.A::$f, 4), a), empty, 1), allLocs, heap)";
-//        parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
-        assertEquals(parseTerm(prettySyntax), parseTerm(verboseSyntax));
+        parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
     }
 
     public void testFieldAtHeapSyntax() throws IOException {
