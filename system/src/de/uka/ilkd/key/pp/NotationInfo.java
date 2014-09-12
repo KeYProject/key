@@ -142,13 +142,13 @@ public final class NotationInfo {
     static final int PRIORITY_LABEL = 140; // TODO: find appropriate value
 
 
-    public static boolean PRETTY_SYNTAX = true;
+    public static boolean DEFAULT_PRETTY_SYNTAX = true;
     /**
      * Whether the very fancy notation is enabled
      * in which Unicode characters for logical operators
      * are printed.
      */
-    public static boolean UNICODE_ENABLED = false;
+    public static boolean DEFAULT_UNICODE_ENABLED = false;
     
     public static boolean HIDE_PACKAGE_PREFIX = false;
     
@@ -173,6 +173,9 @@ public final class NotationInfo {
      */
     private AbbrevMap scm = new AbbrevMap();
     
+    private boolean prettySyntax = DEFAULT_PRETTY_SYNTAX;
+    
+    private boolean unicodeEnabled = DEFAULT_UNICODE_ENABLED;
     
 
     //-------------------------------------------------------------------------
@@ -345,10 +348,12 @@ public final class NotationInfo {
     //-------------------------------------------------------------------------
     
     public void refresh(Services services) {
-       refresh(services, PRETTY_SYNTAX, UNICODE_ENABLED);
+       refresh(services, DEFAULT_PRETTY_SYNTAX, DEFAULT_UNICODE_ENABLED);
     }
 
     public void refresh(Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+   this.unicodeEnabled = useUnicodeSymbols;
+   this.prettySyntax = usePrettyPrinting;
    createDefaultNotationTable();
    assert defaultNotationCache != null;
    if(usePrettyPrinting && services != null) {
@@ -415,4 +420,12 @@ public final class NotationInfo {
 
         return new Notation.FunctionNotation();
     }
+
+   public boolean isPrettySyntax() {
+      return prettySyntax;
+   }
+
+   public boolean isUnicodeEnabled() {
+      return unicodeEnabled;
+   }
 }

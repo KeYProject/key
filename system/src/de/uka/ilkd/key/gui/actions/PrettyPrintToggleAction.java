@@ -33,7 +33,7 @@ public class PrettyPrintToggleAction extends MainWindowAction {
 	setName("Use pretty syntax");
 	setTooltip("If ticked, infix notations are used.");
 	final boolean prettySyntax = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
-	NotationInfo.PRETTY_SYNTAX = prettySyntax;
+	NotationInfo.DEFAULT_PRETTY_SYNTAX = prettySyntax;
 	setSelected(prettySyntax);
 	//setSelected(NotationInfo.PRETTY_SYNTAX);
     }
@@ -42,7 +42,7 @@ public class PrettyPrintToggleAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         boolean selected = ((JCheckBoxMenuItem) e.getSource()).isSelected();
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(selected);
-	NotationInfo.PRETTY_SYNTAX = selected;
+	NotationInfo.DEFAULT_PRETTY_SYNTAX = selected;
 	mainWindow.getUnicodeToggleAction().setEnabled(selected);
 	mainWindow.getHidePackagePrefixToggleAction().setEnabled(selected);
 	mainWindow.makePrettyView();
