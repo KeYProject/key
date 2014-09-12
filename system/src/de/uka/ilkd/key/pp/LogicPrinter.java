@@ -195,6 +195,15 @@ public class LogicPrinter {
         }
     }
 
+    private Sort selectGetFieldSort(Term fieldTerm) {
+        /*
+         * Get sort of selected field.
+         */
+        String lookup = fieldTerm.toString().replace("$", "");
+        ProgramVariable progVar = services.getJavaInfo().getAttribute(lookup);
+        return progVar.sort();
+    }
+
     private enum QuantifiableVariablePrintMode {NORMAL, WITH_OUT_DECLARATION}
     private QuantifiableVariablePrintMode quantifiableVariablePrintMode =
             QuantifiableVariablePrintMode.NORMAL;
@@ -1155,11 +1164,9 @@ public class LogicPrinter {
             layouter.print("[" + opName + "(").beginC(0);
 
             for(int i = 1; i < t.arity(); i++) {
-                if (!NotationInfo.ENSURE_PARSABILITY) {
-                    // do not print anon_heap
-                    if ("anon".equals(opName) && i == 2) {
-                        break;
-                    }
+                // do not print anon_heap if parsability is not required
+                if (!NotationInfo.ENSURE_PARSABILITY && "anon".equals(opName) && i == 2) {
+                    break;
                 }
                 
                 if(i > 1) {
@@ -1314,64 +1321,21 @@ public class LogicPrinter {
             final Term objectTerm = t.sub(1);
             final Term fieldTerm = t.sub(2);
 
-            if (t.sort().equals(fieldTerm.sort())) {
-                if (isFieldConstant(fieldTerm)) {
-                    if (objectTerm.equals(services.getTermBuilder().NULL())) {
-                        // static field access
-                        startTerm(3);
-                        printSelectStatic(fieldTerm, heapLDT);
-                        printSelectAddHeap(heapTerm, tacitHeap);
-                    } else {
-                        // non-static field access
-                        startTerm(3);
-                        markStartSub(1);
-                        printEmbeddedObserver(heapTerm, objectTerm);
-                        markEndSub();
-                        layouter.print(".");
-                        markStartSub(2);
-                        if (isCanonicField(objectTerm, fieldTerm)) {
-                            /*
-                             * Class name can be omitted if the field is canonic, i.e.
-                             * correct field can be determined without explicit mentioning
-                             * of corresponding class name.
-                             *  
-                             * Example syntax: object.field
-                             */
-                            printTerm(fieldTerm);
-                        } else {
-                            /*
-                             * There is another field of the same name that would be selected
-                             * if class name is omitted. In this case class name must be mentioned
-                             * explicitly.
-                             * 
-                             * Example syntax: object.(package.class::field)
-                             */
-                            layouter.print("(");
-                            layouter.print(fieldTerm.toString().replace("::$", "::"));
-                            layouter.print(")");
-                        }
-                        markEndSub();
-                        printSelectAddHeap(heapTerm, tacitHeap);
-                    }
-                } else if (fieldTerm.op() == heapLDT.getArr()) {
-                    // array access
-                    startTerm(3);
-                    printSelectArray(heapTerm, objectTerm, fieldTerm);
-                    printSelectAddHeap(heapTerm, tacitHeap);
-                } else {
+            if (t.sort().equals(Sort.ANY)) {
+                /*
+                 * This section deals with PP of frame conditions (and similar).
+                 */
+                if (isFieldName(fieldTerm.op().toString(), objectTerm)
+                        || isFieldConstant(fieldTerm)) {
                     printFunctionTerm(t);
+                } else {
+                    printSelectAny(heapTerm, objectTerm, fieldTerm, tacitHeap);
                 }
-            }
-            if (t.sort() == Sort.ANY && !isFieldName(fieldTerm.op().toString(), objectTerm)) {
-                startTerm(3);
-                markStartSub(1);
-                printEmbeddedObserver(heapTerm, objectTerm);
-                markEndSub();
-                layouter.print(".");
-                markStartSub(2);
-                printTerm(fieldTerm);
-                markEndSub();
-                printSelectAddHeap(heapTerm, tacitHeap);
+            } else if (fieldTerm.op() == heapLDT.getArr()) {
+                // array access
+                printSelectArray(heapTerm, objectTerm, fieldTerm, tacitHeap);
+            } else if (isFieldConstant(fieldTerm) && selectGetFieldSort(fieldTerm).equals(t.sort())) {
+                printSelectFieldConstant(objectTerm, fieldTerm, heapLDT, heapTerm, tacitHeap);
             } else {
                 printFunctionTerm(t);
             }
@@ -1380,57 +1344,103 @@ public class LogicPrinter {
         }
     }
 
+    private void printSelectFieldConstant(final Term objectTerm, final Term fieldTerm, HeapLDT heapLDT, final Term heapTerm, Term tacitHeap) throws IOException {
+        if (objectTerm.equals(services.getTermBuilder().NULL())) {
+            // static field access
+            startTerm(3);
+            /*
+             * Is consideration for static arrays missing in this?
+             * (Kai Wallisch 08/2014)
+             */
+
+            String className = heapLDT.getClassName((Function) fieldTerm.op());
+
+            if (className == null) {
+                // if the class name cannot be determined, print "null"
+                markStartSub(1);
+                printTerm(services.getTermBuilder().NULL());
+                markEndSub();
+            } else {
+                markStartSub(1);
+                // "null" not printed, print className (which is not a subterm)
+                markEndSub();
+                printClassName(className);
+            }
+
+            layouter.print(".");
+            markStartSub(2);
+            printTerm(fieldTerm);
+            markEndSub();
+            
+            printSelectAddHeap(heapTerm, tacitHeap);
+        } else {
+            // non-static field access
+            startTerm(3);
+            markStartSub(1);
+            printEmbeddedObserver(heapTerm, objectTerm);
+            markEndSub();
+            layouter.print(".");
+            markStartSub(2);
+            if (isCanonicField(objectTerm, fieldTerm)) {
+                /*
+                 * Class name can be omitted if the field is canonic, i.e.
+                 * correct field can be determined without explicit mentioning
+                 * of corresponding class name.
+                 *
+                 * Example syntax: object.field
+                 */
+                layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
+            } else {
+                /*
+                 * There is another field of the same name that would be selected
+                 * if class name is omitted. In this case class name must be mentioned
+                 * explicitly.
+                 *
+                 * Example syntax: object.(package.class::field)
+                 */
+                layouter.print("(");
+                layouter.print(fieldTerm.toString().replace("::$", "::"));
+                layouter.print(")");
+            }
+            markEndSub();
+            printSelectAddHeap(heapTerm, tacitHeap);
+        }
+    }
+
+    private void printSelectAny(final Term heapTerm, final Term objectTerm, final Term fieldTerm, Term tacitHeap) throws IOException {
+        startTerm(3);
+        markStartSub(1);
+        printEmbeddedObserver(heapTerm, objectTerm);
+        markEndSub();
+        layouter.print(".");
+        markStartSub(2);
+        printTerm(fieldTerm);
+        markEndSub();
+        printSelectAddHeap(heapTerm, tacitHeap);
+    }
+
     /*
      * Print out a select on an array.
      * (separated from {@link #printSelect(Term, Term) printSelect}, to improve code readability)
      */
-    private void printSelectArray(Term heapTerm, Term objectTerm, Term fieldTerm) throws IOException {
+    private void printSelectArray(Term heapTerm, Term objectTerm,
+            Term fieldTerm, Term tacitHeap) throws IOException {
+
+        startTerm(3);
         markStartSub(1);
         printEmbeddedObserver(heapTerm, objectTerm);
         markEndSub();
 
         layouter.print("[");
-
         markStartSub();
         startTerm(2);
         markStartSub();
         printTerm(fieldTerm.sub(0));
         markEndSub();
         markEndSub();
-
         layouter.print("]");
-    }
-    
-    /*
-     * Print out a select on a static field.
-     * (separated from {@link #printSelect(Term, Term) printSelect}, to improve code readability)
-     */
-    private void printSelectStatic(Term fieldTerm, HeapLDT heapLDT) throws IOException {
         
-        /*
-        * Is consideration for static arrays missing in this?
-        * (Kai Wallisch 08/2014)
-        */
-
-        String className = heapLDT.getClassName((Function) fieldTerm.op());
-
-        if (className == null) {
-            // if the class name cannot be determined, print "null"
-            markStartSub(1);
-            printTerm(services.getTermBuilder().NULL());
-            markEndSub();
-        } else {
-            markStartSub(1);
-            // "null" not printed, print className (which is not a subterm)
-            markEndSub();
-            printClassName(className);
-        }
-
-        layouter.print(".");
-
-        markStartSub(2);
-        printTerm(fieldTerm);
-        markEndSub();
+        printSelectAddHeap(heapTerm, tacitHeap);
     }
 
     /**
