@@ -1305,6 +1305,9 @@ public class LogicPrinter {
         }
     }
 
+    /*
+     * Print a term of the form: T::select(heap, object, field).
+     */
     public void printSelect(Term t, Term tacitHeap) throws IOException {
         assert t.boundVars().isEmpty();
         assert t.arity() == 3;
@@ -1324,6 +1327,7 @@ public class LogicPrinter {
             if (t.sort().equals(Sort.ANY)) {
                 /*
                  * This section deals with PP of frame conditions (and similar).
+                 * Select-type is any.
                  */
                 if (isFieldName(fieldTerm.op().toString(), objectTerm)
                         || isFieldConstant(fieldTerm)) {
@@ -1344,6 +1348,9 @@ public class LogicPrinter {
         }
     }
 
+    /*
+     * Print a select on a field constant.
+     */
     private void printSelectFieldConstant(final Term objectTerm, final Term fieldTerm, HeapLDT heapLDT, final Term heapTerm, Term tacitHeap) throws IOException {
         if (objectTerm.equals(services.getTermBuilder().NULL())) {
             // static field access
@@ -1407,6 +1414,9 @@ public class LogicPrinter {
         }
     }
 
+    /*
+     * Print a term of the form: any::select(heap, object, field).
+     */
     private void printSelectAny(final Term heapTerm, final Term objectTerm, final Term fieldTerm, Term tacitHeap) throws IOException {
         startTerm(3);
         markStartSub(1);
@@ -1421,7 +1431,6 @@ public class LogicPrinter {
 
     /*
      * Print out a select on an array.
-     * (separated from {@link #printSelect(Term, Term) printSelect}, to improve code readability)
      */
     private void printSelectArray(Term heapTerm, Term objectTerm,
             Term fieldTerm, Term tacitHeap) throws IOException {
