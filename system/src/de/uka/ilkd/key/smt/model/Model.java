@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
+import java.util.StringTokenizer;
 
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.ProblemTypeInformation;
@@ -567,14 +568,47 @@ public class Model {
 
 	}
 	
-	public void removeUnnecessaryObjects(){
-		System.out.println("Removing objects...");
-		String self = constants.get("self");
-		System.out.println("self is: "+self);
-		if(self == null){
-			return;
+	public Set<ObjectVal> getNecessaryPrestateObjects(String location){
+		Set<ObjectVal> result = new HashSet<ObjectVal>();
+		
+		String[] l = location.split("\\.");
+		
+		String objName = l[0];
+		String nullString = "#o0";
+		
+		Heap heap = null;
+		for(Heap h : heaps){
+			if(h.getName().equals("heap")){
+				heap = h;
+			}
+		}
+		ObjectVal o = getObject(constants.get(objName), heap);
+		int i = 1;
+		while(!o.equals(nullString) && i < l.length){			
+			result.add(o);			
+			o = getObject(o.get(l[i]), heap);
+			i++;			
 		}
 		
+		
+		
+		
+		
+		
+		
+		return result;
+		
+		
+		
+	}
+	
+	public void removeUnnecessaryObjects(){
+		//System.out.println("Removing objects...");
+		String self = constants.get("self");
+		//System.out.println("self is: "+self);
+		if(self == null){
+			return;
+		}		
 		
 		for(Heap h : heaps){
 			
