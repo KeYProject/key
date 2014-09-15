@@ -317,7 +317,7 @@ public class KeYResourcesUtil {
     * @return the created {@link IFolder}
     * @throws CoreException
     */
-   public static synchronized IFolder createFolder(IFile file) {
+   public static IFolder createFolder(IFile file) {
       IFolder folder = null;
       IPath folderPath = file.getFullPath().removeLastSegments(1);
       IPath currentFolderPath = new Path(folderPath.segment(0));
