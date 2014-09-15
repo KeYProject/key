@@ -373,8 +373,8 @@ public class TestTermParser extends AbstractTestTermParser {
 				+"public T query(){} "
 				+"public static T staticQ(T p){} "
 				+"public static T staticQ() {}}");
-	String s = "\\forall T t;( (t.query()=t & t.query@(T)()=t & T.staticQ()=t "
-	    +"& T.staticQ(t)=t & T.b=t.a@(T) & T.d=t.c@(T) & t.e@(T)=T.f & t.g@(T)=t.h@(T)))";
+	String s = "\\forall T t;( (t.query()=t & t.(T::query)()=t & T.staticQ()=t "
+	    +"& T.staticQ(t)=t & T.b=t.(T::a) & T.d=t.(T::c) & t.(T::e)=T.f & t.(T::g)=t.(T::h)))";
 	parseTerm(s);
     }
 
