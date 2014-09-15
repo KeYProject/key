@@ -113,7 +113,7 @@ public class LogicPrinter {
     private final ProgramPrinter prgPrinter;
 
     /** Contains information on the concrete syntax of operators. */
-    private final NotationInfo notationInfo;
+    protected final NotationInfo notationInfo;
 
     /** the services object */
     private final Services services;
@@ -209,7 +209,7 @@ public class LogicPrinter {
             QuantifiableVariablePrintMode.NORMAL;
 
     public static String quickPrintTerm(Term t, Services services) {
-        return quickPrintTerm(t, services, NotationInfo.PRETTY_SYNTAX, NotationInfo.UNICODE_ENABLED);
+        return quickPrintTerm(t, services, NotationInfo.DEFAULT_PRETTY_SYNTAX, NotationInfo.DEFAULT_UNICODE_ENABLED);
     }
     
 
@@ -1143,7 +1143,7 @@ public class LogicPrinter {
                 ? null
                 : services.getTypeConverter().getHeapLDT();
 
-        if(NotationInfo.PRETTY_SYNTAX && heapLDT != null) {
+        if(notationInfo.isPrettySyntax() && heapLDT != null) {
             startTerm(t.arity());
 
             final Term heapTerm = t.sub(0);
@@ -1196,7 +1196,7 @@ public class LogicPrinter {
                 ? null
                 : services.getTypeConverter().getHeapLDT();
 
-        if(NotationInfo.PRETTY_SYNTAX && heapLDT != null) {
+        if(notationInfo.isPrettySyntax() && heapLDT != null) {
             startTerm(4);
 
             final Term heapTerm = t.sub(0);
@@ -1313,7 +1313,7 @@ public class LogicPrinter {
         assert t.arity() == 3;
         HeapLDT heapLDT = services == null ? null : services.getTypeConverter().getHeapLDT();
 
-        if (NotationInfo.PRETTY_SYNTAX && heapLDT != null) {
+        if (notationInfo.isPrettySyntax() && heapLDT != null) {
 
             // if tacitHeap is null, use default heap as tacitHeap
             if (tacitHeap == null) {
@@ -1467,7 +1467,7 @@ public class LogicPrinter {
     }
 
     public void printPostfix(Term t, String postfix) throws IOException {
-	if(NotationInfo.PRETTY_SYNTAX) {
+	if(notationInfo.isPrettySyntax()) {
 	    startTerm(t.arity());
 
 	    markStartSub();
@@ -1491,7 +1491,7 @@ public class LogicPrinter {
 
         boolean printFancy = false;
 
-        if(NotationInfo.PRETTY_SYNTAX && heapLDT != null) {
+        if(notationInfo.isPrettySyntax() && heapLDT != null) {
 
             Sort heapSort = heapLDT.targetSort();
             int numHeaps = obs.getHeapCount(services);

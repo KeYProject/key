@@ -34,7 +34,7 @@ public class UnicodeToggleAction extends MainWindowAction {
         final boolean useUnicode =  ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUseUnicode();
         final boolean usePretty = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
         setSelected((useUnicode && usePretty));
-        NotationInfo.UNICODE_ENABLED = (useUnicode && usePretty);
+        NotationInfo.DEFAULT_UNICODE_ENABLED = (useUnicode && usePretty);
         setEnabled(usePretty);
         //setSelected(NotationInfo.UNICODE_ENABLED);
     }
@@ -44,7 +44,7 @@ public class UnicodeToggleAction extends MainWindowAction {
 	boolean useUnicode = ((JCheckBoxMenuItem) e.getSource()).isSelected(); 
 	ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUseUnicode(useUnicode);
 	boolean usePretty = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
-        NotationInfo.UNICODE_ENABLED = useUnicode && usePretty;
+        NotationInfo.DEFAULT_UNICODE_ENABLED = useUnicode && usePretty;
         mainWindow.makePrettyView();
     }
 
