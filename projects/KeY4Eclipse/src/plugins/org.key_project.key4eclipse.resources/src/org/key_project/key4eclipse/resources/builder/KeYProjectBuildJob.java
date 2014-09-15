@@ -55,7 +55,7 @@ public class KeYProjectBuildJob extends Job{
       this.buildType = buildType;
       this.editorSelection = null;
       if(buildType != KeYProjectBuildJob.FULL_BUILD){
-//         this.editorSelection = getEditorSelection();
+         this.editorSelection = getEditorSelection();
       }
       if(buildType != KeYProjectBuildJob.AUTO_BUILD && buildType != KeYProjectBuildJob.FULL_BUILD ){
          KeYProjectDelta keyDelta = KeYProjectDeltaManager.getInstance().getDelta(project);
