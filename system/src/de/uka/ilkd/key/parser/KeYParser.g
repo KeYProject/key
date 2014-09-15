@@ -796,7 +796,7 @@ options {
 	return result.toString();
     }
 
-    private Operator getAttribute(Sort prefixSort, String attributeName) 
+    private Operator getAttributeInPrefixSort(Sort prefixSort, String attributeName) 
            throws RecognitionException/*SemanticException*/ {
         final JavaInfo javaInfo = getJavaInfo();
 
@@ -840,12 +840,10 @@ options {
                 // WATCHOUT why not in DECLARATION MODE	   
                 if(!isDeclParser()) {			      	
                     ProgramVariable var = javaInfo.getCanonicalFieldProgramVariable(attributeName, prefixKJT);
-
                     if (var == null) {
                         semanticError("There is no attribute '" + attributeName + 
                             "' declared in type '" + prefixSort + "'");
                     }
-                            
                     result = var;
                 }
             }
@@ -2721,7 +2719,7 @@ static_attribute_suffix returns [Term result = null]
           		className = 
 		   			attributeName.substring(0, attributeName.lastIndexOf("."));	
             }	
-	       	v = getAttribute(getTypeByClassName(className).getSort(), attributeName); 
+	       	v = getAttributeInPrefixSort(getTypeByClassName(className).getSort(), attributeName); 
 	    }
         { result = createAttributeTerm(null, v); }                   
  ;
@@ -2737,7 +2735,7 @@ attribute_or_query_suffix[Term prefix] returns [Term _attribute_or_query_suffix 
     (result = querySuffix[prefix, memberName] {assert result != null;})?
     {
         if(result == null){
-            Operator v = getAttribute(prefix.sort(), memberName);
+            Operator v = getAttributeInPrefixSort(prefix.sort(), memberName);
             result = createAttributeTerm(prefix, v);
         }
     }
