@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -800,7 +801,7 @@ public class ProofManager {
     * @throws CoreException
     */
    private void checkContractRecursion() throws CoreException {
-      HashSet<List<ProofElement>> cycles = new HashSet<List<ProofElement>>();
+      HashSet<List<ProofElement>> cycles = new LinkedHashSet<List<ProofElement>>();
       findCycles(cycles);
       removeAllRecursionMarker();
       for(List<ProofElement> cycle : cycles){
