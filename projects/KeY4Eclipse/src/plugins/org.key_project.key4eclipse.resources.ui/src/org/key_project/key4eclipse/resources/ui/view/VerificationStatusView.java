@@ -70,6 +70,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.key_project.key4eclipse.common.ui.util.KeYImages;
 import org.key_project.key4eclipse.common.ui.util.StarterUtil;
+import org.key_project.key4eclipse.resources.builder.KeYProjectBuildMutexRule;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileAssumption;
 import org.key_project.key4eclipse.resources.projectinfo.AbstractContractContainer;
 import org.key_project.key4eclipse.resources.projectinfo.AbstractTypeContainer;
@@ -1144,7 +1145,7 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
             }
          }
       };
-      activeJob.setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
+      activeJob.setRule(new KeYProjectBuildMutexRule(projects.toArray(new IProject[projects.size()])));
       activeJob.schedule();
    }
 

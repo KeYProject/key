@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
+import org.key_project.util.java.ArrayUtil;
 
 /**
  * Rule to avoid multiple {@link KeYProjectBuildJob}s run simultaneously.
@@ -26,14 +27,14 @@ import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
  */
 public class KeYProjectBuildMutexRule implements ISchedulingRule{
    
-   private IProject project;
+   private IProject[] projects;
    
-   public KeYProjectBuildMutexRule(IProject project){
-      this.project = project;
+   public KeYProjectBuildMutexRule(IProject... projects){
+      this.projects = projects;
    }
    
-   public IProject getProject(){
-      return project;
+   public IProject[] getProjects(){
+      return projects;
    }
    
    /**
@@ -51,7 +52,7 @@ public class KeYProjectBuildMutexRule implements ISchedulingRule{
             return false;
          }
          else if(rule instanceof IProject){
-            return project.equals(rule);
+            return ArrayUtil.contains(projects, (IProject) rule);
          }
       }
       return (rule == this);
@@ -71,6 +72,6 @@ public class KeYProjectBuildMutexRule implements ISchedulingRule{
     */
    @Override
    public String toString() {
-      return getClass().getSimpleName() + " (" + project + ")";
+      return getClass().getSimpleName() + " (" + ArrayUtil.toString(projects) + ")";
    }
 }

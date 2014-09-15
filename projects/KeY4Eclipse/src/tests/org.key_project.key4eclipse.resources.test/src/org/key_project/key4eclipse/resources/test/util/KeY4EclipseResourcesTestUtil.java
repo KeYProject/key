@@ -153,7 +153,7 @@ public class KeY4EclipseResourcesTestUtil {
       waitBuild();
    }
    
-   private static void waitBuild() {
+   public static void waitBuild() {
       IJobManager manager = Job.getJobManager();
       // Wait for jobs and builds.
       Job[] keyJobs = manager.find(KeYProjectBuildJob.KEY_PROJECT_BUILD_JOB);

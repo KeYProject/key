@@ -43,7 +43,7 @@ public class SWTBotVerificationLogViewTest extends AbstractResourceTest {
             project.close(null);
          }
       }
-      TestUtilsUtil.waitForBuild();
+      KeY4EclipseResourcesTestUtil.waitBuild();
    }
    
    /**
