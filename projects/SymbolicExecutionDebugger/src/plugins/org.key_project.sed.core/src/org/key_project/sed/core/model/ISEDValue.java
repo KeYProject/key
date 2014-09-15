@@ -31,6 +31,12 @@ import org.key_project.sed.core.model.memory.SEDMemoryValue;
  */
 public interface ISEDValue extends IValue, ISEDDebugElement {
    /**
+    * Returns the parent {@link ISEDVariable}.
+    * @return The parent {@link ISEDVariable}.
+    */
+   public ISEDVariable getParent();
+   
+   /**
     * Checks if the represented value is an object.
     * @return {@code true} value is object, {@code false} value is object attribute.
     * @throws DebugException Occurred Exception.
@@ -43,4 +49,12 @@ public interface ISEDValue extends IValue, ISEDDebugElement {
     * @throws DebugException Occurred Exception.
     */
    public boolean isMultiValued() throws DebugException;
+   
+   /**
+    * Returns all relevant {@link ISEDConstraint}.
+    * This is a subset of {@link ISEDDebugNode#getConstraints()}.
+    * @return All relevant {@link ISEDConstraint}s as subset of {@link ISEDDebugNode#getConstraints()}.
+    * @throws DebugException Occurred Exception.
+    */
+   public ISEDConstraint[] getRelevantConstraints() throws DebugException;
 }

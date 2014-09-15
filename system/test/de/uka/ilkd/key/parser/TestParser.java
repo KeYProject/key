@@ -20,7 +20,7 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 import antlr.ANTLRException;
 import de.uka.ilkd.key.proof.init.Includes;
-import de.uka.ilkd.key.proof.io.RuleSource;
+import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 
 public class TestParser extends TestCase {
     /**
@@ -40,7 +40,7 @@ public class TestParser extends TestCase {
 	final File include = new File("include.key");
 	final Includes expected = new Includes();
 	expected.put(include.toString(),
-		RuleSource.initRuleFile(include.toURL()));
+		RuleSourceFactory.initRuleFile(include.toURL()));
 
 	final String keyFile = "\\include \"" + include.getPath() + "\";";
 	final KeYLexerF lexer = new KeYLexerF(keyFile,

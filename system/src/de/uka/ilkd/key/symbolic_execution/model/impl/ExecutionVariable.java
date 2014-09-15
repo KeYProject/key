@@ -34,7 +34,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
@@ -48,9 +48,9 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVa
  */
 public class ExecutionVariable extends AbstractExecutionElement implements IExecutionVariable {
    /**
-    * The parent {@link IExecutionStateNode} which provides this {@link ExecutionVariable}.
+    * The parent {@link IExecutionNode} which provides this {@link ExecutionVariable}.
     */
-   private final IExecutionStateNode<?> parentNode;
+   private final IExecutionNode<?> parentNode;
    
    /**
     * The represented {@link IProgramVariable} which value is shown.
@@ -79,10 +79,10 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
 
    /**
     * Constructor for a "normal" value.
-    * @param parentNode The parent {@link IExecutionStateNode} which provides this {@link ExecutionVariable}.
+    * @param parentNode The parent {@link IExecutionNode} which provides this {@link ExecutionVariable}.
     * @param programVariable The represented {@link IProgramVariable} which value is shown.
     */
-   public ExecutionVariable(IExecutionStateNode<?> parentNode,
+   public ExecutionVariable(IExecutionNode<?> parentNode,
                             IProgramVariable programVariable) {
       this(parentNode, null, programVariable);
    }
@@ -90,11 +90,11 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
    /**
     * Constructor for a "normal" child value.
     * @param settings The {@link ITreeSettings} to use.
-    * @param parentNode The parent {@link IExecutionStateNode} which provides this {@link ExecutionVariable}.
+    * @param parentNode The parent {@link IExecutionNode} which provides this {@link ExecutionVariable}.
     * @param parentValue The parent {@link ExecutionValue} or {@code null} if not available.
     * @param programVariable The represented {@link IProgramVariable} which value is shown.
     */
-   public ExecutionVariable(IExecutionStateNode<?> parentNode,
+   public ExecutionVariable(IExecutionNode<?> parentNode,
                             ExecutionValue parentValue, 
                             IProgramVariable programVariable) {
       super(parentNode.getSettings(), parentNode.getMediator(), parentNode.getProofNode());
@@ -108,12 +108,12 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
 
    /**
     * Constructor for an array cell value.
-    * @param parentNode The parent {@link IExecutionStateNode} which provides this {@link ExecutionVariable}.
+    * @param parentNode The parent {@link IExecutionNode} which provides this {@link ExecutionVariable}.
     * @param parentValue The parent {@link ExecutionValue} or {@code null} if not available.
     * @param arrayIndex The index in the parent array.
     * @param lengthValue The {@link ExecutionValue} from which the array length was computed.
     */
-   public ExecutionVariable(IExecutionStateNode<?> parentNode,
+   public ExecutionVariable(IExecutionNode<?> parentNode,
                             ExecutionValue parentValue, 
                             int arrayIndex,
                             ExecutionValue lengthValue) {
@@ -173,10 +173,10 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
             if (lengthValue != null) {
                siteProofCondition = tb.and(siteProofCondition, lengthValue.getCondition());
             }
-            sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(services, getProofNode(), siteProofCondition, siteProofSelectTerm, true); 
+            sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(services, getProofNode(), getParentNode().getModalityPIO(), siteProofCondition, siteProofSelectTerm, true); 
          }
          else {
-            sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(services, getProofNode(), siteProofCondition, getProgramVariable());
+            sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(services, getProofNode(), getParentNode().getModalityPIO(), siteProofCondition, getProgramVariable());
          }
          ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
                                                                              sequentToProve.getSequentToProve(), 
@@ -397,10 +397,10 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
    }
    
    /**
-    * Returns the parent {@link IExecutionStateNode} which provides this {@link ExecutionVariable}.
-    * @return The parent {@link IExecutionStateNode} which provides this {@link ExecutionVariable}.
+    * Returns the parent {@link IExecutionNode} which provides this {@link ExecutionVariable}.
+    * @return The parent {@link IExecutionNode} which provides this {@link ExecutionVariable}.
     */
-   public IExecutionStateNode<?> getParentNode() {
+   public IExecutionNode<?> getParentNode() {
       return parentNode;
    }
 }

@@ -33,7 +33,7 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodCall;
  * @see SymbolicExecutionTreeBuilder
  * @see ExecutionMethodCall
  */
-public interface IExecutionMethodCall extends IExecutionStateNode<MethodBodyStatement> {
+public interface IExecutionMethodCall extends IExecutionNode<MethodBodyStatement> {
    /**
     * Returns the {@link MethodReference} instance of the called method.
     * @return The {@link MethodReference} of the called method.

@@ -18,11 +18,14 @@ import org.junit.runners.Suite;
 import org.key_project.sed.ui.test.testcase.swtbot.SWTBotAnnotationLinksTabTest;
 import org.key_project.sed.ui.test.testcase.swtbot.SWTBotAnnotationsTabTest;
 import org.key_project.sed.ui.test.testcase.swtbot.SWTBotCallStackTabTest;
+import org.key_project.sed.ui.test.testcase.swtbot.SWTBotConstraintsNodeTabTest;
+import org.key_project.sed.ui.test.testcase.swtbot.SWTBotConstraintsVariableTabTest;
 import org.key_project.sed.ui.test.testcase.swtbot.SWTBotExpandAllTest;
 import org.key_project.sed.ui.test.testcase.swtbot.SWTBotMethordReturnsTabTest;
 import org.key_project.sed.ui.test.testcase.swtbot.SWTBotNodeTabTest;
 import org.key_project.sed.ui.test.testcase.swtbot.SWTBotSourceTabTest;
 import org.key_project.sed.ui.test.testcase.swtbot.SWTBotStatisticsTabTest;
+import org.key_project.sed.ui.test.testcase.swtbot.SWTBotVariablesTabTest;
 
 /**
  * Run all contained JUnit 4 test cases that requires SWT Bot.
@@ -33,11 +36,14 @@ import org.key_project.sed.ui.test.testcase.swtbot.SWTBotStatisticsTabTest;
     SWTBotAnnotationLinksTabTest.class,
     SWTBotAnnotationsTabTest.class,
     SWTBotCallStackTabTest.class,
+    SWTBotConstraintsNodeTabTest.class,
+    SWTBotConstraintsVariableTabTest.class,
     SWTBotExpandAllTest.class,
     SWTBotMethordReturnsTabTest.class,
     SWTBotNodeTabTest.class,
     SWTBotSourceTabTest.class,
-    SWTBotStatisticsTabTest.class
+    SWTBotStatisticsTabTest.class,
+    SWTBotVariablesTabTest.class
 })
 public class SWTBotAllSEDUITests {
 }

@@ -37,6 +37,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
@@ -88,7 +89,6 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
     */
    @Override
    protected String lazyComputeName() throws ProofInputException {
-      
       return createMethodReturnName(null, computeCalledMethodName());
    }
    
@@ -382,6 +382,14 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
    @Override
    protected IExecutionVariable[] lazyComputeVariables() {
       return SymbolicExecutionUtil.createExecutionVariables(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected IExecutionConstraint[] lazyComputeConstraints() {
+      return SymbolicExecutionUtil.createExecutionConstraints(this);
    }
    
    /**

@@ -16,17 +16,24 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.NodeInfo;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * The default implementation of {@link IExecutionStart}.
  * @author Martin Hentschel
  */
-public class ExecutionStart extends AbstractExecutionNode implements IExecutionStart {
+public class ExecutionStart extends AbstractExecutionNode<SourceElement> implements IExecutionStart {
    /**
     * The up to know discovered {@link IExecutionTermination}s.
     */
@@ -50,6 +57,14 @@ public class ExecutionStart extends AbstractExecutionNode implements IExecutionS
    @Override
    protected String lazyComputeName() {
       return DEFAULT_START_NODE_NAME;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected IExecutionConstraint[] lazyComputeConstraints() {
+      return SymbolicExecutionUtil.createExecutionConstraints(this);
    }
    
    /**
@@ -76,5 +91,31 @@ public class ExecutionStart extends AbstractExecutionNode implements IExecutionS
       if (termination != null) {
          terminations = terminations.append(termination);
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected IExecutionVariable[] lazyComputeVariables() {
+      return SymbolicExecutionUtil.createExecutionVariables(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected PosInOccurrence lazyComputeModalityPIO() {
+      return SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(getProofNode().sequent());
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public SourceElement getActiveStatement() {
+      Term modalityTerm = getModalityPIO().subTerm();
+      SourceElement firstStatement = modalityTerm.javaBlock().program().getFirstElement();
+      return NodeInfo.computeActiveStatement(firstStatement);
    }
 }

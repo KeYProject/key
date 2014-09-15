@@ -110,6 +110,13 @@ public final class SideProofStore {
          }
       }
    }
+
+   /**
+    * Removes all {@link Entry}s.
+    */
+   public void clearProofs() {
+      removeEntries(new LinkedList<Entry>(entries));
+   }
    
    /**
     * Checks if an {@link Entry} for the given {@link Proof} exist.

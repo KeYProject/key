@@ -31,7 +31,7 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionLoopInvariant;
  * @see SymbolicExecutionTreeBuilder
  * @see ExecutionLoopInvariant
  */
-public interface IExecutionLoopInvariant extends IExecutionStateNode<SourceElement> {
+public interface IExecutionLoopInvariant extends IExecutionNode<SourceElement> {
    /**
     * Returns the used {@link LoopInvariant}.
     * @return The used {@link LoopInvariant}.
