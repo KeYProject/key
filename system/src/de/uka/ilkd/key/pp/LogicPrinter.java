@@ -1074,7 +1074,7 @@ public class LogicPrinter {
      * @param t the term to be printed.  */
     public void printFunctionTerm(Term t) throws IOException {
         String name = t.op().name().toString();
-        if (NotationInfo.PRETTY_SYNTAX && !NotationInfo.ENSURE_PARSABILITY
+        if (notationInfo.isPrettySyntax() && !NotationInfo.ENSURE_PARSABILITY
                 && services != null && isFieldConstant(t)) {
             startTerm(0);
             String prettyFieldName = HeapLDT.getPrettyFieldName(t.op());
