@@ -17,13 +17,10 @@ public final class NodeUtil {
    public static ISEDDebugNode getParent(ISEDDebugNode node) throws DebugException {
       if(node instanceof ISEDBaseMethodReturn)
       {
-         ISEDMethodCall mc = (ISEDMethodCall) node.getCallStack()[0];
-         if(mc.isCollapsed()) {
-            return ((ISEDBaseMethodReturn)node).getMethodReturnCondition();
+         ISEDBranchCondition bc = ((ISEDBaseMethodReturn)node).getMethodReturnCondition(); 
+         if(((ISEDMethodCall) bc.getParent()).isCollapsed()) {
+            return bc;
          }
-      }
-      else if(node instanceof ISEDBranchCondition && ArrayUtil.isEmpty(node.getCallStack())) {
-         return node.getChildren()[0].getCallStack()[0];
       }
 
       return node.getParent();

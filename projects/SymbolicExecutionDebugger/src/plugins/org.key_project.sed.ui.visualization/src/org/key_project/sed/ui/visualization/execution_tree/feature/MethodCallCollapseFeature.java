@@ -4,10 +4,14 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICustomContext;
+import org.eclipse.graphiti.features.context.impl.RemoveContext;
 import org.eclipse.graphiti.features.context.impl.UpdateContext;
+import org.eclipse.graphiti.features.impl.DefaultRemoveFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.platform.IPlatformImageConstants;
 import org.eclipse.graphiti.util.ColorConstant;
+import org.key_project.sed.core.model.ISEDBaseMethodReturn;
+import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
@@ -66,6 +70,43 @@ public class MethodCallCollapseFeature extends AbstractDebugNodeCollapseFeature 
          }
          catch (DebugException e) {
             LogUtil.getLogger().logError(e);
+         }
+      }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void removeChildren(ISEDDebugNode node)
+         throws DebugException {
+      DefaultRemoveFeature drf = new DefaultRemoveFeature(getFeatureProvider());
+      ISEDIterator iter = new SEDMethodPreorderIterator((ISEDMethodCall) node);
+      while (iter.hasNext()) {
+         ISEDDebugElement next = iter.next();
+         
+         if(next.equals(node)) {
+            continue;
+         }
+         
+         if(next instanceof ISEDDebugNode)
+         {
+            ISEDDebugNode nextNode = (ISEDDebugNode) next;
+
+            PictogramElement[] pes = getFeatureProvider().getAllPictogramElementsForBusinessObject(nextNode);
+            
+            if(pes == null || nextNode instanceof ISEDBaseMethodReturn && nextNode.getCallStack()[0] == node ||
+                 !(nextNode instanceof ISEDBranchCondition) && ArrayUtil.isEmpty(nextNode.getCallStack())) {
+               continue;
+            }
+
+            for(PictogramElement pe : pes)
+            {
+               if(!(nextNode instanceof ISEDMethodCall)) {
+                  removeConnections(pe, drf);
+               }
+               drf.remove(new RemoveContext(pe));
+            }
          }
       }
    }

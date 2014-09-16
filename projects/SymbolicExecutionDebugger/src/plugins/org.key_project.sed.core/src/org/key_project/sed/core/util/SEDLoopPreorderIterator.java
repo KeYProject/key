@@ -14,15 +14,15 @@
 package org.key_project.sed.core.util;
 
 import org.eclipse.debug.core.DebugException;
-import org.key_project.sed.core.model.ISEDBaseMethodReturn;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDMethodCall;
+import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.util.java.ArrayUtil;
 
 /**
  * <p>
- * Iterates preorder over the whole sub tree of a given {@link ISEDMethodCall}.
+ * Iterates preorder over the whole sub tree of a given {@link ISEDDebugElement}.
  * </p>
  * <p>
  * Instances of this class should always be used instead of recursive method
@@ -37,12 +37,12 @@ import org.key_project.util.java.ArrayUtil;
  * @author Martin Hentschel
  * @see ISEDIterator
  */
-public class SEDMethodPreorderIterator implements ISEDIterator {
+public class SEDLoopPreorderIterator implements ISEDIterator {
    /**
     * The element at that the iteration has started used as end condition
     * to make sure that only over the subtree of the element is iterated.
     */
-   private ISEDDebugNode start;
+   private ISEDDebugElement start;
 
    /**
     * The next element or {@code null} if no more elements exists.
@@ -50,34 +50,12 @@ public class SEDMethodPreorderIterator implements ISEDIterator {
    private ISEDDebugElement next;
    
    /**
-    * The Method we iterate over
-    */
-   private ISEDMethodCall mc;
-   
-   /**
-    * States if all Methodbranches are finished or not
-    */
-   boolean allBranchesFinished = true;
-   
-   /**
     * Constructor.
-    * @param start The {@link ISEDMethodCall} to iterate over its sub tree.
+    * @param start The {@link ISEDDebugElement} to iterate over its sub tree.
     */
-   public SEDMethodPreorderIterator(ISEDMethodCall start) {      
+   public SEDLoopPreorderIterator(ISEDDebugElement start) {      
       this.start = start;
       this.next = start;
-      this.mc = start;
-   }
-   
-   /**
-    * Constructor.
-    * @param start The {@link ISEDDebugNode} to iterate over its sub tree.
-    * @param mc The Method in which we iterate
-    */
-   public SEDMethodPreorderIterator(ISEDMethodCall mc, ISEDDebugNode start) {      
-      this.start = start;
-      this.next = start;
-      this.mc = mc;
    }
    
    /**
@@ -94,18 +72,9 @@ public class SEDMethodPreorderIterator implements ISEDIterator {
    @Override
    public ISEDDebugElement next() throws DebugException {
       ISEDDebugElement oldNext = next;
-      boolean methodEndReached = false;
+      boolean loopEndReached = false;
       
-      if(oldNext instanceof ISEDBaseMethodReturn)
-      {
-         ISEDBaseMethodReturn nextMR = (ISEDBaseMethodReturn) oldNext; 
-         ISEDDebugNode nextMC = nextMR.getCallStack()[0];
-         if(nextMC.equals(mc)) {
-            methodEndReached = true;
-         }
-      }
-      
-      updateNext(methodEndReached);
+      updateNext();
       return oldNext;
    }
 
@@ -113,24 +82,15 @@ public class SEDMethodPreorderIterator implements ISEDIterator {
     * Computes the next element and updates {@link #next()}.
     * @throws DebugException Occurred Exception.
     */
-   protected void updateNext(boolean methodEndReached) throws DebugException {
+   protected void updateNext() throws DebugException {
       ISEDDebugElement newNext = null;
       if (next instanceof ISEDDebugNode) {
          ISEDDebugNode node = (ISEDDebugNode)next;
-         ISEDDebugNode[] children = NodeUtil.getChildren(node);
-         if (!ArrayUtil.isEmpty(children) && !methodEndReached) {
-//            if(ArrayUtil.isEmpty(children[0].getCallStack()) && !(children[0] instanceof ISEDBranchCondition)) {
-//               newNext = getNextOnParent(node);
-//            }
-//            else {
-               newNext = children[0];
-//            }
+         ISEDDebugNode[] children = NodeUtil.getChildren(node, true);
+         if (!ArrayUtil.isEmpty(children)) {
+            newNext = children[0];
          }
          else {
-            if(!methodEndReached) {
-               allBranchesFinished = false;
-            }
-
             newNext = getNextOnParent(node);
          }
       }
@@ -164,26 +124,14 @@ public class SEDMethodPreorderIterator implements ISEDIterator {
          else {
             if (parentChildren[parentChildren.length - 1] != start) {
                node = parent;
-               parent = NodeUtil.getParent(parent); // Continue search on parent without recursive call!
+               parent = NodeUtil.getParent(parent);// Continue search on parent without recursive call!
             }
             else {
                return null;
             }
          }
       }
-      
+
       return null;
-   }
-   
-   public boolean allBranchesFinished() throws DebugException {
-      while(hasNext()) {
-         next();
-         // No need to visit the rest of the method
-         if(!allBranchesFinished) {
-            return allBranchesFinished;
-         }
-      }
-      
-      return true;
    }
 }
