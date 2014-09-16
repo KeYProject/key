@@ -11,11 +11,12 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.key4eclipse.resources.ui.handlers;
+package org.key_project.key4eclipse.resources.ui.handler;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -41,13 +42,11 @@ public class ConvertJavaToKeYProjectHandler extends AbstractSaveExecutionHandler
          if (obj instanceof IProject) {
             project = (IProject) obj;
             IProjectDescription description = project.getDescription();
-            String[] newNatures = ArrayUtil.add(description.getNatureIds(), KeYProjectNature.NATURE_ID);
+            String[] newNatures = ArrayUtil.insert(description.getNatureIds(), KeYProjectNature.NATURE_ID, 0);
             description.setNatureIds(newNatures);
-            project.setDescription(description, null);            
-         }
-         if (project != null) {
-            KeYResourcesUtil.cleanBuildProject(project);
-         }
+            project.setDescription(description, null);  
+            KeYResourcesUtil.buildProject(project, IncrementalProjectBuilder.FULL_BUILD);  
+         }       
       }
       return null;
    }

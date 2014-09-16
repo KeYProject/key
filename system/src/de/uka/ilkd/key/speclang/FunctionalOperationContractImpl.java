@@ -583,8 +583,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                       transactionApplicableContract(), 
                       includeHtmlMarkup, 
                       services,
-                      NotationInfo.PRETTY_SYNTAX, 
-                      NotationInfo.UNICODE_ENABLED);
+                      NotationInfo.DEFAULT_PRETTY_SYNTAX, 
+                      NotationInfo.DEFAULT_UNICODE_ENABLED);
     }
     
     public static String getText(FunctionalOperationContract contract,
