@@ -43,6 +43,7 @@ import org.eclipse.graphiti.ui.internal.GraphitiUIPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDLoopStatement;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeResumeFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeStepIntoFeature;
@@ -51,6 +52,7 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeStep
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeSuspendFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeTerminateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeVisualizeStateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.LoopStatementCollapseFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.MethodCallCollapseFeature;
 import org.key_project.sed.ui.visualization.util.ICustomFeatureFactory;
 import org.key_project.sed.ui.visualization.util.LogUtil;
@@ -121,6 +123,10 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
                catch (DebugException e) {
                   LogUtil.getLogger().logError(e);
                }
+         }
+         
+         if(node instanceof ISEDLoopStatement) {
+            data.getGenericContextButtons().add(createCustomContextButtonEntry(new LoopStatementCollapseFeature(getFeatureProvider()), context, "Expand", null, IPlatformImageConstants.IMG_EDIT_EXPAND));
          }
          
          List<IContextButtonEntry> epEntries = collectContextButtonEntriesFromExtensionPoint(isReadOnly(), context);

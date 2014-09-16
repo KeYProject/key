@@ -13,6 +13,7 @@
 
 package org.key_project.sed.ui.visualization.execution_tree.feature;
 
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
@@ -27,7 +28,9 @@ import org.eclipse.graphiti.services.IPeCreateService;
 import org.eclipse.graphiti.util.ColorConstant;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
+import org.key_project.sed.core.util.SEDMethodPreorderIterator;
 import org.key_project.sed.ui.visualization.execution_tree.provider.IExecutionTreeImageConstants;
+import org.key_project.sed.ui.visualization.util.LogUtil;
 
 /**
  * Implementation of {@link IAddFeature} for {@link ISEDMethodCall}s.
@@ -46,7 +49,7 @@ public class MethodCallAddFeature extends AbstractDebugNodeAddFeature {
     * {@inheritDoc}
     */
    public PictogramElement add(IAddContext context) {
-      ISEDDebugNode addedNode = (ISEDDebugNode) context.getNewObject();
+      ISEDMethodCall addedNode = (ISEDMethodCall) context.getNewObject();
 
       IPeCreateService peCreateService = Graphiti.getPeCreateService();
       IGaService gaService = Graphiti.getGaService();
@@ -55,7 +58,19 @@ public class MethodCallAddFeature extends AbstractDebugNodeAddFeature {
       ContainerShape container = peCreateService.createContainerShape(targetDiagram, true);
 
       Rectangle rect = gaService.createRectangle(container);
-      rect.setForeground(manageColor(new ColorConstant(102, 80, 180)));
+      
+      ColorConstant color = new ColorConstant(102, 80, 180);
+      if(addedNode.isCollapsed()) {
+         SEDMethodPreorderIterator iter = new SEDMethodPreorderIterator(addedNode);
+         try {
+            color = iter.allBranchesFinished() ? new ColorConstant(102, 180, 0) : new ColorConstant(255, 102, 0);
+         }
+         catch (DebugException e) {
+            LogUtil.getLogger().logError(e);
+         }
+      }
+      
+      rect.setForeground(manageColor(color));
       rect.setLineWidth(2);
       rect.setFilled(false);
       link(container, addedNode);
