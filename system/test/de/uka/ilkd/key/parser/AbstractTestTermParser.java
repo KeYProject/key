@@ -121,7 +121,7 @@ public abstract class AbstractTestTermParser extends TestCase {
         }
     }
 
-    public Term parseFma(String s) {
+    public Term parseFormula(String s) {
         try {
             return stringTermParser(s).formula();
         } catch (Exception e) {

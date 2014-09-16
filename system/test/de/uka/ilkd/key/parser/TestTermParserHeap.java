@@ -71,7 +71,11 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
     }
 
-    public void testFieldAtHeapSyntax() throws IOException {
+    /*
+     * The @-Operator can be used to specify the heap, which belongs to a
+     * field access. That operator is tests in the method below.
+     */
+    public void testAtOperator() throws IOException {
         Term expectedParseResult;
         String prettySyntax, verboseSyntax;
 
@@ -135,6 +139,10 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         }
     }
 
+    public void testQuantifiedSelect() {
+        // TODO
+    }
+
     private void parsePrintAndCheckEquality(String prettySyntax, String verboseSyntax) throws IOException {
         Term expectedParseResult = parseTerm(verboseSyntax);
         parsePrintAndCheckEquality(prettySyntax, expectedParseResult);
@@ -151,10 +159,10 @@ public class TestTermParserHeap extends AbstractTestTermParser {
      * @param optionalStringRepresentations Optionally, additional String
      * representations can be checked for the desired input as well.
      * @throws IOException This does not make sense at all here. It should be
-     * removed. See class {@link WriterBackend} for further information.
+     * removed. See class {@link de.uka.ilkd.key.util.pp.WriterBackend} for
+     * further information.
      */
-    private void parsePrintAndCheckEquality(String expectedPrettySyntax,
-            Term expectedParseResult,
+    private void parsePrintAndCheckEquality(String expectedPrettySyntax, Term expectedParseResult,
             String... optionalStringRepresentations) throws IOException {
         Term parsedPrettySyntax = parseTerm(expectedPrettySyntax);
         assertEquals(parsedPrettySyntax, expectedParseResult);

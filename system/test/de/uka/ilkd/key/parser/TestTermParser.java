@@ -151,9 +151,9 @@ public class TestTermParser extends AbstractTestTermParser {
 	      tf.createTerm (cons,t_x,t_nil)));
 	     
 	assertEquals("parse head(cons(x,xs))=head(cons(x,nil))",
-		     t,parseFma("head(cons(x,xs))=head(cons(x,nil))"));
+		     t,parseFormula("head(cons(x,xs))=head(cons(x,nil))"));
 	assertEquals("parse head(cons(x,xs))=head(cons(x,nil))",
-		     t,parseFma("head(cons(x,xs))=head(cons(x,nil()))"));
+		     t,parseFormula("head(cons(x,xs))=head(cons(x,nil()))"));
     }
 
     public void testNotEqual() {
@@ -167,7 +167,7 @@ public class TestTermParser extends AbstractTestTermParser {
 	      tf.createTerm (cons,t_x,t_nil))));
 	     
 	assertEquals("parse head(cons(x,xs))!=head(cons(x,nil))",
-		     t,parseFma("head(cons(x,xs))!=head(cons(x,nil))"));
+		     t,parseFormula("head(cons(x,xs))!=head(cons(x,nil))"));
     }
 
 
@@ -186,7 +186,7 @@ public class TestTermParser extends AbstractTestTermParser {
 
 	     
 	assertEquals("parse x=x | y=y -> z=z & xs =xs <-> ! ys = ys",
-		     t,parseFma("x=x|y=y->z=z&xs=xs<->!ys=ys"));
+		     t,parseFormula("x=x|y=y->z=z&xs=xs<->!ys=ys"));
     }
 
     public void test7() {
@@ -195,7 +195,7 @@ public class TestTermParser extends AbstractTestTermParser {
 	 * then build the formulae. */
 	
 	String s = "\\forall list x; \\forall list l1; ! x = l1";
-	Term t = parseFma(s);
+	Term t = parseFormula(s);
 	
 	LogicVariable thisx = (LogicVariable) t.varsBoundHere(0)
 	    .get(0);
@@ -244,7 +244,7 @@ public class TestTermParser extends AbstractTestTermParser {
 	/* Try something with a prediate */
 	
 	String s = "\\exists list x; !isempty(x)";
-	Term t = parseFma(s);
+	Term t = parseFormula(s);
 	
 	LogicVariable thisx = (LogicVariable) t.varsBoundHere(0)
 	    .get(0);
