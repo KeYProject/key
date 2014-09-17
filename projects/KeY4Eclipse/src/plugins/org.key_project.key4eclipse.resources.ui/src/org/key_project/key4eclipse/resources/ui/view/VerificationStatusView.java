@@ -56,11 +56,14 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IViewPart;
@@ -70,6 +73,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.key_project.key4eclipse.common.ui.util.KeYImages;
 import org.key_project.key4eclipse.common.ui.util.StarterUtil;
+import org.key_project.key4eclipse.resources.builder.KeYProjectBuildMutexRule;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileAssumption;
 import org.key_project.key4eclipse.resources.projectinfo.AbstractContractContainer;
 import org.key_project.key4eclipse.resources.projectinfo.AbstractTypeContainer;
@@ -82,7 +86,6 @@ import org.key_project.key4eclipse.resources.projectinfo.ProjectInfo;
 import org.key_project.key4eclipse.resources.projectinfo.ProjectInfoManager;
 import org.key_project.key4eclipse.resources.projectinfo.TypeInfo;
 import org.key_project.key4eclipse.resources.projectinfo.event.IProjectInfoListener;
-import org.key_project.key4eclipse.resources.ui.provider.ProjectInfoColorTreeSynchronizer;
 import org.key_project.key4eclipse.resources.ui.provider.ProjectInfoLabelProvider;
 import org.key_project.key4eclipse.resources.ui.provider.ProjectInfoLazyTreeContentProvider;
 import org.key_project.key4eclipse.resources.ui.util.LogUtil;
@@ -94,6 +97,8 @@ import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.CustomProgressBar;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.viewer.ObservableTreeViewer;
+import org.key_project.util.eclipse.swt.viewer.event.IViewerUpdateListener;
+import org.key_project.util.eclipse.swt.viewer.event.ViewerUpdateEvent;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.ObjectUtil;
@@ -111,6 +116,31 @@ import de.uka.ilkd.key.util.LinkedHashMap;
  */
 @SuppressWarnings("restriction")
 public class VerificationStatusView extends AbstractLinkableViewPart {
+   /**
+    * The color used for closed proofs.
+    */
+   public static final RGB COLOR_CLOSED_PROOF = new RGB(0, 117, 0); // JUnit green: 95, 191, 95;
+   
+   /**
+    * The color used for closed proofs.
+    */
+   public static final RGB COLOR_UNPROVEN_DEPENDENCY = new RGB(0, 0, 170);
+   
+   /**
+    * The color used for open proofs.
+    */
+   public static final RGB COLOR_PROOF_IN_RECURSION_CYCLE = new RGB(170, 0, 0); // JUnit red: 159, 63, 63
+   
+   /**
+    * The color used for open proofs.
+    */
+   public static final RGB COLOR_OPEN_PROOF = new RGB(217, 108, 0); // Eclipse warning border: 246, 211, 87
+   
+   /**
+    * The color used for unspecified methods.
+    */
+   public static final RGB COLOR_UNSPECIFIED = new RGB(110, 110, 110); // JUnit stopped: 120, 120, 120
+   
    /**
     * The unique ID of this view.
     */
@@ -155,11 +185,6 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
     * Label provider of {@link #treeViewer}.
     */
    private ProjectInfoLabelProvider labelProvider;
-   
-   /**
-    * Sets the colors in {@link #treeViewer}.
-    */
-   private ProjectInfoColorTreeSynchronizer colorSynchronizer;
    
    /**
     * The currently shown {@link IProject}s.
@@ -292,6 +317,11 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
    private Job activeJob;
 
    /**
+    * Maps a shown {@link IStatusInfo} to its {@link Color} value.
+    */
+   private Map<Object, Color> statusColorMap;
+   
+   /**
     * {@inheritDoc}
     */
    @Override
@@ -306,11 +336,11 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
       progressComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       Label proofLabel = new Label(progressComposite, SWT.NONE);
       proofLabel.setText("Proofs");
-      proofProgressBar = new CustomProgressBar(progressComposite, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF, ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF, ProjectInfoColorTreeSynchronizer.COLOR_PROOF_IN_RECURSION_CYCLE);
+      proofProgressBar = new CustomProgressBar(progressComposite, COLOR_CLOSED_PROOF, COLOR_OPEN_PROOF, COLOR_PROOF_IN_RECURSION_CYCLE);
       proofProgressBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       Label specificationLabel = new Label(progressComposite, SWT.NONE);
       specificationLabel.setText("Specifications");
-      specificationProgressBar = new CustomProgressBar(progressComposite, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF, ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED, ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
+      specificationProgressBar = new CustomProgressBar(progressComposite, COLOR_CLOSED_PROOF, COLOR_UNSPECIFIED, COLOR_UNSPECIFIED);
       specificationProgressBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       // tabFolder
       CTabFolder tabFolder = new CTabFolder(rootComposite, SWT.FLAT | SWT.BOTTOM);
@@ -345,6 +375,12 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
             handleDoubleClick(event);
          }
       });
+      treeViewer.addViewerUpdateListener(new IViewerUpdateListener() {
+         @Override
+         public void itemUpdated(ViewerUpdateEvent e) {
+            handleItemUpdated(e);
+         }
+      });
       ColumnViewerToolTipSupport.enableFor(treeViewer);
       MenuManager treeViewerMenuManager = new MenuManager();
       treeViewerMenuManager.setRemoveAllWhenShown(true);
@@ -369,27 +405,27 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
       Label legendLabel = new Label(legendComposite, SWT.NONE);
       legendLabel.setText("Colors: ");
       legendLabel.setToolTipText("Colors indicate the verification status and parents are colored according to the worst verification stati of their children.");
-      cyclicProofsColor = new Color(legendLabel.getDisplay(), ProjectInfoColorTreeSynchronizer.COLOR_PROOF_IN_RECURSION_CYCLE);
+      cyclicProofsColor = new Color(legendLabel.getDisplay(), COLOR_PROOF_IN_RECURSION_CYCLE);
       Label cylcicProofsLabel = new Label(legendComposite, SWT.NONE);
       cylcicProofsLabel.setForeground(cyclicProofsColor);
       cylcicProofsLabel.setText("Cyclic proofs");
       cylcicProofsLabel.setToolTipText("Proofs depend on each other (forbidden cyclic dependency).");
-      openProofColor = new Color(legendLabel.getDisplay(), ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
+      openProofColor = new Color(legendLabel.getDisplay(), COLOR_OPEN_PROOF);
       Label openProofLabel = new Label(legendComposite, SWT.NONE);
       openProofLabel.setForeground(openProofColor);
       openProofLabel.setText("Open proof");
       openProofLabel.setToolTipText("A proof is still open which may indicate a bug or that KeY was not powerful enough to finish the proof automatially.");
-      unspecifiedColor = new Color(legendLabel.getDisplay(), ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
+      unspecifiedColor = new Color(legendLabel.getDisplay(), COLOR_UNSPECIFIED);
       Label unspecifiedLabel = new Label(legendComposite, SWT.NONE);
       unspecifiedLabel.setForeground(unspecifiedColor);
       unspecifiedLabel.setText("Unspecified");
       unspecifiedLabel.setToolTipText("A method has no specification and is therfore not proven.");
-      unprovenDependencyColor = new Color(legendLabel.getDisplay(), ProjectInfoColorTreeSynchronizer.COLOR_UNPROVEN_DEPENDENCY);
+      unprovenDependencyColor = new Color(legendLabel.getDisplay(), COLOR_UNPROVEN_DEPENDENCY);
       Label unprovenDependencyLabel = new Label(legendComposite, SWT.NONE);
       unprovenDependencyLabel.setForeground(unprovenDependencyColor);
       unprovenDependencyLabel.setText("Unproven dependency");
       unprovenDependencyLabel.setToolTipText("A proof is successful closed but uses at least one unproven specification of the project.");
-      closedProofColor = new Color(legendLabel.getDisplay(), ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
+      closedProofColor = new Color(legendLabel.getDisplay(), COLOR_CLOSED_PROOF);
       Label closedProofLabel = new Label(legendComposite, SWT.NONE);
       closedProofLabel.setForeground(closedProofColor);
       closedProofLabel.setText("Closed proof");
@@ -439,10 +475,8 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
       final Set<IProject> linkedProjects = listProjects(linkedResources);
       final List<IProject> newProjects = computeProjectsToShow(linkedProjects);
       if (!ObjectUtil.equals(projects, newProjects)) {
+         statusColorMap = new HashMap<Object, Color>();
          projects = newProjects;
-         if (colorSynchronizer != null) {
-            colorSynchronizer.dispose();
-         }
          removeProjectInfoListener();
          projectInfos = new HashMap<IProject, ProjectInfo>();
          for (IProject project : projects) {
@@ -452,7 +486,6 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
          }
          labelProvider.setProjects(projects);
          treeViewer.setInput(projects);
-         colorSynchronizer = new ProjectInfoColorTreeSynchronizer(projects, treeViewer);
       }
       rootComposite.getDisplay().syncExec(new Runnable() {
          @Override
@@ -509,6 +542,9 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
             if (toExpand instanceof ProjectInfo) {
                toExpand = ((ProjectInfo) toExpand).getProject();
             }
+            if (treeViewer.testFindItem(toExpand) == null) {
+               contentProvider.inject(toExpand);
+            }
             treeViewer.expandToLevel(toExpand, 1);
          }
       }
@@ -534,15 +570,10 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
    protected List<IProject> computeProjectsToShow(Set<IProject> linkedProjects) {
       List<IProject> result = new LinkedList<IProject>();
       for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
-         try {
-            if (project.exists() && project.isOpen() && KeYResourcesUtil.isKeYProject(project)) {
-               if (linkedProjects == null || linkedProjects.contains(project)) {
-                  result.add(project);
-               }
+         if (project.exists() && project.isOpen() && KeYResourcesUtil.isKeYProject(project)) {
+            if (linkedProjects == null || linkedProjects.contains(project)) {
+               result.add(project);
             }
-         }
-         catch (CoreException e) {
-            LogUtil.getLogger().logError(e);
          }
       }
       return result;
@@ -1027,20 +1058,28 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
          }
          
          private void updateStatus(ProjectInfo projectInfo, VerificationStatus status, IProgressMonitor monitor) throws Exception {
+            Color color = closedProofColor;
             for (PackageInfo packageInfo : projectInfo.getPackages()) {
                SWTUtil.checkCanceled(monitor);
-               updateStatus(packageInfo, status, monitor);
+               Color packageColor = updateStatus(packageInfo, status, monitor);
+               color = worstColor(color, packageColor);
             }
+            updateTreeItemColorThreadSave(projectInfo, color);
          }
 
-         private void updateStatus(PackageInfo packageInfo, VerificationStatus status, IProgressMonitor monitor) throws Exception {
+         private Color updateStatus(PackageInfo packageInfo, VerificationStatus status, IProgressMonitor monitor) throws Exception {
+            Color color = closedProofColor;
             for (TypeInfo typeInfo : packageInfo.getTypes()) {
                SWTUtil.checkCanceled(monitor);
-               updateStatus(typeInfo, status, monitor);
+               Color typeColor = updateStatus(typeInfo, status, monitor);
+               color = worstColor(color, typeColor);
             }
+            updateTreeItemColorThreadSave(packageInfo, color);
+            return color;
          }
 
-         private void updateStatus(TypeInfo typeInfo, VerificationStatus status, IProgressMonitor monitor) throws Exception {
+         private Color updateStatus(TypeInfo typeInfo, VerificationStatus status, IProgressMonitor monitor) throws Exception {
+            Color color = closedProofColor;
             for (MethodInfo methodInfo : typeInfo.getMethods()) {
                SWTUtil.checkCanceled(monitor);
                status.numOfMethods++;
@@ -1048,7 +1087,9 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
                   status.numOfSpecifiedMethods++;
                   for (ContractInfo contractInfo : methodInfo.getContracts()) {
                      SWTUtil.checkCanceled(monitor);
-                     updateStatus(contractInfo, status);
+                     Color contractColor = updateStatus(contractInfo, status);
+                     updateTreeItemColorThreadSave(methodInfo, contractColor);
+                     color = worstColor(color, contractColor);
                   }
                }
                else {
@@ -1058,22 +1099,29 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
                      status.unspecifiedMethods.put(typeInfo, list);
                   }
                   list.add(methodInfo);
+                  updateTreeItemColorThreadSave(methodInfo, unspecifiedColor);
+                  color = worstColor(color, unspecifiedColor);
                }
             }
             for (ObserverFunctionInfo observerFunctionInfo : typeInfo.getObserverFunctions()) {
                SWTUtil.checkCanceled(monitor);
                for (ContractInfo contractInfo : observerFunctionInfo.getContracts()) {
                   SWTUtil.checkCanceled(monitor);
-                  updateStatus(contractInfo, status);
+                  Color contractColor = updateStatus(contractInfo, status);
+                  updateTreeItemColorThreadSave(observerFunctionInfo, contractColor);
+                  color = worstColor(color, contractColor);
                }
             }
             for (TypeInfo internalTypeInfo : typeInfo.getTypes()) {
                SWTUtil.checkCanceled(monitor);
-               updateStatus(internalTypeInfo, status, monitor);
+               Color typeRgb = updateStatus(internalTypeInfo, status, monitor);
+               color = worstColor(color, typeRgb);
             }
+            updateTreeItemColorThreadSave(typeInfo, color);
+            return color;
          }
 
-         private void updateStatus(ContractInfo contractInfo, VerificationStatus status) throws Exception {
+         private Color updateStatus(ContractInfo contractInfo, VerificationStatus status) throws Exception {
             status.numOfContracts++;
             // Closed state
             Boolean closed;
@@ -1147,10 +1195,118 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
             if (!CollectionUtil.isEmpty(cycle)) {
                status.cycles.add(cycle);
             }
+            // Update color
+            Color rgb = computeColor(!CollectionUtil.isEmpty(cycle), 
+                                     closed == null || !closed.booleanValue(), 
+                                     false, 
+                                     unprovenDependencies != null && !unprovenDependencies.isEmpty());
+            updateTreeItemColorThreadSave(contractInfo, rgb);
+            return rgb;
          }
       };
-      activeJob.setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
+      activeJob.setRule(new KeYProjectBuildMutexRule(projects.toArray(new IProject[projects.size()])));
       activeJob.schedule();
+   }
+   
+   /**
+    * Returns the worst of the given {@link Color}s.
+    * @param first The first {@link Color}.
+    * @param second The second {@link Color}.
+    * @return The worst of both {@link Color}s.
+    */
+   protected Color worstColor(Color first, Color second) {
+      if (cyclicProofsColor == first || cyclicProofsColor == second) {
+         return cyclicProofsColor;
+      }
+      else if (openProofColor == first || openProofColor == second) {
+         return openProofColor;
+      }
+      else if (unspecifiedColor == first || unspecifiedColor == second) {
+         return unspecifiedColor;
+      }
+      else if (unprovenDependencyColor == first || unprovenDependencyColor == second) {
+         return unprovenDependencyColor;
+      }
+      else {
+         return closedProofColor;
+      }
+   }
+
+   /**
+    * Computes the {@link Color}.
+    * @param partOfRecursionCycle Is part of recursion cycle?
+    * @param hasOpenProof Has open proofs?
+    * @param unspecified Is unspecified?
+    * @param unprovenDependencies has unproven dependencies?
+    * @return The {@link Color}.
+    */
+   protected Color computeColor(boolean partOfRecursionCycle, boolean hasOpenProof, boolean unspecified, boolean unprovenDependencies) {
+      if (partOfRecursionCycle) {
+         return cyclicProofsColor;
+      }
+      else if (hasOpenProof) {
+         return openProofColor;
+      }
+      else if (unspecified) {
+         return unspecifiedColor;
+      }
+      else if (unprovenDependencies) {
+         return unprovenDependencyColor;
+      }
+      else {
+         return closedProofColor;
+      }
+   }
+
+   /**
+    * When {@link TreeItem#getData()} is set.
+    * @param e The event.
+    */
+   protected void handleItemUpdated(ViewerUpdateEvent e) {
+      TreeItem item = (TreeItem) e.getItem();
+      if (item != null) {
+         Object data = e.getElement();
+         if (data != null) {
+            Color color = statusColorMap.get(data);
+            if (color != null) {
+               item.setForeground(color);
+            }
+         }
+      }
+   }
+
+   /**
+    * Updates the color of the given {@link IStatusInfo} thread save and only if required.
+    * @param info The {@link IStatusInfo} to update its color.
+    * @param color The {@link Color} to show.
+    */
+   protected void updateTreeItemColorThreadSave(final Object info, final Color color) {
+      Color oldColor = statusColorMap.get(info);
+      if (oldColor == null || oldColor != color) {
+         statusColorMap.put(info, color);
+         if (!treeViewer.getTree().isDisposed()) {
+            treeViewer.getTree().getDisplay().syncExec(new Runnable() {
+               @Override
+               public void run() {
+                  if (!treeViewer.getTree().isDisposed()) {
+                     updateTreeItemColor(info, color);
+                  }
+               }
+            });
+         }
+      }
+   }
+   
+   /**
+    * Updates the color of the given {@link IStatusInfo}.
+    * @param info The {@link IStatusInfo} to update its color.
+    * @param color The {@link Color} to show.
+    */
+   protected void updateTreeItemColor(Object info, Color color) {
+      Widget item = treeViewer.testFindItem(info instanceof ProjectInfo ? ((ProjectInfo) info).getProject() : info);
+      if (item instanceof TreeItem) {
+         ((TreeItem) item).setForeground(color);
+      }
    }
 
    /**
@@ -1535,9 +1691,6 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
       ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceChangeListener);
       KeYResourcesUtil.removeKeYResourcePropertyListener(resourcePropertyListener);
       removeProjectInfoListener();
-      if (colorSynchronizer != null) {
-         colorSynchronizer.dispose();
-      }
       if (contentProvider != null) {
          contentProvider.dispose();
       }

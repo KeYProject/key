@@ -11,7 +11,7 @@ import org.eclipse.jdt.core.JavaCore;
  * Represents a package as known by KeY.
  * @author Martin Hentschel
  */
-public class PackageInfo extends AbstractTypeContainer implements IStatusInfo {
+public class PackageInfo extends AbstractTypeContainer {
    /**
     * The name of the default package.
     */
@@ -78,74 +78,6 @@ public class PackageInfo extends AbstractTypeContainer implements IStatusInfo {
          }
       }
       return null;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isUnspecified() {
-      boolean specified = true;
-      TypeInfo[] types = getTypes();
-      int i = 0;
-      while (specified && i < types.length) {
-         if (types[i].isUnspecified()) {
-            specified = false;
-         }
-         i++;
-      }
-      return !specified;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean hasOpenProof() {
-      boolean allClosed = true;
-      TypeInfo[] types = getTypes();
-      int i = 0;
-      while (allClosed && i < types.length) {
-         if (types[i].hasOpenProof()) {
-            allClosed = false;
-         }
-         i++;
-      }
-      return !allClosed;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isPartOfRecursionCycle() {
-      boolean partOfCycle = false;
-      TypeInfo[] types = getTypes();
-      int i = 0;
-      while (!partOfCycle && i < types.length) {
-         if (types[i].isPartOfRecursionCycle()) {
-            partOfCycle = true;
-         }
-         i++;
-      }
-      return partOfCycle;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean hasUnprovenDependencies() {
-      boolean allDependeniesProven = true;
-      TypeInfo[] types = getTypes();
-      int i = 0;
-      while (allDependeniesProven && i < types.length) {
-         if (types[i].hasUnprovenDependencies()) {
-            allDependeniesProven = false;
-         }
-         i++;
-      }
-      return !allDependeniesProven;
    }
 
    /**
