@@ -2011,21 +2011,17 @@ public class TermBuilder {
     return func(services.getTypeConverter().getSeqLDT().getSeqEmpty());
     }
 
-
     public Term seqSingleton(Term x) {
     return func(services.getTypeConverter().getSeqLDT().getSeqSingleton(), x);
     }
-
 
     public Term seqConcat(Term s, Term s2) {
     return func(services.getTypeConverter().getSeqLDT().getSeqConcat(), s, s2);
     }
 
-
     public Term seqSub(Term s, Term from, Term to) {
     return func(services.getTypeConverter().getSeqLDT().getSeqSub(), s, from, to);
     }
-
 
     public Term seqReverse(Term s) {
     return func(services.getTypeConverter().getSeqLDT().getSeqReverse(), s);
