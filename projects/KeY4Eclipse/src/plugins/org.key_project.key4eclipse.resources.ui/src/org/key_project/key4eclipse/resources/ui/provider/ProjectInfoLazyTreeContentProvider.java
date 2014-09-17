@@ -35,9 +35,56 @@ public class ProjectInfoLazyTreeContentProvider extends AbstractProjectInfoBased
    @Override
    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
       Assert.isTrue(viewer instanceof TreeViewer);
+      Assert.isTrue(newInput == null || newInput instanceof List<?>);
       this.viewer = (TreeViewer)viewer;
       removeProjectInfoListener();
       addProjectInfoListener(newInput);
+   }
+
+   /**
+    * Injects the given {@link Object} into the {@link Viewer} to ensure that it is known.
+    * @param toInject The {@link Object} to inject.
+    */
+   public void inject(Object toInject) {
+      if (toInject instanceof IProject) {
+         List<?> input = (List<?>)viewer.getInput();
+         viewer.replace(input, input.indexOf(toInject), toInject);
+         updateChildCount(toInject, -1);
+      }
+      else if (toInject instanceof PackageInfo) {
+         PackageInfo packageInfo = (PackageInfo) toInject;
+         IProject project = packageInfo.getProjectInfo().getProject();
+         viewer.replace(project, packageInfo.getProjectInfo().indexOfPackage(packageInfo), toInject);
+         updateChildCount(toInject, -1);
+      }
+      else if (toInject instanceof TypeInfo) {
+         TypeInfo typeInfo = (TypeInfo) toInject;
+         AbstractTypeContainer parentContainer = ((TypeInfo) toInject).getParent();
+         if (parentContainer instanceof TypeInfo) {
+            TypeInfo parentType = (TypeInfo)parentContainer;
+            viewer.replace(parentContainer, parentType.countMethods() + parentType.countObserverFunctions() + parentContainer.indexOfType(typeInfo), toInject);
+         }
+         else {
+            viewer.replace(parentContainer, parentContainer.indexOfType(typeInfo), toInject);
+         }
+         updateChildCount(toInject, -1);
+      }
+      else if (toInject instanceof MethodInfo) {
+         MethodInfo methodInfo = (MethodInfo) toInject;
+         viewer.replace(methodInfo.getParent(), methodInfo.getParent().indexOfMethod(methodInfo), toInject);
+         updateChildCount(toInject, -1);
+      }
+      else if (toInject instanceof ObserverFunctionInfo) {
+         ObserverFunctionInfo observerFunctionInfo = (ObserverFunctionInfo) toInject;
+         TypeInfo parentType = observerFunctionInfo.getParent();
+         viewer.replace(observerFunctionInfo.getParent(), parentType.countMethods() + parentType.indexOfObserverFunction(observerFunctionInfo), toInject);
+         updateChildCount(toInject, -1);
+      }
+      else if (toInject instanceof ContractInfo) {
+         ContractInfo contractInfo = (ContractInfo) toInject;
+         viewer.replace(contractInfo.getParent(), contractInfo.getParent().indexOfContract(contractInfo), toInject);
+         updateChildCount(toInject, -1);
+      }
    }
 
    /**
@@ -118,7 +165,13 @@ public class ProjectInfoLazyTreeContentProvider extends AbstractProjectInfoBased
     */
    @Override
    public Object getParent(Object element) {
-      return null;
+      Object parent = ProjectInfoManager.getParent(element);
+      if (parent instanceof ProjectInfo) {
+         return ((ProjectInfo) parent).getProject();
+      }
+      else {
+         return parent;
+      }
    }
    
    /**
