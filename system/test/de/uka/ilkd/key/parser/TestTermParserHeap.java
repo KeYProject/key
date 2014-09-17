@@ -130,7 +130,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
      * This should cause a parser error. This test verifies that the correct
      * Exception is thrown.
      */
-    public void testVerifyExceptionIfAtNotPreceededBySelectTerm() {
+    public void testVerifyExceptionIfAtOperatorNotPreceededBySelectTerm() {
         try {
             stringTermParser("(a.f + a.f)@h2").term();
             fail();
