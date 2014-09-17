@@ -23,67 +23,98 @@ import org.eclipse.core.runtime.QualifiedName;
  */
 public final class KeYProjectProperties {
    
-   public static final QualifiedName PROP_ENABLE_BUILD_PROOFS = new QualifiedName("org.key_project.key4eclipse.resources", "buildProofs");
-   public static final QualifiedName PROP_ENALBLE_BUILD_REQUIRED_PROOFS_ONLY = new QualifiedName("org.key_project.key4eclipse.resources", "buildRequiredProofsOnly");
+   public static final QualifiedName PROP_ENABLE_KEY_RESOURCES_BUILDS = new QualifiedName("org.key_project.key4eclipse.resources", "buildProofs");
+   public static final QualifiedName PROP_ENABLE_BUILD_ON_STARTUP = new QualifiedName("org.key_project.key4eclipse.resources", "buildOnStartup");
+   public static final QualifiedName PROP_ENABLE_BUILD_REQUIRED_PROOFS_ONLY = new QualifiedName("org.key_project.key4eclipse.resources", "buildRequiredProofsOnly");
    public static final QualifiedName PROP_ENABLE_MULTITHREADING = new QualifiedName("org.key_project.key4eclipse.resources", "enableMultiThreading");
    public static final QualifiedName PROP_NUMBER_OF_THREADS = new QualifiedName("org.key_project.key4eclipse.resources", "numberOfThreads");
    public static final QualifiedName PROP_AUTO_DELETE_PROOFFILES = new QualifiedName("org.key_project.key4eclipse.resources", "autoDeleteProofFiles");
-   public static final QualifiedName PROP_HIDE_META_FILES = new QualifiedName("org.key_project.key4eclipse.resources", "hideMetaFiles");
-   
-   
-   public static boolean isEnableBuildProofs(IProject project) throws CoreException {
+    
+   public static boolean isEnableKeYResourcesBuilds(IProject project) {
       if (project != null) {
-         String value = project.getPersistentProperty(PROP_ENABLE_BUILD_PROOFS);
-         if(value == null){
+         String value;
+         try {
+            value = project.getPersistentProperty(PROP_ENABLE_KEY_RESOURCES_BUILDS);
+            if(value == null){
+               return true;
+            }
+            return Boolean.parseBoolean(value);
+         }
+         catch (CoreException e) {
             return true;
          }
-         else return Boolean.parseBoolean(value);
       }
-      else {
-         return false;
+      return false;
+   }
+   
+   public static void setEnableKeYResourcesBuilds(IProject project,  boolean enabled) throws CoreException {
+      if (project != null) {
+         project.setPersistentProperty(PROP_ENABLE_KEY_RESOURCES_BUILDS, enabled + "");
       }
    }
    
-   public static void setEnableBuildProofs(IProject project,  boolean enabled) throws CoreException {
+   
+   public static boolean isEnableBuildOnStartup(IProject project){
       if (project != null) {
-         project.setPersistentProperty(PROP_ENABLE_BUILD_PROOFS, enabled + "");
+         String value;
+         try {
+            value = project.getPersistentProperty(PROP_ENABLE_BUILD_ON_STARTUP);
+            if(value == null){
+               return true;
+            }
+            return Boolean.parseBoolean(value);
+         }
+         catch (CoreException e) {
+            return true;
+         }
+      }
+      return false;
+   }
+   
+   public static void setEnableBuildOnStartup(IProject project, boolean enabled) throws CoreException{
+      if(project != null){
+         project.setPersistentProperty(PROP_ENABLE_BUILD_ON_STARTUP, enabled + "");
       }
    }
    
    
-   public static boolean isEnableBuildRequiredProofsOnly(IProject project) throws CoreException {
+   public static boolean isEnableBuildRequiredProofsOnly(IProject project) {
       if (project != null) {
-         String value = project.getPersistentProperty(PROP_ENALBLE_BUILD_REQUIRED_PROOFS_ONLY);
-         if(value == null){
+         try{
+            String value = project.getPersistentProperty(PROP_ENABLE_BUILD_REQUIRED_PROOFS_ONLY);
+            if(value == null){
+               return true;
+            }
+            return Boolean.parseBoolean(value);
+         } catch (CoreException e){
             return true;
          }
-         else return Boolean.parseBoolean(value);
       }
-      else {
-         return false;
-      }
+      return false;
    }
    
    public static void setEnableBuildProofsEfficient(IProject project,  boolean enabled) throws CoreException {
       if (project != null) {
-         project.setPersistentProperty(PROP_ENALBLE_BUILD_REQUIRED_PROOFS_ONLY, enabled + "");
+         project.setPersistentProperty(PROP_ENABLE_BUILD_REQUIRED_PROOFS_ONLY, enabled + "");
       }
    }
    
    
-   public static boolean isEnableMultiThreading(IProject project) throws CoreException {
+   public static boolean isEnableMultiThreading(IProject project) {
       if (project != null) {
-         String value = project.getPersistentProperty(PROP_ENABLE_MULTITHREADING);
-         if(value == null){
-            return true;
-         }
-         else{
+         String value;
+         try {
+            value = project.getPersistentProperty(PROP_ENABLE_MULTITHREADING);
+            if(value == null){
+               return true;
+            }
             return Boolean.parseBoolean(value);
          }
+         catch (CoreException e) {
+            return true;
+         }
       }
-      else {
-         return false;
-      }
+      return false;
    }
    
    public static void setEnableMultiThreading(IProject project,  boolean enabled) throws CoreException {
@@ -93,7 +124,7 @@ public final class KeYProjectProperties {
    }
    
    
-   public static int getNumberOfThreads(IProject project) throws CoreException {
+   public static int getNumberOfThreads(IProject project) {
       if (project != null) {
          try{
             return Integer.parseInt(project.getPersistentProperty(PROP_NUMBER_OF_THREADS));
@@ -101,10 +132,11 @@ public final class KeYProjectProperties {
          catch (NumberFormatException e) {
             return 2;
          }
+         catch (CoreException e) {
+            return 2;
+         }
       }
-      else {
-         return 0;
-      }
+      return 0;
    }
    
    public static void setNumberOfThreads(IProject project,  String number) throws CoreException {
@@ -114,48 +146,27 @@ public final class KeYProjectProperties {
    }
    
    
-   public static boolean isAutoDeleteProofFiles(IProject project) throws CoreException {
+   public static boolean isAutoDeleteProofFiles(IProject project) {
       if (project != null) {
-         String value = project.getPersistentProperty(PROP_AUTO_DELETE_PROOFFILES);
-         if(value == null){
+         String value;
+         try {
+            value = project.getPersistentProperty(PROP_AUTO_DELETE_PROOFFILES);
+            if(value == null){
+               return true;
+            }
+            return Boolean.parseBoolean(value);
+         }
+         catch (CoreException e) {
             return true;
          }
-         else{
-            return Boolean.parseBoolean(value); 
-         }
       }
-      else {
-         return false;
-      }
+      return false;
    }
    
    
    public static void setAutoDeleteProofFiles(IProject project,  boolean enabled) throws CoreException {
       if (project != null) {
          project.setPersistentProperty(PROP_AUTO_DELETE_PROOFFILES, enabled + "");
-      }
-   }
-   
-   
-   public static boolean isHideMetaFiles(IProject project) throws CoreException {
-      if (project != null) {
-         String value = project.getPersistentProperty(PROP_HIDE_META_FILES);
-         if(value == null){
-            return false;
-         }
-         else{
-            return Boolean.parseBoolean(value);
-         }
-      }
-      else {
-         return false;
-      }
-   }
-   
-   
-   public static void setHideMetaFiles(IProject project,  boolean enabled) throws CoreException {
-      if (project != null) {
-         project.setPersistentProperty(PROP_HIDE_META_FILES, enabled + "");
       }
    }
 }
