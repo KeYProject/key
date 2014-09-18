@@ -81,41 +81,43 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
      * according to JLS Sect. 4.5.5
      */
     public Expression getDefaultValue(Type type) {
-	if (type instanceof ClassType || type instanceof ArrayType) {
-	    return new NullLiteral();
-	} else if (type instanceof PrimitiveType) {
-	    if ("boolean".equals(type.getName())) {
-		return new BooleanLiteral(false);
-	    } else if ("byte".equals(type.getName())  ||
-		       "short".equals(type.getName()) ||
-		       "int".equals(type.getName())) {
-		return new IntLiteral(0);
-	    } else if ("long".equals(type.getName())) {
-		return new LongLiteral(0);
-	    } else if ("\\bigint".equals(type.getName())){
-	        return new BigintLiteral(0);
-        } else if ("\\real".equals(type.getName())){
-            return new RealLiteral();
-	    } else if ("char".equals(type.getName())) {
-		return new CharLiteral((char)0);
-	    } else if ("float".equals(type.getName())) {
-		return new FloatLiteral(0.0F);
-	    } else if ("double".equals(type.getName())) {
-		return new DoubleLiteral(0.0D);
-	    } else if("\\locset".equals(type.getName())) {
-		return EmptySetLiteral.INSTANCE;
-	    } else if("\\seq".equals(type.getName())) {
-		return EmptySeqLiteral.INSTANCE;
-	    } else if("\\set".equals(type.getName())) {
-	        return new DLEmbeddedExpression("emptySet",
-	                Collections.<Expression>emptyList());
-        } else if("\\free".equals(type.getName())) {
-            return new DLEmbeddedExpression("atom",
-                    Collections.<Expression>emptyList());
-	    }
-	}
-	Debug.fail("makeImplicitMembersExplicit: unknown primitive type"+type);
-	return null;
+        if (type instanceof ClassType || type instanceof ArrayType) {
+            return new NullLiteral();
+        } else if (type instanceof PrimitiveType) {
+            if ("boolean".equals(type.getName())) {
+                return new BooleanLiteral(false);
+            } else if ("byte".equals(type.getName())
+                    || "short".equals(type.getName())
+                    || "int".equals(type.getName())) {
+                return new IntLiteral(0);
+            } else if ("long".equals(type.getName())) {
+                return new LongLiteral(0);
+            } else if ("\\bigint".equals(type.getName())) {
+                return new BigintLiteral(0);
+            } else if ("\\real".equals(type.getName())) {
+                return new RealLiteral();
+            } else if ("char".equals(type.getName())) {
+                return new CharLiteral((char) 0);
+            } else if ("float".equals(type.getName())) {
+                return new FloatLiteral(0.0F);
+            } else if ("double".equals(type.getName())) {
+                return new DoubleLiteral(0.0D);
+            } else if ("\\locset".equals(type.getName())) {
+                return EmptySetLiteral.INSTANCE;
+            } else if ("\\seq".equals(type.getName())) {
+                return EmptySeqLiteral.INSTANCE;
+            } else if ("\\set".equals(type.getName())) {
+                return new DLEmbeddedExpression("emptySet",
+                        Collections.<Expression>emptyList());
+            } else if ("\\free".equals(type.getName())) {
+                return new DLEmbeddedExpression("atom",
+                        Collections.<Expression>emptyList());
+            } else if ("\\map".equals(type.getName())) {
+                return EmptyMapLiteral.INSTANCE;
+            }
+        }
+        Debug.fail("makeImplicitMembersExplicit: unknown primitive type" + type);
+        return null;
     }
 
     /**
