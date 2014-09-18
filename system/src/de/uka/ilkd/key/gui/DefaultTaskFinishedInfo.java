@@ -21,6 +21,9 @@ import de.uka.ilkd.key.proof.Proof;
 public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
 
     private final Object source;
+    
+    // TODO
+    // can be Throwable or ApplyStrategyInfo
     private final Object result;
     private final Proof proof;
     private final long time;
@@ -39,26 +42,32 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
         this.closedGoals = closedGoals;
     }
 
+    @Override
     public long getTime() {
         return time;
     }
-    
+
+    @Override
     public Object getResult() {
         return result;
     }
-    
+
+    @Override
     public Object getSource() {           
         return source;
     }
 
+    @Override
     public int getAppliedRules() {
         return appliedRules;
     }
 
+    @Override
     public int getClosedGoals() {
         return closedGoals;
     }
 
+    @Override
     public Proof getProof() {            
         return proof;
     }       
