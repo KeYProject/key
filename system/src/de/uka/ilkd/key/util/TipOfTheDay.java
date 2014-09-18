@@ -13,26 +13,41 @@
 
 package de.uka.ilkd.key.util;
 
+import java.io.*;
+import java.net.URL;
 import java.util.Random;
+
 
 public final class TipOfTheDay {
 
     private final static Random r = new Random();
-    private final static String[] TIPS = new String[] {
-        "Press CTRL+F to search in sequents.",
-        "Proofs can be quick-saved by pressing F5.",
-	"Use the command line option '--experimental' to activate experimental features.",
-	"Pressing ALT when moving the cursor over a term shows some more information.",
-        "Some rules are not available to the user when One-Step-Simplification is turned on.",
-        "You can search for node numbers or rule names in the proof tree view (press CTRL+SHIFT+F).",
-        "Install an SMT solver to help KeY solve problems; CVC3, Simplify, Yices, and Z3 are supported.",
-        "In the right-click menu you can abbreviate terms."
-    };
+    private final static String[] TIPS = getTips();
 
 
+    /**
+     * Randomly select a string
+     */
     public static String get() {
         return TIPS[r.nextInt(TIPS.length)];
     }
 
+    /**
+     * Read strings from file
+     */
+    private static String[] getTips() {
+        String res = "";
+        try {
+            final KeYResourceManager krm = KeYResourceManager.getManager();
+            final URL tipsUrl = krm.getResourceFile(TipOfTheDay.class, "tipsOfTheDay");
+            final InputStream is = new BufferedInputStream(tipsUrl.openStream());
+            int c;
+            while ((c=is.read()) !=-1) {
+                res += (char)c;
+            }
+            return res.split("\n");
+        } catch (IOException e) {
+            return new String[]{""};
+        }
+    }
 
 }
