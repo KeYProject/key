@@ -44,6 +44,7 @@ public final class TipOfTheDay {
             while ((c=is.read()) !=-1) {
                 res += (char)c;
             }
+            is.close();
             return res.split("\n");
         } catch (IOException e) {
             return new String[]{""};
