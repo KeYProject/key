@@ -68,8 +68,6 @@ import de.uka.ilkd.key.util.MiscTools;
  */
 public class ProofSaver {
 
-   //protected IMain main;
-   //protected KeYMediator mediator;
    final protected String filename;
    final protected Proof proof;
    final protected String internalVersion;
@@ -88,17 +86,15 @@ public class ProofSaver {
    private static final EventListenerList listeners = new EventListenerList();
    
    public ProofSaver(Proof proof, String filename, String internalVersion) {
-      //this.main = main;
-      //this.mediator = main.mediator();
       this.filename = filename;
-      this.proof = proof;//mediator.getSelectedProof();
+      this.proof = proof;
       this.internalVersion = internalVersion;
       
    }
 
    public StringBuffer writeLog(Proof p){
     StringBuffer logstr=new StringBuffer();
-    //Advance the Logentries
+    //Advance the Log entries
     if(p.userLog==null)
         p.userLog = new Vector<String>();
     if(p.keyVersionLog==null)
@@ -186,15 +182,11 @@ public class ProofSaver {
           errorMsg = e.toString();
           e.printStackTrace();
       } finally {
-          //try {
 	      if (out != null) out.close();
 	      if (ps != null) {
 		  ps.flush();
 		  ps.close();
-	      }
-          //} catch (IOException ioe) {
-	    //  mediator.notify(new GeneralFailureEvent(ioe.toString()));
-          //}          
+	      }      
       }	  
       return errorMsg; // null if success
    }
@@ -231,7 +223,7 @@ public class ProofSaver {
 
                    // add new relative path
                    final String absPath = tmp.substring(k,j);
-                   final String relPath = MiscTools.makeFilenameRelative(absPath, basePath);
+                   final String relPath = tryToMakeFilenameRelative(absPath, basePath);
                    relPathString = relPathString+" \"" + relPath +"\"";
                    i = j+1;
                }
@@ -244,6 +236,19 @@ public class ProofSaver {
            e.printStackTrace();
        }
        return tmp;
+   }
+   
+   /**
+    * Try to create a relative path, but return the absolute path
+    * if a relative path cannot be found.
+    * This may happen on Windows systems (bug #1480).
+    */
+   private static String tryToMakeFilenameRelative(String absPath, String basePath) {
+       try {
+           return MiscTools.makeFilenameRelative(absPath, basePath);
+       } catch (RuntimeException e) {
+           return absPath;
+       }
    }
 
     private String newNames2Proof(Node n) {
