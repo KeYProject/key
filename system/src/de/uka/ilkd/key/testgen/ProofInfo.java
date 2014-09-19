@@ -28,6 +28,7 @@ public class ProofInfo {
 	public ProofInfo(Proof proof) {
 		this.proof = proof;
 		this.services = proof.getServices();
+		System.out.println("Assignable: "+getAssignable().sort());
 		//getCode();
 	}
 
