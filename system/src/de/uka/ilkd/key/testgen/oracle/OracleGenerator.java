@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.NumberTranslation;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
@@ -28,31 +29,27 @@ public class OracleGenerator {
 	private static int varNum;
 	
 	private HashMap<Operator, String> ops;
-	
-	private OracleConstant constTrue;
-	private OracleConstant constFalse;
-	
+
+
 	private Set<OracleMethod> oracleMethods;
 	
 	private List<OracleVariable> quantifiedVariables;
 	
 	private List<String> prestateTerms;
 	
+	private Map<Sort, OracleMethod> invariants;
+	
 	private static final String PRE_STRING = "pre_";
 	
 	public OracleGenerator(Services services,Map<Sort, String> setNames) {
 		this.services = services;
-		initOps();
-		initConsts();
+		initOps();		
 		oracleMethods = new HashSet<OracleMethod>();
 		quantifiedVariables = new LinkedList<OracleVariable>();
 		prestateTerms = new LinkedList<String>();
+		invariants = new HashMap<Sort, OracleMethod>();
 	}
-	
-	private void initConsts(){
-		constTrue = new OracleConstant("true",services.getTypeConverter().getBooleanType().getSort());
-		constFalse = new OracleConstant("false",services.getTypeConverter().getBooleanType().getSort());		
-	}	
+
 	
 	private void initOps(){
 		ops = new HashMap<Operator,String>();		
@@ -91,11 +88,11 @@ public class OracleGenerator {
 		}
 		//true
 		else if (op == Junctor.TRUE) {
-			return constTrue;
+			return OracleConstant.TRUE;
 		}
 		//false
 		else if (op == Junctor.FALSE) {
-			return constFalse;
+			return OracleConstant.FALSE;
 		}
 		//quantifiable variable
 		else if (op instanceof QuantifiableVariable) {			
@@ -138,10 +135,10 @@ public class OracleGenerator {
 		Function fun = (Function) op;
 		String name = fun.name().toString();
 	    if(isTrueConstant(op)){
-	    	return constTrue;
+	    	return OracleConstant.TRUE;
 	    }
 	    if(isFalseConstant(op)){
-	    	return constFalse;
+	    	return OracleConstant.FALSE;
 	    }
 	    if(term.subs().size() == 0){
 	    	return new OracleConstant(name, term.sort());
@@ -167,7 +164,35 @@ public class OracleGenerator {
 	    	else{
 	    		return new OracleConstant(value, term.sort());
 	    	}	    	
-	    }	    
+	    }
+	    if(name.endsWith("::inv")){
+	    	if(fun instanceof SortDependingFunction){
+	    		SortDependingFunction sdf = (SortDependingFunction) fun;
+	    		Sort s = sdf.getSortDependingOn();
+	    		
+	    		OracleMethod m;
+	    		
+	    		if(invariants.containsKey(s)){
+	    			m = invariants.get(s);
+	    		}
+	    		else{
+	    			//needed for recursive invariants
+	    			m = createDummyInvariant(s);
+	    			invariants.put(s, m);
+	    			
+	    			m = createInvariantMethod(s);
+	    			invariants.put(s, m);
+	    		}
+	    		
+	    		OracleTerm arg = generateOracle(term.sub(0));
+	    		List<OracleTerm> args = new LinkedList<OracleTerm>();
+	    		args.add(arg);
+	    		
+	    		return new OracleTermCall(m, args);
+	    		
+	    		
+	    	}
+	    }
 	    throw new RuntimeException("Unsupported function found: "+fun.name());
     }
 	
@@ -182,6 +207,50 @@ public class OracleGenerator {
 	public static String generateMethodName(){
 		varNum++;
 		return "sub"+varNum;
+	}
+	
+	private String getSortInvName(Sort s){
+		String sortName = s.name().toString();
+		sortName = sortName.replace(".", "");
+		
+		String methodName = "inv_"+sortName;
+		
+		return methodName;
+	}
+	
+	private OracleMethod createDummyInvariant(Sort s){
+		String methodName = getSortInvName(s);
+		
+		List<OracleVariable> args = new LinkedList<OracleVariable>();
+		OracleVariable o = new OracleVariable("o", s);		
+		args.add(o);
+		
+		String body = "return true;";
+		
+		return new OracleMethod(methodName, args, body);
+		
+	}
+	
+	private OracleMethod createInvariantMethod(Sort s){		
+		
+		String methodName = getSortInvName(s);
+		
+		List<OracleVariable> args = new LinkedList<OracleVariable>();
+		OracleVariable o = new OracleVariable("o", s);		
+		args.add(o);
+		
+		OracleInvariantTranslator oit = new OracleInvariantTranslator(services);
+		Term t = oit.getInvariantTerm(s);
+		
+		OracleTerm invTerm = generateOracle(t);
+		
+		String body = "return "+invTerm.toString()+";";
+		
+		return new OracleMethod(methodName, args, body);
+		
+		
+		
+		
 	}
 	
 	private OracleMethod createIfThenElseMethod(Term term){

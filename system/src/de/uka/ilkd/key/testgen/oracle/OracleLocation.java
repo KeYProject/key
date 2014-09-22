@@ -12,6 +12,11 @@ public class OracleLocation {
 		this.object = object;
 		this.field = field;
 	}
+	
+	public OracleLocation(String object){
+		this.object = object;
+		this.field = ALL_FIELDS;
+	}
 
 
 	public String getObject() {

@@ -8,6 +8,9 @@ public class OracleConstant implements OracleTerm {
 	
 	private Sort sort;
 	
+	public static final OracleConstant TRUE = new OracleConstant("true", Sort.FORMULA);
+	public static final OracleConstant FALSE = new OracleConstant("false", Sort.FORMULA);
+	
 	public OracleConstant(String value, Sort sort) {
 		this.value = value;
 		this.sort = sort;
