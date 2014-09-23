@@ -214,7 +214,7 @@ public final class Main {
         CommandLine cl = new CommandLine();
         cl.setIndentation(3);
         cl.addSection("Using KeY");
-        cl.addText("Usage: ./runProver [options] [filename]\n\n", false);
+        cl.addText("Usage: ./key [options] [filename]\n\n", false);
         cl.addSection("Options for the KeY-Prover");
         cl.addOption(HELP, null, "display this text");
         cl.addTextPart("--K-help", "display help for technical/debug parameters\n", true);
