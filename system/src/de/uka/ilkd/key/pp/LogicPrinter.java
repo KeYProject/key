@@ -1244,7 +1244,7 @@ public class LogicPrinter {
                 && fieldTerm.arity() == 0
                 && fieldTerm.boundVars().isEmpty();
     }
-
+  
     /*
      * Print a term of the form: T::select(heap, object, field).
      */

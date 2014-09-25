@@ -143,6 +143,10 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         // TODO
     }
 
+    public void testPrintCreated() throws IOException {
+        parsePrintAndCheckEquality("a.<created>", "boolean::select(heap,a,java.lang.Object::<created>)");
+    }
+
     private void parsePrintAndCheckEquality(String prettySyntax, String verboseSyntax) throws IOException {
         Term expectedParseResult = parseTerm(verboseSyntax);
         parsePrintAndCheckEquality(prettySyntax, expectedParseResult);

@@ -56,7 +56,9 @@ class SelectPrinter {
             } else if (fieldTerm.op() == heapLDT.getArr()) {
                 // array access
                 printSelectArray(heapTerm, objectTerm, fieldTerm, tacitHeap);
-            } else if (lp.isFieldConstant(fieldTerm) && selectGetFieldSort(fieldTerm).equals(t.sort())) {
+            } else if (isSelectOnCreated(fieldTerm, t.sort())) {
+                printCreated(heapTerm, objectTerm, tacitHeap);
+            } else if (lp.isFieldConstant(fieldTerm) && getFieldSort(fieldTerm).equals(t.sort())) {
                 printSelectFieldConstant(objectTerm, fieldTerm, heapLDT, heapTerm, tacitHeap);
             } else {
                 lp.printFunctionTerm(t);
@@ -115,7 +117,7 @@ class SelectPrinter {
     /*
      * Add heap term after a pretty-printed select, using @-Operator.
      */
-    private void printSelectAddHeap(Term heapTerm, Term tacitHeap) throws IOException {
+    private void printHeap(Term heapTerm, Term tacitHeap) throws IOException {
         // print heap term if it is not the standard heap
         if (!heapTerm.equals(tacitHeap)) {
             lp.layouter./*brk(1, -3).*/print("@");
@@ -131,10 +133,10 @@ class SelectPrinter {
         }
     }
 
-    private Sort selectGetFieldSort(Term fieldTerm) {
-        /*
-         * Get sort of selected field.
-         */
+    /*
+     * Get sort of selected field.
+     */
+    private Sort getFieldSort(Term fieldTerm) {
         String lookup = fieldTerm.toString().replace("$", "");
         ProgramVariable progVar = lp.services.getJavaInfo().getAttribute(lookup);
         return progVar.sort();
@@ -171,7 +173,7 @@ class SelectPrinter {
             lp.printTerm(fieldTerm);
             lp.markEndSub();
 
-            printSelectAddHeap(heapTerm, tacitHeap);
+            printHeap(heapTerm, tacitHeap);
         } else {
             // non-static field access
             lp.startTerm(3);
@@ -202,7 +204,7 @@ class SelectPrinter {
                 lp.layouter.print(")");
             }
             lp.markEndSub();
-            printSelectAddHeap(heapTerm, tacitHeap);
+            printHeap(heapTerm, tacitHeap);
         }
     }
 
@@ -218,7 +220,7 @@ class SelectPrinter {
         lp.markStartSub(2);
         lp.printTerm(fieldTerm);
         lp.markEndSub();
-        printSelectAddHeap(heapTerm, tacitHeap);
+        printHeap(heapTerm, tacitHeap);
     }
 
     /*
@@ -241,7 +243,33 @@ class SelectPrinter {
         lp.markEndSub();
         lp.layouter.print("]");
 
-        printSelectAddHeap(heapTerm, tacitHeap);
+        printHeap(heapTerm, tacitHeap);
+    }
+
+    /*
+     * This is used to check whether the <created>-field is targeted by a 
+     * select-term. That means the select-term is similar to the following:
+     * boolean::select( ... , ... , java.lang.Object::<created>)
+     */
+    private boolean isSelectOnCreated(Term fieldTerm, Sort selectSort) {
+        return selectSort.equals(lp.services.getTypeConverter().getBooleanLDT().targetSort())
+                && fieldTerm.toString().equals("java.lang.Object::<created>");
+    }
+
+    /*
+     * Print a select-term, which has the following form: 
+     * boolean::select( ... , ... , java.lang.Object::<created>)
+     */
+    private void printCreated(Term heapTerm, Term objectTerm, Term tacitHeap) throws IOException {
+        lp.startTerm(3);
+        lp.markStartSub(1);
+        lp.printEmbeddedObserver(heapTerm, objectTerm);
+        lp.markEndSub();
+        lp.layouter.print(".");
+        lp.markStartSub(2);
+        lp.printConstant("<created>");
+        lp.markEndSub();
+        printHeap(heapTerm, tacitHeap);
     }
 
 }
