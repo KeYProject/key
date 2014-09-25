@@ -51,15 +51,15 @@ class SelectPrinter {
                         || lp.isFieldConstant(fieldTerm)) {
                     lp.printFunctionTerm(t);
                 } else {
-                    printSelectAny(heapTerm, objectTerm, fieldTerm, tacitHeap);
+                    printAnySelect(heapTerm, objectTerm, fieldTerm, tacitHeap);
                 }
             } else if (fieldTerm.op() == heapLDT.getArr()) {
                 // array access
-                printSelectArray(heapTerm, objectTerm, fieldTerm, tacitHeap);
+                printArraySelect(heapTerm, objectTerm, fieldTerm, tacitHeap);
             } else if (isSelectOnCreated(fieldTerm, t.sort())) {
                 printCreated(heapTerm, objectTerm, tacitHeap);
             } else if (lp.isFieldConstant(fieldTerm) && getFieldSort(fieldTerm).equals(t.sort())) {
-                printSelectFieldConstant(objectTerm, fieldTerm, heapLDT, heapTerm, tacitHeap);
+                printFieldConstantSelect(objectTerm, fieldTerm, heapLDT, heapTerm, tacitHeap);
             } else {
                 lp.printFunctionTerm(t);
             }
@@ -145,7 +145,7 @@ class SelectPrinter {
     /*
      * Print a select on a field constant.
      */
-    private void printSelectFieldConstant(final Term objectTerm, final Term fieldTerm, HeapLDT heapLDT, final Term heapTerm, Term tacitHeap) throws IOException {
+    private void printFieldConstantSelect(final Term objectTerm, final Term fieldTerm, HeapLDT heapLDT, final Term heapTerm, Term tacitHeap) throws IOException {
         if (objectTerm.equals(lp.services.getTermBuilder().NULL())) {
             // static field access
             lp.startTerm(3);
@@ -211,7 +211,7 @@ class SelectPrinter {
     /*
      * Print a term of the form: any::select(heap, object, field).
      */
-    private void printSelectAny(final Term heapTerm, final Term objectTerm, final Term fieldTerm, Term tacitHeap) throws IOException {
+    private void printAnySelect(final Term heapTerm, final Term objectTerm, final Term fieldTerm, Term tacitHeap) throws IOException {
         lp.startTerm(3);
         lp.markStartSub(1);
         lp.printEmbeddedObserver(heapTerm, objectTerm);
@@ -226,7 +226,7 @@ class SelectPrinter {
     /*
      * Print out a select on an array.
      */
-    private void printSelectArray(Term heapTerm, Term objectTerm,
+    private void printArraySelect(Term heapTerm, Term objectTerm,
             Term fieldTerm, Term tacitHeap) throws IOException {
 
         lp.startTerm(3);
