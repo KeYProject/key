@@ -22,7 +22,6 @@ import java.awt.event.KeyEvent;
 import javax.swing.*;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.BoxView;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
 
@@ -35,8 +34,6 @@ public class ViewSelector extends JDialog {
     private static final long serialVersionUID = 5271280688046955444L;
     private JTextField maxTooltipLinesInputField;
     private JCheckBox showWholeTacletCB;
-    //for UsingKeY chapter
-    private JCheckBox showOriginalTacletCB;
 
     /** 
      * creates a new ViewSelector
@@ -65,7 +62,6 @@ public class ViewSelector extends JDialog {
 				.getMaxTooltipLines();
 		boolean showWholeTaclet = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
 				.getShowWholeTaclet();
-		boolean showOriginalTaclet = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowOriginalTaclet();
     	
     	getContentPane().setLayout(new BorderLayout());
 	
@@ -86,13 +82,7 @@ public class ViewSelector extends JDialog {
 	 	showWholeTacletCB = new JCheckBox("pretty-print whole Taclet including "
 				+ "'name', 'find', 'varCond' and 'heuristics'", showWholeTaclet);
 	 	showWholeTacletPanel.add(showWholeTacletCB);
-	 	
-	 	//for original taclet UsingKeY
-	 	JPanel showOriginalTacletPanel = new JPanel();
-	 	showOriginalTacletPanel.setLayout(new BoxLayout(showOriginalTacletPanel, BoxLayout.X_AXIS));
-	 	showOriginalTacletCB = new JCheckBox("print uninstantiated taclet; this option is suitable for learning", showOriginalTaclet);
-	 	showOriginalTacletPanel.add(showOriginalTacletCB);
-	 	//************************//
+	
 	 	JButton okButton = new JButton("OK");
 		okButton.setMnemonic(KeyEvent.VK_ENTER);
 	
@@ -106,8 +96,6 @@ public class ViewSelector extends JDialog {
 			    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setMaxTooltipLines(maxSteps);
 			    boolean ifind = showWholeTacletCB.isSelected();
 			    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setShowWholeTaclet(ifind);
-			    boolean origTac = showOriginalTacletCB.isSelected();
-			    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setShowOriginalTAclet(origTac);
 			    setVisible(false);
                             dispose();
 	 		}
@@ -121,10 +109,8 @@ public class ViewSelector extends JDialog {
 //			    ProofSettings dflt=ProofSettings.DEFAULT_SETTINGS;
 			    ProofIndependentSettings dflt=ProofIndependentSettings.DEFAULT_INSTANCE;
 			    boolean ifind = showWholeTacletCB.isSelected();
-			    boolean origTac = showOriginalTacletCB.isSelected();
 			    dflt.getViewSettings().setMaxTooltipLines(maxSteps);
 			    dflt.getViewSettings().setShowWholeTaclet(ifind);
-			    dflt.getViewSettings().setShowOriginalTAclet(origTac);
 			    //temporary solution, stores more than wanted %%%% 
 			    dflt.saveSettings();
 			    setVisible(false);
@@ -149,7 +135,6 @@ public class ViewSelector extends JDialog {
 							 BoxLayout.Y_AXIS));
 		getContentPane().add(maxLinesPanel);
 		getContentPane().add(showWholeTacletPanel);
-		getContentPane().add(showOriginalTacletPanel);
 		getContentPane().add(buttonPanel);
 	
 		updateButtons();
