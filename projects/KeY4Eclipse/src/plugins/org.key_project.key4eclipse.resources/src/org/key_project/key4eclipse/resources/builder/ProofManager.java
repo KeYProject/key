@@ -731,17 +731,14 @@ public class ProofManager {
          for(Thread thread : threads){
             thread.start();
          }
+         
+         while(threadsAlive(threads)){
+            ObjectUtil.sleep(10);
+         }
       }
       else{
          ProofRunnable run = new ProofRunnable(project, proofElements,proofQueue, environment, monitor);
-         Thread thread = new Thread(run);
-         threads = new Thread[1];
-         threads[0] = thread;
-         thread.start();
-      }
-      
-      while(threadsAlive(threads)){
-         ObjectUtil.sleep(10);
+         run.run();
       }
    }
    
