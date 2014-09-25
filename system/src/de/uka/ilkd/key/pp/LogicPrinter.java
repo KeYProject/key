@@ -363,7 +363,6 @@ public class LogicPrinter {
     public void printTaclet(Taclet taclet,
 	    		    SVInstantiations sv,
                             boolean showWholeTaclet,
-                            boolean showOriginalTaclet,
                             boolean declareSchemaVars) {
 	instantiations = sv;
         quantifiableVariablePrintMode = QuantifiableVariablePrintMode.WITH_OUT_DECLARATION;
@@ -418,7 +417,7 @@ public class LogicPrinter {
      */
     public void printTaclet(Taclet taclet) {
         // the last argument used to be false. Changed that - M.Ulbrich
-        printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true, true, true);
+        printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true, true);
     }
 
     protected void printAttribs(Taclet taclet) throws IOException{
@@ -639,7 +638,7 @@ public class LogicPrinter {
         for (Iterator<Taclet> it = rules.iterator(); it.hasNext();) {
             layouter.brk();
             Taclet t = it.next();
-            printTaclet(t, instantiations, true,true, false);
+            printTaclet(t, instantiations, true, false);
             instantiations = svi;
         }
         layouter.brk(1,-2).print(")").end();
