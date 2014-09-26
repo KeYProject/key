@@ -1003,7 +1003,9 @@ public class LogicPrinter {
         String name = t.op().name().toString();
         if (notationInfo.isPrettySyntax() && services != null && isFieldConstant(t)) {
             startTerm(0);
-            String prettyFieldName = HeapLDT.getPrettyFieldName(t.op());
+            String prettyFieldName = NotationInfo.ENSURE_PARSABILITY
+                    ? t.op().toString()
+                    : HeapLDT.getPrettyFieldName(t.op());
             layouter.print(prettyFieldName);
         }
 
@@ -1165,7 +1167,7 @@ public class LogicPrinter {
                 startTerm(0);
                 printTerm(fieldTerm);
                 markEndSub();
-            } else if(fieldTerm.arity() == 0) {
+            } else if (fieldTerm.arity() == 0) {
                 markStartSub();
                 printTerm(objectTerm);
                 markEndSub();
@@ -1174,9 +1176,16 @@ public class LogicPrinter {
 
                 markStartSub();
                 startTerm(0);
-                printTerm(fieldTerm);
+
+                /* TODO: More sophisticated determination of pretty-syntax, similar
+                 * to select-syntax. Using HeapLDT.getPrettySyntax() here for now,
+                 * as it is current behaviour for KeY.
+                 * 
+                 * (Kai Wallisch 09/2014)
+                 */
+                layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
                 markEndSub();
-            } else if(fieldTerm.op() == heapLDT.getArr()) {
+            } else if (fieldTerm.op() == heapLDT.getArr()) {
                 markStartSub();
                 printTerm(objectTerm);
                 markEndSub();
@@ -1207,6 +1216,11 @@ public class LogicPrinter {
             }
 
         } else {
+            /*
+             * TODO: This is misplaced, since store-term is already partially
+             * printed at this point. Needs refactoring.
+             * (Kai Wallisch 09/2014)
+             */
             printFunctionTerm(t);
         }
     }

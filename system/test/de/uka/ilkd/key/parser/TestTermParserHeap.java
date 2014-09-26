@@ -152,7 +152,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         parsePrintAndCheckEquality("a.<transient>", "int::select(heap,a,java.lang.Object::<transient>)");
 
         // test fallback in case non-default select-type is used
-//        parseAndCheckFallback("int::select(heap,a,java.lang.Object::<created>)");
+        parseAndCheckFallback("int::select(heap,a,java.lang.Object::<created>)");
 
     }
 
