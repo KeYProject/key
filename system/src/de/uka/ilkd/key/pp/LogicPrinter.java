@@ -1165,7 +1165,7 @@ public class LogicPrinter {
                 startTerm(0);
                 printTerm(fieldTerm);
                 markEndSub();
-            } else if(isFieldConstant(fieldTerm)) {
+            } else if(fieldTerm.arity() == 0) {
                 markStartSub();
                 printTerm(objectTerm);
                 markEndSub();
@@ -1174,7 +1174,7 @@ public class LogicPrinter {
 
                 markStartSub();
                 startTerm(0);
-                layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
+                printTerm(fieldTerm);
                 markEndSub();
             } else if(fieldTerm.op() == heapLDT.getArr()) {
                 markStartSub();
