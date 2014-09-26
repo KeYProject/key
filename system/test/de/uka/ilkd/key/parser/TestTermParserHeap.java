@@ -54,21 +54,21 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
         prettySyntax = "a.f";
         verboseSyntax = "int::select(heap, a, testTermParserHeap.A::$f)";
-        parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
+        comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
 
         prettySyntax = "a1.f";
         verboseSyntax = "int::select(heap, a1, testTermParserHeap.A1::$f)";
-        parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
+        comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
 
         prettySyntax = "a1.(testTermParserHeap.A::f)";
         verboseSyntax = "int::select(heap, a1, testTermParserHeap.A::$f)";
-        parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
+        comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
     }
 
     public void testBracketHeapUpdate() throws IOException {
         String prettySyntax = "heap[a.f := 4][create(a)][memset(empty, 1)][anon(allLocs, heap)]";
         String verboseSyntax = "anon(memset(create(store(heap, a, testTermParserHeap.A::$f, 4), a), empty, 1), allLocs, heap)";
-        parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
+        comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
     }
 
     /*
@@ -81,15 +81,15 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
         prettySyntax = "a.f@h";
         verboseSyntax = "int::select(h, a, testTermParserHeap.A::$f)";
-        parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
+        comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
 
         prettySyntax = "a1.f@h";
         verboseSyntax = "int::select(h, a1, testTermParserHeap.A1::$f)";
-        parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
+        comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
 
         prettySyntax = "a1.(testTermParserHeap.A::f)@h";
         verboseSyntax = "int::select(h, a1, testTermParserHeap.A::$f)";
-        parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
+        comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
 
         Term h = parseTerm("h");
         Term a = parseTerm("a");
@@ -99,7 +99,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
         expectedParseResult = getSelectTerm("int", h, expectedParseResult, f);
-        parsePrintAndCheckEquality("a.next.next.next.f@h",
+        compareStringRepresentationAgainstTermRepresentation("a.next.next.next.f@h",
                 expectedParseResult,
                 "(a.next).next.next.f@h",
                 "(a.next.next).next.f@h",
@@ -110,17 +110,17 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h2, expectedParseResult, next);
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
         expectedParseResult = getSelectTerm("int", h, expectedParseResult, f);
-        parsePrintAndCheckEquality("(a.next.next@h2).next.f@h", expectedParseResult);
+        compareStringRepresentationAgainstTermRepresentation("(a.next.next@h2).next.f@h", expectedParseResult);
 
         Term aDotF = getSelectTerm("int", tb.getBaseHeap(), a, f); // a.f
         Term aDotArray = getSelectTerm("int[]", h, a, parseTerm("testTermParserHeap.A::$array")); // a.array
         expectedParseResult = getSelectTerm("int", h, aDotArray, tb.arr(aDotF));
-        parsePrintAndCheckEquality("a.array[a.f]@h", expectedParseResult);
+        compareStringRepresentationAgainstTermRepresentation("a.array[a.f]@h", expectedParseResult);
 
         expectedParseResult = getSelectTerm("testTermParserHeap.A", tb.getBaseHeap(), a, next);
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
         expectedParseResult = getSelectTerm("int", h, expectedParseResult, f);
-        parsePrintAndCheckEquality("(a.next@heap).next.f@h",
+        compareStringRepresentationAgainstTermRepresentation("(a.next@heap).next.f@h",
                 expectedParseResult,
                 "((a.next@heap)).next.f@h");
     }
@@ -153,62 +153,82 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
     public void testGenericObjectProperties() throws IOException {
         // test pretty syntax
-        parsePrintAndCheckEquality("a.<created>", "boolean::select(heap,a,java.lang.Object::<created>)");
-        parsePrintAndCheckEquality("a.<initialized>", "boolean::select(heap,a,java.lang.Object::<initialized>)");
-        parsePrintAndCheckEquality("a.<transient>", "int::select(heap,a,java.lang.Object::<transient>)");
+        comparePrettySyntaxAgainstVerboseSyntax("a.<created>", "boolean::select(heap,a,java.lang.Object::<created>)");
+        comparePrettySyntaxAgainstVerboseSyntax("a.<initialized>", "boolean::select(heap,a,java.lang.Object::<initialized>)");
+        comparePrettySyntaxAgainstVerboseSyntax("a.<transient>", "int::select(heap,a,java.lang.Object::<transient>)");
 
         // test fallback mode in case non-default select-type is used
-        String verboseSyntax = "int::select(heap,a,java.lang.Object::<created>)";
-        Term parsedVerboseSyntax = parseTerm(verboseSyntax);
-        String printedSyntax = printTerm(parsedVerboseSyntax);
-        compareIgnoreWhitespaces(verboseSyntax, printedSyntax);
+        parseAndPrint("int::select(heap,a,java.lang.Object::<created>)");
 
     }
 
-    /*
-     * Remove whitespaces before comparing two Strings.
+    /**
+     * Remove whitespaces before executing
+     * {@link junit.framework.TestCase#assertEquals(java.lang.String, java.lang.String)}.
      */
-    private void compareIgnoreWhitespaces(String expected, String actual) {
+    private void assertEqualsIgnoreWhitespaces(String expected, String actual) {
         assertEquals(expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""));
     }
 
-    /*
-     * Create a LogicPrinter instance, print a term and return the
-     * String representation of that term.
+    /**
+     * Convert a {@link Term} into a {@link String}.
+     *
+     * @param t The {@link Term} that will be converted.
      */
-    String printTerm(Term t) throws IOException {
+    private String printTerm(Term t) throws IOException {
         LogicPrinter lp = new LogicPrinter(services);
         lp.printTerm(t);
         return lp.toString();
     }
 
-    private void parsePrintAndCheckEquality(String prettySyntax, String verboseSyntax) throws IOException {
-        Term expectedParseResult = parseTerm(verboseSyntax);
-        parsePrintAndCheckEquality(prettySyntax, expectedParseResult);
+    /**
+     * Test whether printing is inverse to parsing on a specific {@link String}.
+     *
+     * @param s Pretty-printed String representation of a term.
+     * @throws IOException
+     */
+    private void parseAndPrint(String s) throws IOException {
+        Term t = parseTerm(s);
+        String printedSyntax = printTerm(t);
+        assertEqualsIgnoreWhitespaces(s, printedSyntax);
     }
 
     /**
-     * Test for a specific input whether parsing and printing are inverse to
-     * each other.
+     * Takes two different String representations for the same term and checks
+     * whether they result in the same {@link Term} after parsing. Subsequently,
+     * the {@link Term} is printed back to a {@link String} and compared with
+     * the first argument. The first argument is expected to be in
+     * pretty-syntax.
      *
-     * @param expectedPrettySyntax This is the expected result after printing
+     * @param prettySyntax {@link Term} representation in pretty-syntax.
+     * @param verboseSyntax {@link Term} in verbose syntax.
+     * @throws IOException
+     */
+    private void comparePrettySyntaxAgainstVerboseSyntax(String prettySyntax, String verboseSyntax) throws IOException {
+        Term expectedParseResult = parseTerm(verboseSyntax);
+        compareStringRepresentationAgainstTermRepresentation(prettySyntax, expectedParseResult);
+    }
+
+    /**
+     * Takes a {@link String} and a {@link Term} and checks whether they can be
+     * transformed into each other by the operations parsing and printing.
+     *
+     * @param expectedPrettySyntax Expected result after pretty-printing
      * {@code expectedParseResult}.
-     * @param expectedParseResult This is the expected result after parsing
+     * @param expectedParseResult Expected result after parsing
      * {@code expectedPrettySyntax}.
      * @param optionalStringRepresentations Optionally, additional String
-     * representations can be checked for the desired input as well.
-     * @throws IOException This does not make sense at all here. It should be
-     * removed. See class {@link de.uka.ilkd.key.util.pp.WriterBackend} for
-     * further information.
+     * representations will be tested for correct parsing.
+     * @throws IOException
      */
-    private void parsePrintAndCheckEquality(String expectedPrettySyntax, Term expectedParseResult,
+    private void compareStringRepresentationAgainstTermRepresentation(String expectedPrettySyntax, Term expectedParseResult,
             String... optionalStringRepresentations) throws IOException {
         Term parsedPrettySyntax = parseTerm(expectedPrettySyntax);
         assertEquals(expectedParseResult, parsedPrettySyntax);
 
         String printedSyntax = printTerm(expectedParseResult);
         // compare the string representations, but remove whitespaces
-        compareIgnoreWhitespaces(expectedPrettySyntax, printedSyntax);
+        assertEqualsIgnoreWhitespaces(expectedPrettySyntax, printedSyntax);
 
         // parse printed term again and see if result is still the same
         Term parsedPrintedSyntax = parseTerm(printedSyntax);
