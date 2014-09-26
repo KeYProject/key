@@ -161,8 +161,15 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         String verboseSyntax = "int::select(heap,a,java.lang.Object::<created>)";
         Term parsedVerboseSyntax = parseTerm(verboseSyntax);
         String printedSyntax = printTerm(parsedVerboseSyntax);
-        assertEquals(verboseSyntax.replaceAll("\\s+", ""), printedSyntax.replaceAll("\\s+", ""));
+        compareIgnoreWhitespaces(verboseSyntax, printedSyntax);
 
+    }
+
+    /*
+     * Remove whitespaces before comparing two Strings.
+     */
+    private void compareIgnoreWhitespaces(String expected, String actual) {
+        assertEquals(expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""));
     }
 
     /*
@@ -201,7 +208,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
         String printedSyntax = printTerm(expectedParseResult);
         // compare the string representations, but remove whitespaces
-        assertEquals(expectedPrettySyntax.replaceAll("\\s+", ""), printedSyntax.replaceAll("\\s+", ""));
+        compareIgnoreWhitespaces(expectedPrettySyntax, printedSyntax);
 
         // parse printed term again and see if result is still the same
         Term parsedPrintedSyntax = parseTerm(printedSyntax);
