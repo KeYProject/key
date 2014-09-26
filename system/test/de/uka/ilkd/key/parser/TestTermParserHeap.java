@@ -139,8 +139,10 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         }
     }
 
-    public void testQuantifiedSelect() {
-        // TODO
+    public void testQuantifiedSelect() throws IOException {
+        Term t = parseFormula("\\forall Object o; \\forall Field f; o.f = 1");
+        String s = printTerm(t);
+        System.out.println(s);
     }
 
     public void testPrintCreated() throws IOException {
@@ -150,6 +152,16 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     private void parsePrintAndCheckEquality(String prettySyntax, String verboseSyntax) throws IOException {
         Term expectedParseResult = parseTerm(verboseSyntax);
         parsePrintAndCheckEquality(prettySyntax, expectedParseResult);
+    }
+
+    /*
+     * Create a LogicPrinter instance, print a term and return the
+     * String representation of that term.
+     */
+    String printTerm(Term t) throws IOException {
+        LogicPrinter lp = new LogicPrinter(services);
+        lp.printTerm(t);
+        return lp.toString();
     }
 
     /**
@@ -171,15 +183,17 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         Term parsedPrettySyntax = parseTerm(expectedPrettySyntax);
         assertEquals(parsedPrettySyntax, expectedParseResult);
 
-        LogicPrinter lp = new LogicPrinter(services);
-        lp.printTerm(expectedParseResult);
-        String printedSyntax = lp.toString();
-        Term parsedPrintedSyntax = parseTerm(printedSyntax);
-        assertEquals(parsedPrintedSyntax, expectedParseResult);
-
+        String printedSyntax = printTerm(expectedParseResult);
         // compare the string representations, but remove whitespaces
         assertEquals(expectedPrettySyntax.replaceAll("\\s+", ""), printedSyntax.replaceAll("\\s+", ""));
 
+        // parse printed term again and see if result is still the same
+        Term parsedPrintedSyntax = parseTerm(printedSyntax);
+        assertEquals(parsedPrintedSyntax, expectedParseResult);
+
+        /*
+         * Optionally, further string representations of the same term will be parsed here.
+         */
         for (int i = 0; i < optionalStringRepresentations.length; i++) {
             assertEquals(parseTerm(optionalStringRepresentations[i]), expectedParseResult);
         }
