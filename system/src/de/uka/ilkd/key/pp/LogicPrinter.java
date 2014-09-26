@@ -1251,7 +1251,7 @@ public class LogicPrinter {
      */
     protected boolean isFieldConstant(final Term fieldTerm) {
         assert services != null;
-        String s = ((Function) fieldTerm.op()).name().toString();
+        String s = fieldTerm.op().name().toString();
         return (s.contains("::$") || s.contains("::<"))
                 && fieldTerm.op() instanceof Function
                 && ((Function) fieldTerm.op()).isUnique()

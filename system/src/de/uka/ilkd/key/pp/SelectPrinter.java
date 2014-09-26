@@ -266,14 +266,15 @@ class SelectPrinter {
 
         JavaInfo javaInfo = lp.services.getJavaInfo();
         KeYJavaType selectKJT = javaInfo.getKeYJavaType(t.sort());
+        KeYJavaType objectKJT = javaInfo.getKeYJavaType(objectTerm.sort());
 
-        if (selectKJT != null) {
+        if (selectKJT != null && objectKJT != null) {
+
             assert fieldTerm.op().name().toString().contains("::<");
             String prettyFieldName = HeapLDT.getPrettyFieldName(fieldTerm.op());
-            KeYJavaType objectKJT = javaInfo.getKeYJavaType(objectTerm.sort());
             ProgramVariable pv = javaInfo.getCanonicalFieldProgramVariable(prettyFieldName, objectKJT);
 
-            if (pv.sort().equals(t.sort())) {
+            if (pv != null && pv.sort().equals(t.sort())) {
                 lp.startTerm(3);
                 lp.markStartSub(1);
                 lp.printEmbeddedObserver(heapTerm, objectTerm);
