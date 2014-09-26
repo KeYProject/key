@@ -140,7 +140,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     public void testQuantifiedSelect() throws IOException {
-//        Term t = parseFormula("\\forall Object o; \\forall Field f; o.f = 1");
+        Term t = parseFormula("\\forall Object o; \\forall Field f; o.f = 1");
 //        String s = printTerm(t);
 //        System.out.println(s);
 //        String verboseSyntax = "\\forall Field f; any::select(heap,a,f) = int::select(heap,a,testTermParserHeap.A::$f)";

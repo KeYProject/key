@@ -841,10 +841,16 @@ options {
                 if(!isDeclParser()) {			      	
                     ProgramVariable var = javaInfo.getCanonicalFieldProgramVariable(attributeName, prefixKJT);
                     if (var == null) {
-                        semanticError("There is no attribute '" + attributeName + 
-                            "' declared in type '" + prefixSort + "'");
+                        LogicVariable logicalvar = (LogicVariable)namespaces().variables().lookup(attributeName);
+                        if(logicalvar == null) {
+                            semanticError("There is no attribute '" + attributeName + 
+                                "' declared in type '" + prefixSort + "' and no logical variable of that name.");
+	                    } else {
+	                        result = logicalvar;
+                        }
+                    } else {
+                        result = var;
                     }
-                    result = var;
                 }
             }
         }
@@ -875,12 +881,15 @@ options {
                                            prefix, 
                                            getTermFactory().createTerm(attribute));
         } else {
-            ProgramVariable pv = (ProgramVariable) attribute;
-            if(pv instanceof ProgramConstant) {
-                result = getTermFactory().createTerm(pv);
-            } else if(pv == getServices().getJavaInfo().getArrayLength()) {
+	            if(attribute instanceof LogicVariable) {
+	                Term attrTerm = getTermFactory().createTerm(attribute);
+	                result = getServices().getTermBuilder().dot(Sort.ANY, result, attrTerm);
+	            } else if(attribute instanceof ProgramConstant) {
+                result = getTermFactory().createTerm(attribute);
+            } else if(attribute == getServices().getJavaInfo().getArrayLength()) {
                 result = getServices().getTermBuilder().dotLength(result);
             } else {
+	            ProgramVariable pv = (ProgramVariable) attribute;
             	Function fieldSymbol 
             		= getServices().getTypeConverter()
             		               .getHeapLDT()
