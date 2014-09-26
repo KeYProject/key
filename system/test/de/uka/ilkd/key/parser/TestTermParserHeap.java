@@ -143,6 +143,12 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 //        Term t = parseFormula("\\forall Object o; \\forall Field f; o.f = 1");
 //        String s = printTerm(t);
 //        System.out.println(s);
+//        String verboseSyntax = "\\forall Field f; any::select(heap,a,f) = int::select(heap,a,testTermParserHeap.A::$f)";
+//        String prettySyntax = "\\forall Field f; any::select(heap, a, f) = a.f";
+//        parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
+//        Term t = parseTerm("\\forall Field f; any::select(heap,a,f) = a.f");
+//        System.out.println(t);
+//        System.out.println(printTerm(t));
     }
 
     public void testGenericObjectProperties() throws IOException {
@@ -151,8 +157,11 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         parsePrintAndCheckEquality("a.<initialized>", "boolean::select(heap,a,java.lang.Object::<initialized>)");
         parsePrintAndCheckEquality("a.<transient>", "int::select(heap,a,java.lang.Object::<transient>)");
 
-        // test fallback in case non-default select-type is used
-        parseAndCheckFallback("int::select(heap,a,java.lang.Object::<created>)");
+        // test fallback mode in case non-default select-type is used
+        String verboseSyntax = "int::select(heap,a,java.lang.Object::<created>)";
+        Term parsedVerboseSyntax = parseTerm(verboseSyntax);
+        String printedSyntax = printTerm(parsedVerboseSyntax);
+        assertEquals(verboseSyntax.replaceAll("\\s+", ""), printedSyntax.replaceAll("\\s+", ""));
 
     }
 
@@ -164,16 +173,6 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         LogicPrinter lp = new LogicPrinter(services);
         lp.printTerm(t);
         return lp.toString();
-    }
-
-    /*
-     * Create a term from a String and check whether printing the term results
-     * in the original String again.
-     */
-    private void parseAndCheckFallback(String verboseSyntax) throws IOException {
-        Term parsedVerboseSyntax = parseTerm(verboseSyntax);
-        String printedSyntax = printTerm(parsedVerboseSyntax);
-        assertEquals(verboseSyntax.replaceAll("\\s+", ""), printedSyntax.replaceAll("\\s+", ""));
     }
 
     private void parsePrintAndCheckEquality(String prettySyntax, String verboseSyntax) throws IOException {
