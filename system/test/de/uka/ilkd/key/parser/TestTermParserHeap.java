@@ -140,18 +140,20 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     public void testQuantifiedSelect() throws IOException {
-        Term t = parseFormula("\\forall Object o; \\forall Field f; o.f = 1");
-        String s = printTerm(t);
-        System.out.println(s);
+//        Term t = parseFormula("\\forall Object o; \\forall Field f; o.f = 1");
+//        String s = printTerm(t);
+//        System.out.println(s);
     }
 
-    public void testPrintCreated() throws IOException {
+    public void testGenericObjectProperties() throws IOException {
+        // test pretty syntax
         parsePrintAndCheckEquality("a.<created>", "boolean::select(heap,a,java.lang.Object::<created>)");
-    }
+        parsePrintAndCheckEquality("a.<initialized>", "boolean::select(heap,a,java.lang.Object::<initialized>)");
+        parsePrintAndCheckEquality("a.<transient>", "int::select(heap,a,java.lang.Object::<transient>)");
 
-    private void parsePrintAndCheckEquality(String prettySyntax, String verboseSyntax) throws IOException {
-        Term expectedParseResult = parseTerm(verboseSyntax);
-        parsePrintAndCheckEquality(prettySyntax, expectedParseResult);
+        // test fallback in case non-default select-type is used
+//        parseAndCheckFallback("int::select(heap,a,java.lang.Object::<created>)");
+
     }
 
     /*
@@ -162,6 +164,21 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         LogicPrinter lp = new LogicPrinter(services);
         lp.printTerm(t);
         return lp.toString();
+    }
+
+    /*
+     * Create a term from a String and check whether printing the term results
+     * in the original String again.
+     */
+    private void parseAndCheckFallback(String verboseSyntax) throws IOException {
+        Term parsedVerboseSyntax = parseTerm(verboseSyntax);
+        String printedSyntax = printTerm(parsedVerboseSyntax);
+        assertEquals(verboseSyntax.replaceAll("\\s+", ""), printedSyntax.replaceAll("\\s+", ""));
+    }
+
+    private void parsePrintAndCheckEquality(String prettySyntax, String verboseSyntax) throws IOException {
+        Term expectedParseResult = parseTerm(verboseSyntax);
+        parsePrintAndCheckEquality(prettySyntax, expectedParseResult);
     }
 
     /**
@@ -181,7 +198,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     private void parsePrintAndCheckEquality(String expectedPrettySyntax, Term expectedParseResult,
             String... optionalStringRepresentations) throws IOException {
         Term parsedPrettySyntax = parseTerm(expectedPrettySyntax);
-        assertEquals(parsedPrettySyntax, expectedParseResult);
+        assertEquals(expectedParseResult, parsedPrettySyntax);
 
         String printedSyntax = printTerm(expectedParseResult);
         // compare the string representations, but remove whitespaces
@@ -189,13 +206,13 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
         // parse printed term again and see if result is still the same
         Term parsedPrintedSyntax = parseTerm(printedSyntax);
-        assertEquals(parsedPrintedSyntax, expectedParseResult);
+        assertEquals(expectedParseResult, parsedPrintedSyntax);
 
         /*
          * Optionally, further string representations of the same term will be parsed here.
          */
         for (int i = 0; i < optionalStringRepresentations.length; i++) {
-            assertEquals(parseTerm(optionalStringRepresentations[i]), expectedParseResult);
+            assertEquals(expectedParseResult, parseTerm(optionalStringRepresentations[i]));
         }
     }
 

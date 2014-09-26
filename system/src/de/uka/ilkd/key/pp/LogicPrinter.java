@@ -1237,9 +1237,10 @@ public class LogicPrinter {
      */
     protected boolean isFieldConstant(final Term fieldTerm) {
         assert services != null;
-        return fieldTerm.op() instanceof Function
+        String s = ((Function) fieldTerm.op()).name().toString();
+        return (s.contains("::$") || s.contains("::<"))
+                && fieldTerm.op() instanceof Function
                 && ((Function) fieldTerm.op()).isUnique()
-                && ((Function) fieldTerm.op()).name().toString().contains("::$")
                 && fieldTerm.sort() == services.getTypeConverter().getHeapLDT().getFieldSort()
                 && fieldTerm.arity() == 0
                 && fieldTerm.boundVars().isEmpty();

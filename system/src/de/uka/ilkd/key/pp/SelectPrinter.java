@@ -56,10 +56,14 @@ class SelectPrinter {
             } else if (fieldTerm.op() == heapLDT.getArr()) {
                 // array access
                 printArraySelect(heapTerm, objectTerm, fieldTerm, tacitHeap);
-            } else if (isSelectOnCreated(fieldTerm, t.sort())) {
-                printCreated(heapTerm, objectTerm, tacitHeap);
-            } else if (lp.isFieldConstant(fieldTerm) && getFieldSort(fieldTerm).equals(t.sort())) {
-                printFieldConstantSelect(objectTerm, fieldTerm, heapLDT, heapTerm, tacitHeap);
+            } else if (lp.isFieldConstant(fieldTerm)) {
+                if (((Function) fieldTerm.op()).name().toString().contains("::<")) {
+                    printGenericObjectProperty(t, heapTerm, objectTerm, fieldTerm, tacitHeap);
+                } else if (getFieldSort(fieldTerm).equals(t.sort())) {
+                    printFieldConstant(objectTerm, fieldTerm, heapLDT, heapTerm, tacitHeap);
+                } else {
+                    lp.printFunctionTerm(t);
+                }
             } else {
                 lp.printFunctionTerm(t);
             }
@@ -145,7 +149,7 @@ class SelectPrinter {
     /*
      * Print a select on a field constant.
      */
-    private void printFieldConstantSelect(final Term objectTerm, final Term fieldTerm, HeapLDT heapLDT, final Term heapTerm, Term tacitHeap) throws IOException {
+    private void printFieldConstant(final Term objectTerm, final Term fieldTerm, HeapLDT heapLDT, final Term heapTerm, Term tacitHeap) throws IOException {
         if (objectTerm.equals(lp.services.getTermBuilder().NULL())) {
             // static field access
             lp.startTerm(3);
@@ -253,29 +257,41 @@ class SelectPrinter {
     }
 
     /*
-     * This is used to check whether the <created>-field is targeted by a 
-     * select-term. That means the select-term is similar to the following:
-     * boolean::select( ... , ... , java.lang.Object::<created>)
+     * Print a select-term of the following form: 
+     *      T::select( ... , ... , java.lang.Object::<...>)
+     * For example:
+     *      boolean::select(heap, object, java.lang.Object::<created>)
      */
-    private boolean isSelectOnCreated(Term fieldTerm, Sort selectSort) {
-        return selectSort.equals(lp.services.getTypeConverter().getBooleanLDT().targetSort())
-                && fieldTerm.toString().equals("java.lang.Object::<created>");
-    }
+    private void printGenericObjectProperty(Term t, Term heapTerm, Term objectTerm, Term fieldTerm, Term tacitHeap) throws IOException {
 
-    /*
-     * Print a select-term, which has the following form: 
-     * boolean::select( ... , ... , java.lang.Object::<created>)
-     */
-    private void printCreated(Term heapTerm, Term objectTerm, Term tacitHeap) throws IOException {
-        lp.startTerm(3);
-        lp.markStartSub(1);
-        lp.printEmbeddedObserver(heapTerm, objectTerm);
-        lp.markEndSub();
-        lp.layouter.print(".");
-        lp.markStartSub(2);
-        lp.printConstant("<created>");
-        lp.markEndSub();
-        printHeap(heapTerm, tacitHeap);
+        JavaInfo javaInfo = lp.services.getJavaInfo();
+        KeYJavaType selectKJT = javaInfo.getKeYJavaType(t.sort());
+
+        if (selectKJT != null) {
+            assert fieldTerm.op().name().toString().contains("::<");
+            String prettyFieldName = HeapLDT.getPrettyFieldName(fieldTerm.op());
+            KeYJavaType objectKJT = javaInfo.getKeYJavaType(objectTerm.sort());
+            ProgramVariable pv = javaInfo.getCanonicalFieldProgramVariable(prettyFieldName, objectKJT);
+
+            if (pv.sort().equals(t.sort())) {
+                lp.startTerm(3);
+                lp.markStartSub(1);
+                lp.printEmbeddedObserver(heapTerm, objectTerm);
+                lp.markEndSub();
+                lp.layouter.print(".");
+                lp.markStartSub(2);
+                lp.printConstant(prettyFieldName);
+                lp.markEndSub();
+                printHeap(heapTerm, tacitHeap);
+            } else {
+                // In case field sort is not equal to select sort, use generic fallback.
+                lp.printFunctionTerm(t);
+            }
+
+        } else {
+            // In case select sort is no KeYJavaType, use generic fallback.
+            lp.printFunctionTerm(t);
+        }
     }
 
 }
