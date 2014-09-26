@@ -235,8 +235,14 @@ class SelectPrinter {
         lp.markEndSub();
 
         lp.layouter.print("[");
-        lp.markStartSub();
-        lp.startTerm(2);
+        lp.markStartSub(2);
+
+        /*
+         * Used to be startTerm(2).
+         * Changed it to startTerm(1) because array has only 1 argument.
+         * (Kai Wallisch 09/2014)
+         */
+        lp.startTerm(1);
         lp.markStartSub();
         lp.printTerm(fieldTerm.sub(0));
         lp.markEndSub();
