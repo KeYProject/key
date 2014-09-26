@@ -140,15 +140,19 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     public void testQuantifiedSelect() throws IOException {
-        Term t = parseFormula("\\forall Object o; \\forall Field f; o.f = 1");
-//        String s = printTerm(t);
-//        System.out.println(s);
-//        String verboseSyntax = "\\forall Field f; any::select(heap,a,f) = int::select(heap,a,testTermParserHeap.A::$f)";
-//        String prettySyntax = "\\forall Field f; any::select(heap, a, f) = a.f";
-//        parsePrintAndCheckEquality(prettySyntax, verboseSyntax);
-//        Term t = parseTerm("\\forall Field f; any::select(heap,a,f) = a.f");
-//        System.out.println(t);
-//        System.out.println(printTerm(t));
+        String quantification = "\\forall java.lang.Object o; \\forall Field f; o.f = 1";
+        String expectedToString = "all{o:java.lang.Object}(all{f:Field}(equals(any::select(heap,o,f),Z(1(#)))))";
+        comparePrettyPrintAgainstToString(quantification, expectedToString);
+
+        quantification = "\\forall Field f; a.f = any::select(heap, a, f)";
+        expectedToString = "all{f:Field}(equals(int::select(heap,a,testTermParserHeap.A::$f),any::select(heap,a,f)))";
+        comparePrettyPrintAgainstToString(quantification, expectedToString);
+    }
+
+    private void comparePrettyPrintAgainstToString(String quantification, String expectedToString) throws IOException {
+        Term t = parseTerm(quantification);
+        assertEquals(expectedToString, t.toString());
+        assertEqualsIgnoreWhitespaces(quantification, printTerm(t));
     }
 
     public void testGenericObjectProperties() throws IOException {

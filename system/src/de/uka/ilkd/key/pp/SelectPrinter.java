@@ -47,7 +47,7 @@ class SelectPrinter {
                  * This section deals with PP of frame conditions (and similar).
                  * Select-type is any.
                  */
-                if (isFieldName(fieldTerm.op().toString(), objectTerm)
+                if (isFieldName(fieldTerm.op().name().toString(), objectTerm)
                         || lp.isFieldConstant(fieldTerm)) {
                     lp.printFunctionTerm(t);
                 } else {
