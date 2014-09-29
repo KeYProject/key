@@ -157,8 +157,9 @@ public final class NotationInfo {
      * required to be parsable. If set to true, every LogicPrinter should be
      * parseable.
      * 
-     * It is planned to add a GUI option that enables the user to toggle this.
-     * For now, it is only for testing on branch wallischKeYParser
+     * So far, this is only used once in LogicPrinter - a GUI option does
+     * not seem necessary yet.
+     * 
      * (Kai Wallisch 09/2014)
      */
     static boolean ENSURE_PARSABILITY = true;
