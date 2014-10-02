@@ -574,9 +574,8 @@ public final class JavaInfo {
 	ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
 	KeYJavaType clType = getTypeByClassName(className);
 	for(int i=0; i < args.length; i++) {
-        sig = sig.append(getServices().getTypeConverter()
-                .getKeYJavaType(args[i]));
-	}	
+	    sig = sig.append(getServices().getJavaInfo().getKeYJavaType(args[i].sort()));
+	}
 	IProgramMethod pm   = getProgramMethod(clType, methodName, sig, clType);
 	if(pm == null) {
 	    throw new IllegalArgumentException("Program method "+methodName

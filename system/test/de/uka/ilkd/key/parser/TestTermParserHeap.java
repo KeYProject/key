@@ -6,7 +6,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
-import static de.uka.ilkd.key.parser.KeYParserF.noHeapExpressionBeforeAtExceptionMessage;
+import static de.uka.ilkd.key.parser.KeYParserF.NO_HEAP_EXPRESSION_BEFOE_AT_EXCEPTION_MESSAGE;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import java.io.IOException;
@@ -32,6 +32,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     @Override
     public void setUp() {
         parseDecls("\\programVariables {Heap h, h2;}");
+        parseDecls("\\programVariables {int i;}");
         parseDecls("\\programVariables {testTermParserHeap.A a;}");
         parseDecls("\\programVariables {testTermParserHeap.A1 a1;}");
     }
@@ -117,6 +118,11 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         expectedParseResult = getSelectTerm("int", h, aDotArray, tb.arr(aDotF));
         compareStringRepresentationAgainstTermRepresentation("a.array[a.f]@h", expectedParseResult);
 
+        aDotF = getSelectTerm("int", h, a, f); // a.f
+        aDotArray = getSelectTerm("int[]", tb.getBaseHeap(), a, parseTerm("testTermParserHeap.A::$array")); // a.array
+        expectedParseResult = getSelectTerm("int", tb.getBaseHeap(), aDotArray, tb.arr(aDotF));
+        compareStringRepresentationAgainstTermRepresentation("a.array[a.f@h]", expectedParseResult);
+
         expectedParseResult = getSelectTerm("testTermParserHeap.A", tb.getBaseHeap(), a, next);
         expectedParseResult = getSelectTerm("testTermParserHeap.A", h, expectedParseResult, next);
         expectedParseResult = getSelectTerm("int", h, expectedParseResult, f);
@@ -135,7 +141,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
             stringTermParser("(a.f + a.f)@h2").term();
             fail();
         } catch (Exception e) {
-            assertTrue(e.getMessage().contains(noHeapExpressionBeforeAtExceptionMessage));
+            assertTrue(e.getMessage().contains(NO_HEAP_EXPRESSION_BEFOE_AT_EXCEPTION_MESSAGE));
         }
     }
 
@@ -147,6 +153,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         quantification = "\\forall Field f; a.f = any::select(heap, a, f)";
         expectedToString = "all{f:Field}(equals(int::select(heap,a,testTermParserHeap.A::$f),any::select(heap,a,f)))";
         comparePrettyPrintAgainstToString(quantification, expectedToString);
+
     }
 
     private void comparePrettyPrintAgainstToString(String quantification, String expectedToString) throws IOException {
@@ -164,6 +171,53 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         // test fallback mode in case non-default select-type is used
         parseAndPrint("int::select(heap,a,java.lang.Object::<created>)");
 
+    }
+
+    public void testQueries() throws Exception {
+        comparePrettySyntaxAgainstVerboseSyntax("a.query(i)", "testTermParserHeap.A::query(heap, a, i)");
+        comparePrettySyntaxAgainstVerboseSyntax("a.query(i)@h", "testTermParserHeap.A::query(h, a, i)");
+        comparePrettySyntaxAgainstVerboseSyntax("a.query(a.f)@h", "testTermParserHeap.A::query(h, a, " +
+                "int::select(heap, a, testTermParserHeap.A::$f))");
+
+        comparePrettySyntaxAgainstVerboseSyntax("a.next.query(a.f)@h", "testTermParserHeap.A::query(h, " +
+                "testTermParserHeap.A::select(h, a, testTermParserHeap.A::$next),  " +
+                "int::select(heap, a, testTermParserHeap.A::$f))");
+
+        comparePrettySyntaxAgainstVerboseSyntax("a.getNext().getNext()@h", "testTermParserHeap.A::getNext(h, " +
+                "testTermParserHeap.A::getNext(h, a))");
+
+        comparePrettySyntaxAgainstVerboseSyntax("a.getNext().next@h", "testTermParserHeap.A::select(h, " +
+                "testTermParserHeap.A::getNext(h, a), testTermParserHeap.A::$next)");
+
+        comparePrettySyntaxAgainstVerboseSyntax("(a.getNext()@h2).next@h", "testTermParserHeap.A::select(h, " +
+                "testTermParserHeap.A::getNext(h2, a), testTermParserHeap.A::$next)");
+
+        comparePrettySyntaxAgainstVerboseSyntax("(a.getNext()@heap).next@h", "testTermParserHeap.A::select(h, " +
+                "testTermParserHeap.A::getNext(heap, a), testTermParserHeap.A::$next)");
+
+        comparePrettySyntaxAgainstVerboseSyntax("(a.next@heap).getNext()@h", "testTermParserHeap.A::getNext(h, " +
+                "testTermParserHeap.A::select(heap, a, testTermParserHeap.A::$next))");
+    }
+
+    public void testQueriesInheritance() throws Exception {
+        compareStringRepresentationAgainstTermRepresentation("a.query(i)",
+                parseTerm("testTermParserHeap.A::query(heap, a, i)"),
+                "a.(testTermParserHeap.A::query)(i)");
+
+
+        compareStringRepresentationAgainstTermRepresentation("a1.query(i)",
+                parseTerm("testTermParserHeap.A::query(heap, a1, i)"),
+                "a1.(testTermParserHeap.A::query)(i)");
+
+        compareStringRepresentationAgainstTermRepresentation("a1.queryRedefined()",
+                parseTerm("testTermParserHeap.A1::queryRedefined(heap, a1)"),
+                "a1.(testTermParserHeap.A1::queryRedefined)()");
+
+//        compareStringRepresentationAgainstTermRepresentation("a1.(testTermParserHeap.A::queryRedefined)()",
+//                parseTerm("testTermParserHeap.A::queryRedefined(heap, a1)"));
+
+//        compareStringRepresentationAgainstTermRepresentation("a1.queryOverridden()",
+//                parseTerm("testTermParserHeap.A::queryOverridden(heap, a1)"));
     }
 
     /**

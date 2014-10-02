@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.JavaReader;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.Taclet;
 import org.antlr.runtime.RecognitionException;
@@ -38,24 +39,41 @@ public class KeYParserF extends KeYParser {
     private boolean isImplicitHeap(Term t) {
         return getServices().getTermBuilder().getBaseHeap().equals(t);
     }
-    
+
     // This is also used in TestTermParserHeap.java
-    public static final String noHeapExpressionBeforeAtExceptionMessage =
+    public static final String NO_HEAP_EXPRESSION_BEFOE_AT_EXCEPTION_MESSAGE =
             "Expecting select term before '@', not: ";
 
     private Term replaceHeap(Term term, Term heap, int depth) throws RecognitionException {
         if (depth > 0) {
 
-            if (!isSelectTerm(term)) {
-                semanticError(noHeapExpressionBeforeAtExceptionMessage + term);
-            }
+            if (isSelectTerm(term)) {
 
-            if (!isImplicitHeap(term.sub(0))) {
-                semanticError("Expecting program variable heap as first argument of: " + term);
-            }
+                if (!isImplicitHeap(term.sub(0))) {
+                    semanticError("Expecting program variable heap as first argument of: " + term);
+                }
 
-            Term[] params = new Term[]{heap, replaceHeap(term.sub(1), heap, depth - 1), term.sub(2)};
-            return (getServices().getTermFactory().createTerm(term.op(), params));
+                Term[] params = new Term[]{heap, replaceHeap(term.sub(1), heap, depth - 1), term.sub(2)};
+                return (getServices().getTermFactory().createTerm(term.op(), params));
+
+            } else if (term.op() instanceof ObserverFunction) {
+                if (!isImplicitHeap(term.sub(0))) {
+                    semanticError("Expecting program variable heap as first argument of: " + term);
+                }
+
+                Term[] params = new Term[term.arity()];
+                params[0] = heap;
+                params[1] = replaceHeap(term.sub(1), heap, depth - 1);
+                for(int i = 2; i < params.length; i++) {
+                    params[i] = term.sub(i);
+                }
+
+                return (getServices().getTermFactory().createTerm(term.op(), params));
+
+            } else {
+                semanticError(NO_HEAP_EXPRESSION_BEFOE_AT_EXCEPTION_MESSAGE + term);
+                throw new RecognitionException();
+            }
 
         } else {
             return term;
