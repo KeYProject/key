@@ -30,7 +30,7 @@ public final class HidePackagePrefixToggleAction extends MainWindowAction {
 	setName("Hide Package Prefix");
 	setTooltip("If ticked, class names are written without package prefixes.");
 	final boolean hidePackage = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().hidePackagePrefix();
-	NotationInfo.HIDE_PACKAGE_PREFIX = hidePackage;
+	NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX = hidePackage;
 	setSelected(hidePackage);
     }
 
@@ -38,7 +38,7 @@ public final class HidePackagePrefixToggleAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         boolean selected = ((JCheckBoxMenuItem) e.getSource()).isSelected();
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHidePackagePrefix(selected);
-	NotationInfo.HIDE_PACKAGE_PREFIX = selected;
+	NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX = selected;
 	mainWindow.makePrettyView();
     }
 

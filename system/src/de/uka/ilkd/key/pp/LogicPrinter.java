@@ -255,10 +255,6 @@ public class LogicPrinter {
                 purePrint);
     }
 
-    public LogicPrinter(Services services) {
-        this(new ProgramPrinter(), new NotationInfo(), services);
-    }
-
     /**
      * @return the notationInfo associated with this LogicPrinter
      */
@@ -1000,7 +996,7 @@ public class LogicPrinter {
     public void printFunctionTerm(Term t) throws IOException {
         if (notationInfo.isPrettySyntax()
                 && services != null && isFieldConstant(t)
-                && !NotationInfo.ENSURE_PARSABILITY) {
+                && getNotationInfo().isHidePackagePrefix()) {
             // Hide package prefix when printing field constants.
             startTerm(0);
             String name = t.op().name().toString();
@@ -1093,7 +1089,7 @@ public class LogicPrinter {
 
             for(int i = 1; i < t.arity(); i++) {
                 // do not print anon_heap if parsability is not required
-                if (!NotationInfo.ENSURE_PARSABILITY && "anon".equals(opName) && i == 2) {
+                if (getNotationInfo().isHidePackagePrefix() && "anon".equals(opName) && i == 2) {
                     break;
                 }
 
