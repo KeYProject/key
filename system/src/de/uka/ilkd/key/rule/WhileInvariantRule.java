@@ -826,7 +826,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         for (ProgramVariable pv : localOuts) {
             final String pvBeforeLoopName
-            = tb.newName(pv.name().toString() + "Before_" + inst.inv.getName());
+            = tb.newName(pv.name().toString() + "Before_LOOP");
             final LocationVariable pvBeforeLoop
             = new LocationVariable(new ProgramElementName(pvBeforeLoopName), pv.getKeYJavaType());
             services.getNamespaces().programVariables().addSafely(pvBeforeLoop);
