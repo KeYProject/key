@@ -128,7 +128,7 @@ public class LogicPrinter {
 
     private SVInstantiations instantiations
     	= SVInstantiations.EMPTY_SVINSTANTIATIONS;
-    
+
     private final SelectPrinter selectPrinter = new SelectPrinter(this);
 
     private enum QuantifiableVariablePrintMode {NORMAL, WITH_OUT_DECLARATION}
@@ -138,7 +138,7 @@ public class LogicPrinter {
     public static String quickPrintTerm(Term t, Services services) {
         return quickPrintTerm(t, services, NotationInfo.DEFAULT_PRETTY_SYNTAX, NotationInfo.DEFAULT_UNICODE_ENABLED);
     }
-    
+
 
     public static String quickPrintTerm(Term t, Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         final NotationInfo ni = new NotationInfo();
@@ -154,7 +154,7 @@ public class LogicPrinter {
             return t.toString();
         }
         return p.result().toString();
-    }    
+    }
 
     public static String quickPrintSemisequent(Semisequent s, Services services) {
         final NotationInfo ni = new NotationInfo();
@@ -996,7 +996,7 @@ public class LogicPrinter {
      * be constricted.
      */
     private boolean fieldConstantTreatmentInPrintFunctionTerm = true;
-    
+
     /** Print a term in <code>f(t1,...tn)</code> style.  If the
      * operator has arity 0, no parentheses are printed, i.e.
      * <code>f</code> instead of <code>f()</code>.  If the term
@@ -1005,11 +1005,13 @@ public class LogicPrinter {
      *
      * @param t the term to be printed.  */
     public void printFunctionTerm(Term t) throws IOException {
-        if (notationInfo.isPrettySyntax() 
+        if (notationInfo.isPrettySyntax()
                 && services != null && isFieldConstant(t)
                 && fieldConstantTreatmentInPrintFunctionTerm) {
             startTerm(0);
-            String prettyFieldName = HeapLDT.getPrettyFieldName(t.op());
+            String name = t.op().name().toString();
+            int index = name.lastIndexOf(".");
+            String prettyFieldName = name.substring(index+1);
             layouter.print(prettyFieldName);
         }
         else {
@@ -1036,7 +1038,7 @@ public class LogicPrinter {
             }
         }
     }
-    
+
     /**
      * Print a term in verbose style. Behaves like
      * {@link #printFunctionTerm(Term)} but without special treatment for field
@@ -1115,7 +1117,7 @@ public class LogicPrinter {
                 if (!NotationInfo.ENSURE_PARSABILITY && "anon".equals(opName) && i == 2) {
                     break;
                 }
-                
+
                 if(i > 1) {
                     layouter.print(",").brk(1,0);
                 }
@@ -1199,7 +1201,7 @@ public class LogicPrinter {
                 /* TODO: More sophisticated determination of pretty-syntax, similar
                  * to select-syntax. Using HeapLDT.getPrettySyntax() here for now,
                  * as it is current behaviour for KeY.
-                 * 
+                 *
                  * (Kai Wallisch 09/2014)
                  */
                 layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
@@ -1263,7 +1265,7 @@ public class LogicPrinter {
             printTerm(objectTerm);
         }
     }
-    
+
     /**
      * Find out whether a {@link Term} represents a field symbol, declared in a
      * Java class.
@@ -1278,7 +1280,7 @@ public class LogicPrinter {
                 && fieldTerm.arity() == 0
                 && fieldTerm.boundVars().isEmpty();
     }
-  
+
     /*
      * Print a term of the form: T::select(heap, object, field).
      */
