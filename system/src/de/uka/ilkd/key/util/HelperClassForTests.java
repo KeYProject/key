@@ -29,6 +29,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.RuleCollection;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
+import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 import de.uka.ilkd.key.rule.BuiltInRule;
 
 /**
@@ -43,7 +44,7 @@ public class HelperClassForTests {
             //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
 	    public RuleCollection getStandardRules() {
                 return new RuleCollection(
-                                RuleSourceFactory.fromBuildInRule("LDTsForTestsOnly.key"), 
+                                RuleSourceFactory.fromBuildInRule(ldtFile), 
                                 ImmutableSLList.<BuiltInRule>nil());
             }
         };

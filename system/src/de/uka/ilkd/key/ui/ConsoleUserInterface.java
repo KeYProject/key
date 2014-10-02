@@ -116,7 +116,14 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        progressMax = 0; // reset progress bar marker
        final Proof proof = info.getProof();
        if (proof==null) {
-           if (verbosity > SILENT) System.out.println("Proof loading failed");
+           if (verbosity > SILENT) {
+               System.out.println("Proof loading failed");
+               final Object error = info.getResult();
+               if (error instanceof Throwable) {
+                   if (verbosity >= HIGH) ((Throwable) error).printStackTrace();
+                   else System.out.println(error);
+               }
+           }
            System.exit(1);
        }
        final int openGoals = proof.openGoals().size();
@@ -144,10 +151,10 @@ public class ConsoleUserInterface extends AbstractUserInterface {
                System.exit(0);
            }
            if (macroChosen()) {
-                applyMacro();
-            } else {
-                finish(proof);
-            }
+               applyMacro();
+           } else {
+               finish(proof);
+           }
        }
    }
 

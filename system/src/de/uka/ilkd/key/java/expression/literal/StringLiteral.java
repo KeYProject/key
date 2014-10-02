@@ -21,6 +21,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.ldt.CharListLDT;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.util.ExtList;
 
 
@@ -99,5 +101,10 @@ public class StringLiteral extends Literal implements ReferencePrefix {
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
 	return javaServ.getJavaInfo().getKeYJavaType("java.lang.String");
+    }
+
+    @Override
+    public Name getLDTName() {
+        return CharListLDT.NAME;
     }
 }

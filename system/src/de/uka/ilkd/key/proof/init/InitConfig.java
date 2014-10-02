@@ -121,7 +121,7 @@ public class InitConfig {
      * to the used program model
      * @return the Services of this initial configuration
      */
-    public Services getServices() {
+    public final Services getServices() {
         return services;
     }
 
@@ -439,6 +439,7 @@ public class InitConfig {
     
     
 
+    @Override
     public String toString() {
         return
             "Namespaces:" + namespaces() +"\n" +

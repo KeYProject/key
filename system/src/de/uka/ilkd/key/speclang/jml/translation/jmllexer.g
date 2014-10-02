@@ -107,6 +107,7 @@ LOCKSET_LT: "<#";
 LOCKSET_LEQ: "<#=";
 LOGICALAND : "&&";
 LOGICALOR : "||";
+MAP : "\\map";
 MAX_SPACE : "\\max_space"; //KeY extension, not official JML
 MEASURED_BY : "\\measured_by";
 MEMORY_AREA : "\\memoryArea"; //KeY extension, not official JML
@@ -180,6 +181,16 @@ SEQREPLACE : "\\seq_put";
 INDEXOF : "\\seq_indexOf";
 SEQDEF : "\\seq_def";
 
+MAPEMPTY : "\\map_empty";
+MAPEXPRESSION : "\\map_get"
+                | "\\map_override"
+                | "\\map_update" 
+                | "\\map_remove" 
+                | "\\in_domain" 
+                | "\\domain_implies_created" 
+                | "\\map_si" ("ze" | "ingleton")
+                | "\\is_finite";
+SEQ2MAP : "\\seq_2_map";
 
 DECLASSIFIES : "\\declassifies";
 ERASES : "\\erases";

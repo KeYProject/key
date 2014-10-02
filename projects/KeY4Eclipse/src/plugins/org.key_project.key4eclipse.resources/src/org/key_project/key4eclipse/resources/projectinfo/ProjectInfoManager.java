@@ -473,11 +473,11 @@ public final class ProjectInfoManager {
             }
             IFile file = proofFolder.getFile(PROJECT_INFO_FILE);
             if (file.exists()) {
-               file.setContents(in, true, true, null);
+               file.setContents(in, true, false, null);
             }
             else {
                file.create(in, true, null);
-               file.setCharset(charset.displayName(), null);
+//               file.setCharset(charset.displayName(), null); // TODO: Setting charset requires full project access and causes trouble during build
             }
          }
          finally {

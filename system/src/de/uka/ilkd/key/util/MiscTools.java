@@ -234,6 +234,8 @@ public final class MiscTools {
      * This method only operates on Strings, not on real files!
      * Note that it treats Strings case-sensitive.
      * The resulting filename always uses UNIX directory delimiters.
+     * Raises a RuntimeException if no relative path could be found
+     * (may happen on Windows systems).
      */
     public static String makeFilenameRelative(String origFilename, String toFilename){
         final List<String> origFileNameSections = disectFilename(origFilename);

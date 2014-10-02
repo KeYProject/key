@@ -15,14 +15,18 @@ package org.key_project.key4eclipse.resources.io;
 
 import java.io.ByteArrayInputStream;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourceAttributes;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
-import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.XMLUtil;
@@ -56,6 +60,7 @@ public class ProofMetaFileWriter {
    public static final String TAG_MARKER_MESSAGE = "markerMessage";
    public static final String ATTRIBUTE_MD5 = "proofFileMD5";
    public static final String ATTRIBUTE_PROOF_CLOSED = "proofClosed";
+   public static final String ATTRIBUTE_PROOF_OUTDATED = "proofOutdated";
    public static final String ATTRIBUTE_NAME = "name";
    public static final String ATTRIBUTE_PROOF_FILE = "proofFile";
    public static final String ATTRIBUTE_KIND = "kind";
@@ -74,22 +79,28 @@ public class ProofMetaFileWriter {
     * @throws Exception
     */
    public static void writeMetaFile(ProofElement pe) throws Exception {
-      IFile metaIFile = pe.getMetaFile();
-      String encoding = "UTF-8";
-      String xml = toXml(pe, encoding);
-      if (!metaIFile.exists()) {
-         metaIFile.create(new ByteArrayInputStream(xml.getBytes(encoding)), true, null);
-      }
-      else {
-         ResourceAttributes resAttr = metaIFile.getResourceAttributes();
-         resAttr.setReadOnly(false);
-         metaIFile.setResourceAttributes(resAttr);
-         metaIFile.setContents(new ByteArrayInputStream(xml.getBytes(encoding)), true, true, null);
-      }
-      metaIFile.setHidden(KeYProjectProperties.isHideMetaFiles(metaIFile.getProject()));
-      ResourceAttributes resAttr = metaIFile.getResourceAttributes();
-      resAttr.setReadOnly(true);
-      metaIFile.setResourceAttributes(resAttr);
+      final IFile metaIFile = pe.getMetaFile();
+      final String encoding = "UTF-8";
+      final String xml = toXml(pe, encoding);
+      final byte[] bytes = xml.getBytes(encoding);
+      IWorkspaceRunnable operation = new IWorkspaceRunnable() {
+         @Override
+         public void run(IProgressMonitor monitor) throws CoreException {
+            if (!metaIFile.exists()) {
+               metaIFile.create(new ByteArrayInputStream(bytes), true, null);
+            }
+            else {
+               ResourceAttributes resAttr = metaIFile.getResourceAttributes();
+               resAttr.setReadOnly(false);
+               metaIFile.setResourceAttributes(resAttr);
+               metaIFile.setContents(new ByteArrayInputStream(bytes), true, true, null);
+            }
+            ResourceAttributes resAttr = metaIFile.getResourceAttributes();
+            resAttr.setReadOnly(true);
+            metaIFile.setResourceAttributes(resAttr);
+         }
+      };
+      ResourcesPlugin.getWorkspace().run(operation, null, IWorkspace.AVOID_UPDATE, null);
    }
    
    private static String toXml(ProofElement pe, String encoding) throws Exception {
@@ -101,6 +112,7 @@ public class ProofMetaFileWriter {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_MD5, ResourceUtil.computeContentMD5(pe.getProofFile()));
       attributeValues.put(ATTRIBUTE_PROOF_CLOSED, String.valueOf(pe.getProofClosed()));
+      attributeValues.put(ATTRIBUTE_PROOF_OUTDATED, String.valueOf(pe.getOutdated()));
       XMLUtil.appendStartTag(0, TAG_PROOF_META_FILE, attributeValues, sb);
       appendMarkerMessage(pe, 1, sb);
       appendUsedTypes(pe, 1, types, sb);
@@ -215,12 +227,12 @@ public class ProofMetaFileWriter {
    }
    
    private static void appendUsedContracts(ProofElement pe, int level, StringBuffer sb) {
-      LinkedList<ProofElement> usedContractsProofElements = pe.getUsedContracts();
+      List<IFile> usedContractsProofElements = pe.getUsedContracts();
       if (!usedContractsProofElements.isEmpty()) {
          XMLUtil.appendStartTag(level, TAG_USED_CONTRACTS, null, sb);
-         for (ProofElement usedContractProofElement : usedContractsProofElements) {
+         for (IFile usedContractProofElement : usedContractsProofElements) {
             Map<String, String> attributeValues = new LinkedHashMap<String, String>();
-            attributeValues.put(ATTRIBUTE_PROOF_FILE, usedContractProofElement.getProofFile().getFullPath().toString());
+            attributeValues.put(ATTRIBUTE_PROOF_FILE, usedContractProofElement.getFullPath().toString());
             XMLUtil.appendEmptyTag(level + 1, TAG_USED_CONTRACT, attributeValues, sb);
          }
          XMLUtil.appendEndTag(level, TAG_USED_CONTRACTS, sb);

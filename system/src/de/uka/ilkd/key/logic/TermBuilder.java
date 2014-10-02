@@ -2067,7 +2067,6 @@ public class TermBuilder {
         return func(services.getTypeConverter().getSeqLDT().getSeqEmpty());
     }
 
-
     public Term seqSingleton(Term x) {
         return func(services.getTypeConverter().getSeqLDT().getSeqSingleton(), x);
     }
@@ -2101,11 +2100,9 @@ public class TermBuilder {
         return result;
     }
 
-
     public Term seqSub(Term s, Term from, Term to) {
     return func(services.getTypeConverter().getSeqLDT().getSeqSub(), s, from, to);
     }
-
 
     public Term seqReverse(Term s) {
     return func(services.getTypeConverter().getSeqLDT().getSeqReverse(), s);
@@ -2194,10 +2191,10 @@ public class TermBuilder {
     //-------------------------------------------------------------------------
 
     public Term eqAtLocs(Services services,
-            Term heap1,
-            Term locset1,
-            Term heap2,
-            Term locset2) {
+                         Term heap1,
+                         Term locset1,
+                         Term heap2,
+                         Term locset2) {
         return (locset1.equals(empty())
                 && locset2.equals(empty()))
                 ? tt
@@ -2208,12 +2205,12 @@ public class TermBuilder {
 
 
     public Term eqAtLocsPost(Services services,
-            Term heap1_pre,
-            Term heap1_post,
-            Term locset1,
-            Term heap2_pre,
-            Term heap2_post,
-            Term locset2) {
+                             Term heap1_pre,
+                             Term heap1_post,
+                             Term locset1,
+                             Term heap2_pre,
+                             Term heap2_post,
+                             Term locset2) {
         return (locset1.equals(empty())
                 && locset2.equals(empty()))
                 ? tt
