@@ -990,13 +990,6 @@ public class LogicPrinter {
        }
     }
 
-    /*
-     * Disable this to prevent method printFunctionTerm from doing special
-     * treatment for fieldConstants. If this is true, parsability might
-     * be constricted.
-     */
-    private boolean fieldConstantTreatmentInPrintFunctionTerm = true;
-
     /** Print a term in <code>f(t1,...tn)</code> style.  If the
      * operator has arity 0, no parentheses are printed, i.e.
      * <code>f</code> instead of <code>f()</code>.  If the term
@@ -1007,7 +1000,8 @@ public class LogicPrinter {
     public void printFunctionTerm(Term t) throws IOException {
         if (notationInfo.isPrettySyntax()
                 && services != null && isFieldConstant(t)
-                && fieldConstantTreatmentInPrintFunctionTerm) {
+                && !NotationInfo.ENSURE_PARSABILITY) {
+            // Hide package prefix when printing field constants.
             startTerm(0);
             String name = t.op().name().toString();
             int index = name.lastIndexOf(".");
@@ -1037,21 +1031,6 @@ public class LogicPrinter {
                 layouter.print(")").end();
             }
         }
-    }
-
-    /**
-     * Print a term in verbose style. Behaves like
-     * {@link #printFunctionTerm(Term)} but without special treatment for field
-     * constants.
-     *
-     * @param t the term to be printed.
-     * @throws java.io.IOException
-     */
-    public void printFunctionTermWithoutFieldConstantTreatment(Term t) throws IOException {
-        boolean tmp = fieldConstantTreatmentInPrintFunctionTerm;
-        fieldConstantTreatmentInPrintFunctionTerm = false;
-        printFunctionTerm(t);
-        fieldConstantTreatmentInPrintFunctionTerm = tmp;
     }
 
     public void printCast(String pre,

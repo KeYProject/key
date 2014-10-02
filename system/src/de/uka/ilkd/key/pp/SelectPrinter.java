@@ -49,7 +49,7 @@ class SelectPrinter {
                  */
                 if (isFieldName(fieldTerm.op().name().toString(), objectTerm)
                         || lp.isFieldConstant(fieldTerm)) {
-                    lp.printFunctionTermWithoutFieldConstantTreatment(t);
+                    lp.printFunctionTerm(t);
                 } else {
                     printAnySelect(heapTerm, objectTerm, fieldTerm, tacitHeap);
                 }
@@ -62,13 +62,13 @@ class SelectPrinter {
                 } else if (getFieldSort(fieldTerm).equals(t.sort())) {
                     printFieldConstant(objectTerm, fieldTerm, heapLDT, heapTerm, tacitHeap);
                 } else {
-                    lp.printFunctionTermWithoutFieldConstantTreatment(t);
+                    lp.printFunctionTerm(t);
                 }
             } else {
-                lp.printFunctionTermWithoutFieldConstantTreatment(t);
+                lp.printFunctionTerm(t);
             }
         } else {
-            lp.printFunctionTermWithoutFieldConstantTreatment(t);
+            lp.printFunctionTerm(t);
         }
     }
 
@@ -286,12 +286,12 @@ class SelectPrinter {
                 printHeap(heapTerm, tacitHeap);
             } else {
                 // In case field sort is not equal to select sort, use generic fallback.
-                lp.printFunctionTermWithoutFieldConstantTreatment(t);
+                lp.printFunctionTerm(t);
             }
 
         } else {
             // In case select sort is no KeYJavaType, use generic fallback.
-            lp.printFunctionTermWithoutFieldConstantTreatment(t);
+            lp.printFunctionTerm(t);
         }
     }
 

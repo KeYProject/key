@@ -27,7 +27,7 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.Taclet;
 import org.antlr.runtime.RecognitionException;
 
-/*
+/**
  * Extends generated class {@link KeYParser} with custom constructors.
  */
 public class KeYParserF extends KeYParser {
@@ -41,7 +41,7 @@ public class KeYParserF extends KeYParser {
     }
 
     // This is also used in TestTermParserHeap.java
-    public static final String NO_HEAP_EXPRESSION_BEFOE_AT_EXCEPTION_MESSAGE =
+    public static final String NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE =
             "Expecting select term before '@', not: ";
 
     private Term replaceHeap(Term term, Term heap, int depth) throws RecognitionException {
@@ -71,7 +71,7 @@ public class KeYParserF extends KeYParser {
                 return (getServices().getTermFactory().createTerm(term.op(), params));
 
             } else {
-                semanticError(NO_HEAP_EXPRESSION_BEFOE_AT_EXCEPTION_MESSAGE + term);
+                semanticError(NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE + term);
                 throw new RecognitionException();
             }
 

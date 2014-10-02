@@ -1399,7 +1399,11 @@ options {
         functions().add(f);
     }
     
+    /*
+     * Replace standard heap by another heap in an observer function.
+     */
     protected Term heapSelectionSuffix(Term term, Term heap) throws RecognitionException {
+    	// See file KeYParser.java for implementation.
         throw new UnsupportedOperationException();
     }
     
