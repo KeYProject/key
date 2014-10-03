@@ -148,7 +148,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
             final JDialog dialog      = 
                 new JDialog(parent, getText(), true);
             
-            final JList<?> selectionList = new JList<Object>(insertionTaclets.toArray());
+            final JList selectionList = new JList(insertionTaclets.toArray());
             
             final JScrollPane scrollPane = 
                 new JScrollPane(selectionList, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
@@ -180,7 +180,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu
             {
                 public void valueChanged(ListSelectionEvent e) {                       
                     if (e.getSource() instanceof JList) {
-                        final JList<?> list = (JList<?>)e.getSource();
+                        final JList list = (JList)e.getSource();
                         if (list.getSelectedIndex()>=0) {           
                             if (list.getSelectedValue() instanceof TacletAppListItem) {
                                 displayHiddenFormula.

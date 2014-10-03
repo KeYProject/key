@@ -149,7 +149,7 @@ public class FileChooser extends JPanel{
         }
         
 
-        private JList<File>      axiomsList;
+        private JList      axiomsList;
         private JButton    addAxiomFileButton;
         private JButton    removeAxiomFileButton;
         private JButton    helpButton;
@@ -168,7 +168,7 @@ public class FileChooser extends JPanel{
         private JCheckBox lemmaCheckbox;
         
         private boolean       closedByOkayButton = false;
-        private final DefaultListModel<File> listModel = new DefaultListModel<File>();
+        private final DefaultListModel listModel = new DefaultListModel();
         private static final Dimension MAX_DIM = new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE);
         private boolean firstTimeAddingAxioms = true;      
         public FileChooser(){
@@ -261,9 +261,9 @@ public class FileChooser extends JPanel{
 
         
         
-        private JList<File> getAxiomsList() {
+        private JList getAxiomsList() {
                 if(axiomsList == null){
-                        axiomsList = new JList<File>();
+                        axiomsList = new JList();
                         axiomsList.setModel(listModel);
                         axiomsList.setBorder(BorderFactory.createEtchedBorder());
                 }

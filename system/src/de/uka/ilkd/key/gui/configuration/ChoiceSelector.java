@@ -62,9 +62,9 @@ public class ChoiceSelector extends JDialog {
 
 
     /** the JList with the categories of choices*/
-    private JList<Object> catList;
+    private JList catList;
     /** the JList with the choices for one category */
-    private JList<Object> choiceList;
+    private JList choiceList;
     private JTextArea explanationArea;
     private static Properties explanationMap;
 
@@ -124,7 +124,7 @@ public class ChoiceSelector extends JDialog {
             listPanel.add(catListScroll, BorderLayout.WEST);
         }
         {
-            choiceList = new JList<Object>();
+            choiceList = new JList();
             choiceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             choiceList.setSelectedValue(category2DefaultChoice.get(cats[0]),true);
             choiceList.addListSelectionListener(new ListSelectionListener() {
