@@ -106,7 +106,7 @@ public class ChoiceSelector extends JDialog {
         Object[] cats = category2DefaultChoice.keySet().toArray();
         Arrays.sort(cats);
         {
-            catList = new JList<Object>(cats);
+            catList = new JList(cats);
             catList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             catList.setSelectedIndex(0);
             catList.addListSelectionListener(new ListSelectionListener() {
