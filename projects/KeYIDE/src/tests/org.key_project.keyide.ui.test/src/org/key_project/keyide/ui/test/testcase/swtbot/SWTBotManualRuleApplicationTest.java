@@ -108,6 +108,10 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
    }
    
    /**
+    * ************************************ FUNCTIONAL OPERATION CONTRACT ************************************
+    */
+   
+   /**
     * Tests the applying of one contract out of the "Use Operation Contract"-rule dialog.
     * @throws Exception
     */
@@ -300,6 +304,234 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                         false);
    }
    
+   
+   /**
+    * ************************************ BLOCK CONTRACT ************************************
+    */
+   
+   
+   @Test
+   public void testBlockContract_Cancel() throws Exception{
+      IAppliedRuleTest appliedRuleTest =  new IAppliedRuleTest() {
+         @Override
+         public void test(IJavaProject project, KeYEnvironment<CustomUserInterface> environment, Proof proof, SWTWorkbenchBot bot, SWTBotEditor editor, KeYEditor keyEditor, Node nodeOnWhichRuleIsApplied) {
+            SWTBotShell shell = bot.shell("Contracts for Block: {x=42;}");
+            TestUtilsUtil.clickDirectly(shell.bot().button("Cancel"));
+         }
+      };
+      doStartProofTest("SWTBotManualRuleApplicationTest_testBlockContract_Cancel",
+            "data/blockContract",
+            TestKeY4EclipseUtil.createOperationContractId("BlockContractExample", "BlockContractExample", "main()", "0", "normal_behavior"),
+            new IStopCondition() {
+               @Override
+               public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                  return false;
+               }
+               
+               @Override
+               public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+                  RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+                  return !"Block Contract".equals(MiscTools.getRuleName(ruleApp));
+               }
+               
+               @Override
+               public String getStopMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                  return null;
+               }
+               
+               @Override
+               public int getMaximalWork(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser) {
+                  return 0;
+               }
+               
+               @Override
+               public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+                  return null;
+               }
+            },
+            true,
+            "x:=0}",
+            "Block Contract",
+            appliedRuleTest,
+            3,
+            false);
+   }
+   
+   @Test
+   public void testBlockContract_ApplyOneContract() throws Exception{
+      IAppliedRuleTest appliedRuleTest =  new IAppliedRuleTest() {
+         @Override
+         public void test(IJavaProject project, KeYEnvironment<CustomUserInterface> environment, Proof proof, SWTWorkbenchBot bot, SWTBotEditor editor, KeYEditor keyEditor, Node nodeOnWhichRuleIsApplied) {
+            SWTBotShell shell = bot.shell("Contracts for Block: {x=42;}");
+            shell.bot().table().select(0);
+            TestUtilsUtil.clickDirectly(shell.bot().button("Finish"));
+            SWTBotStyledText styledText = editor.bot().styledText();
+            assertTrue(styledText.getText().indexOf("(x = 0 & well") != -1);
+         }
+      };
+      doStartProofTest("SWTBotManualRuleApplicationTest_testBlockContract_ApplyOneContract",
+            "data/blockContract",
+            TestKeY4EclipseUtil.createOperationContractId("BlockContractExample", "BlockContractExample", "main()", "0", "normal_behavior"),
+            new IStopCondition() {
+               @Override
+               public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                  return false;
+               }
+               
+               @Override
+               public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+                  RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+                  return !"Block Contract".equals(MiscTools.getRuleName(ruleApp));
+               }
+               
+               @Override
+               public String getStopMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                  return null;
+               }
+               
+               @Override
+               public int getMaximalWork(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser) {
+                  return 0;
+               }
+               
+               @Override
+               public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+                  return null;
+               }
+            },
+            true,
+            "x:=0}",
+            "Block Contract",
+            appliedRuleTest,
+            3,
+            false);
+   }
+   
+   @Test public void testBlockContract_ApplyMultipleContracts() throws Exception {
+      IAppliedRuleTest appliedRuleTest =  new IAppliedRuleTest() {
+         @Override
+         public void test(IJavaProject project, KeYEnvironment<CustomUserInterface> environment, Proof proof, SWTWorkbenchBot bot, SWTBotEditor editor, KeYEditor keyEditor, Node nodeOnWhichRuleIsApplied) {
+            SWTBotShell shell = bot.shell("Contracts for Block: {x=42;}");
+            shell.bot().table().select(0,1);
+            TestUtilsUtil.clickDirectly(shell.bot().button("Finish"));
+            SWTBotStyledText styledText = editor.bot().styledText();
+            assertTrue(styledText.getText().indexOf("xBeforeBlock = 0") != -1);
+         }
+      };
+      doStartProofTest("SWTBotManualRuleApplicationTest_testBlockContract_ApplyMultipleContracts",
+            "data/blockContract",
+            TestKeY4EclipseUtil.createOperationContractId("BlockContractExample", "BlockContractExample", "main()", "0", "normal_behavior"),
+            new IStopCondition() {
+               @Override
+               public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                  return false;
+               }
+               
+               @Override
+               public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+                  RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+                  return !"Block Contract".equals(MiscTools.getRuleName(ruleApp));
+               }
+               
+               @Override
+               public String getStopMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                  return null;
+               }
+               
+               @Override
+               public int getMaximalWork(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser) {
+                  return 0;
+               }
+               
+               @Override
+               public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+                  return null;
+               }
+            },
+            true,
+            "x:=0}",
+            "Block Contract",
+            appliedRuleTest,
+            3,
+            false);
+   }
+   
+   
+   /**
+    * ************************************ DEPENDENCY CONTRACT ************************************
+    */
+   
+   
+   /**
+    * Tests the applying of one contract out of the "Use Operation Contract"-rule dialog.
+    * @throws Exception
+    */
+   @Test
+   public void testDependencyContract_applyOneHeap() throws Exception {
+      IAppliedRuleTest appliedRuleTest = new IAppliedRuleTest() {
+         
+         @Override
+         public void test(IJavaProject project,
+               KeYEnvironment<CustomUserInterface> environment, Proof proof,
+               SWTWorkbenchBot bot, SWTBotEditor editor, KeYEditor keyEditor,
+               Node nodeOnWhichRuleIsApplied) {
+            SWTBotShell shell = bot.shell("Please select base heap configuration:");
+            shell.bot().table().select(0);
+            TestUtilsUtil.clickDirectly(shell.bot().button("Finish"));
+            SWTBotStyledText styledText = editor.bot().styledText();
+            int indexFirstContractApplied = -1;
+            assertTrue(indexFirstContractApplied != -1);
+         }
+      };
+      
+      doStartProofTest("SWTBotManualRuleApplicationTest_testDependencyContract_applyOneHeap",
+            "data/dependencyContract",
+            TestKeY4EclipseUtil.createOperationContractId("DependencyContractExample", "DependencyContractExample", "incC(int)", "0", "normal_behavior"), 
+            new IStopCondition() {
+               
+               @Override
+               public boolean shouldStop(int maxApplications, long timeout, Proof proof,
+                     IGoalChooser goalChooser, long startTime, int countApplied,
+                     SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                  return false;
+               }
+               
+               @Override
+               public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof,
+                     IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
+                  RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+                  return !"Dependency Contract".equals(MiscTools.getRuleName(ruleApp));
+               }
+               
+               @Override
+               public String getStopMessage(int maxApplications, long timeout, Proof proof,
+                     IGoalChooser goalChooser, long startTime, int countApplied,
+                     SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                  return null;
+               }
+               
+               @Override
+               public int getMaximalWork(int maxApplications, long timeout, Proof proof,
+                     IGoalChooser goalChooser) {
+                  return 0;
+               }
+               
+               @Override
+               public String getGoalNotAllowedMessage(int maxApplications, long timeout,
+                     Proof proof, IGoalChooser goalChooser, long startTime,
+                     int countApplied, Goal goal) {
+                  return null;
+               }
+            }, 
+            true, 
+            "self.getB()", 
+            "Use Dependency Contract", 
+            appliedRuleTest, 
+            3, 
+            false);
+   }
+   
+   
    /**
     * Performs the following test steps to test an interactive rule application:
     * <ol>
@@ -355,6 +587,9 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                ss.setActiveStrategyProperties(p);
                keyEditor.getUI().startAndWaitForAutoMode(keyEditor.getCurrentProof());
             }
+            if(textToApplyRuleOn == "self.getB()") {
+               System.out.println("Depdency Contract");
+            }
             // Get node to apply rule on
             Node node = keyEditor.getCurrentNode();
             assertFalse(node.isClosed());
@@ -362,6 +597,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             // Apply rule interactively
             final SWTBotStyledText styledText = editor.bot().styledText();
             Point point = TestUtilsUtil.selectText(styledText, textToApplyRuleOn);
+
             TestUtilsUtil.setCursorLocation(styledText, point.x - 5, point.y);
             TestUtilsUtil.clickContextMenu(styledText, point.x - 5, point.y, ruleNameToApply);
             if (appliedRuleTest != null) {
