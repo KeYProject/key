@@ -18,8 +18,10 @@ import java.util.List;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
+import org.key_project.sed.core.model.ISEDConstraint;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDValue;
+import org.key_project.sed.core.model.ISEDVariable;
 import org.key_project.sed.core.model.impl.AbstractSEDValue;
 
 /**
@@ -59,11 +61,17 @@ public class SEDMemoryValue extends AbstractSEDValue {
    private final List<IVariable> variables = new LinkedList<IVariable>();
    
    /**
+    * All the relevant constraints.
+    */
+   private final List<ISEDConstraint> relevantConstaints = new LinkedList<ISEDConstraint>();
+   
+   /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this element is contained.
+    * @param parent The parent {@link ISEDVariable}.
     */
-   public SEDMemoryValue(ISEDDebugTarget target) {
-      super(target);
+   public SEDMemoryValue(ISEDDebugTarget target, ISEDVariable parent) {
+      super(target, parent);
    }
 
    /**
@@ -168,5 +176,23 @@ public class SEDMemoryValue extends AbstractSEDValue {
    @Override
    public void setId(String id) {
       super.setId(id);
+   }
+
+   /**
+    * Adds the given relevant {@link ISEDConstraint}.
+    * @param constraint The relevant {@link ISEDConstraint} to add.
+    */
+   public void addRelevantConstraint(ISEDConstraint constraint) {
+      if (constraint != null) {
+         relevantConstaints.add(constraint);
+      }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDConstraint[] getRelevantConstraints() throws DebugException {
+      return relevantConstaints.toArray(new ISEDConstraint[relevantConstaints.size()]);
    }
 }

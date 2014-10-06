@@ -43,7 +43,7 @@ public class SWTBotVerificationLogViewTest extends AbstractResourceTest {
             project.close(null);
          }
       }
-      TestUtilsUtil.waitForBuild();
+      KeY4EclipseResourcesTestUtil.waitBuild();
    }
    
    /**
@@ -62,17 +62,17 @@ public class SWTBotVerificationLogViewTest extends AbstractResourceTest {
          view = bot.viewById(VerificationLogView.VIEW_ID);
          assertProjectShown(view);
          // Create first key project to show
-         keyProject = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationLogViewTest_testBuilds", true, true, false, 1, true, true);
+         keyProject = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationLogViewTest_testBuilds", true, false, true, false, 1, true);
          assertProjectShown(view, keyProject);
-         assertEquals(1, LogManager.getInstance().countRecords(keyProject));
-         assertEquals(1, view.bot().table().rowCount());
+         assertEquals(3, LogManager.getInstance().countRecords(keyProject));
+         assertEquals(3, view.bot().table().rowCount());
          LogRecord firstRecord = LogManager.getInstance().readRecord(keyProject, 0);
          // Perform second build
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/classWithoutMethods", keyProject.getFolder("src"));
          KeY4EclipseResourcesTestUtil.build(keyProject);
          assertProjectShown(view, keyProject);
-         assertEquals(2, LogManager.getInstance().countRecords(keyProject));
-         assertEquals(2, view.bot().table().rowCount());
+         assertEquals(6, LogManager.getInstance().countRecords(keyProject));
+         assertEquals(6, view.bot().table().rowCount());
          LogRecord secondRecord = LogManager.getInstance().readRecord(keyProject, 1);
          assertEquals(firstRecord, LogManager.getInstance().readRecord(keyProject, 0));
          assertFalse(firstRecord.equals(secondRecord));
@@ -105,34 +105,34 @@ public class SWTBotVerificationLogViewTest extends AbstractResourceTest {
          view = bot.viewById(VerificationLogView.VIEW_ID);
          assertProjectShown(view);
          // Create first key project to show
-         firstKeyProject = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationLogViewTest_testClearLog_key1", true, true, false, 1, true, true);
+         firstKeyProject = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationLogViewTest_testClearLog_key1", true, false, true, false, 1, true);
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/classWithoutMethods", firstKeyProject.getFolder("src"));
          KeY4EclipseResourcesTestUtil.build(firstKeyProject);
          KeY4EclipseResourcesTestUtil.build(firstKeyProject);
          assertProjectShown(view, firstKeyProject);
          // Create second key project to show
-         secondKeyProject = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationLogViewTest_testClearLog_key2", true, true, false, 1, true, true);
+         secondKeyProject = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationLogViewTest_testClearLog_key2", true, false, true, false, 1, true);
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/classWithoutMethods", secondKeyProject.getFolder("src"));
          KeY4EclipseResourcesTestUtil.build(secondKeyProject);
          KeY4EclipseResourcesTestUtil.build(secondKeyProject);
          assertProjectShown(view, firstKeyProject, secondKeyProject);
          // Test initial logs
-         assertEquals(2, LogManager.getInstance().countRecords(firstKeyProject));
-         assertEquals(2, LogManager.getInstance().countRecords(secondKeyProject));
-         assertEquals(2, view.bot().table().rowCount());
+         assertEquals(6, LogManager.getInstance().countRecords(firstKeyProject));
+         assertEquals(6, LogManager.getInstance().countRecords(secondKeyProject));
+         assertEquals(6, view.bot().table().rowCount());
          // Cancel clear log
          view.toolbarPushButton("Clear Log").click();
          view.bot().shell("Confirm clear log").bot().button("Cancel").click();
          // Test logs again
-         assertEquals(2, LogManager.getInstance().countRecords(firstKeyProject));
-         assertEquals(2, LogManager.getInstance().countRecords(secondKeyProject));
-         assertEquals(2, view.bot().table().rowCount());
+         assertEquals(6, LogManager.getInstance().countRecords(firstKeyProject));
+         assertEquals(6, LogManager.getInstance().countRecords(secondKeyProject));
+         assertEquals(6, view.bot().table().rowCount());
          // Commit clear log
          view.toolbarPushButton("Clear Log").click();
          view.bot().shell("Confirm clear log").bot().button("OK").click();
          // Test logs again
          assertEquals(0, LogManager.getInstance().countRecords(firstKeyProject));
-         assertEquals(2, LogManager.getInstance().countRecords(secondKeyProject));
+         assertEquals(6, LogManager.getInstance().countRecords(secondKeyProject));
          assertEquals(0, view.bot().table().rowCount());
       }
       finally {
@@ -174,7 +174,7 @@ public class SWTBotVerificationLogViewTest extends AbstractResourceTest {
          KeY4EclipseResourcesTestUtil.build(generalProject);
          assertProjectShown(view);
          // Create first key project to show
-         firstKeyProject = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationLogViewTest_testShownContentWithAndWithoutLinking_key1", true, true, false, 1, true, true);
+         firstKeyProject = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationLogViewTest_testShownContentWithAndWithoutLinking_key1", true, false, true, false, 1, true);
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/classWithoutMethods", firstKeyProject.getFolder("src"));
          KeY4EclipseResourcesTestUtil.build(firstKeyProject);
          assertProjectShown(view, firstKeyProject);
@@ -184,7 +184,7 @@ public class SWTBotVerificationLogViewTest extends AbstractResourceTest {
          KeY4EclipseResourcesTestUtil.build(javaProject.getProject());
          assertProjectShown(view, firstKeyProject);
          // Create second key project to show
-         secondKeyProject = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationLogViewTest_testShownContentWithAndWithoutLinking_key2", true, true, false, 1, true, true);
+         secondKeyProject = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationLogViewTest_testShownContentWithAndWithoutLinking_key2", true, false, true, false, 1, true);
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/classWithoutMethods", secondKeyProject.getFolder("src"));
          KeY4EclipseResourcesTestUtil.build(secondKeyProject);
          assertProjectShown(view, firstKeyProject, secondKeyProject);

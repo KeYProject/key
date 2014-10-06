@@ -13,29 +13,41 @@
 
 package de.uka.ilkd.key.proof.io;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Properties;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
+import de.uka.ilkd.key.proof.init.InfFlowPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.ui.UserInterface;
@@ -113,6 +125,10 @@ public class DefaultProblemLoader {
     */
    private Proof proof;
 
+   private static String INDEX_FILE = "automaticInfFlow.txt";
+
+   private static String IF_INDEX_FILE = "automaticMacroInfFlow.txt";
+
    /**
     * Constructor.
     * @param file The file or folder to load.
@@ -149,10 +165,8 @@ public class DefaultProblemLoader {
        try {
            // Read environment
            boolean oneStepSimplifier =
-                   ProofIndependentSettings.DEFAULT_INSTANCE
-                           .getGeneralSettings().oneStepSimplification();
-           ProofIndependentSettings.DEFAULT_INSTANCE
-                           .getGeneralSettings().setOneStepSimplification(true);
+                   ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
+           ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
            envInput = createEnvInput();
            problemInitializer = createProblemInitializer();
            initConfig = createInitConfig();
@@ -178,22 +192,110 @@ public class DefaultProblemLoader {
                }
                // this message is propagated to the top level in console mode
                return null; // Everything fine
-         }
+         }         
          finally {
-             ProofIndependentSettings.DEFAULT_INSTANCE
-                         .getGeneralSettings().setOneStepSimplification(oneStepSimplifier);
-            getMediator().resetNrGoalsClosedByHeuristics();
-            if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
-               ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
-            }
-         }
-      }
-      catch (ProblemLoaderException e) {
-          throw(e);
-      }
-      catch (Exception e) { // TODO give more specific exception message
-          throw new ProblemLoaderException(this, e);
-      }
+               ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                                   .setOneStepSimplification(oneStepSimplifier);
+               getMediator().resetNrGoalsClosedByHeuristics();
+               if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
+                   ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
+               }
+           }
+       }
+       catch (ProblemLoaderException e) {
+           throw(e);
+       }
+       catch (Exception e) { // TODO give more specific exception message
+           throw new ProblemLoaderException(this, e);
+       }
+   }
+
+   private File chooseFile(ContractPO po) {
+       final String fName;
+       if (po instanceof InfFlowPO) {
+           fName = IF_INDEX_FILE;
+       } else {
+           fName = INDEX_FILE;
+       }
+       return new File("examples/index/", fName);
+   }
+
+   private void writeToFile(String path, File file) {
+       String examplesPath = "examples/";
+       boolean inExampleDir = 0 <= path.indexOf(examplesPath);
+       String prefix =
+               file.getName().endsWith(IF_INDEX_FILE) && path.contains("insecure") ?
+                       "notprovable: " : "provable: ";
+       path = "./" +
+               (inExampleDir ?
+                       path.substring(path.indexOf(examplesPath) + examplesPath.length()) : path);
+       try {
+           PrintWriter w = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
+           w.println(prefix + path);
+           w.close();
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
+   }
+
+   private ImmutableSet<String> getFileNames(File file) {
+       ImmutableSet<String> result = DefaultImmutableSet.<String>nil();
+       boolean foundValidJavaFiles = false;
+       if (file.isDirectory()) {
+           for (File f: file.listFiles()) {
+               if (!f.isDirectory() && f.getName().endsWith(".java")) {
+                   foundValidJavaFiles = true;
+                   result = result.add(f.getName().substring(0, f.getName().indexOf(".")));
+               }
+           }
+       } else if (file.getName().endsWith(".java")) {
+           foundValidJavaFiles = true;
+           result = result.add(getFile().getName()
+                   .substring(0, getFile().getName().indexOf(".")));
+       }
+       if (!foundValidJavaFiles) {
+           throw new IllegalArgumentException(
+                   "Specified file is no valid directory or java-file!");
+       }
+       return result;
+   }
+
+   public Throwable saveAll() {
+       ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
+       try {
+           envInput = createEnvInput();
+           problemInitializer = createProblemInitializer();
+           initConfig = createInitConfig();
+           final SpecificationRepository specRepos =
+                   initConfig.getServices().getSpecificationRepository();
+           final UserInterface ui = getMediator().getUI();
+           final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
+           ImmutableSet<String> fileNames = getFileNames(getFile());
+           for (KeYJavaType kjt: javaInfo.getAllKeYJavaTypes()) {
+               if (!fileNames.contains(kjt.getName())) {
+                   // skip
+               } else {
+                   for (IObserverFunction target: specRepos.getContractTargets(kjt)) {
+                       for (Contract c: specRepos.getContracts(kjt, target)) {
+                           final ContractPO po = c.createProofObl(initConfig);
+                           po.readProblem();
+                           for (Proof p: po.getPO().getProofs()) {
+                               p.removeInfFlowProofSymbols();
+                               p.setEnv(new ProofEnvironment(initConfig));
+                               ui.getMediator().getSelectionModel().setProof(p);
+                               specRepos.registerProof(po, p);
+                               final File poFile = ui.saveProof(p, ".key");
+                               final String path = poFile.getPath();
+                               writeToFile(path, chooseFile(po));
+                           }
+                       }
+                   }
+               }
+           }
+       } catch (Throwable e) {
+           return new ProblemLoaderException(this, e);
+       }
+       return null;
    }
 
    /**
@@ -272,68 +374,68 @@ public class DefaultProblemLoader {
       final String chooseContract;
       final String proofObligation;
       if (envInput instanceof KeYFile) {
-         KeYFile keyFile = (KeYFile)envInput;
-         chooseContract = keyFile.chooseContract();
-         proofObligation = keyFile.getProofObligation();
+          KeYFile keyFile = (KeYFile)envInput;
+          chooseContract = keyFile.chooseContract();
+          proofObligation = keyFile.getProofObligation();
       }
       else {
-         chooseContract = null;
-         proofObligation = null;
+          chooseContract = null;
+          proofObligation = null;
       }
       // Instantiate proof obligation
       if (envInput instanceof ProofOblInput && chooseContract == null && proofObligation == null) {
-         return new LoadedPOContainer((ProofOblInput)envInput);
+          return new LoadedPOContainer((ProofOblInput)envInput);
       }
       else if (chooseContract != null && chooseContract.length() > 0) {
-         int proofNum = 0;
-         String baseContractName = null;
-         int ind = -1;
-         for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
-            ind = chooseContract.indexOf("." + tag);
-            if (ind > 0) {
-               break;
-            }
-            proofNum++;
-         }
-         if (ind == -1) {
-            baseContractName = chooseContract;
-            proofNum = 0;
-         }
-         else {
-            baseContractName = chooseContract.substring(0, ind);
-         }
-         final Contract contract = initConfig.getServices().getSpecificationRepository().getContractByName(baseContractName);
-         if (contract == null) {
-            throw new RuntimeException("Contract not found: " + baseContractName);
-         }
-         else {
-            return new LoadedPOContainer(contract.createProofObl(initConfig, contract), proofNum);
-         }
+          int proofNum = 0;
+          String baseContractName = null;
+          int ind = -1;
+          for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
+              ind = chooseContract.indexOf("." + tag);
+              if (ind > 0) {
+                  break;
+              }
+              proofNum++;
+          }
+          if (ind == -1) {
+              baseContractName = chooseContract;
+              proofNum = 0;
+          }
+          else {
+              baseContractName = chooseContract.substring(0, ind);
+          }
+          final Contract contract = initConfig.getServices().getSpecificationRepository().getContractByName(baseContractName);
+          if (contract == null) {
+              throw new RuntimeException("Contract not found: " + baseContractName);
+          }
+          else {
+              return new LoadedPOContainer(contract.createProofObl(initConfig), proofNum);
+          }
       }
       else if (proofObligation != null && proofObligation.length() > 0) {
-         // Load proof obligation settings
-         Properties properties = new Properties();
-         properties.load(new ByteArrayInputStream(proofObligation.getBytes()));
-         properties.setProperty(IPersistablePO.PROPERTY_FILENAME, file.getAbsolutePath());
-         if (poPropertiesToForce != null) {
-            properties.putAll(poPropertiesToForce);
-         }
-         String poClass = properties.getProperty(IPersistablePO.PROPERTY_CLASS);
-         if (poClass == null || poClass.isEmpty()) {
-            throw new IOException("Proof obligation class property \"" + IPersistablePO.PROPERTY_CLASS + "\" is not defiend or empty.");
-         }
-         try {
-            // Try to instantiate proof obligation by calling static method: public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException
-            Class<?> poClassInstance = Class.forName(poClass);
-            Method loadMethod = poClassInstance.getMethod("loadFrom", InitConfig.class, Properties.class);
-            return (LoadedPOContainer)loadMethod.invoke(null, initConfig, properties);
-         }
-         catch (Exception e) {
-            throw new IOException("Can't call static factory method \"loadFrom\" on class \"" + poClass + "\".", e);
-         }
+          // Load proof obligation settings
+          final Properties properties = new Properties();
+          properties.load(new ByteArrayInputStream(proofObligation.getBytes()));
+          properties.setProperty(IPersistablePO.PROPERTY_FILENAME, file.getAbsolutePath());
+          if (poPropertiesToForce != null) {
+              properties.putAll(poPropertiesToForce);
+           }
+          String poClass = properties.getProperty(IPersistablePO.PROPERTY_CLASS);
+          if (poClass == null || poClass.isEmpty()) {
+              throw new IOException("Proof obligation class property \"" + IPersistablePO.PROPERTY_CLASS + "\" is not defiend or empty.");
+          }
+          try {
+              // Try to instantiate proof obligation by calling static method: public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException
+              Class<?> poClassInstance = Class.forName(poClass);
+              Method loadMethod = poClassInstance.getMethod("loadFrom", InitConfig.class, Properties.class);
+              return (LoadedPOContainer)loadMethod.invoke(null, initConfig, properties);
+          }
+          catch (Exception e) {
+              throw new IOException("Can't call static factory method \"loadFrom\" on class \"" + poClass + "\".", e);
+          }
       }
       else {
-         return null;
+          return null;
       }
    }
 

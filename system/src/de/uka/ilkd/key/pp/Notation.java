@@ -682,4 +682,21 @@ public abstract class Notation {
 	}
     }
 
+    /**
+     * The standard concrete syntax for sequence singletons.
+     */
+    public static final class SeqSingletonNotation extends Notation {
+        final String lDelimiter, rDelimiter;
+
+	public SeqSingletonNotation(String lDelimiter, String rDelimiter) {
+	    super(130);
+            this.lDelimiter = lDelimiter;
+            this.rDelimiter = rDelimiter;
+	}
+
+	public void print(Term t, LogicPrinter sp) throws IOException {
+	    sp.printSeqSingleton(t, lDelimiter, rDelimiter);
+	}
+    }
+
 }

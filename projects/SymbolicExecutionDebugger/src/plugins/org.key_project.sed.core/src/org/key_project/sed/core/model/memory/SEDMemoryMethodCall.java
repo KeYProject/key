@@ -19,6 +19,7 @@ import java.util.List;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
 import org.key_project.sed.core.model.ISEDBranchCondition;
+import org.key_project.sed.core.model.ISEDConstraint;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDMethodCall;
@@ -80,6 +81,11 @@ public class SEDMemoryMethodCall extends AbstractSEDMethodCall implements ISEDMe
     * The up to know discovered method return conditions.
     */
    private final List<ISEDBranchCondition> methodReturnConditions = new LinkedList<ISEDBranchCondition>();
+   
+   /**
+    * The contained {@link ISEDConstraint}s.
+    */
+   private final List<ISEDConstraint> constraints = new LinkedList<ISEDConstraint>();
    
    /**
     * Constructor.
@@ -301,5 +307,23 @@ public class SEDMemoryMethodCall extends AbstractSEDMethodCall implements ISEDMe
       if (methodReturnCondition != null) {
          methodReturnConditions.add(methodReturnCondition);
       }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addConstraint(ISEDConstraint constraint) {
+      if (constraint != null) {
+         constraints.add(constraint);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDConstraint[] getConstraints() throws DebugException {
+      return constraints.toArray(new ISEDConstraint[constraints.size()]);
    }
 }

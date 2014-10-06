@@ -47,6 +47,14 @@ public class Semisequent implements Iterable<SequentFormula> {
     }
     
 
+    /** creates a new Semisequent with the Semisequent elements in
+     * seqList */ 
+    public Semisequent(SequentFormula seqFormula) {
+        assert seqFormula != null;
+        this.seqList = ImmutableSLList.<SequentFormula>nil().append(seqFormula);
+    }
+    
+
     /** inserts an element at a specified index performing redundancy
      * checks, this may result in returning same semisequent if
      * inserting would create redundancies 

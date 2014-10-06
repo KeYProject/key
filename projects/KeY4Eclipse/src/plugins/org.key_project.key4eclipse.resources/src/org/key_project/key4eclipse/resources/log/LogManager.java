@@ -82,7 +82,7 @@ public class LogManager {
             }
             else {
                logFile.create(new ByteArrayInputStream(content.getBytes()), true, null);
-               logFile.setCharset(CHARSET, null);
+//               logFile.setCharset(CHARSET, null); // TODO: Setting charset requires full project access and causes trouble during build
             }
          }
       }
@@ -206,7 +206,7 @@ public class LogManager {
     */
    private LogRecord parseLogRecord(String csvRecord) throws IOException {
       String[] values = csvRecord.split(CSV_SEPARATOR);
-      return new LogRecord(LogRecordKind.valueOf(values[0]), 
+      return new LogRecord(LogRecordKind.valueOf(values[0].trim()), 
                            NumberUtil.parseFullLong(values[1]), 
                            NumberUtil.parseFullLong(values[2]), 
                            fromSingleCharacter(values[3]), 

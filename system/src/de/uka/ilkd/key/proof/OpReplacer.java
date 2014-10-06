@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.util.InfFlowSpec;
 
 
 /**
@@ -36,10 +37,9 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
  */
 public class OpReplacer {
     private TermFactory tf;
-    
     private final Map<? extends SVSubstitute, ? extends SVSubstitute> map;
-    
-    
+
+
     /**
      * @param map mapping from the operators/terms to be replaced to the ones to 
      * replace them with
@@ -101,7 +101,6 @@ public class OpReplacer {
         if(term == null) {
             return null;
         }
-        
         final Term newTerm = (Term) map.get(term); 
         if(newTerm != null) {
             return newTerm;
@@ -119,11 +118,10 @@ public class OpReplacer {
             if(newSubTerms[i] != subTerm) {
                 changedSubTerm = true;
             }
-        }
-        
+        }        
         final ImmutableArray<QuantifiableVariable> newBoundVars 
         	= replace(term.boundVars());
-    
+        
         final Term result;
         if(newOp != term.op()  
            || changedSubTerm
@@ -150,6 +148,25 @@ public class OpReplacer {
         }
         return result;
     }    
+    
+    /**
+     * Replaces in a list of triples of lists of terms.
+     */
+    public ImmutableList<InfFlowSpec> replaceInfFlowSpec(ImmutableList<InfFlowSpec> terms) {
+        ImmutableList<InfFlowSpec>
+                result = ImmutableSLList.<InfFlowSpec>nil();
+        if (terms == null) {
+            return result;
+        }
+        
+        for(final InfFlowSpec infFlowSpec : terms) {
+            final ImmutableList<Term> preExpressions = replace(infFlowSpec.preExpressions);
+            final ImmutableList<Term> postExpressions = replace(infFlowSpec.postExpressions);
+            final ImmutableList<Term> newObjects = replace(infFlowSpec.newObjects);
+            result = result.append(new InfFlowSpec(preExpressions, postExpressions, newObjects));
+        }
+        return result;
+    }
     
     
     /**

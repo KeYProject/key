@@ -38,10 +38,14 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobManager;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.swt.widgets.Display;
+import org.key_project.key4eclipse.resources.builder.KeYProjectBuildJob;
 import org.key_project.key4eclipse.resources.builder.KeYProjectBuilder;
 import org.key_project.key4eclipse.resources.log.LogManager;
-import org.key_project.key4eclipse.resources.marker.MarkerManager;
+import org.key_project.key4eclipse.resources.marker.MarkerUtil;
 import org.key_project.key4eclipse.resources.nature.KeYProjectNature;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
 import org.key_project.key4eclipse.resources.test.Activator;
@@ -111,7 +115,7 @@ public class KeY4EclipseResourcesTestUtil {
       if(keyBuilder != null){
          return keyBuilder.getBuilderName().equals(builderId);
       }
-      else return false;
+      return false;
    }
    
    
@@ -132,6 +136,12 @@ public class KeY4EclipseResourcesTestUtil {
       return oldEnabled;
    }
    
+   public static boolean isAutoBuilding(){
+      IWorkspace workspace = ResourcesPlugin.getWorkspace();
+      IWorkspaceDescription desc = workspace.getDescription();
+      return desc.isAutoBuilding(); 
+   }
+   
    
    /**
     * Runs an {@link IncrementalProjectBuilder}s INCREMENTAL_BUILD for the given {@link IProject} and waits for the build to finish.
@@ -140,12 +150,34 @@ public class KeY4EclipseResourcesTestUtil {
     */
    public static void build(IProject project) throws CoreException{
       project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, null);
-      TestUtilsUtil.waitForBuild();
+      waitBuild();
+   }
+   
+   public static void waitBuild() {
+      IJobManager manager = Job.getJobManager();
+      // Wait for jobs and builds.
+      Job[] keyJobs = manager.find(KeYProjectBuildJob.KEY_PROJECT_BUILD_JOB);
+      Job[] buildJobs = manager.find(ResourcesPlugin.FAMILY_AUTO_BUILD);
+      while (!ArrayUtil.isEmpty(keyJobs) || !ArrayUtil.isEmpty(buildJobs)) {
+         // Sleep some time but allow the UI to do its tasks
+         if (Display.getDefault().getThread() == Thread.currentThread()) {
+            int i = 0;
+            while (Display.getDefault().readAndDispatch() && i < 1000) {
+               i++;
+            }
+         }
+         else {
+            TestUtilsUtil.sleep(100);
+         }
+         // Check if jobs are still running
+         keyJobs = manager.find(KeYProjectBuildJob.KEY_PROJECT_BUILD_JOB);
+         buildJobs = manager.find(ResourcesPlugin.FAMILY_AUTO_BUILD);
+      }
    }
    
    public static void cleanBuild(IProject project) throws CoreException{
       project.build(IncrementalProjectBuilder.CLEAN_BUILD, null);
-      TestUtilsUtil.waitForBuild();
+      waitBuild();
    }
    
    
@@ -174,7 +206,7 @@ public class KeY4EclipseResourcesTestUtil {
     */
    public static IFolder getProofFolder(IProject project){
       IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-      IPath proofFolderPath = project.getFullPath().append("proofs");
+      IPath proofFolderPath = project.getFullPath().append(KeYResourcesUtil.PROOF_FOLDER_NAME);
       return root.getFolder(proofFolderPath);
    }
    
@@ -203,10 +235,10 @@ public class KeY4EclipseResourcesTestUtil {
     * @throws CoreException
     */
    public static LinkedList<IMarker> getAllKeYMarker(IResource res) throws CoreException{
-      LinkedList<IMarker> allMarkerList = getKeYMarkerByType(MarkerManager.CLOSEDMARKER_ID, res);
-      allMarkerList.addAll(getKeYMarkerByType(MarkerManager.NOTCLOSEDMARKER_ID, res));
-      allMarkerList.addAll(getKeYMarkerByType(MarkerManager.RECURSIONMARKER_ID, res));
-      allMarkerList.addAll(getKeYMarkerByType(MarkerManager.PROBLEMLOADEREXCEPTIONMARKER_ID, res));
+      LinkedList<IMarker> allMarkerList = getKeYMarkerByType(MarkerUtil.CLOSEDMARKER_ID, res);
+      allMarkerList.addAll(getKeYMarkerByType(MarkerUtil.NOTCLOSEDMARKER_ID, res));
+      allMarkerList.addAll(getKeYMarkerByType(MarkerUtil.RECURSIONMARKER_ID, res));
+      allMarkerList.addAll(getKeYMarkerByType(MarkerUtil.PROBLEMLOADEREXCEPTIONMARKER_ID, res));
       return allMarkerList;
    }
    
@@ -215,22 +247,22 @@ public class KeY4EclipseResourcesTestUtil {
    }
    
    
-   public static void setKeYProjectProperties(IProject project, boolean buildProofs, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean hideMetaFiles, boolean autoDeleteProofFiles) throws CoreException{
-      KeYProjectProperties.setEnableBuildProofs(project, buildProofs);
+   public static void setKeYProjectProperties(IProject project, boolean buildProofs, boolean startupBuilds, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean autoDeleteProofFiles) throws CoreException{
+      KeYProjectProperties.setEnableKeYResourcesBuilds(project, buildProofs);
+      KeYProjectProperties.setEnableBuildOnStartup(project, startupBuilds);
       KeYProjectProperties.setEnableBuildProofsEfficient(project, buildProofsEfficient);
       KeYProjectProperties.setEnableMultiThreading(project, enableMultiThreading);
       KeYProjectProperties.setNumberOfThreads(project, String.valueOf(numberOfThreads));
-      KeYProjectProperties.setHideMetaFiles(project, hideMetaFiles);
       KeYProjectProperties.setAutoDeleteProofFiles(project, autoDeleteProofFiles);
    }
    
-   public static IProject initializeTest(String projectName, boolean buildProofs, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean autoDeleteProofFiles, boolean hideMetaFiles) throws CoreException, InterruptedException{
+   public static IProject initializeTest(String projectName, boolean buildProofs, boolean startupBuilds, boolean buildProofsEfficient, boolean enableMultiThreading, int numberOfThreads, boolean autoDeleteProofFiles) throws CoreException, InterruptedException{
       //turn off autobuild
-      enableAutoBuild(false);
+//      enableAutoBuild(false);
       //create a KeYProject
       IJavaProject keyProject = createKeYProject(projectName);
       IProject project = keyProject.getProject();
-      setKeYProjectProperties(project, buildProofs, buildProofsEfficient, enableMultiThreading, numberOfThreads, hideMetaFiles, autoDeleteProofFiles);
+      setKeYProjectProperties(project, buildProofs, startupBuilds, buildProofsEfficient, enableMultiThreading, numberOfThreads, autoDeleteProofFiles);
       //build
       KeY4EclipseResourcesTestUtil.build(project);
       return project;

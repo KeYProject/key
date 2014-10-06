@@ -41,6 +41,6 @@ public class ProofMarkerResolutionGenerator implements IMarkerResolutionGenerato
       catch (CoreException e) {
          LogUtil.getLogger().logError(e);
       }
-      return (IMarkerResolution[])resolutions.toArray(new IMarkerResolution[resolutions.size()]);
+      return resolutions.toArray(new IMarkerResolution[resolutions.size()]);
    }
 }

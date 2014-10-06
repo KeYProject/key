@@ -345,4 +345,12 @@ public class ResourceUtil {
          throw new CoreException(new Logger(Activator.getDefault(), Activator.PLUGIN_ID).createErrorStatus(e));
       }
    }
+   
+   /**
+    * Returns the location of the workspace.
+    * @return The location of the workspace.
+    */
+   public static File getWorkspaceLocation() {
+      return getLocation(ResourcesPlugin.getWorkspace().getRoot());
+   }
 }

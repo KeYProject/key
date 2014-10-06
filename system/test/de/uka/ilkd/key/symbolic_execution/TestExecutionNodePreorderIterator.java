@@ -148,7 +148,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
     * @param proofNode The {@link Node} in KeY's proof tree to represent.
     * @return The created {@link KeYlessStatement}.
     */
-   protected KeYlessStatement createStatement(AbstractKeYlessExecutionNode parent, Node proofNode) {
+   protected KeYlessStatement createStatement(AbstractKeYlessExecutionNode<?> parent, Node proofNode) {
       KeYlessStatement statement = new KeYlessStatement(parent, proofNode.serialNr() + "", null, false);
       parent.addChild(statement);
       return statement;
@@ -178,7 +178,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
     * @param expectedRoots The expected values.
     * @throws ProofInputException Occurred Exception. 
     */
-   protected void assertRoot(IExecutionNode element, 
+   protected void assertRoot(IExecutionNode<?> element, 
                              ExpectedNode[] expectedRoots) throws ProofInputException {
       ExecutionNodePreorderIterator iter = new ExecutionNodePreorderIterator(element);
       assertExpectedNodes(iter, expectedRoots, false);
@@ -200,7 +200,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
          assertNotNull(iter);
          for (ExpectedNode node : expectedRoots) {
             assertTrue(iter.hasNext());
-            IExecutionNode next = iter.next();
+            IExecutionNode<?> next = iter.next();
             assertNotNull(next);
             assertEquals(node.getExpectedName(), next.getName());
             if (iterateOverSubtree) {

@@ -13,11 +13,13 @@
 
 package org.key_project.sed.key.core.model;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.jdt.core.IMethod;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
@@ -26,6 +28,7 @@ import org.key_project.sed.key.core.breakpoints.KeYBreakpointManager;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.eclipse.ResourceUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.AutoModeListener;
@@ -78,6 +81,16 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * The {@link IKeYSEDDebugNode} for which the auto mode was started the last time.
     */
    private IKeYSEDDebugNode<?> lastResumedKeyNode;
+   
+   /**
+    * The constraints
+    */
+   private KeYConstraint[] constraints;
+   
+   /**
+    * The contained KeY variables.
+    */
+   private KeYVariable[] variables;
    
    /**
     * Listens for auto mode start and stop events.
@@ -143,7 +156,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    @Override
    public IKeYSEDDebugNode<?>[] getChildren() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
-         IExecutionNode[] executionChildren = executionNode.getChildren();
+         IExecutionNode<?>[] executionChildren = executionNode.getChildren();
          if (children == null) {
             children = KeYModelUtil.createChildren(this, executionChildren);
          }
@@ -609,5 +622,94 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     */
    public ISEDTermination getTermination(final IExecutionTermination executionTermination) {
       return knownTerminations.get(executionTermination);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasConstraints() throws DebugException {
+      return !isTerminated() && super.hasConstraints();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYConstraint[] getConstraints() throws DebugException {
+      synchronized (this) {
+         if (constraints == null) {
+            constraints = KeYModelUtil.createConstraints(this, executionNode);
+         }
+         return constraints;
+      }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasVariables() throws DebugException {
+      try {
+         return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
+                !executionNode.isDisposed() && 
+                SymbolicExecutionUtil.canComputeVariables(executionNode, executionNode.getServices()) &&
+                super.hasVariables();
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus(e));
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYVariable[] getVariables() throws DebugException {
+      synchronized (this) {
+         if (variables == null) {
+            variables = KeYModelUtil.createVariables(this, executionNode);
+         }
+         return variables;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getLineNumber() throws DebugException {
+      return -1;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getCharStart() throws DebugException {
+      return -1;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getCharEnd() throws DebugException {
+      return -1;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getSourcePath() {
+      IMethod method = getDebugTarget().getLaunchSettings().getMethod();
+      if (method != null) {
+         File localFile = ResourceUtil.getLocation(method.getResource());
+         return localFile != null ? localFile.getAbsolutePath() : null;
+      }
+      else {
+         return null;
+      }
    }
 }

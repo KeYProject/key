@@ -325,7 +325,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
            throw new RuntimeException("Contract not found: " + contractName);
        }
        else {
-           final ProofOblInput po = contract.createProofObl(initConfig, contract);
+           final ProofOblInput po = contract.createProofObl(initConfig);
            return new LoadedPOContainer(po);
        }
     }

@@ -86,7 +86,8 @@ public final class KeyStrokeManager {
             mapping.put(de.uka.ilkd.key.macros.OneStepProofMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE,MULTI_KEY_MASK));
             mapping.put(de.uka.ilkd.key.macros.TestGenMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_T,MULTI_KEY_MASK));
             mapping.put(de.uka.ilkd.key.macros.HeapSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_H,MULTI_KEY_MASK));
-            
+
+            mapping.put(de.uka.ilkd.key.gui.actions.KeYProjectHomepageAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_F1,0));
             mapping.put(de.uka.ilkd.key.gui.actions.QuickSaveAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_F5,0));
             mapping.put(de.uka.ilkd.key.gui.actions.QuickLoadAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_F6,0));
         }
