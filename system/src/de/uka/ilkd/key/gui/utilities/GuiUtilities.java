@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.util;
+package de.uka.ilkd.key.gui.utilities;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -30,6 +30,7 @@ import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.util.Debug;
 
 public final class GuiUtilities {
     

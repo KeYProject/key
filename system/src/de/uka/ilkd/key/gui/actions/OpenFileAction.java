@@ -23,9 +23,9 @@ import javax.swing.JOptionPane;
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.util.GuiUtilities;
 
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 
 public class OpenFileAction extends MainWindowAction {
     
