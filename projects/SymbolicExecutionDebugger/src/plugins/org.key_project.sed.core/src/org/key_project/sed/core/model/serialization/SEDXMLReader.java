@@ -396,6 +396,9 @@ public class SEDXMLReader {
                   if (parent instanceof ISEDMemoryStackFrameCompatibleDebugNode) {
                      ((ISEDMemoryStackFrameCompatibleDebugNode)parent).addVariable(variable);
                   }
+                  else if (parent == null && thread != null) {
+                     thread.addVariable(variable);
+                  }
                   else {
                      throw new SAXException("Can't add variable to parent.");
                   }
@@ -903,10 +906,12 @@ public class SEDXMLReader {
     * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
     * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
     * @return The created {@link SEDMemoryExceptionalTermination}.
+    * @throws SAXException Occurred Exception.
     */   
-   protected SEDMemoryExceptionalTermination createExceptionalTermination(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) {
+   protected SEDMemoryExceptionalTermination createExceptionalTermination(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEDMemoryExceptionalTermination termination = new SEDMemoryExceptionalTermination(target, parent, thread, isVerified(attributes));
       fillDebugNode(termination, attributes);
+      fillStackFrame(termination, attributes);
       return termination;
    }
    
@@ -920,10 +925,12 @@ public class SEDXMLReader {
     * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
     * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
     * @return The created {@link SEDMemoryLoopBodyTermination}.
+    * @throws SAXException Occurred Exception.
     */   
-   protected SEDMemoryLoopBodyTermination createLoopBodyTermination(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) {
+   protected SEDMemoryLoopBodyTermination createLoopBodyTermination(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEDMemoryLoopBodyTermination termination = new SEDMemoryLoopBodyTermination(target, parent, thread, isVerified(attributes));
       fillDebugNode(termination, attributes);
+      fillStackFrame(termination, attributes);
       return termination;
    }
    
@@ -1109,10 +1116,12 @@ public class SEDXMLReader {
     * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
     * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
     * @return The created {@link SEDMemoryTermination}.
+    * @throws SAXException Occurred Exception.
     */   
-   protected SEDMemoryTermination createTermination(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) {
+   protected SEDMemoryTermination createTermination(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEDMemoryTermination termination = new SEDMemoryTermination(target, parent, thread, isVerified(attributes));
       fillDebugNode(termination, attributes);
+      fillStackFrame(termination, attributes);
       return termination;
    }
    
@@ -1234,7 +1243,13 @@ public class SEDXMLReader {
     */
    protected int getLineNumber(Attributes attributes) throws SAXException {
       try {
-         return Integer.parseInt(attributes.getValue(SEDXMLWriter.ATTRIBUTE_LINE_NUMBER));
+         String value = attributes.getValue(SEDXMLWriter.ATTRIBUTE_LINE_NUMBER);
+         if (value != null) {
+            return Integer.parseInt(value);
+         }
+         else {
+            return -1;
+         }
       }
       catch (NumberFormatException e) {
          throw new SAXException(e);
@@ -1249,7 +1264,13 @@ public class SEDXMLReader {
     */
    protected int getCharStart(Attributes attributes) throws SAXException {
       try {
-         return Integer.parseInt(attributes.getValue(SEDXMLWriter.ATTRIBUTE_CHAR_START));
+         String value = attributes.getValue(SEDXMLWriter.ATTRIBUTE_CHAR_START);
+         if (value != null) {
+            return Integer.parseInt(value);
+         }
+         else {
+            return -1;
+         }
       }
       catch (NumberFormatException e) {
          throw new SAXException(e);
@@ -1264,7 +1285,13 @@ public class SEDXMLReader {
     */
    protected int getCharEnd(Attributes attributes) throws SAXException {
       try {
-         return Integer.parseInt(attributes.getValue(SEDXMLWriter.ATTRIBUTE_CHAR_END));
+         String value = attributes.getValue(SEDXMLWriter.ATTRIBUTE_CHAR_END);
+         if (value != null) {
+            return Integer.parseInt(value);
+         }
+         else {
+            return -1;
+         }
       }
       catch (NumberFormatException e) {
          throw new SAXException(e);

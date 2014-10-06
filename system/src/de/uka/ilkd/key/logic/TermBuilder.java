@@ -188,8 +188,8 @@ public class TermBuilder {
      * Returns an available name constructed by affixing a counter to a self-
      * chosen base name for the passed sort.
      */
-    public String newName(TermServices services, Sort sort) {
-    return newName(shortBaseName(sort));
+    public String newName(Sort sort) {
+        return newName(shortBaseName(sort));
     }
 
 
@@ -205,13 +205,39 @@ public class TermBuilder {
      */
     public LocationVariable selfVar(KeYJavaType kjt,
                                     boolean makeNameUnique) {
-    String name = "self";
-    if(makeNameUnique) {
-        name = newName(name);
-    }
-    return new LocationVariable(new ProgramElementName(name), kjt);
+        return selfVar(kjt, makeNameUnique, "");
     }
 
+
+    /**
+     * Creates a program variable for "self". Take care to register it
+     * in the namespaces!
+     */
+    public LocationVariable selfVar(KeYJavaType kjt,
+                                    boolean makeNameUnique,
+                                    String postfix) {
+        String name = "self" + postfix;
+        if(makeNameUnique) {
+            name = newName(name);
+        }
+        return new LocationVariable(new ProgramElementName(name), kjt);
+    }
+
+
+    /**
+     * Creates a program variable for "self". Take care to register it
+     * in the namespaces!
+     */
+    public LocationVariable selfVar(IProgramMethod pm,
+                                    KeYJavaType kjt,
+                                    boolean makeNameUnique,
+                                    String postfix) {
+        if(pm.isStatic()) {
+            return null;
+        } else {
+            return selfVar(kjt, makeNameUnique, postfix);
+        }
+    }
 
     /**
      * Creates a program variable for "self". Take care to register it
@@ -336,15 +362,26 @@ public class TermBuilder {
      * in the namespaces.
      */
     public LocationVariable heapAtPreVar(String baseName,
+                                         boolean makeNameUnique) {
+        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        return heapAtPreVar(baseName, heapLDT.getHeap().sort(), makeNameUnique);
+    }
+
+    /**
+     * Creates a program variable for the atPre heap. Take care to register it
+     * in the namespaces.
+     */
+    public LocationVariable heapAtPreVar(String baseName,
                                          Sort sort,
                                          boolean makeNameUnique) {
         assert sort != null;
-    if(makeNameUnique) {
-        baseName = newName(baseName);
+        if(makeNameUnique) {
+            baseName = newName(baseName);
+        }
+        return new LocationVariable(new ProgramElementName(baseName),
+                                    new KeYJavaType(sort));
     }
-    return new LocationVariable(new ProgramElementName(baseName),
-                            new KeYJavaType(sort));
-    }
+
 
     //-------------------------------------------------------------------------
     //constructors for special classes of term operators
@@ -467,7 +504,7 @@ public class TermBuilder {
         }
     }
 
-    public Term cast(TermServices services, Sort s, Term t) {
+    public Term cast(Sort s, Term t) {
     return tf.createTerm(s.getCastSymbol(services), t);
     }
 
@@ -536,8 +573,7 @@ public class TermBuilder {
     public Term bsum(QuantifiableVariable qv,
                      Term a,
                      Term b,
-                     Term t,
-                     Services services) {
+                     Term t) {
         Function bsum = services.getTypeConverter().getIntegerLDT().getBsum();
         return func(bsum,
                     new Term[]{a, b, t},
@@ -545,7 +581,7 @@ public class TermBuilder {
     }
 
     /** General (unbounded) sum */
-    public Term sum (ImmutableList<QuantifiableVariable> qvs, Term range, Term t, TermServices services) {
+    public Term sum (ImmutableList<QuantifiableVariable> qvs, Term range, Term t) {
         final Function sum = (Function)services.getNamespaces().functions().lookup("sum");
         final Iterator<QuantifiableVariable> it = qvs.iterator();
         Term res = func(sum, new Term[]{convertToBoolean(range), t}, new ImmutableArray<QuantifiableVariable>(it.next()));
@@ -1027,32 +1063,41 @@ public class TermBuilder {
 
 
     public Term sequential(ImmutableList<Term> updates) {
-    if(updates.isEmpty()) {
-        return skip();
-    } else if(updates.size() == 1) {
-        return updates.head();
-    } else {
-        return sequential(updates.head(), sequential(updates.tail()));
-    }
+        if(updates.isEmpty()) {
+            return skip();
+        } else if(updates.size() == 1) {
+            return updates.head();
+        } else {
+            return sequential(updates.head(), sequential(updates.tail()));
+        }
     }
 
     public Term apply(Term update, Term target) {
         return apply(update,target,null);
     }
 
+    public ImmutableList<Term> apply(Term update,
+            ImmutableList<Term> targets) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for (Term target : targets) {
+            result = result.append(apply(update, target));
+        }
+        return result;
+    }
+
     public Term apply(Term update, Term target, ImmutableArray<TermLabel> labels) {
-    if(update.sort() != Sort.UPDATE) {
-        throw new TermCreationException("Not an update: " + update);
-    } else if(update.op() == UpdateJunctor.SKIP) {
-        return target;
-    } else if(target.equals(tt())) {
+        if(update.sort() != Sort.UPDATE) {
+            throw new TermCreationException("Not an update: " + update);
+        } else if(update.op() == UpdateJunctor.SKIP) {
+            return target;
+        } else if(target.equals(tt())) {
             return tt();
         } else {
-        return tf.createTerm(UpdateApplication.UPDATE_APPLICATION,
-                     update,
-                     target,
-                     labels);
-    }
+            return tf.createTerm(UpdateApplication.UPDATE_APPLICATION,
+                    update,
+                    target,
+                    labels);
+        }
     }
 
 
@@ -1717,6 +1762,18 @@ public class TermBuilder {
         }
     }
 
+    public Term unlabel(Term term) {
+        return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock());
+    }
+
+    public Term unlabelRecursive(Term term) {
+        Term[] subs = new Term[term.subs().size()];
+        for (int i = 0; i < subs.length; i++) {
+            subs[i] = unlabelRecursive(term.sub(i));
+        }
+        return tf.createTerm(term.op(), subs, term.boundVars(), term.javaBlock());
+    }
+
     public Term dotArr(Term ref, Term idx) {
         if(ref == null || idx == null) {
             throw new TermCreationException("Tried to build an array access "+
@@ -1990,42 +2047,62 @@ public class TermBuilder {
     //-------------------------------------------------------------------------
 
     public Term seqGet(Sort asSort, Term s, Term idx) {
-    return func(services.getTypeConverter().getSeqLDT().getSeqGet(asSort,
-                                          services),
-            s,
-            idx);
+        return func(services.getTypeConverter().getSeqLDT().getSeqGet(asSort, services),
+                    s,
+                    idx);
     }
 
 
     public Term seqLen(Term s) {
-    return func(services.getTypeConverter().getSeqLDT().getSeqLen(), s);
+        return func(services.getTypeConverter().getSeqLDT().getSeqLen(), s);
     }
 
     /** Function representing the least index of an element x in a sequence s (or underspecified) */
     public Term indexOf(Term s, Term x){
-    return func(services.getTypeConverter().getSeqLDT().getSeqIndexOf(),s,x);
+        return func(services.getTypeConverter().getSeqLDT().getSeqIndexOf(),s,x);
     }
 
 
     public Term seqEmpty() {
-    return func(services.getTypeConverter().getSeqLDT().getSeqEmpty());
+        return func(services.getTypeConverter().getSeqLDT().getSeqEmpty());
     }
-
 
     public Term seqSingleton(Term x) {
-    return func(services.getTypeConverter().getSeqLDT().getSeqSingleton(), x);
+        return func(services.getTypeConverter().getSeqLDT().getSeqSingleton(), x);
     }
-
 
     public Term seqConcat(Term s, Term s2) {
-    return func(services.getTypeConverter().getSeqLDT().getSeqConcat(), s, s2);
+        if (s == seqEmpty()) {
+            return s2;
+        } else if (s2 == seqEmpty()) {
+            return s;
+        } else {
+            return func(services.getTypeConverter().getSeqLDT().getSeqConcat(),
+                        s,
+                        s2);
+        }
     }
 
+    public Term seq(Term... terms) {
+        Term result = seqEmpty();
+        for (Term term : terms) {
+            result = seqConcat(result, seqSingleton(term));
+        }
+        return result;
+    }
+
+
+    public Term seq(ImmutableList<Term> terms) {
+        Term result = seqEmpty();
+        for (Term term : terms) {
+            result = seqConcat(result, seqSingleton(term));
+        }
+        return result;
+    }
 
     public Term seqSub(Term s, Term from, Term to) {
     return func(services.getTypeConverter().getSeqLDT().getSeqSub(), s, from, to);
     }
-
 
     public Term seqReverse(Term s) {
     return func(services.getTypeConverter().getSeqLDT().getSeqReverse(), s);
@@ -2108,5 +2185,37 @@ public class TermBuilder {
        }
        return result;
     }
-    
+
+    //-------------------------------------------------------------------------
+    // information flow operators
+    //-------------------------------------------------------------------------
+
+    public Term eqAtLocs(Services services,
+                         Term heap1,
+                         Term locset1,
+                         Term heap2,
+                         Term locset2) {
+        return (locset1.equals(empty())
+                && locset2.equals(empty()))
+                ? tt
+                        : func((Function) services.getNamespaces().functions().lookup(new Name(
+                                "__EQUALS__LOCS__")), // TODO: define string constant elsewhere
+                                heap1, locset1, heap2, locset2);
+    }
+
+
+    public Term eqAtLocsPost(Services services,
+                             Term heap1_pre,
+                             Term heap1_post,
+                             Term locset1,
+                             Term heap2_pre,
+                             Term heap2_post,
+                             Term locset2) {
+        return (locset1.equals(empty())
+                && locset2.equals(empty()))
+                ? tt
+                        : func((Function) services.getNamespaces().functions().lookup(new Name(
+                                "__EQUALS__LOCS__POST__")), // TODO: define string constant elsewhere
+                                heap1_pre, heap1_post, locset1, heap2_pre, heap2_post, locset2);
+    }
 }

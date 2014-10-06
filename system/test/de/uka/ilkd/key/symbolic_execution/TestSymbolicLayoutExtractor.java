@@ -662,7 +662,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
          // Resume
          resume(env.getUi(), env.getBuilder(), oraclePathInBaseDir + symbolicExecutionOracleFileName, keyRepDirectory);
          // Find most left method return node
-         IExecutionNode returnNode = env.getBuilder().getStartNode();
+         IExecutionNode<?> returnNode = env.getBuilder().getStartNode();
          int foundReturnStatement = 0;
          while (foundReturnStatement < numberOfReturnNodeInMostLeftBranch && returnNode.getChildren().length >= 1) {
             returnNode = returnNode.getChildren()[0];
@@ -671,10 +671,10 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
             }
          }
          assertTrue(returnNode instanceof IExecutionMethodReturn);
-         IExecutionNode nodeToTest;
+         IExecutionNode<?> nodeToTest;
          if (onReturnStatementNode) {
             // Get the return statement which is returned in returnNode
-            IExecutionNode returnStatement = returnNode.getParent();
+            IExecutionNode<?> returnStatement = returnNode.getParent();
             while (!(returnStatement instanceof IExecutionStatement)) {
                if (returnStatement instanceof IExecutionStatement) {
                   foundReturnStatement++;
@@ -689,7 +689,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
             nodeToTest = returnNode;
          }
          // Extract possible heaps
-         SymbolicLayoutExtractor extractor = new SymbolicLayoutExtractor(nodeToTest.getProofNode(), false, false);
+         SymbolicLayoutExtractor extractor = new SymbolicLayoutExtractor(nodeToTest.getProofNode(), nodeToTest.getModalityPIO(), false, false);
          extractor.analyse();
          // Test the initial memory layouts (first time with lazy computation)
          List<ISymbolicLayout> initialLayoutsFirstTime = new ArrayList<ISymbolicLayout>(extractor.getLayoutsCount());

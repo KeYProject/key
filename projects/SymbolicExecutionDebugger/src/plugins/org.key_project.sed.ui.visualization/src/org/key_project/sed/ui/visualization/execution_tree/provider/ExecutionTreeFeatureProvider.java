@@ -403,10 +403,7 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
          return super.getCustomFeatures(context);
       }
       else {
-         return new ICustomFeature[] {
-               new MethodCallCollapseFeature(this)
-         };
-         //return new ICustomFeature[0];
+         return new ICustomFeature[0];
       }
    }
 

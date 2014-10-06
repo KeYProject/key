@@ -35,7 +35,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * The default implementation of {@link IExecutionLoopStatement}.
  * @author Martin Hentschel
  */
-public class ExecutionLoopStatement extends AbstractExecutionStateNode<LoopStatement> implements IExecutionLoopStatement {
+public class ExecutionLoopStatement extends AbstractExecutionNode<LoopStatement> implements IExecutionLoopStatement {
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.

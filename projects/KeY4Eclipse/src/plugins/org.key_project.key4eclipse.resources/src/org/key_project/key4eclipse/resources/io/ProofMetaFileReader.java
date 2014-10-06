@@ -37,6 +37,7 @@ import org.xml.sax.helpers.DefaultHandler;
 public class ProofMetaFileReader {
    private String proofFileMD5;
    private boolean proofClosed;
+   private boolean proofOutdated;
    private String markerMessage;
    private final LinkedList<ProofMetaFileTypeElement> typeElemens = new LinkedList<ProofMetaFileTypeElement>();
    private final LinkedList<IFile> usedContracts = new LinkedList<IFile>();
@@ -82,6 +83,7 @@ public class ProofMetaFileReader {
             Assert.isTrue(parentStack.isEmpty());
             proofFileMD5 = getMD5(attributes);
             proofClosed = isProofClosed(attributes);
+            proofOutdated = isProofOutdated(attributes);
             parentStack.addFirst(ProofMetaFileWriter.TAG_PROOF_META_FILE);
          }
          else if (ProofMetaFileWriter.TAG_MARKER_MESSAGE.equals(qName)) {
@@ -195,6 +197,16 @@ public class ProofMetaFileReader {
          String value = attributes.getValue(ProofMetaFileWriter.ATTRIBUTE_PROOF_CLOSED);
          return value != null && Boolean.parseBoolean(value);
       }
+      
+      /**
+       * Returns the proof outdated state.
+       * @param attributes The attributes to read from.
+       * @return The read value.
+       */
+      protected boolean isProofOutdated(Attributes attributes) {
+         String value = attributes.getValue(ProofMetaFileWriter.ATTRIBUTE_PROOF_OUTDATED);
+         return value != null && Boolean.parseBoolean(value);
+      }
 
       /**
        * Returns the name.
@@ -251,9 +263,7 @@ public class ProofMetaFileReader {
          if (path != null) {
             return ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(path));
          }
-         else {
-            return null;
-         }
+         return null;
       }
    }
 
@@ -270,6 +280,10 @@ public class ProofMetaFileReader {
       return proofClosed;
    }
    
+   public boolean getProofOutdated(){
+      return proofOutdated;
+   }
+   
    public String getMarkerMessage(){
       return markerMessage;
    }
@@ -278,7 +292,7 @@ public class ProofMetaFileReader {
     * Return the {@link LinkedList} with all {@link ProofMetaFileTypeElement}s.
     * @return the {@link ProofMetaFileTypeElement}s
     */
-   public LinkedList<ProofMetaFileTypeElement> getTypeElements() {
+   public List<ProofMetaFileTypeElement> getTypeElements() {
       return typeElemens;
    }
    

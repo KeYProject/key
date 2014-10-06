@@ -589,7 +589,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         //prepare cut formula
   	    final ContractPO po
 		    = services.getSpecificationRepository()
-			    .getPOForProof(goal.proof());
+			    .getContractPOForProof(goal.proof());
 	    final Term mbyOk;
 	    if(po != null && /* po.getMbyAtPre() != null && */ mby != null) {
 //	        mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),

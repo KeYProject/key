@@ -1,0 +1,535 @@
+\profile "Java Profile";
+
+\settings {
+"#Proof-Settings-Config-File
+#Tue Jan 21 19:30:19 CET 2014
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[SMTSettings]useUninterpretedMultiplication=true
+[SMTSettings]SelectedTaclets=
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
+[SMTSettings]instantiateHierarchyAssumptions=true
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
+[StrategyProperty]RETREAT_MODE_OPTIONS_KEY=RETREAT_MODE_NONE
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_ON
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT
+[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_RESTRICTED
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=9000
+[SMTSettings]integersMaximum=2147483645
+[Choice]DefaultChoices=assertions-assertions\\:on , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , runtimeExceptions-runtimeExceptions\\:allow , JavaCard-JavaCard\\:on , Strings-Strings\\:on , modelFields-modelFields\\:treatAsAxiom , bigint-bigint\\:on , sequences-sequences\\:on , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , optimisedSelectRules-optimisedSelectRules\\:on
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_OFF
+[StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_TRUE
+[SMTSettings]maxGenericSorts=2
+[SMTSettings]integersMinimum=-2147483645
+[SMTSettings]UseBuiltUniqueness=false
+[SMTSettings]explicitTypeHierarchy=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+"
+}
+
+\javaSource "../../../examples/firstTouch/004InformationFlow--SimpleEvoting/src";
+
+
+
+\sorts{
+Heap;
+Formula;
+simple_evoting.Setup\extends java.lang.Object;
+Field;
+boolean;
+numbers;
+int;
+simple_evoting.Server\extends java.lang.Object;
+java.lang.Exception\extends java.lang.Throwable;
+simple_evoting.Voter\extends java.lang.Object;
+Seq;
+}
+
+\functions{
+Heap heapAtPre_A;
+Formula wellFormed(Heap);
+Null null;
+Field java.lang.Object::<created>;
+boolean boolean::select(Heap,java.lang.Object,Field);
+boolean TRUE;
+boolean simple_evoting.Setup::exactInstance(any);
+numbers #;
+numbers 0(numbers);
+int Z(numbers);
+Formula leq(int,int);
+Field simple_evoting.Setup::$numberOfVoters;
+int int::select(Heap,java.lang.Object,Field);
+Formula lt(int,int);
+Formula inInt(int);
+Field simple_evoting.Setup::$server;
+simple_evoting.Server simple_evoting.Server::select(Heap,java.lang.Object,Field);
+Field simple_evoting.Server::$ballotCast;
+boolean[] boolean[]::select(Heap,java.lang.Object,Field);
+Field arr(int);
+Field simple_evoting.Setup::$numberOfCandidates;
+Field simple_evoting.Server::$votesForCandidates;
+int[] int[]::select(Heap,java.lang.Object,Field);
+Formula java.lang.Object::<inv>(Heap,java.lang.Object);
+Heap heapAtPost_A;
+Heap heapAtPre_B;
+Heap heapAtPost_B;
+Field simple_evoting.Environment::$result;
+Field simple_evoting.Setup::$voters;
+simple_evoting.Voter[] simple_evoting.Voter[]::select(Heap,java.lang.Object,Field);
+simple_evoting.Voter simple_evoting.Voter::select(Heap,java.lang.Object,Field);
+Field simple_evoting.Voter::$vote;
+numbers 1(numbers);
+int bsum(int,int,int);
+Seq seqDef(int,int,any);
+Field simple_evoting.Setup::$out;
+int length(java.lang.Object);
+}
+
+\programVariables{
+Heap heap;
+simple_evoting.Setup self_A;
+simple_evoting.Setup selfAtPost_A;
+java.lang.Exception excAtPost_A;
+java.lang.Exception exc_A;
+simple_evoting.Setup self_B;
+simple_evoting.Setup selfAtPost_B;
+java.lang.Exception excAtPost_B;
+java.lang.Exception exc_B;
+}
+
+\rules{
+
+Class_invariant_axiom_for_java_lang_String {
+  \schemaVar \term Heap sv_heap;
+  \schemaVar \term java.lang.String sv_self;
+  
+  \find ( java.lang.Object::<inv>(sv_heap, sv_self) )
+  \sameUpdateLevel
+  \replacewith ( true )
+  \heuristics ( classAxiom )
+};
+
+Class_invariant_axiom_for_java_lang_Class {
+  \schemaVar \term Heap sv_heap;
+  \schemaVar \term java.lang.Class sv_self;
+  
+  \find ( java.lang.Object::<inv>(sv_heap, sv_self) )
+  \sameUpdateLevel
+  \replacewith ( true )
+  \heuristics ( classAxiom )
+};
+
+Class_invariant_axiom_for_simple_evoting_Server {
+  \schemaVar \term Heap sv_heap;
+  \schemaVar \term simple_evoting.Server sv_self;
+  
+  \find ( java.lang.Object::<inv>(sv_heap, sv_self) )
+  \sameUpdateLevel
+  \replacewith (
+      !  boolean[]::select(sv_heap, sv_self, simple_evoting.Server::$ballotCast)
+       = null
+    & !  int[]::select(sv_heap,
+                       sv_self,
+                       simple_evoting.Server::$votesForCandidates)
+       = null
+    &   int::select(sv_heap, sv_self, simple_evoting.Server::$numberOfVoters)
+      = int::select(sv_heap, null, simple_evoting.Setup::$numberOfVoters)
+    &   int::select(sv_heap,
+                    sv_self,
+                    simple_evoting.Server::$numberOfCandidates)
+      = int::select(sv_heap, null, simple_evoting.Setup::$numberOfCandidates)
+    &   length(boolean[]::select(sv_heap,
+                                 sv_self,
+                                 simple_evoting.Server::$ballotCast))
+      = int::select(sv_heap, sv_self, simple_evoting.Server::$numberOfVoters)
+    &   length(int[]::select(sv_heap,
+                             sv_self,
+                             simple_evoting.Server::$votesForCandidates))
+      = int::select(sv_heap,
+                    sv_self,
+                    simple_evoting.Server::$numberOfCandidates)
+    &   LocSet::select(sv_heap, sv_self, simple_evoting.Server::$rep)
+      = union(allFields(sv_self),
+              union(singleton(null, simple_evoting.Setup::$numberOfVoters),
+                    singleton(null, simple_evoting.Setup::$numberOfCandidates)))
+  )
+  \heuristics ( classAxiom )
+};
+
+Class_invariant_axiom_for_simple_evoting_Voter {
+  \schemaVar \term Heap sv_heap;
+  \schemaVar \term simple_evoting.Voter sv_self;
+  
+  \find ( java.lang.Object::<inv>(sv_heap, sv_self) )
+  \sameUpdateLevel
+  \replacewith (
+      leq(Z(0(#)), int::select(sv_heap, sv_self, simple_evoting.Voter::$vote))
+    & lt(int::select(sv_heap, sv_self, simple_evoting.Voter::$vote),
+         int::select(sv_heap, null, simple_evoting.Setup::$numberOfCandidates))
+    & (  leq(Z(0(#)), int::select(sv_heap, sv_self, simple_evoting.Voter::$id))
+       & lt(int::select(sv_heap, sv_self, simple_evoting.Voter::$id),
+            int::select(sv_heap, null, simple_evoting.Setup::$numberOfVoters)))
+  )
+  \heuristics ( classAxiom )
+};
+
+Class_invariant_axiom_for_simple_evoting_Message {
+  \schemaVar \term Heap sv_heap;
+  \schemaVar \term simple_evoting.Message sv_self;
+  
+  \find ( java.lang.Object::<inv>(sv_heap, sv_self) )
+  \sameUpdateLevel
+  \replacewith (
+      !  simple_evoting.Voter::select(sv_heap,
+                                      sv_self,
+                                      simple_evoting.Message::$source)
+       = null
+    &   int::select(sv_heap,
+                    simple_evoting.Voter::select(sv_heap,
+                                                 sv_self,
+                                                 simple_evoting.Message::$source),
+                    simple_evoting.Voter::$id)
+      = int::select(sv_heap, sv_self, simple_evoting.Message::$id)
+    & (  leq(Z(0(#)),
+             int::select(sv_heap, sv_self, simple_evoting.Message::$id))
+       & lt(int::select(sv_heap, sv_self, simple_evoting.Message::$id),
+            int::select(sv_heap, null, simple_evoting.Setup::$numberOfVoters)))
+  )
+  \heuristics ( classAxiom )
+};
+
+Class_invariant_axiom_for_simple_evoting_SMT {
+  \schemaVar \term Heap sv_heap;
+  \schemaVar \term simple_evoting.SMT sv_self;
+  
+  \find ( java.lang.Object::<inv>(sv_heap, sv_self) )
+  \sameUpdateLevel
+  \replacewith ( true )
+  \heuristics ( classAxiom )
+};
+
+Class_invariant_axiom_for_simple_evoting_Setup {
+  \schemaVar \term Heap sv_heap;
+  \schemaVar \term simple_evoting.Setup sv_self;
+  \schemaVar \variables int i_2;
+  \schemaVar \variables int i_1;
+  \schemaVar \variables int i_0;
+  \schemaVar \variables int i;
+  
+  \find ( java.lang.Object::<inv>(sv_heap, sv_self) )
+  \sameUpdateLevel
+  \varcond (
+     \notFreeIn( i, sv_self),
+     \notFreeIn( i, sv_heap),
+     \notFreeIn( i_0, sv_self),
+     \notFreeIn( i_0, sv_heap),
+     \notFreeIn( i_1, sv_self),
+     \notFreeIn( i_1, sv_heap),
+     \notFreeIn( i_2, sv_self),
+     \notFreeIn( i_2, sv_heap)
+  )
+  \replacewith (
+      \forall i_2;
+        (     leq(Z(0(#)), i_2)
+            & lt(i_2,
+                 length(simple_evoting.Voter[]::select(sv_heap,
+                                                       null,
+                                                       simple_evoting.Setup::$voters)))
+            & inInt(i_2)
+         -> !  simple_evoting.Voter::select(sv_heap,
+                                            simple_evoting.Voter[]::select(sv_heap,
+                                                                           null,
+                                                                           simple_evoting.Setup::$voters),
+                                            arr(i_2))
+             = null)
+    & !  simple_evoting.Voter[]::select(sv_heap,
+                                        null,
+                                        simple_evoting.Setup::$voters)
+       = null
+    & !  simple_evoting.Server::select(sv_heap,
+                                       null,
+                                       simple_evoting.Setup::$server)
+       = null
+    & (  !  simple_evoting.Voter[]::select(sv_heap,
+                                           null,
+                                           simple_evoting.Setup::$voters)
+          = null
+       & \forall i_1;
+           (     leq(Z(0(#)), i_1)
+               & lt(i_1,
+                    length(simple_evoting.Voter[]::select(sv_heap,
+                                                          null,
+                                                          simple_evoting.Setup::$voters)))
+            -> !  simple_evoting.Voter::select(sv_heap,
+                                               simple_evoting.Voter[]::select(sv_heap,
+                                                                              null,
+                                                                              simple_evoting.Setup::$voters),
+                                               arr(i_1))
+                = null))
+    & (  !  simple_evoting.Server::select(sv_heap,
+                                          null,
+                                          simple_evoting.Setup::$server)
+          = null
+       & java.lang.Object::<inv>(sv_heap,
+                                 simple_evoting.Server::select(sv_heap,
+                                                               null,
+                                                               simple_evoting.Setup::$server)))
+    &   length(simple_evoting.Voter[]::select(sv_heap,
+                                              null,
+                                              simple_evoting.Setup::$voters))
+      = int::select(sv_heap, null, simple_evoting.Setup::$numberOfVoters)
+    & \forall i_0;
+        (     leq(Z(0(#)), i_0)
+            & lt(i_0,
+                 length(simple_evoting.Voter[]::select(sv_heap,
+                                                       null,
+                                                       simple_evoting.Setup::$voters)))
+            & inInt(i_0)
+         ->   int::select(sv_heap,
+                          simple_evoting.Voter::select(sv_heap,
+                                                       simple_evoting.Voter[]::select(sv_heap,
+                                                                                      null,
+                                                                                      simple_evoting.Setup::$voters),
+                                                       arr(i_0)),
+                          simple_evoting.Voter::$id)
+            = i_0)
+    & \forall i;
+        (     leq(Z(0(#)), i)
+            & lt(i,
+                 length(simple_evoting.Voter[]::select(sv_heap,
+                                                       null,
+                                                       simple_evoting.Setup::$voters)))
+            & inInt(i)
+         -> java.lang.Object::<inv>(sv_heap,
+                                    simple_evoting.Voter::select(sv_heap,
+                                                                 simple_evoting.Voter[]::select(sv_heap,
+                                                                                                null,
+                                                                                                simple_evoting.Setup::$voters),
+                                                                 arr(i))))
+  )
+  \heuristics ( classAxiom )
+};
+}
+
+\problem {
+     wellFormed(heapAtPre_A<<anonHeapFunction>>)
+   & heap = heapAtPre_A<<anonHeapFunction>>
+   & !self_A = null
+   &   boolean::select(heap,
+                       self_A,
+                       java.lang.Object::<created>)
+     = TRUE
+   & simple_evoting.Setup::exactInstance(self_A) = TRUE
+   & (  \forall int j;
+          (     leq(Z(0(#)), j)
+              & lt(j,
+                   int::select(heapAtPre_A<<anonHeapFunction>>,
+                               null,
+                               simple_evoting.Setup::$numberOfVoters))
+              & inInt(j)
+           -> !  boolean::select(heapAtPre_A<<anonHeapFunction>>,
+                                 boolean[]::select(heapAtPre_A<<anonHeapFunction>>,
+                                                   simple_evoting.Server::select(heapAtPre_A<<anonHeapFunction>>,
+                                                                                 null,
+                                                                                 simple_evoting.Setup::$server),
+                                                   simple_evoting.Server::$ballotCast),
+                                 arr(j))
+               = TRUE)
+      & (  \forall int i;
+             (     leq(Z(0(#)), i)
+                 & lt(i,
+                      int::select(heapAtPre_A<<anonHeapFunction>>,
+                                  null,
+                                  simple_evoting.Setup::$numberOfCandidates))
+                 & inInt(i)
+              ->   int::select(heapAtPre_A<<anonHeapFunction>>,
+                               int[]::select(heapAtPre_A<<anonHeapFunction>>,
+                                             simple_evoting.Server::select(heapAtPre_A<<anonHeapFunction>>,
+                                                                           null,
+                                                                           simple_evoting.Setup::$server),
+                                             simple_evoting.Server::$votesForCandidates),
+                               arr(i))
+                 = Z(0(#)))
+         & java.lang.Object::<inv>(heapAtPre_A<<anonHeapFunction>>,
+                                   self_A)))
+   & \<{
+         exc_A=null;try {self_A.main()@simple_evoting.Setup;
+         }catch (java.lang.Exception e) {
+           exc_A=e;
+         }
+       }\> (  selfAtPost_A = self_A
+            & excAtPost_A = exc_A
+            & heapAtPost_A = heap)
+   & (  wellFormed(heapAtPre_B<<anonHeapFunction>>)
+      & heap = heapAtPre_B<<anonHeapFunction>>
+      & !self_B = null
+      &   boolean::select(heap,
+                          self_B,
+                          java.lang.Object::<created>)
+        = TRUE
+      &   simple_evoting.Setup::exactInstance(self_B)
+        = TRUE
+      & (  \forall int j;
+             (     leq(Z(0(#)), j)
+                 & lt(j,
+                      int::select(heapAtPre_B<<anonHeapFunction>>,
+                                  null,
+                                  simple_evoting.Setup::$numberOfVoters))
+                 & inInt(j)
+              -> !  boolean::select(heapAtPre_B<<anonHeapFunction>>,
+                                    boolean[]::select(heapAtPre_B<<anonHeapFunction>>,
+                                                      simple_evoting.Server::select(heapAtPre_B<<anonHeapFunction>>,
+                                                                                    null,
+                                                                                    simple_evoting.Setup::$server),
+                                                      simple_evoting.Server::$ballotCast),
+                                    arr(j))
+                  = TRUE)
+         & (  \forall int i;
+                (     leq(Z(0(#)), i)
+                    & lt(i,
+                         int::select(heapAtPre_B<<anonHeapFunction>>,
+                                     null,
+                                     simple_evoting.Setup::$numberOfCandidates))
+                    & inInt(i)
+                 ->   int::select(heapAtPre_B<<anonHeapFunction>>,
+                                  int[]::select(heapAtPre_B<<anonHeapFunction>>,
+                                                simple_evoting.Server::select(heapAtPre_B<<anonHeapFunction>>,
+                                                                              null,
+                                                                              simple_evoting.Setup::$server),
+                                                simple_evoting.Server::$votesForCandidates),
+                                  arr(i))
+                    = Z(0(#)))
+            & java.lang.Object::<inv>(heapAtPre_B<<anonHeapFunction>>,
+                                      self_B)))
+      & \<{
+            exc_B=null;try {self_B.main()@simple_evoting.Setup;
+            }catch (java.lang.Exception e) {
+              exc_B=e;
+            }
+          }\> (  selfAtPost_B = self_B
+               & excAtPost_B = exc_B
+               & heapAtPost_B = heap))
+->   (       boolean::select(heapAtPre_A<<anonHeapFunction>>,
+                             null,
+                             simple_evoting.Environment::$result)
+           = boolean::select(heapAtPre_B<<anonHeapFunction>>,
+                             null,
+                             simple_evoting.Environment::$result)
+         &   int::select(heapAtPre_A<<anonHeapFunction>>,
+                         null,
+                         simple_evoting.Setup::$numberOfVoters)
+           = int::select(heapAtPre_B<<anonHeapFunction>>,
+                         null,
+                         simple_evoting.Setup::$numberOfVoters)
+      -> (  boolean::select(heapAtPost_A,
+                            null,
+                            simple_evoting.Environment::$result)
+          = boolean::select(heapAtPost_B,
+                            null,
+                            simple_evoting.Environment::$result))<<postCondition>>)
+   & (       int::select(heapAtPre_A<<anonHeapFunction>>,
+                         null,
+                         simple_evoting.Setup::$numberOfCandidates)
+           = int::select(heapAtPre_B<<anonHeapFunction>>,
+                         null,
+                         simple_evoting.Setup::$numberOfCandidates)
+         &   int::select(heapAtPre_A<<anonHeapFunction>>,
+                         null,
+                         simple_evoting.Setup::$numberOfVoters)
+           = int::select(heapAtPre_B<<anonHeapFunction>>,
+                         null,
+                         simple_evoting.Setup::$numberOfVoters)
+         &   int[]::select(heapAtPre_A<<anonHeapFunction>>,
+                           simple_evoting.Server::select(heapAtPre_A<<anonHeapFunction>>,
+                                                         null,
+                                                         simple_evoting.Setup::$server),
+                           simple_evoting.Server::$votesForCandidates)
+           = int[]::select(heapAtPre_B<<anonHeapFunction>>,
+                           simple_evoting.Server::select(heapAtPre_B<<anonHeapFunction>>,
+                                                         null,
+                                                         simple_evoting.Setup::$server),
+                           simple_evoting.Server::$votesForCandidates)
+         &   seqDef{int i;}(Z(0(#)),
+                            int::select(heapAtPre_A<<anonHeapFunction>>,
+                                        null,
+                                        simple_evoting.Setup::$numberOfCandidates),
+                            bsum{int j;}(Z(0(#)),
+                                         int::select(heapAtPre_A<<anonHeapFunction>>,
+                                                     null,
+                                                     simple_evoting.Setup::$numberOfVoters),
+                                         \if (  int::select(heapAtPre_A<<anonHeapFunction>>,
+                                                            simple_evoting.Voter::select(heapAtPre_A<<anonHeapFunction>>,
+                                                                                         simple_evoting.Voter[]::select(heapAtPre_A<<anonHeapFunction>>,
+                                                                                                                        null,
+                                                                                                                        simple_evoting.Setup::$voters),
+                                                                                         arr(j)),
+                                                            simple_evoting.Voter::$vote)
+                                              = i)
+                                             \then (Z(1(#)))
+                                             \else (Z(0(#)))))
+           = seqDef{int i;}(Z(0(#)),
+                            int::select(heapAtPre_B<<anonHeapFunction>>,
+                                        null,
+                                        simple_evoting.Setup::$numberOfCandidates),
+                            bsum{int j;}(Z(0(#)),
+                                         int::select(heapAtPre_B<<anonHeapFunction>>,
+                                                     null,
+                                                     simple_evoting.Setup::$numberOfVoters),
+                                         \if (  int::select(heapAtPre_B<<anonHeapFunction>>,
+                                                            simple_evoting.Voter::select(heapAtPre_B<<anonHeapFunction>>,
+                                                                                         simple_evoting.Voter[]::select(heapAtPre_B<<anonHeapFunction>>,
+                                                                                                                        null,
+                                                                                                                        simple_evoting.Setup::$voters),
+                                                                                         arr(j)),
+                                                            simple_evoting.Voter::$vote)
+                                              = i)
+                                             \then (Z(1(#)))
+                                             \else (Z(0(#)))))
+      -> (    int[]::select(heapAtPost_A,
+                            null,
+                            simple_evoting.Setup::$out)
+            = int[]::select(heapAtPost_B,
+                            null,
+                            simple_evoting.Setup::$out)
+          &   seqDef{int i;}(Z(0(#)),
+                             length(int[]::select(heapAtPost_A,
+                                                  null,
+                                                  simple_evoting.Setup::$out)),
+                             int::select(heapAtPost_A,
+                                         int[]::select(heapAtPost_A,
+                                                       null,
+                                                       simple_evoting.Setup::$out),
+                                         arr(i)))
+            = seqDef{int i;}(Z(0(#)),
+                             length(int[]::select(heapAtPost_B,
+                                                  null,
+                                                  simple_evoting.Setup::$out)),
+                             int::select(heapAtPost_B,
+                                         int[]::select(heapAtPost_B,
+                                                       null,
+                                                       simple_evoting.Setup::$out),
+                                         arr(i))))<<postCondition>>)
+
+}
+
+\proof {
+(keyLog "0" (keyUser "christoph" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+
+(autoModeTime "0")
+
+(branch "dummy ID"
+(opengoal "     wellFormed(heapAtPre_A<<anonHeapFunction>>)    & heap = heapAtPre_A<<anonHeapFunction>>    & !self_A = null    &   boolean::select(heap,                        self_A,                        java.lang.Object::<created>)      = TRUE    & simple_evoting.Setup::exactInstance(self_A) = TRUE    & (  \\forall int j;           (     leq(Z(0(#)), j)               & lt(j,                    int::select(heapAtPre_A<<anonHeapFunction>>,                                null,                                simple_evoting.Setup::$numberOfVoters))               & inInt(j)            -> !  boolean::select(heapAtPre_A<<anonHeapFunction>>,                                  boolean[]::select(heapAtPre_A<<anonHeapFunction>>,                                                    simple_evoting.Server::select(heapAtPre_A<<anonHeapFunction>>,                                                                                  null,                                                                                  simple_evoting.Setup::$server),                                                    simple_evoting.Server::$ballotCast),                                  arr(j))                = TRUE)       & (  \\forall int i;              (     leq(Z(0(#)), i)                  & lt(i,                       int::select(heapAtPre_A<<anonHeapFunction>>,                                   null,                                   simple_evoting.Setup::$numberOfCandidates))                  & inInt(i)               ->   int::select(heapAtPre_A<<anonHeapFunction>>,                                int[]::select(heapAtPre_A<<anonHeapFunction>>,                                              simple_evoting.Server::select(heapAtPre_A<<anonHeapFunction>>,                                                                            null,                                                                            simple_evoting.Setup::$server),                                              simple_evoting.Server::$votesForCandidates),                                arr(i))                  = Z(0(#)))          & java.lang.Object::<inv>(heapAtPre_A<<anonHeapFunction>>,                                    self_A)))    & \\<{          exc_A=null;try {self_A.main()@simple_evoting.Setup;          }catch (java.lang.Exception e) {            exc_A=e;          }        }\\> (  selfAtPost_A = self_A             & excAtPost_A = exc_A             & heapAtPost_A = heap)    & (  wellFormed(heapAtPre_B<<anonHeapFunction>>)       & heap = heapAtPre_B<<anonHeapFunction>>       & !self_B = null       &   boolean::select(heap,                           self_B,                           java.lang.Object::<created>)         = TRUE       &   simple_evoting.Setup::exactInstance(self_B)         = TRUE       & (  \\forall int j;              (     leq(Z(0(#)), j)                  & lt(j,                       int::select(heapAtPre_B<<anonHeapFunction>>,                                   null,                                   simple_evoting.Setup::$numberOfVoters))                  & inInt(j)               -> !  boolean::select(heapAtPre_B<<anonHeapFunction>>,                                     boolean[]::select(heapAtPre_B<<anonHeapFunction>>,                                                       simple_evoting.Server::select(heapAtPre_B<<anonHeapFunction>>,                                                                                     null,                                                                                     simple_evoting.Setup::$server),                                                       simple_evoting.Server::$ballotCast),                                     arr(j))                   = TRUE)          & (  \\forall int i;                 (     leq(Z(0(#)), i)                     & lt(i,                          int::select(heapAtPre_B<<anonHeapFunction>>,                                      null,                                      simple_evoting.Setup::$numberOfCandidates))                     & inInt(i)                  ->   int::select(heapAtPre_B<<anonHeapFunction>>,                                   int[]::select(heapAtPre_B<<anonHeapFunction>>,                                                 simple_evoting.Server::select(heapAtPre_B<<anonHeapFunction>>,                                                                               null,                                                                               simple_evoting.Setup::$server),                                                 simple_evoting.Server::$votesForCandidates),                                   arr(i))                     = Z(0(#)))             & java.lang.Object::<inv>(heapAtPre_B<<anonHeapFunction>>,                                       self_B)))       & \\<{             exc_B=null;try {self_B.main()@simple_evoting.Setup;             }catch (java.lang.Exception e) {               exc_B=e;             }           }\\> (  selfAtPost_B = self_B                & excAtPost_B = exc_B                & heapAtPost_B = heap)) ->   (       boolean::select(heapAtPre_A<<anonHeapFunction>>,                              null,                              simple_evoting.Environment::$result)            = boolean::select(heapAtPre_B<<anonHeapFunction>>,                              null,                              simple_evoting.Environment::$result)          &   int::select(heapAtPre_A<<anonHeapFunction>>,                          null,                          simple_evoting.Setup::$numberOfVoters)            = int::select(heapAtPre_B<<anonHeapFunction>>,                          null,                          simple_evoting.Setup::$numberOfVoters)       -> (  boolean::select(heapAtPost_A,                             null,                             simple_evoting.Environment::$result)           = boolean::select(heapAtPost_B,                             null,                             simple_evoting.Environment::$result))<<postCondition>>)    & (       int::select(heapAtPre_A<<anonHeapFunction>>,                          null,                          simple_evoting.Setup::$numberOfCandidates)            = int::select(heapAtPre_B<<anonHeapFunction>>,                          null,                          simple_evoting.Setup::$numberOfCandidates)          &   int::select(heapAtPre_A<<anonHeapFunction>>,                          null,                          simple_evoting.Setup::$numberOfVoters)            = int::select(heapAtPre_B<<anonHeapFunction>>,                          null,                          simple_evoting.Setup::$numberOfVoters)          &   int[]::select(heapAtPre_A<<anonHeapFunction>>,                            simple_evoting.Server::select(heapAtPre_A<<anonHeapFunction>>,                                                          null,                                                          simple_evoting.Setup::$server),                            simple_evoting.Server::$votesForCandidates)            = int[]::select(heapAtPre_B<<anonHeapFunction>>,                            simple_evoting.Server::select(heapAtPre_B<<anonHeapFunction>>,                                                          null,                                                          simple_evoting.Setup::$server),                            simple_evoting.Server::$votesForCandidates)          &   seqDef{int i;}(Z(0(#)),                             int::select(heapAtPre_A<<anonHeapFunction>>,                                         null,                                         simple_evoting.Setup::$numberOfCandidates),                             bsum{int j;}(Z(0(#)),                                          int::select(heapAtPre_A<<anonHeapFunction>>,                                                      null,                                                      simple_evoting.Setup::$numberOfVoters),                                          \\if (  int::select(heapAtPre_A<<anonHeapFunction>>,                                                             simple_evoting.Voter::select(heapAtPre_A<<anonHeapFunction>>,                                                                                          simple_evoting.Voter[]::select(heapAtPre_A<<anonHeapFunction>>,                                                                                                                         null,                                                                                                                         simple_evoting.Setup::$voters),                                                                                          arr(j)),                                                             simple_evoting.Voter::$vote)                                               = i)                                              \\then (Z(1(#)))                                              \\else (Z(0(#)))))            = seqDef{int i;}(Z(0(#)),                             int::select(heapAtPre_B<<anonHeapFunction>>,                                         null,                                         simple_evoting.Setup::$numberOfCandidates),                             bsum{int j;}(Z(0(#)),                                          int::select(heapAtPre_B<<anonHeapFunction>>,                                                      null,                                                      simple_evoting.Setup::$numberOfVoters),                                          \\if (  int::select(heapAtPre_B<<anonHeapFunction>>,                                                             simple_evoting.Voter::select(heapAtPre_B<<anonHeapFunction>>,                                                                                          simple_evoting.Voter[]::select(heapAtPre_B<<anonHeapFunction>>,                                                                                                                         null,                                                                                                                         simple_evoting.Setup::$voters),                                                                                          arr(j)),                                                             simple_evoting.Voter::$vote)                                               = i)                                              \\then (Z(1(#)))                                              \\else (Z(0(#)))))       -> (    int[]::select(heapAtPost_A,                             null,                             simple_evoting.Setup::$out)             = int[]::select(heapAtPost_B,                             null,                             simple_evoting.Setup::$out)           &   seqDef{int i;}(Z(0(#)),                              length(int[]::select(heapAtPost_A,                                                   null,                                                   simple_evoting.Setup::$out)),                              int::select(heapAtPost_A,                                          int[]::select(heapAtPost_A,                                                        null,                                                        simple_evoting.Setup::$out),                                          arr(i)))             = seqDef{int i;}(Z(0(#)),                              length(int[]::select(heapAtPost_B,                                                   null,                                                   simple_evoting.Setup::$out)),                              int::select(heapAtPost_B,                                          int[]::select(heapAtPost_B,                                                        null,                                                        simple_evoting.Setup::$out),                                          arr(i))))<<postCondition>>) ")
+)
+
+}

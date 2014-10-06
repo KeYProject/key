@@ -13,9 +13,15 @@
 
 package de.uka.ilkd.key.symbolic_execution.model;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 
 /**
  * <p>
@@ -36,13 +42,9 @@ import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
  * <li>{@link IExecutionTermination} (termination, e.g. {@code <end>} or {@code <uncaught java.lang.NullPointerException>})</li>
  * </ul>
  * </p>
- * <p>
- * Nodes which represents a statement of the code and have a state are
- * sub interfaces of sub interface {@link IExecutionStateNode}.
- * </p>
  * @author Martin Hentschel
  */
-public interface IExecutionNode extends IExecutionElement {
+public interface IExecutionNode<S extends SourceElement> extends IExecutionElement {
    /**
     * Prefix that is used in {@link IExecutionNode}s which represents an internal state in KeY which is not part of the source code.
     */
@@ -58,13 +60,13 @@ public interface IExecutionNode extends IExecutionElement {
     * current node is the root.
     * @return The parent {@link IExecutionNode} or {@code null} on root.
     */
-   public IExecutionNode getParent();
+   public IExecutionNode<?> getParent();
    
    /**
     * Returns the available children.
     * @return The available children.
     */
-   public IExecutionNode[] getChildren();
+   public IExecutionNode<?>[] getChildren();
    
    /**
     * Checks if this node has changed the path condition of the parent.
@@ -88,11 +90,66 @@ public interface IExecutionNode extends IExecutionElement {
     * Returns the method call stack.
     * @return The method call stack. 
     */
-   public IExecutionNode[] getCallStack();
+   public IExecutionNode<?>[] getCallStack();
    
    /**
     * Returns all available {@link IExecutionConstraint}s.
     * @return The available {@link IExecutionConstraint}s.
     */
    public IExecutionConstraint[] getConstraints();
+   /**
+    * Returns the {@link PosInOccurrence} of the modality of interest including updates.
+    * @return The {@link PosInOccurrence} of the modality of interest including updates.
+    */
+   public PosInOccurrence getModalityPIO();
+   
+   /**
+    * Returns the active statement which is executed in the code.
+    * @return The active statement which is executed in the code.
+    */
+   public S getActiveStatement();
+   
+   /**
+    * Returns the {@link PositionInfo} of {@link #getActiveStatement()}.
+    * @return The {@link PositionInfo} of {@link #getActiveStatement()}.
+    */
+   public PositionInfo getActivePositionInfo();
+   
+   /**
+    * Returns the variable value pairs of the current state.
+    * @return The variable value pairs.
+    */
+   public IExecutionVariable[] getVariables();
+   
+   /**
+    * Returns the number of memory layouts.
+    * @return The number of memory layouts.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public int getLayoutsCount() throws ProofInputException;
+   
+   /**
+    * Returns the equivalence classes of the memory layout with the given index.
+    * @param layoutIndex The index of the memory layout.
+    * @return The equivalence classes of the memory layout at the given index.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public ImmutableList<ISymbolicEquivalenceClass> getLayoutsEquivalenceClasses(int layoutIndex) throws ProofInputException;
+   
+   /**
+    * Returns the initial memory layout before the method was executed.
+    * @param layoutIndex The index of the memory layout.
+    * @return The initial memory layout at the given index.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public ISymbolicLayout getInitialLayout(int layoutIndex) throws ProofInputException;
+   
+   /**
+    * Returns the current memory layout which shows the memory
+    * structure before the current node in the symbolic execution tree is executed.
+    * @param layoutIndex The index of the memory layout.
+    * @return The current memory layout at the given index.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public ISymbolicLayout getCurrentLayout(int layoutIndex) throws ProofInputException;
 }

@@ -132,7 +132,7 @@ public abstract class AbstractProjectInfoBasedContent implements IDisposable {
     * @return The {@link IProject} if known or {@code null} otherwise.
     */
    protected IProject getProject(ProjectInfo projectInfo) {
-      return observedInfos.get(projectInfo);
+      return projectInfo != null ? projectInfo.getProject() : null;
    }
 
    /**

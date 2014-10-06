@@ -326,6 +326,10 @@
                annotationTypeID="org.key_project.sed.core.annotationType.search"
                icon="icons/search.gif">
          </image>
+         <image
+               annotationTypeID="org.key_project.sed.core.annotationType.breakpoint"
+               icon="icons/brkp_obj.gif">
+         </image>
       </extension>
       <extension
             point="org.eclipse.ui.commands">

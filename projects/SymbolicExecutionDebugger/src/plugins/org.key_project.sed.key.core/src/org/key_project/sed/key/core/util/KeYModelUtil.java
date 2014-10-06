@@ -55,7 +55,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
@@ -90,7 +89,7 @@ public final class KeYModelUtil {
     */
    public static IKeYSEDDebugNode<?>[] updateChildren(IKeYSEDDebugNode<?> parent, 
                                                       IKeYSEDDebugNode<?>[] oldChildren, 
-                                                      IExecutionNode[] executionChildren) throws DebugException {
+                                                      IExecutionNode<?>[] executionChildren) throws DebugException {
       if (executionChildren != null) {
          IKeYSEDDebugNode<?>[] result = new IKeYSEDDebugNode<?>[executionChildren.length];
          // Add old children
@@ -114,7 +113,7 @@ public final class KeYModelUtil {
     * @throws DebugException Occurred Exception.
     */
    public static IKeYSEDDebugNode<?>[] createChildren(IKeYSEDDebugNode<?> parent, 
-                                                      IExecutionNode[] executionChildren) throws DebugException {
+                                                      IExecutionNode<?>[] executionChildren) throws DebugException {
       if (executionChildren != null) {
          IKeYSEDDebugNode<?>[] result = new IKeYSEDDebugNode<?>[executionChildren.length];
          for (int i = 0; i < executionChildren.length; i++) {
@@ -135,7 +134,7 @@ public final class KeYModelUtil {
     * @return The created {@link IKeYSEDDebugNode}.
     * @throws DebugException Occurred Exception.
     */
-   protected static IKeYSEDDebugNode<?> createChild(IKeYSEDDebugNode<?> parent, IExecutionNode executionNode) throws DebugException {
+   protected static IKeYSEDDebugNode<?> createChild(IKeYSEDDebugNode<?> parent, IExecutionNode<?> executionNode) throws DebugException {
       KeYDebugTarget target = parent.getDebugTarget();
       KeYThread thread = parent.getThread();
       IKeYSEDDebugNode<?> result;
@@ -388,13 +387,13 @@ public final class KeYModelUtil {
 
    /**
     * Creates debug model representations for the {@link IExecutionVariable}s
-    * contained in the given {@link IExecutionStateNode}.
+    * contained in the given {@link IExecutionNode}.
     * @param debugNode The {@link IKeYSEDDebugNode} which should be used as parent.
-    * @param executionNode The {@link IExecutionStateNode} to return its variables.
+    * @param executionNode The {@link IExecutionNode} to return its variables.
     * @return The contained {@link KeYVariable}s as debug model representation.
     */
    public static KeYVariable[] createVariables(IKeYSEDDebugNode<?> debugNode, 
-                                               IExecutionStateNode<?> executionNode) {
+                                               IExecutionNode<?> executionNode) {
       if (executionNode != null && !executionNode.isDisposed() && debugNode != null) {
          IExecutionVariable[] variables = executionNode.getVariables();
          if (variables != null) {
@@ -420,11 +419,11 @@ public final class KeYModelUtil {
     * @param callStack The call stack to convert.
     * @return The converted call stack.
     */
-   public static IKeYSEDDebugNode<?>[] createCallStack(KeYDebugTarget debugTarget, IExecutionNode[] callStack) {
+   public static IKeYSEDDebugNode<?>[] createCallStack(KeYDebugTarget debugTarget, IExecutionNode<?>[] callStack) {
       if (debugTarget != null && callStack != null) {
          IKeYSEDDebugNode<?>[] result = new IKeYSEDDebugNode<?>[callStack.length];
          int i = 0;
-         for (IExecutionNode executionNode : callStack) {
+         for (IExecutionNode<?> executionNode : callStack) {
             IKeYSEDDebugNode<?> debugNode = debugTarget.getDebugNode(executionNode);
             Assert.isNotNull(debugNode, "Can't find debug node for execution node \"" + executionNode + "\".");
             result[i] = debugNode;
@@ -445,7 +444,7 @@ public final class KeYModelUtil {
     * @return The contained {@link KeYConstraint}s as debug model representation.
     */
    public static KeYConstraint[] createConstraints(IKeYSEDDebugNode<?> debugNode, 
-                                                   IExecutionNode executionNode) {
+                                                   IExecutionNode<?> executionNode) {
       if (executionNode != null && !executionNode.isDisposed() && debugNode != null) {
          IExecutionConstraint[] constraints = executionNode.getConstraints();
          if (constraints != null) {

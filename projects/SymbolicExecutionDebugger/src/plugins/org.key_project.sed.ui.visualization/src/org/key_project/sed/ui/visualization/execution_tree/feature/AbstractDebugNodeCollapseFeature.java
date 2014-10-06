@@ -8,7 +8,9 @@ import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.impl.RemoveContext;
 import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
 import org.eclipse.graphiti.features.impl.DefaultRemoveFeature;
+import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Polyline;
+import org.eclipse.graphiti.mm.algorithms.styles.LineStyle;
 import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
 import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.ConnectionDecorator;
@@ -36,6 +38,46 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
       super(fp);
    }
    
+   protected void shrinkRectHeights(ISEDMethodCall mc, MethodCallUpdateFeature uf) throws DebugException {
+      GraphicsAlgorithm rectGA = null;
+      do
+      {
+         ISEDBranchCondition[] bcs = mc.getMethodReturnConditions();
+         rectGA = uf.getPictogramElementForBusinessObject(mc, 0).getGraphicsAlgorithm();
+         
+         int height = 0;
+         for(ISEDBranchCondition bc : bcs) {
+            ISEDDebugNode mr = bc.getChildren()[0];
+            PictogramElement mrPE = uf.getPictogramElementForBusinessObject(mr);
+                             
+            if(mrPE != null && mrPE.getGraphicsAlgorithm().getHeight() > height) {
+               height = mrPE.getGraphicsAlgorithm().getHeight();
+            }
+         }
+         
+         int diff = rectGA.getY() + rectGA.getHeight() - uf.findDeepestYInMethod((ISEDMethodCall) mc) - uf.OFFSET - height / 2;
+
+         if(diff != 0)
+         {
+            rectGA.setHeight(rectGA.getHeight() - diff);
+   
+            for(int i = 0; i < bcs.length; i++) {
+               ISEDDebugNode mr = bcs[i].getChildren()[0];
+               PictogramElement mrPE = uf.getPictogramElementForBusinessObject(mr);
+                                
+               if(mrPE != null) {
+                  ISEDMethodCall parentMC = ArrayUtil.isEmpty(mc.getCallStack()) ? null : (ISEDMethodCall) mc.getCallStack()[0];
+                  uf.moveSubTreeBetweenMRVertical(parentMC, mr, -diff);
+               }
+            }
+         }
+
+         mc = (ISEDMethodCall) (!ArrayUtil.isEmpty(mc.getCallStack()) ? mc.getCallStack()[0] : null);
+      } while(mc != null);
+   }
+   
+   protected abstract void createConnection(AnchorContainer startAC, AnchorContainer endAC);
+   
    /**
     * TODO
     * This function removes all children and connections of the given node, until
@@ -59,28 +101,9 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
     */
    protected void removeConnections(PictogramElement pe, DefaultRemoveFeature drf) {
       List<Connection> cons = Graphiti.getPeService().getOutgoingConnections((AnchorContainer) pe);
-   
+
       for(Connection con : cons)
          drf.remove(new RemoveContext(con));
-   }
-   
-   /*
-    * TODO
-    */
-   protected void createConnection(AnchorContainer startAC, AnchorContainer endAC) {
-      IPeCreateService peCreateService = Graphiti.getPeCreateService();
-      IGaService gaService = Graphiti.getGaService();
-
-      Connection connection = peCreateService.createFreeFormConnection(getDiagram());
-      connection.setStart(startAC.getAnchors().get(0));
-      connection.setEnd(endAC.getAnchors().get(0));
- 
-      ConnectionDecorator cd = peCreateService.createConnectionDecorator(connection, false, 1.0, true);
-      Polyline arrow = gaService.createPolyline(cd, new int[] {-10, 5, 0, 0, -10, -5});
-      arrow.setStyle(ExecutionTreeStyleUtil.getStyleForParentConnection(getDiagram()));
-
-      Polyline polyline = gaService.createPolyline(connection);
-      polyline.setStyle(ExecutionTreeStyleUtil.getStyleForParentConnection(getDiagram()));
    }
    
    /**

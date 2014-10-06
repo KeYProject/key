@@ -1,5 +1,6 @@
 package org.key_project.sed.ui.visualization.execution_tree.feature;
 
+import java.awt.Color;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,25 +13,37 @@ import org.eclipse.graphiti.features.context.impl.RemoveContext;
 import org.eclipse.graphiti.features.context.impl.UpdateContext;
 import org.eclipse.graphiti.features.impl.DefaultRemoveFeature;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
+import org.eclipse.graphiti.mm.algorithms.Polyline;
+import org.eclipse.graphiti.mm.algorithms.styles.LineStyle;
 import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
+import org.eclipse.graphiti.mm.pictograms.Connection;
+import org.eclipse.graphiti.mm.pictograms.ConnectionDecorator;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.platform.IPlatformImageConstants;
-import org.eclipse.graphiti.util.ColorConstant;
+import org.eclipse.graphiti.services.Graphiti;
+import org.eclipse.graphiti.services.IGaService;
+import org.eclipse.graphiti.services.IPeCreateService;
 import org.key_project.sed.core.model.ISEDBaseMethodReturn;
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDLoopCondition;
 import org.key_project.sed.core.model.ISEDLoopStatement;
 import org.key_project.sed.core.model.ISEDMethodCall;
-import org.key_project.sed.core.util.ISEDIterator;
 import org.key_project.sed.core.util.NodeUtil;
-import org.key_project.sed.core.util.SEDMethodPreorderIterator;
-import org.key_project.sed.core.util.SEDPreorderIterator;
+import org.key_project.sed.core.util.SEDLoopPreorderIterator;
+import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeStyleUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.java.ArrayUtil;
 
 public class LoopStatementCollapseFeature extends AbstractDebugNodeCollapseFeature {
+   
+   /**
+    * The {@link SEDLoopPreorderIterator}
+    */
+   private SEDLoopPreorderIterator iter = null;
+   
    /**
     * Constructor.
     * @param fp The {@link IFeatureProvider} which provides this {@link ICustomFeature}.
@@ -46,148 +59,40 @@ public class LoopStatementCollapseFeature extends AbstractDebugNodeCollapseFeatu
       if(pes != null)
       {
          ISEDLoopStatement ls = (ISEDLoopStatement) getBusinessObjectForPictogramElement(pes[0]);
-         pes = getFeatureProvider().getAllPictogramElementsForBusinessObject(ls);
-         
+
          UpdateContext uc = new UpdateContext(pes[0]);
          LoopStatementUpdateFeature uf = (LoopStatementUpdateFeature) getFeatureProvider().getUpdateFeature(uc);
 
+         try
+         {
+            iter = new SEDLoopPreorderIterator(ls);
+            
+            if(!ls.isCollapsed()) {
+               removeChildren(ls);
+               removeConnections(pes[0]);
+            }
+            else {
+               GraphicsAlgorithm ga = pes[0].getGraphicsAlgorithm();
+               ga.setX(uf.METOFF);
+               uf.update(uc);
+            }
+
+         }
+         catch (DebugException e) {
+            LogUtil.getLogger().logError(e);
+         }
+         
+         ls.setCollapsed(!ls.isCollapsed());
       }
    }
    
-//   protected void updateCollapse(ISEDLoopStatement ls, IProgressMonitor monitor) throws DebugException {
-//      GraphicsAlgorithm rectGA = getPictogramElementForBusinessObject(ls, 0).getGraphicsAlgorithm();
-//      GraphicsAlgorithm nodeGA = getPictogramElementForBusinessObject(ls).getGraphicsAlgorithm();
-//
-//      removeChildren(ls, ls);
-//      removeConnections(getPictogramElementForBusinessObject(ls));
-//
-//      int maxX = rectGA.getX();
-//      Set<ISEDDebugNode> leafs = new HashSet<ISEDDebugNode>();
-//
-//      if(bcs.length > 1) {
-//         int above = findBiggestWidthInPartTreeAbove(ls);
-//         if(above > rectGA.getWidth()) {
-////            leafs.add(mc);
-//            nodeGA.setX(nodeGA.getX() - (above - nodeGA.getWidth()) / 2);
-//         }
-//         else
-//            nodeGA.setX(maxX);
-////         leafs.add(mc);
-////         nodeGA.setX(findMostLeftXInMethod(node));
-//      }
-//      else {
-////         moveRightAndAbove(mc, maxX - nodeGA.getX(), monitor);
-//         nodeGA.setX(rectGA.getX());
-//      }
-//      
-//      boolean recenterMR = false;
-//      for(ISEDBranchCondition bc : bcs)
-//      {
-//         createGraphicalRepresentationForNode(bc, OFFSET, maxX);
-//         
-//         PictogramElement bcPE = getFeatureProvider().getPictogramElementForBusinessObject(bc);
-//         GraphicsAlgorithm bcGA = bcPE.getGraphicsAlgorithm();
-//
-//         ISEDBaseMethodReturn mr = (ISEDBaseMethodReturn) bc.getChildren()[0];
-//         PictogramElement mrPE = getFeatureProvider().getPictogramElementForBusinessObject(mr);
-//         GraphicsAlgorithm mrGA = mrPE.getGraphicsAlgorithm();
-//         
-//         if(maxX == rectGA.getX() && bcGA.getX() < maxX + METOFF) {
-//            bcGA.setX(maxX + METOFF);
-//         }
-//         
-//         if(bcs.length == 1) {
-//            int newX = findMostLeftXOfBranchInParents(ls);
-//            if(findBiggestWidthInPartTreeAbove(mr) < mrGA.getWidth()) {
-//               newX += METOFF;
-//            }
-//            
-//            mrGA.setX(newX);
-//         }
-//
-//         if(bcGA.getWidth() < mrGA.getWidth() && bcs.length == 1) {
-//            bcGA.setX(mrGA.getX() + (mrGA.getWidth() - bcGA.getWidth()) / 2);
-////            mrGA.setX(mrGA.getX() - METOFF);
-//         }
-//         else {
-//            if(!hasBiggerChild(mr, mrGA.getWidth()) || recenterMR) {
-//               int hMove = bcGA.getX() - mrGA.getX() + (bcGA.getWidth() - mrGA.getWidth()) / 2;
-//   //            System.out.println(hMove);
-//               moveSubTreeHorizontal(mr, hMove, new SubProgressMonitor(monitor, 1));
-//               
-//               int mostLeft = findMostLeftXInSubtree(bc);
-//               if(mostLeft < bcGA.getX()) {
-//                  moveSubTreeHorizontal(bc, bcGA.getX() - mostLeft, new SubProgressMonitor(monitor, 1));
-//   //               System.out.println(bc);
-//               }
-//               
-//               recenterMR = true;
-//            }
-////            leafs.add((bcGA.getWidth() > mrGA.getWidth() ? bc : mr));
-//         }
-//         
-//         maxX = findMostRightXInSubtree(bc) + OFFSET;
-//
-//         createConnection((AnchorContainer)bcPE, (AnchorContainer)mrPE);
-//         
-//         leafs.add((bcGA.getWidth() > mrGA.getWidth() ? bc : mr));
-//         
-////         if(bcs.length == 1)
-////         {
-//////            System.out.println(findMostLeftXOfBranchInParents(NodeUtil.getParent(mc)) + " -> " + mrGA.getX());
-//////            if(findMostLeftXOfBranchInParents(NodeUtil.getParent(mc)) > mrGA.getX()) {
-//////               mrGA.setX(mrGA.getX() - METOFF);
-//////            }
-//////            if(findBiggestWidthInPartTreeAbove(mr) > mrGA.getWidth()) {
-//////               mrGA.setX(mrGA.getX() - METOFF);
-//////            }
-//////            if(findBiggestWidthInPartTreeAbove(mr) < mrGA.getWidth()) {
-//////               nodeGA.setX(rectGA.getX() + METOFF);
-////               leafs.add((bcGA.getWidth() > mrGA.getWidth() ? bc : mr));
-//////            }
-////         }
-//      }
-//
-//      shrinkRectHeights(ls);
-//      centerChildren(ls, new HashSet<ISEDDebugNode>(leafs), new SubProgressMonitor(monitor, 1));
-//      monitor.worked(1);
-//      
-////      resizeRectsIfNeeded(mc, monitor);
-//      
-//      if(bcs.length == 1)
-//      {
-//         for(ISEDDebugNode leaf : leafs) {
-//            
-//            if(ArrayUtil.isEmpty(NodeUtil.getChildren(leaf))) {
-//               continue;
-//            }
-//            
-//            PictogramElement leafPE = getFeatureProvider().getPictogramElementForBusinessObject(leaf);
-//            GraphicsAlgorithm leafGA = leafPE.getGraphicsAlgorithm();
-//            
-//            ISEDDebugNode child = NodeUtil.getChildren(leaf)[0];
-//            GraphicsAlgorithm childGA = getPictogramElementForBusinessObject(child).getGraphicsAlgorithm();
-//            GraphicsAlgorithm parentGA = getPictogramElementForBusinessObject(NodeUtil.getParent(leaf)).getGraphicsAlgorithm();
-//            
-//            int toMove = leafGA.getX() - childGA.getX() + (leafGA.getWidth() - childGA.getWidth()) / 2;
-//            moveSubTreeHorizontal(child, toMove, monitor);
-//            System.out.println(leaf);
-//         }
-//      }
-//      
-//      
-////      resizeRectsIfNeeded(mc, monitor);
-////
-////      updateParents(getPictogramElementForBusinessObject(mc), OFFSET, new SubProgressMonitor(monitor, 1));
-////      
-//      resizeRectsIfNeeded(ls, monitor);
-//   }
-
    @Override
-   protected void removeChildren(ISEDDebugNode node)
-         throws DebugException {
+   protected void removeChildren(ISEDDebugNode node) throws DebugException {
+      boolean firstNextIteration = false;
       DefaultRemoveFeature drf = new DefaultRemoveFeature(getFeatureProvider());
-      ISEDIterator iter = new SEDPreorderIterator(node);
+      PictogramElement lastIterNodePE = null;
+      
+      iter = new SEDLoopPreorderIterator((ISEDLoopStatement) node);
       while (iter.hasNext()) {
          ISEDDebugElement next = iter.next();
          
@@ -195,22 +100,58 @@ public class LoopStatementCollapseFeature extends AbstractDebugNodeCollapseFeatu
             continue;
          }
          
-         if(next instanceof ISEDDebugNode)
+         ISEDDebugNode nextNode = (ISEDDebugNode) next;
+
+         if(iter.getIteration() != 2)
          {
-            ISEDDebugNode nextNode = (ISEDDebugNode) next;
             PictogramElement pe = getFeatureProvider().getPictogramElementForBusinessObject(nextNode);
             
-            if(pe == null) {
-               continue;
-            }
-            
-            if(!(nextNode instanceof ISEDMethodCall)) {
+            if(pe != null) {
                removeConnections(pe, drf);
+               drf.remove(new RemoveContext(pe));
             }
-            drf.remove(new RemoveContext(pe));
+         }
+         
+         if(iter.getIteration() == 3 && !firstNextIteration) {
+            lastIterNodePE = getFeatureProvider().getPictogramElementForBusinessObject(NodeUtil.getParent(nextNode));
+            
+            if(lastIterNodePE != null) {
+               removeConnections(lastIterNodePE, drf);
+            }
+            firstNextIteration = true;
+         }
+         
+         if(!ArrayUtil.isEmpty(NodeUtil.getChildren(nextNode))) {
+            if(NodeUtil.getChildren(nextNode)[0] == iter.getCurrentLoopLeaf() && lastIterNodePE != null) {
+               createConnection((AnchorContainer) lastIterNodePE, (AnchorContainer) getFeatureProvider().getPictogramElementForBusinessObject(iter.getCurrentLoopLeaf()));
+               lastIterNodePE = null;
+               firstNextIteration = false;
+            }
          }
       }
-      
+   }
+   
+   /*
+    * TODO
+    */
+   protected void createConnection(AnchorContainer startAC, AnchorContainer endAC) {
+      IPeCreateService peCreateService = Graphiti.getPeCreateService();
+      IGaService gaService = Graphiti.getGaService();
+
+      Connection connection = peCreateService.createFreeFormConnection(getDiagram());
+      connection.setStart(startAC.getAnchors().get(0));
+      connection.setEnd(endAC.getAnchors().get(0));
+ 
+      ConnectionDecorator cd = peCreateService.createConnectionDecorator(connection, false, 1.0, true);
+      Polyline arrow = gaService.createPolyline(cd, new int[] {-10, 5, 0, 0, -10, -5});
+      arrow.setStyle(ExecutionTreeStyleUtil.getStyleForParentConnection(getDiagram()));
+      arrow.setLineStyle(LineStyle.DASH);
+      arrow.setForeground(manageColor(255, 0, 0));
+
+      Polyline polyline = gaService.createPolyline(connection);
+      polyline.setStyle(ExecutionTreeStyleUtil.getStyleForParentConnection(getDiagram()));
+      polyline.setLineStyle(LineStyle.DASH);
+      polyline.setForeground(manageColor(255, 0, 0));
    }
 
    @Override

@@ -311,6 +311,8 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+               // Get variables view
+               SWTBotView variablesView = TestSedCoreUtil.getVariablesView(bot);
                // Get debug target TreeItem
                SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
                // Do run
@@ -318,9 +320,10 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Select statement int result;
                item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1); 
                // Wait for jobs
+               variablesView.show();
+               TestUtilsUtil.sleep(1000); // Give the UI the chance to show variables.
                TestUtilsUtil.waitForJobs();
-               // Get variables view
-               SWTBotView variablesView = TestSedCoreUtil.getVariablesView(bot);
+               // Get variables
                SWTBotTree variablesTree = variablesView.bot().tree();
                SWTBotTreeItem[] items = variablesTree.getAllItems();
                assertEquals(items != null ? "items found: " + items.length : "items are null", showVariableValues, !ArrayUtil.isEmpty(items));

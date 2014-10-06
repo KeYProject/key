@@ -122,13 +122,13 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
                                           boolean saveReturnValues,
                                           boolean saveConstraints) throws ProofInputException, ParserConfigurationException, SAXException, IOException {
       // Create model
-      IExecutionNode expectedNode = createModel();
+      IExecutionNode<?> expectedNode = createModel();
       // Serialize model to XML string
       ExecutionNodeWriter writer = new ExecutionNodeWriter();
       String xml = writer.toXML(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, saveVariabes, saveCallStack, saveReturnValues, saveConstraints);
       // Read from XML string
       ExecutionNodeReader reader = new ExecutionNodeReader();
-      IExecutionNode currentNode = reader.read(new ByteArrayInputStream(xml.getBytes(Charset.forName(ExecutionNodeWriter.DEFAULT_ENCODING))));
+      IExecutionNode<?> currentNode = reader.read(new ByteArrayInputStream(xml.getBytes(Charset.forName(ExecutionNodeWriter.DEFAULT_ENCODING))));
       TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode, saveVariabes, saveCallStack, true, saveReturnValues, saveConstraints);
       // Serialize model to output stream
       ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -142,7 +142,7 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
          tempFile.delete();
          writer.write(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, tempFile, saveVariabes, saveCallStack, saveReturnValues, saveConstraints);
          assertTrue(tempFile.isFile());
-         // Read from tempoary file
+         // Read from temporary file
          currentNode = reader.read(tempFile);
          TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode, saveVariabes, saveCallStack, true, saveReturnValues, saveConstraints);
       }
@@ -155,7 +155,7 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
     * Creates an example symbolic execution tree.
     * @return The root of the example symbolic execution tree.
     */
-   protected IExecutionNode createModel() {
+   protected IExecutionNode<?> createModel() {
       KeYlessStart root = new KeYlessStart("start", "pc1", true);
       root.addCallStackEntry(root);
       KeYlessBranchCondition bc = new KeYlessBranchCondition(root, "bc", "pc2", false, "condition of bc", true, true, "myCustomBC");

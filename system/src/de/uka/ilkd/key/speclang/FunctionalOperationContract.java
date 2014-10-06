@@ -32,7 +32,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  * and a modality.
  */
 public interface FunctionalOperationContract extends OperationContract {
-    
+
     /**
      * Returns the modality of the contract.
      */
@@ -101,6 +101,15 @@ public interface FunctionalOperationContract extends OperationContract {
                                    Map<LocationVariable,Term> atPres,
                                    Services services);
 
+    public String getBaseName();
+    public Term getPre();
+    public Term getPost();
+    public Term getMod();
+    public Term getMby();
+    public Term getSelf();
+    public ImmutableList<Term> getParams();
+    public Term getResult();
+    public Term getExc();
     public KeYJavaType getSpecifiedIn();
 
     public boolean hasResultVar();

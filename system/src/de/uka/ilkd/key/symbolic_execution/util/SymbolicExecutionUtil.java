@@ -17,9 +17,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -120,13 +120,13 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import java.util.Iterator;
 
 /**
  * Provides utility methods for symbolic execution with KeY.
@@ -469,12 +469,14 @@ public final class SymbolicExecutionUtil {
     * sequent of the given {@link Node}.
     * @param services The {@link Services} to use.
     * @param node The original {@link Node} which provides the sequent to extract from.
+    * @param pio The {@link PosInOccurrence} of the SE modality.
     * @param additionalConditions Optional additional conditions.
     * @param variable The {@link IProgramVariable} of the value which is interested.
     * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
     */
    public static SiteProofVariableValueInput createExtractVariableValueSequent(Services services,
                                                                                Node node,
+                                                                               PosInOccurrence pio,
                                                                                Term additionalConditions,
                                                                                IProgramVariable variable) {
       // Make sure that correct parameters are given
@@ -485,7 +487,7 @@ public final class SymbolicExecutionUtil {
       // Create formula which contains the value interested in.
       Term newTerm = services.getTermBuilder().func(newPredicate, services.getTermBuilder().var((ProgramVariable)variable));
       // Create Sequent to prove with new succedent.
-      Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, additionalConditions, newTerm, false);
+      Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, pio, additionalConditions, newTerm, false);
       // Return created sequent and the used predicate to identify the value interested in.
       return new SiteProofVariableValueInput(sequentToProve, newPredicate);
    }
@@ -496,6 +498,7 @@ public final class SymbolicExecutionUtil {
     * sequent of the given {@link Node}.
     * @param services The {@link Services} to use.
     * @param node The original {@link Node} which provides the sequent to extract from.
+    * @param pio The {@link PosInOccurrence} of the modality or its updates.
     * @param additionalConditions Additional conditions to add to the antecedent.
     * @param term The new succedent term.
     * @param keepUpdates {@code true} keep updates, {@code false} throw updates away.
@@ -503,6 +506,7 @@ public final class SymbolicExecutionUtil {
     */
    public static SiteProofVariableValueInput createExtractTermSequent(Services services,
                                                                       Node node,
+                                                                      PosInOccurrence pio,
                                                                       Term additionalConditions,
                                                                       Term term,
                                                                       boolean keepUpdates) {
@@ -515,8 +519,8 @@ public final class SymbolicExecutionUtil {
       Term newTerm = services.getTermBuilder().func(newPredicate, term);
       // Create Sequent to prove with new succedent.
       Sequent sequentToProve = keepUpdates ? 
-                               createSequentToProveWithNewSuccedent(node, additionalConditions, newTerm, false) :
-                               createSequentToProveWithNewSuccedent(node, additionalConditions, newTerm, null, false);
+                               createSequentToProveWithNewSuccedent(node, pio, additionalConditions, newTerm, false) :
+                               createSequentToProveWithNewSuccedent(node, pio, additionalConditions, newTerm, null, false);
       // Return created sequent and the used predicate to identify the value interested in.
       return new SiteProofVariableValueInput(sequentToProve, newPredicate);
    }
@@ -589,14 +593,14 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Checks if it is right now possible to compute the variables of the given {@link IExecutionStateNode}
-    * via {@link IExecutionStateNode#getVariables()}. 
-    * @param node The {@link IExecutionStateNode} to check.
+    * Checks if it is right now possible to compute the variables of the given {@link IExecutionNode}
+    * via {@link IExecutionNode#getVariables()}. 
+    * @param node The {@link IExecutionNode} to check.
     * @param services The {@link Services} to use.
     * @return {@code true} right now it is possible to compute variables, {@code false} it is not possible to compute variables.
     * @throws ProofInputException Occurred Exception.
     */
-   public static boolean canComputeVariables(IExecutionStateNode<?> node, Services services) throws ProofInputException {
+   public static boolean canComputeVariables(IExecutionNode<?> node, Services services) throws ProofInputException {
       return node != null && 
              !node.isDisposed() &&
              !services.getTermBuilder().ff().equals(node.getPathCondition());
@@ -608,7 +612,7 @@ public final class SymbolicExecutionUtil {
     * @param node The {@link IExecutionNode} to create constraints for.
     * @return The created {@link IExecutionConstraint}s.
     */
-   public static IExecutionConstraint[] createExecutionConstraints(IExecutionNode node) {
+   public static IExecutionConstraint[] createExecutionConstraints(IExecutionNode<?> node) {
       if (node != null && !node.isDisposed()) {
          TermBuilder tb = node.getServices().getTermBuilder();
          List<IExecutionConstraint> constraints = new LinkedList<IExecutionConstraint>();
@@ -638,38 +642,38 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} SE label is somewhere contained, {@code false} SE label is not contained at all.
     */
    public static boolean containsSymbolicExecutionLabel(Term term) {
+      boolean hasModality = false;
       term = TermBuilder.goBelowUpdates(term);
       if (term.op() instanceof Modality) {
-         return hasSymbolicExecutionLabel(term);
+         hasModality = hasSymbolicExecutionLabel(term);
       }
-      else {
-         boolean hasModality = false;
+      if (!hasModality) {
          int i = 0;
          while (!hasModality && i < term.arity()) {
             hasModality = containsSymbolicExecutionLabel(term.sub(i));
             i++;
          }
-         return hasModality;
       }
+      return hasModality;
    }
 
    /**
-    * Creates for the given {@link IExecutionStateNode} the contained
+    * Creates for the given {@link IExecutionNode} the contained
     * root {@link IExecutionVariable}s.
-    * @param node The {@link IExecutionStateNode} to create variables for.
+    * @param node The {@link IExecutionNode} to create variables for.
     * @return The created {@link IExecutionVariable}s.
     */
-   public static IExecutionVariable[] createExecutionVariables(IExecutionStateNode<?> node) {
+   public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node) {
       if (node != null) {
          Node proofNode = node.getProofNode();
          List<IProgramVariable> variables = new LinkedList<IProgramVariable>();
          // Add self variable
-         IProgramVariable selfVar = findSelfTerm(proofNode);
+         IProgramVariable selfVar = findSelfTerm(proofNode, node.getModalityPIO());
          if (selfVar != null) {
             variables.add(selfVar);
          }
          // Add method parameters
-         Node callNode = findMethodCallNode(node.getProofNode());
+         Node callNode = findMethodCallNode(node.getProofNode(), node.getModalityPIO());
          if (callNode != null
                  && callNode.getNodeInfo().getActiveStatement() instanceof MethodBodyStatement) {
             MethodBodyStatement mbs =
@@ -839,7 +843,7 @@ public final class SymbolicExecutionUtil {
          Term sub = arrayIndexTerm.sub(0);
          // Make sure that the defined index is an integer
          if (services.getTypeConverter().getIntegerLDT().getNumberSymbol() == sub.op()) {
-            return Integer.parseInt(ProofSaver.printAnything(sub, services));
+            return Integer.parseInt(SymbolicExecutionUtil.formatTerm(sub, services, false, true));
          }
          else {
             return -1;
@@ -853,17 +857,23 @@ public final class SymbolicExecutionUtil {
    /**
     * Searches the {@link IProgramVariable} of the current {@code this}/{@code self} reference.
     * @param node The {@link Node} to search in.
+    * @param pio The {@link PosInOccurrence} describing the location of the modality of interest.
     * @return The found {@link IProgramVariable} with the current {@code this}/{@code self} reference or {@code null} if no one is available.
     */
-   public static IProgramVariable findSelfTerm(Node node) {
-      Term term = node.getAppliedRuleApp().posInOccurrence().subTerm();
-      term = TermBuilder.goBelowUpdates(term);
-      JavaBlock jb = term.javaBlock();
-      Services services = node.proof().getServices();
-      IExecutionContext context = JavaTools.getInnermostExecutionContext(jb, services);
-      if (context instanceof ExecutionContext) {
-         ReferencePrefix prefix = context.getRuntimeInstance();
-         return prefix instanceof IProgramVariable ? (IProgramVariable)prefix : null;
+   public static IProgramVariable findSelfTerm(Node node, PosInOccurrence pio) {
+      if (pio != null) {
+         Term term = pio.subTerm();
+         term = TermBuilder.goBelowUpdates(term);
+         JavaBlock jb = term.javaBlock();
+         Services services = node.proof().getServices();
+         IExecutionContext context = JavaTools.getInnermostExecutionContext(jb, services);
+         if (context instanceof ExecutionContext) {
+            ReferencePrefix prefix = context.getRuntimeInstance();
+            return prefix instanceof IProgramVariable ? (IProgramVariable)prefix : null;
+         }
+         else {
+            return null;
+         }
       }
       else {
          return null;
@@ -1196,19 +1206,19 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Searches the modality {@link Term} with the maximal {@link SymbolicExecutionTermLabel} ID
+    * Searches the modality {@link PosInOccurrence} with the maximal {@link SymbolicExecutionTermLabel} ID
     * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Sequent}.
     * @param sequent The {@link Sequent} to search in.
-    * @return The modality {@link Term} with the maximal ID if available or {@code null} otherwise.
+    * @return The modality {@link PosInOccurrence} with the maximal ID if available or {@code null} otherwise.
     */
-   public static Term findModalityWithMaxSymbolicExecutionLabelId(Sequent sequent) {
+   public static PosInOccurrence findModalityWithMaxSymbolicExecutionLabelId(Sequent sequent) {
       if (sequent != null) {
-         Term nextAntecedent = findModalityWithMaxSymbolicExecutionLabelId(sequent.antecedent());
-         Term nextSuccedent = findModalityWithMaxSymbolicExecutionLabelId(sequent.succedent());
+         PosInOccurrence nextAntecedent = findModalityWithMaxSymbolicExecutionLabelId(sequent.antecedent(), true);
+         PosInOccurrence nextSuccedent = findModalityWithMaxSymbolicExecutionLabelId(sequent.succedent(), false);
          if (nextAntecedent != null) {
             if (nextSuccedent != null) {
-               SymbolicExecutionTermLabel antecedentLabel = getSymbolicExecutionLabel(nextAntecedent);
-               SymbolicExecutionTermLabel succedentLabel = getSymbolicExecutionLabel(nextSuccedent);
+               SymbolicExecutionTermLabel antecedentLabel = getSymbolicExecutionLabel(nextAntecedent.subTerm());
+               SymbolicExecutionTermLabel succedentLabel = getSymbolicExecutionLabel(nextSuccedent.subTerm());
                return antecedentLabel.getId() > succedentLabel.getId() ?
                        nextAntecedent : nextSuccedent;
             }
@@ -1229,23 +1239,25 @@ public final class SymbolicExecutionUtil {
     * Searches the modality {@link Term} with the maximal {@link SymbolicExecutionTermLabel} ID
     * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Semisequent}.
     * @param semisequent The {@link Semisequent} to search in.
+    * @param inAntec {@code true} antecedent, {@code false} succedent.
     * @return The modality {@link Term} with the maximal ID if available or {@code null} otherwise.
     */
-   public static Term findModalityWithMaxSymbolicExecutionLabelId(Semisequent semisequent) {
+   public static PosInOccurrence findModalityWithMaxSymbolicExecutionLabelId(Semisequent semisequent, boolean inAntec) {
       if (semisequent != null) {
          int maxId = Integer.MIN_VALUE;
-         Term modality = null;
+         PosInOccurrence maxPio = null;
          for (SequentFormula sf : semisequent) {
-            Term current = findModalityWithMaxSymbolicExecutionLabelId(sf.formula());
+            PosInTerm current = findModalityWithMaxSymbolicExecutionLabelId(sf.formula());
             if (current != null) {
-               SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(current);
-               if (modality == null || label.getId() > maxId) {
-                  modality = current;
+               PosInOccurrence pio = new PosInOccurrence(sf, current, inAntec);
+               SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(pio.subTerm());
+               if (maxPio == null || label.getId() > maxId) {
+                  maxPio = pio;
                   maxId = label.getId();
                }
             }
          }
-         return modality;
+         return maxPio;
       }
       else {
          return null;
@@ -1253,17 +1265,16 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Searches the modality {@link Term} with the maximal {@link SymbolicExecutionTermLabel} ID
+    * Searches the modality {@link PosInTerm} with the maximal {@link SymbolicExecutionTermLabel} ID
     * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Term}.
     * @param term The {@link Term} to search in.
-    * @return The modality {@link Term} with the maximal ID if available or {@code null} otherwise.
+    * @return The modality {@link PosInTerm} with the maximal ID if available or {@code null} otherwise.
     */
-   public static Term findModalityWithMaxSymbolicExecutionLabelId(Term term) {
+   public static PosInTerm findModalityWithMaxSymbolicExecutionLabelId(Term term) {
       if (term != null) {
-         FindModalityWithSymbolicExecutionLabelId visitor =
-                 new FindModalityWithSymbolicExecutionLabelId(true);
+         FindModalityWithSymbolicExecutionLabelId visitor = new FindModalityWithSymbolicExecutionLabelId(true);
          term.execPreOrder(visitor);
-         return visitor.getModality();
+         return visitor.getPosInTerm();
       }
       else {
          return null;
@@ -1271,21 +1282,20 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Searches the modality {@link Term} with the minimal {@link SymbolicExecutionTermLabel} ID
+    * Searches the modality {@link PosInOccurrence} with the minimal {@link SymbolicExecutionTermLabel} ID
     * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Sequent}.
     * @param sequent The {@link Sequent} to search in.
-    * @return The modality {@link Term} with the maximal ID if available or {@code null} otherwise.
+    * @return The modality {@link PosInOccurrence} with the maximal ID if available or {@code null} otherwise.
     */
-   public static Term findModalityWithMinSymbolicExecutionLabelId(Sequent sequent) {
+   public static PosInOccurrence findModalityWithMinSymbolicExecutionLabelId(Sequent sequent) {
       if (sequent != null) {
-         Term nextAntecedent = findModalityWithMinSymbolicExecutionLabelId(sequent.antecedent());
-         Term nextSuccedent = findModalityWithMinSymbolicExecutionLabelId(sequent.succedent());
+         PosInOccurrence nextAntecedent = findModalityWithMinSymbolicExecutionLabelId(sequent.antecedent(), true);
+         PosInOccurrence nextSuccedent = findModalityWithMinSymbolicExecutionLabelId(sequent.succedent(), false);
          if (nextAntecedent != null) {
             if (nextSuccedent != null) {
-               SymbolicExecutionTermLabel antecedentLabel = getSymbolicExecutionLabel(nextAntecedent);
-               SymbolicExecutionTermLabel succedentLabel = getSymbolicExecutionLabel(nextSuccedent);
-               return antecedentLabel.getId() < succedentLabel.getId() ?
-                       nextAntecedent : nextSuccedent;
+               SymbolicExecutionTermLabel antecedentLabel = getSymbolicExecutionLabel(nextAntecedent.subTerm());
+               SymbolicExecutionTermLabel succedentLabel = getSymbolicExecutionLabel(nextSuccedent.subTerm());
+               return antecedentLabel.getId() < succedentLabel.getId() ? nextAntecedent : nextSuccedent;
             }
             else {
                return nextAntecedent;
@@ -1301,26 +1311,28 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Searches the modality {@link Term} with the minimal {@link SymbolicExecutionTermLabel} ID
+    * Searches the modality {@link PosInOccurrence} with the minimal {@link SymbolicExecutionTermLabel} ID
     * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Semisequent}.
     * @param semisequent The {@link Semisequent} to search in.
-    * @return The modality {@link Term} with the minimal ID if available or {@code null} otherwise.
+    * @param inAntec {@code true} antecedent, {@code false} succedent.
+    * @return The modality {@link PosInOccurrence} with the minimal ID if available or {@code null} otherwise.
     */
-   public static Term findModalityWithMinSymbolicExecutionLabelId(Semisequent semisequent) {
+   public static PosInOccurrence findModalityWithMinSymbolicExecutionLabelId(Semisequent semisequent, boolean inAntec) {
       if (semisequent != null) {
          int maxId = Integer.MIN_VALUE;
-         Term modality = null;
+         PosInOccurrence minPio = null;
          for (SequentFormula sf : semisequent) {
-            Term current = findModalityWithMinSymbolicExecutionLabelId(sf.formula());
+            PosInTerm current = findModalityWithMinSymbolicExecutionLabelId(sf.formula());
             if (current != null) {
-               SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(current);
-               if (modality == null || label.getId() < maxId) {
-                  modality = current;
+               PosInOccurrence pio = new PosInOccurrence(sf, current, inAntec);
+               SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(pio.subTerm());
+               if (minPio == null || label.getId() < maxId) {
+                  minPio = pio;
                   maxId = label.getId();
                }
             }
          }
-         return modality;
+         return minPio;
       }
       else {
          return null;
@@ -1328,17 +1340,16 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Searches the modality {@link Term} with the minimal {@link SymbolicExecutionTermLabel} ID
+    * Searches the modality {@link PosInTerm} with the minimal {@link SymbolicExecutionTermLabel} ID
     * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Term}.
     * @param term The {@link Term} to search in.
-    * @return The modality {@link Term} with the maximal ID if available or {@code null} otherwise.
+    * @return The modality {@link PosInTerm} with the maximal ID if available or {@code null} otherwise.
     */
-   public static Term findModalityWithMinSymbolicExecutionLabelId(Term term) {
+   public static PosInTerm findModalityWithMinSymbolicExecutionLabelId(Term term) {
       if (term != null) {
-         FindModalityWithSymbolicExecutionLabelId visitor =
-                 new FindModalityWithSymbolicExecutionLabelId(false);
+         FindModalityWithSymbolicExecutionLabelId visitor = new FindModalityWithSymbolicExecutionLabelId(false);
          term.execPreOrder(visitor);
-         return visitor.getModality();
+         return visitor.getPosInTerm();
       }
       else {
          return null;
@@ -1352,9 +1363,9 @@ public final class SymbolicExecutionUtil {
     */
    private static final class FindModalityWithSymbolicExecutionLabelId extends DefaultVisitor {
       /**
-       * The modality {@link Term} with the maximal ID.
+       * The modality {@link PosInTerm} with the maximal ID.
        */
-      private Term modality;
+      private PosInTerm posInTerm;
       
       /**
        * The maximal ID.
@@ -1365,6 +1376,13 @@ public final class SymbolicExecutionUtil {
        * {@code true} search maximal ID, {@code false} search minimal ID.
        */
       private boolean maximum;
+      
+      /**
+       * The current {@link PosInTerm}.
+       */
+      private PosInTerm currentPosInTerm = null;
+      
+      private Deque<Integer> indexStack = new LinkedList<Integer>();
       
       /**
        * Constructor.
@@ -1381,19 +1399,47 @@ public final class SymbolicExecutionUtil {
       public void visit(Term visited) {
          SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(visited);
          if (label != null) {
-            if (modality == null || (maximum ? label.getId() > maxId : label.getId() < maxId)) {
-               modality = visited;
+            if (posInTerm == null || (maximum ? label.getId() > maxId : label.getId() < maxId)) {
+               posInTerm = currentPosInTerm;
                maxId = label.getId();
             }
          }
       }
 
       /**
-       * Returns the modality {@link Term} with the maximal ID.
-       * @return The modality {@link Term} with the maximal ID.
+       * {@inheritDoc}
        */
-      public Term getModality() {
-         return modality;
+      @Override
+      public void subtreeEntered(Term subtreeRoot) {
+         if (currentPosInTerm == null) {
+            currentPosInTerm = PosInTerm.getTopLevel();
+         }
+         else {
+            int index = indexStack.getFirst();
+            currentPosInTerm = currentPosInTerm.down(index);
+         }
+         indexStack.addFirst(0);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void subtreeLeft(Term subtreeRoot) {
+         currentPosInTerm = currentPosInTerm.up();
+         indexStack.removeFirst();
+         if (!indexStack.isEmpty()) {
+            Integer nextIndex = indexStack.removeFirst();
+            indexStack.addFirst(nextIndex + 1);
+         }
+      }
+
+      /**
+       * Returns the modality {@link PosInTerm} with the maximal ID.
+       * @return The modality {@link PosInTerm} with the maximal ID.
+       */
+      public PosInTerm getPosInTerm() {
+         return posInTerm;
       }
    }
 
@@ -1569,12 +1615,13 @@ public final class SymbolicExecutionUtil {
     * which also represents a symbolic execution tree node
     * (checked via {@link #isSymbolicExecutionTreeNode(Node, RuleApp)}).
     * @param node The {@link Node} to start search in.
+    * @param pio The {@link PosInOccurrence} of the modality.
     * @return The parent {@link Node} of the given {@link Node} which is also a set node or {@code null} if no parent node was found.
     */
-   public static Node findMethodCallNode(Node node) {
-      if (node != null && node.getAppliedRuleApp() != null) {
+   public static Node findMethodCallNode(Node node, PosInOccurrence pio) {
+      if (node != null && pio != null) {
          // Get current program method
-         Term term = node.getAppliedRuleApp().posInOccurrence().subTerm();
+         Term term = pio.subTerm();
          term = TermBuilder.goBelowUpdates(term);
          Services services = node.proof().getServices();
          MethodFrame mf = JavaTools.getInnermostMethodFrame(term.javaBlock(), services);
@@ -1585,8 +1632,7 @@ public final class SymbolicExecutionUtil {
             while (parent != null && result == null) {
                SourceElement activeStatement = parent.getNodeInfo().getActiveStatement();
                if (activeStatement instanceof MethodBodyStatement && 
-                   ((MethodBodyStatement)activeStatement).getProgramMethod(services)
-                       == mf.getProgramMethod()) {
+                   ((MethodBodyStatement)activeStatement).getProgramMethod(services) == mf.getProgramMethod()) {
                   result = parent;
                }
                else {
@@ -2325,9 +2371,9 @@ public final class SymbolicExecutionUtil {
     * @return The created {@link Sequent}.
     */
    public static Sequent createSequentToProveWithNewSuccedent(Node node,
-                                                              RuleApp ruleApp,
+                                                              PosInOccurrence pio,
                                                               Term newSuccedent) {
-      return createSequentToProveWithNewSuccedent(node, ruleApp, null, newSuccedent, false);
+      return createSequentToProveWithNewSuccedent(node, pio, null, newSuccedent, false);
    }
 
    /**
@@ -2342,7 +2388,7 @@ public final class SymbolicExecutionUtil {
                                                               Term additionalAntecedent,
                                                               Term newSuccedent,
                                                               boolean addResultLabel) {
-      return createSequentToProveWithNewSuccedent(node, node.getAppliedRuleApp(), additionalAntecedent, newSuccedent, addResultLabel);
+      return createSequentToProveWithNewSuccedent(node, node.getAppliedRuleApp().posInOccurrence(), additionalAntecedent, newSuccedent, addResultLabel);
    }
 
    /**
@@ -2354,19 +2400,19 @@ public final class SymbolicExecutionUtil {
     * @return The created {@link Sequent}.
     */
    public static Sequent createSequentToProveWithNewSuccedent(Node node, 
-                                                              RuleApp ruleApp,
+                                                              PosInOccurrence pio,
                                                               Term additionalAntecedent,
                                                               Term newSuccedent,
                                                               boolean addResultLabel) {
-      if (ruleApp.posInOccurrence() != null) {
+      if (pio != null) {
          // Get the updates from the return node which includes the value interested in.
-         Term originalModifiedFormula = ruleApp.posInOccurrence().constrainedFormula().formula();
+         Term originalModifiedFormula = pio.constrainedFormula().formula();
          ImmutableList<Term> originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;
          // Create new sequent
-         return createSequentToProveWithNewSuccedent(node, ruleApp, additionalAntecedent, newSuccedent, originalUpdates, addResultLabel);
+         return createSequentToProveWithNewSuccedent(node, pio, additionalAntecedent, newSuccedent, originalUpdates, addResultLabel);
       }
       else {
-         return createSequentToProveWithNewSuccedent(node, ruleApp, additionalAntecedent, newSuccedent, null, addResultLabel);
+         return createSequentToProveWithNewSuccedent(node, pio, additionalAntecedent, newSuccedent, null, addResultLabel);
       }
    }
    
@@ -2384,7 +2430,7 @@ public final class SymbolicExecutionUtil {
                                                               Term newSuccedent,
                                                               ImmutableList<Term> updates,
                                                               boolean addResultLabel) {
-      return createSequentToProveWithNewSuccedent(node, node.getAppliedRuleApp(), additionalAntecedent, newSuccedent, updates, addResultLabel);
+      return createSequentToProveWithNewSuccedent(node, node.getAppliedRuleApp().posInOccurrence(), additionalAntecedent, newSuccedent, updates, addResultLabel);
    }
    
    /**
@@ -2397,7 +2443,7 @@ public final class SymbolicExecutionUtil {
     * @return The created {@link Sequent}.
     */
    public static Sequent createSequentToProveWithNewSuccedent(Node node, 
-                                                              RuleApp ruleApp,
+                                                              PosInOccurrence pio,
                                                               Term additionalAntecedent,
                                                               Term newSuccedent,
                                                               ImmutableList<Term> updates,
@@ -2411,7 +2457,6 @@ public final class SymbolicExecutionUtil {
          newSuccedentToProve = newSuccedent;
       }
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
-      PosInOccurrence pio = ruleApp.posInOccurrence();
       Sequent originalSequentWithoutMethodFrame = SideProofUtil.computeGeneralSequentToProve(node.sequent(), pio != null ? pio.constrainedFormula() : null);
       Set<Term> skolemTerms = collectSkolemConstants(originalSequentWithoutMethodFrame, newSuccedentToProve);
       originalSequentWithoutMethodFrame = removeAllUnusedSkolemEqualities(originalSequentWithoutMethodFrame, skolemTerms);
@@ -2673,26 +2718,34 @@ public final class SymbolicExecutionUtil {
       if (skolemCheck == -1) {
          TermBuilder tb = services.getTermBuilder();
          List<Term> replacements = findSkolemReplacements(sequent, term);
-         assert !replacements.isEmpty();
-         Term other = term.sub(1);
-         List<Term> newTerms = new LinkedList<Term>();
-         for (Term replacement : replacements) {
-            newTerms.add(tb.equals(replacement, other));
+         if (!replacements.isEmpty()) {
+            Term other = term.sub(1);
+            List<Term> newTerms = new LinkedList<Term>();
+            for (Term replacement : replacements) {
+               newTerms.add(tb.equals(replacement, other));
+            }
+            term = tb.and(newTerms);
+            return replaceSkolemConstants(sequent, term, services);
          }
-         term = tb.and(newTerms);
-         return replaceSkolemConstants(sequent, term, services);
+         else {
+            return services.getTermBuilder().tt(); // If no other term is available the quality is jsut true.
+         }
       }
       else if (skolemCheck == 1) {
          TermBuilder tb = services.getTermBuilder();
          List<Term> replacements = findSkolemReplacements(sequent, term);
-         assert !replacements.isEmpty();
-         Term other = term.sub(0);
-         List<Term> newTerms = new LinkedList<Term>();
-         for (Term replacement : replacements) {
-            newTerms.add(tb.equals(other, replacement));
+         if (!replacements.isEmpty()) {
+            Term other = term.sub(0);
+            List<Term> newTerms = new LinkedList<Term>();
+            for (Term replacement : replacements) {
+               newTerms.add(tb.equals(other, replacement));
+            }
+            term = tb.and(newTerms);
+            return replaceSkolemConstants(sequent, term, services);
          }
-         term = tb.and(newTerms);
-         return replaceSkolemConstants(sequent, term, services);
+         else {
+            return services.getTermBuilder().tt(); // If no other term is available the quality is jsut true.
+         }
       }
       else {
          List<Term> newChildren = new LinkedList<Term>();
@@ -2705,12 +2758,57 @@ public final class SymbolicExecutionUtil {
             }
             newChildren.add(newChild);
          }
-         return changed ? services.getTermFactory().createTerm(term.op(),
-                                                               new ImmutableArray<Term>(newChildren),
-                                                               term.boundVars(),
-                                                               term.javaBlock(),
-                                                               term.getLabels()) :
-                          term;
+         if (changed) {
+            if (term.op() == Junctor.NOT) {
+               // Create new NOT term using build in simplification of TermBuilder.
+               assert newChildren.size() == 1;
+               assert term.boundVars().isEmpty();
+               assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
+               Term result = services.getTermBuilder().not(newChildren.get(0));
+               if (term.hasLabels()) {
+                  result = services.getTermBuilder().label(result, term.getLabels());
+               }
+               return result;
+            }
+            else if (term.op() == Junctor.OR) {
+               // Create new OR term using build in simplification of TermBuilder.
+               assert term.boundVars().isEmpty();
+               assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
+               Term result = services.getTermBuilder().or(newChildren);
+               if (term.hasLabels()) {
+                  result = services.getTermBuilder().label(result, term.getLabels());
+               }
+               return result;
+            }
+            else if (term.op() == Junctor.AND) {
+               // Create new AND term using build in simplification of TermBuilder.
+               assert term.boundVars().isEmpty();
+               assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
+               Term result = services.getTermBuilder().and(newChildren);
+               if (term.hasLabels()) {
+                  result = services.getTermBuilder().label(result, term.getLabels());
+               }
+               return result;
+            }
+            else if (term.op() == Junctor.IMP) {
+               // Create new IMP term using build in simplification of TermBuilder.
+               assert newChildren.size() == 2;
+               assert term.boundVars().isEmpty();
+               assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
+               return services.getTermBuilder().imp(newChildren.get(0), newChildren.get(1), term.getLabels());
+            }
+            else {
+               // Create new term in general.
+               return services.getTermFactory().createTerm(term.op(),
+                                                           new ImmutableArray<Term>(newChildren),
+                                                           term.boundVars(),
+                                                           term.javaBlock(),
+                                                           term.getLabels());
+            }
+         }
+         else {
+            return term;
+         }
       }
    }
 
@@ -2883,7 +2981,7 @@ public final class SymbolicExecutionUtil {
     * @param executionNode The {@link IExecutionNode} to get the root of its symbolic execution tree.
     * @return The root of the given {@link IExecutionNode}.
     */
-   public static IExecutionNode getRoot(IExecutionNode executionNode) {
+   public static IExecutionNode<?> getRoot(IExecutionNode<?> executionNode) {
       if (executionNode != null) {
          while (executionNode.getParent() != null) {
             executionNode = executionNode.getParent();
@@ -2902,8 +3000,8 @@ public final class SymbolicExecutionUtil {
     */
    public static IProgramVariable extractExceptionVariable(Proof proof) {
       Node root = proof.root();
-      Term modalityTerm =
-              SymbolicExecutionUtil.findModalityWithMinSymbolicExecutionLabelId(root.sequent());
+      PosInOccurrence modalityTermPIO = SymbolicExecutionUtil.findModalityWithMinSymbolicExecutionLabelId(root.sequent());
+      Term modalityTerm = modalityTermPIO != null ? modalityTermPIO.subTerm() : null;
       if (modalityTerm != null) {
          modalityTerm = TermBuilder.goBelowUpdates(modalityTerm);
          JavaProgramElement updateContent = modalityTerm.javaBlock().program();
@@ -3196,7 +3294,7 @@ public final class SymbolicExecutionUtil {
     */
    public static void setUsePrettyPrinting(boolean usePrettyPrinting) {
       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(usePrettyPrinting);
-      NotationInfo.PRETTY_SYNTAX = usePrettyPrinting;
+      NotationInfo.DEFAULT_PRETTY_SYNTAX = usePrettyPrinting;
    }
 
    /**

@@ -516,6 +516,12 @@ public final class ProgramSV extends AbstractSV
 
 
    @Override
+   public String getUniqueName() {
+       return sort().declarationString() + " " + name();
+   }
+
+
+   @Override
    public String getFullName() {
       return null;
    }

@@ -92,6 +92,12 @@ public class JavaProfile extends AbstractProfile {
        result = result.prepend(new TermLabelConfiguration(
                ParameterlessTermLabel.UNDEFINED_VALUE_LABEL_NAME,
                new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.UNDEFINED_VALUE_LABEL)));
+       result = result.prepend(new TermLabelConfiguration(
+               ParameterlessTermLabel.SELF_COMPOSITION_LABEL_NAME,
+               new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)));
+       result = result.prepend(new TermLabelConfiguration(
+               ParameterlessTermLabel.POST_CONDITION_LABEL_NAME,
+               new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.POST_CONDITION_LABEL)));
        return result;
     }
 

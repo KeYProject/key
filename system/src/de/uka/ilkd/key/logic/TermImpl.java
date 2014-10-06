@@ -119,12 +119,12 @@ class TermImpl implements Term {
 	    freeVars = freeVars.union(subFreeVars);	   
 	}
     }
-    
-    
+
+
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
-    
+
     /**
      * Checks whether the Term is valid on the top level. If this is
      * the case this method returns the Term unmodified. Otherwise a
@@ -132,8 +132,8 @@ class TermImpl implements Term {
      */
     public Term checked() {
     	if(op().validTopLevel(this)) {
-	    return this;	    
-	} else {	   	    
+	    return this;
+	} else {
 	    throw new TermCreationException(op(), this);
 	}
     }    
@@ -141,6 +141,19 @@ class TermImpl implements Term {
     @Override
     public Operator op() {
         return op;
+    }
+    
+    
+    @Override
+    public <T> T op(Class<T> opClass)
+            throws IllegalArgumentException {
+        if (!opClass.isInstance(op)) {
+            throw new IllegalArgumentException(
+                    "Operator does not match the expected type:\n"
+                    + "Operator type was: " + op.getClass() + "\n"
+                    + "Expected type was: " + opClass);
+        }
+        return opClass.cast(op);
     }
     
     

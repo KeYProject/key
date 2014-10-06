@@ -29,7 +29,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * The default implementation of {@link IExecutionLoopCondition}.
  * @author Martin Hentschel
  */
-public class ExecutionLoopCondition extends AbstractExecutionStateNode<LoopStatement> implements IExecutionLoopCondition {
+public class ExecutionLoopCondition extends AbstractExecutionNode<LoopStatement> implements IExecutionLoopCondition {
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
