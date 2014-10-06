@@ -1,6 +1,12 @@
 ChangeLog
 =========
 
+Revision 2.4.0:
+===============
+ * Information flow reasoning
+ * Improved test case generation
+ * Support for CVC4 SMT solver backend
+
 Revision 2.2.3:
 ===============
  * Fix concurrency issue introduced in 2.2.2
