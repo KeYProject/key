@@ -53,6 +53,7 @@ import org.key_project.sed.core.model.ISEDExceptionalTermination;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDTermination;
+import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.util.ISEDIterator;
 import org.key_project.sed.core.util.NodeUtil;
 import org.key_project.sed.core.util.SEDMethodPreorderIterator;
@@ -387,6 +388,14 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                Object bo = getBusinessObjectForPictogramElement(pictogramElement);
                ISEDDebugNode node = bo instanceof ISEDDebugNode ? (ISEDDebugNode)bo : null;
                
+               if(node == null && bo instanceof ISEDDebugTarget)
+               {
+                  ISEDThread[] threads = ((ISEDDebugTarget) bo).getSymbolicThreads();
+                  if (!ArrayUtil.isEmpty(threads)) {
+                     node = threads[0];
+                  }
+               }
+               
                if(node != null) {
                   adjustRects(node, monitor);
                }
@@ -466,13 +475,27 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                   Set<ISEDDebugNode> leafs = updateChildrenLeftAligned((ISEDDebugElement)bos[i], monitor, offsetBetweenPictogramElements, maxX);
                   maxX += offsetBetweenPictogramElements;
                   monitor.worked(1);
+                  
+//                  for(ISEDDebugNode leaf : leafs) {
+//                     System.out.println("L: " + leaf);
+//                  }
                   // Center sub tree
                   ISEDDebugNode start = bos[i] instanceof ISEDDebugNode ? (ISEDDebugNode) bos[i] : null;
                   centerChildren(start, new HashSet<ISEDDebugNode>(leafs), monitor);
+                  
                   if(bos[i] instanceof ISEDDebugNode) {
                      adjustRects((ISEDDebugNode) bos[i], monitor);
-                     updateParents(getPictogramElementForBusinessObject(start), OFFSET, new SubProgressMonitor(monitor, 1));
+//                     updateParents(getPictogramElementForBusinessObject(start), OFFSET, new SubProgressMonitor(monitor, 1));
                   }
+                  else if(bos[i] instanceof ISEDDebugTarget)
+                  {
+                     ISEDThread[] threads = ((ISEDDebugTarget) bos[i]).getSymbolicThreads();
+                     if (!ArrayUtil.isEmpty(threads)) {
+                        adjustRects(threads[0], monitor);
+//                        updateParents(getPictogramElementForBusinessObject(start), OFFSET, new SubProgressMonitor(monitor, 1));
+                     }
+                  }
+
                   monitor.worked(1);
                }
                i++;
@@ -555,18 +578,20 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                leafs.add(nextNode);
             }
          }
-         else if((nextNode instanceof ISEDBaseMethodReturn) && !leafs.contains(nextNode)){
-            GraphicsAlgorithm parentGA = getPictogramElementForBusinessObject(NodeUtil.getParent(nextNode)).getGraphicsAlgorithm();
-            GraphicsAlgorithm nextGA = nextPE.getGraphicsAlgorithm();
-            nextGA.setX(parentGA.getX());
-            
-            if(nextGA.getY() < parentGA.getY() + parentGA.getHeight() + OFFSET) {
-               moveSubTreeVertical(nextNode, parentGA.getY() + parentGA.getHeight() + OFFSET - nextGA.getY());
-               updateAllMethodRectHeights((ISEDMethodCall) nextNode.getCallStack()[0], nextGA, nextNode instanceof ISEDBaseMethodReturn);
-            }
-
-            leafs.add(nextNode);
-         }
+//         else if((nextNode instanceof ISEDBaseMethodReturn) && !leafs.contains(nextNode)){
+//            System.out.println("hallo");
+//            
+//            GraphicsAlgorithm parentGA = getPictogramElementForBusinessObject(NodeUtil.getParent(nextNode)).getGraphicsAlgorithm();
+//            GraphicsAlgorithm nextGA = nextPE.getGraphicsAlgorithm();
+//            nextGA.setX(parentGA.getX());
+//            
+//            if(nextGA.getY() < parentGA.getY() + parentGA.getHeight() + OFFSET) {
+//               moveSubTreeVertical(nextNode, parentGA.getY() + parentGA.getHeight() + OFFSET - nextGA.getY());
+//               updateAllMethodRectHeights((ISEDMethodCall) nextNode.getCallStack()[0], nextGA, nextNode instanceof ISEDBaseMethodReturn);
+//            }
+//
+//            leafs.add(nextNode);
+//         }
             
          monitor.worked(1);
       }
@@ -781,7 +806,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
          PictogramElement currentPE = nextPE;
          
          
-   //      System.out.println(current);
+//         System.out.println(current);
          
          if(isMC && !mc.isCollapsed()) {
             descendantsPE.add(getPictogramElementForBusinessObject(current, 0));
@@ -1225,34 +1250,11 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                               }
                            }
                         }
-
-//                        if(mostRightInPrev > -1 && mostRightInPrev + OFFSET <= mcGA.getX()) {
-//                           int toMove = mcGA.getX() + METOFF - ga.getX();
-//                           moveRightAndAbove(node, toMove, monitor);
-//                           moveSubTreeHorizontal(node, toMove, monitor);
-//                        }
-//                        else {
-//                           if(mostRightInPrev == -1) {
-//                              mostRightInPrev = outerGA.getX() + METOFF;
-//                           }
-//                           
-//                           if(mostRightInPrev + OFFSET <= ga.getX()) {
-//                              if(mostRightInPrev + OFFSET <= ga.getX() - METOFF) {
-//                                 mcGA.setX(ga.getX() - METOFF);
-//                              }
-//                              else {
-//                                 int toMove = METOFF - ga.getX();
-//                                 moveRightAndAbove(node, toMove, monitor);
-//                                 moveSubTreeHorizontal(node, toMove, monitor);
-//                                 mcGA.setX(mostRightInPrev + OFFSET);
-//                              }
-//                           }
-//                        }
                      }
                   }
                }
             }
-            else if(node instanceof ISEDMethodCall || node instanceof ISEDBaseMethodReturn) {
+            else { //if(node instanceof ISEDMethodCall || node instanceof ISEDBaseMethodReturn) {
                int toMove = mcGA.getX() + METOFF - ga.getX();
                moveRightAndAbove(node, toMove, monitor);
                moveSubTreeHorizontal(node, toMove, monitor);

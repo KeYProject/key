@@ -13,11 +13,15 @@
 
 package org.key_project.sed.core.util;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Set;
+
 import org.eclipse.debug.core.DebugException;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEDLoopCondition;
+import org.key_project.sed.core.model.ISEDLoopStatement;
 import org.key_project.util.java.ArrayUtil;
 
 /**
@@ -42,20 +46,49 @@ public class SEDLoopPreorderIterator implements ISEDIterator {
     * The element at that the iteration has started used as end condition
     * to make sure that only over the subtree of the element is iterated.
     */
-   private ISEDDebugElement start;
+   private ISEDLoopStatement start;
 
    /**
     * The next element or {@code null} if no more elements exists.
     */
-   private ISEDDebugElement next;
+   private ISEDDebugNode next;
+   
+   /**
+    * The Set of last {@link ISEDLoopCondition}s of the Loop
+    */
+   private LinkedList<ISEDLoopCondition> loopLeafs;
+   
+   /**
+    * LoopLeaf of the current branch
+    */
+   private ISEDLoopCondition currentLoopLeaf; 
+   
+   /**
+    * Current Iteration
+    */
+   private int iteration;
+   
+   /**
+    * Amount which changes the iteration (backtrack)
+    */
+   private int changeAmount;
+   
+   /**
+    * To change or not to change
+    */
+   private boolean change = false;
    
    /**
     * Constructor.
     * @param start The {@link ISEDDebugElement} to iterate over its sub tree.
+    * @throws DebugException 
     */
-   public SEDLoopPreorderIterator(ISEDDebugElement start) {      
+   public SEDLoopPreorderIterator(ISEDLoopStatement start) throws DebugException {      
       this.start = start;
       this.next = start;
+      loopLeafs = gatherLoopLeafs();
+      iteration = 0;
+      changeAmount = 0;
    }
    
    /**
@@ -72,9 +105,18 @@ public class SEDLoopPreorderIterator implements ISEDIterator {
    @Override
    public ISEDDebugElement next() throws DebugException {
       ISEDDebugElement oldNext = next;
-      boolean loopEndReached = false;
-      
       updateNext();
+      
+      if(change) {
+         iteration -= changeAmount;
+         changeAmount = 0;
+         change = false;
+      }
+      
+      if(changeAmount > 0) {
+         change = true;
+      }
+      
       return oldNext;
    }
 
@@ -83,14 +125,22 @@ public class SEDLoopPreorderIterator implements ISEDIterator {
     * @throws DebugException Occurred Exception.
     */
    protected void updateNext() throws DebugException {
-      ISEDDebugElement newNext = null;
+      ISEDDebugNode newNext = null;
       if (next instanceof ISEDDebugNode) {
          ISEDDebugNode node = (ISEDDebugNode)next;
          ISEDDebugNode[] children = NodeUtil.getChildren(node, true);
-         if (!ArrayUtil.isEmpty(children)) {
+         if (!ArrayUtil.isEmpty(children) && !loopLeafs.contains(children[0])) {
             newNext = children[0];
+            
+            if(next instanceof ISEDLoopCondition) {
+               iteration++;
+            }
          }
          else {
+            if (!ArrayUtil.isEmpty(children) && loopLeafs.contains(children[0])) {
+               currentLoopLeaf = (ISEDLoopCondition) children[0];
+            }
+  
             newNext = getNextOnParent(node);
          }
       }
@@ -104,7 +154,7 @@ public class SEDLoopPreorderIterator implements ISEDIterator {
     * @return The next {@link ISEDDebugElement} to visit.
     * @throws DebugException Occurred Exception.
     */
-   protected ISEDDebugElement getNextOnParent(ISEDDebugNode node) throws DebugException {
+   private ISEDDebugNode getNextOnParent(ISEDDebugNode node) throws DebugException {
       ISEDDebugNode parent = NodeUtil.getParent(node);
       // Search next debug node
       while (parent instanceof ISEDDebugNode) {
@@ -123,6 +173,11 @@ public class SEDLoopPreorderIterator implements ISEDIterator {
          }
          else {
             if (parentChildren[parentChildren.length - 1] != start) {
+               if(node instanceof ISEDLoopCondition) {
+                  changeAmount++;
+//                  iteration--;
+               }
+               
                node = parent;
                parent = NodeUtil.getParent(parent);// Continue search on parent without recursive call!
             }
@@ -133,5 +188,45 @@ public class SEDLoopPreorderIterator implements ISEDIterator {
       }
 
       return null;
+   }
+   
+   private LinkedList<ISEDLoopCondition> gatherLoopLeafs() throws DebugException {
+      LinkedList<ISEDLoopCondition> loopLeafs = new LinkedList<ISEDLoopCondition>();
+      
+      ISEDDebugNode next = start;
+      ISEDLoopCondition condition = null;
+      
+      while(next != null) {
+         ISEDDebugNode[] children = NodeUtil.getChildren(next);
+         if (!ArrayUtil.isEmpty(children)) {
+            next = children[0];
+            
+            if(next instanceof ISEDLoopCondition) {
+               condition = (ISEDLoopCondition) next;
+            }
+         }
+         else {
+            if(condition != null) {
+               loopLeafs.add(condition);
+               condition = null;
+            }
+            
+            next = getNextOnParent(next);
+         }
+      }
+      
+      return loopLeafs;
+   }
+   
+   public LinkedList<ISEDLoopCondition> getLoopLeafs() {
+      return loopLeafs;
+   }
+   
+   public int getIteration() {
+      return iteration;
+   }
+   
+   public ISEDLoopCondition getCurrentLoopLeaf() {
+      return currentLoopLeaf;
    }
 }

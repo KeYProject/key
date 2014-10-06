@@ -384,9 +384,6 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
 //         if(!isCollapsed())
 //            setCollapsed(true);
       }
-      
-//      if(!isCollapsed())
-//         setCollapsed(true);
    }
 
    /**

@@ -17,9 +17,12 @@ public final class NodeUtil {
    public static ISEDDebugNode getParent(ISEDDebugNode node) throws DebugException {
       if(node instanceof ISEDBaseMethodReturn)
       {
-         ISEDBranchCondition bc = ((ISEDBaseMethodReturn)node).getMethodReturnCondition(); 
-         if(((ISEDMethodCall) bc.getParent()).isCollapsed()) {
-            return bc;
+         ISEDBranchCondition bc = ((ISEDBaseMethodReturn)node).getMethodReturnCondition();
+         
+         if(bc != null) {
+            if(((ISEDMethodCall) bc.getParent()).isCollapsed()) {
+               return bc;
+            }
          }
       }
 
