@@ -82,6 +82,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                           }
                        },
                        true,
+                       false,
                        "false",
                        "closeFalse",
                        null,
@@ -100,6 +101,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                        TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "isValid()", "0", "normal_behavior"),
                        null,
                        false,
+                       false,
                        "exc=null;",
                        "assignment",
                        null,
@@ -107,7 +109,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                        false);
    }
    
-   /**
+   /*
     * ************************************ FUNCTIONAL OPERATION CONTRACT ************************************
     */
    
@@ -175,6 +177,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                }
             }, 
             true, 
+            false,
             "exc:=null}", 
             "Use Operation Contract", 
             appliedRuleTest, 
@@ -246,6 +249,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                }
             }, 
             true, 
+            false,
             "exc:=null}", 
             "Use Operation Contract", 
             appliedRuleTest, 
@@ -297,6 +301,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                            }
                         },
                         true,
+                        false,
                         "exc:=null}",
                         "Use Operation Contract",
                         appliedRuleTest,
@@ -305,7 +310,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
    }
    
    
-   /**
+   /*
     * ************************************ BLOCK CONTRACT ************************************
     */
    
@@ -350,6 +355,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                }
             },
             true,
+            false,
             "x:=0}",
             "Block Contract",
             appliedRuleTest,
@@ -400,6 +406,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                }
             },
             true,
+            false,
             "x:=0}",
             "Block Contract",
             appliedRuleTest,
@@ -407,7 +414,8 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             false);
    }
    
-   @Test public void testBlockContract_ApplyMultipleContracts() throws Exception {
+   @Test 
+   public void testBlockContract_ApplyMultipleContracts() throws Exception {
       IAppliedRuleTest appliedRuleTest =  new IAppliedRuleTest() {
          @Override
          public void test(IJavaProject project, KeYEnvironment<CustomUserInterface> environment, Proof proof, SWTWorkbenchBot bot, SWTBotEditor editor, KeYEditor keyEditor, Node nodeOnWhichRuleIsApplied) {
@@ -449,6 +457,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                }
             },
             true,
+            false,
             "x:=0}",
             "Block Contract",
             appliedRuleTest,
@@ -457,7 +466,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
    }
    
    
-   /**
+   /*
     * ************************************ DEPENDENCY CONTRACT ************************************
     */
    
@@ -524,6 +533,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                }
             }, 
             true, 
+            true,
             "self.getB()", 
             "Use Dependency Contract", 
             appliedRuleTest, 
@@ -548,6 +558,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
     * @param contractId The unique ID of the proof obligation (contract) for which a proof will be started.
     * @param stopCondition An optional custom {@link IStopCondition} which stops the started auto mode at a node on which the rule to test can be applied.
     * @param useOperationContracts {@code true} use operation contracts, {@code false} inline methods instead
+    * @param useDependencyContracts Use dependency contracts?
     * @param textToApplyRuleOn The text in the {@link KeYEditor} for which the context menu contains the rule to apply.
     * @param ruleNameToApply The name of the rule to apply.
     * @param appliedRuleTest Optionally, some additional test steps, e.g. to deal with an opened {@link Shell}.
@@ -560,6 +571,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                                    String contractId,
                                    final IStopCondition stopCondition,
                                    final boolean useOperationContracts,
+                                   final boolean useDependencyContracts,
                                    final String textToApplyRuleOn,
                                    final String ruleNameToApply,
                                    final IAppliedRuleTest appliedRuleTest,
@@ -584,6 +596,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                SymbolicExecutionUtil.updateStrategySettings(proof, useOperationContracts, true, false, false);
                StrategyProperties p = ss.getActiveStrategyProperties();
                p.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, useOperationContracts ? StrategyProperties.METHOD_CONTRACT : StrategyProperties.METHOD_EXPAND);
+               p.setProperty(StrategyProperties.DEP_OPTIONS_KEY, useDependencyContracts ? StrategyProperties.DEP_ON : StrategyProperties.DEP_OFF);
                ss.setActiveStrategyProperties(p);
                keyEditor.getUI().startAndWaitForAutoMode(keyEditor.getCurrentProof());
             }
