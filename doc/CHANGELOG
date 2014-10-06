@@ -1,6 +1,10 @@
 ChangeLog
 =========
 
+Revision 2.2.3:
+===============
+ * Fix concurrency issue introduced in 2.2.2
+
 Revision 2.2.2:
 ===============
  * Support for CVC3 version 2.4.1 SMT backend
