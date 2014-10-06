@@ -160,7 +160,6 @@ public final class RepresentsAxiom extends ClassAxiom {
 	return visibility;
     }
 
-    
     public ImmutableSet<Taclet> getTaclets(
           ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
           Services services) {

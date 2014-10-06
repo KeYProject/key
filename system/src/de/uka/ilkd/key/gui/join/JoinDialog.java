@@ -84,7 +84,7 @@ public class JoinDialog extends StdDialog{
         
         private SequentViewer sequentViewer1;
         private SequentViewer sequentViewer2;
-        private JList         choiceList;
+        private JList     choiceList;
         private CheckedUserInput predicateInput;
         private JLabel        joinHeadline;
         private JLabel        infoPredicate;

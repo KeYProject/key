@@ -55,8 +55,8 @@ public class ProofClosedJTextPaneDisplay extends ShowDisplayPane {
             setMessage("Proof Closed. No statistics available.");
         }
         JOptionPane.showMessageDialog
-            (parentComponent, getMessage(), 
-                    "Proof closed", JOptionPane.INFORMATION_MESSAGE);              
+            (parentComponent, getMessage(),
+                    "Proof closed", JOptionPane.INFORMATION_MESSAGE);
         return true;
     }
 }

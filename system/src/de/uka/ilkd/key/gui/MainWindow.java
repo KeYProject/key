@@ -103,8 +103,9 @@ import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
 
-@SuppressWarnings("serial")
 public final class MainWindow extends JFrame  {
+
+    private static final long serialVersionUID = 4019709804595371520L;
 
     private static MainWindow instance = null;
 
@@ -360,7 +361,8 @@ public final class MainWindow extends JFrame  {
         // FIXME do this NOT in layout of GUI
         // minimize interaction
         final boolean stupidMode =
-        		  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter();
+        		  ProofIndependentSettings.DEFAULT_INSTANCE
+        		  .getGeneralSettings().tacletFilter();
         mediator.setMinimizeInteraction(stupidMode);
 
         // set up actions
@@ -375,7 +377,8 @@ public final class MainWindow extends JFrame  {
         exitMainAction            = new ExitMainAction(this);
         showActiveSettingsAction  = new ShowActiveSettingsAction(this);
         loadUserDefinedTacletsAction = new LemmaGenerationAction.ProveAndAddTaclets(this);
-        loadUserDefinedTacletsForProvingAction = new LemmaGenerationAction.ProveUserDefinedTaclets(this);
+        loadUserDefinedTacletsForProvingAction =
+                new LemmaGenerationAction.ProveUserDefinedTaclets(this);
         loadKeYTaclets            = new LemmaGenerationAction.ProveKeYTaclets(this);
         lemmaGenerationBatchModeAction    = new LemmaGenerationBatchModeAction(this);
         unicodeToggleAction = new UnicodeToggleAction(this);
@@ -465,7 +468,9 @@ public final class MainWindow extends JFrame  {
 
     private ComplexButton createSMTComponent() {
 	smtComponent= new ComplexButton(TOOLBAR_ICON_SIZE);
-	smtComponent.setEmptyItem("No solver available","<html>No SMT solver is applicable for KeY.<br><br>If a solver is installed on your system," +
+	smtComponent.setEmptyItem("No solver available",
+	        "<html>No SMT solver is applicable for KeY.<br>"+
+	        "<br>If a solver is installed on your system," +
 		"<br>please configure the KeY-System accordingly:\n" +
 		"<br>Options | SMT Solvers</html>");
 
@@ -478,7 +483,8 @@ public final class MainWindow extends JFrame  {
 		ComplexButton but = (ComplexButton) e.getSource();
 		if(but.getSelectedItem() instanceof SMTInvokeAction){
 		    SMTInvokeAction action = (SMTInvokeAction) but.getSelectedItem();
-		    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().setActiveSolverUnion(action.solverUnion);
+		    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings()
+		                    .setActiveSolverUnion(action.solverUnion);
 		}
 
 	    }
@@ -640,8 +646,10 @@ public final class MainWindow extends JFrame  {
         view.setMnemonic(KeyEvent.VK_V);
 
         JMenuItem laf = new JCheckBoxMenuItem("Use system look and feel (experimental)");
-        laf.setToolTipText("If checked KeY tries to appear in the look and feel of your window manager, if not in the default Java LaF (aka Metal).");
-        final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        laf.setToolTipText("If checked KeY tries to appear in the look and feel of your "+
+                           "window manager, if not in the default Java LaF (aka Metal).");
+        final de.uka.ilkd.key.gui.configuration.ViewSettings vs =
+                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         laf.setSelected(vs.useSystemLaF());
         laf.addActionListener(new ActionListener() {
             @Override
@@ -707,6 +715,8 @@ public final class MainWindow extends JFrame  {
 //	options.add(setupSpeclangMenu()); // legacy since only JML supported
 	options.addSeparator();
         options.add(new JCheckBoxMenuItem(new ToggleConfirmExitAction(this)));
+	options.add(new JCheckBoxMenuItem(new AutoSave(this)));
+	options.add(new JCheckBoxMenuItem(new DefaultProofFolder(this)));
         options.add(new MinimizeInteraction(this));
         options.add(new JCheckBoxMenuItem(new RightMouseClickToggleAction(this)));
         options.add(new JCheckBoxMenuItem(oneStepSimplAction));
@@ -747,7 +757,7 @@ public final class MainWindow extends JFrame  {
 	       smtComponent.setItems(null);
 	   }
 
-	   private SMTInvokeAction findAction(SMTInvokeAction [] actions, SolverTypeCollection union){
+	   private SMTInvokeAction findAction(SMTInvokeAction [] actions, SolverTypeCollection union) {
 	       for(SMTInvokeAction action : actions){
 		   if(action.solverUnion.equals(union)){
 		       return action;
@@ -768,7 +778,8 @@ public final class MainWindow extends JFrame  {
 
 		smtComponent.setItems(actions);
 
-		SolverTypeCollection active = ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().computeActiveSolverUnion();
+		SolverTypeCollection active = ProofIndependentSettings
+		        .DEFAULT_INSTANCE.getSMTSettings().computeActiveSolverUnion();
 
 		SMTInvokeAction activeAction = findAction(actions, active);
 
@@ -777,7 +788,8 @@ public final class MainWindow extends JFrame  {
 		    Object item = smtComponent.getTopItem();
 		    if(item instanceof SMTInvokeAction){
 			active = ((SMTInvokeAction)item).solverUnion;
-			ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().setActiveSolverUnion(active);
+			ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings()
+			                            .setActiveSolverUnion(active);
 		    }else{
 			activeAction = null;
 		    }
@@ -837,9 +849,10 @@ public final class MainWindow extends JFrame  {
 
     /** saves a proof */
     public void saveProof(File proofFile) {
-        String filename = proofFile.getAbsolutePath();
-        Proof proof = getMediator().getSelectedProof();
-        ProofSaver saver = new ProofSaver(proof, filename, Main.INTERNAL_VERSION);
+        final String filename = proofFile.getAbsolutePath();
+        final Proof proof = getMediator().getSelectedProof();
+        ProofSaver saver =
+                new ProofSaver(proof, filename, Main.INTERNAL_VERSION);
         String errorMsg ;
 
         try {
@@ -1094,6 +1107,10 @@ public final class MainWindow extends JFrame  {
      * This has been partly taken from the GlassPaneDemo of the Java Tutorial
      */
     private static class BlockingGlassPane extends JComponent {
+        /**
+         *
+         */
+        private static final long serialVersionUID = 1218022319090988424L;
         private final GlassPaneListener listener;
 
         public BlockingGlassPane(Container contentPane) {
@@ -1265,9 +1282,13 @@ public final class MainWindow extends JFrame  {
 
     /**
      * This action is responsible for the invocation of an SMT solver For
-     * example the toolbar button is paramtrized with an instance of this action
+     * example the toolbar button is parameterized with an instance of this action
      */
     private final class SMTInvokeAction extends MainWindowAction {
+	/**
+         *
+         */
+        private static final long serialVersionUID = -8176122007799747342L;
 
         SolverTypeCollection solverUnion;
 

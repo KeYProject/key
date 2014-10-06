@@ -23,6 +23,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * Saves the current selected proof.
@@ -43,26 +44,34 @@ public final class SaveFileAction extends MainWindowAction {
         
         mainWindow.getMediator().enableWhenProofLoaded(this);
     }
-    
+
     public void actionPerformed(ActionEvent e) {
         if (mainWindow.getMediator().ensureProofLoaded()) {
             final KeYFileChooser jFC = GuiUtilities.getFileChooser("Choose filename to save proof");
             // Try to save back to file where proof was initially loaded from
             File selectedFile = null;
-            Proof selectedProof = mainWindow.getMediator().getSelectedProof();
+            final Proof selectedProof = mainWindow.getMediator().getSelectedProof();
             if (selectedProof != null) {
                selectedFile = selectedProof.getProofFile();
             }
             // Suggest default file name if required
+            final String defaultName = MiscTools.toValidFileName(selectedProof.name().toString()) + ".proof";
             if (selectedFile == null) {
-               String defaultName = MiscTools.toValidFileName(selectedProof.name().toString()) + ".proof";
                selectedFile = new File(jFC.getCurrentDirectory(), defaultName);
             }
-            
-            boolean saved = jFC.showSaveDialog(mainWindow, selectedFile);
+            final Pair<Boolean, Pair<File, Boolean>> res =
+                    jFC.showSaveDialog(mainWindow, defaultName + ".proof", false);
+            boolean saved = res.first;
+            boolean newDir = res.second.second;
             if (saved) {
                 mainWindow.saveProof(jFC.getSelectedFile());
+            } else if (newDir) {
+                File dir = res.second.first;
+                if (!dir.delete()) {
+                    dir.deleteOnExit();
+                }
             }
+            jFC.resetPath();
         } else {
             mainWindow.popupWarning("No proof.", "Oops...");
         }
