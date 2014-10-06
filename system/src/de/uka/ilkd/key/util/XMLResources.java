@@ -1,9 +1,10 @@
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.util;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import de.uka.ilkd.key.gui.InfoView;
 
 /**
  * An instance of this class loads several XML files, whose contents are
@@ -22,10 +23,22 @@ public class XMLResources {
     static final String FUNCTION_RESOURCE = "/de/uka/ilkd/key/gui/help/functionExplanations.xml";
     protected final Properties functionExplanations;
 
-    XMLResources() {
+    public XMLResources() {
         ruleExplanations = getResource(RULE_RESOURCE);
         termLabelExplanations = getResource(LABEL_RESOURCE);
         functionExplanations = getResource(FUNCTION_RESOURCE);
+    }
+    
+    public Properties getRuleExplanations() {
+        return ruleExplanations;
+    }
+    
+    public Properties getTermLabelExplanations() {
+        return termLabelExplanations;
+    }
+    
+    public Properties getFunctionExplanations() {
+        return functionExplanations;
     }
 
     private static Properties getResource(String xmlFile) {
@@ -45,7 +58,4 @@ public class XMLResources {
         return ret;
     }
 
-    public static void main(String[] args) {
-        new XMLResources();
-    }
 }

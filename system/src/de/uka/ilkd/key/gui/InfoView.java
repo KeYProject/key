@@ -17,6 +17,7 @@ import javax.swing.JSplitPane;
 import javax.swing.event.TreeSelectionListener;
 
 import de.uka.ilkd.key.util.GuiUtilities;
+import de.uka.ilkd.key.util.XMLResources;
 import javax.swing.event.TreeSelectionEvent;
 
 /**
