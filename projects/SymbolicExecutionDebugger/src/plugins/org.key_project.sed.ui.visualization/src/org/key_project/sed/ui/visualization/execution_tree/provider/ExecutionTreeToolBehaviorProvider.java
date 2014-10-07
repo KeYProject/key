@@ -108,7 +108,6 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
       if (isReadOnly()) {
          data.getGenericContextButtons().clear();
          
-         // collapse
          ISEDDebugNode node = (ISEDDebugNode) getFeatureProvider().getBusinessObjectForPictogramElement(context.getPictogramElement());
          if(node instanceof ISEDMethodCall) {
             ISEDMethodCall mc = (ISEDMethodCall) node; 
@@ -125,8 +124,7 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
                   LogUtil.getLogger().logError(e);
                }
          }
-         
-         if(node instanceof ISEDLoopStatement) {
+         else if(node instanceof ISEDLoopStatement) {
             ISEDLoopStatement ls = (ISEDLoopStatement) node;
             if(ls.isCollapsed()) {
                data.getGenericContextButtons().add(createCustomContextButtonEntry(new LoopStatementCollapseFeature(getFeatureProvider()), context, "Expand", null, IPlatformImageConstants.IMG_EDIT_EXPAND));
@@ -183,8 +181,22 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
       CollectionUtil.addAll(result, menuEntries);
       if (isReadOnly()) {
          ISEDDebugNode node = (ISEDDebugNode) getFeatureProvider().getBusinessObjectForPictogramElement(context.getPictogramElements()[0]);
-
-         if(node instanceof ISEDLoopStatement) {
+         if(node instanceof ISEDMethodCall) {
+            ISEDMethodCall mc = (ISEDMethodCall) node; 
+            if(mc.isCollapsed()) {
+               result.add(createCustomContextMenuEntry(new MethodCallCollapseFeature(getFeatureProvider()), context, "Expand", null, IPlatformImageConstants.IMG_EDIT_EXPAND));
+            }
+            else
+               try {
+                  if(mc.getMethodReturnConditions().length > 0){
+                     result.add(createCustomContextMenuEntry(new MethodCallCollapseFeature(getFeatureProvider()), context, "Collapse", null, IPlatformImageConstants.IMG_EDIT_COLLAPSE));
+                  }
+               }
+               catch (DebugException e) {
+                  LogUtil.getLogger().logError(e);
+               }
+         }
+         else if(node instanceof ISEDLoopStatement) {
             ContextMenuEntry loopMenu = (ContextMenuEntry) createCustomContextMenuEntry(null, context, "Show Iteration", null, IExecutionTreeImageConstants.IMG_LOOP_CONDITION);
             loopMenu.setSubmenu(true);
             
