@@ -153,8 +153,9 @@ public class KeYMediator {
     }
 
     public KeYExceptionHandler getExceptionHandler(){
-	if(getSelectedProof() != null){
-	    return getServices().getExceptionHandler();
+       Proof selectedProof = getSelectedProof();
+	if(selectedProof != null && !selectedProof.isDisposed()){
+	    return selectedProof.getServices().getExceptionHandler();
 	}else{
 	    return defaultExceptionHandler;
 	}
