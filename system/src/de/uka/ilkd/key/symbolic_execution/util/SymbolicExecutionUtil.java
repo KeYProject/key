@@ -1100,7 +1100,7 @@ public final class SymbolicExecutionUtil {
     */
    public static boolean isExceptionalMethodReturnNode(Node node, RuleApp ruleApp) {
       String ruleName = MiscTools.getRuleName(ruleApp);
-      return "methodCallParamThrow".equals(ruleName);
+      return "methodCallParamThrow".equals(ruleName) || "methodCallThrow".equals(ruleName);
    }
 
    /**
