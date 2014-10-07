@@ -106,4 +106,9 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * Convert the list to a Java array (O(n))
      */
     <S> S[] toArray(S[] array);
+
+    /**
+     * Convert the list to a Java array (O(n))
+     */
+    <S> S[] toArray(Class<S> type);
 }

@@ -29,6 +29,7 @@ import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.RenamingTable;
@@ -53,9 +54,13 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.Debug;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 
 /** 
@@ -186,6 +191,11 @@ public abstract class Taclet implements Rule, Named {
     
     private Trigger trigger;
     
+    /* TODO: find better solution*/
+    private final boolean surviveSymbExec;
+    
+    
+
     /**
      * creates a Schematic Theory Specific Rule (Taclet) with the given
      * parameters.  
@@ -197,13 +207,14 @@ public abstract class Taclet implements Rule, Named {
      * @param attrs attributes for the Taclet; these are boolean values
      * indicating a noninteractive or recursive use of the Taclet.      
      */
-    Taclet(Name                     name,
-	   TacletApplPart           applPart,  
-	   ImmutableList<TacletGoalTemplate> goalTemplates, 
-	   ImmutableList<RuleSet>            ruleSets,
-	   TacletAttributes         attrs, 
-	   ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,
-	   ImmutableSet<Choice> choices ){
+    Taclet(Name name,
+           TacletApplPart applPart,
+           ImmutableList<TacletGoalTemplate> goalTemplates,
+           ImmutableList<RuleSet> ruleSets,
+           TacletAttributes attrs,
+           ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+           ImmutableSet<Choice> choices,
+           boolean surviveSmbExec) {
 
         this.name          = name;
         ifSequent          = applPart.ifSequent();
@@ -215,8 +226,9 @@ public abstract class Taclet implements Rule, Named {
         this.ruleSets      = ruleSets;
         this.choices       = choices;
         this.prefixMap     = prefixMap;
-        this.displayName   = attrs.displayName() == null ? 
-                name.toString() : attrs.displayName();
+        this.displayName = attrs.displayName() == null
+                           ? name.toString() : attrs.displayName();
+        this.surviveSymbExec = surviveSmbExec;
 
         this.trigger = attrs.getTrigger();
     }
@@ -227,6 +239,29 @@ public abstract class Taclet implements Rule, Named {
 
     public Trigger getTrigger() {
         return trigger;
+    }
+
+    /**
+     * creates a Schematic Theory Specific Rule (Taclet) with the given
+     * parameters.
+     *
+     * @param name the name of the Taclet
+     * @param applPart contains the application part of an Taclet that is the
+     * if-sequence, the variable conditions
+     * @param goalTemplates a list of goal descriptions.
+     * @param ruleSets a list of rule sets for the Taclet
+     * @param attrs attributes for the Taclet; these are boolean values
+     * indicating a noninteractive or recursive use of the Taclet.
+     */
+    Taclet(Name name,
+           TacletApplPart applPart,
+           ImmutableList<TacletGoalTemplate> goalTemplates,
+           ImmutableList<RuleSet> ruleSets,
+           TacletAttributes attrs,
+           ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+           ImmutableSet<Choice> choices) {
+        this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices,
+             false);
     }
     
     protected void cacheMatchInfo() {
@@ -498,7 +533,7 @@ public abstract class Taclet implements Rule, Named {
 						   MatchConditions matchCond,
 						   Services services) {
       
-	if (term.javaBlock().isEmpty()) {
+	if (term.javaBlock().isEmpty()) { // this.name().toString().startsWith("unfold_computed_formula")
 	    if (!template.javaBlock().isEmpty()){
 		Debug.out("Match Failed. No program to match.");
 		return null; //FAILED
@@ -929,7 +964,7 @@ public abstract class Taclet implements Rule, Named {
      * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is rewritten
      * @return the instanted formulas of the semisquent as list
      */
-    private ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi, Services services, 
+    protected ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi, Services services,
             MatchConditions matchCond, PosInOccurrence applicationPosInOccurrence) {       
         
        // TODO: use mutable list
@@ -1422,5 +1457,46 @@ public abstract class Taclet implements Rule, Named {
             if ( admissibleRuleSets.contains ( tacletRuleSet ) ) return true;
         }
         return false;
+    }
+
+    public boolean getSurviveSymbExec() {
+        return surviveSymbExec;
+    }
+
+    public Set<SchemaVariable> collectSchemaVars() {
+
+	Set<SchemaVariable> result = new LinkedHashSet<SchemaVariable>();
+	OpCollector oc = new OpCollector();
+
+	//find, assumes
+	for(SchemaVariable sv: this.getIfFindVariables()) {
+	    result.add(sv);
+	}
+
+	//add, replacewith
+	for(TacletGoalTemplate tgt : this.goalTemplates()) {
+	    collectSchemaVarsHelper(tgt.sequent(), oc);
+	    if(tgt instanceof AntecSuccTacletGoalTemplate) {
+		collectSchemaVarsHelper(
+			((AntecSuccTacletGoalTemplate)tgt).replaceWith(), oc);
+	    } else if(tgt instanceof RewriteTacletGoalTemplate) {
+		((RewriteTacletGoalTemplate)tgt).replaceWith()
+					        .execPostOrder(oc);
+	    }
+	}
+
+	for(Operator op : oc.ops()) {
+	    if(op instanceof SchemaVariable) {
+		result.add((SchemaVariable)op);
+	    }
+	}
+
+	return result;
+    }
+
+    private void collectSchemaVarsHelper(Sequent s, OpCollector oc) {
+	for(SequentFormula cf : s) {
+	    cf.formula().execPostOrder(oc);
+	}
     }
 }

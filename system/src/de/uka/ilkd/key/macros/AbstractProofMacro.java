@@ -93,5 +93,4 @@ public abstract class AbstractProofMacro implements ProofMacro {
     public final javax.swing.KeyStroke getKeyStroke() {
         return KeyStrokeManager.get(this);
     }
-    
 }

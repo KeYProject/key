@@ -375,7 +375,7 @@ public class LogicPrinter {
 		layouter.beginC();
 	    }
 	    if (declareSchemaVars) {
-		Set<SchemaVariable> schemaVars = collectSchemaVars(taclet);
+		Set<SchemaVariable> schemaVars = taclet.collectSchemaVars();
 		layouter.brk();
 		for(SchemaVariable schemaVar : schemaVars) {
                     layouter.print(schemaVar.proofToString() + "  ");
@@ -1445,6 +1445,17 @@ public class LogicPrinter {
 	markEndSub();
 
 	layouter.print(")}").end();
+    }
+
+
+    public void printSeqSingleton(Term t, String lDelimiter, String rDelimiter) throws IOException {
+	assert t.arity() == 1;
+	startTerm(1);
+	layouter.print(lDelimiter).beginC(0);
+	markStartSub();
+	printTerm(t.sub(0));
+	markEndSub();
+	layouter.print(rDelimiter).end();
     }
 
 
