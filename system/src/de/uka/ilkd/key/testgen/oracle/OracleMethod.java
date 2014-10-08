@@ -44,19 +44,21 @@ public class OracleMethod {
 	}	
 
 	public String toString() {
-
+		//System.out.println("printing");
 		String argString = "";
 
 		for(OracleVariable var : args){
 			argString += var.getSort().name()+" "+var.getName()+",";
-		}		
-		argString = argString.substring(0, argString.length()-1);		
+		}	
+		if(!args.isEmpty()){
+			argString = argString.substring(0, argString.length()-1);		
+		}
 
 		String retType = "boolean";
 		if(returnType!=null){
 			retType = returnType.name().toString();
 		}
-		return "public "+retType+" "+methodName+ "("+argString+"){"+body+";}";
+		return "public "+retType+" "+methodName+ "("+argString+"){ return "+body+";}";
 
 	}
 }

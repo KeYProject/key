@@ -42,6 +42,7 @@ public class ReflectionClassCreator {
 	    final StringBuffer result = new StringBuffer();
 	    result.append(classDecl());
 	    result.append(ghostMapDecls(true));
+	    result.append(staticInitializer(true));
 	    result.append(instanceMethod());
 	    result.append(instances(sorts));
 	    result.append(getterAndSetter(sorts));
@@ -117,14 +118,11 @@ public class ReflectionClassCreator {
 	    final StringBuffer r = new StringBuffer();
 	    r.append("\n");
 	    
-	    r.append("  private static final String NoSuchFieldExceptionText =\n");
-	    r.append("  \"This exception occurs when ghost fields or model fields are used in the code or \" +\n");
-	    r.append("  \"if mock objects are used that have different fields, than the real objects. \" +\n");
-	    r.append("  \"The tester should extend the handling of such fields in this generated utility class RFL.java.\";\n\n");
+	    r.append("  private static final String NoSuchFieldExceptionText;");
 	    
-	    r.append("  public static boolean ghostMapActive = "+ghostMapActive+";\n\n");
+	    r.append("  public static boolean ghostMapActive;");
 	
-	    r.append("  public static java.util.HashMap<Integer,Object> ghostModelFields = new java.util.HashMap<Integer,Object>();\n\n");
+	    r.append("  public static java.util.HashMap<Integer,Object> ghostModelFields;\n\n");
 	
 	    r.append("  public static int getHash(Class<?> c, Object obj, String attr){\n");
 	    r.append("    return c.hashCode() * (obj!=null?obj.hashCode():1) * attr.hashCode();\n");
@@ -137,7 +135,7 @@ public class ReflectionClassCreator {
 	    final StringBuffer r = new StringBuffer();
 	    r.append("\n\n");
 	    r.append("  /** The Objenesis library can create instances of classes that have no default constructor. */\n");
-	    r.append("  private static org.objenesis.Objenesis objenesis = new org.objenesis.ObjenesisStd();\n\n");
+	    r.append("  private static org.objenesis.Objenesis objenesis;\n\n");
 	    r.append("  private static Object newInstance(Class c) throws Exception {\n");
 	    r.append("    Object res=objenesis.newInstance(c);\n");
 	    r.append("    if (res==null)\n");
@@ -145,6 +143,28 @@ public class ReflectionClassCreator {
 	    r.append("  return res;\n");
 	    r.append("  }\n");
 	    return r;
+	}
+	
+	private StringBuffer staticInitializer(boolean ghostMapActive){
+		StringBuffer r = new StringBuffer();
+		String tab = "   ";
+		r.append("\n\n");
+		r.append(tab+"static{\n");
+		
+		r.append(tab+"objenesis = new org.objenesis.ObjenesisStd();\n");
+		
+		r.append(tab+"ghostMapActive = "+ghostMapActive+";\n");
+		
+		r.append(tab+"ghostModelFields = new java.util.HashMap<Integer,Object>();\n");
+		
+		r.append(tab+"NoSuchFieldExceptionText =\n");
+	    r.append(tab+tab+"  \"This exception occurs when ghost fields or model fields are used in the code or \" +\n");
+	    r.append(tab+tab+"  \"if mock objects are used that have different fields, than the real objects. \" +\n");
+	    r.append(tab+tab+"  \"The tester should extend the handling of such fields in this generated utility class RFL.java.\";\n");
+	    
+		r.append("}\n\n");
+		
+		return r;		
 	}
 	
 	/**

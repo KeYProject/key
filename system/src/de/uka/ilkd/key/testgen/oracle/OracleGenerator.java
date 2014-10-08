@@ -14,7 +14,9 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -56,8 +58,8 @@ public class OracleGenerator {
 		ops.put(Equality.EQV, "==");
 		ops.put(Equality.EQUALS, "==");
 		ops.put(Junctor.AND, "&&");
-		ops.put(Junctor.OR, "!!");
-		ops.put(services.getTypeConverter().getIntegerLDT().getLessThan(), "<=");
+		ops.put(Junctor.OR, "||");
+		ops.put(services.getTypeConverter().getIntegerLDT().getLessOrEquals(), "<=");
 		ops.put(services.getTypeConverter().getIntegerLDT().getLessThan(), "<");
 		ops.put(services.getTypeConverter().getIntegerLDT().getGreaterOrEquals(), ">=");
 		ops.put(services.getTypeConverter().getIntegerLDT().getGreaterThan(), ">");
@@ -71,10 +73,17 @@ public class OracleGenerator {
 		ops.put(services.getTypeConverter().getIntegerLDT().getJavaDivInt(), "/");
 		ops.put(services.getTypeConverter().getIntegerLDT().getMod(), "%");
 		ops.put(services.getTypeConverter().getIntegerLDT().getJavaMod(), "%");		
-	}	
+	}
+	
+	public OracleMethod generateOracleMethod(Term term){
+		OracleTerm body = generateOracle(term);
+		return new OracleMethod("testOracle", new LinkedList<OracleVariable>(), body.toString());
+	}
 	
 	public OracleTerm generateOracle(Term term){
 		Operator op = term.op();
+		
+		//System.out.println("Translate: "+term+" "+term.op().toString());
 		
 		//binary terms
 		if(ops.containsKey(op)){			
@@ -123,8 +132,15 @@ public class OracleGenerator {
 		else if (op instanceof Function) {
 			return translateFunction(term);
 		}
+		//program variables
+		else if (op instanceof ProgramVariable){
+			LocationVariable loc = (LocationVariable) op;
+			//System.out.println("Term: "+loc.sort()+" "+loc.name());
+			return new OracleConstant(loc.name().toString(), loc.sort());
+		}
 		
 		else{
+			System.out.println("Could not translate: "+term);
 			throw new RuntimeException("Could not translate oracle for: "+term+" of type "+term.op());
 		}
 		
@@ -193,6 +209,10 @@ public class OracleGenerator {
 	    		
 	    	}
 	    }
+	    
+	   
+	    
+	    System.out.println("Could not translate "+fun.name());
 	    throw new RuntimeException("Unsupported function found: "+fun.name());
     }
 	

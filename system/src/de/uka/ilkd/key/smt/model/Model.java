@@ -603,16 +603,27 @@ public class Model {
 	}
 	
 	public void removeUnnecessaryObjects(){
-		//System.out.println("Removing objects...");
-		String self = constants.get("self");
-		//System.out.println("self is: "+self);
-		if(self == null){
-			return;
-		}		
+			
+		System.out.println("Start cleaning...");
+		Set<String> objConstants = new HashSet<String>();
+		
+		for(String c : constants.keySet()){
+			
+			if(types.getTypeForConstant(c)==null) continue;
+			
+			if(types.getTypeForConstant(c).getId().equals(SMTObjTranslator.OBJECT_SORT)){
+				objConstants.add(constants.get(c));
+			}
+		}
+		
+		System.out.println("Found: "+objConstants);
 		
 		for(Heap h : heaps){
-			
-			Set<ObjectVal> reachable = getReachableObjects(self, h);			
+			Set<ObjectVal> reachable = new HashSet<ObjectVal>();
+			for(String o : objConstants){
+				reachable.addAll(getReachableObjects(o, h));
+			}			
+						
 			h.getObjects().clear();
 			h.getObjects().addAll(reachable);			
 			

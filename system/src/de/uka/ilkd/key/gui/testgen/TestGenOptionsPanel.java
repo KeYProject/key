@@ -18,6 +18,7 @@ class TestGenOptionsPanel extends TablePanel{
 	
 	private FileChooserPanel saveToFilePanel;
 	private FileChooserPanel openJMLPanel;
+	private FileChooserPanel objenesisPanel;
 	private JTextField maxProcesses;
 	private JTextField maxUnwinds;
 	private JCheckBox useJUnit;
@@ -37,6 +38,7 @@ class TestGenOptionsPanel extends TablePanel{
 			                                       "as well as creation of objects from classes which have no default constructor." +
 			                                       "This functionality is enabled by RFL.java which is generated along the test suite.";
 	private static final String infoOpenJMLPath = "Set location of openjml.jar";
+	private static final String infoObjenesisPath = "Set location of objenesis.jar";
 	
 	public TestGenOptionsPanel(TestGenerationSettings settings){
 		super();
@@ -53,6 +55,7 @@ class TestGenOptionsPanel extends TablePanel{
     protected void createComponents() {
 	   getSaveToFilePanel();
 	   getOpenJMLPanel();
+	   getObjenesisPanel();
 	   getMaxProcesses();
 	   getMaxUnwinds();
 	   getInvariantForall();
@@ -136,7 +139,23 @@ class TestGenOptionsPanel extends TablePanel{
 				}
 			});
 		}
-		return saveToFilePanel;
+		return openJMLPanel;
+	}
+	public FileChooserPanel getObjenesisPanel() {
+		if(objenesisPanel == null){
+			objenesisPanel = addFileChooserPanel("Location of objenesis:",
+					settings.getObjenesisPath(), infoObjenesisPath, 
+                        false,true,new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					settings.setObjenesisPath(objenesisPanel.getPath());
+					settings.fireSettingsChanged();
+
+				}
+			});
+		}
+		return objenesisPanel;
 	}
 	public JCheckBox getJUnitPanel(){
 		if(useJUnit == null){

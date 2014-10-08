@@ -18,6 +18,9 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.testgen.oracle.OracleGenerator;
+import de.uka.ilkd.key.testgen.oracle.OracleMethod;
+import de.uka.ilkd.key.testgen.oracle.OracleTerm;
 
 public class ProofInfo {
 
@@ -28,8 +31,13 @@ public class ProofInfo {
 	public ProofInfo(Proof proof) {
 		this.proof = proof;
 		this.services = proof.getServices();
-		System.out.println("Assignable: "+getAssignable().sort());
+		//System.out.println("Assignable: "+getAssignable().sort());
 		//getCode();
+		//System.out.println("DA");
+//		OracleGenerator gen = new OracleGenerator(services, null);
+//		OracleMethod m = gen.generateOracleMethod(getPostCondition());
+//		System.out.println(m);
+		
 	}
 
 	public IProgramMethod getMUT(){		

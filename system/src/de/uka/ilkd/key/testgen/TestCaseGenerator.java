@@ -45,6 +45,10 @@ public class TestCaseGenerator {
 	public static final String ALL_FIELDS = "allFields";
 	public static final String ALL_SEQ = "allSeq";
 	public static final String ALL_LOCSETS = "allLocSets";
+	
+	public static final String OBJENESIS_NAME = "objenesis-2.1.jar";
+	
+	private static final String TAB = "   ";
 	private Services services;
 	private Proof proof;
 	static int fileCounter = 0;
@@ -82,13 +86,19 @@ public class TestCaseGenerator {
 	        + "   echo \"Copy openjml.jar into the directory with test files.\"\n"
 	        + "fi\n";
 	
-	private String createCompileWithOpenJML(String path){
+	private String createCompileWithOpenJML(String openJMLPath, String objenesisPath){
 		return "#!/bin/bash\n\n"
-		        + "if [ -e \""+path+File.separator+"openjml.jar\" ]\n"
-		        + "then\n"
-		        + "   java -jar "+path+File.separator+"openjml.jar -cp \".\" -rac *.java\n"
+		        + "if [ -e \""+openJMLPath+File.separator+"openjml.jar\" ] \n"
+		        + "then\n" 
+		        + "   if [ -e \""+objenesisPath+File.separator+OBJENESIS_NAME+"\" ]\n"
+		        + "   then\n"
+		        + "      java -jar "+openJMLPath+File.separator+"openjml.jar -cp \"."+objenesisPath+File.separator+OBJENESIS_NAME+"\" -rac *.java\n"
+		        + "   else\n"
+		        + "      echo \"objenesis-2.1.jar not found!\"\n"
+		        + "   fi\n"
 		        + "else\n"
 		        + "   echo \"openjml.jar not found!\"\n"
+		        
 		        + "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"\n"
 		        + "   echo \"Copy openjml.jar into the directory with test files.\"\n"
 		        + "fi\n";
@@ -97,21 +107,26 @@ public class TestCaseGenerator {
 	// KeY-project
 	private String executeWithOpenJML;
 
-	private String createExecuteWithOpenJML(String path){
+	private String createExecuteWithOpenJML(String path, String objenesisPath){
 		return "#!/bin/bash\n"
 		        + "if [ -e \""+path+File.separator+"jmlruntime.jar\" ]\n"
 		        + "then"
 		        + "  if [ -e \""+path+File.separator+"jmlspecs.jar\" ]\n"
 		        + "  then\n"
-		        + "   if [ \"$1\" = \"\" ] ; then\n"
-		        + "    echo \"Provide the test driver as an argument (without .java postfix). For example:\"\n"
-		        + "    echo \"  executeWithOpenJML.sh TestGeneric0 \"\n"
-		        + "    echo \"Make sure that jmlruntime.jar and jmlspecs.jar are in the\"\n"
-		        + "    echo \"current directory.\"\n"
-		        + "    quit\n"
-		        + "   else\n"
-		        + "     java -cp "+path+File.separator+"jmlruntime.jar:"+path+File.separator+"jmlspecs.jar:. $1\n"
-		        + "   fi\n"
+		        + "     if [ -e \""+objenesisPath+File.separator+OBJENESIS_NAME+"\" ]\n"
+		        + "     then\n"
+		        + "        if [ \"$1\" = \"\" ] ; then\n"
+		        + "           echo \"Provide the test driver as an argument (without .java postfix). For example:\"\n"
+		        + "           echo \"  executeWithOpenJML.sh TestGeneric0 \"\n"
+		        + "           echo \"Make sure that jmlruntime.jar and jmlspecs.jar are in the\"\n"
+		        + "           echo \"current directory.\"\n"
+		        + "           quit\n"
+		        + "        else\n"
+		        + "           java -cp "+objenesisPath+File.separator+OBJENESIS_NAME+":"+path+File.separator+"jmlruntime.jar:"+path+File.separator+"jmlspecs.jar:. $1\n"
+		        + "        fi\n"
+		        + "      else\n"
+		        + "         echo \"objenesis-2.1.jar not found!\"\n"
+		        + "      fi\n"
 		        + "else\n"
 		        + "  echo \"jmlspecs.jar not found!\"\n"
 		        + "  echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"\n"
@@ -139,8 +154,8 @@ public class TestCaseGenerator {
 		info = new ProofInfo(proof);
 		MUTName = info.getMUT().getFullName();	
 		rflCreator = new ReflectionClassCreator();
-		executeWithOpenJML = createExecuteWithOpenJML(settings.getOpenjmlPath());
-		compileWithOpenJML = createCompileWithOpenJML(settings.getOpenjmlPath());		
+		executeWithOpenJML = createExecuteWithOpenJML(settings.getOpenjmlPath(),settings.getObjenesisPath());
+		compileWithOpenJML = createCompileWithOpenJML(settings.getOpenjmlPath(), settings.getObjenesisPath());		
 	}
 	
 	public String getMUTCall(){
@@ -521,6 +536,7 @@ public class TestCaseGenerator {
 			}
 		}
 */
+		m.removeUnnecessaryObjects();
 		
 		final List<Assignment> assignments = new LinkedList<Assignment>();
 		Heap heap = null;
@@ -620,16 +636,19 @@ public class TestCaseGenerator {
 				}
 			}
 		}
+		
 		final StringBuffer result = new StringBuffer();
 		for (final Assignment a : assignments) {
 			result.append("\n   ");
 			result.append(a.toString(useRFL));
 		}
 		
-		result.append("\n");
-		result.append(createBoolSet()+"\n");
-		result.append(createIntSet()+"\n");
-		result.append(createObjSet()+"\n");
+		if(junitFormat){
+			result.append("\n");
+			result.append(createBoolSet()+"\n");
+			result.append(createIntSet()+"\n");
+			result.append(createObjSet(heap)+"\n");
+		}
 		
 		return result.toString();
 	}
@@ -672,7 +691,9 @@ public class TestCaseGenerator {
 		          " * @author herda\n" +
 		          " */\n";
 		if (junitFormat) {
-			res += "import junit.framework.*;\n" + " public class " + className
+			res += "import junit.framework.*;\n"
+					+ "import java.util.List;\n"
+					+ "import java.util.LinkedList;\n" + " public class " + className
 			        + " extends junit.framework.TestCase {\n\n" + " public "
 			        + className + "(){}\n"
 			        + " public static junit.framework.TestSuite suite () {\n"
@@ -718,9 +739,9 @@ public class TestCaseGenerator {
 		StringBuffer res = new StringBuffer();		
 		//bool
 		String allbool = ALL_BOOLS;
-		res.append("List<Boolean> "+allbool +"= new LinkedList<Boolean>();\n");
-		res.append(allbool+".add(true);\n");
-		res.append(allbool+".add(false);\n");
+		res.append(TAB+"List<Boolean> "+allbool +"= new LinkedList<Boolean>();\n");
+		res.append(TAB+allbool+".add(true);\n");
+		res.append(TAB+allbool+".add(false);\n");
 		return res.toString();		
 	}
 	
@@ -733,29 +754,30 @@ public class TestCaseGenerator {
 		long hi = (long) (Math.pow(2, size-1)-1);
 		
 		String allint = ALL_INTS;
-		res.append("List<Integer> "+allint +"= new LinkedList<Integer>();\n");
+		res.append(TAB+"List<Integer> "+allint +"= new LinkedList<Integer>();\n");
 		
 		for(long i = low; i <= hi; i++ ){			
-			res.append(allint+".add("+i+");\n");			
+			res.append(TAB+allint+".add("+i+");\n");			
 		}	
 		
 		return res.toString();		
 	}
 	
-	private String createObjSet(){
+	private String createObjSet(Heap h){
 		
-		StringBuffer res  = new StringBuffer();
-		long size = ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().objectBound;
+		StringBuffer res  = new StringBuffer();		
 		
-		long low = (long) - Math.pow(2, size-1);
-		long hi = (long) (Math.pow(2, size-1)-1);
+		res.append(TAB+"List<Object> "+ALL_OBJECTS +"= new LinkedList<Object>();\n");
 		
-		String allobj = ALL_OBJECTS;
-		res.append("List<Object> "+allobj +"= new LinkedList<Object>();\n");
-		
-		for(long i = low; i <= hi; i++ ){			
-			res.append(allobj+".add(_o"+i+");\n");			
-		}		
+		for(ObjectVal o : h.getObjects()){
+			String name = o.getName();
+			if(name.equals("#o0")){
+				continue;
+			}
+			name = name.replace("#", "_");
+			res.append(TAB+ALL_OBJECTS+".add("+name+");\n");
+			
+		}			
 		
 		return res.toString();		
 	}
