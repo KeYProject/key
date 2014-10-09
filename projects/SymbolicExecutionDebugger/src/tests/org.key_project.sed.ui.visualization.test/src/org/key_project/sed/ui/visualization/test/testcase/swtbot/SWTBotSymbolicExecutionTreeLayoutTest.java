@@ -5,14 +5,13 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.eclipse.swtbot.eclipse.gef.finder.SWTGefBot;
 import org.eclipse.swtbot.eclipse.gef.finder.widgets.SWTBotGefEditor;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.ui.visualization.execution_tree.feature.AbstractDebugNodeUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugTargetConnectFeature;
+import org.key_project.sed.ui.visualization.test.util.TestVisualizationUtil;
 
 /**
  * Tests the automatic layout of symbolic execution trees via
@@ -51,13 +50,16 @@ public class SWTBotSymbolicExecutionTreeLayoutTest extends AbstractSymbolicExecu
 
          @Override
          public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
-            assertDiagram(bot, project, "Number2.set", "data/Number2/oracle", null);
+//            assertDiagram(bot, project, "Number2.set", "data/Number2/oracle", null);
 //            SWTBotGefEditor editor = new SWTGefBot().gefEditor("Number2.set_diagram");
 //            SWTBotGefEditor editor = new SWTGefBot().gefEditor("data/Number2/oracle/Number2.set_diagram");
 //            SWTBotGefEditor editor = new SWTGefBot().gefEditor("Empty Diagram");
 //            editor = editor.select("<call self.equals(n)>");//.clickContextMenu("Collapse");
 //            assertDiagram(bot, project, "Number2.set", "data/Number2/oracle", null);
 //            assertDiagram(bot, project, "Number2.set", "data/Number2/oracle", "Collapsed");
+            SWTBotGefEditor editor = TestVisualizationUtil.getSymbolicExecutionTreeViewGefEditor(bot);
+            editor.select("<call self.equals(n)>");
+            editor.clickContextMenu("Collapse");
          }
 
       };

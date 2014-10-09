@@ -54,7 +54,7 @@ public class MethodCallCollapseFeature extends AbstractDebugNodeCollapseFeature 
       
       if(pes != null)
       {
-         ISEDMethodCall mc = (ISEDMethodCall) getBusinessObjectForPictogramElement(pes[0]);
+         ISEDMethodCall mc = (ISEDMethodCall) getBusinessObjectForPictogramElement(pes[0]); // TODO: Handle all supported business objects
          pes = getFeatureProvider().getAllPictogramElementsForBusinessObject(mc);
          
          try

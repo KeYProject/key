@@ -3,6 +3,7 @@ package org.key_project.sed.ui.visualization.execution_tree.feature;
 import java.util.List;
 
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.ITerminate;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.impl.RemoveContext;
@@ -111,15 +112,17 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
    */
    @Override
    public boolean canExecute(ICustomContext context) {
+      boolean canExecute = false;
       PictogramElement[] pes = context.getPictogramElements();
-      
-      if(pes != null && pes.length == 1)
-      {
-         Object bo = getBusinessObjectForPictogramElement(pes[0]);
-         return canExecuteBusinessObject(bo);
+      if (pes != null) {
+         int i = 0;
+         while (i < pes.length && !canExecute) {
+            Object businessObject = getBusinessObjectForPictogramElement(pes[i]);
+            canExecute = canExecuteBusinessObject(businessObject);
+            i++;
+         }
       }
-      
-      return false;
+      return canExecute;
    }
    
    /**
