@@ -393,6 +393,12 @@ SLASH
 :	'/'
     ;
 
+BACKSLASH
+@init { paraphrase.push("`\\'"); }
+@after { paraphrase.pop(); }
+:	'\\'
+    ;
+
 COLON
     @init { paraphrase.push("`:'"); }
 @after { paraphrase.pop(); }

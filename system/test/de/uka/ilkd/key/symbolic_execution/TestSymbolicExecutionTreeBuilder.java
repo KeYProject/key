@@ -111,6 +111,30 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    }
    
    /**
+    * Tests example: examples/_testcase/set/exceptionalMethodReturnTestWithLoop
+    */
+   public void testExceptionalMethodReturnTestWithLoop() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/exceptionalMethodReturnTestWithLoop/test/Loop.java", 
+                "Loop", 
+                "magic", 
+                null,
+                "examples/_testcase/set/exceptionalMethodReturnTestWithLoop/oracle/Loop.xml",
+                false,
+                false,
+                true,
+                true,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/staticInstanceFieldChanged
     */
    public void testStaticInstanceFieldChanged() throws Exception {

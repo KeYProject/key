@@ -10,42 +10,54 @@
                         <statement name="fourthLevel(a_3);" pathCondition="true" pathConditionChanged="false">
                            <methodCall name="&lt;call self.fourthLevel(a_4)&gt;" pathCondition="true" pathConditionChanged="false">
                               <statement name="throw new Exception ();" pathCondition="true" pathConditionChanged="false">
-                                 <statement name="a_2=a_2*2;" pathCondition="true" pathConditionChanged="false">
-                                    <methodReturn name="&lt;return of secondLevel&gt;" signature="&lt;return of self.secondLevel(a_2)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
-                                       <statement name="secondLevel(a_1);" pathCondition="true" pathConditionChanged="false">
-                                          <methodCall name="&lt;call self.secondLevel(a_5)&gt;" pathCondition="true" pathConditionChanged="false">
-                                             <statement name="thirdLevel(a_5);" pathCondition="true" pathConditionChanged="false">
-                                                <methodCall name="&lt;call self.thirdLevel(a_6)&gt;" pathCondition="true" pathConditionChanged="false">
-                                                   <statement name="fourthLevel(a_6);" pathCondition="true" pathConditionChanged="false">
-                                                      <methodCall name="&lt;call self.fourthLevel(a_7)&gt;" pathCondition="true" pathConditionChanged="false">
-                                                         <statement name="throw new Exception ();" pathCondition="true" pathConditionChanged="false">
-                                                            <statement name="a_5=a_5*2;" pathCondition="true" pathConditionChanged="false">
-                                                               <methodReturn name="&lt;return of secondLevel&gt;" signature="&lt;return of self.secondLevel(a_5)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
-                                                                  <methodReturn name="&lt;return of firstLevel&gt;" signature="&lt;return of self.firstLevel(a_1)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
-                                                                     <statement name="firstLevel(a);" pathCondition="true" pathConditionChanged="false">
-                                                                     </statement>
-                                                                  </methodReturn>
-                                                               </methodReturn>
-                                                            </statement>
+                                 <exceptionalMethodReturn name="&lt;throw java.lang.Exception&gt;" signature="&lt;exceptional return of &lt;call self.fourthLevel(a_4)&gt;&gt;" pathCondition="true" pathConditionChanged="false" methodReturnCondition="true">
+                                    <exceptionalMethodReturn name="&lt;throw java.lang.Exception&gt;" signature="&lt;exceptional return of &lt;call self.thirdLevel(a_3)&gt;&gt;" pathCondition="true" pathConditionChanged="false" methodReturnCondition="true">
+                                       <statement name="a_2=a_2*2;" pathCondition="true" pathConditionChanged="false">
+                                          <methodReturn name="&lt;return of secondLevel&gt;" signature="&lt;return of self.secondLevel(a_2)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                             <statement name="secondLevel(a_1);" pathCondition="true" pathConditionChanged="false">
+                                                <methodCall name="&lt;call self.secondLevel(a_5)&gt;" pathCondition="true" pathConditionChanged="false">
+                                                   <statement name="thirdLevel(a_5);" pathCondition="true" pathConditionChanged="false">
+                                                      <methodCall name="&lt;call self.thirdLevel(a_6)&gt;" pathCondition="true" pathConditionChanged="false">
+                                                         <statement name="fourthLevel(a_6);" pathCondition="true" pathConditionChanged="false">
+                                                            <methodCall name="&lt;call self.fourthLevel(a_7)&gt;" pathCondition="true" pathConditionChanged="false">
+                                                               <statement name="throw new Exception ();" pathCondition="true" pathConditionChanged="false">
+                                                                  <exceptionalMethodReturn name="&lt;throw java.lang.Exception&gt;" signature="&lt;exceptional return of &lt;call self.fourthLevel(a_7)&gt;&gt;" pathCondition="true" pathConditionChanged="false" methodReturnCondition="true">
+                                                                     <exceptionalMethodReturn name="&lt;throw java.lang.Exception&gt;" signature="&lt;exceptional return of &lt;call self.thirdLevel(a_6)&gt;&gt;" pathCondition="true" pathConditionChanged="false" methodReturnCondition="true">
+                                                                        <statement name="a_5=a_5*2;" pathCondition="true" pathConditionChanged="false">
+                                                                           <methodReturn name="&lt;return of secondLevel&gt;" signature="&lt;return of self.secondLevel(a_5)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                                                              <methodReturn name="&lt;return of firstLevel&gt;" signature="&lt;return of self.firstLevel(a_1)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                                                                                 <statement name="firstLevel(a);" pathCondition="true" pathConditionChanged="false">
+                                                                                 </statement>
+                                                                              </methodReturn>
+                                                                           </methodReturn>
+                                                                        </statement>
+                                                                     </exceptionalMethodReturn>
+                                                                  </exceptionalMethodReturn>
+                                                               </statement>
+                                                               <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                            </methodCall>
                                                          </statement>
+                                                         <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                       </methodCall>
                                                    </statement>
+                                                   <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                 </methodCall>
                                              </statement>
-                                             <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                          </methodCall>
+                                          </methodReturn>
                                        </statement>
-                                    </methodReturn>
-                                 </statement>
+                                    </exceptionalMethodReturn>
+                                 </exceptionalMethodReturn>
                               </statement>
+                              <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
                            </methodCall>
                         </statement>
+                        <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
                      </methodCall>
                   </statement>
-                  <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                  <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                </methodCall>
             </statement>
-            <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+            <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
          </methodCall>
       </statement>
    </methodCall>
