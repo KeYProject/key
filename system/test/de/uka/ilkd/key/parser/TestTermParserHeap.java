@@ -76,7 +76,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
     /*
      * The @-Operator can be used to specify the heap, which belongs to a
-     * field access. That operator is tests in the method below.
+     * field access. That operator is tested in the method below.
      */
     public void testAtOperator() throws IOException {
         Term expectedParseResult;
