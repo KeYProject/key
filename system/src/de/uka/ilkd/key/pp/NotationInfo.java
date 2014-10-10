@@ -302,8 +302,8 @@ public final class NotationInfo {
 	tbl.put(charListLDT.getClConcat(), new Notation.Infix("+",PRIORITY_CAST,PRIORITY_ATOM,PRIORITY_ATOM));
 	tbl.put(charListLDT.getClCons(), new CharListNotation());
 	tbl.put(charListLDT.getClEmpty(), new Notation.Constant("\"\"",PRIORITY_BOTTOM));
-	
-	    this.notationTable = tbl;
+
+	this.notationTable = tbl;
     }
     
     /**
@@ -339,6 +339,13 @@ public final class NotationInfo {
         tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation(" " + UnicodeHelper.IN + " "));
         tbl.put(setLDT.getSubset(), new Notation.Infix(""+UnicodeHelper.SUBSET, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
         tbl.put(services.getTypeConverter().getHeapLDT().getPrec(), new Notation.Infix(""+UnicodeHelper.PRECEDES, PRIORITY_ATOM,PRIORITY_TOP, PRIORITY_TOP));
+
+        //seq operators
+        final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
+        tbl.put(seqLDT.getSeqConcat(), new Notation.Infix(""+UnicodeHelper.SEQ_CONCAT, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK, PRIORITY_BELOW_ARITH_WEAK));
+        tbl.put(seqLDT.getSeqEmpty(), new Notation.Constant(""+UnicodeHelper.SEQ_SINGLETON_L+UnicodeHelper.SEQ_SINGLETON_R, PRIORITY_BOTTOM));
+        tbl.put(seqLDT.getSeqSingleton(), new Notation.SeqSingletonNotation(""+UnicodeHelper.SEQ_SINGLETON_L,""+UnicodeHelper.SEQ_SINGLETON_R));
+
         tbl.put(TermLabel.class, new Notation.LabelNotation(""+UnicodeHelper.FLQQ, ""+UnicodeHelper.FRQQ, PRIORITY_LABEL));
         this.notationTable = tbl;
     }

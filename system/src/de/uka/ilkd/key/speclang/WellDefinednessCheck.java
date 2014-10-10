@@ -39,6 +39,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.WellDefinednessPO;
@@ -1200,8 +1201,16 @@ public abstract class WellDefinednessCheck implements Contract {
 
     @Override
     public final ProofOblInput createProofObl(InitConfig initConfig, Contract contract) {
-        assert contract instanceof WellDefinednessCheck;
-        return new WellDefinednessPO(initConfig, (WellDefinednessCheck) contract);
+        return new WellDefinednessPO(initConfig, (WellDefinednessCheck)contract);
+    }
+
+    @Override
+    public final ContractPO createProofObl(InitConfig initConfig) {
+        return (ContractPO)createProofObl(initConfig, this);
+    }
+
+    public final ProofOblInput getProofObl(Services services) {
+        return services.getSpecificationRepository().getPO(this);
     }
 
     @Override

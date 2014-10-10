@@ -124,7 +124,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 	    DeclPicker lexer = new DeclPicker(new KeYLexerF(cinp,
 		    file.toString(),
 		    initConfig.getServices().getExceptionHandler()));
-            
+
             final ParserConfig normalConfig 
                 = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
             final ParserConfig schemaConfig 
@@ -149,7 +149,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 	            searchS = "\\proofObligation";
 	       }
 	       else {
-	         throw new ProofInputException("No \\problem or \\chooseContract or \\proofObligation in the input file!");
+	         throw new ProofInputException(
+	                 "No \\problem or \\chooseContract or \\proofObligation in the input file!");
 	       }
 	       
 	    }

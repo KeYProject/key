@@ -43,6 +43,7 @@ import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
@@ -74,7 +75,6 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
-import de.uka.ilkd.key.util.GuiUtilities;
 
 
 /**

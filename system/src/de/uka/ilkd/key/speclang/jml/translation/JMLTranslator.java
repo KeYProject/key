@@ -159,6 +159,7 @@ public final class JMLTranslator {
         VALUES ("\\values"),
         INDEX ("\\index"),
         INDEX_OF ("\\seq_indexOf"),
+        SEQ_CONST ("\\seq"),
         SEQ_GET ("\\seq_get"),
         SEQ_CONCAT ("\\seq_concat"),
         REACH ("reach"),
@@ -174,7 +175,10 @@ public final class JMLTranslator {
         UNSIGNED_SHIFT_RIGHT (">>>"),
         BREAKS ("breaks"),
         CONTINUES ("continues"),
-        RETURNS ("returns");
+        RETURNS ("returns"),
+
+        // information flow
+        INF_FLOW_SPEC_LIST ("infflowspeclist");
 
         private final String jmlName;
         JMLKeyWord(String name) {
@@ -370,8 +374,8 @@ public final class JMLTranslator {
                 if (result == null) {
                     result = tb.tt();
                 } else {
-                    Map /* Operator -> Operator */ replaceMap =
-                            new LinkedHashMap();
+                    Map /* Operator -> Operator */<LogicVariable, ProgramVariable> replaceMap =
+                            new LinkedHashMap<LogicVariable, ProgramVariable>();
                     replaceMap.put(eVar, excVar);
                     OpReplacer excVarReplacer = new OpReplacer(replaceMap, services.getTermFactory());
 
@@ -537,7 +541,7 @@ public final class JMLTranslator {
                             "bounded sum must declare exactly one variable");
                 }
                 LogicVariable qv = declVars.head();
-                Term resultTerm = tb.bsum(qv, a.getTerm(), b.getTerm(), t.getTerm(), services);
+                Term resultTerm = tb.bsum(qv, a.getTerm(), b.getTerm(), t.getTerm());
                 warnings.add(new PositionedString("The keyword \\bsum is deprecated and will be removed in the future.\n" +
                 		"Please use the standard \\sum syntax."));
                 final SLExpression bsumExpr = new SLExpression(resultTerm, promo);
@@ -555,7 +559,7 @@ public final class JMLTranslator {
                     Term lo,
                     Term hi,
                     Term body) {
-                return tb.bsum(qv, lo, hi, body, services);
+                return tb.bsum(qv, lo, hi, body);
             }
 
             @Override
@@ -564,7 +568,7 @@ public final class JMLTranslator {
                     ImmutableList<QuantifiableVariable> qvs, Term range,
                     Term body) {
                 final Term tr = typerestrict(declsType,nullable,qvs,services);
-                return tb.sum(qvs, tb.andSC(tr,range), body, services);
+                return tb.sum(qvs, tb.andSC(tr,range), body);
             }
 
         });
@@ -765,7 +769,7 @@ public final class JMLTranslator {
                     Term body) {
                 final Term cond = tb.ife(tb.convertToFormula(body),
                                          tb.one(), tb.zero());
-                return tb.bsum(qv, lo, hi, cond, services);
+                return tb.bsum(qv, lo, hi, cond);
             }
 
             @Override
@@ -776,7 +780,7 @@ public final class JMLTranslator {
                 final Term tr = typerestrict(declsType,nullable,qvs,services);
                 final Term cond = tb.ife(tb.convertToFormula(body),
                         tb.one(), tb.zero());
-                return tb.sum(qvs, tb.andSC(tr,range), cond, services);
+                return tb.sum(qvs, tb.andSC(tr,range), cond);
             }
 
         });
@@ -885,6 +889,32 @@ public final class JMLTranslator {
                 final Term elem = ((SLExpression)params[2]).getTerm();
                 final KeYJavaType inttype = services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_BIGINT);
                 return new SLExpression(tb.indexOf(seq,elem),inttype);
+            }
+        });
+
+        translationMethods.put(JMLKeyWord.SEQ_CONST, new JMLTranslationMethod() {
+
+            @Override
+            public Object translate(SLTranslationExceptionManager excManager,
+                                    Object... params)
+                    throws SLTranslationException {
+                checkParameters(params, ImmutableList.class, Services.class);
+                ImmutableList<SLExpression> exprList =
+                        (ImmutableList<SLExpression>) params[0];
+                Services services = (Services) params[1];
+
+                ImmutableList<Term> terms = ImmutableSLList.<Term>nil();
+                for (SLExpression expr : exprList) {
+                    if (expr.isTerm()) {
+                        Term t = expr.getTerm();
+                        terms = terms.append(t);
+                    } else {
+                        throw excManager.createException("Not a term: " + expr);
+                    }
+                }
+                final KeYJavaType seqtype =
+                        services.getJavaInfo().getPrimitiveKeYJavaType("\\seq");
+                return new SLExpression(tb.seq(terms), seqtype);
             }
         });
 
@@ -1240,7 +1270,7 @@ public final class JMLTranslator {
                     } else if(intHelper.isIntegerTerm(result)) {
                         result = intHelper.buildCastExpression(type, result);
                     } else {result = new SLExpression(
-                            tb.cast(services, type.getSort(), result.getTerm()),
+                            tb.cast(type.getSort(), result.getTerm()),
                             type);
                     }
                 } else {
@@ -1626,6 +1656,19 @@ public final class JMLTranslator {
 			               .getKeYJavaType(PrimitiveType.JAVA_SEQ);
 				return new SLExpression(tb.values(),t);
 			}});
+        
+        translationMethods.put(JMLKeyWord.INF_FLOW_SPEC_LIST, new JMLTranslationMethod() {
+
+            @Override
+            public ImmutableList<?> translate(
+                    SLTranslationExceptionManager excManager,
+                    Object... params)
+                    throws SLTranslationException {
+                checkParameters(params, ImmutableList.class, Services.class);
+                ImmutableList<?> infFlowSpecList = (ImmutableList<?>) params[0];
+                return infFlowSpecList;
+            }
+        });
     }
 
 
@@ -2316,7 +2359,7 @@ public final class JMLTranslator {
         protected abstract String opName();
         protected abstract SLExpression translate(JavaIntegerSemanticsHelper intHelper, SLExpression left, SLExpression right) throws SLTranslationException;
     }
-    
+
     /*
      Translate a function name together with a list of arguments to a JDL term.
      */

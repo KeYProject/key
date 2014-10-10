@@ -18,12 +18,7 @@ import static de.uka.ilkd.key.util.Assert.assertSubSort;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -57,9 +52,14 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Standard implementation of the OperationContract interface.
@@ -510,11 +510,6 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     @Override
-    public Term getMby() {
-        return this.originalMby;
-    }
-
-    @Override
     public Term getMby(ProgramVariable selfVar,
                        ImmutableList<ProgramVariable> paramVars,
                        Services services) {
@@ -566,24 +561,24 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     private String getText(boolean includeHtmlMarkup, Services services) {
-       return getText(pm, 
-                      originalResultVar, 
-                      originalSelfVar, 
-                      originalParamVars, 
-                      originalExcVar, 
-                      hasMby(), 
-                      originalMby, 
-                      originalMods, 
-                      hasRealModifiesClause, 
-                      globalDefs, 
-                      originalPres, 
-                      originalPosts, 
-                      originalAxioms, 
-                      getModality(), 
-                      transactionApplicableContract(), 
-                      includeHtmlMarkup, 
+       return getText(pm,
+                      originalResultVar,
+                      originalSelfVar,
+                      originalParamVars,
+                      originalExcVar,
+                      hasMby(),
+                      originalMby,
+                      originalMods,
+                      hasRealModifiesClause,
+                      globalDefs,
+                      originalPres,
+                      originalPosts,
+                      originalAxioms,
+                      getModality(),
+                      transactionApplicableContract(),
+                      includeHtmlMarkup,
                       services,
-                      NotationInfo.DEFAULT_PRETTY_SYNTAX, 
+                      NotationInfo.DEFAULT_PRETTY_SYNTAX,
                       NotationInfo.DEFAULT_UNICODE_ENABLED);
     }
     
@@ -1274,6 +1269,17 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
 
     @Override
+    public final ContractPO createProofObl(InitConfig initConfig) {
+        return (ContractPO)createProofObl(initConfig, this);
+    }
+
+
+    @Override
+    public ProofOblInput getProofObl(Services services) {
+        return services.getSpecificationRepository().getPO(this);
+    }
+
+    @Override
     public ProofOblInput createProofObl(InitConfig initConfig, Contract contract) {
         return new FunctionalOperationContractPO(initConfig,
                 (FunctionalOperationContract) contract);
@@ -1359,6 +1365,54 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
 
+   @Override
+   public boolean hasSelfVar() {
+      return originalSelfVar != null;
+   }
+
+    @Override
+    public String getBaseName() {
+        return baseName;
+    }
+
+
+    @Override
+    public Term getPre() {
+        assert originalPres.values().size() == 1
+               : "information flow extension not compatible with multi-heap setting";
+        return originalPres.values().iterator().next();
+    }
+
+
+    @Override
+    public Term getPost() {
+        assert originalPosts.values().size() == 1
+               : "information flow extension not compatible with multi-heap setting";
+        return originalPosts.values().iterator().next();
+    }
+
+
+    @Override
+    public Term getMod() {
+        return originalMods.values().iterator().next();
+    }
+
+
+    @Override
+    public Term getMby() {
+        return originalMby;
+    }
+
+
+    @Override
+    public Term getSelf() {
+        if (originalSelfVar == null){
+            assert pm.isStatic() : "missing self variable in non-static method contract";
+            return null;
+        }
+        return TB.var(originalSelfVar);
+    }
+
     @Override
     public boolean hasResultVar() {
        return originalResultVar != null;
@@ -1366,16 +1420,34 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
 
     @Override
-    public boolean hasSelfVar() {
-       return originalSelfVar != null;
+    public ImmutableList<Term> getParams() {
+        if (originalParamVars == null) {
+            return null;
+        }
+        return TB.var(originalParamVars);
     }
 
 
     @Override
+    public Term getResult() {
+        if (originalResultVar == null) {
+            return null;
+        }
+        return TB.var(originalResultVar);
+    }
+
+
+    @Override
+    public Term getExc() {
+        if (originalExcVar == null) {
+            return null;
+        }
+        return TB.var(originalExcVar);
+    }
+
     public KeYJavaType getSpecifiedIn() {
 	    return specifiedIn;
     }
-
 
     @Override
     public OriginalVariables getOrigVars() {
