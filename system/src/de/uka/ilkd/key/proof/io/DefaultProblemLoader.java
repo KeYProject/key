@@ -23,7 +23,6 @@ import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Properties;
-import org.antlr.runtime.MissingTokenException;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -33,6 +32,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -52,6 +52,7 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.ui.UserInterface;
+import de.uka.ilkd.key.util.ExceptionHandlerException;
 
 /**
  * <p>
@@ -207,13 +208,27 @@ public class DefaultProblemLoader {
        catch (ProblemLoaderException e) {
            throw e;
        }
-       catch (Exception e) { // TODO give more specific exception message
-           // TODO: Eclipse complains that more specific exception types would not occur, hence the ugly type lookup.
-           if (e instanceof MissingTokenException) {
-               final MissingTokenException mte = (MissingTokenException) e;
-               final String msg = "Syntax error: missing "+mte.token+" at "+mte.input+":"+mte.line;
+       catch (ProofInputException pie) {
+           // try to resolve error message
+           Throwable c0 = pie.getCause();
+           if (c0 instanceof ExceptionHandlerException) {
+               c0 = c0.getCause();    
+           }
+           if (c0 instanceof org.antlr.runtime.MissingTokenException) {
+               final org.antlr.runtime.MissingTokenException mte = (org.antlr.runtime.MissingTokenException) c0;
+               final org.antlr.runtime.Token occurrence = mte.token;
+               // TODO: other commonly missed tokens
+               final String token = mte.expecting == KeYLexer.SEMI? "semicolon": "token id "+mte.expecting;
+               final String msg = "Syntax error: missing "+token+" at "+
+                               occurrence.getText()+" statement ("+mte.input.getSourceName()
+                               +":"+mte.line+")";
                throw new ProblemLoaderException(this, msg, mte);
-           } else
+               // TODO other ANTLR exceptions
+           } else {
+               throw new ProblemLoaderException(this, "Loading proof input failed", pie);
+           }
+       }
+       catch (Exception e) { // TODO give more specific exception message
            throw new ProblemLoaderException(this, e);
        }
    }
