@@ -23,6 +23,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Properties;
+import org.antlr.runtime.MissingTokenException;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -204,9 +205,15 @@ public class DefaultProblemLoader {
            }
        }
        catch (ProblemLoaderException e) {
-           throw(e);
+           throw e;
        }
        catch (Exception e) { // TODO give more specific exception message
+           // TODO: Eclipse complains that more specific exception types would not occur, hence the ugly type lookup.
+           if (e instanceof MissingTokenException) {
+               final MissingTokenException mte = (MissingTokenException) e;
+               final String msg = "Syntax error: missing "+mte.token+" at "+mte.input+":"+mte.line;
+               throw new ProblemLoaderException(this, msg, mte);
+           } else
            throw new ProblemLoaderException(this, e);
        }
    }

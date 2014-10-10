@@ -36,6 +36,7 @@ import javax.swing.SwingWorker;
  * @author Martin Hentschel
  */
 public final class ProblemLoader extends DefaultProblemLoader {
+    // TODO: why is the superclass called 'default'?
 
    private ProverTaskListener ptl;
 
