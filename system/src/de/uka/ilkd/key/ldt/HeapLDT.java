@@ -178,7 +178,7 @@ public final class HeapLDT extends LDT {
      * Extracts the name of the enclosing class from the name of a constant
      * symbol representing a field.
      */
-    public String getClassName(Function fieldSymbol) {
+    public static String getClassName(Function fieldSymbol) {
 	String name = fieldSymbol.name().toString();
 	int index = name.indexOf("::");
 	if(index == -1) {

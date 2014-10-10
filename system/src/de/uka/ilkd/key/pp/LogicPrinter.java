@@ -1322,11 +1322,12 @@ public class LogicPrinter {
                 layouter.print(".");
             }
 
-            final String prettyFieldName = services.getTypeConverter()
-                    .getHeapLDT()
-                    .getPrettyFieldName(t.op());
-
-            layouter.print(prettyFieldName);
+            // Print class name if the field is static.
+            String fieldName = obs.isStatic()
+                    ? HeapLDT.getClassName((Function)t.op()) + "."
+                    : "";
+            fieldName += HeapLDT.getPrettyFieldName(t.op());
+            layouter.print(fieldName);
 
             if(obs.getNumParams() > 0 || obs instanceof IProgramMethod) {
                 layouter.print("(").beginC(0);
@@ -1344,8 +1345,7 @@ public class LogicPrinter {
 
             // must the heap be printed at all: no, if default heap.
             final Term heapTerm = t.sub(0);
-            final boolean printHeap = !heapTerm.equals(tacitHeap);
-            if (printHeap) {
+            if (!heapTerm.equals(tacitHeap)) {
                 layouter.brk(0).print("@");
                 markStartSub(0);
                 printTerm(heapTerm);

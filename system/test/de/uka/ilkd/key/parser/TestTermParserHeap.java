@@ -227,8 +227,8 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         comparePrettySyntaxAgainstVerboseSyntax("testTermParserHeap.A.staticField",
                 "int::select(heap, null, testTermParserHeap.A::$staticField)");
 
-//        comparePrettySyntaxAgainstVerboseSyntax("testTermParserHeap.A.staticMethod()",
-//                "testTermParserHeap.A::staticMethod(heap)");
+        comparePrettySyntaxAgainstVerboseSyntax("testTermParserHeap.A.staticMethod()",
+                "testTermParserHeap.A::staticMethod(heap)");
     }
 
     /**

@@ -158,7 +158,7 @@ class SelectPrinter {
              * (Kai Wallisch 08/2014)
              */
 
-            String className = heapLDT.getClassName((Function) fieldTerm.op());
+            String className = HeapLDT.getClassName((Function) fieldTerm.op());
 
             if (className == null) {
                 // if the class name cannot be determined, print "null"
