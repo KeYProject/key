@@ -5,9 +5,9 @@ import java.util.List;
 public class OracleTermCall implements OracleTerm {
 	
 	private OracleMethod method;
-	private List<OracleTerm> args;
+	private List<? extends OracleTerm> args;
 	
-	public OracleTermCall(OracleMethod method, List<OracleTerm> args) {
+	public OracleTermCall(OracleMethod method, List<? extends OracleTerm> args) {
 	    super();
 	    this.method = method;
 	    this.args = args;
@@ -19,7 +19,9 @@ public class OracleTermCall implements OracleTerm {
 		for(OracleTerm arg  : args){
 			aString += arg.toString() + ",";
 		}
-		aString = aString.substring(0, aString.length()-1);
+		if(!args.isEmpty()){
+			aString = aString.substring(0, aString.length()-1);
+		}
 		return methodName+"("+aString+")";		
 	}
 	

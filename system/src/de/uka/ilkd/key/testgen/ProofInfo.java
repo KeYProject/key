@@ -18,9 +18,6 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.testgen.oracle.OracleGenerator;
-import de.uka.ilkd.key.testgen.oracle.OracleMethod;
-import de.uka.ilkd.key.testgen.oracle.OracleTerm;
 
 public class ProofInfo {
 

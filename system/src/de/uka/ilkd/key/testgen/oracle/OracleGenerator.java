@@ -43,7 +43,7 @@ public class OracleGenerator {
 	
 	private static final String PRE_STRING = "pre_";
 	
-	public OracleGenerator(Services services,Map<Sort, String> setNames) {
+	public OracleGenerator(Services services) {
 		this.services = services;
 		initOps();		
 		oracleMethods = new HashSet<OracleMethod>();
@@ -80,6 +80,13 @@ public class OracleGenerator {
 		return new OracleMethod("testOracle", new LinkedList<OracleVariable>(), body.toString());
 	}
 	
+	
+	
+	public Set<OracleMethod> getOracleMethods() {
+		return oracleMethods;
+	}
+
+
 	public OracleTerm generateOracle(Term term){
 		Operator op = term.op();
 		
@@ -198,6 +205,7 @@ public class OracleGenerator {
 	    			
 	    			m = createInvariantMethod(s);
 	    			invariants.put(s, m);
+	    			oracleMethods.add(m);
 	    		}
 	    		
 	    		OracleTerm arg = generateOracle(term.sub(0));
@@ -283,9 +291,9 @@ public class OracleGenerator {
 		OracleTerm falseCase = generateOracle(term.sub(2));
 		
 		String body = "if("+cond+"){"
-				+ "\n   "+trueCase+""
+				+ "\n   return "+trueCase+";"
 				+ "\n}else{"
-				+ "\n   "+falseCase+""
+				+ "\n   return "+falseCase+";"
 				+ "\n}";
 		
 		return new OracleMethod(methodName, args, body, term.sort());		

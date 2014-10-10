@@ -15,7 +15,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.testgen.TGInfoDialog;
 import de.uka.ilkd.key.gui.testgen.TestGenerationSettings;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -24,6 +23,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -32,6 +32,10 @@ import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.model.Heap;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.model.ObjectVal;
+import de.uka.ilkd.key.testgen.oracle.OracleGenerator;
+import de.uka.ilkd.key.testgen.oracle.OracleMethod;
+import de.uka.ilkd.key.testgen.oracle.OracleTerm;
+import de.uka.ilkd.key.testgen.oracle.OracleTermCall;
 
 /**
  * @author gladisch
@@ -72,6 +76,9 @@ public class TestCaseGenerator {
 	private String fileName;
 	private String MUTName;
 	private ProofInfo info;
+	private OracleGenerator oracleGenerator;
+	private List<OracleMethod> oracleMethods;
+	private String oracleMethodCall;
 	private final Map<Sort, StringBuffer> sortDummyClass;
 	final String DummyPostfix = "DummyImpl";
 	// TODO: in future remove this string and provide the file in the
@@ -155,7 +162,20 @@ public class TestCaseGenerator {
 		MUTName = info.getMUT().getFullName();	
 		rflCreator = new ReflectionClassCreator();
 		executeWithOpenJML = createExecuteWithOpenJML(settings.getOpenjmlPath(),settings.getObjenesisPath());
-		compileWithOpenJML = createCompileWithOpenJML(settings.getOpenjmlPath(), settings.getObjenesisPath());		
+		compileWithOpenJML = createCompileWithOpenJML(settings.getOpenjmlPath(), settings.getObjenesisPath());
+		oracleGenerator  =new OracleGenerator(services);
+		if(junitFormat){
+			System.out.println("Translating oracle");
+			try{
+				oracleMethods = new LinkedList<OracleMethod>();
+				oracleMethodCall = getOracleAssertion(oracleMethods);
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+			
+			
+			//System.out.println("Done!);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ");
+		}
 	}
 	
 	public String getMUTCall(){
@@ -456,7 +476,24 @@ public class TestCaseGenerator {
 		TestCaseGenerator.fileCounter++;
 		return testCase.toString();
 	}
+	
+	
+	
+	protected String getOracleAssertion(List<OracleMethod> oracleMethods){		
+		Term postcondition = getPostCondition();
+		
+		OracleMethod oracle = oracleGenerator.generateOracleMethod(postcondition);
+		OracleTermCall oracleCall = new OracleTermCall(oracle, new LinkedList<OracleTerm>());
+		
+		oracleMethods.add(oracle);
+		oracleMethods.addAll(oracleGenerator.getOracleMethods());
+		
+		return "assertTrue("+oracleCall.toString()+");";
+	}
 
+	private Term getPostCondition() {
+		return info.getPostCondition();
+	}
 	public String generateJUnitTestSuite(Collection<SMTSolver> problemSolvers) {
 		
 		fileName = "TestGeneric" + TestCaseGenerator.fileCounter;
@@ -488,6 +525,12 @@ public class TestCaseGenerator {
 						testMethod
 						        .append("   //Calling the method under test\n   "
 						                + mut + "\n");
+						
+						
+						if(junitFormat){
+							testMethod.append("   //calling the test oracle\n"+oracleMethodCall+"\n");
+						}
+						
 						testMethod.append(" }\n\n");
 						i++;
 						success = true;
@@ -512,6 +555,15 @@ public class TestCaseGenerator {
 		}
 		testSuite.append(getMainMethod(fileName, i) + "\n\n");
 		testSuite.append(testMethods);
+		
+		if(junitFormat){
+			for(OracleMethod m : oracleMethods){
+				testSuite.append("\n\n");
+				testSuite.append(m);
+			}
+		}
+		
+		
 		testSuite.append("\n}");
 		writeToFile(fileName + ".java", testSuite);
 		logger.writeln("Writing test file to:" + directory + modDir
@@ -649,6 +701,7 @@ public class TestCaseGenerator {
 			result.append(createIntSet()+"\n");
 			result.append(createObjSet(heap)+"\n");
 		}
+				
 		
 		return result.toString();
 	}
