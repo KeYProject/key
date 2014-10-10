@@ -1,13 +1,26 @@
 package org.key_project.key4eclipse.common.ui.completion;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.IContentProvider;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ListViewer;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
+import org.key_project.util.eclipse.swt.SWTUtil;
 
 import de.uka.ilkd.key.gui.DependencyContractCompletion.TermStringWrapper;
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
@@ -64,6 +77,8 @@ public class DependencyContractCompletion extends AbstractInteractiveRuleApplica
       
       private final TermStringWrapper[] heaps;
       
+      private Object[] selectedHeap;
+      
       /**
        * Constructor.
        * @param app The DefaultBuiltInRuleApp to be completed.
@@ -79,7 +94,7 @@ public class DependencyContractCompletion extends AbstractInteractiveRuleApplica
          cApp = cApp.tryToInstantiateContract(services);
          
          steps = UseDependencyContractRule.getSteps(app.getHeapContext(), cApp.posInOccurrence(), goal.sequent(), services);
-         
+                  
          assert app.getHeapContext() != null;
 
          if (steps.size() >= 1) {
@@ -124,8 +139,18 @@ public class DependencyContractCompletion extends AbstractInteractiveRuleApplica
        */
       @Override
       public void createControl(Composite root) {
-         ListViewer viewer = new ListViewer(root, SWT.BORDER | SWT.SINGLE);
-         // TODO: Create GUI to select heaps
+         ListViewer viewer = new ListViewer(root, SWT.BORDER | SWT.SINGLE);         
+         ArrayContentProvider provider = new ArrayContentProvider();
+         viewer.setContentProvider(provider);
+         viewer.setInput(heaps);
+         viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+            
+            @Override
+            public void selectionChanged(SelectionChangedEvent event) {
+               ISelection selection = event.getSelection();
+               selectedHeap = SWTUtil.toArray(selection);
+            }
+         });
       }
 
       /**
@@ -134,7 +159,9 @@ public class DependencyContractCompletion extends AbstractInteractiveRuleApplica
       @Override
       public IBuiltInRuleApp finish() {
          final Term[] resultHeaps = null; // TODO: Assign selected heap.
-        
+         
+         
+         
          PosInOccurrence step = de.uka.ilkd.key.gui.DependencyContractCompletion.findCorrespondingStep(steps, resultHeaps);
          if (step == null) {
             return null;

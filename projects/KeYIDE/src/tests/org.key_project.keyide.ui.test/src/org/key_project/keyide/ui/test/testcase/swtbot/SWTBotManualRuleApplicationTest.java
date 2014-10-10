@@ -603,6 +603,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             if(textToApplyRuleOn == "self.getB()") {
                System.out.println("Depdency Contract");
             }
+            
             // Get node to apply rule on
             Node node = keyEditor.getCurrentNode();
             assertFalse(node.isClosed());
