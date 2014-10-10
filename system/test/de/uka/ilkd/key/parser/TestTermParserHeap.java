@@ -178,34 +178,33 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     public void testQueries() throws Exception {
         comparePrettySyntaxAgainstVerboseSyntax("a.query(i)", "testTermParserHeap.A::query(heap, a, i)");
         comparePrettySyntaxAgainstVerboseSyntax("a.query(i)@h", "testTermParserHeap.A::query(h, a, i)");
-        comparePrettySyntaxAgainstVerboseSyntax("a.query(a.f)@h", "testTermParserHeap.A::query(h, a, " +
-                "int::select(heap, a, testTermParserHeap.A::$f))");
+        comparePrettySyntaxAgainstVerboseSyntax("a.query(a.f)@h", "testTermParserHeap.A::query(h, a, "
+                + "int::select(heap, a, testTermParserHeap.A::$f))");
 
-        comparePrettySyntaxAgainstVerboseSyntax("a.next.query(a.f)@h", "testTermParserHeap.A::query(h, " +
-                "testTermParserHeap.A::select(h, a, testTermParserHeap.A::$next),  " +
-                "int::select(heap, a, testTermParserHeap.A::$f))");
+        comparePrettySyntaxAgainstVerboseSyntax("a.next.query(a.f)@h", "testTermParserHeap.A::query(h, "
+                + "testTermParserHeap.A::select(h, a, testTermParserHeap.A::$next),  "
+                + "int::select(heap, a, testTermParserHeap.A::$f))");
 
-        comparePrettySyntaxAgainstVerboseSyntax("a.getNext().getNext()@h", "testTermParserHeap.A::getNext(h, " +
-                "testTermParserHeap.A::getNext(h, a))");
+        comparePrettySyntaxAgainstVerboseSyntax("a.getNext().getNext()@h", "testTermParserHeap.A::getNext(h, "
+                + "testTermParserHeap.A::getNext(h, a))");
 
-        comparePrettySyntaxAgainstVerboseSyntax("a.getNext().next@h", "testTermParserHeap.A::select(h, " +
-                "testTermParserHeap.A::getNext(h, a), testTermParserHeap.A::$next)");
+        comparePrettySyntaxAgainstVerboseSyntax("a.getNext().next@h", "testTermParserHeap.A::select(h, "
+                + "testTermParserHeap.A::getNext(h, a), testTermParserHeap.A::$next)");
 
-        comparePrettySyntaxAgainstVerboseSyntax("(a.getNext()@h2).next@h", "testTermParserHeap.A::select(h, " +
-                "testTermParserHeap.A::getNext(h2, a), testTermParserHeap.A::$next)");
+        comparePrettySyntaxAgainstVerboseSyntax("(a.getNext()@h2).next@h", "testTermParserHeap.A::select(h, "
+                + "testTermParserHeap.A::getNext(h2, a), testTermParserHeap.A::$next)");
 
-        comparePrettySyntaxAgainstVerboseSyntax("(a.getNext()@heap).next@h", "testTermParserHeap.A::select(h, " +
-                "testTermParserHeap.A::getNext(heap, a), testTermParserHeap.A::$next)");
+        comparePrettySyntaxAgainstVerboseSyntax("(a.getNext()@heap).next@h", "testTermParserHeap.A::select(h, "
+                + "testTermParserHeap.A::getNext(heap, a), testTermParserHeap.A::$next)");
 
-        comparePrettySyntaxAgainstVerboseSyntax("(a.next@heap).getNext()@h", "testTermParserHeap.A::getNext(h, " +
-                "testTermParserHeap.A::select(heap, a, testTermParserHeap.A::$next))");
+        comparePrettySyntaxAgainstVerboseSyntax("(a.next@heap).getNext()@h", "testTermParserHeap.A::getNext(h, "
+                + "testTermParserHeap.A::select(heap, a, testTermParserHeap.A::$next))");
     }
 
     public void testQueriesInheritance() throws Exception {
         compareStringRepresentationAgainstTermRepresentation("a.query(i)",
                 parseTerm("testTermParserHeap.A::query(heap, a, i)"),
                 "a.(testTermParserHeap.A::query)(i)");
-
 
         compareStringRepresentationAgainstTermRepresentation("a1.query(i)",
                 parseTerm("testTermParserHeap.A::query(heap, a1, i)"),
@@ -217,9 +216,19 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
 //        compareStringRepresentationAgainstTermRepresentation("a1.(testTermParserHeap.A::queryRedefined)()",
 //                parseTerm("testTermParserHeap.A::queryRedefined(heap, a1)"));
-
 //        compareStringRepresentationAgainstTermRepresentation("a1.queryOverridden()",
 //                parseTerm("testTermParserHeap.A::queryOverridden(heap, a1)"));
+    }
+
+    /*
+     * Test pretty-printing on static fields and methods.
+     */
+    public void testAccessStaticMembers() throws IOException {
+        comparePrettySyntaxAgainstVerboseSyntax("testTermParserHeap.A.staticField",
+                "int::select(heap, null, testTermParserHeap.A::$staticField)");
+
+//        comparePrettySyntaxAgainstVerboseSyntax("testTermParserHeap.A.staticMethod()",
+//                "testTermParserHeap.A::staticMethod(heap)");
     }
 
     /**

@@ -174,7 +174,7 @@ class SelectPrinter {
 
             lp.layouter.print(".");
             lp.markStartSub(2);
-            lp.printTerm(fieldTerm);
+            lp.layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
             lp.markEndSub();
 
             printHeap(heapTerm, tacitHeap);

@@ -5,6 +5,11 @@ private int f;
 A next;
 int[] array;
 
+static int staticField;
+static int staticMethod() {
+	return 0;
+}
+
 /*@ pure */ public int query(int a) { return 0; }
 /*@ pure */ public A getNext() { return next; }
 /*@ pure */ public int queryOverridden() { return 0; }
