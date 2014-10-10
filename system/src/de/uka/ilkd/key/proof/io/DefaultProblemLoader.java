@@ -162,6 +162,7 @@ public class DefaultProblemLoader {
     * @throws IOException Occurred Exception.
     */
    public ProblemLoaderException load() throws ProblemLoaderException {
+       // TODO: returns AND throws exceptions?
        try {
            // Read environment
            boolean oneStepSimplifier =
