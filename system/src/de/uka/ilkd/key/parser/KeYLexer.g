@@ -375,8 +375,6 @@ SLASH
     ;
 
 BACKSLASH
-@init { paraphrase.push("`\\'"); }
-@after { paraphrase.pop(); }
 :	'\\'
     ;
 
