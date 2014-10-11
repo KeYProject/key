@@ -60,7 +60,13 @@ class SelectPrinter {
                 if (((Function) fieldTerm.op()).name().toString().contains("::<")) {
                     printGenericObjectProperty(t, heapTerm, objectTerm, fieldTerm, tacitHeap);
                 } else if (getFieldSort(fieldTerm).equals(t.sort())) {
-                    printFieldConstant(objectTerm, fieldTerm, heapLDT, heapTerm, tacitHeap);
+                    if (objectTerm.equals(lp.services.getTermBuilder().NULL())) {
+                        // static field access
+                        printStaticFieldConstant(fieldTerm, heapTerm, tacitHeap);
+                    } else {
+                        // non-static field access
+                        printNonStaticFieldConstant(heapTerm, objectTerm, fieldTerm, tacitHeap);
+                    }
                 } else {
                     lp.printFunctionTerm(t);
                 }
@@ -147,69 +153,70 @@ class SelectPrinter {
     }
 
     /*
-     * Print a select on a field constant.
+     * Print a static field constant.
      */
-    private void printFieldConstant(final Term objectTerm, final Term fieldTerm, HeapLDT heapLDT, final Term heapTerm, Term tacitHeap) throws IOException {
-        if (objectTerm.equals(lp.services.getTermBuilder().NULL())) {
-            // static field access
-            lp.startTerm(3);
-            /*
-             * Is consideration for static arrays missing in this?
-             * (Kai Wallisch 08/2014)
-             */
+    private void printStaticFieldConstant(final Term fieldTerm, final Term heapTerm, Term tacitHeap) throws IOException {
+        lp.startTerm(3);
+        /*
+         * Is consideration for static arrays missing in this?
+         * (Kai Wallisch 08/2014)
+         */
 
-            String className = HeapLDT.getClassName((Function) fieldTerm.op());
+        String className = HeapLDT.getClassName((Function) fieldTerm.op());
 
-            if (className == null) {
-                // if the class name cannot be determined, print "null"
-                lp.markStartSub(1);
-                lp.printTerm(lp.services.getTermBuilder().NULL());
-                lp.markEndSub();
-            } else {
-                lp.markStartSub(1);
-                // "null" not printed, print className (which is not a subterm)
-                lp.markEndSub();
-                lp.printClassName(className);
-            }
-
-            lp.layouter.print(".");
-            lp.markStartSub(2);
-            lp.layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
-            lp.markEndSub();
-
-            printHeap(heapTerm, tacitHeap);
-        } else {
-            // non-static field access
-            lp.startTerm(3);
+        if (className == null) {
+            // if the class name cannot be determined, print "null"
             lp.markStartSub(1);
-            lp.printEmbeddedObserver(heapTerm, objectTerm);
+            lp.printTerm(lp.services.getTermBuilder().NULL());
             lp.markEndSub();
-            lp.layouter.print(".");
-            lp.markStartSub(2);
-            if (isCanonicField(objectTerm, fieldTerm)) {
-                /*
-                 * Class name can be omitted if the field is canonic, i.e.
-                 * correct field can be determined without explicit mentioning
-                 * of corresponding class name.
-                 *
-                 * Example syntax: object.field
-                 */
-                lp.layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
-            } else {
-                /*
-                 * There is another field of the same name that would be selected
-                 * if class name is omitted. In this case class name must be mentioned
-                 * explicitly.
-                 *
-                 * Example syntax: object.(package.class::field)
-                 */
-                lp.layouter.print("(");
-                lp.layouter.print(fieldTerm.toString().replace("::$", "::"));
-                lp.layouter.print(")");
-            }
+        } else {
+            lp.markStartSub(1);
+            // "null" not printed, print className (which is not a subterm)
             lp.markEndSub();
-            printHeap(heapTerm, tacitHeap);
+            lp.printClassName(className);
         }
+
+        lp.layouter.print(".");
+        lp.markStartSub(2);
+        lp.layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
+        lp.markEndSub();
+
+        printHeap(heapTerm, tacitHeap);
+    }
+
+    /*
+     * Print a non-static field constant.
+     */
+    private void printNonStaticFieldConstant(final Term heapTerm, final Term objectTerm, final Term fieldTerm, Term tacitHeap) throws IOException {
+        lp.startTerm(3);
+        lp.markStartSub(1);
+        lp.printEmbeddedObserver(heapTerm, objectTerm);
+        lp.markEndSub();
+        lp.layouter.print(".");
+        lp.markStartSub(2);
+        if (isCanonicField(objectTerm, fieldTerm)) {
+            /*
+             * Class name can be omitted if the field is canonic, i.e.
+             * correct field can be determined without explicit mentioning
+             * of corresponding class name.
+             *
+             * Example syntax: object.field
+             */
+            lp.layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
+        } else {
+            /*
+             * There is another field of the same name that would be selected
+             * if class name is omitted. In this case class name must be mentioned
+             * explicitly.
+             *
+             * Example syntax: object.(package.class::field)
+             */
+            lp.layouter.print("(");
+            lp.layouter.print(fieldTerm.toString().replace("::$", "::"));
+            lp.layouter.print(")");
+        }
+        lp.markEndSub();
+        printHeap(heapTerm, tacitHeap);
     }
 
     /*
