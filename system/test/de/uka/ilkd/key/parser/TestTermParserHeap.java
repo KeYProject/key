@@ -224,11 +224,17 @@ public class TestTermParserHeap extends AbstractTestTermParser {
      * Test pretty-printing on static fields and methods.
      */
     public void testAccessStaticMembers() throws IOException {
+        // static field access
         comparePrettySyntaxAgainstVerboseSyntax("testTermParserHeap.A.staticField",
                 "int::select(heap, null, testTermParserHeap.A::$staticField)");
 
+        // static method access
         comparePrettySyntaxAgainstVerboseSyntax("testTermParserHeap.A.staticMethod()",
                 "testTermParserHeap.A::staticMethod(heap)");
+
+        // static array access
+        comparePrettySyntaxAgainstVerboseSyntax("testTermParserHeap.A.staticArray[0]",
+                "int::select(heap,int[]::select(heap,null,testTermParserHeap.A::$staticArray),arr(Z(0(#))))");
     }
 
     /**

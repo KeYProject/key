@@ -6,6 +6,7 @@ A next;
 int[] array;
 
 static int staticField;
+static int[] staticArray;
 static int staticMethod() {
 	return 0;
 }
