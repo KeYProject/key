@@ -19,7 +19,9 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" resultTe
                            <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
+                        <completedBlockEntry path="/0/0/0/0/0/0" conditionString="true"/>
                      </statement>
+                     <blockCompletionEntry path="/0/0/0/0/0/0/0"/>
                   </branchStatement>
                </operationContract>
             </statement>

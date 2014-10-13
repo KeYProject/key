@@ -206,7 +206,9 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        SEDMemoryBranchCondition returnCondition = new SEDMemoryBranchCondition(target, call, thread);
        returnCondition.setName("A Return Condition");
        returnCondition.addChild(returnNegative);
+       returnNegative.addGroupStartCondition(returnCondition);
        call.addMethodReturnCondition(returnCondition);
+       call.addGroupEndCondition(returnCondition);
        returnNegative.setMethodReturnCondition(returnCondition);
        bnegative.addChild(returnNegative);
        

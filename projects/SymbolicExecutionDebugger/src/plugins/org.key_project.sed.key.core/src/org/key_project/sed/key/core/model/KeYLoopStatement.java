@@ -23,8 +23,10 @@ import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
+import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDLoopStatement;
 import org.key_project.sed.core.model.impl.AbstractSEDLoopStatement;
+import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 
@@ -73,6 +75,11 @@ public class KeYLoopStatement extends AbstractSEDLoopStatement implements IKeYSE
     * The method call stack.
     */
    private IKeYSEDDebugNode<?>[] callStack;
+   
+   /**
+    * The conditions under which a group ending in this node starts.
+    */
+   private SEDMemoryBranchCondition[] groupStartConditions;
 
    /**
     * Constructor.
@@ -384,5 +391,26 @@ public class KeYLoopStatement extends AbstractSEDLoopStatement implements IKeYSE
          }
          return callStack;
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public SEDMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
+      synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+         if (groupStartConditions == null) {
+            groupStartConditions = KeYModelUtil.createCompletedBlocksConditions(this);
+         }
+         return groupStartConditions;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setParent(ISEDDebugNode parent) {
+      super.setParent(parent);
    }
 }

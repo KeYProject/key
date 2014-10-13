@@ -51,11 +51,15 @@ mod: false" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" i
   }
 }\] (and(equals(b_0_3,TRUE),geq(i,Z(0(#))))))))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                                        </termination>
+                                       <completedBlockEntry path="/0/0/0/0/0/0/0/0/0/0" conditionString="true"/>
                                     </statement>
                                  </statement>
+                                 <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
                               </branchStatement>
                            </methodReturn>
+                           <completedBlockEntry path="/0/0/0/0/0/0/0" conditionString="true"/>
                         </statement>
+                        <blockCompletionEntry path="/0/0/0/0/0/0/0/0"/>
                      </branchStatement>
                      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0"/>
                   </methodCall>
@@ -142,11 +146,15 @@ mod: false" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initially
   }
 }\] (and(equals(b_3,TRUE),geq(i,Z(0(#))))))))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                                        </termination>
+                                       <completedBlockEntry path="/0/0/1/0/0/0/0/0/0/0" conditionString="true"/>
                                     </statement>
                                  </statement>
+                                 <blockCompletionEntry path="/0/0/1/0/0/0/0/0/0/0/0/0"/>
                               </branchStatement>
                            </methodReturn>
+                           <completedBlockEntry path="/0/0/1/0/0/0/0" conditionString="true"/>
                         </statement>
+                        <blockCompletionEntry path="/0/0/1/0/0/0/0/0"/>
                      </branchStatement>
                      <methodReturnEntry path="/0/0/1/0/0/0/0/0/0"/>
                   </methodCall>

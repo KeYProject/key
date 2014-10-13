@@ -436,6 +436,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertTrue("Expected IExecutionBranchStatement but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionBranchStatement);
          assertVariables((IExecutionBranchStatement)expected, (IExecutionBranchStatement)current, compareVariables, compareConstraints);
          assertConstraints((IExecutionBranchStatement)expected, (IExecutionBranchStatement)current, compareConstraints);
+         assertBlockCompletions((IExecutionBranchStatement)expected, (IExecutionBranchStatement)current);
       }
       else if (expected instanceof IExecutionLoopCondition) {
          assertTrue("Expected IExecutionLoopCondition but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionLoopCondition);
@@ -519,6 +520,63 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Optionally compare parent
       if (compareParent) {
          assertExecutionNode(expected, current, false, compareVariables, compareCallStack, compareReturnValues, compareConstraints);
+      }
+   }
+
+   /**
+    * Compares the completed blocks.
+    * @param expected The expected {@link IExecutionNode}.
+    * @param current The current {@link IExecutionNode}.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected static void assertCompletedBlocks(IExecutionNode<?> expected, IExecutionNode<?> current) throws ProofInputException {
+      ImmutableList<IExecutionNode<?>> expectedEntries = expected.getCompletedBlocks();
+      ImmutableList<IExecutionNode<?>> currentEntries = current.getCompletedBlocks();
+      if (expectedEntries != null) {
+         assertNotNull("Completed blocks of \"" + current + "\" should not be null.", currentEntries);
+         assertEquals("Node: " + expected, expectedEntries.size(), currentEntries.size());
+         Iterator<IExecutionNode<?>> expectedIter = expectedEntries.iterator();
+         Iterator<IExecutionNode<?>> currentIter = currentEntries.iterator();
+         while (expectedIter.hasNext() && currentIter.hasNext()) {
+            IExecutionNode<?> expectedNext = expectedIter.next();
+            IExecutionNode<?> currentNext = currentIter.next();
+            assertExecutionNode(expectedNext, currentNext, false, false, false, false, false);
+            String expectedCondition = expected.getFormatedBlockCompletionCondition(expectedNext);
+            String currentCondition = current.getFormatedBlockCompletionCondition(currentNext);
+            if (!JavaUtil.equalIgnoreWhiteSpace(expectedCondition, currentCondition)) {
+               assertEquals(expectedCondition, currentCondition);
+            }
+         }
+         assertFalse(expectedIter.hasNext());
+         assertFalse(currentIter.hasNext());
+      }
+      else{
+         assertTrue("Completed block entries of \"" + current + "\" is \"" + currentEntries + "\" but should be null or empty.", currentEntries == null || currentEntries.isEmpty());
+      }
+   }
+
+   /**
+    * Compares the block completions.
+    * @param expected The expected {@link IExecutionBranchStatement}.
+    * @param current The current {@link IExecutionBranchStatement}.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected static void assertBlockCompletions(IExecutionBranchStatement expected, IExecutionBranchStatement current) throws ProofInputException {
+      ImmutableList<IExecutionNode<?>> expectedEntries = expected.getBlockCompletions();
+      ImmutableList<IExecutionNode<?>> currentEntries = current.getBlockCompletions();
+      if (expectedEntries != null) {
+         assertNotNull("Block completions of \"" + current + "\" should not be null.", currentEntries);
+         assertEquals("Node: " + expected, expectedEntries.size(), currentEntries.size());
+         Iterator<IExecutionNode<?>> expectedIter = expectedEntries.iterator();
+         Iterator<IExecutionNode<?>> currentIter = currentEntries.iterator();
+         while (expectedIter.hasNext() && currentIter.hasNext()) {
+            assertExecutionNode(expectedIter.next(), currentIter.next(), false, false, false, false, false);
+         }
+         assertFalse(expectedIter.hasNext());
+         assertFalse(currentIter.hasNext());
+      }
+      else{
+         assertTrue("Block completion entries of \"" + current + "\" is \"" + currentEntries + "\" but should be null or empty.", currentEntries == null || currentEntries.isEmpty());
       }
    }
 

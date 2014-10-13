@@ -79,6 +79,11 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
     * The {@link KeYMethodCall} which is now returned.
     */
    private final KeYMethodCall methodCall;
+   
+   /**
+    * The conditions under which a group ending in this node starts.
+    */
+   private SEDMemoryBranchCondition[] groupStartConditions;
 
    /**
     * Constructor.
@@ -420,5 +425,18 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
    @Override
    public void setParent(ISEDDebugNode parent) {
       super.setParent(parent);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public SEDMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
+      synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+         if (groupStartConditions == null) {
+            groupStartConditions = KeYModelUtil.createCompletedBlocksConditions(this);
+         }
+         return groupStartConditions;
+      }
    }
 }

@@ -109,7 +109,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement> ext
    }
 
    /**
-    * Computes the path condition lazily when {@link #getMethodReturnCondition()}
+    * Computes the method return condition lazily when {@link #getMethodReturnCondition()}
     * or {@link #getFormatedMethodReturnCondition()} is called the first time.
     * @throws ProofInputException Occurred Exception
     */

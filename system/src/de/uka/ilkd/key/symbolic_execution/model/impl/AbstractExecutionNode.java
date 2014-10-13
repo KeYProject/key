@@ -13,12 +13,16 @@
 
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -26,12 +30,14 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeSymbolicLayoutExtractor;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * Provides a basic implementation of {@link IExecutionNode}.
@@ -72,6 +78,21 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
     * The {@link PosInOccurrence} of the modality or its updates.
     */
    private PosInOccurrence modalityPIO;
+   
+   /**
+    * The up to know discovered completed {@link IExecutionNode}s.
+    */
+   private ImmutableList<IExecutionNode<?>> completedBlocks = ImmutableSLList.nil();
+   
+   /**
+    * The already computed block completion conditions.
+    */
+   private final Map<IExecutionNode<?>, Term> blockCompletionConditions = new HashMap<IExecutionNode<?>, Term>();
+
+   /**
+    * The already computed human readable block completion conditions.
+    */
+   private final Map<IExecutionNode<?>, String> formatedBlockCompletionConditions = new HashMap<IExecutionNode<?>, String>();
    
    /**
     * Constructor.
@@ -332,5 +353,89 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
       return term.op() == UpdateApplication.UPDATE_APPLICATION ? 
              pio : 
              originalPio;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ImmutableList<IExecutionNode<?>> getCompletedBlocks() throws ProofInputException {
+      return completedBlocks;
+   }
+   
+   /**
+    * Registers the given {@link IExecutionNode}.
+    * @param completedBlock The {@link IExecutionNode} to register.
+    */
+   public void addCompletedBlock(IExecutionNode<?> completedBlock) {
+      if (completedBlock != null && !completedBlocks.contains(completedBlock)) {
+         if (completedBlock instanceof ExecutionBranchStatement) {
+            ((ExecutionBranchStatement) completedBlock).addBlockCompletion(this);
+         }
+         else {
+            throw new IllegalArgumentException("Unsupported completed block: " + completedBlock);
+         }
+         completedBlocks = completedBlocks.append(completedBlock);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Term getBlockCompletionCondition(IExecutionNode<?> completedNode) throws ProofInputException {
+      Term result = blockCompletionConditions.get(completedNode);
+      if (result == null) {
+         result = (Term) lazyComputeMethodReturnCondition(completedNode, false);
+      }
+      return result;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getFormatedBlockCompletionCondition(IExecutionNode<?> completedNode) throws ProofInputException {
+      String result = formatedBlockCompletionConditions.get(completedNode);
+      if (result == null) {
+         result = (String) lazyComputeMethodReturnCondition(completedNode, true);
+      }
+      return result;
+   }
+
+   /**
+    * Computes the condition lazily when {@link #getBlockCompletionCondition(IExecutionNode)}
+    * or {@link #getFormatedBlockCompletionCondition(IExecutionNode)} is called the first time.
+    * @param completedNode The completed {@link IExecutionNode} for which the condition is requested.
+    * @param returnFormatedCondition {@code true} formated condition is returned, {@code false} {@link Term} is returned.
+    * @throws ProofInputException Occurred Exception
+    */
+   protected Object lazyComputeMethodReturnCondition(IExecutionNode<?> completedNode, boolean returnFormatedCondition) throws ProofInputException {
+      if (!isDisposed() && completedBlocks.contains(completedNode)) {
+         final Services services = getServices();
+         // Collect branch conditions
+         List<Term> bcs = new LinkedList<Term>();
+         AbstractExecutionNode<?> parent = getParent();
+         while (parent != null && parent != completedNode) {
+            if (parent instanceof IExecutionBranchCondition) {
+               bcs.add(((IExecutionBranchCondition)parent).getBranchCondition());
+            }
+            parent = parent.getParent();
+         }
+         // Add current branch condition to path
+         Term condition = services.getTermBuilder().and(bcs);
+         // Simplify path condition
+         condition = SymbolicExecutionUtil.simplify(getProof(), condition);
+         condition = SymbolicExecutionUtil.improveReadability(condition, services);
+         // Format path condition
+         String formatedCondition = formatTerm(condition, services);
+         // Update maps
+         blockCompletionConditions.put(completedNode, condition);
+         formatedBlockCompletionConditions.put(completedNode, formatedCondition);
+         return returnFormatedCondition ? formatedCondition : condition;
+      }
+      else {
+         return null;
+      }
    }
 }

@@ -51,6 +51,7 @@ import org.key_project.sed.core.model.ISEDValue;
 import org.key_project.sed.core.model.ISEDVariable;
 import org.key_project.sed.core.model.impl.AbstractSEDBaseMethodReturn;
 import org.key_project.sed.core.model.memory.ISEDMemoryDebugNode;
+import org.key_project.sed.core.model.memory.ISEDMemoryGroupable;
 import org.key_project.sed.core.model.memory.ISEDMemoryStackFrameCompatibleDebugNode;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchStatement;
@@ -223,6 +224,20 @@ public class SEDXMLReader {
                   entry.getKey().addChild((ISEDDebugNode)element);
                }
             }
+            // Inject group end references
+            Set<Entry<ISEDMemoryGroupable, List<GroupEndReference>>> groupEndReferences = handler.getGroupEndReferences().entrySet();
+            for (Entry<ISEDMemoryGroupable, List<GroupEndReference>> entry : groupEndReferences) {
+               for (GroupEndReference references : entry.getValue()) {
+                  ISEDDebugElement element = handler.getElementById(references.getId());
+                  if (element == null) {
+                     throw new SAXException("Referenced node with ID \"" + references.getId() + "\" is not available in model.");
+                  }
+                  if (!(element instanceof ISEDBranchCondition)) {
+                     throw new SAXException("Referenced node with ID \"" + references.getId() + "\" refers to wrong model object \"" + element + "\".");
+                  }
+                  entry.getKey().addGroupEndCondition((ISEDBranchCondition)element);
+               }
+            }
             // Inject method return conditions
             Set<Entry<AbstractSEDBaseMethodReturn, String>> returnConditions = handler.getMethodReturnConditionReferences().entrySet();
             for (Entry<AbstractSEDBaseMethodReturn, String> entry : returnConditions) {
@@ -314,6 +329,11 @@ public class SEDXMLReader {
       private final Map<ISEDMemoryDebugNode, List<ChildReference>> nodeChildReferences = new HashMap<ISEDMemoryDebugNode, List<ChildReference>>();
       
       /**
+       * Maps {@link ISEDMemoryGroupable} to its group end references.
+       */
+      private final Map<ISEDMemoryGroupable, List<GroupEndReference>> groupEndReferences = new HashMap<ISEDMemoryGroupable, List<GroupEndReference>>();
+      
+      /**
        * Maps {@link AbstractSEDBaseMethodReturn}s to their method return conditions.
        */
       private final Map<AbstractSEDBaseMethodReturn, String> methodReturnConditionReferences = new HashMap<AbstractSEDBaseMethodReturn, String>();
@@ -378,6 +398,14 @@ public class SEDXMLReader {
                }
                refs.add((ChildReference)obj);
             }
+            else if (obj instanceof GroupEndReference) {
+               List<GroupEndReference> refs = groupEndReferences.get(parent);
+               if (refs == null) {
+                  refs = new LinkedList<GroupEndReference>();
+                  groupEndReferences.put((ISEDMemoryGroupable) parent, refs);
+               }
+               refs.add((GroupEndReference)obj);
+            }
             else if (obj instanceof SEDMemoryDebugTarget) {
                target = (SEDMemoryDebugTarget)obj;
                result.add(target);
@@ -438,6 +466,9 @@ public class SEDXMLReader {
                if (isMethodReturnCondition(uri, localName, qName)) {
                   ((SEDMemoryMethodCall)parent).addMethodReturnCondition((ISEDBranchCondition)child);
                }
+               else if (isGroupStartCondition(uri, localName, qName)) {
+                  parent.addGroupStartCondition((ISEDBranchCondition)child);
+               }
                else {
                   if (parent != null) {
                      parent.addChild(child);
@@ -494,6 +525,9 @@ public class SEDXMLReader {
          else if (isChildReferences(uri, localName, qName)) {
             // Nothing to do
          }
+         else if (isGroupEndReferences(uri, localName, qName)) {
+            // Nothing to do
+         }
          else {
             if (!parentStack.isEmpty()) {
                parentStack.removeFirst();
@@ -546,11 +580,19 @@ public class SEDXMLReader {
       }
 
       /**
-       * Returns the nod child references.
+       * Returns the node child references.
        * @return The node child references.
        */
       public Map<ISEDMemoryDebugNode, List<ChildReference>> getNodeChildReferences() {
          return nodeChildReferences;
+      }
+
+      /**
+       * Returns the group end references.
+       * @return The group end references.
+       */
+      public Map<ISEDMemoryGroupable, List<GroupEndReference>> getGroupEndReferences() {
+         return groupEndReferences;
       }
 
       /**
@@ -649,6 +691,17 @@ public class SEDXMLReader {
    }
    
    /**
+    * Checks if the given tag name represents a {@link GroupEndReference}.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @return {@code true} represents an {@link GroupEndReference}, {@code false} represents something else.
+    */
+   protected boolean isGroupEndReferences(String uri, String localName, String qName) {
+      return SEDXMLWriter.TAG_GROUP_END_REFERENCE.equals(qName);
+   }
+   
+   /**
     * Checks if the given tag name represents an {@link ISEDBranchCondition}.
     * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
     * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
@@ -657,6 +710,17 @@ public class SEDXMLReader {
     */
    protected boolean isMethodReturnCondition(String uri, String localName, String qName) {
       return SEDXMLWriter.TAG_METHOD_RETURN_CONDITIONS.equals(qName);
+   }
+   
+   /**
+    * Checks if the given tag name represents an {@link ISEDBranchCondition}.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @return {@code true} represents an {@link ISEDBranchCondition}, {@code false} represents something else.
+    */
+   protected boolean isGroupStartCondition(String uri, String localName, String qName) {
+      return SEDXMLWriter.TAG_GROUP_START_CONDITION.equals(qName);
    }
    
    /**
@@ -702,11 +766,15 @@ public class SEDXMLReader {
       else if (SEDXMLWriter.TAG_CHILD_REFERENCE.equals(qName)) {
          return new ChildReference(getNodeIdRef(attributes));
       }
+      else if (SEDXMLWriter.TAG_GROUP_END_REFERENCE.equals(qName)) {
+         return new GroupEndReference(getNodeIdRef(attributes));
+      }
       else if (SEDXMLWriter.TAG_DEBUG_TARGET.equals(qName)) {
          return createDebugTarget(uri, localName, qName, attributes);
       }
       else if (SEDXMLWriter.TAG_BRANCH_CONDITION.equals(qName) ||
-               SEDXMLWriter.TAG_METHOD_RETURN_CONDITIONS.equals(qName)) {
+               SEDXMLWriter.TAG_METHOD_RETURN_CONDITIONS.equals(qName) ||
+               SEDXMLWriter.TAG_GROUP_START_CONDITION.equals(qName)) {
          return createBranchCondition(target, parent, thread, uri, localName, qName, attributes);
       }
       else if (SEDXMLWriter.TAG_BRANCH_STATEMENT.equals(qName)) {
@@ -1475,6 +1543,33 @@ public class SEDXMLReader {
        * @param id The target ID.
        */
       public ChildReference(String id) {
+         this.id = id;
+      }
+
+      /**
+       * Returns the target ID.
+       * @return The target ID.
+       */
+      public String getId() {
+         return id;
+      }
+   }
+
+   /**
+    * Represents temporary a group end reference.
+    * @author Martin Hentschel
+    */
+   protected static class GroupEndReference {
+      /**
+       * The target ID.
+       */
+      private final String id;
+
+      /**
+       * Constructor.
+       * @param id The target ID.
+       */
+      public GroupEndReference(String id) {
          this.id = id;
       }
 

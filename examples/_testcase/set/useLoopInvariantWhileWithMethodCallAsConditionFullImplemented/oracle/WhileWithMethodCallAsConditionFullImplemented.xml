@@ -54,7 +54,9 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                                     </statement>
                                  </statement>
                               </methodReturn>
+                              <completedBlockEntry path="/0/0/0/0/0/0/0/0" conditionString="true"/>
                            </statement>
+                           <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0"/>
                         </branchStatement>
                         <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0"/>
                      </methodCall>
@@ -92,8 +94,10 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
 }\] (and(equals(b_3,TRUE),and(geq(i,Z(0(#))),and(geq(length(array),i),equals(result_1,i))))))))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                                     </termination>
                                  </exceptionalMethodReturn>
+                                 <completedBlockEntry path="/0/0/0/0/0/1/0/0" conditionString="true"/>
                               </exceptionalMethodReturn>
                            </statement>
+                           <blockCompletionEntry path="/0/0/0/0/0/1/0/0/0/0"/>
                         </branchStatement>
                         <methodReturnEntry path="/0/0/0/0/0/1/0/0/0/0"/>
                      </methodCall>

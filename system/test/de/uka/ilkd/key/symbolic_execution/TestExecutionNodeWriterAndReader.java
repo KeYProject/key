@@ -190,6 +190,8 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       bnVar2.addValue(bnVar2Value);
       KeYlessLoopStatement ln = new KeYlessLoopStatement(root, "ln", "pc6", true);
       root.addChild(ln);
+      ln.addCompletedBlock(bn, "My Block Completion Condition!");
+      bn.addBlockCompletion(ln);
       KeYlessLoopCondition lc = new KeYlessLoopCondition(ln, "lc", "pc7", false);
       ln.addChild(lc);
       KeYlessMethodCall mc = new KeYlessMethodCall(ln, "mc", "pc8", false);

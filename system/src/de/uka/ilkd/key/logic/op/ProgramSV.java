@@ -106,6 +106,11 @@ public final class ProgramSV extends AbstractSV
     public SourceElement getFirstElement(){
 	return this;
     }
+
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+       return getFirstElement();
+    }
     
     
     @Override
