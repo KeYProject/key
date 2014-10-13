@@ -224,6 +224,8 @@ public class DefaultProblemLoader {
                                +":"+mte.line+")";
                throw new ProblemLoaderException(this, msg, mte);
                // TODO other ANTLR exceptions
+           } else if (c0 instanceof ProblemLoaderException) {
+               throw (ProblemLoaderException)c0;
            } else {
                throw new ProblemLoaderException(this, "Loading proof input failed", pie);
            }
