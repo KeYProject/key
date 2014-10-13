@@ -21,8 +21,7 @@ import java.io.IOException;
 public class TestTermParserHeap extends AbstractTestTermParser {
 
     private static final String javaPath = System.getProperty("key.home")
-            + File.separator + "system"
-            + File.separator + "proofExamples"
+            + File.separator + "examples"
             + File.separator + "_testcase"
             + File.separator + "termParser"
             + File.separator + "parserTest.key";
