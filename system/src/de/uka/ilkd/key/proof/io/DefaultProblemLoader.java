@@ -23,6 +23,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Properties;
+import org.antlr.runtime.MismatchedTokenException;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -70,506 +71,527 @@ import de.uka.ilkd.key.util.ExceptionHandlerException;
  * @author Martin Hentschel
  */
 public class DefaultProblemLoader {
-   /**
-    * The file or folder to load.
-    */
-   private final File file;
+    /**
+     * The file or folder to load.
+     */
+    private final File file;
 
-   /**
-    * The optional class path entries to use.
-    */
-   private final List<File> classPath;
+    /**
+     * The optional class path entries to use.
+     */
+    private final List<File> classPath;
 
-   /**
-    * An optional boot class path.
-    */
-   private final File bootClassPath;
+    /**
+     * An optional boot class path.
+     */
+    private final File bootClassPath;
 
-   /**
-    * The {@link KeYMediator} to use.
-    */
-   private final KeYMediator mediator;
+    /**
+     * The {@link KeYMediator} to use.
+     */
+    private final KeYMediator mediator;
 
-   /**
-    * The {@link Profile} to use for new {@link Proof}s.
-    */
-   private final Profile profileOfNewProofs;
-   
-   /**
-    * {@code true} to call {@link UserInterface#selectProofObligation(InitConfig)}
-    * if no {@link Proof} is defined by the loaded proof or 
-    * {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
-    */
-   private final boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
-   
-   /**
-    * Some optional additional {@link Properties} for the PO.
-    */
-   private final Properties poPropertiesToForce;
+    /**
+     * The {@link Profile} to use for new {@link Proof}s.
+     */
+    private final Profile profileOfNewProofs;
 
-   /**
-    * The instantiated {@link EnvInput} which describes the file to load.
-    */
-   private EnvInput envInput;
+    /**
+     * {@code true} to call {@link UserInterface#selectProofObligation(InitConfig)}
+     * if no {@link Proof} is defined by the loaded proof or 
+     * {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
+     */
+    private final boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
 
-   /**
-    * The instantiated {@link ProblemInitializer} used during the loading process.
-    */
-   private ProblemInitializer problemInitializer;
+    /**
+     * Some optional additional {@link Properties} for the PO.
+     */
+    private final Properties poPropertiesToForce;
 
-   /**
-    * The instantiated {@link InitConfig} which provides access to the loaded source elements and specifications.
-    */
-   private InitConfig initConfig;
+    /**
+     * The instantiated {@link EnvInput} which describes the file to load.
+     */
+    private EnvInput envInput;
 
-   /**
-    * The instantiate proof or {@code null} if no proof was instantiated during loading process.
-    */
-   private Proof proof;
+    /**
+     * The instantiated {@link ProblemInitializer} used during the loading process.
+     */
+    private ProblemInitializer problemInitializer;
 
-   private static String INDEX_FILE = "automaticInfFlow.txt";
+    /**
+     * The instantiated {@link InitConfig} which provides access to the loaded source elements and specifications.
+     */
+    private InitConfig initConfig;
 
-   private static String IF_INDEX_FILE = "automaticMacroInfFlow.txt";
+    /**
+     * The instantiate proof or {@code null} if no proof was instantiated during loading process.
+     */
+    private Proof proof;
 
-   /**
-    * Constructor.
-    * @param file The file or folder to load.
-    * @param classPath The optional class path entries to use.
-    * @param bootClassPath An optional boot class path.
-    * @param profileOfNewProofs The {@link Profile} to use for new {@link Proof}s.
-    * @param mediator The {@link KeYMediator} to use.
-    * @param askUiToSelectAProofObligationIfNotDefinedByLoadedFile {@code true} to call {@link UserInterface#selectProofObligation(InitConfig)} if no {@link Proof} is defined by the loaded proof or {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
-    */
-   public DefaultProblemLoader(File file, 
-                               List<File> classPath, 
-                               File bootClassPath,
-                               Profile profileOfNewProofs, 
-                               KeYMediator mediator,
-                               boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
-                               Properties poPropertiesToForce) {
-      assert mediator != null;
-      this.file = file;
-      this.classPath = classPath;
-      this.bootClassPath = bootClassPath;
-      this.mediator = mediator;
-      this.profileOfNewProofs = profileOfNewProofs != null ? profileOfNewProofs : AbstractProfile.getDefaultProfile();
-      this.askUiToSelectAProofObligationIfNotDefinedByLoadedFile = askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
-      this.poPropertiesToForce = poPropertiesToForce;
-   }
+    private static String INDEX_FILE = "automaticInfFlow.txt";
 
-   /**
-    * Executes the loading process and tries to instantiate a proof
-    * and to re-apply rules on it if possible.
-    * @throws ProofInputException Occurred Exception.
-    * @throws IOException Occurred Exception.
-    */
-   public ProblemLoaderException load() throws ProblemLoaderException {
-       // TODO: returns AND throws exceptions?
-       try {
-           // Read environment
-           boolean oneStepSimplifier =
-                   ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
-           ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
-           envInput = createEnvInput();
-           problemInitializer = createProblemInitializer();
-           initConfig = createInitConfig();
-           // Read proof obligation settings
-           LoadedPOContainer poContainer = createProofObligationContainer();
-           try {
-               if (poContainer == null) {
-                   if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
-                      if (mediator.getUI().selectProofObligation(initConfig)) {
-                         return null;
-                      } else {
-                         return new ProblemLoaderException(this, "Aborted.");
-                      }
-                   }
-                   else {
-                      return null; // Do not instantiate any proof but allow the user of the DefaultProblemLoader to access the loaded InitConfig.
-                   }
-               }
-               // Create proof and apply rules again if possible
-               proof = createProof(poContainer);
-               if (proof != null) {
-                   replayProof(proof);
-               }
-               // this message is propagated to the top level in console mode
-               return null; // Everything fine
-         }         
-         finally {
-               ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
-                                   .setOneStepSimplification(oneStepSimplifier);
-               getMediator().resetNrGoalsClosedByHeuristics();
-               if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
-                   ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
-               }
-           }
-       }
-       catch (ProblemLoaderException e) {
-           throw e;
-       }
-       catch (ProofInputException pie) {
-           // try to resolve error message
-           Throwable c0 = pie.getCause();
-           if (c0 instanceof ExceptionHandlerException) {
-               c0 = c0.getCause();    
-           }
-           if (c0 instanceof org.antlr.runtime.MissingTokenException) {
-               final org.antlr.runtime.MissingTokenException mte = (org.antlr.runtime.MissingTokenException) c0;
-               final org.antlr.runtime.Token occurrence = mte.token;
-               // TODO: other commonly missed tokens
-               final String token = mte.expecting == KeYLexer.SEMI? "semicolon": "token id "+mte.expecting;
-               final String msg = "Syntax error: missing "+token+" at "+
-                               occurrence.getText()+" statement ("+mte.input.getSourceName()
-                               +":"+mte.line+")";
-               throw new ProblemLoaderException(this, msg, mte);
-               // TODO other ANTLR exceptions
-           } else if (c0 instanceof ProblemLoaderException) {
-               throw (ProblemLoaderException)c0;
-           } else {
-               throw new ProblemLoaderException(this, "Loading proof input failed", pie);
-           }
-       }
-       catch (Exception e) { // TODO give more specific exception message
-           throw new ProblemLoaderException(this, e);
-       }
-   }
+    private static String IF_INDEX_FILE = "automaticMacroInfFlow.txt";
 
-   private File chooseFile(ContractPO po) {
-       final String fName;
-       if (po instanceof InfFlowPO) {
-           fName = IF_INDEX_FILE;
-       } else {
-           fName = INDEX_FILE;
-       }
-       return new File("examples/index/", fName);
-   }
+    /**
+     * Constructor.
+     * @param file The file or folder to load.
+     * @param classPath The optional class path entries to use.
+     * @param bootClassPath An optional boot class path.
+     * @param profileOfNewProofs The {@link Profile} to use for new {@link Proof}s.
+     * @param mediator The {@link KeYMediator} to use.
+     * @param askUiToSelectAProofObligationIfNotDefinedByLoadedFile {@code true} to call {@link UserInterface#selectProofObligation(InitConfig)} if no {@link Proof} is defined by the loaded proof or {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
+     */
+    public DefaultProblemLoader(File file, 
+                    List<File> classPath, 
+                    File bootClassPath,
+                    Profile profileOfNewProofs, 
+                    KeYMediator mediator,
+                    boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
+                    Properties poPropertiesToForce) {
+        assert mediator != null;
+        this.file = file;
+        this.classPath = classPath;
+        this.bootClassPath = bootClassPath;
+        this.mediator = mediator;
+        this.profileOfNewProofs = profileOfNewProofs != null ? profileOfNewProofs : AbstractProfile.getDefaultProfile();
+        this.askUiToSelectAProofObligationIfNotDefinedByLoadedFile = askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
+        this.poPropertiesToForce = poPropertiesToForce;
+    }
 
-   private void writeToFile(String path, File file) {
-       String examplesPath = "examples/";
-       boolean inExampleDir = 0 <= path.indexOf(examplesPath);
-       String prefix =
-               file.getName().endsWith(IF_INDEX_FILE) && path.contains("insecure") ?
-                       "notprovable: " : "provable: ";
-       path = "./" +
-               (inExampleDir ?
-                       path.substring(path.indexOf(examplesPath) + examplesPath.length()) : path);
-       try {
-           PrintWriter w = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
-           w.println(prefix + path);
-           w.close();
-       } catch (IOException e) {
-           e.printStackTrace();
-       }
-   }
+    /**
+     * Executes the loading process and tries to instantiate a proof
+     * and to re-apply rules on it if possible.
+     * @throws ProofInputException Occurred Exception.
+     * @throws IOException Occurred Exception.
+     */
+    public ProblemLoaderException load() throws ProblemLoaderException {
+        // TODO: returns AND throws exceptions?
+        try {
+            // Read environment
+            boolean oneStepSimplifier =
+                            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
+            envInput = createEnvInput();
+            problemInitializer = createProblemInitializer();
+            initConfig = createInitConfig();
+            // Read proof obligation settings
+            LoadedPOContainer poContainer = createProofObligationContainer();
+            try {
+                if (poContainer == null) {
+                    if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
+                        if (mediator.getUI().selectProofObligation(initConfig)) {
+                            return null;
+                        } else {
+                            return new ProblemLoaderException(this, "Aborted.");
+                        }
+                    }
+                    else {
+                        return null; // Do not instantiate any proof but allow the user of the DefaultProblemLoader to access the loaded InitConfig.
+                    }
+                }
+                // Create proof and apply rules again if possible
+                proof = createProof(poContainer);
+                if (proof != null) {
+                    replayProof(proof);
+                }
+                // this message is propagated to the top level in console mode
+                return null; // Everything fine
+            }         
+            finally {
+                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                .setOneStepSimplification(oneStepSimplifier);
+                getMediator().resetNrGoalsClosedByHeuristics();
+                if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
+                    ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
+                }
+            }
+        }
+        catch (Exception e) { // TODO give more specific exception message
+            throw recoverParserErrorMessage(e);
+        }
+    }
+    
+    /**
+     * Find first 'non-wrapper' exception type in cause chain.
+     */
+    private Throwable unwrap(Throwable e) {
+        while (e instanceof ExceptionHandlerException
+               || e instanceof ProblemLoaderException)
+            e = e.getCause();
+        return e;
+    }
 
-   private ImmutableSet<String> getFileNames(File file) {
-       ImmutableSet<String> result = DefaultImmutableSet.<String>nil();
-       boolean foundValidJavaFiles = false;
-       if (file.isDirectory()) {
-           for (File f: file.listFiles()) {
-               if (!f.isDirectory() && f.getName().endsWith(".java")) {
-                   foundValidJavaFiles = true;
-                   result = result.add(f.getName().substring(0, f.getName().indexOf(".")));
-               }
-           }
-       } else if (file.getName().endsWith(".java")) {
-           foundValidJavaFiles = true;
-           result = result.add(getFile().getName()
-                   .substring(0, getFile().getName().indexOf(".")));
-       }
-       if (!foundValidJavaFiles) {
-           throw new IllegalArgumentException(
-                   "Specified file is no valid directory or java-file!");
-       }
-       return result;
-   }
+    /**
+     * Tries to recover parser errors and make them human-readable,
+     * rewrap them into ProblemLoaderExceptions.
+     */
+    private ProblemLoaderException recoverParserErrorMessage(Exception e) {
+        // try to resolve error message
+        final Throwable c0 = unwrap(e);
+        if (c0 instanceof org.antlr.runtime.RecognitionException) {
+            final org.antlr.runtime.RecognitionException re = (org.antlr.runtime.RecognitionException) c0;
+            final org.antlr.runtime.Token occurrence = re.token; // TODO may be null
+            final String[] tokens = (new KeYLexer()).getTokenNames(); // XXX
+            if (c0 instanceof org.antlr.runtime.MismatchedTokenException) {
+                final org.antlr.runtime.MismatchedTokenException mte = (MismatchedTokenException) c0;
+                final String expected = tokens[mte.expecting];
+                final String found = mte.token.getText();
+                final String msg = "Syntax error: expected "+expected
+                                +", but found "+found+" ("+mte.input.getSourceName()
+                                +":"+mte.line+")";
+                return new ProblemLoaderException(this, msg, mte);
+            } else if (c0 instanceof org.antlr.runtime.MissingTokenException) {
+                final org.antlr.runtime.MissingTokenException mte = (org.antlr.runtime.MissingTokenException) c0;
+                // TODO: other commonly missed tokens
+                final String token = mte.expecting == KeYLexer.SEMI? "semicolon": "token id "+mte.expecting;
+                final String msg = "Syntax error: missing "+token+" at "+
+                                occurrence.getText()+" statement ("+mte.input.getSourceName()
+                                +":"+mte.line+")";
+                return new ProblemLoaderException(this, msg, mte);
+                // TODO other ANTLR exceptions
+            }
+        } else if (c0 instanceof ProblemLoaderException) {
+            return (ProblemLoaderException)c0;
+        }
+        // default
+        return new ProblemLoaderException(this, "Loading proof input failed", e);
+    }
 
-   public Throwable saveAll() {
-       ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
-       try {
-           envInput = createEnvInput();
-           problemInitializer = createProblemInitializer();
-           initConfig = createInitConfig();
-           final SpecificationRepository specRepos =
-                   initConfig.getServices().getSpecificationRepository();
-           final UserInterface ui = getMediator().getUI();
-           final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
-           ImmutableSet<String> fileNames = getFileNames(getFile());
-           for (KeYJavaType kjt: javaInfo.getAllKeYJavaTypes()) {
-               if (!fileNames.contains(kjt.getName())) {
-                   // skip
-               } else {
-                   for (IObserverFunction target: specRepos.getContractTargets(kjt)) {
-                       for (Contract c: specRepos.getContracts(kjt, target)) {
-                           final ContractPO po = c.createProofObl(initConfig);
-                           po.readProblem();
-                           for (Proof p: po.getPO().getProofs()) {
-                               p.removeInfFlowProofSymbols();
-                               p.setEnv(new ProofEnvironment(initConfig));
-                               ui.getMediator().getSelectionModel().setProof(p);
-                               specRepos.registerProof(po, p);
-                               final File poFile = ui.saveProof(p, ".key");
-                               final String path = poFile.getPath();
-                               writeToFile(path, chooseFile(po));
-                           }
-                       }
-                   }
-               }
-           }
-       } catch (Throwable e) {
-           return new ProblemLoaderException(this, e);
-       }
-       return null;
-   }
+    private File chooseFile(ContractPO po) {
+        final String fName;
+        if (po instanceof InfFlowPO) {
+            fName = IF_INDEX_FILE;
+        } else {
+            fName = INDEX_FILE;
+        }
+        return new File("examples/index/", fName);
+    }
 
-   /**
-    * Instantiates the {@link EnvInput} which represents the file to load.
-    * @return The created {@link EnvInput}.
-    * @throws IOException Occurred Exception.
-    */
-   protected EnvInput createEnvInput() throws IOException {
+    private void writeToFile(String path, File file) {
+        String examplesPath = "examples/";
+        boolean inExampleDir = 0 <= path.indexOf(examplesPath);
+        String prefix =
+                        file.getName().endsWith(IF_INDEX_FILE) && path.contains("insecure") ?
+                                        "notprovable: " : "provable: ";
+        path = "./" +
+                        (inExampleDir ?
+                                        path.substring(path.indexOf(examplesPath) + examplesPath.length()) : path);
+        try {
+            PrintWriter w = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
+            w.println(prefix + path);
+            w.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-      final String filename = file.getName();
+    private ImmutableSet<String> getFileNames(File file) {
+        ImmutableSet<String> result = DefaultImmutableSet.<String>nil();
+        boolean foundValidJavaFiles = false;
+        if (file.isDirectory()) {
+            for (File f: file.listFiles()) {
+                if (!f.isDirectory() && f.getName().endsWith(".java")) {
+                    foundValidJavaFiles = true;
+                    result = result.add(f.getName().substring(0, f.getName().indexOf(".")));
+                }
+            }
+        } else if (file.getName().endsWith(".java")) {
+            foundValidJavaFiles = true;
+            result = result.add(getFile().getName()
+                            .substring(0, getFile().getName().indexOf(".")));
+        }
+        if (!foundValidJavaFiles) {
+            throw new IllegalArgumentException(
+                            "Specified file is no valid directory or java-file!");
+        }
+        return result;
+    }
 
-      if (filename.endsWith(".java")) {
-         // java file, probably enriched by specifications
-         if (file.getParentFile() == null) {
-            return new SLEnvInput(".", classPath, bootClassPath, profileOfNewProofs);
-         }
-         else {
-            return new SLEnvInput(file.getParentFile().getAbsolutePath(),
-                  classPath, bootClassPath, profileOfNewProofs);
-         }
-      }
-      else if (filename.endsWith(".key") || filename.endsWith(".proof")) {
-         // KeY problem specification or saved proof
-         return new KeYUserProblemFile(filename, file, mediator.getUI(), profileOfNewProofs);
+    public Throwable saveAll() {
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
+        try {
+            envInput = createEnvInput();
+            problemInitializer = createProblemInitializer();
+            initConfig = createInitConfig();
+            final SpecificationRepository specRepos =
+                            initConfig.getServices().getSpecificationRepository();
+            final UserInterface ui = getMediator().getUI();
+            final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
+            ImmutableSet<String> fileNames = getFileNames(getFile());
+            for (KeYJavaType kjt: javaInfo.getAllKeYJavaTypes()) {
+                if (!fileNames.contains(kjt.getName())) {
+                    // skip
+                } else {
+                    for (IObserverFunction target: specRepos.getContractTargets(kjt)) {
+                        for (Contract c: specRepos.getContracts(kjt, target)) {
+                            final ContractPO po = c.createProofObl(initConfig);
+                            po.readProblem();
+                            for (Proof p: po.getPO().getProofs()) {
+                                p.removeInfFlowProofSymbols();
+                                p.setEnv(new ProofEnvironment(initConfig));
+                                ui.getMediator().getSelectionModel().setProof(p);
+                                specRepos.registerProof(po, p);
+                                final File poFile = ui.saveProof(p, ".key");
+                                final String path = poFile.getPath();
+                                writeToFile(path, chooseFile(po));
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Throwable e) {
+            return new ProblemLoaderException(this, e);
+        }
+        return null;
+    }
 
-      }
-      else if (file.isDirectory()) {
-         // directory containing java sources, probably enriched
-         // by specifications
-         return new SLEnvInput(file.getPath(), classPath, bootClassPath, profileOfNewProofs);
-      }
-      else {
-         if (filename.lastIndexOf('.') != -1) {
-            throw new IllegalArgumentException("Unsupported file extension \'"
-                  + filename.substring(filename.lastIndexOf('.'))
-                  + "\' of read-in file " + filename
-                  + ". Allowed extensions are: .key, .proof, .java or "
-                  + "complete directories.");
-         }
-         else {
-            throw new FileNotFoundException("File or directory\n\t " + filename
-                  + "\n not found.");
-         }
-      }
-   }
+    /**
+     * Instantiates the {@link EnvInput} which represents the file to load.
+     * @return The created {@link EnvInput}.
+     * @throws IOException Occurred Exception.
+     */
+    protected EnvInput createEnvInput() throws IOException {
 
-   /**
-    * Instantiates the {@link ProblemInitializer} to use.
-    * @param registerProof Register loaded {@link Proof}
-    * @return The {@link ProblemInitializer} to use.
-    */
-   protected ProblemInitializer createProblemInitializer() {
-      UserInterface ui = mediator.getUI();
-      return new ProblemInitializer(ui,
-                                    new Services(envInput.getProfile(), 
-                                          mediator.getExceptionHandler()),
-                                    ui);
-   }
+        final String filename = file.getName();
 
-   /**
-    * Creates the {@link InitConfig}.
-    * @return The created {@link InitConfig}.
-    * @throws ProofInputException Occurred Exception.
-    */
-   protected InitConfig createInitConfig() throws ProofInputException {
-      return problemInitializer.prepare(envInput);
-   }
+        if (filename.endsWith(".java")) {
+            // java file, probably enriched by specifications
+            if (file.getParentFile() == null) {
+                return new SLEnvInput(".", classPath, bootClassPath, profileOfNewProofs);
+            }
+            else {
+                return new SLEnvInput(file.getParentFile().getAbsolutePath(),
+                                classPath, bootClassPath, profileOfNewProofs);
+            }
+        }
+        else if (filename.endsWith(".key") || filename.endsWith(".proof")) {
+            // KeY problem specification or saved proof
+            return new KeYUserProblemFile(filename, file, mediator.getUI(), profileOfNewProofs);
 
-   /**
-    * Creates a {@link LoadedPOContainer} if available which contains
-    * the {@link ProofOblInput} for which a {@link Proof} should be instantiated.
-    * @return The {@link LoadedPOContainer} or {@code null} if not available.
-    * @throws IOException Occurred Exception.
-    */
-   protected LoadedPOContainer createProofObligationContainer() throws IOException {
-      final String chooseContract;
-      final String proofObligation;
-      if (envInput instanceof KeYFile) {
-          KeYFile keyFile = (KeYFile)envInput;
-          chooseContract = keyFile.chooseContract();
-          proofObligation = keyFile.getProofObligation();
-      }
-      else {
-          chooseContract = null;
-          proofObligation = null;
-      }
-      // Instantiate proof obligation
-      if (envInput instanceof ProofOblInput && chooseContract == null && proofObligation == null) {
-          return new LoadedPOContainer((ProofOblInput)envInput);
-      }
-      else if (chooseContract != null && chooseContract.length() > 0) {
-          int proofNum = 0;
-          String baseContractName = null;
-          int ind = -1;
-          for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
-              ind = chooseContract.indexOf("." + tag);
-              if (ind > 0) {
-                  break;
-              }
-              proofNum++;
-          }
-          if (ind == -1) {
-              baseContractName = chooseContract;
-              proofNum = 0;
-          }
-          else {
-              baseContractName = chooseContract.substring(0, ind);
-          }
-          final Contract contract = initConfig.getServices().getSpecificationRepository().getContractByName(baseContractName);
-          if (contract == null) {
-              throw new RuntimeException("Contract not found: " + baseContractName);
-          }
-          else {
-              return new LoadedPOContainer(contract.createProofObl(initConfig), proofNum);
-          }
-      }
-      else if (proofObligation != null && proofObligation.length() > 0) {
-          // Load proof obligation settings
-          final Properties properties = new Properties();
-          properties.load(new ByteArrayInputStream(proofObligation.getBytes()));
-          properties.setProperty(IPersistablePO.PROPERTY_FILENAME, file.getAbsolutePath());
-          if (poPropertiesToForce != null) {
-              properties.putAll(poPropertiesToForce);
-           }
-          String poClass = properties.getProperty(IPersistablePO.PROPERTY_CLASS);
-          if (poClass == null || poClass.isEmpty()) {
-              throw new IOException("Proof obligation class property \"" + IPersistablePO.PROPERTY_CLASS + "\" is not defiend or empty.");
-          }
-          try {
-              // Try to instantiate proof obligation by calling static method: public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException
-              Class<?> poClassInstance = Class.forName(poClass);
-              Method loadMethod = poClassInstance.getMethod("loadFrom", InitConfig.class, Properties.class);
-              return (LoadedPOContainer)loadMethod.invoke(null, initConfig, properties);
-          }
-          catch (Exception e) {
-              throw new IOException("Can't call static factory method \"loadFrom\" on class \"" + poClass + "\".", e);
-          }
-      }
-      else {
-          return null;
-      }
-   }
+        }
+        else if (file.isDirectory()) {
+            // directory containing java sources, probably enriched
+            // by specifications
+            return new SLEnvInput(file.getPath(), classPath, bootClassPath, profileOfNewProofs);
+        }
+        else {
+            if (filename.lastIndexOf('.') != -1) {
+                throw new IllegalArgumentException("Unsupported file extension \'"
+                                + filename.substring(filename.lastIndexOf('.'))
+                                + "\' of read-in file " + filename
+                                + ". Allowed extensions are: .key, .proof, .java or "
+                                + "complete directories.");
+            }
+            else {
+                throw new FileNotFoundException("File or directory\n\t " + filename
+                                + "\n not found.");
+            }
+        }
+    }
 
-   /**
-    * Creates a {@link Proof} for the given {@link LoadedPOContainer} and
-    * tries to apply rules again.
-    * @param poContainer The {@link LoadedPOContainer} to instantiate a {@link Proof} for.
-    * @return The instantiated {@link Proof}.
-    * @throws ProofInputException Occurred Exception.
-    */
-   protected Proof createProof(LoadedPOContainer poContainer) throws ProofInputException {
-      ProofAggregate proofList = problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
-      
-      mediator.getUI().createProofEnvironmentAndRegisterProof(poContainer.getProofOblInput(), proofList, initConfig);
+    /**
+     * Instantiates the {@link ProblemInitializer} to use.
+     * @param registerProof Register loaded {@link Proof}
+     * @return The {@link ProblemInitializer} to use.
+     */
+    protected ProblemInitializer createProblemInitializer() {
+        UserInterface ui = mediator.getUI();
+        return new ProblemInitializer(ui,
+                        new Services(envInput.getProfile(), 
+                                        mediator.getExceptionHandler()),
+                                        ui);
+    }
 
-      return proofList.getProof(poContainer.getProofNum());
-   }
+    /**
+     * Creates the {@link InitConfig}.
+     * @return The created {@link InitConfig}.
+     * @throws ProofInputException Occurred Exception.
+     */
+    protected InitConfig createInitConfig() throws ProofInputException {
+        return problemInitializer.prepare(envInput);
+    }
 
-   protected void replayProof(Proof proof) throws ProofInputException {
-      mediator.setProof(proof);
+    /**
+     * Creates a {@link LoadedPOContainer} if available which contains
+     * the {@link ProofOblInput} for which a {@link Proof} should be instantiated.
+     * @return The {@link LoadedPOContainer} or {@code null} if not available.
+     * @throws IOException Occurred Exception.
+     */
+    protected LoadedPOContainer createProofObligationContainer() throws IOException {
+        final String chooseContract;
+        final String proofObligation;
+        if (envInput instanceof KeYFile) {
+            KeYFile keyFile = (KeYFile)envInput;
+            chooseContract = keyFile.chooseContract();
+            proofObligation = keyFile.getProofObligation();
+        }
+        else {
+            chooseContract = null;
+            proofObligation = null;
+        }
+        // Instantiate proof obligation
+        if (envInput instanceof ProofOblInput && chooseContract == null && proofObligation == null) {
+            return new LoadedPOContainer((ProofOblInput)envInput);
+        }
+        else if (chooseContract != null && chooseContract.length() > 0) {
+            int proofNum = 0;
+            String baseContractName = null;
+            int ind = -1;
+            for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
+                ind = chooseContract.indexOf("." + tag);
+                if (ind > 0) {
+                    break;
+                }
+                proofNum++;
+            }
+            if (ind == -1) {
+                baseContractName = chooseContract;
+                proofNum = 0;
+            }
+            else {
+                baseContractName = chooseContract.substring(0, ind);
+            }
+            final Contract contract = initConfig.getServices().getSpecificationRepository().getContractByName(baseContractName);
+            if (contract == null) {
+                throw new RuntimeException("Contract not found: " + baseContractName);
+            }
+            else {
+                return new LoadedPOContainer(contract.createProofObl(initConfig), proofNum);
+            }
+        }
+        else if (proofObligation != null && proofObligation.length() > 0) {
+            // Load proof obligation settings
+            final Properties properties = new Properties();
+            properties.load(new ByteArrayInputStream(proofObligation.getBytes()));
+            properties.setProperty(IPersistablePO.PROPERTY_FILENAME, file.getAbsolutePath());
+            if (poPropertiesToForce != null) {
+                properties.putAll(poPropertiesToForce);
+            }
+            String poClass = properties.getProperty(IPersistablePO.PROPERTY_CLASS);
+            if (poClass == null || poClass.isEmpty()) {
+                throw new IOException("Proof obligation class property \"" + IPersistablePO.PROPERTY_CLASS + "\" is not defiend or empty.");
+            }
+            try {
+                // Try to instantiate proof obligation by calling static method: public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException
+                Class<?> poClassInstance = Class.forName(poClass);
+                Method loadMethod = poClassInstance.getMethod("loadFrom", InitConfig.class, Properties.class);
+                return (LoadedPOContainer)loadMethod.invoke(null, initConfig, properties);
+            }
+            catch (Exception e) {
+                throw new IOException("Can't call static factory method \"loadFrom\" on class \"" + poClass + "\".", e);
+            }
+        }
+        else {
+            return null;
+        }
+    }
 
-      mediator.stopInterface(true); // first stop (above) is not enough
+    /**
+     * Creates a {@link Proof} for the given {@link LoadedPOContainer} and
+     * tries to apply rules again.
+     * @param poContainer The {@link LoadedPOContainer} to instantiate a {@link Proof} for.
+     * @return The instantiated {@link Proof}.
+     * @throws ProofInputException Occurred Exception.
+     */
+    protected Proof createProof(LoadedPOContainer poContainer) throws ProofInputException {
+        ProofAggregate proofList = problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
 
-      String status = "";
-      List<Throwable> errors = null;
-      if (envInput instanceof KeYUserProblemFile) {
-          DefaultProofFileParser parser = new DefaultProofFileParser(this, proof,
-                                                              mediator);
-         problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
-         status = parser.getStatus();
-         errors = parser.getErrors();
-      }
+        mediator.getUI().createProofEnvironmentAndRegisterProof(poContainer.getProofOblInput(), proofList, initConfig);
 
-      if ("".equals(status)) {
-          mediator.getUI().resetStatus(this);
-      } else {
-          mediator.getUI().reportStatus(this, status);
-          if (errors != null &&
-                  !errors.isEmpty()) {
-              throw new ProblemLoaderException(this,
-                      "Proof could only be loaded partially.\n" +
-                      "In summary " + errors.size() +
-                      " not loadable rule application(s) have been detected.\n" +
-                      "The first one:\n"+errors.get(0).getMessage(), errors.get(0));
-          }
-      }
-   }
+        return proofList.getProof(poContainer.getProofNum());
+    }
 
-   /**
-    * Returns the file or folder to load.
-    * @return The file or folder to load.
-    */
-   public File getFile() {
-      return file;
-   }
+    protected void replayProof(Proof proof) throws ProofInputException {
+        mediator.setProof(proof);
 
-   /**
-    * Returns the optional class path entries to use.
-    * @return The optional class path entries to use.
-    */
-   public List<File> getClassPath() {
-      return classPath;
-   }
+        mediator.stopInterface(true); // first stop (above) is not enough
 
-   /**
-    * Returns the optional boot class path.
-    * @return The optional boot class path.
-    */
-   public File getBootClassPath() {
-      return bootClassPath;
-   }
+        String status = "";
+        List<Throwable> errors = null;
+        if (envInput instanceof KeYUserProblemFile) {
+            DefaultProofFileParser parser = new DefaultProofFileParser(this, proof,
+                            mediator);
+            problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
+            status = parser.getStatus();
+            errors = parser.getErrors();
+        }
 
-   /**
-    * Returns the {@link KeYMediator} to use.
-    * @return The {@link KeYMediator} to use.
-    */
-   public KeYMediator getMediator() {
-      return mediator;
-   }
+        if ("".equals(status)) {
+            mediator.getUI().resetStatus(this);
+        } else {
+            mediator.getUI().reportStatus(this, status);
+            if (errors != null &&
+                            !errors.isEmpty()) {
+                throw new ProblemLoaderException(this,
+                                "Proof could only be loaded partially.\n" +
+                                                "In summary " + errors.size() +
+                                                " not loadable rule application(s) have been detected.\n" +
+                                                "The first one:\n"+errors.get(0).getMessage(), errors.get(0));
+            }
+        }
+    }
 
-   /**
-    * Returns the instantiated {@link EnvInput} which describes the file to load.
-    * @return The instantiated {@link EnvInput} which describes the file to load.
-    */
-   public EnvInput getEnvInput() {
-      return envInput;
-   }
+    /**
+     * Returns the file or folder to load.
+     * @return The file or folder to load.
+     */
+    public File getFile() {
+        return file;
+    }
 
-   /**
-    * Returns the instantiated {@link ProblemInitializer} used during the loading process.
-    * @return The instantiated {@link ProblemInitializer} used during the loading process.
-    */
-   public ProblemInitializer getProblemInitializer() {
-      return problemInitializer;
-   }
+    /**
+     * Returns the optional class path entries to use.
+     * @return The optional class path entries to use.
+     */
+    public List<File> getClassPath() {
+        return classPath;
+    }
 
-   /**
-    * Returns the instantiated {@link InitConfig} which provides access to the loaded source elements and specifications.
-    * @return The instantiated {@link InitConfig} which provides access to the loaded source elements and specifications.
-    */
-   public InitConfig getInitConfig() {
-      return initConfig;
-   }
+    /**
+     * Returns the optional boot class path.
+     * @return The optional boot class path.
+     */
+    public File getBootClassPath() {
+        return bootClassPath;
+    }
 
-   /**
-    * Returns the instantiate proof or {@code null} if no proof was instantiated during loading process.
-    * @return The instantiate proof or {@code null} if no proof was instantiated during loading process.
-    */
-   public Proof getProof() {
-      return proof;
-   }
+    /**
+     * Returns the {@link KeYMediator} to use.
+     * @return The {@link KeYMediator} to use.
+     */
+    public KeYMediator getMediator() {
+        return mediator;
+    }
+
+    /**
+     * Returns the instantiated {@link EnvInput} which describes the file to load.
+     * @return The instantiated {@link EnvInput} which describes the file to load.
+     */
+    public EnvInput getEnvInput() {
+        return envInput;
+    }
+
+    /**
+     * Returns the instantiated {@link ProblemInitializer} used during the loading process.
+     * @return The instantiated {@link ProblemInitializer} used during the loading process.
+     */
+    public ProblemInitializer getProblemInitializer() {
+        return problemInitializer;
+    }
+
+    /**
+     * Returns the instantiated {@link InitConfig} which provides access to the loaded source elements and specifications.
+     * @return The instantiated {@link InitConfig} which provides access to the loaded source elements and specifications.
+     */
+    public InitConfig getInitConfig() {
+        return initConfig;
+    }
+
+    /**
+     * Returns the instantiate proof or {@code null} if no proof was instantiated during loading process.
+     * @return The instantiate proof or {@code null} if no proof was instantiated during loading process.
+     */
+    public Proof getProof() {
+        return proof;
+    }
 }
