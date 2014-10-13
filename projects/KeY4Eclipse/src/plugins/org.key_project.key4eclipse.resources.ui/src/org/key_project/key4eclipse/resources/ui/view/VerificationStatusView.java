@@ -1079,18 +1079,20 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
          }
 
          private Color updateStatus(TypeInfo typeInfo, VerificationStatus status, IProgressMonitor monitor) throws Exception {
-            Color color = closedProofColor;
+            Color typeColor = closedProofColor;
             for (MethodInfo methodInfo : typeInfo.getMethods()) {
                SWTUtil.checkCanceled(monitor);
                status.numOfMethods++;
                if (methodInfo.countContracts() >= 1) {
                   status.numOfSpecifiedMethods++;
+                  Color methodColor = closedProofColor;
                   for (ContractInfo contractInfo : methodInfo.getContracts()) {
                      SWTUtil.checkCanceled(monitor);
                      Color contractColor = updateStatus(contractInfo, status);
-                     updateTreeItemColorThreadSave(methodInfo, contractColor);
-                     color = worstColor(color, contractColor);
+                     typeColor = worstColor(typeColor, contractColor);
+                     methodColor = worstColor(methodColor, contractColor);
                   }
+                  updateTreeItemColorThreadSave(methodInfo, methodColor);
                }
                else {
                   List<MethodInfo> list = status.unspecifiedMethods.get(typeInfo);
@@ -1100,7 +1102,7 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
                   }
                   list.add(methodInfo);
                   updateTreeItemColorThreadSave(methodInfo, unspecifiedColor);
-                  color = worstColor(color, unspecifiedColor);
+                  typeColor = worstColor(typeColor, unspecifiedColor);
                }
             }
             for (ObserverFunctionInfo observerFunctionInfo : typeInfo.getObserverFunctions()) {
@@ -1109,16 +1111,16 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
                   SWTUtil.checkCanceled(monitor);
                   Color contractColor = updateStatus(contractInfo, status);
                   updateTreeItemColorThreadSave(observerFunctionInfo, contractColor);
-                  color = worstColor(color, contractColor);
+                  typeColor = worstColor(typeColor, contractColor);
                }
             }
             for (TypeInfo internalTypeInfo : typeInfo.getTypes()) {
                SWTUtil.checkCanceled(monitor);
                Color typeRgb = updateStatus(internalTypeInfo, status, monitor);
-               color = worstColor(color, typeRgb);
+               typeColor = worstColor(typeColor, typeRgb);
             }
-            updateTreeItemColorThreadSave(typeInfo, color);
-            return color;
+            updateTreeItemColorThreadSave(typeInfo, typeColor);
+            return typeColor;
          }
 
          private Color updateStatus(ContractInfo contractInfo, VerificationStatus status) throws Exception {
