@@ -24,6 +24,7 @@ import java.util.Map;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
@@ -633,6 +634,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       appendCompletedBlocks(level + 1, node, sb);
+      appendBlockCompletions(level + 1, node, sb);
       appendEndTag(level, TAG_LOOP_STATEMENT, sb);
    }
 
@@ -1110,11 +1112,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
    /**
     * Appends the block completion entries to the given {@link StringBuffer}.
     * @param level The level of the children.
-    * @param node The {@link IExecutionBranchStatement} which provides the completed blocks.
+    * @param node The {@link IExecutionBlockStartNode} which provides the completed blocks.
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception
     */
-   protected void appendBlockCompletions(int level, IExecutionBranchStatement node, StringBuffer sb) throws ProofInputException {
+   protected void appendBlockCompletions(int level,  IExecutionBlockStartNode<?> node, StringBuffer sb) throws ProofInputException {
       ImmutableList<IExecutionNode<?>> blockCompletions = node.getBlockCompletions();
       if (blockCompletions != null) {
          for (IExecutionNode<?> blockCompletion : blockCompletions) {

@@ -63,6 +63,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
+import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
@@ -627,9 +628,10 @@ public class SymbolicExecutionTreeBuilder {
             if (completedBlocks != null) {
                for (Entry<Pair<Integer, ProgramElement>, ImmutableList<IExecutionNode<?>>> entry : completedBlocks.entrySet()) {
                   for (IExecutionNode<?> entryNode : entry.getValue()) {
-                     if (entryNode instanceof ExecutionBranchStatement &&
-                         entryNode != parentToAddTo) { // Ignore empty blocks
-                        ((ExecutionBranchStatement) entryNode).addBlockCompletion(parentToAddTo);
+                     if (entryNode != parentToAddTo) { // Ignore empty blocks
+                        if (entryNode instanceof AbstractExecutionBlockStartNode<?>) {
+                           ((AbstractExecutionBlockStartNode<?>) entryNode).addBlockCompletion(parentToAddTo);
+                        }
                      }
                   }
                }
@@ -788,6 +790,7 @@ public class SymbolicExecutionTreeBuilder {
                if (isNotInImplicitMethod(node)) {
                   if (SymbolicExecutionUtil.isFirstLoopIteration(node, node.getAppliedRuleApp(), statement)) {
                      result = new ExecutionLoopStatement(settings, mediator, node);
+                     addToBlockMap(node, result);
                   }
                }
             }

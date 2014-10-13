@@ -38,8 +38,10 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="fa
                            </statement>
                         </branchCondition>
                      </loopInvariant>
+                     <completedBlockEntry path="/0/0/0/0" conditionString="true"/>
                   </statement>
                </statement>
+               <blockCompletionEntry path="/0/0/0/0/0/0"/>
             </loopStatement>
          </statement>
       </statement>

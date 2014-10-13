@@ -19,6 +19,7 @@
                                                 </termination>
                                              </methodReturn>
                                           </statement>
+                                          <completedBlockEntry path="/0/0/0/0" conditionString="true"/>
                                        </loopCondition>
                                     </statement>
                                  </statement>
@@ -28,6 +29,7 @@
                      </loopCondition>
                   </statement>
                </statement>
+               <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
             </loopStatement>
          </statement>
       </statement>

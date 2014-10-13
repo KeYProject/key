@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.symbolic_execution.model;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchStatement;
@@ -32,10 +31,5 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchStatement;
  * @see SymbolicExecutionTreeBuilder
  * @see ExecutionBranchStatement
  */
-public interface IExecutionBranchStatement extends IExecutionNode<BranchStatement> {
-   /**
-    * Returns the up to now discovered {@link IExecutionNode}s.
-    * @return The up to now discovered {@link IExecutionNode}s.
-    */
-   public ImmutableList<IExecutionNode<?>> getBlockCompletions();
+public interface IExecutionBranchStatement extends IExecutionBlockStartNode<BranchStatement> {
 }

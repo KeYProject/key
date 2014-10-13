@@ -369,8 +369,8 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
     */
    public void addCompletedBlock(IExecutionNode<?> completedBlock) {
       if (completedBlock != null && !completedBlocks.contains(completedBlock)) {
-         if (completedBlock instanceof ExecutionBranchStatement) {
-            ((ExecutionBranchStatement) completedBlock).addBlockCompletion(this);
+         if (completedBlock instanceof AbstractExecutionBlockStartNode<?>) {
+            ((AbstractExecutionBlockStartNode<?>) completedBlock).addBlockCompletion(this);
          }
          else {
             throw new IllegalArgumentException("Unsupported completed block: " + completedBlock);

@@ -100,7 +100,9 @@ as result of ArrayAverage.average(array)&gt;" isReturnValueComputed="true" metho
                               </branchCondition>
                            </loopInvariant>
                            <completedBlockEntry path="/0/0/0/0" conditionString="not(equals(array,null))"/>
+                           <completedBlockEntry path="/0/0/0/0/1/0/0" conditionString="true"/>
                         </statement>
+                        <blockCompletionEntry path="/0/0/0/0/1/0/0/0"/>
                      </loopStatement>
                   </statement>
                </branchCondition>

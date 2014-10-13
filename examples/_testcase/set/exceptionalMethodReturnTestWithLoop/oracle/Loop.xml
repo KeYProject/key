@@ -37,6 +37,7 @@
                                                       </termination>
                                                    </methodReturn>
                                                 </statement>
+                                                <completedBlockEntry path="/0/0/0" conditionString="and(not(equals(l,null)),not(equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content))))"/>
                                              </loopCondition>
                                           </branchStatement>
                                        </statement>
@@ -66,6 +67,7 @@
                                                    <callStackEntry path="/0"/>
                                                    <termination name="&lt;end&gt;" pathCondition="and(not(equals(l,null)),equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                    </termination>
+                                                   <completedBlockEntry path="/0/0/0" conditionString="and(not(equals(l,null)),equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content)))"/>
                                                 </methodReturn>
                                                 <completedBlockEntry path="/0/0/0/0/0/0/0/1/0/0/0/0/0/0" conditionString="true"/>
                                              </statement>
@@ -85,6 +87,7 @@
                            <callStackEntry path="/0"/>
                            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(l,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                            </termination>
+                           <completedBlockEntry path="/0/0/0" conditionString="equals(l,null)"/>
                         </exceptionalMethodReturn>
                         <completedBlockEntry path="/0/0/0/0/0/0" conditionString="true"/>
                      </branchCondition>
@@ -94,6 +97,9 @@
                   </branchStatement>
                </statement>
             </loopCondition>
+            <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+            <blockCompletionEntry path="/0/0/0/0/0/0/0/1/0/0/0/0/0/0/0/0"/>
+            <blockCompletionEntry path="/0/0/0/0/0/0/1/0"/>
          </loopStatement>
       </statement>
       <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>

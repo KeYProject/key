@@ -71,6 +71,7 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
@@ -410,6 +411,10 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       assertTrue("Expected \"" + expected.getName() + "\" but is \"" + current.getName() + "\".", JavaUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
       assertEquals(expected.isPathConditionChanged(), current.isPathConditionChanged());
       assertTrue("Expected \"" + expected.getFormatedPathCondition() + "\" but is \"" + current.getFormatedPathCondition() + "\".", JavaUtil.equalIgnoreWhiteSpace(expected.getFormatedPathCondition(), current.getFormatedPathCondition()));
+      if (expected instanceof IExecutionBlockStartNode<?>) {
+         assertTrue(current instanceof IExecutionBlockStartNode<?>);
+         assertBlockCompletions((IExecutionBlockStartNode<?>)expected, (IExecutionBlockStartNode<?>)current);
+      }
       if (expected instanceof IExecutionBranchCondition) {
          assertTrue("Expected IExecutionBranchCondition but is " + current.getClass() + ".", current instanceof IExecutionBranchCondition);
          assertTrue("Expected \"" + ((IExecutionBranchCondition)expected).getFormatedBranchCondition() + "\" but is \"" + ((IExecutionBranchCondition)current).getFormatedBranchCondition() + "\".", JavaUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)expected).getFormatedBranchCondition(), ((IExecutionBranchCondition)current).getFormatedBranchCondition()));
@@ -436,7 +441,6 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertTrue("Expected IExecutionBranchStatement but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionBranchStatement);
          assertVariables((IExecutionBranchStatement)expected, (IExecutionBranchStatement)current, compareVariables, compareConstraints);
          assertConstraints((IExecutionBranchStatement)expected, (IExecutionBranchStatement)current, compareConstraints);
-         assertBlockCompletions((IExecutionBranchStatement)expected, (IExecutionBranchStatement)current);
       }
       else if (expected instanceof IExecutionLoopCondition) {
          assertTrue("Expected IExecutionLoopCondition but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionLoopCondition);
@@ -557,11 +561,11 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
 
    /**
     * Compares the block completions.
-    * @param expected The expected {@link IExecutionBranchStatement}.
-    * @param current The current {@link IExecutionBranchStatement}.
+    * @param expected The expected {@link IExecutionBlockStartNode}.
+    * @param current The current {@link IExecutionBlockStartNode}.
     * @throws ProofInputException Occurred Exception.
     */
-   protected static void assertBlockCompletions(IExecutionBranchStatement expected, IExecutionBranchStatement current) throws ProofInputException {
+   protected static void assertBlockCompletions(IExecutionBlockStartNode<?> expected, IExecutionBlockStartNode<?> current) throws ProofInputException {
       ImmutableList<IExecutionNode<?>> expectedEntries = expected.getBlockCompletions();
       ImmutableList<IExecutionNode<?>> currentEntries = current.getBlockCompletions();
       if (expectedEntries != null) {

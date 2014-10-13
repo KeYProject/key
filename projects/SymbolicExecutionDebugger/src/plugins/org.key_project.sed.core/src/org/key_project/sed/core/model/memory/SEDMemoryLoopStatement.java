@@ -31,7 +31,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDLoopStatement;
  * information in the memory.
  * @author Martin Hentschel
  */
-public class SEDMemoryLoopStatement extends AbstractSEDLoopStatement implements ISEDMemoryStackFrameCompatibleDebugNode, ISEDMemoryDebugNode {
+public class SEDMemoryLoopStatement extends AbstractSEDLoopStatement implements ISEDMemoryStackFrameCompatibleDebugNode, ISEDMemoryDebugNode, ISEDMemoryGroupable {
    /**
     * The contained child nodes.
     */
@@ -86,6 +86,12 @@ public class SEDMemoryLoopStatement extends AbstractSEDLoopStatement implements 
     * The known group start conditions.
     */
    private final List<ISEDBranchCondition> groupStartConditions = new LinkedList<ISEDBranchCondition>();
+
+   /**
+    * The known group end conditions.
+    */
+   private final List<ISEDBranchCondition> groupEndConditions = new LinkedList<ISEDBranchCondition>();
+   
    
    /**
     * Constructor.
@@ -324,6 +330,24 @@ public class SEDMemoryLoopStatement extends AbstractSEDLoopStatement implements 
    public void addGroupStartCondition(ISEDBranchCondition groupStartCondition) {
       if (groupStartCondition != null) {
          groupStartConditions.add(groupStartCondition);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDBranchCondition[] getGroupEndConditions() throws DebugException {
+      return groupEndConditions.toArray(new ISEDBranchCondition[groupEndConditions.size()]);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addGroupEndCondition(ISEDBranchCondition groupEndCondition) {
+      if (groupEndCondition != null) {
+         groupEndConditions.add(groupEndCondition);
       }
    }
 }

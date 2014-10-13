@@ -34,6 +34,6 @@ import org.key_project.sed.core.model.memory.SEDMemoryLoopStatement;
  * @author Martin Hentschel
  * @see ISEDDebugNode
  */
-public interface ISEDLoopStatement extends ISEDDebugNode, IStackFrame {
+public interface ISEDLoopStatement extends ISEDDebugNode, IStackFrame, ISEDGroupable {
 
 }

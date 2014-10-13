@@ -1,31 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_1ecb3d26-1136-4b21-bf0f-fc5e3bf4114a" name="main()" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_d1bf993b-11a7-4bc8-8d4c-ff48c32f99c7" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testDoWhileFalse\src\DoWhileFalseTest.java">
-         <sedMethodCall xml:id="_41f09592-7e5e-4fbd-8251-b2ef2a6d4295" name="&lt;call self.main()&gt;" pathCondition="true" lineNumber="-1" charStart="96" charEnd="100" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testDoWhileFalse\src\DoWhileFalseTest.java">
-            <sedStatement xml:id="_7cb1f97e-5893-4cea-96ec-361dd4d2567d" name="int result = 0;" pathCondition="true" lineNumber="-1" charStart="108" charEnd="123" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testDoWhileFalse\src\DoWhileFalseTest.java">
-               <sedLoopStatement xml:id="_4c66a876-7d9f-4384-b5ac-2b965a5191a2" name="do ... while ( false );" pathCondition="true" lineNumber="-1" charStart="127" charEnd="129" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testDoWhileFalse\src\DoWhileFalseTest.java">
-                  <sedStatement xml:id="_329f07c8-3bfc-4aa6-8653-190237da097a" name="result_1++;" pathCondition="true" lineNumber="-1" charStart="136" charEnd="146" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testDoWhileFalse\src\DoWhileFalseTest.java">
-                     <sedLoopCondition xml:id="_4c72182a-abac-4d98-b5fe-46e2b0df488d" name="false" pathCondition="true" lineNumber="-1" charStart="162" charEnd="167" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testDoWhileFalse\src\DoWhileFalseTest.java">
-                        <sedStatement xml:id="_e8dfb6a3-8f6a-4fb4-9171-b4ec3f5fe2ab" name="return result_1;" pathCondition="true" lineNumber="-1" charStart="173" charEnd="187" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testDoWhileFalse\src\DoWhileFalseTest.java">
-                           <sedMethodReturn xml:id="_45725e95-9ed9-4f6e-be91-7572b19fcaf5" name="&lt;return Z(1(#)) as result of self.main()&gt;" pathCondition="true" lineNumber="-1" charStart="96" charEnd="100" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testDoWhileFalse\src\DoWhileFalseTest.java" methodReturnConditionRef="_7e86679b-e356-4763-89a4-ef76d52c881f">
-                              <sedTermination xml:id="_3d0d4211-e0e4-4919-a514-aa02308304a3" name="&lt;end&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testDoWhileFalse\src\DoWhileFalseTest.java" verified="true">
+   <sedTarget xml:id="_dea8ed0c-e9eb-429f-9d74-a091892bb2f1" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_55934d7e-c0e8-453e-8f81-4049b93fabae" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testDoWhileFalse\src\DoWhileFalseTest.java">
+         <sedMethodCall xml:id="_d1a15289-0552-4e6a-b90a-b7980a191f19" name="&lt;call self.main()&gt;" pathCondition="true" lineNumber="-1" charStart="96" charEnd="100" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testDoWhileFalse\src\DoWhileFalseTest.java">
+            <sedStatement xml:id="_555748f6-01cb-4374-9da6-56c320e71ab8" name="int result = 0;" pathCondition="true" lineNumber="-1" charStart="108" charEnd="123" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testDoWhileFalse\src\DoWhileFalseTest.java">
+               <sedLoopStatement xml:id="_536588c5-ebe6-4e97-9f4b-a997d974f5f2" name="do ... while ( false );" pathCondition="true" lineNumber="-1" charStart="127" charEnd="129" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testDoWhileFalse\src\DoWhileFalseTest.java">
+                  <sedStatement xml:id="_14dde0a0-9bc5-4c1c-84c7-ed06fcfb0d88" name="result_1++;" pathCondition="true" lineNumber="-1" charStart="136" charEnd="146" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testDoWhileFalse\src\DoWhileFalseTest.java">
+                     <sedLoopCondition xml:id="_b0e53b00-af5b-4895-9093-2022b43b3f34" name="false" pathCondition="true" lineNumber="-1" charStart="162" charEnd="167" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testDoWhileFalse\src\DoWhileFalseTest.java">
+                        <sedStatement xml:id="_557e49f9-fc66-453a-9f26-af21f73fec7f" name="return result_1;" pathCondition="true" lineNumber="-1" charStart="173" charEnd="187" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testDoWhileFalse\src\DoWhileFalseTest.java">
+                           <sedMethodReturn xml:id="_3d1e8665-c03b-4b28-805a-1a20ee6e1933" name="&lt;return Z(1(#)) as result of self.main()&gt;" pathCondition="true" lineNumber="-1" charStart="96" charEnd="100" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testDoWhileFalse\src\DoWhileFalseTest.java" methodReturnConditionRef="_c6accf8a-9a1e-401d-aff0-6cefe6820d5a">
+                              <sedTermination xml:id="_cd44b943-f35a-4dbc-a5c1-fa76e80ec0a1" name="&lt;end&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testDoWhileFalse\src\DoWhileFalseTest.java" verified="true">
                               </sedTermination>
-                              <sedGroupStartCondition xml:id="_7e86679b-e356-4763-89a4-ef76d52c881f" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-                                 <sedChildReference nodeIdRef="_45725e95-9ed9-4f6e-be91-7572b19fcaf5"/>
+                              <sedGroupStartCondition xml:id="_c6accf8a-9a1e-401d-aff0-6cefe6820d5a" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                 <sedChildReference nodeIdRef="_3d1e8665-c03b-4b28-805a-1a20ee6e1933"/>
                               </sedGroupStartCondition>
                            </sedMethodReturn>
                         </sedStatement>
+                        <sedGroupStartCondition xml:id="_19d1f560-a5dc-4efd-be1f-62443f124a77" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                           <sedChildReference nodeIdRef="_b0e53b00-af5b-4895-9093-2022b43b3f34"/>
+                        </sedGroupStartCondition>
                      </sedLoopCondition>
                   </sedStatement>
+                  <sedGroupEndReference nodeIdRef="_19d1f560-a5dc-4efd-be1f-62443f124a77"/>
                </sedLoopStatement>
             </sedStatement>
-            <sedMethodCallMethodReturnCondition xml:id="_7e86679b-e356-4763-89a4-ef76d52c881f" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-               <sedChildReference nodeIdRef="_45725e95-9ed9-4f6e-be91-7572b19fcaf5"/>
+            <sedMethodCallMethodReturnCondition xml:id="_c6accf8a-9a1e-401d-aff0-6cefe6820d5a" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_3d1e8665-c03b-4b28-805a-1a20ee6e1933"/>
             </sedMethodCallMethodReturnCondition>
-            <sedGroupEndReference nodeIdRef="_7e86679b-e356-4763-89a4-ef76d52c881f"/>
+            <sedGroupEndReference nodeIdRef="_c6accf8a-9a1e-401d-aff0-6cefe6820d5a"/>
          </sedMethodCall>
-         <sedTerminationEntry nodeIdRef="_3d0d4211-e0e4-4919-a514-aa02308304a3"/>
+         <sedTerminationEntry nodeIdRef="_cd44b943-f35a-4dbc-a5c1-fa76e80ec0a1"/>
       </sedThread>
    </sedTarget>
 </launch>

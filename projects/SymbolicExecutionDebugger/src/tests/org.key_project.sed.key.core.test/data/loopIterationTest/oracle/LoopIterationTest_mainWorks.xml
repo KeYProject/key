@@ -1,26 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_12c97a0b-d765-4ccc-ac5e-810528f60e0d" name="mainWorks()" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_d3f2be84-5460-435b-8d87-5a3872318348" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java">
-         <sedMethodCall xml:id="_f8385135-7fa5-4759-86fc-793964d57d79" name="&lt;call self.mainWorks()&gt;" pathCondition="true" lineNumber="-1" charStart="332" charEnd="341" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java">
-            <sedStatement xml:id="_637373ee-80ac-4822-81dc-13c9203a5a85" name="int i = 0;" pathCondition="true" lineNumber="-1" charStart="349" charEnd="359" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java">
-               <sedLoopStatement xml:id="_395e5406-2754-4964-a3f8-9aeced0b78a2" name="while ( i&lt;3 )" pathCondition="true" lineNumber="-1" charStart="363" charEnd="368" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java">
-                  <sedLoopCondition xml:id="_b236e062-3a6c-441b-ae86-cfe837290ba6" name="i&lt;3" pathCondition="true" lineNumber="-1" charStart="370" charEnd="375" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java">
-                     <sedStatement xml:id="_10a73ee8-0602-47dc-8827-7608781ab0cc" name="i++;" pathCondition="true" lineNumber="-1" charStart="383" charEnd="387" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java">
-                        <sedLoopCondition xml:id="_14b484a4-f63c-4eee-9468-54fd5c3fa76e" name="i&lt;3" pathCondition="true" lineNumber="-1" charStart="370" charEnd="375" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java">
-                           <sedStatement xml:id="_aaf5180b-4950-48f6-b7ab-cfb9351d27be" name="i++;" pathCondition="true" lineNumber="-1" charStart="383" charEnd="387" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java">
-                              <sedLoopCondition xml:id="_678847dd-b16d-45a7-9c20-f1aa40129181" name="i&lt;3" pathCondition="true" lineNumber="-1" charStart="370" charEnd="375" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java">
-                                 <sedStatement xml:id="_793434df-b70b-4bfa-9b92-c6b7eeba70fb" name="i++;" pathCondition="true" lineNumber="-1" charStart="383" charEnd="387" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java">
-                                    <sedLoopCondition xml:id="_16ec39b8-d97b-41b5-a867-30d0239b9574" name="i&lt;3" pathCondition="true" lineNumber="-1" charStart="370" charEnd="375" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java">
-                                       <sedStatement xml:id="_0c26740f-22fe-4ec2-8ad7-85c15ba3d3ec" name="int j;" pathCondition="true" lineNumber="-1" charStart="396" charEnd="402" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java">
-                                          <sedMethodReturn xml:id="_c4476e12-4c65-49d4-a3ec-c445ab32dc6f" name="&lt;return of self.mainWorks()&gt;" pathCondition="true" lineNumber="-1" charStart="332" charEnd="341" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java" methodReturnConditionRef="_81da0be0-c3d4-40d2-9e8a-b0dccfe7c9c7">
-                                             <sedTermination xml:id="_dc83b6d5-ad90-4e3a-ab29-c16a1871dadc" name="&lt;end&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java" verified="true">
+   <sedTarget xml:id="_55d38f48-ce34-428c-a5c6-581ffa42dc95" name="mainWorks()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_2483f70a-8add-4df9-8378-9edf64d35753" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java">
+         <sedMethodCall xml:id="_14528c56-fffa-43c7-9611-7f2b630a619f" name="&lt;call self.mainWorks()&gt;" pathCondition="true" lineNumber="-1" charStart="332" charEnd="341" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java">
+            <sedStatement xml:id="_a1711898-dfbc-434c-9462-d308fcf4f26c" name="int i = 0;" pathCondition="true" lineNumber="-1" charStart="349" charEnd="359" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java">
+               <sedLoopStatement xml:id="_e8e3fe1d-1f58-4545-b553-dead49a915ff" name="while ( i&lt;3 )" pathCondition="true" lineNumber="-1" charStart="363" charEnd="368" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java">
+                  <sedLoopCondition xml:id="_d9bff632-bc12-4367-80b2-13d99fa4631c" name="i&lt;3" pathCondition="true" lineNumber="-1" charStart="370" charEnd="375" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java">
+                     <sedStatement xml:id="_0e568a9d-b50d-4ce2-8ed4-e3b94206133d" name="i++;" pathCondition="true" lineNumber="-1" charStart="383" charEnd="387" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java">
+                        <sedLoopCondition xml:id="_67f0167c-875a-4a18-bbcd-da2008415227" name="i&lt;3" pathCondition="true" lineNumber="-1" charStart="370" charEnd="375" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java">
+                           <sedStatement xml:id="_0eeac706-3128-43e3-aa6c-5c79dbfc9234" name="i++;" pathCondition="true" lineNumber="-1" charStart="383" charEnd="387" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java">
+                              <sedLoopCondition xml:id="_bf37b0a1-69d0-47d9-96ac-0527de918049" name="i&lt;3" pathCondition="true" lineNumber="-1" charStart="370" charEnd="375" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java">
+                                 <sedStatement xml:id="_7c9a7602-c583-4698-aaeb-c754150dbc8e" name="i++;" pathCondition="true" lineNumber="-1" charStart="383" charEnd="387" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java">
+                                    <sedLoopCondition xml:id="_09a0afa2-9d62-4ae8-b439-3ac8f412edec" name="i&lt;3" pathCondition="true" lineNumber="-1" charStart="370" charEnd="375" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java">
+                                       <sedStatement xml:id="_90695595-e36e-4f02-8584-6f3284de05b9" name="int j;" pathCondition="true" lineNumber="-1" charStart="396" charEnd="402" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java">
+                                          <sedMethodReturn xml:id="_623d216d-c3a7-4fa8-9b2f-0984b09d31a5" name="&lt;return of self.mainWorks()&gt;" pathCondition="true" lineNumber="-1" charStart="332" charEnd="341" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java" methodReturnConditionRef="_80f70390-d9b5-4df8-9b1d-5d868fef1633">
+                                             <sedTermination xml:id="_45b52b91-cb31-43b0-a933-34e213f385b1" name="&lt;end&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied\src\LoopIterationTest.java" verified="true">
                                              </sedTermination>
-                                             <sedGroupStartCondition xml:id="_81da0be0-c3d4-40d2-9e8a-b0dccfe7c9c7" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-                                                <sedChildReference nodeIdRef="_c4476e12-4c65-49d4-a3ec-c445ab32dc6f"/>
+                                             <sedGroupStartCondition xml:id="_80f70390-d9b5-4df8-9b1d-5d868fef1633" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                                <sedChildReference nodeIdRef="_623d216d-c3a7-4fa8-9b2f-0984b09d31a5"/>
                                              </sedGroupStartCondition>
                                           </sedMethodReturn>
                                        </sedStatement>
+                                       <sedGroupStartCondition xml:id="_2c19cff3-8204-46f8-abb8-0e7913b26355" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                          <sedChildReference nodeIdRef="_09a0afa2-9d62-4ae8-b439-3ac8f412edec"/>
+                                       </sedGroupStartCondition>
                                     </sedLoopCondition>
                                  </sedStatement>
                               </sedLoopCondition>
@@ -28,14 +31,15 @@
                         </sedLoopCondition>
                      </sedStatement>
                   </sedLoopCondition>
+                  <sedGroupEndReference nodeIdRef="_2c19cff3-8204-46f8-abb8-0e7913b26355"/>
                </sedLoopStatement>
             </sedStatement>
-            <sedMethodCallMethodReturnCondition xml:id="_81da0be0-c3d4-40d2-9e8a-b0dccfe7c9c7" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-               <sedChildReference nodeIdRef="_c4476e12-4c65-49d4-a3ec-c445ab32dc6f"/>
+            <sedMethodCallMethodReturnCondition xml:id="_80f70390-d9b5-4df8-9b1d-5d868fef1633" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_623d216d-c3a7-4fa8-9b2f-0984b09d31a5"/>
             </sedMethodCallMethodReturnCondition>
-            <sedGroupEndReference nodeIdRef="_81da0be0-c3d4-40d2-9e8a-b0dccfe7c9c7"/>
+            <sedGroupEndReference nodeIdRef="_80f70390-d9b5-4df8-9b1d-5d868fef1633"/>
          </sedMethodCall>
-         <sedTerminationEntry nodeIdRef="_dc83b6d5-ad90-4e3a-ab29-c16a1871dadc"/>
+         <sedTerminationEntry nodeIdRef="_45b52b91-cb31-43b0-a933-34e213f385b1"/>
       </sedThread>
    </sedTarget>
 </launch>

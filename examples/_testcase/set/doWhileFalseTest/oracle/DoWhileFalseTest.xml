@@ -11,8 +11,10 @@
                         </termination>
                      </methodReturn>
                   </statement>
+                  <completedBlockEntry path="/0/0/0" conditionString="true"/>
                </loopCondition>
             </statement>
+            <blockCompletionEntry path="/0/0/0/0/0"/>
          </loopStatement>
       </statement>
       <methodReturnEntry path="/0/0/0/0/0/0/0"/>

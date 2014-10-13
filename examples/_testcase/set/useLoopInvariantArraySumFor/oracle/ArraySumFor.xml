@@ -37,7 +37,9 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                      </statement>
                   </branchCondition>
                </loopInvariant>
+               <completedBlockEntry path="/0/0/0" conditionString="true"/>
             </statement>
+            <blockCompletionEntry path="/0/0/0/0"/>
          </loopStatement>
       </statement>
       <methodReturnEntry path="/0/0/0/0/0/1/0/0"/>
