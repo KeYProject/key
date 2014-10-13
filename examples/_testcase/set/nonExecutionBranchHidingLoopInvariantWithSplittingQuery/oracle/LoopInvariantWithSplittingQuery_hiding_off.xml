@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call LoopInvariantWithSplittingQuery.main(x)&gt;" pathCondition="true" pathConditionChanged="false">
-      <loopInvariant name="invariant: magic(x) &gt;= 0;
-variant: magic(x)
+      <loopInvariant name="invariant: LoopInvariantWithSplittingQuery.magic(x) &gt;= 0;
+variant: LoopInvariantWithSplittingQuery.magic(x)
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
          <branchCondition name="update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
     x_50=magic(x);

@@ -3,13 +3,22 @@
    <methodCall name="&lt;call QueryInPrecondition.main(x,y)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int magicValue = magic(x,y);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_0 = magic(x, y) catch(exc_0)
-pre: xPre(x) = TRUE &amp; y &lt; 0 | !(xPre(x) = TRUE &amp; y &lt; 0)
-post: (   xPre(x)@heapBefore_magic_0 = TRUE &amp; y &lt; 0
-   -&gt; result_0 = subFirst(x, y) &amp; exc_0 = null)
-&amp; (   !(xPre(x)@heapBefore_magic_0 = TRUE &amp; y &lt; 0)
-   -&gt; result_0 = subSecond(x, y) &amp; exc_0 = null)
+pre: QueryInPrecondition.xPre(x) = TRUE &amp; y &lt; 0
+| !(QueryInPrecondition.xPre(x) = TRUE &amp; y &lt; 0)
+post: (       QueryInPrecondition.xPre(x)
+            @heapBefore_magic_0
+        = TRUE
+      &amp; y &lt; 0
+   -&gt;   result_0 = QueryInPrecondition.subFirst(x, y)
+      &amp; exc_0 = null)
+&amp; (   !(    QueryInPrecondition.xPre(x)
+              @heapBefore_magic_0
+          = TRUE
+        &amp; y &lt; 0)
+   -&gt;   result_0 = QueryInPrecondition.subSecond(x, y)
+      &amp; exc_0 = null)
 mod: \if (true)  \then (empty)  \else (allLocs)
-\cap \if (!(xPre(x) = TRUE &amp; y &lt; 0))
+\cap \if (!(QueryInPrecondition.xPre(x) = TRUE &amp; y &lt; 0))
          \then (empty)
          \else (allLocs)
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="x, y" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
