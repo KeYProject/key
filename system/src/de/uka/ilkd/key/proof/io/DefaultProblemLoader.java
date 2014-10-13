@@ -21,7 +21,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import org.antlr.runtime.MismatchedTokenException;
 
@@ -54,6 +56,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * <p>
@@ -131,6 +134,20 @@ public class DefaultProblemLoader {
     private static String INDEX_FILE = "automaticInfFlow.txt";
 
     private static String IF_INDEX_FILE = "automaticMacroInfFlow.txt";
+    
+    /**
+     * Maps internal error codes of the parser to human readable strings.
+     * The integers refer to the common MismatchedTokenExceptions,
+     * where one token is expected and another is found.
+     * Both are usually only referred to by their internal code.
+     */
+    private final static Map<Pair<Integer,Integer>,String> readableParserErrors;
+    
+    static {
+        // format: (expected, found)
+        readableParserErrors = new HashMap<Pair<Integer, Integer>, String>();
+        readableParserErrors.put(new Pair<Integer, Integer>(KeYLexer.SEMI, KeYLexer.COMMA), "there may be only one declaration per line");
+    }
 
     /**
      * Constructor.
@@ -225,27 +242,29 @@ public class DefaultProblemLoader {
      * Tries to recover parser errors and make them human-readable,
      * rewrap them into ProblemLoaderExceptions.
      */
-    private ProblemLoaderException recoverParserErrorMessage(Exception e) {
+    protected ProblemLoaderException recoverParserErrorMessage(Exception e) {
         // try to resolve error message
         final Throwable c0 = unwrap(e);
         if (c0 instanceof org.antlr.runtime.RecognitionException) {
             final org.antlr.runtime.RecognitionException re = (org.antlr.runtime.RecognitionException) c0;
-            final org.antlr.runtime.Token occurrence = re.token; // TODO may be null
-            final String[] tokens = (new KeYLexer()).getTokenNames(); // XXX
+            final org.antlr.runtime.Token occurrence = re.token; // may be null
             if (c0 instanceof org.antlr.runtime.MismatchedTokenException) {
                 final org.antlr.runtime.MismatchedTokenException mte = (MismatchedTokenException) c0;
-                final String expected = tokens[mte.expecting];
-                final String found = mte.token.getText();
-                final String msg = "Syntax error: expected "+expected
-                                +", but found "+found+" ("+mte.input.getSourceName()
+                final String genericMsg = "expected "+mte.expecting
+                                +", but found "+mte.c;
+                final String readable = readableParserErrors.get(new Pair<Integer, Integer>(mte.expecting,mte.c));
+                final String msg = "Syntax error: " 
+                                +(readable == null? genericMsg: readable)
+                                +" ("+mte.input.getSourceName()
                                 +":"+mte.line+")";
                 return new ProblemLoaderException(this, msg, mte);
             } else if (c0 instanceof org.antlr.runtime.MissingTokenException) {
                 final org.antlr.runtime.MissingTokenException mte = (org.antlr.runtime.MissingTokenException) c0;
                 // TODO: other commonly missed tokens
                 final String token = mte.expecting == KeYLexer.SEMI? "semicolon": "token id "+mte.expecting;
-                final String msg = "Syntax error: missing "+token+" at "+
-                                occurrence.getText()+" statement ("+mte.input.getSourceName()
+                final String msg = "Syntax error: missing "+token+
+                                (occurrence == null? "": " at "+occurrence.getText())
+                                +" statement ("+mte.input.getSourceName()
                                 +":"+mte.line+")";
                 return new ProblemLoaderException(this, msg, mte);
                 // TODO other ANTLR exceptions
