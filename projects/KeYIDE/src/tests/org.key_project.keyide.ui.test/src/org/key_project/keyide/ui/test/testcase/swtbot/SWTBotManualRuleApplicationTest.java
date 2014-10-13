@@ -83,10 +83,11 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                        },
                        true,
                        false,
+                       false,
                        "false",
                        "closeFalse",
                        null,
-                       1,
+                       1, 
                        true);
    }
    
@@ -102,10 +103,11 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                        null,
                        false,
                        false,
+                       false,
                        "exc=null;",
                        "assignment",
                        null,
-                       1,
+                       1, 
                        false);
    }
    
@@ -178,6 +180,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             }, 
             true, 
             false,
+            false, 
             "exc:=null}", 
             "Use Operation Contract", 
             appliedRuleTest, 
@@ -250,6 +253,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             }, 
             true, 
             false,
+            false, 
             "exc:=null}", 
             "Use Operation Contract", 
             appliedRuleTest, 
@@ -302,10 +306,11 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                         },
                         true,
                         false,
+                        false,
                         "exc:=null}",
                         "Use Operation Contract",
                         appliedRuleTest,
-                        0,
+                        0, 
                         false);
    }
    
@@ -356,10 +361,11 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             },
             true,
             false,
+            true,
             "x:=0}",
             "Block Contract",
             appliedRuleTest,
-            3,
+            3, 
             false);
    }
    
@@ -407,10 +413,11 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             },
             true,
             false,
+            true,
             "x:=0}",
             "Block Contract",
             appliedRuleTest,
-            3,
+            3, 
             false);
    }
    
@@ -458,10 +465,11 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             },
             true,
             false,
+            true,
             "x:=0}",
             "Block Contract",
             appliedRuleTest,
-            3,
+            3, 
             false);
    }
    
@@ -534,6 +542,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             }, 
             true, 
             true,
+            false, 
             "self.getB()", 
             "Use Dependency Contract", 
             appliedRuleTest, 
@@ -559,6 +568,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
     * @param stopCondition An optional custom {@link IStopCondition} which stops the started auto mode at a node on which the rule to test can be applied.
     * @param useOperationContracts {@code true} use operation contracts, {@code false} inline methods instead
     * @param useDependencyContracts Use dependency contracts?
+    * @param useBlockContracts {@code true} use block contracts, {@code false} expand blocks
     * @param textToApplyRuleOn The text in the {@link KeYEditor} for which the context menu contains the rule to apply.
     * @param ruleNameToApply The name of the rule to apply.
     * @param appliedRuleTest Optionally, some additional test steps, e.g. to deal with an opened {@link Shell}.
@@ -572,10 +582,11 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                                    final IStopCondition stopCondition,
                                    final boolean useOperationContracts,
                                    final boolean useDependencyContracts,
+                                   final boolean useBlockContracts,
                                    final String textToApplyRuleOn,
                                    final String ruleNameToApply,
                                    final IAppliedRuleTest appliedRuleTest,
-                                   final int expectedNumOfChildrenAfterRuleApplication,
+                                   final int expectedNumOfChildrenAfterRuleApplication, 
                                    final boolean expectedProofClosed) throws Exception {
       IKeYEditorTestSteps steps = new IKeYEditorTestSteps() {
          @Override
@@ -594,16 +605,14 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                StrategySettings ss = keyEditor.getCurrentProof().getSettings().getStrategySettings();
                ss.setCustomApplyStrategyStopCondition(stopCondition);
                SymbolicExecutionUtil.updateStrategySettings(proof, useOperationContracts, true, false, false);
-               StrategyProperties p = ss.getActiveStrategyProperties();
-               p.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, useOperationContracts ? StrategyProperties.METHOD_CONTRACT : StrategyProperties.METHOD_EXPAND);
-               p.setProperty(StrategyProperties.DEP_OPTIONS_KEY, useDependencyContracts ? StrategyProperties.DEP_ON : StrategyProperties.DEP_OFF);
-               ss.setActiveStrategyProperties(p);
+               StrategyProperties sp = ss.getActiveStrategyProperties();
+               sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, useOperationContracts ? StrategyProperties.METHOD_CONTRACT : StrategyProperties.METHOD_EXPAND);
+               sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, useDependencyContracts ? StrategyProperties.DEP_ON : StrategyProperties.DEP_OFF);
+               sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, useBlockContracts ? StrategyProperties.BLOCK_CONTRACT : StrategyProperties.BLOCK_EXPAND);
+               SymbolicExecutionUtil.updateStrategySettings(proof, sp);
+               proof.setActiveStrategy(proof.getInitConfig().getProfile().getDefaultStrategyFactory().create(proof, sp));
                keyEditor.getUI().startAndWaitForAutoMode(keyEditor.getCurrentProof());
             }
-            if(textToApplyRuleOn == "self.getB()") {
-               System.out.println("Depdency Contract");
-            }
-            
             // Get node to apply rule on
             Node node = keyEditor.getCurrentNode();
             assertFalse(node.isClosed());

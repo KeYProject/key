@@ -119,6 +119,7 @@ public abstract class AbstractSWTBotKeYEditorTest extends AbstractSetupTestCase 
       try {
          environment = KeYEnvironment.load(ResourceUtil.getLocation(src), null, null, EclipseUserInterfaceCustomization.getInstance());
          Contract contract = environment.getSpecificationRepository().getContractByName(contractName);
+         assertNotNull(contract);
          proof = environment.createProof(contract.createProofObl(environment.getInitConfig(), contract));
          if (startAutoMode) {
             environment.getUi().startAndWaitForAutoMode(proof);
