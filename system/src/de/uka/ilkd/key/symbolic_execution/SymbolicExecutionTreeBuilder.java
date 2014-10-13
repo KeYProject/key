@@ -636,19 +636,6 @@ public class SymbolicExecutionTreeBuilder {
                   }
                }
             }
-            // #####################
-            // #####################
-            // #####################
-//            Map<Integer, IExecutionNode<?>> removedBlockEntries = updateBlockMap(node);
-//            // Check for block completions
-//            if (removedBlockEntries != null) {
-//               for (Entry<Integer, IExecutionNode<?>> entry : removedBlockEntries.entrySet()) {
-//                  if (entry.getValue() instanceof ExecutionBranchStatement &&
-//                      entry.getValue() != parentToAddTo) { // Ignore empty blocks
-//                     ((ExecutionBranchStatement) entry.getValue()).addBlockCompletion(parentToAddTo);
-//                  }
-//               }
-//            }
          }
          // Check if the node is already contained in the symbolic execution tree
          AbstractExecutionNode<?> executionNode = keyNodeMapping.get(node);
@@ -788,10 +775,8 @@ public class SymbolicExecutionTreeBuilder {
             }
             else if (SymbolicExecutionUtil.isLoopStatement(node, node.getAppliedRuleApp(), statement, posInfo)) {
                if (isNotInImplicitMethod(node)) {
-                  if (SymbolicExecutionUtil.isFirstLoopIteration(node, node.getAppliedRuleApp(), statement)) {
-                     result = new ExecutionLoopStatement(settings, mediator, node);
-                     addToBlockMap(node, result);
-                  }
+                  result = new ExecutionLoopStatement(settings, mediator, node);
+                  addToBlockMap(node, result);
                }
             }
             else if (SymbolicExecutionUtil.isStatementNode(node, node.getAppliedRuleApp(), statement, posInfo)) {

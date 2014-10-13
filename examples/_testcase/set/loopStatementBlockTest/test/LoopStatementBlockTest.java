@@ -1,6 +1,6 @@
 
 public class LoopStatementBlockTest {
-   public static int nextedLoop() {
+   public static int nestedLoop() {
       int[] x = new int[] {2, 2};
       for (int i = 0; i < x.length; i++) {
          while (x[i] > 0) {
