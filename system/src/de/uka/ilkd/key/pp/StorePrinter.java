@@ -3,7 +3,6 @@ package de.uka.ilkd.key.pp;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
-import static de.uka.ilkd.key.pp.SelectPrinter.getPrettySyntaxForFieldConstant;
 import java.io.IOException;
 
 /**
@@ -12,12 +11,10 @@ import java.io.IOException;
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-class StorePrinter {
-
-    private final LogicPrinter lp;
+class StorePrinter extends FieldPrinter {
 
     StorePrinter(LogicPrinter lp) {
-        this.lp = lp;
+        super(lp);
     }
 
     /*
@@ -70,13 +67,11 @@ class StorePrinter {
             final Term fieldTerm = t.sub(2);
             final Term valueTerm = t.sub(3);
 
-            if (objectTerm.equals(lp.services.getTermBuilder().NULL())
-                    && fieldTerm.op() instanceof Function
-                    && ((Function) fieldTerm.op()).isUnique()) {
+            if (isStaticFieldConstant(objectTerm, fieldTerm)) {
                 printStoreOnStaticField(heapTerm, fieldTerm, valueTerm, closingBrace);
-            } else if (lp.isGenericFieldConstant(fieldTerm)) {
+            } else if (isGenericFieldConstant(fieldTerm)) {
                 printStoreOnGenericFieldConstant(heapTerm, objectTerm, fieldTerm, valueTerm, closingBrace);
-            } else if (lp.isJavaFieldConstant(fieldTerm)) {
+            } else if (isJavaFieldConstant(fieldTerm)) {
                 printStoreOnJavaFieldConstant(heapTerm, objectTerm, fieldTerm, valueTerm, closingBrace);
             } else if (fieldTerm.op() == heapLDT.getArr()) {
                 printStoreOnArrayElement(heapTerm, objectTerm, fieldTerm, valueTerm, closingBrace);
@@ -126,7 +121,7 @@ class StorePrinter {
 
         lp.markStartSub();
         lp.startTerm(0);
-        lp.layouter.print(getPrettySyntaxForFieldConstant(objectTerm, fieldTerm, lp.services.getJavaInfo()));
+        lp.layouter.print(getPrettySyntaxForFieldConstant(objectTerm, fieldTerm));
         lp.markEndSub();
 
         finishPrettyPrint(valueTerm, closingBrace);

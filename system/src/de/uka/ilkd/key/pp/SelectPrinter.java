@@ -15,12 +15,10 @@ import java.io.IOException;
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-class SelectPrinter {
-
-    private final LogicPrinter lp;
+class SelectPrinter extends FieldPrinter {
 
     SelectPrinter(LogicPrinter lp) {
-        this.lp = lp;
+        super(lp);
     }
 
     /*
@@ -48,7 +46,7 @@ class SelectPrinter {
                  * Select-type is any.
                  */
                 if (isFieldName(fieldTerm.op().name().toString(), objectTerm)
-                        || lp.isJavaFieldConstant(fieldTerm)) {
+                        || isJavaFieldConstant(fieldTerm)) {
                     lp.printFunctionTerm(t);
                 } else {
                     printAnySelect(heapTerm, objectTerm, fieldTerm, tacitHeap);
@@ -56,17 +54,16 @@ class SelectPrinter {
             } else if (fieldTerm.op() == heapLDT.getArr()) {
                 // array access
                 printArraySelect(heapTerm, objectTerm, fieldTerm, tacitHeap);
-            } else if (lp.isGenericFieldConstant(fieldTerm)) {
+            } else if (isGenericFieldConstant(fieldTerm)) {
+                // object properties denoted like o.<created>
                 printGenericObjectProperty(t, heapTerm, objectTerm, fieldTerm, tacitHeap);
-            } else if (lp.isJavaFieldConstant(fieldTerm)) {
-                if (getFieldSort(fieldTerm).equals(t.sort())) {
-                    if (objectTerm.equals(lp.services.getTermBuilder().NULL())) {
-                        // static field access
-                        printStaticJavaFieldConstant(fieldTerm, heapTerm, tacitHeap);
-                    } else {
-                        // non-static field access
-                        printNonStaticJavaFieldConstant(heapTerm, objectTerm, fieldTerm, tacitHeap);
-                    }
+            } else if (isFieldConstant(fieldTerm) && getFieldSort(fieldTerm).equals(t.sort())) {
+                if (isStaticFieldConstant(objectTerm, fieldTerm)) {
+                    // static field access
+                    printStaticJavaFieldConstant(fieldTerm, heapTerm, tacitHeap);
+                } else if (isJavaFieldConstant(fieldTerm)) {
+                    // non-static field access
+                    printNonStaticJavaFieldConstant(heapTerm, objectTerm, fieldTerm, tacitHeap);
                 } else {
                     lp.printFunctionTerm(t);
                 }
@@ -76,78 +73,6 @@ class SelectPrinter {
         } else {
             lp.printFunctionTerm(t);
         }
-    }
-
-    /**
-     * Determine the syntax in which a field constant is printed when associated
-     * with the object represented by {@code objectTerm} Default is the name of
-     * the field. In case the field is hidden by another field, the name of the
-     * field is preceeded by the corresponding class name.
-     *
-     * Example default: object.field Example hidden field:
-     * object.(package.class::field)
-     *
-     * Remark: This method is declared static because it is also used in method
-     * {@link StorePrinter#printStoreOnFieldConstant(de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, boolean) }
-     */
-    protected static String getPrettySyntaxForFieldConstant(Term objectTerm,
-            Term fieldTerm,
-            JavaInfo javaInfo) {
-        if (isCanonicField(objectTerm, fieldTerm, javaInfo)) {
-            /*
-             * Class name can be omitted if the field is canonic, i.e.
-             * correct field can be determined without explicit mentioning
-             * of corresponding class name.
-             *
-             * Example syntax: object.field
-             */
-            return HeapLDT.getPrettyFieldName(fieldTerm.op());
-        } else {
-            /*
-             * There is another field of the same name that would be selected
-             * if class name is omitted. In this case class name must be mentioned
-             * explicitly.
-             *
-             * Example syntax: object.(package.class::field)
-             */
-            return "(" + fieldTerm.toString().replace("::$", "::") + ")";
-        }
-    }
-
-    /*
-     * Determine whether class can be omitted when printing a field
-     * in a select term. A field can be omitted, if it is canonic for
-     * the associated object.
-     * 
-     * For more information on canonic, see
-     * {@link de.uka.ilkd.key.java.JavaInfo#getCanonicalFieldProgramVariable(String,KeYJavaType)}
-     * 
-     * (Kai Wallisch 09/2014)
-     */
-    private static boolean isCanonicField(Term objectTerm,
-            Term fieldTerm,
-            JavaInfo javaInfo) {
-        Sort sort = objectTerm.sort();
-        KeYJavaType kjt = javaInfo.getKeYJavaType(sort);
-        String fieldName = HeapLDT.getPrettyFieldName(fieldTerm.op());
-        ProgramVariable pv = javaInfo.getCanonicalFieldProgramVariable(fieldName, kjt);
-        if (pv == null) {
-            return false;
-        }
-
-        /*
-         * Compare originTypeAndName and pvTypeAndName based on their String
-         * representation. I did not find a better solution to this yet.
-         * But it seems to be standard, as it is done similary in method HeapLDT.getPrettyFieldName().
-         * (Kai Wallisch 09/2014)
-         */
-        String[] originTypeAndName = fieldTerm.toString().split("::\\$");
-        assert originTypeAndName.length == 2;
-        String[] pvTypeAndName = pv.toString().split("::");
-        assert pvTypeAndName.length == 2;
-
-        return (pvTypeAndName[0].equals(originTypeAndName[0])
-                && pvTypeAndName[1].equals(originTypeAndName[1]));
     }
 
     /*
@@ -231,7 +156,7 @@ class SelectPrinter {
         lp.markEndSub();
         lp.layouter.print(".");
         lp.markStartSub(2);
-        lp.layouter.print(getPrettySyntaxForFieldConstant(objectTerm, fieldTerm, lp.services.getJavaInfo()));
+        lp.layouter.print(getPrettySyntaxForFieldConstant(objectTerm, fieldTerm));
         lp.markEndSub();
         printHeap(heapTerm, tacitHeap);
     }

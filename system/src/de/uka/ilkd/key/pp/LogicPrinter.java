@@ -144,7 +144,6 @@ public class LogicPrinter {
         return quickPrintTerm(t, services, NotationInfo.DEFAULT_PRETTY_SYNTAX, NotationInfo.DEFAULT_UNICODE_ENABLED);
     }
 
-
     public static String quickPrintTerm(Term t, Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         final NotationInfo ni = new NotationInfo();
         if (services != null) {
@@ -1000,7 +999,7 @@ public class LogicPrinter {
      * @param t the term to be printed.  */
     public void printFunctionTerm(Term t) throws IOException {
         if (notationInfo.isPrettySyntax()
-                && services != null && isJavaFieldConstant(t)
+                && services != null && FieldPrinter.isJavaFieldConstant(t, getHeapLDT())
                 && getNotationInfo().isHidePackagePrefix()) {
             // Hide package prefix when printing field constants.
             startTerm(0);
@@ -1067,7 +1066,6 @@ public class LogicPrinter {
     public void printHeapConstructor(Term t, boolean closingBrace) throws IOException {
         assert t.boundVars().isEmpty();
 
-
         final HeapLDT heapLDT = getHeapLDT();
 
         if(notationInfo.isPrettySyntax() && heapLDT != null) {
@@ -1132,31 +1130,6 @@ public class LogicPrinter {
         } else {
             printTerm(objectTerm);
         }
-    }
-
-    protected boolean isFieldConstant(Term fieldTerm) {
-        return fieldTerm.op() instanceof Function
-                && ((Function) fieldTerm.op()).isUnique()
-                && fieldTerm.sort() == getHeapLDT().getFieldSort()
-                && fieldTerm.arity() == 0
-                && fieldTerm.boundVars().isEmpty();
-    }
-    
-    /**
-     * Find out whether a {@link Term} represents a field symbol, declared in a
-     * Java class.
-     *
-     * @return Returns true iff the given parameter represents a field constant.
-     * @param fieldTerm The target field.
-     */
-    protected boolean isJavaFieldConstant(Term fieldTerm) {
-        return fieldTerm.op().name().toString().contains("::$")
-                && isFieldConstant(fieldTerm);
-    }
-
-    protected boolean isGenericFieldConstant(Term fieldTerm) {
-        return fieldTerm.op().name().toString().contains("::<")
-                && isFieldConstant(fieldTerm);
     }
 
     /*
