@@ -108,6 +108,11 @@ public class New extends TypeOperator
         return (accessPath != null) ? accessPath.getFirstElement() : this;
     }
 
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+       return (accessPath != null) ? accessPath.getFirstElementIncludingBlocks() : this;
+    }
+
     
     @Override    
     public SourceElement getLastElement() {

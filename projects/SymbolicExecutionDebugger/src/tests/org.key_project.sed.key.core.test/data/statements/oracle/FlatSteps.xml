@@ -1,23 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_7a84113f-7b0c-43dc-adac-08b9a368d3a1" name="doSomething(int, java.lang.String, boolean)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_5159fe9c-ae89-4bf6-a62f-6588171339f8" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_f43d6104-19ff-4127-874d-a4e92326459a" name="&lt;call self.doSomething(asdf,a,b)&gt;" pathCondition="true" lineNumber="-1" charStart="228" charEnd="239" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements\src\FlatSteps.java">
-            <sedStatement xml:id="_57e96c75-6523-4722-88db-c49148e02d17" name="int x = 1;" pathCondition="true" lineNumber="-1" charStart="276" charEnd="286" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements\src\FlatSteps.java">
-               <sedStatement xml:id="_0648f481-933f-4cd8-aa3a-6f16c498c9ad" name="int y = 2;" pathCondition="true" lineNumber="-1" charStart="290" charEnd="300" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements\src\FlatSteps.java">
-                  <sedStatement xml:id="_c14f9834-a461-48ba-99ba-3eb58a684ed1" name="int z = 3;" pathCondition="true" lineNumber="-1" charStart="304" charEnd="314" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements\src\FlatSteps.java">
-                     <sedMethodReturn xml:id="_3863b37c-5dce-4719-8f96-0da591c71c37" name="&lt;return of self.doSomething(asdf,a,b)&gt;" pathCondition="true" lineNumber="-1" charStart="228" charEnd="239" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements\src\FlatSteps.java" methodReturnConditionRef="_96c2b025-d47f-4a6d-9110-fc8a48b611e4">
-                        <sedTermination xml:id="_2ab05e94-2562-48df-8034-178223651195" name="&lt;end&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements\src\FlatSteps.java" verified="true">
+   <sedTarget xml:id="_fae2e906-f54b-454f-92a5-79886c95cfb2" name="doSomething(int, java.lang.String, boolean)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_834ee072-d9ff-455f-9521-70257efe7ebf" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements\src\FlatSteps.java">
+         <sedMethodCall xml:id="_f597c26c-82e5-4889-8239-a29c201e31bd" name="&lt;call self.doSomething(asdf,a,b)&gt;" pathCondition="true" lineNumber="-1" charStart="228" charEnd="239" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements\src\FlatSteps.java">
+            <sedStatement xml:id="_560b1e3a-09f1-4188-bb9b-c415dfcaa5a2" name="int x = 1;" pathCondition="true" lineNumber="-1" charStart="276" charEnd="286" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements\src\FlatSteps.java">
+               <sedStatement xml:id="_5503026c-9c1d-4663-8d71-572a78625cdf" name="int y = 2;" pathCondition="true" lineNumber="-1" charStart="290" charEnd="300" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements\src\FlatSteps.java">
+                  <sedStatement xml:id="_e84891cb-cfa7-413e-b296-a2fec5084aef" name="int z = 3;" pathCondition="true" lineNumber="-1" charStart="304" charEnd="314" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements\src\FlatSteps.java">
+                     <sedMethodReturn xml:id="_13d1dfac-6443-4a4b-80a5-308582980d5e" name="&lt;return of self.doSomething(asdf,a,b)&gt;" pathCondition="true" lineNumber="-1" charStart="228" charEnd="239" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements\src\FlatSteps.java" methodReturnConditionRef="_03905a2b-4fe4-4010-ac8a-8c6dfa01fcdc">
+                        <sedTermination xml:id="_28526ac6-9f46-49f7-b5fe-f277ee822719" name="&lt;end&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements\src\FlatSteps.java" verified="true">
                         </sedTermination>
+                        <sedGroupStartCondition xml:id="_03905a2b-4fe4-4010-ac8a-8c6dfa01fcdc" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                           <sedChildReference nodeIdRef="_13d1dfac-6443-4a4b-80a5-308582980d5e"/>
+                        </sedGroupStartCondition>
                      </sedMethodReturn>
                   </sedStatement>
                </sedStatement>
             </sedStatement>
-            <sedMethodCallMethodReturnCondition xml:id="_96c2b025-d47f-4a6d-9110-fc8a48b611e4" name="true" pathCondition="true">
-               <sedChildReference nodeIdRef="_3863b37c-5dce-4719-8f96-0da591c71c37"/>
+            <sedMethodCallMethodReturnCondition xml:id="_03905a2b-4fe4-4010-ac8a-8c6dfa01fcdc" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_13d1dfac-6443-4a4b-80a5-308582980d5e"/>
             </sedMethodCallMethodReturnCondition>
+            <sedGroupEndReference nodeIdRef="_03905a2b-4fe4-4010-ac8a-8c6dfa01fcdc"/>
          </sedMethodCall>
-         <sedTerminationEntry nodeIdRef="_2ab05e94-2562-48df-8034-178223651195"/>
+         <sedTerminationEntry nodeIdRef="_28526ac6-9f46-49f7-b5fe-f277ee822719"/>
       </sedThread>
    </sedTarget>
 </launch>

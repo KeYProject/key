@@ -81,6 +81,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * Allows to read XML files which contains an symbolic execution tree
@@ -143,6 +144,28 @@ public class ExecutionNodeReader {
                      throw new SAXException("Expected basemethod return on \"" + path + "\" but is " + returnEntry.getElementType() + ".");
                   }
                   entry.getKey().addMethodReturn((IExecutionBaseMethodReturn<?>)returnEntry);
+               }
+            }
+            // Construct completed blocks
+            Set<Entry<AbstractKeYlessExecutionNode<?>, List<Pair<String, String>>>> completedBlockEntries = handler.getCompletedBlockEntries().entrySet();
+            for (Entry<AbstractKeYlessExecutionNode<?>, List<Pair<String, String>>> entry : completedBlockEntries) {
+               for (Pair<String, String> pair : entry.getValue()) {
+                  IExecutionNode<?> returnEntry = findNode(root, pair.first);
+                  if (returnEntry == null) {
+                     throw new SAXException("Can't find completed block entry \"" + pair.first + "\" in parsed symbolic execution tree.");
+                  }
+                  entry.getKey().addCompletedBlock(returnEntry, pair.second);
+               }
+            }
+            // Construct block completions
+            Set<Entry<KeYlessBranchStatement, List<String>>> blockCompletionEntries = handler.getBlockCompletionEntries().entrySet();
+            for (Entry<KeYlessBranchStatement, List<String>> entry : blockCompletionEntries) {
+               for (String path : entry.getValue()) {
+                  IExecutionNode<?> returnEntry = findNode(root, path);
+                  if (returnEntry == null) {
+                     throw new SAXException("Can't find block completion entry \"" + path + "\" in parsed symbolic execution tree.");
+                  }
+                  entry.getKey().addBlockCompletion(returnEntry);
                }
             }
             // Construct terminations
@@ -236,6 +259,16 @@ public class ExecutionNodeReader {
       private final Map<KeYlessMethodCall, List<String>> methodReturnPathEntries = new LinkedHashMap<KeYlessMethodCall, List<String>>();
       
       /**
+       * Maps an {@link AbstractKeYlessExecutionNode} to its completed block entries
+       */
+      private final Map<AbstractKeYlessExecutionNode<?>, List<Pair<String, String>>> completedBlockEntries = new LinkedHashMap<AbstractKeYlessExecutionNode<?>, List<Pair<String, String>>>();
+      
+      /**
+       * Maps an {@link KeYlessBranchStatement} to the path entries of its block completions.
+       */
+      private final Map<KeYlessBranchStatement, List<String>> blockCompletionEntries = new LinkedHashMap<KeYlessBranchStatement, List<String>>();
+      
+      /**
        * Maps an {@link KeYlessStart} to the path entries of its terminations.
        */
       private final Map<KeYlessStart, List<String>> terminationPathEntries = new LinkedHashMap<KeYlessStart, List<String>>();
@@ -304,6 +337,22 @@ public class ExecutionNodeReader {
             }
             methodReturnEntries.add(0, getPathInTree(attributes));
          }
+         else if (isCompletedBlockEntry(uri, localName, qName)) {
+            List<Pair<String, String>> completedBlocks = completedBlockEntries.get(parent);
+            if (completedBlocks == null) {
+               completedBlocks = new LinkedList<Pair<String, String>>();
+               completedBlockEntries.put(parent, completedBlocks);
+            }
+            completedBlocks.add(new Pair<String, String>(getPathInTree(attributes), getConditionString(attributes)));
+         }
+         else if (isBlockCompletionEntry(uri, localName, qName)) {
+            List<String> blockCompletionPathEntries = blockCompletionEntries.get(parent);
+            if (blockCompletionPathEntries == null) {
+               blockCompletionPathEntries = new LinkedList<String>();
+               blockCompletionEntries.put((KeYlessBranchStatement)parent, blockCompletionPathEntries);
+            }
+            blockCompletionPathEntries.add(getPathInTree(attributes));
+         }
          else if (isTerminationEntry(uri, localName, qName)) {
             List<String> terminationEntries = terminationPathEntries.get(parent);
             if (terminationEntries == null) {
@@ -352,6 +401,12 @@ public class ExecutionNodeReader {
          else if (isMethodReturnEntry(uri, localName, qName)) {
             // Nothing to do.
          }
+         else if (isCompletedBlockEntry(uri, localName, qName)) {
+            // Nothing to do.
+         }
+         else if (isBlockCompletionEntry(uri, localName, qName)) {
+            // Nothing to do.
+         }
          else if (isTerminationEntry(uri, localName, qName)) {
             // Nothing to do.
          }
@@ -385,6 +440,22 @@ public class ExecutionNodeReader {
        */
       public Map<KeYlessMethodCall, List<String>> getMethodReturnPathEntries() {
          return methodReturnPathEntries;
+      }
+
+      /**
+       * Returns the mapping of {@link AbstractKeYlessExecutionNode} to its completed block entries.
+       * @return The mapping of {@link AbstractKeYlessExecutionNode} to its completed block entries.
+       */
+      public Map<AbstractKeYlessExecutionNode<?>, List<Pair<String, String>>> getCompletedBlockEntries() {
+         return completedBlockEntries;
+      }
+
+      /**
+       * Returns the mapping of a {@link KeYlessBranchStatement} to its block completion entries.
+       * @return The mapping of a {@link KeYlessBranchStatement} to its block completion entries.
+       */
+      public Map<KeYlessBranchStatement, List<String>> getBlockCompletionEntries() {
+         return blockCompletionEntries;
       }
 
       /**
@@ -460,6 +531,28 @@ public class ExecutionNodeReader {
     */
    protected boolean isMethodReturnEntry(String uri, String localName, String qName) {
       return ExecutionNodeWriter.TAG_METHOD_RETURN_ENTRY.equals(qName);
+   }
+
+   /**
+    * Checks if the currently parsed tag represents an entry of {@link IExecutionNode#getCompletedBlocks()}.
+    * @param uri The URI.
+    * @param localName THe local name.
+    * @param qName The qName.
+    * @return {@code true} represents completed block entry, {@code false} is something else.
+    */
+   protected boolean isCompletedBlockEntry(String uri, String localName, String qName) {
+      return ExecutionNodeWriter.TAG_COMPLETED_BLOCK_ENTRY.equals(qName);
+   }
+
+   /**
+    * Checks if the currently parsed tag represents an entry of {@link IExecutionBranchStatement#getBlockCompletions()}.
+    * @param uri The URI.
+    * @param localName THe local name.
+    * @param qName The qName.
+    * @return {@code true} represents block completion entry, {@code false} is something else.
+    */
+   protected boolean isBlockCompletionEntry(String uri, String localName, String qName) {
+      return ExecutionNodeWriter.TAG_BLOCK_COMPLETION_ENTRY.equals(qName);
    }
 
    /**
@@ -1008,6 +1101,16 @@ public class ExecutionNodeReader {
       private final List<IExecutionVariable> variables = new LinkedList<IExecutionVariable>();
       
       /**
+       * The completed blocks.
+       */
+      private ImmutableList<IExecutionNode<?>> completedBlocks = ImmutableSLList.nil();
+
+      /**
+       * The formated conditions under which a block is completed.
+       */
+      private final Map<IExecutionNode<?>, String> formatedCompletedBlockConditions = new LinkedHashMap<IExecutionNode<?>, String>();
+      
+      /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
@@ -1174,6 +1277,42 @@ public class ExecutionNodeReader {
       @Override
       public PosInOccurrence getModalityPIO() {
          return null;
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ImmutableList<IExecutionNode<?>> getCompletedBlocks() throws ProofInputException {
+         return completedBlocks;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Term getBlockCompletionCondition(IExecutionNode<?> completedNode) throws ProofInputException {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getFormatedBlockCompletionCondition(IExecutionNode<?> completedNode) throws ProofInputException {
+         return formatedCompletedBlockConditions.get(completedNode);
+      }
+
+      /**
+       * Adds the given completed block.
+       * @param completedBlock The completed block.
+       * @param formatedCondition The formated condition under which the block is completed.
+       */
+      public void addCompletedBlock(IExecutionNode<?> completedBlock, String formatedCondition) {
+         if (completedBlock != null) {
+            completedBlocks = completedBlocks.append(completedBlock);
+            formatedCompletedBlockConditions.put(completedBlock, formatedCondition);
+         }
       }
    }
    
@@ -1432,6 +1571,11 @@ public class ExecutionNodeReader {
     */
    public static class KeYlessBranchStatement extends AbstractKeYlessExecutionNode<BranchStatement> implements IExecutionBranchStatement {
       /**
+       * The block completions.
+       */
+      private ImmutableList<IExecutionNode<?>> blockCompletions = ImmutableSLList.nil();
+      
+      /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
@@ -1451,6 +1595,24 @@ public class ExecutionNodeReader {
       @Override
       public String getElementType() {
          return "Branch Statement";
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ImmutableList<IExecutionNode<?>> getBlockCompletions() {
+         return blockCompletions;
+      }
+      
+      /**
+       * Adds the given block completion.
+       * @param blockCompletion The block completion to add.
+       */
+      public void addBlockCompletion(IExecutionNode<?> blockCompletion) {
+         if (blockCompletion != null) {
+            blockCompletions = blockCompletions.append(blockCompletion);
+         }
       }
    }
    

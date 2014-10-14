@@ -57,7 +57,9 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                               </termination>
                            </statement>
                         </methodReturn>
+                        <completedBlockEntry path="/0/0/0/0/0/0" conditionString="true"/>
                      </statement>
+                     <blockCompletionEntry path="/0/0/0/0/0/0/0"/>
                   </branchStatement>
                   <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
                </methodCall>
@@ -102,7 +104,9 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                               </termination>
                            </statement>
                         </methodReturn>
+                        <completedBlockEntry path="/0/0/0/1/0/0" conditionString="true"/>
                      </statement>
+                     <blockCompletionEntry path="/0/0/0/1/0/0/0"/>
                   </branchStatement>
                   <methodReturnEntry path="/0/0/0/1/0/0/0/0"/>
                </methodCall>

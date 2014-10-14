@@ -23,7 +23,9 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                               <callStackEntry path="/0"/>
                               <termination name="&lt;loop body end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(i_0,Z(0(#))),not(equals(array,null))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
                               </termination>
+                              <completedBlockEntry path="/0/0/0/0/0/0/0/0" conditionString="true"/>
                            </statement>
+                           <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0"/>
                         </branchStatement>
                      </statement>
                   </branchCondition>

@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_0c38fd9a-6993-42b9-929e-dfa7a8aa7002" name="main()" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_817e512d-d776-4f84-a34a-0f048af1fea6" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_1c9d6a10-1b4f-4c26-917e-a70216e68539" name="&lt;call self.main()&gt;" pathCondition="true" lineNumber="-1" charStart="49" charEnd="53" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowVariableTest\src\ThrowVariableTest.java">
-            <sedStatement xml:id="_7a3d8689-b307-4e11-9d88-74b22d09b141" name="IllegalArgumentException e = new IllegalArgumentException ();" pathCondition="true" lineNumber="-1" charStart="61" charEnd="121" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowVariableTest\src\ThrowVariableTest.java">
-               <sedStatement xml:id="_0f704317-e2c7-4d0e-9a49-572bf4bca95e" name="throw e;" pathCondition="true" lineNumber="-1" charStart="125" charEnd="133" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowVariableTest\src\ThrowVariableTest.java">
-                  <sedExceptionalTermination xml:id="_57b49aeb-a819-4390-8c05-9e106abc3974" name="&lt;uncaught java.lang.IllegalArgumentException&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowVariableTest\src\ThrowVariableTest.java" verified="true">
-                  </sedExceptionalTermination>
+   <sedTarget xml:id="_fee3d332-390c-4fa0-a082-5cc0100304c8" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_5d21550c-a989-41e1-8276-f7069216b02f" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowVariableTest\src\ThrowVariableTest.java">
+         <sedMethodCall xml:id="_f2d8d2d6-85ec-4eda-9dd1-192089706f8e" name="&lt;call self.main()&gt;" pathCondition="true" lineNumber="-1" charStart="49" charEnd="53" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowVariableTest\src\ThrowVariableTest.java">
+            <sedStatement xml:id="_4cc214e1-3b20-4a6c-adc7-240bad28de90" name="IllegalArgumentException e = new IllegalArgumentException ();" pathCondition="true" lineNumber="-1" charStart="61" charEnd="121" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowVariableTest\src\ThrowVariableTest.java">
+               <sedStatement xml:id="_2832745e-92d6-44a8-8b0d-a82373bbab99" name="throw e;" pathCondition="true" lineNumber="-1" charStart="125" charEnd="133" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowVariableTest\src\ThrowVariableTest.java">
+                  <sedExceptionalMethodReturn xml:id="_2cfb521e-2ebe-4cf1-865b-3021020f3768" name="&lt;exceptional return of &lt;call self.main()&gt;&gt;" pathCondition="true" lineNumber="-1" charStart="49" charEnd="53" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowVariableTest\src\ThrowVariableTest.java" methodReturnConditionRef="_01752c07-0e62-4422-a5d8-b6db3feb9c49">
+                     <sedExceptionalTermination xml:id="_4e10ae2f-a112-4c5c-82ed-3dcc66e9f97b" name="&lt;uncaught java.lang.IllegalArgumentException&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowVariableTest\src\ThrowVariableTest.java" verified="true">
+                     </sedExceptionalTermination>
+                  </sedExceptionalMethodReturn>
                </sedStatement>
             </sedStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_01752c07-0e62-4422-a5d8-b6db3feb9c49" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_2cfb521e-2ebe-4cf1-865b-3021020f3768"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedGroupEndReference nodeIdRef="_01752c07-0e62-4422-a5d8-b6db3feb9c49"/>
          </sedMethodCall>
-         <sedTerminationEntry nodeIdRef="_57b49aeb-a819-4390-8c05-9e106abc3974"/>
+         <sedTerminationEntry nodeIdRef="_4e10ae2f-a112-4c5c-82ed-3dcc66e9f97b"/>
       </sedThread>
    </sedTarget>
 </launch>
