@@ -1115,11 +1115,6 @@ public class LogicPrinter {
         }
     }
 
-    public void printStore(Term t, boolean closingBrace) throws IOException {
-        storePrinter.printStore(t, closingBrace);
-    }
-
-
     protected void printEmbeddedObserver(final Term heapTerm, final Term objectTerm)
             throws IOException {
         Notation notation = notationInfo.getNotation(objectTerm.op());
@@ -1142,7 +1137,8 @@ public class LogicPrinter {
     /**
      * Find out whether a {@link Term} represents a field symbol, declared in a
      * Java class.
-     * 
+     *
+     * @return Returns true iff the given parameter represents a field constant.
      * @param fieldTerm The target field.
      */
     protected boolean isFieldConstant(final Term fieldTerm) {
@@ -1163,6 +1159,12 @@ public class LogicPrinter {
         selectPrinter.printSelect(t, tacitHeap);
     }
 
+    /*
+     * Print a term of the form: store(heap, object, field, value).
+     */
+    public void printStore(Term t, boolean closingBrace) throws IOException {
+        storePrinter.printStore(t, closingBrace);
+    }
 
     public void printPostfix(Term t, String postfix) throws IOException {
 	if(notationInfo.isPrettySyntax()) {
@@ -1176,7 +1178,6 @@ public class LogicPrinter {
 	    printFunctionTerm(t);
 	}
     }
-
 
     public void printObserver(Term t, Term tacitHeap) throws IOException {
         assert t.op() instanceof IObserverFunction;

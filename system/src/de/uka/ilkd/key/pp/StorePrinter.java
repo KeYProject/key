@@ -19,6 +19,35 @@ class StorePrinter {
         this.lp = lp;
     }
 
+    private void initPrettyPrint(final Term heapTerm) throws IOException {
+        lp.startTerm(4);
+
+        lp.markStartSub();
+        boolean hasEmbedded = lp.printEmbeddedHeapConstructorTerm(heapTerm);
+        lp.markEndSub();
+
+        if (hasEmbedded) {
+            lp.layouter.brk(0);
+        } else {
+            lp.layouter.beginC(0);
+        }
+
+        lp.layouter.print("[");
+    }
+
+    private void finishPrettyPrint(final Term valueTerm, boolean closingBrace) throws IOException {
+        lp.layouter.print(" := ");
+        lp.markStartSub();
+        lp.printTerm(valueTerm);
+        lp.markEndSub();
+
+        lp.layouter.print("]");
+
+        if (closingBrace) {
+            lp.layouter.end();
+        }
+    }
+
     void printStore(Term t, boolean closingBrace) throws IOException {
         assert t.boundVars().isEmpty();
         assert t.arity() == 4;
@@ -26,24 +55,13 @@ class StorePrinter {
         final HeapLDT heapLDT = lp.getHeapLDT();
 
         if (lp.notationInfo.isPrettySyntax() && heapLDT != null) {
-            lp.startTerm(4);
 
             final Term heapTerm = t.sub(0);
             final Term objectTerm = t.sub(1);
             final Term fieldTerm = t.sub(2);
             final Term valueTerm = t.sub(3);
 
-            lp.markStartSub();
-            boolean hasEmbedded = lp.printEmbeddedHeapConstructorTerm(heapTerm);
-            lp.markEndSub();
-
-            if (hasEmbedded) {
-                lp.layouter.brk(0);
-            } else {
-                lp.layouter.beginC(0);
-            }
-
-            lp.layouter.print("[");
+            initPrettyPrint(heapTerm);
 
             if (objectTerm.equals(lp.services.getTermBuilder().NULL())
                     && fieldTerm.op() instanceof Function
@@ -102,26 +120,17 @@ class StorePrinter {
 
                 lp.layouter.print("]");
             } else {
+                /*
+                 * TODO: This is misplaced, since store-term is already partially
+                 * printed at this point. Needs refactoring.
+                 * (Kai Wallisch 09/2014)
+                 */
                 lp.printFunctionTerm(t);
             }
 
-            lp.layouter.print(" := ");
-            lp.markStartSub();
-            lp.printTerm(valueTerm);
-            lp.markEndSub();
-
-            lp.layouter.print("]");
-
-            if (closingBrace) {
-                lp.layouter.end();
-            }
+            finishPrettyPrint(valueTerm, closingBrace);
 
         } else {
-            /*
-             * TODO: This is misplaced, since store-term is already partially
-             * printed at this point. Needs refactoring.
-             * (Kai Wallisch 09/2014)
-             */
             lp.printFunctionTerm(t);
         }
     }
