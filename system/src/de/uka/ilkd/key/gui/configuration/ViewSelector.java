@@ -15,6 +15,7 @@ package de.uka.ilkd.key.gui.configuration;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -77,6 +78,7 @@ public class ViewSelector extends JDialog {
 				+ "In case of longer <br>tooltips the instantiation will be "
 				+ "suppressed. </font></html>"));
 		maxLinesPanel.add(maxTooltipLinesInputField);
+		
 		JPanel showUninstantiatedTacletPanel = new JPanel();
 		showUninstantiatedTacletPanel.setLayout(new BoxLayout(showUninstantiatedTacletPanel,
 				BoxLayout.X_AXIS));
@@ -90,12 +92,12 @@ public class ViewSelector extends JDialog {
 	 	showWholeTacletCB = new JCheckBox("pretty-print whole Taclet including "
 				+ "'name', 'find', 'varCond' and 'heuristics'", showWholeTaclet);
 	 	showWholeTacletPanel.add(showWholeTacletCB);
-	 	JPanel tacletOptionsPanel = new JPanel();
 	 	
-	 	tacletOptionsPanel.setLayout(new BoxLayout(tacletOptionsPanel,
-				BoxLayout.Y_AXIS));
+	 	JPanel tacletOptionsPanel = new JPanel();
+	 	tacletOptionsPanel.setLayout(new GridLayout(2, 1));
 	 	tacletOptionsPanel.add(showWholeTacletPanel);
 	 	tacletOptionsPanel.add(showUninstantiatedTacletPanel);
+	 	
 	 	JButton okButton = new JButton("OK");
 		okButton.setMnemonic(KeyEvent.VK_ENTER);
 	
