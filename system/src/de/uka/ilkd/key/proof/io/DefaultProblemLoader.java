@@ -249,28 +249,28 @@ public class DefaultProblemLoader {
             final org.antlr.runtime.RecognitionException re = (org.antlr.runtime.RecognitionException) c0;
             final org.antlr.runtime.Token occurrence = re.token; // may be null
             if (c0 instanceof org.antlr.runtime.MismatchedTokenException) {
-                final org.antlr.runtime.MismatchedTokenException mte = (MismatchedTokenException) c0;
-                final String genericMsg = "expected "+mte.expecting
-                                +", but found "+mte.c;
-                final String readable = readableParserErrors.get(new Pair<Integer, Integer>(mte.expecting,mte.c));
-                final String msg = "Syntax error: " 
-                                +(readable == null? genericMsg: readable)
-                                +" ("+mte.input.getSourceName()
-                                +":"+mte.line+")";
-                return new ProblemLoaderException(this, msg, mte);
-            } else if (c0 instanceof org.antlr.runtime.MissingTokenException) {
-                final org.antlr.runtime.MissingTokenException mte = (org.antlr.runtime.MissingTokenException) c0;
-                // TODO: other commonly missed tokens
-                final String token = mte.expecting == KeYLexer.SEMI? "semicolon": "token id "+mte.expecting;
-                final String msg = "Syntax error: missing "+token+
-                                (occurrence == null? "": " at "+occurrence.getText())
-                                +" statement ("+mte.input.getSourceName()
-                                +":"+mte.line+")";
-                return new ProblemLoaderException(this, msg, mte);
-                // TODO other ANTLR exceptions
+                if (c0 instanceof org.antlr.runtime.MissingTokenException) {
+                    final org.antlr.runtime.MissingTokenException mte = (org.antlr.runtime.MissingTokenException) c0;
+                    // TODO: other commonly missed tokens
+                    final String token = mte.expecting == KeYLexer.SEMI? "semicolon": "token id "+mte.expecting;
+                    final String msg = "Syntax error: missing "+token+
+                                    (occurrence == null? "": " at "+occurrence.getText())
+                                    +" statement ("+mte.input.getSourceName()
+                                    +":"+mte.line+")";
+                    return new ProblemLoaderException(this, msg, mte);
+                    // TODO other ANTLR exceptions
+                } else {
+                    final org.antlr.runtime.MismatchedTokenException mte = (MismatchedTokenException) c0;
+                    final String genericMsg = "expected "+mte.expecting
+                                    +", but found "+mte.c;
+                    final String readable = readableParserErrors.get(new Pair<Integer, Integer>(mte.expecting,mte.c));
+                    final String msg = "Syntax error: " 
+                                    +(readable == null? genericMsg: readable)
+                                    +" ("+mte.input.getSourceName()
+                                    +":"+mte.line+")";
+                    return new ProblemLoaderException(this, msg, mte);
+                } 
             }
-        } else if (c0 instanceof ProblemLoaderException) {
-            return (ProblemLoaderException)c0;
         }
         // default
         return new ProblemLoaderException(this, "Loading proof input failed", e);
