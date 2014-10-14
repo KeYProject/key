@@ -72,7 +72,7 @@ class StorePrinter {
             if (objectTerm.equals(lp.services.getTermBuilder().NULL())
                     && fieldTerm.op() instanceof Function
                     && ((Function) fieldTerm.op()).isUnique()) {
-                printStoreOnStaticField(heapTerm, fieldTerm, objectTerm, valueTerm, closingBrace);
+                printStoreOnStaticField(heapTerm, fieldTerm, valueTerm, closingBrace);
             } else if (fieldTerm.arity() == 0) {
                 printStoreOnFieldConstant(heapTerm, objectTerm, fieldTerm, valueTerm, closingBrace);
             } else if (fieldTerm.op() == heapLDT.getArr()) {
@@ -139,14 +139,14 @@ class StorePrinter {
     /*
      * This is called in case parameter fieldTerm represents a static field.
      */
-    private void printStoreOnStaticField(final Term heapTerm, final Term fieldTerm, final Term objectTerm, final Term valueTerm, boolean closingBrace) throws IOException {
+    private void printStoreOnStaticField(final Term heapTerm, final Term fieldTerm, final Term valueTerm, boolean closingBrace) throws IOException {
         initPrettyPrint(heapTerm);
 
         String className = HeapLDT.getClassName((Function) fieldTerm.op());
 
         if (className == null) {
             lp.markStartSub();
-            lp.printTerm(objectTerm);
+            lp.printTerm(lp.services.getTermBuilder().NULL());
             lp.markEndSub();
         } else {
             lp.markStartSub();
