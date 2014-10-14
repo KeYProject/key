@@ -52,7 +52,7 @@ public class TestCaseGenerator {
 	
 	public static final String OBJENESIS_NAME = "objenesis-2.1.jar";
 	
-	private static final String TAB = "   ";
+	public static final String TAB = "   ";
 	private Services services;
 	private Proof proof;
 	static int fileCounter = 0;

@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -26,6 +27,14 @@ import de.uka.ilkd.key.testgen.TestCaseGenerator;
 
 public class OracleGenerator {
 	
+	
+	
+	private static final String OR = "||";
+
+	private static final String AND = "&&";
+
+	private static final String EQUALS = "==";
+
 	private Services services;
 	
 	private static int varNum;
@@ -55,10 +64,10 @@ public class OracleGenerator {
 	
 	private void initOps(){
 		ops = new HashMap<Operator,String>();		
-		ops.put(Equality.EQV, "==");
-		ops.put(Equality.EQUALS, "==");
-		ops.put(Junctor.AND, "&&");
-		ops.put(Junctor.OR, "||");
+		ops.put(Equality.EQV, EQUALS);
+		ops.put(Equality.EQUALS, EQUALS);
+		ops.put(Junctor.AND, AND);
+		ops.put(Junctor.OR, OR);
 		ops.put(services.getTypeConverter().getIntegerLDT().getLessOrEquals(), "<=");
 		ops.put(services.getTypeConverter().getIntegerLDT().getLessThan(), "<");
 		ops.put(services.getTypeConverter().getIntegerLDT().getGreaterOrEquals(), ">=");
@@ -77,7 +86,7 @@ public class OracleGenerator {
 	
 	public OracleMethod generateOracleMethod(Term term){
 		OracleTerm body = generateOracle(term);
-		return new OracleMethod("testOracle", new LinkedList<OracleVariable>(), body.toString());
+		return new OracleMethod("testOracle", new LinkedList<OracleVariable>(), "return "+body.toString()+";");
 	}
 	
 	
@@ -95,11 +104,22 @@ public class OracleGenerator {
 		//binary terms
 		if(ops.containsKey(op)){			
 			OracleTerm left = generateOracle(term.sub(0));
-			OracleTerm right = generateOracle(term.sub(1));			
-			return new OracleBinTerm(ops.get(op),left,right);			
+			OracleTerm right = generateOracle(term.sub(1));	
+			String javaOp = ops.get(op);
+			
+			if(javaOp.equals(EQUALS)){
+				return eq(left, right);
+			}
+			
+			
+			return new OracleBinTerm(javaOp,left,right);			
 		}//negation
 		else if(op == Junctor.NOT){
 			OracleTerm sub = generateOracle(term.sub(0));
+			if(sub instanceof OracleNegTerm){
+				OracleNegTerm neg = (OracleNegTerm) sub;
+				return neg.getSub();
+			}
 			return new OracleNegTerm(sub);
 		}
 		//true
@@ -109,6 +129,15 @@ public class OracleGenerator {
 		//false
 		else if (op == Junctor.FALSE) {
 			return OracleConstant.FALSE;
+		}
+		else if (op == Junctor.IMP){
+			OracleTerm left = generateOracle(term.sub(0));
+			OracleTerm right = generateOracle(term.sub(1));
+			
+			
+			
+			OracleTerm notLeft = neg(left);
+			return new OracleBinTerm(OR, notLeft, right);
 		}
 		//quantifiable variable
 		else if (op instanceof QuantifiableVariable) {			
@@ -160,13 +189,13 @@ public class OracleGenerator {
 	    if(isTrueConstant(op)){
 	    	return OracleConstant.TRUE;
 	    }
-	    if(isFalseConstant(op)){
+	    else if(isFalseConstant(op)){
 	    	return OracleConstant.FALSE;
 	    }
-	    if(term.subs().size() == 0){
+	    else if(term.subs().size() == 0){
 	    	return new OracleConstant(name, term.sort());
 	    }
-	    if(name.endsWith("select")){
+	    else if(name.endsWith("select")){
 	    	
 	    	Term heap = term.sub(0);	    	
 	    	OracleTerm heapTerm  = generateOracle(heap);	    	
@@ -176,9 +205,13 @@ public class OracleGenerator {
 	    	
 	    	Term field = term.sub(2);
 	    	OracleTerm fldTerm = generateOracle(field);
-	    	String value = objTerm.toString() + "."+fldTerm.toString();
+	    	String fieldName = fldTerm.toString();
+	    	fieldName = fieldName.substring(fieldName.lastIndexOf(":")+1, fieldName.length());
+	    	fieldName = fieldName.replace("$", "");
+	    	String value = objTerm.toString() + "."+fieldName;
 	    	
-	    	if(heapTerm.toString().equals("heap")){
+	    	
+	    	if(heapTerm.toString().equals("heapAtPre")){
 	    		if(!objTerm.toString().startsWith(PRE_STRING)){	
 	    			prestateTerms.add(objTerm.toString());
 	    			return new OracleConstant(PRE_STRING+value, term.sort());
@@ -188,11 +221,11 @@ public class OracleGenerator {
 	    		return new OracleConstant(value, term.sort());
 	    	}	    	
 	    }
-	    if(name.endsWith("::inv")){
-	    	if(fun instanceof SortDependingFunction){
-	    		SortDependingFunction sdf = (SortDependingFunction) fun;
-	    		Sort s = sdf.getSortDependingOn();
+	    else if(name.endsWith("::<inv>")){	    	
+	    	if(fun instanceof IObserverFunction){
+	    		IObserverFunction obs = (IObserverFunction) fun;
 	    		
+	    		Sort s = obs.getContainerType().getSort();
 	    		OracleMethod m;
 	    		
 	    		if(invariants.containsKey(s)){
@@ -208,20 +241,44 @@ public class OracleGenerator {
 	    			oracleMethods.add(m);
 	    		}
 	    		
-	    		OracleTerm arg = generateOracle(term.sub(0));
+	    		Term heap = term.sub(0);	    	
+		    	OracleTerm heapTerm  = generateOracle(heap);
+		    	
+		    	Term object = term.sub(1);
+		    	OracleTerm objTerm = generateOracle(object);
+		    	
+		    	if(heapTerm.toString().equals("heapAtPre")){
+		    		if(!objTerm.toString().startsWith(PRE_STRING)){	
+		    			prestateTerms.add(objTerm.toString());		    			
+		    			objTerm = new OracleConstant(PRE_STRING+object.toString(), object.sort());		    			
+		    		}
+		    	}	    		
+	    		
 	    		List<OracleTerm> args = new LinkedList<OracleTerm>();
-	    		args.add(arg);
+	    		args.add(objTerm);
 	    		
 	    		return new OracleTermCall(m, args);
+	    	}
+	    }
+	    else if (name.endsWith("::instance")){
+	    	
+	    	if(fun instanceof SortDependingFunction){
+	    		SortDependingFunction sdf  = (SortDependingFunction) fun;
+	    		Sort s = sdf.getSortDependingOn();
+	    		
+	    		
+	    		OracleTerm arg = generateOracle(term.sub(0));
+	    		OracleType type = new OracleType(s);
+	    		
+	    		return new OracleBinTerm("instanceof", arg, type);
 	    		
 	    		
 	    	}
+	    	
+	    	
 	    }
 	    
-	   
-	    
-	    System.out.println("Could not translate "+fun.name());
-	    throw new RuntimeException("Unsupported function found: "+fun.name());
+	    throw new RuntimeException("Unsupported function found: "+name+ " of type "+fun.getClass().getName());
     }
 	
 	private boolean isTrueConstant(Operator o) {
@@ -367,7 +424,7 @@ public class OracleGenerator {
 				+ "\n}"
 				+ "\n return true;";
 	    return body;
-    }
+    }	
 	
 	private String createExistsBody(QuantifiableVariable qv, String setName,
             OracleTerm cond) {
@@ -379,6 +436,35 @@ public class OracleGenerator {
 				+ "\n return false;";
 	    return body;
     }
+	
+	private static OracleTerm neg(OracleTerm t){
+		
+		if(t instanceof OracleNegTerm){			
+			return ((OracleNegTerm) t).getSub();
+		}
+		else{
+			return new OracleNegTerm(t);
+		}
+		
+	}
+	
+	private static OracleTerm eq(OracleTerm left, OracleTerm right){
+		if(left.equals(OracleConstant.TRUE)){
+			return right;
+		}
+		else if(left.equals(OracleConstant.FALSE)){
+			return neg(right);
+		}
+		else if(right.equals(OracleConstant.TRUE)){
+			return left;
+		}
+		else if(right.equals(OracleConstant.FALSE)){
+			return neg(left);
+		}
+		else{
+			return new OracleBinTerm(EQUALS, left, right);
+		}
+	}
 	
 	
 	

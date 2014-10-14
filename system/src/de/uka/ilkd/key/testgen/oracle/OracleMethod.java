@@ -3,6 +3,7 @@ package de.uka.ilkd.key.testgen.oracle;
 import java.util.List;
 
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.testgen.TestCaseGenerator;
 
 public class OracleMethod {
 
@@ -45,6 +46,7 @@ public class OracleMethod {
 
 	public String toString() {
 		//System.out.println("printing");
+		String tab = TestCaseGenerator.TAB;
 		String argString = "";
 
 		for(OracleVariable var : args){
@@ -58,7 +60,9 @@ public class OracleMethod {
 		if(returnType!=null){
 			retType = returnType.name().toString();
 		}
-		return "public "+retType+" "+methodName+ "("+argString+"){ return "+body+";}";
+		return tab + "public "+retType+" "+methodName+ "("+argString+"){\n"
+				+tab+ tab+body+"\n"
+						+ tab+"}";
 
 	}
 }
