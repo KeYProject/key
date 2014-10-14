@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call BranchStatementBlockTest.ifNoBlock(x,y)&gt;" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (x&lt;y)" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (x&lt;y)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <branchCondition name="gt(y,x)" pathCondition="gt(y,x)" pathConditionChanged="true" branchCondition="gt(y,x)" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return x;" pathCondition="gt(y,x)" pathConditionChanged="false">
                <methodReturn name="&lt;return of ifNoBlock&gt;" signature="&lt;return of BranchStatementBlockTest.ifNoBlock(x,y)&gt;" pathCondition="gt(y,x)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="gt(y,x)">

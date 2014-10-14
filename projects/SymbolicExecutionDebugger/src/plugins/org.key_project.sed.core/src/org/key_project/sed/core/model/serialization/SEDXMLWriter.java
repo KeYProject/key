@@ -381,6 +381,11 @@ public class SEDXMLWriter {
     * Refers to an existing {@link ISEDDebugNode} to store {@link ISEDMethodReturn#getMethodReturnCondition()}.
     */
    public static final String ATTRIBUTE_METHOD_RETURN_CONDITION = "methodReturnConditionRef";
+
+   /**
+    * Attribute name to store {@link ISEDGroupable#isGroupable()}.
+    */
+   public static final String ATTRIBUTE_GROUPABLE = "groupable";
    
    /**
     * Writes the given {@link ISEDDebugTarget}s into the {@link OutputStream} with the defined encoding.
@@ -1085,6 +1090,9 @@ public class SEDXMLWriter {
             if (returnCondition != null) {
                attributeValues.put(ATTRIBUTE_METHOD_RETURN_CONDITION, returnCondition.getId());
             }
+         }
+         if (node instanceof ISEDGroupable) {
+            attributeValues.put(ATTRIBUTE_GROUPABLE, ((ISEDGroupable) node).isGroupable() + "");
          }
       }
       return attributeValues;

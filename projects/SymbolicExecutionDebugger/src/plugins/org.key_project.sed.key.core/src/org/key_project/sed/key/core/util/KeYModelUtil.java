@@ -48,6 +48,7 @@ import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
@@ -525,5 +526,23 @@ public final class KeYModelUtil {
       catch (ProofInputException e) {
          throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute method return condition.", e));
       }
+   }
+
+   /**
+    * Computes the group end conditions.
+    * @param node The {@link IKeYSEDDebugNode} for which group end conditions are requested.
+    * @return The up to now known group end conditions.
+    * @throws DebugException Occurred Exception.
+    */
+   public static ISEDBranchCondition[] computeGroupEndConditions(IKeYSEDDebugNode<? extends IExecutionBlockStartNode<?>> node) throws DebugException {
+      ImmutableList<IExecutionNode<?>> completions = node.getExecutionNode().getBlockCompletions();
+      ISEDBranchCondition[] result = new ISEDBranchCondition[completions.size()];
+      int i = 0;
+      for (IExecutionNode<?> completion : completions) {
+         IKeYSEDDebugNode<?> keyCompletion = KeYModelUtil.createNode(node.getDebugTarget(), node.getThread(), null, completion);
+         result[i] = keyCompletion.getGroupStartCondition(node);
+         i++;
+      }
+      return result;
    }
 }

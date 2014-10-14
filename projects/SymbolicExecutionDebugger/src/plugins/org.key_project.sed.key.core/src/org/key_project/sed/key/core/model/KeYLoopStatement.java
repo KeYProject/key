@@ -23,6 +23,7 @@ import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
+import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDLoopStatement;
 import org.key_project.sed.core.model.impl.AbstractSEDLoopStatement;
@@ -412,5 +413,23 @@ public class KeYLoopStatement extends AbstractSEDLoopStatement implements IKeYSE
    @Override
    public void setParent(ISEDDebugNode parent) {
       super.setParent(parent);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDBranchCondition[] getGroupEndConditions() throws DebugException {
+      synchronized (this) { // Is thread save execution really required?
+         return KeYModelUtil.computeGroupEndConditions(this);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isGroupable() {
+      return executionNode.isBlockOpened();
    }
 }

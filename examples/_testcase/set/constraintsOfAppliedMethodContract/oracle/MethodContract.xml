@@ -13,7 +13,7 @@
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <branchStatement name="if (m&gt;10)" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (m&gt;10)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <constraint name="wellFormed(heap)"/>
          <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
          <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>

@@ -59,6 +59,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
@@ -158,8 +159,8 @@ public class ExecutionNodeReader {
                }
             }
             // Construct block completions
-            Set<Entry<KeYlessBranchStatement, List<String>>> blockCompletionEntries = handler.getBlockCompletionEntries().entrySet();
-            for (Entry<KeYlessBranchStatement, List<String>> entry : blockCompletionEntries) {
+            Set<Entry<AbstractKeYlessExecutionBlockStartNode<?>, List<String>>> blockCompletionEntries = handler.getBlockCompletionEntries().entrySet();
+            for (Entry<AbstractKeYlessExecutionBlockStartNode<?>, List<String>> entry : blockCompletionEntries) {
                for (String path : entry.getValue()) {
                   IExecutionNode<?> returnEntry = findNode(root, path);
                   if (returnEntry == null) {
@@ -264,9 +265,9 @@ public class ExecutionNodeReader {
       private final Map<AbstractKeYlessExecutionNode<?>, List<Pair<String, String>>> completedBlockEntries = new LinkedHashMap<AbstractKeYlessExecutionNode<?>, List<Pair<String, String>>>();
       
       /**
-       * Maps an {@link KeYlessBranchStatement} to the path entries of its block completions.
+       * Maps an {@link AbstractKeYlessExecutionBlockStartNode} to the path entries of its block completions.
        */
-      private final Map<KeYlessBranchStatement, List<String>> blockCompletionEntries = new LinkedHashMap<KeYlessBranchStatement, List<String>>();
+      private final Map<AbstractKeYlessExecutionBlockStartNode<?>, List<String>> blockCompletionEntries = new LinkedHashMap<AbstractKeYlessExecutionBlockStartNode<?>, List<String>>();
       
       /**
        * Maps an {@link KeYlessStart} to the path entries of its terminations.
@@ -349,7 +350,7 @@ public class ExecutionNodeReader {
             List<String> blockCompletionPathEntries = blockCompletionEntries.get(parent);
             if (blockCompletionPathEntries == null) {
                blockCompletionPathEntries = new LinkedList<String>();
-               blockCompletionEntries.put((KeYlessBranchStatement)parent, blockCompletionPathEntries);
+               blockCompletionEntries.put((AbstractKeYlessExecutionBlockStartNode<?>)parent, blockCompletionPathEntries);
             }
             blockCompletionPathEntries.add(getPathInTree(attributes));
          }
@@ -451,10 +452,10 @@ public class ExecutionNodeReader {
       }
 
       /**
-       * Returns the mapping of a {@link KeYlessBranchStatement} to its block completion entries.
-       * @return The mapping of a {@link KeYlessBranchStatement} to its block completion entries.
+       * Returns the mapping of a {@link AbstractKeYlessExecutionBlockStartNode} to its block completion entries.
+       * @return The mapping of a {@link AbstractKeYlessExecutionBlockStartNode} to its block completion entries.
        */
-      public Map<KeYlessBranchStatement, List<String>> getBlockCompletionEntries() {
+      public Map<AbstractKeYlessExecutionBlockStartNode<?>, List<String>> getBlockCompletionEntries() {
          return blockCompletionEntries;
       }
 
@@ -642,13 +643,13 @@ public class ExecutionNodeReader {
          return new KeYlessBranchCondition(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getBranchCondition(attributes), isMergedBranchCondition(attributes), isBranchConditionComputed(attributes), getAdditionalBranchLabel(attributes));
       }
       else if (ExecutionNodeWriter.TAG_BRANCH_STATEMENT.equals(qName)) {
-         return new KeYlessBranchStatement(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
+         return new KeYlessBranchStatement(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isBlockOpened(attributes));
       }
       else if (ExecutionNodeWriter.TAG_LOOP_CONDITION.equals(qName)) {
-         return new KeYlessLoopCondition(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
+         return new KeYlessLoopCondition(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isBlockOpened(attributes));
       }
       else if (ExecutionNodeWriter.TAG_LOOP_STATEMENT.equals(qName)) {
-         return new KeYlessLoopStatement(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
+         return new KeYlessLoopStatement(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isBlockOpened(attributes));
       }
       else if (ExecutionNodeWriter.TAG_METHOD_CALL.equals(qName)) {
          return new KeYlessMethodCall(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
@@ -758,6 +759,15 @@ public class ExecutionNodeReader {
     */
    protected boolean isHasNotNullCheck(Attributes attributes) {
       return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_HAS_NOT_NULL_CHECK));
+   }
+
+   /**
+    * Returns the block opened value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isBlockOpened(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_BLOCK_OPENED));
    }
    
    /**
@@ -1317,6 +1327,62 @@ public class ExecutionNodeReader {
    }
    
    /**
+    * An abstract implementation of {@link IExecutionBlockStartNode} which is independent
+    * from KeY and provides such only children and default attributes.
+    * @author Martin Hentschel
+    */
+   public static abstract class AbstractKeYlessExecutionBlockStartNode<S extends SourceElement> extends AbstractKeYlessExecutionNode<S> implements IExecutionBlockStartNode<S> {
+      /**
+       * The block completions.
+       */
+      private ImmutableList<IExecutionNode<?>> blockCompletions = ImmutableSLList.nil();
+      
+      /**
+       * Is a block opened?
+       */
+      private final boolean blockOpened;
+      
+      /**
+       * Constructor.
+       * @param parent The parent {@link IExecutionNode}.
+       * @param name The name of this node.
+       * @param formatedPathCondition The formated path condition.
+       * @param pathConditionChanged Is the path condition changed compared to parent?
+       * @param blockOpened {@code false} block is definitively not opened, {@code true} block is or might be opened.
+       */
+      public AbstractKeYlessExecutionBlockStartNode(IExecutionNode<?> parent, String name, String formatedPathCondition, boolean pathConditionChanged, boolean blockOpened) {
+         super(parent, name, formatedPathCondition, pathConditionChanged);
+         this.blockOpened = blockOpened;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ImmutableList<IExecutionNode<?>> getBlockCompletions() {
+         return blockCompletions;
+      }
+      
+      /**
+       * Adds the given block completion.
+       * @param blockCompletion The block completion to add.
+       */
+      public void addBlockCompletion(IExecutionNode<?> blockCompletion) {
+         if (blockCompletion != null) {
+            blockCompletions = blockCompletions.append(blockCompletion);
+         }
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isBlockOpened() {
+         return blockOpened;
+      }
+   }
+   
+   /**
     * An implementation of {@link IExecutionLoopCondition} which is independent
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
@@ -1569,24 +1635,21 @@ public class ExecutionNodeReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessBranchStatement extends AbstractKeYlessExecutionNode<BranchStatement> implements IExecutionBranchStatement {
-      /**
-       * The block completions.
-       */
-      private ImmutableList<IExecutionNode<?>> blockCompletions = ImmutableSLList.nil();
-      
+   public static class KeYlessBranchStatement extends AbstractKeYlessExecutionBlockStartNode<BranchStatement> implements IExecutionBranchStatement {
       /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
        * @param formatedPathCondition The formated path condition.
        * @param pathConditionChanged Is the path condition changed compared to parent?
+       * @param blockOpened {@code false} block is definitively not opened, {@code true} block is or might be opened.
        */
       public KeYlessBranchStatement(IExecutionNode<?> parent, 
                                     String name, 
                                     String formatedPathCondition,
-                                    boolean pathConditionChanged) {
-         super(parent, name, formatedPathCondition, pathConditionChanged);
+                                    boolean pathConditionChanged,
+                                    boolean blockOpened) {
+         super(parent, name, formatedPathCondition, pathConditionChanged, blockOpened);
       }
 
       /**
@@ -1596,24 +1659,6 @@ public class ExecutionNodeReader {
       public String getElementType() {
          return "Branch Statement";
       }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public ImmutableList<IExecutionNode<?>> getBlockCompletions() {
-         return blockCompletions;
-      }
-      
-      /**
-       * Adds the given block completion.
-       * @param blockCompletion The block completion to add.
-       */
-      public void addBlockCompletion(IExecutionNode<?> blockCompletion) {
-         if (blockCompletion != null) {
-            blockCompletions = blockCompletions.append(blockCompletion);
-         }
-      }
    }
    
    /**
@@ -1621,19 +1666,21 @@ public class ExecutionNodeReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessLoopCondition extends AbstractKeYlessExecutionNode<LoopStatement> implements IExecutionLoopCondition {
+   public static class KeYlessLoopCondition extends AbstractKeYlessExecutionBlockStartNode<LoopStatement> implements IExecutionLoopCondition {
       /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
        * @param formatedPathCondition The formated path condition.
        * @param pathConditionChanged Is the path condition changed compared to parent?
+       * @param blockOpened {@code false} block is definitively not opened, {@code true} block is or might be opened.
        */
       public KeYlessLoopCondition(IExecutionNode<?> parent, 
                                   String name, 
                                   String formatedPathCondition,
-                                  boolean pathConditionChanged) {
-         super(parent, name, formatedPathCondition, pathConditionChanged);
+                                  boolean pathConditionChanged,
+                                  boolean blockOpened) {
+         super(parent, name, formatedPathCondition, pathConditionChanged, blockOpened);
       }
 
       /**
@@ -1666,19 +1713,21 @@ public class ExecutionNodeReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessLoopStatement extends AbstractKeYlessExecutionNode<LoopStatement> implements IExecutionLoopStatement {
+   public static class KeYlessLoopStatement extends AbstractKeYlessExecutionBlockStartNode<LoopStatement> implements IExecutionLoopStatement {
       /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
        * @param formatedPathCondition The formated path condition.
        * @param pathConditionChanged Is the path condition changed compared to parent?
+       * @param blockOpened {@code false} block is definitively not opened, {@code true} block is or might be opened.
        */
       public KeYlessLoopStatement(IExecutionNode<?> parent, 
                                   String name, 
                                   String formatedPathCondition, 
-                                  boolean pathConditionChanged) {
-         super(parent, name, formatedPathCondition, pathConditionChanged);
+                                  boolean pathConditionChanged,
+                                  boolean blockOpened) {
+         super(parent, name, formatedPathCondition, pathConditionChanged, blockOpened);
       }
 
       /**

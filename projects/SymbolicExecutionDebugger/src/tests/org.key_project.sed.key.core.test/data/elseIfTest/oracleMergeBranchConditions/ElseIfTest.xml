@@ -1,197 +1,197 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_6d9d6123-cbd2-4652-bed1-63cd37610826" name="elseIf(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_49ce2ccc-15bb-4be5-9751-33c78bfc01ae" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-         <sedMethodCall xml:id="_168ff61d-c09e-4adc-ac68-7ff96a6b989f" name="&lt;call self.elseIf(x)&gt;" pathCondition="true" lineNumber="-1" charStart="90" charEnd="96" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-            <sedStatement xml:id="_381e372f-44f0-4da2-9bb8-e42f3102bd8f" name="int a;" pathCondition="true" lineNumber="-1" charStart="109" charEnd="115" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-               <sedBranchStatement xml:id="_63c918ae-4d50-491c-97d9-70dea050e780" name="if (x==0)" pathCondition="true" lineNumber="-1" charStart="119" charEnd="131" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                  <sedBranchCondition xml:id="_6fffc330-e9cf-4b3e-8008-20c966e92490" name="equals(x,Z(0(#)))" pathCondition="equals(x,Z(0(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                     <sedStatement xml:id="_7a0e81b3-5673-4bd8-a85e-6d343af443de" name="a=1;" pathCondition="equals(x,Z(0(#)))" lineNumber="-1" charStart="137" charEnd="143" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                        <sedStatement xml:id="_28699c7c-20f9-4461-ad2a-a694b5d1d6ce" name="return a;" pathCondition="equals(x,Z(0(#)))" lineNumber="-1" charStart="329" charEnd="338" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                           <sedMethodReturn xml:id="_775dbd78-b046-4068-abb1-ff9ac1a838e5" name="&lt;return of self.elseIf(x)&gt;" pathCondition="equals(x,Z(0(#)))" lineNumber="-1" charStart="90" charEnd="96" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" methodReturnConditionRef="_6dc0e12d-21b9-45a5-9566-835a7b4ea5c1">
-                              <sedTermination xml:id="_b656ef2b-7588-47b8-af8e-c0ac91fa4dbb" name="&lt;end&gt;" pathCondition="equals(x,Z(0(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" verified="true">
+   <sedTarget xml:id="_e855d46e-ee4a-41b4-8266-1d583f08c445" name="elseIf(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_949ec08c-e18d-4f0f-b3ca-fc418434ebfc" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
+         <sedMethodCall xml:id="_eac2655f-0caf-4950-b07f-0ac9c79e526f" name="&lt;call self.elseIf(x)&gt;" pathCondition="true" lineNumber="-1" charStart="90" charEnd="96" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" groupable="true">
+            <sedStatement xml:id="_16579b53-89d1-4974-acd3-d8e6d8ff6f97" name="int a;" pathCondition="true" lineNumber="-1" charStart="109" charEnd="115" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
+               <sedBranchStatement xml:id="_479e70f4-52fc-47ac-9173-ca718e5deeb6" name="if (x==0)" pathCondition="true" lineNumber="-1" charStart="119" charEnd="131" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" groupable="true">
+                  <sedBranchCondition xml:id="_3052dc6f-9658-4dbd-acf5-f21b955ec68a" name="equals(x,Z(0(#)))" pathCondition="equals(x,Z(0(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
+                     <sedStatement xml:id="_ba521040-235e-494e-a424-1f29ac8fb1b7" name="a=1;" pathCondition="equals(x,Z(0(#)))" lineNumber="-1" charStart="137" charEnd="143" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
+                        <sedStatement xml:id="_da68a24e-1704-43f8-b67e-f54807fd82e9" name="return a;" pathCondition="equals(x,Z(0(#)))" lineNumber="-1" charStart="329" charEnd="338" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
+                           <sedMethodReturn xml:id="_4bea6ed9-0159-4a46-ae09-027548ba1c88" name="&lt;return of self.elseIf(x)&gt;" pathCondition="equals(x,Z(0(#)))" lineNumber="-1" charStart="90" charEnd="96" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" methodReturnConditionRef="_0767eedf-60a7-4521-b5c1-90b9752be6b4">
+                              <sedTermination xml:id="_3919fe07-9533-4592-a13b-a6889cc9f395" name="&lt;end&gt;" pathCondition="equals(x,Z(0(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" verified="true">
                               </sedTermination>
-                              <sedGroupStartCondition xml:id="_6dc0e12d-21b9-45a5-9566-835a7b4ea5c1" name="equals(x,Z(0(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-                                 <sedChildReference nodeIdRef="_775dbd78-b046-4068-abb1-ff9ac1a838e5"/>
+                              <sedGroupStartCondition xml:id="_0767eedf-60a7-4521-b5c1-90b9752be6b4" name="equals(x,Z(0(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                 <sedChildReference nodeIdRef="_4bea6ed9-0159-4a46-ae09-027548ba1c88"/>
                               </sedGroupStartCondition>
                            </sedMethodReturn>
                         </sedStatement>
-                        <sedGroupStartCondition xml:id="_6d1849e9-f554-4c9b-8bce-9a263dcba009" name="equals(x,Z(0(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-                           <sedChildReference nodeIdRef="_7a0e81b3-5673-4bd8-a85e-6d343af443de"/>
+                        <sedGroupStartCondition xml:id="_96786988-1c21-45e5-80a5-219d47888ef8" name="equals(x,Z(0(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                           <sedChildReference nodeIdRef="_ba521040-235e-494e-a424-1f29ac8fb1b7"/>
                         </sedGroupStartCondition>
                      </sedStatement>
                   </sedBranchCondition>
-                  <sedBranchCondition xml:id="_46c0c346-48d4-4f60-b5e4-33b639523323" name="not(equals(x,Z(0(#))))" pathCondition="not(equals(x,Z(0(#))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                     <sedBranchStatement xml:id="_dbc46da0-6999-4240-9427-414b7deb0a47" name="if (x==1||x==2||x==3)" pathCondition="not(equals(x,Z(0(#))))" lineNumber="-1" charStart="119" charEnd="131" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                        <sedBranchCondition xml:id="_c9701891-d5aa-4f22-beef-629f335b10d4" name="equals(x,Z(1(#)))" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                           <sedBranchStatement xml:id="_835b2e64-14a3-4532-ac2d-ba8512736801" name="if (x==1||x==2)" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="195" charEnd="217" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                              <sedStatement xml:id="_85456128-f27f-45ef-bd66-0df757912680" name="a=-1;" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="224" charEnd="231" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                                 <sedStatement xml:id="_d49f4a9d-4f23-4002-934f-00806a6e373a" name="a=x*x;" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="242" charEnd="252" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                                    <sedStatement xml:id="_1128bfbc-14f2-43be-a65e-a5b41c33abf2" name="return a;" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="329" charEnd="338" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                                       <sedMethodReturn xml:id="_23ae7330-aa36-4101-9a5d-f31bc22906c8" name="&lt;return of self.elseIf(x)&gt;" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="90" charEnd="96" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" methodReturnConditionRef="_d95629fd-92b5-4711-9a4a-510426aeb83b">
-                                          <sedTermination xml:id="_462d7dc4-5da5-4011-9cf1-bc4f04452437" name="&lt;end&gt;" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" verified="true">
+                  <sedBranchCondition xml:id="_7962b749-8926-40f8-afed-04f320544d6a" name="not(equals(x,Z(0(#))))" pathCondition="not(equals(x,Z(0(#))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
+                     <sedBranchStatement xml:id="_eb582a44-602d-479a-8989-125a7b1bd4e5" name="if (x==1||x==2||x==3)" pathCondition="not(equals(x,Z(0(#))))" lineNumber="-1" charStart="119" charEnd="131" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" groupable="true">
+                        <sedBranchCondition xml:id="_a430b166-0f05-48b3-9e8c-5d4b09454ec0" name="equals(x,Z(1(#)))" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
+                           <sedBranchStatement xml:id="_7ab7ded4-f634-483b-93cc-3437d98e527e" name="if (x==1||x==2)" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="195" charEnd="217" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" groupable="true">
+                              <sedStatement xml:id="_e4d581e3-e6e7-4ff1-8ebb-84e692c336cd" name="a=-1;" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="224" charEnd="231" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
+                                 <sedStatement xml:id="_6a645e58-8f6f-47a0-98a3-b2fbc7164c5d" name="a=x*x;" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="242" charEnd="252" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
+                                    <sedStatement xml:id="_aee0035f-afbb-4345-809c-5f96288a60e9" name="return a;" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="329" charEnd="338" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
+                                       <sedMethodReturn xml:id="_bf376830-8c3f-4a3d-bda1-c0d4a9aeab95" name="&lt;return of self.elseIf(x)&gt;" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="90" charEnd="96" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" methodReturnConditionRef="_2e03177e-b225-450a-8a4e-74b85149c995">
+                                          <sedTermination xml:id="_75705444-92c3-4054-a2d6-aaf9d01342be" name="&lt;end&gt;" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" verified="true">
                                           </sedTermination>
-                                          <sedGroupStartCondition xml:id="_d95629fd-92b5-4711-9a4a-510426aeb83b" name="equals(x,Z(1(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-                                             <sedChildReference nodeIdRef="_23ae7330-aa36-4101-9a5d-f31bc22906c8"/>
+                                          <sedGroupStartCondition xml:id="_2e03177e-b225-450a-8a4e-74b85149c995" name="equals(x,Z(1(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                             <sedChildReference nodeIdRef="_bf376830-8c3f-4a3d-bda1-c0d4a9aeab95"/>
                                           </sedGroupStartCondition>
                                        </sedMethodReturn>
                                     </sedStatement>
-                                    <sedGroupStartCondition xml:id="_5c3ceda7-b6bf-42c0-91c5-46aaa8774ccf" name="equals(x,Z(1(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-                                       <sedChildReference nodeIdRef="_d49f4a9d-4f23-4002-934f-00806a6e373a"/>
+                                    <sedGroupStartCondition xml:id="_28921c89-cf0a-40d3-a9eb-e5ebaa88fa5b" name="equals(x,Z(1(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                       <sedChildReference nodeIdRef="_6a645e58-8f6f-47a0-98a3-b2fbc7164c5d"/>
                                     </sedGroupStartCondition>
-                                    <sedGroupStartCondition xml:id="_41260dee-4a5e-47f3-be21-d15fa58171e7" name="equals(x,Z(1(#)))" pathCondition="not(equals(x,Z(0(#))))" lineNumber="-1" charStart="-1" charEnd="-1">
-                                       <sedChildReference nodeIdRef="_d49f4a9d-4f23-4002-934f-00806a6e373a"/>
+                                    <sedGroupStartCondition xml:id="_00071f4f-5708-4b15-9fc8-1d49a72213af" name="equals(x,Z(1(#)))" pathCondition="not(equals(x,Z(0(#))))" lineNumber="-1" charStart="-1" charEnd="-1">
+                                       <sedChildReference nodeIdRef="_6a645e58-8f6f-47a0-98a3-b2fbc7164c5d"/>
                                     </sedGroupStartCondition>
                                  </sedStatement>
-                                 <sedGroupStartCondition xml:id="_f4dfd35c-4ce8-4a15-8157-38e2660f923b" name="true" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="-1" charEnd="-1">
-                                    <sedChildReference nodeIdRef="_85456128-f27f-45ef-bd66-0df757912680"/>
+                                 <sedGroupStartCondition xml:id="_733ba8f5-3d72-4b1a-8f1c-da017d6dca63" name="true" pathCondition="equals(x,Z(1(#)))" lineNumber="-1" charStart="-1" charEnd="-1">
+                                    <sedChildReference nodeIdRef="_e4d581e3-e6e7-4ff1-8ebb-84e692c336cd"/>
                                  </sedGroupStartCondition>
                               </sedStatement>
-                              <sedGroupEndReference nodeIdRef="_f4dfd35c-4ce8-4a15-8157-38e2660f923b"/>
+                              <sedGroupEndReference nodeIdRef="_733ba8f5-3d72-4b1a-8f1c-da017d6dca63"/>
                            </sedBranchStatement>
                         </sedBranchCondition>
-                        <sedBranchCondition xml:id="_9df25a6c-baf6-4a4b-a452-247db6876039" name="equals(x,Z(2(#)))" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                           <sedBranchStatement xml:id="_2fa39f22-685d-48a3-92ad-a67bf9c75612" name="if (x==1||x==2)" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="195" charEnd="217" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                              <sedStatement xml:id="_641f9b61-73a1-435f-b4e2-5998163bb0fe" name="a=-1;" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="224" charEnd="231" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                                 <sedStatement xml:id="_c85686c4-e5e2-4150-a109-d9e7a1190898" name="a=x*x;" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="242" charEnd="252" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                                    <sedStatement xml:id="_608e5523-6f69-45f8-b8cb-47f2d28991a5" name="return a;" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="329" charEnd="338" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                                       <sedMethodReturn xml:id="_2556a754-4540-4389-aa09-28c9bab3c50d" name="&lt;return of self.elseIf(x)&gt;" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="90" charEnd="96" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" methodReturnConditionRef="_b1ac5e18-b3df-4e11-8064-27a26c3f5fe8">
-                                          <sedTermination xml:id="_c4a55367-52c5-41e2-8de1-f365463d5abb" name="&lt;end&gt;" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" verified="true">
+                        <sedBranchCondition xml:id="_1b0aff2c-3c36-44c7-87ce-a562e83e5b88" name="equals(x,Z(2(#)))" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
+                           <sedBranchStatement xml:id="_8cbdfcaf-f5b4-4047-99cc-6b705ea12751" name="if (x==1||x==2)" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="195" charEnd="217" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" groupable="true">
+                              <sedStatement xml:id="_82b009f0-579a-4c1b-a8a7-e08c3272a138" name="a=-1;" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="224" charEnd="231" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
+                                 <sedStatement xml:id="_0c189aee-abde-482b-afe4-f02556d49907" name="a=x*x;" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="242" charEnd="252" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
+                                    <sedStatement xml:id="_efc7eeac-3c66-4020-9d03-2bb2faa98ea8" name="return a;" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="329" charEnd="338" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
+                                       <sedMethodReturn xml:id="_ddd99d41-dea3-4147-a87b-54dfccc06224" name="&lt;return of self.elseIf(x)&gt;" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="90" charEnd="96" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" methodReturnConditionRef="_ae792492-dff2-4332-a75c-ab811ee6ab14">
+                                          <sedTermination xml:id="_4383c315-73fe-49d6-9811-1e1e73366ba8" name="&lt;end&gt;" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" verified="true">
                                           </sedTermination>
-                                          <sedGroupStartCondition xml:id="_b1ac5e18-b3df-4e11-8064-27a26c3f5fe8" name="equals(x,Z(2(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-                                             <sedChildReference nodeIdRef="_2556a754-4540-4389-aa09-28c9bab3c50d"/>
+                                          <sedGroupStartCondition xml:id="_ae792492-dff2-4332-a75c-ab811ee6ab14" name="equals(x,Z(2(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                             <sedChildReference nodeIdRef="_ddd99d41-dea3-4147-a87b-54dfccc06224"/>
                                           </sedGroupStartCondition>
                                        </sedMethodReturn>
                                     </sedStatement>
-                                    <sedGroupStartCondition xml:id="_9fa00493-ba83-4767-8893-afb6dea7544f" name="equals(x,Z(2(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-                                       <sedChildReference nodeIdRef="_c85686c4-e5e2-4150-a109-d9e7a1190898"/>
+                                    <sedGroupStartCondition xml:id="_137f8e54-c33c-4eec-bf63-8ed445918929" name="equals(x,Z(2(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                       <sedChildReference nodeIdRef="_0c189aee-abde-482b-afe4-f02556d49907"/>
                                     </sedGroupStartCondition>
-                                    <sedGroupStartCondition xml:id="_9e6319a2-cc4b-46b7-a4dc-7e0bd77f63e2" name="equals(x,Z(2(#)))" pathCondition="not(equals(x,Z(0(#))))" lineNumber="-1" charStart="-1" charEnd="-1">
-                                       <sedChildReference nodeIdRef="_c85686c4-e5e2-4150-a109-d9e7a1190898"/>
+                                    <sedGroupStartCondition xml:id="_5013a854-3e20-4678-9106-3d31618d6760" name="equals(x,Z(2(#)))" pathCondition="not(equals(x,Z(0(#))))" lineNumber="-1" charStart="-1" charEnd="-1">
+                                       <sedChildReference nodeIdRef="_0c189aee-abde-482b-afe4-f02556d49907"/>
                                     </sedGroupStartCondition>
                                  </sedStatement>
-                                 <sedGroupStartCondition xml:id="_69ad4535-cf8e-4a44-bb64-5392b379b652" name="true" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="-1" charEnd="-1">
-                                    <sedChildReference nodeIdRef="_641f9b61-73a1-435f-b4e2-5998163bb0fe"/>
+                                 <sedGroupStartCondition xml:id="_cf8385bc-86c2-45bd-b9fc-146826e98945" name="true" pathCondition="equals(x,Z(2(#)))" lineNumber="-1" charStart="-1" charEnd="-1">
+                                    <sedChildReference nodeIdRef="_82b009f0-579a-4c1b-a8a7-e08c3272a138"/>
                                  </sedGroupStartCondition>
                               </sedStatement>
-                              <sedGroupEndReference nodeIdRef="_69ad4535-cf8e-4a44-bb64-5392b379b652"/>
+                              <sedGroupEndReference nodeIdRef="_cf8385bc-86c2-45bd-b9fc-146826e98945"/>
                            </sedBranchStatement>
                         </sedBranchCondition>
-                        <sedBranchCondition xml:id="_b2be7e7b-8301-4f97-ae94-379852d0b875" name="equals(x,Z(3(#)))" pathCondition="equals(x,Z(3(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                           <sedBranchStatement xml:id="_9f6ae16d-7d20-4089-b5ed-7a425ba9621f" name="if (x==1||x==2)" pathCondition="equals(x,Z(3(#)))" lineNumber="-1" charStart="195" charEnd="217" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                              <sedStatement xml:id="_77a39654-d57d-493b-b2bc-5f1c482038ad" name="a=x*x;" pathCondition="equals(x,Z(3(#)))" lineNumber="-1" charStart="242" charEnd="252" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                                 <sedStatement xml:id="_9baf0b4c-bf3a-47b7-9ab7-4878a58d4e77" name="return a;" pathCondition="equals(x,Z(3(#)))" lineNumber="-1" charStart="329" charEnd="338" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                                    <sedMethodReturn xml:id="_e61a7ff5-0508-4731-86f1-11c73127d900" name="&lt;return of self.elseIf(x)&gt;" pathCondition="equals(x,Z(3(#)))" lineNumber="-1" charStart="90" charEnd="96" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" methodReturnConditionRef="_fbd1499b-a9ce-4854-bc4f-98fc1cdf8187">
-                                       <sedTermination xml:id="_c105b05d-1542-46aa-a0da-af36ea4e7f1e" name="&lt;end&gt;" pathCondition="equals(x,Z(3(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" verified="true">
+                        <sedBranchCondition xml:id="_f87f4e4d-c127-4ca3-8962-6d53458a1057" name="equals(x,Z(3(#)))" pathCondition="equals(x,Z(3(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
+                           <sedBranchStatement xml:id="_44f53249-e88a-439a-bb70-3249e26ddae8" name="if (x==1||x==2)" pathCondition="equals(x,Z(3(#)))" lineNumber="-1" charStart="195" charEnd="217" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" groupable="false">
+                              <sedStatement xml:id="_9fd62357-aad1-4ff8-9046-88f7018517e5" name="a=x*x;" pathCondition="equals(x,Z(3(#)))" lineNumber="-1" charStart="242" charEnd="252" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
+                                 <sedStatement xml:id="_2f3aed0a-531c-40db-942a-7e463b69eac4" name="return a;" pathCondition="equals(x,Z(3(#)))" lineNumber="-1" charStart="329" charEnd="338" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
+                                    <sedMethodReturn xml:id="_8a340d4a-54f4-43e3-a4bc-0971081dd962" name="&lt;return of self.elseIf(x)&gt;" pathCondition="equals(x,Z(3(#)))" lineNumber="-1" charStart="90" charEnd="96" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" methodReturnConditionRef="_cdd4b35d-001e-4a37-a2cd-e7b5a9d22c50">
+                                       <sedTermination xml:id="_94406026-52a1-4842-bfad-055f47f15cef" name="&lt;end&gt;" pathCondition="equals(x,Z(3(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" verified="true">
                                        </sedTermination>
-                                       <sedGroupStartCondition xml:id="_fbd1499b-a9ce-4854-bc4f-98fc1cdf8187" name="equals(x,Z(3(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-                                          <sedChildReference nodeIdRef="_e61a7ff5-0508-4731-86f1-11c73127d900"/>
+                                       <sedGroupStartCondition xml:id="_cdd4b35d-001e-4a37-a2cd-e7b5a9d22c50" name="equals(x,Z(3(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                          <sedChildReference nodeIdRef="_8a340d4a-54f4-43e3-a4bc-0971081dd962"/>
                                        </sedGroupStartCondition>
                                     </sedMethodReturn>
                                  </sedStatement>
-                                 <sedGroupStartCondition xml:id="_bc580791-6514-4c3e-aca6-5b4d72491ed0" name="equals(x,Z(3(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-                                    <sedChildReference nodeIdRef="_77a39654-d57d-493b-b2bc-5f1c482038ad"/>
+                                 <sedGroupStartCondition xml:id="_6e0af051-d0b6-4064-8eff-9394792d29b3" name="equals(x,Z(3(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                    <sedChildReference nodeIdRef="_9fd62357-aad1-4ff8-9046-88f7018517e5"/>
                                  </sedGroupStartCondition>
-                                 <sedGroupStartCondition xml:id="_9ce377a7-21a3-43ec-8627-16bcddacd0e7" name="equals(x,Z(3(#)))" pathCondition="not(equals(x,Z(0(#))))" lineNumber="-1" charStart="-1" charEnd="-1">
-                                    <sedChildReference nodeIdRef="_77a39654-d57d-493b-b2bc-5f1c482038ad"/>
+                                 <sedGroupStartCondition xml:id="_f16dc78c-c962-4274-bada-f4084af7c664" name="equals(x,Z(3(#)))" pathCondition="not(equals(x,Z(0(#))))" lineNumber="-1" charStart="-1" charEnd="-1">
+                                    <sedChildReference nodeIdRef="_9fd62357-aad1-4ff8-9046-88f7018517e5"/>
                                  </sedGroupStartCondition>
                               </sedStatement>
                            </sedBranchStatement>
                         </sedBranchCondition>
-                        <sedBranchCondition xml:id="_9caba1c3-6f59-436b-ad7d-8099a5adfbcf" name="and(and(not(equals(x,Z(1(#)))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#)))))" pathCondition="and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#)))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                           <sedBranchStatement xml:id="_17aec214-1fbc-4656-83f0-883d8597e909" name="if (x==4)" pathCondition="and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#)))))" lineNumber="-1" charStart="119" charEnd="131" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                              <sedBranchCondition xml:id="_81d69543-9537-4295-96b3-8687fa3baddd" name="equals(x,Z(4(#)))" pathCondition="equals(x,Z(4(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                                 <sedStatement xml:id="_c048b5bd-3626-4504-b006-78a970a92b25" name="return 42;" pathCondition="equals(x,Z(4(#)))" lineNumber="-1" charStart="284" charEnd="294" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                                    <sedMethodReturn xml:id="_754e7ced-2530-43fd-be85-1b5022649148" name="&lt;return of self.elseIf(x)&gt;" pathCondition="equals(x,Z(4(#)))" lineNumber="-1" charStart="90" charEnd="96" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" methodReturnConditionRef="_c219e2bd-c9d5-489d-b979-4c285b1527c4">
-                                       <sedTermination xml:id="_32eda654-4d67-4b4f-8652-a48fe74cf889" name="&lt;end&gt;" pathCondition="equals(x,Z(4(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" verified="true">
+                        <sedBranchCondition xml:id="_fdbd2646-4244-41c4-8fcb-17225b9866ca" name="and(and(not(equals(x,Z(1(#)))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#)))))" pathCondition="and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#)))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
+                           <sedBranchStatement xml:id="_afb7db22-df6a-4066-b223-5ede762b5fc5" name="if (x==4)" pathCondition="and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#)))))" lineNumber="-1" charStart="119" charEnd="131" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" groupable="true">
+                              <sedBranchCondition xml:id="_163afa9a-b30e-462c-8d4d-f96ea956f0f7" name="equals(x,Z(4(#)))" pathCondition="equals(x,Z(4(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
+                                 <sedStatement xml:id="_c87d7db7-ddcc-4d04-950b-51bd3f3495c1" name="return 42;" pathCondition="equals(x,Z(4(#)))" lineNumber="-1" charStart="284" charEnd="294" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
+                                    <sedMethodReturn xml:id="_11450fee-55b8-4058-96c1-ab9b8fa1b332" name="&lt;return of self.elseIf(x)&gt;" pathCondition="equals(x,Z(4(#)))" lineNumber="-1" charStart="90" charEnd="96" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" methodReturnConditionRef="_50db3778-5a5d-498c-b6a5-183b4b773742">
+                                       <sedTermination xml:id="_4c60e4a4-7eaf-4e4b-8929-b59997b67eb7" name="&lt;end&gt;" pathCondition="equals(x,Z(4(#)))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" verified="true">
                                        </sedTermination>
-                                       <sedGroupStartCondition xml:id="_c219e2bd-c9d5-489d-b979-4c285b1527c4" name="equals(x,Z(4(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-                                          <sedChildReference nodeIdRef="_754e7ced-2530-43fd-be85-1b5022649148"/>
+                                       <sedGroupStartCondition xml:id="_50db3778-5a5d-498c-b6a5-183b4b773742" name="equals(x,Z(4(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                          <sedChildReference nodeIdRef="_11450fee-55b8-4058-96c1-ab9b8fa1b332"/>
                                        </sedGroupStartCondition>
                                     </sedMethodReturn>
-                                    <sedGroupStartCondition xml:id="_bc26a8de-0b0c-465a-abf3-814011e8b613" name="equals(x,Z(4(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-                                       <sedChildReference nodeIdRef="_c048b5bd-3626-4504-b006-78a970a92b25"/>
+                                    <sedGroupStartCondition xml:id="_cfff0a77-cbf5-42d7-ad4c-075c7fa885c8" name="equals(x,Z(4(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                       <sedChildReference nodeIdRef="_c87d7db7-ddcc-4d04-950b-51bd3f3495c1"/>
                                     </sedGroupStartCondition>
-                                    <sedGroupStartCondition xml:id="_0054da42-741f-44c2-a995-bec900419aff" name="equals(x,Z(4(#)))" pathCondition="not(equals(x,Z(0(#))))" lineNumber="-1" charStart="-1" charEnd="-1">
-                                       <sedChildReference nodeIdRef="_c048b5bd-3626-4504-b006-78a970a92b25"/>
+                                    <sedGroupStartCondition xml:id="_1a0a4587-eda5-44c2-bdf4-733f14a4efd7" name="equals(x,Z(4(#)))" pathCondition="not(equals(x,Z(0(#))))" lineNumber="-1" charStart="-1" charEnd="-1">
+                                       <sedChildReference nodeIdRef="_c87d7db7-ddcc-4d04-950b-51bd3f3495c1"/>
                                     </sedGroupStartCondition>
-                                    <sedGroupStartCondition xml:id="_78493037-4344-4608-a156-63a303a0ef87" name="equals(x,Z(4(#)))" pathCondition="and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#)))))" lineNumber="-1" charStart="-1" charEnd="-1">
-                                       <sedChildReference nodeIdRef="_c048b5bd-3626-4504-b006-78a970a92b25"/>
+                                    <sedGroupStartCondition xml:id="_fb7d573e-5f5b-4a2b-bd42-59463eca967a" name="equals(x,Z(4(#)))" pathCondition="and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#)))))" lineNumber="-1" charStart="-1" charEnd="-1">
+                                       <sedChildReference nodeIdRef="_c87d7db7-ddcc-4d04-950b-51bd3f3495c1"/>
                                     </sedGroupStartCondition>
                                  </sedStatement>
                               </sedBranchCondition>
-                              <sedBranchCondition xml:id="_f3cc23e1-14e7-4b42-8852-98148eead815" name="not(equals(x,Z(4(#))))" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                                 <sedStatement xml:id="_04ed5066-89e6-45c7-acb7-524ae0a9daeb" name="a=x;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" lineNumber="-1" charStart="314" charEnd="320" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                                    <sedStatement xml:id="_432eb2b9-3126-4f69-8d43-8a86315396b0" name="return a;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" lineNumber="-1" charStart="329" charEnd="338" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
-                                       <sedMethodReturn xml:id="_c0e4ace5-51ea-4f76-b093-8c2f561303c0" name="&lt;return of self.elseIf(x)&gt;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" lineNumber="-1" charStart="90" charEnd="96" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" methodReturnConditionRef="_371e66be-d842-4d89-a494-373ae1676468">
-                                          <sedTermination xml:id="_e2dd63e7-cb23-4ae8-9731-9b2e2837bfce" name="&lt;end&gt;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" verified="true">
+                              <sedBranchCondition xml:id="_aaaee0aa-c2c9-4d61-b1b9-d96a63561f87" name="not(equals(x,Z(4(#))))" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
+                                 <sedStatement xml:id="_28e4fefb-8b68-473d-ae2c-80808d3c799e" name="a=x;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" lineNumber="-1" charStart="314" charEnd="320" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
+                                    <sedStatement xml:id="_65303c09-412c-4079-a352-5d6fed7a0661" name="return a;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" lineNumber="-1" charStart="329" charEnd="338" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java">
+                                       <sedMethodReturn xml:id="_5dc89fea-899d-4400-b851-200f2d50737c" name="&lt;return of self.elseIf(x)&gt;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" lineNumber="-1" charStart="90" charEnd="96" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" methodReturnConditionRef="_64246c58-b909-4dcc-984c-a5cbefb4c45b">
+                                          <sedTermination xml:id="_d72b0e8f-f736-4946-b370-85874e24a481" name="&lt;end&gt;" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions\src\ElseIfTest.java" verified="true">
                                           </sedTermination>
-                                          <sedGroupStartCondition xml:id="_371e66be-d842-4d89-a494-373ae1676468" name="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-                                             <sedChildReference nodeIdRef="_c0e4ace5-51ea-4f76-b093-8c2f561303c0"/>
+                                          <sedGroupStartCondition xml:id="_64246c58-b909-4dcc-984c-a5cbefb4c45b" name="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                             <sedChildReference nodeIdRef="_5dc89fea-899d-4400-b851-200f2d50737c"/>
                                           </sedGroupStartCondition>
                                        </sedMethodReturn>
                                     </sedStatement>
-                                    <sedGroupStartCondition xml:id="_f54671c2-8fcc-4aba-8ff1-7dbb4f29a869" name="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-                                       <sedChildReference nodeIdRef="_04ed5066-89e6-45c7-acb7-524ae0a9daeb"/>
+                                    <sedGroupStartCondition xml:id="_b6a80ae3-7135-4f54-adab-e21dd43ba2b5" name="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                       <sedChildReference nodeIdRef="_28e4fefb-8b68-473d-ae2c-80808d3c799e"/>
                                     </sedGroupStartCondition>
-                                    <sedGroupStartCondition xml:id="_e0d7a1a9-49c0-4212-8cd8-5b4698d2dc67" name="and(and(and(not(equals(x,Z(1(#)))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" pathCondition="not(equals(x,Z(0(#))))" lineNumber="-1" charStart="-1" charEnd="-1">
-                                       <sedChildReference nodeIdRef="_04ed5066-89e6-45c7-acb7-524ae0a9daeb"/>
+                                    <sedGroupStartCondition xml:id="_77c56ce2-3dab-4ae4-a21a-5f113d2241a3" name="and(and(and(not(equals(x,Z(1(#)))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" pathCondition="not(equals(x,Z(0(#))))" lineNumber="-1" charStart="-1" charEnd="-1">
+                                       <sedChildReference nodeIdRef="_28e4fefb-8b68-473d-ae2c-80808d3c799e"/>
                                     </sedGroupStartCondition>
-                                    <sedGroupStartCondition xml:id="_d86cee64-5dd5-46ab-aa87-1955706f682e" name="not(equals(x,Z(4(#))))" pathCondition="and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#)))))" lineNumber="-1" charStart="-1" charEnd="-1">
-                                       <sedChildReference nodeIdRef="_04ed5066-89e6-45c7-acb7-524ae0a9daeb"/>
+                                    <sedGroupStartCondition xml:id="_6d3db2be-e1c9-4826-904b-5bad69f8d0a6" name="not(equals(x,Z(4(#))))" pathCondition="and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#)))))" lineNumber="-1" charStart="-1" charEnd="-1">
+                                       <sedChildReference nodeIdRef="_28e4fefb-8b68-473d-ae2c-80808d3c799e"/>
                                     </sedGroupStartCondition>
                                  </sedStatement>
                               </sedBranchCondition>
-                              <sedGroupEndReference nodeIdRef="_78493037-4344-4608-a156-63a303a0ef87"/>
-                              <sedGroupEndReference nodeIdRef="_d86cee64-5dd5-46ab-aa87-1955706f682e"/>
+                              <sedGroupEndReference nodeIdRef="_fb7d573e-5f5b-4a2b-bd42-59463eca967a"/>
+                              <sedGroupEndReference nodeIdRef="_6d3db2be-e1c9-4826-904b-5bad69f8d0a6"/>
                            </sedBranchStatement>
                         </sedBranchCondition>
-                        <sedGroupEndReference nodeIdRef="_41260dee-4a5e-47f3-be21-d15fa58171e7"/>
-                        <sedGroupEndReference nodeIdRef="_9e6319a2-cc4b-46b7-a4dc-7e0bd77f63e2"/>
-                        <sedGroupEndReference nodeIdRef="_9ce377a7-21a3-43ec-8627-16bcddacd0e7"/>
-                        <sedGroupEndReference nodeIdRef="_0054da42-741f-44c2-a995-bec900419aff"/>
-                        <sedGroupEndReference nodeIdRef="_e0d7a1a9-49c0-4212-8cd8-5b4698d2dc67"/>
+                        <sedGroupEndReference nodeIdRef="_00071f4f-5708-4b15-9fc8-1d49a72213af"/>
+                        <sedGroupEndReference nodeIdRef="_5013a854-3e20-4678-9106-3d31618d6760"/>
+                        <sedGroupEndReference nodeIdRef="_f16dc78c-c962-4274-bada-f4084af7c664"/>
+                        <sedGroupEndReference nodeIdRef="_1a0a4587-eda5-44c2-bdf4-733f14a4efd7"/>
+                        <sedGroupEndReference nodeIdRef="_77c56ce2-3dab-4ae4-a21a-5f113d2241a3"/>
                      </sedBranchStatement>
                   </sedBranchCondition>
-                  <sedGroupEndReference nodeIdRef="_6d1849e9-f554-4c9b-8bce-9a263dcba009"/>
-                  <sedGroupEndReference nodeIdRef="_5c3ceda7-b6bf-42c0-91c5-46aaa8774ccf"/>
-                  <sedGroupEndReference nodeIdRef="_9fa00493-ba83-4767-8893-afb6dea7544f"/>
-                  <sedGroupEndReference nodeIdRef="_bc580791-6514-4c3e-aca6-5b4d72491ed0"/>
-                  <sedGroupEndReference nodeIdRef="_bc26a8de-0b0c-465a-abf3-814011e8b613"/>
-                  <sedGroupEndReference nodeIdRef="_f54671c2-8fcc-4aba-8ff1-7dbb4f29a869"/>
+                  <sedGroupEndReference nodeIdRef="_96786988-1c21-45e5-80a5-219d47888ef8"/>
+                  <sedGroupEndReference nodeIdRef="_28921c89-cf0a-40d3-a9eb-e5ebaa88fa5b"/>
+                  <sedGroupEndReference nodeIdRef="_137f8e54-c33c-4eec-bf63-8ed445918929"/>
+                  <sedGroupEndReference nodeIdRef="_6e0af051-d0b6-4064-8eff-9394792d29b3"/>
+                  <sedGroupEndReference nodeIdRef="_cfff0a77-cbf5-42d7-ad4c-075c7fa885c8"/>
+                  <sedGroupEndReference nodeIdRef="_b6a80ae3-7135-4f54-adab-e21dd43ba2b5"/>
                </sedBranchStatement>
             </sedStatement>
-            <sedMethodCallMethodReturnCondition xml:id="_6dc0e12d-21b9-45a5-9566-835a7b4ea5c1" name="equals(x,Z(0(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-               <sedChildReference nodeIdRef="_775dbd78-b046-4068-abb1-ff9ac1a838e5"/>
+            <sedMethodCallMethodReturnCondition xml:id="_0767eedf-60a7-4521-b5c1-90b9752be6b4" name="equals(x,Z(0(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_4bea6ed9-0159-4a46-ae09-027548ba1c88"/>
             </sedMethodCallMethodReturnCondition>
-            <sedMethodCallMethodReturnCondition xml:id="_d95629fd-92b5-4711-9a4a-510426aeb83b" name="equals(x,Z(1(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-               <sedChildReference nodeIdRef="_23ae7330-aa36-4101-9a5d-f31bc22906c8"/>
+            <sedMethodCallMethodReturnCondition xml:id="_2e03177e-b225-450a-8a4e-74b85149c995" name="equals(x,Z(1(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_bf376830-8c3f-4a3d-bda1-c0d4a9aeab95"/>
             </sedMethodCallMethodReturnCondition>
-            <sedMethodCallMethodReturnCondition xml:id="_b1ac5e18-b3df-4e11-8064-27a26c3f5fe8" name="equals(x,Z(2(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-               <sedChildReference nodeIdRef="_2556a754-4540-4389-aa09-28c9bab3c50d"/>
+            <sedMethodCallMethodReturnCondition xml:id="_ae792492-dff2-4332-a75c-ab811ee6ab14" name="equals(x,Z(2(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_ddd99d41-dea3-4147-a87b-54dfccc06224"/>
             </sedMethodCallMethodReturnCondition>
-            <sedMethodCallMethodReturnCondition xml:id="_fbd1499b-a9ce-4854-bc4f-98fc1cdf8187" name="equals(x,Z(3(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-               <sedChildReference nodeIdRef="_e61a7ff5-0508-4731-86f1-11c73127d900"/>
+            <sedMethodCallMethodReturnCondition xml:id="_cdd4b35d-001e-4a37-a2cd-e7b5a9d22c50" name="equals(x,Z(3(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_8a340d4a-54f4-43e3-a4bc-0971081dd962"/>
             </sedMethodCallMethodReturnCondition>
-            <sedMethodCallMethodReturnCondition xml:id="_c219e2bd-c9d5-489d-b979-4c285b1527c4" name="equals(x,Z(4(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-               <sedChildReference nodeIdRef="_754e7ced-2530-43fd-be85-1b5022649148"/>
+            <sedMethodCallMethodReturnCondition xml:id="_50db3778-5a5d-498c-b6a5-183b4b773742" name="equals(x,Z(4(#)))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_11450fee-55b8-4058-96c1-ab9b8fa1b332"/>
             </sedMethodCallMethodReturnCondition>
-            <sedMethodCallMethodReturnCondition xml:id="_371e66be-d842-4d89-a494-373ae1676468" name="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-               <sedChildReference nodeIdRef="_c0e4ace5-51ea-4f76-b093-8c2f561303c0"/>
+            <sedMethodCallMethodReturnCondition xml:id="_64246c58-b909-4dcc-984c-a5cbefb4c45b" name="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_5dc89fea-899d-4400-b851-200f2d50737c"/>
             </sedMethodCallMethodReturnCondition>
-            <sedGroupEndReference nodeIdRef="_6dc0e12d-21b9-45a5-9566-835a7b4ea5c1"/>
-            <sedGroupEndReference nodeIdRef="_d95629fd-92b5-4711-9a4a-510426aeb83b"/>
-            <sedGroupEndReference nodeIdRef="_b1ac5e18-b3df-4e11-8064-27a26c3f5fe8"/>
-            <sedGroupEndReference nodeIdRef="_fbd1499b-a9ce-4854-bc4f-98fc1cdf8187"/>
-            <sedGroupEndReference nodeIdRef="_c219e2bd-c9d5-489d-b979-4c285b1527c4"/>
-            <sedGroupEndReference nodeIdRef="_371e66be-d842-4d89-a494-373ae1676468"/>
+            <sedGroupEndReference nodeIdRef="_0767eedf-60a7-4521-b5c1-90b9752be6b4"/>
+            <sedGroupEndReference nodeIdRef="_2e03177e-b225-450a-8a4e-74b85149c995"/>
+            <sedGroupEndReference nodeIdRef="_ae792492-dff2-4332-a75c-ab811ee6ab14"/>
+            <sedGroupEndReference nodeIdRef="_cdd4b35d-001e-4a37-a2cd-e7b5a9d22c50"/>
+            <sedGroupEndReference nodeIdRef="_50db3778-5a5d-498c-b6a5-183b4b773742"/>
+            <sedGroupEndReference nodeIdRef="_64246c58-b909-4dcc-984c-a5cbefb4c45b"/>
          </sedMethodCall>
-         <sedTerminationEntry nodeIdRef="_b656ef2b-7588-47b8-af8e-c0ac91fa4dbb"/>
-         <sedTerminationEntry nodeIdRef="_462d7dc4-5da5-4011-9cf1-bc4f04452437"/>
-         <sedTerminationEntry nodeIdRef="_c4a55367-52c5-41e2-8de1-f365463d5abb"/>
-         <sedTerminationEntry nodeIdRef="_c105b05d-1542-46aa-a0da-af36ea4e7f1e"/>
-         <sedTerminationEntry nodeIdRef="_32eda654-4d67-4b4f-8652-a48fe74cf889"/>
-         <sedTerminationEntry nodeIdRef="_e2dd63e7-cb23-4ae8-9731-9b2e2837bfce"/>
+         <sedTerminationEntry nodeIdRef="_3919fe07-9533-4592-a13b-a6889cc9f395"/>
+         <sedTerminationEntry nodeIdRef="_75705444-92c3-4054-a2d6-aaf9d01342be"/>
+         <sedTerminationEntry nodeIdRef="_4383c315-73fe-49d6-9811-1e1e73366ba8"/>
+         <sedTerminationEntry nodeIdRef="_94406026-52a1-4842-bfad-055f47f15cef"/>
+         <sedTerminationEntry nodeIdRef="_4c60e4a4-7eaf-4e4b-8929-b59997b67eb7"/>
+         <sedTerminationEntry nodeIdRef="_d72b0e8f-f736-4946-b370-85874e24a481"/>
       </sedThread>
    </sedTarget>
 </launch>

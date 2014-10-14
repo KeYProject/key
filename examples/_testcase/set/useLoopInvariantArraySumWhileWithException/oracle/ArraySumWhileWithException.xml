@@ -18,7 +18,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                      <callStackEntry path="/0"/>
                      <statement name="i++;" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="false">
                         <callStackEntry path="/0"/>
-                        <branchStatement name="if (array.length==3)" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="false">
+                        <branchStatement name="if (array.length==3)" pathCondition="imp(geq(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="false" blockOpened="true">
                            <callStackEntry path="/0"/>
                            <branchCondition name="equals(length(array),Z(3(#)))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(geq(i_0,Z(0(#))),leq(i_0,Z(2(#)))),equals(length(array),Z(3(#)))),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="true" branchCondition="equals(length(array),Z(3(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
                               <callStackEntry path="/0"/>

@@ -5,7 +5,7 @@
          <callStackEntry path="/0"/>
          <methodCall name="&lt;call MethodCallStackTest.positive(x_2)&gt;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <branchStatement name="if (x_2&gt;=0)" pathCondition="true" pathConditionChanged="false">
+            <branchStatement name="if (x_2&gt;=0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                <callStackEntry path="/0/0/0"/>
                <callStackEntry path="/0"/>
                <branchCondition name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -23,7 +23,7 @@
                            <callStackEntry path="/0"/>
                            <methodCall name="&lt;call MethodCallStackTest.positive(x_7)&gt;" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false">
                               <callStackEntry path="/0"/>
-                              <branchStatement name="if (x_7&gt;=0)" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false">
+                              <branchStatement name="if (x_7&gt;=0)" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" blockOpened="true">
                                  <callStackEntry path="/0/0/0/0/0/0/0/0/0"/>
                                  <callStackEntry path="/0"/>
                                  <branchCondition name="gt(y,Z(neglit(1(#))))" pathCondition="and(geq(x,Z(0(#))),geq(y,Z(0(#))))" pathConditionChanged="true" branchCondition="gt(y,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -102,7 +102,7 @@
                            <callStackEntry path="/0"/>
                            <methodCall name="&lt;call MethodCallStackTest.positive(x_5)&gt;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false">
                               <callStackEntry path="/0"/>
-                              <branchStatement name="if (x_5&gt;=0)" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false">
+                              <branchStatement name="if (x_5&gt;=0)" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" blockOpened="true">
                                  <callStackEntry path="/0/0/0/0/1/0/0/0/0"/>
                                  <callStackEntry path="/0"/>
                                  <branchCondition name="gt(y,Z(neglit(1(#))))" pathCondition="and(leq(x,Z(neglit(1(#)))),geq(y,Z(0(#))))" pathConditionChanged="true" branchCondition="gt(y,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">

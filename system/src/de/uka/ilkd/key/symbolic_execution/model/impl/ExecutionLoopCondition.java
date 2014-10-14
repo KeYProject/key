@@ -21,15 +21,15 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * The default implementation of {@link IExecutionLoopCondition}.
  * @author Martin Hentschel
  */
-public class ExecutionLoopCondition extends AbstractExecutionNode<LoopStatement> implements IExecutionLoopCondition {
+public class ExecutionLoopCondition extends AbstractExecutionBlockStartNode<LoopStatement> implements IExecutionLoopCondition {
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.

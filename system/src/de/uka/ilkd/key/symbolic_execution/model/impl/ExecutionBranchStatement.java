@@ -16,8 +16,6 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.statement.BranchStatement;
@@ -35,12 +33,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * The default implementation of {@link IExecutionBranchStatement}.
  * @author Martin Hentschel
  */
-public class ExecutionBranchStatement extends AbstractExecutionNode<BranchStatement> implements IExecutionBranchStatement {
-   /**
-    * The up to know discovered completing {@link IExecutionNode}s.
-    */
-   private ImmutableList<IExecutionNode<?>> blockCompletions = ImmutableSLList.nil();
-   
+public class ExecutionBranchStatement extends AbstractExecutionBlockStartNode<BranchStatement> implements IExecutionBranchStatement {
    /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
@@ -103,29 +96,5 @@ public class ExecutionBranchStatement extends AbstractExecutionNode<BranchStatem
    @Override
    public String getElementType() {
       return "Branch Statement";
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public ImmutableList<IExecutionNode<?>> getBlockCompletions() {
-      return blockCompletions;
-   }
-   
-   /**
-    * Registers the given {@link IExecutionNode}.
-    * @param blockCompletion The {@link IExecutionNode} to register.
-    */
-   public void addBlockCompletion(IExecutionNode<?> blockCompletion) {
-      if (blockCompletion != null && !blockCompletions.contains(blockCompletion)) {
-         if (blockCompletion instanceof AbstractExecutionNode<?>) {
-            blockCompletions = blockCompletions.append(blockCompletion);
-            ((AbstractExecutionNode<?>) blockCompletion).addCompletedBlock(this);
-         }
-         else {
-            throw new IllegalArgumentException("Unsupported block completion: " + blockCompletion);
-         }
-      }
    }
 }

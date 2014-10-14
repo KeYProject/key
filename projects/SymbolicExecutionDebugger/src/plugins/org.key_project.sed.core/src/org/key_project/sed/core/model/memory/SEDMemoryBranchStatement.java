@@ -91,6 +91,11 @@ public class SEDMemoryBranchStatement extends AbstractSEDBranchStatement impleme
     * The known group end conditions.
     */
    private final List<ISEDBranchCondition> groupEndConditions = new LinkedList<ISEDBranchCondition>();
+
+   /**
+    * The grouable state.
+    */
+   private boolean groupable;
    
    /**
     * Constructor.
@@ -348,5 +353,21 @@ public class SEDMemoryBranchStatement extends AbstractSEDBranchStatement impleme
       if (groupEndCondition != null) {
          groupEndConditions.add(groupEndCondition);
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isGroupable() {
+      return groupable;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setGroupable(boolean groupable) {
+      this.groupable = groupable;
    }
 }
