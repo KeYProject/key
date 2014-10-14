@@ -130,6 +130,7 @@ public class LogicPrinter {
     	= SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
     private final SelectPrinter selectPrinter = new SelectPrinter(this);
+    private final StorePrinter storePrinter = new StorePrinter(this);
     
     protected HeapLDT getHeapLDT() {
         return services == null ? null : services.getTypeConverter().getHeapLDT();
@@ -1046,7 +1047,7 @@ public class LogicPrinter {
         maybeParens(t.sub(0), ass);
     }
 
-    private boolean printEmbeddedHeapConstructorTerm(Term t) throws IOException {
+    protected boolean printEmbeddedHeapConstructorTerm(Term t) throws IOException {
 
         Notation notation = notationInfo.getNotation(t.op());
         if (notation instanceof HeapConstructorNotation) {
@@ -1115,110 +1116,7 @@ public class LogicPrinter {
     }
 
     public void printStore(Term t, boolean closingBrace) throws IOException {
-        assert t.boundVars().isEmpty();
-        assert t.arity() == 4;
-
-        final HeapLDT heapLDT = getHeapLDT();
-
-        if(notationInfo.isPrettySyntax() && heapLDT != null) {
-            startTerm(4);
-
-            final Term heapTerm = t.sub(0);
-            final Term objectTerm = t.sub(1);
-            final Term fieldTerm  = t.sub(2);
-            final Term valueTerm  = t.sub(3);
-
-            markStartSub();
-            boolean hasEmbedded = printEmbeddedHeapConstructorTerm(heapTerm);
-            markEndSub();
-
-            if(hasEmbedded) {
-                layouter.brk(0);
-            } else {
-                layouter.beginC(0);
-            }
-
-            layouter.print("[");
-
-            if(objectTerm.equals(services.getTermBuilder().NULL())
-                    && fieldTerm.op() instanceof Function
-                    && ((Function)fieldTerm.op()).isUnique()) {
-
-                String className = heapLDT.getClassName((Function)fieldTerm.op());
-
-                if(className == null) {
-                    markStartSub();
-                    printTerm(objectTerm);
-                    markEndSub();
-                } else {
-                    markStartSub();
-                    // "null" not printed
-                    markEndSub();
-                    printClassName(className);
-                }
-
-                layouter.print(".");
-
-                markStartSub();
-                startTerm(0);
-                printTerm(fieldTerm);
-                markEndSub();
-            } else if (fieldTerm.arity() == 0) {
-                markStartSub();
-                printTerm(objectTerm);
-                markEndSub();
-
-                layouter.print(".");
-
-                markStartSub();
-                startTerm(0);
-
-                /* TODO: More sophisticated determination of pretty-syntax, similar
-                 * to select-syntax. Using HeapLDT.getPrettySyntax() here for now,
-                 * as it is current behaviour for KeY.
-                 *
-                 * (Kai Wallisch 09/2014)
-                 */
-                layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
-                markEndSub();
-            } else if (fieldTerm.op() == heapLDT.getArr()) {
-                markStartSub();
-                printTerm(objectTerm);
-                markEndSub();
-
-                layouter.print("[");
-
-                markStartSub();
-                startTerm(1);
-                markStartSub();
-                printTerm(fieldTerm.sub(0));
-                markEndSub();
-                markEndSub();
-
-                layouter.print("]");
-            } else {
-                printFunctionTerm(t);
-            }
-
-            layouter.print(" := ");
-            markStartSub();
-            printTerm(valueTerm);
-            markEndSub();
-
-            layouter.print("]");
-
-            if(closingBrace) {
-                layouter.end();
-            }
-
-        } else {
-            /*
-             * TODO: This is misplaced, since store-term is already partially
-             * printed at this point. Needs refactoring.
-             * (Kai Wallisch 09/2014)
-             */
-            printFunctionTerm(t);
-        }
+        storePrinter.printStore(t, closingBrace);
     }
 
 
