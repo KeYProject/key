@@ -1000,7 +1000,7 @@ public class LogicPrinter {
      * @param t the term to be printed.  */
     public void printFunctionTerm(Term t) throws IOException {
         if (notationInfo.isPrettySyntax()
-                && services != null && isFieldConstant(t)
+                && services != null && isJavaFieldConstant(t)
                 && getNotationInfo().isHidePackagePrefix()) {
             // Hide package prefix when printing field constants.
             startTerm(0);
@@ -1134,6 +1134,14 @@ public class LogicPrinter {
         }
     }
 
+    protected boolean isFieldConstant(Term fieldTerm) {
+        return fieldTerm.op() instanceof Function
+                && ((Function) fieldTerm.op()).isUnique()
+                && fieldTerm.sort() == getHeapLDT().getFieldSort()
+                && fieldTerm.arity() == 0
+                && fieldTerm.boundVars().isEmpty();
+    }
+    
     /**
      * Find out whether a {@link Term} represents a field symbol, declared in a
      * Java class.
@@ -1141,15 +1149,14 @@ public class LogicPrinter {
      * @return Returns true iff the given parameter represents a field constant.
      * @param fieldTerm The target field.
      */
-    protected boolean isFieldConstant(final Term fieldTerm) {
-        assert services != null;
-        String s = fieldTerm.op().name().toString();
-        return (s.contains("::$") || s.contains("::<"))
-                && fieldTerm.op() instanceof Function
-                && ((Function) fieldTerm.op()).isUnique()
-                && fieldTerm.sort() == getHeapLDT().getFieldSort()
-                && fieldTerm.arity() == 0
-                && fieldTerm.boundVars().isEmpty();
+    protected boolean isJavaFieldConstant(Term fieldTerm) {
+        return fieldTerm.op().name().toString().contains("::$")
+                && isFieldConstant(fieldTerm);
+    }
+
+    protected boolean isGenericFieldConstant(Term fieldTerm) {
+        return fieldTerm.op().name().toString().contains("::<")
+                && isFieldConstant(fieldTerm);
     }
 
     /*

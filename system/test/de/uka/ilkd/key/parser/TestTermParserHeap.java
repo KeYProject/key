@@ -262,6 +262,11 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         verbose = "store(heap, int[]::select(heap,null,testTermParserHeap.A::$staticArray), arr(i), i)";
         comparePrettySyntaxAgainstVerboseSyntax(pretty, verbose);
 
+        // object property
+        pretty = "heap[create(a)][a.<initialized> := FALSE]";
+        verbose = "store(create(heap,a),a,java.lang.Object::<initialized>,FALSE)";
+        comparePrettySyntaxAgainstVerboseSyntax(pretty, verbose);
+
     }
 
     /**

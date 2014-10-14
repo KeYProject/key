@@ -48,7 +48,7 @@ class SelectPrinter {
                  * Select-type is any.
                  */
                 if (isFieldName(fieldTerm.op().name().toString(), objectTerm)
-                        || lp.isFieldConstant(fieldTerm)) {
+                        || lp.isJavaFieldConstant(fieldTerm)) {
                     lp.printFunctionTerm(t);
                 } else {
                     printAnySelect(heapTerm, objectTerm, fieldTerm, tacitHeap);
@@ -56,16 +56,16 @@ class SelectPrinter {
             } else if (fieldTerm.op() == heapLDT.getArr()) {
                 // array access
                 printArraySelect(heapTerm, objectTerm, fieldTerm, tacitHeap);
-            } else if (lp.isFieldConstant(fieldTerm)) {
-                if (((Function) fieldTerm.op()).name().toString().contains("::<")) {
-                    printGenericObjectProperty(t, heapTerm, objectTerm, fieldTerm, tacitHeap);
-                } else if (getFieldSort(fieldTerm).equals(t.sort())) {
+            } else if (lp.isGenericFieldConstant(fieldTerm)) {
+                printGenericObjectProperty(t, heapTerm, objectTerm, fieldTerm, tacitHeap);
+            } else if (lp.isJavaFieldConstant(fieldTerm)) {
+                if (getFieldSort(fieldTerm).equals(t.sort())) {
                     if (objectTerm.equals(lp.services.getTermBuilder().NULL())) {
                         // static field access
-                        printStaticFieldConstant(fieldTerm, heapTerm, tacitHeap);
+                        printStaticJavaFieldConstant(fieldTerm, heapTerm, tacitHeap);
                     } else {
                         // non-static field access
-                        printNonStaticFieldConstant(heapTerm, objectTerm, fieldTerm, tacitHeap);
+                        printNonStaticJavaFieldConstant(heapTerm, objectTerm, fieldTerm, tacitHeap);
                     }
                 } else {
                     lp.printFunctionTerm(t);
@@ -192,7 +192,7 @@ class SelectPrinter {
     /*
      * Print a static field constant.
      */
-    private void printStaticFieldConstant(final Term fieldTerm, final Term heapTerm, Term tacitHeap) throws IOException {
+    private void printStaticJavaFieldConstant(final Term fieldTerm, final Term heapTerm, Term tacitHeap) throws IOException {
         lp.startTerm(3);
         /*
          * Is consideration for static arrays missing in this?
@@ -224,7 +224,7 @@ class SelectPrinter {
     /*
      * Print a non-static field constant.
      */
-    private void printNonStaticFieldConstant(final Term heapTerm, final Term objectTerm, final Term fieldTerm, Term tacitHeap) throws IOException {
+    private void printNonStaticJavaFieldConstant(final Term heapTerm, final Term objectTerm, final Term fieldTerm, Term tacitHeap) throws IOException {
         lp.startTerm(3);
         lp.markStartSub(1);
         lp.printEmbeddedObserver(heapTerm, objectTerm);

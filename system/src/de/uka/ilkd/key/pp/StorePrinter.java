@@ -74,8 +74,10 @@ class StorePrinter {
                     && fieldTerm.op() instanceof Function
                     && ((Function) fieldTerm.op()).isUnique()) {
                 printStoreOnStaticField(heapTerm, fieldTerm, valueTerm, closingBrace);
-            } else if (fieldTerm.arity() == 0) {
-                printStoreOnFieldConstant(heapTerm, objectTerm, fieldTerm, valueTerm, closingBrace);
+            } else if (lp.isGenericFieldConstant(fieldTerm)) {
+                printStoreOnGenericFieldConstant(heapTerm, objectTerm, fieldTerm, valueTerm, closingBrace);
+            } else if (lp.isJavaFieldConstant(fieldTerm)) {
+                printStoreOnJavaFieldConstant(heapTerm, objectTerm, fieldTerm, valueTerm, closingBrace);
             } else if (fieldTerm.op() == heapLDT.getArr()) {
                 printStoreOnArrayElement(heapTerm, objectTerm, fieldTerm, valueTerm, closingBrace);
             } else {
@@ -113,7 +115,7 @@ class StorePrinter {
     /*
      * This is called in case parameter fieldTerm represents a non-static field.
      */
-    private void printStoreOnFieldConstant(final Term heapTerm, final Term objectTerm, final Term fieldTerm, final Term valueTerm, boolean closingBrace) throws IOException {
+    private void printStoreOnJavaFieldConstant(final Term heapTerm, final Term objectTerm, final Term fieldTerm, final Term valueTerm, boolean closingBrace) throws IOException {
         initPrettyPrint(heapTerm);
 
         lp.markStartSub();
@@ -125,6 +127,23 @@ class StorePrinter {
         lp.markStartSub();
         lp.startTerm(0);
         lp.layouter.print(getPrettySyntaxForFieldConstant(objectTerm, fieldTerm, lp.services.getJavaInfo()));
+        lp.markEndSub();
+
+        finishPrettyPrint(valueTerm, closingBrace);
+    }
+
+    private void printStoreOnGenericFieldConstant(final Term heapTerm, final Term objectTerm, final Term fieldTerm, final Term valueTerm, boolean closingBrace) throws IOException {
+        initPrettyPrint(heapTerm);
+
+        lp.markStartSub();
+        lp.printTerm(objectTerm);
+        lp.markEndSub();
+
+        lp.layouter.print(".");
+
+        lp.markStartSub();
+        lp.startTerm(0);
+        lp.layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
         lp.markEndSub();
 
         finishPrettyPrint(valueTerm, closingBrace);
