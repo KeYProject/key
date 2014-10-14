@@ -88,6 +88,11 @@ public class SEDMemoryExceptionalMethodReturn extends AbstractSEDExceptionalMeth
    private final List<ISEDConstraint> constraints = new LinkedList<ISEDConstraint>();
    
    /**
+    * The known group start conditions.
+    */
+   private final List<ISEDBranchCondition> groupStartConditions = new LinkedList<ISEDBranchCondition>();
+   
+   /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this method return is contained.
     * @param parent The parent in that this node is contained as child.
@@ -323,5 +328,23 @@ public class SEDMemoryExceptionalMethodReturn extends AbstractSEDExceptionalMeth
    @Override
    public ISEDConstraint[] getConstraints() throws DebugException {
       return constraints.toArray(new ISEDConstraint[constraints.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDBranchCondition[] getGroupStartConditions() throws DebugException {
+      return groupStartConditions.toArray(new ISEDBranchCondition[groupStartConditions.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addGroupStartCondition(ISEDBranchCondition groupStartCondition) {
+      if (groupStartCondition != null) {
+         groupStartConditions.add(groupStartCondition);
+      }
    }
 }

@@ -250,6 +250,12 @@ public class StatementBlock extends JavaStatement
         return (e instanceof StatementBlock) ? e.getFirstElement() : e;
     }
 
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+       if (isEmpty()) return this;
+       else return getBody().get(0);
+    }
+
     public int getPrefixLength() {
         return prefixElementArray.size();
     }
@@ -268,8 +274,4 @@ public class StatementBlock extends JavaStatement
         }
         return firstActiveChildPos;
     }
-
-
-
-
 }

@@ -151,6 +151,11 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+       return getFirstElement();
+    }
+
+    @Override
     public SourceElement getLastElement(){
 	return this;
     }

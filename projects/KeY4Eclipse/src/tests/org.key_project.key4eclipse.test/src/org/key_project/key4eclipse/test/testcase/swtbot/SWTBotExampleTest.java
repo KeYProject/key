@@ -56,7 +56,7 @@ public class SWTBotExampleTest extends AbstractSetupTestCase {
             SwingBotJDialog dialog = frame.bot().jDialog("Load Example");
             SwingBotJList list = dialog.bot().jList();
             // Select example
-            list.select(5);
+            list.selectByText("Cell");
             // Close dialog and load example
             SwingBotJButton loadButton = dialog.bot().jButton("Load Example");
             loadButton.clickAndWait();

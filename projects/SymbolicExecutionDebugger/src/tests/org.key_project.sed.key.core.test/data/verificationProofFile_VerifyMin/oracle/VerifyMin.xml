@@ -1,35 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_bdaa4a59-ac10-4028-8c11-10665f4fa1b8" name="VerifyMin[VerifyMin::min(int,int)].JML normal_behavior operation contract.0" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_a3a5d540-e518-4b10-ba45-b4980fb9f121" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_4a220b58-b212-4898-b8fd-e4e10c5e2659" name="&lt;call VerifyMin.min(_x,_y)&gt;" pathCondition="true" lineNumber="-1" charStart="202" charEnd="205" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java">
-            <sedBranchStatement xml:id="_617b9269-f31f-43cc-909b-fd465440885b" name="if (_x&lt;_y)" pathCondition="true" lineNumber="-1" charStart="229" charEnd="240" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java">
-               <sedBranchCondition xml:id="_00a3b8be-7df0-426e-a36b-c3b770f25b4a" name="gt(y,x)" pathCondition="gt(y,x)">
-                  <sedStatement xml:id="_fbf010bd-46f1-4722-8118-3074192f0b8d" name="return _x;" pathCondition="gt(y,x)" lineNumber="-1" charStart="252" charEnd="261" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java">
-                     <sedMethodReturn xml:id="_f7e545e1-3175-464a-89cd-c7f4c5d5d22d" name="&lt;return of min&gt;" pathCondition="gt(y,x)" lineNumber="-1" charStart="202" charEnd="205" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java" methodReturnConditionRef="_e15e7437-a477-4027-beae-a9a3e639e00a">
-                        <sedTermination xml:id="_81421124-5e98-482f-88aa-06127ab65cff" name="&lt;end&gt;" pathCondition="gt(y,x)" lineNumber="-1" charStart="-1" charEnd="-1" verified="true">
+   <sedTarget xml:id="_6622e43d-ac55-4835-bc20-75586d1ff851" name="VerifyMin[VerifyMin::min(int,int)].JML normal_behavior operation contract.0" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_0a252d40-9f69-4b95-b455-c1b9bc1ffeaf" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+         <sedMethodCall xml:id="_93c657ce-d9e9-4794-abd3-20450f07d2c0" name="&lt;call VerifyMin.min(_x,_y)&gt;" pathCondition="true" lineNumber="-1" charStart="202" charEnd="205" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java">
+            <sedBranchStatement xml:id="_97893d85-ef41-447e-9667-2a52090b68db" name="if (_x&lt;_y)" pathCondition="true" lineNumber="-1" charStart="229" charEnd="240" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java">
+               <sedBranchCondition xml:id="_4d05870f-2ad8-4de7-a7bf-2501c9764666" name="gt(y,x)" pathCondition="gt(y,x)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java">
+                  <sedStatement xml:id="_6093f667-53a4-43aa-85bf-77467cb5def9" name="return _x;" pathCondition="gt(y,x)" lineNumber="-1" charStart="252" charEnd="261" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java">
+                     <sedMethodReturn xml:id="_06c053cb-602e-4898-9d1d-b3e27e5462ec" name="&lt;return of min&gt;" pathCondition="gt(y,x)" lineNumber="-1" charStart="202" charEnd="205" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java" methodReturnConditionRef="_e5847291-9de5-4fb3-8d16-84f49b6e4661">
+                        <sedTermination xml:id="_c9915615-fe69-4d34-b1f8-b6714490f531" name="&lt;end&gt;" pathCondition="gt(y,x)" lineNumber="-1" charStart="-1" charEnd="-1" verified="true">
                         </sedTermination>
+                        <sedGroupStartCondition xml:id="_e5847291-9de5-4fb3-8d16-84f49b6e4661" name="gt(y,x)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                           <sedChildReference nodeIdRef="_06c053cb-602e-4898-9d1d-b3e27e5462ec"/>
+                        </sedGroupStartCondition>
                      </sedMethodReturn>
+                     <sedGroupStartCondition xml:id="_c5f91e41-260e-4396-b017-4b9aee661169" name="gt(y,x)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                        <sedChildReference nodeIdRef="_6093f667-53a4-43aa-85bf-77467cb5def9"/>
+                     </sedGroupStartCondition>
                   </sedStatement>
                </sedBranchCondition>
-               <sedBranchCondition xml:id="_c7779530-1ec8-4a46-b256-53fddee4b037" name="leq(y,x)" pathCondition="leq(y,x)">
-                  <sedStatement xml:id="_7b516eb4-1584-45b9-b81f-4a28e2a3e3c5" name="return _y;" pathCondition="leq(y,x)" lineNumber="-1" charStart="295" charEnd="304" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java">
-                     <sedMethodReturn xml:id="_b9a2d464-f84d-4390-84fe-c8e488673403" name="&lt;return of min&gt;" pathCondition="leq(y,x)" lineNumber="-1" charStart="202" charEnd="205" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java" methodReturnConditionRef="_45bf2dbd-478b-4f06-ae37-b05a1fee04d1">
-                        <sedTermination xml:id="_b70e323e-94f6-41f3-9b8e-7ae7f6232da4" name="&lt;end&gt;" pathCondition="leq(y,x)" lineNumber="-1" charStart="-1" charEnd="-1" verified="true">
+               <sedBranchCondition xml:id="_6ce5c72e-718d-478d-b289-ffc551e28fa3" name="leq(y,x)" pathCondition="leq(y,x)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java">
+                  <sedStatement xml:id="_d281ba52-a9ed-4697-928e-aa1a3923ab76" name="return _y;" pathCondition="leq(y,x)" lineNumber="-1" charStart="295" charEnd="304" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java">
+                     <sedMethodReturn xml:id="_063c334b-1434-4ba9-97e8-e421e52dff07" name="&lt;return of min&gt;" pathCondition="leq(y,x)" lineNumber="-1" charStart="202" charEnd="205" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetProofFileTest_testVerifyMin\src\VerifyMin.java" methodReturnConditionRef="_bd268079-d26b-4533-b967-aae55ddbf077">
+                        <sedTermination xml:id="_84754b68-8253-427c-9f20-ae9c653ad007" name="&lt;end&gt;" pathCondition="leq(y,x)" lineNumber="-1" charStart="-1" charEnd="-1" verified="true">
                         </sedTermination>
+                        <sedGroupStartCondition xml:id="_bd268079-d26b-4533-b967-aae55ddbf077" name="leq(y,x)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                           <sedChildReference nodeIdRef="_063c334b-1434-4ba9-97e8-e421e52dff07"/>
+                        </sedGroupStartCondition>
                      </sedMethodReturn>
+                     <sedGroupStartCondition xml:id="_443f34de-de0d-482a-b423-a6405a379e87" name="leq(y,x)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                        <sedChildReference nodeIdRef="_d281ba52-a9ed-4697-928e-aa1a3923ab76"/>
+                     </sedGroupStartCondition>
                   </sedStatement>
                </sedBranchCondition>
+               <sedGroupEndReference nodeIdRef="_c5f91e41-260e-4396-b017-4b9aee661169"/>
+               <sedGroupEndReference nodeIdRef="_443f34de-de0d-482a-b423-a6405a379e87"/>
             </sedBranchStatement>
-            <sedMethodCallMethodReturnCondition xml:id="_e15e7437-a477-4027-beae-a9a3e639e00a" name="gt(y,x)" pathCondition="true">
-               <sedChildReference nodeIdRef="_f7e545e1-3175-464a-89cd-c7f4c5d5d22d"/>
+            <sedMethodCallMethodReturnCondition xml:id="_e5847291-9de5-4fb3-8d16-84f49b6e4661" name="gt(y,x)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_06c053cb-602e-4898-9d1d-b3e27e5462ec"/>
             </sedMethodCallMethodReturnCondition>
-            <sedMethodCallMethodReturnCondition xml:id="_45bf2dbd-478b-4f06-ae37-b05a1fee04d1" name="leq(y,x)" pathCondition="true">
-               <sedChildReference nodeIdRef="_b9a2d464-f84d-4390-84fe-c8e488673403"/>
+            <sedMethodCallMethodReturnCondition xml:id="_bd268079-d26b-4533-b967-aae55ddbf077" name="leq(y,x)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_063c334b-1434-4ba9-97e8-e421e52dff07"/>
             </sedMethodCallMethodReturnCondition>
+            <sedGroupEndReference nodeIdRef="_e5847291-9de5-4fb3-8d16-84f49b6e4661"/>
+            <sedGroupEndReference nodeIdRef="_bd268079-d26b-4533-b967-aae55ddbf077"/>
          </sedMethodCall>
-         <sedTerminationEntry nodeIdRef="_81421124-5e98-482f-88aa-06127ab65cff"/>
-         <sedTerminationEntry nodeIdRef="_b70e323e-94f6-41f3-9b8e-7ae7f6232da4"/>
+         <sedTerminationEntry nodeIdRef="_c9915615-fe69-4d34-b1f8-b6714490f531"/>
+         <sedTerminationEntry nodeIdRef="_84754b68-8253-427c-9f20-ae9c653ad007"/>
       </sedThread>
    </sedTarget>
 </launch>

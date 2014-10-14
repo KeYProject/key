@@ -11,6 +11,7 @@
                         </termination>
                      </methodReturn>
                   </statement>
+                  <completedBlockEntry path="/0/0/0" conditionString="equals(x,Z(0(#)))"/>
                </statement>
             </branchCondition>
             <branchCondition name="not(equals(x,Z(0(#))))" pathCondition="not(equals(x,Z(0(#))))" pathConditionChanged="true" branchCondition="not(equals(x,Z(0(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -25,8 +26,12 @@
                                     </termination>
                                  </methodReturn>
                               </statement>
+                              <completedBlockEntry path="/0/0/0" conditionString="equals(x,Z(1(#)))"/>
+                              <completedBlockEntry path="/0/0/0/1/0" conditionString="equals(x,Z(1(#)))"/>
                            </statement>
+                           <completedBlockEntry path="/0/0/0/1/0/0/0" conditionString="true"/>
                         </statement>
+                        <blockCompletionEntry path="/0/0/0/1/0/0/0/0"/>
                      </branchStatement>
                   </branchCondition>
                   <branchCondition name="not(equals(x,Z(1(#))))" pathCondition="and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#)))))" pathConditionChanged="true" branchCondition="not(equals(x,Z(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -40,8 +45,12 @@
                                        </termination>
                                     </methodReturn>
                                  </statement>
+                                 <completedBlockEntry path="/0/0/0" conditionString="equals(x,Z(2(#)))"/>
+                                 <completedBlockEntry path="/0/0/0/1/0" conditionString="equals(x,Z(2(#)))"/>
                               </statement>
+                              <completedBlockEntry path="/0/0/0/1/0/1/0/0" conditionString="true"/>
                            </statement>
+                           <blockCompletionEntry path="/0/0/0/1/0/1/0/0/0"/>
                         </branchStatement>
                      </branchCondition>
                      <branchCondition name="not(equals(x,Z(2(#))))" pathCondition="and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#)))))" pathConditionChanged="true" branchCondition="not(equals(x,Z(2(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -54,6 +63,8 @@
                                        </termination>
                                     </methodReturn>
                                  </statement>
+                                 <completedBlockEntry path="/0/0/0" conditionString="equals(x,Z(3(#)))"/>
+                                 <completedBlockEntry path="/0/0/0/1/0" conditionString="equals(x,Z(3(#)))"/>
                               </statement>
                            </branchStatement>
                         </branchCondition>
@@ -65,6 +76,9 @@
                                        <termination name="&lt;end&gt;" pathCondition="equals(x,Z(4(#)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                        </termination>
                                     </methodReturn>
+                                    <completedBlockEntry path="/0/0/0" conditionString="equals(x,Z(4(#)))"/>
+                                    <completedBlockEntry path="/0/0/0/1/0" conditionString="equals(x,Z(4(#)))"/>
+                                    <completedBlockEntry path="/0/0/0/1/0/1/1/1/0" conditionString="equals(x,Z(4(#)))"/>
                                  </statement>
                               </branchCondition>
                               <branchCondition name="not(equals(x,Z(4(#))))" pathCondition="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))" pathConditionChanged="true" branchCondition="not(equals(x,Z(4(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -75,14 +89,30 @@
                                           </termination>
                                        </methodReturn>
                                     </statement>
+                                    <completedBlockEntry path="/0/0/0" conditionString="and(and(and(and(not(equals(x,Z(0(#)))),not(equals(x,Z(1(#))))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))"/>
+                                    <completedBlockEntry path="/0/0/0/1/0" conditionString="and(and(and(not(equals(x,Z(1(#)))),not(equals(x,Z(2(#))))),not(equals(x,Z(3(#))))),not(equals(x,Z(4(#)))))"/>
+                                    <completedBlockEntry path="/0/0/0/1/0/1/1/1/0" conditionString="not(equals(x,Z(4(#))))"/>
                                  </statement>
                               </branchCondition>
+                              <blockCompletionEntry path="/0/0/0/1/0/1/1/1/0/0/0"/>
+                              <blockCompletionEntry path="/0/0/0/1/0/1/1/1/0/1/0"/>
                            </branchStatement>
                         </branchCondition>
                      </branchCondition>
                   </branchCondition>
+                  <blockCompletionEntry path="/0/0/0/1/0/0/0/0/0"/>
+                  <blockCompletionEntry path="/0/0/0/1/0/1/0/0/0/0"/>
+                  <blockCompletionEntry path="/0/0/0/1/0/1/1/0/0/0"/>
+                  <blockCompletionEntry path="/0/0/0/1/0/1/1/1/0/0/0"/>
+                  <blockCompletionEntry path="/0/0/0/1/0/1/1/1/0/1/0"/>
                </branchStatement>
             </branchCondition>
+            <blockCompletionEntry path="/0/0/0/0/0"/>
+            <blockCompletionEntry path="/0/0/0/1/0/0/0/0/0"/>
+            <blockCompletionEntry path="/0/0/0/1/0/1/0/0/0/0"/>
+            <blockCompletionEntry path="/0/0/0/1/0/1/1/0/0/0"/>
+            <blockCompletionEntry path="/0/0/0/1/0/1/1/1/0/0/0"/>
+            <blockCompletionEntry path="/0/0/0/1/0/1/1/1/0/1/0"/>
          </branchStatement>
       </statement>
       <methodReturnEntry path="/0/0/0/0/0/0/0"/>

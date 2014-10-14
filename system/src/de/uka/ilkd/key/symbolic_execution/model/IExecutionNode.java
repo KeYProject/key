@@ -152,4 +152,24 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
     * @throws ProofInputException Occurred Exception.
     */
    public ISymbolicLayout getCurrentLayout(int layoutIndex) throws ProofInputException;
+   
+   /**
+    * Returns all code blocks completed by this {@link IExecutionNode}.
+    * @return All code blocks completed by this {@link IExecutionNode}.
+    */
+   public ImmutableList<IExecutionNode<?>> getCompletedBlocks() throws ProofInputException;
+   
+   /**
+    * Returns the condition under which this node completes the code block of the given {@link IExecutionNode}.
+    * @param completedNode The completed {@link IExecutionNode} for which the condition is requested.
+    * @return The condition under which this node completes the code block of the given {@link IExecutionNode}.
+    */
+   public Term getBlockCompletionCondition(IExecutionNode<?> completedNode) throws ProofInputException;
+   
+   /**
+    * Returns the human readable condition under which this node completes the code block of the given {@link IExecutionNode}.
+    * @param completedNode The completed {@link IExecutionNode} for which the condition is requested.
+    * @return The human readable condition under which this node completes the code block of the given {@link IExecutionNode}.
+    */
+   public String getFormatedBlockCompletionCondition(IExecutionNode<?> completedNode) throws ProofInputException;
 }
