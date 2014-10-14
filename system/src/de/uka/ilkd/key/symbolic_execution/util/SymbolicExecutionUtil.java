@@ -64,6 +64,7 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -3266,7 +3267,7 @@ public final class SymbolicExecutionUtil {
     * @param ruleApp The {@link RuleApp}.
     * @return The computed call stack size and the second statement if available.
     */
-   public static Pair<Integer, ProgramElement> computeSecondStatement(RuleApp ruleApp) {
+   public static Pair<Integer, SourceElement> computeSecondStatement(RuleApp ruleApp) {
       if (ruleApp != null) {
          // Find inner most block
          SourceElement firstStatement = NodeInfo.computeFirstStatement(ruleApp);
@@ -3296,10 +3297,10 @@ public final class SymbolicExecutionUtil {
             block = blocks.removeFirst();
          }
          if (block != null && block.getChildCount() >= 2) {
-            return new Pair<Integer, ProgramElement>(methodFrameCount, block.getChildAt(1));
+            return new Pair<Integer, SourceElement>(methodFrameCount, block.getChildAt(1));
          }
          else {
-            return new Pair<Integer, ProgramElement>(methodFrameCount, null);
+            return new Pair<Integer, SourceElement>(methodFrameCount, null);
          }
       }
       else {
@@ -3308,13 +3309,42 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Checks if the given {@link ProgramElement} contains the given {@link ProgramElement}.
+    * Compares the given {@link SourceElement}s including their {@link PositionInfo}s.
+    * @param first The first {@link SourceElement}.
+    * @param second The second {@link SourceElement}.
+    * @return {@code true} both are equal and at the same {@link PositionInfo}, {@code false} otherwise.
+    */
+   public static boolean equalsWithPosition(SourceElement first, SourceElement second) {
+      if (first != null && second != null) {
+         if (first instanceof While) {
+            if (second instanceof While) {
+               // Special treatment for while because its position info is lost during prove, but maintained in its guard.
+               return first.equals(second) &&
+                      equalsWithPosition(((While) first).getGuard(), ((While) second).getGuard());
+            }
+            else {
+               return false;
+            }
+         }
+         else {
+            // Compare all source elements including ints position info
+            return first.equals(second) &&
+                   JavaUtil.equals(first.getPositionInfo(), second.getPositionInfo());
+         }
+      }
+      else {
+         return first == null && second == null;
+      }
+   }
+
+   /**
+    * Checks if the given {@link ProgramElement} contains the given {@link SourceElement}.
     * @param toSearchIn The {@link ProgramElement} to search in.
-    * @param toSearch The {@link ProgramElement} to search.
+    * @param toSearch The {@link SourceElement} to search.
     * @param services The {@link Services} to use.
     * @return {@code true} contained, {@code false} not contained.
     */
-   public static boolean containsStatement(ProgramElement toSearchIn, ProgramElement toSearch, Services services) {
+   public static boolean containsStatement(ProgramElement toSearchIn, SourceElement toSearch, Services services) {
       if (toSearchIn != null) {
          ContainsStatementVisitor visitor = new ContainsStatementVisitor(toSearchIn, toSearch, services);
          visitor.start();
@@ -3333,7 +3363,7 @@ public final class SymbolicExecutionUtil {
       /**
        * The {@link ProgramElement} to search.
        */
-      private final ProgramElement toSearch;
+      private final SourceElement toSearch;
       
       /**
        * The result.
@@ -3343,10 +3373,10 @@ public final class SymbolicExecutionUtil {
       /**
        * Constructor.
        * @param root The {@link ProgramElement} to start search in.
-       * @param toSearch The {@link ProgramElement} to search.
+       * @param toSearch The {@link SourceElement} to search.
        * @param services The {@link Services} to use.
        */
-      public ContainsStatementVisitor(ProgramElement root, ProgramElement toSearch, Services services) {
+      public ContainsStatementVisitor(ProgramElement root, SourceElement toSearch, Services services) {
          super(root, services);
          this.toSearch = toSearch;
       }
@@ -3356,7 +3386,7 @@ public final class SymbolicExecutionUtil {
        */
       @Override
       protected void doDefaultAction(SourceElement se) {
-         if (se == toSearch) {
+         if (equalsWithPosition(se, toSearch)) { // Comparison by == is not possible since loops are recreated
             contained = true;
          }
       }

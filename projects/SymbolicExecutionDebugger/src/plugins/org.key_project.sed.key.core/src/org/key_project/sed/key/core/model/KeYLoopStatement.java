@@ -424,4 +424,12 @@ public class KeYLoopStatement extends AbstractSEDLoopStatement implements IKeYSE
          return KeYModelUtil.computeGroupEndConditions(this);
       }
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isGroupable() {
+      return executionNode.isBlockOpened();
+   }
 }

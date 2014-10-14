@@ -426,4 +426,12 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
    public void setParent(ISEDDebugNode parent) {
       super.setParent(parent);
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isGroupable() {
+      return executionNode.isBlockOpened();
+   }
 }

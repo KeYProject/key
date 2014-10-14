@@ -171,7 +171,7 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       KeYlessTermination tloop = new KeYlessTermination(root, "t loop", "pcLoopTermination", false, TerminationKind.LOOP_BODY, true);
       root.addChild(tloop);
       root.addTermination(tloop);
-      KeYlessBranchStatement bn = new KeYlessBranchStatement(root, "bn", "pc5", true);
+      KeYlessBranchStatement bn = new KeYlessBranchStatement(root, "bn", "pc5", true, true);
       bn.addCallStackEntry(root);
       bn.addCallStackEntry(bc);
       root.addChild(bn);
@@ -188,11 +188,11 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       bn.addVariable(bnVar2);
       KeYlessValue bnVar2Value = new KeYlessValue(bnVar2, "myTypeAgain", "myValueAgain", "value of bnVar2", false, true, "c3");
       bnVar2.addValue(bnVar2Value);
-      KeYlessLoopStatement ln = new KeYlessLoopStatement(root, "ln", "pc6", true);
+      KeYlessLoopStatement ln = new KeYlessLoopStatement(root, "ln", "pc6", true, false);
       root.addChild(ln);
       ln.addCompletedBlock(bn, "My Block Completion Condition!");
       bn.addBlockCompletion(ln);
-      KeYlessLoopCondition lc = new KeYlessLoopCondition(ln, "lc", "pc7", false);
+      KeYlessLoopCondition lc = new KeYlessLoopCondition(ln, "lc", "pc7", false, true);
       ln.addChild(lc);
       KeYlessMethodCall mc = new KeYlessMethodCall(ln, "mc", "pc8", false);
       mc.addCallStackEntry(mc);

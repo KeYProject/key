@@ -212,6 +212,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Attribute name to store {@link IExecutionOperationContract#getFormatedContractParams()}.
     */
    public static final String ATTRIBUTE_CONTRACT_PARAMETERS = "contractParameters";
+
+   /**
+    * Attribute name to store {@link IExecutionBlockStartNode#isBlockOpened()}.
+    */
+   public static final String ATTRIBUTE_BLOCK_OPENED = "blockOpened";
    
    /**
     * Tag name to store {@link IExecutionBranchCondition}s.
@@ -565,6 +570,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
+      attributeValues.put(ATTRIBUTE_BLOCK_OPENED, node.isBlockOpened() + "");
       appendStartTag(level, TAG_BRANCH_STATEMENT, attributeValues, sb);
       appendConstraints(level + 1, node, saveConstraints, sb);
       appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
@@ -597,12 +603,14 @@ public class ExecutionNodeWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
+      attributeValues.put(ATTRIBUTE_BLOCK_OPENED, node.isBlockOpened() + "");
       appendStartTag(level, TAG_LOOP_CONDITION, attributeValues, sb);
       appendConstraints(level + 1, node, saveConstraints, sb);
       appendVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       appendCompletedBlocks(level + 1, node, sb);
+      appendBlockCompletions(level + 1, node, sb);
       appendEndTag(level, TAG_LOOP_CONDITION, sb);
    }
 
@@ -628,6 +636,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
+      attributeValues.put(ATTRIBUTE_BLOCK_OPENED, node.isBlockOpened() + "");
       appendStartTag(level, TAG_LOOP_STATEMENT, attributeValues, sb);
       appendConstraints(level + 1, node, saveConstraints, sb);
       appendVariables(level + 1, node, saveVariables, saveConstraints, sb);

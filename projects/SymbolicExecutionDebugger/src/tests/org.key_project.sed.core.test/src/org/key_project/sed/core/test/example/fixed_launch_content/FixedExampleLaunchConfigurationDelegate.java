@@ -144,6 +144,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        SEDMemoryLoopStatement ln = new SEDMemoryLoopStatement(target, s1, thread);
        ln.setName("while (x == 1)");
        ln.setPathCondition("pc3");
+       ln.setGroupable(false);
        s1.addChild(ln);
        
        SEDMemoryLoopCondition lc = new SEDMemoryLoopCondition(target, ln, thread);
@@ -185,6 +186,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        SEDMemoryMethodCall call = new SEDMemoryMethodCall(target, bnotzero, thread);
        call.setName("foo(result)");
        call.setPathCondition("pc11");
+       call.setGroupable(true);
        bnotzero.addChild(call);
 
        SEDMemoryBranchStatement branch = new SEDMemoryBranchStatement(target, call, thread);

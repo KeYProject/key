@@ -20,6 +20,11 @@ public abstract class AbstractExecutionBlockStartNode<S extends SourceElement> e
    private ImmutableList<IExecutionNode<?>> blockCompletions = ImmutableSLList.nil();
 
    /**
+    * Defines if a block is or might be opened.
+    */
+   private boolean blockOpened = true;
+   
+   /**
     * Constructor.
     * @param settings The {@link ITreeSettings} to use.
     * @param mediator The used {@link KeYMediator} during proof.
@@ -27,6 +32,22 @@ public abstract class AbstractExecutionBlockStartNode<S extends SourceElement> e
     */
    public AbstractExecutionBlockStartNode(ITreeSettings settings, KeYMediator mediator, Node proofNode) {
       super(settings, mediator, proofNode);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isBlockOpened() {
+      return blockOpened;
+   }
+
+   /**
+    * Defines if a block might be opened or not.
+    * @param blockOpened {@code false} block is definitively not opened, {@code true} block is or might be opened.
+    */
+   public void setBlockOpened(boolean blockOpened) {
+      this.blockOpened = blockOpened;
    }
 
    /**

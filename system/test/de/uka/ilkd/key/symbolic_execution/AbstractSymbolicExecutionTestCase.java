@@ -411,9 +411,13 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       assertTrue("Expected \"" + expected.getName() + "\" but is \"" + current.getName() + "\".", JavaUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
       assertEquals(expected.isPathConditionChanged(), current.isPathConditionChanged());
       assertTrue("Expected \"" + expected.getFormatedPathCondition() + "\" but is \"" + current.getFormatedPathCondition() + "\".", JavaUtil.equalIgnoreWhiteSpace(expected.getFormatedPathCondition(), current.getFormatedPathCondition()));
-      if (expected instanceof IExecutionBlockStartNode<?>) {
-         assertTrue(current instanceof IExecutionBlockStartNode<?>);
-         assertBlockCompletions((IExecutionBlockStartNode<?>)expected, (IExecutionBlockStartNode<?>)current);
+      if (compareParent) {
+         if (expected instanceof IExecutionBlockStartNode<?>) {
+            assertTrue(current instanceof IExecutionBlockStartNode<?>);
+            assertEquals(((IExecutionBlockStartNode<?>)expected).isBlockOpened(), ((IExecutionBlockStartNode<?>)current).isBlockOpened());
+            assertBlockCompletions((IExecutionBlockStartNode<?>)expected, (IExecutionBlockStartNode<?>)current);
+         }
+         assertCompletedBlocks(expected, current);
       }
       if (expected instanceof IExecutionBranchCondition) {
          assertTrue("Expected IExecutionBranchCondition but is " + current.getClass() + ".", current instanceof IExecutionBranchCondition);

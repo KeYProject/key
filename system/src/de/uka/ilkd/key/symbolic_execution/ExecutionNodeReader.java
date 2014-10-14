@@ -643,13 +643,13 @@ public class ExecutionNodeReader {
          return new KeYlessBranchCondition(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getBranchCondition(attributes), isMergedBranchCondition(attributes), isBranchConditionComputed(attributes), getAdditionalBranchLabel(attributes));
       }
       else if (ExecutionNodeWriter.TAG_BRANCH_STATEMENT.equals(qName)) {
-         return new KeYlessBranchStatement(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
+         return new KeYlessBranchStatement(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isBlockOpened(attributes));
       }
       else if (ExecutionNodeWriter.TAG_LOOP_CONDITION.equals(qName)) {
-         return new KeYlessLoopCondition(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
+         return new KeYlessLoopCondition(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isBlockOpened(attributes));
       }
       else if (ExecutionNodeWriter.TAG_LOOP_STATEMENT.equals(qName)) {
-         return new KeYlessLoopStatement(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
+         return new KeYlessLoopStatement(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isBlockOpened(attributes));
       }
       else if (ExecutionNodeWriter.TAG_METHOD_CALL.equals(qName)) {
          return new KeYlessMethodCall(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
@@ -759,6 +759,15 @@ public class ExecutionNodeReader {
     */
    protected boolean isHasNotNullCheck(Attributes attributes) {
       return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_HAS_NOT_NULL_CHECK));
+   }
+
+   /**
+    * Returns the block opened value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isBlockOpened(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_BLOCK_OPENED));
    }
    
    /**
@@ -1329,14 +1338,21 @@ public class ExecutionNodeReader {
       private ImmutableList<IExecutionNode<?>> blockCompletions = ImmutableSLList.nil();
       
       /**
+       * Is a block opened?
+       */
+      private final boolean blockOpened;
+      
+      /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
        * @param formatedPathCondition The formated path condition.
        * @param pathConditionChanged Is the path condition changed compared to parent?
+       * @param blockOpened {@code false} block is definitively not opened, {@code true} block is or might be opened.
        */
-      public AbstractKeYlessExecutionBlockStartNode(IExecutionNode<?> parent, String name, String formatedPathCondition, boolean pathConditionChanged) {
+      public AbstractKeYlessExecutionBlockStartNode(IExecutionNode<?> parent, String name, String formatedPathCondition, boolean pathConditionChanged, boolean blockOpened) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
+         this.blockOpened = blockOpened;
       }
 
       /**
@@ -1355,6 +1371,14 @@ public class ExecutionNodeReader {
          if (blockCompletion != null) {
             blockCompletions = blockCompletions.append(blockCompletion);
          }
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isBlockOpened() {
+         return blockOpened;
       }
    }
    
@@ -1618,12 +1642,14 @@ public class ExecutionNodeReader {
        * @param name The name of this node.
        * @param formatedPathCondition The formated path condition.
        * @param pathConditionChanged Is the path condition changed compared to parent?
+       * @param blockOpened {@code false} block is definitively not opened, {@code true} block is or might be opened.
        */
       public KeYlessBranchStatement(IExecutionNode<?> parent, 
                                     String name, 
                                     String formatedPathCondition,
-                                    boolean pathConditionChanged) {
-         super(parent, name, formatedPathCondition, pathConditionChanged);
+                                    boolean pathConditionChanged,
+                                    boolean blockOpened) {
+         super(parent, name, formatedPathCondition, pathConditionChanged, blockOpened);
       }
 
       /**
@@ -1640,19 +1666,21 @@ public class ExecutionNodeReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessLoopCondition extends AbstractKeYlessExecutionNode<LoopStatement> implements IExecutionLoopCondition {
+   public static class KeYlessLoopCondition extends AbstractKeYlessExecutionBlockStartNode<LoopStatement> implements IExecutionLoopCondition {
       /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
        * @param formatedPathCondition The formated path condition.
        * @param pathConditionChanged Is the path condition changed compared to parent?
+       * @param blockOpened {@code false} block is definitively not opened, {@code true} block is or might be opened.
        */
       public KeYlessLoopCondition(IExecutionNode<?> parent, 
                                   String name, 
                                   String formatedPathCondition,
-                                  boolean pathConditionChanged) {
-         super(parent, name, formatedPathCondition, pathConditionChanged);
+                                  boolean pathConditionChanged,
+                                  boolean blockOpened) {
+         super(parent, name, formatedPathCondition, pathConditionChanged, blockOpened);
       }
 
       /**
@@ -1692,12 +1720,14 @@ public class ExecutionNodeReader {
        * @param name The name of this node.
        * @param formatedPathCondition The formated path condition.
        * @param pathConditionChanged Is the path condition changed compared to parent?
+       * @param blockOpened {@code false} block is definitively not opened, {@code true} block is or might be opened.
        */
       public KeYlessLoopStatement(IExecutionNode<?> parent, 
                                   String name, 
                                   String formatedPathCondition, 
-                                  boolean pathConditionChanged) {
-         super(parent, name, formatedPathCondition, pathConditionChanged);
+                                  boolean pathConditionChanged,
+                                  boolean blockOpened) {
+         super(parent, name, formatedPathCondition, pathConditionChanged, blockOpened);
       }
 
       /**

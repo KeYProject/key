@@ -96,6 +96,11 @@ public class SEDMemoryMethodCall extends AbstractSEDMethodCall implements ISEDMe
     * The known group end conditions.
     */
    private final List<ISEDBranchCondition> groupEndConditions = new LinkedList<ISEDBranchCondition>();
+
+   /**
+    * The grouable state.
+    */
+   private boolean groupable;
    
    /**
     * Constructor.
@@ -371,5 +376,21 @@ public class SEDMemoryMethodCall extends AbstractSEDMethodCall implements ISEDMe
       if (groupStartCondition != null) {
          groupStartConditions.add(groupStartCondition);
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isGroupable() {
+      return groupable;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setGroupable(boolean groupable) {
+      this.groupable = groupable;
    }
 }

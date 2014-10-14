@@ -1042,6 +1042,7 @@ public final class TestSedCoreUtil {
          // Compare group ends
          if (expected instanceof ISEDGroupable) {
             assertTrue(current instanceof ISEDGroupable);
+            assertEquals(((ISEDGroupable) expected).isGroupable(), ((ISEDGroupable) current).isGroupable());
             compareConditions(((ISEDGroupable) expected).getGroupEndConditions(), ((ISEDGroupable) current).getGroupEndConditions(), compareReferences, compareId, compareVariables, compareCallStack, compareConstraints);
          }
          else {

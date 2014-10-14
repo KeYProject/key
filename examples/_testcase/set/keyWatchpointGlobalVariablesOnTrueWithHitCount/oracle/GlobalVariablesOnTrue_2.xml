@@ -4,7 +4,7 @@
       <statement name="x_global=17;" pathCondition="true" pathConditionChanged="false">
          <statement name="main(x_global);" pathCondition="true" pathConditionChanged="false">
             <methodCall name="&lt;call GlobalVariablesOnTrue.main(x_1)&gt;" pathCondition="true" pathConditionChanged="false">
-               <branchStatement name="if (x_1&gt;=0)" pathCondition="true" pathConditionChanged="false">
+               <branchStatement name="if (x_1&gt;=0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                </branchStatement>
             </methodCall>
          </statement>

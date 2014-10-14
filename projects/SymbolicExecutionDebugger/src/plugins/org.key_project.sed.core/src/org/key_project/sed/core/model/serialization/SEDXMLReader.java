@@ -1217,8 +1217,11 @@ public class SEDXMLReader {
       node.setId(getId(attributes));
       node.setName(getName(attributes));
       node.setPathCondition(getPathCondition(attributes));
+      if (node instanceof ISEDMemoryGroupable) {
+         ((ISEDMemoryGroupable) node).setGroupable(isGroupable(attributes));
+      }
    }
-   
+
    /**
     * Fills the attributes of the given {@link ISEDMemoryStackFrameCompatibleDebugNode}.
     * @param node The {@link ISEDMemoryStackFrameCompatibleDebugNode} to fill.
@@ -1427,6 +1430,15 @@ public class SEDXMLReader {
     */
    protected boolean isInitiallyValid(Attributes attributes) {
       return Boolean.parseBoolean(attributes.getValue(SEDXMLWriter.ATTRIBUTE_INITIALLY_VALID));
+   }
+   
+   /**
+    * Returns the groupable value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isGroupable(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(SEDXMLWriter.ATTRIBUTE_GROUPABLE));
    }
    
    /**
