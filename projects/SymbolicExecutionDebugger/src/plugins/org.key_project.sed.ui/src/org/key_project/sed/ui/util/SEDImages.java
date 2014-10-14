@@ -185,6 +185,11 @@ public final class SEDImages {
      * The key for the image that is used for symbolic debugging.
      */
     public static final String SYMBOLIC_DEBUG = "org.key_project.sed.ui.images.symbolicDebug";
+
+    /**
+     * The key for the image that is used for symbolic debugging.
+     */
+    public static final String SHOW_ALL_CONSTRAINTS = "org.key_project.sed.ui.images.showAllConstraints";
     
     /**
      * Forbid instances.
@@ -326,6 +331,9 @@ public final class SEDImages {
         else if (SYMBOLIC_DEBUG.equals(key)) {
            path = "icons/symbolic_debug.gif";
         }
+        else if (SHOW_ALL_CONSTRAINTS.equals(key)) {
+           path = "icons/show_all_constraints.gif";
+        }
         // Load image if possible
         if (path != null) {
            InputStream in = null;
@@ -389,6 +397,7 @@ public final class SEDImages {
                registry.remove(METHOD_CONTRACT_NOT_PRE);
                registry.remove(METHOD_CONTRACT_NOT_PRE_NOT_NPC);
                registry.remove(METHOD_RETURN);
+               registry.remove(SHOW_ALL_CONSTRAINTS);
                registry.remove(TERMINATION);
                registry.remove(TERMINATION_NOT_VERIFIED);
                registry.remove(SYMBOLIC_DEBUG);

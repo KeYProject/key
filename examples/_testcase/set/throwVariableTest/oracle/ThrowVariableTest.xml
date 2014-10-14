@@ -3,10 +3,13 @@
    <methodCall name="&lt;call self.main()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="IllegalArgumentException e = new IllegalArgumentException ();" pathCondition="true" pathConditionChanged="false">
          <statement name="throw e;" pathCondition="true" pathConditionChanged="false">
-            <termination name="&lt;uncaught java.lang.IllegalArgumentException&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-            </termination>
+            <exceptionalMethodReturn name="&lt;throw java.lang.IllegalArgumentException&gt;" signature="&lt;exceptional return of &lt;call self.main()&gt;&gt;" pathCondition="true" pathConditionChanged="false" methodReturnCondition="true">
+               <termination name="&lt;uncaught java.lang.IllegalArgumentException&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+               </termination>
+            </exceptionalMethodReturn>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0"/>
    </methodCall>
-   <terminationEntry path="/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0"/>
 </start>

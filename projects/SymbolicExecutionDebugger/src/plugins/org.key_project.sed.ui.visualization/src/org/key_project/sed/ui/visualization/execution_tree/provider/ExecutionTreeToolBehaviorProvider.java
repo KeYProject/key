@@ -28,6 +28,7 @@ import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.IPictogramElementContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
+import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.palette.IPaletteCompartmentEntry;
@@ -43,6 +44,7 @@ import org.eclipse.graphiti.ui.internal.GraphitiUIPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDLoopStatement;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeResumeFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeStepIntoFeature;
@@ -51,6 +53,7 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeStep
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeSuspendFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeTerminateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeVisualizeStateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.LoopStatementCollapseFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.MethodCallCollapseFeature;
 import org.key_project.sed.ui.visualization.util.ICustomFeatureFactory;
 import org.key_project.sed.ui.visualization.util.LogUtil;
@@ -105,7 +108,6 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
       if (isReadOnly()) {
          data.getGenericContextButtons().clear();
          
-         // collapse
          ISEDDebugNode node = (ISEDDebugNode) getFeatureProvider().getBusinessObjectForPictogramElement(context.getPictogramElement());
          if(node instanceof ISEDMethodCall) {
             ISEDMethodCall mc = (ISEDMethodCall) node; 
@@ -121,6 +123,15 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
                catch (DebugException e) {
                   LogUtil.getLogger().logError(e);
                }
+         }
+         else if(node instanceof ISEDLoopStatement) {
+            ISEDLoopStatement ls = (ISEDLoopStatement) node;
+            if(ls.isCollapsed()) {
+               data.getGenericContextButtons().add(createCustomContextButtonEntry(new LoopStatementCollapseFeature(getFeatureProvider()), context, "Expand", null, IPlatformImageConstants.IMG_EDIT_EXPAND));
+            }
+            else {
+               data.getGenericContextButtons().add(createCustomContextButtonEntry(new LoopStatementCollapseFeature(getFeatureProvider()), context, "Collapse", null, IPlatformImageConstants.IMG_EDIT_COLLAPSE));
+            }
          }
          
          List<IContextButtonEntry> epEntries = collectContextButtonEntriesFromExtensionPoint(isReadOnly(), context);
@@ -169,6 +180,32 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
       List<IContextMenuEntry> result = new LinkedList<IContextMenuEntry>();
       CollectionUtil.addAll(result, menuEntries);
       if (isReadOnly()) {
+         ISEDDebugNode node = (ISEDDebugNode) getFeatureProvider().getBusinessObjectForPictogramElement(context.getPictogramElements()[0]);
+         if(node instanceof ISEDMethodCall) {
+            ISEDMethodCall mc = (ISEDMethodCall) node; 
+            if(mc.isCollapsed()) {
+               result.add(createCustomContextMenuEntry(new MethodCallCollapseFeature(getFeatureProvider()), context, "Expand", null, IPlatformImageConstants.IMG_EDIT_EXPAND));
+            }
+            else
+               try {
+                  if(mc.getMethodReturnConditions().length > 0){
+                     result.add(createCustomContextMenuEntry(new MethodCallCollapseFeature(getFeatureProvider()), context, "Collapse", null, IPlatformImageConstants.IMG_EDIT_COLLAPSE));
+                  }
+               }
+               catch (DebugException e) {
+                  LogUtil.getLogger().logError(e);
+               }
+         }
+         else if(node instanceof ISEDLoopStatement) {
+            ContextMenuEntry loopMenu = (ContextMenuEntry) createCustomContextMenuEntry(null, context, "Show Iteration", null, IExecutionTreeImageConstants.IMG_LOOP_CONDITION);
+            loopMenu.setSubmenu(true);
+            
+            for(int i = 0; i < 10; i++) {
+               loopMenu.add(createCustomContextMenuEntry(new DebugNodeResumeFeature(getFeatureProvider()), context, "Iteration " + i, null, IExecutionTreeImageConstants.IMG_LOOP_STATEMENT));
+            }
+            result.add(loopMenu);
+         }
+
          result.add(createCustomContextMenuEntry(new DebugNodeResumeFeature(getFeatureProvider()), context, "Resume", null, IExecutionTreeImageConstants.IMG_RESUME));
          result.add(createCustomContextMenuEntry(new DebugNodeSuspendFeature(getFeatureProvider()), context, "Suspend", null, IExecutionTreeImageConstants.IMG_SUSPEND));
          result.add(createCustomContextMenuEntry(new DebugNodeTerminateFeature(getFeatureProvider()), context, "Terminate", null, IExecutionTreeImageConstants.IMG_TERMINATE));
@@ -305,6 +342,26 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
          }
       }
       return result.toArray(new IPaletteCompartmentEntry[result.size()]);
+   }
+   
+   @Override
+   public GraphicsAlgorithm[] getClickArea(PictogramElement pe) {
+      Object bo = getFeatureProvider().getBusinessObjectForPictogramElement(pe);
+      if(bo instanceof ISEDMethodCall && pe.getGraphicsAlgorithm() instanceof Rectangle) {
+         return new GraphicsAlgorithm[] {};
+      }
+      
+      return super.getClickArea(pe);
+   }
+   
+   @Override
+   public GraphicsAlgorithm getSelectionBorder(PictogramElement pe) {
+      Object bo = getFeatureProvider().getBusinessObjectForPictogramElement(pe);
+      if(bo instanceof ISEDMethodCall && pe.getGraphicsAlgorithm() instanceof Rectangle) {
+         return null;
+      }
+      
+      return super.getSelectionBorder(pe);
    }
 
    /**

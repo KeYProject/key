@@ -18,8 +18,7 @@ public class ProblemLoaderException
 extends RuntimeException // to have it passed through the parser (without adding throws declarations everywhere)
 {
 
-
-    private static final long serialVersionUID = -8442899290593478727L;
+    private static final long serialVersionUID = -3012196004988313969L;
     private DefaultProblemLoader origin;
 
     public ProblemLoaderException(DefaultProblemLoader origin, Throwable cause) {
@@ -39,5 +38,21 @@ extends RuntimeException // to have it passed through the parser (without adding
 
     public DefaultProblemLoader getOrigin() {
         return origin;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        if (getMessage() != null)
+            sb = sb.append(getMessage());
+        sb = sb.append(" (");
+        if (origin == null) sb = sb.append("unknown origin");
+        else sb = sb.append("file: ").append(origin.getFile());
+        if (getCause() != null) {
+            sb = sb.append("; caused by: ");
+            sb = sb.append(getCause());
+        }
+        sb = sb.append(')');
+        return sb.toString();
     }
 }

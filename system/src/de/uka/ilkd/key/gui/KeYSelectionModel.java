@@ -45,6 +45,22 @@ public class KeYSelectionModel {
 	goalIsValid = false;
     }
 
+    /**
+     * Does not take care of GUI effects
+     */
+    public void setProof(Proof p) {
+        assert p != null;
+        proof = p;
+        Goal g = proof.openGoals().iterator().next();
+        if ( g == null) {
+            selectedNode = proof.root().leavesIterator().next();
+        } else {
+            goalIsValid = true;
+            selectedNode = g.node();
+            selectedGoal = g;
+        }
+    }
+
     /** sets the selected proof
      * @param p the Proof that is selected
      */

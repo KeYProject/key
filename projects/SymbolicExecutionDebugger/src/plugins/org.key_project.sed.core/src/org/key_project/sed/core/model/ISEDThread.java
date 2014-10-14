@@ -36,7 +36,7 @@ import org.key_project.sed.core.model.memory.SEDMemoryThread;
  * @author Martin Hentschel
  * @see ISEDDebugNode
  */
-public interface ISEDThread extends ISEDDebugNode, IThread {
+public interface ISEDThread extends ISEDDebugNode, IThread, IStackFrame {
    /**
     * Returns all leaf nodes to select.
     * @return The leaf nodes to select.

@@ -13,6 +13,7 @@
 
 package org.key_project.sed.core.model;
 
+import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IVariable;
 import org.key_project.sed.core.model.impl.AbstractSEDVariable;
 
@@ -28,4 +29,9 @@ import org.key_project.sed.core.model.impl.AbstractSEDVariable;
  * @author Martin Hentschel
  */
 public interface ISEDVariable extends IVariable, ISEDDebugElement {
+   /**
+    * Returns the parent {@link IStackFrame} which provides this {@link ISEDVariable}.
+    * @return The parent {@link IStackFrame} which provides this {@link ISEDVariable}.
+    */
+   public IStackFrame getStackFrame();
 }

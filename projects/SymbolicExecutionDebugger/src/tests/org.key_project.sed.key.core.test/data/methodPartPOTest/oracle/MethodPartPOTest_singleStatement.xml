@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_70c93372-5fe9-4dd9-9053-d7e886ce2d16" name="doSomething(int, java.lang.String, boolean) from 28 : 9 to 28 : 38" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_5b642a95-29ec-4569-8b2e-0744de1e82c1" name="&lt;start&gt;" pathCondition="true">
-         <sedStatement xml:id="_88b700ea-b023-4b36-92b9-52e92081b0bf" name="int y = 2+CONSTANT+this.field;" pathCondition="true" lineNumber="-1" charStart="421" charEnd="450" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorSingleStatementSelected\src\MethodPartPOTest.java">
-            <sedTermination xml:id="_1e802217-db3f-4611-b4b3-4b589423c58c" name="&lt;end&gt;" pathCondition="true" verified="true">
+   <sedTarget xml:id="_c5b5c195-ba0f-4abe-ac8a-ad72fefe940e" name="doSomething(int, java.lang.String, boolean) from 28 : 9 to 28 : 38" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_4efc6333-ca93-4f46-86d6-0e8325a0c60c" name="&lt;start&gt;" pathCondition="true">
+         <sedStatement xml:id="_2e2fb01a-c2ac-448a-8dac-8fbb71ff7f5e" name="int y = 2+CONSTANT+this.field;" pathCondition="true" lineNumber="-1" charStart="421" charEnd="450" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorSingleStatementSelected\src\MethodPartPOTest.java">
+            <sedTermination xml:id="_3d69bbb1-7a9d-476f-9424-f8ee7cce7e25" name="&lt;end&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYLaunchConfigurationDelegateTest_testLaunchInTextEditorSingleStatementSelected\src\MethodPartPOTest.java" verified="true">
             </sedTermination>
          </sedStatement>
-         <sedTerminationEntry nodeIdRef="_1e802217-db3f-4611-b4b3-4b589423c58c"/>
+         <sedTerminationEntry nodeIdRef="_3d69bbb1-7a9d-476f-9424-f8ee7cce7e25"/>
       </sedThread>
    </sedTarget>
 </launch>

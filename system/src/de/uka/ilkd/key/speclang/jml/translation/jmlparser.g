@@ -38,6 +38,7 @@ header {
     import de.uka.ilkd.key.speclang.translation.*;
     import de.uka.ilkd.key.util.Pair;
     import de.uka.ilkd.key.util.Triple;
+    import de.uka.ilkd.key.util.InfFlowSpec;
 
     import java.math.BigInteger;
     import java.util.List;
@@ -346,13 +347,15 @@ top returns [Object result = null] throws  SLTranslationException
     |   result = breaksclause
     |   result = continuesclause
     |   result = dependsclause
-    |   result = declassifyclause
     |   result = ensuresclause
     |   result = representsclause
     |   result = axiomsclause
     |   result = requiresclause
     |   result = decreasesclause
-    |   result = respectsclause
+    |   result = separatesclause  // old information flow syntax
+    |   result = determinesclause // new information flow syntax
+    |   result = loopseparatesclause  // old information flow syntax
+    |   result = loopdeterminesclause // new information flow syntax
     |   result = returnsclause
     |   result = signalsclause
     |   result = signalsonlyclause
@@ -379,22 +382,6 @@ assignableclause returns [Term result = null] throws SLTranslationException
     | STRICTLY_NOTHING
         { result = tb.strictlyNothing(); }
     )
-    ;
-
-
-declassifyclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
-{
-    Term declass = null;
-    Term frompart = null;
-    Term topart = null;
-    Term ifpart = null;
-}
-:
-    del:DECLASSIFY declass = predicate
-    (FROM frompart = storeRefUnion)?
-    (TO topart = storeRefUnion)?
-    (IF ifpart = predicate)?
-    { result = translator.translate(del.getText(), ImmutableList.class, declass, frompart, topart, ifpart, services); }
     ;
 
 
@@ -491,14 +478,80 @@ representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
     ;
 
 
-respectsclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException {
+separatesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] throws SLTranslationException {
+    ImmutableList<Term> sep = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> decl = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> erases = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> tmp;
+}
+:
+    SEPARATES (NOTHING | sep = infflowspeclist)
+    (   (DECLASSIFIES (NOTHING | tmp = infflowspeclist {decl = decl.append(tmp);})) |
+        (ERASES (NOTHING | tmp = infflowspeclist {erases = erases.append(tmp);})) |
+        (NEW_OBJECTS (NOTHING | tmp = infflowspeclist {newObs = newObs.append(tmp);}))
+    )*
+    {decl = sep.append(decl);
+     erases = sep.append(erases);
+     result = new InfFlowSpec(decl, erases, newObs);}
+    ;
+
+
+loopseparatesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] throws SLTranslationException {
+    ImmutableList<Term> sep = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> tmp;
+}
+:
+    LOOP_SEPARATES (NOTHING | sep = infflowspeclist)
+    (   (NEW_OBJECTS (NOTHING | tmp = infflowspeclist {newObs = newObs.append(tmp);}))
+    )*
+    {result = new InfFlowSpec(sep, sep, newObs);}
+    ;
+
+
+determinesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] throws SLTranslationException {
+    ImmutableList<Term> det = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> by = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> decl = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> erases = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> tmp;
+}
+:
+    DETERMINES (NOTHING | det = infflowspeclist)
+    BY (NOTHING | (ITSELF {by = det;}) | by = infflowspeclist)
+    (   (DECLASSIFIES (NOTHING | tmp = infflowspeclist {decl = decl.append(tmp);})) |
+        (ERASES (NOTHING | tmp = infflowspeclist {erases = erases.append(tmp);})) |
+        (NEW_OBJECTS (NOTHING | tmp = infflowspeclist {newObs = newObs.append(tmp);}))
+    )*
+    {det = det.append(erases);
+     by = by.append(decl);
+     result = new InfFlowSpec(by, det, newObs);}
+    ;
+
+
+loopdeterminesclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] throws SLTranslationException {
+    ImmutableList<Term> det = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> tmp;
+}
+:
+    LOOP_DETERMINES (NOTHING | det = infflowspeclist)
+    BY ITSELF
+    (   (NEW_OBJECTS (NOTHING | tmp = infflowspeclist {newObs = newObs.append(tmp);}))
+    )*
+    {result = new InfFlowSpec(det, det, newObs);}
+    ;
+
+
+infflowspeclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException {
     Term term = null;
 }
 :
-    resp:RESPECTS
-    term = storeref { result = result.append(term); }
-    (COMMA term = storeref { result = result.append(term); })*
-        { result = translator.translate(resp.getText(), ImmutableList.class, result, services); }
+    term = termexpression { result = result.append(term); }
+    (COMMA term = termexpression { result = result.append(term); })*
+        { result = translator.translate("infflowspeclist", ImmutableList.class, result, services); }
     ;
 
 
@@ -1589,6 +1642,18 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         {
             result = translator.translate("\\dl_", SLExpression.class, escape, list, services);
         }
+        
+    |   mapEmpty:MAPEMPTY { result = translator.translateMapExpressionToJDL(mapEmpty,list,services); }
+        
+    |   mapExp:MAPEXPRESSION LPAREN ( list=expressionlist )? RPAREN
+		{
+		    result = translator.translateMapExpressionToJDL(mapExp,list,services);
+		}
+
+    |   s2m:SEQ2MAP LPAREN ( list=expressionlist )? RPAREN
+		{
+		    result = translator.translateMapExpressionToJDL(s2m,list,services);
+		}
 
     |   NOT_MODIFIED LPAREN t=storeRefUnion RPAREN
         {
@@ -1776,14 +1841,43 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 
         }
 
-    |   SEQEMPTY
+    |   (SEQEMPTY
+        | ((LPAREN SEQDEF | LPAREN SEQ) quantifiedvardecls SEMI)
+        | (SEQSINGLETON | SEQ) LPAREN
+        | SEQSUB LPAREN
+        | SEQREVERSE
+        | SEQREPLACE
+        | (tk1:SEQCONTAINS{tk=tk1;}
+          | tk2: SEQCONCAT{tk=tk2;}
+          | tk3: SEQGET{tk=tk3;}
+          | tk4: INDEXOF{tk=tk4;}))
+         => result = sequence    
+    
+    |   LPAREN result=expression RPAREN
+;
+
+
+sequence returns [SLExpression result = null] throws SLTranslationException
+{
+    ImmutableList<SLExpression> list = null;
+    ImmutableList<Term> tlist = null;
+    SLExpression e1 = null;
+    SLExpression e2 = null;
+    SLExpression e3 = null;
+    KeYJavaType typ;
+    Term t, t2;
+    Token tk = null;
+    Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = null;    
+}
+:
+        SEQEMPTY
         {
             result = new SLExpression(tb.seqEmpty());
         }
-
-    |   SEQSINGLETON LPAREN e1=expression RPAREN
+    |   ((LPAREN SEQDEF | LPAREN SEQ) quantifiedvardecls SEMI) => result=seqdefterm
+    |   (SEQSINGLETON | SEQ) LPAREN list=exprList RPAREN
         {
-            result = new SLExpression(tb.seqSingleton(e1.getTerm()));
+            result = translator.translate("\\seq", SLExpression.class, list, services);
         }
 
     |   SEQSUB LPAREN e1=expression COMMA e2=expression COMMA e3=expression RPAREN
@@ -1805,12 +1899,12 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
             final Term put = tb.seqConcat(ante, tb.seqConcat(insert, post));
             result = new SLExpression(put);
         }
+        
     |   (tk2: SEQCONCAT{tk=tk2;} | tk3: SEQGET{tk=tk3;} | tk4: INDEXOF{tk=tk4;})
         LPAREN e1=expression COMMA e2=expression RPAREN
         {
             result = translator.translate(tk.getText(), SLExpression.class, services, e1, e2);
         }
-    |   LPAREN result=expression RPAREN
 ;
 
 specquantifiedexpression returns [SLExpression result = null] throws SLTranslationException
@@ -1922,7 +2016,6 @@ seqdefterm returns [SLExpression result=null] throws SLTranslationException
         resolverManager.popLocalVariablesNamespace();
         throw ex;
         }
-
 
 quantifiedvardecls returns [Pair<KeYJavaType,ImmutableList<LogicVariable>> result = null]
                    throws SLTranslationException

@@ -271,7 +271,7 @@ public abstract class SequentView extends JTextArea {
         return s;
     }
 
-    public String getHighlightedText() {
+    public String getHighlightedText() {       
         return getHighlightedText(getPosInSequent(getMousePosition()));
     }
 

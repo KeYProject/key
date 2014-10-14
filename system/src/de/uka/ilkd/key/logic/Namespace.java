@@ -188,12 +188,14 @@ public class Namespace implements java.io.Serializable {
     * has been found
     */  
     public Named lookup(Name name) {
-	Named symbol=lookupLocally(name);
-	if (symbol==null && parent!=null) {
-	    return parent.lookup(name);
-	} else {
-	    return symbol;
-	}
+        Named symbol = lookupLocally(name);
+        if (symbol != null) {
+            return symbol;
+        }
+        if (parent != null) {
+            return parent.lookup(name);
+        }
+        return null;
     }
     
     /** Convenience method to look up. */

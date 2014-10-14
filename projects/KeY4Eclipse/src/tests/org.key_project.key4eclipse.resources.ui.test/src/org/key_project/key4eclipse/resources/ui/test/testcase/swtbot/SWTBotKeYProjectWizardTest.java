@@ -21,6 +21,7 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.junit.Test;
+import org.key_project.key4eclipse.resources.test.util.KeY4EclipseResourcesTestUtil;
 import org.key_project.key4eclipse.resources.ui.test.util.KeY4EclipseResourcesUiTestUtil;
 import org.key_project.key4eclipse.resources.ui.wizard.KeYProjectWizard;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
@@ -48,7 +49,7 @@ public class SWTBotKeYProjectWizardTest extends AbstractSetupTestCase {
       
       IWorkspace workspace = ResourcesPlugin.getWorkspace();
       
-      TestUtilsUtil.waitForBuild();
+      KeY4EclipseResourcesTestUtil.waitBuild();
       
       IProject project = workspace.getRoot().getProject("SWTBotKeYProjectWizardTest_testKeYProjectWizard");
       KeY4EclipseResourcesUiTestUtil.assertKeYNature(project);

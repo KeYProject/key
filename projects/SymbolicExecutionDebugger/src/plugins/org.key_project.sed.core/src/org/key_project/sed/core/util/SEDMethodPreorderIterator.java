@@ -148,7 +148,7 @@ public class SEDMethodPreorderIterator implements ISEDIterator {
       ISEDDebugNode parent = NodeUtil.getParent(node);
       // Search next debug node
       while (parent instanceof ISEDDebugNode) {
-         ISEDDebugNode[] parentChildren = NodeUtil.getChildren(parent);
+         ISEDDebugNode[] parentChildren = NodeUtil.getChildren(parent, true);
          int nodeIndex = ArrayUtil.indexOf(parentChildren, node);
          if (nodeIndex < 0) {
             throw new DebugException(LogUtil.getLogger().createErrorStatus("Parent node \"" + parent + "\" does not contain child \"" + node + "."));

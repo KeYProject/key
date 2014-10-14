@@ -324,7 +324,7 @@ public class TestJMLTranslator extends TestCase {
                 TB.bsum(i,
                         TB.zTerm("0"),
                         TB.zTerm("2147483647"),
-                        TB.var(i), services));
+                        TB.var(i)));
         assertTrue(result != null);
         assertSame(q, result.sub(0).op());
         assertTrue("Result was: " + result + "; \nExpected was: " + expected,
@@ -354,7 +354,7 @@ public class TestJMLTranslator extends TestCase {
                 TB.bsum(i,
                         TB.zTerm("0"),
                         TB.zTerm("2147483647"),
-                        TB.var(i), services);
+                        TB.var(i));
         assertTrue(result != null);
         assertSame(q, result.op());
         assertTrue("Result was: " + result + "; \nExpected was: " + expected,

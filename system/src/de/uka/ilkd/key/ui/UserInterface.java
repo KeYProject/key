@@ -90,6 +90,10 @@ public interface UserInterface
      */
     void loadProblem(File file, List<File> classPath, File bootClassPath);
 
+    void setSaveOnly(boolean s);
+
+    boolean isSaveOnly();
+
     void setMacro(ProofMacro macro);
 
     ProofMacro getMacro();
@@ -204,6 +208,7 @@ public interface UserInterface
      */
     void removeProof(Proof proof);
 
+    File saveProof(Proof proof, String fileExtension);
     
     /**
      * This method is called if no {@link LoadedPOContainer} was created

@@ -44,6 +44,7 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class AbstractUserInterface implements UserInterface {
 
     private ProofMacro autoMacro = new SkipMacro();
+    protected boolean saveOnly = false;
 
     private ProverTaskListener pml = null;
 
@@ -61,6 +62,14 @@ public abstract class AbstractUserInterface implements UserInterface {
         app = forced? app.forceInstantiate(goal): app.tryToInstantiate(goal);
         // cannot complete that app
         return app.complete() ? app : null;
+    }
+
+    public void setSaveOnly(boolean s) {
+        this.saveOnly = s;
+    }
+
+    public boolean isSaveOnly() {
+        return this.saveOnly;
     }
 
     public void setMacro(ProofMacro macro) {
@@ -138,8 +147,13 @@ public abstract class AbstractUserInterface implements UserInterface {
        DefaultProblemLoader loader = null;
        try {
           getMediator().stopInterface(true);
-          loader = new DefaultProblemLoader(file, classPath, bootClassPath, profile, getMediator(), false, poPropertiesToForce);
-          loader.load();
+          loader = new DefaultProblemLoader(file, classPath, bootClassPath, profile,
+                                            getMediator(), false, poPropertiesToForce);
+          if (isSaveOnly()) {
+              loader.saveAll();
+          } else {
+              loader.load();
+          }
           return loader;
        }
        catch (ProblemLoaderException e) {
@@ -163,7 +177,7 @@ public abstract class AbstractUserInterface implements UserInterface {
        createProofEnvironmentAndRegisterProof(input, proofList, initConfig);
        return proofList.getFirstProof();
     }
-    
+
     /**
      * {@inheritDoc}
      */

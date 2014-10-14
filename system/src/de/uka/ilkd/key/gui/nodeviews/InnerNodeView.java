@@ -72,9 +72,9 @@ public class InnerNodeView extends SequentView {
         this.node = node;
         filter = new IdentitySequentPrintFilter(node.sequent());
         setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(),
-                mainWindow.getMediator().getNotationInfo(),
-                mainWindow.getMediator().getServices(),
-                getVisibleTermLabels()));
+                        mainWindow.getMediator().getNotationInfo(),
+                        mainWindow.getMediator().getServices(),
+                        getVisibleTermLabels()));
         setSelectionColor(new Color(10, 180, 50));
         setBackground(INACTIVE_BACKGROUND_COLOR);
 

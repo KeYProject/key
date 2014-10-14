@@ -28,8 +28,18 @@ import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.eclipse.gef.finder.widgets.SWTBotGefEditor;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IPropertyListener;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PartInitException;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.serialization.SEDXMLWriter;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
@@ -61,7 +71,7 @@ public final class TestVisualizationUtil {
       TestCase.assertNotNull(modelFile);
       // Create model file
       SEDXMLWriter writer = new SEDXMLWriter();
-      String modelContent = writer.toXML(new ISEDDebugTarget[0], "UTF-8", false, false, null);
+      String modelContent = writer.toXML(new ISEDDebugTarget[0], "UTF-8", false, false, false, null);
       if (!modelFile.exists()) {
          modelFile.create(new ByteArrayInputStream(modelContent.getBytes(Charset.forName("UTF-8"))), true, null);
       }
@@ -104,5 +114,108 @@ public final class TestVisualizationUtil {
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       SWTBotView setView = TestVisualizationUtil.getSymbolicExecutionTreeView(bot);
       setView.setFocus();
+   }
+
+   /**
+    * Returns the {@link SWTBotGefEditor} for the Graphiti Editor in {@link #getSymbolicExecutionTreeView(SWTWorkbenchBot)}.
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @return The {@link SWTBotGefEditor}.
+    */
+   public static SWTBotGefEditor getSymbolicExecutionTreeViewGefEditor(SWTWorkbenchBot bot) {
+      SWTBotView botView = getSymbolicExecutionTreeView(bot);
+      final ExecutionTreeView view = (ExecutionTreeView) botView.getReference().getView(true);
+      IEditorReference dummyReference = new IEditorReference() {
+         @Override
+         public void removePropertyListener(IPropertyListener listener) {
+         }
+         
+         @Override
+         public void removePartPropertyListener(IPropertyChangeListener listener) {
+         }
+         
+         @Override
+         public boolean isDirty() {
+            return getEditor(false).isDirty();
+         }
+         
+         @Override
+         public String getTitleToolTip() {
+            return getEditor(false).getTitleToolTip();
+         }
+         
+         @Override
+         public Image getTitleImage() {
+            return getEditor(false).getTitleImage();
+         }
+         
+         @Override
+         public String getTitle() {
+            return getEditor(false).getTitle();
+         }
+         
+         @Override
+         public String getPartProperty(String key) {
+            return null;
+         }
+         
+         @Override
+         public String getPartName() {
+            return null;
+         }
+         
+         @Override
+         public IWorkbenchPart getPart(boolean restore) {
+            return getEditor(restore);
+         }
+         
+         @Override
+         public IWorkbenchPage getPage() {
+            return getEditor(false).getSite().getPage();
+         }
+         
+         @Override
+         public String getId() {
+            return getEditor(false).getSite().getId();
+         }
+         
+         @Override
+         public String getContentDescription() {
+            return null;
+         }
+         
+         @Override
+         public void addPropertyListener(IPropertyListener listener) {
+         }
+         
+         @Override
+         public void addPartPropertyListener(IPropertyChangeListener listener) {
+         }
+         
+         @Override
+         public boolean isPinned() {
+            return false;
+         }
+         
+         @Override
+         public String getName() {
+            return null;
+         }
+         
+         @Override
+         public String getFactoryId() {
+            return null;
+         }
+         
+         @Override
+         public IEditorInput getEditorInput() throws PartInitException {
+            return getEditor(false).getEditorInput();
+         }
+         
+         @Override
+         public IEditorPart getEditor(boolean restore) {
+            return view.getEditorPart();
+         }
+      };
+      return new SWTBotGefEditor(dummyReference, bot);
    }
 }

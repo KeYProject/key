@@ -545,6 +545,54 @@ public final class SWTUtil {
    }
 
    /**
+    * Invokes {@link AbstractTableViewer#add(Object)} thread save.
+    * @param viewer The {@link AbstractTableViewer} to invoke method on.
+    * @param elements The new elements to add.
+    */
+   public static void addAsync(final AbstractTableViewer viewer, final Object[] elements) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.add(elements);
+            }
+         });
+      }
+   }
+
+   /**
+    * Invokes {@link AbstractTableViewer#remove(Object)} thread save.
+    * @param viewer The {@link AbstractTableViewer} to invoke method on.
+    * @param element The old element to remove.
+    */
+   public static void removeAsync(final AbstractTableViewer viewer, final Object element) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.remove(element);
+            }
+         });
+      }
+   }
+
+   /**
+    * Invokes {@link AbstractTableViewer#remove(Object)} thread save.
+    * @param viewer The {@link AbstractTableViewer} to invoke method on.
+    * @param elements The old elements to remove.
+    */
+   public static void removeAsync(final AbstractTableViewer viewer, final Object[] elements) {
+      if (viewer != null && !viewer.getControl().isDisposed()) {
+         viewer.getControl().getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               viewer.remove(elements);
+            }
+         });
+      }
+   }
+
+   /**
     * Invokes {@link CheckboxTableViewer#setChecked(Object, boolean)} thread save.
     * @param viewer The {@link AbstractTableViewer} to invoke method on.
     * @param element The element to modify its checked state.

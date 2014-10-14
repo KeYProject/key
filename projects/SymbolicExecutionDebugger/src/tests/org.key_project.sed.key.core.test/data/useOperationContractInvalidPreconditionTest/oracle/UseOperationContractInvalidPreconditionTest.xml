@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_705cd981-61a6-4ac9-bbd4-70b9913152df" name="main()" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_fdd6298c-fa76-4a1c-be72-55b284df79da" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_9393bda0-b007-4687-b3b0-190fe057c96a" name="&lt;call UseOperationContractInvalidPreconditionTest.main()&gt;" pathCondition="true" lineNumber="-1" charStart="151" charEnd="155" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractInvalidPreconditionTest\src\UseOperationContractInvalidPreconditionTest.java">
-            <sedStatement xml:id="_11e6f802-c795-405c-9b8d-ff3e96193476" name="UseOperationContractInvalidPreconditionTest obj = new UseOperationContractInvalidPreconditionTest ();" pathCondition="true" lineNumber="-1" charStart="173" charEnd="273" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractInvalidPreconditionTest\src\UseOperationContractInvalidPreconditionTest.java">
-               <sedMethodCall xml:id="_59363e11-d0cd-4acc-9644-d16904c236af" name="&lt;call UseOperationContractInvalidPreconditionTest()&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractInvalidPreconditionTest\src\UseOperationContractInvalidPreconditionTest.java">
-                  <sedMethodReturn xml:id="_ba529bab-f6ca-4de6-b0d9-97afda33236e" name="&lt;return of UseOperationContractInvalidPreconditionTest()&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractInvalidPreconditionTest\src\UseOperationContractInvalidPreconditionTest.java" methodReturnConditionRef="_710e6ee9-c4ef-49d9-b061-c7a58dbefb87">
-                     <sedStatement xml:id="_23e09602-60f4-47eb-8748-2a240b935af6" name="int magicNumber = obj.magic(-123);" pathCondition="true" lineNumber="-1" charStart="278" charEnd="312" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractInvalidPreconditionTest\src\UseOperationContractInvalidPreconditionTest.java">
-                        <sedMethodContract xml:id="_8d185c5c-7a26-4755-9ddf-880470e01b01" name="result_0 = obj.magic(-123) catch(exc_0)
+   <sedTarget xml:id="_41543faa-6c92-4867-872f-b1bcbaa3977d" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_14ff1544-d2e7-43d7-b8af-bceefd4d60c4" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_77084c9f-6fd3-4c70-b8d8-7085c2854cf2" name="&lt;call UseOperationContractInvalidPreconditionTest.main()&gt;" pathCondition="true" lineNumber="-1" charStart="151" charEnd="155" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractInvalidPreconditionTest\src\UseOperationContractInvalidPreconditionTest.java">
+            <sedStatement xml:id="_209fc8c6-aec1-4e1e-9374-32292785ebb1" name="UseOperationContractInvalidPreconditionTest obj = new UseOperationContractInvalidPreconditionTest ();" pathCondition="true" lineNumber="-1" charStart="173" charEnd="273" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractInvalidPreconditionTest\src\UseOperationContractInvalidPreconditionTest.java">
+               <sedMethodCall xml:id="_c366729c-7bf1-4497-9941-a0eb603c3a40" name="&lt;call UseOperationContractInvalidPreconditionTest()&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractInvalidPreconditionTest\src\UseOperationContractInvalidPreconditionTest.java">
+                  <sedMethodReturn xml:id="_708eafd9-4508-4f68-bfb9-04a36deb456d" name="&lt;return of UseOperationContractInvalidPreconditionTest()&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractInvalidPreconditionTest\src\UseOperationContractInvalidPreconditionTest.java" methodReturnConditionRef="_6f1ec743-0ae6-4a66-9595-15a49032c9c5">
+                     <sedStatement xml:id="_6166db94-654a-45a6-9e66-2a22d469eac2" name="int magicNumber = obj.magic(-123);" pathCondition="true" lineNumber="-1" charStart="278" charEnd="312" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractInvalidPreconditionTest\src\UseOperationContractInvalidPreconditionTest.java">
+                        <sedMethodContract xml:id="_9174745b-36e5-4614-a692-c5ea1c275e62" name="result_0 = obj.magic(-123) catch(exc_0)
 pre: -123 &gt;= 0 &amp; obj.&lt;inv&gt;
 post: result_0 = 42 &amp; obj.&lt;inv&gt; &amp; exc_0 = null
 mod: allLocs
 termination: diamond" pathCondition="true" lineNumber="-1" charStart="553" charEnd="558" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractInvalidPreconditionTest\src\UseOperationContractInvalidPreconditionTest.java" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="true">
-                           <sedBranchCondition xml:id="_8d24fa7b-59a9-4312-89ff-740c86dbb84b" name="Post (magic): true" pathCondition="true">
-                              <sedStatement xml:id="_dd8a71c0-cdcb-43af-b6aa-0fa6bfb3556a" name="int magicNumberCopy = magicNumber;" pathCondition="true" lineNumber="-1" charStart="317" charEnd="351" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractInvalidPreconditionTest\src\UseOperationContractInvalidPreconditionTest.java">
-                                 <sedStatement xml:id="_ba45f123-00ca-4cd1-8004-cf43f993668d" name="return magicNumber+magicNumberCopy;" pathCondition="true" lineNumber="-1" charStart="356" charEnd="393" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractInvalidPreconditionTest\src\UseOperationContractInvalidPreconditionTest.java">
-                                    <sedMethodReturn xml:id="_2d01d29f-abe1-400f-8893-40f5320e1b29" name="&lt;return of UseOperationContractInvalidPreconditionTest.main()&gt;" pathCondition="true" lineNumber="-1" charStart="151" charEnd="155" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractInvalidPreconditionTest\src\UseOperationContractInvalidPreconditionTest.java" methodReturnConditionRef="_e9979b56-c0a2-4cf0-b1c0-51ef17281eea">
-                                       <sedTermination xml:id="_62614f19-ea01-461b-9201-6734ba30c8a8" name="&lt;end&gt;" pathCondition="true" verified="true">
+                           <sedBranchCondition xml:id="_8227e6e7-9bb8-48ae-961c-30306880360d" name="Post (magic): true" pathCondition="true">
+                              <sedStatement xml:id="_c758e1c3-a51e-41d8-aa49-e8a7c0c85d6d" name="int magicNumberCopy = magicNumber;" pathCondition="true" lineNumber="-1" charStart="317" charEnd="351" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractInvalidPreconditionTest\src\UseOperationContractInvalidPreconditionTest.java">
+                                 <sedStatement xml:id="_0fc572be-aebb-489c-a7ec-4a2912c4adf3" name="return magicNumber+magicNumberCopy;" pathCondition="true" lineNumber="-1" charStart="356" charEnd="393" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractInvalidPreconditionTest\src\UseOperationContractInvalidPreconditionTest.java">
+                                    <sedMethodReturn xml:id="_38cd4833-5e68-40e1-95a9-d8854f855546" name="&lt;return of UseOperationContractInvalidPreconditionTest.main()&gt;" pathCondition="true" lineNumber="-1" charStart="151" charEnd="155" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractInvalidPreconditionTest\src\UseOperationContractInvalidPreconditionTest.java" methodReturnConditionRef="_96e7385f-fa1b-46f9-82ec-760f31e7588c">
+                                       <sedTermination xml:id="_2091886d-45d1-447d-b868-d9e000abd32a" name="&lt;end&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractInvalidPreconditionTest\src\UseOperationContractInvalidPreconditionTest.java" verified="true">
                                        </sedTermination>
                                     </sedMethodReturn>
                                  </sedStatement>
@@ -25,16 +25,16 @@ termination: diamond" pathCondition="true" lineNumber="-1" charStart="553" charE
                         </sedMethodContract>
                      </sedStatement>
                   </sedMethodReturn>
-                  <sedMethodCallMethodReturnCondition xml:id="_710e6ee9-c4ef-49d9-b061-c7a58dbefb87" name="true" pathCondition="true">
-                     <sedChildReference nodeIdRef="_ba529bab-f6ca-4de6-b0d9-97afda33236e"/>
+                  <sedMethodCallMethodReturnCondition xml:id="_6f1ec743-0ae6-4a66-9595-15a49032c9c5" name="true" pathCondition="true">
+                     <sedChildReference nodeIdRef="_708eafd9-4508-4f68-bfb9-04a36deb456d"/>
                   </sedMethodCallMethodReturnCondition>
                </sedMethodCall>
             </sedStatement>
-            <sedMethodCallMethodReturnCondition xml:id="_e9979b56-c0a2-4cf0-b1c0-51ef17281eea" name="true" pathCondition="true">
-               <sedChildReference nodeIdRef="_2d01d29f-abe1-400f-8893-40f5320e1b29"/>
+            <sedMethodCallMethodReturnCondition xml:id="_96e7385f-fa1b-46f9-82ec-760f31e7588c" name="true" pathCondition="true">
+               <sedChildReference nodeIdRef="_38cd4833-5e68-40e1-95a9-d8854f855546"/>
             </sedMethodCallMethodReturnCondition>
          </sedMethodCall>
-         <sedTerminationEntry nodeIdRef="_62614f19-ea01-461b-9201-6734ba30c8a8"/>
+         <sedTerminationEntry nodeIdRef="_2091886d-45d1-447d-b868-d9e000abd32a"/>
       </sedThread>
    </sedTarget>
 </launch>

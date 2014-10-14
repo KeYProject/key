@@ -40,6 +40,27 @@ import org.key_project.util.test.util.TestUtilsUtil;
  */
 public class ResourceUtilTest extends TestCase {
    /**
+    * Tests {@link ResourceUtil#getWorkspaceLocation()}
+    * @throws CoreException Occurred Exception
+    */
+   @Test
+   public void testGetWorkspaceLocation() throws CoreException {
+      File location = ResourceUtil.getWorkspaceLocation();
+      assertNotNull(location);
+      assertTrue(location.isDirectory());
+      // Make sure that test project does not exist
+      String projectName = "ResourceUtilTest_testGetWorkspaceLocation";
+      File projectLocation = new File(location, projectName);
+      assertFalse(projectLocation.isDirectory());
+      // Create project
+      IProject project = TestUtilsUtil.createProject(projectName);
+      assertTrue(projectLocation.isDirectory());
+      // Delete project
+      project.delete(true, null);
+      assertFalse(projectLocation.isDirectory());
+   }
+   
+   /**
     * Tests {@link ResourceUtil#validateWorkspaceFileName(String)}
     */
    @Test
