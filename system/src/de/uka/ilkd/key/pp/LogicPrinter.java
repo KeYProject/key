@@ -130,6 +130,10 @@ public class LogicPrinter {
     	= SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
     private final SelectPrinter selectPrinter = new SelectPrinter(this);
+    
+    protected HeapLDT getHeapLDT() {
+        return services == null ? null : services.getTypeConverter().getHeapLDT();
+    }
 
     private enum QuantifiableVariablePrintMode {NORMAL, WITH_OUT_DECLARATION}
     private QuantifiableVariablePrintMode quantifiableVariablePrintMode =
@@ -1063,9 +1067,7 @@ public class LogicPrinter {
         assert t.boundVars().isEmpty();
 
 
-        final HeapLDT heapLDT = services == null
-                ? null
-                : services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = getHeapLDT();
 
         if(notationInfo.isPrettySyntax() && heapLDT != null) {
             startTerm(t.arity());
@@ -1116,9 +1118,7 @@ public class LogicPrinter {
         assert t.boundVars().isEmpty();
         assert t.arity() == 4;
 
-        final HeapLDT heapLDT = services == null
-                ? null
-                : services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = getHeapLDT();
 
         if(notationInfo.isPrettySyntax() && heapLDT != null) {
             startTerm(4);
@@ -1244,6 +1244,8 @@ public class LogicPrinter {
     /**
      * Find out whether a {@link Term} represents a field symbol, declared in a
      * Java class.
+     * 
+     * @param fieldTerm The target field.
      */
     protected boolean isFieldConstant(final Term fieldTerm) {
         assert services != null;
@@ -1251,7 +1253,7 @@ public class LogicPrinter {
         return (s.contains("::$") || s.contains("::<"))
                 && fieldTerm.op() instanceof Function
                 && ((Function) fieldTerm.op()).isUnique()
-                && fieldTerm.sort() == services.getTypeConverter().getHeapLDT().getFieldSort()
+                && fieldTerm.sort() == getHeapLDT().getFieldSort()
                 && fieldTerm.arity() == 0
                 && fieldTerm.boundVars().isEmpty();
     }
@@ -1282,8 +1284,7 @@ public class LogicPrinter {
         assert t.op() instanceof IObserverFunction;
         assert t.boundVars().isEmpty();
 
-        final HeapLDT heapLDT = services == null
-                ? null : services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = getHeapLDT();
 
         final IObserverFunction obs = (IObserverFunction) t.op();
 

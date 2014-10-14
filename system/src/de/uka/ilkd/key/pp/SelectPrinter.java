@@ -29,7 +29,7 @@ class SelectPrinter {
     public void printSelect(Term t, Term tacitHeap) throws IOException {
         assert t.boundVars().isEmpty();
         assert t.arity() == 3;
-        HeapLDT heapLDT = lp.services == null ? null : lp.services.getTypeConverter().getHeapLDT();
+        HeapLDT heapLDT = lp.getHeapLDT();
 
         if (lp.notationInfo.isPrettySyntax() && heapLDT != null) {
 
