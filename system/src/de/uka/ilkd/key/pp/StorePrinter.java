@@ -3,6 +3,7 @@ package de.uka.ilkd.key.pp;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
+import static de.uka.ilkd.key.pp.SelectPrinter.getPrettySyntaxForFieldConstant;
 import java.io.IOException;
 
 /**
@@ -123,14 +124,7 @@ class StorePrinter {
 
         lp.markStartSub();
         lp.startTerm(0);
-
-        /* TODO: More sophisticated determination of pretty-syntax, similar
-         * to select-syntax. Using HeapLDT.getPrettySyntax() here for now,
-         * as it is current behaviour for KeY.
-         *
-         * (Kai Wallisch 09/2014)
-         */
-        lp.layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
+        lp.layouter.print(getPrettySyntaxForFieldConstant(objectTerm, fieldTerm, lp.services.getJavaInfo()));
         lp.markEndSub();
 
         finishPrettyPrint(valueTerm, closingBrace);
@@ -159,7 +153,7 @@ class StorePrinter {
 
         lp.markStartSub();
         lp.startTerm(0);
-        lp.printTerm(fieldTerm);
+        lp.layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
         lp.markEndSub();
 
         finishPrettyPrint(valueTerm, closingBrace);

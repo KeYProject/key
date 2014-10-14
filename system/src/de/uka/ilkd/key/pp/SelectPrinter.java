@@ -78,6 +78,42 @@ class SelectPrinter {
         }
     }
 
+    /**
+     * Determine the syntax in which a field constant is printed when associated
+     * with the object represented by {@code objectTerm} Default is the name of
+     * the field. In case the field is hidden by another field, the name of the
+     * field is preceeded by the corresponding class name.
+     *
+     * Example default: object.field Example hidden field:
+     * object.(package.class::field)
+     *
+     * Remark: This method is declared static because it is also used in method
+     * {@link StorePrinter#printStoreOnFieldConstant(de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, boolean) }
+     */
+    protected static String getPrettySyntaxForFieldConstant(Term objectTerm,
+            Term fieldTerm,
+            JavaInfo javaInfo) {
+        if (isCanonicField(objectTerm, fieldTerm, javaInfo)) {
+            /*
+             * Class name can be omitted if the field is canonic, i.e.
+             * correct field can be determined without explicit mentioning
+             * of corresponding class name.
+             *
+             * Example syntax: object.field
+             */
+            return HeapLDT.getPrettyFieldName(fieldTerm.op());
+        } else {
+            /*
+             * There is another field of the same name that would be selected
+             * if class name is omitted. In this case class name must be mentioned
+             * explicitly.
+             *
+             * Example syntax: object.(package.class::field)
+             */
+            return "(" + fieldTerm.toString().replace("::$", "::") + ")";
+        }
+    }
+
     /*
      * Determine whether class can be omitted when printing a field
      * in a select term. A field can be omitted, if it is canonic for
@@ -88,9 +124,10 @@ class SelectPrinter {
      * 
      * (Kai Wallisch 09/2014)
      */
-    private boolean isCanonicField(Term objectTerm, Term fieldTerm) {
+    private static boolean isCanonicField(Term objectTerm,
+            Term fieldTerm,
+            JavaInfo javaInfo) {
         Sort sort = objectTerm.sort();
-        JavaInfo javaInfo = lp.services.getJavaInfo();
         KeYJavaType kjt = javaInfo.getKeYJavaType(sort);
         String fieldName = HeapLDT.getPrettyFieldName(fieldTerm.op());
         ProgramVariable pv = javaInfo.getCanonicalFieldProgramVariable(fieldName, kjt);
@@ -194,27 +231,7 @@ class SelectPrinter {
         lp.markEndSub();
         lp.layouter.print(".");
         lp.markStartSub(2);
-        if (isCanonicField(objectTerm, fieldTerm)) {
-            /*
-             * Class name can be omitted if the field is canonic, i.e.
-             * correct field can be determined without explicit mentioning
-             * of corresponding class name.
-             *
-             * Example syntax: object.field
-             */
-            lp.layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
-        } else {
-            /*
-             * There is another field of the same name that would be selected
-             * if class name is omitted. In this case class name must be mentioned
-             * explicitly.
-             *
-             * Example syntax: object.(package.class::field)
-             */
-            lp.layouter.print("(");
-            lp.layouter.print(fieldTerm.toString().replace("::$", "::"));
-            lp.layouter.print(")");
-        }
+        lp.layouter.print(getPrettySyntaxForFieldConstant(objectTerm, fieldTerm, lp.services.getJavaInfo()));
         lp.markEndSub();
         printHeap(heapTerm, tacitHeap);
     }

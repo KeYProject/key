@@ -236,6 +236,34 @@ public class TestTermParserHeap extends AbstractTestTermParser {
                 "int::select(heap,int[]::select(heap,null,testTermParserHeap.A::$staticArray),arr(Z(0(#))))");
     }
 
+    /*
+     * Test parsing and printing of store-terms.
+     */
+    public void testStore() throws IOException {
+        String pretty, verbose;
+
+        // non-static non-hidden field
+        pretty = "heap[a.f := null]";
+        verbose = "store(heap, a, testTermParserHeap.A::$f, null)";
+        comparePrettySyntaxAgainstVerboseSyntax(pretty, verbose);
+
+        // non-static hidden field
+        pretty = "heap[a.(testTermParserHeap.A1::f) := null]";
+        verbose = "store(heap, a, testTermParserHeap.A1::$f, null)";
+        comparePrettySyntaxAgainstVerboseSyntax(pretty, verbose);
+
+        // static field
+        pretty = "heap[testTermParserHeap.A.staticArray := null]";
+        verbose = "store(heap, null, testTermParserHeap.A::$staticArray, null)";
+        comparePrettySyntaxAgainstVerboseSyntax(pretty, verbose);
+
+        // element of static array
+        pretty = "heap[testTermParserHeap.A.staticArray[i] := i]";
+        verbose = "store(heap, int[]::select(heap,null,testTermParserHeap.A::$staticArray), arr(i), i)";
+        comparePrettySyntaxAgainstVerboseSyntax(pretty, verbose);
+
+    }
+
     /**
      * Remove whitespaces before executing
      * {@link junit.framework.TestCase#assertEquals(java.lang.String, java.lang.String)}.

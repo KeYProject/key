@@ -1,6 +1,7 @@
 package testTermParserHeap;
 
 class A {
+
 private int f;
 A next;
 int[] array;
