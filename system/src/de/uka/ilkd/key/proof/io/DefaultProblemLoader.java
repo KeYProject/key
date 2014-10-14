@@ -152,6 +152,7 @@ public class DefaultProblemLoader {
         missedErrors = new HashMap<Integer, String>();
         missedErrors.put(KeYLexer.RPAREN, "closing parenthesis");
         missedErrors.put(KeYLexer.RBRACE, "closing brace");
+        missedErrors.put(KeYLexer.SEMI, "semicolon");
     }
 
     /**
