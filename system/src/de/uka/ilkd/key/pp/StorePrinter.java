@@ -19,6 +19,10 @@ class StorePrinter {
         this.lp = lp;
     }
 
+    /*
+     * Common code for all pretty-printed store variants.
+     * This section is executed at the beginning of pretty-printing.
+     */
     private void initPrettyPrint(final Term heapTerm) throws IOException {
         lp.startTerm(4);
 
@@ -35,6 +39,10 @@ class StorePrinter {
         lp.layouter.print("[");
     }
 
+    /*
+     * Common code for all pretty-printed store variants.
+     * This section is executed at the end of pretty-printing.
+     */
     private void finishPrettyPrint(final Term valueTerm, boolean closingBrace) throws IOException {
         lp.layouter.print(" := ");
         lp.markStartSub();
@@ -61,78 +69,100 @@ class StorePrinter {
             final Term fieldTerm = t.sub(2);
             final Term valueTerm = t.sub(3);
 
-            initPrettyPrint(heapTerm);
-
             if (objectTerm.equals(lp.services.getTermBuilder().NULL())
                     && fieldTerm.op() instanceof Function
                     && ((Function) fieldTerm.op()).isUnique()) {
-
-                String className = HeapLDT.getClassName((Function) fieldTerm.op());
-
-                if (className == null) {
-                    lp.markStartSub();
-                    lp.printTerm(objectTerm);
-                    lp.markEndSub();
-                } else {
-                    lp.markStartSub();
-                    // "null" not printed
-                    lp.markEndSub();
-                    lp.printClassName(className);
-                }
-
-                lp.layouter.print(".");
-
-                lp.markStartSub();
-                lp.startTerm(0);
-                lp.printTerm(fieldTerm);
-                lp.markEndSub();
+                printStoreOnStaticField(heapTerm, fieldTerm, objectTerm, valueTerm, closingBrace);
             } else if (fieldTerm.arity() == 0) {
-                lp.markStartSub();
-                lp.printTerm(objectTerm);
-                lp.markEndSub();
-
-                lp.layouter.print(".");
-
-                lp.markStartSub();
-                lp.startTerm(0);
-
-                /* TODO: More sophisticated determination of pretty-syntax, similar
-                 * to select-syntax. Using HeapLDT.getPrettySyntax() here for now,
-                 * as it is current behaviour for KeY.
-                 *
-                 * (Kai Wallisch 09/2014)
-                 */
-                lp.layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
-                lp.markEndSub();
+                printStoreOnFieldConstant(heapTerm, objectTerm, fieldTerm, valueTerm, closingBrace);
             } else if (fieldTerm.op() == heapLDT.getArr()) {
-                lp.markStartSub();
-                lp.printTerm(objectTerm);
-                lp.markEndSub();
-
-                lp.layouter.print("[");
-
-                lp.markStartSub();
-                lp.startTerm(1);
-                lp.markStartSub();
-                lp.printTerm(fieldTerm.sub(0));
-                lp.markEndSub();
-                lp.markEndSub();
-
-                lp.layouter.print("]");
+                printStoreOnArrayElement(heapTerm, objectTerm, fieldTerm, valueTerm, closingBrace);
             } else {
-                /*
-                 * TODO: This is misplaced, since store-term is already partially
-                 * printed at this point. Needs refactoring.
-                 * (Kai Wallisch 09/2014)
-                 */
                 lp.printFunctionTerm(t);
             }
-
-            finishPrettyPrint(valueTerm, closingBrace);
-
         } else {
             lp.printFunctionTerm(t);
         }
+    }
+
+    /*
+     * This is called in case parameter fieldTerm represents an array element.
+     */
+    private void printStoreOnArrayElement(final Term heapTerm, final Term objectTerm, final Term fieldTerm, final Term valueTerm, boolean closingBrace) throws IOException {
+        initPrettyPrint(heapTerm);
+
+        lp.markStartSub();
+        lp.printTerm(objectTerm);
+        lp.markEndSub();
+
+        lp.layouter.print("[");
+
+        lp.markStartSub();
+        lp.startTerm(1);
+        lp.markStartSub();
+        lp.printTerm(fieldTerm.sub(0));
+        lp.markEndSub();
+        lp.markEndSub();
+
+        lp.layouter.print("]");
+
+        finishPrettyPrint(valueTerm, closingBrace);
+    }
+
+    /*
+     * This is called in case parameter fieldTerm represents a non-static field.
+     */
+    private void printStoreOnFieldConstant(final Term heapTerm, final Term objectTerm, final Term fieldTerm, final Term valueTerm, boolean closingBrace) throws IOException {
+        initPrettyPrint(heapTerm);
+
+        lp.markStartSub();
+        lp.printTerm(objectTerm);
+        lp.markEndSub();
+
+        lp.layouter.print(".");
+
+        lp.markStartSub();
+        lp.startTerm(0);
+
+        /* TODO: More sophisticated determination of pretty-syntax, similar
+         * to select-syntax. Using HeapLDT.getPrettySyntax() here for now,
+         * as it is current behaviour for KeY.
+         *
+         * (Kai Wallisch 09/2014)
+         */
+        lp.layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
+        lp.markEndSub();
+
+        finishPrettyPrint(valueTerm, closingBrace);
+    }
+
+    /*
+     * This is called in case parameter fieldTerm represents a static field.
+     */
+    private void printStoreOnStaticField(final Term heapTerm, final Term fieldTerm, final Term objectTerm, final Term valueTerm, boolean closingBrace) throws IOException {
+        initPrettyPrint(heapTerm);
+
+        String className = HeapLDT.getClassName((Function) fieldTerm.op());
+
+        if (className == null) {
+            lp.markStartSub();
+            lp.printTerm(objectTerm);
+            lp.markEndSub();
+        } else {
+            lp.markStartSub();
+            // "null" not printed
+            lp.markEndSub();
+            lp.printClassName(className);
+        }
+
+        lp.layouter.print(".");
+
+        lp.markStartSub();
+        lp.startTerm(0);
+        lp.printTerm(fieldTerm);
+        lp.markEndSub();
+
+        finishPrettyPrint(valueTerm, closingBrace);
     }
 
 }
