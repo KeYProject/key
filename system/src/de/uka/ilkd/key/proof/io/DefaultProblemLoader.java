@@ -141,12 +141,17 @@ public class DefaultProblemLoader {
      * where one token is expected and another is found.
      * Both are usually only referred to by their internal code.
      */
-    private final static Map<Pair<Integer,Integer>,String> readableParserErrors;
+    private final static Map<Pair<Integer,Integer>,String> mismatchErrors;
+    private final static Map<Integer,String> missedErrors;
     
     static {
         // format: (expected, found)
-        readableParserErrors = new HashMap<Pair<Integer, Integer>, String>();
-        readableParserErrors.put(new Pair<Integer, Integer>(KeYLexer.SEMI, KeYLexer.COMMA), "there may be only one declaration per line");
+        mismatchErrors = new HashMap<Pair<Integer, Integer>, String>();
+        mismatchErrors.put(new Pair<Integer, Integer>(KeYLexer.SEMI, KeYLexer.COMMA), "there may be only one declaration per line");
+        
+        missedErrors = new HashMap<Integer, String>();
+        missedErrors.put(KeYLexer.RPAREN, "closing parenthesis");
+        missedErrors.put(KeYLexer.RBRACE, "closing brace");
     }
 
     /**
@@ -252,7 +257,8 @@ public class DefaultProblemLoader {
                 if (c0 instanceof org.antlr.runtime.MissingTokenException) {
                     final org.antlr.runtime.MissingTokenException mte = (org.antlr.runtime.MissingTokenException) c0;
                     // TODO: other commonly missed tokens
-                    final String token = mte.expecting == KeYLexer.SEMI? "semicolon": "token id "+mte.expecting;
+                    final String readable = missedErrors.get(mte.expecting);
+                    final String token = readable==null? "token id "+mte.expecting: readable;
                     final String msg = "Syntax error: missing "+token+
                                     (occurrence == null? "": " at "+occurrence.getText())
                                     +" statement ("+mte.input.getSourceName()
@@ -263,7 +269,7 @@ public class DefaultProblemLoader {
                     final org.antlr.runtime.MismatchedTokenException mte = (MismatchedTokenException) c0;
                     final String genericMsg = "expected "+mte.expecting
                                     +", but found "+mte.c;
-                    final String readable = readableParserErrors.get(new Pair<Integer, Integer>(mte.expecting,mte.c));
+                    final String readable = mismatchErrors.get(new Pair<Integer, Integer>(mte.expecting,mte.c));
                     final String msg = "Syntax error: " 
                                     +(readable == null? genericMsg: readable)
                                     +" ("+mte.input.getSourceName()
