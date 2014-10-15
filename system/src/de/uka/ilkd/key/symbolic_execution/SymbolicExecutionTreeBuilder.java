@@ -156,7 +156,7 @@ public class SymbolicExecutionTreeBuilder {
    /**
     * The used mediator during proof.
     */
-   private KeYMediator mediator;
+   private final KeYMediator mediator;
    
    /**
     * The {@link Proof} from which the symbolic execution tree is extracted.
@@ -834,10 +834,10 @@ public class SymbolicExecutionTreeBuilder {
             Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>> afterBlockMaps = getAfterBlockMaps(label);
             Map<JavaPair, ImmutableList<IExecutionNode<?>>> afterBlockMap = findAfterBlockMap(afterBlockMaps, node);
             if (afterBlockMap == null) {
-               afterBlockMap = new HashMap<JavaPair, ImmutableList<IExecutionNode<?>>>();
+               afterBlockMap = new LinkedHashMap<JavaPair, ImmutableList<IExecutionNode<?>>>();
             }
             else {
-               afterBlockMap = new HashMap<JavaPair, ImmutableList<IExecutionNode<?>>>(afterBlockMap);
+               afterBlockMap = new LinkedHashMap<JavaPair, ImmutableList<IExecutionNode<?>>>(afterBlockMap);
             }
             afterBlockMaps.put(node, afterBlockMap);
             JavaPair secondPair = new JavaPair(stackSize, ImmutableSLList.<SourceElement>nil().append(sourceElements));
@@ -964,7 +964,7 @@ public class SymbolicExecutionTreeBuilder {
          Integer key = Integer.valueOf(id);
          Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>> result = afterBlockMap.get(key);
          if (result == null) {
-            result = new HashMap<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>>();
+            result = new LinkedHashMap<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>>();
             afterBlockMap.put(key, result);
          }
          return result;
@@ -977,7 +977,7 @@ public class SymbolicExecutionTreeBuilder {
     * @return The now completed blocks.
     */
    protected Map<JavaPair, ImmutableList<IExecutionNode<?>>> updateAfterBlockMap(Node node) {
-      Map<JavaPair, ImmutableList<IExecutionNode<?>>> completedBlocks = new HashMap<JavaPair, ImmutableList<IExecutionNode<?>>>();
+      Map<JavaPair, ImmutableList<IExecutionNode<?>>> completedBlocks = new LinkedHashMap<JavaPair, ImmutableList<IExecutionNode<?>>>();
       SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(node.getAppliedRuleApp());
       if (label != null) {
          // Find most recent map
@@ -990,7 +990,7 @@ public class SymbolicExecutionTreeBuilder {
             JavaBlock javaBlock = node.getAppliedRuleApp().posInOccurrence().subTerm().javaBlock();
             MethodFrame innerMostMethodFrame = JavaTools.getInnermostMethodFrame(javaBlock, proof.getServices());
             // Create copy with values below level
-            Map<JavaPair, ImmutableList<IExecutionNode<?>>> newBlockMap = new HashMap<JavaPair, ImmutableList<IExecutionNode<?>>>();
+            Map<JavaPair, ImmutableList<IExecutionNode<?>>> newBlockMap = new LinkedHashMap<JavaPair, ImmutableList<IExecutionNode<?>>>();
             if (oldBlockMap != null) {
                for (Entry<JavaPair, ImmutableList<IExecutionNode<?>>> entry : oldBlockMap.entrySet()) {
                   boolean done = isAfterBlockReached(stackSize, innerMostMethodFrame, activeStatement, entry.getKey());
