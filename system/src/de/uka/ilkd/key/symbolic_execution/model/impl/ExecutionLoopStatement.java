@@ -28,7 +28,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -91,14 +90,6 @@ public class ExecutionLoopStatement extends AbstractExecutionBlockStartNode<Loop
       catch (IOException e) {
          return ls.toString();
       }
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected IExecutionVariable[] lazyComputeVariables() {
-      return SymbolicExecutionUtil.createExecutionVariables(this);
    }
 
    /**

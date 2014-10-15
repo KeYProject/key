@@ -667,6 +667,17 @@ public final class SymbolicExecutionUtil {
     * @return The created {@link IExecutionVariable}s.
     */
    public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node) {
+      return createExecutionVariables(node, null);
+   }
+
+   /**
+    * Creates for the given {@link IExecutionNode} the contained
+    * root {@link IExecutionVariable}s.
+    * @param node The {@link IExecutionNode} to create variables for.
+    * @param condition A {@link Term} specifying some additional constraints to consider.
+    * @return The created {@link IExecutionVariable}s.
+    */
+   public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node, Term condition) {
       if (node != null) {
          Node proofNode = node.getProofNode();
          List<IProgramVariable> variables = new LinkedList<IProgramVariable>();
@@ -677,10 +688,8 @@ public final class SymbolicExecutionUtil {
          }
          // Add method parameters
          Node callNode = findMethodCallNode(node.getProofNode(), node.getModalityPIO());
-         if (callNode != null
-                 && callNode.getNodeInfo().getActiveStatement() instanceof MethodBodyStatement) {
-            MethodBodyStatement mbs =
-                    (MethodBodyStatement)callNode.getNodeInfo().getActiveStatement();
+         if (callNode != null && callNode.getNodeInfo().getActiveStatement() instanceof MethodBodyStatement) {
+            MethodBodyStatement mbs = (MethodBodyStatement)callNode.getNodeInfo().getActiveStatement();
             for (Expression e : mbs.getArguments()) {
                if (e instanceof IProgramVariable) {
                   variables.add((IProgramVariable)e);
@@ -697,7 +706,7 @@ public final class SymbolicExecutionUtil {
          IExecutionVariable[] result = new IExecutionVariable[variables.size()];
          int i = 0;
          for (IProgramVariable var : variables) {
-            result[i] = new ExecutionVariable(node, var);
+            result[i] = new ExecutionVariable(node, var, condition);
             i++;
          }
          return result;

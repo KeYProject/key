@@ -122,6 +122,13 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
    public IExecutionVariable[] getVariables();
    
    /**
+    * Returns the variable value pairs of the current state under the given condition.
+    * @param condition A {@link Term} specifying some additional constraints to consider.
+    * @return The variable value pairs.
+    */
+   public IExecutionVariable[] getVariables(Term condition);
+   
+   /**
     * Returns the number of memory layouts.
     * @return The number of memory layouts.
     * @throws ProofInputException Occurred Exception.

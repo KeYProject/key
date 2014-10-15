@@ -68,6 +68,11 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
    private final int arrayIndex;
    
    /**
+    * An optional additional condition to consider.
+    */
+   private final Term additionalCondition;
+   
+   /**
     * The {@link ExecutionValue} from which the array length was computed.
     */
    private final ExecutionValue lengthValue;
@@ -81,10 +86,12 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     * Constructor for a "normal" value.
     * @param parentNode The parent {@link IExecutionNode} which provides this {@link ExecutionVariable}.
     * @param programVariable The represented {@link IProgramVariable} which value is shown.
+    * @param additionalCondition An optional additional condition to consider.
     */
    public ExecutionVariable(IExecutionNode<?> parentNode,
-                            IProgramVariable programVariable) {
-      this(parentNode, null, programVariable);
+                            IProgramVariable programVariable,
+                            Term additionalCondition) {
+      this(parentNode, null, programVariable, additionalCondition);
    }
    
    /**
@@ -93,10 +100,12 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     * @param parentNode The parent {@link IExecutionNode} which provides this {@link ExecutionVariable}.
     * @param parentValue The parent {@link ExecutionValue} or {@code null} if not available.
     * @param programVariable The represented {@link IProgramVariable} which value is shown.
+    * @param additionalCondition An optional additional condition to consider.
     */
    public ExecutionVariable(IExecutionNode<?> parentNode,
                             ExecutionValue parentValue, 
-                            IProgramVariable programVariable) {
+                            IProgramVariable programVariable,
+                            Term additionalCondition) {
       super(parentNode.getSettings(), parentNode.getMediator(), parentNode.getProofNode());
       assert programVariable != null;
       this.parentNode = parentNode;
@@ -104,6 +113,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
       this.programVariable = programVariable;
       this.arrayIndex = -1;
       this.lengthValue = null;
+      this.additionalCondition = additionalCondition;
    }
 
    /**
@@ -112,17 +122,28 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     * @param parentValue The parent {@link ExecutionValue} or {@code null} if not available.
     * @param arrayIndex The index in the parent array.
     * @param lengthValue The {@link ExecutionValue} from which the array length was computed.
+    * @param additionalCondition An optional additional condition to consider.
     */
    public ExecutionVariable(IExecutionNode<?> parentNode,
                             ExecutionValue parentValue, 
                             int arrayIndex,
-                            ExecutionValue lengthValue) {
+                            ExecutionValue lengthValue,
+                            Term additionalCondition) {
       super(parentNode.getSettings(), parentNode.getMediator(), parentNode.getProofNode());
       this.programVariable = null;
       this.parentNode = parentNode;
       this.parentValue = parentValue;
       this.arrayIndex = arrayIndex;
       this.lengthValue = lengthValue;
+      this.additionalCondition = additionalCondition;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Term getAdditionalCondition() {
+      return additionalCondition;
    }
 
    /**
@@ -165,6 +186,9 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          SiteProofVariableValueInput sequentToProve;
          Term siteProofSelectTerm = null;
          Term siteProofCondition = parentNode.getPathCondition();
+         if (additionalCondition != null) {
+            siteProofCondition = tb.and(siteProofCondition, additionalCondition);
+         }
          if (getParentValue() != null || SymbolicExecutionUtil.isStaticVariable(getProgramVariable())) {
             siteProofSelectTerm = createSelectTerm(services);
             if (getParentValue() != null) { // Is null at static variables

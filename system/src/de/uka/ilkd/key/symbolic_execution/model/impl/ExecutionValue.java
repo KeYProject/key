@@ -206,7 +206,7 @@ public class ExecutionValue extends AbstractExecutionElement implements IExecuti
                      ArrayDeclaration ad = (ArrayDeclaration)javaType;
                      Set<IProgramVariable> pvs = SymbolicExecutionUtil.getProgramVariables(ad.length());
                      if (pvs.size() == 1) {
-                        ExecutionVariable lengthVariable = new ExecutionVariable(getVariable().getParentNode(), this, pvs.iterator().next());
+                        ExecutionVariable lengthVariable = new ExecutionVariable(getVariable().getParentNode(), this, pvs.iterator().next(), getVariable().getAdditionalCondition());
                         children.add(lengthVariable);
                         ExecutionValue[] lengthValues = lengthVariable.getValues();
                         for (ExecutionValue lengthValue : lengthValues) {
@@ -215,7 +215,7 @@ public class ExecutionValue extends AbstractExecutionElement implements IExecuti
                                            Integer.valueOf(lengthValue.getValueString()) :
                                            Integer.valueOf(SymbolicExecutionUtil.formatTerm(lengthValue.getValue(), services, false, true));
                               for (int i = 0; i < length; i++) {
-                                 ExecutionVariable childI = new ExecutionVariable(getVariable().getParentNode(), this, i, lengthValue);
+                                 ExecutionVariable childI = new ExecutionVariable(getVariable().getParentNode(), this, i, lengthValue, getVariable().getAdditionalCondition());
                                  children.add(childI);
                               }
                            }
@@ -232,7 +232,7 @@ public class ExecutionValue extends AbstractExecutionElement implements IExecuti
                         ImmutableList<ProgramVariable> vars = services.getJavaInfo().getAllAttributes(field.getFullName(), keyType);
                         for (ProgramVariable var : vars) {
                            if (!var.isImplicit() && !var.isStatic()) {
-                              children.add(new ExecutionVariable(getVariable().getParentNode(), this, field.getProgramVariable()));
+                              children.add(new ExecutionVariable(getVariable().getParentNode(), this, field.getProgramVariable(), getVariable().getAdditionalCondition()));
                            }
                         }
                      }

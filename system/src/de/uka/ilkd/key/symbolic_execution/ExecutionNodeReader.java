@@ -1253,6 +1253,14 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
+      public IExecutionVariable[] getVariables(Term condition) {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
       public int getLayoutsCount() throws ProofInputException {
          return 0;
       }
@@ -2548,6 +2556,14 @@ public class ExecutionNodeReader {
       @Override
       public String getElementType() {
          return "Variable";
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Term getAdditionalCondition() {
+         return null;
       }
    }
    
