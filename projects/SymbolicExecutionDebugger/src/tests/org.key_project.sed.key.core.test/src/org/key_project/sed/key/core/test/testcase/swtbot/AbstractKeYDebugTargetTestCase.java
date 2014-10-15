@@ -316,7 +316,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          assertTrue(leafStep.canStepInto());
          launchTreeItem.select();
          // Click on "Step Into" and wait until step was executed.
-         DebugTargetResumeSuspendListener.run(bot, target, new Runnable() {
+         DebugTargetResumeSuspendListener.run(bot, target, true, new Runnable() {
             @Override
             public void run() {
                SWTBotMenu menuItem = launchTreeItem.contextMenu("Step Into"); 
@@ -379,7 +379,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          assertTrue(leafStep.canStepOver());
          launchTreeItem.select();
          // Click on "Step Over" and wait until step was executed.
-         DebugTargetResumeSuspendListener.run(bot, target, new Runnable() {
+         DebugTargetResumeSuspendListener.run(bot, target, true, new Runnable() {
             @Override
             public void run() {
                SWTBotMenu menuItem = launchTreeItem.contextMenu("Step Over"); 
@@ -433,7 +433,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          assertTrue(leafStep.canStepReturn());
          launchTreeItem.select();
          // Click on "Step Return" and wait until step was executed.
-         DebugTargetResumeSuspendListener.run(bot, target, new Runnable() {
+         DebugTargetResumeSuspendListener.run(bot, target, true, new Runnable() {
             @Override
             public void run() {
                SWTBotMenu menuItem = launchTreeItem.contextMenu("Step Return"); 
@@ -487,7 +487,7 @@ public class AbstractKeYDebugTargetTestCase extends AbstractSetupTestCase {
          assertTrue(leafStep.canResume());
          launchTreeItem.select();
          // Click on "Resume" and wait until step was executed.
-         DebugTargetResumeSuspendListener.run(bot, target, new Runnable() {
+         DebugTargetResumeSuspendListener.run(bot, target, true, new Runnable() {
             @Override
             public void run() {
                SWTBotMenu menuItem = launchTreeItem.contextMenu("Resume"); 
