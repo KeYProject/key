@@ -77,6 +77,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
+import org.key_project.sed.core.model.ISEDBaseMethodReturn;
 import org.key_project.sed.core.model.ISEDGroupable;
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchStatement;
@@ -1047,6 +1048,16 @@ public final class TestSedCoreUtil {
          }
          else {
             assertFalse(current instanceof ISEDGroupable);
+         }
+         // Compare call states
+         if (expected instanceof ISEDBaseMethodReturn) {
+            assertTrue(current instanceof ISEDBaseMethodReturn);
+            if (compareVariables) {
+               compareVariables(((ISEDBaseMethodReturn) expected).getCallStateVariables(), ((ISEDBaseMethodReturn) current).getCallStateVariables(), compareVariables, compareConstraints);
+            }
+         }
+         else {
+            assertFalse(current instanceof ISEDBaseMethodReturn);
          }
          // Compare parent
          if (compareReferences) {

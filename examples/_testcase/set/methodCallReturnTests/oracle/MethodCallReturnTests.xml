@@ -695,49 +695,225 @@
                                                                                                                                     </value>
                                                                                                                                  </variable>
                                                                                                                               </termination>
+                                                                                                                              <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                                 <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                                                                                                    <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                                       <value name="value {true}" typeString="int" valueString="int::select(heap,self,MethodCallReturnTests::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                                       </value>
+                                                                                                                                    </variable>
+                                                                                                                                 </value>
+                                                                                                                              </callStateVariable>
+                                                                                                                              <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                                 <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                                 </value>
+                                                                                                                              </callStateVariable>
+                                                                                                                              <callStateVariable name="heapBefore_main" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                                 <value name="heapBefore_main {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                                 </value>
+                                                                                                                              </callStateVariable>
+                                                                                                                              <callStateVariable name="savedHeapBefore_main" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                                 <value name="savedHeapBefore_main {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                                 </value>
+                                                                                                                              </callStateVariable>
                                                                                                                            </methodReturn>
                                                                                                                         </statement>
+                                                                                                                        <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                           </value>
+                                                                                                                        </callStateVariable>
+                                                                                                                        <callStateVariable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                           <value name="returnedValue1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                           </value>
+                                                                                                                        </callStateVariable>
+                                                                                                                        <callStateVariable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                           <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                           </value>
+                                                                                                                        </callStateVariable>
+                                                                                                                        <callStateVariable name="heapBefore_valueReturnStatic_0" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                           <value name="heapBefore_valueReturnStatic_0 {true}" typeString="Heap" valueString="store(store(heap,self,MethodCallReturnTests::$value,Z(3(#))),null,MethodCallReturnTests::$staticValue,Z(2(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                           </value>
+                                                                                                                        </callStateVariable>
+                                                                                                                        <callStateVariable name="savedHeapBefore_valueReturnStatic_0" arrayIndex="-1" isArrayIndex="false">
+                                                                                                                           <value name="savedHeapBefore_valueReturnStatic_0 {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                                           </value>
+                                                                                                                        </callStateVariable>
                                                                                                                      </methodReturn>
                                                                                                                   </statement>
                                                                                                                </statement>
                                                                                                                <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                             </methodCall>
                                                                                                          </statement>
+                                                                                                         <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                                                            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                            </value>
+                                                                                                         </callStateVariable>
+                                                                                                         <callStateVariable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
+                                                                                                            <value name="returnedValue1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                            </value>
+                                                                                                         </callStateVariable>
+                                                                                                         <callStateVariable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
+                                                                                                            <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                            </value>
+                                                                                                         </callStateVariable>
+                                                                                                         <callStateVariable name="heapBefore_valueReturnStatic" arrayIndex="-1" isArrayIndex="false">
+                                                                                                            <value name="heapBefore_valueReturnStatic {true}" typeString="Heap" valueString="store(store(heap,self,MethodCallReturnTests::$value,Z(3(#))),null,MethodCallReturnTests::$staticValue,Z(1(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                            </value>
+                                                                                                         </callStateVariable>
+                                                                                                         <callStateVariable name="savedHeapBefore_valueReturnStatic" arrayIndex="-1" isArrayIndex="false">
+                                                                                                            <value name="savedHeapBefore_valueReturnStatic {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                                            </value>
+                                                                                                         </callStateVariable>
                                                                                                       </methodReturn>
                                                                                                    </statement>
                                                                                                 </statement>
                                                                                                 <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                              </methodCall>
                                                                                           </statement>
+                                                                                          <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                                             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                             </value>
+                                                                                          </callStateVariable>
+                                                                                          <callStateVariable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
+                                                                                             <value name="returnedValue1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                             </value>
+                                                                                          </callStateVariable>
+                                                                                          <callStateVariable name="MethodCallReturnTests::staticValue" arrayIndex="-1" isArrayIndex="false">
+                                                                                             <value name="MethodCallReturnTests::staticValue {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                             </value>
+                                                                                          </callStateVariable>
+                                                                                          <callStateVariable name="heapBefore_emptyReturnStatic" arrayIndex="-1" isArrayIndex="false">
+                                                                                             <value name="heapBefore_emptyReturnStatic {true}" typeString="Heap" valueString="store(store(heap,self,MethodCallReturnTests::$value,Z(3(#))),null,MethodCallReturnTests::$staticValue,Z(0(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                             </value>
+                                                                                          </callStateVariable>
+                                                                                          <callStateVariable name="savedHeapBefore_emptyReturnStatic" arrayIndex="-1" isArrayIndex="false">
+                                                                                             <value name="savedHeapBefore_emptyReturnStatic {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                                             </value>
+                                                                                          </callStateVariable>
                                                                                        </methodReturn>
                                                                                     </statement>
                                                                                  </statement>
                                                                                  <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                               </methodCall>
                                                                            </statement>
+                                                                           <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                              <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                              </value>
+                                                                           </callStateVariable>
+                                                                           <callStateVariable name="returnedValue1" arrayIndex="-1" isArrayIndex="false">
+                                                                              <value name="returnedValue1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                              </value>
+                                                                           </callStateVariable>
+                                                                           <callStateVariable name="heapBefore_noReturnStatic" arrayIndex="-1" isArrayIndex="false">
+                                                                              <value name="heapBefore_noReturnStatic {true}" typeString="Heap" valueString="store(heap,self,MethodCallReturnTests::$value,Z(3(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                              </value>
+                                                                           </callStateVariable>
+                                                                           <callStateVariable name="savedHeapBefore_noReturnStatic" arrayIndex="-1" isArrayIndex="false">
+                                                                              <value name="savedHeapBefore_noReturnStatic {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                              </value>
+                                                                           </callStateVariable>
                                                                         </methodReturn>
                                                                      </statement>
                                                                      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                   </methodCall>
                                                                </statement>
+                                                               <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                                                                  <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                                     <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                                        <value name="value {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                        </value>
+                                                                     </variable>
+                                                                  </value>
+                                                               </callStateVariable>
+                                                               <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                  </value>
+                                                               </callStateVariable>
+                                                               <callStateVariable name="heapBefore_valueReturn_0" arrayIndex="-1" isArrayIndex="false">
+                                                                  <value name="heapBefore_valueReturn_0 {true}" typeString="Heap" valueString="store(heap,self,MethodCallReturnTests::$value,Z(2(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                  </value>
+                                                               </callStateVariable>
+                                                               <callStateVariable name="savedHeapBefore_valueReturn_0" arrayIndex="-1" isArrayIndex="false">
+                                                                  <value name="savedHeapBefore_valueReturn_0 {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                                  </value>
+                                                               </callStateVariable>
                                                             </methodReturn>
                                                          </statement>
                                                       </statement>
                                                       <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                    </methodCall>
                                                 </statement>
+                                                <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                                                   <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                      <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                         <value name="value {true}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                         </value>
+                                                      </variable>
+                                                   </value>
+                                                </callStateVariable>
+                                                <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                   <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                   </value>
+                                                </callStateVariable>
+                                                <callStateVariable name="heapBefore_valueReturn" arrayIndex="-1" isArrayIndex="false">
+                                                   <value name="heapBefore_valueReturn {true}" typeString="Heap" valueString="store(heap,self,MethodCallReturnTests::$value,Z(1(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                   </value>
+                                                </callStateVariable>
+                                                <callStateVariable name="savedHeapBefore_valueReturn" arrayIndex="-1" isArrayIndex="false">
+                                                   <value name="savedHeapBefore_valueReturn {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                   </value>
+                                                </callStateVariable>
                                              </methodReturn>
                                           </statement>
                                        </statement>
                                        <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                     </methodCall>
                                  </statement>
+                                 <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                       <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                          <value name="value {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                          </value>
+                                       </variable>
+                                    </value>
+                                 </callStateVariable>
+                                 <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </callStateVariable>
+                                 <callStateVariable name="heapBefore_emptyReturn" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="heapBefore_emptyReturn {true}" typeString="Heap" valueString="store(heap,self,MethodCallReturnTests::$value,Z(0(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </callStateVariable>
+                                 <callStateVariable name="savedHeapBefore_emptyReturn" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="savedHeapBefore_emptyReturn {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </callStateVariable>
                               </methodReturn>
                            </statement>
                         </statement>
                         <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0"/>
                      </methodCall>
                   </statement>
+                  <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                     <value name="self {true}" typeString="MethodCallReturnTests" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                           <value name="value {true}" typeString="int" valueString="int::select(heap,self,MethodCallReturnTests::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="heapBefore_noReturn" arrayIndex="-1" isArrayIndex="false">
+                     <value name="heapBefore_noReturn {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="savedHeapBefore_noReturn" arrayIndex="-1" isArrayIndex="false">
+                     <value name="savedHeapBefore_noReturn {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
                </methodReturn>
             </statement>
             <methodReturnEntry path="/0/0/0/0/0"/>

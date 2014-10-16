@@ -203,6 +203,16 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       mr.addCallStackEntry(mc);
       mc.addChild(mr);
       mc.addMethodReturn(mr);
+      
+      KeYlessVariable mrVar1 = new KeYlessVariable(null, true, 2, "mrVar1");
+      mr.addCallStateVariable(mrVar1);
+      KeYlessValue mrVar1Value1 = new KeYlessValue(mrVar1, "myType1", "myValue1", "value of mrVar1", true, false, "c1");
+      mrVar1.addValue(mrVar1Value1);
+      KeYlessVariable mrVar1child1 = new KeYlessVariable(mrVar1Value1, true, 2, "mrVar1child1");
+      mrVar1Value1.addChildVariable(mrVar1child1);
+      KeYlessValue mrVar1child1Value1 = new KeYlessValue(mrVar1child1, "myType2", "myValue1child1", "value of mrVar1child1", true, false, "c2");
+      mrVar1child1.addValue(mrVar1child1Value1);
+      
       KeYlessExceptionalMethodReturn emr = new KeYlessExceptionalMethodReturn(mc, "emr", "pcExceptional", true, "mc(arg)", "myExceptionalMethodReturnCondition");
       emr.addCallStackEntry(mc);
       mc.addChild(emr);

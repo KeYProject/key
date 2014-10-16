@@ -419,6 +419,10 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          }
          assertCompletedBlocks(expected, current);
       }
+      if (expected instanceof IExecutionBaseMethodReturn<?>) {
+         assertTrue(current instanceof IExecutionBaseMethodReturn<?>);
+         assertCallStateVariables((IExecutionBaseMethodReturn<?>) expected, (IExecutionBaseMethodReturn<?>) current, compareVariables, compareConstraints);
+      }
       if (expected instanceof IExecutionBranchCondition) {
          assertTrue("Expected IExecutionBranchCondition but is " + current.getClass() + ".", current instanceof IExecutionBranchCondition);
          assertTrue("Expected \"" + ((IExecutionBranchCondition)expected).getFormatedBranchCondition() + "\" but is \"" + ((IExecutionBranchCondition)current).getFormatedBranchCondition() + "\".", JavaUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)expected).getFormatedBranchCondition(), ((IExecutionBranchCondition)current).getFormatedBranchCondition()));
@@ -734,6 +738,24 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       }
       else {
          assertNull(current);
+      }
+   }
+
+   /**
+    * Makes sure that the given nodes contains the same {@link IExecutionVariable}s of the call state.
+    * @param expected The expected node.
+    * @param current The current node.
+    * @param compareVariables Compare variables?
+    * @param compareConstraints Compare constraints?
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected static void assertCallStateVariables(IExecutionBaseMethodReturn<?> expected, IExecutionBaseMethodReturn<?> current, boolean compareVariables, boolean compareConstraints) throws ProofInputException {
+      if (compareVariables) {
+         assertNotNull(expected);
+         assertNotNull(current);
+         IExecutionVariable[] expectedVariables = expected.getCallStateVariables();
+         IExecutionVariable[] currentVariables = current.getCallStateVariables();
+         assertVariables(expectedVariables, currentVariables, true, true, compareConstraints);
       }
    }
 

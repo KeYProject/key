@@ -50,6 +50,7 @@ import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.ISEDValue;
 import org.key_project.sed.core.model.ISEDVariable;
 import org.key_project.sed.core.model.impl.AbstractSEDBaseMethodReturn;
+import org.key_project.sed.core.model.memory.ISEDMemoryBaseMethodReturn;
 import org.key_project.sed.core.model.memory.ISEDMemoryDebugNode;
 import org.key_project.sed.core.model.memory.ISEDMemoryGroupable;
 import org.key_project.sed.core.model.memory.ISEDMemoryStackFrameCompatibleDebugNode;
@@ -384,6 +385,21 @@ public class SEDXMLReader {
                throw new SAXException("Can't add termination entry to parent.");
             }
          }
+         else if (isCallStateVariable(uri, localName, qName)) {
+            IVariable variable = createVariable(target, (IStackFrame)parent, uri, localName, qName, attributes);
+            if (variablesValueStack.isEmpty()) {
+               if (parent instanceof ISEDMemoryBaseMethodReturn) {
+                  ((ISEDMemoryBaseMethodReturn)parent).addCallStateVariable(variable);
+                  variablesValueStack.addFirst(variable);
+               }
+               else {
+                  throw new SAXException("Can't add call state variable to parent.");
+               }
+            }
+            else {
+               throw new SAXException("Can't add call state variable to parent.");
+            }
+         }
          else {
             Object obj = createElement(target, parent != null ? parent : thread, thread, parentVariableOrValue, uri, localName, qName, attributes, annotationIdMapping, methodReturnConditionReferences);
             if (obj instanceof ISEDDebugElement) {
@@ -498,7 +514,9 @@ public class SEDXMLReader {
        */
       @Override
       public void endElement(String uri, String localName, String qName) throws SAXException {
-         if (isVariable(uri, localName, qName) || isValue(uri, localName, qName)) {
+         if (isCallStateVariable(uri, localName, qName) || 
+             isVariable(uri, localName, qName) || 
+             isValue(uri, localName, qName)) {
             variablesValueStack.removeFirst();
          }
          else if (isConstraint(uri, localName, qName)) {
@@ -721,6 +739,17 @@ public class SEDXMLReader {
     */
    protected boolean isGroupStartCondition(String uri, String localName, String qName) {
       return SEDXMLWriter.TAG_GROUP_START_CONDITION.equals(qName);
+   }
+   
+   /**
+    * Checks if the given tag name represents an {@link IVariable}.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @return {@code true} represents an {@link IVariable}, {@code false} represents something else.
+    */
+   protected boolean isCallStateVariable(String uri, String localName, String qName) {
+      return SEDXMLWriter.TAG_CALL_STATE_VARIABLE.equals(qName);
    }
    
    /**

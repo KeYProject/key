@@ -274,7 +274,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                      Term returnValue = SideProofUtil.extractOperatorValue(goal, input.getOperator());
                      assert returnValue != null;
                      returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), returnValue, services);
-                     return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), returnValue, null)};
+                     return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), getModalityPIO(), returnValue, null)};
                   }
                   else {
                      // Group equal values of different branches
@@ -293,7 +293,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                      // Create result
                      if (valueNodeMap.size() == 1) {
                         Term returnValue = valueNodeMap.keySet().iterator().next();
-                        return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), returnValue, null)};
+                        return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), getModalityPIO(), returnValue, null)};
                      }
                      else {
                         IExecutionMethodReturnValue[] result = new IExecutionMethodReturnValue[valueNodeMap.size()];
@@ -309,7 +309,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                               condition = SymbolicExecutionUtil.simplify(info.getProof(), condition);
                            }
                            condition = SymbolicExecutionUtil.improveReadability(condition, info.getProof().getServices());
-                           result[i] = new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), entry.getKey(), condition);
+                           result[i] = new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), getModalityPIO(), entry.getKey(), condition);
                            i++;
                         }
                         return result;

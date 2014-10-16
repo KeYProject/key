@@ -623,12 +623,12 @@ public final class SymbolicExecutionUtil {
          Sequent sequent = proofNode.sequent();
          for (SequentFormula sf : sequent.antecedent()) {
             if (!containsSymbolicExecutionLabel(sf.formula())) {
-               constraints.add(new ExecutionConstraint(node.getSettings(), node.getMediator(), proofNode, sf.formula()));
+               constraints.add(new ExecutionConstraint(node.getSettings(), node.getMediator(), proofNode, node.getModalityPIO(), sf.formula()));
             }
          }
          for (SequentFormula sf : sequent.succedent()) {
             if (!containsSymbolicExecutionLabel(sf.formula())) {
-               constraints.add(new ExecutionConstraint(node.getSettings(), node.getMediator(), proofNode, tb.not(sf.formula())));
+               constraints.add(new ExecutionConstraint(node.getSettings(), node.getMediator(), proofNode, node.getModalityPIO(), tb.not(sf.formula())));
             }
          }
          return constraints.toArray(new IExecutionConstraint[constraints.size()]);
@@ -679,15 +679,35 @@ public final class SymbolicExecutionUtil {
     */
    public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node, Term condition) {
       if (node != null) {
-         Node proofNode = node.getProofNode();
+         return createExecutionVariables(node, node.getProofNode(), node.getModalityPIO(), condition);
+      }
+      else {
+         return new IExecutionVariable[0];
+      }
+   }
+
+   /**
+    * Creates for the given {@link IExecutionNode} the contained
+    * root {@link IExecutionVariable}s.
+    * @param node The {@link IExecutionNode} to create variables for.
+    * @param proofNode The proof {@link Node} to work with.
+    * @param modalityPIO The {@link PosInOccurrence} of the modality of interest.
+    * @param condition A {@link Term} specifying some additional constraints to consider.
+    * @return The created {@link IExecutionVariable}s.
+    */
+   public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node, 
+                                                               Node proofNode, 
+                                                               PosInOccurrence modalityPIO, 
+                                                               Term condition) {
+      if (proofNode != null) {
          List<IProgramVariable> variables = new LinkedList<IProgramVariable>();
          // Add self variable
-         IProgramVariable selfVar = findSelfTerm(proofNode, node.getModalityPIO());
+         IProgramVariable selfVar = findSelfTerm(proofNode, modalityPIO);
          if (selfVar != null) {
             variables.add(selfVar);
          }
          // Add method parameters
-         Node callNode = findMethodCallNode(node.getProofNode(), node.getModalityPIO());
+         Node callNode = findMethodCallNode(proofNode, modalityPIO);
          if (callNode != null && callNode.getNodeInfo().getActiveStatement() instanceof MethodBodyStatement) {
             MethodBodyStatement mbs = (MethodBodyStatement)callNode.getNodeInfo().getActiveStatement();
             for (Expression e : mbs.getArguments()) {
@@ -706,7 +726,7 @@ public final class SymbolicExecutionUtil {
          IExecutionVariable[] result = new IExecutionVariable[variables.size()];
          int i = 0;
          for (IProgramVariable var : variables) {
-            result[i] = new ExecutionVariable(node, var, condition);
+            result[i] = new ExecutionVariable(node, proofNode, modalityPIO, var, condition);
             i++;
          }
          return result;

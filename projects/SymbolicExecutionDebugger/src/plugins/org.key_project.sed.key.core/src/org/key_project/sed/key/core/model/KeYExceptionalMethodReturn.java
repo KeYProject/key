@@ -19,6 +19,7 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDExceptionalMethodReturn;
+import org.key_project.sed.core.model.ISEDVariable;
 import org.key_project.sed.core.model.impl.AbstractSEDExceptionalMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
@@ -84,6 +85,11 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
     * The conditions under which a group ending in this node starts.
     */
    private SEDMemoryBranchCondition[] groupStartConditions;
+   
+   /**
+    * The contained KeY variables at the call state.
+    */
+   private KeYVariable[] callStateVariables;
 
    /**
     * Constructor.
@@ -251,6 +257,19 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
             variables = KeYModelUtil.createVariables(this, executionNode);
          }
          return variables;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDVariable[] getCallStateVariables() throws DebugException {
+      synchronized (this) {
+         if (callStateVariables == null) {
+            callStateVariables = KeYModelUtil.createCallStateVariables(this, executionNode);
+         }
+         return callStateVariables;
       }
    }
 

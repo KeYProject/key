@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
@@ -31,6 +32,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -76,6 +78,11 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     * The {@link ExecutionValue} from which the array length was computed.
     */
    private final ExecutionValue lengthValue;
+   
+   /**
+    * The {@link PosInOccurrence} of the modality of interest.
+    */
+   private final PosInOccurrence modalityPIO;
 
    /**
     * The possible values of this {@link IExecutionValue}.
@@ -89,9 +96,11 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     * @param additionalCondition An optional additional condition to consider.
     */
    public ExecutionVariable(IExecutionNode<?> parentNode,
+                            Node proofNode, 
+                            PosInOccurrence modalityPIO, 
                             IProgramVariable programVariable,
                             Term additionalCondition) {
-      this(parentNode, null, programVariable, additionalCondition);
+      this(parentNode, proofNode, modalityPIO, null, programVariable, additionalCondition);
    }
    
    /**
@@ -103,17 +112,21 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     * @param additionalCondition An optional additional condition to consider.
     */
    public ExecutionVariable(IExecutionNode<?> parentNode,
+                            Node proofNode, 
+                            PosInOccurrence modalityPIO, 
                             ExecutionValue parentValue, 
                             IProgramVariable programVariable,
                             Term additionalCondition) {
-      super(parentNode.getSettings(), parentNode.getMediator(), parentNode.getProofNode());
+      super(parentNode.getSettings(), parentNode.getMediator(), proofNode);
       assert programVariable != null;
+      assert modalityPIO != null;
       this.parentNode = parentNode;
       this.parentValue = parentValue;
       this.programVariable = programVariable;
       this.arrayIndex = -1;
       this.lengthValue = null;
       this.additionalCondition = additionalCondition;
+      this.modalityPIO = modalityPIO;
    }
 
    /**
@@ -125,17 +138,21 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     * @param additionalCondition An optional additional condition to consider.
     */
    public ExecutionVariable(IExecutionNode<?> parentNode,
+                            Node proofNode, 
+                            PosInOccurrence modalityPIO, 
                             ExecutionValue parentValue, 
                             int arrayIndex,
                             ExecutionValue lengthValue,
                             Term additionalCondition) {
-      super(parentNode.getSettings(), parentNode.getMediator(), parentNode.getProofNode());
+      super(parentNode.getSettings(), parentNode.getMediator(), proofNode);
+      assert modalityPIO != null;
       this.programVariable = null;
       this.parentNode = parentNode;
       this.parentValue = parentValue;
       this.arrayIndex = arrayIndex;
       this.lengthValue = lengthValue;
       this.additionalCondition = additionalCondition;
+      this.modalityPIO = modalityPIO;
    }
 
    /**
@@ -197,10 +214,10 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
             if (lengthValue != null) {
                siteProofCondition = tb.and(siteProofCondition, lengthValue.getCondition());
             }
-            sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(services, getProofNode(), getParentNode().getModalityPIO(), siteProofCondition, siteProofSelectTerm, true); 
+            sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(services, getProofNode(), modalityPIO, siteProofCondition, siteProofSelectTerm, true); 
          }
          else {
-            sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(services, getProofNode(), getParentNode().getModalityPIO(), siteProofCondition, getProgramVariable());
+            sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(services, getProofNode(), modalityPIO, siteProofCondition, getProgramVariable());
          }
          ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
                                                                              sequentToProve.getSequentToProve(), 
@@ -426,5 +443,13 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     */
    public IExecutionNode<?> getParentNode() {
       return parentNode;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public PosInOccurrence getModalityPIO() {
+      return modalityPIO;
    }
 }

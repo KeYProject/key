@@ -294,6 +294,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
    public static final String TAG_VARIABLE = "variable";
 
    /**
+    * Tag name to store call state {@link IExecutionVariable}s.
+    */
+   public static final String TAG_CALL_STATE_VARIABLE = "callStateVariable";
+
+   /**
     * Tag name to store {@link IExecutionValue}s.
     */
    public static final String TAG_VALUE = "value";
@@ -720,6 +725,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       appendCompletedBlocks(level + 1, node, sb);
+      appendCallStateVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendEndTag(level, TAG_METHOD_RETURN, sb);
    }
 
@@ -753,6 +759,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, saveReturnValues, saveConstraints, sb);
       appendCompletedBlocks(level + 1, node, sb);
+      appendCallStateVariables(level + 1, node, saveVariables, saveConstraints, sb);
       appendEndTag(level, TAG_EXCEPTIONAL_METHOD_RETURN, sb);
    }
 
@@ -973,7 +980,25 @@ public class ExecutionNodeWriter extends AbstractWriter {
       if (saveVariables) {
          IExecutionVariable[] variables = node.getVariables();
          for (IExecutionVariable variable : variables) {
-            appendVariable(level, variable, saveConstraints, sb);
+            appendVariable(level, variable, saveConstraints, TAG_VARIABLE, sb);
+         }
+      }
+   }
+
+   /**
+    * Appends the contained {@link IExecutionVariable}s to the given {@link StringBuffer}.
+    * @param level The level to use.
+    * @param node The {@link IExecutionNode} which provides the {@link IExecutionVariable}s.
+    * @param saveVariables Save variables? 
+    * @param saveConstraints Save constraints?
+    * @param sb The {@link StringBuffer} to append to.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected void appendCallStateVariables(int level, IExecutionBaseMethodReturn<?> node, boolean saveVariables, boolean saveConstraints, StringBuffer sb) throws ProofInputException {
+      if (saveVariables) {
+         IExecutionVariable[] variables = node.getCallStateVariables();
+         for (IExecutionVariable variable : variables) {
+            appendVariable(level, variable, saveConstraints, TAG_CALL_STATE_VARIABLE, sb);
          }
       }
    }
@@ -983,17 +1008,18 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @param level The level to use.
     * @param variable The {@link IExecutionVariable} to append.
     * @param saveConstraints Save constraints?
+    * @param tagName The tag name to store an {@link IExecutionVariable}.
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void appendVariable(int level, IExecutionVariable variable, boolean saveConstraints, StringBuffer sb) throws ProofInputException {
+   protected void appendVariable(int level, IExecutionVariable variable, boolean saveConstraints, String tagName, StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, variable.getName());
       attributeValues.put(ATTRIBUTE_ARRAY_INDEX, variable.getArrayIndex() + "");
       attributeValues.put(ATTRIBUTE_IS_ARRAY_INDEX, variable.isArrayIndex() + "");
-      appendStartTag(level, TAG_VARIABLE, attributeValues, sb);
+      appendStartTag(level, tagName, attributeValues, sb);
       appendValues(level + 1, variable, saveConstraints, sb);
-      appendEndTag(level, TAG_VARIABLE, sb);
+      appendEndTag(level, tagName, sb);
    }
 
    /**
@@ -1033,7 +1059,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       // Children
       IExecutionVariable[] childVariables = value.getChildVariables();
       for (IExecutionVariable childVariable : childVariables) {
-         appendVariable(level + 1, childVariable, saveConstraints, sb);
+         appendVariable(level + 1, childVariable, saveConstraints, TAG_VARIABLE, sb);
       }
       appendEndTag(level, TAG_VALUE, sb);
    }

@@ -214,6 +214,19 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        returnNegative.setMethodReturnCondition(returnCondition);
        bnegative.addChild(returnNegative);
        
+       SEDMemoryVariable negativeCallVar = new SEDMemoryVariable(target, et);
+       negativeCallVar.setName("negativeCallVar");
+       returnNegative.addCallStateVariable(negativeCallVar);
+       SEDMemoryValue negativeCallVarValue = new SEDMemoryValue(target, negativeCallVar);
+       negativeCallVarValue.setValueString("negativeCallVarValue");
+       negativeCallVar.setValue(negativeCallVarValue);
+       SEDMemoryVariable negativeCallVarChild = new SEDMemoryVariable(target, et);
+       negativeCallVarChild.setName("negativeCallVarChild");
+       negativeCallVarValue.addVariable(negativeCallVarChild);
+       SEDMemoryValue negativeCallVarChildValue = new SEDMemoryValue(target, negativeCallVarChild);
+       negativeCallVarChildValue.setValueString("negativeCallVarChildValue");
+       negativeCallVarChild.setValue(negativeCallVarChildValue);
+       
        SEDMemoryTermination terminationNegative = new SEDMemoryTermination(target, returnNegative, thread, true);
        terminationNegative.setName("<end>");
        terminationNegative.setPathCondition("pc15");

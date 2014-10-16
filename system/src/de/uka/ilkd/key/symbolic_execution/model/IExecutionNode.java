@@ -97,11 +97,6 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
     * @return The available {@link IExecutionConstraint}s.
     */
    public IExecutionConstraint[] getConstraints();
-   /**
-    * Returns the {@link PosInOccurrence} of the modality of interest including updates.
-    * @return The {@link PosInOccurrence} of the modality of interest including updates.
-    */
-   public PosInOccurrence getModalityPIO();
    
    /**
     * Returns the active statement which is executed in the code.
