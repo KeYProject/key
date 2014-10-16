@@ -62,6 +62,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -130,10 +131,13 @@ public class KeYResourcesUtil {
             Object target = proofRef.getTarget();
             if(IProofReference.USE_CONTRACT.equals(proofRef.getKind()) && target instanceof Contract){
                Contract contract = (Contract) target;
-               for(ProofElement proofElement : proofElements){
-                  if(contract.getName().equals(proofElement.getContract().getName())){
-                     usedContracts.add(proofElement.getProofFile());
-                     break;
+               ImmutableSet<Contract> contracts = pe.getSpecificationRepository().splitContract(contract);
+               for (Contract atomicContract : contracts) {
+                  for(ProofElement proofElement : proofElements){
+                     if(atomicContract.getName().equals(proofElement.getContract().getName())){
+                        usedContracts.add(proofElement.getProofFile());
+                        break;
+                     }
                   }
                }
             }
