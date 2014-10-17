@@ -17,7 +17,7 @@ package de.uka.ilkd.key.util;
 import java.util.*;
 
 
-public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl 
+public class KeYRecoderExcHandler extends AbstractKeYExceptionHandler 
                                   implements recoder.service.ErrorHandler {
 
     private List<Throwable> recoderExceptions = new LinkedList<Throwable>();
