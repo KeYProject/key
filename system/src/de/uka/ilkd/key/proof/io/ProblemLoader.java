@@ -28,14 +28,14 @@ import java.util.Properties;
 import javax.swing.SwingWorker;
 
 /**
- * This class extends the functionality of the {@link DefaultProblemLoader}. It
+ * This class extends the functionality of the {@link AbstractProblemLoader}. It
  * allows to do the loading process as {@link SwingWorker3} {@link Thread} and
  * it opens the proof obligation browser it is not possible to instantiate a
  * proof configured by the opened file.
  *
  * @author Martin Hentschel
  */
-public final class ProblemLoader extends DefaultProblemLoader {
+public final class ProblemLoader extends AbstractProblemLoader {
     // TODO: why is the superclass called 'default'?
 
    private ProverTaskListener ptl;

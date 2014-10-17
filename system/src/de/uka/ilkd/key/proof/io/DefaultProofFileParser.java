@@ -68,7 +68,7 @@ public class DefaultProofFileParser implements IProofFileParser {
     private static final String ERROR_LOADING_PROOF_LINE = "Error loading proof.\n";
     private static final String NOT_APPLICABLE = " not available or not applicable in this context.";
 
-    private final DefaultProblemLoader loader;
+    private final AbstractProblemLoader loader;
    private Proof proof = null;
    private Iterator<Node> children = null;
 
@@ -99,7 +99,7 @@ public class DefaultProofFileParser implements IProofFileParser {
    private List<Throwable> errors = new LinkedList<Throwable>();
 
 
-   public DefaultProofFileParser(DefaultProblemLoader loader, Proof proof, KeYMediator mediator) {
+   public DefaultProofFileParser(AbstractProblemLoader loader, Proof proof, KeYMediator mediator) {
       super();
       this.proof = proof;
       this.mediator = mediator;

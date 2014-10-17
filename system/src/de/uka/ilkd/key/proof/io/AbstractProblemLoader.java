@@ -65,7 +65,7 @@ import de.uka.ilkd.key.util.Pair;
  * no user interaction is required.
  * </p>
  * <p>
- * The basic usage of this class is to instantiate a new {@link DefaultProblemLoader}
+ * The basic usage of this class is to instantiate a new {@link AbstractProblemLoader}
  * instance with should load the file configured by the constructor's arguments.
  * The next step is to call {@link #load()} which does the loading process and
  * tries to instantiate a proof and to apply rules again if possible. The result
@@ -73,7 +73,7 @@ import de.uka.ilkd.key.util.Pair;
  * </p>
  * @author Martin Hentschel
  */
-public abstract class DefaultProblemLoader {
+public abstract class AbstractProblemLoader {
     /**
      * The file or folder to load.
      */
@@ -164,7 +164,7 @@ public abstract class DefaultProblemLoader {
      * @param mediator The {@link KeYMediator} to use.
      * @param askUiToSelectAProofObligationIfNotDefinedByLoadedFile {@code true} to call {@link UserInterface#selectProofObligation(InitConfig)} if no {@link Proof} is defined by the loaded proof or {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
      */
-    public DefaultProblemLoader(File file, 
+    public AbstractProblemLoader(File file, 
                     List<File> classPath, 
                     File bootClassPath,
                     Profile profileOfNewProofs, 

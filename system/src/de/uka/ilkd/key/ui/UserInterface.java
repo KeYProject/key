@@ -33,7 +33,7 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -141,17 +141,17 @@ public interface UserInterface
     KeYMediator getMediator();
     
     /**
-     * Opens a java file in this {@link UserInterface} and returns the instantiated {@link DefaultProblemLoader}
+     * Opens a java file in this {@link UserInterface} and returns the instantiated {@link AbstractProblemLoader}
      * which can be used to instantiated proofs programmatically.
      * @param profile An optional {@link Profile} to use. If it is {@code null} the default profile {@link KeYMediator#getDefaultProfile()} is used.
      * @param file The java file to open.
      * @param classPaths The class path entries to use.
      * @param bootClassPath The boot class path to use.
      * @param poPropertiesToForce Some optional {@link Properties} for the PO which extend or overwrite saved PO {@link Properties}.
-     * @return The opened {@link DefaultProblemLoader}.
+     * @return The opened {@link AbstractProblemLoader}.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    DefaultProblemLoader load(Profile profile, File file, List<File> classPaths, File bootClassPath, Properties poPropertiesToForce) throws ProblemLoaderException;
+    AbstractProblemLoader load(Profile profile, File file, List<File> classPaths, File bootClassPath, Properties poPropertiesToForce) throws ProblemLoaderException;
     
     /**
      * Instantiates a new {@link Proof} in this {@link UserInterface} for the given
