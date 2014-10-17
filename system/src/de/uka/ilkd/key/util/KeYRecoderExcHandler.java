@@ -29,7 +29,8 @@ public class KeYRecoderExcHandler extends AbstractKeYExceptionHandler
     public void reportException(Throwable e) {
         super.reportException(e);
         if(!getExceptions().isEmpty()) {
-            throw new ExceptionHandlerException(e);
+            // TODO: this exception is currently uncaught, should really not be thrown
+//            throw new ExceptionHandlerException(e);
         }    
     }
 
