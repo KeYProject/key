@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call self.compute(k)&gt;" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (this.h*2&gt;k)" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (this.h*2&gt;k)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <branchCondition name="gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k)" pathCondition="gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k)" pathConditionChanged="true" branchCondition="gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k)" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="this.l=r.nl.m+r.x;" pathCondition="gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k)" pathConditionChanged="false">
                <branchCondition name="not(equals(Refer::select(heap,null,StaticMember::$r),null))" pathCondition="and(gt(mul(int::select(heap,self,StaticMember::$h),Z(2(#))),k),not(equals(Refer::select(heap,null,StaticMember::$r),null)))" pathConditionChanged="true" branchCondition="not(equals(Refer::select(heap,null,StaticMember::$r),null))" mergedBranchCondition="false" isBranchConditionComputed="true">

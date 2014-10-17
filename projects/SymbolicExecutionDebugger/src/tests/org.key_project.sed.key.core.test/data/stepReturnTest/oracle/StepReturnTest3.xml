@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_5d0ba4ee-1aeb-4dfc-ac5e-375b4b6334d2" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_3cc06aed-5e91-45d5-9af7-607f510eacc4" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
-         <sedMethodCall xml:id="_9f0cac44-0bc7-4793-83c6-12f3d14242c5" name="&lt;call self.main(a)&gt;" pathCondition="true" lineNumber="-1" charStart="46" charEnd="50" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
-            <sedStatement xml:id="_3a0eed7a-0074-47ef-9b2c-e53f9fbcd191" name="firstLevel(a);" pathCondition="true" lineNumber="-1" charStart="63" charEnd="77" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
+   <sedTarget xml:id="_8e077975-a394-4650-8b57-c3b6841c80bf" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_290327e4-238b-4966-880b-53bc8533c103" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
+         <sedMethodCall xml:id="_549fd670-40e6-43fd-bd93-2cbb0e985cf7" name="&lt;call self.main(a)&gt;" pathCondition="true" lineNumber="-1" charStart="46" charEnd="50" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java" groupable="true">
+            <sedStatement xml:id="_1b7227e9-5620-48bf-9951-94cdc5a5fb85" name="firstLevel(a);" pathCondition="true" lineNumber="-1" charStart="63" charEnd="77" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
             </sedStatement>
          </sedMethodCall>
       </sedThread>

@@ -30,7 +30,6 @@ import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.java.CollectionUtil;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -415,16 +414,8 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     */
    @Override
    public ISEDBranchCondition[] getGroupEndConditions() throws DebugException {
-      synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
-         ImmutableList<IExecutionNode<?>> completions = executionNode.getBlockCompletions();
-         ISEDBranchCondition[] result = new ISEDBranchCondition[completions.size()];
-         int i = 0;
-         for (IExecutionNode<?> completion : completions) {
-            IKeYSEDDebugNode<?> keyCompletion = KeYModelUtil.createNode(getDebugTarget(), getThread(), null, completion);
-            result[i] = keyCompletion.getGroupStartCondition(this);
-            i++;
-         }
-         return result;
+      synchronized (this) { // Is thread save execution really required?
+         return KeYModelUtil.computeGroupEndConditions(this);
       }
    }
 
@@ -434,5 +425,13 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
    @Override
    public void setParent(ISEDDebugNode parent) {
       super.setParent(parent);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isGroupable() {
+      return executionNode.isBlockOpened();
    }
 }

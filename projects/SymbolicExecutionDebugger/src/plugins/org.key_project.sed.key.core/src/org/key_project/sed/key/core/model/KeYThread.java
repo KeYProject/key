@@ -257,7 +257,6 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
          try {
             // Inform UI that the process is resumed
             super.resume();
-            getDebugTarget().threadResumed(this);
          }
          catch (DebugException exception) {
             LogUtil.getLogger().logError(exception);
@@ -281,7 +280,6 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
          finally {
             try {
                super.suspend();
-               getDebugTarget().threadSuspended(this);
             }
             catch (DebugException e1) {
                LogUtil.getLogger().logError(e1);
@@ -358,7 +356,6 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
       if (canResume()) {
          // Inform UI that the process is resumed
          super.resume();
-         getDebugTarget().threadResumed(this);
          // Run auto mode
          runAutoMode(keyNode,
                      KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), 
@@ -454,7 +451,6 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
       if (canSuspend()) {
          getUi().stopAutoMode();
          super.suspend();
-         getDebugTarget().threadSuspended(this);
       }
    }
 

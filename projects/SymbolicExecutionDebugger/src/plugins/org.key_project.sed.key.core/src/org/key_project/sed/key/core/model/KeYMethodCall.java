@@ -484,4 +484,12 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
    public void setParent(ISEDDebugNode parent) {
       super.setParent(parent);
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isGroupable() {
+      return true;
+   }
 }

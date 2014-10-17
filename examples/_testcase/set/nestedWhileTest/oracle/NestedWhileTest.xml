@@ -3,48 +3,70 @@
    <methodCall name="&lt;call self.mainNested()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
-            <loopStatement name="while ( i&lt;3 )" pathCondition="true" pathConditionChanged="false">
-               <loopCondition name="i&lt;3" pathCondition="true" pathConditionChanged="false">
-                  <loopStatement name="while ( i&lt;3 )" pathCondition="true" pathConditionChanged="false">
-                     <loopCondition name="i&lt;3" pathCondition="true" pathConditionChanged="false">
-                        <loopStatement name="while ( i&lt;2 )" pathCondition="true" pathConditionChanged="false">
-                           <loopCondition name="i&lt;2" pathCondition="true" pathConditionChanged="false">
+            <loopStatement name="while ( i&lt;3 )" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+               <loopCondition name="i&lt;3" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+                  <loopStatement name="while ( i&lt;3 )" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+                     <loopCondition name="i&lt;3" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+                        <loopStatement name="while ( i&lt;2 )" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+                           <loopCondition name="i&lt;2" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                               <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
                                  <statement name="i++;" pathCondition="true" pathConditionChanged="false">
-                                    <loopCondition name="i&lt;2" pathCondition="true" pathConditionChanged="false">
+                                    <loopCondition name="i&lt;2" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                                        <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
                                           <statement name="i++;" pathCondition="true" pathConditionChanged="false">
-                                             <loopCondition name="i&lt;2" pathCondition="true" pathConditionChanged="false">
+                                             <loopCondition name="i&lt;2" pathCondition="true" pathConditionChanged="false" blockOpened="false">
                                                 <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
                                                    <statement name="i++;" pathCondition="true" pathConditionChanged="false">
-                                                      <loopCondition name="i&lt;3" pathCondition="true" pathConditionChanged="false">
+                                                      <loopCondition name="i&lt;3" pathCondition="true" pathConditionChanged="false" blockOpened="false">
                                                          <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
                                                             <statement name="i++;" pathCondition="true" pathConditionChanged="false">
-                                                               <loopCondition name="i&lt;3" pathCondition="true" pathConditionChanged="false">
+                                                               <loopCondition name="i&lt;3" pathCondition="true" pathConditionChanged="false" blockOpened="false">
                                                                   <statement name="return result_1;" pathCondition="true" pathConditionChanged="false">
                                                                      <methodReturn name="&lt;return of mainNested&gt;" signature="&lt;return of self.mainNested()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                                         <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                                                         </termination>
                                                                      </methodReturn>
                                                                   </statement>
+                                                                  <completedBlockEntry path="/0/0/0/0" conditionString="true"/>
                                                                </loopCondition>
+                                                               <completedBlockEntry path="/0/0/0/0/0" conditionString="true"/>
                                                             </statement>
                                                          </statement>
+                                                         <completedBlockEntry path="/0/0/0/0/0/0" conditionString="true"/>
                                                       </loopCondition>
+                                                      <completedBlockEntry path="/0/0/0/0/0/0/0" conditionString="true"/>
                                                    </statement>
                                                 </statement>
+                                                <completedBlockEntry path="/0/0/0/0/0/0/0/0" conditionString="true"/>
                                              </loopCondition>
+                                             <completedBlockEntry path="/0/0/0/0/0/0/0/0/0/0/0/0" conditionString="true"/>
                                           </statement>
                                        </statement>
+                                       <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                       <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
                                     </loopCondition>
+                                    <completedBlockEntry path="/0/0/0/0/0/0/0/0/0" conditionString="true"/>
+                                    <completedBlockEntry path="/0/0/0/0/0/0/0/0/0/0/0/0" conditionString="true"/>
                                  </statement>
                               </statement>
+                              <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
+                              <blockCompletionEntry path="/0/0/0/0/0/0/0"/>
                            </loopCondition>
+                           <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                         </loopStatement>
+                        <completedBlockEntry path="/0/0/0/0/0/0/0/0/0" conditionString="true"/>
+                        <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                        <blockCompletionEntry path="/0/0/0/0/0"/>
                      </loopCondition>
+                     <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                   </loopStatement>
+                  <completedBlockEntry path="/0/0/0/0/0/0/0" conditionString="true"/>
+                  <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                  <blockCompletionEntry path="/0/0/0"/>
                </loopCondition>
+               <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
             </loopStatement>
+            <completedBlockEntry path="/0/0/0/0/0" conditionString="true"/>
          </statement>
       </statement>
       <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>

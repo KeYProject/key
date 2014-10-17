@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call BranchStatementBlockTest.switchTest(x)&gt;" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="switch (x)" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="switch (x)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <branchCondition name="equals(x,Z(1(#)))" pathCondition="equals(x,Z(1(#)))" pathConditionChanged="true" branchCondition="equals(x,Z(1(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return 1;" pathCondition="equals(x,Z(1(#)))" pathConditionChanged="false">
                <methodReturn name="&lt;return of switchTest&gt;" signature="&lt;return of BranchStatementBlockTest.switchTest(x)&gt;" pathCondition="equals(x,Z(1(#)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="equals(x,Z(1(#)))">

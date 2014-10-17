@@ -102,6 +102,7 @@ public class TestKey extends TestSuite {
 
     static Class<? extends TestCase>[] setTests = new Class[] {
         de.uka.ilkd.key.util.TestNodePreorderIterator.class,
+        de.uka.ilkd.key.symbolic_execution.TestConditionalVariables.class,
         de.uka.ilkd.key.symbolic_execution.TestExecutionNodePreorderIterator.class,
         de.uka.ilkd.key.symbolic_execution.TestExecutionNodeWriterAndReader.class,
         de.uka.ilkd.key.symbolic_execution.TestParallelSiteProofs.class,

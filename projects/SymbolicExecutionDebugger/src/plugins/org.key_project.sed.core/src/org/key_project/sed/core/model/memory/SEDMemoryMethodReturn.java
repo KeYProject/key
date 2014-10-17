@@ -31,7 +31,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDMethodReturn;
  * information in the memory.
  * @author Martin Hentschel
  */
-public class SEDMemoryMethodReturn extends AbstractSEDMethodReturn implements ISEDMemoryStackFrameCompatibleDebugNode, ISEDMemoryDebugNode {
+public class SEDMemoryMethodReturn extends AbstractSEDMethodReturn implements ISEDMemoryStackFrameCompatibleDebugNode, ISEDMemoryBaseMethodReturn {
    /**
     * The contained child nodes.
     */
@@ -41,6 +41,11 @@ public class SEDMemoryMethodReturn extends AbstractSEDMethodReturn implements IS
     * The contained variables.
     */
    private final List<IVariable> variables = new LinkedList<IVariable>();
+   
+   /**
+    * The contained variables at the call state.
+    */
+   private final List<IVariable> callStateVariables = new LinkedList<IVariable>();
    
    /**
     * The name of this debug node.
@@ -262,6 +267,22 @@ public class SEDMemoryMethodReturn extends AbstractSEDMethodReturn implements IS
    @Override
    public IVariable[] getVariables() throws DebugException {
       return variables.toArray(new IVariable[variables.size()]);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addCallStateVariable(IVariable variable) {
+      callStateVariables.add(variable);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IVariable[] getCallStateVariables() throws DebugException {
+      return callStateVariables.toArray(new IVariable[callStateVariables.size()]);
    }
 
    /**

@@ -26,7 +26,7 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
     x_9=magic(x);
     b_1=x_9&gt;0;
   }
-}\] (and(equals(b_1,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))" pathConditionChanged="false">
+}\] (and(equals(b_1,TRUE),geq(LoopInvariantWithSplittingQuery::magic(heap,x),Z(0(#))))))" pathConditionChanged="false" blockOpened="true">
                   <branchCondition name="gt(x_0,Z(neglit(1(#))))" pathCondition="not(or(leq(x_0,Z(neglit(1(#)))),not(imp(geq(x_0,Z(0(#))),update-application(elem-update(x)(x_0),\[{method-frame(source=main(int)@LoopInvariantWithSplittingQuery): {
     x_9=magic(x);
     b_1=x_9&gt;0;

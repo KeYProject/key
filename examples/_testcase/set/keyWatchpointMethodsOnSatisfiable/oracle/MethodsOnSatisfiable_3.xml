@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call MethodsOnSatisfiable.doSomething()&gt;" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (x_global&gt;=0)" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (x_global&gt;=0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <branchCondition name="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" pathCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="main(x_global);" pathCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="false">
             </statement>

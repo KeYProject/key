@@ -90,14 +90,14 @@ public class ProofMetaFileWriter {
                metaIFile.create(new ByteArrayInputStream(bytes), true, null);
             }
             else {
-               ResourceAttributes resAttr = metaIFile.getResourceAttributes();
-               resAttr.setReadOnly(false);
-               metaIFile.setResourceAttributes(resAttr);
+               // Make sure that file is not read-only for compatibility with older relases. But do not set read-only flag because it requires admin rights on Mac OS to delete it.
+               if (metaIFile.isReadOnly()) {
+                  ResourceAttributes resAttr = metaIFile.getResourceAttributes();
+                  resAttr.setReadOnly(false);
+                  metaIFile.setResourceAttributes(resAttr);
+               }
                metaIFile.setContents(new ByteArrayInputStream(bytes), true, true, null);
             }
-            ResourceAttributes resAttr = metaIFile.getResourceAttributes();
-            resAttr.setReadOnly(true);
-            metaIFile.setResourceAttributes(resAttr);
          }
       };
       ResourcesPlugin.getWorkspace().run(operation, null, IWorkspace.AVOID_UPDATE, null);

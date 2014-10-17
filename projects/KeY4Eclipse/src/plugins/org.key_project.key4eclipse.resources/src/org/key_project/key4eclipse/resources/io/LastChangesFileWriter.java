@@ -70,14 +70,14 @@ public class LastChangesFileWriter {
                lastChangesFile.create(new ByteArrayInputStream(xml.getBytes(encoding)), true, null);
             }
             else {
-               ResourceAttributes resAttr = lastChangesFile.getResourceAttributes();
-               resAttr.setReadOnly(false);
-               lastChangesFile.setResourceAttributes(resAttr);
+               // Make sure that file is not read-only for compatibility with older relases. But do not set read-only flag because it requires admin rights on Mac OS to delete it.
+               if (lastChangesFile.isReadOnly()) {
+                  ResourceAttributes resAttr = lastChangesFile.getResourceAttributes();
+                  resAttr.setReadOnly(false);
+                  lastChangesFile.setResourceAttributes(resAttr);
+               }
                lastChangesFile.setContents(new ByteArrayInputStream(xml.getBytes(encoding)), true, true, null);
             }
-            ResourceAttributes resAttr = lastChangesFile.getResourceAttributes();
-            resAttr.setReadOnly(true);
-            lastChangesFile.setResourceAttributes(resAttr);
          } catch (Exception e){
             LogUtil.getLogger().logError(e);
          }

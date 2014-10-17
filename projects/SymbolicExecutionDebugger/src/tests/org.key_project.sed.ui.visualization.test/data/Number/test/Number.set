@@ -2,12 +2,12 @@
 <launch xmlns="http://key-project.org/sed/serialization">
    <sedTarget xml:id="_1fb53e22-623c-46fe-9e3d-dccb3de44e60" name="equals(Number)" modelIdentifier="org.key_project.sed.key.core">
       <sedThread xml:id="_35610221-6779-4503-9ee4-484311de1af1" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-         <sedMethodCall xml:id="_2665da05-b3c1-4fe5-b0ca-31ef160252ae" name="self.equals(n);" pathCondition="true" lineNumber="-1" charStart="1343" charEnd="1349" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\runtime-SymbolicExecutionDebugger.product\SED Examples\src\Number.java">
+         <sedMethodCall xml:id="_2665da05-b3c1-4fe5-b0ca-31ef160252ae" name="self.equals(n);" pathCondition="true" lineNumber="-1" charStart="1343" charEnd="1349" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSaveSetAsTest_testSaveAs\Number.java" groupable="false">
             <sedVariable xml:id="_7c17bd39-2f2a-4755-9305-c6168d47d091" name="exc" referenceTypeName="Null">
                <sedValue xml:id="_00ddbfd7-bb08-449b-a2d8-f5d3a9dc5d96" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
                </sedValue>
             </sedVariable>
-            <sedBranchStatement xml:id="_b7359669-af12-40c0-850b-115260bcb8ba" name="if (this.content==n.content)" pathCondition="true" lineNumber="-1" charStart="1364" charEnd="1441" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\runtime-SymbolicExecutionDebugger.product\SED Examples\src\Number.java">
+            <sedBranchStatement xml:id="_b7359669-af12-40c0-850b-115260bcb8ba" name="if (this.content==n.content)" pathCondition="true" lineNumber="-1" charStart="1364" charEnd="1441" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSaveSetAsTest_testSaveAs\Number.java" groupable="false">
                <sedVariable xml:id="_37452e80-c753-4f12-bfc0-8378900a0063" name="self" referenceTypeName="Number">
                   <sedValue xml:id="_afe28a06-f7b9-49b6-bf11-164681979ef9" referenceTypeName="Number" valueString="self" allocated="true" multiValued="false">
                      <sedVariable xml:id="_41ee00bd-2404-4525-8059-f0a45e23af9e" name="content" referenceTypeName="int">
@@ -41,7 +41,7 @@
                   <sedCallStackEntry nodeIdRef="_2665da05-b3c1-4fe5-b0ca-31ef160252ae"/>
                   <sedBranchCondition xml:id="_9295f176-0fed-403f-afa0-691e4af894b1" name="self.content = n.content" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1">
                      <sedCallStackEntry nodeIdRef="_2665da05-b3c1-4fe5-b0ca-31ef160252ae"/>
-                     <sedStatement xml:id="_d2cce5df-8732-4c7f-8fae-65f75cc149cc" name="return true;" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="1395" charEnd="1407" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\runtime-SymbolicExecutionDebugger.product\SED Examples\src\Number.java">
+                     <sedStatement xml:id="_d2cce5df-8732-4c7f-8fae-65f75cc149cc" name="return true;" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="1395" charEnd="1407" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSaveSetAsTest_testSaveAs\Number.java">
                         <sedVariable xml:id="_79e37517-48a8-43b3-9b5a-7432a75d8844" name="self" referenceTypeName="Number">
                            <sedValue xml:id="_67cc15f8-4303-498a-8cd4-2b6610a4f85d" referenceTypeName="Number" valueString="self" allocated="true" multiValued="false">
                               <sedVariable xml:id="_c4ace246-2765-417e-86c4-23a3709f16ba" name="content" referenceTypeName="int">
@@ -63,7 +63,7 @@
                            </sedValue>
                         </sedVariable>
                         <sedCallStackEntry nodeIdRef="_2665da05-b3c1-4fe5-b0ca-31ef160252ae"/>
-                        <sedMethodReturn xml:id="_0e992376-4fd1-4f24-bfd6-dda55014632a" name="&lt;return TRUE as result of self.equals(n);&gt;" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="1343" charEnd="1349" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\runtime-SymbolicExecutionDebugger.product\SED Examples\src\Number.java">
+                        <sedMethodReturn xml:id="_0e992376-4fd1-4f24-bfd6-dda55014632a" name="&lt;return TRUE as result of self.equals(n);&gt;" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="1343" charEnd="1349" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSaveSetAsTest_testSaveAs\Number.java">
                            <sedVariable xml:id="_d699a7c4-d95c-499b-a01e-5cb3ed1d1f33" name="self" referenceTypeName="Number">
                               <sedValue xml:id="_b3bccde1-2482-461b-a4c6-942ad8eb71ab" referenceTypeName="Number" valueString="self" allocated="true" multiValued="false">
                                  <sedVariable xml:id="_aa602553-d14c-4a9c-aea8-275b94dfd7b9" name="content" referenceTypeName="int">
@@ -92,7 +92,7 @@
                   </sedBranchCondition>
                   <sedBranchCondition xml:id="_dbcec85e-1b70-4f31-807a-40134c8b63c0" name="!self.content = n.content" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1">
                      <sedCallStackEntry nodeIdRef="_2665da05-b3c1-4fe5-b0ca-31ef160252ae"/>
-                     <sedStatement xml:id="_475c1f0e-28d1-4cd3-8fbf-e5124c3091d7" name="return false;" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="1424" charEnd="1437" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\runtime-SymbolicExecutionDebugger.product\SED Examples\src\Number.java">
+                     <sedStatement xml:id="_475c1f0e-28d1-4cd3-8fbf-e5124c3091d7" name="return false;" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="1424" charEnd="1437" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSaveSetAsTest_testSaveAs\Number.java">
                         <sedVariable xml:id="_9093e0d2-2b46-4296-8358-39b8d35c416f" name="self" referenceTypeName="Number">
                            <sedValue xml:id="_7ecae1e9-4152-4a23-a087-24cf0b6c8116" referenceTypeName="Number" valueString="self" allocated="true" multiValued="false">
                               <sedVariable xml:id="_b3887aa5-b837-423a-bb37-78323519330b" name="content" referenceTypeName="int">
@@ -114,7 +114,7 @@
                            </sedValue>
                         </sedVariable>
                         <sedCallStackEntry nodeIdRef="_2665da05-b3c1-4fe5-b0ca-31ef160252ae"/>
-                        <sedMethodReturn xml:id="_185a5b3b-e99b-4858-992f-072cb3caeb37" name="&lt;return FALSE as result of self.equals(n);&gt;" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="1343" charEnd="1349" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\runtime-SymbolicExecutionDebugger.product\SED Examples\src\Number.java">
+                        <sedMethodReturn xml:id="_185a5b3b-e99b-4858-992f-072cb3caeb37" name="&lt;return FALSE as result of self.equals(n);&gt;" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="1343" charEnd="1349" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotSaveSetAsTest_testSaveAs\Number.java">
                            <sedVariable xml:id="_85142d13-e2cd-43bb-93f0-7648e1e55d05" name="self" referenceTypeName="Number">
                               <sedValue xml:id="_53210528-8006-4564-8a1a-b0326b52ad2d" referenceTypeName="Number" valueString="self" allocated="true" multiValued="false">
                                  <sedVariable xml:id="_d15635e4-ac39-4367-9f0f-66f6adb325ee" name="content" referenceTypeName="int">

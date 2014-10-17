@@ -39,6 +39,54 @@ import de.uka.ilkd.key.ui.CustomUserInterface;
  */
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: examples/_testcase/set/loopStatementBlockTest
+    */
+   public void testLoopStatementBlockTest_nestedLoop() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/loopStatementBlockTest/test/LoopStatementBlockTest.java", 
+                "LoopStatementBlockTest", 
+                "nestedLoop", 
+                null,
+                "examples/_testcase/set/loopStatementBlockTest/oracle/LoopStatementBlockTest_nestedLoop.xml",
+                false,
+                false,
+                false,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/loopStatementBlockTest
+    */
+   public void testLoopStatementBlockTest_simpleLoop() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/loopStatementBlockTest/test/LoopStatementBlockTest.java", 
+                "LoopStatementBlockTest", 
+                "simpleLoop", 
+                null,
+                "examples/_testcase/set/loopStatementBlockTest/oracle/LoopStatementBlockTest_simpleLoop.xml",
+                false,
+                false,
+                false,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/branchStatementBlockTest
     */
    public void testBranchStatementBlockTest_min() throws Exception {
