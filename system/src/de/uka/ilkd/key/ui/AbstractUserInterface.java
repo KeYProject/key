@@ -147,7 +147,7 @@ public abstract class AbstractUserInterface implements UserInterface {
        DefaultProblemLoader loader = null;
        try {
           getMediator().stopInterface(true);
-          loader = new DefaultProblemLoader(file, classPath, bootClassPath, profile,
+          loader = new ProblemLoader(file, classPath, bootClassPath, profile,
                                             getMediator(), false, poPropertiesToForce);
           if (isSaveOnly()) {
               loader.saveAll();

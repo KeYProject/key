@@ -99,7 +99,8 @@ public final class ProblemLoader extends DefaultProblemLoader {
        }
    }
 
-   private void reportException(final Throwable message) {
+   @Override
+   protected void reportException(final Throwable message) {
        if (message != null) {
            getExceptionHandler().reportException(message);
        }

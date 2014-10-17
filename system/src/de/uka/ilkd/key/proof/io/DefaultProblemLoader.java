@@ -73,7 +73,7 @@ import de.uka.ilkd.key.util.Pair;
  * </p>
  * @author Martin Hentschel
  */
-public class DefaultProblemLoader {
+public abstract class DefaultProblemLoader {
     /**
      * The file or folder to load.
      */
@@ -282,6 +282,12 @@ public class DefaultProblemLoader {
         // default
         return new ProblemLoaderException(this, "Loading proof input failed", e);
     }
+    
+    /**
+     * Report exceptions here, do not throw them.
+     * @param message
+     */
+    protected abstract void reportException(final Throwable message);
 
     private File chooseFile(ContractPO po) {
         final String fName;
