@@ -59,6 +59,7 @@ public class ProofElement {
    private boolean proofClosed;
    private LinkedHashSet<IProofReference<?>> proofReferences;
    private List<IFile> usedContracts;
+   private List<String> calledMethods;
 
    private List<ProofMetaFileTypeElement> typeElements;
    
@@ -211,13 +212,18 @@ public class ProofElement {
       this.usedContracts = usedContracts;
    }
 
-   
    public List<ProofMetaFileTypeElement> getTypeElements() {
       return typeElements;
    }
    
-   
-   
+   public List<String> getCalledMethods() {
+      return calledMethods;
+   }
+
+   public void setCalledMethods(List<String> calledMethods) {
+      this.calledMethods = calledMethods;
+   }
+
    @Override
    public String toString(){
       return contract.getName();

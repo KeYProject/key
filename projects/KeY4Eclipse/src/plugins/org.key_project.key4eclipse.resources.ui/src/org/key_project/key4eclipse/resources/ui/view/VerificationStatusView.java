@@ -1027,13 +1027,34 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
                sb.append("</ul>" + StringUtil.NEW_LINE);
                sb.append("</li>" + StringUtil.NEW_LINE);
             }
+            if (!status.calledMethods.isEmpty()) {
+               sb.append("<li>" + StringUtil.NEW_LINE);
+               sb.append("Closed world assumption for the dynamic dispatch of the following method calls:" + StringUtil.NEW_LINE);
+               sb.append("<ol>" + StringUtil.NEW_LINE);
+               for (Entry<String, List<IFile>> entry : status.calledMethods.entrySet()) {
+                  SWTUtil.checkCanceled(monitor);
+                  sb.append("<li>" + StringUtil.NEW_LINE);
+                  sb.append(entry.getKey() + StringUtil.NEW_LINE);
+                  sb.append("<ul>" + StringUtil.NEW_LINE);
+                  for (IFile usedByFile : entry.getValue()) {
+                     SWTUtil.checkCanceled(monitor);
+                     sb.append("<li>Used by proof: <a href=\"" + toURL(usedByFile) + "\">" + StringUtil.NEW_LINE);
+                     sb.append(usedByFile.getFullPath());
+                     sb.append("</a></li>" + StringUtil.NEW_LINE);
+                  }
+                  sb.append("</ul>" + StringUtil.NEW_LINE);
+                  sb.append("</li>" + StringUtil.NEW_LINE);
+               }
+               sb.append("</ol>" + StringUtil.NEW_LINE);
+               sb.append("</li>" + StringUtil.NEW_LINE);
+            }
             sb.append("<li>Methods are called in a state satisfying the precondition, assumed for:" + StringUtil.NEW_LINE);
             sb.append("<ol>" + StringUtil.NEW_LINE);
             if (!status.unspecifiedMethods.isEmpty()) {
                sb.append("<li><a href=\"#UnspecifiedMethods\">Unspecified methods</a></li>" + StringUtil.NEW_LINE);
             }
             sb.append("<li>Methods of used APIs</li>" + StringUtil.NEW_LINE);
-            sb.append("<li>Projects in which the source code will be used</li>" + StringUtil.NEW_LINE);
+            sb.append("<li>System in which the source code will be used</li>" + StringUtil.NEW_LINE);
             sb.append("</ol>" + StringUtil.NEW_LINE);
             sb.append("</li>" + StringUtil.NEW_LINE);
             sb.append("<li><i>Source code is compiled using a correct Java compiler.</i></li>" + StringUtil.NEW_LINE);
@@ -1139,6 +1160,18 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
             }
             else {
                status.unprovenContracts.add(contractInfo);
+            }
+            // Called methods
+            List<String> calledMethods = contractInfo.checkCalledMethods();
+            if (calledMethods != null) {
+               for (String calledMethod : calledMethods) {
+                  List<IFile> usedByProofs = status.calledMethods.get(calledMethod);
+                  if (usedByProofs == null) {
+                     usedByProofs = new LinkedList<IFile>();
+                     status.calledMethods.put(calledMethod, usedByProofs);
+                  }
+                  usedByProofs.add(contractInfo.getProofFile());
+               }
             }
             // Unproven dependencies
             List<IFile> unprovenDependencies = contractInfo.checkUnprovenDependencies();
@@ -1509,6 +1542,11 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
        * All recursion cycles.
        */
       private final Set<List<IFile>> cycles = new LinkedHashSet<List<IFile>>();
+      
+      /**
+       * Lists all called methods.
+       */
+      private final Map<String, List<IFile>> calledMethods = new LinkedHashMap<String, List<IFile>>();
    }
    
    /**
