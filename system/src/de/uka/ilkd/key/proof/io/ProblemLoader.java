@@ -36,19 +36,15 @@ import javax.swing.SwingWorker;
  * @author Martin Hentschel
  */
 public final class ProblemLoader extends AbstractProblemLoader {
-    // TODO: why is the superclass called 'default'?
 
-   private ProverTaskListener ptl;
+   private final ProverTaskListener ptl;
 
    public ProblemLoader(File file, List<File> classPath, File bootClassPath,
                         Profile profileOfNewProofs, KeYMediator mediator,
                         boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
-                        Properties poPropertiesToForce) {
+                        Properties poPropertiesToForce, ProverTaskListener ptl) {
       super(file, classPath, bootClassPath, profileOfNewProofs, mediator,
             askUiToSelectAProofObligationIfNotDefinedByLoadedFile, poPropertiesToForce);
-   }
-
-   public void addTaskListener(ProverTaskListener ptl) {
       this.ptl = ptl;
    }
 
