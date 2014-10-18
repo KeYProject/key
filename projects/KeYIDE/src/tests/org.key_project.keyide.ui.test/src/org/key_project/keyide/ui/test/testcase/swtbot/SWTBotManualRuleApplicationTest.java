@@ -613,6 +613,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                proof.setActiveStrategy(proof.getInitConfig().getProfile().getDefaultStrategyFactory().create(proof, sp));
                keyEditor.getUI().startAndWaitForAutoMode(keyEditor.getCurrentProof());
             }
+
             // Get node to apply rule on
             Node node = keyEditor.getCurrentNode();
             assertFalse(node.isClosed());

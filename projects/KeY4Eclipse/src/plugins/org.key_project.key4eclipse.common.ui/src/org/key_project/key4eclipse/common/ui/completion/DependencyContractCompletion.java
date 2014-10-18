@@ -1,34 +1,22 @@
 package org.key_project.key4eclipse.common.ui.completion;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
-
 import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.IContentProvider;
-import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.ListViewer;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
-import org.key_project.util.eclipse.swt.SWTUtil;
 
 import de.uka.ilkd.key.gui.DependencyContractCompletion.TermStringWrapper;
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -77,7 +65,7 @@ public class DependencyContractCompletion extends AbstractInteractiveRuleApplica
       
       private final TermStringWrapper[] heaps;
       
-      private Object[] selectedHeap;
+      private TermStringWrapper selectedHeap;
       
       /**
        * Constructor.
@@ -139,7 +127,7 @@ public class DependencyContractCompletion extends AbstractInteractiveRuleApplica
        */
       @Override
       public void createControl(Composite root) {
-         ListViewer viewer = new ListViewer(root, SWT.BORDER | SWT.SINGLE);         
+         ComboViewer viewer = new ComboViewer(root, SWT.BORDER | SWT.SINGLE);         
          ArrayContentProvider provider = new ArrayContentProvider();
          viewer.setContentProvider(provider);
          viewer.setInput(heaps);
@@ -147,10 +135,11 @@ public class DependencyContractCompletion extends AbstractInteractiveRuleApplica
             
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
-               ISelection selection = event.getSelection();
-               selectedHeap = SWTUtil.toArray(selection);
+               IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+               selectedHeap = (TermStringWrapper) selection.getFirstElement();
             }
          });
+         viewer.setSelection(new StructuredSelection(heaps[0]));
       }
 
       /**
@@ -158,10 +147,8 @@ public class DependencyContractCompletion extends AbstractInteractiveRuleApplica
        */
       @Override
       public IBuiltInRuleApp finish() {
-         final Term[] resultHeaps = null; // TODO: Assign selected heap.
-         
-         
-         
+         final Term[] resultHeaps = selectedHeap.terms;
+          
          PosInOccurrence step = de.uka.ilkd.key.gui.DependencyContractCompletion.findCorrespondingStep(steps, resultHeaps);
          if (step == null) {
             return null;
