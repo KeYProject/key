@@ -52,6 +52,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
    public void testCloseFalse_ProofClosed() throws Exception {
       doStartProofTest("SWTBotManualRuleApplicationTest_testCloseFalse_ProofClosed", 
                        "data/paycard",
+                       true,
                        TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "isValid()", "0", "normal_behavior"),
                        new IStopCondition() {
                           @Override
@@ -99,6 +100,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
    public void testAssignment_ProofStillOpen() throws Exception {
       doStartProofTest("SWTBotManualRuleApplicationTest_testAssignment_ProofStillOpen", 
                        "data/paycard",
+                       true,
                        TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "isValid()", "0", "normal_behavior"),
                        null,
                        false,
@@ -141,6 +143,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
       
       doStartProofTest("SWTBotManualRuleApplicationTest_testUseOperationContract_applyOneContract",
             "data/paycard",
+            true,
             TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "chargeAndRecord(int)", "0", "normal_behavior"), 
             new IStopCondition() {
                
@@ -214,6 +217,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
       
       doStartProofTest("SWTBotManualRuleApplicationTest_testUseOperationContract_applyMultipleContracts",
             "data/paycard",
+            true,
             TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "chargeAndRecord(int)", "0", "normal_behavior"), 
             new IStopCondition() {
                
@@ -276,6 +280,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
       };
       doStartProofTest("SWTBotManualRuleApplicationTest_testUseOperationContract_Cancel",
                         "data/paycard",
+                        true,
                         TestKeY4EclipseUtil.createOperationContractId("PayCard", "PayCard", "chargeAndRecord(int)", "0", "normal_behavior"),
                         new IStopCondition() {
                            @Override
@@ -331,6 +336,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
       };
       doStartProofTest("SWTBotManualRuleApplicationTest_testBlockContract_Cancel",
             "data/blockContract",
+            true,
             TestKeY4EclipseUtil.createOperationContractId("BlockContractExample", "BlockContractExample", "main()", "0", "normal_behavior"),
             new IStopCondition() {
                @Override
@@ -383,6 +389,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
       };
       doStartProofTest("SWTBotManualRuleApplicationTest_testBlockContract_ApplyOneContract",
             "data/blockContract",
+            true,
             TestKeY4EclipseUtil.createOperationContractId("BlockContractExample", "BlockContractExample", "main()", "0", "normal_behavior"),
             new IStopCondition() {
                @Override
@@ -435,6 +442,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
       };
       doStartProofTest("SWTBotManualRuleApplicationTest_testBlockContract_ApplyMultipleContracts",
             "data/blockContract",
+            true,
             TestKeY4EclipseUtil.createOperationContractId("BlockContractExample", "BlockContractExample", "main()", "0", "normal_behavior"),
             new IStopCondition() {
                @Override
@@ -503,43 +511,9 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
       
       doStartProofTest("SWTBotManualRuleApplicationTest_testDependencyContract_applyOneHeap",
             "data/dependencyContract",
-            TestKeY4EclipseUtil.createOperationContractId("DependencyContractExample", "DependencyContractExample", "incC(int)", "0", "normal_behavior"), 
-            new IStopCondition() {
-               
-               @Override
-               public boolean shouldStop(int maxApplications, long timeout, Proof proof,
-                     IGoalChooser goalChooser, long startTime, int countApplied,
-                     SingleRuleApplicationInfo singleRuleApplicationInfo) {
-                  return false;
-               }
-               
-               @Override
-               public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof,
-                     IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
-                  RuleApp ruleApp = goal.getRuleAppManager().peekNext();
-                  return !"Dependency Contract".equals(MiscTools.getRuleName(ruleApp));
-               }
-               
-               @Override
-               public String getStopMessage(int maxApplications, long timeout, Proof proof,
-                     IGoalChooser goalChooser, long startTime, int countApplied,
-                     SingleRuleApplicationInfo singleRuleApplicationInfo) {
-                  return null;
-               }
-               
-               @Override
-               public int getMaximalWork(int maxApplications, long timeout, Proof proof,
-                     IGoalChooser goalChooser) {
-                  return 0;
-               }
-               
-               @Override
-               public String getGoalNotAllowedMessage(int maxApplications, long timeout,
-                     Proof proof, IGoalChooser goalChooser, long startTime,
-                     int countApplied, Goal goal) {
-                  return null;
-               }
-            }, 
+            false,
+            "DependencyContractExample.proof", 
+            null, 
             true, 
             true,
             false, 
@@ -564,7 +538,8 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
      * </ol>
     * @param projectName The unique project name of the project which will be created in the workspace.
     * @param pathToSourceCodeInTestPlugin The path to the source code in the test plug-in which will be extracted into the created project.
-    * @param contractId The unique ID of the proof obligation (contract) for which a proof will be started.
+    * @param isContract {@code true} is contract, {@code false} is proof file.
+    * @param contractNameOrProofFile The name of the contract to prove or the path to the proof file to load.
     * @param stopCondition An optional custom {@link IStopCondition} which stops the started auto mode at a node on which the rule to test can be applied.
     * @param useOperationContracts {@code true} use operation contracts, {@code false} inline methods instead
     * @param useDependencyContracts Use dependency contracts?
@@ -578,7 +553,8 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
     */
    protected void doStartProofTest(String projectName,
                                    String pathToSourceCodeInTestPlugin,
-                                   String contractId,
+                                   boolean isContract,
+                                   String contractNameOrProofFile,
                                    final IStopCondition stopCondition,
                                    final boolean useOperationContracts,
                                    final boolean useDependencyContracts,
@@ -641,7 +617,8 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
       };
       doEditorTest(projectName, 
                    pathToSourceCodeInTestPlugin, 
-                   contractId,
+                   isContract,
+                   contractNameOrProofFile,
                    5,
                    false, 
                    steps); 
