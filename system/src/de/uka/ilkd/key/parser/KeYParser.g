@@ -352,6 +352,10 @@ options {
     	}
     	return super.getSourceName();
     }
+    
+    List<Throwable> getExceptions() {
+        return keh.getExceptions();
+    }
 
     public String getChooseContract() {
         return chooseContract;
