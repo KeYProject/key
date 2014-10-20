@@ -16,11 +16,11 @@ package de.uka.ilkd.key.util;
 import java.util.*;
 
 
-public abstract class KeYExceptionHandlerImpl implements KeYExceptionHandler {
+public abstract class AbstractKeYExceptionHandler implements KeYExceptionHandler {
 
     protected List<Throwable> exceptions = null; 
 
-    public KeYExceptionHandlerImpl() {
+    public AbstractKeYExceptionHandler() {
 	exceptions = new LinkedList<Throwable>();
     }
 

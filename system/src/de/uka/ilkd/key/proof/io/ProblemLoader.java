@@ -28,27 +28,23 @@ import java.util.Properties;
 import javax.swing.SwingWorker;
 
 /**
- * This class extends the functionality of the {@link DefaultProblemLoader}. It
+ * This class extends the functionality of the {@link AbstractProblemLoader}. It
  * allows to do the loading process as {@link SwingWorker3} {@link Thread} and
  * it opens the proof obligation browser it is not possible to instantiate a
  * proof configured by the opened file.
  *
  * @author Martin Hentschel
  */
-public final class ProblemLoader extends DefaultProblemLoader {
-    // TODO: why is the superclass called 'default'?
+public final class ProblemLoader extends AbstractProblemLoader {
 
-   private ProverTaskListener ptl;
+   private final ProverTaskListener ptl;
 
    public ProblemLoader(File file, List<File> classPath, File bootClassPath,
                         Profile profileOfNewProofs, KeYMediator mediator,
                         boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
-                        Properties poPropertiesToForce) {
+                        Properties poPropertiesToForce, ProverTaskListener ptl) {
       super(file, classPath, bootClassPath, profileOfNewProofs, mediator,
             askUiToSelectAProofObligationIfNotDefinedByLoadedFile, poPropertiesToForce);
-   }
-
-   public void addTaskListener(ProverTaskListener ptl) {
       this.ptl = ptl;
    }
 
@@ -78,7 +74,6 @@ public final class ProblemLoader extends DefaultProblemLoader {
           getMediator().getUI().reportStatus(this, errorMessage);
           return exception;
       } catch (final Throwable throwable) {
-          throwable.printStackTrace();
           reportException(throwable);
           return throwable;
       }
@@ -99,7 +94,8 @@ public final class ProblemLoader extends DefaultProblemLoader {
        }
    }
 
-   private void reportException(final Throwable message) {
+   @Override
+   protected void reportException(final Throwable message) {
        if (message != null) {
            getExceptionHandler().reportException(message);
        }

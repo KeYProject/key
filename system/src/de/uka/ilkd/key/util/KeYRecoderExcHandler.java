@@ -17,7 +17,7 @@ package de.uka.ilkd.key.util;
 import java.util.*;
 
 
-public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl 
+public class KeYRecoderExcHandler extends AbstractKeYExceptionHandler 
                                   implements recoder.service.ErrorHandler {
 
     private List<Throwable> recoderExceptions = new LinkedList<Throwable>();
@@ -29,7 +29,8 @@ public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl
     public void reportException(Throwable e) {
         super.reportException(e);
         if(!getExceptions().isEmpty()) {
-            throw new ExceptionHandlerException(e);
+            // TODO: this exception is currently uncaught, should really not be thrown
+//            throw new ExceptionHandlerException(e);
         }    
     }
 

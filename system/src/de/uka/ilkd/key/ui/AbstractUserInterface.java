@@ -33,7 +33,7 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -52,8 +52,7 @@ public abstract class AbstractUserInterface implements UserInterface {
                                              File bootClassPath, KeYMediator mediator) {
         final ProblemLoader pl =
                 new ProblemLoader(file, classPath, bootClassPath,
-                                  AbstractProfile.getDefaultProfile(), mediator, true, null);
-        pl.addTaskListener(this);
+                                  AbstractProfile.getDefaultProfile(), mediator, true, null, this);
         return pl;
     }
 
@@ -139,16 +138,16 @@ public abstract class AbstractUserInterface implements UserInterface {
      * {@inheritDoc}
      */
     @Override
-    public DefaultProblemLoader load(Profile profile,
+    public AbstractProblemLoader load(Profile profile,
                                      File file,
                                      List<File> classPath,
                                      File bootClassPath,
                                      Properties poPropertiesToForce) throws ProblemLoaderException {
-       DefaultProblemLoader loader = null;
+       AbstractProblemLoader loader = null;
        try {
           getMediator().stopInterface(true);
-          loader = new DefaultProblemLoader(file, classPath, bootClassPath, profile,
-                                            getMediator(), false, poPropertiesToForce);
+          loader = new ProblemLoader(file, classPath, bootClassPath, profile,
+                                            getMediator(), false, poPropertiesToForce, this);
           if (isSaveOnly()) {
               loader.saveAll();
           } else {
