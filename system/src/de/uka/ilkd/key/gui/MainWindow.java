@@ -681,7 +681,7 @@ public final class MainWindow extends JFrame  {
         proof.setMnemonic(KeyEvent.VK_P);
 
         proof.add(autoModeAction);
-        final JMenuItem macros = new ProofMacroMenu(mediator, null);
+        final JMenuItem macros = new ProofMacroMenu(mediator);
         proof.add(macros);
         proof.add(new UndoLastStepAction(this, true));
         proof.add(new AbandonTaskAction(this));

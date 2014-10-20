@@ -84,6 +84,31 @@ public class ProofMacroMenu extends JMenu {
             }
         }
 
+        mediator.enableWhenProofLoaded(this);
+        this.numberOfMacros = count;
+    }
+    
+
+    /**
+     * Instantiates a new proof macro menu.
+     * Only to be used in the {@link MainWindow}.
+     *
+     * Only macros applicable at any PosInOccurrence are added as menu items.
+     *
+     * @param mediator the mediator of the current proof.
+     */
+    ProofMacroMenu(KeYMediator mediator) {
+        super("Strategy macros");
+
+        int count = 0;
+        for (ProofMacro macro : loader) {
+            // TODO: check applicability
+            JMenuItem menuItem = createMenuItem(macro, mediator, null);
+            add(menuItem);
+            count++;
+        }
+
+        mediator.enableWhenProofLoaded(this);
         this.numberOfMacros = count;
     }
 
