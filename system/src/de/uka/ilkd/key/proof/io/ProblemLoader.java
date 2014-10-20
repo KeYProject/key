@@ -35,7 +35,7 @@ import javax.swing.SwingWorker;
  *
  * @author Martin Hentschel
  */
-public final class ProblemLoader extends AbstractProblemLoader {
+public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename in MultiThreadProblemLoader analog to SingleThreadProblemLoader because it uses multiple Threads (UI and SwingWorker)?
 
    private final ProverTaskListener ptl;
 
@@ -94,7 +94,10 @@ public final class ProblemLoader extends AbstractProblemLoader {
        }
    }
 
-   @Override
+   /**
+    * Report exceptions here, do not throw them.
+    * @param message
+    */
    protected void reportException(final Throwable message) {
        if (message != null) {
            getExceptionHandler().reportException(message);

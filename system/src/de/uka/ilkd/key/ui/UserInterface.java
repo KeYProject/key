@@ -141,8 +141,13 @@ public interface UserInterface
     KeYMediator getMediator();
     
     /**
+     * <p>
      * Opens a java file in this {@link UserInterface} and returns the instantiated {@link AbstractProblemLoader}
      * which can be used to instantiated proofs programmatically.
+     * </p>
+     * <p>
+     * <b>The loading is performed in the {@link Thread} of the caller!</b>
+     * </p>
      * @param profile An optional {@link Profile} to use. If it is {@code null} the default profile {@link KeYMediator#getDefaultProfile()} is used.
      * @param file The java file to open.
      * @param classPaths The class path entries to use.

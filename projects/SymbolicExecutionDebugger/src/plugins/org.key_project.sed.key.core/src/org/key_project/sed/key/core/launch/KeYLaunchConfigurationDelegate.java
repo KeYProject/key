@@ -53,7 +53,7 @@ import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
@@ -242,7 +242,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                                                String launchConfigurationName, 
                                                                KeYLaunchSettings settings) throws Exception {
        // Load location
-       DefaultProblemLoader loader = ui.load(SymbolicExecutionJavaProfile.getDefaultInstance(), settings.getLocation(), settings.getClassPaths(), settings.getBootClassPath(), SymbolicExecutionTreeBuilder.createPoPropertiesToForce()); 
+       AbstractProblemLoader loader = ui.load(SymbolicExecutionJavaProfile.getDefaultInstance(), settings.getLocation(), settings.getClassPaths(), settings.getBootClassPath(), SymbolicExecutionTreeBuilder.createPoPropertiesToForce()); 
        InitConfig initConfig = loader.getInitConfig();
        // Try to reuse already instantiated proof
        Proof proof = loader.getProof();

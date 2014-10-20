@@ -36,6 +36,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -146,8 +147,7 @@ public abstract class AbstractUserInterface implements UserInterface {
        AbstractProblemLoader loader = null;
        try {
           getMediator().stopInterface(true);
-          loader = new ProblemLoader(file, classPath, bootClassPath, profile,
-                                            getMediator(), false, poPropertiesToForce, this);
+          loader = new SingleThreadProblemLoader(file, classPath, bootClassPath, profile, getMediator(), false, poPropertiesToForce);
           if (isSaveOnly()) {
               loader.saveAll();
           } else {
