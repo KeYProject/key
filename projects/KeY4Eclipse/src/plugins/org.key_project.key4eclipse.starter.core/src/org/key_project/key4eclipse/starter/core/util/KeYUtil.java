@@ -85,7 +85,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.EnvNode;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
@@ -392,7 +392,7 @@ public final class KeYUtil {
                             main.setVisible(true);
                         }
                         // Check if location is already loaded
-                        DefaultProblemLoader loader = main.getUserInterface().load(null, location, classPaths, bootClassPath, null);
+                        AbstractProblemLoader loader = main.getUserInterface().load(null, location, classPaths, bootClassPath, null);
                         InitConfig initConfig = loader.getInitConfig();
                         // Get method to proof in KeY
                         IProgramMethod pm = getProgramMethod(method, initConfig.getServices().getJavaInfo());

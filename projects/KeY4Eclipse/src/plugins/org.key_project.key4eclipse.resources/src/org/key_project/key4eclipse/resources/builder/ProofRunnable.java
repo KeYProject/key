@@ -37,6 +37,7 @@ import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 
 public class ProofRunnable implements Runnable {
@@ -76,7 +77,9 @@ public class ProofRunnable implements Runnable {
                   pe.setProofClosed(proof.closed());
                   pe.setOutdated(false);
                   pe.setProofReferences(ProofReferenceUtil.computeProofReferences(proof));
-                  pe.setUsedContracts(KeYResourcesUtil.getUsedContractsProofElements(pe, proofElements));
+                  Pair<List<IFile>, List<String>> usedElementsPair = KeYResourcesUtil.computeUsedProofElements(pe, proofElements);
+                  pe.setUsedContracts(usedElementsPair.first);
+                  pe.setCalledMethods(usedElementsPair.second);
                   pe.setMarkerMsg(generateProofMarkerMessage(pe, proof, proofDuration));
                   try{
                      save(proof,pe);

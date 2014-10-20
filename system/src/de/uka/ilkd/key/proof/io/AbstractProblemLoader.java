@@ -60,13 +60,14 @@ import de.uka.ilkd.key.util.Pair;
 
 /**
  * <p>
- * This class provides the functionality to load something it KeY.
+ * This class provides the basic functionality to load something in KeY.
  * The loading process is done in the current {@link Thread} and
  * no user interaction is required.
  * </p>
  * <p>
- * The basic usage of this class is to instantiate a new {@link AbstractProblemLoader}
- * instance with should load the file configured by the constructor's arguments.
+ * The basic usage of this class is to instantiate a new 
+ * {@link SingleThreadProblemLoader} or {@link ProblemLoader}
+ * instance which should load the file configured by the constructor's arguments.
  * The next step is to call {@link #load()} which does the loading process and
  * tries to instantiate a proof and to apply rules again if possible. The result
  * of the loading process is available via the getter methods.
@@ -165,12 +166,12 @@ public abstract class AbstractProblemLoader {
      * @param askUiToSelectAProofObligationIfNotDefinedByLoadedFile {@code true} to call {@link UserInterface#selectProofObligation(InitConfig)} if no {@link Proof} is defined by the loaded proof or {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
      */
     public AbstractProblemLoader(File file, 
-                    List<File> classPath, 
-                    File bootClassPath,
-                    Profile profileOfNewProofs, 
-                    KeYMediator mediator,
-                    boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
-                    Properties poPropertiesToForce) {
+                                 List<File> classPath, 
+                                 File bootClassPath,
+                                 Profile profileOfNewProofs, 
+                                 KeYMediator mediator,
+                                 boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
+                                 Properties poPropertiesToForce) {
         assert mediator != null;
         this.file = file;
         this.classPath = classPath;
@@ -282,12 +283,6 @@ public abstract class AbstractProblemLoader {
         // default
         return new ProblemLoaderException(this, "Loading proof input failed", e);
     }
-    
-    /**
-     * Report exceptions here, do not throw them.
-     * @param message
-     */
-    protected abstract void reportException(final Throwable message);
 
     private File chooseFile(ContractPO po) {
         final String fName;
