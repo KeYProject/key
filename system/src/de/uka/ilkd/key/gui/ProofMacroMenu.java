@@ -48,10 +48,8 @@ import de.uka.ilkd.key.macros.ProofMacro;
  */
 public class ProofMacroMenu extends JMenu {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -5436200313524574310L;
+
+    private static final long serialVersionUID = -5946657022043894399L;
 
     /**
      * The loader used to access the providers for macros.
@@ -102,10 +100,11 @@ public class ProofMacroMenu extends JMenu {
 
         int count = 0;
         for (ProofMacro macro : loader) {
-            // TODO: check applicability
-            JMenuItem menuItem = createMenuItem(macro, mediator, null);
-            add(menuItem);
-            count++;
+            if (macro.isApplicableWithoutPosition()) {
+                JMenuItem menuItem = createMenuItem(macro, mediator, null);
+                add(menuItem);
+                count++;
+            }
         }
 
         mediator.enableWhenProofLoaded(this);
