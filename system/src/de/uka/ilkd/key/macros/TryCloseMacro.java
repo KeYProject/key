@@ -81,6 +81,11 @@ public class TryCloseMacro extends AbstractProofMacro {
         return goals != null && !goals.isEmpty();
     }
 
+    @Override
+    public boolean isApplicableWithoutPosition() {
+        return true;
+    }
+    
     /*
      * Run the automation on the goal. Retreat if not successful.
      */
