@@ -154,7 +154,7 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
    /**
     * The protocol used to link to {@link File}s in the local file system.
     */
-   private static final String PROTOCOL_FILE_PREFIX = "file:/";
+   private static final String PROTOCOL_FILE_PREFIX = "file://";
 
    /**
     * The root {@link Composite} which contains all shown content.
@@ -1393,10 +1393,11 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
             }
             else if (event.location.startsWith(PROTOCOL_FILE_PREFIX)) {
                String location = event.location.substring(PROTOCOL_FILE_PREFIX.length());
-               files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(new Path(location));
+               File locationFile = new File(location);
+               files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(new Path(locationFile.getAbsolutePath()));
             }
             if (!ArrayUtil.isEmpty(files)) {
-               event.doit = false; // The Mac OS Browser implementation is buggy and may reports locations during the event with changed lower and upper cases. In Case it is wrong still allow the Browser to handle the event.
+               event.doit = false;
                if (event.location.endsWith(KeYUtil.PROOF_FILE_EXTENSION) ||
                    event.location.endsWith(KeYUtil.KEY_FILE_EXTENSION)) {
                   openProofs(files);
