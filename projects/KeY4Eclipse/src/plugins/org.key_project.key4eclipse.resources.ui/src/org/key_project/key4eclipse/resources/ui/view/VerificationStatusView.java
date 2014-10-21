@@ -101,6 +101,7 @@ import org.key_project.util.eclipse.swt.viewer.event.IViewerUpdateListener;
 import org.key_project.util.eclipse.swt.viewer.event.ViewerUpdateEvent;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
@@ -1070,7 +1071,7 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
             if (file != null) {
                File localFile = ResourceUtil.getLocation(file);
                return localFile != null ? 
-                      PROTOCOL_FILE_PREFIX + localFile.getAbsolutePath().replace(File.separatorChar, '/') : 
+                      PROTOCOL_FILE_PREFIX + IOUtil.encodeURIPath(localFile.getAbsolutePath()) : 
                       PROTOCOL_RESOURCE + file.getFullPath();
             }
             else {
@@ -1393,7 +1394,7 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
             }
             else if (event.location.startsWith(PROTOCOL_FILE_PREFIX)) {
                String location = event.location.substring(PROTOCOL_FILE_PREFIX.length());
-               File locationFile = new File(location);
+               File locationFile = new File(IOUtil.decodeURIPath(location));
                files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(new Path(locationFile.getAbsolutePath()));
             }
             if (!ArrayUtil.isEmpty(files)) {
