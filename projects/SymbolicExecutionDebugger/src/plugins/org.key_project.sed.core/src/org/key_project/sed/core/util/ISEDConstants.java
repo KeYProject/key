@@ -15,6 +15,7 @@ package org.key_project.sed.core.util;
 
 import org.eclipse.debug.internal.ui.viewers.model.provisional.PresentationContext;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.TreeModelViewer;
+import org.key_project.sed.core.model.ISEDBaseMethodReturn;
 import org.key_project.sed.core.model.ISEDGroupable;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
@@ -29,6 +30,10 @@ public interface ISEDConstants {
     * The ID used for the call stack, accessible via {@link ISEDDebugNode#getCallStack()}.
     */
    public static final String ID_CALL_STACK = "org.key_project.sed.core.callStack";
+   /**
+    * The ID used for the call stack, accessible via {@link ISEDBaseMethodReturn#getCallStateVariables()}.
+    */
+   public static final String ID_CALL_STATE = "org.key_project.sed.core.callState";
 
    /**
     * The ID used for the method return conditions, accessible via {@link ISEDMethodCall#getMethodReturnConditions()}.

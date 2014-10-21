@@ -13,28 +13,20 @@
 
 package org.key_project.sed.ui.property;
 
-import org.eclipse.ui.views.properties.tabbed.ISection;
-import org.key_project.sed.core.model.ISEDGroupable;
+import org.eclipse.jface.viewers.IFilter;
+import org.key_project.sed.core.model.ISEDBaseMethodReturn;
 
 /**
- * {@link ISection} implementation to show the group ending conditions of an {@link ISEDGroupable}
- * which is provided via {@link ISEDGroupable#getGroupEndConditions()}.
+ * {@link IFilter} implementation used to define if a {@link ISEDBaseMethodReturn}
+ * is available or not.
  * @author Martin Hentschel
  */
-public class GroupEndConditionsPropertySection extends AbstractSEDDebugNodePropertySection {
+public class SEDBaseMethodReturnTreeFilter implements IFilter {
    /**
     * {@inheritDoc}
     */
    @Override
-   protected ISEDDebugNodeTabContent createContent() {
-      return new GroupEndConditionsTabComposite();
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean shouldUseExtraSpace() {
-      return true;
+   public boolean select(Object toTest) {
+      return AbstractSEDDebugNodePropertySection.getDebugNode(toTest) instanceof ISEDBaseMethodReturn;
    }
 }

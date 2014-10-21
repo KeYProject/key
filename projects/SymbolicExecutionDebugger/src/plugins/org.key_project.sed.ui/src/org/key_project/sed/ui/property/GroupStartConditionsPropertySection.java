@@ -29,4 +29,12 @@ public class GroupStartConditionsPropertySection extends AbstractSEDDebugNodePro
    protected ISEDDebugNodeTabContent createContent() {
       return new GroupStartConditionsTabComposite();
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean shouldUseExtraSpace() {
+      return true;
+   }
 }

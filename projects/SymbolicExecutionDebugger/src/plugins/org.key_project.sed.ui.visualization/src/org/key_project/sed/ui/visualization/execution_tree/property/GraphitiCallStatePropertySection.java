@@ -11,23 +11,24 @@
  *    Technical University Darmstadt - initial API and implementation and/or initial documentation
  *******************************************************************************/
 
-package org.key_project.sed.ui.property;
+package org.key_project.sed.ui.visualization.execution_tree.property;
 
 import org.eclipse.ui.views.properties.tabbed.ISection;
-import org.key_project.sed.core.model.ISEDGroupable;
+import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.ui.property.CallStateTabComposite;
+import org.key_project.sed.ui.property.ISEDDebugNodeTabContent;
 
 /**
- * {@link ISection} implementation to show the group ending conditions of an {@link ISEDGroupable}
- * which is provided via {@link ISEDGroupable#getGroupEndConditions()}.
+ * {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s.
  * @author Martin Hentschel
  */
-public class GroupEndConditionsPropertySection extends AbstractSEDDebugNodePropertySection {
+public class GraphitiCallStatePropertySection extends AbstractGraphitiDebugNodePropertySection {
    /**
     * {@inheritDoc}
     */
    @Override
    protected ISEDDebugNodeTabContent createContent() {
-      return new GroupEndConditionsTabComposite();
+      return new CallStateTabComposite();
    }
 
    /**

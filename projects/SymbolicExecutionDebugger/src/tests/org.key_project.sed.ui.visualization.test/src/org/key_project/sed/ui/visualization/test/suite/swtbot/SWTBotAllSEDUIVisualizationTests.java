@@ -18,6 +18,7 @@ import org.junit.runners.Suite;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiAnnotationLinksTabTest;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiAnnotationsTabTest;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiCallStackTabTest;
+import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiCallStateTabTest;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiConstraintsTabTest;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiGroupEndConditionsTabTest;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiGroupStartConditionsTabTest;
@@ -39,6 +40,7 @@ import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotSymbolicE
    SWTBotGraphitiAnnotationLinksTabTest.class,
    SWTBotGraphitiAnnotationsTabTest.class,
    SWTBotGraphitiCallStackTabTest.class,
+   SWTBotGraphitiCallStateTabTest.class,
    SWTBotGraphitiConstraintsTabTest.class,
    SWTBotGraphitiGroupEndConditionsTabTest.class,
    SWTBotGraphitiGroupStartConditionsTabTest.class,

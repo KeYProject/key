@@ -17,8 +17,10 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IValue;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementContentProvider;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDVariable;
+import org.key_project.sed.core.provider.SEDVariableContentProvider;
 import org.key_project.sed.core.util.LogUtil;
 
 /**
@@ -26,6 +28,7 @@ import org.key_project.sed.core.util.LogUtil;
  * @author Martin Hentschel
  * @see ISEDVariable
  */
+@SuppressWarnings("restriction")
 public abstract class AbstractSEDVariable extends AbstractSEDDebugElement implements ISEDVariable {
    /**
     * The parent {@link IStackFrame} in which this {@link ISEDVariable} is shown.
@@ -89,5 +92,19 @@ public abstract class AbstractSEDVariable extends AbstractSEDDebugElement implem
    @Override
    public IStackFrame getStackFrame() {
       return stackFrame;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @SuppressWarnings("rawtypes")
+   @Override
+   public Object getAdapter(Class adapter) {
+      if (IElementContentProvider.class.equals(adapter)) {
+         return new SEDVariableContentProvider();
+      }
+      else {
+         return super.getAdapter(adapter);
+      }
    }
 }

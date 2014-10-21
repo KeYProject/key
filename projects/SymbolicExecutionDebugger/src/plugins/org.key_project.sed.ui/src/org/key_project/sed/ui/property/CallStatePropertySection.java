@@ -14,20 +14,20 @@
 package org.key_project.sed.ui.property;
 
 import org.eclipse.ui.views.properties.tabbed.ISection;
-import org.key_project.sed.core.model.ISEDGroupable;
+import org.key_project.sed.core.model.ISEDBaseMethodReturn;
 
 /**
- * {@link ISection} implementation to show the group ending conditions of an {@link ISEDGroupable}
- * which is provided via {@link ISEDGroupable#getGroupEndConditions()}.
+ * {@link ISection} implementation to show the call state of an {@link ISEDBaseMethodReturn}
+ * which is provided via {@link ISEDBaseMethodReturn#getCallStateVariables()}.
  * @author Martin Hentschel
  */
-public class GroupEndConditionsPropertySection extends AbstractSEDDebugNodePropertySection {
+public class CallStatePropertySection extends AbstractSEDDebugNodePropertySection {
    /**
     * {@inheritDoc}
     */
    @Override
    protected ISEDDebugNodeTabContent createContent() {
-      return new GroupEndConditionsTabComposite();
+      return new CallStateTabComposite();
    }
 
    /**
