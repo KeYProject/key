@@ -1382,7 +1382,6 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
    @SuppressWarnings("deprecation")
    protected void handleReportBrowserChanging(LocationEvent event) {
       if (event.location != null) {
-         event.doit = event.location.startsWith("about:blank");
          if (!event.location.startsWith("about:blank#")) {
             IFile[] files = null;
             if (event.location.startsWith(PROTOCOL_RESOURCE)) {
@@ -1397,6 +1396,7 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
                files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(new Path(location));
             }
             if (!ArrayUtil.isEmpty(files)) {
+               event.doit = false; // The Mac OS Browser implementation is buggy and may reports locations during the event with changed lower and upper cases. In Case it is wrong still allow the Browser to handle the event.
                if (event.location.endsWith(KeYUtil.PROOF_FILE_EXTENSION) ||
                    event.location.endsWith(KeYUtil.KEY_FILE_EXTENSION)) {
                   openProofs(files);
