@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_06ff2ac8-3a58-422d-a2b3-e10c67a33b0b" name="main()" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_aa389662-f99d-4b8e-98f7-553486050386" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowTest\src\ThrowTest.java">
-         <sedMethodCall xml:id="_d31af177-f243-49f4-b560-617245afaec5" name="&lt;call self.main()&gt;" pathCondition="true" lineNumber="-1" charStart="41" charEnd="45" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowTest\src\ThrowTest.java" groupable="true">
-            <sedStatement xml:id="_828ab827-1dd1-44ab-94b0-c0cd97ca5612" name="throw new RuntimeException ();" pathCondition="true" lineNumber="-1" charStart="53" charEnd="82" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowTest\src\ThrowTest.java">
-               <sedExceptionalMethodReturn xml:id="_e0d8c8c4-4dd5-4f0c-ad52-d688932d8910" name="&lt;exceptional return of &lt;call self.main()&gt;&gt;" pathCondition="true" lineNumber="-1" charStart="41" charEnd="45" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowTest\src\ThrowTest.java" methodReturnConditionRef="_31473738-c17d-443f-9ded-1c6d8a6ad881">
-                  <sedExceptionalTermination xml:id="_d8782b28-cab4-46ee-b799-fa1d835d6b7a" name="&lt;uncaught java.lang.RuntimeException&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowTest\src\ThrowTest.java" verified="true">
+   <sedTarget xml:id="_36ae97a3-fe58-4b0c-93be-aa69adcd6b88" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_1ccabcfa-6f9a-40fe-9b60-b4f5a77bed8e" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowTest\src\ThrowTest.java">
+         <sedMethodCall xml:id="_55e1ef81-3e6b-44cb-bcb1-5953678fa6ba" name="&lt;call self.main()&gt;" pathCondition="true" lineNumber="-1" charStart="41" charEnd="45" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowTest\src\ThrowTest.java" groupable="true">
+            <sedStatement xml:id="_8676324f-468d-4a68-a608-fccc1dc30975" name="throw new RuntimeException ();" pathCondition="true" lineNumber="-1" charStart="53" charEnd="82" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowTest\src\ThrowTest.java">
+               <sedExceptionalMethodReturn xml:id="_0fd2e95d-f322-452a-be9a-4581e9c117c3" name="&lt;exceptional return of &lt;call self.main()&gt;&gt;" pathCondition="true" lineNumber="-1" charStart="41" charEnd="45" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowTest\src\ThrowTest.java" methodReturnConditionRef="_7048e1f5-0201-48d2-bc13-56f481481bf7">
+                  <sedExceptionalTermination xml:id="_4ce4d110-5e4f-4ee0-a22b-fcf2d4b857ae" name="&lt;uncaught java.lang.RuntimeException&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testThrowTest\src\ThrowTest.java" verified="true">
                   </sedExceptionalTermination>
+                  <sedGroupStartCondition xml:id="_7048e1f5-0201-48d2-bc13-56f481481bf7" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                     <sedChildReference nodeIdRef="_0fd2e95d-f322-452a-be9a-4581e9c117c3"/>
+                  </sedGroupStartCondition>
                </sedExceptionalMethodReturn>
             </sedStatement>
-            <sedMethodCallMethodReturnCondition xml:id="_31473738-c17d-443f-9ded-1c6d8a6ad881" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-               <sedChildReference nodeIdRef="_e0d8c8c4-4dd5-4f0c-ad52-d688932d8910"/>
+            <sedMethodCallMethodReturnCondition xml:id="_7048e1f5-0201-48d2-bc13-56f481481bf7" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_0fd2e95d-f322-452a-be9a-4581e9c117c3"/>
             </sedMethodCallMethodReturnCondition>
-            <sedGroupEndReference nodeIdRef="_31473738-c17d-443f-9ded-1c6d8a6ad881"/>
+            <sedGroupEndReference nodeIdRef="_7048e1f5-0201-48d2-bc13-56f481481bf7"/>
          </sedMethodCall>
-         <sedTerminationEntry nodeIdRef="_d8782b28-cab4-46ee-b799-fa1d835d6b7a"/>
+         <sedTerminationEntry nodeIdRef="_4ce4d110-5e4f-4ee0-a22b-fcf2d4b857ae"/>
       </sedThread>
    </sedTarget>
 </launch>

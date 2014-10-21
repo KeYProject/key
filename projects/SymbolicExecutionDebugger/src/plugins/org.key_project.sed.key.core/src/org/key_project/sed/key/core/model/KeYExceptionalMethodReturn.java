@@ -24,6 +24,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDExceptionalMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
@@ -453,7 +454,14 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
    public SEDMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          if (groupStartConditions == null) {
-            groupStartConditions = KeYModelUtil.createCompletedBlocksConditions(this);
+            SEDMemoryBranchCondition returnCondition = getMethodReturnCondition();
+            SEDMemoryBranchCondition[] completedBlockConditions = KeYModelUtil.createCompletedBlocksConditions(this);
+            if (returnCondition != null) {
+               groupStartConditions = ArrayUtil.insert(completedBlockConditions, returnCondition, 0);
+            }
+            else {
+               groupStartConditions = completedBlockConditions;
+            }
          }
          return groupStartConditions;
       }
