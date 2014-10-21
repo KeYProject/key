@@ -60,6 +60,10 @@ public class IOUtilTest extends TestCase {
       assertEquals("A/B", IOUtil.encodeURIPath("A/B"));
       assertEquals("/Users/MyName/MyFile.html", IOUtil.encodeURIPath("/Users/MyName/MyFile.html"));
       assertEquals("C:/Users/MyName/MyFile.html", IOUtil.encodeURIPath("C:\\Users\\MyName\\MyFile.html"));
+      assertEquals("./MyName/MyFile.html", IOUtil.encodeURIPath(".\\MyName\\MyFile.html"));
+      assertEquals("./MyName/MyFile.html", IOUtil.encodeURIPath("./MyName/MyFile.html"));
+      assertEquals("../../MyName/MyFile.html", IOUtil.encodeURIPath("..\\..\\MyName\\MyFile.html"));
+      assertEquals("../../MyName/MyFile.html", IOUtil.encodeURIPath("../../MyName/MyFile.html"));
       // Test URIs with spaces
       assertEquals("/Users/My%20Name/My%20File.html", IOUtil.encodeURIPath("/Users/My Name/My File.html"));
       assertEquals("C:/Users/My%20Name/My%20File.html", IOUtil.encodeURIPath("C:\\Users\\My Name\\My File.html"));
@@ -77,6 +81,8 @@ public class IOUtilTest extends TestCase {
       assertEquals("A/B", IOUtil.decodeURIPath("A/B"));
       assertEquals("/Users/MyName/MyFile.html", IOUtil.decodeURIPath("/Users/MyName/MyFile.html"));
       assertEquals("C:/Users/MyName/MyFile.html", IOUtil.decodeURIPath("C:/Users/MyName/MyFile.html"));
+      assertEquals("./MyName/MyFile.html", IOUtil.decodeURIPath("./MyName/MyFile.html"));
+      assertEquals("../../MyName/MyFile.html", IOUtil.decodeURIPath("../../MyName/MyFile.html"));
       // Test URIs with spaces
       assertEquals("/Users/My Name/My File.html", IOUtil.decodeURIPath("/Users/My%20Name/My%20File.html"));
       assertEquals("C:/Users/My Name/My File.html", IOUtil.decodeURIPath("C:/Users/My%20Name/My%20File.html"));
