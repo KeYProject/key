@@ -110,7 +110,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
              bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
              classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
              // Get local file for the eclipse resource
-             location = KeYUtil.getSourceLocation(project);
+             location = KeYResourceProperties.getSourceClassPathLocation(project);
              Assert.isNotNull(location, "The resource \"" + method.getResource() + "\" is not local.");
           }
           else {

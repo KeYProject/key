@@ -235,7 +235,7 @@ public final class KeYUtil {
                 // Make sure that the location is contained in a Java project
                 IProject project = locationToLoad.getProject();
                 // Get local file for the eclipse resource
-                location = getSourceLocation(project);
+                location = KeYResourceProperties.getSourceClassPathLocation(project);
                 // Get KeY project settings
                 bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
                 classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
@@ -335,32 +335,6 @@ public final class KeYUtil {
     }
     
     /**
-     * Returns the source location of the given {@link IProject}.
-     * @param project The {@link IProject} to get its source location.
-     * @return The source location.
-     * @throws JavaModelException Occurred Exception if {@link IProject} is not supported.
-     */
-    public static File getSourceLocation(IProject project) throws JavaModelException {
-       if (project != null) {
-          if (JDTUtil.isJavaProject(project)) {
-             List<File> sourcePaths = JDTUtil.getSourceLocations(project);
-             if (1 == sourcePaths.size()) {
-                return sourcePaths.get(0);
-             }
-             else {
-                throw new JavaModelException(new CoreException(LogUtil.getLogger().createErrorStatus("Multiple source paths are not supported.")));
-             }
-          }
-          else {
-             throw new JavaModelException(new CoreException(LogUtil.getLogger().createErrorStatus("The project \"" + project.getName() + "\" is no Java project.")));
-          }
-       }
-       else {
-          throw new JavaModelException(new CoreException(LogUtil.getLogger().createErrorStatus("Project not defined.")));
-       }
-    }
-    
-    /**
      * Starts a proof for the given {@link IMethod}.
      * @param method The {@link IMethod} to start proof for.
      * @throws Exception Occurred Exception.
@@ -372,7 +346,7 @@ public final class KeYUtil {
             // Make sure that the location is contained in a Java project
             IProject project = method.getResource().getProject();
             // Get local file for the eclipse resource
-            final File location = getSourceLocation(project);
+            final File location = KeYResourceProperties.getSourceClassPathLocation(project);
             // Get KeY project settings
             final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
             final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
