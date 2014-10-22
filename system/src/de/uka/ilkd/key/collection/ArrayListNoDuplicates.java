@@ -33,7 +33,7 @@ public class ArrayListNoDuplicates<T> extends ArrayList<T> {
     public boolean addAll(Collection<? extends T> ts) {
         boolean result = true;
         for (T t: ts) {
-            result = add(t);
+            result &= add(t);
         }
         return result;
     }
