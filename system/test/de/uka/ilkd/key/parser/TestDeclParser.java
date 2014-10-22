@@ -47,7 +47,6 @@ public class TestDeclParser extends TestCase {
 	super(name);
     }
 
-    @Override
     public void setUp() {
 	serv = new Services(AbstractProfile.getDefaultProfile());
 	nss = serv.getNamespaces();
@@ -148,87 +147,86 @@ public class TestDeclParser extends TestCase {
 
 
     public void testGenericSortDecl() {
-        Named       n;
-        GenericSort G, H;
-        Sort        S, T;
+	Named       n;
+	GenericSort G, H;
+	Sort        S, T;
+	
+	nss = new NamespaceSet ();
+	parseDecls("\\sorts { \\generic G; \\generic H \\extends G; }");
 
-        nss = new NamespaceSet ();
-        parseDecls("\\sorts { \\generic G; \\generic H \\extends G; }");
-
-        G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
-                        DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
-                        DefaultImmutableSet.<Sort>nil() );
-        H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
-                        DefaultImmutableSet.<Sort>nil().add ( G ),
-                        DefaultImmutableSet.<Sort>nil() );
-
-
-        nss = new NamespaceSet ();
-        parseDecls("\\sorts { S; \\generic G; \\generic H \\extends G, S; }");
-
-        S = checkSort        ( nss.sorts().lookup(new Name("S")) );
-        G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
-                        DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
-                        DefaultImmutableSet.<Sort>nil() );
-        H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
-                        DefaultImmutableSet.<Sort>nil().add ( S ).add ( G ),
-                        DefaultImmutableSet.<Sort>nil() );
+	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
+			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
+			       DefaultImmutableSet.<Sort>nil() );
+	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
+			       DefaultImmutableSet.<Sort>nil().add ( G ),
+			       DefaultImmutableSet.<Sort>nil() );
 
 
-        nss = new NamespaceSet ();
-        parseDecls("\\sorts { S; T; \\generic H \\oneof {S, T}; }");
-
-        S = checkSort        ( nss.sorts().lookup(new Name("S")) );
-        T = checkSort        ( nss.sorts().lookup(new Name("T")) );
-        H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
-                        DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
-                        DefaultImmutableSet.<Sort>nil().add ( S ).add ( T ) );
-
-
-        nss = new NamespaceSet ();
-        parseDecls("\\sorts { S; T; \\generic G; \\generic H \\oneof {S} \\extends T, G; }");
-
-        S = checkSort        ( nss.sorts().lookup(new Name("S")) );
-        T = checkSort        ( nss.sorts().lookup(new Name("T")) );
-        G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
-                        DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
-                        DefaultImmutableSet.<Sort>nil() );
-        H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
-                        DefaultImmutableSet.<Sort>nil().add ( T ).add ( G ),
-                        DefaultImmutableSet.<Sort>nil().add ( S ) );
+	nss = new NamespaceSet ();
+	parseDecls("\\sorts { S; \\generic G; \\generic H \\extends G, S; }");
+	
+	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
+	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
+			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
+			       DefaultImmutableSet.<Sort>nil() );
+	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
+			       DefaultImmutableSet.<Sort>nil().add ( S ).add ( G ),
+			       DefaultImmutableSet.<Sort>nil() );
 
 
-        nss = new NamespaceSet ();
-        parseDecls("\\sorts { S, T; \\generic G,G2; \\generic H,H2 \\oneof {S} \\extends T, G; }");
+	nss = new NamespaceSet ();
+	parseDecls("\\sorts { S; T; \\generic H \\oneof {S, T}; }");
 
-        S = checkSort        ( nss.sorts().lookup(new Name("S")) );
-        T = checkSort        ( nss.sorts().lookup(new Name("T")) );
-        G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
-                        DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
-                        DefaultImmutableSet.<Sort>nil() );
-        checkGenericSort     ( nss.sorts().lookup(new Name("G2")),
-                        DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
-                        DefaultImmutableSet.<Sort>nil() );
-        H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
-                        DefaultImmutableSet.<Sort>nil().add ( T ).add ( G ),
-                        DefaultImmutableSet.<Sort>nil().add ( S ) );
-        checkGenericSort     ( nss.sorts().lookup(new Name("H2")),
-                        DefaultImmutableSet.<Sort>nil().add ( T ).add ( G ),
-                        DefaultImmutableSet.<Sort>nil().add ( S ) );
+	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
+	T = checkSort        ( nss.sorts().lookup(new Name("T")) );
+	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
+			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
+			       DefaultImmutableSet.<Sort>nil().add ( S ).add ( T ) );
+	
 
+	nss = new NamespaceSet ();
+	parseDecls("\\sorts { S; T; \\generic G; \\generic H \\oneof {S} \\extends T, G; }");
 
-        nss = new NamespaceSet ();
-        String str = "\\sorts { \\generic G; \\generic H \\oneof {G}; }";
-        KeYParserF p = stringParser(str);
-        try {
-            p.decls();
+	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
+	T = checkSort        ( nss.sorts().lookup(new Name("T")) );
+	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
+			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
+			       DefaultImmutableSet.<Sort>nil() );
+	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
+			       DefaultImmutableSet.<Sort>nil().add ( T ).add ( G ),
+			       DefaultImmutableSet.<Sort>nil().add ( S ) );
+	
 
-        } catch (Exception x) {
-            Throwable e = p.getExceptions().get(0);
+	nss = new NamespaceSet ();
+	parseDecls("\\sorts { S, T; \\generic G,G2; \\generic H,H2 \\oneof {S} \\extends T, G; }");
 
-            assertTrue ( "Expected a GenericSortException",
-                            e instanceof de.uka.ilkd.key.parser.GenericSortException ||  e.getCause() instanceof de.uka.ilkd.key.parser.GenericSortException);
-        }
+	S = checkSort        ( nss.sorts().lookup(new Name("S")) );
+	T = checkSort        ( nss.sorts().lookup(new Name("T")) );
+	G = checkGenericSort ( nss.sorts().lookup(new Name("G")),
+			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
+			       DefaultImmutableSet.<Sort>nil() );
+	checkGenericSort     ( nss.sorts().lookup(new Name("G2")),
+			       DefaultImmutableSet.<Sort>nil().add(Sort.ANY),
+			       DefaultImmutableSet.<Sort>nil() );
+	H = checkGenericSort ( nss.sorts().lookup(new Name("H")),
+			       DefaultImmutableSet.<Sort>nil().add ( T ).add ( G ),
+			       DefaultImmutableSet.<Sort>nil().add ( S ) );
+	checkGenericSort     ( nss.sorts().lookup(new Name("H2")),
+			       DefaultImmutableSet.<Sort>nil().add ( T ).add ( G ),
+			       DefaultImmutableSet.<Sort>nil().add ( S ) );
+	
+
+	nss = new NamespaceSet ();
+	String str = "\\sorts { \\generic G; \\generic H \\oneof {G}; }";
+	try {
+	    KeYParserF p = stringParser(str);
+	    p.decls();
+
+	    fail ( "Expected an GenericSortException" );
+	} catch ( Exception e ) {
+	    assertTrue ( "Expected a GenericSortException",
+			 e instanceof de.uka.ilkd.key.parser.GenericSortException ||  e.getCause() instanceof de.uka.ilkd.key.parser.GenericSortException);
+	}
     }
 
     /** asserts that the found object is a schemavariable and 

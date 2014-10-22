@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.parser;
 
 import java.util.HashMap;
-import java.util.List;
 
 import org.antlr.runtime.LegacyCommonTokenStream;
 import org.antlr.runtime.RecognitionException;
@@ -232,10 +231,6 @@ public class KeYParserF {
 	} catch (RecognitionException e) {
 	    throw new ANTLRException(e.getMessage());
 	}
-    }
-    
-    List<Throwable> getExceptions() {
-        return keYParser.getExceptions();
     }
 
     public ImmutableSet<Contract> getContracts() {
