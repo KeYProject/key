@@ -148,7 +148,7 @@ public class TestDeclParser extends TestCase {
 
 
     public void testGenericSortDecl() {
-        @SuppressWarnings("unused")
+        Named       n;
         GenericSort G, H;
         Sort        S, T;
 
@@ -443,7 +443,7 @@ public class TestDeclParser extends TestCase {
 
     public void testAmbigiousDecls() {
 	try {
-	    KeYParserF kp = stringParser
+	    stringParser
 		("\\sorts { elem; list; }\n" +
 		 "\\functions {" + 
 		 "elem x;"+
@@ -460,10 +460,8 @@ public class TestDeclParser extends TestCase {
 		 "  \\term elem x,y ;\n" +
 		 "  \\variables list lv ;\n" +
 		 "  \\formula b;\n" +
-		 "}\n");
-	    kp.decls();
-	    Throwable exc = kp.getExceptions().get(0);
-	    assertTrue("Parsed in ambigious declaration", exc instanceof AmbigiousDeclException);
+		 "}\n").decls();
+	  fail("Parsed in ambigious declaration");
 	} catch(RuntimeException e){
 	    if(!(e.getCause() instanceof AmbigiousDeclException)){
 		fail("Unexpected excpetion. Testcase failed." +e);
