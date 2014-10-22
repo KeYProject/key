@@ -46,18 +46,18 @@ public class OracleGenerator {
 	
 	private List<OracleVariable> quantifiedVariables;
 	
-	private List<String> prestateTerms;
+	private Set<String> prestateTerms;
 	
 	private Map<Sort, OracleMethod> invariants;
 	
-	private static final String PRE_STRING = "pre_";
+	public static final String PRE_STRING = "_pre";
 	
 	public OracleGenerator(Services services) {
 		this.services = services;
 		initOps();		
 		oracleMethods = new HashSet<OracleMethod>();
 		quantifiedVariables = new LinkedList<OracleVariable>();
-		prestateTerms = new LinkedList<String>();
+		prestateTerms = new HashSet<String>();
 		invariants = new HashMap<Sort, OracleMethod>();
 	}
 
@@ -212,14 +212,24 @@ public class OracleGenerator {
 	    	
 	    	
 	    	if(heapTerm.toString().equals("heapAtPre")){
-	    		if(!objTerm.toString().startsWith(PRE_STRING)){	
-	    			prestateTerms.add(objTerm.toString());
+	    		
+	    		if(value.startsWith(PRE_STRING)){
+	    			String sub = value.substring(PRE_STRING.length(), value.length());	    			
+	    			prestateTerms.add(sub);
+	    		}
+	    		else{
+	    			prestateTerms.add(value);
+	    		}
+	    		
+	    		
+	    		if(!objTerm.toString().startsWith(PRE_STRING)){
+	    			
 	    			return new OracleConstant(PRE_STRING+value, term.sort());
 	    		}
 	    	}
-	    	else{
-	    		return new OracleConstant(value, term.sort());
-	    	}	    	
+	    	
+	    	
+	    	return new OracleConstant(value, term.sort());	    	
 	    }
 	    else if(name.endsWith("::<inv>")){	    	
 	    	if(fun instanceof IObserverFunction){
@@ -357,6 +367,13 @@ public class OracleGenerator {
 		
 	}
 	
+	
+	
+	public Set<String> getPrestateTerms() {
+		return prestateTerms;
+	}
+
+
 	private String getSetName(Sort s){
 		
 		if(s.equals(Sort.FORMULA)){

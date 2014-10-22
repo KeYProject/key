@@ -8,10 +8,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
@@ -169,14 +171,35 @@ public class TestCaseGenerator {
 			try{
 				oracleMethods = new LinkedList<OracleMethod>();
 				oracleMethodCall = getOracleAssertion(oracleMethods);
+				
 			}catch(Exception e){
 				e.printStackTrace();
 			}
-			
-			
-			//System.out.println("Done!);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ");
 		}
 	}
+	
+	
+	
+	private Set<ObjectVal> getPrestateObjects(Model m){
+		
+		Set<ObjectVal> result  =new HashSet<ObjectVal>();
+		
+		Set<String> refs = oracleGenerator.getPrestateTerms();
+		try{
+			for(String ref : refs){
+				result.addAll(m.getNecessaryPrestateObjects(ref));
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		
+		return result;
+		
+		
+	}
+	
+	
 	
 	public String getMUTCall(){
 		IProgramMethod m = info.getMUT();		
@@ -528,7 +551,7 @@ public class TestCaseGenerator {
 						
 						
 						if(junitFormat){
-							testMethod.append("   //calling the test oracle\n"+oracleMethodCall+"\n");
+							testMethod.append("   //calling the test oracle\n"+TAB+oracleMethodCall+"\n");
 						}
 						
 						testMethod.append(" }\n\n");
@@ -579,6 +602,18 @@ public class TestCaseGenerator {
 		TestCaseGenerator.fileCounter++;
 		return testSuite.toString();
 	}
+	
+	private boolean contains(Collection<? extends ObjectVal> objects, String name){
+		
+		for(ObjectVal o : objects){
+			String oName = createObjectName(o);
+			if(oName.equals(name)){
+				return true;
+			}
+		}
+		
+		return false;
+	}
 
 	public String generateTestCase(Model m) {
 /*		if(useRFL){
@@ -598,7 +633,12 @@ public class TestCaseGenerator {
 				break;
 			}
 		}
+		
+		Set<ObjectVal> prestate = getPrestateObjects(m);
+		
 		if (heap != null) {
+			
+			
 			// create objects
 			for (final ObjectVal o : heap.getObjects()) {
 				if (o.getName().equals("#o0")) {
@@ -619,8 +659,13 @@ public class TestCaseGenerator {
 					}else
 						right = "new " + type + "()";
 				}
-				assignments.add(new Assignment(type, o.getName().replace("#",
-				        "_"), right));
+				
+				String objName = createObjectName(o);
+				
+				assignments.add(new Assignment(type, objName, right));
+				if(junitFormat && prestate.contains(o)){
+					assignments.add(new Assignment(type, getPreName(objName), right));
+				}
 			}
 		}
 		// init constants
@@ -647,6 +692,9 @@ public class TestCaseGenerator {
 				}
 				val = translateValueExpression(val);
 				assignments.add(new Assignment(type, c, val));
+				if(junitFormat && contains(prestate, val)){
+					assignments.add(new Assignment(type, getPreName(c), getPreName(val)));
+				}
 			}
 		}
 		// init fields
@@ -655,7 +703,7 @@ public class TestCaseGenerator {
 				if (o.getName().equals("#o0")) {
 					continue;
 				}
-				final String receiverObject = o.getName().replace("#", "_");
+				final String receiverObject = createObjectName(o);
 				for (final String f : o.getFieldvalues().keySet()) {
 					if (f.contains("<") || f.contains(">")) {
 						continue;
@@ -670,6 +718,16 @@ public class TestCaseGenerator {
 					final String rcObjType = getSafeType(o.getSort());
 					assignments
 					        .add(new Assignment(new RefEx(rcObjType,receiverObject,vType,fieldName), val));
+					
+					if(junitFormat && prestate.contains(o)){
+						//if value that is pointed to is object and in prestate then use prestate object
+						if(!vType.equals("int") && !vType.equals("boolean") && contains(prestate, val)){
+							val = getPreName(val);
+						}					
+						assignments
+				        .add(new Assignment(new RefEx(rcObjType,getPreName(receiverObject),vType,fieldName), val));
+					}
+					
 				}
 				if (o.getSort() != null
 				        && o.getSort().name().toString().endsWith("[]")) {
@@ -684,6 +742,12 @@ public class TestCaseGenerator {
 						val = translateValueExpression(val);
 						assignments.add(new Assignment(receiverObject + fieldName, val));
 						//assignments.add(new Assignment("",new RefArrayEx("","",name,""+i), val));
+						
+						if(junitFormat && prestate.contains(o)){
+							assignments.add(new Assignment(getPreName(receiverObject) + fieldName, val));
+						}
+						
+						
 					}
 				}
 			}
@@ -704,6 +768,12 @@ public class TestCaseGenerator {
 				
 		
 		return result.toString();
+	}
+	private String getPreName(String val) {
+		return OracleGenerator.PRE_STRING+val;
+	}
+	private String createObjectName(final ObjectVal o) {
+		return o.getName().replace("#", "_");
 	}
 	
 	private String getTypeOfValue(Heap heap, Model m, String val){

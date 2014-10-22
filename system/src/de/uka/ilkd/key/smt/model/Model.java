@@ -73,6 +73,8 @@ public class Model {
 	
 	
 	
+	
+	
 
 	public boolean isEmpty() {
 		return empty;
@@ -572,7 +574,7 @@ public class Model {
 		Set<ObjectVal> result = new HashSet<ObjectVal>();
 		
 		String[] l = location.split("\\.");
-		
+		System.out.println("location: "+location);
 		String objName = l[0];
 		String nullString = "#o0";
 		
@@ -585,8 +587,15 @@ public class Model {
 		ObjectVal o = getObject(constants.get(objName), heap);
 		int i = 1;
 		while(!o.equals(nullString) && i < l.length){			
-			result.add(o);			
-			o = getObject(o.get(l[i]), heap);
+			result.add(o);
+			System.out.println(o.getName()+"."+l[i]);
+			String pointed = o.getFieldUsingSimpleName(l[i]);
+			if(pointed == null){
+				break;
+			}
+			
+			
+			o = getObject(pointed, heap);
 			i++;			
 		}
 		
@@ -699,7 +708,7 @@ public class Model {
 	}
 	
 	public ObjectVal getObject(String name, Heap heap){
-		
+		//System.out.println(name+"@"+heap.getName());
 		for(ObjectVal o : heap.getObjects()){
 			
 			if(o.getName().startsWith(name)){
