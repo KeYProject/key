@@ -34,16 +34,6 @@ import org.key_project.sed.core.model.memory.SEDMemoryLoopStatement;
  * @author Martin Hentschel
  * @see ISEDDebugNode
  */
-public interface ISEDLoopStatement extends ISEDDebugNode, IStackFrame {
-   /**
-    * Checks if this {@link ISEDMethodCall} is collapsed.
-    * @return {@code true} collapsed, {@code false} expanded (default state).
-    */
-   public boolean isCollapsed();
-   
-   /**
-    * Defines if this {@link ISEDMethodCall} is collapsed.
-    * @param collapsed {@code true} collapsed, {@code false} expanded (default state).
-    */
-   public void setCollapsed(boolean collapsed);
+public interface ISEDLoopStatement extends ISEDDebugNode, IStackFrame, ISEDGroupable {
+
 }

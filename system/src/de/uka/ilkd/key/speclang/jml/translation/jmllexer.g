@@ -94,6 +94,7 @@ INDEX : "\\index";
 INTO : "\\into";
 INV : "\\inv";
 INVARIANT_FOR : "\\invariant_for";
+STATIC_INVARIANT_FOR : "\\static_invariant_for";
 IS_INITIALIZED : "\\is_initialized";
 LARROW : "<-";
 LBLNEG : "\\lblneg";

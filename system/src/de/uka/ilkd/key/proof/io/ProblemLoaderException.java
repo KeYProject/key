@@ -19,24 +19,24 @@ extends RuntimeException // to have it passed through the parser (without adding
 {
 
     private static final long serialVersionUID = -3012196004988313969L;
-    private DefaultProblemLoader origin;
+    private AbstractProblemLoader origin;
 
-    public ProblemLoaderException(DefaultProblemLoader origin, Throwable cause) {
+    public ProblemLoaderException(AbstractProblemLoader origin, Throwable cause) {
         super(cause.getMessage(), cause);
         this.origin = origin;
     }
 
-    public ProblemLoaderException(DefaultProblemLoader origin, String msg, Throwable cause) {
+    public ProblemLoaderException(AbstractProblemLoader origin, String msg, Throwable cause) {
         super(msg, cause);
         this.origin = origin;
     }
     
-    public ProblemLoaderException(DefaultProblemLoader origin, String msg) {
+    public ProblemLoaderException(AbstractProblemLoader origin, String msg) {
         super(msg);
         this.origin = origin;
     }
 
-    public DefaultProblemLoader getOrigin() {
+    public AbstractProblemLoader getOrigin() {
         return origin;
     }
     

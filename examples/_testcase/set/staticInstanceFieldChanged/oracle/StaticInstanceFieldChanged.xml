@@ -58,6 +58,22 @@
                      </value>
                   </variable>
                </termination>
+               <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                  <value name="self {true}" typeString="StaticInstanceFieldChanged" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  </value>
+               </callStateVariable>
+               <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </callStateVariable>
+               <callStateVariable name="heapBefore_magic" arrayIndex="-1" isArrayIndex="false">
+                  <value name="heapBefore_magic {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </callStateVariable>
+               <callStateVariable name="savedHeapBefore_magic" arrayIndex="-1" isArrayIndex="false">
+                  <value name="savedHeapBefore_magic {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </callStateVariable>
             </exceptionalMethodReturn>
          </branchCondition>
          <branchCondition name="not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null))" pathCondition="not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null))" pathConditionChanged="true" branchCondition="not(equals(StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -284,6 +300,22 @@
                                        </value>
                                     </variable>
                                  </termination>
+                                 <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="self {true}" typeString="StaticInstanceFieldChanged" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </callStateVariable>
+                                 <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </callStateVariable>
+                                 <callStateVariable name="heapBefore_magic" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="heapBefore_magic {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </callStateVariable>
+                                 <callStateVariable name="savedHeapBefore_magic" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="savedHeapBefore_magic {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </callStateVariable>
                               </methodReturn>
                            </statement>
                         </branchCondition>
@@ -355,10 +387,54 @@
                                     </value>
                                  </variable>
                               </termination>
+                              <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="self {true}" typeString="StaticInstanceFieldChanged" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </callStateVariable>
+                              <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </callStateVariable>
+                              <callStateVariable name="heapBefore_magic" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="heapBefore_magic {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </callStateVariable>
+                              <callStateVariable name="savedHeapBefore_magic" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="savedHeapBefore_magic {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </callStateVariable>
                            </exceptionalMethodReturn>
                         </branchCondition>
                      </statement>
                   </statement>
+                  <callStateVariable name="d_1" arrayIndex="-1" isArrayIndex="false">
+                     <value name="d_1 {true}" typeString="StaticInstanceFieldChanged.DirectValue" valueString="d_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                           <value name="value {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="n_1" arrayIndex="-1" isArrayIndex="false">
+                     <value name="n_1 {true}" typeString="StaticInstanceFieldChanged.NextValue" valueString="StaticInstanceFieldChanged.NextValue::select(heap,null,StaticInstanceFieldChanged::$nextInstance)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="dvalue" arrayIndex="-1" isArrayIndex="false">
+                           <value name="dvalue {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="heapBefore_&lt;init&gt;" arrayIndex="-1" isArrayIndex="false">
+                     <value name="heapBefore_&lt;init&gt; {true}" typeString="Heap" valueString="store(store(create(heap,d_3),d_3,java.lang.Object::&lt;initialized&gt;,FALSE),d_3,StaticInstanceFieldChanged.DirectValue::$value,Z(0(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="savedHeapBefore_&lt;init&gt;" arrayIndex="-1" isArrayIndex="false">
+                     <value name="savedHeapBefore_&lt;init&gt; {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
                </methodReturn>
                <methodReturnEntry path="/0/0/1/0/0"/>
             </methodCall>

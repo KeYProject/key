@@ -97,11 +97,6 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
     * @return The available {@link IExecutionConstraint}s.
     */
    public IExecutionConstraint[] getConstraints();
-   /**
-    * Returns the {@link PosInOccurrence} of the modality of interest including updates.
-    * @return The {@link PosInOccurrence} of the modality of interest including updates.
-    */
-   public PosInOccurrence getModalityPIO();
    
    /**
     * Returns the active statement which is executed in the code.
@@ -120,6 +115,13 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
     * @return The variable value pairs.
     */
    public IExecutionVariable[] getVariables();
+   
+   /**
+    * Returns the variable value pairs of the current state under the given condition.
+    * @param condition A {@link Term} specifying some additional constraints to consider.
+    * @return The variable value pairs.
+    */
+   public IExecutionVariable[] getVariables(Term condition);
    
    /**
     * Returns the number of memory layouts.
@@ -152,4 +154,24 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
     * @throws ProofInputException Occurred Exception.
     */
    public ISymbolicLayout getCurrentLayout(int layoutIndex) throws ProofInputException;
+   
+   /**
+    * Returns all code blocks completed by this {@link IExecutionNode}.
+    * @return All code blocks completed by this {@link IExecutionNode}.
+    */
+   public ImmutableList<IExecutionNode<?>> getCompletedBlocks() throws ProofInputException;
+   
+   /**
+    * Returns the condition under which this node completes the code block of the given {@link IExecutionNode}.
+    * @param completedNode The completed {@link IExecutionNode} for which the condition is requested.
+    * @return The condition under which this node completes the code block of the given {@link IExecutionNode}.
+    */
+   public Term getBlockCompletionCondition(IExecutionNode<?> completedNode) throws ProofInputException;
+   
+   /**
+    * Returns the human readable condition under which this node completes the code block of the given {@link IExecutionNode}.
+    * @param completedNode The completed {@link IExecutionNode} for which the condition is requested.
+    * @return The human readable condition under which this node completes the code block of the given {@link IExecutionNode}.
+    */
+   public String getFormatedBlockCompletionCondition(IExecutionNode<?> completedNode) throws ProofInputException;
 }

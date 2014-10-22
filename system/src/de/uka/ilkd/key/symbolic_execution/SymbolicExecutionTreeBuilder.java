@@ -48,6 +48,7 @@ import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
@@ -63,6 +64,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
+import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionBlockStartNode;
+import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchStatement;
@@ -83,6 +86,7 @@ import de.uka.ilkd.key.symbolic_execution.util.DefaultEntry;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.NodePreorderIterator;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * <p>
@@ -152,7 +156,7 @@ public class SymbolicExecutionTreeBuilder {
    /**
     * The used mediator during proof.
     */
-   private KeYMediator mediator;
+   private final KeYMediator mediator;
    
    /**
     * The {@link Proof} from which the symbolic execution tree is extracted.
@@ -193,6 +197,12 @@ public class SymbolicExecutionTreeBuilder {
     * As key is {@link SymbolicExecutionTermLabel#getId()} used.
     */
    private Map<Integer, Map<Node, ImmutableList<Node>>> methodCallStackMap = new LinkedHashMap<Integer, Map<Node, ImmutableList<Node>>>();
+   
+   /**
+    * Contains the possible statements after a code block of interest for each tracked symbolic execution modality.
+    * As key is {@link SymbolicExecutionTermLabel#getId()} used.
+    */
+   private Map<Integer, Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>>> afterBlockMap = new LinkedHashMap<Integer, Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>>>();
 
    /**
     * Contains {@link Node}s of method calls which return statements should be ignored. 
@@ -410,6 +420,10 @@ public class SymbolicExecutionTreeBuilder {
          methodCallStackMap.clear();
          methodCallStackMap = null;
       }
+      if (afterBlockMap != null) {
+         afterBlockMap.clear();
+         afterBlockMap = null;
+      }
       if (methodReturnsToIgnoreMap != null) {
          methodReturnsToIgnoreMap.clear();
          methodReturnsToIgnoreMap = null;
@@ -609,6 +623,29 @@ public class SymbolicExecutionTreeBuilder {
          SourceElement statement = info.getActiveStatement();
          // Update call stack
          updateCallStack(node, statement);
+         // Update block map
+         RuleApp currentOrFutureRuleApplication = node.getAppliedRuleApp();
+         if (currentOrFutureRuleApplication == null && 
+             node != proof.root()) { // Executing peekNext() on the root crashes the tests for unknown reasons.
+            Goal goal = proof.getGoal(node);
+            if (goal != null) {
+               currentOrFutureRuleApplication = goal.getRuleAppManager().peekNext();
+            }
+         }
+         if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, currentOrFutureRuleApplication)) {
+            Map<JavaPair, ImmutableList<IExecutionNode<?>>> completedBlocks = updateAfterBlockMap(node, currentOrFutureRuleApplication);
+            if (completedBlocks != null) {
+               for (Entry<JavaPair, ImmutableList<IExecutionNode<?>>> entry : completedBlocks.entrySet()) {
+                  for (IExecutionNode<?> entryNode : entry.getValue()) {
+                     if (entryNode != parentToAddTo) { // Ignore empty blocks
+                        if (entryNode instanceof AbstractExecutionBlockStartNode<?>) {
+                           ((AbstractExecutionBlockStartNode<?>) entryNode).addBlockCompletion(parentToAddTo);
+                        }
+                     }
+                  }
+               }
+            }
+         }
          // Check if the node is already contained in the symbolic execution tree
          AbstractExecutionNode<?> executionNode = keyNodeMapping.get(node);
          if (executionNode == null) {
@@ -634,6 +671,8 @@ public class SymbolicExecutionTreeBuilder {
                   keyNodeLoopConditionMapping.put(node, condition);
                   // Set call stack on new created node
                   condition.setCallStack(createCallStack(node));
+                  Pair<Integer, SourceElement> secondPair = SymbolicExecutionUtil.computeSecondStatement(node.getAppliedRuleApp());
+                  addToBlockMap(node, condition, secondPair.first, secondPair.second, statement);
                }
                parentToAddTo = condition;
             }
@@ -641,7 +680,7 @@ public class SymbolicExecutionTreeBuilder {
       }
       return parentToAddTo;
    }
-   
+
    protected boolean shouldPrune(Node node) {
       if (isUninterpretedPredicateUsed) {
          return node.isClosed();
@@ -740,30 +779,30 @@ public class SymbolicExecutionTreeBuilder {
                }
             }
             else if (SymbolicExecutionUtil.isBranchStatement(node, node.getAppliedRuleApp(), statement, posInfo)) {
-               if (isNotInImpliciteMethod(node)) {
+               if (isNotInImplicitMethod(node)) {
                   result = new ExecutionBranchStatement(settings, mediator, node);
+                  addToBlockMap(node, (ExecutionBranchStatement)result);
                }
             }
             else if (SymbolicExecutionUtil.isLoopStatement(node, node.getAppliedRuleApp(), statement, posInfo)) {
-               if (isNotInImpliciteMethod(node)) {
-                  if (SymbolicExecutionUtil.isFirstLoopIteration(node, node.getAppliedRuleApp(), statement)) {
-                     result = new ExecutionLoopStatement(settings, mediator, node);
-                  }
+               if (isNotInImplicitMethod(node)) {
+                  result = new ExecutionLoopStatement(settings, mediator, node);
+                  addToBlockMap(node, (ExecutionLoopStatement)result);
                }
             }
             else if (SymbolicExecutionUtil.isStatementNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
-               if (isNotInImpliciteMethod(node)) {
+               if (isNotInImplicitMethod(node)) {
                   result = new ExecutionStatement(settings, mediator, node);
                }
             }
          }
          else if (SymbolicExecutionUtil.isOperationContract(node, node.getAppliedRuleApp())) {
-            if (isNotInImpliciteMethod(node)) {
+            if (isNotInImplicitMethod(node)) {
                result = new ExecutionOperationContract(settings, mediator, node);
             }
          }
          else if (SymbolicExecutionUtil.isLoopInvariant(node, node.getAppliedRuleApp())) {
-            if (isNotInImpliciteMethod(node)) {
+            if (isNotInImplicitMethod(node)) {
                result = new ExecutionLoopInvariant(settings, mediator, node);
                // Initialize new call stack of the preserves loop invariant branch
                initNewLoopBodyMethodCallStack(node);
@@ -777,10 +816,268 @@ public class SymbolicExecutionTreeBuilder {
       return result;
    }
    
-   protected AbstractExecutionNode<?> createMehtodReturn(AbstractExecutionNode<?> parent,
-                                                         Node node, 
-                                                         SourceElement statement) {
-      AbstractExecutionNode<?> result = null;
+   /**
+    * Adds the given {@link AbstractExecutionNode} add reason for a new block to the block maps.
+    * @param node The current {@link Node}.
+    * @param blockStartNode The {@link AbstractExecutionNode} to add.
+    */
+   protected void addToBlockMap(Node node, AbstractExecutionBlockStartNode<?> blockStartNode) {
+      Pair<Integer, SourceElement> secondPair = SymbolicExecutionUtil.computeSecondStatement(node.getAppliedRuleApp());
+      addToBlockMap(node, blockStartNode, secondPair.first, secondPair.second);
+   }
+   
+   /**
+    * Adds the given {@link AbstractExecutionNode} add reason for a new block to the block maps.
+    * @param node The current {@link Node}.
+    * @param blockStartNode The {@link AbstractExecutionNode} to add.
+    * @param secondPair The next element to end at.
+    * @return {@code false} block is definitively not opened, {@code true} block is or might be opened.
+    */
+   protected void addToBlockMap(Node node, AbstractExecutionBlockStartNode<?> blockStartNode, int stackSize, SourceElement... sourceElements) {
+      boolean blockPossible = checkBlockPossibility(node, stackSize, sourceElements);
+      if (blockPossible) {
+         if (sourceElements != null && sourceElements.length >= 1) {
+            SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(node.getAppliedRuleApp());
+            // Find most recent map
+            Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>> afterBlockMaps = getAfterBlockMaps(label);
+            Map<JavaPair, ImmutableList<IExecutionNode<?>>> afterBlockMap = findAfterBlockMap(afterBlockMaps, node);
+            if (afterBlockMap == null) {
+               afterBlockMap = new LinkedHashMap<JavaPair, ImmutableList<IExecutionNode<?>>>();
+            }
+            else {
+               afterBlockMap = new LinkedHashMap<JavaPair, ImmutableList<IExecutionNode<?>>>(afterBlockMap);
+            }
+            afterBlockMaps.put(node, afterBlockMap);
+            JavaPair secondPair = new JavaPair(stackSize, ImmutableSLList.<SourceElement>nil().append(sourceElements));
+            ImmutableList<IExecutionNode<?>> blockStartList = afterBlockMap.get(secondPair);
+            if (blockStartList == null) {
+               blockStartList = ImmutableSLList.nil();
+            }
+            blockStartList = blockStartList.append(blockStartNode);
+            afterBlockMap.put(secondPair, blockStartList);
+         }
+      }
+      blockStartNode.setBlockOpened(blockPossible);
+   }
+   
+   /**
+    * Checks if it possible that the current {@link Node} opens a block.
+    * @param node The current {@link Node}.
+    * @param expectedStackSize The expected stack size.
+    * @param expectedSourceElements The expected after block {@link SourceElement}s.
+    * @return {@code false} A block is definitively not possible, {@code true} a block is or might be possible. 
+    */
+   private boolean checkBlockPossibility(Node node, 
+                                         int expectedStackSize, 
+                                         SourceElement... expectedSourceElements) {
+      if (node != null && expectedSourceElements != null && expectedSourceElements.length >= 1) {
+         RuleApp ruleApp = null;
+         boolean seNodeFound = false;
+         // Find single symbolic execution child node
+         while (!seNodeFound && node != null) {
+            // Select new child node
+            if (node.childrenCount() > 1) {
+               int i = 0;
+               int openChildCount = 0;
+               Node nextNode = null;
+               while (i < node.childrenCount()) {
+                  Node child = node.child(i);
+                  if (!child.isClosed()) {
+                     openChildCount++;
+                     nextNode = child;
+                  }
+                  i++;
+               }
+               if (openChildCount == 1) {
+                  node = nextNode;
+               }
+               else {
+                  node = null; // Stop search because multiple open branches indicate that a block is required.
+               }
+            }
+            else if (node.childrenCount() == 1) {
+               node = node.child(0);
+            }
+            else {
+               node = null;
+            }
+            // Check selected child
+            if (node != null) {
+               if (node.childrenCount() == 0) {
+                  Goal goal = proof.getGoal(node);
+                  ruleApp = goal.getRuleAppManager().peekNext();
+               }
+               else {
+                  ruleApp = node.getAppliedRuleApp();
+               }
+               seNodeFound = SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp);
+            }
+         }
+         // If SE node is found check if the after block state is reached.
+         if (seNodeFound) {
+            int currentStackSize = SymbolicExecutionUtil.computeStackSize(ruleApp);
+            SourceElement currentActiveStatement = NodeInfo.computeActiveStatement(ruleApp);
+            JavaBlock currentJavaBlock = ruleApp.posInOccurrence().subTerm().javaBlock();
+            MethodFrame currentInnerMostMethodFrame = JavaTools.getInnermostMethodFrame(currentJavaBlock, proof.getServices());
+            return !isAfterBlockReached(currentStackSize, currentInnerMostMethodFrame, currentActiveStatement, expectedStackSize, ImmutableSLList.<SourceElement>nil().append(expectedSourceElements).iterator());
+         }
+         else {
+            return true; // No single SE node reached, so allow blocks
+         }
+      }
+      else {
+         return true; // Don't know, so allow blocks
+      }
+   }
+   
+   /**
+    * Searches the relevant after block {@link Map} in the given once for the given {@link Node}.
+    * @param afterBlockMaps The available after sblock {@link Map}s.
+    * @param node The {@link Node} for which the block {@link Map} is requested.
+    * @return The found after block {@link Map} or {@code null} if not available.
+    */
+   protected Map<JavaPair, ImmutableList<IExecutionNode<?>>> findAfterBlockMap(Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>> afterBlockMaps, Node node) {
+      if (afterBlockMaps != null) {
+         Map<JavaPair, ImmutableList<IExecutionNode<?>>> result = null;
+         while (result == null && node != null) {
+            result = afterBlockMaps.get(node);
+            node = node.parent();
+         }
+         return result;
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Returns the after block map. If not already
+    * available an empty block map is created.
+    * @param label The {@link SymbolicExecutionTermLabel} which provides the ID.
+    * @return The after block map of the ID of the given {@link SymbolicExecutionTermLabel}.
+    */
+   protected Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>> getAfterBlockMaps(SymbolicExecutionTermLabel label) {
+      assert label != null : "No symbolic execuion term label provided";
+      return getAfterBlockMaps(label.getId());
+   }
+
+   /**
+    * Returns the after block map used for the given ID. If not already
+    * available an empty block map is created.
+    * @param id The ID.
+    * @return The after block map of the given ID.
+    */
+   protected Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>> getAfterBlockMaps(int id) {
+      synchronized (afterBlockMap) {
+         Integer key = Integer.valueOf(id);
+         Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>> result = afterBlockMap.get(key);
+         if (result == null) {
+            result = new LinkedHashMap<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>>();
+            afterBlockMap.put(key, result);
+         }
+         return result;
+      }
+   }
+   
+   /**
+    * Updates the after block maps when a symbolic execution tree node is detected.
+    * @param node The {@link Node} which is a symbolic execution tree node.
+    * @param ruleApp The {@link RuleApp} to consider.
+    * @return The now completed blocks.
+    */
+   protected Map<JavaPair, ImmutableList<IExecutionNode<?>>> updateAfterBlockMap(Node node, RuleApp ruleApp) {
+      Map<JavaPair, ImmutableList<IExecutionNode<?>>> completedBlocks = new LinkedHashMap<JavaPair, ImmutableList<IExecutionNode<?>>>();
+      SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(ruleApp);
+      if (label != null) {
+         // Find most recent map
+         Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>> afterBlockMaps = getAfterBlockMaps(label);
+         Map<JavaPair, ImmutableList<IExecutionNode<?>>> oldBlockMap = findAfterBlockMap(afterBlockMaps, node);
+         if (oldBlockMap != null) {
+            // Compute stack and active statement
+            int stackSize = SymbolicExecutionUtil.computeStackSize(ruleApp);
+            SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
+            JavaBlock javaBlock = ruleApp.posInOccurrence().subTerm().javaBlock();
+            MethodFrame innerMostMethodFrame = JavaTools.getInnermostMethodFrame(javaBlock, proof.getServices());
+            // Create copy with values below level
+            Map<JavaPair, ImmutableList<IExecutionNode<?>>> newBlockMap = new LinkedHashMap<JavaPair, ImmutableList<IExecutionNode<?>>>();
+            if (oldBlockMap != null) {
+               for (Entry<JavaPair, ImmutableList<IExecutionNode<?>>> entry : oldBlockMap.entrySet()) {
+                  boolean done = isAfterBlockReached(stackSize, innerMostMethodFrame, activeStatement, entry.getKey());
+                  if (done) {
+                     completedBlocks.put(entry.getKey(), entry.getValue());
+                  }
+                  else {
+                     newBlockMap.put(entry.getKey(), entry.getValue());
+                  }
+               }
+            }
+            // Add new block
+            afterBlockMaps.put(node, newBlockMap);
+         }
+      }
+      return completedBlocks;
+   }
+   
+   /**
+    * Checks if the after block condition is fulfilled.
+    * @param currentStackSize The current stack size.
+    * @param currentInnerMostMethodFrame The current inner most {@link MethodFrame}.
+    * @param currentActiveStatement The current active statement.
+    * @param expectedPair The {@link JavaPair} specifying the after block statements.
+    * @return {@code true} after block is reached, {@code false} after block is not reached.
+    */
+   protected boolean isAfterBlockReached(int currentStackSize, 
+                                         MethodFrame currentInnerMostMethodFrame, 
+                                         SourceElement currentActiveStatement, 
+                                         JavaPair expectedPair) {
+      return isAfterBlockReached(currentStackSize, currentInnerMostMethodFrame, currentActiveStatement, expectedPair.first, expectedPair.second.iterator());
+   }
+   
+   /**
+    * Checks if the after block condition is fulfilled.
+    * @param currentStackSize The current stack size.
+    * @param currentInnerMostMethodFrame The current inner most {@link MethodFrame}.
+    * @param currentActiveStatement The current active statement.
+    * @param expectedStackSize The expected stack size.
+    * @param expectedStatementsIterator An {@link Iterator} with the expected after block statements.
+    * @return {@code true} after block is reached, {@code false} after block is not reached.
+    */
+   protected boolean isAfterBlockReached(int currentStackSize, 
+                                         MethodFrame currentInnerMostMethodFrame, 
+                                         SourceElement currentActiveStatement, 
+                                         int expectedStackSize,
+                                         Iterator<SourceElement> expectedStatementsIterator) {
+      boolean done = false;
+      if (expectedStackSize > currentStackSize) {
+         done = true;
+      }
+      else {
+         while (!done && expectedStatementsIterator.hasNext()) {
+            SourceElement next = expectedStatementsIterator.next();
+            if (SymbolicExecutionUtil.equalsWithPosition(next, currentActiveStatement)) { // Comparison by == is not possible since loops are recreated
+               done = true;
+            }
+            else if (expectedStackSize == currentStackSize &&
+                     (currentInnerMostMethodFrame != null && currentInnerMostMethodFrame.getBody().isEmpty() ||
+                      (next != null && !SymbolicExecutionUtil.containsStatement(currentInnerMostMethodFrame, next, proof.getServices())))) {
+               done = true;
+            }
+         }
+      }
+      return done;
+   }
+   
+   /**
+    * Creates an method return node.
+    * @param parent The parent {@link AbstractExecutionNode}.
+    * @param node The {@link Node} which represents a method return.
+    * @param statement The currently active {@link SourceElement}.
+    * @return The created {@link AbstractExecutionMethodReturn}.
+    */
+   protected AbstractExecutionMethodReturn<?> createMehtodReturn(AbstractExecutionNode<?> parent,
+                                                                 Node node, 
+                                                                 SourceElement statement) {
+      AbstractExecutionMethodReturn<?> result = null;
       if (SymbolicExecutionUtil.hasSymbolicExecutionLabel(node.getAppliedRuleApp())) {
          if (statement != null && !SymbolicExecutionUtil.isRuleAppToIgnore(node.getAppliedRuleApp())) {
             boolean methodReturn = SymbolicExecutionUtil.isMethodReturnNode(node, node.getAppliedRuleApp());
@@ -810,13 +1107,18 @@ public class SymbolicExecutionTreeBuilder {
       return result;
    }
    
-   protected boolean isNotInImpliciteMethod(Node node) {
+   /**
+    * Checks if the given {@link Node} is not in an implicit method.
+    * @param node The {@link Node} to check.
+    * @return {@code true} is not implicit, {@code false} is implicit 
+    */
+   protected boolean isNotInImplicitMethod(Node node) {
       Term term = node.getAppliedRuleApp().posInOccurrence().subTerm();
       term = TermBuilder.goBelowUpdates(term);
       Services services = proof.getServices();
       IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(), services);
       IProgramMethod pm = ec.getMethodContext();
-      return SymbolicExecutionUtil.isNotImplicite(services, pm);
+      return SymbolicExecutionUtil.isNotImplicit(services, pm);
    }
    
    /**
@@ -1037,5 +1339,55 @@ public class SymbolicExecutionTreeBuilder {
       Properties poPropertiesToForce = new Properties();
       poPropertiesToForce.setProperty(IPersistablePO.PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL, true + "");
       return poPropertiesToForce;
+   }
+   
+   /**
+    * Utility class to  group a call stack size with an {@link ImmutableList} of {@link SourceElement} with the elements of interest.
+    * @author Martin Hentschel
+    */
+   protected static class JavaPair extends Pair<Integer, ImmutableList<SourceElement>> {
+      /**
+       * Constructor.
+       * @param stackSize The call stack size.
+       * @param elementsOfInterest The {@link SourceElement}s of interest.
+       */
+      public JavaPair(Integer stackSize, ImmutableList<SourceElement> elementsOfInterest) {
+         super(stackSize, elementsOfInterest);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean equals(Object o) {
+         if (super.equals(o)) {
+            if (o instanceof JavaPair) {
+               JavaPair other = (JavaPair) o;
+               if (second.size() == other.second.size()) {
+                  Iterator<SourceElement> iter = second.iterator();
+                  Iterator<SourceElement> otherIter = other.second.iterator();
+                  boolean equals = true;
+                  while (equals && iter.hasNext()) {
+                     SourceElement next = iter.next();
+                     SourceElement otherNext = otherIter.next();
+                     if (!SymbolicExecutionUtil.equalsWithPosition(next, otherNext)) { // Comparison by == is not possible since loops are recreated
+                        equals = false;
+                     }
+                  }
+                  assert !otherIter.hasNext();
+                  return equals;
+               }
+               else {
+                  return false;
+               }
+            }
+            else {
+               return false;
+            }
+         }
+         else {
+            return false;
+         }
+      }
    }
 }

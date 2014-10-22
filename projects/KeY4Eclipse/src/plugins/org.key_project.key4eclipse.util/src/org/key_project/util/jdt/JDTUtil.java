@@ -539,6 +539,103 @@ public class JDTUtil {
    }
    
    /**
+    * Returns the {@link IResource}s in the workspace of all used
+    * source entries in the java build path of the given project.
+    * @param project The given Project.
+    * @return The found source {@link IResource}s in the workspace.
+    * @throws JavaModelException Occurred Exception.
+    */
+   public static List<IResource> getSourceResources(IProject project) throws JavaModelException {
+       return getSourceResources(project, new HashSet<IProject>());
+   }
+   
+   /**
+    * Internal helper method that is used in {@link #getSourceResources(IProject)}
+    * to compute the source path. It is required to solve cycles in project dependencies.
+    * @param project The given Project.
+    * @param alreadyHandledProjects The already handled {@link IProject} that don't need to be analysed again.
+    * @return The found source {@link IResource}s in the workspace.
+    * @throws JavaModelException Occurred Exception.
+    */    
+   private static List<IResource> getSourceResources(IProject project, Set<IProject> alreadyHandledProjects) throws JavaModelException {
+       List<IResource> result = new LinkedList<IResource>();
+       if (project != null) {
+           Assert.isNotNull(alreadyHandledProjects);
+           alreadyHandledProjects.add(project);
+           IJavaProject javaProject = getJavaProject(project);
+           if (javaProject != null && javaProject.exists()) {
+               IClasspathEntry[] entries = javaProject.getRawClasspath();
+               for (IClasspathEntry entry : entries) {
+                   if (entry.getContentKind() == IPackageFragmentRoot.K_SOURCE) {
+                       List<IResource> location = getResourceFor(javaProject, entry, IPackageFragmentRoot.K_SOURCE, alreadyHandledProjects);
+                       if (location != null) {
+                           result.addAll(location);
+                       }
+                   }
+               }
+           }
+       }
+       return result;
+   }
+   
+   /**
+    * Returns the {@link IResource}s of the given {@link IClasspathEntry}.
+    * @param javaProject The actual {@link IJavaProject} that provides the {@link IClasspathEntry}.
+    * @param entry The given {@link IClasspathEntry}.
+    * @param alreadyHandledProjects The already handled {@link IProject} that don't need to be analysed again.
+    * @return The found {@link IResource}s.
+    * @throws JavaModelException 
+    */
+   private static List<IResource> getResourceFor(IJavaProject javaProject, 
+                                                 IClasspathEntry entry,
+                                                 int expectedKind,
+                                                 Set<IProject> alreadyHandledProjects) throws JavaModelException {
+       if (entry != null) {
+           if (entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER ||
+               entry.getEntryKind() == IClasspathEntry.CPE_SOURCE ||
+               entry.getEntryKind() == IClasspathEntry.CPE_LIBRARY ||
+               entry.getEntryKind() == IClasspathEntry.CPE_VARIABLE) {
+               List<IResource> result = new LinkedList<IResource>();
+               IPackageFragmentRoot[] roots = javaProject.findPackageFragmentRoots(entry);
+               for (IPackageFragmentRoot root : roots) {
+                   if (root.getKind() == expectedKind) {
+                       if (root.getResource() != null) {
+                           if (root.getResource().getLocationURI() != null) {
+                               result.add(root.getResource());
+                           }
+                       }
+                       else if (root.getPath() != null) {
+                           IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(root.getPath());
+                           if (resource != null && resource.exists()) {
+                               result.add(resource);
+                           }
+                       }
+                   }
+               }
+               return result; // Ignore containers
+           }
+           else if (entry.getEntryKind() == IClasspathEntry.CPE_PROJECT) {
+               Assert.isNotNull(entry.getPath());
+               IResource project = ResourcesPlugin.getWorkspace().getRoot().findMember(entry.getPath());
+               Assert.isTrue(project instanceof IProject);
+               if (!alreadyHandledProjects.contains(project)) {
+                   return getSourceResources((IProject)project, alreadyHandledProjects);
+               }
+               else {
+                   return null; // Project was already analyzed, no need to do it again.
+               }
+           }
+           else {
+               Assert.isTrue(false, "Unknown content kind \"" + entry.getContentKind() + "\" of class path entry \"" + entry + "\".");
+               return null;
+           }
+       }
+       else {
+           return null;
+       }
+   }
+   
+   /**
     * Returns the locations of the given {@link IClasspathEntry}.
     * @param javaProject The actual {@link IJavaProject} that provides the {@link IClasspathEntry}.
     * @param entry The given {@link IClasspathEntry}.

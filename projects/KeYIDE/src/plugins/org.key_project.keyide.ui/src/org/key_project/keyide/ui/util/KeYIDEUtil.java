@@ -83,7 +83,7 @@ public final class KeYIDEUtil {
            if (method != null && method.exists()) {
                // Load location
                final IProject project = method.getResource().getProject();
-               final File location = KeYUtil.getSourceLocation(project);
+               final File location = KeYResourceProperties.getSourceClassPathLocation(project);
                final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
                final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
                  

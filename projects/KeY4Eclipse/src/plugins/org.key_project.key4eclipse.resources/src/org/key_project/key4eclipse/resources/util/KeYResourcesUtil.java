@@ -62,14 +62,18 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.ClassTree;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * @author Stefan Käsdorf
@@ -121,25 +125,41 @@ public class KeYResourcesUtil {
       return false;
    }
    
-   
-   public static List<IFile> getUsedContractsProofElements(ProofElement pe, List<ProofElement> proofElements){
-      LinkedList<IFile> usedContracts = new LinkedList<IFile>();
+   /**
+    * Computes the used contracts and called methods.
+    * @param pe The {@link ProofElement}.
+    * @param proofElements The {@link List} of all available {@link ProofElement}s.
+    * @return A {@link Pair} of the used contracts and the called methods.
+    */
+   public static Pair<List<IFile>, List<String>> computeUsedProofElements(ProofElement pe, List<ProofElement> proofElements){
+      List<IFile> usedContracts = new LinkedList<IFile>();
+      List<String> calledMethods = new LinkedList<String>();
       HashSet<IProofReference<?>> proofReferences = pe.getProofReferences();
       if(proofReferences != null && !proofReferences.isEmpty()){
          for(IProofReference<?> proofRef : proofReferences){
             Object target = proofRef.getTarget();
-            if(IProofReference.USE_CONTRACT.equals(proofRef.getKind()) && target instanceof Contract){
+            if (IProofReference.USE_CONTRACT.equals(proofRef.getKind()) && target instanceof Contract){
                Contract contract = (Contract) target;
-               for(ProofElement proofElement : proofElements){
-                  if(contract.getName().equals(proofElement.getContract().getName())){
-                     usedContracts.add(proofElement.getProofFile());
-                     break;
+               ImmutableSet<Contract> contracts = pe.getSpecificationRepository().splitContract(contract);
+               for (Contract atomicContract : contracts) {
+                  for(ProofElement proofElement : proofElements){
+                     if(atomicContract.getName().equals(proofElement.getContract().getName())){
+                        usedContracts.add(proofElement.getProofFile());
+                        break;
+                     }
                   }
+               }
+            }
+            else if (IProofReference.CALL_METHOD.equals(proofRef.getKind())) {
+               if (target instanceof IProgramMethod) {
+                  IProgramMethod pm = (IProgramMethod) target;
+                  String displayName = ClassTree.getDisplayName(pe.getKeYEnvironment().getServices(), pm);
+                  calledMethods.add(pm.getContainerType().getFullName() + "#" + displayName);
                }
             }
          }
       }
-      return usedContracts;
+      return new Pair<List<IFile>, List<String>>(usedContracts, calledMethods);
    }
    
    

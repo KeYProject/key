@@ -4433,6 +4433,10 @@ oneJavaSource returns [String s = null]
      }
   |  
      SLASH { b.append("/"); }
+  |  
+     COLON {b.append(":");}
+  |
+     BACKSLASH {b.append("\\");}
   )+ {
     s = b.toString();
   }

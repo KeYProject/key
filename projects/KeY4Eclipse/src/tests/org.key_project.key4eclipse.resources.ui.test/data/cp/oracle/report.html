@@ -196,11 +196,151 @@ JavaCard:off (Sound if a Java program is proven.)
 <h1><a name="Assumptions">Assumptions</a></h1>
 Proofs are performed under the following assumptions still need to be proven:
 <ol>
+<li>
+Closed world assumption for the dynamic dispatch of the following method calls:
+<ol>
+<li>
+cl.CP#<createObject>()
+<ul>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/cl/CP.java/cl_CP[cl_CP__CP()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/cl/CP.java/cl_CP[cl_CP__CP()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+</ul>
+</li>
+<li>
+cl.CP#<allocate>()
+<ul>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/cl/CP.java/cl_CP[cl_CP__CP()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/cl/CP.java/cl_CP[cl_CP__CP()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+</ul>
+</li>
+<li>
+cl.CP#<prepareEnter>()
+<ul>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/cl/CP.java/cl_CP[cl_CP__CP()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/cl/CP.java/cl_CP[cl_CP__CP()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+</ul>
+</li>
+<li>
+java.lang.Object#<prepare>()
+<ul>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/cl/CP.java/cl_CP[cl_CP__CP()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/cl/CP.java/cl_CP[cl_CP__CP()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/cy/MR.java/cy_MR[cy_MR__MR()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/cy/MR.java/cy_MR[cy_MR__MR()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/op/OP.java/op_OP[op_OP__OP()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/op/OP.java/op_OP[op_OP__OP()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/ud/UD.java/ud_UD[ud_UD__UD()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/ud/UD.java/ud_UD[ud_UD__UD()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/us/US.java/us_US[us_US__US()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/us/US.java/us_US[us_US__US()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+</ul>
+</li>
+<li>
+java.lang.Object#<init>()
+<ul>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/cl/CP.java/cl_CP[cl_CP__CP()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/cl/CP.java/cl_CP[cl_CP__CP()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/cy/MR.java/cy_MR[cy_MR__MR()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/cy/MR.java/cy_MR[cy_MR__MR()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/op/OP.java/op_OP[op_OP__OP()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/op/OP.java/op_OP[op_OP__OP()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/ud/UD.java/ud_UD[ud_UD__UD()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/ud/UD.java/ud_UD[ud_UD__UD()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/us/US.java/us_US[us_US__US()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/us/US.java/us_US[us_US__US()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+</ul>
+</li>
+<li>
+cy.MR#<createObject>()
+<ul>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/cy/MR.java/cy_MR[cy_MR__MR()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/cy/MR.java/cy_MR[cy_MR__MR()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+</ul>
+</li>
+<li>
+cy.MR#<allocate>()
+<ul>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/cy/MR.java/cy_MR[cy_MR__MR()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/cy/MR.java/cy_MR[cy_MR__MR()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+</ul>
+</li>
+<li>
+cy.MR#<prepareEnter>()
+<ul>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/cy/MR.java/cy_MR[cy_MR__MR()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/cy/MR.java/cy_MR[cy_MR__MR()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+</ul>
+</li>
+<li>
+op.OP#<createObject>()
+<ul>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/op/OP.java/op_OP[op_OP__OP()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/op/OP.java/op_OP[op_OP__OP()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+</ul>
+</li>
+<li>
+op.OP#<allocate>()
+<ul>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/op/OP.java/op_OP[op_OP__OP()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/op/OP.java/op_OP[op_OP__OP()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+</ul>
+</li>
+<li>
+op.OP#<prepareEnter>()
+<ul>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/op/OP.java/op_OP[op_OP__OP()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/op/OP.java/op_OP[op_OP__OP()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+</ul>
+</li>
+<li>
+ud.UD#<createObject>()
+<ul>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/ud/UD.java/ud_UD[ud_UD__UD()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/ud/UD.java/ud_UD[ud_UD__UD()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+</ul>
+</li>
+<li>
+ud.UD#<allocate>()
+<ul>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/ud/UD.java/ud_UD[ud_UD__UD()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/ud/UD.java/ud_UD[ud_UD__UD()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+</ul>
+</li>
+<li>
+ud.UD#<prepareEnter>()
+<ul>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/ud/UD.java/ud_UD[ud_UD__UD()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/ud/UD.java/ud_UD[ud_UD__UD()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+</ul>
+</li>
+<li>
+us.US#<createObject>()
+<ul>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/us/US.java/us_US[us_US__US()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/us/US.java/us_US[us_US__US()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+</ul>
+</li>
+<li>
+us.US#<allocate>()
+<ul>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/us/US.java/us_US[us_US__US()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/us/US.java/us_US[us_US__US()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+</ul>
+</li>
+<li>
+us.US#<prepareEnter>()
+<ul>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/us/US.java/us_US[us_US__US()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testColorPriorization/proofs/us/US.java/us_US[us_US__US()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+</ul>
+</li>
+</ol>
+</li>
 <li>Methods are called in a state satisfying the precondition, assumed for:
 <ol>
 <li><a href="#UnspecifiedMethods">Unspecified methods</a></li>
 <li>Methods of used APIs</li>
-<li>Projects in which the source code will be used</li>
+<li>System in which the source code will be used</li>
 </ol>
 </li>
 <li><i>Source code is compiled using a correct Java compiler.</i></li>

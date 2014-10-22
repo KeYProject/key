@@ -1738,6 +1738,11 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 
 	}
 
+	|   STATIC_INVARIANT_FOR LPAREN typ=referencetype RPAREN
+	{
+	    result = translator.translate("\\static_invariant_for", SLExpression.class, services, typ);
+	}
+
     |   ( LPAREN LBLNEG ) => LPAREN lblneg:LBLNEG IDENT result=expression RPAREN
 	{
 	    addIgnoreWarning("\\lblneg",lblneg);

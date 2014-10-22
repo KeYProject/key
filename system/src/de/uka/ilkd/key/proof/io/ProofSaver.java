@@ -265,7 +265,7 @@ public class ProofSaver {
                    // add new relative path
                    final String absPath = tmp.substring(k,j);
                    final String relPath = tryToMakeFilenameRelative(absPath, basePath);
-                   relPathString = relPathString+" \"" + relPath +"\"";
+                   relPathString = relPathString+" \"" + escapeCharacters(relPath) +"\"";
                    i = j+1;
                }
                tmp2 = tmp2 + s + relPathString + ";";
