@@ -145,13 +145,15 @@ public abstract class AbstractUserInterface implements UserInterface {
                                      File bootClassPath,
                                      Properties poPropertiesToForce) throws ProblemLoaderException {
        AbstractProblemLoader loader = null;
+       ProblemLoaderException result = null;
        try {
           getMediator().stopInterface(true);
           loader = new SingleThreadProblemLoader(file, classPath, bootClassPath, profile, getMediator(), false, poPropertiesToForce);
           if (isSaveOnly()) {
+              // TODO: what is 'saveOnly' and why does the loader save?
               loader.saveAll();
           } else {
-              loader.load();
+              result = loader.load();
           }
           return loader;
        }

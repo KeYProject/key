@@ -100,7 +100,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
     */
    protected void reportException(final Throwable message) {
        if (message != null) {
-           getExceptionHandler().reportException(message);
+           getMediator().getUI().notify(new ExceptionFailureEvent(message.toString(),message));
        }
    }
 

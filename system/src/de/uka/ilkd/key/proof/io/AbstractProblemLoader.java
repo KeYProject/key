@@ -188,7 +188,7 @@ public abstract class AbstractProblemLoader {
      * @throws ProofInputException Occurred Exception.
      * @throws IOException Occurred Exception.
      */
-    public ProblemLoaderException load() throws ProblemLoaderException {
+    public ProblemLoaderException load() {
         // TODO: returns AND throws exceptions?
         try {
             // Read environment
