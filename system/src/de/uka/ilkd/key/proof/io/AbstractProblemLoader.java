@@ -188,7 +188,7 @@ public abstract class AbstractProblemLoader {
      * @throws ProofInputException Occurred Exception.
      * @throws IOException Occurred Exception.
      */
-    public ProblemLoaderException load() {
+    public ProblemLoaderException load() throws ProblemLoaderException {
         // TODO: returns AND throws exceptions?
         try {
             // Read environment
@@ -528,7 +528,7 @@ public abstract class AbstractProblemLoader {
         return proofList.getProof(poContainer.getProofNum());
     }
 
-    protected void replayProof(Proof proof) throws ProofInputException {
+    protected void replayProof(Proof proof) throws ProofInputException, ProblemLoaderException {
         mediator.setProof(proof);
 
         mediator.stopInterface(true); // first stop (above) is not enough
