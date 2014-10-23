@@ -191,6 +191,12 @@
                     id="org.key_project.sed.ui.groupEnds.tab"
                     label="Group Ends">
               </propertyTab>
+              <propertyTab
+                    afterTab="org.key_project.sed.ui.node.tab"
+                    category="Debug"
+                    id="org.key_project.sed.ui.callState.tab"
+                    label="Call State">
+              </propertyTab>
           </propertyTabs>
       </extension>
        
@@ -267,6 +273,12 @@
                     filter="org.key_project.sed.ui.property.GroupableStartTreeFilter"
                     id="org.key_project.sed.ui.property.GroupStartConditionsPropertySection"
                     tab="org.key_project.sed.ui.groupStarts.tab">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.property.CallStatePropertySection"
+                    filter="org.key_project.sed.ui.property.SEDBaseMethodReturnTreeFilter"
+                    id="org.key_project.sed.ui.property.CallStatePropertySection"
+                    tab="org.key_project.sed.ui.callState.tab">
               </propertySection>
           </propertySections>
       </extension>

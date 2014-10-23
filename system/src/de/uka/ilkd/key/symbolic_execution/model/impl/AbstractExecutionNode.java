@@ -70,6 +70,11 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
    private IExecutionVariable[] variables;
    
    /**
+    * The variable value pairs of the current state under given conditions.
+    */
+   private final Map<Term, IExecutionVariable[]> conditionalVariables = new HashMap<Term, IExecutionVariable[]>();
+   
+   /**
     * The used {@link ExecutionNodeSymbolicLayoutExtractor}.
     */
    private ExecutionNodeSymbolicLayoutExtractor layoutExtractor;
@@ -264,7 +269,34 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
     * called the first time.
     * @return The {@link IExecutionVariable}s of the current state.
     */
-   protected abstract IExecutionVariable[] lazyComputeVariables();
+   protected IExecutionVariable[] lazyComputeVariables() {
+      return SymbolicExecutionUtil.createExecutionVariables(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IExecutionVariable[] getVariables(Term condition) {
+      synchronized (this) {
+         IExecutionVariable[] result = conditionalVariables.get(condition);
+         if (result == null) {
+            result = lazyComputeVariables(condition);
+            conditionalVariables.put(condition, result);
+         }
+         return result;
+      }
+   }
+
+   /**
+    * Computes the variables lazily when {@link #getVariables(Term)} is 
+    * called the first time.
+    * @param condition A {@link Term} specifying some additional constraints to consider.
+    * @return The {@link IExecutionVariable}s of the current state under the given condition.
+    */
+   protected IExecutionVariable[] lazyComputeVariables(Term condition) {
+      return SymbolicExecutionUtil.createExecutionVariables(this, condition);
+   }
 
    /**
     * Returns the used {@link ExecutionNodeSymbolicLayoutExtractor}.

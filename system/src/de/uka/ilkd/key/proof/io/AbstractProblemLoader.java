@@ -60,20 +60,21 @@ import de.uka.ilkd.key.util.Pair;
 
 /**
  * <p>
- * This class provides the functionality to load something it KeY.
+ * This class provides the basic functionality to load something in KeY.
  * The loading process is done in the current {@link Thread} and
  * no user interaction is required.
  * </p>
  * <p>
- * The basic usage of this class is to instantiate a new {@link DefaultProblemLoader}
- * instance with should load the file configured by the constructor's arguments.
+ * The basic usage of this class is to instantiate a new 
+ * {@link SingleThreadProblemLoader} or {@link ProblemLoader}
+ * instance which should load the file configured by the constructor's arguments.
  * The next step is to call {@link #load()} which does the loading process and
  * tries to instantiate a proof and to apply rules again if possible. The result
  * of the loading process is available via the getter methods.
  * </p>
  * @author Martin Hentschel
  */
-public class DefaultProblemLoader {
+public abstract class AbstractProblemLoader {
     /**
      * The file or folder to load.
      */
@@ -152,6 +153,7 @@ public class DefaultProblemLoader {
         missedErrors = new HashMap<Integer, String>();
         missedErrors.put(KeYLexer.RPAREN, "closing parenthesis");
         missedErrors.put(KeYLexer.RBRACE, "closing brace");
+        missedErrors.put(KeYLexer.SEMI, "semicolon");
     }
 
     /**
@@ -163,13 +165,13 @@ public class DefaultProblemLoader {
      * @param mediator The {@link KeYMediator} to use.
      * @param askUiToSelectAProofObligationIfNotDefinedByLoadedFile {@code true} to call {@link UserInterface#selectProofObligation(InitConfig)} if no {@link Proof} is defined by the loaded proof or {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
      */
-    public DefaultProblemLoader(File file, 
-                    List<File> classPath, 
-                    File bootClassPath,
-                    Profile profileOfNewProofs, 
-                    KeYMediator mediator,
-                    boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
-                    Properties poPropertiesToForce) {
+    public AbstractProblemLoader(File file, 
+                                 List<File> classPath, 
+                                 File bootClassPath,
+                                 Profile profileOfNewProofs, 
+                                 KeYMediator mediator,
+                                 boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
+                                 Properties poPropertiesToForce) {
         assert mediator != null;
         this.file = file;
         this.classPath = classPath;

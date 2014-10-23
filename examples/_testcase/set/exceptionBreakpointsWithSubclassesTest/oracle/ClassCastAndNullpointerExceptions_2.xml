@@ -13,6 +13,7 @@
                   </statement>
                   <completedBlockEntry path="/0/0/0/0" conditionString="true"/>
                </branchCondition>
+               <blockCompletionEntry path="/"/>
                <blockCompletionEntry path="/0/0/0/0/1"/>
             </branchStatement>
          </branchCondition>

@@ -137,6 +137,30 @@
                               </value>
                            </variable>
                         </termination>
+                        <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                           <value name="self {true}" typeString="VariablesParameterAttributesChange" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="a" arrayIndex="-1" isArrayIndex="false">
+                           <value name="a {true}" typeString="int" valueString="a" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="b" arrayIndex="-1" isArrayIndex="false">
+                           <value name="b {true}" typeString="int" valueString="b" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="heapBefore_main" arrayIndex="-1" isArrayIndex="false">
+                           <value name="heapBefore_main {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="savedHeapBefore_main" arrayIndex="-1" isArrayIndex="false">
+                           <value name="savedHeapBefore_main {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </callStateVariable>
                      </methodReturn>
                   </statement>
                </statement>

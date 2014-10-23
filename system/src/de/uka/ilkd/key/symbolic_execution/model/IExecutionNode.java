@@ -97,11 +97,6 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
     * @return The available {@link IExecutionConstraint}s.
     */
    public IExecutionConstraint[] getConstraints();
-   /**
-    * Returns the {@link PosInOccurrence} of the modality of interest including updates.
-    * @return The {@link PosInOccurrence} of the modality of interest including updates.
-    */
-   public PosInOccurrence getModalityPIO();
    
    /**
     * Returns the active statement which is executed in the code.
@@ -120,6 +115,13 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
     * @return The variable value pairs.
     */
    public IExecutionVariable[] getVariables();
+   
+   /**
+    * Returns the variable value pairs of the current state under the given condition.
+    * @param condition A {@link Term} specifying some additional constraints to consider.
+    * @return The variable value pairs.
+    */
+   public IExecutionVariable[] getVariables(Term condition);
    
    /**
     * Returns the number of memory layouts.

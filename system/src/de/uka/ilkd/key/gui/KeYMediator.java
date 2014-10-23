@@ -944,6 +944,20 @@ public class KeYMediator {
         });
     }
 
+    /*
+     * Disable certain actions until a proof is loaded.
+     */
+    public void enableWhenProofLoaded(final javax.swing.AbstractButton a) {
+        a.setEnabled(getSelectedProof() != null);
+        addKeYSelectionListener(new KeYSelectionListener() {
+            public void selectedNodeChanged(KeYSelectionEvent e) {}
+            public void selectedProofChanged(KeYSelectionEvent e) {
+                a.setEnabled(
+                    e.getSource().getSelectedProof() != null);
+            }
+        });
+    }
+    
     /**
      * takes a notification event and informs the notification
      * manager

@@ -13,6 +13,32 @@
 
 package de.uka.ilkd.key.util;
 
+import java.util.*;
 
-public class CollectingExceptionHandler extends KeYExceptionHandlerImpl{
+
+public abstract class AbstractKeYExceptionHandler implements KeYExceptionHandler {
+
+    protected List<Throwable> exceptions = null; 
+
+    public AbstractKeYExceptionHandler() {
+	exceptions = new LinkedList<Throwable>();
+    }
+
+    
+    @Override
+    public void reportException(Throwable e) {
+	exceptions.add(e);
+    }
+
+    
+    @Override    
+    public List<Throwable> getExceptions() {
+	return exceptions;
+    }
+
+        
+    @Override    
+    public void clear() {
+	exceptions.clear();
+    }
 }

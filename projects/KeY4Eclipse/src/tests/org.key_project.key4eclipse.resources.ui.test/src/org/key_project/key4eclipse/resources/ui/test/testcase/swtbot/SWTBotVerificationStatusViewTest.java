@@ -65,6 +65,67 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
    }
 
    /**
+    * Tests in particular a used combined method contract.
+    * @throws Exception Occurred Exception.
+    */
+   @Test
+   public void testCombinedUsedMethodContract() throws Exception {
+      SWTWorkbenchBot bot = new SWTWorkbenchBot();
+      SWTBotView view = null;
+      IProject project = null;
+      try {
+         TestUtilsUtil.closeWelcomeView(bot);
+         // Open view and ensure that no content is shown.
+         TestUtilsUtil.openView(VerificationStatusView.VIEW_ID);
+         view = bot.viewById(VerificationStatusView.VIEW_ID);
+         SWTBotTree tree = view.bot().tree();
+         assertProjectShown(tree);
+         // Test empty project (step 0)
+         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testCombinedUsedMethodContract", true, false, true, false, 1, true);
+         assertProjectShown(tree, project);
+         SWTBotCustomProgressBar proofBar = SWTBotCustomProgressBar.customProgressBar(bot, 0);
+         SWTBotCustomProgressBar specificationBar = SWTBotCustomProgressBar.customProgressBar(bot, 1);
+         IFolder srcFolder = project.getFolder("src");
+         assertTrue(srcFolder.exists());
+         // Add classes
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/verificationStatusView/combinedContract/test", srcFolder, true);
+         KeY4EclipseResourcesTestUtil.build(project);
+         // Find content
+         ProjectInfo projectInfo = ProjectInfoManager.getInstance().getProjectInfo(project);
+         PackageInfo aPackage = projectInfo.getPackage("a");
+         PackageInfo bPackage = projectInfo.getPackage("b");
+         TypeInfo aType = aPackage.getType("A");
+         TypeInfo bType = bPackage.getType("B");
+         MethodInfo aMin = aType.getMethod("min(int, int)");
+         MethodInfo bMin = bType.getMethod("min(int, int)");
+         Map<Object, RGB> colorMapping = new HashMap<Object, RGB>();
+         colorMapping.put(project, VerificationStatusView.COLOR_OPEN_PROOF);
+         colorMapping.put(aPackage, VerificationStatusView.COLOR_UNSPECIFIED);         
+         colorMapping.put(bPackage, VerificationStatusView.COLOR_OPEN_PROOF);         
+         colorMapping.put(aType, VerificationStatusView.COLOR_UNSPECIFIED);         
+         colorMapping.put(bType, VerificationStatusView.COLOR_OPEN_PROOF);         
+         colorMapping.put(aMin, VerificationStatusView.COLOR_UNPROVEN_DEPENDENCY);
+         colorMapping.put(aMin.getContract(0), VerificationStatusView.COLOR_UNPROVEN_DEPENDENCY);         
+         colorMapping.put(bMin, VerificationStatusView.COLOR_OPEN_PROOF);  
+         colorMapping.put(bMin.getContract(0), VerificationStatusView.COLOR_CLOSED_PROOF);         
+         colorMapping.put(bMin.getContract(1), VerificationStatusView.COLOR_OPEN_PROOF);         
+         // Test content
+         assertProjectShown(tree, colorMapping, project);
+         assertProgressBars(proofBar, true, false, 2, 3, specificationBar, true, false, 2, 4);
+         assertReport(view, "data/verificationStatusView/combinedContract/oracle/report.html");
+      }
+      finally {
+         if (view != null) {
+            view.close();
+         }
+         if (project != null) {
+            project.delete(true, true, null);
+            KeY4EclipseResourcesTestUtil.build(project);
+         }
+      }
+   }
+
+   /**
     * Tests the information about taclet options
     * <ol>
     *    <li>Proof with just informations about taclet options</li>

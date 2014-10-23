@@ -83,6 +83,22 @@ termination: diamond" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged
                            </value>
                         </variable>
                      </termination>
+                     <callStateVariable name="x" arrayIndex="-1" isArrayIndex="false">
+                        <value name="x {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="heapBefore_main" arrayIndex="-1" isArrayIndex="false">
+                        <value name="heapBefore_main {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="savedHeapBefore_main" arrayIndex="-1" isArrayIndex="false">
+                        <value name="savedHeapBefore_main {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </callStateVariable>
                   </methodReturn>
                </operationContract>
                <completedBlockEntry path="/0/0" conditionString="gt(x,Z(neglit(1(#))))"/>
@@ -224,6 +240,22 @@ mod: false" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initially
                               </value>
                            </variable>
                         </termination>
+                        <callStateVariable name="x" arrayIndex="-1" isArrayIndex="false">
+                           <value name="x {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="heapBefore_main" arrayIndex="-1" isArrayIndex="false">
+                           <value name="heapBefore_main {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="savedHeapBefore_main" arrayIndex="-1" isArrayIndex="false">
+                           <value name="savedHeapBefore_main {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </callStateVariable>
                      </methodReturn>
                   </statement>
                </branchCondition>

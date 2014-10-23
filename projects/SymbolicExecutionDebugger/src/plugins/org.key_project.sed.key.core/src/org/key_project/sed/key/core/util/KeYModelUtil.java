@@ -48,6 +48,7 @@ import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
@@ -425,20 +426,50 @@ public final class KeYModelUtil {
     * @param executionNode The {@link IExecutionNode} to return its variables.
     * @return The contained {@link KeYVariable}s as debug model representation.
     */
+   public static KeYVariable[] createCallStateVariables(IKeYSEDDebugNode<?> debugNode, 
+                                                        IExecutionBaseMethodReturn<?> executionNode) {
+      if (executionNode != null && !executionNode.isDisposed() && debugNode != null) {
+         IExecutionVariable[] variables = executionNode.getCallStateVariables();
+         return createVariables(debugNode, variables);
+      }
+      else {
+         return new KeYVariable[0];
+      }
+   }
+
+   /**
+    * Creates debug model representations for the {@link IExecutionVariable}s
+    * contained in the given {@link IExecutionNode}.
+    * @param debugNode The {@link IKeYSEDDebugNode} which should be used as parent.
+    * @param executionNode The {@link IExecutionNode} to return its variables.
+    * @return The contained {@link KeYVariable}s as debug model representation.
+    */
    public static KeYVariable[] createVariables(IKeYSEDDebugNode<?> debugNode, 
                                                IExecutionNode<?> executionNode) {
       if (executionNode != null && !executionNode.isDisposed() && debugNode != null) {
          IExecutionVariable[] variables = executionNode.getVariables();
-         if (variables != null) {
-            KeYVariable[] result = new KeYVariable[variables.length];
-            for (int i = 0; i < variables.length; i++) {
-               result[i] = new KeYVariable(debugNode.getDebugTarget(), (IStackFrame)debugNode, variables[i]);
-            }
-            return result;
+         return createVariables(debugNode, variables);
+      }
+      else {
+         return new KeYVariable[0];
+      }
+   }
+
+   /**
+    * Creates debug model representations for the {@link IExecutionVariable}s
+    * contained in the given {@link IExecutionNode}.
+    * @param debugNode The {@link IKeYSEDDebugNode} which should be used as parent.
+    * @param variables The {@link IExecutionVariable}s.
+    * @return The contained {@link KeYVariable}s as debug model representation.
+    */
+   public static KeYVariable[] createVariables(IKeYSEDDebugNode<?> debugNode, 
+                                               IExecutionVariable[] variables) {
+      if (variables != null) {
+         KeYVariable[] result = new KeYVariable[variables.length];
+         for (int i = 0; i < variables.length; i++) {
+            result[i] = new KeYVariable(debugNode.getDebugTarget(), (IStackFrame)debugNode, variables[i]);
          }
-         else {
-            return new KeYVariable[0];
-         }
+         return result;
       }
       else {
          return new KeYVariable[0];

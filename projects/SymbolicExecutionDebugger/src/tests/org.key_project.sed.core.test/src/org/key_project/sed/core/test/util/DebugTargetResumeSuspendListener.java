@@ -16,7 +16,9 @@ package org.key_project.sed.core.test.util;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IDebugEventSetListener;
+import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
+import org.eclipse.debug.core.model.IThread;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.key_project.util.java.ObjectUtil;
@@ -32,7 +34,12 @@ public class DebugTargetResumeSuspendListener implements IDebugEventSetListener 
    /**
     * The {@link IDebugTarget} to wait for resume/suspend events.
     */
-   private IDebugTarget target;
+   private final IDebugTarget target;
+   
+   /**
+    * Indicates if events from children like an {@link IThread} are also accepted.
+    */
+   private final boolean acceptChildEvents;
    
    /**
     * Indicates that the resume event was detected.
@@ -47,10 +54,12 @@ public class DebugTargetResumeSuspendListener implements IDebugEventSetListener 
    /**
     * Constructor.
     * @param target The {@link IDebugTarget} to wait for resume/suspend events.
+    * @param acceptChildEvents Indicates if events from children like an {@link IThread} are also accepted.
     */
-   public DebugTargetResumeSuspendListener(IDebugTarget target) {
-      super();
+   public DebugTargetResumeSuspendListener(IDebugTarget target, 
+                                           boolean acceptChildEvents) {
       this.target = target;
+      this.acceptChildEvents = acceptChildEvents;
    }
 
    /**
@@ -59,7 +68,11 @@ public class DebugTargetResumeSuspendListener implements IDebugEventSetListener 
    @Override
    public void handleDebugEvents(DebugEvent[] events) {
       for (DebugEvent event : events) {
-         if (ObjectUtil.equals(target, event.getSource())) {
+         Object eventSource = event.getSource();
+         if (acceptChildEvents && eventSource instanceof IDebugElement) {
+            eventSource = ((IDebugElement) eventSource).getDebugTarget();
+         }
+         if (ObjectUtil.equals(target, eventSource)) {
             if (event.getKind() == DebugEvent.SUSPEND) {
                suspendDetected = true;
             }
@@ -113,10 +126,11 @@ public class DebugTargetResumeSuspendListener implements IDebugEventSetListener 
     * until both events are detected.
     * @param bot The {@link SWTBot} to use.
     * @param target The {@link IDebugTarget} to work with.
+    * @param acceptChildEvents Indicates if events from children like an {@link IThread} are also accepted.
     * @param run The {@link Runnable} to execute which cause suspend/resume events.
     */
-   public static void run(SWTBot bot, IDebugTarget target, Runnable run) {
-      DebugTargetResumeSuspendListener listener = new DebugTargetResumeSuspendListener(target);
+   public static void run(SWTBot bot, IDebugTarget target, boolean acceptChildEvents, Runnable run) {
+      DebugTargetResumeSuspendListener listener = new DebugTargetResumeSuspendListener(target, acceptChildEvents);
       try {
          listener.start();
          if (run != null) {

@@ -21,7 +21,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -64,14 +63,6 @@ public class ExecutionLoopCondition extends AbstractExecutionBlockStartNode<Loop
    @Override
    public PositionInfo getGuardExpressionPositionInfo() {
       return getGuardExpression().getPositionInfo();
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected IExecutionVariable[] lazyComputeVariables() {
-      return SymbolicExecutionUtil.createExecutionVariables(this);
    }
 
    /**

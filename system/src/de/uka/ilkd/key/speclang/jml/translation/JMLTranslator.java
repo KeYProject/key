@@ -111,6 +111,7 @@ public final class JMLTranslator {
         ARRAY_REF ("array reference"),
         INV ("\\inv"),
         INV_FOR ("\\invariant_for"),
+        STATIC_INV_FOR ("\\static_invariant_for"),
         CAST ("cast"),
         CONDITIONAL ("conditional"),
         FRESH ("\\fresh"),
@@ -818,6 +819,23 @@ public final class JMLTranslator {
                 IObserverFunction inv = services.getJavaInfo().getInv();
                 Term obj = ((SLExpression) params[1]).getTerm();
                 return new SLExpression(tb.func(inv, tb.getBaseHeap(), obj));
+            }
+        });
+
+        translationMethods.put(JMLKeyWord.STATIC_INV_FOR,
+                new JMLTranslationMethod() {
+
+            @Override
+            public SLExpression translate(
+                    SLTranslationExceptionManager excManager,
+                    Object... params)
+                            throws SLTranslationException {
+                checkParameters(params, Services.class, KeYJavaType.class);
+                final Services services = (Services)params[0];
+                final TermBuilder tb = services.getTermBuilder();
+                final KeYJavaType kjt = (KeYJavaType) params[1];
+                final Term term = tb.staticInv(kjt);
+                return new SLExpression(term);
             }
         });
 

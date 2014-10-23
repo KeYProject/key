@@ -150,6 +150,14 @@ public interface ProofMacro {
     public boolean canApplyTo(KeYMediator mediator,
                               Node node,
                               PosInOccurrence posInOcc);
+    
+    /**
+     * Can this macro be applied with no {@link PosInOccurrence} given?
+     * This method is necessary because we need to check global applicability
+     * even when no proof is loaded (e.g., in GUI initialization).
+     * Fixes bug #1495
+     */
+    public boolean isApplicableWithoutPosition();
 
     /**
      * Apply this macro.
