@@ -9,7 +9,9 @@
                      <statement name="this.z--;" pathCondition="true" pathConditionChanged="false">
                         <loopCondition name="this.z&gt;=0" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                            <statement name="this.z--;" pathCondition="true" pathConditionChanged="false">
+                              <completedBlockEntry path="/0/0/0/0/0/0/0/0" conditionString="true"/>
                            </statement>
+                           <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0"/>
                         </loopCondition>
                         <completedBlockEntry path="/0/0/0/0/0/0" conditionString="true"/>
                      </statement>
