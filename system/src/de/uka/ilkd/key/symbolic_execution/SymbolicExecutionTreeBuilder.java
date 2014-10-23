@@ -59,6 +59,7 @@ import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -224,6 +225,19 @@ public class SymbolicExecutionTreeBuilder {
     * {@code true} infeasible paths are closed, {@code false} infeasible may be open may be closed.
     */
    private final boolean isUninterpretedPredicateUsed;
+   
+   /**
+    * Branch conditions ({@link ExecutionBranchCondition}) are only applied to the 
+    * execution tree model if they have at least one child. For this reason they are
+    * added to the model in {@link #completeTree()} after the whole proof
+    * tree of KeY was analyzed via {@link #visit(Proof, Node)}. The adding
+    * of {@link ExecutionBranchCondition} to the model must be done from leaf nodes
+    * to the root, but in correct child order. This {@link Deque} forms
+    * the order in that the {@link ExecutionBranchCondition} must be applied.
+    * The contained {@link List} makes sure that the children are applied
+    * in the same order as they occur in KeY's proof tree.
+    */
+   private final Deque<Entry<AbstractExecutionNode<?>, List<ExecutionBranchCondition>>> branchConditionsStack = new LinkedList<Entry<AbstractExecutionNode<?>, List<ExecutionBranchCondition>>>();
 
    /**
     * Constructor.
@@ -481,19 +495,6 @@ public class SymbolicExecutionTreeBuilder {
        * Maps the {@link Node} in KeY's proof tree to the {@link IExecutionNode} of the symbolic execution tree where the {@link Node}s children should be added to.
        */
       private Map<Node, AbstractExecutionNode<?>> addToMapping = new LinkedHashMap<Node, AbstractExecutionNode<?>>();
-      
-      /**
-       * Branch conditions ({@link ExecutionBranchCondition}) are only applied to the 
-       * execution tree model if they have at least one child. For this reason they are
-       * added to the model in {@link #completeTree()} after the whole proof
-       * tree of KeY was analyzed via {@link #visit(Proof, Node)}. The adding
-       * of {@link ExecutionBranchCondition} to the model must be done from leaf nodes
-       * to the root, but in correct child order. This {@link Deque} forms
-       * the order in that the {@link ExecutionBranchCondition} must be applied.
-       * The contained {@link List} makes sure that the children are applied
-       * in the same order as they occur in KeY's proof tree.
-       */
-      private Deque<Entry<AbstractExecutionNode<?>, List<ExecutionBranchCondition>>> branchConditionsStack = new LinkedList<Entry<AbstractExecutionNode<?>, List<ExecutionBranchCondition>>>();
 
       /**
        * This utility {@link Map} helps to find a {@link List} in {@link #branchConditionsStack}
@@ -564,37 +565,51 @@ public class SymbolicExecutionTreeBuilder {
        * </p>
        */
       public void completeTree() {
-          for (Entry<AbstractExecutionNode<?>, List<ExecutionBranchCondition>> entry : branchConditionsStack) {
-             for (ExecutionBranchCondition condition : entry.getValue()) {
-                AbstractExecutionNode<?>[] conditionsChildren = condition.getChildren(); 
-                if (!JavaUtil.isEmpty(conditionsChildren)) {
-                   if (settings.isMergeBranchConditions()) {
-                      // Merge branch conditions if possible
-                      boolean addingToParentRequired = false;
-                      for (AbstractExecutionNode<?> child : conditionsChildren) {
-                         if (child instanceof ExecutionBranchCondition) {
-                            ExecutionBranchCondition bcChild = (ExecutionBranchCondition)child;
-                            bcChild.addMergedProofNode(condition.getProofNode());
-                            addChild(entry.getKey(), child); // Move child one up in hierarchy
-                         }
-                         else {
-                            addingToParentRequired = true; // Adding of current branch condition is required because non branch condition children are available
-                         }
-                      }
-                      if (addingToParentRequired) {
-                         addChild(entry.getKey(), condition);
-                      }
-                   }
-                   else {
-                      // Add all branch conditions without merging
-                      addChild(entry.getKey(), condition);
-                   }
-                }
-                else {
-                   keyNodeBranchConditionMapping.remove(condition.getProofNode());
-                }
-             }
+         Iterator<Entry<AbstractExecutionNode<?>, List<ExecutionBranchCondition>>> stackIter = branchConditionsStack.iterator();
+         while (stackIter.hasNext()) {
+            Entry<AbstractExecutionNode<?>, List<ExecutionBranchCondition>> entry = stackIter.next();
+            Iterator<ExecutionBranchCondition> bcIter = entry.getValue().iterator();
+            while (bcIter.hasNext()) {
+               ExecutionBranchCondition condition = bcIter.next();
+               AbstractExecutionNode<?>[] conditionsChildren = condition.getChildren(); 
+               if (!JavaUtil.isEmpty(conditionsChildren)) {
+                  if (settings.isMergeBranchConditions()) {
+                     // Merge branch conditions if possible
+                     boolean addingToParentRequired = false;
+                     for (AbstractExecutionNode<?> child : conditionsChildren) {
+                        if (child instanceof ExecutionBranchCondition) {
+                           ExecutionBranchCondition bcChild = (ExecutionBranchCondition)child;
+                           bcChild.addMergedProofNode(condition.getProofNode());
+                           addChild(entry.getKey(), child); // Move child one up in hierarchy
+                           finishBlockCompletion(condition);
+                        }
+                        else {
+                           addingToParentRequired = true; // Adding of current branch condition is required because non branch condition children are available
+                        }
+                     }
+                     if (addingToParentRequired) {
+                        addChild(entry.getKey(), condition);
+                        finishBlockCompletion(condition);
+                     }
+                  }
+                  else {
+                     // Add all branch conditions without merging
+                     addChild(entry.getKey(), condition);
+                     finishBlockCompletion(condition);
+                  }
+                  bcIter.remove();
+               }
+            }
+            if (entry.getValue().isEmpty()) {
+               stackIter.remove();
+            }
          }
+      }
+   }
+   
+   protected void finishBlockCompletion(IExecutionBranchCondition node) {
+      for (IExecutionBlockStartNode<?> start : node.getCompletedBlocks()) {
+         ((AbstractExecutionBlockStartNode<?>) start).addBlockCompletion(node); // BranchConditions are updated when they are added to the SET.
       }
    }
    
@@ -639,7 +654,10 @@ public class SymbolicExecutionTreeBuilder {
                   for (IExecutionNode<?> entryNode : entry.getValue()) {
                      if (entryNode != parentToAddTo) { // Ignore empty blocks
                         if (entryNode instanceof AbstractExecutionBlockStartNode<?>) {
-                           ((AbstractExecutionBlockStartNode<?>) entryNode).addBlockCompletion(parentToAddTo);
+                           parentToAddTo.addCompletedBlock((AbstractExecutionBlockStartNode<?>) entryNode);
+                           if (!(parentToAddTo instanceof IExecutionBranchCondition)) {
+                              ((AbstractExecutionBlockStartNode<?>) entryNode).addBlockCompletion(parentToAddTo); // BranchConditions are updated when they are added to the SET.
+                           }
                         }
                      }
                   }
