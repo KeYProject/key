@@ -123,7 +123,7 @@ public class DependencyContractCompletion extends AbstractInteractiveRuleApplica
       }
 
       /**
-       * {@inheritDoc}
+       * {@inheritDoc} 
        */
       @Override
       public void createControl(Composite root) {
