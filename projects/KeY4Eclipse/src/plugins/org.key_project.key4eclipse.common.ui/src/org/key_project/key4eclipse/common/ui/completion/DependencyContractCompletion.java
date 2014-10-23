@@ -1,16 +1,20 @@
 package org.key_project.key4eclipse.common.ui.completion;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.key_project.key4eclipse.common.ui.provider.ImmutableCollectionContentProvider;
+import org.key_project.util.eclipse.swt.viewer.AbstractSimpleHTMLLabelProvider;
+import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.gui.DependencyContractCompletion.TermStringWrapper;
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
@@ -127,19 +131,33 @@ public class DependencyContractCompletion extends AbstractInteractiveRuleApplica
        */
       @Override
       public void createControl(Composite root) {
-         ComboViewer viewer = new ComboViewer(root, SWT.BORDER | SWT.SINGLE);         
-         ArrayContentProvider provider = new ArrayContentProvider();
-         viewer.setContentProvider(provider);
+         TableColumnLayout tableLayout = new TableColumnLayout(); // The TableColumnLayout together with the not visible TableViewerColumn ensure that no vertical column lines are shown.
+         Composite viewerComposite = new Composite(root, SWT.NONE);
+         viewerComposite.setLayout(tableLayout);
+         TableViewer viewer = new TableViewer(viewerComposite, SWT.BORDER | SWT.SINGLE);
+         viewer.getTable().setLinesVisible(true);
+         TableViewerColumn contractColumn = new TableViewerColumn(viewer, SWT.NONE);
+         contractColumn.getColumn().setText("Heap");
+         tableLayout.setColumnData(contractColumn.getColumn(), new ColumnWeightData(100));
+         viewer.setContentProvider(ImmutableCollectionContentProvider.getInstance());
+         AbstractSimpleHTMLLabelProvider labelViewer = new AbstractSimpleHTMLLabelProvider() {
+            @Override
+            protected String getHtml(Object element) {
+               return ObjectUtil.toString(element);
+            }
+         };
+         viewer.setLabelProvider(labelViewer);
          viewer.setInput(heaps);
          viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
                IStructuredSelection selection = (IStructuredSelection) event.getSelection();
                selectedHeap = (TermStringWrapper) selection.getFirstElement();
             }
          });
-         viewer.setSelection(new StructuredSelection(heaps[0]));
+         if (heaps.length >= 1) {
+            viewer.setSelection(new StructuredSelection(heaps[0]));
+         }
       }
 
       /**
