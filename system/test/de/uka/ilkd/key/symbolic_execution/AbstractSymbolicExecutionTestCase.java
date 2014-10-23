@@ -542,16 +542,16 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ProofInputException Occurred Exception.
     */
    protected static void assertCompletedBlocks(IExecutionNode<?> expected, IExecutionNode<?> current) throws ProofInputException {
-      ImmutableList<IExecutionNode<?>> expectedEntries = expected.getCompletedBlocks();
-      ImmutableList<IExecutionNode<?>> currentEntries = current.getCompletedBlocks();
+      ImmutableList<IExecutionBlockStartNode<?>> expectedEntries = expected.getCompletedBlocks();
+      ImmutableList<IExecutionBlockStartNode<?>> currentEntries = current.getCompletedBlocks();
       if (expectedEntries != null) {
          assertNotNull("Completed blocks of \"" + current + "\" should not be null.", currentEntries);
          assertEquals("Node: " + expected, expectedEntries.size(), currentEntries.size());
-         Iterator<IExecutionNode<?>> expectedIter = expectedEntries.iterator();
-         Iterator<IExecutionNode<?>> currentIter = currentEntries.iterator();
+         Iterator<IExecutionBlockStartNode<?>> expectedIter = expectedEntries.iterator();
+         Iterator<IExecutionBlockStartNode<?>> currentIter = currentEntries.iterator();
          while (expectedIter.hasNext() && currentIter.hasNext()) {
-            IExecutionNode<?> expectedNext = expectedIter.next();
-            IExecutionNode<?> currentNext = currentIter.next();
+            IExecutionBlockStartNode<?> expectedNext = expectedIter.next();
+            IExecutionBlockStartNode<?> currentNext = currentIter.next();
             assertExecutionNode(expectedNext, currentNext, false, false, false, false, false);
             String expectedCondition = expected.getFormatedBlockCompletionCondition(expectedNext);
             String currentCondition = current.getFormatedBlockCompletionCondition(currentNext);

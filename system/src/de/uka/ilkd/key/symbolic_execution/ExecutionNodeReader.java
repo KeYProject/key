@@ -155,7 +155,10 @@ public class ExecutionNodeReader {
                   if (returnEntry == null) {
                      throw new SAXException("Can't find completed block entry \"" + pair.first + "\" in parsed symbolic execution tree.");
                   }
-                  entry.getKey().addCompletedBlock(returnEntry, pair.second);
+                  else if (!(returnEntry instanceof IExecutionBlockStartNode<?>)) {
+                     throw new SAXException("Found completed block entry is not an instance of IExecutionBlockStartNode.");
+                  }
+                  entry.getKey().addCompletedBlock((IExecutionBlockStartNode<?>)returnEntry, pair.second);
                }
             }
             // Construct block completions
@@ -1141,12 +1144,12 @@ public class ExecutionNodeReader {
       /**
        * The completed blocks.
        */
-      private ImmutableList<IExecutionNode<?>> completedBlocks = ImmutableSLList.nil();
+      private ImmutableList<IExecutionBlockStartNode<?>> completedBlocks = ImmutableSLList.nil();
 
       /**
        * The formated conditions under which a block is completed.
        */
-      private final Map<IExecutionNode<?>, String> formatedCompletedBlockConditions = new LinkedHashMap<IExecutionNode<?>, String>();
+      private final Map<IExecutionBlockStartNode<?>, String> formatedCompletedBlockConditions = new LinkedHashMap<IExecutionBlockStartNode<?>, String>();
       
       /**
        * Constructor.
@@ -1329,7 +1332,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public ImmutableList<IExecutionNode<?>> getCompletedBlocks() throws ProofInputException {
+      public ImmutableList<IExecutionBlockStartNode<?>> getCompletedBlocks() {
          return completedBlocks;
       }
 
@@ -1337,7 +1340,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public Term getBlockCompletionCondition(IExecutionNode<?> completedNode) throws ProofInputException {
+      public Term getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode) throws ProofInputException {
          return null;
       }
 
@@ -1345,7 +1348,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public String getFormatedBlockCompletionCondition(IExecutionNode<?> completedNode) throws ProofInputException {
+      public String getFormatedBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode) throws ProofInputException {
          return formatedCompletedBlockConditions.get(completedNode);
       }
 
@@ -1354,7 +1357,7 @@ public class ExecutionNodeReader {
        * @param completedBlock The completed block.
        * @param formatedCondition The formated condition under which the block is completed.
        */
-      public void addCompletedBlock(IExecutionNode<?> completedBlock, String formatedCondition) {
+      public void addCompletedBlock(IExecutionBlockStartNode<?> completedBlock, String formatedCondition) {
          if (completedBlock != null) {
             completedBlocks = completedBlocks.append(completedBlock);
             formatedCompletedBlockConditions.put(completedBlock, formatedCondition);
