@@ -66,7 +66,6 @@ public abstract class AbstractExecutionBlockStartNode<S extends SourceElement> e
       if (blockCompletion != null && !blockCompletions.contains(blockCompletion)) {
          if (blockCompletion instanceof AbstractExecutionNode<?>) {
             blockCompletions = blockCompletions.append(blockCompletion);
-            ((AbstractExecutionNode<?>) blockCompletion).addCompletedBlock(this);
          }
          else {
             throw new IllegalArgumentException("Unsupported block completion: " + blockCompletion);

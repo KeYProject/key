@@ -4,6 +4,8 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.ui.wizards.NewJavaProjectWizardPageOne;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.key4eclipse.resources.ui.Activator;
@@ -15,6 +17,21 @@ import org.key_project.util.eclipse.WorkbenchUtil;
  * @author Martin Hentschel
  */
 public class KeYResourceExampleNewWizard extends KeYProjectWizard {
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addPages() {
+      super.addPages();
+      // Set initial project name.
+      for (IWizardPage page : getPages()) {
+         if (page instanceof NewJavaProjectWizardPageOne) {
+            NewJavaProjectWizardPageOne one = (NewJavaProjectWizardPageOne)page;
+            one.setProjectName("KeY Project Example");
+         }
+      }
+   }
+   
    /**
     * {@inheritDoc}
     */

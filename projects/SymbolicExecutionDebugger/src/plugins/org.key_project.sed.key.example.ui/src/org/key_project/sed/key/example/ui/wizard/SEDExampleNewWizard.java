@@ -48,21 +48,6 @@ public class SEDExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
    protected String getExampleName() {
       return "SED Examples";
    }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void addPages() {
-      super.addPages();
-      // Set initial project name.
-      for (IWizardPage page : getPages()) {
-         if (page instanceof NewJavaProjectWizardPageOne) {
-            NewJavaProjectWizardPageOne one = (NewJavaProjectWizardPageOne)page;
-            one.setProjectName(getExampleName());
-         }
-      }
-   }
 
    /**
     * {@inheritDoc}
