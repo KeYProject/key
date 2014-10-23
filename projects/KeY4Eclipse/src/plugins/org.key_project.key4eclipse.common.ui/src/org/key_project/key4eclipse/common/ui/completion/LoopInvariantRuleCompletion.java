@@ -103,7 +103,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
                                      null);
             try {
              inv = InvariantConfigurator.getInstance().getLoopInvariant(inv,
-                     services, false, loopApp.getHeapContext()); 
+                     services, false, loopApp.getHeapContext());  
             } catch (RuleAbortException e) {
             }
          } else {
