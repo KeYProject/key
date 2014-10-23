@@ -66,7 +66,6 @@ public class KeYExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
    /**
     * {@inheritDoc}
     */
-   @SuppressWarnings("restriction")
    @Override
    public void addPages() {
       examplePage = new KeYExampleWizardPage("examplePage");

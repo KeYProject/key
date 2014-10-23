@@ -16,6 +16,8 @@ package org.key_project.key4eclipse.common.ui.wizard;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.internal.ui.wizards.NewWizardMessages;
+import org.eclipse.jdt.ui.wizards.NewJavaProjectWizardPageOne;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 
 /**
@@ -53,6 +55,31 @@ public abstract class AbstractNewJavaExampleProjectWizard extends AbstractNewJav
    @Override
    protected String computeTitle() {
       return NewWizardMessages.NewJavaProjectWizardPageOne_page_title + " with content from " + getExampleName();
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addPages() {
+      super.addPages();
+      // Set initial project name.
+      if (shouldSetInitialProjectName()) {
+         for (IWizardPage page : getPages()) {
+            if (page instanceof NewJavaProjectWizardPageOne) {
+               NewJavaProjectWizardPageOne one = (NewJavaProjectWizardPageOne)page;
+               one.setProjectName(getExampleName());
+            }
+         }
+      }
+   }
+   
+   /**
+    * Checks if the initial project name should be set.
+    * @return {@code true} set initial project name, {@code false} do not set initial project name.
+    */
+   protected boolean shouldSetInitialProjectName() {
+      return true;
    }
 
    /**
