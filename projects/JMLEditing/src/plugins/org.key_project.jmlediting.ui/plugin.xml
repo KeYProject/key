@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.key_project.javaeditor.javaConfigurationExtensions">
+      <javaConfigurationExtensions
+            class="org.key_project.jmlediting.ui.extension.JMLSourceViewerConfigurationExtension"
+            id="org.key_project.jmlediting.ui.extension.JMLSourceViewerConfigurationExtension"
+            name="JML"
+            defaultEnabled="true">
+      </javaConfigurationExtensions>
+   </extension>
+   <extension
+         id="org.key_project.jmlediting.ui.JMLcompletion"
+         point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
+      <javaCompletionProposalComputer
+            activate="true"
+            categoryId="org.eclipse.jdt.ui.defaultProposalCategory"
+            class="org.key_project.jmlediting.ui.completion.JMLCompletionProposalComputer"
+            needsSortingAfterFiltering="false">
+      </javaCompletionProposalComputer>
+   </extension>
+   <extension
+         point="org.eclipse.jdt.ui.javaEditorTextHovers">
+      <hover
+            activate="true"
+            class="org.key_project.jmlediting.ui.hover.JMLTextHover"
+            description="JML Text Hovers"
+            id="org.key_project.jmlediting.ui.hover.JMLTextHover"
+            label="JML">
+      </hover>
+   </extension>
+
+</plugin>
