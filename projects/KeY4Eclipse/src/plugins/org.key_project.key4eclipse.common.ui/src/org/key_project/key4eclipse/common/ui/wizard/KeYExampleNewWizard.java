@@ -49,7 +49,7 @@ import de.uka.ilkd.key.gui.ExampleChooser.ShortFile;
  * content provided by the KeY project.
  * @author Martin Hentschel
  */
-public class KeYExampleNewWizard extends AbstractNewJavaProjectWizard {
+public class KeYExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
    /**
     * The used {@link KeYExampleWizardPage} in which the user selects one example.
     */
@@ -66,7 +66,6 @@ public class KeYExampleNewWizard extends AbstractNewJavaProjectWizard {
    /**
     * {@inheritDoc}
     */
-   @SuppressWarnings("restriction")
    @Override
    public void addPages() {
       examplePage = new KeYExampleWizardPage("examplePage");

@@ -106,6 +106,7 @@ my @reloadSuccesses;
 my %successes;
 my %failing;
 my %erroneous;
+my %runtimes;
 
 #
 # go through automatic files
@@ -128,7 +129,8 @@ foreach my $dotkey (@automatic_JAVADL) {
 
    &prepare_file($dotkey);
 
-   my $success = &runAuto ($dotkey . ".auto.key");
+   my ($success, $elapsed) = &runAuto ($dotkey . ".auto.key");
+   $runtimes{$dotkey} = $elapsed;
 
    if ($provable and $success == 0) {
        &processReturn (0, "indeed provable", $dotkey);
@@ -312,37 +314,45 @@ sub writeXmlReport {
     my $tests     = $errors + $failures + $successes;
     my $timestamp = &iso8601now;
 
+    my $totaltime = 0;
+    $totaltime += $_ foreach (values %runtimes);
+
     print OUT <<HEADER;
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite errors="$errors" failures="$failures" name="runAllProofs" tests="$counter" timestamp="$timestamp" host="localhost" time="0.0">
+<testsuite errors="$errors" failures="$failures" name="runAllProofs" tests="$counter" timestamp="$timestamp" host="localhost" time="$totaltime">
   <properties>
     <property name="reload" value="$reloadTests" />
     <property name="directory" value="$path_to_key" />
   </properties>
 HEADER
     foreach (keys(%successes)) {
+        my $time = $runtimes{$_};
 	print OUT '  <testcase classname="runallproofs.run" name="' . 
-	    $_ . '" time="0.0" />'  . "\n";
+	    $_ . '" time="' . $time . '" />'  . "\n";
     }
     foreach (@reloadSuccesses) {
+        my $time = $runtimes{$_};
 	print OUT '  <testcase classname="runallproofs.reload" name="' . 
-	    $_ . '" time="0.0" />'  . "\n";
+	    $_ . '" time="' . $time . '" />'  . "\n";
     }
     foreach (keys(%erroneous)) {
+        my $time = $runtimes{$_};
 	print OUT '  <testcase classname="runallproofs.run" name="' . 
-	    $_ . '" time="0.0">'  . "\n";
+	    $_ . '" time="' . $time . '">'  . "\n";
 	print OUT '     <error type="ERR">error during proof for ' .
 	    $_ . "</error>\n  </testcase>\n";
     }
     foreach (keys(%failing)) {
+        my $time = $runtimes{$_};
 	print OUT '  <testcase classname="runallproofs.run" name="' . 
-	    $_ . '" time="0.0">'  . "\n";
+	    $_ . '" time="' . $time . '">'  . "\n";
 	print OUT '     <failure type="FAIL">proof for ' .
 	    $_ . " failed</failure>\n  </testcase>\n";
     }
     foreach (@reloadFailed) {
+        my $time = $runtimes{$_};
 	print OUT '  <testcase classname="runallproofs.reload" name="' . 
-	    $_ . '" time="0.0">'  . "\n";
+	    $_ . '" time="' . $time . '">'  . "\n";
 	print OUT '     <failure type="FAIL">could not reload proof for ' .
 	    $_ . "</failure>\n  </testcase>\n";
     }
@@ -393,8 +403,9 @@ sub runAuto {
   print "Command is: $command\n" unless $option{'silent'};
   my $starttime = time();
   my $result = &system_timeout($time_limit, $command);
-  print "Total time elapsed: " . (time() - $starttime) . " sec\n" unless $option{'silent'};
-  return $result;
+  my $elapsed = time - $starttime;
+  print "Total time elapsed: " . $elapsed . " sec\n" unless $option{'silent'};
+  return ($result, $elapsed);
 }
 
 sub processReturn {
@@ -414,7 +425,7 @@ sub processReturn {
 
 sub reloadFile {
     my $file = $_[0];
-    if (not $option{'silent'}) {print "\nTry to reload proof result $file:\n";}
+    print "\nTry to reload proof result $file:\n" unless $option{'silent'};
 
     my $dk = &getcwd . "/$file";
     unless(-r $dk) {
@@ -425,8 +436,10 @@ sub reloadFile {
 
     my $command = "'" . $path_to_key . "/bin/key' --auto-loadonly '$dk'";
     # print "Command is: $command\n";
+    my $before = time;
     my $result = &system_timeout($time_limit, $command);
 #    print "\nReturn value: $result\n";
+    $runtimes{$file} = time - $before;
 
     if($result != 0) {
 	if (not $option{'silent'}) {

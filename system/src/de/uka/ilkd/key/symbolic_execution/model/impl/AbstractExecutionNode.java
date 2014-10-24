@@ -30,6 +30,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeSymbolicLayoutExtractor;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -85,19 +86,19 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
    private PosInOccurrence modalityPIO;
    
    /**
-    * The up to know discovered completed {@link IExecutionNode}s.
+    * The up to know discovered completed {@link IExecutionBlockStartNode}s.
     */
-   private ImmutableList<IExecutionNode<?>> completedBlocks = ImmutableSLList.nil();
+   private ImmutableList<IExecutionBlockStartNode<?>> completedBlocks = ImmutableSLList.nil();
    
    /**
     * The already computed block completion conditions.
     */
-   private final Map<IExecutionNode<?>, Term> blockCompletionConditions = new HashMap<IExecutionNode<?>, Term>();
+   private final Map<IExecutionBlockStartNode<?>, Term> blockCompletionConditions = new HashMap<IExecutionBlockStartNode<?>, Term>();
 
    /**
     * The already computed human readable block completion conditions.
     */
-   private final Map<IExecutionNode<?>, String> formatedBlockCompletionConditions = new HashMap<IExecutionNode<?>, String>();
+   private final Map<IExecutionBlockStartNode<?>, String> formatedBlockCompletionConditions = new HashMap<IExecutionBlockStartNode<?>, String>();
    
    /**
     * Constructor.
@@ -391,22 +392,16 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
     * {@inheritDoc}
     */
    @Override
-   public ImmutableList<IExecutionNode<?>> getCompletedBlocks() throws ProofInputException {
+   public ImmutableList<IExecutionBlockStartNode<?>> getCompletedBlocks() {
       return completedBlocks;
    }
    
    /**
-    * Registers the given {@link IExecutionNode}.
-    * @param completedBlock The {@link IExecutionNode} to register.
+    * Registers the given {@link IExecutionBlockStartNode}.
+    * @param completedBlock The {@link IExecutionBlockStartNode} to register.
     */
-   public void addCompletedBlock(IExecutionNode<?> completedBlock) {
+   public void addCompletedBlock(IExecutionBlockStartNode<?> completedBlock) {
       if (completedBlock != null && !completedBlocks.contains(completedBlock)) {
-         if (completedBlock instanceof AbstractExecutionBlockStartNode<?>) {
-            ((AbstractExecutionBlockStartNode<?>) completedBlock).addBlockCompletion(this);
-         }
-         else {
-            throw new IllegalArgumentException("Unsupported completed block: " + completedBlock);
-         }
          completedBlocks = completedBlocks.append(completedBlock);
       }
    }
@@ -415,10 +410,10 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
     * {@inheritDoc}
     */
    @Override
-   public Term getBlockCompletionCondition(IExecutionNode<?> completedNode) throws ProofInputException {
+   public Term getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode) throws ProofInputException {
       Term result = blockCompletionConditions.get(completedNode);
       if (result == null) {
-         result = (Term) lazyComputeMethodReturnCondition(completedNode, false);
+         result = (Term) lazyComputeBlockCompletionCondition(completedNode, false);
       }
       return result;
    }
@@ -427,10 +422,10 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
     * {@inheritDoc}
     */
    @Override
-   public String getFormatedBlockCompletionCondition(IExecutionNode<?> completedNode) throws ProofInputException {
+   public String getFormatedBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode) throws ProofInputException {
       String result = formatedBlockCompletionConditions.get(completedNode);
       if (result == null) {
-         result = (String) lazyComputeMethodReturnCondition(completedNode, true);
+         result = (String) lazyComputeBlockCompletionCondition(completedNode, true);
       }
       return result;
    }
@@ -442,7 +437,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
     * @param returnFormatedCondition {@code true} formated condition is returned, {@code false} {@link Term} is returned.
     * @throws ProofInputException Occurred Exception
     */
-   protected Object lazyComputeMethodReturnCondition(IExecutionNode<?> completedNode, boolean returnFormatedCondition) throws ProofInputException {
+   protected Object lazyComputeBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode, boolean returnFormatedCondition) throws ProofInputException {
       if (!isDisposed() && completedBlocks.contains(completedNode)) {
          final Services services = getServices();
          // Collect branch conditions

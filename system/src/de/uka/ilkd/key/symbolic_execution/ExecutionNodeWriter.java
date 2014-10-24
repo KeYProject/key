@@ -1133,9 +1133,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * @throws ProofInputException Occurred Exception
     */
    protected void appendCompletedBlocks(int level, IExecutionNode<?> node, StringBuffer sb) throws ProofInputException {
-      ImmutableList<IExecutionNode<?>> completedBlocks = node.getCompletedBlocks();
+      ImmutableList<IExecutionBlockStartNode<?>> completedBlocks = node.getCompletedBlocks();
       if (completedBlocks != null) {
-         for (IExecutionNode<?> completedBlock : completedBlocks) {
+         for (IExecutionBlockStartNode<?> completedBlock : completedBlocks) {
             Map<String, String> attributeValues = new LinkedHashMap<String, String>();
             attributeValues.put(ATTRIBUTE_PATH_IN_TREE, computePath(completedBlock));
             attributeValues.put(ATTRIBUTE_CONDITION_STRING, node.getFormatedBlockCompletionCondition(completedBlock));

@@ -5,21 +5,34 @@
          id="org.key_project.key4eclipse.resources.ui.KeYProjectWizard"
          name="KeYProjectWizard"
          point="org.eclipse.ui.newWizards">
+      <category
+            id="org.key_project.key4eclipse.resources.ui.KeYCategory"
+            name="KeY">
+      </category>
       <wizard
             category="org.key_project.key4eclipse.resources.ui.KeYCategory"
             class="org.key_project.key4eclipse.resources.ui.wizard.KeYProjectWizard"
+            finalPerspective="org.eclipse.jdt.ui.JavaPerspective"
             icon="icons/logo16.gif"
             id="org.key_project.key4eclipse.resources.ui.keyprojectwizard"
             name="KeY Project"
             project="true">
          <description>
-            Create a KeY project
+            Create a KeY project.
          </description>
       </wizard>
-      <category
-            id="org.key_project.key4eclipse.resources.ui.KeYCategory"
-            name="KeY">
-      </category>
+      <wizard
+            category="org.eclipse.ui.Examples/org.key_project.key4eclipse.common.ui.example.category"
+            class="org.key_project.key4eclipse.resources.ui.wizard.KeYResourceExampleNewWizard"
+            finalPerspective="org.eclipse.jdt.ui.JavaPerspective"
+            icon="icons/logo16.gif"
+            id="org.key_project.key4eclipse.resources.ui.wizard.KeYResourceExampleNewWizard"
+            name="KeY Project Example"
+            project="true">
+         <description>
+            Create a new KeY Project filled with example content.
+         </description>
+      </wizard>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
