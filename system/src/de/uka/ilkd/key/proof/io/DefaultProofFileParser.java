@@ -124,7 +124,7 @@ public class DefaultProofFileParser implements IProofFileParser {
 
 // note: Expressions without parameters only emit the endExpr signal
    @Override
-   public void beginExpr(char id, String s) throws ProblemLoaderException {
+   public void beginExpr(char id, String s) {
 
        //start no new commands until the ignored branch closes
        //count sub-branches though
@@ -215,7 +215,11 @@ public class DefaultProofFileParser implements IProofFileParser {
        case 'c' : //contract
            currContract = proof.getServices().getSpecificationRepository().getContractByName(s);
            if(currContract == null) {
-               throw new ProblemLoaderException(loader, "Error loading proof: contract \"" + s + "\" not found.");
+               // XXX: changed from throwing this exception
+               final ProblemLoaderException e = new ProblemLoaderException(loader, "Error loading proof: contract \"" + s + "\" not found.");
+               reportError(ERROR_LOADING_PROOF_LINE+
+                               ", goal "+currGoal.node().serialNr()+
+                               ", rule "+currTacletName+NOT_APPLICABLE,e);
            }
            break;
        case 'x' : //ifInst (for built in rules)
@@ -245,7 +249,7 @@ public class DefaultProofFileParser implements IProofFileParser {
 
 
    @Override
-   public void endExpr(char id, int linenr) throws ProblemLoaderException {
+   public void endExpr(char id, int linenr) {
        //System.out.println("end "+id);
 
        //read no new commands until ignored branch closes

@@ -528,7 +528,7 @@ public abstract class AbstractProblemLoader {
         return proofList.getProof(poContainer.getProofNum());
     }
 
-    protected void replayProof(Proof proof) throws ProofInputException {
+    protected void replayProof(Proof proof) throws ProofInputException, ProblemLoaderException {
         mediator.setProof(proof);
 
         mediator.stopInterface(true); // first stop (above) is not enough

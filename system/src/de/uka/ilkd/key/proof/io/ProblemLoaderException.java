@@ -14,11 +14,9 @@
 package de.uka.ilkd.key.proof.io;
 
 
-public class ProblemLoaderException
-extends RuntimeException // to have it passed through the parser (without adding throws declarations everywhere)
-{
+public final class ProblemLoaderException extends Exception {
 
-    private static final long serialVersionUID = -3012196004988313969L;
+    private static final long serialVersionUID = 5683051720482052601L;
     private AbstractProblemLoader origin;
 
     public ProblemLoaderException(AbstractProblemLoader origin, Throwable cause) {
