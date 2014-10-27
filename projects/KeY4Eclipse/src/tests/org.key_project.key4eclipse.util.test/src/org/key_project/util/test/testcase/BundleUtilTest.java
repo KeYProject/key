@@ -298,7 +298,7 @@ public class BundleUtilTest extends TestCase {
       }
       // Test null target
       try {
-          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/extractTest", null);
+          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/extractTest", (IContainer)null);
           fail("Exception expected.");
       }
       catch (CoreException e) {
