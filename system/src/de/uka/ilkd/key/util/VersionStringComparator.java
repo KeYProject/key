@@ -9,7 +9,7 @@ import java.util.Comparator;
  */
 public class VersionStringComparator implements Comparator<String> {
     
-    private final static String SEPARATOR_PATTERN = ".";
+    private final static String SEPARATOR_PATTERN = "\\D";
 
     private final LexicographicComparator<Integer> lxc = new LexicographicComparator<Integer>();
 

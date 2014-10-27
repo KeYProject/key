@@ -72,8 +72,4 @@ public final class NetworkUtils {
             return null;
         }
     }
-    
-    public static void main(String[] a) {
-        System.out.println(getLatestVersion());
-    }
 }
