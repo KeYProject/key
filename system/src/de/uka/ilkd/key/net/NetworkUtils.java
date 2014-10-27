@@ -11,6 +11,7 @@ import java.net.UnknownHostException;
 public final class NetworkUtils {
 
     private static final URL KEY_URL = getURL("http://key-project.org/");
+    private static final URL LATEST_VERSION_URL = getURL("http://key-project.org/download/latest");
 
     /**
      * Tests whether the KeY Project home page is
@@ -33,9 +34,29 @@ public final class NetworkUtils {
             return false;
         } finally {
             if (in != null)
-                try {
-                    in.close();
-                } catch (IOException e) {}
+                try {in.close();} catch (IOException e) {}
+        }
+    }
+    
+    /**
+     * Tries to read the latest stable version number of KeY
+     * from the KeY home page.
+     * It must be contained in file <a href="http://key-project.org/download/latest">
+     * download/latest</a> in a single line.
+     */
+    public static String getLatestVersion() {
+        BufferedReader in = null;
+        try {
+            in = new BufferedReader(new InputStreamReader(LATEST_VERSION_URL.openStream()));
+            // just read one single line
+            String version = in.readLine();
+            in.close();
+            return version;
+        } catch (IOException e) {
+            // something went wrong
+            if (in != null)
+                try {in.close();} catch (IOException e1) {}
+            return new String("0.0.0");
         }
     }
     
@@ -53,6 +74,6 @@ public final class NetworkUtils {
     }
     
     public static void main(String[] a) {
-        System.out.println(homePageAvailable());
+        System.out.println(getLatestVersion());
     }
 }
