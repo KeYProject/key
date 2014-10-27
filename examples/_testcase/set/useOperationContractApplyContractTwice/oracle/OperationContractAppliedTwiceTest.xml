@@ -13,13 +13,15 @@ pre: true
 post: result_1 = 42 &amp; exc_1 = null
 mod: empty, creates no new objects
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_1" exceptionTerm="exc_1" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-                  <branchStatement name="if (first_1==42)" pathCondition="true" pathConditionChanged="false">
+                  <branchStatement name="if (first_1==42)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                      <statement name="return first_1+second_1;" pathCondition="true" pathConditionChanged="false">
                         <methodReturn name="&lt;return of doubleMagic&gt;" signature="&lt;return of OperationContractAppliedTwiceTest.doubleMagic()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                            <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
+                        <completedBlockEntry path="/0/0/0/0/0/0" conditionString="true"/>
                      </statement>
+                     <blockCompletionEntry path="/0/0/0/0/0/0/0"/>
                   </branchStatement>
                </operationContract>
             </statement>

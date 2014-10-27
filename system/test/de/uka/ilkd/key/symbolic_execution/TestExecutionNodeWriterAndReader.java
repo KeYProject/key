@@ -171,7 +171,7 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       KeYlessTermination tloop = new KeYlessTermination(root, "t loop", "pcLoopTermination", false, TerminationKind.LOOP_BODY, true);
       root.addChild(tloop);
       root.addTermination(tloop);
-      KeYlessBranchStatement bn = new KeYlessBranchStatement(root, "bn", "pc5", true);
+      KeYlessBranchStatement bn = new KeYlessBranchStatement(root, "bn", "pc5", true, true);
       bn.addCallStackEntry(root);
       bn.addCallStackEntry(bc);
       root.addChild(bn);
@@ -188,9 +188,11 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       bn.addVariable(bnVar2);
       KeYlessValue bnVar2Value = new KeYlessValue(bnVar2, "myTypeAgain", "myValueAgain", "value of bnVar2", false, true, "c3");
       bnVar2.addValue(bnVar2Value);
-      KeYlessLoopStatement ln = new KeYlessLoopStatement(root, "ln", "pc6", true);
+      KeYlessLoopStatement ln = new KeYlessLoopStatement(root, "ln", "pc6", true, false);
       root.addChild(ln);
-      KeYlessLoopCondition lc = new KeYlessLoopCondition(ln, "lc", "pc7", false);
+      ln.addCompletedBlock(bn, "My Block Completion Condition!");
+      bn.addBlockCompletion(ln);
+      KeYlessLoopCondition lc = new KeYlessLoopCondition(ln, "lc", "pc7", false, true);
       ln.addChild(lc);
       KeYlessMethodCall mc = new KeYlessMethodCall(ln, "mc", "pc8", false);
       mc.addCallStackEntry(mc);
@@ -201,6 +203,16 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       mr.addCallStackEntry(mc);
       mc.addChild(mr);
       mc.addMethodReturn(mr);
+      
+      KeYlessVariable mrVar1 = new KeYlessVariable(null, true, 2, "mrVar1");
+      mr.addCallStateVariable(mrVar1);
+      KeYlessValue mrVar1Value1 = new KeYlessValue(mrVar1, "myType1", "myValue1", "value of mrVar1", true, false, "c1");
+      mrVar1.addValue(mrVar1Value1);
+      KeYlessVariable mrVar1child1 = new KeYlessVariable(mrVar1Value1, true, 2, "mrVar1child1");
+      mrVar1Value1.addChildVariable(mrVar1child1);
+      KeYlessValue mrVar1child1Value1 = new KeYlessValue(mrVar1child1, "myType2", "myValue1child1", "value of mrVar1child1", true, false, "c2");
+      mrVar1child1.addValue(mrVar1child1Value1);
+      
       KeYlessExceptionalMethodReturn emr = new KeYlessExceptionalMethodReturn(mc, "emr", "pcExceptional", true, "mc(arg)", "myExceptionalMethodReturnCondition");
       emr.addCallStackEntry(mc);
       mc.addChild(emr);

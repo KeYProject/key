@@ -65,21 +65,11 @@ lexer grammar KeYLexer;
     // why is keh sometimes null?
 
     public KeYLexer(CharStream in, KeYExceptionHandler keh) {
-	this(in);
-	if(keh != null) { this.keh = keh; }
-	this.selector = new Stack<SaveStruct>();
+	      this(in);
+	      if(keh != null) { this.keh = keh; }
+	      this.selector = new Stack<SaveStruct>();
     }
     
-    @Override
-    public void reportError(RecognitionException ex) {
-        /*
-         TODO: Don't pass along RecognitionException instances, they don't have useful messages.
-         See http://www.antlr3.org/api/ActionScript/org/antlr/runtime/RecognitionException.html for further information.
-         
-         (Kai Wallisch May 2014)
-        */
-        keh.reportException(ex);
-    }
 
     public Stack<SaveStruct> getSelector() {
       return selector;
@@ -141,6 +131,7 @@ lexer grammar KeYLexer;
     /*
      TODO: Remove this method. (Kai Wallisch May 2014)
     */
+    @Deprecated
    private void newline() {
      Debug.out("newline() was called but ANTLRv3 does not implement it anymore.");
    }
@@ -391,6 +382,12 @@ SLASH
 @init { paraphrase.push("`/'"); }
 @after { paraphrase.pop(); }
 :	'/'
+    ;
+
+BACKSLASH
+@init { paraphrase.push("`\\'"); }
+@after { paraphrase.pop(); }
+:	'\\'
     ;
 
 COLON

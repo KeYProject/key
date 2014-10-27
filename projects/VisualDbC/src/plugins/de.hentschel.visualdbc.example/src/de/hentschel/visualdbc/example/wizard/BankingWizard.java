@@ -34,6 +34,14 @@ public class BankingWizard extends AbstractExampleWizard {
    /**
     * {@inheritDoc}
     */
+   @Override
+   protected boolean shouldSetInitialProjectName() {
+      return false; // Does not work for unknown reason
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
    @SuppressWarnings("restriction")
    @Override
    protected boolean createExampleContent(IContainer sourceDirectory) throws Exception {

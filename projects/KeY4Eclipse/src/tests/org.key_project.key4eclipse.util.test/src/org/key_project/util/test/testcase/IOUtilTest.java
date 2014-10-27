@@ -49,6 +49,46 @@ import org.key_project.util.test.util.TestUtilsUtil;
  */
 public class IOUtilTest extends TestCase {
    /**
+    * {@link IOUtil#encodeURIPath(String)}.
+    */
+   @Test
+   public void testEncodeURIPath() {
+      // Test null
+      assertEquals(null, IOUtil.encodeURIPath(null));
+      // Test normal URIs
+      assertEquals("A", IOUtil.encodeURIPath("A"));
+      assertEquals("A/B", IOUtil.encodeURIPath("A/B"));
+      assertEquals("/Users/MyName/MyFile.html", IOUtil.encodeURIPath("/Users/MyName/MyFile.html"));
+      assertEquals("C:/Users/MyName/MyFile.html", IOUtil.encodeURIPath("C:\\Users\\MyName\\MyFile.html"));
+      assertEquals("./MyName/MyFile.html", IOUtil.encodeURIPath(".\\MyName\\MyFile.html"));
+      assertEquals("./MyName/MyFile.html", IOUtil.encodeURIPath("./MyName/MyFile.html"));
+      assertEquals("../../MyName/MyFile.html", IOUtil.encodeURIPath("..\\..\\MyName\\MyFile.html"));
+      assertEquals("../../MyName/MyFile.html", IOUtil.encodeURIPath("../../MyName/MyFile.html"));
+      // Test URIs with spaces
+      assertEquals("/Users/My%20Name/My%20File.html", IOUtil.encodeURIPath("/Users/My Name/My File.html"));
+      assertEquals("C:/Users/My%20Name/My%20File.html", IOUtil.encodeURIPath("C:\\Users\\My Name\\My File.html"));
+   }
+   
+   /**
+    * {@link IOUtil#decodeURIPath(String)}.
+    */
+   @Test
+   public void testDecodeURIPath() {
+      // Test null
+      assertEquals(null, IOUtil.decodeURIPath(null));
+      // Test normal URIs
+      assertEquals("A", IOUtil.decodeURIPath("A"));
+      assertEquals("A/B", IOUtil.decodeURIPath("A/B"));
+      assertEquals("/Users/MyName/MyFile.html", IOUtil.decodeURIPath("/Users/MyName/MyFile.html"));
+      assertEquals("C:/Users/MyName/MyFile.html", IOUtil.decodeURIPath("C:/Users/MyName/MyFile.html"));
+      assertEquals("./MyName/MyFile.html", IOUtil.decodeURIPath("./MyName/MyFile.html"));
+      assertEquals("../../MyName/MyFile.html", IOUtil.decodeURIPath("../../MyName/MyFile.html"));
+      // Test URIs with spaces
+      assertEquals("/Users/My Name/My File.html", IOUtil.decodeURIPath("/Users/My%20Name/My%20File.html"));
+      assertEquals("C:/Users/My Name/My File.html", IOUtil.decodeURIPath("C:/Users/My%20Name/My%20File.html"));
+   }
+   
+   /**
     * {@link IOUtil#contains(Iterable, File)}.
     */
    @Test

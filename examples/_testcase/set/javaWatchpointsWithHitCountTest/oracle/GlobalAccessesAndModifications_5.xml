@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call self.main()&gt;" pathCondition="true" pathConditionChanged="false">
-      <loopStatement name="for ( int i = 0; i&lt;2; i++ )" pathCondition="true" pathConditionChanged="false">
+      <loopStatement name="for ( int i = 0; i&lt;2; i++ )" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
-            <loopCondition name="i&lt;2" pathCondition="true" pathConditionChanged="false">
+            <loopCondition name="i&lt;2" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                <statement name="doAccessesAndModifications();" pathCondition="true" pathConditionChanged="false">
                   <methodCall name="&lt;call self.doAccessesAndModifications()&gt;" pathCondition="true" pathConditionChanged="false">
                      <statement name="this.modification=5;" pathCondition="true" pathConditionChanged="false">
@@ -37,6 +37,7 @@
                                                                                                          <methodReturn name="&lt;return of doNothing&gt;" signature="&lt;return of g_6.doNothing()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                                                                             <methodReturn name="&lt;return of doAccessesAndModifications&gt;" signature="&lt;return of self.doAccessesAndModifications()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                                                                                <statement name="i++;" pathCondition="true" pathConditionChanged="false">
+                                                                                                                  <completedBlockEntry path="/0/0/0/0" conditionString="true"/>
                                                                                                                </statement>
                                                                                                             </methodReturn>
                                                                                                          </methodReturn>
@@ -79,7 +80,10 @@
                      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                   </methodCall>
                </statement>
+               <blockCompletionEntry path="/0/0/0"/>
+               <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
             </loopCondition>
+            <completedBlockEntry path="/0/0/0/0" conditionString="true"/>
          </statement>
       </loopStatement>
    </methodCall>

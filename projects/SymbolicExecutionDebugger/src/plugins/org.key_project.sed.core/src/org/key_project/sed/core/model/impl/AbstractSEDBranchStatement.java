@@ -23,7 +23,7 @@ import org.key_project.sed.core.model.ISEDThread;
  * @author Martin Hentschel
  * @see ISEDBranchStatement
  */
-public abstract class AbstractSEDBranchStatement extends AbstractSEDStackFrameCompatibleDebugNode implements ISEDBranchStatement {
+public abstract class AbstractSEDBranchStatement extends AbstractSEDGroupableStackFrameCompatibleDebugNode implements ISEDBranchStatement {
    /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this branch statement is contained.

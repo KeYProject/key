@@ -92,7 +92,7 @@ public class NoPosTacletApp extends TacletApp {
 	    return new NoPosTacletApp(taclet,
 				      inst,
 				      ifInstantiations);
-	} 
+	}
 	return null;
     }
  
@@ -369,11 +369,12 @@ public class NoPosTacletApp extends TacletApp {
 
         MatchConditions mc = setupMatchConditions(pos, services);
         
-        if ( mc == null )
+        if ( mc == null ) {
             return null;
+        }
         
         MatchConditions res = null;
-	if (taclet() instanceof FindTaclet) {	   
+	if (taclet() instanceof FindTaclet) {
 		res = ((FindTaclet)taclet())
 		    .matchFind ( t,
 				 mc,
@@ -382,19 +383,20 @@ public class NoPosTacletApp extends TacletApp {
 		// constructor; this could be optimised
 		if ( res == null ||
 		     !checkVarCondNotFreeIn(taclet(), 
-                             res.getInstantiations(), pos) )
+                             res.getInstantiations(), pos) ) {
 		    return null;
+		}
 	} else {
 	    res = mc;
 	}
-        
         return evalCheckRes(res, services);
     }
 
     private NoPosTacletApp evalCheckRes(MatchConditions res, 
 	    			        Services services) {
-	if ( res == null )
+	if ( res == null ) {
 	    return null;
+	}
 
 	if ( updateContextFixed &&
 	     !updateContextCompatible ( res ) ) {
@@ -432,6 +434,5 @@ public class NoPosTacletApp extends TacletApp {
 	return 
 	    instantiations.getUpdateContext ()
 	    .equals ( p_mc.getInstantiations ().getUpdateContext () );
-    }
-
- }
+    }    
+}

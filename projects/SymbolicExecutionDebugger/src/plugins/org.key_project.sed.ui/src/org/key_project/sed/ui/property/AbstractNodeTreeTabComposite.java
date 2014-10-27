@@ -28,7 +28,6 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.ui.util.LogUtil;
@@ -72,14 +71,16 @@ public abstract class AbstractNodeTreeTabComposite implements ISEDDebugNodeTabCo
       
       viewerGroup = factory.createGroup(composite, getGroupName());
       viewerGroup.setLayout(new FillLayout());
+      
       FormData data = new FormData();
       data.left = new FormAttachment(0, 0);
       data.right = new FormAttachment(100, 0);
-      data.top = new FormAttachment(0, ITabbedPropertyConstants.VSPACE);
+      data.top = new FormAttachment(0, 0);
+      data.bottom = new FormAttachment(100, 0);
       viewerGroup.setLayoutData(data);
       
       viewerContext = createPresentationContext();
-      viewer = new TreeModelViewer(viewerGroup, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL, viewerContext);
+      viewer = new TreeModelViewer(viewerGroup, getViewerStyle(), viewerContext);
       viewer.addDoubleClickListener(new IDoubleClickListener() {
          @Override
          public void doubleClick(DoubleClickEvent event) {
@@ -88,6 +89,14 @@ public abstract class AbstractNodeTreeTabComposite implements ISEDDebugNodeTabCo
       });
    }
    
+   /**
+    * Returns the style to use for the {@link TreeModelViewer}.
+    * @return The style to use for the {@link TreeModelViewer}.
+    */
+   protected int getViewerStyle() {
+      return SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL;
+   }
+
    /**
     * Returns the text to show in the group.
     * @return The text to show.

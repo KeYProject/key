@@ -74,6 +74,7 @@ public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
    protected void doTestAllExamples(boolean srcDir) throws Exception {
       final Set<String> EXAMPLES_WITH_COMPILER_FAILURES = new HashSet<String>();
       EXAMPLES_WITH_COMPILER_FAILURES.add("Java5");
+      EXAMPLES_WITH_COMPILER_FAILURES.add("InformationFlow--SimpleEvoting");
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       // Close welcome view
       TestUtilsUtil.closeWelcomeView(bot);

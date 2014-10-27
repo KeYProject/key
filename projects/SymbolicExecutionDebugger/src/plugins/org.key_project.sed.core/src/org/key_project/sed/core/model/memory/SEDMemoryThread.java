@@ -21,6 +21,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
+import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDConstraint;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
@@ -88,6 +89,11 @@ public class SEDMemoryThread extends AbstractSEDThread implements ISEDMemoryStac
     * The contained variables.
     */
    private final List<IVariable> variables = new LinkedList<IVariable>();
+   
+   /**
+    * The known group start conditions.
+    */
+   private final List<ISEDBranchCondition> groupStartConditions = new LinkedList<ISEDBranchCondition>();
    
    /**
     * Constructor.
@@ -337,5 +343,23 @@ public class SEDMemoryThread extends AbstractSEDThread implements ISEDMemoryStac
    @Override
    public IVariable[] getVariables() throws DebugException {
       return variables.toArray(new IVariable[variables.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDBranchCondition[] getGroupStartConditions() throws DebugException {
+      return groupStartConditions.toArray(new ISEDBranchCondition[groupStartConditions.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addGroupStartCondition(ISEDBranchCondition groupStartCondition) {
+      if (groupStartCondition != null) {
+         groupStartConditions.add(groupStartCondition);
+      }
    }
 }

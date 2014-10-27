@@ -154,6 +154,21 @@ public class ContractInfo {
    }
    
    /**
+    * Checks if the proof calls some methods so that a closed world assumption is taken.
+    * @return A list of called methods.
+    * @throws Exception Occurred Exception.
+    */
+   public List<String> checkCalledMethods() throws Exception {
+      if (metaFile != null && metaFile.exists()) {
+         ProofMetaFileReader pmfr = new ProofMetaFileReader(metaFile);
+         return pmfr.getCalledMethods();
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
     * Tries to read the made assumptions.
     * @return The made assumptions or {@code null} if not available.
     * @throws Exception Occurred Exception.

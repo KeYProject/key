@@ -706,7 +706,7 @@ options {
     				 Sort s, 
     				 boolean makeVariableSV,
             			 boolean makeSkolemTermSV,
-            			 boolean makeTermLabelSV,
+                                 boolean makeTermLabelSV,
             			 SchemaVariableModifierSet mods) 
             			 	throws AmbigiousDeclException {
         if (!skip_schemavariables) {
@@ -729,7 +729,7 @@ options {
                     v = SchemaVariableFactory.createSkolemTermSV(new Name(name), 
                     				                 s);
                 } else if (makeTermLabelSV) {
-                	 v = SchemaVariableFactory.createTermLabelSV(new Name(name));
+                    v = SchemaVariableFactory.createTermLabelSV(new Name(name));
                 } else { v = SchemaVariableFactory.createTermSV(
                 					new Name(name), 
                 					s, 
@@ -1803,11 +1803,11 @@ one_schema_var_decl
     ( schema_modifiers[mods] ) ?
     {s = Sort.FORMULA;}
     ids = simple_ident_comma_list 
-  | TERMLABEL 
+  | TERMLABEL
     { makeTermLabelSV = true; }
     { mods = new SchemaVariableModifierSet.TermLabelSV (); }
-    ( schema_modifiers[mods] ) ?   
-    ids = simple_ident_comma_list 
+    ( schema_modifiers[mods] ) ?
+    ids = simple_ident_comma_list
   | UPDATE
     { mods = new SchemaVariableModifierSet.FormulaSV (); }
     ( schema_modifiers[mods] ) ?
@@ -1841,7 +1841,7 @@ one_schema_var_decl
                        s,
                        makeVariableSV,
                        makeSkolemTermSV,
-                       makeTermLabelSV, 
+                       makeTermLabelSV,
 		       mods);
    }
  )
@@ -4433,6 +4433,10 @@ oneJavaSource returns [String s = null]
      }
   |  
      SLASH { b.append("/"); }
+  |  
+     COLON {b.append(":");}
+  |
+     BACKSLASH {b.append("\\");}
   )+ {
     s = b.toString();
   }
