@@ -157,6 +157,15 @@ options {
    private String proofObligation = null;
     
    private int savedGuessing = -1;
+   
+   /*
+    counter variable for parser rules accessterm and heap_selection suffix:
+    - stores nesting depth of alpha::select(h,o,f)-terms created via pretty syntax	
+    - rule accessterm increases the counter
+    - rule heap_selection_suffix calls method heapSelectionSuffix(), which resets
+      the counter
+   */
+   protected int globalImplicitHeapSuffixCounter = 0;
 
    private int lineOffset=0;
    private int colOffset=0;
@@ -787,7 +796,7 @@ options {
 	return result.toString();
     }
 
-    private Operator getAttribute(Sort prefixSort, String attributeName) 
+    private Operator getAttributeInPrefixSort(Sort prefixSort, String attributeName) 
            throws RecognitionException/*SemanticException*/ {
         final JavaInfo javaInfo = getJavaInfo();
 
@@ -830,27 +839,19 @@ options {
                 }
                 // WATCHOUT why not in DECLARATION MODE	   
                 if(!isDeclParser()) {			      	
-                    final ImmutableList<ProgramVariable> vars = 	
-                    javaInfo.getAllAttributes(attributeName, prefixKJT);
-
-                    if (vars.size() == 0) {
-                        semanticError("There is no attribute '" + attributeName + 
-                            "' declared in type '" + prefixSort + "'");
-                    }                    
-
-                    if (LogicPrinter.printInShortForm(attributeName, 
-                            prefixSort, getServices())) {       		   
-                        result = vars.head();
-                    } else {
-                        if (vars.size() > 1) {
-                            semanticError
-                            ("Cannot uniquely determine attribute " + attributeName + 
-                                "\n Please specify the exact type by attaching" +
-                                " @( declaredInType ) to the attribute name." + 
-                                "\n Found attributes of the same name in: " + getTypeList(vars));
+                    ProgramVariable var = javaInfo.getCanonicalFieldProgramVariable(attributeName, prefixKJT);
+                    if (var == null) {
+                        LogicVariable logicalvar = (LogicVariable)namespaces().variables().lookup(attributeName);
+                        if(logicalvar == null) {
+                            semanticError("There is no attribute '" + attributeName + 
+                                "' declared in type '" + prefixSort + "' and no logical variable of that name.");
+	                    } else {
+	                        result = logicalvar;
                         }
+                    } else {
+                        result = var;
                     }
-                }              
+                }
             }
         }
 
@@ -880,12 +881,15 @@ options {
                                            prefix, 
                                            getTermFactory().createTerm(attribute));
         } else {
-            ProgramVariable pv = (ProgramVariable) attribute;
-            if(pv instanceof ProgramConstant) {
-                result = getTermFactory().createTerm(pv);
-            } else if(pv == getServices().getJavaInfo().getArrayLength()) {
+	            if(attribute instanceof LogicVariable) {
+	                Term attrTerm = getTermFactory().createTerm(attribute);
+	                result = getServices().getTermBuilder().dot(Sort.ANY, result, attrTerm);
+	            } else if(attribute instanceof ProgramConstant) {
+                result = getTermFactory().createTerm(attribute);
+            } else if(attribute == getServices().getJavaInfo().getArrayLength()) {
                 result = getServices().getTermBuilder().dotLength(result);
             } else {
+	            ProgramVariable pv = (ProgramVariable) attribute;
             	Function fieldSymbol 
             		= getServices().getTypeConverter()
             		               .getHeapLDT()
@@ -940,6 +944,11 @@ options {
             // may be thrown in cases of invalid java identifiers
             return false;
         } 
+    }
+    
+    protected boolean isHeapTerm(Term term) {
+        return term != null && term.sort() == 
+            getServices().getTypeConverter().getHeapLDT().targetSort();
     }
     
     private void unbindVars(Namespace orig) {
@@ -1389,7 +1398,14 @@ options {
     public void addFunction(Function f) {
         functions().add(f);
     }
-
+    
+    /*
+     * Replace standard heap by another heap in an observer function.
+     */
+    protected Term heapSelectionSuffix(Term term, Term heap) throws RecognitionException {
+    	// See file KeYParser.java for implementation.
+        throw new UnsupportedOperationException();
+    }
     
     private ImmutableSet<Modality> lookupOperatorSV(String opName, ImmutableSet<Modality> modalities) 
     		throws RecognitionException/*KeYSemanticException*/ {
@@ -1418,7 +1434,7 @@ options {
        return modalities;
     }
 
-    private void semanticError(String message) throws RecognitionException {
+    protected void semanticError(String message) throws RecognitionException {
       throw new KeYSemanticException(input, getSourceName(), message);
     }
 
@@ -2317,33 +2333,6 @@ array_decls[Pair<Sort,Type> p, boolean checksort] returns [Sort s = null]
             }
         }     
     ;
-    
-
-attrid returns [String attr = "";]
-@init{
-  classRef = "";
-  KeYJavaType kjt = null;
-  boolean brackets = false;
-} : 
-        
-    id = simple_ident 
-       (AT LPAREN classRef = simple_ident_dots (EMPTYBRACKETS {brackets = true;})? RPAREN {
-            if(brackets) classRef += "[]";
-            if (!isDeclParser()) {
-	        kjt = getTypeByClassName(classRef);
-		if(kjt == null)
-                  throw new NotDeclException
-                    ("Class " + classRef + " is unknown.", 
-                     classRef, getSourceName(), getLine(), 
-                     getColumn());
-		classRef = kjt.getFullName();
-            }
-         classRef+="::";
-       })? 
-    {
-	attr = classRef+id;
-    }
-    ;
 
 id_declaration returns [ IdDeclaration idd = null ]
     :
@@ -2743,7 +2732,7 @@ static_attribute_suffix returns [Term result = null]
           		className = 
 		   			attributeName.substring(0, attributeName.lastIndexOf("."));	
             }	
-	       	v = getAttribute(getTypeByClassName(className).getSort(), attributeName); 
+	       	v = getAttributeInPrefixSort(getTypeByClassName(className).getSort(), attributeName); 
 	    }
         { result = createAttributeTerm(null, v); }                   
  ;
@@ -2752,92 +2741,67 @@ static_attribute_suffix returns [Term result = null]
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
-
 attribute_or_query_suffix[Term prefix] returns [Term _attribute_or_query_suffix = null]
-@init{
-    Operator v = null;
-    result = prefix;
-    attributeName = "";    
-}    
 @after { _attribute_or_query_suffix = result; }
-    :   
-        DOT 
-        ( 
-           (IDENT (AT LPAREN simple_ident_dots RPAREN)? LPAREN)=>( result = query[prefix])
-           | 
-           attributeName = attrid 
-           {   
-              v = getAttribute(prefix.sort(), attributeName);
-	      result = createAttributeTerm(prefix, v);
-           }   
-        )
- ;
-        catch [TermCreationException ex] {
-              keh.reportException
-		(new KeYSemanticException(input, getSourceName(), ex));
+    :
+    DOT memberName = attrid
+    (result = querySuffix[prefix, memberName] {assert result != null;})?
+    {
+        if(result == null){
+            Operator v = getAttributeInPrefixSort(prefix.sort(), memberName);
+            result = createAttributeTerm(prefix, v);
         }
+    }
+    ;
+catch [TermCreationException ex] {
+    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+}
 
-query [Term prefix] returns [Term result = null] 
+attrid returns [String attr = "";]
+    :
+    // the o.f@(packagename.Classname) syntax has been dropped.
+    // instead, one can write o.(packagename.Classname::f) 
+      id = simple_ident
+        { attr = id; }
+    | LPAREN clss = sort_name DOUBLECOLON id2 = simple_ident RPAREN
+        { attr = clss + "::" + id2; }
+    ;
+    
+querySuffix [Term prefix, String memberName] returns [Term result = null] 
 @init{
-    classRef = "";
+    String classRef, name;
     boolean brackets = false;
 }
     :
-    mid=IDENT (AT LPAREN classRef = simple_ident_dots (EMPTYBRACKETS {brackets = true;} )? RPAREN)? args = argument_list
-    { 
-       if("".equals(classRef)){
+    args = argument_list
+    {
+       if(memberName.indexOf("::") == -1) {
           classRef = prefix.sort().name().toString();
-       }else{
-         if(brackets) classRef += "[]";
-         KeYJavaType kjt = getTypeByClassName(classRef);
-         if(kjt == null)
-           throw new NotDeclException
+          name = memberName;
+       } else {
+          String parts[] = memberName.split("::", 2);
+          classRef = parts[0];
+          name = parts[1];
+       }
+       KeYJavaType kjt = getTypeByClassName(classRef);
+       if(kjt == null)
+          throw new NotDeclException
              ("Class " + classRef + " is unknown.", 
               classRef, getSourceName(), getLine(), 
               getColumn());
-         classRef = kjt.getFullName();
-       }
-       result = getServices().getJavaInfo().getProgramMethodTerm
-                (prefix, mid.getText(), args, classRef);
-    }        
- ;
-        catch [TermCreationException ex] {
-              keh.reportException
-		(new KeYSemanticException(input, getSourceName(), ex));
-        }
+       classRef = kjt.getFullName();
 
-static_query returns [Term result = null] 
-@init{
-    queryRef = "";
-}
-    :
-    queryRef =  staticAttributeOrQueryReference args = argument_list
-    { 
-       int index = queryRef.indexOf(':');
-       String className = queryRef.substring(0, index); 
-       String qname = queryRef.substring(index+2); 
-       result = getServices().getJavaInfo().getProgramMethodTerm(null, qname, args, className);
-       if(result == null && isTermParser()) {
-	  final Sort sort = lookupSort(className);
-          if (sort == null) {
-		semanticError("Could not find matching sort for " + className);
-          }
-          KeYJavaType kjt = getServices().getJavaInfo().getKeYJavaType(sort);
-          if (kjt == null) {
-		semanticError("Found logic sort for " + className + 
-		 " but no corresponding java type!");
-          }          
-       }
-	    
-    }        
+       result = getServices().getJavaInfo().getProgramMethodTerm
+                (prefix, name, args, classRef);
+    }
  ;
-        catch [TermCreationException ex] {
-        keh.reportException
-		(new KeYSemanticException(input, getSourceName(), ex));
-        }
+catch [TermCreationException ex] {
+    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+}
 
 //term120
-accessterm returns [Term _accessterm = null] 
+accessterm returns [Term _accessterm = null]
+@init{ int implicitHeapSuffixCounter = globalImplicitHeapSuffixCounter; }
 @after { _accessterm = result; }
     :
       (MINUS ~NUM_LITERAL) => MINUS result = term110
@@ -2867,38 +2831,76 @@ accessterm returns [Term _accessterm = null]
 	}
       |
       ( {isStaticQuery()}? // look for package1.package2.Class.query(
-        result = static_query
+        result = static_query { implicitHeapSuffixCounter++; }
       |
         {isStaticAttribute()}?            // look for package1.package2.Class.attr
-        result = static_attribute_suffix
+        result = static_attribute_suffix { implicitHeapSuffixCounter++; }
       |
-        result = atom
+        result = atom { implicitHeapSuffixCounter = globalImplicitHeapSuffixCounter; }
       )
-         ( result = array_access_suffix[result]
-         | result = attribute_or_query_suffix[result]
-         | result = heap_update_suffix[result]
+         
+         ( result = accessterm_bracket_suffix[result] { implicitHeapSuffixCounter++; }
+         | result = attribute_or_query_suffix[result] { implicitHeapSuffixCounter++; }
          )*
- ;
-        catch [TermCreationException ex] {
-               keh.reportException
-                (new KeYSemanticException(input, getSourceName(), ex));
-        }
+         
+         { globalImplicitHeapSuffixCounter = implicitHeapSuffixCounter; }
+         
+    // at most one heap selection suffix
+    ( result = heap_selection_suffix[result] )? // resets globalImplicitHeapSuffixCounter to zero
+    ;
+catch [TermCreationException ex] {
+    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+}
 
-heap_update_suffix [Term heap] returns [Term _heap_update_suffix = null]
-@init { result = heap; }
-@after { _heap_update_suffix = result; }
+heap_selection_suffix [Term term] returns [Term result]
     :
-    LBRACE
-    result=elementary_heap_update[result]
-    ( PARALLEL result=elementary_heap_update[result] )*
-    RBRACE
+    AT heap=accessterm
+    { result = heapSelectionSuffix(term, heap); }
     ;
 
-elementary_heap_update [Term heap] returns [Term result=heap]
-    : // TODO find the right kind of super non-terminal for "o.f" and "a[i]"
+accessterm_bracket_suffix[Term reference] returns [Term resultAtAfter]
+@after{resultAtAfter = result;}
+    :
+    {isHeapTerm(reference)}? result = heap_update_suffix[reference]
+    | result = array_access_suffix[reference]
+    ;
+        
+static_query returns [Term result = null] 
+@init{
+    queryRef = "";
+}
+    :
+    queryRef =  staticAttributeOrQueryReference args = argument_list
+    { 
+       int index = queryRef.indexOf(':');
+       String className = queryRef.substring(0, index); 
+       String qname = queryRef.substring(index+2); 
+       result = getServices().getJavaInfo().getProgramMethodTerm(null, qname, args, className);
+       if(result == null && isTermParser()) {
+	  final Sort sort = lookupSort(className);
+          if (sort == null) {
+		semanticError("Could not find matching sort for " + className);
+          }
+          KeYJavaType kjt = getServices().getJavaInfo().getKeYJavaType(sort);
+          if (kjt == null) {
+		semanticError("Found logic sort for " + className + 
+		 " but no corresponding java type!");
+          }          
+       }
+	    
+    }        
+ ;
+catch [TermCreationException ex] {
+    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+}
+
+heap_update_suffix [Term heap] returns [Term result=heap]
+    : // TODO find the right kind of non-terminal for "o.f" and "a[i]"
       // and do not resign to parsing an arbitrary term
-    ( (equivalence_term ASSIGN) => target=equivalence_term ASSIGN val=equivalence_term
-        {
+    LBRACKET
+    ( (equivalence_term ASSIGN) =>
+       target=equivalence_term ASSIGN val=equivalence_term
+        {  // TODO at least make some check that it is a select term after all ...
            Term objectTerm = target.sub(1);
            Term fieldTerm  = target.sub(2);
            result = getServices().getTermBuilder().store(heap, objectTerm, fieldTerm, val);
@@ -2918,11 +2920,11 @@ elementary_heap_update [Term heap] returns [Term result=heap]
            }
         }
     )
+    RBRACKET
     ;
-        catch [TermCreationException ex] {
-               keh.reportException
-                (new KeYSemanticException(input, getSourceName(), ex));
-        }
+catch [TermCreationException ex] {
+    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+}
 
 array_access_suffix [Term arrayReference] returns [Term _array_access_suffix = null] 
 @init{

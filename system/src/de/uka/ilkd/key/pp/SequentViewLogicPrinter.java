@@ -78,7 +78,7 @@ public class SequentViewLogicPrinter extends LogicPrinter {
     
     @Override
     public void printClassName (String className) throws IOException {
-        final boolean hidePP = notationInfo.isPrettySyntax() && NotationInfo.HIDE_PACKAGE_PREFIX;
+        final boolean hidePP = notationInfo.isPrettySyntax() && getNotationInfo().isHidePackagePrefix();
         if (hidePP) {
             className = className.substring(className.lastIndexOf('.')+1);
         }
