@@ -16,7 +16,7 @@ package de.uka.ilkd.key.util;
 import java.io.*;
 import java.net.URL;
 import java.util.Random;
-import de.uka.ilkd.key.net.NetworkUtils;
+import de.uka.ilkd.key.util.net.NetworkUtils;
 
 
 public final class TipOfTheDay {

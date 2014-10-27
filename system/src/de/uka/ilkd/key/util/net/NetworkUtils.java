@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.net;
+package de.uka.ilkd.key.util.net;
 
 import java.io.BufferedReader;
 import java.io.IOException;
