@@ -44,6 +44,7 @@ import de.uka.ilkd.key.testgen.oracle.OracleTermCall;
  * @author herda
  */
 public class TestCaseGenerator {
+	private static final String NULLABLE = "/*@ nullable */";
 	public static final String ALL_OBJECTS = "allObjects";
 	public static final String ALL_INTS = "allInts";
 	public static final String ALL_BOOLS = "allBools";
@@ -506,7 +507,10 @@ public class TestCaseGenerator {
 		Term postcondition = getPostCondition();
 		
 		OracleMethod oracle = oracleGenerator.generateOracleMethod(postcondition);
-		OracleTermCall oracleCall = new OracleTermCall(oracle, new LinkedList<OracleTerm>());
+		
+		
+		
+		OracleTermCall oracleCall = new OracleTermCall(oracle, oracle.getArgs());
 		
 		oracleMethods.add(oracle);
 		oracleMethods.addAll(oracleGenerator.getOracleMethods());
@@ -603,16 +607,24 @@ public class TestCaseGenerator {
 		return testSuite.toString();
 	}
 	
-	private boolean contains(Collection<? extends ObjectVal> objects, String name){
+	private boolean isInPrestate(Collection<? extends ObjectVal> prestate, ObjectVal o){
+		return true;
+	}
+	
+	private boolean isInPrestate(Collection<? extends ObjectVal> prestate, String name){
 		
-		for(ObjectVal o : objects){
-			String oName = createObjectName(o);
-			if(oName.equals(name)){
-				return true;
-			}
-		}
 		
-		return false;
+		
+		return true;
+// TODO return only needed objects		
+//		for(ObjectVal o : prestate){
+//			String oName = createObjectName(o);
+//			if(oName.equals(name)){
+//				return true;
+//			}
+//		}
+//		
+//		return false;
 	}
 
 	public String generateTestCase(Model m) {
@@ -663,7 +675,7 @@ public class TestCaseGenerator {
 				String objName = createObjectName(o);
 				
 				assignments.add(new Assignment(type, objName, right));
-				if(junitFormat && prestate.contains(o)){
+				if(junitFormat && isInPrestate(prestate, o)){
 					assignments.add(new Assignment(type, getPreName(objName), right));
 				}
 			}
@@ -688,11 +700,11 @@ public class TestCaseGenerator {
 					} else {
 						type = "Object";
 					}
-					type = "/*@ nullable */ " + type;
+					type = NULLABLE +" "+ type;
 				}
 				val = translateValueExpression(val);
 				assignments.add(new Assignment(type, c, val));
-				if(junitFormat && contains(prestate, val)){
+				if(junitFormat && type.startsWith(NULLABLE) && isInPrestate(prestate, val)){
 					assignments.add(new Assignment(type, getPreName(c), getPreName(val)));
 				}
 			}
@@ -719,9 +731,9 @@ public class TestCaseGenerator {
 					assignments
 					        .add(new Assignment(new RefEx(rcObjType,receiverObject,vType,fieldName), val));
 					
-					if(junitFormat && prestate.contains(o)){
+					if(junitFormat && isInPrestate(prestate, o)){
 						//if value that is pointed to is object and in prestate then use prestate object
-						if(!vType.equals("int") && !vType.equals("boolean") && contains(prestate, val)){
+						if(!vType.equals("int") && !vType.equals("boolean") && isInPrestate(prestate, val)){
 							val = getPreName(val);
 						}					
 						assignments
@@ -743,7 +755,7 @@ public class TestCaseGenerator {
 						assignments.add(new Assignment(receiverObject + fieldName, val));
 						//assignments.add(new Assignment("",new RefArrayEx("","",name,""+i), val));
 						
-						if(junitFormat && prestate.contains(o)){
+						if(junitFormat && isInPrestate(prestate, o)){
 							assignments.add(new Assignment(getPreName(receiverObject) + fieldName, val));
 						}
 						
