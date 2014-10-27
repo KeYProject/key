@@ -27,7 +27,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedList;
@@ -63,8 +63,6 @@ public final class ExampleChooser extends JDialog {
 
     private static final long serialVersionUID = -4405666868752394532L;
 
-    public static final String EXAMPLE_PROPERTY_FILE_NAME = "key-example.properties";
-
     /**
      * This constant is accessed by the eclipse based projects.
      */
@@ -93,38 +91,58 @@ public final class ExampleChooser extends JDialog {
     public static class Example {
         private static final String ADDITIONAL_FILE_PREFIX = "example.additionalFile.";
         private File directory;
+        private StringBuilder description;
         private Properties properties;
 
         public Example(File file) throws IOException {
             this.directory = file.getParentFile();
             this.properties = new Properties();
+            this.description = new StringBuilder();
 
-            InputStream is = null;
+            BufferedReader r = null;
             try {
-                is = new FileInputStream(file);
-                properties.load(is);
+                r = new BufferedReader(new FileReader(file));
+                String line;
+                boolean emptyLineSeen = false;
+                while((line = r.readLine()) != null) {
+                    if(emptyLineSeen) {
+                        description.append(line).append("\n");
+                    } else {
+                        String trimmed = line.trim();
+                        if(trimmed.length() == 0) {
+                            emptyLineSeen = true;
+                        } else if(trimmed.startsWith("#")) {
+                            // ignore
+                        } else {
+                            String[] entry = trimmed.split(" *[:=] *", 2);
+                            if(entry.length > 1) {
+                                properties.put(entry[0], entry[1]);
+                            }
+                        }
+                    }
+                }
             } finally {
-                if(is != null) {
-                    try { is.close(); }
+                if(r != null) {
+                    try { r.close(); }
                     catch(IOException ex) { };
                 }
             }
         }
 
         public File getProofFile() {
-           return new File(directory, properties.getProperty("example.proofFile", "project.key"));
+           return new File(directory, properties.getProperty("example.proofFile", "project.proof"));
         }
 
         public File getObligationFile() {
-            return new File(directory, properties.getProperty("example.file", "project.proof"));
+            return new File(directory, properties.getProperty("example.file", "project.key"));
         }
 
         public String getName() {
-            return properties.getProperty("example.name", "<no name set>");
+            return properties.getProperty("example.name", directory.getName());
         }
 
-        public File getDescriptionFile() {
-            return new File(directory, properties.getProperty("example.descriptionFile", "README.txt"));
+        public CharSequence getDescription() {
+            return description;
         }
 
         public List<File> getAdditionalFiles() {
@@ -160,7 +178,7 @@ public final class ExampleChooser extends JDialog {
             while(en.hasMoreElements()) {
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) en.nextElement();
                 if(node.getUserObject().equals(path[from])) {
-                    return findChild(root, path, from + 1);
+                    return findChild(node, path, from + 1);
                 }
             }
             // not found ==> add new
@@ -198,6 +216,7 @@ public final class ExampleChooser extends JDialog {
 
 	exampleList = new JTree();
 	exampleList.setModel(model);
+	exampleList.setRootVisible(false);
 	exampleList.addTreeSelectionListener(
 	        new TreeSelectionListener() {
 	            @Override
@@ -362,8 +381,6 @@ public final class ExampleChooser extends JDialog {
         }
     }
 
-
-
     private void updateDescription() {
 
         DefaultMutableTreeNode node =
@@ -375,10 +392,10 @@ public final class ExampleChooser extends JDialog {
             Example example = (Example) nodeObj;
 
             if(example != selectedExample) {
-                addTab(example.getDescriptionFile(), "Description");
-                addTab(example.getObligationFile(), "Proof Obligation");
+                addTab(example.getDescription().toString(), "Description");
+                addTab(fileAsString(example.getObligationFile()), "Proof Obligation");
                 for (File file : example.getAdditionalFiles()) {
-                    addTab(file, file.getName());
+                    addTab(fileAsString(file), file.getName());
                 }
                 loadButton.setEnabled(true);
                 loadProofButton.setEnabled(example.hasProof());
@@ -395,9 +412,10 @@ public final class ExampleChooser extends JDialog {
     //public interface
     //-------------------------------------------------------------------------
 
-    private void addTab(File file, String name) {
+    private void addTab(String string, String name) {
+        // TODO Auto-generated method stub
         JTextArea area = new JTextArea();
-        area.setText(fileAsString(file));
+        area.setText(string);
         area.setFont(new Font(Font.MONOSPACED, Font.PLAIN, area.getFont().getSize()));
         area.setCaretPosition(0);
         area.setEditable(false);
