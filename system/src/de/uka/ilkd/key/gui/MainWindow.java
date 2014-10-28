@@ -105,7 +105,7 @@ import de.uka.ilkd.key.util.PreferenceSaver;
 
 public final class MainWindow extends JFrame  {
 
-    private static final long serialVersionUID = 4019709804595371520L;
+    private static final long serialVersionUID = 5853419918923902636L;
 
     private static MainWindow instance = null;
 
@@ -191,9 +191,6 @@ public final class MainWindow extends JFrame  {
         new OneStepSimplificationToggleAction(this);
 
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
-
-    /** Determines if the KeY prover is started in visible mode*/
-    public static boolean visible = true;
 
     /** for locking of threads waiting for the prover to exit */
     public final Object monitor = new Object();
@@ -338,11 +335,6 @@ public final class MainWindow extends JFrame  {
             throw new NullPointerException("KeYMediator is not set.");
         }
         return mediator;
-    }
-
-    @Override
-    public void setVisible(boolean v){
-        super.setVisible(v && visible);
     }
 
     /** initialised, creates GUI and lays out the main frame */
@@ -1390,10 +1382,6 @@ public final class MainWindow extends JFrame  {
         }
     }
 
-
-    public static void setVisibleMode(boolean visible) {
-	MainWindow.visible = visible;
-    }
 
     public TaskTree getProofList() {
 	return proofList;

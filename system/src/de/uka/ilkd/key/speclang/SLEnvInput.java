@@ -121,7 +121,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     // TODO : move GUI stuff somewhere else
     
     private void showWarningDialog(ImmutableSet<PositionedString> warnings) {
-        if(!MainWindow.visible) {
+        if(java.awt.GraphicsEnvironment.isHeadless()) {
             return;
         }
                 
