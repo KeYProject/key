@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -25,6 +26,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 public class TestTermParser extends AbstractTestTermParser {
@@ -37,9 +39,13 @@ public class TestTermParser extends AbstractTestTermParser {
 
     private static Term t_x,t_y,t_z,t_xs,t_ys;
     private static Term t_headxs,t_tailys,t_nil;
+    
+    private final Recoder2KeY r2k;
 
     public TestTermParser(String name) {
 	super(name);
+        r2k = new Recoder2KeY(services, nss);
+        r2k.parseSpecialClasses();
     }
     
     @Override
@@ -118,6 +124,15 @@ public class TestTermParser extends AbstractTestTermParser {
 	t_headxs = tf.createTerm(head,new Term[]{t_xs}, null, null);
 	t_tailys = tf.createTerm(tail,new Term[]{t_ys}, null, null);
 	t_nil = tf.createTerm(nil);
+    }
+    
+    @Override
+    protected KeYParserF getParser(String s) {
+        return new KeYParserF(ParserMode.TERM,getLexer(s),
+                r2k,
+                services,
+                nss,
+                new AbbrevMap());
     }
 
     public void test1() {

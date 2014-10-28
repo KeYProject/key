@@ -40,7 +40,7 @@ public class KeYParserF extends KeYParser {
         return getServices().getTermBuilder().getBaseHeap().equals(t);
     }
 
-    // This is also used in TestTermParserHeap.java
+    // This is used for testing in TestTermParserHeap.java
     public static final String NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE =
             "Expecting select term before '@', not: ";
 
