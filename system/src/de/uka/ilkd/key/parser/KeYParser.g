@@ -90,6 +90,9 @@ options {
   import de.uka.ilkd.key.java.recoderext.*;
   import de.uka.ilkd.key.pp.AbbrevMap;
   import de.uka.ilkd.key.pp.LogicPrinter;
+
+  import de.uka.ilkd.key.ldt.SeqLDT;
+  import de.uka.ilkd.key.ldt.IntegerLDT;
   
 }
 
@@ -949,6 +952,14 @@ options {
     protected boolean isHeapTerm(Term term) {
         return term != null && term.sort() == 
             getServices().getTypeConverter().getHeapLDT().targetSort();
+    }
+
+    private boolean isSequenceTerm(Term reference) {
+        return reference != null && reference.sort().name().equals(SeqLDT.NAME);
+    }
+
+    private boolean isIntTerm(Term reference) {
+        return reference.sort().name().equals(IntegerLDT.NAME);
     }
     
     private void unbindVars(Namespace orig) {
@@ -2862,7 +2873,19 @@ accessterm_bracket_suffix[Term reference] returns [Term resultAtAfter]
 @after{resultAtAfter = result;}
     :
     {isHeapTerm(reference)}? result = heap_update_suffix[reference]
+    | {isSequenceTerm(reference)}? result = seq_get_suffix[reference]
     | result = array_access_suffix[reference]
+    ;
+
+seq_get_suffix[Term reference] returns [Term result]
+    :
+    LBRACKET
+	indexTerm = logicTermReEntry
+    {
+        if(!isIntTerm(indexTerm)) semanticError("Expecting term of sort " + IntegerLDT.NAME + " as index of sequence " + reference + ", but found: " + indexTerm);
+	    result = getServices().getTermBuilder().seqGet(Sort.ANY, reference, indexTerm);
+    }
+    RBRACKET
     ;
         
 static_query returns [Term result = null] 
