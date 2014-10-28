@@ -1,0 +1,15 @@
+#
+# This is the sample file for sum and max in the "Getting Started" section.
+#
+example.name = Sum and Max
+example.file = project.key
+example.path = Getting Started
+example.additionalFile.1 = src/SumAndMax.java
+
+This is an example of an annotated Java Program. See the tab "SumAndMax.java" for the source code annotated with JML.
+
+Given an N-element array of natural numbers, write a program to compute the sum and the maximum of the elements in the array.
+
+The single proof obligation is verifiable without user interaction (but note that "Arithmetic Treatment" is switched to "Model Search" in the strategy configuration).
+
+(This is the KeY solution to the first challenge from the Verified Software Competition (VSComp) at VSTTE'10, organised by Peter Müller and Natarajan Shankar) 

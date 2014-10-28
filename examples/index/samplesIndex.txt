@@ -7,7 +7,8 @@ firstTouch/02-Subset/README.txt
 # removed duplicate directory!
 # firstTouch/03-SumAndMax/README.txt
 heap/vstte10_01_SumAndMax/FIRSTTOUCH.txt
-firstTouch/04-LinkedList/README.txt
+# moved to competitions below
+# firstTouch/04-LinkedList/README.txt
 firstTouch/05-ReverseArray/README.txt
 firstTouch/06-BinarySearch/README.txt
 firstTouch/07-Cell/README.txt
@@ -25,23 +26,26 @@ firstTouch/006InformationFlow--NewObjects/README.txt
 firstTouch/007InformationFlow--LoopInvariants/README.txt
 firstTouch/008InformationFlow--BlockContracts/README.txt
 
-heap/information_flow/README.txt
-heap/vstte10_05_Queue/README.txt
-heap/observer/README.txt
-heap/WeideEtAl_02_BinarySearch/README.txt
-heap/simple/README.txt
-heap/vacid0_05_RedBlackTrees/README.txt
-heap/Transactions/README.txt
-heap/vstte10_04_Queens/README.txt
-heap/list_seq.hidden/README.txt
-heap/vstte10_02_Invert/README.txt
-heap/linkedListSimple/README.txt
-heap/list_ghost/README.txt
-heap/list_seq/README.txt
-heap/inconsistent_represents/README.txt
-heap/list/README.txt
-heap/WeideEtAl_01_AddAndMultiply/README.txt
-heap/vacid0_01_SparseArray/README.txt
 heap/SmansEtAl/README.txt
-heap/vstte10_03_LinkedList/README.txt
+heap/Transactions/README.txt
+heap/WeideEtAl_01_AddAndMultiply/README.txt
+heap/WeideEtAl_02_BinarySearch/README.txt
+heap/inconsistent_represents/README.txt
+heap/information_flow/README.txt
+heap/linkedListSimple/README.txt
+heap/list/README.txt
+heap/list_ghost/README.txt
+heap/list_seq.hidden/README.txt
+heap/list_seq/README.txt
+heap/observer/README.txt
+heap/simple/README.txt
+
 heap/vstte10_01_SumAndMax/README.txt
+heap/vstte10_02_Invert/README.txt
+heap/vstte10_03_LinkedList/README.txt
+heap/vstte10_04_Queens/README.txt
+heap/vstte10_05_Queue/README.txt
+
+heap/vacid0_01_SparseArray/README.txt
+heap/vacid0_05_RedBlackTrees/README.txt
+

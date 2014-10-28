@@ -68,8 +68,11 @@ public final class ExampleChooser extends JDialog {
      */
     public static final String KEY_FILE_NAME = "project.key";
 
-    private static final String README_NAME = "README.txt";
+    private static final String PROOF_FILE_NAME = "project.proof";
 
+    /**
+     * This class is a singleton class and this its only instance.
+     */
     private static ExampleChooser instance;
 
     private final JTree exampleList;
@@ -78,8 +81,14 @@ public final class ExampleChooser extends JDialog {
     private final JButton cancelButton;
     private JTabbedPane tabPane;
 
+    /**
+     * The result value of the dialog. <code>null</code> if nothing to be loaded
+     */
     private File fileToLoad = null;
 
+    /**
+     * The currently selected example. <code>null</code> if none selected
+     */
     private Example selectedExample;
 
     /**
@@ -89,7 +98,35 @@ public final class ExampleChooser extends JDialog {
      * Used for displaying files in the examples list w/o prefix
      */
     public static class Example {
+        /**
+         * The {@link Properties} key to specify the path in the tree.
+         */
+        private static final String KEY_PATH = "example.path";
+
+        /**
+         * The {@link Properties} key to specify the name of the example.
+         * Directory name if left open.
+         */
+        private static final String KEY_NAME = "example.name";
+
+        /**
+         * The {@link Properties} key to specify the file for the example.
+         * KEY_FILE_NAME by default
+         */
+        private static final String KEY_FILE = "example.file";
+
+        /**
+         * The {@link Properties} key to specify the proof file in the tree.
+         * May be left open
+         */
+        private static final String KEY_PROOF_FILE = "example.proofFile";
+
+        /**
+         * The {@link Properties} key to specify the path in the tree.
+         * Prefix to specify additional files to load. Append 1, 2, 3, ...
+         */
         private static final String ADDITIONAL_FILE_PREFIX = "example.additionalFile.";
+
         private File directory;
         private StringBuilder description;
         private Properties properties;
@@ -130,15 +167,15 @@ public final class ExampleChooser extends JDialog {
         }
 
         public File getProofFile() {
-           return new File(directory, properties.getProperty("example.proofFile", "project.proof"));
+           return new File(directory, properties.getProperty(KEY_PROOF_FILE, PROOF_FILE_NAME));
         }
 
         public File getObligationFile() {
-            return new File(directory, properties.getProperty("example.file", "project.key"));
+            return new File(directory, properties.getProperty(KEY_FILE, KEY_FILE_NAME));
         }
 
         public String getName() {
-            return properties.getProperty("example.name", directory.getName());
+            return properties.getProperty(KEY_NAME, directory.getName());
         }
 
         public CharSequence getDescription() {
@@ -156,7 +193,7 @@ public final class ExampleChooser extends JDialog {
         }
 
         public String[] getPath() {
-            return properties.getProperty("example.path", "").split("/");
+            return properties.getProperty(KEY_PATH, "").split("/");
         }
 
         @Override
@@ -188,7 +225,7 @@ public final class ExampleChooser extends JDialog {
         }
 
         public boolean hasProof() {
-            return properties.containsKey("example.proofFile");
+            return properties.containsKey(KEY_PROOF_FILE);
         }
 
     }
@@ -235,12 +272,6 @@ public final class ExampleChooser extends JDialog {
 	exampleScrollPane.setBorder(new TitledBorder("Examples"));
 
 	//create description label
-//	descriptionText = new JTextArea();
-//	descriptionText.setEditable(false);
-//	descriptionText.setLineWrap(true);
-//	descriptionText.setWrapStyleWord(true);
-//	final JScrollPane descriptionScrollPane
-//		= new JScrollPane(descriptionText);
 	tabPane = new JTabbedPane(JTabbedPane.TOP);
 
 	JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -304,11 +335,13 @@ public final class ExampleChooser extends JDialog {
                             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                             JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-        //select first example, or disable load button
+        // select first example
         DefaultMutableTreeNode firstLeaf = ((DefaultMutableTreeNode)model.getRoot()).getFirstLeaf();
-        exampleList.getSelectionModel().setSelectionPath(new TreePath(firstLeaf));
+        TreePath pathToFirstLeaf = new TreePath(firstLeaf.getPath());
+        exampleList.getSelectionModel().setSelectionPath(pathToFirstLeaf);
+        exampleList.makeVisible(pathToFirstLeaf);
 
-	//show
+	// show
         getContentPane().setLayout(new BoxLayout(getContentPane(),
                                                  BoxLayout.Y_AXIS));
 	setSize(800,400);
@@ -392,10 +425,10 @@ public final class ExampleChooser extends JDialog {
             Example example = (Example) nodeObj;
 
             if(example != selectedExample) {
-                addTab(example.getDescription().toString(), "Description");
-                addTab(fileAsString(example.getObligationFile()), "Proof Obligation");
+                addTab(example.getDescription().toString(), "Description", true);
+                addTab(fileAsString(example.getObligationFile()), "Proof Obligation", false);
                 for (File file : example.getAdditionalFiles()) {
-                    addTab(fileAsString(file), file.getName());
+                    addTab(fileAsString(file), file.getName(), false);
                 }
                 loadButton.setEnabled(true);
                 loadProofButton.setEnabled(example.hasProof());
@@ -412,13 +445,14 @@ public final class ExampleChooser extends JDialog {
     //public interface
     //-------------------------------------------------------------------------
 
-    private void addTab(String string, String name) {
-        // TODO Auto-generated method stub
+    private void addTab(String string, String name, boolean wrap) {
         JTextArea area = new JTextArea();
         area.setText(string);
         area.setFont(new Font(Font.MONOSPACED, Font.PLAIN, area.getFont().getSize()));
         area.setCaretPosition(0);
         area.setEditable(false);
+        area.setWrapStyleWord(true);
+        area.setLineWrap(wrap);
         tabPane.add(new JScrollPane(area), name);
     }
 

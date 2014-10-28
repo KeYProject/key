@@ -1,3 +1,11 @@
+example.name = 5 - Red-Black Trees
+example.path = Competitions/VACID-0
+example.additionalFile.1 = src/RedBlackTree.java
+example.additionalFile.2 = src/Harness.java
+example.additionalFile.3 = src/Node.java
+example.additionalFile.4 = src/AbstractMap.java
+
+
 README on VACID-0: Red-black trees
 Author: Daniel Bruns <bruns@kit.edu>
 Last change date: Aug 12, 2011
