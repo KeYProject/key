@@ -150,7 +150,7 @@ public final class NotationInfo {
      */
     public static boolean DEFAULT_UNICODE_ENABLED = false;
     
-    public static boolean HIDE_PACKAGE_PREFIX = false;
+    public static boolean DEFAULT_HIDE_PACKAGE_PREFIX = false;
     
     /** This maps operators and classes of operators to {@link
      * Notation}s.  The idea is that we first look whether the operator has
@@ -177,7 +177,8 @@ public final class NotationInfo {
     
     private boolean unicodeEnabled = DEFAULT_UNICODE_ENABLED;
     
-
+    private boolean hidePackagePrefix = DEFAULT_HIDE_PACKAGE_PREFIX;
+    
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------    
@@ -359,15 +360,17 @@ public final class NotationInfo {
     }
 
     public void refresh(Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
-   this.unicodeEnabled = useUnicodeSymbols;
-   this.prettySyntax = usePrettyPrinting;
-   createDefaultNotationTable();
-   assert defaultNotationCache != null;
-   if(usePrettyPrinting && services != null) {
-       addFancyNotations(services);
-       if (useUnicodeSymbols)
-           addVeryFancyNotations(services);
-   }
+        this.unicodeEnabled = useUnicodeSymbols;
+        this.prettySyntax = usePrettyPrinting;
+        createDefaultNotationTable();
+        assert defaultNotationCache != null;
+        if (usePrettyPrinting && services != null) {
+            addFancyNotations(services);
+            if (useUnicodeSymbols) {
+                addVeryFancyNotations(services);
+            }
+        }
+        hidePackagePrefix = DEFAULT_HIDE_PACKAGE_PREFIX;
     }
     
     public AbbrevMap getAbbrevMap(){
@@ -428,11 +431,20 @@ public final class NotationInfo {
         return new Notation.FunctionNotation();
     }
 
-   public boolean isPrettySyntax() {
-      return prettySyntax;
-   }
+    public boolean isPrettySyntax() {
+        return prettySyntax;
+    }
 
-   public boolean isUnicodeEnabled() {
-      return unicodeEnabled;
-   }
+    public boolean isUnicodeEnabled() {
+        return unicodeEnabled;
+    }
+
+    public boolean isHidePackagePrefix() {
+        return hidePackagePrefix;
+    }
+
+    public void setHidePackagePrefix(boolean b) {
+        hidePackagePrefix = b;
+    }
+
 }

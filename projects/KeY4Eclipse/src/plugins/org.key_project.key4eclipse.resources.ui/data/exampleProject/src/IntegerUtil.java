@@ -1,5 +1,3 @@
-package example;
-
 public final class IntegerUtil {
 	/*@ normal_behavior
 	  @ ensures \result == x + y;

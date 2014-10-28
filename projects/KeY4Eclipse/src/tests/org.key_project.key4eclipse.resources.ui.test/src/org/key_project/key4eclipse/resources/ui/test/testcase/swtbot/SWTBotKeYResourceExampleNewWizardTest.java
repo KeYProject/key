@@ -58,15 +58,22 @@ public class SWTBotKeYResourceExampleNewWizardTest extends TestCase {
       assertTrue(javaProject.exists());
       // Test opened editor
       SWTBotEditor editor = bot.activeEditor();
-      assertEquals(project.getFile(new Path("src/example/IntegerUtil.java")), editor.getReference().getEditorInput().getAdapter(IFile.class));
+      assertEquals(project.getFile(new Path("src/IntegerUtil.java")), editor.getReference().getEditorInput().getAdapter(IFile.class));
       editor.close();
       // Test verification result
       ProjectInfo projectInfo = ProjectInfoManager.getInstance().getProjectInfo(project);
-      PackageInfo packageInfo = projectInfo.getPackage("example");
-      TypeInfo typeInfo = packageInfo.getType("IntegerUtil");
-      MethodInfo addInfo = typeInfo.getMethod("add(int, int)");
+      PackageInfo packageInfo = projectInfo.getPackage(PackageInfo.DEFAULT_NAME);
+      TypeInfo integerInfo = packageInfo.getType("IntegerUtil");
+      MethodInfo addInfo = integerInfo.getMethod("add(int, int)");
       assertEquals(Boolean.TRUE, addInfo.getContract(0).checkProofClosed());
-      MethodInfo subInfo = typeInfo.getMethod("sub(int, int)");
+      MethodInfo subInfo = integerInfo.getMethod("sub(int, int)");
       assertEquals(Boolean.FALSE, subInfo.getContract(0).checkProofClosed());
+      TypeInfo recursionInfo = packageInfo.getType("MultipleRecursion");
+      MethodInfo aInfo = recursionInfo.getMethod("a()");
+      assertEquals(Boolean.TRUE, aInfo.getContract(0).checkProofClosed());
+      assertEquals(1, aInfo.getContract(0).checkProofRecursionCycle().size());
+      MethodInfo bInfo = recursionInfo.getMethod("b()");
+      assertEquals(Boolean.TRUE, bInfo.getContract(0).checkProofClosed());
+      assertEquals(1, bInfo.getContract(0).checkProofRecursionCycle().size());
    }
 }

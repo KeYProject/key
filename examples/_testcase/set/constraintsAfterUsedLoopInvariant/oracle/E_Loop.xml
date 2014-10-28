@@ -65,7 +65,7 @@
 &amp;   javaMulInt(self.low, 2)
   = javaMulInt(i, javaSubInt(i, 1));
 variant: javaAddInt(javaSubInt(self.high, i), 1)
-mod: {(self, low)}
+mod: {(self, E_Loop::$low)}
 mod[savedHeap]: allLocs" pathCondition="true" pathConditionChanged="false" initiallyValid="false">
                <constraint name="wellFormed(heap)"/>
                <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
