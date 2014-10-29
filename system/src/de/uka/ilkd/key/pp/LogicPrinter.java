@@ -1153,7 +1153,7 @@ public class LogicPrinter {
         if (notationInfo.isPrettySyntax()) {
             startTerm(2);
             if (!t.sort().equals(Sort.ANY)) {
-                layouter.print("((" + t.sort().toString() + "))");
+                layouter.print("(" + t.sort().toString() + ")");
             }
             markStartSub();
             printTerm(t.sub(0));
