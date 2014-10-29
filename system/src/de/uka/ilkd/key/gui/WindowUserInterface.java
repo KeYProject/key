@@ -73,10 +73,6 @@ public class WindowUserInterface extends AbstractUserInterface {
         this.numOfInvokedMacros = 0;
     }
 
-    protected String getMacroConsoleOutput() {
-        return "Applying: " + getMacro().getClass().getSimpleName();
-    }
-
     public void loadProblem(File file, List<File> classPath,
                             File bootClassPath) {
         mainWindow.addRecentFile(file.getAbsolutePath());
