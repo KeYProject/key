@@ -1,5 +1,5 @@
 example.name = 4 - N Queens
-example.path = Competitions/VSComp 10
+example.path = Benchmarks/VSComp 10
 example.additionalFile.1 = src/Queens.java
 
 The fourth challenge from the Verified Software Competition (VSComp) at VSTTE'10, organised by Peter Mueller and Natarajan Shankar: 

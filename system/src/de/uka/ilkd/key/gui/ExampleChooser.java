@@ -52,6 +52,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 
 public final class ExampleChooser extends JDialog {
@@ -98,6 +99,12 @@ public final class ExampleChooser extends JDialog {
      * Used for displaying files in the examples list w/o prefix
      */
     public static class Example {
+        /**
+         * The default category under which examples range if they do not
+         * have {@link #KEY_PATH} set.
+         */
+        private static final String DEFAULT_CATEGORY_PATH = "Unsorted";
+
         /**
          * The {@link Properties} key to specify the path in the tree.
          */
@@ -193,7 +200,7 @@ public final class ExampleChooser extends JDialog {
         }
 
         public String[] getPath() {
-            return properties.getProperty(KEY_PATH, "").split("/");
+            return properties.getProperty(KEY_PATH, DEFAULT_CATEGORY_PATH).split("/");
         }
 
         @Override
@@ -253,6 +260,7 @@ public final class ExampleChooser extends JDialog {
 
 	exampleList = new JTree();
 	exampleList.setModel(model);
+	exampleList.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 	exampleList.setRootVisible(false);
 	exampleList.addTreeSelectionListener(
 	        new TreeSelectionListener() {
@@ -416,8 +424,13 @@ public final class ExampleChooser extends JDialog {
 
     private void updateDescription() {
 
+        TreePath selectionPath = exampleList.getSelectionModel().getSelectionPath();
+        if(selectionPath == null) {
+            return;
+        }
+
         DefaultMutableTreeNode node =
-                (DefaultMutableTreeNode) exampleList.getSelectionModel().getSelectionPath().getLastPathComponent();
+                (DefaultMutableTreeNode) selectionPath.getLastPathComponent();
         Object nodeObj = node.getUserObject();
         tabPane.removeAll();
 

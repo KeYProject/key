@@ -1,5 +1,5 @@
 example.name = 5 - Red-Black Trees
-example.path = Competitions/VACID-0
+example.path = Benchmarks/VACID-0
 example.additionalFile.1 = src/RedBlackTree.java
 example.additionalFile.2 = src/Harness.java
 example.additionalFile.3 = src/Node.java

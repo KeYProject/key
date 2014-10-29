@@ -1,5 +1,5 @@
 example.name = 1 - Sparse Arrays
-example.path = Competitions/VACID-0
+example.path = Benchmarks/VACID-0
 example.additionalFile.1 = src/Harness.java
 example.additionalFile.2 = src/SparseArray.java
 example.additionalFile.3 = src/MemoryAllocator.java

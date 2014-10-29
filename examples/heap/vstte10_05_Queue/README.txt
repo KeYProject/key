@@ -1,5 +1,5 @@
 example.name = 5 - Amortized Queue
-example.path = Competitions/VSComp 10
+example.path = Benchmarks/VSComp 10
 example.additionalFile.1 = src/AmortizedQueue.java
 example.additionalFile.2 = src/LinkedList.java
 

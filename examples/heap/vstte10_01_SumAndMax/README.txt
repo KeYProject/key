@@ -1,5 +1,5 @@
 example.name = 1 - Sum and Max
-example.path = Competitions/VSComp 10
+example.path = Benchmarks/VSComp 10
 example.additionalFile.1 = src/SumAndMax.java
 
 The first challenge from the Verified Software Competition (VSComp) at VSTTE'10, organised by Peter Mueller and Natarajan Shankar: 
