@@ -43,6 +43,7 @@ import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
+import de.uka.ilkd.key.java.expression.literal.EmptyMapLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
 import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
@@ -479,5 +480,7 @@ public interface Visitor {
     void performActionOnSeqGet(SeqGet seqGet);
     
     void performActionOnTransactionStatement(TransactionStatement transSt);
+
+    public void performActionOnEmptyMapLiteral(EmptyMapLiteral aThis);
 
 }

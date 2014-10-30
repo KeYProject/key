@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.model;
 
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -32,7 +33,7 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
  * @see SymbolicExecutionTreeBuilder
  * @see ExecutionBranchCondition
  */
-public interface IExecutionBranchCondition extends IExecutionNode {
+public interface IExecutionBranchCondition extends IExecutionNode<SourceElement> {
    /**
     * Returns the optional additional branch label.
     * @return The additional branch label if available or {@code null} if not available.

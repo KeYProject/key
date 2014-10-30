@@ -35,8 +35,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -187,6 +187,11 @@ public class SymbolicLayoutExtractor {
    private final Node node;
    
    /**
+    * The {@link PosInOccurrence} of the modality or its updates.
+    */
+   private final PosInOccurrence modalityPio;
+   
+   /**
     * The used {@link IModelSettings}.
     */
    private final IModelSettings settings;
@@ -241,11 +246,6 @@ public class SymbolicLayoutExtractor {
    private int preVariableIndex = 0;
    
    /**
-    * The complete path condition which defines how to reach {@link #node} from the root of the proof.
-    */
-   private Term pathCondition;
-   
-   /**
     * Contains objects which should be ignored in the state because they
     * are created during symbolic execution or part of the proof obligation.
     */
@@ -254,11 +254,19 @@ public class SymbolicLayoutExtractor {
    /**
     * Constructor.
     * @param node The {@link Node} of KeY's proof tree to compute memory layouts for.
+    * @param modalityPio The {@link PosInOccurrence} of the modality or its updates.
+    * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
+    * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
     */
-   public SymbolicLayoutExtractor(Node node, boolean usePrettyPrinting) {
+   public SymbolicLayoutExtractor(Node node, 
+                                  PosInOccurrence modalityPio,
+                                  boolean useUnicode,
+                                  boolean usePrettyPrinting) {
       assert node != null;
+      assert modalityPio != null;
       this.node = node;
-      this.settings = new ModelSettings(usePrettyPrinting);
+      this.modalityPio = modalityPio;
+      this.settings = new ModelSettings(useUnicode, usePrettyPrinting);
    }
 
    /**
@@ -275,7 +283,7 @@ public class SymbolicLayoutExtractor {
       synchronized (this) {
          if (!isAnalysed()) {
             // Get path condition
-            pathCondition = SymbolicExecutionUtil.computePathCondition(node, false);
+            Term pathCondition = SymbolicExecutionUtil.computePathCondition(node, false);
             pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
             // Compute all locations used in path conditions and updates. The values of the locations will be later computed in the state computation (and finally shown in a memory layout).
             Set<ExtractLocationParameter> temporaryCurrentLocations = new LinkedHashSet<ExtractLocationParameter>();
@@ -295,7 +303,7 @@ public class SymbolicLayoutExtractor {
             symbolicObjectsResultingInCurrentState = sortTerms(symbolicObjectsResultingInCurrentState); // Sort terms alphabetically. This guarantees that in equivalence classes the representative term is for instance self.next and not self.next.next.
             symbolicObjectsResultingInCurrentState.add(getServices().getTermBuilder().NULL()); // Add null because it can happen that a object is null and this option must be included in equivalence class computation
             // Compute a Sequent with the initial conditions of the proof without modality
-            Sequent initialConditionsSequent = createSequentForEquivalenceClassComputation(pathCondition);
+            Sequent initialConditionsSequent = createSequentForEquivalenceClassComputation();
             ApplyStrategyInfo info = null;
             try {
                // Instantiate proof in which equivalent classes of symbolic objects are computed.
@@ -463,33 +471,18 @@ public class SymbolicLayoutExtractor {
     * Creates a {@link Sequent} which is used to compute equivalence classes.
     * </p>
     * <p>
-    * The created {@link Sequent} is a modified version of the {@link Sequent}
-    * provided by the proofs root node. It contains the given path condition
-    * as additional antecedent and the modality with the java code is removed.
+    * The created {@link Sequent} is the {@link Sequent} of {@link #node}
+    * without the modality.
     * </p>
-    * @param pathCondition The path condition to include.
     * @return The created {@link Sequent} to use for equivalence class computation.
     */
-   protected Sequent createSequentForEquivalenceClassComputation(Term pathCondition) {
-      // Get original sequent
-      Sequent originalSequent = getRoot().sequent();
-      // Add path condition to antecedent
-      Semisequent newAntecedent = originalSequent.antecedent();
-      newAntecedent = newAntecedent.insertLast(new SequentFormula(pathCondition)).semisequent();
-      // Remove everything after modality from sequent
-      Semisequent newSuccedent = Semisequent.EMPTY_SEMISEQUENT;
-      for (SequentFormula sf : originalSequent.succedent()) {
-         Term term = sf.formula();
-         if (Junctor.IMP.equals(term.op())) {
-            Term newImplication = getServices().getTermBuilder().imp(term.sub(0), getServices().getTermBuilder().ff());
-            newSuccedent = newSuccedent.insertLast(new SequentFormula(newImplication)).semisequent();
-            // Updates are not required, because getServices().getTermBuilder().apply(updates, true) is just true
-         }
-         else {
-            newSuccedent = newSuccedent.insertLast(sf).semisequent();
-         }
-      }
-      return Sequent.createSequent(newAntecedent, newSuccedent);
+   protected Sequent createSequentForEquivalenceClassComputation() {
+      return SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, 
+                                                                        modalityPio, 
+                                                                        null,
+                                                                        null,
+                                                                        null,
+                                                                        false);
    }
    
    /**
@@ -512,7 +505,7 @@ public class SymbolicLayoutExtractor {
          }
       }
       starter.setMaxRuleApplications(maxProofSteps);
-      starter.start(false);
+      starter.start();
    }
 
    /**
@@ -539,7 +532,7 @@ public class SymbolicLayoutExtractor {
             TacletApp t2 = c.addInstantiation(cutF, term, false, getServices());
 
             final ImmutableList<Goal> branches = g.apply(t2);
-            starter.start(branches, false);
+            starter.start(branches);
         }
       }
    }
@@ -610,14 +603,8 @@ public class SymbolicLayoutExtractor {
    protected Set<ExtractLocationParameter> extractLocationsFromSequent(Sequent sequent, 
                                                                        Set<Term> objectsToIgnore) throws ProofInputException {
       Set<ExtractLocationParameter> result = new LinkedHashSet<ExtractLocationParameter>();
-      for (SequentFormula sf : sequent.antecedent()) {
+      for (SequentFormula sf : sequent) {
          result.addAll(extractLocationsFromTerm(sf.formula(), objectsToIgnore));
-      }
-      for (SequentFormula sf : sequent.succedent()) {
-         Term term = sf.formula();
-         if (Junctor.IMP != term.op()) {
-            result.addAll(extractLocationsFromTerm(term, objectsToIgnore));
-         }
       }
       return result;
    }
@@ -730,30 +717,9 @@ public class SymbolicLayoutExtractor {
                                               Set<Term> updateCreatedObjectsToFill, 
                                               Set<Term> updateValueObjectsToFill, 
                                               Set<Term> objectsToIgnore) throws ProofInputException {
-      Term updateApplication = findUpdates(sequent);
-      if (updateApplication == null) {
-         throw new ProofInputException("Can't find update application in \"" + sequent + "\".");
-      }
+      Term updateApplication = modalityPio.subTerm();
       Term topUpdate = UpdateApplication.getUpdate(updateApplication);
       collectLocationsFromTerm(topUpdate, locationsToFill, updateCreatedObjectsToFill, updateValueObjectsToFill, objectsToIgnore);
-   }
-   
-   /**
-    * Searches the {@link Term} with the updates in the given {@link Sequent}.
-    * @param sequent The {@link Sequent} to search update {@link Term} in.
-    * @return The found {@link Term} with the {@link UpdateApplication} or {@code null} if not found.
-    */
-   protected Term findUpdates(Sequent sequent) {
-      Term result = null;
-      Iterator<SequentFormula> sucIter = sequent.succedent().iterator();
-      while (result == null && sucIter.hasNext()) {
-         SequentFormula sf = sucIter.next();
-         Term term = sf.formula();
-         if (UpdateApplication.UPDATE_APPLICATION == term.op()) {
-            result = term;
-         }
-      }
-      return result;
    }
 
    /**
@@ -988,7 +954,7 @@ public class SymbolicLayoutExtractor {
     * @throws ProofInputException Occurred Exception
     */
    public ISymbolicLayout getInitialLayout(int layoutIndex) throws ProofInputException {
-      return getLayout(getRoot(), initialLayouts, layoutIndex, initialLocationTerm, initialLocations, pathCondition, computeInitialStateName());
+      return getLayout(initialLayouts, layoutIndex, initialLocationTerm, initialLocations, computeInitialStateName(), false);
    }
 
    /**
@@ -1011,7 +977,7 @@ public class SymbolicLayoutExtractor {
     * @throws ProofInputException Occurred Exception
     */
    public ISymbolicLayout getCurrentLayout(int layoutIndex) throws ProofInputException {
-      return getLayout(node, currentLayouts, layoutIndex, currentLocationTerm, currentLocations, pathCondition, computeCurrentStateName());
+      return getLayout(currentLayouts, layoutIndex, currentLocationTerm, currentLocations, computeCurrentStateName(), true);
    }
    
    /**
@@ -1025,23 +991,21 @@ public class SymbolicLayoutExtractor {
    /**
     * Helper method of {@link #getInitialLayout(int)} and
     * {@link #getCurrentLayout(int)} to lazily compute and get a memory layout.
-    * @param node The {@link Node} which provides the state.
     * @param confiurationsMap The map which contains already computed memory layouts.
     * @param layoutIndex The index of the memory layout to lazily compute and return.
     * @param layoutTerm The result term to use in side proof.
     * @param locations The locations to compute in side proof.
-    * @param pathCondition An optional path condition to include in the side proof.
     * @param stateName The name of the state.
+    * @param currentLayout {@code true} current layout, {@code false} initial layout.
     * @return The lazily computed memory layout.
     * @throws ProofInputException Occurred Exception.
     */
-   protected ISymbolicLayout getLayout(Node node,
-                                              Map<Integer, ISymbolicLayout> confiurationsMap, 
-                                              int layoutIndex,
-                                              Term layoutTerm,
-                                              Set<ExtractLocationParameter> locations,
-                                              Term pathCondition,
-                                              String stateName) throws ProofInputException {
+   protected ISymbolicLayout getLayout(Map<Integer, ISymbolicLayout> confiurationsMap, 
+                                       int layoutIndex,
+                                       Term layoutTerm,
+                                       Set<ExtractLocationParameter> locations,
+                                       String stateName,
+                                       boolean currentLayout) throws ProofInputException {
       synchronized (this) {
          assert layoutIndex >= 0;
          assert layoutIndex < appliedCutsPerLayout.size();
@@ -1051,7 +1015,7 @@ public class SymbolicLayoutExtractor {
             // Get memory layout
             ImmutableSet<Term> layout = appliedCutsPerLayout.get(layoutIndex);
             ImmutableList<ISymbolicEquivalenceClass> equivalentClasses = getEquivalenceClasses(layoutIndex);
-            result = lazyComputeLayout(node, layout, layoutTerm, locations, equivalentClasses, pathCondition, stateName);
+            result = lazyComputeLayout(layout, layoutTerm, locations, equivalentClasses, stateName, currentLayout);
             confiurationsMap.put(Integer.valueOf(layoutIndex), result);
          }
          return result;
@@ -1061,7 +1025,7 @@ public class SymbolicLayoutExtractor {
    /**
     * <p>
     * Computes a memory layout lazily when it is first time requested via 
-    * {@link #getLayout(Node, Map, int, Term, Set, Term, String)}.
+    * {@link #getLayout(Map, int, Term, Set, String, boolean)}.
     * </p>
     * <p>
     * The method starts a side proof with the given arguments to compute
@@ -1078,32 +1042,33 @@ public class SymbolicLayoutExtractor {
     * Finally, the last step is to create the {@link ISymbolicLayout} instance
     * and to fill it with the values/associations defined by {@link ExecutionVariableValuePair} instances.
     * </p>
-    * @param node The {@link Node} which provides the state.
     * @param layout The memory layout terms.
     * @param layoutTerm The result term to use in side proof.
     * @param locations The locations to compute in side proof.
     * @param equivalentClasses The equivalence classes defined by the memory layout terms.
-    * @param pathCondition An optional path condition to include in the side proof.
     * @param stateName The name of the state.
+    * @param currentLayout {@code true} current layout, {@code false} initial layout.
     * @return The created memory layout.
     * @throws ProofInputException Occurred Exception.
     */
-   protected ISymbolicLayout lazyComputeLayout(Node node,
-                                               ImmutableSet<Term> layout, 
+   protected ISymbolicLayout lazyComputeLayout(ImmutableSet<Term> layout, 
                                                Term layoutTerm,
                                                Set<ExtractLocationParameter> locations,
                                                ImmutableList<ISymbolicEquivalenceClass> equivalentClasses,
-                                               Term pathCondition,
-                                               String stateName) throws ProofInputException {
+                                               String stateName,
+                                               boolean currentLayout) throws ProofInputException {
       if (!locations.isEmpty()) {
          // Get original updates
-         Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-         ImmutableList<Term> originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;
+         ImmutableList<Term> originalUpdates;
+         if (!currentLayout) {
+            originalUpdates = ImmutableSLList.nil();
+         }
+         else {
+            Term originalModifiedFormula = modalityPio.constrainedFormula().formula();
+            originalUpdates = TermBuilder.goBelowUpdates2(originalModifiedFormula).first;            
+         }
          // Combine memory layout with original updates
          Term layoutCondition = getServices().getTermBuilder().and(layout);
-         if (pathCondition != null) {
-            layoutCondition = getServices().getTermBuilder().and(layoutCondition, pathCondition);
-         }
          ImmutableList<Term> additionalUpdates = ImmutableSLList.nil();
          for (Term originalUpdate : originalUpdates) {
             if (UpdateJunctor.PARALLEL_UPDATE == originalUpdate.op()) {
@@ -1120,7 +1085,7 @@ public class SymbolicLayoutExtractor {
             additionalUpdates = additionalUpdates.append(evp.createPreUpdate());
          }
          ImmutableList<Term> newUpdates = ImmutableSLList.<Term>nil().append(getServices().getTermBuilder().parallel(additionalUpdates));
-         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, layoutCondition, layoutTerm, newUpdates, false);
+         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, modalityPio, layoutCondition, layoutTerm, newUpdates, false);
          // Instantiate and run proof
          ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
                                                                              sequent, 

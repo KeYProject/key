@@ -31,7 +31,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
  *   \assumes (==>\forall var; phi)
  *   \find (\forall var; phi ==>)
  * </code>
- * would nearly never match, as <tt>var</tt> would be required to match 
+ * would nearly never match, as <tt>var</tt> would be required to match
  * the same object.
  */
 public class BoundUniquenessChecker {
@@ -49,32 +49,32 @@ public class BoundUniquenessChecker {
     }
 
     /**
-     * adds <tt>term</tt> to the list of terms to include in  
+     * adds <tt>term</tt> to the list of terms to include in
      * the uniqueness check
-     * @param term a Term  
+     * @param term a Term
      */
     public void addTerm(Term term) {
-	terms = terms.prepend(term);	
+	terms = terms.prepend(term);
     }
 
     /**
      * adds all formulas in the sequent to the list of terms to
-     * include in the uniqueness check  
+     * include in the uniqueness check
      * @param seq the Sequent with the formulas to add
      */
     public void addAll(Sequent seq) {
 	for (final SequentFormula cf : seq) {
-	    terms = terms.prepend(cf.formula());	
+	    terms = terms.prepend(cf.formula());
 	}
     }
 
     //recursive helper
     private boolean correct(Term t) {
 	/* Note that a term can bound a variable in several
-	 * subterms. 
+	 * subterms.
          */
         final HashSet<QuantifiableVariable> localVars = new LinkedHashSet<QuantifiableVariable>(10);
-        
+
         for (int i = 0, ar = t.arity(); i<ar; i++) {
             for (int j=0, sz = t.varsBoundHere(i).size(); j<sz; j++) {
                 final QuantifiableVariable qv
@@ -85,10 +85,10 @@ public class BoundUniquenessChecker {
                     localVars.add(qv);
                 }
             }
-        }	
+        }
 
         boundVars.addAll(localVars);
-        
+
 	for (int i = 0, ar = t.arity(); i < ar; ++i) {
 	    if (!correct(t.sub(i))) {
 		return false;
@@ -104,9 +104,9 @@ public class BoundUniquenessChecker {
      */
     public boolean correct() {
         for (final Term term : terms) {
-            if (!correct(term)) {       
+            if (!correct(term)) {
                 return false;
-            }	        
+            }
         }
         return true;    
     }

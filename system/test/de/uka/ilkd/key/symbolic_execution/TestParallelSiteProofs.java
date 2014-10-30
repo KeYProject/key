@@ -25,7 +25,6 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.ui.CustomUserInterface;
@@ -48,7 +47,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
       final String methodFullName = "compute";
       String oraclePathInBaseDirFile = "examples/_testcase/set/magic42/oracle/Magic42.xml";
       // Create proof environment for symbolic execution
-      SymbolicExecutionEnvironment<CustomUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false);
+      SymbolicExecutionEnvironment<CustomUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false, false, false, false, false);
       try {
          // Resume
          resume(env.getUi(), env.getBuilder(), oraclePathInBaseDirFile, keyRepDirectory);
@@ -67,7 +66,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
       // Define test settings
       String javaPathInkeyRepDirectory = "examples/_testcase/set/magic42/test/Magic42.proof";
       // Create proof environment for symbolic execution
-      SymbolicExecutionEnvironment<CustomUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, false, false, false, false, false, false);
+      SymbolicExecutionEnvironment<CustomUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, false, false, false, false, false, false, false);
       try {
          // Do test steps
          doParallelSiteProofTest(env);
@@ -86,17 +85,17 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
       // Create threads
       List<SiteProofThread<?>> threads = new LinkedList<SiteProofThread<?>>();
       ExecutionNodePreorderIterator iter = new ExecutionNodePreorderIterator(env.getBuilder().getStartNode());
-      while (iter.hasNext() && threads.size() < 30) {
-         IExecutionNode next = iter.next(); 
-         if (next instanceof IExecutionStateNode) {
-            threads.add(new ExecutionVariableSiteProofThread((IExecutionStateNode<?>)next));
+      while (iter.hasNext() && threads.size() < 54) {
+         IExecutionNode<?> next = iter.next(); 
+         if (next instanceof IExecutionNode) {
+            threads.add(new ExecutionVariableSiteProofThread(next));
          }
          if (next instanceof IExecutionMethodReturn) {
             threads.add(new ExecutionReturnValueSiteProofThread((IExecutionMethodReturn)next));
          }
       }
       // Make sure that the correct number of threads are available
-      assertEquals(31, threads.size());
+      assertEquals(54, threads.size());
       // Start threads
       for (SiteProofThread<?> thread : threads) {
          thread.start();
@@ -187,22 +186,22 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
    }
    
    /**
-    * A {@link Thread} which computes the variables of a given {@link IExecutionStateNode}
+    * A {@link Thread} which computes the variables of a given {@link IExecutionNode}
     * via site proofs.
     * @author Martin Hentschel
     */
    private static class ExecutionVariableSiteProofThread extends SiteProofThread<IExecutionVariable[]> {
       /**
-       * The {@link IExecutionStateNode} to read variables from.
+       * The {@link IExecutionNode} to read variables from.
        */
-      private IExecutionStateNode<?> stateNode;
+      private IExecutionNode<?> node;
 
       /**
        * Constructor. 
-       * @param stateNode The {@link IExecutionStateNode} to read variables from.
+       * @param node The {@link IExecutionNode} to read variables from.
        */
-      public ExecutionVariableSiteProofThread(IExecutionStateNode<?> stateNode) {
-         this.stateNode = stateNode;
+      public ExecutionVariableSiteProofThread(IExecutionNode<?> node) {
+         this.node = node;
       }
 
       /**
@@ -211,7 +210,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
       @Override
       public void run() {
          try {
-            setResult(stateNode.getVariables());
+            setResult(node.getVariables());
          }
          catch (Exception e) {
             setException(e);

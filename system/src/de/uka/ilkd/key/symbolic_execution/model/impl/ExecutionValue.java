@@ -13,23 +13,27 @@
 
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
@@ -79,6 +83,11 @@ public class ExecutionValue extends AbstractExecutionElement implements IExecuti
     * The child {@link IExecutionVariable}s.
     */
    private ExecutionVariable[] childVariables;
+   
+   /**
+    * The {@link IExecutionConstraint}s.
+    */
+   private IExecutionConstraint[] constraints;
 
    /**
     * Constructor.
@@ -184,43 +193,48 @@ public class ExecutionValue extends AbstractExecutionElement implements IExecuti
     */
    protected ExecutionVariable[] lazyComputeChildVariables() throws ProofInputException {
       List<ExecutionVariable> children = new LinkedList<ExecutionVariable>();
-      Term value = getValue();
-      if (value != null && !isValueUnknown()) { // Don't show children of unknown values
-         Sort valueSort = value.sort();
-         if (valueSort != getServices().getJavaInfo().getNullType().getSort()) {
-            KeYJavaType keyType = getServices().getJavaInfo().getKeYJavaType(valueSort);
-            if (keyType != null) { // Can be null, e.g. if Sort is the Sort of Heap
-               Type javaType = keyType.getJavaType();
-               if (javaType instanceof ArrayDeclaration) {
-                  // Array value
-                  ArrayDeclaration ad = (ArrayDeclaration)javaType;
-                  Set<IProgramVariable> pvs = SymbolicExecutionUtil.getProgramVariables(ad.length());
-                  if (pvs.size() == 1) {
-                     ExecutionVariable lengthVariable = new ExecutionVariable(getVariable().getParentNode(), this, pvs.iterator().next());
-                     children.add(lengthVariable);
-                     ExecutionValue[] lengthValues = lengthVariable.getValues();
-                     for (ExecutionValue lengthValue : lengthValues) {
-                        try {
-                           int length = Integer.valueOf(lengthValue.getValueString());
-                           for (int i = 0; i < length; i++) {
-                              ExecutionVariable childI = new ExecutionVariable(getVariable().getParentNode(), this, i, lengthValue);
-                              children.add(childI);
+      if (!isDisposed()) {
+         final Services services = getServices();
+         Term value = getValue();
+         if (value != null && !isValueUnknown()) { // Don't show children of unknown values
+            Sort valueSort = value.sort();
+            if (valueSort != services.getJavaInfo().getNullType().getSort()) {
+               KeYJavaType keyType = services.getJavaInfo().getKeYJavaType(valueSort);
+               if (keyType != null) { // Can be null, e.g. if Sort is the Sort of Heap
+                  Type javaType = keyType.getJavaType();
+                  if (javaType instanceof ArrayDeclaration) {
+                     // Array value
+                     ArrayDeclaration ad = (ArrayDeclaration)javaType;
+                     Set<IProgramVariable> pvs = SymbolicExecutionUtil.getProgramVariables(ad.length());
+                     if (pvs.size() == 1) {
+                        ExecutionVariable lengthVariable = new ExecutionVariable(getVariable().getParentNode(), getVariable().getProofNode(), getVariable().getModalityPIO(), this, pvs.iterator().next(), getVariable().getAdditionalCondition());
+                        children.add(lengthVariable);
+                        ExecutionValue[] lengthValues = lengthVariable.getValues();
+                        for (ExecutionValue lengthValue : lengthValues) {
+                           try {
+                              int length = getSettings().isUsePrettyPrinting() ?
+                                           Integer.valueOf(lengthValue.getValueString()) :
+                                           Integer.valueOf(SymbolicExecutionUtil.formatTerm(lengthValue.getValue(), services, false, true));
+                              for (int i = 0; i < length; i++) {
+                                 ExecutionVariable childI = new ExecutionVariable(getVariable().getParentNode(), getVariable().getProofNode(), getVariable().getModalityPIO(), this, i, lengthValue, getVariable().getAdditionalCondition());
+                                 children.add(childI);
+                              }
                            }
-                        }
-                        catch (NumberFormatException e) {
-                           // Symbolic value, nothing to do.
+                           catch (NumberFormatException e) {
+                              // Symbolic value, nothing to do.
+                           }
                         }
                      }
                   }
-               }
-               else if (javaType instanceof ClassType) {
-                  // Normal value
-                  ImmutableList<Field> fields = ((ClassType)javaType).getAllFields(getServices());
-                  for (Field field : fields) {
-                     ImmutableList<ProgramVariable> vars = getServices().getJavaInfo().getAllAttributes(field.getFullName(), keyType);
-                     for (ProgramVariable var : vars) {
-                        if (!var.isImplicit() && !var.isStatic()) {
-                           children.add(new ExecutionVariable(getVariable().getParentNode(), this, field.getProgramVariable()));
+                  else if (javaType instanceof ClassType) {
+                     // Normal value
+                     ImmutableList<Field> fields = ((ClassType)javaType).getAllFields(services);
+                     for (Field field : fields) {
+                        ImmutableList<ProgramVariable> vars = services.getJavaInfo().getAllAttributes(field.getFullName(), keyType);
+                        for (ProgramVariable var : vars) {
+                           if (!var.isImplicit() && !var.isStatic()) {
+                              children.add(new ExecutionVariable(getVariable().getParentNode(), getVariable().getProofNode(), getVariable().getModalityPIO(), this, field.getProgramVariable(), getVariable().getAdditionalCondition()));
+                           }
                         }
                      }
                   }
@@ -267,5 +281,101 @@ public class ExecutionValue extends AbstractExecutionElement implements IExecuti
    @Override
    public String getConditionString() throws ProofInputException {
       return conditionString;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IExecutionConstraint[] getConstraints() throws ProofInputException {
+      synchronized (this) {
+         if (constraints == null) {
+            constraints = lazyComputeConstraints();
+         }
+         return constraints;
+      }
+   }
+   
+   /**
+    * Computes the related constraints lazily when {@link #getConstraints()} is called the first time.
+    * @return The related {@link IExecutionConstraint}s.
+    * @throws ProofInputException Occurred Exception
+    */
+   protected IExecutionConstraint[] lazyComputeConstraints() throws ProofInputException {
+      if (!isDisposed() && !isValueUnknown()) {
+         List<IExecutionConstraint> constraints = new LinkedList<IExecutionConstraint>();
+         IExecutionConstraint[] allConstraints = getVariable().getParentNode().getConstraints();
+         Set<Term> relevantTerms = collectRelevantTerms(getServices(), getValue());
+         for (IExecutionConstraint constraint : allConstraints) {
+            if (containsTerm(constraint.getTerm(), relevantTerms)) {
+               constraints.add(constraint);
+            }
+         }
+         return constraints.toArray(new IExecutionConstraint[constraints.size()]);
+      }
+      else {
+         return new IExecutionConstraint[0];
+      }
+   }
+   
+   /**
+    * Collects all {@link Term}s contained in relevant constraints.
+    * @param services The {@link Services} to use.
+    * @param term The initial {@link Term}.
+    * @return The relevant {@link Term}s.
+    */
+   protected Set<Term> collectRelevantTerms(Services services, Term term) {
+      final Set<Term> terms = new HashSet<Term>();
+      fillRelevantTerms(services, term, terms);
+      return terms;
+   }
+   
+   /**
+    * Utility method used by {@link #collectRelevantTerms(Services, Term)}.
+    * @param services The {@link Services} to use.
+    * @param term The initial {@link Term}.
+    * @param toFill The {@link Set} of relevant {@link Term}s to fill.
+    */
+   protected void fillRelevantTerms(Services services, Term term, Set<Term> toFill) {
+      if (term != null) {
+         if (term.op() instanceof ProgramVariable ||
+             SymbolicExecutionUtil.isSelect(services, term)) {
+            toFill.add(term);
+         }
+         else {
+            for (int i = 0; i < term.arity(); i++) {
+               fillRelevantTerms(services, term.sub(i), toFill);
+            }
+         }
+      }
+   }
+
+   /**
+    * Checks if the given {@link Term} contains at least one of the given once.
+    * @param term The {@link Term} to search in.
+    * @param toSearch The {@link Term}s to search.
+    * @return {@code true} at least one {@link Term} is contained, {@code false} none of the {@link Term}s is contained.
+    */
+   protected boolean containsTerm(Term term, Set<Term> toSearch) {
+      if (toSearch.contains(term)) {
+         return true;
+      }
+      else {
+         boolean contained = false;
+         int i = 0;
+         while (!contained && i < term.arity()) {
+            contained = containsTerm(term.sub(i), toSearch);
+            i++;
+         }
+         return contained;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public PosInOccurrence getModalityPIO() {
+      return getVariable().getModalityPIO();
    }
 }

@@ -6,6 +6,8 @@
 (1) Requirements: 
 -------------------------------------
 
+Hardware:	2 GB RAM
+
 Operating System: Linux/Unix, MacOSX, Windows (untested) 
 
 Java SE 6 or newer (already installed)
@@ -27,9 +29,9 @@ Optionally, KeY can make use of the following binaries:
   At the KeY homepage you can find the following parts:
 
    * README.xxx-src.txt: this file
-   * KeY-xxx-src.tgz or KeY-xxx-src.zip: 
+   * KeY-xxx-src.tgz or KeY-xxx-src.zip:
 		the source code version of KeY-system
-   * KeYExtLib-xxx.tgz or KeYExtLib-xxx.zip: 
+   * KeYExtLib-xxx.tgz or KeYExtLib-xxx.zip:
 		contains the external libraries
 
    where xxx stands for the current version.

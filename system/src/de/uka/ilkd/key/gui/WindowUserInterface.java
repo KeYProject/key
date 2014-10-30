@@ -16,12 +16,17 @@ package de.uka.ilkd.key.gui;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -29,14 +34,16 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractUserInterface;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
+import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * This class is the starting point for the extraction of a unified
@@ -52,7 +59,7 @@ import de.uka.ilkd.key.util.KeYExceptionHandler;
 public class WindowUserInterface extends AbstractUserInterface {
 
     private MainWindow mainWindow;
-
+    private int numOfInvokedMacros;
 
     private LinkedList<InteractiveRuleApplicationCompletion> completions =
             new LinkedList<InteractiveRuleApplicationCompletion>();
@@ -63,6 +70,7 @@ public class WindowUserInterface extends AbstractUserInterface {
         completions.add(new DependencyContractCompletion());
         completions.add(new LoopInvariantRuleCompletion());
         completions.add(new BlockContractCompletion(mainWindow));
+        this.numOfInvokedMacros = 0;
     }
 
     protected String getMacroConsoleOutput() {
@@ -94,20 +102,16 @@ public class WindowUserInterface extends AbstractUserInterface {
     @Override
     public void proofCreated(ProblemInitializer sender,
                              ProofAggregate proofAggregate) {
-        mainWindow.addProblem(proofAggregate);
-        mainWindow.setStandardStatusLine();
     }
 
     @Override
     public void reportException(Object sender, ProofOblInput input, Exception e) {
-        reportStatus(
-                sender, input.name() + " failed");
+        reportStatus(sender, input.name() + " failed");
     }
 
     @Override
     public void reportStatus(Object sender, String status, int progress) {
-        mainWindow.setStatusLine(
-                status, progress);
+        mainWindow.setStatusLine(status, progress);
     }
 
     @Override
@@ -120,14 +124,12 @@ public class WindowUserInterface extends AbstractUserInterface {
         mainWindow.setStandardStatusLine();
     }
 
-    public void finish(Proof proof) {
-        // do nothing
-    }
-
     @Override
     public void taskFinished(TaskFinishedInfo info) {
         if (info.getSource() instanceof ApplyStrategy) {
-            resetStatus(this);
+            if (numOfInvokedMacros == 0) {
+                resetStatus(this);
+            }
             ApplyStrategy.ApplyStrategyInfo result =
                     (ApplyStrategyInfo) info.getResult();
 
@@ -148,6 +150,24 @@ public class WindowUserInterface extends AbstractUserInterface {
                 }
             }
             mainWindow.displayResults(info.toString());
+        } else if (info.getSource() instanceof ProofMacro) {
+            if (numOfInvokedMacros == 0) {
+                resetStatus(this);
+                assert info instanceof ProofMacroFinishedInfo;
+                Proof proof = info.getProof();
+                if (!proof.closed()) {
+                    Goal g = proof.openGoals().head();
+                    mainWindow.getMediator().goalChosen(g);
+                    if (inStopAtFirstUncloseableGoalMode(info.getProof())) {
+                        // iff Stop on non-closeable Goal is selected a little
+                        // popup is generated and proof is stopped
+                        AutoDismissDialog dialog = new AutoDismissDialog(
+                                "Couldn't close Goal Nr. " + g.node().serialNr()
+                                + " automatically");
+                        dialog.show();
+                    }
+                }
+            }
         } else if (info.getSource() instanceof ProblemLoader) {
             resetStatus(this);
             if (info.getResult() != null) {
@@ -156,10 +176,14 @@ public class WindowUserInterface extends AbstractUserInterface {
                 ExceptionDialog.showDialog(
                         mainWindow, exceptionHandler.getExceptions());
                 exceptionHandler.clear();
+            } else if (getMediator().getUI().isSaveOnly()) {
+                mainWindow.displayResults("Finished Saving!");
             } else {
                 KeYMediator mediator = mainWindow.getMediator();
-                mediator.getNotationInfo().refresh(
-                        mediator.getServices());
+                mediator.getNotationInfo().refresh(mediator.getServices());
+                if (macroChosen()) {
+                    applyMacro();
+                }
             }
         } else {
             resetStatus(this);
@@ -170,6 +194,13 @@ public class WindowUserInterface extends AbstractUserInterface {
         // this seems to be a good place to free some memory
         Runtime.getRuntime().gc();
     }
+
+
+    @Override
+    protected void macroFinished(TaskFinishedInfo info) {
+        numOfInvokedMacros--;
+    }
+
 
     protected boolean inStopAtFirstUncloseableGoalMode(Proof proof) {
         return proof.getSettings().getStrategySettings()
@@ -190,6 +221,12 @@ public class WindowUserInterface extends AbstractUserInterface {
     }
 
     @Override
+    protected void macroStarted(String message,
+                                int size) {
+        numOfInvokedMacros++;
+    }
+
+    @Override
     public void setMaximum(int maximum) {
         mainWindow.getStatusLine().setProgressBarMaximum(maximum);
     }
@@ -202,12 +239,13 @@ public class WindowUserInterface extends AbstractUserInterface {
     @Override
     public void notifyAutoModeBeingStarted() {
         mainWindow.setCursor(new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));
+        super.notifyAutoModeBeingStarted();
     }
 
     @Override
     public void notifyAutomodeStopped() {
-        mainWindow
-        .setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        mainWindow.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        super.notifyAutomodeStopped();
     }
 
     @Override
@@ -217,7 +255,7 @@ public class WindowUserInterface extends AbstractUserInterface {
 
     @Override
     public void completeAndApplyTacletMatch(ApplyTacletDialogModel[] models,
-            Goal goal) {
+                                            Goal goal) {
         new TacletMatchCompletionDialog(mainWindow, models, goal, mainWindow.getMediator());
     }
 
@@ -236,7 +274,7 @@ public class WindowUserInterface extends AbstractUserInterface {
 
     @Override
     public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
-        if (mainWindow.getMediator().autoMode()) {
+        if (mainWindow.getMediator().isInAutoMode()) {
             return super.completeBuiltInRuleApp(app, goal, forced);
         }
         IBuiltInRuleApp result = app;
@@ -252,8 +290,7 @@ public class WindowUserInterface extends AbstractUserInterface {
     @Override
     public ProblemInitializer createProblemInitializer(Profile profile) {
         ProblemInitializer pi = new ProblemInitializer(this,
-                new Services(profile, mainWindow.getMediator().getExceptionHandler()),
-                this);
+                new Services(profile, mainWindow.getMediator().getExceptionHandler()), this);
         return pi;
     }
 
@@ -269,12 +306,12 @@ public class WindowUserInterface extends AbstractUserInterface {
     * {@inheritDoc}
     */
    @Override
-   public DefaultProblemLoader load(Profile profile, File file, List<File> classPath,
-                                    File bootClassPath) throws ProblemLoaderException {
+   public AbstractProblemLoader load(Profile profile, File file, List<File> classPath,
+                                    File bootClassPath, Properties poPropertiesToForce) throws ProblemLoaderException {
       if (file != null) {
          mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());
       }
-      return super.load(profile, file, classPath, bootClassPath);
+      return super.load(profile, file, classPath, bootClassPath, poPropertiesToForce);
    }
 
    /**
@@ -285,38 +322,56 @@ public class WindowUserInterface extends AbstractUserInterface {
       return mainWindow.getProofList().containsProof(proof);
    }
 
+   @Override
+   public File saveProof(Proof proof, String fileExtension) {
+       final MainWindow mainWindow = MainWindow.getInstance();
+       final KeYFileChooser jFC = GuiUtilities.getFileChooser("Choose filename to save proof");
+       final String defaultName = MiscTools.toValidFileName(proof.name().toString()).toString();
+       boolean autoSave = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave();
+       final Pair<Boolean, Pair<File, Boolean>> res =
+               jFC.showSaveDialog(mainWindow, defaultName + fileExtension, autoSave);
+       final boolean saved = res.first;
+       final boolean newDir = res.second.second;
+       File file = null;
+       if (saved) {
+           file = jFC.getSelectedFile();
+           mainWindow.saveProof(jFC.getSelectedFile());
+       } else if (newDir) {
+           final File dir = res.second.first;
+           if (!dir.delete()) {
+               dir.deleteOnExit();
+           }
+       }
+       jFC.resetPath();
+       return file;
+   }
+
    /**
     * {@inheritDoc}
     */
    @Override
    public void removeProof(Proof proof) {
        if (!proof.isDisposed()) {
-           // The following was copied from AbandonTaskAction when I redirected
-           // the abandon method there to this method.
-           // The code seems to do more than the original code of this method...
-           final TaskTreeNode rootTask = proof.getBasicTask().getRootTask();
-           mainWindow.getProofList().removeTask(rootTask);
-           final Proof[] rootTaskProofs = rootTask.allProofs();
-           for (Proof p : rootTaskProofs) {
-               //In a previous revision the following statement was performed only
-               //on one proof object, namely on: mediator.getProof()
-               p.dispose();
-           }
-           proof.dispose();
-           mainWindow.getProofTreeView().removeProofs(rootTaskProofs);
-
-           // The original code of this method. Neccessary?
+          // The original code of this method. Neccessary?
            mainWindow.getProofList().removeProof(proof);
+
 
            // Run the garbage collector.
            Runtime r = Runtime.getRuntime();
            r.gc();
-       }
-   }
+        }
+    }
 
    @Override
    public boolean selectProofObligation(InitConfig initConfig) {
-      ProofManagementDialog.showInstance(initConfig);
-      return ProofManagementDialog.startedProof();
+      return ProofManagementDialog.showInstance(initConfig);
    }
+
+   @Override
+   public void proofRegistered(ProofEnvironmentEvent event) {
+      mainWindow.addProblem(event.getProofList());
+      mainWindow.setStandardStatusLine();
+   }
+
+  
 }

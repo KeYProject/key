@@ -17,10 +17,14 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
+import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDMethodReturn;
+import org.key_project.sed.core.model.ISEDVariable;
 import org.key_project.sed.core.model.impl.AbstractSEDMethodReturn;
+import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
@@ -32,7 +36,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * based on KeY.
  * @author Martin Hentschel
  */
-public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDDebugNode<IExecutionMethodReturn> {
+public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDDebugNode<IExecutionMethodReturn>, IKeYBaseMethodReturn {
    /**
     * The {@link IExecutionMethodReturn} to represent by this debug node.
     */
@@ -57,6 +61,11 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
     * The contained KeY variables.
     */
    private KeYVariable[] variables;
+   
+   /**
+    * The constraints
+    */
+   private KeYConstraint[] constraints;
 
    /**
     * The method call stack.
@@ -64,19 +73,45 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
    private IKeYSEDDebugNode<?>[] callStack;
 
    /**
+    * The condition under which this method return is reached from its calling node.
+    */
+   private SEDMemoryBranchCondition methodReturnCondition;
+   
+   /**
+    * The {@link KeYMethodCall} which is now returned.
+    */
+   private final KeYMethodCall methodCall;
+   
+   /**
+    * The conditions under which a group ending in this node starts.
+    */
+   private SEDMemoryBranchCondition[] groupStartConditions;
+   
+   /**
+    * The contained KeY variables at the call state.
+    */
+   private KeYVariable[] callStateVariables;
+
+   /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this branch condition is contained.
     * @param parent The parent in that this node is contained as child.
     * @param thread The {@link KeYThread} in that this node is contained.
+    * @param methodCall The {@link KeYMethodCall} which is now returned.
     * @param executionNode The {@link IExecutionMethodReturn} to represent by this debug node.
     */
    public KeYMethodReturn(KeYDebugTarget target, 
                           IKeYSEDDebugNode<?> parent, 
                           KeYThread thread, 
+                          KeYMethodCall methodCall,
                           IExecutionMethodReturn executionNode) throws DebugException {
       super(target, parent, thread);
       Assert.isNotNull(executionNode);
+      Assert.isNotNull(methodCall);
+      this.methodCall = methodCall;
       this.executionNode = executionNode;
+      getMethodCall().addMehodReturn(this);
+      target.registerDebugNode(this);
       initializeAnnotations();
    }
 
@@ -110,7 +145,7 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
    @Override
    public IKeYSEDDebugNode<?>[] getChildren() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
-         IExecutionNode[] executionChildren = executionNode.getChildren();
+         IExecutionNode<?>[] executionChildren = executionNode.getChildren();
          if (children == null) {
             children = KeYModelUtil.createChildren(this, executionChildren);
          }
@@ -210,17 +245,11 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
    }
    
    /**
-    * Returns the method call node if available in debug model.
-    * @return The {@link KeYMethodCall} node or {@code null} if not available.
+    * {@inheritDoc}
     */
+   @Override
    public KeYMethodCall getMethodCall() {
-      IKeYSEDDebugNode<?> callNode = getDebugTarget().getDebugNode(executionNode.getMethodCall());
-      if (callNode instanceof KeYMethodCall) {
-         return (KeYMethodCall)callNode;
-      }
-      else {
-         return null;
-      }
+      return methodCall;
    }
 
    /**
@@ -240,9 +269,44 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
     * {@inheritDoc}
     */
    @Override
+   public ISEDVariable[] getCallStateVariables() throws DebugException {
+      synchronized (this) {
+         if (callStateVariables == null) {
+            callStateVariables = KeYModelUtil.createCallStateVariables(this, executionNode);
+         }
+         return callStateVariables;
+      }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasConstraints() throws DebugException {
+      return !isTerminated() && super.hasConstraints();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYConstraint[] getConstraints() throws DebugException {
+      synchronized (this) {
+         if (constraints == null) {
+            constraints = KeYModelUtil.createConstraints(this, executionNode);
+         }
+         return constraints;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public boolean hasVariables() throws DebugException {
       try {
          return getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode() &&
+                !executionNode.isDisposed() && 
                 SymbolicExecutionUtil.canComputeVariables(executionNode, executionNode.getServices()) &&
                 super.hasVariables();
       }
@@ -354,6 +418,56 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
             callStack = KeYModelUtil.createCallStack(getDebugTarget(), executionNode.getCallStack()); 
          }
          return callStack;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public SEDMemoryBranchCondition getMethodReturnCondition() throws DebugException {
+      try {
+         synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+            if (methodReturnCondition == null) {
+               KeYMethodCall methodCall = getMethodCall();
+               methodReturnCondition = new SEDMemoryBranchCondition(getDebugTarget(), methodCall, getThread());
+               methodReturnCondition.addChild(this);
+               methodReturnCondition.setName(executionNode.getFormatedMethodReturnCondition());
+               methodReturnCondition.setPathCondition(methodCall.getPathCondition());
+            }
+            return methodReturnCondition;
+         }
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute method return condition.", e));
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setParent(ISEDDebugNode parent) {
+      super.setParent(parent);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public SEDMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
+      synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+         if (groupStartConditions == null) {
+            SEDMemoryBranchCondition returnCondition = getMethodReturnCondition();
+            SEDMemoryBranchCondition[] completedBlockConditions = KeYModelUtil.createCompletedBlocksConditions(this);
+            if (returnCondition != null) {
+               groupStartConditions = ArrayUtil.insert(completedBlockConditions, returnCondition, 0);
+            }
+            else {
+               groupStartConditions = completedBlockConditions;
+            }
+         }
+         return groupStartConditions;
       }
    }
 }

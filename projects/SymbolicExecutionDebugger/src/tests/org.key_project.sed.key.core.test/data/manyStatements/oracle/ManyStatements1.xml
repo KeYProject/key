@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_08164f72-eb3a-4743-bda4-489332fb29e7" name="main()" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_faa27f75-6d85-49cd-a85e-997cf1af7ea1" name="&lt;start&gt;" pathCondition="true">
+   <sedTarget xml:id="_4582b723-d793-4a98-b49e-68111ab0039e" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_7d002847-60fd-4ebf-8ee9-2cbb3de20e32" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest_testDifferentValues\src\ManyStatements.java">
       </sedThread>
    </sedTarget>
 </launch>

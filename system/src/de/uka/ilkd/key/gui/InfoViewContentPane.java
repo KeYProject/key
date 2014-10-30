@@ -11,6 +11,10 @@ import javax.swing.JTextArea;
  */
 public class InfoViewContentPane extends JScrollPane {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = -7609483136106706196L;
     private final JTextArea description;
 
     InfoViewContentPane() {

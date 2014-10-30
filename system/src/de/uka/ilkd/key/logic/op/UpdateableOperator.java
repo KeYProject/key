@@ -19,6 +19,6 @@ package de.uka.ilkd.key.logic.op;
  * locations as well. This means e.g. occur as top level operators on the 
  * left side of an assignment pair of an update. 
  */
-public interface UpdateableOperator extends SortedOperator {
+public interface UpdateableOperator extends SortedOperator, ParsableVariable {
 
 }

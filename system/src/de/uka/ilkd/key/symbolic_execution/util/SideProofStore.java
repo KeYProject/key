@@ -110,6 +110,13 @@ public final class SideProofStore {
          }
       }
    }
+
+   /**
+    * Removes all {@link Entry}s.
+    */
+   public void clearProofs() {
+      removeEntries(new LinkedList<Entry>(entries));
+   }
    
    /**
     * Checks if an {@link Entry} for the given {@link Proof} exist.
@@ -283,7 +290,7 @@ public final class SideProofStore {
          this.description = description;
          this.proof = proof;
          CustomUserInterface ui = new CustomUserInterface(false);
-         this.environment = new KeYEnvironment<CustomUserInterface>(ui, proof.env().getInitConfig(), proof);
+         this.environment = new KeYEnvironment<CustomUserInterface>(ui, proof.getInitConfig(), proof);
       }
 
       /**

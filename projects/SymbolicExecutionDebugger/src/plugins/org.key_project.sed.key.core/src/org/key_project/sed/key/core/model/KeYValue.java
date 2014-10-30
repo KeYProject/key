@@ -13,14 +13,22 @@
 
 package org.key_project.sed.key.core.model;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.key_project.sed.core.model.ISEDValue;
+import org.key_project.sed.core.model.ISEDVariable;
 import org.key_project.sed.core.model.impl.AbstractSEDValue;
 import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
@@ -46,12 +54,18 @@ public class KeYValue extends AbstractSEDValue {
    private KeYVariable[] variables;
    
    /**
+    * All relevant {@link KeYConstraint}s.
+    */
+   private KeYConstraint[] relevantConstraints;
+   
+   /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this element is contained.
     * @param executionValue The {@link IExecutionValue} to represent in debug model.
+    * @param parent The parent {@link ISEDVariable}.
     */
-   public KeYValue(KeYDebugTarget target, IExecutionValue executionValue) {
-      super(target);
+   public KeYValue(KeYDebugTarget target, ISEDVariable parent, IExecutionValue executionValue) {
+      super(target, parent);
       Assert.isNotNull(executionValue);
       this.executionValue = executionValue;
    }
@@ -107,7 +121,7 @@ public class KeYValue extends AbstractSEDValue {
                if (executionVariables != null) {
                   variables = new KeYVariable[executionVariables.length];
                   for (int i = 0; i < executionVariables.length; i++) {
-                     variables[i] = new KeYVariable(getDebugTarget(), executionVariables[i]);
+                     variables[i] = new KeYVariable(getDebugTarget(), getParent().getStackFrame(), executionVariables[i]);
                   }
                }
                else {
@@ -169,5 +183,32 @@ public class KeYValue extends AbstractSEDValue {
    @Override
    public boolean isMultiValued() throws DebugException {
       return false;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYConstraint[] getRelevantConstraints() throws DebugException {
+      try {
+         synchronized (this) {
+            if (relevantConstraints == null) {
+               Set<IExecutionConstraint> relevantExecutionConstraints = new HashSet<IExecutionConstraint>();
+               CollectionUtil.addAll(relevantExecutionConstraints, executionValue.getConstraints());
+               List<KeYConstraint> constraints = new LinkedList<KeYConstraint>();
+               KeYConstraint[] allConstraints = ((IKeYSEDDebugNode<?>)getParent().getStackFrame()).getConstraints();
+               for (KeYConstraint constraint : allConstraints) {
+                  if (relevantExecutionConstraints.remove(constraint.getExecutionConstraint())) {
+                     constraints.add(constraint);
+                  }
+               }
+               relevantConstraints = constraints.toArray(new KeYConstraint[constraints.size()]);
+            }
+            return relevantConstraints;
+         }
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus(e));
+      }
    }
 }

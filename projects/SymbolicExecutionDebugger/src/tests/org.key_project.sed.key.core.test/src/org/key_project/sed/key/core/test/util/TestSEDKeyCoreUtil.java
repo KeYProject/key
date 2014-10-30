@@ -135,6 +135,7 @@ public final class TestSEDKeyCoreUtil {
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node? Use {@code null} to use default value.
     * @param showKeYMainWindow Show KeY's main window? Use {@code null} to use default value.
     * @param mergeBranchConditions Merge branch conditions?
+    * @param useUnicode Use unicode characters?
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @throws Exception Occurred Exception.
@@ -146,6 +147,7 @@ public final class TestSEDKeyCoreUtil {
                                 final Boolean showVariablesOfSelectedDebugNode,
                                 final Boolean showKeYMainWindow,
                                 final Boolean mergeBranchConditions,
+                                final Boolean useUnicode,
                                 final Boolean usePrettyPrinting,
                                 final Boolean showSignatureOnMethodReturnNodes) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
@@ -181,6 +183,9 @@ public final class TestSEDKeyCoreUtil {
                }
                if (mergeBranchConditions != null) {
                   wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, mergeBranchConditions);
+               }
+               if (useUnicode != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_UNICODE, useUnicode);
                }
                if (usePrettyPrinting != null) {
                   wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING, usePrettyPrinting);
@@ -242,7 +247,7 @@ public final class TestSEDKeyCoreUtil {
     * @param targetName The expected name of the {@link ISEDDebugTarget}. 
     * @return The created expected model.
     */
-   public static ISEDDebugTarget createExpectedInitialModel(String targetName) {
+   public static ISEDDebugTarget createExpectedInitialModel(String targetName, boolean disposed) {
       // Create debug target
       SEDMemoryDebugTarget target = new SEDMemoryDebugTarget(null, false);
       target.setModelIdentifier(KeYDebugTarget.MODEL_IDENTIFIER);
@@ -250,6 +255,9 @@ public final class TestSEDKeyCoreUtil {
       // Add thread
       SEDMemoryThread thread = new SEDMemoryThread(target, false);
       thread.setName(IExecutionStart.DEFAULT_START_NODE_NAME);
+      if (!disposed) {
+         thread.setPathCondition("true");
+      }
       target.addSymbolicThread(thread);
       return target;
    }
@@ -261,8 +269,19 @@ public final class TestSEDKeyCoreUtil {
     * @param targetName The expected name of the {@link ISEDDebugTarget}. 
     * @throws DebugException Occurred Exception.
     */
+   public static void assertDisposedInitialTarget(ISEDDebugTarget target, String targetName) throws DebugException {
+      TestSedCoreUtil.compareDebugTarget(createExpectedInitialModel(targetName, true), target, false, false, false, false);
+   }
+   
+   /**
+    * Makes sure that the given {@link ISEDDebugTarget} is
+    * in the initial state.
+    * @param target The give {@link ISEDDebugTarget} to check.
+    * @param targetName The expected name of the {@link ISEDDebugTarget}. 
+    * @throws DebugException Occurred Exception.
+    */
    public static void assertInitialTarget(ISEDDebugTarget target, String targetName) throws DebugException {
-      TestSedCoreUtil.compareDebugTarget(createExpectedInitialModel(targetName), target, false, false, false);
+      TestSedCoreUtil.compareDebugTarget(createExpectedInitialModel(targetName, false), target, false, false, false, false);
    }
    
    /**
@@ -275,7 +294,7 @@ public final class TestSEDKeyCoreUtil {
     * @throws ParserConfigurationException Occurred Exception.
     */
    public static void assertFlatStepsExample(ISEDDebugTarget target) throws DebugException, ParserConfigurationException, SAXException, IOException {
-      TestSedCoreUtil.compareDebugTarget(createExpectedModel(Activator.PLUGIN_ID, "data/statements/oracle/FlatSteps.xml"), target, false, false, false);
+      TestSedCoreUtil.compareDebugTarget(createExpectedModel(Activator.PLUGIN_ID, "data/statements/oracle/FlatSteps.xml"), target, false, false, false, false);
    }
    
    /**

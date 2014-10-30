@@ -76,5 +76,11 @@ public interface EnvInput {
      * Returns the {@link Profile} to use.
      * @return The {@link Profile} to use.
      */
-    public Profile getProfile();
+    Profile getProfile();
+
+    /**
+     * Returns the initial {@link File} which is loaded if available.
+     * @return The initial {@link File} which is loaded or {@code null} otherwise.
+     */
+    File getInitialFile();
 }

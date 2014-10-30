@@ -32,7 +32,9 @@ import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchStatement;
+import org.key_project.sed.core.model.memory.SEDMemoryConstraint;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
+import org.key_project.sed.core.model.memory.SEDMemoryExceptionalMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryExceptionalTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopBodyTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopCondition;
@@ -100,6 +102,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        SEDMemoryThread thread = new SEDMemoryThread(target, false);
        thread.setName("Fixed Example Thread");
        thread.setPathCondition("pc1");
+       thread.addConstraint(new SEDMemoryConstraint(target, "Thread's Constraint"));
        target.addSymbolicThread(thread);
        
        SEDMemoryStatement s1 = new SEDMemoryStatement(target, thread, thread);
@@ -108,11 +111,40 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        s1.setLineNumber(-1);
        s1.setCharStart(3);
        s1.setCharEnd(5);
+       s1.addConstraint(new SEDMemoryConstraint(target, "int x = 1 Constraint"));
        thread.addChild(s1);
+       
+       SEDMemoryConstraint s1Constarint1 = new SEDMemoryConstraint(target, "s1Constarint1");
+       s1.addConstraint(s1Constarint1);
+       SEDMemoryConstraint s1Constarint2 = new SEDMemoryConstraint(target, "s1Constarint2");
+       s1.addConstraint(s1Constarint2);
+       SEDMemoryConstraint s1Constarint3 = new SEDMemoryConstraint(target, "s1Constarint3");
+       s1.addConstraint(s1Constarint3);
+       
+       SEDMemoryVariable s1var1 = new SEDMemoryVariable(target, s1);
+       s1var1.setName("var1");
+       s1var1.setReferenceTypeName("var1type");
+       SEDMemoryValue s1var1value = new SEDMemoryValue(target, s1var1);
+       s1var1value.setReferenceTypeName("s1var1valueType");
+       s1var1value.setValueString("s1var1value");
+       s1var1value.addRelevantConstraint(s1Constarint1);
+       s1var1.setValue(s1var1value);
+       s1.addVariable(s1var1);
+       
+       SEDMemoryVariable s1var2 = new SEDMemoryVariable(target, s1);
+       s1var2.setName("var2");
+       s1var2.setReferenceTypeName("var2type");
+       SEDMemoryValue s1var2value = new SEDMemoryValue(target, s1var2);
+       s1var2value.setReferenceTypeName("s1var2valueType");
+       s1var2value.setValueString("s1var2value");
+       s1var2value.addRelevantConstraint(s1Constarint2);
+       s1var2.setValue(s1var2value);
+       s1.addVariable(s1var2);
        
        SEDMemoryLoopStatement ln = new SEDMemoryLoopStatement(target, s1, thread);
        ln.setName("while (x == 1)");
        ln.setPathCondition("pc3");
+       ln.setGroupable(false);
        s1.addChild(ln);
        
        SEDMemoryLoopCondition lc = new SEDMemoryLoopCondition(target, ln, thread);
@@ -144,6 +176,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        et.setName("throws DivisionByZeroException()");
        et.setPathCondition("pc9");
        bzero.addChild(et);
+       thread.addTermination(et);
        
        SEDMemoryBranchCondition bnotzero = new SEDMemoryBranchCondition(target, s3, thread);
        bnotzero.setName("z != 0");
@@ -153,6 +186,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        SEDMemoryMethodCall call = new SEDMemoryMethodCall(target, bnotzero, thread);
        call.setName("foo(result)");
        call.setPathCondition("pc11");
+       call.setGroupable(true);
        bnotzero.addChild(call);
 
        SEDMemoryBranchStatement branch = new SEDMemoryBranchStatement(target, call, thread);
@@ -171,12 +205,33 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        returnNegative.setName("return -1");
        returnNegative.setPathCondition("pc14");
        returnNegative.setCallStack(new ISEDDebugNode[] {call});
+       SEDMemoryBranchCondition returnCondition = new SEDMemoryBranchCondition(target, call, thread);
+       returnCondition.setName("A Return Condition");
+       returnCondition.addChild(returnNegative);
+       returnNegative.addGroupStartCondition(returnCondition);
+       call.addMethodReturnCondition(returnCondition);
+       call.addGroupEndCondition(returnCondition);
+       returnNegative.setMethodReturnCondition(returnCondition);
        bnegative.addChild(returnNegative);
+       
+       SEDMemoryVariable negativeCallVar = new SEDMemoryVariable(target, et);
+       negativeCallVar.setName("negativeCallVar");
+       returnNegative.addCallStateVariable(negativeCallVar);
+       SEDMemoryValue negativeCallVarValue = new SEDMemoryValue(target, negativeCallVar);
+       negativeCallVarValue.setValueString("negativeCallVarValue");
+       negativeCallVar.setValue(negativeCallVarValue);
+       SEDMemoryVariable negativeCallVarChild = new SEDMemoryVariable(target, et);
+       negativeCallVarChild.setName("negativeCallVarChild");
+       negativeCallVarValue.addVariable(negativeCallVarChild);
+       SEDMemoryValue negativeCallVarChildValue = new SEDMemoryValue(target, negativeCallVarChild);
+       negativeCallVarChildValue.setValueString("negativeCallVarChildValue");
+       negativeCallVarChild.setValue(negativeCallVarChildValue);
        
        SEDMemoryTermination terminationNegative = new SEDMemoryTermination(target, returnNegative, thread, true);
        terminationNegative.setName("<end>");
        terminationNegative.setPathCondition("pc15");
        returnNegative.addChild(terminationNegative);
+       thread.addTermination(terminationNegative);
        
        SEDMemoryBranchCondition bpositive = new SEDMemoryBranchCondition(target, branch, thread);
        bpositive.setName("result >= 0");
@@ -184,36 +239,36 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        bpositive.setCallStack(new ISEDDebugNode[] {call});
        branch.addChild(bpositive);
        
-       SEDMemoryMethodReturn returnPositive = new SEDMemoryMethodReturn(target, bpositive, thread);
+       SEDMemoryExceptionalMethodReturn returnPositive = new SEDMemoryExceptionalMethodReturn(target, bpositive, thread);
        returnPositive.setName("return 1");
        returnPositive.setPathCondition("pc17");
        returnPositive.setCallStack(new ISEDDebugNode[] {call});
        bpositive.addChild(returnPositive);
        
-       SEDMemoryVariable returnPositiveVar1 = new SEDMemoryVariable(target);
+       SEDMemoryVariable returnPositiveVar1 = new SEDMemoryVariable(target, returnPositive);
        returnPositiveVar1.setName("returnPositiveVar1");
        returnPositiveVar1.setReferenceTypeName("returnPositiveVar1type");
-       SEDMemoryValue returnPositiveVar1value = new SEDMemoryValue(target);
+       SEDMemoryValue returnPositiveVar1value = new SEDMemoryValue(target, returnPositiveVar1);
        returnPositiveVar1value.setAllocated(true);
        returnPositiveVar1value.setReferenceTypeName("returnPositiveVar1valueType");
        returnPositiveVar1value.setValueString("returnPositiveVar1value");
        returnPositiveVar1.setValue(returnPositiveVar1value);
        returnPositive.addVariable(returnPositiveVar1);
        
-       SEDMemoryVariable returnPositiveVar1_1 = new SEDMemoryVariable(target);
+       SEDMemoryVariable returnPositiveVar1_1 = new SEDMemoryVariable(target, returnPositive);
        returnPositiveVar1_1.setName("returnPositiveVar1_1");
        returnPositiveVar1_1.setReferenceTypeName("returnPositiveVar1_1type");
-       SEDMemoryValue returnPositiveVar1_1value = new SEDMemoryValue(target);
+       SEDMemoryValue returnPositiveVar1_1value = new SEDMemoryValue(target, returnPositiveVar1_1);
        returnPositiveVar1_1value.setAllocated(true);
        returnPositiveVar1_1value.setReferenceTypeName("returnPositiveVar1_1valueType");
        returnPositiveVar1_1value.setValueString("returnPositiveVar1_1value");
        returnPositiveVar1_1.setValue(returnPositiveVar1_1value);
        returnPositive.addVariable(returnPositiveVar1_1);
        
-       SEDMemoryVariable returnPositiveVar2 = new SEDMemoryVariable(target);
+       SEDMemoryVariable returnPositiveVar2 = new SEDMemoryVariable(target, returnPositive);
        returnPositiveVar2.setName("returnPositiveVar2");
        returnPositiveVar2.setReferenceTypeName("returnPositiveVar2type");
-       SEDMemoryValue returnPositiveVar2value = new SEDMemoryValue(target);
+       SEDMemoryValue returnPositiveVar2value = new SEDMemoryValue(target, returnPositiveVar2);
        returnPositiveVar2value.setAllocated(true);
        returnPositiveVar2value.setReferenceTypeName("returnPositiveVar2valueType");
        returnPositiveVar2value.setValueString("returnPositiveVar2value");
@@ -224,5 +279,6 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        terminationPositive.setName("<loop body end>");
        terminationPositive.setPathCondition("pc18");
        returnPositive.addChild(terminationPositive);
+       thread.addTermination(terminationPositive);
     }
 }

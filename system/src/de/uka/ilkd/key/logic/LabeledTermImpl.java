@@ -74,8 +74,8 @@ class LabeledTermImpl extends TermImpl {
 	@Override
 	public boolean containsLabel(TermLabel label) {
 		assert label != null : "Label must not be null";
-		for (TermLabel l : labels) {
-			if (label.equals(l)) {
+		for (int i = 0, sz = labels.size(); i<sz; i++) {
+			if (label.equals(labels.get(i))) {
 				return true;
 			}
 		}
@@ -86,16 +86,15 @@ class LabeledTermImpl extends TermImpl {
 	 * {@inheritDoc}
 	 */
 	public boolean equals(Object o) {
-		if (!(o instanceof LabeledTermImpl)) {
-			return false;
-		}
-		final LabeledTermImpl cmp = (LabeledTermImpl) o;
+	   if (!super.equals(o)) {
+	      return false;
+	   }
+		
+	   final LabeledTermImpl cmp = (LabeledTermImpl) o;
 		if (labels.size() == cmp.labels.size()) {
-			if (!super.equals(o)) {
-				return false;
-			}
-			for (TermLabel l : labels) { // this is not optimal, but as long as number of labels limited ok
-				if (!cmp.labels.contains(l)) {
+			for (int i = 0, sz = labels.size(); i<sz; i++) { 
+			   // this is not optimal, but as long as number of labels limited ok
+				if (!cmp.labels.contains(labels.get(i))) {
 					return false;
 				}
 			}

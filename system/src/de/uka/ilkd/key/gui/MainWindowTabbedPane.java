@@ -2,7 +2,7 @@ package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
-import de.uka.ilkd.key.util.GuiUtilities;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import javax.swing.JComponent;
@@ -17,6 +17,11 @@ import javax.swing.KeyStroke;
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class MainWindowTabbedPane extends JTabbedPane {
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 334677113533050832L;
 
     /**
      * the current proof tree

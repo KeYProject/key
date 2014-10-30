@@ -13,23 +13,24 @@
 
 package de.uka.ilkd.key.symbolic_execution.model;
 
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
 
 /**
  * <p>
- * A variable value pair contained in an {@link IExecutionStateNode}, e.g.
+ * A variable value pair contained in an {@link IExecutionNode}, e.g.
  * the method parameter {@code int x = 42;} will have the variable value pair
  * {@code x = 42}. This class represents the variable ({@code x}) which is represented
- * while its values are reprented as child {@link IExecutionValue} instances.
+ * while its values are represented as child {@link IExecutionValue} instances.
  * </p>
  * <p>
  * The default implementation is {@link ExecutionVariable} which
- * is instantiated lazily by the {@link IExecutionStateNode} implementations.
+ * is instantiated lazily by the {@link IExecutionNode} implementations.
  * </p>
  * @author Martin Hentschel
- * @see IExecutionStateNode
+ * @see IExecutionNode
  * @see IExecutionValue
  * @see ExecutionVariable
  */
@@ -51,6 +52,12 @@ public interface IExecutionVariable extends IExecutionElement {
     * @return {@code true} is array cell value, {@code false} is a "normal" value.
     */
    public boolean isArrayIndex();
+   
+   /**
+    * Returns the optional additional condition considered during value computation.
+    * @return The optional additional condition considered during value computation.
+    */
+   public Term getAdditionalCondition();
    
    /**
     * Returns the parent {@link IExecutionValue} if available.

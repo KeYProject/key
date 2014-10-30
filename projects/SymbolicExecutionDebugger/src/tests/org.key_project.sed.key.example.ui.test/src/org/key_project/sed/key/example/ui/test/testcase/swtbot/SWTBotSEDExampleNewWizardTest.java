@@ -138,10 +138,10 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
                   for (int i = 0; i < numberOfStepIntos; i++) {
                      stepInto(bot, item, target);
                   }
-                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false, false);
                }
             };
-            doKeYDebugTargetTest(javaProject, true, true, selector, useExistingContract, preconditionOrExistingContract, false, false, false, false, false, true, 10, executor);
+            doKeYDebugTargetTest(javaProject, true, true, selector, useExistingContract, preconditionOrExistingContract, false, false, false, false, false, false, true, 10, executor);
          }
       };
       doExampleTest(projectName, steps);
@@ -168,8 +168,8 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
       IExampleTestSteps steps = new IExampleTestSteps() {
          @Override
          public void doTest(IJavaProject javaProject) throws Exception {
-            IKeYDebugTargetTestExecutor executor = createResumeExecutor(false, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false, false, false, useMethodContracts, useLoopInvariants, false, false);
-            doKeYDebugTargetTest(javaProject, true, true, selector, useExistingContract, preconditionOrExistingContract, false, false, false, false, false, true, 10, executor);
+            IKeYDebugTargetTestExecutor executor = createResumeExecutor(false, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false, false, false, false, useMethodContracts, useLoopInvariants, false, false);
+            doKeYDebugTargetTest(javaProject, true, true, selector, useExistingContract, preconditionOrExistingContract, false, false, false, false, false, false, true, 10, executor);
          }
       };
       doExampleTest(projectName, steps);

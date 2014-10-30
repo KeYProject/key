@@ -24,6 +24,12 @@ public interface ITreeSettings {
     * or {@code false} allow that branch conditions contains branch conditions.
     */
    public boolean isMergeBranchConditions();
+   
+   /**
+    * Checks if unicode characters are used.
+    * @return {@code true} use unicode characters, {@code false} do not use unicode characters.
+    */
+   public boolean isUseUnicode();
 
    /**
     * Checks if pretty printing is used or not.

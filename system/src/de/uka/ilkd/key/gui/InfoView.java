@@ -16,7 +16,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.event.TreeSelectionListener;
 
-import de.uka.ilkd.key.util.GuiUtilities;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
+import de.uka.ilkd.key.util.XMLResources;
 import javax.swing.event.TreeSelectionEvent;
 
 /**
@@ -26,6 +27,10 @@ import javax.swing.event.TreeSelectionEvent;
  */
 public class InfoView extends JSplitPane {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = -6944612837850368411L;
     private final InfoTree infoTree;
     private final InfoViewContentPane contentPane;
     private final KeYMediator mediator;

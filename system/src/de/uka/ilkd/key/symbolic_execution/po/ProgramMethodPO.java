@@ -145,7 +145,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
    @Override
    protected ImmutableList<StatementBlock> buildOperationBlocks(ImmutableList<LocationVariable> formalParVars,
                                                 ProgramVariable selfVar,
-                                                ProgramVariable resultVar) {
+                                                ProgramVariable resultVar, Services services) {
       // Get program method to execute
       IProgramMethod pm = getProgramMethod();
       // Extracts code parts of the method
@@ -160,7 +160,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
     */
    @Override
    protected Term generateMbyAtPreDef(ProgramVariable selfVar,
-                                      ImmutableList<ProgramVariable> paramVars) {
+                                      ImmutableList<ProgramVariable> paramVars, Services services) {
       return tb.tt();
    }
 
@@ -216,7 +216,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
    protected Term buildFrameClause(List<LocationVariable> modHeaps,
                                    Map<Term, Term> heapToAtPre,
                                    ProgramVariable selfVar,
-                                   ImmutableList<ProgramVariable> paramVars) {
+                                   ImmutableList<ProgramVariable> paramVars, Services services) {
       return tb.tt();
    }
 
@@ -369,7 +369,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
          throw new IOException("Method signature has not valid order of chracters \"(\" and \")\".");
       }
       String name = signature.substring(0, breaketsStart);
-      String[] types = signature.substring(breaketsStart + 1, breaketsEnd).split(",");
+      String parameters = signature.substring(breaketsStart + 1, breaketsEnd);
+      String[] types = parameters.isEmpty() ? new String[0] : parameters.split(",");
       // Find container and parameter types
       KeYJavaType type = javaInfo.getKeYJavaType(className.trim());
       if (type == null) {

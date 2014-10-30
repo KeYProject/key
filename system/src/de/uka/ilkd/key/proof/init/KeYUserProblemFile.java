@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Term;
@@ -30,6 +29,7 @@ import de.uka.ilkd.key.proof.io.IProofFileParser;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import org.antlr.runtime.RecognitionException;
 
 
 /** 
@@ -75,8 +75,10 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         
         //read activated choices
         try {
-            ProofSettings settings = getPreferences();
-            
+
+        	ProofSettings settings = getPreferences();
+            initConfig.setSettings(settings);	
+        	
             ParserConfig pc = new ParserConfig
                 (initConfig.getServices(), 
                  initConfig.namespaces());
@@ -91,12 +93,11 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             
             initConfig.setActivatedChoices(settings.getChoiceSettings()
         	      		                   .getDefaultChoicesAsSet());
+            
         
-        } catch (antlr.ANTLRException e) {
+        } catch (Exception e) {
             throw new ProofInputException(e);      
-        } catch (FileNotFoundException fnfe) {
-            throw new ProofInputException(fnfe);
-        }        
+        }     
 	
         //read in-code specifications
         SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), 
@@ -123,7 +124,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 	    DeclPicker lexer = new DeclPicker(new KeYLexerF(cinp,
 		    file.toString(),
 		    initConfig.getServices().getExceptionHandler()));
-            
+
             final ParserConfig normalConfig 
                 = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
             final ParserConfig schemaConfig 
@@ -148,7 +149,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 	            searchS = "\\proofObligation";
 	       }
 	       else {
-	         throw new ProofInputException("No \\problem or \\chooseContract or \\proofObligation in the input file!");
+	         throw new ProofInputException(
+	                 "No \\problem or \\chooseContract or \\proofObligation in the input file!");
 	       }
 	       
 	    }
@@ -162,10 +164,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 
             initConfig.setTaclets(problemParser.getTaclets());
             lastParser = problemParser;
-        } catch (antlr.ANTLRException e) {
+        } catch (Exception e) {
             throw new ProofInputException(e);
-        } catch (FileNotFoundException fnfe) {
-            throw new ProofInputException(fnfe);
         }
     }
 
@@ -175,14 +175,14 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         assert problemTerm != null;
         String name = name();
         ProofSettings settings = getPreferences();
+        initConfig.setSettings(settings);
         return ProofAggregate.createProofAggregate(
                 new Proof(name, 
                           problemTerm, 
                           problemHeader,
                           initConfig.createTacletIndex(), 
                           initConfig.createBuiltInRuleIndex(),
-                          initConfig.getServices(), 
-                          settings), 
+                          initConfig), 
                 name);
     }
     
@@ -197,13 +197,13 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * Reads a saved proof of a .key file.
      */
     public void readProof(IProofFileParser prl) throws ProofInputException {
-	if(lastParser == null) {
-	    readProblem();
-	}
+        if (lastParser == null) {
+            readProblem();
+        }
         try {
             lastParser.proof(prl);
-        } catch(antlr.ANTLRException e) {
-            throw new ProofInputException(e);
+        } catch (RecognitionException ex) {
+            throw new ProofInputException(ex);
         }
     }
         

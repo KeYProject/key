@@ -682,6 +682,8 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=breaks_clause         { sc.addBreaks(ps); }
 	|   ps=continues_clause      { sc.addContinues(ps); }
 	|   ps=returns_clause        { sc.addReturns(ps); }
+        |   ps=separates_clause      { sc.addInfFlowSpecs(ps); }
+        |   ps=determines_clause      { sc.addInfFlowSpecs(ps); }
     )
     {
 	if(b == Behavior.EXCEPTIONAL_BEHAVIOR
@@ -711,6 +713,41 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 //-----------------------------------------------------------------------------
 //simple specification body clauses
 //-----------------------------------------------------------------------------
+
+
+// old information flow annotations
+separates_clause
+	returns [PositionedString r = null]
+	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+    separates_keyword result=expression { result = result.prepend("separates "); }
+;
+
+
+separates_keyword
+:
+        RESPECTS
+    |   SEPARATES
+;
+
+
+determines_clause
+	returns [PositionedString r = null]
+	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+    determines_keyword result=expression { result = result.prepend("determines "); }
+;
+
+
+determines_keyword
+:
+        DETERMINES
+;
+
 
 assignable_clause
 	returns [PositionedString r = null]
@@ -1269,6 +1306,8 @@ loop_specification[ImmutableList<String> mods]
 	options { greedy = true; }
 	:
             ps=loop_invariant       { ls.addInvariant(ps); }
+        |   ps=loop_separates_clause      { ls.addInfFlowSpecs(ps); }
+        |   ps=loop_determines_clause      { ls.addInfFlowSpecs(ps); }
         |   ps=assignable_clause    { ls.addAssignable(ps); }
         |   ps=variant_function     { ls.setVariant(ps); }
     )*
@@ -1305,6 +1344,27 @@ decreasing_keyword
     |   DECREASING_REDUNDANTLY
     |   DECREASES
     |   DECREASES_REDUNDANTLY
+;
+
+
+// old information flow annotations
+loop_separates_clause
+	returns [PositionedString r = null]
+	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+    separates_keyword result=expression { result = result.prepend("loop_separates "); }
+;
+
+
+loop_determines_clause
+	returns [PositionedString r = null]
+	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+    determines_keyword result=expression { result = result.prepend("loop_determines "); }
 ;
 
 

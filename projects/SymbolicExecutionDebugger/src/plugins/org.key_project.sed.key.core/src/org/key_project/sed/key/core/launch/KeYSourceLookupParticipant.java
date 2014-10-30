@@ -27,6 +27,8 @@ import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 
+import de.uka.ilkd.key.proof.JavaModel;
+
 /**
  * {@link AbstractSourceLookupParticipant} implementation for the
  * Symbolic Execution Debugger based on KeY.
@@ -65,18 +67,18 @@ public class KeYSourceLookupParticipant extends AbstractSourceLookupParticipant 
       if (adaptable instanceof IDebugElement) {
          IDebugTarget target = ((IDebugElement) adaptable).getDebugTarget();
          if (target instanceof KeYDebugTarget) {
-            KeYLaunchSettings settings = ((KeYDebugTarget) target).getLaunchSettings();
-            File location = settings.getLocation();
-            if (location != null) {
-               result.add(location);
-            }
-            List<File> classPaths = settings.getClassPaths();
-            if (classPaths != null) {
-               result.addAll(classPaths);
-            }
-            File bootClassPath = settings.getBootClassPath();
-            if (bootClassPath != null) {
-               result.add(bootClassPath);
+            KeYDebugTarget keyTarget = (KeYDebugTarget) target;
+            if (!keyTarget.getProof().isDisposed()) {
+               JavaModel javaModel = keyTarget.getProof().getServices().getJavaModel();
+               if (javaModel.getModelDir() != null) {
+                  result.add(new File(javaModel.getModelDir()));
+               }
+               if (javaModel.getClassPathEntries() != null) {
+                  result.addAll(javaModel.getClassPathEntries());
+               }
+               if (javaModel.getBootClassPath() != null) {
+                  result.add(new File(javaModel.getBootClassPath()));
+               }
             }
          }
       }

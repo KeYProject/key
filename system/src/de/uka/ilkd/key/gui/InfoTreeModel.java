@@ -31,6 +31,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.XMLResources;
 
 /**
  * Extension of {@link DefaultTreeModel} used by {@link InfoTree}.
@@ -39,14 +40,18 @@ import de.uka.ilkd.key.util.MiscTools;
  */
 public class InfoTreeModel extends DefaultTreeModel {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 2093787874117871875L;
     private static final String LEMMAS = "Lemmas";
     private static final String TACLET_BASE = "Taclet Base";
 
     public InfoTreeModel(Goal goal, XMLResources xmlResources, MainWindow mainWindow) {
         super(new InfoTreeNode());
-        insertAsLast(new RulesNode(xmlResources.ruleExplanations, goal), (InfoTreeNode) root);
-        insertAsLast(new TermLabelsNode(mainWindow, xmlResources.termLabelExplanations), (InfoTreeNode) root);
-        insertAsLast(new FunctionsNode(xmlResources.functionExplanations), (InfoTreeNode) root);
+        insertAsLast(new RulesNode(xmlResources.getRuleExplanations(), goal), (InfoTreeNode) root);
+        insertAsLast(new TermLabelsNode(mainWindow, xmlResources.getTermLabelExplanations()), (InfoTreeNode) root);
+        insertAsLast(new FunctionsNode(xmlResources.getFunctionExplanations()), (InfoTreeNode) root);
     }
 
     private void insertAsLast(InfoTreeNode ins, InfoTreeNode parent) {
@@ -55,6 +60,10 @@ public class InfoTreeModel extends DefaultTreeModel {
 
     private class FunctionsNode extends InfoTreeNode {
 
+        /**
+         *
+         */
+        private static final long serialVersionUID = -5546552277804988834L;
         private static final String COLLECTION = 
                 "This node stands for a category of symbols; expand it to browse the symbols " +
                 "in the category.";
@@ -91,6 +100,11 @@ public class InfoTreeModel extends DefaultTreeModel {
 
     private class TermLabelsNode extends InfoTreeNode {
 
+        /**
+         *
+         */
+        private static final long serialVersionUID = 7447092361863294242L;
+
         TermLabelsNode(MainWindow mainWindow, Properties termLabelExplanations) {
             super("Term Labels", "Show descriptions for currently available term labels.");
 
@@ -102,6 +116,11 @@ public class InfoTreeModel extends DefaultTreeModel {
     }
 
     private class RulesNode extends InfoTreeNode {
+
+        /**
+         *
+         */
+        private static final long serialVersionUID = 7622830441420768861L;
 
         RulesNode(Properties ruleExplanations, Goal goal) {
             super("Rules", "Browse descriptions for currently available rules.");

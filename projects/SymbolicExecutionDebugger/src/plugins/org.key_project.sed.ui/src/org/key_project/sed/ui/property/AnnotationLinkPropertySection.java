@@ -17,4 +17,12 @@ public class AnnotationLinkPropertySection extends AbstractSEDDebugNodePropertyS
    protected AnnotationLinkTabComposite createContent() {
       return new AnnotationLinkTabComposite();
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean shouldUseExtraSpace() {
+      return true;
+   }
 }

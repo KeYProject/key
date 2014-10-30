@@ -60,6 +60,12 @@ public interface Term extends SVSubstitute, Sorted {
     public Operator op();
     
     /**
+     * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f")
+     * casted to the passed type.
+     */
+    public <T> T op(Class<T> opClass) throws IllegalArgumentException;
+    
+    /**
      * The subterms.
      */
     public ImmutableArray<Term> subs();
@@ -137,7 +143,7 @@ public interface Term extends SVSubstitute, Sorted {
      * operator, sort, arity, varsBoundHere and javaBlock as this object
      * modulo bound renaming
      */  
-    public boolean equalsModRenaming(Object o);  
+    public boolean equalsModRenaming(Term o);  
     
     /**
      * returns true if the term is labeled

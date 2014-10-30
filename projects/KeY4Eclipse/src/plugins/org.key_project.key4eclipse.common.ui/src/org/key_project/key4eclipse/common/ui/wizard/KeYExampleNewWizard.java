@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.ui.wizards.NewJavaProjectWizardPageOne;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.key_project.key4eclipse.common.ui.wizard.page.KeYExampleWizardPage;
+import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.ResourceUtil.IFileOpener;
@@ -48,7 +49,7 @@ import de.uka.ilkd.key.gui.ExampleChooser.ShortFile;
  * content provided by the KeY project.
  * @author Martin Hentschel
  */
-public class KeYExampleNewWizard extends AbstractNewJavaProjectWizard {
+public class KeYExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
    /**
     * The used {@link KeYExampleWizardPage} in which the user selects one example.
     */
@@ -65,7 +66,6 @@ public class KeYExampleNewWizard extends AbstractNewJavaProjectWizard {
    /**
     * {@inheritDoc}
     */
-   @SuppressWarnings("restriction")
    @Override
    public void addPages() {
       examplePage = new KeYExampleWizardPage("examplePage");
@@ -105,14 +105,14 @@ public class KeYExampleNewWizard extends AbstractNewJavaProjectWizard {
     */
    @SuppressWarnings("restriction")
    @Override
-   protected boolean createExampleContent(final IContainer sourceDirectory) throws Exception {
+   protected boolean createExampleContent(IContainer sourceDirectory) throws Exception {
       // List example content
       File example = examplePage.getSelectedExample().getFile();
       File[] exampleContent = example.listFiles();
       // Separate between source and project content
       List<File> projectContent = new LinkedList<File>();
       List<File> sourceContent = new LinkedList<File>();
-      final Set<String> oldNames = new HashSet<String>();
+      Set<String> oldNames = new HashSet<String>();
       // Separate between source and project content
       for (File content : exampleContent) {
          // List java files
@@ -157,50 +157,72 @@ public class KeYExampleNewWizard extends AbstractNewJavaProjectWizard {
          }
       }
       // Copy example content into new created Java Project and its source directory
-      IFileOpener opener = new IFileOpener() {
-         @Override
-         public InputStream open(File file) throws IOException {
-            // Make sure that javaSource is correct in all *.key and *.proof files
-            if (KeYUtil.isFileExtensionSupported(IOUtil.getFileExtension(file))) {
-               String content = IOUtil.readFrom(file);
-               final String JAVA_SOURCE_START = "\\javaSource \"";
-               final String JAVA_SOURCE_END = "\";";
-               int start = content.indexOf(JAVA_SOURCE_START);
-               if (start >= 0) {
-                  int end = content.indexOf(JAVA_SOURCE_END, start);
-                  if (end >= 0) {
-                     String currentDir = content.substring(start + JAVA_SOURCE_START.length(), end);
-                     String newSourceDir = sourceDirectory instanceof IProject ? "." : sourceDirectory.getName();
-                     if (oldNames.contains(currentDir)) {
-                        content = content.substring(0, start) +
-                                  JAVA_SOURCE_START +
-                                  newSourceDir +
-                                  content.substring(end);
-                     }
-                     else {
-                        content = content.substring(0, start) +
-                                  JAVA_SOURCE_START +
-                                  newSourceDir + '/' + currentDir +
-                                  content.substring(end);
-                     }
-                  }
-               }
-               return new ByteArrayInputStream(content.getBytes());
-            }
-            else {
-               return new FileInputStream(file);
-            }
-         }
-      };
+      KeYFileOpener opener = new KeYFileOpener(sourceDirectory, oldNames);
       IProject project = sourceDirectory.getProject();
       ResourceUtil.copyIntoWorkspace(project, opener, projectContent);
       ResourceUtil.copyIntoWorkspace(sourceDirectory, opener, sourceContent);
+      // Set source sub directory if required
+      if (!StringUtil.isTrimmedEmpty(opener.getSourceSubDirectory())) {
+         KeYResourceProperties.setSourceClassPath(project, sourceDirectory.getFullPath().append(opener.getSourceSubDirectory()).toString());
+      }
       // Select project file
       IFile projectFile = project.getFile(new Path(ExampleChooser.KEY_FILE_NAME));
       if (projectFile.exists()) {
          selectAndReveal(projectFile);
       }
       return true;
+   }
+   
+   private static class KeYFileOpener implements IFileOpener {
+      private final IContainer sourceDirectory;
+      
+      private final Set<String> oldNames;
+      
+      private String sourceSubDirectory;
+      
+      public KeYFileOpener(IContainer sourceDirectory, Set<String> oldNames) {
+         this.sourceDirectory = sourceDirectory;
+         this.oldNames = oldNames;
+      }
+
+      @Override
+      public InputStream open(File file) throws IOException {
+         // Make sure that javaSource is correct in all *.key and *.proof files
+         if (KeYUtil.isFileExtensionSupported(IOUtil.getFileExtension(file))) {
+            String content = IOUtil.readFrom(file);
+            final String JAVA_SOURCE_START = "\\javaSource \"";
+            final String JAVA_SOURCE_END = "\";";
+            int start = content.indexOf(JAVA_SOURCE_START);
+            if (start >= 0) {
+               int end = content.indexOf(JAVA_SOURCE_END, start);
+               if (end >= 0) {
+                  String currentDir = content.substring(start + JAVA_SOURCE_START.length(), end);
+                  String newSourceDir = sourceDirectory instanceof IProject ? "." : sourceDirectory.getName();
+                  if (oldNames.contains(currentDir)) {
+                     content = content.substring(0, start) +
+                               JAVA_SOURCE_START +
+                               newSourceDir +
+                               content.substring(end);
+                  }
+                  else {
+                     sourceSubDirectory = currentDir;
+                     content = content.substring(0, start) +
+                               JAVA_SOURCE_START +
+                               newSourceDir + '/' + currentDir +
+                               content.substring(end);
+                  }
+               }
+            }
+            return new ByteArrayInputStream(content.getBytes());
+         }
+         else {
+            return new FileInputStream(file);
+         }
+      }
+
+      public String getSourceSubDirectory() {
+         return sourceSubDirectory;
+      }
    }
 
    /**

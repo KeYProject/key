@@ -31,35 +31,35 @@ public class AutoDeleteTests extends AbstractResourceTest {
    //Full build - single thread
    @Test
    public void testFullBuildSingleThreadAddAndRemoveJavaFile() throws CoreException, InterruptedException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testFullBuildSingleThreadAddAndRemoveJavaFile", true, false, false, 1, true, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testFullBuildSingleThreadAddAndRemoveJavaFile", true, false, false, false, 1, true);
       testAddAndRemoveJavaFile(project);
       project.close(null);
    }
    
    @Test
    public void testFullBuildSingleThreadAddJavaFileAndRemoveMethod() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testFullBuildSingleThreadAddJavaFileAndRemoveMethod", true, false, false, 1, true, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testFullBuildSingleThreadAddJavaFileAndRemoveMethod", true, false, false, false, 1, true);
       testAddJavaFileAndRemoveMethod(project);
       project.close(null);
    }
    
    @Test
    public void testFullBuildSingleThreadAddJavaFileAndRemoveAllMethods() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testFullBuildSingleThreadAddJavaFileAndRemoveAllMethods", true, false, false, 1, true, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testFullBuildSingleThreadAddJavaFileAndRemoveAllMethods", true, false, false, false, 1, true);
       testAddJavaFileAndRemoveAllMethods(project);
       project.close(null);
    }
 
    @Test
-   public void testFullBuildSingleThreadAddSomeFilesAndRemoveOne() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testFullBuildSingleThreadAddSomeFilesAndRemoveOne", true, false, false, 1, true, false);
+   public void testFullBuildSingleThreadAddSomeFilesAndRemoveOne() throws CoreException, InterruptedException {
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testFullBuildSingleThreadAddSomeFilesAndRemoveOne", true, false, false, false, 1, true);
       testAddSomeFilesAndRemoveOne(project);
       project.close(null);
    }
    
    @Test
-   public void testFullBuildSingleThreadAddPackagesAndRemoveOne() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testFullBuildSingleThreadAddPackagesAndRemoveOne", true, false, false, 1, true, false);
+   public void testFullBuildSingleThreadAddPackagesAndRemoveOne() throws CoreException, InterruptedException {
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testFullBuildSingleThreadAddPackagesAndRemoveOne", true, false, false, false, 1, true);
       testAddPackagesAndRemoveOne(project);
       project.close(null);
    }
@@ -68,35 +68,35 @@ public class AutoDeleteTests extends AbstractResourceTest {
    //Full build - multiple threads
    @Test
    public void testFullBuildMultipleThreadsAddAndRemoveJavaFile() throws CoreException, InterruptedException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testFullBuildMultipleThreadsAddAndRemoveJavaFile", true, false, true, 2, true, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testFullBuildMultipleThreadsAddAndRemoveJavaFile", true, false, false, true, 2, true);
       testAddAndRemoveJavaFile(project);
       project.close(null);
    }
    
    @Test
    public void testFullBuildMultipleThreadsAddJavaFileAndRemoveMethod() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testFullBuildMultipleThreadsAddJavaFileAndRemoveMethod", true, false, true, 2, true, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testFullBuildMultipleThreadsAddJavaFileAndRemoveMethod", true, false, false, true, 2, true);
       testAddJavaFileAndRemoveMethod(project);
       project.close(null);
    }
    
    @Test
    public void testFullBuildMultipleThreadsAddJavaFileAndRemoveAllMethods() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testFullBuildMultipleThreadsAddJavaFileAndRemoveAllMethods", true, false, true, 2, true, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testFullBuildMultipleThreadsAddJavaFileAndRemoveAllMethods", true, false, false, true, 2, true);
       testAddJavaFileAndRemoveAllMethods(project);
       project.close(null);
    }
 
    @Test
-   public void testFullBuildMultipleThreadsAddSomeFilesAndRemoveOne() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testFullBuildMultipleThreadsAddSomeFilesAndRemoveOne", true, false, true, 2, true, false);
+   public void testFullBuildMultipleThreadsAddSomeFilesAndRemoveOne() throws CoreException, InterruptedException {
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testFullBuildMultipleThreadsAddSomeFilesAndRemoveOne", true, false, false, true, 2, true);
       testAddSomeFilesAndRemoveOne(project);
       project.close(null);
    }
    
    @Test
-   public void testFullBuildMultipleThreadsAddPackagesAndRemoveOne() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testFullBuildMultipleThreadsAddPackagesAndRemoveOne", true, false, true, 2, true, false);
+   public void testFullBuildMultipleThreadsAddPackagesAndRemoveOne() throws CoreException, InterruptedException {
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testFullBuildMultipleThreadsAddPackagesAndRemoveOne", true, false, false, true, 2, true);
       testAddPackagesAndRemoveOne(project);
       project.close(null);
    }
@@ -105,35 +105,35 @@ public class AutoDeleteTests extends AbstractResourceTest {
    //Efficient build - single thread
    @Test
    public void testEfficientBuildSingleThreadAddAndRemoveJavaFile() throws CoreException, InterruptedException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testEfficientBuildSingleThreadAddAndRemoveJavaFile", true, true, false, 1, true, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testEfficientBuildSingleThreadAddAndRemoveJavaFile", true, false, true, false, 1, true);
       testAddAndRemoveJavaFile(project);
       project.close(null);
    }
    
    @Test
    public void testEfficientBuildSingleThreadAddJavaFileAndRemoveMethod() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testEfficientBuildSingleThreadAddJavaFileAndRemoveMethod", true, true, false, 1, true, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testEfficientBuildSingleThreadAddJavaFileAndRemoveMethod", true, false, true, false, 1, true);
       testAddJavaFileAndRemoveMethod(project);
       project.close(null);
    }
    
    @Test
-   public void testEfficientBuildSingleThreadAddJavaFileAndRemoveAllMethods() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testEfficientBuildSingleThreadAddJavaFileAndRemoveAllMethods", true, true, false, 1, true, false);
+   public void testEfficientBuildSingleThreadAddJavaFileAndRemoveAllMethods() throws CoreException, InterruptedException, IOException {
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testEfficientBuildSingleThreadAddJavaFileAndRemoveAllMethods", true, false, true, false, 1, true);
       testAddJavaFileAndRemoveAllMethods(project);
       project.close(null);
    }
 
    @Test
-   public void testEfficientBuildSingleThreadAddSomeFilesAndRemoveOne() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testEfficientBuildSingleThreadAddSomeFilesAndRemoveOne", true, true, false, 1, true, false);
+   public void testEfficientBuildSingleThreadAddSomeFilesAndRemoveOne() throws CoreException, InterruptedException {
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testEfficientBuildSingleThreadAddSomeFilesAndRemoveOne", true, false, true, false, 1, true);
       testAddSomeFilesAndRemoveOne(project);
       project.close(null);
    }
    
    @Test
-   public void testEfficientBuildSingleThreadAddPackagesAndRemoveOne() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testEfficientBuildSingleThreadAddPackagesAndRemoveOne", true, true, false, 1, true, false);
+   public void testEfficientBuildSingleThreadAddPackagesAndRemoveOne() throws CoreException, InterruptedException {
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testEfficientBuildSingleThreadAddPackagesAndRemoveOne", true, false, true, false, 1, true);
       testAddPackagesAndRemoveOne(project);
       project.close(null);
    }
@@ -142,35 +142,35 @@ public class AutoDeleteTests extends AbstractResourceTest {
    //Efficient build - multiple threads
    @Test
    public void testEfficientBuildMultipleThreadsAddAndRemoveJavaFile() throws CoreException, InterruptedException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testEfficientBuildMultipleThreadsAddAndRemoveJavaFile", true, true, true, 2, true, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testEfficientBuildMultipleThreadsAddAndRemoveJavaFile", true, false, true, true, 2, true);
       testAddAndRemoveJavaFile(project);
       project.close(null);
    }
    
    @Test
    public void testEfficientBuildMultipleThreadsAddJavaFileAndRemoveMethod() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testEfficientBuildMultipleThreadsAddJavaFileAndRemoveMethod", true, true, true, 2, true, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testEfficientBuildMultipleThreadsAddJavaFileAndRemoveMethod", true, false, true, true, 2, true);
       testAddJavaFileAndRemoveMethod(project);
       project.close(null);
    }
    
    @Test
    public void testEfficientBuildMultipleThreadsAddJavaFileAndRemoveAllMethods() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testEfficientBuildMultipleThreadsAddJavaFileAndRemoveAllMethods", true, true, true, 2, true, false);
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testEfficientBuildMultipleThreadsAddJavaFileAndRemoveAllMethods", true, false, true, true, 2, true);
       testAddJavaFileAndRemoveAllMethods(project);
       project.close(null);
    }
 
    @Test
-   public void testEfficientBuildMultipleThreadsAddSomeFilesAndRemoveOne() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testEfficientBuildMultipleThreadsAddSomeFilesAndRemoveOne", true, true, true, 2, true, false);
+   public void testEfficientBuildMultipleThreadsAddSomeFilesAndRemoveOne() throws CoreException, InterruptedException {
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testEfficientBuildMultipleThreadsAddSomeFilesAndRemoveOne", true, false, true, true, 2, true);
       testAddSomeFilesAndRemoveOne(project);
       project.close(null);
    }
    
    @Test
-   public void testEfficientBuildMultipleThreadsAddPackagesAndRemoveOne() throws CoreException, InterruptedException, IOException{
-      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testEfficientBuildMultipleThreadsAddPackagesAndRemoveOne", true, true, true, 2, true, false);
+   public void testEfficientBuildMultipleThreadsAddPackagesAndRemoveOne() throws CoreException, InterruptedException {
+      IProject project = KeY4EclipseResourcesTestUtil.initializeTest("AutoDeleteTests_testEfficientBuildMultipleThreadsAddPackagesAndRemoveOne", true, false, true, true, 2, true);
       testAddPackagesAndRemoveOne(project);
       project.close(null);
    }
@@ -186,7 +186,7 @@ public class AutoDeleteTests extends AbstractResourceTest {
       IFile metaFile = KeY4EclipseResourcesTestUtil.getFile(proofFile.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       
       assertTrue(!javaFile.exists());
-      assertTrue(!proofFolder.exists());
+      KeY4EclipseResourcesTestUtil.assertCleanProofFolder(proofFolder);
       assertTrue(!proofFile.exists() && !metaFile.exists());
       
       
@@ -206,7 +206,7 @@ public class AutoDeleteTests extends AbstractResourceTest {
       KeY4EclipseResourcesTestUtil.build(project);
       
       assertTrue(!javaFile.exists());
-      assertTrue(!proofFolder.exists());
+      KeY4EclipseResourcesTestUtil.assertCleanProofFolder(proofFolder);
       assertTrue(!proofFile.exists() && !metaFile.exists());
    }
    
@@ -223,7 +223,7 @@ public class AutoDeleteTests extends AbstractResourceTest {
       IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       
       assertTrue(!javaFile.exists());
-      assertTrue(!proofFolder.exists());
+      KeY4EclipseResourcesTestUtil.assertCleanProofFolder(proofFolder);
       assertTrue(!proofFile0.exists() && !metaFile0.exists());
       assertTrue(!proofFile1.exists() && !metaFile1.exists());
       
@@ -246,7 +246,6 @@ public class AutoDeleteTests extends AbstractResourceTest {
       assertTrue(proofFolder.exists());
       assertTrue(proofFile0.exists() && metaFile0.exists());
       assertTrue(!proofFile1.exists() && !metaFile1.exists());
-      
    }
 
    
@@ -262,7 +261,7 @@ public class AutoDeleteTests extends AbstractResourceTest {
       IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       
       assertTrue(!javaFile.exists());
-      assertTrue(!proofFolder.exists());
+      KeY4EclipseResourcesTestUtil.assertCleanProofFolder(proofFolder);
       assertTrue(!proofFile0.exists() && !metaFile0.exists());
       assertTrue(!proofFile1.exists() && !metaFile1.exists());
       
@@ -282,14 +281,14 @@ public class AutoDeleteTests extends AbstractResourceTest {
       KeY4EclipseResourcesTestUtil.build(project);
 
       assertTrue(javaFile.exists());
-      assertTrue(!proofFolder.exists());
+      KeY4EclipseResourcesTestUtil.assertCleanProofFolder(proofFolder);
       assertTrue(!proofFile0.exists() && !metaFile0.exists());
       assertTrue(!proofFile1.exists() && !metaFile1.exists());
       
    }
    
    
-   private void testAddSomeFilesAndRemoveOne(IProject project) throws CoreException, IOException{
+   private void testAddSomeFilesAndRemoveOne(IProject project) throws CoreException {
       IFolder proofFolder = KeY4EclipseResourcesTestUtil.getProofFolder(project);
       IFile javaFile0 = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("src").append("File0.java"));
@@ -303,7 +302,7 @@ public class AutoDeleteTests extends AbstractResourceTest {
       IFile metaFile1 = KeY4EclipseResourcesTestUtil.getFile(proofFile1.getFullPath().removeFileExtension().addFileExtension("proofmeta"));
       
       assertTrue(!javaFile0.exists() && !javaFile1.exists());
-      assertTrue(!proofFolder.exists());
+      KeY4EclipseResourcesTestUtil.assertCleanProofFolder(proofFolder);
       assertTrue(!proofFile0.exists() && !metaFile0.exists());
       assertTrue(!proofFile1.exists() && !metaFile1.exists());
       
@@ -328,7 +327,7 @@ public class AutoDeleteTests extends AbstractResourceTest {
    }   
    
    
-   private void testAddPackagesAndRemoveOne(IProject project) throws CoreException, IOException{
+   private void testAddPackagesAndRemoveOne(IProject project) throws CoreException {
       IFolder proofFolder = KeY4EclipseResourcesTestUtil.getProofFolder(project);
       IFile javaFile0 = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("src").append("package0").append("File.java"));
@@ -346,7 +345,7 @@ public class AutoDeleteTests extends AbstractResourceTest {
             project.getFullPath().append("proofs").append("package1"));
       
       assertTrue(!javaFile0.exists() && !javaFile1.exists());
-      assertTrue(!proofFolder.exists());
+      KeY4EclipseResourcesTestUtil.assertCleanProofFolder(proofFolder);
       assertTrue(!proofFile0.exists() && !metaFile0.exists());
       assertTrue(!proofFile1.exists() && !metaFile1.exists());
       assertTrue(!package0Folder.exists() && !package1Folder.exists());

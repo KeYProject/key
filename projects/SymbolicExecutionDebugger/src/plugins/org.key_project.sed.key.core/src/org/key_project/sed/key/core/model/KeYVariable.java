@@ -15,6 +15,7 @@ package org.key_project.sed.key.core.model;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IValue;
 import org.key_project.sed.core.model.ISEDVariable;
 import org.key_project.sed.core.model.impl.AbstractSEDVariable;
@@ -44,10 +45,11 @@ public class KeYVariable extends AbstractSEDVariable {
    /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this element is contained.
+    * @param stackFrame The parent {@link IStackFrame} in which this {@link ISEDVariable} is shown.
     * @param executionVariable The {@link IExecutionVariable} to represent in debug model.
     */
-   public KeYVariable(KeYDebugTarget target, IExecutionVariable executionVariable) {
-      super(target);
+   public KeYVariable(KeYDebugTarget target, IStackFrame stackFrame, IExecutionVariable executionVariable) {
+      super(target, stackFrame);
       Assert.isNotNull(executionVariable);
       this.executionVariable = executionVariable;
    }
@@ -108,10 +110,10 @@ public class KeYVariable extends AbstractSEDVariable {
                   throw new DebugException(LogUtil.getLogger().createErrorStatus("An IExecutionVariable must provide at least one IExecutionValue."));
                }
                else if (values.length == 1) {
-                  value = new KeYValue(getDebugTarget(), values[0]);
+                  value = new KeYValue(getDebugTarget(), this, values[0]);
                }
                else {
-                  value = new KeYConditionalValues(getDebugTarget(), values);
+                  value = new KeYConditionalValues(getDebugTarget(), this, values);
                }
             }
             return value;

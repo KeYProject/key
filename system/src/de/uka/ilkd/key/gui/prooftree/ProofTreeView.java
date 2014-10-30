@@ -19,12 +19,12 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.*;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
@@ -93,7 +93,7 @@ public class ProofTreeView extends JPanel {
     /** the model that is displayed by the delegateView */
     GUIProofTreeModel delegateModel;
 
-    private HashMap<Proof, GUIProofTreeModel> models = new LinkedHashMap<Proof, GUIProofTreeModel>(20);
+    private WeakHashMap<Proof, GUIProofTreeModel> models = new WeakHashMap<Proof, GUIProofTreeModel>(20);
 
     /** the proof this view shows */
     private Proof proof;
@@ -338,17 +338,11 @@ public class ProofTreeView extends JPanel {
         proofTreeSearchPanel.reset();
     }
 
-
-    public void removeProof(Proof p) {
-        models.remove(p);
-    }
-
     public void removeProofs(Proof[] ps) {
         for (final Proof p : ps) {
-	    models.remove(p);
-	}
+           models.remove(p);
+        }
     }
-
 
     /**
      *  moves the scope of the tree view to the given node so that it
@@ -543,6 +537,7 @@ public class ProofTreeView extends JPanel {
 
 	/** the selected proof has changed (e.g. a new proof has been
 	 * loaded) */
+        @Override
 	public void selectedProofChanged(KeYSelectionEvent e) {
 	    Debug.out("ProofTreeView: initialize with new proof");
 	    lastGoalNode = null;

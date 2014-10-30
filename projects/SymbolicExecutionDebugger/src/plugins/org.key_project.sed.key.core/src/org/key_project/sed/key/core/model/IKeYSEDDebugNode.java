@@ -23,7 +23,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
  * based on KeY must have.
  * @author Martin Hentschel
  */
-public interface IKeYSEDDebugNode<E extends IExecutionNode> extends ISEDDebugNode {
+public interface IKeYSEDDebugNode<E extends IExecutionNode<?>> extends ISEDDebugNode {
    /**
     * Returns the represented {@link IExecutionNode}.
     * @return The reprsented {@link IExecutionNode}.
@@ -53,4 +53,17 @@ public interface IKeYSEDDebugNode<E extends IExecutionNode> extends ISEDDebugNod
     */
    @Override
    public IKeYSEDDebugNode<?>[] getChildren() throws DebugException;
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYConstraint[] getConstraints() throws DebugException;
+
+   /**
+    * It is valid to set the parent as long it was not defined before.
+    * So a parent might be set lazily later but can never be changed.
+    * @param parent The new parent to set.
+    */
+   public void setParent(ISEDDebugNode parent);
 }

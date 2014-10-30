@@ -55,38 +55,43 @@ public class ProofObligationCreator {
          * @return A proof aggregate containing the proofs created by this method.
          */
         public ProofAggregate create(ImmutableSet<Taclet> taclets,
-                        InitConfig initConfig, ImmutableSet<Taclet> axioms,
+                        InitConfig[] initConfigs, ImmutableSet<Taclet> axioms,
                         Collection<LoaderListener> listeners) {
-                initConfig.setTaclets(initConfig.getTaclets().union(axioms));
-                ProofAggregate[] singleProofs = new ProofAggregate[taclets
-                                .size()];
-                int i = 0;
-                for(LoaderListener listener : listeners){
-                        listener.progressStarted(this);
-          
-                }
-                UserDefinedSymbols symbolsForAxioms = analyzeTaclets(axioms,initConfig.namespaces());
 
-                symbolsForAxioms.addSymbolsToNamespaces(initConfig.namespaces());
+              ProofAggregate[] singleProofs = new ProofAggregate[taclets.size()];
                 
-                for (Taclet taclet : taclets) {
-                        for(LoaderListener listener : listeners){
-                                listener.reportStatus(this, "Create Lemma for "
-                                        + taclet.name());
-                                
-                        }
-                        singleProofs[i] = create(taclet, initConfig,symbolsForAxioms);
-                        i++;
-                }
-                  ProofAggregate proofAggregate = singleProofs.length == 1 ? singleProofs[0]
-                                : ProofAggregate.createProofAggregate(
-                                                singleProofs,
-                                                createName(singleProofs));
-                // listener.progressStopped(this);
-                  for(LoaderListener listener : listeners){
-                          listener.resetStatus(this);
-                  }
-                return proofAggregate;
+              for(LoaderListener listener : listeners){
+                      listener.progressStarted(this);
+        
+              }
+
+              int i = 0;
+
+              for (Taclet taclet : taclets) {
+                 InitConfig initConfig = initConfigs[i];
+                 initConfig.setTaclets(initConfig.getTaclets().union(axioms));
+                 UserDefinedSymbols symbolsForAxioms = analyzeTaclets(axioms, initConfig.namespaces());
+
+                 symbolsForAxioms.addSymbolsToNamespaces(initConfig.namespaces());
+
+                 for(LoaderListener listener : listeners){
+                    listener.reportStatus(this, "Create Lemma for "
+                          + taclet.name());
+
+                 }
+                 singleProofs[i] = create(taclet, initConfig, symbolsForAxioms);
+                 i++;
+              }
+
+              ProofAggregate proofAggregate = singleProofs.length == 1 ? singleProofs[0]
+                    : ProofAggregate.createProofAggregate(
+                          singleProofs,
+                          createName(singleProofs));
+              // listener.progressStopped(this);
+              for(LoaderListener listener : listeners){
+                 listener.resetStatus(this);
+              }
+              return proofAggregate;
         }
         
        
@@ -160,7 +165,7 @@ public class ProofObligationCreator {
                 Proof proof = new Proof(name, formula, "" /*header*/,
                                 initConfig.createTacletIndex(),
                                 initConfig.createBuiltInRuleIndex(),
-                                initConfig.getServices());
+                                initConfig);
          
                      
                 userDefinedSymbols.addSymbolsToNamespaces(proof.getNamespaces());

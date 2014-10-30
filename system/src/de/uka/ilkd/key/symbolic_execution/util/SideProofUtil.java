@@ -594,6 +594,7 @@ public final class SideProofUtil {
       // Create ProofStarter
       ProofStarter starter = new ProofStarter(false);
       // Configure ProofStarter
+      //TODO: Avoid proof environment use only InitConfig
       ProofEnvironment env = cloneProofEnvironmentWithOwnOneStepSimplifier(proof, useSimplifyTermProfile); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
       starter.init(sequentToProve, env);
       return starter;
@@ -625,7 +626,7 @@ public final class SideProofUtil {
       sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NON_SPLITTING);
       starter.setStrategy(sp);
       // Execute proof in the current thread
-      return starter.start(false);
+      return starter.start();
    }
 
    /**
@@ -718,16 +719,15 @@ public final class SideProofUtil {
       assert source != null;
       assert !source.isDisposed();
       // Get required source instances
-      final ProofEnvironment sourceEnv = source.env();
-      final InitConfig sourceInitConfig = sourceEnv.getInitConfig();
-      RuleJustificationInfo sourceJustiInfo = sourceEnv.getJustifInfo();
+      final InitConfig sourceInitConfig = source.getInitConfig();
+      final RuleJustificationInfo sourceJustiInfo = sourceInitConfig.getJustifInfo();
       // Create new profile which has separate OneStepSimplifier instance
       JavaProfile profile;
       if (useSimplifyTermProfile) {
          profile = new SimplifyTermProfile() {
             @Override
             protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
-               Profile sourceProfile = sourceEnv.getInitConfig().getProfile();
+               Profile sourceProfile = sourceInitConfig.getProfile();
                if (sourceProfile instanceof SymbolicExecutionJavaProfile) {
                   ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
                   result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations()); // Make sure that the term labels of symbolic execution are also supported by the new environment.
@@ -743,7 +743,7 @@ public final class SideProofUtil {
          profile = new JavaProfile() {
             @Override
             protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
-               Profile sourceProfile = sourceEnv.getInitConfig().getProfile();
+               Profile sourceProfile = sourceInitConfig.getProfile();
                if (sourceProfile instanceof SymbolicExecutionJavaProfile) {
                   ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
                   result = result.prepend(SymbolicExecutionJavaProfile.getSymbolicExecutionTermLabelConfigurations()); // Make sure that the term labels of symbolic execution are also supported by the new environment.
@@ -756,7 +756,7 @@ public final class SideProofUtil {
          };
       }
       // Create new InitConfig
-      final InitConfig initConfig = new InitConfig(source.getServices().copy(profile, true));
+      final InitConfig initConfig = new InitConfig(source.getServices().copy(profile, false));
       // Set modified taclet options in which runtime exceptions are banned.
       ImmutableSet<Choice> choices = sourceInitConfig.getActivatedChoices();
       choices = choices.remove(new Choice("allow", "runtimeExceptions"));
@@ -769,10 +769,8 @@ public final class SideProofUtil {
       initConfig.setTaclets(sourceInitConfig.getTaclets());
       // Create new ProofEnvironment and initialize it with values from initial one.
       ProofEnvironment env = new ProofEnvironment(initConfig);
-      env.setJavaModel(sourceEnv.getJavaModel());
-      env.setNumber(sourceEnv.getNumber());
       for (Taclet taclet : initConfig.activatedTaclets()) {
-         env.getJustifInfo().addJustification(taclet, sourceJustiInfo.getJustification(taclet));
+         initConfig.getJustifInfo().addJustification(taclet, sourceJustiInfo.getJustification(taclet));
       }
       for (BuiltInRule rule : initConfig.builtInRules()) {
          RuleJustification origJusti = sourceJustiInfo.getJustification(rule);
@@ -780,7 +778,7 @@ public final class SideProofUtil {
             assert rule instanceof OneStepSimplifier;
             origJusti = AxiomJustification.INSTANCE;
          }
-         env.getJustifInfo().addJustification(rule, origJusti);
+         initConfig.getJustifInfo().addJustification(rule, origJusti);
       }
       return env;
    }

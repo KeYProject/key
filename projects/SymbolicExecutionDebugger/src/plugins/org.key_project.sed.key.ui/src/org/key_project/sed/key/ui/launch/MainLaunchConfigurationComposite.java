@@ -595,7 +595,7 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
            if (method != null && method.exists()) {
                IProject project = method.getResource().getProject();
                // Get source paths from class path
-               final File location = KeYUtil.getSourceLocation(project);
+               final File location = KeYResourceProperties.getSourceClassPathLocation(project);
                final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
                final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
                // Load location

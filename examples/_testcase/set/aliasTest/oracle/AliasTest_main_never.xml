@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.main(a,b);" pathCondition="true" pathConditionChanged="false">
+   <variable name="heapAtPre" arrayIndex="-1" isArrayIndex="false">
+      <value name="heapAtPre {true}" typeString="Heap" valueString="heapAtPre" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+      </value>
+   </variable>
+   <methodCall name="&lt;call self.main(a,b)&gt;" pathCondition="true" pathConditionChanged="false">
       <variable name="exc" arrayIndex="-1" isArrayIndex="false">
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
@@ -84,13 +88,13 @@
                   <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main(a,b);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
+               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main(a,b)&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
 	Z(6(#)) {equals(b,a)}, 
 	Z(5(#)) {not(equals(b,a))}
 as result of main&gt;" signatureIncludingReturnValue="&lt;return 
 	Z(6(#)) {equals(b,a)}, 
 	Z(5(#)) {not(equals(b,a))}
-as result of self.main(a,b);&gt;" isReturnValueComputed="true">
+as result of self.main(a,b)&gt;" isReturnValueComputed="true" methodReturnCondition="true">
                   <methodReturnValue name="Z(6(#)) {equals(b,a)}" returnValueString="Z(6(#))" hasCondition="true" conditionString="equals(b,a)">
                   </methodReturnValue>
                   <methodReturnValue name="Z(5(#)) {not(equals(b,a))}" returnValueString="Z(5(#))" hasCondition="true" conditionString="not(equals(b,a))">
@@ -122,10 +126,48 @@ as result of self.main(a,b);&gt;" isReturnValueComputed="true">
                      </value>
                   </variable>
                   <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
                   </termination>
+                  <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                     <value name="self {true}" typeString="AliasTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="a" arrayIndex="-1" isArrayIndex="false">
+                     <value name="a {true}" typeString="AliasTest.IntWrapper" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                           <value name="value {true}" typeString="int" valueString="int::select(heap,a,AliasTest.IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="b" arrayIndex="-1" isArrayIndex="false">
+                     <value name="b {true}" typeString="AliasTest.IntWrapper" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                           <value name="value {true}" typeString="int" valueString="int::select(heap,b,AliasTest.IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="heapBefore_main" arrayIndex="-1" isArrayIndex="false">
+                     <value name="heapBefore_main {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="savedHeapBefore_main" arrayIndex="-1" isArrayIndex="false">
+                     <value name="savedHeapBefore_main {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
                </methodReturn>
             </statement>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0"/>
 </start>
