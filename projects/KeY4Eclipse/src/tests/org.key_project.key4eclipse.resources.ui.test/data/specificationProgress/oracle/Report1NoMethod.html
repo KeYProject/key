@@ -60,10 +60,50 @@ JavaCard:off (Sound if a Java program is proven.)
 <h1><a name="Assumptions">Assumptions</a></h1>
 Proofs are performed under the following assumptions still need to be proven:
 <ol>
+<li>
+Closed world assumption for the dynamic dispatch of the following method calls:
+<ol>
+<li>
+myPackage.MyClass#<createObject>()
+<ul>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testSpecificationAndProofProgress/proofs/myPackage/MyClass.java/myPackage_MyClass[myPackage_MyClass__MyClass()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testSpecificationAndProofProgress/proofs/myPackage/MyClass.java/myPackage_MyClass[myPackage_MyClass__MyClass()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+</ul>
+</li>
+<li>
+myPackage.MyClass#<allocate>()
+<ul>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testSpecificationAndProofProgress/proofs/myPackage/MyClass.java/myPackage_MyClass[myPackage_MyClass__MyClass()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testSpecificationAndProofProgress/proofs/myPackage/MyClass.java/myPackage_MyClass[myPackage_MyClass__MyClass()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+</ul>
+</li>
+<li>
+myPackage.MyClass#<prepareEnter>()
+<ul>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testSpecificationAndProofProgress/proofs/myPackage/MyClass.java/myPackage_MyClass[myPackage_MyClass__MyClass()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testSpecificationAndProofProgress/proofs/myPackage/MyClass.java/myPackage_MyClass[myPackage_MyClass__MyClass()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+</ul>
+</li>
+<li>
+java.lang.Object#<prepare>()
+<ul>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testSpecificationAndProofProgress/proofs/myPackage/MyClass.java/myPackage_MyClass[myPackage_MyClass__MyClass()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testSpecificationAndProofProgress/proofs/myPackage/MyClass.java/myPackage_MyClass[myPackage_MyClass__MyClass()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+</ul>
+</li>
+<li>
+java.lang.Object#<init>()
+<ul>
+<li>Used by proof: <a href="file:/D:/Forschung/Development/SymbolicExecutionDebugger/junit-workspace/SWTBotVerificationStatusViewTest_testSpecificationAndProofProgress/proofs/myPackage/MyClass.java/myPackage_MyClass[myPackage_MyClass__MyClass()]_JML_normal_behavior_operation_contract_0.proof">
+/SWTBotVerificationStatusViewTest_testSpecificationAndProofProgress/proofs/myPackage/MyClass.java/myPackage_MyClass[myPackage_MyClass__MyClass()]_JML_normal_behavior_operation_contract_0.proof</a></li>
+</ul>
+</li>
+</ol>
+</li>
 <li>Methods are called in a state satisfying the precondition, assumed for:
 <ol>
 <li>Methods of used APIs</li>
-<li>Projects in which the source code will be used</li>
+<li>System in which the source code will be used</li>
 </ol>
 </li>
 <li><i>Source code is compiled using a correct Java compiler.</i></li>

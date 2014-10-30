@@ -142,8 +142,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         //scrollable warning list
         JScrollPane scrollpane = new JScrollPane();
         scrollpane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        JList list =
-                new JList(warnings.toArray(new PositionedString[warnings.size()]));
+        JList list = new JList(warnings.toArray(new PositionedString[warnings.size()]));
         list.setBorder(BorderFactory.createLoweredBevelBorder());
         scrollpane.setViewportView(list);
         pane.add(scrollpane, BorderLayout.CENTER);
@@ -298,9 +297,9 @@ public final class SLEnvInput extends AbstractEnvInput {
                     = new JavaASTCollector(pm.getBody(), LoopStatement.class);
                 collector.start();
                 for(ProgramElement loop : collector.getNodes()) {
-                    LoopInvariant inv = specExtractor.extractLoopInvariant(
-                	    			pm, 
-                        			(LoopStatement) loop);
+                    LoopInvariant inv =
+                            specExtractor.extractLoopInvariant(pm,
+                        			               (LoopStatement) loop);
                     if(inv != null) {
                         specRepos.addLoopInvariant(inv.setTarget(kjt, pm));
                     }
@@ -371,7 +370,7 @@ public final class SLEnvInput extends AbstractEnvInput {
             createSpecs(new JMLSpecExtractor(initConfig.getServices()));
         }
     }
-    
+
     @Override
     public File getInitialFile() {
        return null;

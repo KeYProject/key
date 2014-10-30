@@ -14,14 +14,12 @@
 package org.key_project.key4eclipse.test.testcase;
 
 import java.io.File;
-import java.io.IOException;
 
 import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.junit.Test;
 import org.key_project.key4eclipse.util.KeYExampleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -42,7 +40,7 @@ public class RefreshProofSaverListenerTest extends TestCase {
     * via {@link ProofSaver#save()}.
     */
    @Test
-   public void testRefresh() throws IOException, CoreException {
+   public void testRefresh() throws Exception {
       // Create file
       IProject project = TestUtilsUtil.createProject("RefreshProofSaverListenerTest_testRefresh");
       IFile file = TestUtilsUtil.createFile(project, "Test.proof", "Replace me!");

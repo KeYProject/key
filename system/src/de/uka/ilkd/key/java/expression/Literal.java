@@ -16,6 +16,7 @@ package de.uka.ilkd.key.java.expression;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
@@ -67,6 +68,7 @@ public abstract class Literal extends JavaProgramElement implements Expression, 
      * @param ec the ExecutionContext in which the expression is evaluated 
      * @return the literal's type
      */
+    @Override
     public KeYJavaType getKeYJavaType(Services javaServ, 
 				      ExecutionContext ec) {
 	return getKeYJavaType(javaServ);
@@ -79,6 +81,7 @@ public abstract class Literal extends JavaProgramElement implements Expression, 
     public abstract KeYJavaType getKeYJavaType(Services javaServ);
     
     
+    @Override
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
         if (this.equals(src)) {
@@ -89,5 +92,10 @@ public abstract class Literal extends JavaProgramElement implements Expression, 
             return null;
         }        
     }
+    
+    /*
+    * Return the Name of the LDT, which this Literal belongs to.
+    */
+    public abstract Name getLDTName();
 
 }

@@ -340,7 +340,7 @@ public class ChoiceSelector extends JDialog {
          }
        });
     }
-    
+
     /**
      * Creates {@link ChoiceEntry}s for all given choices.
      * @param choices The choices.

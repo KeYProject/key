@@ -55,6 +55,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
@@ -113,7 +114,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     */
    private Term uninterpretedPredicate;
 
-   private InitConfig proofConfig;
+   InitConfig proofConfig;
 
    /**
     * Constructor.
@@ -222,27 +223,27 @@ public abstract class AbstractOperationPO extends AbstractPO {
           }
           final Term progPost;
           if(representsFromContract == null) {
-        	  final Term[] updateSubs = new Term[target.arity()];
-        	  int i = 0;
-        	  for (LocationVariable heap : modHeaps) {
-        		  if(target.getStateCount() >= 1) {
-        			  updateSubs[i++] = tb.var(heap);
-        			  if(target.getStateCount() == 2) {
-        				  updateSubs[i++] = tb.var(atPreVars.get(heap));
-        			  }
-        		  }
-        	  }
-        	  if(!target.isStatic()) {
-        		  updateSubs[i++] = tb.var(selfVar);
-        	  }
-        	  for(ProgramVariable paramVar : paramVars) {
-        		  updateSubs[i++] = tb.var(paramVar);
-        	  }
-        	  progPost = tb.apply(tb.elementary(tb.var(resultVar), tb.func(target, updateSubs)), postTerm);
-          }else{
-        	  final Term body = representsFromContract;
-        	  assert body.op() == Equality.EQUALS : "Only fully functional represents clauses for model methods are supported!";
-        	  progPost = tb.apply(tb.elementary(tb.var(resultVar), body.sub(1)), postTerm);        	  
+              final Term[] updateSubs = new Term[target.arity()];
+              int i = 0;
+              for (LocationVariable heap : modHeaps) {
+                  if(target.getStateCount() >= 1) {
+                      updateSubs[i++] = tb.var(heap);
+                      if(target.getStateCount() == 2) {
+                          updateSubs[i++] = tb.var(atPreVars.get(heap));
+                      }
+                  }
+              }
+              if(!target.isStatic()) {
+                  updateSubs[i++] = tb.var(selfVar);
+              }
+              for(ProgramVariable paramVar : paramVars) {
+                  updateSubs[i++] = tb.var(paramVar);
+              }
+              progPost = tb.apply(tb.elementary(tb.var(resultVar), tb.func(target, updateSubs)), postTerm);
+          } else {
+              final Term body = representsFromContract;
+              assert body.op() == Equality.EQUALS : "Only fully functional represents clauses for model methods are supported!";
+              progPost = tb.apply(tb.elementary(tb.var(resultVar), body.sub(1)), postTerm);
           }
           termPOs.add(tb.imp(pre, progPost));
       } else {
@@ -506,9 +507,23 @@ public abstract class AbstractOperationPO extends AbstractPO {
    protected Term generateSelfExactType(IProgramMethod pm,
                                         ProgramVariable selfVar,
                                         KeYJavaType selfKJT) {
+       return selfVar == null || pm.isConstructor()
+              ? tb.tt() : generateSelfExactType(pm, tb.var(selfVar), selfKJT);
+   }
+
+   /**
+    * Generates the general assumption which defines the type of self.
+    * @param pm The {@link IProgramMethod} to execute.
+    * @param selfVar The self variable.
+    * @param selfKJT The {@link KeYJavaType} of the self variable.
+    * @return The term representing the general assumption.
+    */
+   protected Term generateSelfExactType(IProgramMethod pm, 
+                                        Term selfVar, 
+                                        KeYJavaType selfKJT) {
       final Term selfExactType = selfVar == null || pm.isConstructor() ?
             tb.tt() :
-            tb.exactInstance(selfKJT.getSort(), tb.var(selfVar));
+            tb.exactInstance(selfKJT.getSort(), selfVar);
       return selfExactType;
    }
 
@@ -524,6 +539,22 @@ public abstract class AbstractOperationPO extends AbstractPO {
       }
       return paramsOK;
    }
+
+    /**
+     * Generates the general assumption that all parameter arguments are valid.
+     *
+     * @param paramVars The parameters {@link ProgramVariable}s.
+     * @return The term representing the general assumption.
+     */
+    protected Term generateParamsOK2(ImmutableList<Term> paramVars) {
+        Term paramsOK = tb.tt();
+        for (Term paramVar : paramVars) {
+            assert paramVar.op() instanceof ProgramVariable;
+            ProgramVariable pv = (ProgramVariable)paramVar.op();
+            paramsOK = tb.and(paramsOK, tb.reachableValue(pv));
+        }
+        return paramsOK;
+    }
 
    protected abstract Term generateMbyAtPreDef(ProgramVariable selfVar,
                                                ImmutableList<ProgramVariable> paramVars, Services services);
@@ -867,6 +898,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
       String value = properties.getProperty(IPersistablePO.PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL);
       return value != null && !value.isEmpty() ? Boolean.valueOf(value) : false;
    }
+
+   public ImmutableSet<NoPosTacletApp> getInitialTaclets() {
+        return taclets;
+    }
 
    /**
     * Returns the uninterpreted predicate used in the given {@link Proof} if available.

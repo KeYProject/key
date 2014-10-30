@@ -39,6 +39,7 @@ import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
@@ -63,6 +64,8 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -620,12 +623,12 @@ public final class SymbolicExecutionUtil {
          Sequent sequent = proofNode.sequent();
          for (SequentFormula sf : sequent.antecedent()) {
             if (!containsSymbolicExecutionLabel(sf.formula())) {
-               constraints.add(new ExecutionConstraint(node.getSettings(), node.getMediator(), proofNode, sf.formula()));
+               constraints.add(new ExecutionConstraint(node.getSettings(), node.getMediator(), proofNode, node.getModalityPIO(), sf.formula()));
             }
          }
          for (SequentFormula sf : sequent.succedent()) {
             if (!containsSymbolicExecutionLabel(sf.formula())) {
-               constraints.add(new ExecutionConstraint(node.getSettings(), node.getMediator(), proofNode, tb.not(sf.formula())));
+               constraints.add(new ExecutionConstraint(node.getSettings(), node.getMediator(), proofNode, node.getModalityPIO(), tb.not(sf.formula())));
             }
          }
          return constraints.toArray(new IExecutionConstraint[constraints.size()]);
@@ -664,20 +667,49 @@ public final class SymbolicExecutionUtil {
     * @return The created {@link IExecutionVariable}s.
     */
    public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node) {
+      return createExecutionVariables(node, null);
+   }
+
+   /**
+    * Creates for the given {@link IExecutionNode} the contained
+    * root {@link IExecutionVariable}s.
+    * @param node The {@link IExecutionNode} to create variables for.
+    * @param condition A {@link Term} specifying some additional constraints to consider.
+    * @return The created {@link IExecutionVariable}s.
+    */
+   public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node, Term condition) {
       if (node != null) {
-         Node proofNode = node.getProofNode();
+         return createExecutionVariables(node, node.getProofNode(), node.getModalityPIO(), condition);
+      }
+      else {
+         return new IExecutionVariable[0];
+      }
+   }
+
+   /**
+    * Creates for the given {@link IExecutionNode} the contained
+    * root {@link IExecutionVariable}s.
+    * @param node The {@link IExecutionNode} to create variables for.
+    * @param proofNode The proof {@link Node} to work with.
+    * @param modalityPIO The {@link PosInOccurrence} of the modality of interest.
+    * @param condition A {@link Term} specifying some additional constraints to consider.
+    * @return The created {@link IExecutionVariable}s.
+    */
+   public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node, 
+                                                               Node proofNode, 
+                                                               PosInOccurrence modalityPIO, 
+                                                               Term condition) {
+      if (proofNode != null) {
          List<IProgramVariable> variables = new LinkedList<IProgramVariable>();
          // Add self variable
-         IProgramVariable selfVar = findSelfTerm(proofNode, node.getModalityPIO());
+         IProgramVariable selfVar = findSelfTerm(proofNode, modalityPIO);
          if (selfVar != null) {
             variables.add(selfVar);
          }
          // Add method parameters
-         Node callNode = findMethodCallNode(node.getProofNode(), node.getModalityPIO());
-         if (callNode != null
-                 && callNode.getNodeInfo().getActiveStatement() instanceof MethodBodyStatement) {
-            MethodBodyStatement mbs =
-                    (MethodBodyStatement)callNode.getNodeInfo().getActiveStatement();
+         Node callNode = findMethodCallNode(proofNode, modalityPIO);
+         if (callNode != null && callNode.getNodeInfo().getActiveStatement() instanceof MethodBodyStatement) {
+            MethodBodyStatement mbs = (MethodBodyStatement)callNode.getNodeInfo().getActiveStatement();
             for (Expression e : mbs.getArguments()) {
                if (e instanceof IProgramVariable) {
                   variables.add((IProgramVariable)e);
@@ -694,7 +726,7 @@ public final class SymbolicExecutionUtil {
          IExecutionVariable[] result = new IExecutionVariable[variables.size()];
          int i = 0;
          for (IProgramVariable var : variables) {
-            result[i] = new ExecutionVariable(node, var);
+            result[i] = new ExecutionVariable(node, proofNode, modalityPIO, var, condition);
             i++;
          }
          return result;
@@ -909,7 +941,7 @@ public final class SymbolicExecutionUtil {
             else {
                MethodBodyStatement mbs = (MethodBodyStatement)statement;
                IProgramMethod pm = mbs.getProgramMethod(node.proof().getServices());
-               return isNotImplicite(node.proof().getServices(), pm);
+               return isNotImplicit(node.proof().getServices(), pm);
             }
          }
          else {
@@ -925,9 +957,9 @@ public final class SymbolicExecutionUtil {
     * Checks if the given {@link IProgramMethod} is not implicit.
     * @param services The {@link Services} to use.
     * @param pm The {@link IProgramMethod} to check.
-    * @return {@code true} is not implicite, {@code false} is implicite 
+    * @return {@code true} is not implicit, {@code false} is implicit 
     */
-   public static boolean isNotImplicite(Services services, IProgramMethod pm) {
+   public static boolean isNotImplicit(Services services, IProgramMethod pm) {
       if (pm != null) {
          if (KeYTypeUtil.isImplicitConstructor(pm)) {
             IProgramMethod explicitConstructor = KeYTypeUtil.findExplicitConstructor(services, pm);
@@ -973,53 +1005,6 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * <p>
-    * Checks if the given {@link SourceElement} which represents a {@link LoopStatement} is executed
-    * the first time in proof node or if it is a higher loop iteration.
-    * </p>
-    * <p>
-    * The reason why such checks are required is that KeY's tacklet sometimes create
-    * a copy in further loop iteration without a source code position and sometimes
-    * is the original loop reused. The expected behavior of KeY should be to
-    * reuse the original loop all the time to save memory. But the symbolic
-    * execution tree should contain the loop statement only when it is executed
-    * the first time and in further iterations only the checked loop condition.
-    * For this reason is this check required.
-    * </p>
-    * <p>
-    * <b>Attention:</b> This check requires to iterate over parent {@link Node}s
-    * and can not be decided locally in the current {@link Node}.
-    * This is a performance deficit.
-    * </p>
-    * @param node The current {@link Node} of the proof tree.
-    * @param ruleApp The applied rule in {@link Node}.
-    * @param statement The active {@link LoopStatement} of {@link Node} to check.
-    * @return {@code true} it is the first loop iteration, {@code false} it is a second or higher loop iteration.
-    */
-   public static boolean isFirstLoopIteration(Node node, RuleApp ruleApp, SourceElement statement) {
-      // Compute stack size of current node
-      int stackSize = computeStackSize(ruleApp);
-      // Iterate over all parents until another loop iteration is found or the current method was called
-      boolean firstLoop = true;
-      Node parent = node.parent();
-      while (firstLoop && parent != null) {
-         // Check if the current parent node treats the same loop
-         SourceElement activeStatement = parent.getNodeInfo().getActiveStatement();
-         firstLoop = activeStatement != statement;
-         // Define parent for next iteration
-         parent = parent.parent();
-         // Check if the next parent is the method call of the current method, in this case iteration can stop
-         if (isMethodCallNode(parent, parent.getAppliedRuleApp(),
-                              parent.getNodeInfo().getActiveStatement(), true) &&
-             computeStackSize(parent.getAppliedRuleApp()) < stackSize) {
-            // Stop iteration because further parents are before the current method is called
-            parent = null;
-         }
-      }
-      return firstLoop;
-   }
-
-   /**
     * Checks if the given node should be represented as statement.
     * @param node The current {@link Node} in the proof tree of KeY.
     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
@@ -1033,7 +1018,7 @@ public final class SymbolicExecutionUtil {
              posInfo.getEndPosition() != Position.UNDEFINED &&
              posInfo.getEndPosition().getLine() >= 0 &&  // Filter out statements where source code is missing.
              !(statement instanceof EmptyStatement) && // Filter out empty statements
-             !(statement instanceof StatementBlock && ((StatementBlock)statement).isEmpty()); // FIlter out empty blocks
+             !(statement instanceof StatementBlock && ((StatementBlock)statement).isEmpty()); // Filter out empty blocks
    }
    
    /**
@@ -1057,7 +1042,7 @@ public final class SymbolicExecutionUtil {
          Contract contract = ((AbstractContractRuleApp)ruleApp).getInstantiation();
          if (contract instanceof OperationContract) {
             IProgramMethod target = ((OperationContract)contract).getTarget();
-            return isNotImplicite(node.proof().getServices(), target);
+            return isNotImplicit(node.proof().getServices(), target);
          }
          else {
             return false;
@@ -1100,7 +1085,7 @@ public final class SymbolicExecutionUtil {
     */
    public static boolean isExceptionalMethodReturnNode(Node node, RuleApp ruleApp) {
       String ruleName = MiscTools.getRuleName(ruleApp);
-      return "methodCallParamThrow".equals(ruleName);
+      return "methodCallParamThrow".equals(ruleName) || "methodCallThrow".equals(ruleName);
    }
 
    /**
@@ -1460,8 +1445,8 @@ public final class SymbolicExecutionUtil {
          else if (isExceptionalMethodReturnNode(node, ruleApp)) {
             return !isInImplicitMethod(node, ruleApp);
          }
-         else if (isLoopStatement(node, ruleApp, statement, posInfo)) { 
-            return isFirstLoopIteration(node, ruleApp, statement);
+         else if (isLoopStatement(node, ruleApp, statement, posInfo)) { // This check is redundant to the loop iteration check, but is faster
+            return true;
          }
          else if (isBranchStatement(node, ruleApp, statement, posInfo) ||
                   isMethodCallNode(node, ruleApp, statement) ||
@@ -1470,8 +1455,7 @@ public final class SymbolicExecutionUtil {
             return true;
          }
          else if (hasLoopCondition(node, ruleApp, statement)) {
-            return ((LoopStatement)statement).getGuardExpression().getPositionInfo()
-                        != PositionInfo.UNDEFINED &&
+            return ((LoopStatement)statement).getGuardExpression().getPositionInfo() != PositionInfo.UNDEFINED &&
                    !isDoWhileLoopCondition(node, statement) && 
                    !isForLoopCondition(node, statement);
          }
@@ -3304,5 +3288,144 @@ public final class SymbolicExecutionUtil {
     */
    public static boolean hasApplicableRules(Goal goal) {
       return goal.getRuleAppManager().peekNext() != null;
+   }
+
+   /**
+    * Computes the call stack size and the second statement
+    * similar to {@link NodeInfo#computeActiveStatement(SourceElement)}.
+    * @param ruleApp The {@link RuleApp}.
+    * @return The computed call stack size and the second statement if available.
+    */
+   public static Pair<Integer, SourceElement> computeSecondStatement(RuleApp ruleApp) {
+      if (ruleApp != null) {
+         // Find inner most block
+         SourceElement firstStatement = NodeInfo.computeFirstStatement(ruleApp);
+         Deque<StatementBlock> blocks = new LinkedList<StatementBlock>();
+         int methodFrameCount = 0;
+         if (firstStatement != null) {
+            if (firstStatement instanceof StatementBlock) {
+               blocks.addFirst((StatementBlock) firstStatement);
+            }
+            SourceElement lastStatement = null;
+            while (firstStatement instanceof ProgramPrefix && 
+                   lastStatement != firstStatement) {
+               lastStatement = firstStatement;
+               firstStatement = firstStatement.getFirstElementIncludingBlocks();
+               if (lastStatement instanceof MethodFrame) {
+                  blocks.clear(); // Only block of inner most method frames are of interest.
+                  methodFrameCount++;
+               }
+               if (firstStatement instanceof StatementBlock) {
+                  blocks.addFirst((StatementBlock) firstStatement);
+               }
+            }
+         }
+         // Compute second statement
+         StatementBlock block = null;
+         while (!blocks.isEmpty() && (block == null || block.getChildCount() < 2)) {
+            block = blocks.removeFirst();
+         }
+         if (block != null && block.getChildCount() >= 2) {
+            return new Pair<Integer, SourceElement>(methodFrameCount, block.getChildAt(1));
+         }
+         else {
+            return new Pair<Integer, SourceElement>(methodFrameCount, null);
+         }
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Compares the given {@link SourceElement}s including their {@link PositionInfo}s.
+    * @param first The first {@link SourceElement}.
+    * @param second The second {@link SourceElement}.
+    * @return {@code true} both are equal and at the same {@link PositionInfo}, {@code false} otherwise.
+    */
+   public static boolean equalsWithPosition(SourceElement first, SourceElement second) {
+      if (first != null && second != null) {
+         if (first instanceof While) {
+            if (second instanceof While) {
+               // Special treatment for while because its position info is lost during prove, but maintained in its guard.
+               return first.equals(second) &&
+                      equalsWithPosition(((While) first).getGuard(), ((While) second).getGuard());
+            }
+            else {
+               return false;
+            }
+         }
+         else {
+            // Compare all source elements including ints position info
+            return first.equals(second) &&
+                   JavaUtil.equals(first.getPositionInfo(), second.getPositionInfo());
+         }
+      }
+      else {
+         return first == null && second == null;
+      }
+   }
+
+   /**
+    * Checks if the given {@link ProgramElement} contains the given {@link SourceElement}.
+    * @param toSearchIn The {@link ProgramElement} to search in.
+    * @param toSearch The {@link SourceElement} to search.
+    * @param services The {@link Services} to use.
+    * @return {@code true} contained, {@code false} not contained.
+    */
+   public static boolean containsStatement(ProgramElement toSearchIn, SourceElement toSearch, Services services) {
+      if (toSearchIn != null) {
+         ContainsStatementVisitor visitor = new ContainsStatementVisitor(toSearchIn, toSearch, services);
+         visitor.start();
+         return visitor.isContained();
+      }
+      else {
+         return false;
+      }
+   }
+   
+   /**
+    * Utilits class used by {@link SymbolicExecutionUtil#containsStatement(MethodFrame, ProgramElement, Services)}.
+    * @author Martin Hentschel
+    */
+   private static class ContainsStatementVisitor extends JavaASTVisitor {
+      /**
+       * The {@link ProgramElement} to search.
+       */
+      private final SourceElement toSearch;
+      
+      /**
+       * The result.
+       */
+      private boolean contained = false;
+      
+      /**
+       * Constructor.
+       * @param root The {@link ProgramElement} to start search in.
+       * @param toSearch The {@link SourceElement} to search.
+       * @param services The {@link Services} to use.
+       */
+      public ContainsStatementVisitor(ProgramElement root, SourceElement toSearch, Services services) {
+         super(root, services);
+         this.toSearch = toSearch;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      protected void doDefaultAction(SourceElement se) {
+         if (equalsWithPosition(se, toSearch)) { // Comparison by == is not possible since loops are recreated
+            contained = true;
+         }
+      }
+
+      /**
+       * Returns the result.
+       * @return {@code true} contained, {@code false} not contained.
+       */
+      public boolean isContained() {
+         return contained;
+      }
    }
 }

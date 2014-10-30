@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call TwoLoops.main(x)&gt;" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (x&gt;=0)" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (x&gt;=0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <branchCondition name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <loopInvariant name="invariant: x &gt;= 0;
 variant: x
@@ -23,6 +23,7 @@ mod: false" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false" i
                   </statement>
                </branchCondition>
             </loopInvariant>
+            <completedBlockEntry path="/0/0" conditionString="true"/>
          </branchCondition>
          <branchCondition name="lt(x,Z(0(#)))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="ghostint originalX = x;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false">
@@ -46,8 +47,11 @@ mod: false" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initially
                      </statement>
                   </branchCondition>
                </loopInvariant>
+               <completedBlockEntry path="/0/0" conditionString="lt(x,Z(0(#)))"/>
             </statement>
          </branchCondition>
+         <blockCompletionEntry path="/0/0/1/0"/>
+         <blockCompletionEntry path="/0/0/0"/>
       </branchStatement>
       <methodReturnEntry path="/0/0/0/0/1/0/0"/>
       <methodReturnEntry path="/0/0/1/0/0/1/0/0"/>

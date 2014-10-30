@@ -115,6 +115,25 @@ public final class ParameterlessTermLabel implements TermLabel {
            new ParameterlessTermLabel(UNDEFINED_VALUE_LABEL_NAME);
 
    /**
+    * Name of {@link #SELF_COMPOSITION_LABEL}.
+    */
+   public static final Name SELF_COMPOSITION_LABEL_NAME = new Name("selfComposedExecution");
+
+   /**
+    * Label attached to the post condition.
+    */
+   public static final TermLabel SELF_COMPOSITION_LABEL =
+           new ParameterlessTermLabel(SELF_COMPOSITION_LABEL_NAME);
+
+   /**
+    * Label attached to the post condition.
+    */
+   public static final Name POST_CONDITION_LABEL_NAME = new Name("postCondition");
+
+   public static final TermLabel POST_CONDITION_LABEL =
+           new ParameterlessTermLabel(POST_CONDITION_LABEL_NAME);
+
+   /**
     * Name of {@link #RESULT_LABEL}.
     */
    public static final Name RESULT_LABEL_NAME = new Name("RES");

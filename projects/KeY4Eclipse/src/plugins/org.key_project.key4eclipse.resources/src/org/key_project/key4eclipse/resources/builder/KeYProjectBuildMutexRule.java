@@ -64,7 +64,9 @@ public class KeYProjectBuildMutexRule implements ISchedulingRule{
     */
    @Override
    public boolean isConflicting(ISchedulingRule rule) {
-      return (rule instanceof KeYProjectBuildMutexRule);
+      return rule instanceof KeYProjectBuildMutexRule;
+             // ||contains(rule); // This is required for compatibility with Eclipse 4.x
+             // TODO: All save operations have to be performed in KeYProjectBuildJob to avoid deadlock when contains(rule) is checked as well 
    }
 
    /**

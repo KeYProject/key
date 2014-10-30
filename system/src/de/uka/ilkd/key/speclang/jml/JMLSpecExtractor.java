@@ -367,9 +367,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
      * @param addInvariant whether to add <i>static</i> invariants to pre- and post-conditions
      */
     @Override
-    public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm,
-                                                                 boolean addInvariant)
-                  throws SLTranslationException {
+    public ImmutableSet<SpecificationElement>
+                extractMethodSpecs(IProgramMethod pm,
+                                   boolean addInvariant) throws SLTranslationException {
         ImmutableSet<SpecificationElement> result
         = DefaultImmutableSet.<SpecificationElement>nil();
 
@@ -524,14 +524,16 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
 
     @Override
-    public ImmutableSet<BlockContract> extractBlockContracts(final IProgramMethod method, final StatementBlock block) throws SLTranslationException
-    {
+    public ImmutableSet<BlockContract>
+                extractBlockContracts(final IProgramMethod method,
+                                      final StatementBlock block) throws SLTranslationException {
         return createBlockContracts(method, new LinkedList<Label>(), block, block.getComments());
     }
 
     @Override
-    public ImmutableSet<BlockContract> extractBlockContracts(final IProgramMethod method, final LabeledStatement labeled) throws SLTranslationException
-    {
+    public ImmutableSet<BlockContract>
+                extractBlockContracts(final IProgramMethod method,
+                                      final LabeledStatement labeled) throws SLTranslationException {
         final List<Label> labels = new LinkedList<Label>();
         labels.add(labeled.getLabel());
         Statement nextNonLabeled = labeled.getBody();
@@ -541,7 +543,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
             nextNonLabeled = currentLabeled.getBody();
         }
         if (nextNonLabeled instanceof StatementBlock) {
-            return createBlockContracts(method, labels, (StatementBlock) nextNonLabeled, labeled.getComments());
+            return createBlockContracts(method, labels, (StatementBlock) nextNonLabeled,
+                                        labeled.getComments());
         }
         else {
             return DefaultImmutableSet.nil();
@@ -556,11 +559,14 @@ public final class JMLSpecExtractor implements SpecExtractor {
     {
         ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
         // For some odd reason every comment block appears twice; thus we remove duplicates.
-        final TextualJMLConstruct[] constructs = parseMethodLevelComments(removeDuplicates(comments), getFileName(method));
-        for (int i = constructs.length - 1; i >= 0 && constructs[i] instanceof TextualJMLSpecCase; i--) {
+        final TextualJMLConstruct[] constructs =
+                parseMethodLevelComments(removeDuplicates(comments), getFileName(method));
+        for (int i = constructs.length - 1; i >= 0 &&
+                constructs[i] instanceof TextualJMLSpecCase; i--) {
             final TextualJMLSpecCase specificationCase = (TextualJMLSpecCase) constructs[i];
             try {
-                result = result.union(jsf.createJMLBlockContracts(method, labels, block, specificationCase));
+                result = result.union(jsf.createJMLBlockContracts(method, labels,
+                                                                  block, specificationCase));
             }
             catch (final SLWarningException exception) {
                 warnings = warnings.add(exception.getWarning());
@@ -574,7 +580,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
         return type.getPositionInfo().getFileName();
     }
 
-    private TextualJMLConstruct[] parseMethodLevelComments(final Comment[] comments, final String fileName) throws SLTranslationException {
+    private TextualJMLConstruct[]
+                parseMethodLevelComments(final Comment[] comments,
+                                         final String fileName) throws SLTranslationException {
         if (comments.length == 0) {
             return new TextualJMLConstruct[0];
         }

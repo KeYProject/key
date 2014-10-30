@@ -35,6 +35,7 @@ import org.eclipse.jface.resource.StringConverter;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.model.ISEDGroupable;
 import org.key_project.sed.core.model.ISEDBaseMethodReturn;
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchStatement;
@@ -160,14 +161,24 @@ public class SEDXMLWriter {
    public static final String TAG_THREAD = "sedThread";
 
    /**
-    * Tag name to store {@link ISEDMethodCall#getMethodReturnConditions()}s.
+    * Tag name to store {@link ISEDMethodCall#getMethodReturnConditions()}.
     */
    public static final String TAG_METHOD_RETURN_CONDITIONS = "sedMethodCallMethodReturnCondition";
+
+   /**
+    * Tag name to store {@link ISEDDebugNode#getGroupStartConditions()}.
+    */
+   public static final String TAG_GROUP_START_CONDITION = "sedGroupStartCondition";
 
    /**
     * Tag name to store {@link IVariable}s.
     */
    public static final String TAG_VARIABLE = "sedVariable";
+
+   /**
+    * Tag name to store {@link IVariable}s provided by {@link ISEDBaseMethodReturn#getCallStateVariables()}.
+    */
+   public static final String TAG_CALL_STATE_VARIABLE = "sedCallStateVariable";
 
    /**
     * Tag name to store {@link IValue}s.
@@ -188,6 +199,11 @@ public class SEDXMLWriter {
     * Tag name to store a reference to an existing {@link ISEDDebugNode}.
     */
    public static final String TAG_CHILD_REFERENCE = "sedChildReference";
+
+   /**
+    * Tag name to store a reference of {@link ISEDGroupable#getGroupEndConditions()}.
+    */
+   public static final String TAG_GROUP_END_REFERENCE = "sedGroupEndReference";
 
    /**
     * Tag name to store {@link ISEDMethodContract}s.
@@ -370,6 +386,11 @@ public class SEDXMLWriter {
     * Refers to an existing {@link ISEDDebugNode} to store {@link ISEDMethodReturn#getMethodReturnCondition()}.
     */
    public static final String ATTRIBUTE_METHOD_RETURN_CONDITION = "methodReturnConditionRef";
+
+   /**
+    * Attribute name to store {@link ISEDGroupable#isGroupable()}.
+    */
+   public static final String ATTRIBUTE_GROUPABLE = "groupable";
    
    /**
     * Writes the given {@link ISEDDebugTarget}s into the {@link OutputStream} with the defined encoding.
@@ -1043,7 +1064,8 @@ public class SEDXMLWriter {
                              boolean saveCallStack,
                              boolean saveConstraints,
                              boolean childrenByID,
-                             StringBuffer sb, IProgressMonitor monitor) throws DebugException {
+                             StringBuffer sb, 
+                             IProgressMonitor monitor) throws DebugException {
       appendNode(level, tagName, node, saveVariables, saveCallStack, saveConstraints, childrenByID, createDefaultNodeAttributes(node), sb, monitor);
    }
    
@@ -1073,6 +1095,9 @@ public class SEDXMLWriter {
             if (returnCondition != null) {
                attributeValues.put(ATTRIBUTE_METHOD_RETURN_CONDITION, returnCondition.getId());
             }
+         }
+         if (node instanceof ISEDGroupable) {
+            attributeValues.put(ATTRIBUTE_GROUPABLE, ((ISEDGroupable) node).isGroupable() + "");
          }
       }
       return attributeValues;
@@ -1115,6 +1140,10 @@ public class SEDXMLWriter {
          if (node instanceof IStackFrame) {
             appendVariables(level + 1, (IStackFrame)node, saveVariables, saveConstraints, sb, monitor);
          }
+         // Append call state variables
+         if (node instanceof ISEDBaseMethodReturn) {
+            appendCallSateVariables(level + 1, (ISEDBaseMethodReturn)node, saveVariables, saveConstraints, sb, monitor);
+         }
          // Append call stack
          appendCallStack(level + 1, node, saveCallStack, sb);
          // Append children
@@ -1139,6 +1168,12 @@ public class SEDXMLWriter {
          else if (node instanceof ISEDThread) {
             appendTerminations(level + 1, (ISEDThread)node, sb);
          }
+         // Append group start nodes
+         appendGroupStartNodes(level + 1, node, saveVariables, saveCallStack, saveConstraints, sb, monitor);
+         // Append method end nodes
+         if (node instanceof ISEDGroupable) {
+            appendGroupEndNodes(level + 1, (ISEDGroupable) node, sb, monitor);
+         }
          // Append end tag
          XMLUtil.appendEndTag(level, tagName, sb);
       }
@@ -1158,6 +1193,45 @@ public class SEDXMLWriter {
             Map<String, String> attributeValues = new LinkedHashMap<String, String>();
             attributeValues.put(ATTRIBUTE_NODE_ID_REF, termination.getId());
             XMLUtil.appendEmptyTag(level, TAG_TERMINATION_ENTRY, attributeValues, sb);
+         }
+      }
+   }
+   
+   /**
+    * Appends all known group start conditions.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param node The {@link ISEDDebugNode} which provides the known start conditions.
+    * @param saveVariables Save variables?
+    * @param saveCallStack Save call stack?
+    * @param saveConstraints Save constraints?
+    * @param sb The {@link StringBuffer} to write to.
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @throws DebugException Occurred Exception.
+    */
+   protected void appendGroupStartNodes(int level, ISEDDebugNode node, boolean saveVariables, boolean saveCallStack, boolean saveConstraints, StringBuffer sb, IProgressMonitor monitor) throws DebugException {
+      ISEDBranchCondition[] conditions = node.getGroupStartConditions();
+      if (conditions != null) {
+         for (ISEDBranchCondition condition : conditions) {
+            appendNode(level, TAG_GROUP_START_CONDITION, condition, saveVariables, saveCallStack, saveConstraints, true, sb, monitor);
+         }
+      }
+   }
+
+   /**
+    * Appends all known group end conditions.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param node he {@link ISEDGroupable} which provides the known end conditions.
+    * @param sb The {@link StringBuffer} to write to.
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @throws DebugException Occurred Exception.
+    */
+   protected void appendGroupEndNodes(int level, ISEDGroupable node, StringBuffer sb, IProgressMonitor monitor) throws DebugException {
+      ISEDBranchCondition[] conditions = node.getGroupEndConditions();
+      if (conditions != null) {
+         for (ISEDBranchCondition condition : conditions) {
+            Map<String, String> childAttributeValues = new LinkedHashMap<String, String>();
+            childAttributeValues.put(ATTRIBUTE_NODE_ID_REF, condition.getId());
+            XMLUtil.appendEmptyTag(level, TAG_GROUP_END_REFERENCE, childAttributeValues, sb);               
          }
       }
    }
@@ -1241,6 +1315,29 @@ public class SEDXMLWriter {
    /**
     * Appends all contained variables to the {@link StringBuffer}.
     * @param level The level in the tree used for leading white space (formating).
+    * @param methodReturn The {@link ISEDBaseMethodReturn} which contains the variables.
+    * @param saveVariables Save variables?
+    * @param saveConstraints Save constraints?
+    * @param sb The {@link StringBuffer} to write to.
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @throws DebugException Occurred Exception.
+    */
+   protected void appendCallSateVariables(int level, ISEDBaseMethodReturn methodReturn, boolean saveVariables, boolean saveConstraints, StringBuffer sb, IProgressMonitor monitor) throws DebugException {
+      if (saveVariables) {
+         IVariable[] variables = methodReturn.getCallStateVariables();
+         if (variables != null) {
+            for (IVariable variable : variables) {
+               SWTUtil.checkCanceled(monitor);
+               appendVariable(level, variable, saveConstraints, sb, TAG_CALL_STATE_VARIABLE, monitor);
+               monitor.worked(1);
+            }
+         }
+      }
+   }
+
+   /**
+    * Appends all contained variables to the {@link StringBuffer}.
+    * @param level The level in the tree used for leading white space (formating).
     * @param stackFrame The {@link IStackFrame} which contains the variables.
     * @param saveVariables Save variables?
     * @param saveConstraints Save constraints?
@@ -1253,7 +1350,7 @@ public class SEDXMLWriter {
          IVariable[] variables = stackFrame.getVariables();
          for (IVariable variable : variables) {
             SWTUtil.checkCanceled(monitor);
-            appendVariable(level, variable, saveConstraints, sb, monitor);
+            appendVariable(level, variable, saveConstraints, sb, TAG_VARIABLE, monitor);
             monitor.worked(1);
          }
       }
@@ -1265,10 +1362,11 @@ public class SEDXMLWriter {
     * @param variable The variable to append.
     * @param saveConstraints Save constraints?
     * @param sb The {@link StringBuffer} to write to.
+    * @param tagName The tag name to use to store the variable.
     * @param monitor The {@link IProgressMonitor} to use.
     * @throws DebugException Occurred Exception.
     */
-   protected void appendVariable(int level, IVariable variable, boolean saveConstraints, StringBuffer sb, IProgressMonitor monitor) throws DebugException {
+   protected void appendVariable(int level, IVariable variable, boolean saveConstraints, StringBuffer sb, String tagName, IProgressMonitor monitor) throws DebugException {
       // Append start tag
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       if (variable instanceof ISEDVariable) {
@@ -1276,13 +1374,13 @@ public class SEDXMLWriter {
       }
       attributeValues.put(ATTRIBUTE_NAME, variable.getName());
       attributeValues.put(ATTRIBUTE_REFERENCE_TYPE_NAME, variable.getReferenceTypeName());
-      XMLUtil.appendStartTag(level, TAG_VARIABLE, attributeValues, sb);
+      XMLUtil.appendStartTag(level, tagName, attributeValues, sb);
       // Append children
       if (variable.getValue() != null) {
          appendValue(level + 1, variable.getValue(), saveConstraints, sb, monitor);
       }
       // Append end tag
-      XMLUtil.appendEndTag(level, TAG_VARIABLE, sb);
+      XMLUtil.appendEndTag(level, tagName, sb);
    }
 
    /**
@@ -1314,7 +1412,7 @@ public class SEDXMLWriter {
          IVariable[] variables = value.getVariables();
          for (IVariable variable : variables) {
             SWTUtil.checkCanceled(monitor);
-            appendVariable(level + 1, variable, saveConstraints, sb, monitor);
+            appendVariable(level + 1, variable, saveConstraints, sb, TAG_VARIABLE, monitor);
             monitor.worked(1);
          }
       }

@@ -29,4 +29,12 @@ public class MethodReturnConditionsPropertySection extends AbstractSEDDebugNodeP
    protected ISEDDebugNodeTabContent createContent() {
       return new MethodReturnConditionsTabComposite();
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean shouldUseExtraSpace() {
+      return true;
+   }
 }

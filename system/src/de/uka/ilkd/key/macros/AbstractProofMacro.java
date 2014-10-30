@@ -88,10 +88,13 @@ public abstract class AbstractProofMacro implements ProofMacro {
         return applyTo(mediator, getGoals(node), posInOcc, listener);
     }
 
+    @Override
+    public boolean isApplicableWithoutPosition() {
+        return false;
+    }
 
     @Override
     public final javax.swing.KeyStroke getKeyStroke() {
         return KeyStrokeManager.get(this);
     }
-    
 }

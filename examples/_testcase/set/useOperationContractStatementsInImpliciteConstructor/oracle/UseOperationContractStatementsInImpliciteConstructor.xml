@@ -9,7 +9,7 @@
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <branchStatement name="if (array!=null)" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (array!=null)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <variable name="self" arrayIndex="-1" isArrayIndex="false">
             <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
             </value>
@@ -169,6 +169,30 @@ termination: diamond" pathCondition="not(equals(array,null))" pathConditionChang
                                  </value>
                               </variable>
                            </termination>
+                           <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                              <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </callStateVariable>
+                           <callStateVariable name="array" arrayIndex="-1" isArrayIndex="false">
+                              <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 <variable name="length" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="length {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </callStateVariable>
+                           <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                              <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </callStateVariable>
+                           <callStateVariable name="heapBefore_average" arrayIndex="-1" isArrayIndex="false">
+                              <value name="heapBefore_average {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </callStateVariable>
+                           <callStateVariable name="savedHeapBefore_average" arrayIndex="-1" isArrayIndex="false">
+                              <value name="savedHeapBefore_average {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </callStateVariable>
                         </exceptionalMethodReturn>
                      </branchCondition>
                      <branchCondition name="not(equals(length(array),Z(0(#))))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(0(#))))))" pathConditionChanged="true" branchCondition="not(equals(length(array),Z(0(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -240,10 +264,35 @@ as result of self.average(array)&gt;" isReturnValueComputed="true" methodReturnC
                                  </value>
                               </variable>
                            </termination>
+                           <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                              <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </callStateVariable>
+                           <callStateVariable name="array" arrayIndex="-1" isArrayIndex="false">
+                              <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 <variable name="length" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </callStateVariable>
+                           <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                              <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </callStateVariable>
+                           <callStateVariable name="heapBefore_average" arrayIndex="-1" isArrayIndex="false">
+                              <value name="heapBefore_average {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </callStateVariable>
+                           <callStateVariable name="savedHeapBefore_average" arrayIndex="-1" isArrayIndex="false">
+                              <value name="savedHeapBefore_average {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </callStateVariable>
                         </methodReturn>
                      </branchCondition>
                   </statement>
                </operationContract>
+               <completedBlockEntry path="/0/0" conditionString="not(equals(array,null))"/>
             </statement>
          </branchCondition>
          <branchCondition name="equals(array,null)" pathCondition="equals(array,null)" pathConditionChanged="true" branchCondition="equals(array,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -302,9 +351,32 @@ as result of self.average(array)&gt;" isReturnValueComputed="true" methodReturnC
                         </value>
                      </variable>
                   </termination>
+                  <completedBlockEntry path="/0/0" conditionString="equals(array,null)"/>
+                  <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                     <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="array" arrayIndex="-1" isArrayIndex="false">
+                     <value name="array {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="heapBefore_average" arrayIndex="-1" isArrayIndex="false">
+                     <value name="heapBefore_average {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="savedHeapBefore_average" arrayIndex="-1" isArrayIndex="false">
+                     <value name="savedHeapBefore_average {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
                </exceptionalMethodReturn>
             </statement>
          </branchCondition>
+         <blockCompletionEntry path="/0/0/0/0"/>
+         <blockCompletionEntry path="/0/0/1/0/0"/>
       </branchStatement>
       <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
       <methodReturnEntry path="/0/0/0/0/0/0/1/0"/>

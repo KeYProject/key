@@ -27,7 +27,7 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
 
     /** @return union of this set with set */
     ImmutableSet<T> union(ImmutableSet<T> set);
-    
+
     /** @return intersection of this set with set */
     ImmutableSet<T> intersect(ImmutableSet<T> set);
 
