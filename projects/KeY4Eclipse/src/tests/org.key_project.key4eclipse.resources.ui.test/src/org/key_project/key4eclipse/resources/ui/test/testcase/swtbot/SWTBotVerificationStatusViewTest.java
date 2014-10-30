@@ -32,7 +32,6 @@ import org.key_project.key4eclipse.resources.projectinfo.ProjectInfoManager;
 import org.key_project.key4eclipse.resources.projectinfo.TypeInfo;
 import org.key_project.key4eclipse.resources.test.testcase.junit.AbstractResourceTest;
 import org.key_project.key4eclipse.resources.test.util.KeY4EclipseResourcesTestUtil;
-import org.key_project.key4eclipse.resources.ui.provider.ProjectInfoColorTreeSynchronizer;
 import org.key_project.key4eclipse.resources.ui.test.Activator;
 import org.key_project.key4eclipse.resources.ui.view.VerificationStatusView;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
@@ -66,6 +65,67 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
    }
 
    /**
+    * Tests in particular a used combined method contract.
+    * @throws Exception Occurred Exception.
+    */
+   @Test
+   public void testCombinedUsedMethodContract() throws Exception {
+      SWTWorkbenchBot bot = new SWTWorkbenchBot();
+      SWTBotView view = null;
+      IProject project = null;
+      try {
+         TestUtilsUtil.closeWelcomeView(bot);
+         // Open view and ensure that no content is shown.
+         TestUtilsUtil.openView(VerificationStatusView.VIEW_ID);
+         view = bot.viewById(VerificationStatusView.VIEW_ID);
+         SWTBotTree tree = view.bot().tree();
+         assertProjectShown(tree);
+         // Test empty project (step 0)
+         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testCombinedUsedMethodContract", true, false, true, false, 1, true);
+         assertProjectShown(tree, project);
+         SWTBotCustomProgressBar proofBar = SWTBotCustomProgressBar.customProgressBar(bot, 0);
+         SWTBotCustomProgressBar specificationBar = SWTBotCustomProgressBar.customProgressBar(bot, 1);
+         IFolder srcFolder = project.getFolder("src");
+         assertTrue(srcFolder.exists());
+         // Add classes
+         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/verificationStatusView/combinedContract/test", srcFolder, true);
+         KeY4EclipseResourcesTestUtil.build(project);
+         // Find content
+         ProjectInfo projectInfo = ProjectInfoManager.getInstance().getProjectInfo(project);
+         PackageInfo aPackage = projectInfo.getPackage("a");
+         PackageInfo bPackage = projectInfo.getPackage("b");
+         TypeInfo aType = aPackage.getType("A");
+         TypeInfo bType = bPackage.getType("B");
+         MethodInfo aMin = aType.getMethod("min(int, int)");
+         MethodInfo bMin = bType.getMethod("min(int, int)");
+         Map<Object, RGB> colorMapping = new HashMap<Object, RGB>();
+         colorMapping.put(project, VerificationStatusView.COLOR_OPEN_PROOF);
+         colorMapping.put(aPackage, VerificationStatusView.COLOR_UNSPECIFIED);         
+         colorMapping.put(bPackage, VerificationStatusView.COLOR_OPEN_PROOF);         
+         colorMapping.put(aType, VerificationStatusView.COLOR_UNSPECIFIED);         
+         colorMapping.put(bType, VerificationStatusView.COLOR_OPEN_PROOF);         
+         colorMapping.put(aMin, VerificationStatusView.COLOR_UNPROVEN_DEPENDENCY);
+         colorMapping.put(aMin.getContract(0), VerificationStatusView.COLOR_UNPROVEN_DEPENDENCY);         
+         colorMapping.put(bMin, VerificationStatusView.COLOR_OPEN_PROOF);  
+         colorMapping.put(bMin.getContract(0), VerificationStatusView.COLOR_CLOSED_PROOF);         
+         colorMapping.put(bMin.getContract(1), VerificationStatusView.COLOR_OPEN_PROOF);         
+         // Test content
+         assertProjectShown(tree, colorMapping, project);
+         assertProgressBars(proofBar, true, false, 2, 3, specificationBar, true, false, 2, 4);
+         assertReport(view, "data/verificationStatusView/combinedContract/oracle/report.html");
+      }
+      finally {
+         if (view != null) {
+            view.close();
+         }
+         if (project != null) {
+            project.delete(true, true, null);
+            KeY4EclipseResourcesTestUtil.build(project);
+         }
+      }
+   }
+
+   /**
     * Tests the information about taclet options
     * <ol>
     *    <li>Proof with just informations about taclet options</li>
@@ -89,7 +149,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          SWTBotCustomProgressBar proofBar = SWTBotCustomProgressBar.customProgressBar(bot, 0);
          SWTBotCustomProgressBar specificationBar = SWTBotCustomProgressBar.customProgressBar(bot, 1);
          // Test initial project
-         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testTacletOptions", true, true, false, 1, true, true);
+         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testTacletOptions", true, false, true, false, 1, true);
          IFolder srcFolder = project.getFolder("src");
          assertTrue(srcFolder.exists());
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/tacletOptions/src", srcFolder, true);
@@ -103,11 +163,11 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          MethodInfo methodInfo = typeInfo.getMethod("magic()");
          ContractInfo contractInfo = methodInfo.getContract(0);
          Map<Object, RGB> colorMapping = new HashMap<Object, RGB>();
-         colorMapping.put(project, ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
-         colorMapping.put(packageInfo, ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
-         colorMapping.put(typeInfo, ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
-         colorMapping.put(methodInfo, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
-         colorMapping.put(contractInfo, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
+         colorMapping.put(project, VerificationStatusView.COLOR_UNSPECIFIED);
+         colorMapping.put(packageInfo, VerificationStatusView.COLOR_UNSPECIFIED);
+         colorMapping.put(typeInfo, VerificationStatusView.COLOR_UNSPECIFIED);
+         colorMapping.put(methodInfo, VerificationStatusView.COLOR_CLOSED_PROOF);
+         colorMapping.put(contractInfo, VerificationStatusView.COLOR_CLOSED_PROOF);
          // Ensure initial content
          assertProjectShown(tree, colorMapping, project);
          assertProgressBars(proofBar, false, false, 1, 1, specificationBar, true, false, 1, 2);
@@ -155,7 +215,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          SWTBotCustomProgressBar proofBar = SWTBotCustomProgressBar.customProgressBar(bot, 0);
          SWTBotCustomProgressBar specificationBar = SWTBotCustomProgressBar.customProgressBar(bot, 1);
          // Test initial project
-         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testColorPriorization", true, true, false, 1, true, true);
+         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testColorPriorization", true, false, true, false, 1, true);
          IFolder srcFolder = project.getFolder("src");
          assertTrue(srcFolder.exists());
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/cp/src", srcFolder, true);
@@ -190,49 +250,49 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          MethodInfo unspecifiedCorrectUnprovenMethod = unspecifiedType.getMethod("correctUnprovenDependency()");
          MethodInfo unspecifiedUnspecifiedMethod = unspecifiedType.getMethod("unspecified()");
          Map<Object, RGB> colorMapping = new HashMap<Object, RGB>();
-         colorMapping.put(project, ProjectInfoColorTreeSynchronizer.COLOR_PROOF_IN_RECURSION_CYCLE);
-         colorMapping.put(closedProofsPackage, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
-         colorMapping.put(cyclicProofsPackage, ProjectInfoColorTreeSynchronizer.COLOR_PROOF_IN_RECURSION_CYCLE);
-         colorMapping.put(openProofsPackage, ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
-         colorMapping.put(unprovenDependencyPackage, ProjectInfoColorTreeSynchronizer.COLOR_UNPROVEN_DEPENDENCY);
-         colorMapping.put(unspecifiedPackage, ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
-         colorMapping.put(closedProofsType, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
-         colorMapping.put(multipleRecursionType, ProjectInfoColorTreeSynchronizer.COLOR_PROOF_IN_RECURSION_CYCLE);
-         colorMapping.put(openProofType, ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
-         colorMapping.put(unprovenDependencyType, ProjectInfoColorTreeSynchronizer.COLOR_UNPROVEN_DEPENDENCY);
-         colorMapping.put(unspecifiedType, ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
+         colorMapping.put(project, VerificationStatusView.COLOR_PROOF_IN_RECURSION_CYCLE);
+         colorMapping.put(closedProofsPackage, VerificationStatusView.COLOR_CLOSED_PROOF);
+         colorMapping.put(cyclicProofsPackage, VerificationStatusView.COLOR_PROOF_IN_RECURSION_CYCLE);
+         colorMapping.put(openProofsPackage, VerificationStatusView.COLOR_OPEN_PROOF);
+         colorMapping.put(unprovenDependencyPackage, VerificationStatusView.COLOR_UNPROVEN_DEPENDENCY);
+         colorMapping.put(unspecifiedPackage, VerificationStatusView.COLOR_UNSPECIFIED);
+         colorMapping.put(closedProofsType, VerificationStatusView.COLOR_CLOSED_PROOF);
+         colorMapping.put(multipleRecursionType, VerificationStatusView.COLOR_PROOF_IN_RECURSION_CYCLE);
+         colorMapping.put(openProofType, VerificationStatusView.COLOR_OPEN_PROOF);
+         colorMapping.put(unprovenDependencyType, VerificationStatusView.COLOR_UNPROVEN_DEPENDENCY);
+         colorMapping.put(unspecifiedType, VerificationStatusView.COLOR_UNSPECIFIED);
 
-         colorMapping.put(closedProofsCorrectMethod, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
-         colorMapping.put(multipleRecursionAMethod, ProjectInfoColorTreeSynchronizer.COLOR_PROOF_IN_RECURSION_CYCLE);
-         colorMapping.put(multipleRecursionBMethod, ProjectInfoColorTreeSynchronizer.COLOR_PROOF_IN_RECURSION_CYCLE);
-         colorMapping.put(multipleRecursionCorrectMethod, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
-         colorMapping.put(multipleRecursionCorrectUnprovenMethod, ProjectInfoColorTreeSynchronizer.COLOR_UNPROVEN_DEPENDENCY);
-         colorMapping.put(multipleRecursionUnspecifiedMethod, ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
-         colorMapping.put(multipleRecursionWrongMethod, ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
-         colorMapping.put(openProofCorrectMethod, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
-         colorMapping.put(openProofCorrectUnprovenMethod, ProjectInfoColorTreeSynchronizer.COLOR_UNPROVEN_DEPENDENCY);
-         colorMapping.put(openProofWrongMethod, ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
-         colorMapping.put(unprovenDependencyCorrectMethod, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
-         colorMapping.put(unprovenDependencyCorrectUnprovenMethod, ProjectInfoColorTreeSynchronizer.COLOR_UNPROVEN_DEPENDENCY);
-         colorMapping.put(unspecifiedCorrectMethod, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
-         colorMapping.put(unspecifiedCorrectUnprovenMethod, ProjectInfoColorTreeSynchronizer.COLOR_UNPROVEN_DEPENDENCY);
-         colorMapping.put(unspecifiedUnspecifiedMethod, ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
+         colorMapping.put(closedProofsCorrectMethod, VerificationStatusView.COLOR_CLOSED_PROOF);
+         colorMapping.put(multipleRecursionAMethod, VerificationStatusView.COLOR_PROOF_IN_RECURSION_CYCLE);
+         colorMapping.put(multipleRecursionBMethod, VerificationStatusView.COLOR_PROOF_IN_RECURSION_CYCLE);
+         colorMapping.put(multipleRecursionCorrectMethod, VerificationStatusView.COLOR_CLOSED_PROOF);
+         colorMapping.put(multipleRecursionCorrectUnprovenMethod, VerificationStatusView.COLOR_UNPROVEN_DEPENDENCY);
+         colorMapping.put(multipleRecursionUnspecifiedMethod, VerificationStatusView.COLOR_UNSPECIFIED);
+         colorMapping.put(multipleRecursionWrongMethod, VerificationStatusView.COLOR_OPEN_PROOF);
+         colorMapping.put(openProofCorrectMethod, VerificationStatusView.COLOR_CLOSED_PROOF);
+         colorMapping.put(openProofCorrectUnprovenMethod, VerificationStatusView.COLOR_UNPROVEN_DEPENDENCY);
+         colorMapping.put(openProofWrongMethod, VerificationStatusView.COLOR_OPEN_PROOF);
+         colorMapping.put(unprovenDependencyCorrectMethod, VerificationStatusView.COLOR_CLOSED_PROOF);
+         colorMapping.put(unprovenDependencyCorrectUnprovenMethod, VerificationStatusView.COLOR_UNPROVEN_DEPENDENCY);
+         colorMapping.put(unspecifiedCorrectMethod, VerificationStatusView.COLOR_CLOSED_PROOF);
+         colorMapping.put(unspecifiedCorrectUnprovenMethod, VerificationStatusView.COLOR_UNPROVEN_DEPENDENCY);
+         colorMapping.put(unspecifiedUnspecifiedMethod, VerificationStatusView.COLOR_UNSPECIFIED);
 
-         colorMapping.put(closedProofsCorrectMethod.getContract(0), ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
-         colorMapping.put(multipleRecursionAMethod.getContract(0), ProjectInfoColorTreeSynchronizer.COLOR_PROOF_IN_RECURSION_CYCLE);
-         colorMapping.put(multipleRecursionBMethod.getContract(0), ProjectInfoColorTreeSynchronizer.COLOR_PROOF_IN_RECURSION_CYCLE);
-         colorMapping.put(multipleRecursionCorrectMethod.getContract(0), ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
-         colorMapping.put(multipleRecursionCorrectUnprovenMethod.getContract(0), ProjectInfoColorTreeSynchronizer.COLOR_UNPROVEN_DEPENDENCY);
-         colorMapping.put(multipleRecursionUnspecifiedMethod.getContract(0), ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
-         colorMapping.put(multipleRecursionWrongMethod.getContract(0), ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
-         colorMapping.put(openProofCorrectMethod.getContract(0), ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
-         colorMapping.put(openProofCorrectUnprovenMethod.getContract(0), ProjectInfoColorTreeSynchronizer.COLOR_UNPROVEN_DEPENDENCY);
-         colorMapping.put(openProofWrongMethod.getContract(0), ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
-         colorMapping.put(unprovenDependencyCorrectMethod.getContract(0), ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
-         colorMapping.put(unprovenDependencyCorrectUnprovenMethod.getContract(0), ProjectInfoColorTreeSynchronizer.COLOR_UNPROVEN_DEPENDENCY);
-         colorMapping.put(unspecifiedCorrectMethod.getContract(0), ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
-         colorMapping.put(unspecifiedCorrectUnprovenMethod.getContract(0), ProjectInfoColorTreeSynchronizer.COLOR_UNPROVEN_DEPENDENCY);
-         colorMapping.put(unspecifiedUnspecifiedMethod.getContract(0), ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
+         colorMapping.put(closedProofsCorrectMethod.getContract(0), VerificationStatusView.COLOR_CLOSED_PROOF);
+         colorMapping.put(multipleRecursionAMethod.getContract(0), VerificationStatusView.COLOR_PROOF_IN_RECURSION_CYCLE);
+         colorMapping.put(multipleRecursionBMethod.getContract(0), VerificationStatusView.COLOR_PROOF_IN_RECURSION_CYCLE);
+         colorMapping.put(multipleRecursionCorrectMethod.getContract(0), VerificationStatusView.COLOR_CLOSED_PROOF);
+         colorMapping.put(multipleRecursionCorrectUnprovenMethod.getContract(0), VerificationStatusView.COLOR_UNPROVEN_DEPENDENCY);
+         colorMapping.put(multipleRecursionUnspecifiedMethod.getContract(0), VerificationStatusView.COLOR_UNSPECIFIED);
+         colorMapping.put(multipleRecursionWrongMethod.getContract(0), VerificationStatusView.COLOR_OPEN_PROOF);
+         colorMapping.put(openProofCorrectMethod.getContract(0), VerificationStatusView.COLOR_CLOSED_PROOF);
+         colorMapping.put(openProofCorrectUnprovenMethod.getContract(0), VerificationStatusView.COLOR_UNPROVEN_DEPENDENCY);
+         colorMapping.put(openProofWrongMethod.getContract(0), VerificationStatusView.COLOR_OPEN_PROOF);
+         colorMapping.put(unprovenDependencyCorrectMethod.getContract(0), VerificationStatusView.COLOR_CLOSED_PROOF);
+         colorMapping.put(unprovenDependencyCorrectUnprovenMethod.getContract(0), VerificationStatusView.COLOR_UNPROVEN_DEPENDENCY);
+         colorMapping.put(unspecifiedCorrectMethod.getContract(0), VerificationStatusView.COLOR_CLOSED_PROOF);
+         colorMapping.put(unspecifiedCorrectUnprovenMethod.getContract(0), VerificationStatusView.COLOR_UNPROVEN_DEPENDENCY);
+         colorMapping.put(unspecifiedUnspecifiedMethod.getContract(0), VerificationStatusView.COLOR_UNSPECIFIED);
          // Ensure initial content
          assertProjectShown(tree, colorMapping, project);
          assertProgressBars(proofBar, true, true, 16, 18, specificationBar, true, false, 18, 20);
@@ -274,7 +334,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          SWTBotCustomProgressBar proofBar = SWTBotCustomProgressBar.customProgressBar(bot, 0);
          SWTBotCustomProgressBar specificationBar = SWTBotCustomProgressBar.customProgressBar(bot, 1);
          // Test initial project
-         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testSpecificationAndProofProgress", true, true, false, 1, true, true);
+         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testSpecificationAndProofProgress", true, false, true, false, 1, true);
          IFolder srcFolder = project.getFolder("src");
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/specificationProgress/src1NoMethod", srcFolder, true);
          assertTrue(srcFolder.exists());
@@ -284,9 +344,9 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          PackageInfo packageInfo = projectInfo.getPackage("myPackage");
          TypeInfo typeInfo = packageInfo.getType("MyClass");
          Map<Object, RGB> colorMapping = new HashMap<Object, RGB>();
-         colorMapping.put(project, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
-         colorMapping.put(packageInfo, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
-         colorMapping.put(typeInfo, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
+         colorMapping.put(project, VerificationStatusView.COLOR_CLOSED_PROOF);
+         colorMapping.put(packageInfo, VerificationStatusView.COLOR_CLOSED_PROOF);
+         colorMapping.put(typeInfo, VerificationStatusView.COLOR_CLOSED_PROOF);
          // Ensure initial content
          assertProjectShown(tree, colorMapping, project);
          assertProgressBars(proofBar, false, false, 1, 1, specificationBar, false, false, 1, 1);
@@ -295,10 +355,10 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/specificationProgress/src2Unspecified", srcFolder, true);
          KeY4EclipseResourcesTestUtil.build(project);
          MethodInfo methodInfo = typeInfo.getMethod("magic()");
-         colorMapping.put(project, ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
-         colorMapping.put(packageInfo, ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
-         colorMapping.put(typeInfo, ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
-         colorMapping.put(methodInfo, ProjectInfoColorTreeSynchronizer.COLOR_UNSPECIFIED);
+         colorMapping.put(project, VerificationStatusView.COLOR_UNSPECIFIED);
+         colorMapping.put(packageInfo, VerificationStatusView.COLOR_UNSPECIFIED);
+         colorMapping.put(typeInfo, VerificationStatusView.COLOR_UNSPECIFIED);
+         colorMapping.put(methodInfo, VerificationStatusView.COLOR_UNSPECIFIED);
          assertProjectShown(tree, colorMapping, project);
          assertProgressBars(proofBar, false, false, 1, 1, specificationBar, true, false, 1, 2);
          assertReport(view, "data/specificationProgress/oracle/Report2Unspecified.html");
@@ -306,22 +366,22 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/specificationProgress/src3SpecifiedWrong", srcFolder, true);
          KeY4EclipseResourcesTestUtil.build(project);
          ContractInfo contractInfo = methodInfo.getContract(0);
-         colorMapping.put(project, ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
-         colorMapping.put(packageInfo, ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
-         colorMapping.put(typeInfo, ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
-         colorMapping.put(methodInfo, ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
-         colorMapping.put(contractInfo, ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
+         colorMapping.put(project, VerificationStatusView.COLOR_OPEN_PROOF);
+         colorMapping.put(packageInfo, VerificationStatusView.COLOR_OPEN_PROOF);
+         colorMapping.put(typeInfo, VerificationStatusView.COLOR_OPEN_PROOF);
+         colorMapping.put(methodInfo, VerificationStatusView.COLOR_OPEN_PROOF);
+         colorMapping.put(contractInfo, VerificationStatusView.COLOR_OPEN_PROOF);
          assertProjectShown(tree, colorMapping, project);
          assertProgressBars(proofBar, true, false, 1, 2, specificationBar, false, false, 2, 2);
          assertReport(view, "data/specificationProgress/oracle/Report3SpecifiedWrong.html");
          // Correct specification
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/specificationProgress/src4SpecifiedCorrect", srcFolder, true);
          KeY4EclipseResourcesTestUtil.build(project);
-         colorMapping.put(project, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
-         colorMapping.put(packageInfo, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
-         colorMapping.put(typeInfo, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
-         colorMapping.put(methodInfo, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
-         colorMapping.put(contractInfo, ProjectInfoColorTreeSynchronizer.COLOR_CLOSED_PROOF);
+         colorMapping.put(project, VerificationStatusView.COLOR_CLOSED_PROOF);
+         colorMapping.put(packageInfo, VerificationStatusView.COLOR_CLOSED_PROOF);
+         colorMapping.put(typeInfo, VerificationStatusView.COLOR_CLOSED_PROOF);
+         colorMapping.put(methodInfo, VerificationStatusView.COLOR_CLOSED_PROOF);
+         colorMapping.put(contractInfo, VerificationStatusView.COLOR_CLOSED_PROOF);
          assertProjectShown(tree, colorMapping, project);
          assertProgressBars(proofBar, false, false, 2, 2, specificationBar, false, false, 2, 2);
          assertReport(view, "data/specificationProgress/oracle/Report4SpecifiedCorrect.html");
@@ -361,7 +421,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          SWTBotCustomProgressBar proofBar = SWTBotCustomProgressBar.customProgressBar(bot, 0);
          SWTBotCustomProgressBar specificationBar = SWTBotCustomProgressBar.customProgressBar(bot, 1);
          // Test initial project
-         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testColorOfCyclicProofs", true, true, false, 1, true, true);
+         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testColorOfCyclicProofs", true, false, true, false, 1, true);
          IFolder srcFolder = project.getFolder("src");
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/cyclicProofs/src", srcFolder, true);
          assertTrue(srcFolder.exists());
@@ -375,13 +435,13 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          MethodInfo bMethodInfo = typeInfo.getMethod("a()");
          ContractInfo bContractInfo = bMethodInfo.getContract(0);
          Map<Object, RGB> colorMapping = new HashMap<Object, RGB>();
-         colorMapping.put(project, ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
-         colorMapping.put(packageInfo, ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
-         colorMapping.put(typeInfo, ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
-         colorMapping.put(aMethodInfo, ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
-         colorMapping.put(aContractInfo, ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
-         colorMapping.put(bMethodInfo, ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
-         colorMapping.put(bContractInfo, ProjectInfoColorTreeSynchronizer.COLOR_OPEN_PROOF);
+         colorMapping.put(project, VerificationStatusView.COLOR_OPEN_PROOF);
+         colorMapping.put(packageInfo, VerificationStatusView.COLOR_OPEN_PROOF);
+         colorMapping.put(typeInfo, VerificationStatusView.COLOR_OPEN_PROOF);
+         colorMapping.put(aMethodInfo, VerificationStatusView.COLOR_OPEN_PROOF);
+         colorMapping.put(aContractInfo, VerificationStatusView.COLOR_OPEN_PROOF);
+         colorMapping.put(bMethodInfo, VerificationStatusView.COLOR_OPEN_PROOF);
+         colorMapping.put(bContractInfo, VerificationStatusView.COLOR_OPEN_PROOF);
          // Ensure that both proofs are open
          assertProjectShown(tree, colorMapping, project);
          assertProgressBars(proofBar, true, false, 1, 3, specificationBar, false, false, 3, 3);
@@ -390,21 +450,21 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          IFolder proofFolder = project.getFolder(KeYResourcesUtil.PROOF_FOLDER_NAME);
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/cyclicProofs/firstProof", proofFolder, true);
          KeY4EclipseResourcesTestUtil.build(project);
-         colorMapping.put(aMethodInfo, ProjectInfoColorTreeSynchronizer.COLOR_UNPROVEN_DEPENDENCY);
-         colorMapping.put(aContractInfo, ProjectInfoColorTreeSynchronizer.COLOR_UNPROVEN_DEPENDENCY);
+         colorMapping.put(aMethodInfo, VerificationStatusView.COLOR_UNPROVEN_DEPENDENCY);
+         colorMapping.put(aContractInfo, VerificationStatusView.COLOR_UNPROVEN_DEPENDENCY);
          assertProjectShown(tree, colorMapping, project);
          assertProgressBars(proofBar, true, false, 2, 3, specificationBar, false, false, 3, 3);
          assertReport(view, "data/cyclicProofs/oracle/Report2FirstClosed.html");
          // Finish second proof
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/cyclicProofs/secondProof", proofFolder, true);
          KeY4EclipseResourcesTestUtil.build(project);
-         colorMapping.put(project, ProjectInfoColorTreeSynchronizer.COLOR_PROOF_IN_RECURSION_CYCLE);
-         colorMapping.put(packageInfo, ProjectInfoColorTreeSynchronizer.COLOR_PROOF_IN_RECURSION_CYCLE);
-         colorMapping.put(typeInfo, ProjectInfoColorTreeSynchronizer.COLOR_PROOF_IN_RECURSION_CYCLE);
-         colorMapping.put(aMethodInfo, ProjectInfoColorTreeSynchronizer.COLOR_PROOF_IN_RECURSION_CYCLE);
-         colorMapping.put(aContractInfo, ProjectInfoColorTreeSynchronizer.COLOR_PROOF_IN_RECURSION_CYCLE);
-         colorMapping.put(bMethodInfo, ProjectInfoColorTreeSynchronizer.COLOR_PROOF_IN_RECURSION_CYCLE);
-         colorMapping.put(bContractInfo, ProjectInfoColorTreeSynchronizer.COLOR_PROOF_IN_RECURSION_CYCLE);
+         colorMapping.put(project, VerificationStatusView.COLOR_PROOF_IN_RECURSION_CYCLE);
+         colorMapping.put(packageInfo, VerificationStatusView.COLOR_PROOF_IN_RECURSION_CYCLE);
+         colorMapping.put(typeInfo, VerificationStatusView.COLOR_PROOF_IN_RECURSION_CYCLE);
+         colorMapping.put(aMethodInfo, VerificationStatusView.COLOR_PROOF_IN_RECURSION_CYCLE);
+         colorMapping.put(aContractInfo, VerificationStatusView.COLOR_PROOF_IN_RECURSION_CYCLE);
+         colorMapping.put(bMethodInfo, VerificationStatusView.COLOR_PROOF_IN_RECURSION_CYCLE);
+         colorMapping.put(bContractInfo, VerificationStatusView.COLOR_PROOF_IN_RECURSION_CYCLE);
          assertProjectShown(tree, colorMapping, project);
          assertProgressBars(proofBar, false, true, 3, 3, specificationBar, false, false, 3, 3);
          assertReport(view, "data/cyclicProofs/oracle/Report3BothClosed.html");
@@ -513,7 +573,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          SWTBotTree tree = view.bot().tree();
          assertProjectShown(tree);
          // Test empty project (step 0)
-         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testPackagesAndTypes", true, true, false, 1, true, true);
+         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testPackagesAndTypes", true, false, true, false, 1, true);
          assertProjectShown(tree, project);
          IFolder srcFolder = project.getFolder("src");
          assertTrue(srcFolder.exists());
@@ -569,7 +629,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          SWTBotTree tree = view.bot().tree();
          assertProjectShown(tree);
          // Test empty project (step 0)
-         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testObserverFunctionsAndContracts", true, true, false, 1, true, true);
+         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testObserverFunctionsAndContracts", true, false, true, false, 1, true);
          assertProjectShown(tree, project);
          IFolder srcFolder = project.getFolder("src");
          assertTrue(srcFolder.exists());
@@ -618,7 +678,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          SWTBotTree tree = view.bot().tree();
          assertProjectShown(tree);
          // Test empty project (step 0)
-         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testMethodContracts", true, true, false, 1, true, true);
+         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testMethodContracts", true, false, true, false, 1, true);
          assertProjectShown(tree, project);
          IFolder srcFolder = project.getFolder("src");
          assertTrue(srcFolder.exists());
@@ -667,7 +727,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          SWTBotTree tree = view.bot().tree();
          assertProjectShown(tree);
          // Test empty project (step 0)
-         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testMethods", true, true, false, 1, true, true);
+         project = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testMethods", true, false, true, false, 1, true);
          assertProjectShown(tree, project);
          IFolder srcFolder = project.getFolder("src");
          assertTrue(srcFolder.exists());
@@ -724,7 +784,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          KeY4EclipseResourcesTestUtil.build(generalProject);
          assertProjectShown(tree);
          // Create first key project to show
-         firstKeyProject = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testShownContentWithAndWithoutLinking_key1", true, true, false, 1, true, true);
+         firstKeyProject = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testShownContentWithAndWithoutLinking_key1", true, false, true, false, 1, true);
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/classWithoutMethods", firstKeyProject.getFolder("src"));
          KeY4EclipseResourcesTestUtil.build(firstKeyProject);
          assertProjectShown(tree, firstKeyProject);
@@ -734,7 +794,7 @@ public class SWTBotVerificationStatusViewTest extends AbstractResourceTest {
          KeY4EclipseResourcesTestUtil.build(javaProject.getProject());
          assertProjectShown(tree, firstKeyProject);
          // Create second key project to show
-         secondKeyProject = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testShownContentWithAndWithoutLinking_key2", true, true, false, 1, true, true);
+         secondKeyProject = KeY4EclipseResourcesTestUtil.initializeTest("SWTBotVerificationStatusViewTest_testShownContentWithAndWithoutLinking_key2", true, false, true, false, 1, true);
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/classWithoutMethods", secondKeyProject.getFolder("src"));
          KeY4EclipseResourcesTestUtil.build(secondKeyProject);
          assertProjectShown(tree, firstKeyProject, secondKeyProject);

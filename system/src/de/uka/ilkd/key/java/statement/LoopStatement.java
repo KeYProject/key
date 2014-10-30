@@ -84,39 +84,39 @@ public abstract class LoopStatement extends JavaStatement
      *      Loop statement.
      *      @param body a statement.
      */
-    public LoopStatement(Expression guard,Statement body,ExtList comments) {
+    public LoopStatement(Expression guard, Statement body, ExtList comments) {
 	super(comments);
-        this.body    = body;
+	this.body    = body;
 	this.updates = null;
 	this.inits   = null;
 	this.guard   = new Guard(guard);
     }
 
 
-    public LoopStatement(Expression guard,Statement body,ExtList comments, PositionInfo pos) {
+    public LoopStatement(Expression guard, Statement body, ExtList comments, PositionInfo pos) {
 	super(add(comments,pos));
-        this.body    = body;
+	this.body    = body;
 	this.updates = null;
 	this.inits   = null;
 	this.guard   = new Guard(guard);
     }
-    
+
 
     /**
      *      Loop statement.
      *      @param body a statement.
      */
-    public LoopStatement(Expression guard,Statement body) {
+    public LoopStatement(Expression guard, Statement body) {
         this.body    = body;
 	this.updates = null;
 	this.inits   = null;
 	this.guard   = new Guard(guard);
     }
 
-    public LoopStatement(Expression guard, Statement body, 
+    public LoopStatement(Expression guard, Statement body,
                          PositionInfo pos) {
 	super(pos);
-        this.body    = body;
+	this.body    = body;
 	this.updates = null;
 	this.inits   = null;
 	this.guard   = new Guard(guard);
@@ -174,16 +174,36 @@ public abstract class LoopStatement extends JavaStatement
     }
 
 
+    /**
+     * Loop statement. This constructor is used for the transformation
+     * of Recoder to KeY.
+     * @param inits the initializers of the loop
+     * @param guard the guard of the loop
+     * @param updates the updates of the loop
+     * @param body the body of the loop
+     * @param pos the position of the loop
+     */
+     public LoopStatement(ILoopInit inits, IGuard guard,
+                          IForUpdates updates, Statement body,
+                          PositionInfo pos) {
+         super(pos);
+         this.body    = body;
+         this.updates = updates;
+         this.inits   = inits;
+         this.guard   = guard;
+     }
+
+
    /**
     * Loop statement. This constructor is used for the transformation
     * of Recoder to KeY.
     * @param inits the initializers of the loop
     * @param guard the guard of the loop
     * @param updates the updates of the loop
-    * @param body the body of the loop   
+    * @param body the body of the loop
     */
-    public LoopStatement(ILoopInit inits, IGuard guard, 
-			 IForUpdates updates, Statement body){
+    public LoopStatement(ILoopInit inits, IGuard guard,
+			 IForUpdates updates, Statement body) {
         this.body    = body;
 	this.updates = updates;
 	this.inits   = inits;
@@ -388,4 +408,22 @@ public abstract class LoopStatement extends JavaStatement
      *      @return the boolean value.
      */
     public abstract boolean isCheckedBeforeIteration();
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || !(o instanceof LoopStatement)) {
+            return false;
+        }
+
+        LoopStatement cmp = (LoopStatement)o;
+        return super.equals(cmp)
+                && (this.getStartPosition().equals(Position.UNDEFINED) ||
+                        cmp.getStartPosition().equals(Position.UNDEFINED) ||
+                        this.getStartPosition().getLine() == cmp.getStartPosition().getLine());
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

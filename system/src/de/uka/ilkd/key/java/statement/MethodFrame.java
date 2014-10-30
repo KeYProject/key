@@ -125,7 +125,12 @@ public class MethodFrame extends JavaStatement implements
         return body.getFirstElement();
     }
 
-    public SourceElement getLastElement() {
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+        return body;
+    }
+
+   public SourceElement getLastElement() {
         return body.getLastElement();
     }
 

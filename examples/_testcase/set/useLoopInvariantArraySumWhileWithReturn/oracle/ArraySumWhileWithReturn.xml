@@ -12,7 +12,7 @@
 variant: javaSubInt(array.length, i)
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <callStackEntry path="/0"/>
-               <branchStatement name="if (array==null)" pathCondition="true" pathConditionChanged="false">
+               <branchStatement name="if (array==null)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                   <callStackEntry path="/0"/>
                   <branchCondition name="equals(array,null)" pathCondition="equals(array,null)" pathConditionChanged="true" branchCondition="equals(array,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <callStackEntry path="/0"/>
@@ -23,11 +23,12 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                            <termination name="&lt;end&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
                         </methodReturn>
+                        <completedBlockEntry path="/0/0/0/0/0" conditionString="equals(array,null)"/>
                      </statement>
                   </branchCondition>
                   <branchCondition name="not(equals(array,null))" pathCondition="not(equals(array,null))" pathConditionChanged="true" branchCondition="not(equals(array,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <callStackEntry path="/0"/>
-                     <branchStatement name="if (i==array.length)" pathCondition="not(equals(array,null))" pathConditionChanged="false">
+                     <branchStatement name="if (i==array.length)" pathCondition="not(equals(array,null))" pathConditionChanged="false" blockOpened="true">
                         <callStackEntry path="/0"/>
                         <branchCondition name="equals(length(array),i_0)" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),i_0)))" pathConditionChanged="true" branchCondition="equals(length(array),i_0)" mergedBranchCondition="false" isBranchConditionComputed="true">
                            <callStackEntry path="/0"/>
@@ -38,6 +39,8 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                                  <termination name="&lt;end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),i_0)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                  </termination>
                               </methodReturn>
+                              <completedBlockEntry path="/0/0/0/0/0" conditionString="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),i_0)))"/>
+                              <completedBlockEntry path="/0/0/0/0/0/1/0" conditionString="imp(geq(length(array),Z(0(#))),equals(length(array),i_0))"/>
                            </statement>
                         </branchCondition>
                         <branchCondition name="not(equals(length(array),i_0))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),i_0))))" pathConditionChanged="true" branchCondition="not(equals(length(array),i_0))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -48,11 +51,18 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                                  <callStackEntry path="/0"/>
                                  <termination name="&lt;loop body end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),i_0))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
                                  </termination>
+                                 <completedBlockEntry path="/0/0/0/0/0" conditionString="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),i_0))))"/>
+                                 <completedBlockEntry path="/0/0/0/0/0/1/0" conditionString="not(and(geq(i_0,Z(0(#))),equals(length(array),i_0)))"/>
                               </statement>
                            </statement>
                         </branchCondition>
+                        <blockCompletionEntry path="/0/0/0/0/0/1/0/0/0"/>
+                        <blockCompletionEntry path="/0/0/0/0/0/1/0/1/0/0"/>
                      </branchStatement>
                   </branchCondition>
+                  <blockCompletionEntry path="/0/0/0/0/0/0/0"/>
+                  <blockCompletionEntry path="/0/0/0/0/0/1/0/0/0"/>
+                  <blockCompletionEntry path="/0/0/0/0/0/1/0/1/0/0"/>
                </branchStatement>
             </loopInvariant>
          </statement>

@@ -2,7 +2,7 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call self.min(i,j)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int result;" pathCondition="true" pathConditionChanged="false">
-         <branchStatement name="if (i&lt;j&amp;&amp;i!=j)" pathCondition="true" pathConditionChanged="false">
+         <branchStatement name="if (i&lt;j&amp;&amp;i!=j)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
             <branchCondition name="leq(j,i)" pathCondition="leq(j,i)" pathConditionChanged="true" branchCondition="leq(j,i)" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="result_1=j;" pathCondition="leq(j,i)" pathConditionChanged="false">
                   <statement name="return result_1;" pathCondition="leq(j,i)" pathConditionChanged="false">
@@ -11,6 +11,7 @@
                         </termination>
                      </methodReturn>
                   </statement>
+                  <completedBlockEntry path="/0/0/0" conditionString="leq(j,i)"/>
                </statement>
             </branchCondition>
             <branchCondition name="gt(j,i)" pathCondition="gt(j,i)" pathConditionChanged="true" branchCondition="gt(j,i)" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -21,8 +22,11 @@
                         </termination>
                      </methodReturn>
                   </statement>
+                  <completedBlockEntry path="/0/0/0" conditionString="gt(j,i)"/>
                </statement>
             </branchCondition>
+            <blockCompletionEntry path="/0/0/0/0/0"/>
+            <blockCompletionEntry path="/0/0/0/1/0"/>
          </branchStatement>
       </statement>
       <methodReturnEntry path="/0/0/0/0/0/0/0"/>

@@ -458,14 +458,108 @@
                                                    </value>
                                                 </variable>
                                              </termination>
+                                             <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                                                <value name="self {true}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                                   <variable name="a" arrayIndex="-1" isArrayIndex="false">
+                                                      <value name="a {true}" typeString="int" valueString="int::select(heap,self,VariablesInstanceVariableTest::$a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                      </value>
+                                                   </variable>
+                                                   <variable name="b" arrayIndex="-1" isArrayIndex="false">
+                                                      <value name="b {true}" typeString="int" valueString="int::select(heap,self,VariablesInstanceVariableTest::$b)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                      </value>
+                                                   </variable>
+                                                   <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
+                                                      <value name="wrapper {or(or(or(and(equals(param,null),or(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null),not(equals(boolean::select(heap,IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),java.lang.Object::&lt;created&gt;),TRUE)))),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(or(or(and(equals(param,null),or(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null),not(equals(boolean::select(heap,IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),java.lang.Object::&lt;created&gt;),TRUE)))),and(equals(param,null),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null)))),and(not(equals(param,null)),equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))),and(not(equals(param,null)),not(equals(IntWrapper::select(heap,self,VariablesInstanceVariableTest::$wrapper),null))))">
+                                                      </value>
+                                                   </variable>
+                                                </value>
+                                             </callStateVariable>
+                                             <callStateVariable name="param" arrayIndex="-1" isArrayIndex="false">
+                                                <value name="param {equals(param,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(param,null)">
+                                                </value>
+                                                <value name="param {not(equals(param,null))}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(param,null))">
+                                                   <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                      <value name="value {true}" typeString="int" valueString="int::select(heap,param,IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                      </value>
+                                                   </variable>
+                                                </value>
+                                             </callStateVariable>
+                                             <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                </value>
+                                             </callStateVariable>
+                                             <callStateVariable name="heapBefore_main" arrayIndex="-1" isArrayIndex="false">
+                                                <value name="heapBefore_main {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                </value>
+                                             </callStateVariable>
+                                             <callStateVariable name="savedHeapBefore_main" arrayIndex="-1" isArrayIndex="false">
+                                                <value name="savedHeapBefore_main {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                                </value>
+                                             </callStateVariable>
                                           </methodReturn>
                                        </statement>
                                     </statement>
+                                    <callStateVariable name="i_4" arrayIndex="-1" isArrayIndex="false">
+                                       <value name="i_4 {true}" typeString="IntWrapper" valueString="i_6" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                          <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                             <value name="value {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                             </value>
+                                          </variable>
+                                       </value>
+                                    </callStateVariable>
+                                    <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                       <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </callStateVariable>
+                                    <callStateVariable name="x" arrayIndex="-1" isArrayIndex="false">
+                                       <value name="x {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </callStateVariable>
+                                    <callStateVariable name="param" arrayIndex="-1" isArrayIndex="false">
+                                       <value name="param {true}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                          <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                             <value name="value {true}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                             </value>
+                                          </variable>
+                                       </value>
+                                    </callStateVariable>
+                                    <callStateVariable name="heapBefore_&lt;init&gt;_1" arrayIndex="-1" isArrayIndex="false">
+                                       <value name="heapBefore_&lt;init&gt;_1 {true}" typeString="Heap" valueString="store(store(create(store(store(create(store(store(heap,self,VariablesInstanceVariableTest::$a,Z(5(#))),self,VariablesInstanceVariableTest::$b,Z(3(#))),i_2),i_2,java.lang.Object::&lt;initialized&gt;,TRUE),i_2,IntWrapper::$value,Z(1(#))),i_6),i_6,java.lang.Object::&lt;initialized&gt;,FALSE),i_6,IntWrapper::$value,Z(0(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </callStateVariable>
+                                    <callStateVariable name="savedHeapBefore_&lt;init&gt;_1" arrayIndex="-1" isArrayIndex="false">
+                                       <value name="savedHeapBefore_&lt;init&gt;_1 {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </callStateVariable>
                                  </methodReturn>
                                  <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
                               </methodCall>
                            </statement>
                         </statement>
+                        <callStateVariable name="i" arrayIndex="-1" isArrayIndex="false">
+                           <value name="i {true}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="value {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="x" arrayIndex="-1" isArrayIndex="false">
+                           <value name="x {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="heapBefore_&lt;init&gt;" arrayIndex="-1" isArrayIndex="false">
+                           <value name="heapBefore_&lt;init&gt; {true}" typeString="Heap" valueString="store(store(create(store(store(heap,self,VariablesInstanceVariableTest::$a,Z(5(#))),self,VariablesInstanceVariableTest::$b,Z(3(#))),i_2),i_2,java.lang.Object::&lt;initialized&gt;,FALSE),i_2,IntWrapper::$value,Z(0(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="savedHeapBefore_&lt;init&gt;" arrayIndex="-1" isArrayIndex="false">
+                           <value name="savedHeapBefore_&lt;init&gt; {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </callStateVariable>
                      </methodReturn>
                      <methodReturnEntry path="/0/0/0/0/0/0/0"/>
                   </methodCall>

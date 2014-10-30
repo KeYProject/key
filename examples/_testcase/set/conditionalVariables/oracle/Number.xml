@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <variable name="heapAtPre" arrayIndex="-1" isArrayIndex="false">
+      <value name="heapAtPre {true}" typeString="Heap" valueString="heapAtPre" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+      </value>
+   </variable>
+   <methodCall name="&lt;call self.equals(n)&gt;" pathCondition="true" pathConditionChanged="false">
+      <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+         </value>
+      </variable>
+      <branchStatement name="if (this.content==n.content)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+         <variable name="self" arrayIndex="-1" isArrayIndex="false">
+            <value name="self {true}" typeString="Number" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+               <variable name="content" arrayIndex="-1" isArrayIndex="false">
+                  <value name="content {true}" typeString="int" valueString="int::select(heap,self,Number::$content)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+            </value>
+         </variable>
+         <variable name="n" arrayIndex="-1" isArrayIndex="false">
+            <value name="n {equals(n,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(n,null)">
+            </value>
+            <value name="n {not(equals(n,null))}" typeString="Number" valueString="n" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(n,null))">
+               <variable name="content" arrayIndex="-1" isArrayIndex="false">
+                  <value name="content {true}" typeString="int" valueString="int::select(heap,n,Number::$content)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+            </value>
+         </variable>
+         <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            </value>
+         </variable>
+         <branchCondition name="not(equals(n,null))" pathCondition="not(equals(n,null))" pathConditionChanged="true" branchCondition="not(equals(n,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <variable name="self" arrayIndex="-1" isArrayIndex="false">
+               <value name="self {true}" typeString="Number" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  <variable name="content" arrayIndex="-1" isArrayIndex="false">
+                     <value name="content {true}" typeString="int" valueString="int::select(heap,self,Number::$content)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+               </value>
+            </variable>
+            <variable name="n" arrayIndex="-1" isArrayIndex="false">
+               <value name="n {true}" typeString="Number" valueString="n" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  <variable name="content" arrayIndex="-1" isArrayIndex="false">
+                     <value name="content {true}" typeString="int" valueString="int::select(heap,n,Number::$content)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+               </value>
+            </variable>
+            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="x_1" arrayIndex="-1" isArrayIndex="false">
+               <value name="x_1 {true}" typeString="int" valueString="int::select(heap,self,Number::$content)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="x_2" arrayIndex="-1" isArrayIndex="false">
+               <value name="x_2 {true}" typeString="int" valueString="int::select(heap,n,Number::$content)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <branchCondition name="equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content))" pathCondition="and(not(equals(n,null)),equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content)))" pathConditionChanged="true" branchCondition="equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content))" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                  <value name="self {true}" typeString="Number" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="content" arrayIndex="-1" isArrayIndex="false">
+                        <value name="content {true}" typeString="int" valueString="int::select(heap,n,Number::$content)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="n" arrayIndex="-1" isArrayIndex="false">
+                  <value name="n {true}" typeString="Number" valueString="n" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="content" arrayIndex="-1" isArrayIndex="false">
+                        <value name="content {true}" typeString="int" valueString="int::select(heap,n,Number::$content)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                  <value name="x {true}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <statement name="return true;" pathCondition="and(not(equals(n,null)),equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content)))" pathConditionChanged="false">
+                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                     <value name="self {true}" typeString="Number" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="content" arrayIndex="-1" isArrayIndex="false">
+                           <value name="content {true}" typeString="int" valueString="int::select(heap,n,Number::$content)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="n" arrayIndex="-1" isArrayIndex="false">
+                     <value name="n {true}" typeString="Number" valueString="n" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="content" arrayIndex="-1" isArrayIndex="false">
+                           <value name="content {true}" typeString="int" valueString="int::select(heap,n,Number::$content)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <methodReturn name="&lt;return of equals&gt;" signature="&lt;return of self.equals(n)&gt;" pathCondition="and(not(equals(n,null)),equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(not(equals(n,null)),equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content)))">
+                     <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                        <value name="self {true}" typeString="Number" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="content" arrayIndex="-1" isArrayIndex="false">
+                              <value name="content {true}" typeString="int" valueString="int::select(heap,n,Number::$content)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <variable name="n" arrayIndex="-1" isArrayIndex="false">
+                        <value name="n {true}" typeString="Number" valueString="n" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="content" arrayIndex="-1" isArrayIndex="false">
+                              <value name="content {true}" typeString="int" valueString="int::select(heap,n,Number::$content)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <termination name="&lt;end&gt;" pathCondition="and(not(equals(n,null)),equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </termination>
+                  </methodReturn>
+                  <completedBlockEntry path="/0/0" conditionString="and(not(equals(n,null)),equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content)))"/>
+               </statement>
+            </branchCondition>
+            <branchCondition name="not(equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content)))" pathCondition="and(not(equals(n,null)),not(equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content))))" pathConditionChanged="true" branchCondition="not(equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                  <value name="self {true}" typeString="Number" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="content" arrayIndex="-1" isArrayIndex="false">
+                        <value name="content {true}" typeString="int" valueString="int::select(heap,self,Number::$content)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="n" arrayIndex="-1" isArrayIndex="false">
+                  <value name="n {true}" typeString="Number" valueString="n" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="content" arrayIndex="-1" isArrayIndex="false">
+                        <value name="content {true}" typeString="int" valueString="int::select(heap,n,Number::$content)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                  <value name="x {true}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <statement name="return false;" pathCondition="and(not(equals(n,null)),not(equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content))))" pathConditionChanged="false">
+                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                     <value name="self {true}" typeString="Number" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="content" arrayIndex="-1" isArrayIndex="false">
+                           <value name="content {true}" typeString="int" valueString="int::select(heap,self,Number::$content)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="n" arrayIndex="-1" isArrayIndex="false">
+                     <value name="n {true}" typeString="Number" valueString="n" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="content" arrayIndex="-1" isArrayIndex="false">
+                           <value name="content {true}" typeString="int" valueString="int::select(heap,n,Number::$content)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <methodReturn name="&lt;return of equals&gt;" signature="&lt;return of self.equals(n)&gt;" pathCondition="and(not(equals(n,null)),not(equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(not(equals(n,null)),not(equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content))))">
+                     <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                        <value name="self {true}" typeString="Number" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="content" arrayIndex="-1" isArrayIndex="false">
+                              <value name="content {true}" typeString="int" valueString="int::select(heap,self,Number::$content)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <variable name="n" arrayIndex="-1" isArrayIndex="false">
+                        <value name="n {true}" typeString="Number" valueString="n" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="content" arrayIndex="-1" isArrayIndex="false">
+                              <value name="content {true}" typeString="int" valueString="int::select(heap,n,Number::$content)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <termination name="&lt;end&gt;" pathCondition="and(not(equals(n,null)),not(equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </termination>
+                  </methodReturn>
+                  <completedBlockEntry path="/0/0" conditionString="and(not(equals(n,null)),not(equals(int::select(heap,self,Number::$content),int::select(heap,n,Number::$content))))"/>
+               </statement>
+            </branchCondition>
+         </branchCondition>
+         <branchCondition name="equals(n,null)" pathCondition="equals(n,null)" pathConditionChanged="true" branchCondition="equals(n,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <variable name="self" arrayIndex="-1" isArrayIndex="false">
+               <value name="self {true}" typeString="Number" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  <variable name="content" arrayIndex="-1" isArrayIndex="false">
+                     <value name="content {true}" typeString="int" valueString="int::select(heap,self,Number::$content)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+               </value>
+            </variable>
+            <variable name="n" arrayIndex="-1" isArrayIndex="false">
+               <value name="n {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="x_1" arrayIndex="-1" isArrayIndex="false">
+               <value name="x_1 {true}" typeString="int" valueString="int::select(heap,self,Number::$content)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call self.equals(n)&gt;&gt;" pathCondition="equals(n,null)" pathConditionChanged="false" methodReturnCondition="equals(n,null)">
+               <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                  <value name="self {true}" typeString="Number" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="content" arrayIndex="-1" isArrayIndex="false">
+                        <value name="content {true}" typeString="int" valueString="int::select(heap,self,Number::$content)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="n" arrayIndex="-1" isArrayIndex="false">
+                  <value name="n {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="x_1" arrayIndex="-1" isArrayIndex="false">
+                  <value name="x_1 {true}" typeString="int" valueString="int::select(heap,self,Number::$content)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="n_1" arrayIndex="-1" isArrayIndex="false">
+                  <value name="n_1 {true}" typeString="java.lang.NullPointerException" valueString="n_4" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(n,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {true}" typeString="java.lang.NullPointerException" valueString="n_4" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+               </termination>
+               <completedBlockEntry path="/0/0" conditionString="equals(n,null)"/>
+            </exceptionalMethodReturn>
+         </branchCondition>
+         <blockCompletionEntry path="/0/0/0/0/0"/>
+         <blockCompletionEntry path="/0/0/0/1/0"/>
+         <blockCompletionEntry path="/0/0/1/0"/>
+      </branchStatement>
+      <methodReturnEntry path="/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/1/0/0"/>
+      <methodReturnEntry path="/0/0/1/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/1/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/0"/>
+</start>

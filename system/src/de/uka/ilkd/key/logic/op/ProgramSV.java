@@ -106,6 +106,11 @@ public final class ProgramSV extends AbstractSV
     public SourceElement getFirstElement(){
 	return this;
     }
+
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+       return getFirstElement();
+    }
     
     
     @Override
@@ -512,6 +517,12 @@ public final class ProgramSV extends AbstractSV
    @Override
    public KeYJavaType getReturnType() {
       return null;
+   }
+
+
+   @Override
+   public String getUniqueName() {
+       return sort().declarationString() + " " + name();
    }
 
 

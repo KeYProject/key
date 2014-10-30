@@ -10,32 +10,19 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 package de.uka.ilkd.key.proof.init;
 
-
-/** Reading prover input failed
+/**
+ * Reading prover input failed
  */
 public class ProofInputException extends Exception {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 2020248619026188315L;
-    private final String message;
-
     public ProofInputException(Exception e) {
-        super(e.getMessage());
-        message = e.toString();
-        initCause(e);
+        super(e);
     }
 
-    public ProofInputException(String message) {
-        super(message);
-        this.message = message;
+    public ProofInputException(String s) {
+        super(s);
     }
 
-    public String toString() {
-        return message;
-    }
 }

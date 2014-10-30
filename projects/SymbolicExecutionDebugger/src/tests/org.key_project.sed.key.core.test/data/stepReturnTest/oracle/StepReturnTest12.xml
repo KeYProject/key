@@ -1,31 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_0d8f7f02-9419-413e-8e54-bf0b66ef5e77" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_4ed706fa-ac8c-4858-b55a-19a8edbf5d24" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_c5a5f493-4fa6-446c-995f-3105222e652d" name="&lt;call self.main(a)&gt;" pathCondition="true" lineNumber="-1" charStart="46" charEnd="50" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
-            <sedStatement xml:id="_f96aa4b8-b51e-4ac4-b79f-ac60d82f00e0" name="firstLevel(a);" pathCondition="true" lineNumber="-1" charStart="63" charEnd="77" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
-               <sedMethodCall xml:id="_b64e5fa3-0dc8-4b0f-8ea5-27babdd8df70" name="&lt;call self.firstLevel(a_1)&gt;" pathCondition="true" lineNumber="-1" charStart="131" charEnd="141" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
-                  <sedStatement xml:id="_bbc81800-1594-4b72-a744-71384a36d357" name="secondLevel(a_1);" pathCondition="true" lineNumber="-1" charStart="154" charEnd="169" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
-                     <sedMethodCall xml:id="_38f4fd19-08d6-4ec8-9990-c702afccdf8f" name="&lt;call self.secondLevel(a_2)&gt;" pathCondition="true" lineNumber="-1" charStart="209" charEnd="220" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
-                        <sedStatement xml:id="_2016ed95-f608-4125-9666-e65483e72c3e" name="thirdLevel(a_2);" pathCondition="true" lineNumber="-1" charStart="243" charEnd="257" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
-                           <sedMethodCall xml:id="_6b47f90c-44c9-4593-b941-b7f2df495302" name="&lt;call self.thirdLevel(a_3)&gt;" pathCondition="true" lineNumber="-1" charStart="327" charEnd="337" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
-                              <sedStatement xml:id="_28c6203e-2eda-42d7-adc4-fc38a009f320" name="fourthLevel(a_3);" pathCondition="true" lineNumber="-1" charStart="350" charEnd="365" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
-                                 <sedMethodCall xml:id="_74d8f393-ec95-418f-8bcd-8101692a91cb" name="&lt;call self.fourthLevel(a_4)&gt;" pathCondition="true" lineNumber="-1" charStart="435" charEnd="446" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
-                                    <sedStatement xml:id="_f517d0d0-00b8-4c03-bc15-6c178d5fc13b" name="throw new Exception ();" pathCondition="true" lineNumber="-1" charStart="459" charEnd="481" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
-                                       <sedStatement xml:id="_da4556f5-5212-4b46-9193-32b7b216f52f" name="a_2=a_2*2;" pathCondition="true" lineNumber="-1" charStart="292" charEnd="302" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
-                                          <sedMethodReturn xml:id="_80976418-c5a7-4d2e-88c0-82245fbb4cfb" name="&lt;return of self.secondLevel(a_2)&gt;" pathCondition="true" lineNumber="-1" charStart="209" charEnd="220" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java" methodReturnConditionRef="_be84105e-adac-4dbd-a48e-b96bc6f5ff80">
-                                             <sedStatement xml:id="_de2eb905-452f-482f-b702-27ac815f4a52" name="secondLevel(a_1);" pathCondition="true" lineNumber="-1" charStart="173" charEnd="188" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
+   <sedTarget xml:id="_b27b2a50-2081-4914-90a6-17e6c9f32c34" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_46879cdd-96b6-45f3-bebc-d53266ff004f" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
+         <sedMethodCall xml:id="_4df29bd5-d685-46f1-8fd7-ae98a1a67e21" name="&lt;call self.main(a)&gt;" pathCondition="true" lineNumber="-1" charStart="46" charEnd="50" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java" groupable="true">
+            <sedStatement xml:id="_c72697d4-23e4-455d-be27-8fc28ea8508c" name="firstLevel(a);" pathCondition="true" lineNumber="-1" charStart="63" charEnd="77" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
+               <sedMethodCall xml:id="_785fdc8f-ceec-4f4a-a620-d2608a4854db" name="&lt;call self.firstLevel(a_1)&gt;" pathCondition="true" lineNumber="-1" charStart="131" charEnd="141" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java" groupable="true">
+                  <sedStatement xml:id="_dbbfe2c1-2dcd-4cab-b050-9a14eb8b61e6" name="secondLevel(a_1);" pathCondition="true" lineNumber="-1" charStart="154" charEnd="169" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
+                     <sedMethodCall xml:id="_d51921b3-0ef8-4b32-8215-ca2d66fb6b08" name="&lt;call self.secondLevel(a_2)&gt;" pathCondition="true" lineNumber="-1" charStart="209" charEnd="220" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java" groupable="true">
+                        <sedStatement xml:id="_07fdc13d-e7f3-4413-a676-f127b3337981" name="thirdLevel(a_2);" pathCondition="true" lineNumber="-1" charStart="243" charEnd="257" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
+                           <sedMethodCall xml:id="_7cdc076c-a09e-4c2a-8bcb-f41f93d9b6f9" name="&lt;call self.thirdLevel(a_3)&gt;" pathCondition="true" lineNumber="-1" charStart="327" charEnd="337" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java" groupable="true">
+                              <sedStatement xml:id="_9fa6c7ed-8b79-45ef-87ea-a6fdf4e0a70b" name="fourthLevel(a_3);" pathCondition="true" lineNumber="-1" charStart="350" charEnd="365" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
+                                 <sedMethodCall xml:id="_dd8eb20c-2278-48d6-9f9c-2b42d3a8caaa" name="&lt;call self.fourthLevel(a_4)&gt;" pathCondition="true" lineNumber="-1" charStart="435" charEnd="446" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java" groupable="true">
+                                    <sedStatement xml:id="_fdcaf71c-0d50-4b88-97e1-899d7d5af2b6" name="throw new Exception ();" pathCondition="true" lineNumber="-1" charStart="459" charEnd="481" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
+                                       <sedExceptionalMethodReturn xml:id="_4ec9270f-21cd-46dc-a6be-6142722eb5af" name="&lt;exceptional return of &lt;call self.fourthLevel(a_4)&gt;&gt;" pathCondition="true" lineNumber="-1" charStart="435" charEnd="446" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java" methodReturnConditionRef="_341d88dd-ddb1-498b-b0f0-df8b9f467469">
+                                          <sedExceptionalMethodReturn xml:id="_001750ac-2b1f-4a5d-bf1c-a4e28eeed23a" name="&lt;exceptional return of &lt;call self.thirdLevel(a_3)&gt;&gt;" pathCondition="true" lineNumber="-1" charStart="327" charEnd="337" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java" methodReturnConditionRef="_374c00ab-2a85-4fab-a2cb-fc1247800849">
+                                             <sedStatement xml:id="_3fd731fd-4f53-4d6d-9ffd-2889b1fe1f6c" name="a_2=a_2*2;" pathCondition="true" lineNumber="-1" charStart="292" charEnd="302" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
+                                                <sedMethodReturn xml:id="_fa44381c-c2e6-4063-9edd-a0945c6c19a5" name="&lt;return of self.secondLevel(a_2)&gt;" pathCondition="true" lineNumber="-1" charStart="209" charEnd="220" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java" methodReturnConditionRef="_1c2bf701-e430-4c95-a7e1-ae6f45273845">
+                                                   <sedStatement xml:id="_a48ebac8-17ee-461a-a013-b693c8aa47e8" name="secondLevel(a_1);" pathCondition="true" lineNumber="-1" charStart="173" charEnd="188" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
+                                                   </sedStatement>
+                                                   <sedGroupStartCondition xml:id="_1c2bf701-e430-4c95-a7e1-ae6f45273845" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                                      <sedChildReference nodeIdRef="_fa44381c-c2e6-4063-9edd-a0945c6c19a5"/>
+                                                   </sedGroupStartCondition>
+                                                </sedMethodReturn>
                                              </sedStatement>
-                                          </sedMethodReturn>
-                                       </sedStatement>
+                                             <sedGroupStartCondition xml:id="_374c00ab-2a85-4fab-a2cb-fc1247800849" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                                <sedChildReference nodeIdRef="_001750ac-2b1f-4a5d-bf1c-a4e28eeed23a"/>
+                                             </sedGroupStartCondition>
+                                          </sedExceptionalMethodReturn>
+                                          <sedGroupStartCondition xml:id="_341d88dd-ddb1-498b-b0f0-df8b9f467469" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                             <sedChildReference nodeIdRef="_4ec9270f-21cd-46dc-a6be-6142722eb5af"/>
+                                          </sedGroupStartCondition>
+                                       </sedExceptionalMethodReturn>
                                     </sedStatement>
+                                    <sedMethodCallMethodReturnCondition xml:id="_341d88dd-ddb1-498b-b0f0-df8b9f467469" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                       <sedChildReference nodeIdRef="_4ec9270f-21cd-46dc-a6be-6142722eb5af"/>
+                                    </sedMethodCallMethodReturnCondition>
+                                    <sedGroupEndReference nodeIdRef="_341d88dd-ddb1-498b-b0f0-df8b9f467469"/>
                                  </sedMethodCall>
                               </sedStatement>
+                              <sedMethodCallMethodReturnCondition xml:id="_374c00ab-2a85-4fab-a2cb-fc1247800849" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                 <sedChildReference nodeIdRef="_001750ac-2b1f-4a5d-bf1c-a4e28eeed23a"/>
+                              </sedMethodCallMethodReturnCondition>
+                              <sedGroupEndReference nodeIdRef="_374c00ab-2a85-4fab-a2cb-fc1247800849"/>
                            </sedMethodCall>
                         </sedStatement>
-                        <sedMethodCallMethodReturnCondition xml:id="_be84105e-adac-4dbd-a48e-b96bc6f5ff80" name="true" pathCondition="true">
-                           <sedChildReference nodeIdRef="_80976418-c5a7-4d2e-88c0-82245fbb4cfb"/>
+                        <sedMethodCallMethodReturnCondition xml:id="_1c2bf701-e430-4c95-a7e1-ae6f45273845" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                           <sedChildReference nodeIdRef="_fa44381c-c2e6-4063-9edd-a0945c6c19a5"/>
                         </sedMethodCallMethodReturnCondition>
+                        <sedGroupEndReference nodeIdRef="_1c2bf701-e430-4c95-a7e1-ae6f45273845"/>
                      </sedMethodCall>
                   </sedStatement>
                </sedMethodCall>

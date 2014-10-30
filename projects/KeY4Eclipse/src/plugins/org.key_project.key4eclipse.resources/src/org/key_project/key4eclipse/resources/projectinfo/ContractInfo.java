@@ -11,9 +11,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileAssumption;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileReader;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
-import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
-import org.key_project.util.java.CollectionUtil;
 
 import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -25,7 +23,7 @@ import de.uka.ilkd.key.proof.io.KeYFile;
  * Represents a contract as known by KeY.
  * @author Martin Hentschel
  */
-public class ContractInfo implements IStatusInfo {
+public class ContractInfo {
    /**
     * The parent {@link AbstractContractContainer} in which this {@link ContractInfo} is contained in.
     */
@@ -149,6 +147,21 @@ public class ContractInfo implements IStatusInfo {
          else {
             return null;
          }
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Checks if the proof calls some methods so that a closed world assumption is taken.
+    * @return A list of called methods.
+    * @throws Exception Occurred Exception.
+    */
+   public List<String> checkCalledMethods() throws Exception {
+      if (metaFile != null && metaFile.exists()) {
+         ProofMetaFileReader pmfr = new ProofMetaFileReader(metaFile);
+         return pmfr.getCalledMethods();
       }
       else {
          return null;
@@ -282,59 +295,6 @@ public class ContractInfo implements IStatusInfo {
        * Diamond modality.
        */
       DIAMOND
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isUnspecified() {
-      return false;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean hasOpenProof() {
-      try {
-         Boolean closed = checkProofClosed();
-         return closed == null || !closed.booleanValue();
-      }
-      catch (CoreException e) {
-         LogUtil.getLogger().logError(e);
-         return false;
-      }
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isPartOfRecursionCycle() {
-      try {
-         List<IFile> cycle = checkProofRecursionCycle();
-         return !CollectionUtil.isEmpty(cycle);
-      }
-      catch (CoreException e) {
-         LogUtil.getLogger().logError(e);
-         return false;
-      }
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean hasUnprovenDependencies() {
-      try {
-         List<IFile> unprovenProofs = checkUnprovenDependencies();
-         return unprovenProofs != null && !unprovenProofs.isEmpty();
-      }
-      catch (Exception e) {
-         LogUtil.getLogger().logError(e);
-         return false;
-      }
    }
 
    /**

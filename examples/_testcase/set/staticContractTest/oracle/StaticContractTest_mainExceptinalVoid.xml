@@ -7,9 +7,12 @@ post: !exc_0 = null
 &amp; java.lang.Exception::instance(exc_0) = TRUE
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" exceptionTerm="exc_0" contractParameters="x" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-         <termination name="&lt;uncaught java.lang.Throwable&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-         </termination>
+         <exceptionalMethodReturn name="&lt;throw java.lang.Throwable&gt;" signature="&lt;exceptional return of &lt;call StaticContractTest.mainExceptinalVoid(x)&gt;&gt;" pathCondition="true" pathConditionChanged="false" methodReturnCondition="true">
+            <termination name="&lt;uncaught java.lang.Throwable&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+            </termination>
+         </exceptionalMethodReturn>
       </operationContract>
+      <methodReturnEntry path="/0/0/0"/>
    </methodCall>
-   <terminationEntry path="/0/0/0"/>
+   <terminationEntry path="/0/0/0/0"/>
 </start>

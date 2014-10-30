@@ -17,14 +17,16 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.rule.InfFlowContractAppTaclet;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleKey;
 
+
 public class RuleJustificationInfo {
 
-    private Map<RuleKey, RuleJustification> rule2justif 
-    	= new LinkedHashMap<RuleKey, RuleJustification>();
+    private Map<RuleKey, RuleJustification> rule2justif =
+            new LinkedHashMap<RuleKey, RuleJustification>();
 
     public void addJustification(Rule r, RuleJustification j) {
         final RuleKey ruleKey = new RuleKey(r);
@@ -36,33 +38,36 @@ public class RuleJustificationInfo {
                     throw new IllegalArgumentException("Rule " + r.name()
                             + " already in registered.");
 
-               }
+                }
             }
-         } else {
-             rule2justif.put(ruleKey, j);
-         }
+        } else {
+            rule2justif.put(ruleKey, j);
+        }
     }
 
     public RuleJustification getJustification(Rule r) {
-	return rule2justif.get(new RuleKey(r));
+        return rule2justif.get(new RuleKey(r));
     }
 
     public RuleJustification getJustification(RuleApp r, TermServices services) {
-	RuleJustification just = getJustification(r.rule());
+        RuleJustification just = getJustification(r.rule());
         if (just instanceof ComplexRuleJustification) {
             return ((ComplexRuleJustification) just).getSpecificJustification(r, services);
         } else {
-	    return just;
-	}
+            return just;
+        }
     }
 
     public void removeJustificationFor(Rule rule) {
+        if (InfFlowContractAppTaclet.hasType(rule)) {
+            InfFlowContractAppTaclet.unregister(rule.name());
+        }
         rule2justif.remove(new RuleKey(rule));
-     }
+    }
 
-   public RuleJustificationInfo copy() {
-      RuleJustificationInfo info = new RuleJustificationInfo();
-      info.rule2justif.putAll(rule2justif);
-      return info;
-   }
+    public RuleJustificationInfo copy() {
+        RuleJustificationInfo info = new RuleJustificationInfo();
+        info.rule2justif.putAll(rule2justif);
+        return info;
+    }
 }

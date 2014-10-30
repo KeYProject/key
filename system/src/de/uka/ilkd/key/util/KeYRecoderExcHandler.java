@@ -17,7 +17,7 @@ package de.uka.ilkd.key.util;
 import java.util.*;
 
 
-public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl 
+public class KeYRecoderExcHandler extends AbstractKeYExceptionHandler 
                                   implements recoder.service.ErrorHandler {
 
     private List<Throwable> recoderExceptions = new LinkedList<Throwable>();
@@ -75,13 +75,14 @@ public class KeYRecoderExcHandler extends KeYExceptionHandlerImpl
     }
    
     
+    @Override
     public int getErrorThreshold() {
         return recoderErrorThreshold;
     }
     
     
     @Override    
-    public void setErrorThreshold(int maxCount) {
+    public final void setErrorThreshold(int maxCount) {
         if (maxCount < 0) {
             throw new IllegalArgumentException("Recoder: Threshold should be >= 0");
         }

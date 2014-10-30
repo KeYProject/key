@@ -101,6 +101,11 @@ public abstract class VariableDeclaration
         return getChildAt(0).getFirstElement();
     }
 
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+       return getChildAt(0).getFirstElementIncludingBlocks();
+    }
+
     public SourceElement getLastElement() {
         return getChildAt(getChildCount() - 1).getLastElement();
     }

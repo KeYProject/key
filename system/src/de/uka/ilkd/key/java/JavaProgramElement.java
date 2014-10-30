@@ -144,8 +144,8 @@ public abstract class JavaProgramElement extends JavaSourceElement
     public boolean equals(Object o){
     	if(o == this) return true;
     	if (!(o instanceof JavaProgramElement))
-    		return false;    
- 
+		return false;
+
         return equalsModRenaming((JavaProgramElement)o,
                                  NameAbstractionTableDisabled.INSTANCE);
     }

@@ -37,10 +37,12 @@ import org.xml.sax.helpers.DefaultHandler;
 public class ProofMetaFileReader {
    private String proofFileMD5;
    private boolean proofClosed;
+   private boolean proofOutdated;
    private String markerMessage;
    private final LinkedList<ProofMetaFileTypeElement> typeElemens = new LinkedList<ProofMetaFileTypeElement>();
    private final LinkedList<IFile> usedContracts = new LinkedList<IFile>();
    private final List<ProofMetaFileAssumption> assumptions = new LinkedList<ProofMetaFileAssumption>();
+   private final List<String> calledMethods = new LinkedList<String>();
 
    /**
     * The Constructor that automatically reads the given meta{@link IFile} and Provides the content.
@@ -82,6 +84,7 @@ public class ProofMetaFileReader {
             Assert.isTrue(parentStack.isEmpty());
             proofFileMD5 = getMD5(attributes);
             proofClosed = isProofClosed(attributes);
+            proofOutdated = isProofOutdated(attributes);
             parentStack.addFirst(ProofMetaFileWriter.TAG_PROOF_META_FILE);
          }
          else if (ProofMetaFileWriter.TAG_MARKER_MESSAGE.equals(qName)) {
@@ -145,6 +148,21 @@ public class ProofMetaFileReader {
             assumptions.add(new ProofMetaFileAssumption(getKind(attributes), getName(attributes), getTarget(attributes), getType(attributes)));
             parentStack.addFirst(ProofMetaFileWriter.TAG_ASSUMPTION);
          }
+         else if (ProofMetaFileWriter.TAG_CALLED_METHODS.equals(qName)) {
+            Object parent = parentStack.peekFirst();
+            if (!ProofMetaFileWriter.TAG_PROOF_META_FILE.equals(parent)) {
+               throw new SAXException(ProofMetaFileWriter.TAG_CALLED_METHODS  + " has to be a child of " + ProofMetaFileWriter.TAG_PROOF_META_FILE + ".");
+            }
+            parentStack.addFirst(ProofMetaFileWriter.TAG_CALLED_METHODS);
+         }
+         else if (ProofMetaFileWriter.TAG_CALLED_METHOD.equals(qName)) {
+            Object parent = parentStack.peekFirst();
+            if (!ProofMetaFileWriter.TAG_CALLED_METHODS.equals(parent)) {
+               throw new SAXException(ProofMetaFileWriter.TAG_CALLED_METHOD  + " has to be a child of " + ProofMetaFileWriter.TAG_CALLED_METHODS + ".");
+            }
+            calledMethods.add(getFullQualifiedName(attributes));
+            parentStack.addFirst(ProofMetaFileWriter.TAG_CALLED_METHOD);
+         }
          else {
             throw new SAXException("Unsupported element " + qName + ".");
          }
@@ -195,6 +213,16 @@ public class ProofMetaFileReader {
          String value = attributes.getValue(ProofMetaFileWriter.ATTRIBUTE_PROOF_CLOSED);
          return value != null && Boolean.parseBoolean(value);
       }
+      
+      /**
+       * Returns the proof outdated state.
+       * @param attributes The attributes to read from.
+       * @return The read value.
+       */
+      protected boolean isProofOutdated(Attributes attributes) {
+         String value = attributes.getValue(ProofMetaFileWriter.ATTRIBUTE_PROOF_OUTDATED);
+         return value != null && Boolean.parseBoolean(value);
+      }
 
       /**
        * Returns the name.
@@ -231,6 +259,15 @@ public class ProofMetaFileReader {
       protected String getType(Attributes attributes) {
          return attributes.getValue(ProofMetaFileWriter.ATTRIBUTE_TYPE);
       }
+
+      /**
+       * Returns the ful qualified name value.
+       * @param attributes The attributes to read from.
+       * @return The read value.
+       */
+      protected String getFullQualifiedName(Attributes attributes) {
+         return attributes.getValue(ProofMetaFileWriter.ATTRIBUTE_FULL_QUALIFIED_NAME);
+      }
       
       /**
        * Returns the MD5 value.
@@ -251,9 +288,7 @@ public class ProofMetaFileReader {
          if (path != null) {
             return ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(path));
          }
-         else {
-            return null;
-         }
+         return null;
       }
    }
 
@@ -270,6 +305,10 @@ public class ProofMetaFileReader {
       return proofClosed;
    }
    
+   public boolean getProofOutdated(){
+      return proofOutdated;
+   }
+   
    public String getMarkerMessage(){
       return markerMessage;
    }
@@ -278,7 +317,7 @@ public class ProofMetaFileReader {
     * Return the {@link LinkedList} with all {@link ProofMetaFileTypeElement}s.
     * @return the {@link ProofMetaFileTypeElement}s
     */
-   public LinkedList<ProofMetaFileTypeElement> getTypeElements() {
+   public List<ProofMetaFileTypeElement> getTypeElements() {
       return typeElemens;
    }
    
@@ -288,5 +327,9 @@ public class ProofMetaFileReader {
    
    public List<ProofMetaFileAssumption> getAssumptions() {
       return assumptions;
+   }
+
+   public List<String> getCalledMethods() {
+      return calledMethods;
    }
 }

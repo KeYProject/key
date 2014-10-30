@@ -18,9 +18,10 @@ import java.io.IOException;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
-import antlr.ANTLRException;
 import de.uka.ilkd.key.proof.init.Includes;
+import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
+import org.antlr.runtime.RecognitionException;
 
 public class TestParser extends TestCase {
     /**
@@ -31,10 +32,10 @@ public class TestParser extends TestCase {
      * needed for includes specified by a path relative to the KeY file's
      * location, was uninitialized.
      * 
-     * @throws ANTLRException
+     * @throws org.antlr.runtime.RecognitionException
      * @throws IOException
      */
-    public void testRelativeInclude() throws ANTLRException, IOException {
+    public void testRelativeInclude() throws RecognitionException, IOException {
 	// `include.key` does not actually exist since `RuleSource#initRuleFile`
 	// does not care for the moment
 	final File include = new File("include.key");
