@@ -73,10 +73,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        this(batchMode, verbose? DEBUG: NORMAL);
    }
 
-   protected String getMacroConsoleOutput() {
-       return "[ APPLY " + getMacro().getClass().getSimpleName() + " ]";
-   }
-
    private void finish(Proof proof) {
        // setInteractive(false) has to be called because the ruleAppIndex
        // has to be notified that we work in auto mode (CS)

@@ -81,8 +81,6 @@ public abstract class AbstractUserInterface implements UserInterface {
         return this.autoMacro;
     }
 
-    protected abstract String getMacroConsoleOutput();
-
     public boolean macroChosen() {
         return !(getMacro() instanceof SkipMacro);
     }
@@ -108,7 +106,7 @@ public abstract class AbstractUserInterface implements UserInterface {
         assert macroChosen();
         final ProofMacro macro = getMacro();
         if (macro.canApplyTo(getMediator(), null)) {
-            System.out.println(getMacroConsoleOutput());
+            Debug.out("[ APPLY " + getMacro().getClass().getSimpleName() + " ]");
             Proof proof = getMediator().getSelectedProof();
             TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
             ProverTaskListener ptl = getListener();
