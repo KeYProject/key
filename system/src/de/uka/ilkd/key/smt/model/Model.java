@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
-import java.util.StringTokenizer;
 
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.ProblemTypeInformation;
@@ -634,7 +633,7 @@ public class Model {
 	
 	public void removeUnnecessaryObjects(){
 			
-		System.out.println("Start cleaning...");
+		//System.out.println("Start cleaning...");
 		Set<String> objConstants = new HashSet<String>();
 		
 		for(String c : constants.keySet()){
@@ -646,7 +645,7 @@ public class Model {
 			}
 		}
 		
-		System.out.println("Found: "+objConstants);
+		//System.out.println("Found: "+objConstants);
 		
 		for(Heap h : heaps){
 			Set<ObjectVal> reachable = new HashSet<ObjectVal>();

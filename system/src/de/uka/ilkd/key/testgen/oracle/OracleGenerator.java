@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.smt.NumberTranslation;
+import de.uka.ilkd.key.testgen.ReflectionClassCreator;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
 
 public class OracleGenerator {
@@ -58,17 +59,23 @@ public class OracleGenerator {
 	
 	private List<OracleVariable> methodArgs;
 
-	private Set<Term> constants;	
+	private Set<Term> constants;
+	
+	private ReflectionClassCreator rflCreator;
+	
+	private boolean useRFL;
 	
 	public static final String PRE_STRING = "_pre";
 	
-	public OracleGenerator(Services services) {
+	public OracleGenerator(Services services, ReflectionClassCreator rflCreator, boolean useRFL) {
 		this.services = services;
 		initOps();		
 		oracleMethods = new HashSet<OracleMethod>();
 		quantifiedVariables = new LinkedList<OracleVariable>();
 		prestateTerms = new HashSet<String>();
 		invariants = new HashMap<Sort, OracleMethod>();
+		this.rflCreator = rflCreator;
+		this.useRFL = useRFL;
 		initTrue();
 		initFalse();
 		methodArgs  = null;
@@ -350,45 +357,7 @@ public class OracleGenerator {
 	    	
 	    	//System.out.println(term+ " init: "+initialSelect);
 	    	
-	    	Term heap = term.sub(0);	    	
-	    	OracleTerm heapTerm  = generateOracle(heap, true);	  
-	    	
-	    	
-	    	
-	    	Term object = term.sub(1);	
-	    	
-	    	OracleTerm objTerm = generateOracle(object, true);
-	    	
-	    	
-	    	
-	    	Term field = term.sub(2);
-	    	OracleTerm fldTerm = generateOracle(field, true);
-	    	String fieldName = fldTerm.toString();
-	    	fieldName = fieldName.substring(fieldName.lastIndexOf(":")+1, fieldName.length());
-	    	fieldName = fieldName.replace("$", "");
-	    	
-	    	String value;
-	    	
-	    	if(fieldName.startsWith("[")){
-	    		value = objTerm.toString()+fieldName;
-	    	}else{
-	    		value = objTerm.toString() + "."+fieldName;
-	    	}
-	    	
-	    	
-	    	if(heapTerm.toString().equals("heapAtPre")){	    		    		
-	    		if(!initialSelect){
-	    			if(term.sort().extendsTrans(services.getJavaInfo().getJavaLangObject().getSort())){
-	    				return new OracleConstant(TestCaseGenerator.OLDMap+".get("+PRE_STRING+value+")", term.sort());
-	    			}
-	    			else{
-	    				return new OracleConstant(PRE_STRING+value, term.sort());
-	    			}
-	    		}	    		
-	    	}
-	    	
-	    	
-	    	return new OracleConstant(value, term.sort());	    	
+	    	return translateSelect(term, initialSelect);	    	
 	    }
 	    else if(name.equals("arr")){
 	    	OracleTerm index = generateOracle(term.sub(0), initialSelect);	    	
@@ -424,7 +393,7 @@ public class OracleGenerator {
 		    	Term object = term.sub(1);
 		    	OracleTerm objTerm = generateOracle(object, initialSelect);
 		    	
-		    	if(heapTerm.toString().equals("heapAtPre")){
+		    	if(isPreHeap(heapTerm)){
 		    		if(!objTerm.toString().startsWith(PRE_STRING)){	
 		    			prestateTerms.add(objTerm.toString());		    			
 		    			objTerm = new OracleConstant(PRE_STRING+object.toString(), object.sort());		    			
@@ -459,6 +428,87 @@ public class OracleGenerator {
 	    
 	    throw new RuntimeException("Unsupported function found: "+name+ " of type "+fun.getClass().getName());
     }
+
+	private OracleTerm translateSelect(Term term, boolean initialSelect) {
+		Term heap = term.sub(0);	    	
+		OracleTerm heapTerm  = generateOracle(heap, true);	   	
+		
+		Term object = term.sub(1);	
+		
+		OracleTerm objTerm = generateOracle(object, true);
+		
+		
+		
+		Term field = term.sub(2);
+		OracleTerm fldTerm = generateOracle(field, true);
+		String fieldName = fldTerm.toString();
+		fieldName = fieldName.substring(fieldName.lastIndexOf(":")+1, fieldName.length());
+		fieldName = fieldName.replace("$", "");
+		
+		String value;
+		
+		value = createLocationString(heapTerm, objTerm, fieldName, object.sort(), term.sort(), initialSelect);		
+		
+		if(!initialSelect && isPreHeap(heapTerm)){
+			if(term.sort().extendsTrans(services.getJavaInfo().getJavaLangObject().getSort())){
+				return new OracleConstant(TestCaseGenerator.OLDMap+".get("+value+")", term.sort());
+			}
+		}		
+		
+		return new OracleConstant(value, term.sort());
+	}
+
+	private String createLocationString(OracleTerm heapTerm, OracleTerm objTerm, String fieldName,Sort objSort, Sort fieldSort, boolean initialSelect) {
+		String value;
+		
+		String objString =objTerm.toString();
+		
+		if(isPreHeap(heapTerm)){
+			
+			if(useRFL){
+				if(!objString.startsWith(ReflectionClassCreator.NAME_OF_CLASS)){
+					objString = PRE_STRING + objString;
+				}			
+			}
+			else if(initialSelect){
+				objString = PRE_STRING + objString;
+			}		
+			
+		}		
+		
+		if(fieldName.startsWith("[")){
+			value = objString+fieldName;
+		}else{
+			
+			if(useRFL){
+				
+				rflCreator.addSort(objSort);
+				rflCreator.addSort(objSort);
+				
+				value = ReflectionClassCreator.NAME_OF_CLASS +
+						"."+
+						ReflectionClassCreator.GET_PREFIX+
+						ReflectionClassCreator.cleanTypeName(fieldSort.toString())+
+						"("+
+						objSort+".class, "+
+						objString+", "+
+						"\""+fieldName+"\""+
+						")";						
+						
+			}
+			else{
+				value = objString + "."+fieldName;
+			}
+			
+			
+			
+		}
+		return value;
+	}
+
+	private boolean isPreHeap(OracleTerm heapTerm) {
+		return heapTerm.toString().equals("heapAtPre");
+	}
 	
 	private boolean isTrueConstant(Operator o) {
 		return o.equals(services.getTypeConverter().getBooleanLDT().getTrueConst());

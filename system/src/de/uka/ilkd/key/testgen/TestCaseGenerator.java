@@ -36,7 +36,6 @@ import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.model.ObjectVal;
 import de.uka.ilkd.key.testgen.oracle.OracleGenerator;
 import de.uka.ilkd.key.testgen.oracle.OracleMethod;
-import de.uka.ilkd.key.testgen.oracle.OracleTerm;
 import de.uka.ilkd.key.testgen.oracle.OracleTermCall;
 
 /**
@@ -168,7 +167,7 @@ public class TestCaseGenerator {
 		rflCreator = new ReflectionClassCreator();
 		executeWithOpenJML = createExecuteWithOpenJML(settings.getOpenjmlPath(),settings.getObjenesisPath());
 		compileWithOpenJML = createCompileWithOpenJML(settings.getOpenjmlPath(), settings.getObjenesisPath());
-		oracleGenerator  =new OracleGenerator(services);
+		oracleGenerator  =new OracleGenerator(services,rflCreator, useRFL);
 		if(junitFormat){
 			//System.out.println("Translating oracle");
 			try{
@@ -853,7 +852,7 @@ public class TestCaseGenerator {
 					        */
 					type = "Object";
 				} else {
-					System.out.println(o);
+					//System.out.println(o);
 					type = o.getSort().name().toString();
 				}
 			} else {
