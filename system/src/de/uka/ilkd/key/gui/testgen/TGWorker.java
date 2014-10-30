@@ -33,6 +33,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.SingleProof;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.smt.SMTProblem;
@@ -243,11 +244,12 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 					return null;
 				}
 			}
-		}		
+		}	
+		InitConfig initConfig = oldProof.getInitConfig().deepCopy();
 		final Proof proof = new Proof("Test Case for NodeNr: "
-				+ node.serialNr(), newSequent, "", oldProof.getInitConfig().createTacletIndex(), 
-				oldProof.getInitConfig().createBuiltInRuleIndex(),
-				oldProof.getInitConfig() );
+				+ node.serialNr(), newSequent, "", initConfig.createTacletIndex(), 
+				initConfig.createBuiltInRuleIndex(),
+				initConfig.deepCopy() );
 		proof.setEnv(oldProof.getEnv());
 		proof.setNamespaces(oldProof.getNamespaces());
 

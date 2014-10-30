@@ -554,9 +554,13 @@ public class TestCaseGenerator {
 						testMethod
 						        .append("   //Test preamble: creating objects and intializing test data"
 						                + generateTestCase(m) + "\n\n");
+						
+						//info.getCode();
+						
+						testMethod.append(TAB+"//Other variables\n" + getOtherVariables(m)+"\n");
 						testMethod
 						        .append("   //Calling the method under test\n   "
-						                + mut + "\n");
+						                + info.getCode() + "\n");
 						
 						
 						if(junitFormat){
@@ -612,6 +616,26 @@ public class TestCaseGenerator {
 		return testSuite.toString();
 	}
 	
+	private String getOtherVariables(Model m) {
+		String result = "";
+		
+		for(Term c : oracleGenerator.getConstants()){
+			if(!m.getConstants().containsKey(c.toString())){
+				String init = "null";
+				if(c.sort().equals(services.getTypeConverter().getIntegerLDT().targetSort())){
+					init = "0";
+				}
+				else if(c.sort().equals(services.getTypeConverter().getBooleanLDT().targetSort())){
+					init = "false";
+				}
+				
+				result += "\n"+TAB+ c.sort().name() + " " + c + " = " + init + ";";
+				result += "\n"+TAB+ c.sort().name() + " " + getPreName(c.toString()) + " = " + init + ";";
+				
+			}
+		}
+		return result;
+	}
 	private boolean isInPrestate(Collection<? extends ObjectVal> prestate, ObjectVal o){
 		return true;
 	}

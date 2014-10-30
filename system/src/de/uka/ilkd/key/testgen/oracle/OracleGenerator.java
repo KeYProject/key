@@ -56,7 +56,9 @@ public class OracleGenerator {
 	
 	private Map<Sort, OracleMethod> invariants;
 	
-	private List<OracleVariable> methodArgs;	
+	private List<OracleVariable> methodArgs;
+
+	private Set<Term> constants;	
 	
 	public static final String PRE_STRING = "_pre";
 	
@@ -112,7 +114,7 @@ public class OracleGenerator {
 	
 	public OracleMethod generateOracleMethod(Term term){
 		
-		
+		constants = getConstants(term);
 		methodArgs = getMethodArgs(term);
 		OracleTerm body = generateOracle(term, false);
 		return new OracleMethod("testOracle", methodArgs, "return "+body.toString()+";");
@@ -175,6 +177,12 @@ public class OracleGenerator {
 		return result;		
 	}
 	
+	
+	
+	public Set<Term> getConstants() {
+		return constants;
+	}
+
 	private List<OracleVariable> getMethodArgs(Term t){
 		
 		List<OracleVariable> result = new LinkedList<OracleVariable>();
@@ -189,8 +197,9 @@ public class OracleGenerator {
 		OracleVariable allObj = new OracleVariable(TestCaseGenerator.ALL_OBJECTS, allObjSort);
 		OracleVariable oldMap = new OracleVariable(TestCaseGenerator.OLDMap, oldMapSort);
 		
-		for(Term c : getConstants(t)){
+		for(Term c : constants){
 			result.add(new OracleVariable(c.toString(), c.sort()));
+			result.add(new OracleVariable(PRE_STRING+c.toString(), c.sort()));
 		}
 		
 		result.add(allBools);
@@ -230,7 +239,7 @@ public class OracleGenerator {
 		
 		Operator op = term.op();
 		
-		System.out.println("Translate: "+term+" init: "+initialSelect);
+		//System.out.println("Translate: "+term+" init: "+initialSelect);
 		
 		//binary terms
 		if(ops.containsKey(op)){			
@@ -311,7 +320,7 @@ public class OracleGenerator {
 		}
 		
 		else{
-			System.out.println("Could not translate: "+term);
+			//System.out.println("Could not translate: "+term);
 			throw new RuntimeException("Could not translate oracle for: "+term+" of type "+term.op());
 		}
 		
@@ -339,7 +348,7 @@ public class OracleGenerator {
 	    }
 	    else if(name.endsWith("select")){
 	    	
-	    	System.out.println(term+ " init: "+initialSelect);
+	    	//System.out.println(term+ " init: "+initialSelect);
 	    	
 	    	Term heap = term.sub(0);	    	
 	    	OracleTerm heapTerm  = generateOracle(heap, true);	  
