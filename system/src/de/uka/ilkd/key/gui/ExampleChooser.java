@@ -27,7 +27,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedList;
@@ -135,42 +134,15 @@ public final class ExampleChooser extends JDialog {
         private static final String ADDITIONAL_FILE_PREFIX = "example.additionalFile.";
 
         private File directory;
-        private StringBuilder description;
+        private String description;
         private Properties properties;
 
         public Example(File file) throws IOException {
             this.directory = file.getParentFile();
             this.properties = new Properties();
-            this.description = new StringBuilder();
-
-            BufferedReader r = null;
-            try {
-                r = new BufferedReader(new FileReader(file));
-                String line;
-                boolean emptyLineSeen = false;
-                while((line = r.readLine()) != null) {
-                    if(emptyLineSeen) {
-                        description.append(line).append("\n");
-                    } else {
-                        String trimmed = line.trim();
-                        if(trimmed.length() == 0) {
-                            emptyLineSeen = true;
-                        } else if(trimmed.startsWith("#")) {
-                            // ignore
-                        } else {
-                            String[] entry = trimmed.split(" *[:=] *", 2);
-                            if(entry.length > 1) {
-                                properties.put(entry[0], entry[1]);
-                            }
-                        }
-                    }
-                }
-            } finally {
-                if(r != null) {
-                    try { r.close(); }
-                    catch(IOException ex) { };
-                }
-            }
+            StringBuilder sb = new StringBuilder();
+            extractDescription(file, sb, properties);
+            this.description = sb.toString();
         }
 
         public File getProofFile() {
@@ -185,7 +157,7 @@ public final class ExampleChooser extends JDialog {
             return properties.getProperty(KEY_NAME, directory.getName());
         }
 
-        public CharSequence getDescription() {
+        public String getDescription() {
             return description;
         }
 
@@ -356,49 +328,7 @@ public final class ExampleChooser extends JDialog {
 	setLocationRelativeTo(MainWindow.getInstance());
     }
 
-    /**
-     * Lists all examples in the given directory.
-     * This method is also accessed by the eclipse based projects.
-     * @param examplesDir The examples directory to list examples in.
-     * @return The found examples.
-     */
-    public static List<Example> listExamples(File examplesDir) {
-        List<Example> result = new LinkedList<Example>();
 
-        String line;
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(
-                    new FileReader(new File(new File(examplesDir, "index"), "samplesIndex.txt")));
-            while((line = br.readLine()) != null) {
-                line = line.trim();
-                if(line.startsWith("#") || line.length() == 0) {
-                    continue;
-                }
-                File f = new File(examplesDir, line);
-                try {
-                    result.add(new Example(f));
-                } catch (IOException e) {
-                    System.err.println("Cannot parse example " +  f + "; ignoring it.");
-                    e.printStackTrace();
-                }
-            }
-        } catch (IOException e) {
-            System.err.println("Error while reading samples");
-            e.printStackTrace();
-        } finally {
-            try {
-                if(br != null) {
-                    br.close();
-                }
-            } catch (IOException e) {
-                System.err.println("Error while reading samples");
-                e.printStackTrace();
-            }
-        }
-
-       return result;
-    }
 
     //-------------------------------------------------------------------------
     //internal methods
@@ -421,6 +351,41 @@ public final class ExampleChooser extends JDialog {
             return "<Error reading file: " + f + ">";
         }
     }
+
+    private static StringBuilder extractDescription(File file, StringBuilder sb, Properties properties)
+            throws IOException {
+        BufferedReader r = null;
+        try {
+            r = new BufferedReader(new FileReader(file));
+            String line;
+            boolean emptyLineSeen = false;
+            while((line = r.readLine()) != null) {
+                if(emptyLineSeen) {
+                    sb.append(line).append("\n");
+                } else {
+                    String trimmed = line.trim();
+                    if(trimmed.length() == 0) {
+                        emptyLineSeen = true;
+                    } else if(trimmed.startsWith("#")) {
+                        // ignore
+                    } else {
+                        String[] entry = trimmed.split(" *[:=] *", 2);
+                        if(entry.length > 1) {
+                            properties.put(entry[0], entry[1]);
+                        }
+                    }
+                }
+            }
+        } finally {
+            if(r != null) {
+                try { r.close(); }
+                catch(IOException ex) { };
+            }
+        }
+        return sb;
+    }
+
+
 
     private void updateDescription() {
 
@@ -501,5 +466,61 @@ public final class ExampleChooser extends JDialog {
 	//return result
 	final File result = instance.fileToLoad;
 	return result;
+    }
+
+    /**
+     * Lists all examples in the given directory.
+     * This method is also accessed by the eclipse based projects.
+     * @param examplesDir The examples directory to list examples in.
+     * @return The found examples.
+     */
+    public static List<Example> listExamples(File examplesDir) {
+        List<Example> result = new LinkedList<Example>();
+
+        String line;
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(
+                    new FileReader(new File(new File(examplesDir, "index"), "samplesIndex.txt")));
+            while((line = br.readLine()) != null) {
+                line = line.trim();
+                if(line.startsWith("#") || line.length() == 0) {
+                    continue;
+                }
+                File f = new File(examplesDir, line);
+                try {
+                    result.add(new Example(f));
+                } catch (IOException e) {
+                    System.err.println("Cannot parse example " +  f + "; ignoring it.");
+                    e.printStackTrace();
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error while reading samples");
+            e.printStackTrace();
+        } finally {
+            try {
+                if(br != null) {
+                    br.close();
+                }
+            } catch (IOException e) {
+                System.err.println("Error while reading samples");
+                e.printStackTrace();
+            }
+        }
+
+       return result;
+    }
+
+    /**
+     * Read the description stored in an example.
+     *
+     * @deprecated Use {@link Example#getDescription()} instead.
+     *
+     * @param example the example to read out
+     * @return the description stored in the example
+     */
+    public static String readDescription(Example example) {
+        return example.getDescription();
     }
 }
