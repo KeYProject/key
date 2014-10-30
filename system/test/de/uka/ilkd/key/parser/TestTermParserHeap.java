@@ -20,7 +20,7 @@ import java.io.IOException;
  */
 public class TestTermParserHeap extends AbstractTestTermParser {
 
-    private static final String javaPath = System.getProperty("key.home")
+    static final String javaPath = System.getProperty("key.home")
             + File.separator + "examples"
             + File.separator + "_testcase"
             + File.separator + "termParser"
@@ -267,26 +267,6 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         verbose = "store(create(heap,a),a,java.lang.Object::<initialized>,FALSE)";
         comparePrettySyntaxAgainstVerboseSyntax(pretty, verbose);
 
-    }
-
-    /**
-     * Remove whitespaces before executing
-     * {@link junit.framework.TestCase#assertEquals(java.lang.String, java.lang.String)}.
-     */
-    private void assertEqualsIgnoreWhitespaces(String expected, String actual) {
-        assertEquals(expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""));
-    }
-
-    /**
-     * Convert a {@link Term} into a {@link String}.
-     *
-     * @param t The {@link Term} that will be converted.
-     */
-    private String printTerm(Term t) throws IOException {
-        LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), services);
-        lp.getNotationInfo().setHidePackagePrefix(false);
-        lp.printTerm(t);
-        return lp.toString();
     }
 
     /**

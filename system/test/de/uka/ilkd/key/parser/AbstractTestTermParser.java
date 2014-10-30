@@ -11,9 +11,13 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.DefaultExceptionHandler;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import junit.framework.TestCase;
@@ -125,6 +129,26 @@ public abstract class AbstractTestTermParser extends TestCase {
             e.printStackTrace(pw);
             throw new RuntimeException("Exc while Parsing:\n" + sw);
         }
+    }
+    
+    /**
+     * Convert a {@link Term} into a {@link String}.
+     *
+     * @param t The {@link Term} that will be converted.
+     */
+    protected String printTerm(Term t) throws IOException {
+        LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), services);
+        lp.getNotationInfo().setHidePackagePrefix(false);
+        lp.printTerm(t);
+        return lp.toString();
+    }
+    
+    /**
+     * Remove whitespaces before executing
+     * {@link junit.framework.TestCase#assertEquals(java.lang.String, java.lang.String)}.
+     */
+    protected void assertEqualsIgnoreWhitespaces(String expected, String actual) {
+        assertEquals(expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""));
     }
 
     protected abstract Services getServices();
