@@ -55,6 +55,8 @@ public class TestCaseGenerator {
 	
 	public static final String OBJENESIS_NAME = "objenesis-2.1.jar";
 	
+	public static final String OLDMap = "old";
+	
 	public static final String TAB = "   ";
 	private Services services;
 	private Proof proof;
@@ -168,7 +170,7 @@ public class TestCaseGenerator {
 		compileWithOpenJML = createCompileWithOpenJML(settings.getOpenjmlPath(), settings.getObjenesisPath());
 		oracleGenerator  =new OracleGenerator(services);
 		if(junitFormat){
-			System.out.println("Translating oracle");
+			//System.out.println("Translating oracle");
 			try{
 				oracleMethods = new LinkedList<OracleMethod>();
 				oracleMethodCall = getOracleAssertion(oracleMethods);
@@ -515,6 +517,9 @@ public class TestCaseGenerator {
 		oracleMethods.add(oracle);
 		oracleMethods.addAll(oracleGenerator.getOracleMethods());
 		
+		System.out.println("Modifier Set: "+oracleGenerator.getOracleLocationSet(info.getAssignable()));
+		
+		
 		return "assertTrue("+oracleCall.toString()+");";
 	}
 
@@ -626,6 +631,16 @@ public class TestCaseGenerator {
 //		
 //		return false;
 	}
+	
+	public String generateModifierSetAssertions(Model m){
+		StringBuffer res  =new StringBuffer();
+		
+		res.append(TAB + "//Modifier set assertions");
+		
+		
+		
+		return res.toString();
+	}
 
 	public String generateTestCase(Model m) {
 /*		if(useRFL){
@@ -637,6 +652,8 @@ public class TestCaseGenerator {
 */
 		m.removeUnnecessaryObjects();
 		
+		Set<String> objects = new HashSet<String>();
+		
 		final List<Assignment> assignments = new LinkedList<Assignment>();
 		Heap heap = null;
 		for (final Heap h : m.getHeaps()) {
@@ -646,8 +663,8 @@ public class TestCaseGenerator {
 			}
 		}
 		
-		Set<ObjectVal> prestate = getPrestateObjects(m);
-		
+		//Set<ObjectVal> prestate = getPrestateObjects(m);
+		Set<ObjectVal> prestate = new HashSet<ObjectVal>();
 		if (heap != null) {
 			
 			
@@ -673,7 +690,7 @@ public class TestCaseGenerator {
 				}
 				
 				String objName = createObjectName(o);
-				
+				objects.add(objName);
 				assignments.add(new Assignment(type, objName, right));
 				if(junitFormat && isInPrestate(prestate, o)){
 					assignments.add(new Assignment(type, getPreName(objName), right));
@@ -746,7 +763,7 @@ public class TestCaseGenerator {
 					
 					String safeType = getSafeType(o.getSort());
 					rflCreator.addSort(safeType);
-					System.out.println("Added sort (init array fields):"+safeType);					
+					//System.out.println("Added sort (init array fields):"+safeType);					
 
 					for (int i = 0; i < o.getLength(); i++) {
 						final String fieldName = "[" + i + "]";
@@ -773,14 +790,24 @@ public class TestCaseGenerator {
 		
 		if(junitFormat){
 			result.append("\n");
+			result.append(createOldMap(objects)+"\n");
 			result.append(createBoolSet()+"\n");
 			result.append(createIntSet()+"\n");
-			result.append(createObjSet(heap)+"\n");
+			result.append(createObjSet(heap)+"\n");			
 		}
 				
 		
 		return result.toString();
 	}
+	
+	private String createOldMap(Set<String> objNames){
+		String result = "\n"+TAB+"Map<Object,Object> "+OLDMap+" = new HashMap<Object,Object>()";
+		for(String o : objNames){
+			result += "\n"+TAB+OLDMap+".put("+getPreName(o)+","+o+");";
+		}
+		return result;
+	}
+	
 	private String getPreName(String val) {
 		return OracleGenerator.PRE_STRING+val;
 	}
@@ -802,6 +829,7 @@ public class TestCaseGenerator {
 					        */
 					type = "Object";
 				} else {
+					System.out.println(o);
 					type = o.getSort().name().toString();
 				}
 			} else {
@@ -828,7 +856,10 @@ public class TestCaseGenerator {
 		if (junitFormat) {
 			res += "import junit.framework.*;\n"
 					+ "import java.util.List;\n"
-					+ "import java.util.LinkedList;\n" + " public class " + className
+					+ "import java.util.LinkedList;\n"
+					+ "import java.util.Map;\n"
+					+ "import java.util.HashMap;\n"
+					+ " public class " + className
 			        + " extends junit.framework.TestCase {\n\n" + " public "
 			        + className + "(){}\n"
 			        + " public static junit.framework.TestSuite suite () {\n"
@@ -874,6 +905,7 @@ public class TestCaseGenerator {
 		StringBuffer res = new StringBuffer();		
 		//bool
 		String allbool = ALL_BOOLS;
+		res.append('\n');
 		res.append(TAB+"List<Boolean> "+allbool +"= new LinkedList<Boolean>();\n");
 		res.append(TAB+allbool+".add(true);\n");
 		res.append(TAB+allbool+".add(false);\n");

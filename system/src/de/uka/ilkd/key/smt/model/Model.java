@@ -574,7 +574,7 @@ public class Model {
 		Set<ObjectVal> result = new HashSet<ObjectVal>();
 		
 		String[] l = location.split("\\.");
-		System.out.println("location: "+location);
+		//System.out.println("location: "+location);
 		String objName = l[0];
 		String nullString = "#o0";
 		
@@ -588,7 +588,37 @@ public class Model {
 		int i = 1;
 		while(!o.equals(nullString) && i < l.length){			
 			result.add(o);
-			System.out.println(o.getName()+"."+l[i]);
+			//System.out.println(o.getName()+"."+l[i]);
+			String pointed = o.getFieldUsingSimpleName(l[i]);
+			if(pointed == null){
+				break;
+			}
+			
+			
+			o = getObject(pointed, heap);
+			i++;			
+		}	
+		
+		return result;		
+	}
+	
+	public ObjectVal findObject(String ref){
+		String[] l = ref.split("\\.");
+		//System.out.println("location: "+location);
+		String objName = l[0];
+		String nullString = "#o0";
+		
+		Heap heap = null;
+		for(Heap h : heaps){
+			if(h.getName().equals("heap")){
+				heap = h;
+			}
+		}
+		ObjectVal o = getObject(constants.get(objName), heap);
+		int i = 1;
+		while(!o.equals(nullString) && i < l.length){			
+			
+			//System.out.println(o.getName()+"."+l[i]);
 			String pointed = o.getFieldUsingSimpleName(l[i]);
 			if(pointed == null){
 				break;
@@ -599,16 +629,7 @@ public class Model {
 			i++;			
 		}
 		
-		
-		
-		
-		
-		
-		
-		return result;
-		
-		
-		
+		return o;
 	}
 	
 	public void removeUnnecessaryObjects(){

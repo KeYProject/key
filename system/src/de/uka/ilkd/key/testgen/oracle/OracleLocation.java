@@ -43,4 +43,16 @@ public class OracleLocation {
 		
 	}
 	
+	public String toString(){
+		
+		if(field.startsWith("[")){
+			return object+field;
+		}
+		else{
+			return object + "."+ field;
+		}
+		
+		
+	}
+	
 }

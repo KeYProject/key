@@ -96,6 +96,33 @@ public class OracleLocationSet {
 
 		return false;
 	}
+	
+	public String toString(){
+		
+		if(this == EMPTY){
+			return "Empty";
+		}
+		
+		if(this == ALL_LOCS){
+			return "All";
+		}
+		
+		
+		String result = "";
+		
+		result += "{";
+		
+		for(OracleLocation loc : locs){
+			result += loc + " ";
+		}
+		
+		result += "}";
+		
+		
+		return result;
+		
+		
+	}
 
 }
 

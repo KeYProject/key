@@ -17,7 +17,7 @@ public class OracleTermCall implements OracleTerm {
 		String methodName = method.getMethodName();
 		String aString = "";
 		for(OracleTerm arg  : args){
-			aString += arg.toString() + ",";
+			aString += " "+arg.toString() + ",";
 		}
 		if(!args.isEmpty()){
 			aString = aString.substring(0, aString.length()-1);

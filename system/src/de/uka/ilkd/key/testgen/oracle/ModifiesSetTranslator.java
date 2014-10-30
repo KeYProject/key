@@ -49,8 +49,8 @@ public class ModifiesSetTranslator {
 		if(isSingleTon(t)){
 			Term obj = t.sub(0);
 			Term field = t.sub(1);			
-			String objString = gen.generateOracle(obj).toString();
-			String fieldString = gen.generateOracle(field).toString();			
+			String objString = gen.generateOracle(obj, false).toString();
+			String fieldString = gen.generateOracle(field, false).toString();			
 			OracleLocation loc = new OracleLocation(objString, fieldString);
 			return OracleLocationSet.singleton(loc);			
 		}
@@ -69,7 +69,7 @@ public class ModifiesSetTranslator {
 		
 		else if(isAllFields(t)){
 			Term obj = t.sub(0);
-			String objString = gen.generateOracle(obj).toString();
+			String objString = gen.generateOracle(obj, false).toString();
 			OracleLocation loc = new OracleLocation(objString);
 			return OracleLocationSet.singleton(loc);
 		}
