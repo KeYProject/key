@@ -41,6 +41,7 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.RuleCollection;
 import de.uka.ilkd.key.proof.io.*;
+import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 
 public class TacletForTests {
 
@@ -66,7 +67,7 @@ public class TacletForTests {
             //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
             public RuleCollection getStandardRules() {
                 return new RuleCollection(
-                                RuleSourceFactory.fromBuildInRule("LDTsForTestsOnly.key"), 
+                                RuleSourceFactory.fromBuildInRule(ldtFile), 
                                 ImmutableSLList.<BuiltInRule>nil());
             }
         };

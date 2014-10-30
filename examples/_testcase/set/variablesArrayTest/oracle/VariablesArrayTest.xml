@@ -33,6 +33,14 @@
                      <value name="length {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
+                  <variable name="[0]" arrayIndex="0" isArrayIndex="true">
+                     <value name="[0] {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="[1]" arrayIndex="1" isArrayIndex="true">
+                     <value name="[1] {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
                </value>
             </variable>
             <statement name="multiArray[1]=new int[]{3,4,5 };" pathCondition="true" pathConditionChanged="false">
@@ -48,6 +56,26 @@
                   <value name="multiArray {true}" typeString="int[][]" valueString="x_arr_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="length" arrayIndex="-1" isArrayIndex="false">
                         <value name="length {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="[0]" arrayIndex="0" isArrayIndex="true">
+                        <value name="[0] {true}" typeString="int[]" valueString="x_arr_4" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="length" arrayIndex="-1" isArrayIndex="false">
+                              <value name="length {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="[0]" arrayIndex="0" isArrayIndex="true">
+                              <value name="[0] {true}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="[1]" arrayIndex="1" isArrayIndex="true">
+                              <value name="[1] {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <variable name="[1]" arrayIndex="1" isArrayIndex="true">
+                        <value name="[1] {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
@@ -67,6 +95,42 @@
                            <value name="length {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
+                        <variable name="[0]" arrayIndex="0" isArrayIndex="true">
+                           <value name="[0] {true}" typeString="int[]" valueString="x_arr_4" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <variable name="length" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="length {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="[0]" arrayIndex="0" isArrayIndex="true">
+                                 <value name="[0] {true}" typeString="int" valueString="Z(1(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="[1]" arrayIndex="1" isArrayIndex="true">
+                                 <value name="[1] {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                        <variable name="[1]" arrayIndex="1" isArrayIndex="true">
+                           <value name="[1] {true}" typeString="int[]" valueString="x_arr_9" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <variable name="length" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="length {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="[0]" arrayIndex="0" isArrayIndex="true">
+                                 <value name="[0] {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="[1]" arrayIndex="1" isArrayIndex="true">
+                                 <value name="[1] {true}" typeString="int" valueString="Z(4(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="[2]" arrayIndex="2" isArrayIndex="true">
+                                 <value name="[2] {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
                      </value>
                   </variable>
                   <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
@@ -84,6 +148,22 @@
                            </value>
                         </variable>
                      </termination>
+                     <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                        <value name="self {true}" typeString="VariablesArrayTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="heapBefore_main" arrayIndex="-1" isArrayIndex="false">
+                        <value name="heapBefore_main {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="savedHeapBefore_main" arrayIndex="-1" isArrayIndex="false">
+                        <value name="savedHeapBefore_main {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </callStateVariable>
                   </methodReturn>
                </statement>
             </statement>

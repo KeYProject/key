@@ -10,11 +10,17 @@
                         <statement name="fourthLevel(a_3);" pathCondition="true" pathConditionChanged="false">
                            <methodCall name="&lt;call self.fourthLevel(a_4)&gt;" pathCondition="true" pathConditionChanged="false">
                               <statement name="throw new Exception ();" pathCondition="true" pathConditionChanged="false">
-                                 <statement name="a_2=a_2*2;" pathCondition="true" pathConditionChanged="false">
-                                 </statement>
+                                 <exceptionalMethodReturn name="&lt;throw java.lang.Exception&gt;" signature="&lt;exceptional return of &lt;call self.fourthLevel(a_4)&gt;&gt;" pathCondition="true" pathConditionChanged="false" methodReturnCondition="true">
+                                    <exceptionalMethodReturn name="&lt;throw java.lang.Exception&gt;" signature="&lt;exceptional return of &lt;call self.thirdLevel(a_3)&gt;&gt;" pathCondition="true" pathConditionChanged="false" methodReturnCondition="true">
+                                       <statement name="a_2=a_2*2;" pathCondition="true" pathConditionChanged="false">
+                                       </statement>
+                                    </exceptionalMethodReturn>
+                                 </exceptionalMethodReturn>
                               </statement>
+                              <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
                            </methodCall>
                         </statement>
+                        <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
                      </methodCall>
                   </statement>
                </methodCall>

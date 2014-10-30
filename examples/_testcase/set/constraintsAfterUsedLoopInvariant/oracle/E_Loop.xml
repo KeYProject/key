@@ -65,7 +65,7 @@
 &amp;   javaMulInt(self.low, 2)
   = javaMulInt(i, javaSubInt(i, 1));
 variant: javaAddInt(javaSubInt(self.high, i), 1)
-mod: {(self, low)}
+mod: {(self, E_Loop::$low)}
 mod[savedHeap]: allLocs" pathCondition="true" pathConditionChanged="false" initiallyValid="false">
                <constraint name="wellFormed(heap)"/>
                <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
@@ -94,28 +94,28 @@ mod[savedHeap]: allLocs" pathCondition="true" pathConditionChanged="false" initi
                   <value name="i {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <branchCondition name="or(or(not(equals(int::select(anon_heap_loop,self,E_Loop::$low),E_Loop_low_4)),not(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2))),and(leq(i_0,E_Loop_high_2),equals(mul(i_0,i_0),add(mul(E_Loop_low_4,Z(2(#))),i_0))))" pathCondition="imp(and(and(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2),equals(int::select(anon_heap_loop,self,E_Loop::$low),E_Loop_low_4&lt;&lt;selectSK&gt;&gt;)),equals(add(E_Loop_low_4,mul(E_Loop_low_4&lt;&lt;selectSK&gt;&gt;,Z(neglit(1(#))))),Z(0(#)))),and(leq(i_0,E_Loop_high_2),equals(mul(i_0,i_0),add(mul(E_Loop_low_4,Z(2(#))),i_0))))" pathConditionChanged="true" branchCondition="or(or(not(equals(int::select(anon_heap_loop,self,E_Loop::$low),E_Loop_low_4)),not(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2))),and(leq(i_0,E_Loop_high_2),equals(mul(i_0,i_0),add(mul(E_Loop_low_4,Z(2(#))),i_0))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+               <branchCondition name="or(or(not(equals(int::select(anon_heap_LOOP,self,E_Loop::$low),E_Loop_low_4)),not(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2))),and(leq(i_0,E_Loop_high_2),equals(mul(i_0,i_0),add(mul(E_Loop_low_4,Z(2(#))),i_0))))" pathCondition="imp(and(and(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2),equals(int::select(anon_heap_LOOP,self,E_Loop::$low),E_Loop_low_4&lt;&lt;selectSK&gt;&gt;)),equals(add(E_Loop_low_4,mul(E_Loop_low_4&lt;&lt;selectSK&gt;&gt;,Z(neglit(1(#))))),Z(0(#)))),and(leq(i_0,E_Loop_high_2),equals(mul(i_0,i_0),add(mul(E_Loop_low_4,Z(2(#))),i_0))))" pathConditionChanged="true" branchCondition="or(or(not(equals(int::select(anon_heap_LOOP,self,E_Loop::$low),E_Loop_low_4)),not(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2))),and(leq(i_0,E_Loop_high_2),equals(mul(i_0,i_0),add(mul(E_Loop_low_4,Z(2(#))),i_0))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                   <constraint name="wellFormed(heap)"/>
                   <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                   <constraint name="equals(E_Loop::exactInstance(self),TRUE)"/>
-                  <constraint name="wellFormed(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;)"/>
-                  <constraint name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,self,E_Loop::$low,Z(0(#))))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(heap)(anon(heap,singleton(self,E_Loop::$low),anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;))),and(and(leq(i,javaAddInt(int::select(heap,self,E_Loop::$high),Z(1(#)))),equals(javaMulInt(int::select(heap,self,E_Loop::$low),Z(2(#))),javaMulInt(i,javaSubInt(i,Z(1(#)))))),inInt(i))))"/>
+                  <constraint name="wellFormed(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;)"/>
+                  <constraint name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,self,E_Loop::$low,Z(0(#))))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(heap)(anon(heap,singleton(self,E_Loop::$low),anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;))),and(and(leq(i,javaAddInt(int::select(heap,self,E_Loop::$high),Z(1(#)))),equals(javaMulInt(int::select(heap,self,E_Loop::$low),Z(2(#))),javaMulInt(i,javaSubInt(i,Z(1(#)))))),inInt(i))))"/>
                   <constraint name="not(equals(self,null))"/>
                   <variable name="self" arrayIndex="-1" isArrayIndex="false">
                      <value name="self {true}" typeString="E_Loop" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                         <constraint name="equals(E_Loop::exactInstance(self),TRUE)"/>
-                        <constraint name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,self,E_Loop::$low,Z(0(#))))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(heap)(anon(heap,singleton(self,E_Loop::$low),anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;))),and(and(leq(i,javaAddInt(int::select(heap,self,E_Loop::$high),Z(1(#)))),equals(javaMulInt(int::select(heap,self,E_Loop::$low),Z(2(#))),javaMulInt(i,javaSubInt(i,Z(1(#)))))),inInt(i))))"/>
+                        <constraint name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,self,E_Loop::$low,Z(0(#))))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(heap)(anon(heap,singleton(self,E_Loop::$low),anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;))),and(and(leq(i,javaAddInt(int::select(heap,self,E_Loop::$high),Z(1(#)))),equals(javaMulInt(int::select(heap,self,E_Loop::$low),Z(2(#))),javaMulInt(i,javaSubInt(i,Z(1(#)))))),inInt(i))))"/>
                         <constraint name="not(equals(self,null))"/>
                         <variable name="high" arrayIndex="-1" isArrayIndex="false">
                            <value name="high {equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2)}" typeString="int" valueString="E_Loop_high_2" isValueAnObject="false" isValueUnknown="false" conditionString="equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2)">
                            </value>
                            <value name="high {not(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2))}" typeString="int" valueString="int::select(heap,self,E_Loop::$high)" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2))">
-                              <constraint name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,self,E_Loop::$low,Z(0(#))))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(heap)(anon(heap,singleton(self,E_Loop::$low),anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;))),and(and(leq(i,javaAddInt(int::select(heap,self,E_Loop::$high),Z(1(#)))),equals(javaMulInt(int::select(heap,self,E_Loop::$low),Z(2(#))),javaMulInt(i,javaSubInt(i,Z(1(#)))))),inInt(i))))"/>
+                              <constraint name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,self,E_Loop::$low,Z(0(#))))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(heap)(anon(heap,singleton(self,E_Loop::$low),anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;))),and(and(leq(i,javaAddInt(int::select(heap,self,E_Loop::$high),Z(1(#)))),equals(javaMulInt(int::select(heap,self,E_Loop::$low),Z(2(#))),javaMulInt(i,javaSubInt(i,Z(1(#)))))),inInt(i))))"/>
                            </value>
                         </variable>
                         <variable name="low" arrayIndex="-1" isArrayIndex="false">
-                           <value name="low {true}" typeString="int" valueString="int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           <value name="low {true}" typeString="int" valueString="int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
@@ -129,50 +129,50 @@ mod[savedHeap]: allLocs" pathCondition="true" pathConditionChanged="false" initi
                      </value>
                   </variable>
                   <variable name="heap" arrayIndex="-1" isArrayIndex="false">
-                     <value name="heap {true}" typeString="Heap" valueString="anon(store(heap,self,E_Loop::$low,Z(0(#))),singleton(self,E_Loop::$low),anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="heap {true}" typeString="Heap" valueString="anon(store(heap,self,E_Loop::$low,Z(0(#))),singleton(self,E_Loop::$low),anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         <constraint name="wellFormed(heap)"/>
                         <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                         <constraint name="equals(E_Loop::exactInstance(self),TRUE)"/>
-                        <constraint name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,self,E_Loop::$low,Z(0(#))))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(heap)(anon(heap,singleton(self,E_Loop::$low),anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;))),and(and(leq(i,javaAddInt(int::select(heap,self,E_Loop::$high),Z(1(#)))),equals(javaMulInt(int::select(heap,self,E_Loop::$low),Z(2(#))),javaMulInt(i,javaSubInt(i,Z(1(#)))))),inInt(i))))"/>
+                        <constraint name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,self,E_Loop::$low,Z(0(#))))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(heap)(anon(heap,singleton(self,E_Loop::$low),anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;))),and(and(leq(i,javaAddInt(int::select(heap,self,E_Loop::$high),Z(1(#)))),equals(javaMulInt(int::select(heap,self,E_Loop::$low),Z(2(#))),javaMulInt(i,javaSubInt(i,Z(1(#)))))),inInt(i))))"/>
                         <constraint name="not(equals(self,null))"/>
                      </value>
                   </variable>
-                  <variable name="heapBeforeLoop" arrayIndex="-1" isArrayIndex="false">
-                     <value name="heapBeforeLoop {true}" typeString="Heap" valueString="store(heap,self,E_Loop::$low,Z(0(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  <variable name="heapBefore_LOOP" arrayIndex="-1" isArrayIndex="false">
+                     <value name="heapBefore_LOOP {true}" typeString="Heap" valueString="store(heap,self,E_Loop::$low,Z(0(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         <constraint name="wellFormed(heap)"/>
                         <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                         <constraint name="equals(E_Loop::exactInstance(self),TRUE)"/>
-                        <constraint name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,self,E_Loop::$low,Z(0(#))))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(heap)(anon(heap,singleton(self,E_Loop::$low),anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;))),and(and(leq(i,javaAddInt(int::select(heap,self,E_Loop::$high),Z(1(#)))),equals(javaMulInt(int::select(heap,self,E_Loop::$low),Z(2(#))),javaMulInt(i,javaSubInt(i,Z(1(#)))))),inInt(i))))"/>
+                        <constraint name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,self,E_Loop::$low,Z(0(#))))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(heap)(anon(heap,singleton(self,E_Loop::$low),anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;))),and(and(leq(i,javaAddInt(int::select(heap,self,E_Loop::$high),Z(1(#)))),equals(javaMulInt(int::select(heap,self,E_Loop::$low),Z(2(#))),javaMulInt(i,javaSubInt(i,Z(1(#)))))),inInt(i))))"/>
                         <constraint name="not(equals(self,null))"/>
                      </value>
                   </variable>
-                  <variable name="iBeforeLoop" arrayIndex="-1" isArrayIndex="false">
-                     <value name="iBeforeLoop {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  <variable name="iBefore_LOOP" arrayIndex="-1" isArrayIndex="false">
+                     <value name="iBefore_LOOP {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <variable name="variant" arrayIndex="-1" isArrayIndex="false">
                      <value name="variant {equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2)}" typeString="int" valueString="add(add(Z(1(#)),E_Loop_high_2),mul(i_0,Z(neglit(1(#)))))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2)">
                      </value>
                      <value name="variant {not(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2))}" typeString="int" valueString="add(add(Z(1(#)),mul(i_0,Z(neglit(1(#))))),int::select(heap,self,E_Loop::$high))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2))">
-                        <constraint name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,self,E_Loop::$low,Z(0(#))))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(heap)(anon(heap,singleton(self,E_Loop::$low),anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;))),and(and(leq(i,javaAddInt(int::select(heap,self,E_Loop::$high),Z(1(#)))),equals(javaMulInt(int::select(heap,self,E_Loop::$low),Z(2(#))),javaMulInt(i,javaSubInt(i,Z(1(#)))))),inInt(i))))"/>
+                        <constraint name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,self,E_Loop::$low,Z(0(#))))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(heap)(anon(heap,singleton(self,E_Loop::$low),anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;))),and(and(leq(i,javaAddInt(int::select(heap,self,E_Loop::$high),Z(1(#)))),equals(javaMulInt(int::select(heap,self,E_Loop::$low),Z(2(#))),javaMulInt(i,javaSubInt(i,Z(1(#)))))),inInt(i))))"/>
                      </value>
                   </variable>
-                  <statement name="this.low=this.low+i;" pathCondition="imp(and(and(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2),equals(int::select(anon_heap_loop,self,E_Loop::$low),E_Loop_low_4&lt;&lt;selectSK&gt;&gt;)),equals(add(E_Loop_low_4,mul(E_Loop_low_4&lt;&lt;selectSK&gt;&gt;,Z(neglit(1(#))))),Z(0(#)))),and(leq(i_0,E_Loop_high_2),equals(mul(i_0,i_0),add(mul(E_Loop_low_4,Z(2(#))),i_0))))" pathConditionChanged="false">
+                  <statement name="this.low=this.low+i;" pathCondition="imp(and(and(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2),equals(int::select(anon_heap_LOOP,self,E_Loop::$low),E_Loop_low_4&lt;&lt;selectSK&gt;&gt;)),equals(add(E_Loop_low_4,mul(E_Loop_low_4&lt;&lt;selectSK&gt;&gt;,Z(neglit(1(#))))),Z(0(#)))),and(leq(i_0,E_Loop_high_2),equals(mul(i_0,i_0),add(mul(E_Loop_low_4,Z(2(#))),i_0))))" pathConditionChanged="false">
                      <constraint name="geq(int::select(heap,self,E_Loop::$high),i_0)"/>
-                     <constraint name="geq(mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
+                     <constraint name="geq(mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
                      <constraint name="wellFormed(heap)"/>
                      <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                      <constraint name="equals(E_Loop::exactInstance(self),TRUE)"/>
-                     <constraint name="wellFormed(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;)"/>
-                     <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
+                     <constraint name="wellFormed(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;)"/>
+                     <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
                      <constraint name="not(equals(self,null))"/>
                      <variable name="self" arrayIndex="-1" isArrayIndex="false">
                         <value name="self {true}" typeString="E_Loop" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <constraint name="geq(int::select(heap,self,E_Loop::$high),i_0)"/>
-                           <constraint name="geq(mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
+                           <constraint name="geq(mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
                            <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                            <constraint name="equals(E_Loop::exactInstance(self),TRUE)"/>
-                           <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
+                           <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
                            <constraint name="not(equals(self,null))"/>
                            <variable name="high" arrayIndex="-1" isArrayIndex="false">
                               <value name="high {equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2)}" typeString="int" valueString="E_Loop_high_2" isValueAnObject="false" isValueUnknown="false" conditionString="equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2)">
@@ -182,11 +182,11 @@ mod[savedHeap]: allLocs" pathCondition="true" pathConditionChanged="false" initi
                               </value>
                            </variable>
                            <variable name="low" arrayIndex="-1" isArrayIndex="false">
-                              <value name="low {and(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2),equals(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),E_Loop_low_4))}" typeString="int" valueString="E_Loop_low_4" isValueAnObject="false" isValueUnknown="false" conditionString="and(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2),equals(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),E_Loop_low_4))">
+                              <value name="low {and(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2),equals(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),E_Loop_low_4))}" typeString="int" valueString="E_Loop_low_4" isValueAnObject="false" isValueUnknown="false" conditionString="and(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2),equals(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),E_Loop_low_4))">
                               </value>
-                              <value name="low {not(and(equals(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),E_Loop_low_4),equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2)))}" typeString="int" valueString="int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low)" isValueAnObject="false" isValueUnknown="false" conditionString="not(and(equals(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),E_Loop_low_4),equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2)))">
-                                 <constraint name="geq(mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
-                                 <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
+                              <value name="low {not(and(equals(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),E_Loop_low_4),equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2)))}" typeString="int" valueString="int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low)" isValueAnObject="false" isValueUnknown="false" conditionString="not(and(equals(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),E_Loop_low_4),equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2)))">
+                                 <constraint name="geq(mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
+                                 <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
                               </value>
                            </variable>
                         </value>
@@ -200,13 +200,13 @@ mod[savedHeap]: allLocs" pathCondition="true" pathConditionChanged="false" initi
                         </value>
                      </variable>
                      <variable name="heap" arrayIndex="-1" isArrayIndex="false">
-                        <value name="heap {true}" typeString="Heap" valueString="anon(store(heap,self,E_Loop::$low,Z(0(#))),singleton(self,E_Loop::$low),anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <value name="heap {true}" typeString="Heap" valueString="anon(store(heap,self,E_Loop::$low,Z(0(#))),singleton(self,E_Loop::$low),anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            <constraint name="geq(int::select(heap,self,E_Loop::$high),i_0)"/>
-                           <constraint name="geq(mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
+                           <constraint name="geq(mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
                            <constraint name="wellFormed(heap)"/>
                            <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                            <constraint name="equals(E_Loop::exactInstance(self),TRUE)"/>
-                           <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
+                           <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
                            <constraint name="not(equals(self,null))"/>
                         </value>
                      </variable>
@@ -221,22 +221,22 @@ mod[savedHeap]: allLocs" pathCondition="true" pathConditionChanged="false" initi
                         <value name="exc_1 {true}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <statement name="i=i+1;" pathCondition="imp(and(and(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2),equals(int::select(anon_heap_loop,self,E_Loop::$low),E_Loop_low_4&lt;&lt;selectSK&gt;&gt;)),equals(add(E_Loop_low_4,mul(E_Loop_low_4&lt;&lt;selectSK&gt;&gt;,Z(neglit(1(#))))),Z(0(#)))),and(leq(i_0,E_Loop_high_2),equals(mul(i_0,i_0),add(mul(E_Loop_low_4,Z(2(#))),i_0))))" pathConditionChanged="false">
+                     <statement name="i=i+1;" pathCondition="imp(and(and(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2),equals(int::select(anon_heap_LOOP,self,E_Loop::$low),E_Loop_low_4&lt;&lt;selectSK&gt;&gt;)),equals(add(E_Loop_low_4,mul(E_Loop_low_4&lt;&lt;selectSK&gt;&gt;,Z(neglit(1(#))))),Z(0(#)))),and(leq(i_0,E_Loop_high_2),equals(mul(i_0,i_0),add(mul(E_Loop_low_4,Z(2(#))),i_0))))" pathConditionChanged="false">
                         <constraint name="geq(int::select(heap,self,E_Loop::$high),i_0)"/>
-                        <constraint name="geq(mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
+                        <constraint name="geq(mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
                         <constraint name="wellFormed(heap)"/>
                         <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                         <constraint name="equals(E_Loop::exactInstance(self),TRUE)"/>
-                        <constraint name="wellFormed(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;)"/>
-                        <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
+                        <constraint name="wellFormed(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;)"/>
+                        <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
                         <constraint name="not(equals(self,null))"/>
                         <variable name="self" arrayIndex="-1" isArrayIndex="false">
                            <value name="self {true}" typeString="E_Loop" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               <constraint name="geq(int::select(heap,self,E_Loop::$high),i_0)"/>
-                              <constraint name="geq(mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
+                              <constraint name="geq(mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
                               <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                               <constraint name="equals(E_Loop::exactInstance(self),TRUE)"/>
-                              <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
+                              <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
                               <constraint name="not(equals(self,null))"/>
                               <variable name="high" arrayIndex="-1" isArrayIndex="false">
                                  <value name="high {equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2)}" typeString="int" valueString="E_Loop_high_2" isValueAnObject="false" isValueUnknown="false" conditionString="equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2)">
@@ -270,14 +270,14 @@ mod[savedHeap]: allLocs" pathCondition="true" pathConditionChanged="false" initi
                            <value name="exc_1 {true}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <termination name="&lt;loop body end&gt;" pathCondition="imp(and(and(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2),equals(int::select(anon_heap_loop,self,E_Loop::$low),E_Loop_low_4&lt;&lt;selectSK&gt;&gt;)),equals(add(E_Loop_low_4,mul(E_Loop_low_4&lt;&lt;selectSK&gt;&gt;,Z(neglit(1(#))))),Z(0(#)))),and(leq(i_0,E_Loop_high_2),equals(mul(i_0,i_0),add(mul(E_Loop_low_4,Z(2(#))),i_0))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
+                        <termination name="&lt;loop body end&gt;" pathCondition="imp(and(and(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2),equals(int::select(anon_heap_LOOP,self,E_Loop::$low),E_Loop_low_4&lt;&lt;selectSK&gt;&gt;)),equals(add(E_Loop_low_4,mul(E_Loop_low_4&lt;&lt;selectSK&gt;&gt;,Z(neglit(1(#))))),Z(0(#)))),and(leq(i_0,E_Loop_high_2),equals(mul(i_0,i_0),add(mul(E_Loop_low_4,Z(2(#))),i_0))))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
                            <constraint name="geq(int::select(heap,self,E_Loop::$high),i_0)"/>
-                           <constraint name="geq(mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
+                           <constraint name="geq(mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
                            <constraint name="wellFormed(heap)"/>
                            <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                            <constraint name="equals(E_Loop::exactInstance(self),TRUE)"/>
-                           <constraint name="wellFormed(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;)"/>
-                           <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
+                           <constraint name="wellFormed(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;)"/>
+                           <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
                            <constraint name="not(equals(self,null))"/>
                            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
                               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
@@ -302,28 +302,28 @@ mod[savedHeap]: allLocs" pathCondition="true" pathConditionChanged="false" initi
                      </statement>
                   </statement>
                </branchCondition>
-               <branchCondition name="or(or(not(equals(int::select(anon_heap_loop,self,E_Loop::$low),E_Loop_low_4)),not(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2))),and(equals(i_0,add(Z(1(#)),E_Loop_high_2)),equals(mul(i_0,i_0),add(mul(E_Loop_low_4,Z(2(#))),i_0))))" pathCondition="imp(and(and(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2),equals(int::select(anon_heap_loop,self,E_Loop::$low),E_Loop_low_4&lt;&lt;selectSK&gt;&gt;)),equals(add(E_Loop_low_4,mul(E_Loop_low_4&lt;&lt;selectSK&gt;&gt;,Z(neglit(1(#))))),Z(0(#)))),and(equals(i_0,add(Z(1(#)),E_Loop_high_2)),equals(mul(i_0,i_0),add(mul(E_Loop_low_4,Z(2(#))),i_0))))" pathConditionChanged="true" branchCondition="or(or(not(equals(int::select(anon_heap_loop,self,E_Loop::$low),E_Loop_low_4)),not(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2))),and(equals(i_0,add(Z(1(#)),E_Loop_high_2)),equals(mul(i_0,i_0),add(mul(E_Loop_low_4,Z(2(#))),i_0))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+               <branchCondition name="or(or(not(equals(int::select(anon_heap_LOOP,self,E_Loop::$low),E_Loop_low_4)),not(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2))),and(equals(i_0,add(Z(1(#)),E_Loop_high_2)),equals(mul(i_0,i_0),add(mul(E_Loop_low_4,Z(2(#))),i_0))))" pathCondition="imp(and(and(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2),equals(int::select(anon_heap_LOOP,self,E_Loop::$low),E_Loop_low_4&lt;&lt;selectSK&gt;&gt;)),equals(add(E_Loop_low_4,mul(E_Loop_low_4&lt;&lt;selectSK&gt;&gt;,Z(neglit(1(#))))),Z(0(#)))),and(equals(i_0,add(Z(1(#)),E_Loop_high_2)),equals(mul(i_0,i_0),add(mul(E_Loop_low_4,Z(2(#))),i_0))))" pathConditionChanged="true" branchCondition="or(or(not(equals(int::select(anon_heap_LOOP,self,E_Loop::$low),E_Loop_low_4)),not(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2))),and(equals(i_0,add(Z(1(#)),E_Loop_high_2)),equals(mul(i_0,i_0),add(mul(E_Loop_low_4,Z(2(#))),i_0))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
                   <constraint name="wellFormed(heap)"/>
                   <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                   <constraint name="equals(E_Loop::exactInstance(self),TRUE)"/>
-                  <constraint name="wellFormed(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;)"/>
-                  <constraint name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,self,E_Loop::$low,Z(0(#))))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(heap)(anon(heap,singleton(self,E_Loop::$low),anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;))),and(and(leq(i,javaAddInt(int::select(heap,self,E_Loop::$high),Z(1(#)))),equals(javaMulInt(int::select(heap,self,E_Loop::$low),Z(2(#))),javaMulInt(i,javaSubInt(i,Z(1(#)))))),inInt(i))))"/>
+                  <constraint name="wellFormed(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;)"/>
+                  <constraint name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,self,E_Loop::$low,Z(0(#))))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(heap)(anon(heap,singleton(self,E_Loop::$low),anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;))),and(and(leq(i,javaAddInt(int::select(heap,self,E_Loop::$high),Z(1(#)))),equals(javaMulInt(int::select(heap,self,E_Loop::$low),Z(2(#))),javaMulInt(i,javaSubInt(i,Z(1(#)))))),inInt(i))))"/>
                   <constraint name="not(equals(self,null))"/>
                   <variable name="self" arrayIndex="-1" isArrayIndex="false">
                      <value name="self {true}" typeString="E_Loop" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                         <constraint name="equals(E_Loop::exactInstance(self),TRUE)"/>
-                        <constraint name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,self,E_Loop::$low,Z(0(#))))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(heap)(anon(heap,singleton(self,E_Loop::$low),anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;))),and(and(leq(i,javaAddInt(int::select(heap,self,E_Loop::$high),Z(1(#)))),equals(javaMulInt(int::select(heap,self,E_Loop::$low),Z(2(#))),javaMulInt(i,javaSubInt(i,Z(1(#)))))),inInt(i))))"/>
+                        <constraint name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,self,E_Loop::$low,Z(0(#))))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(heap)(anon(heap,singleton(self,E_Loop::$low),anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;))),and(and(leq(i,javaAddInt(int::select(heap,self,E_Loop::$high),Z(1(#)))),equals(javaMulInt(int::select(heap,self,E_Loop::$low),Z(2(#))),javaMulInt(i,javaSubInt(i,Z(1(#)))))),inInt(i))))"/>
                         <constraint name="not(equals(self,null))"/>
                         <variable name="high" arrayIndex="-1" isArrayIndex="false">
                            <value name="high {equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2)}" typeString="int" valueString="E_Loop_high_2" isValueAnObject="false" isValueUnknown="false" conditionString="equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2)">
                            </value>
                            <value name="high {not(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2))}" typeString="int" valueString="int::select(heap,self,E_Loop::$high)" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2))">
-                              <constraint name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,self,E_Loop::$low,Z(0(#))))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(heap)(anon(heap,singleton(self,E_Loop::$low),anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;))),and(and(leq(i,javaAddInt(int::select(heap,self,E_Loop::$high),Z(1(#)))),equals(javaMulInt(int::select(heap,self,E_Loop::$low),Z(2(#))),javaMulInt(i,javaSubInt(i,Z(1(#)))))),inInt(i))))"/>
+                              <constraint name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,self,E_Loop::$low,Z(0(#))))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(heap)(anon(heap,singleton(self,E_Loop::$low),anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;))),and(and(leq(i,javaAddInt(int::select(heap,self,E_Loop::$high),Z(1(#)))),equals(javaMulInt(int::select(heap,self,E_Loop::$low),Z(2(#))),javaMulInt(i,javaSubInt(i,Z(1(#)))))),inInt(i))))"/>
                            </value>
                         </variable>
                         <variable name="low" arrayIndex="-1" isArrayIndex="false">
-                           <value name="low {true}" typeString="int" valueString="int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           <value name="low {true}" typeString="int" valueString="int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
@@ -337,30 +337,30 @@ mod[savedHeap]: allLocs" pathCondition="true" pathConditionChanged="false" initi
                      </value>
                   </variable>
                   <variable name="heap" arrayIndex="-1" isArrayIndex="false">
-                     <value name="heap {true}" typeString="Heap" valueString="anon(store(heap,self,E_Loop::$low,Z(0(#))),singleton(self,E_Loop::$low),anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="heap {true}" typeString="Heap" valueString="anon(store(heap,self,E_Loop::$low,Z(0(#))),singleton(self,E_Loop::$low),anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         <constraint name="wellFormed(heap)"/>
                         <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                         <constraint name="equals(E_Loop::exactInstance(self),TRUE)"/>
-                        <constraint name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,self,E_Loop::$low,Z(0(#))))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(heap)(anon(heap,singleton(self,E_Loop::$low),anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;))),and(and(leq(i,javaAddInt(int::select(heap,self,E_Loop::$high),Z(1(#)))),equals(javaMulInt(int::select(heap,self,E_Loop::$low),Z(2(#))),javaMulInt(i,javaSubInt(i,Z(1(#)))))),inInt(i))))"/>
+                        <constraint name="update-application(parallel-upd(parallel-upd(elem-update(exc)(null),elem-update(heap)(store(heap,self,E_Loop::$low,Z(0(#))))),elem-update(i)(Z(0(#)))),update-application(parallel-upd(elem-update(i)(i_0),elem-update(heap)(anon(heap,singleton(self,E_Loop::$low),anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;))),and(and(leq(i,javaAddInt(int::select(heap,self,E_Loop::$high),Z(1(#)))),equals(javaMulInt(int::select(heap,self,E_Loop::$low),Z(2(#))),javaMulInt(i,javaSubInt(i,Z(1(#)))))),inInt(i))))"/>
                         <constraint name="not(equals(self,null))"/>
                      </value>
                   </variable>
-                  <methodReturn name="&lt;return of calculate&gt;" signature="&lt;return of self.calculate()&gt;" pathCondition="imp(and(and(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2),equals(int::select(anon_heap_loop,self,E_Loop::$low),E_Loop_low_4&lt;&lt;selectSK&gt;&gt;)),equals(add(E_Loop_low_4,mul(E_Loop_low_4&lt;&lt;selectSK&gt;&gt;,Z(neglit(1(#))))),Z(0(#)))),and(equals(i_0,add(Z(1(#)),E_Loop_high_2)),equals(mul(i_0,i_0),add(mul(E_Loop_low_4,Z(2(#))),i_0))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="imp(and(and(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2),equals(int::select(anon_heap_loop,self,E_Loop::$low),E_Loop_low_4&lt;&lt;selectSK&gt;&gt;)),equals(add(E_Loop_low_4,mul(E_Loop_low_4&lt;&lt;selectSK&gt;&gt;,Z(neglit(1(#))))),Z(0(#)))),and(equals(i_0,add(Z(1(#)),E_Loop_high_2)),equals(mul(i_0,i_0),add(mul(E_Loop_low_4,Z(2(#))),i_0))))">
-                     <constraint name="geq(mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
+                  <methodReturn name="&lt;return of calculate&gt;" signature="&lt;return of self.calculate()&gt;" pathCondition="imp(and(and(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2),equals(int::select(anon_heap_LOOP,self,E_Loop::$low),E_Loop_low_4&lt;&lt;selectSK&gt;&gt;)),equals(add(E_Loop_low_4,mul(E_Loop_low_4&lt;&lt;selectSK&gt;&gt;,Z(neglit(1(#))))),Z(0(#)))),and(equals(i_0,add(Z(1(#)),E_Loop_high_2)),equals(mul(i_0,i_0),add(mul(E_Loop_low_4,Z(2(#))),i_0))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="imp(and(and(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2),equals(int::select(anon_heap_LOOP,self,E_Loop::$low),E_Loop_low_4&lt;&lt;selectSK&gt;&gt;)),equals(add(E_Loop_low_4,mul(E_Loop_low_4&lt;&lt;selectSK&gt;&gt;,Z(neglit(1(#))))),Z(0(#)))),and(equals(i_0,add(Z(1(#)),E_Loop_high_2)),equals(mul(i_0,i_0),add(mul(E_Loop_low_4,Z(2(#))),i_0))))">
+                     <constraint name="geq(mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
                      <constraint name="wellFormed(heap)"/>
                      <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                      <constraint name="equals(E_Loop::exactInstance(self),TRUE)"/>
-                     <constraint name="wellFormed(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;)"/>
+                     <constraint name="wellFormed(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;)"/>
                      <constraint name="geq(int::select(heap,self,E_Loop::$high),add(Z(neglit(1(#))),i_0))"/>
-                     <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
+                     <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
                      <constraint name="not(equals(self,null))"/>
                      <variable name="self" arrayIndex="-1" isArrayIndex="false">
                         <value name="self {true}" typeString="E_Loop" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                           <constraint name="geq(mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
+                           <constraint name="geq(mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
                            <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                            <constraint name="equals(E_Loop::exactInstance(self),TRUE)"/>
                            <constraint name="geq(int::select(heap,self,E_Loop::$high),add(Z(neglit(1(#))),i_0))"/>
-                           <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
+                           <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
                            <constraint name="not(equals(self,null))"/>
                            <variable name="high" arrayIndex="-1" isArrayIndex="false">
                               <value name="high {equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2)}" typeString="int" valueString="E_Loop_high_2" isValueAnObject="false" isValueUnknown="false" conditionString="equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2)">
@@ -370,9 +370,9 @@ mod[savedHeap]: allLocs" pathCondition="true" pathConditionChanged="false" initi
                               </value>
                            </variable>
                            <variable name="low" arrayIndex="-1" isArrayIndex="false">
-                              <value name="low {true}" typeString="int" valueString="int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                                 <constraint name="geq(mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
-                                 <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
+                              <value name="low {true}" typeString="int" valueString="int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 <constraint name="geq(mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
+                                 <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
                               </value>
                            </variable>
                         </value>
@@ -386,24 +386,24 @@ mod[savedHeap]: allLocs" pathCondition="true" pathConditionChanged="false" initi
                         </value>
                      </variable>
                      <variable name="heap" arrayIndex="-1" isArrayIndex="false">
-                        <value name="heap {true}" typeString="Heap" valueString="anon(store(heap,self,E_Loop::$low,Z(0(#))),singleton(self,E_Loop::$low),anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                           <constraint name="geq(mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
+                        <value name="heap {true}" typeString="Heap" valueString="anon(store(heap,self,E_Loop::$low,Z(0(#))),singleton(self,E_Loop::$low),anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           <constraint name="geq(mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
                            <constraint name="wellFormed(heap)"/>
                            <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                            <constraint name="equals(E_Loop::exactInstance(self),TRUE)"/>
                            <constraint name="geq(int::select(heap,self,E_Loop::$high),add(Z(neglit(1(#))),i_0))"/>
-                           <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
+                           <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
                            <constraint name="not(equals(self,null))"/>
                         </value>
                      </variable>
-                     <termination name="&lt;end&gt;" pathCondition="imp(and(and(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2),equals(int::select(anon_heap_loop,self,E_Loop::$low),E_Loop_low_4&lt;&lt;selectSK&gt;&gt;)),equals(add(E_Loop_low_4,mul(E_Loop_low_4&lt;&lt;selectSK&gt;&gt;,Z(neglit(1(#))))),Z(0(#)))),and(equals(i_0,add(Z(1(#)),E_Loop_high_2)),equals(mul(i_0,i_0),add(mul(E_Loop_low_4,Z(2(#))),i_0))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
-                        <constraint name="geq(mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
+                     <termination name="&lt;end&gt;" pathCondition="imp(and(and(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2),equals(int::select(anon_heap_LOOP,self,E_Loop::$low),E_Loop_low_4&lt;&lt;selectSK&gt;&gt;)),equals(add(E_Loop_low_4,mul(E_Loop_low_4&lt;&lt;selectSK&gt;&gt;,Z(neglit(1(#))))),Z(0(#)))),and(equals(i_0,add(Z(1(#)),E_Loop_high_2)),equals(mul(i_0,i_0),add(mul(E_Loop_low_4,Z(2(#))),i_0))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        <constraint name="geq(mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
                         <constraint name="wellFormed(heap)"/>
                         <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                         <constraint name="equals(E_Loop::exactInstance(self),TRUE)"/>
-                        <constraint name="wellFormed(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;)"/>
+                        <constraint name="wellFormed(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;)"/>
                         <constraint name="geq(int::select(heap,self,E_Loop::$high),add(Z(neglit(1(#))),i_0))"/>
-                        <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
+                        <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
                         <constraint name="not(equals(self,null))"/>
                         <variable name="exc" arrayIndex="-1" isArrayIndex="false">
                            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
@@ -414,17 +414,53 @@ mod[savedHeap]: allLocs" pathCondition="true" pathConditionChanged="false" initi
                            </value>
                         </variable>
                         <variable name="heap" arrayIndex="-1" isArrayIndex="false">
-                           <value name="heap {true}" typeString="Heap" valueString="anon(store(heap,self,E_Loop::$low,Z(0(#))),singleton(self,E_Loop::$low),anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                              <constraint name="geq(mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
+                           <value name="heap {true}" typeString="Heap" valueString="anon(store(heap,self,E_Loop::$low,Z(0(#))),singleton(self,E_Loop::$low),anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              <constraint name="geq(mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
                               <constraint name="wellFormed(heap)"/>
                               <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
                               <constraint name="equals(E_Loop::exactInstance(self),TRUE)"/>
                               <constraint name="geq(int::select(heap,self,E_Loop::$high),add(Z(neglit(1(#))),i_0))"/>
-                              <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_loop&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
+                              <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
                               <constraint name="not(equals(self,null))"/>
                            </value>
                         </variable>
                      </termination>
+                     <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                        <value name="self {true}" typeString="E_Loop" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <constraint name="geq(mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#))),mul(i_0,Z(neglit(1(#)))))"/>
+                           <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
+                           <constraint name="equals(E_Loop::exactInstance(self),TRUE)"/>
+                           <constraint name="geq(int::select(heap,self,E_Loop::$high),add(Z(neglit(1(#))),i_0))"/>
+                           <constraint name="equals(mul(i_0,i_0),add(i_0,mul(int::select(anon_heap_LOOP&lt;&lt;anonHeapFunction&gt;&gt;,self,E_Loop::$low),Z(2(#)))))"/>
+                           <constraint name="not(equals(self,null))"/>
+                           <variable name="high" arrayIndex="-1" isArrayIndex="false">
+                              <value name="high {equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2)}" typeString="int" valueString="E_Loop_high_2" isValueAnObject="false" isValueUnknown="false" conditionString="equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2)">
+                              </value>
+                              <value name="high {not(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2))}" typeString="int" valueString="int::select(heap,self,E_Loop::$high)" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(int::select(heap,self,E_Loop::$high),E_Loop_high_2))">
+                                 <constraint name="geq(int::select(heap,self,E_Loop::$high),add(Z(neglit(1(#))),i_0))"/>
+                              </value>
+                           </variable>
+                           <variable name="low" arrayIndex="-1" isArrayIndex="false">
+                              <value name="low {true}" typeString="int" valueString="int::select(heap,self,E_Loop::$low)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="heapBefore_calculate" arrayIndex="-1" isArrayIndex="false">
+                        <value name="heapBefore_calculate {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           <constraint name="wellFormed(heap)"/>
+                           <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
+                           <constraint name="geq(int::select(heap,self,E_Loop::$high),add(Z(neglit(1(#))),i_0))"/>
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="savedHeapBefore_calculate" arrayIndex="-1" isArrayIndex="false">
+                        <value name="savedHeapBefore_calculate {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </callStateVariable>
                   </methodReturn>
                </branchCondition>
             </loopInvariant>

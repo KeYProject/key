@@ -19,10 +19,12 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDExceptionalMethodReturn;
+import org.key_project.sed.core.model.ISEDVariable;
 import org.key_project.sed.core.model.impl.AbstractSEDExceptionalMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
@@ -79,6 +81,16 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
     * The {@link KeYMethodCall} which is now returned.
     */
    private final KeYMethodCall methodCall;
+   
+   /**
+    * The conditions under which a group ending in this node starts.
+    */
+   private SEDMemoryBranchCondition[] groupStartConditions;
+   
+   /**
+    * The contained KeY variables at the call state.
+    */
+   private KeYVariable[] callStateVariables;
 
    /**
     * Constructor.
@@ -253,6 +265,19 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
     * {@inheritDoc}
     */
    @Override
+   public ISEDVariable[] getCallStateVariables() throws DebugException {
+      synchronized (this) {
+         if (callStateVariables == null) {
+            callStateVariables = KeYModelUtil.createCallStateVariables(this, executionNode);
+         }
+         return callStateVariables;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public boolean hasConstraints() throws DebugException {
       return !isTerminated() && super.hasConstraints();
    }
@@ -420,5 +445,25 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
    @Override
    public void setParent(ISEDDebugNode parent) {
       super.setParent(parent);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public SEDMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
+      synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+         if (groupStartConditions == null) {
+            SEDMemoryBranchCondition returnCondition = getMethodReturnCondition();
+            SEDMemoryBranchCondition[] completedBlockConditions = KeYModelUtil.createCompletedBlocksConditions(this);
+            if (returnCondition != null) {
+               groupStartConditions = ArrayUtil.insert(completedBlockConditions, returnCondition, 0);
+            }
+            else {
+               groupStartConditions = completedBlockConditions;
+            }
+         }
+         return groupStartConditions;
+      }
    }
 }

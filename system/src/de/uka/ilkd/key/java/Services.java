@@ -70,7 +70,7 @@ public class Services implements TermServices {
      * the information object on the Java model
      */
     private final JavaInfo javainfo;
-        
+
     /**
      * variable namer for inner renaming
      */
@@ -80,7 +80,7 @@ public class Services implements TermServices {
      * the exception-handler
      */
     private KeYExceptionHandler exceptionHandler;
-    
+
     /**
      * map of names to counters
      */
@@ -361,7 +361,7 @@ public class Services implements TermServices {
     public Proof getProof() {
 	return proof;
     }
-    
+
     public interface ITermProgramVariableCollectorFactory{
        public TermProgramVariableCollector create(Services services);
     }
@@ -402,13 +402,13 @@ public class Services implements TermServices {
 
     public ITermProgramVariableCollectorFactory getFactory() {
         return factory;
-     }
+    }
 
 
     public void setFactory(ITermProgramVariableCollectorFactory factory) {
-    	this.factory = factory;
+        this.factory = factory;
     }
-     
+
 
     /**
      * returns the {@link JavaModel} with all path information

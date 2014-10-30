@@ -43,7 +43,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     private StatementBlock result;
 
     public OuterBreakContinueAndReturnReplacer(final StatementBlock block,
-                                               final List<Label> alwaysInnerLabels,
+                                               final Iterable<Label> alwaysInnerLabels,
                                                final Label breakOutLabel,
                                                final Map<Label, ProgramVariable> breakFlags,
                                                final Map<Label, ProgramVariable> continueFlags,
@@ -52,7 +52,9 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
                                                final Services services)
     {
         super(block, services);
-        this.labels.addAll(alwaysInnerLabels);
+        for (Label label : alwaysInnerLabels) {
+            this.labels.add(label);
+        }
         this.breakOut = new Break(breakOutLabel);
         this.breakFlags = breakFlags;
         this.continueFlags = continueFlags;

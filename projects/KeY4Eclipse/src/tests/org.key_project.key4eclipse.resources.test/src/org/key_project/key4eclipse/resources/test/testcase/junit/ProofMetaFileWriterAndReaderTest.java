@@ -38,7 +38,8 @@ public class ProofMetaFileWriterAndReaderTest extends TestCase {
    @Test
    public void testWritingAndReading_Minimal() throws Exception {
       doWritingAndReadingTest("ProofMetaFileWriterAndReaderTest_testWritingAndReading_Minimal", 
-                              false, 
+                              false,
+                              false,
                               false, 
                               false, 
                               false, 
@@ -51,7 +52,22 @@ public class ProofMetaFileWriterAndReaderTest extends TestCase {
    @Test
    public void testWritingAndReading_Closed() throws Exception {
       doWritingAndReadingTest("ProofMetaFileWriterAndReaderTest_testWritingAndReading_Closed", 
-                              true, 
+                              true,
+                              false,
+                              false, 
+                              false,
+                              false,
+                              false);
+   }
+   
+   /**
+    * Tests writing and reading
+    */
+   @Test
+   public void testWritingAndReading_Outdated() throws Exception {
+      doWritingAndReadingTest("ProofMetaFileWriterAndReaderTest_testWritingAndReading_Outdated", 
+                              false,
+                              true,
                               false, 
                               false,
                               false,
@@ -65,6 +81,7 @@ public class ProofMetaFileWriterAndReaderTest extends TestCase {
    public void testWritingAndReading_MarkerMessage() throws Exception {
       doWritingAndReadingTest("ProofMetaFileWriterAndReaderTest_testWritingAndReading_MarkerMessage", 
                               false, 
+                              false,
                               true, 
                               false,
                               false,
@@ -79,6 +96,7 @@ public class ProofMetaFileWriterAndReaderTest extends TestCase {
       doWritingAndReadingTest("ProofMetaFileWriterAndReaderTest_testWritingAndReading_Types", 
                               false, 
                               false, 
+                              false,
                               true,
                               false,
                               false);
@@ -92,6 +110,7 @@ public class ProofMetaFileWriterAndReaderTest extends TestCase {
       doWritingAndReadingTest("ProofMetaFileWriterAndReaderTest_testWritingAndReading_Contracts", 
                               false, 
                               false, 
+                              false,
                               false,
                               true,
                               false);
@@ -107,6 +126,7 @@ public class ProofMetaFileWriterAndReaderTest extends TestCase {
                               false, 
                               false,
                               false,
+                              false,
                               true);
    }
    
@@ -117,6 +137,7 @@ public class ProofMetaFileWriterAndReaderTest extends TestCase {
    public void testWritingAndReading_Everything() throws Exception {
       doWritingAndReadingTest("ProofMetaFileWriterAndReaderTest_testWritingAndReading_Everything", 
                               true, 
+                              true,
                               true, 
                               true, 
                               true, 
@@ -129,6 +150,7 @@ public class ProofMetaFileWriterAndReaderTest extends TestCase {
    @Test
    public void doWritingAndReadingTest(String projectName,
                                        boolean proofClosed,
+                                       boolean proofOutdated,
                                        boolean withMarkerMessage,
                                        boolean withTypes,
                                        boolean withContracts,
@@ -147,18 +169,18 @@ public class ProofMetaFileWriterAndReaderTest extends TestCase {
       IFile proofFile = mainProofs.getFile("Main[Main__magic(A)]_JML_normal_behavior_operation_contract_0.proof");
       IFile metaFile = mainProofs.getFile("Main[Main__magic(A)]_JML_normal_behavior_operation_contract_0.proofmeta");
       IFile anotherProofFile = aProofs.getFile("A[A__contractMagic()]_JML_normal_behavior_operation_contract_0.proof");
-      IFile anotherMetaFile = aProofs.getFile("A[A__contractMagic()]_JML_normal_behavior_operation_contract_0.proofmeta");
       // Load existing proof
       KeYEnvironment<CustomUserInterface> env = KeYEnvironment.load(ResourceUtil.getLocation(proofFile), null, null);
       try {
          // Create ProofElement
          Proof proof = env.getLoadedProof();
          assertNotNull(proof);
-         ProofElement pe = new ProofElement(javaFile, null, env, proofs, proofFile, metaFile, null, null);
+         ProofElement pe = new ProofElement(javaFile, null, env, proofs, proofFile, metaFile, null, null, null);
          if (withMarkerMessage) {
             pe.setMarkerMsg("Hello\nWorld\n!");
          }
          pe.setProofClosed(proofClosed);
+         pe.setOutdated(proofOutdated);
          if (withTypes || withAssumptions) {
             LinkedHashSet<IProofReference<?>> proofReferences = ProofReferenceUtil.computeProofReferences(proof);
             if (!withTypes || !withAssumptions) {
@@ -182,8 +204,8 @@ public class ProofMetaFileWriterAndReaderTest extends TestCase {
             pe.setProofReferences(proofReferences);
          }
          if (withContracts) {
-            LinkedList<ProofElement> usedContracts = new LinkedList<ProofElement>();
-            usedContracts.add(new ProofElement(javaFile, null, null, proofs, anotherProofFile, anotherMetaFile, null, null));
+            LinkedList<IFile> usedContracts = new LinkedList<IFile>();
+            usedContracts.add(anotherProofFile);
             pe.setUsedContracts(usedContracts);
          }
          // Write meta file first time
@@ -193,6 +215,7 @@ public class ProofMetaFileWriterAndReaderTest extends TestCase {
          ProofMetaFileReader reader = new ProofMetaFileReader(metaFile);
          assertEquals(ResourceUtil.computeContentMD5(proofFile), reader.getProofFileMD5());
          assertEquals(proofClosed, reader.getProofClosed());
+         assertEquals(proofOutdated, reader.getProofOutdated());
          if (withMarkerMessage) {
             assertEquals("Hello\nWorld\n!", reader.getMarkerMessage());
          }

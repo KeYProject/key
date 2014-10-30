@@ -26,6 +26,7 @@ import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -206,14 +207,16 @@ public class ExecutionValue extends AbstractExecutionElement implements IExecuti
                      ArrayDeclaration ad = (ArrayDeclaration)javaType;
                      Set<IProgramVariable> pvs = SymbolicExecutionUtil.getProgramVariables(ad.length());
                      if (pvs.size() == 1) {
-                        ExecutionVariable lengthVariable = new ExecutionVariable(getVariable().getParentNode(), this, pvs.iterator().next());
+                        ExecutionVariable lengthVariable = new ExecutionVariable(getVariable().getParentNode(), getVariable().getProofNode(), getVariable().getModalityPIO(), this, pvs.iterator().next(), getVariable().getAdditionalCondition());
                         children.add(lengthVariable);
                         ExecutionValue[] lengthValues = lengthVariable.getValues();
                         for (ExecutionValue lengthValue : lengthValues) {
                            try {
-                              int length = Integer.valueOf(lengthValue.getValueString());
+                              int length = getSettings().isUsePrettyPrinting() ?
+                                           Integer.valueOf(lengthValue.getValueString()) :
+                                           Integer.valueOf(SymbolicExecutionUtil.formatTerm(lengthValue.getValue(), services, false, true));
                               for (int i = 0; i < length; i++) {
-                                 ExecutionVariable childI = new ExecutionVariable(getVariable().getParentNode(), this, i, lengthValue);
+                                 ExecutionVariable childI = new ExecutionVariable(getVariable().getParentNode(), getVariable().getProofNode(), getVariable().getModalityPIO(), this, i, lengthValue, getVariable().getAdditionalCondition());
                                  children.add(childI);
                               }
                            }
@@ -230,7 +233,7 @@ public class ExecutionValue extends AbstractExecutionElement implements IExecuti
                         ImmutableList<ProgramVariable> vars = services.getJavaInfo().getAllAttributes(field.getFullName(), keyType);
                         for (ProgramVariable var : vars) {
                            if (!var.isImplicit() && !var.isStatic()) {
-                              children.add(new ExecutionVariable(getVariable().getParentNode(), this, field.getProgramVariable()));
+                              children.add(new ExecutionVariable(getVariable().getParentNode(), getVariable().getProofNode(), getVariable().getModalityPIO(), this, field.getProgramVariable(), getVariable().getAdditionalCondition()));
                            }
                         }
                      }
@@ -366,5 +369,13 @@ public class ExecutionValue extends AbstractExecutionElement implements IExecuti
          }
          return contained;
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public PosInOccurrence getModalityPIO() {
+      return getVariable().getModalityPIO();
    }
 }

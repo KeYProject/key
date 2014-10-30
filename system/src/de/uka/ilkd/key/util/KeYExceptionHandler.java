@@ -22,4 +22,5 @@ public interface KeYExceptionHandler {
     public List<Throwable> getExceptions();
 
     public void clear();
+
 }

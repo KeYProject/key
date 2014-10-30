@@ -31,11 +31,8 @@ import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.AmbigiousDeclException;
-import de.uka.ilkd.key.parser.KeYLexerF;
-import de.uka.ilkd.key.parser.KeYParserF;
-import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import org.antlr.runtime.RecognitionException;
 
 
 public class TestDeclParser extends TestCase {
@@ -464,7 +461,7 @@ public class TestDeclParser extends TestCase {
 	    if(!(e.getCause() instanceof AmbigiousDeclException)){
 		fail("Unexpected excpetion. Testcase failed." +e);
 	    }
-	} catch(antlr.RecognitionException re) {
+	} catch(RecognitionException re) {
 	    fail("Unexpected excpetion. Testcase failed." + re);
 	} 
 	

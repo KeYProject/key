@@ -35,11 +35,12 @@ public class ExceptionHandlerException extends RuntimeException {
 	super(ex);
     }
     
-    
+    @Override
     public String getMessage() {
     	return toString();
     }
-    
+
+    @Override
     public String toString() {
     	return super.getMessage();
     }

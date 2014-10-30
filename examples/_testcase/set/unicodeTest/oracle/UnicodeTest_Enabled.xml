@@ -9,7 +9,7 @@
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <branchStatement name="if (x&amp;y)" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (x&amp;y)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <variable name="x" arrayIndex="-1" isArrayIndex="false">
             <value name="x {true}" typeString="boolean" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
@@ -77,7 +77,28 @@
                         </value>
                      </variable>
                   </termination>
+                  <callStateVariable name="x" arrayIndex="-1" isArrayIndex="false">
+                     <value name="x {true}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="y" arrayIndex="-1" isArrayIndex="false">
+                     <value name="y {true}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="heapBefore_magic" arrayIndex="-1" isArrayIndex="false">
+                     <value name="heapBefore_magic {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="savedHeapBefore_magic" arrayIndex="-1" isArrayIndex="false">
+                     <value name="savedHeapBefore_magic {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
                </methodReturn>
+               <completedBlockEntry path="/0/0" conditionString="x = TRUE ∧ y = TRUE"/>
             </statement>
          </branchCondition>
          <branchCondition name="¬x = TRUE ∨ ¬y = TRUE" pathCondition="¬(x = TRUE ∧ y = TRUE)" pathConditionChanged="true" branchCondition="¬x = TRUE ∨ ¬y = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -146,9 +167,36 @@
                         </value>
                      </variable>
                   </termination>
+                  <callStateVariable name="x" arrayIndex="-1" isArrayIndex="false">
+                     <value name="x {x = TRUE}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="x = TRUE">
+                     </value>
+                     <value name="x {¬x = TRUE}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="¬x = TRUE">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="y" arrayIndex="-1" isArrayIndex="false">
+                     <value name="y {x = TRUE}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="x = TRUE">
+                     </value>
+                     <value name="y {¬x = TRUE}" typeString="boolean" valueString="y" isValueAnObject="false" isValueUnknown="false" conditionString="¬x = TRUE">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="heapBefore_magic" arrayIndex="-1" isArrayIndex="false">
+                     <value name="heapBefore_magic {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="savedHeapBefore_magic" arrayIndex="-1" isArrayIndex="false">
+                     <value name="savedHeapBefore_magic {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
                </methodReturn>
+               <completedBlockEntry path="/0/0" conditionString="¬(x = TRUE ∧ y = TRUE)"/>
             </statement>
          </branchCondition>
+         <blockCompletionEntry path="/0/0/0/0"/>
+         <blockCompletionEntry path="/0/0/1/0"/>
       </branchStatement>
       <methodReturnEntry path="/0/0/0/0/0"/>
       <methodReturnEntry path="/0/0/1/0/0"/>

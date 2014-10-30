@@ -31,6 +31,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.XMLResources;
 
 /**
  * Extension of {@link DefaultTreeModel} used by {@link InfoTree}.
@@ -48,9 +49,9 @@ public class InfoTreeModel extends DefaultTreeModel {
 
     public InfoTreeModel(Goal goal, XMLResources xmlResources, MainWindow mainWindow) {
         super(new InfoTreeNode());
-        insertAsLast(new RulesNode(xmlResources.ruleExplanations, goal), (InfoTreeNode) root);
-        insertAsLast(new TermLabelsNode(mainWindow, xmlResources.termLabelExplanations), (InfoTreeNode) root);
-        insertAsLast(new FunctionsNode(xmlResources.functionExplanations), (InfoTreeNode) root);
+        insertAsLast(new RulesNode(xmlResources.getRuleExplanations(), goal), (InfoTreeNode) root);
+        insertAsLast(new TermLabelsNode(mainWindow, xmlResources.getTermLabelExplanations()), (InfoTreeNode) root);
+        insertAsLast(new FunctionsNode(xmlResources.getFunctionExplanations()), (InfoTreeNode) root);
     }
 
     private void insertAsLast(InfoTreeNode ins, InfoTreeNode parent) {

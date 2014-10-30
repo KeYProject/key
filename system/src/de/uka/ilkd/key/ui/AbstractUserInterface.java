@@ -33,9 +33,10 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -44,6 +45,7 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class AbstractUserInterface implements UserInterface {
 
     private ProofMacro autoMacro = new SkipMacro();
+    protected boolean saveOnly = false;
 
     private ProverTaskListener pml = null;
 
@@ -51,8 +53,7 @@ public abstract class AbstractUserInterface implements UserInterface {
                                              File bootClassPath, KeYMediator mediator) {
         final ProblemLoader pl =
                 new ProblemLoader(file, classPath, bootClassPath,
-                                  AbstractProfile.getDefaultProfile(), mediator, true, null);
-        pl.addTaskListener(this);
+                                  AbstractProfile.getDefaultProfile(), mediator, true, null, this);
         return pl;
     }
 
@@ -61,6 +62,14 @@ public abstract class AbstractUserInterface implements UserInterface {
         app = forced? app.forceInstantiate(goal): app.tryToInstantiate(goal);
         // cannot complete that app
         return app.complete() ? app : null;
+    }
+
+    public void setSaveOnly(boolean s) {
+        this.saveOnly = s;
+    }
+
+    public boolean isSaveOnly() {
+        return this.saveOnly;
     }
 
     public void setMacro(ProofMacro macro) {
@@ -130,16 +139,22 @@ public abstract class AbstractUserInterface implements UserInterface {
      * {@inheritDoc}
      */
     @Override
-    public DefaultProblemLoader load(Profile profile,
+    public AbstractProblemLoader load(Profile profile,
                                      File file,
                                      List<File> classPath,
                                      File bootClassPath,
                                      Properties poPropertiesToForce) throws ProblemLoaderException {
-       DefaultProblemLoader loader = null;
+       AbstractProblemLoader loader = null;
+       ProblemLoaderException result = null;
        try {
           getMediator().stopInterface(true);
-          loader = new DefaultProblemLoader(file, classPath, bootClassPath, profile, getMediator(), false, poPropertiesToForce);
-          loader.load();
+          loader = new SingleThreadProblemLoader(file, classPath, bootClassPath, profile, getMediator(), false, poPropertiesToForce);
+          if (isSaveOnly()) {
+              // TODO: what is 'saveOnly' and why does the loader save?
+              loader.saveAll();
+          } else {
+              result = loader.load();
+          }
           return loader;
        }
        catch (ProblemLoaderException e) {
@@ -163,7 +178,7 @@ public abstract class AbstractUserInterface implements UserInterface {
        createProofEnvironmentAndRegisterProof(input, proofList, initConfig);
        return proofList.getFirstProof();
     }
-    
+
     /**
      * {@inheritDoc}
      */

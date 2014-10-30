@@ -60,6 +60,12 @@ public interface Term extends SVSubstitute, Sorted {
     public Operator op();
     
     /**
+     * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f")
+     * casted to the passed type.
+     */
+    public <T> T op(Class<T> opClass) throws IllegalArgumentException;
+    
+    /**
      * The subterms.
      */
     public ImmutableArray<Term> subs();

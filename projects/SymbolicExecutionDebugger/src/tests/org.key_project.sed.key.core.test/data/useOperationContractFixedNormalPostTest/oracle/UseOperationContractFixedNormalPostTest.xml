@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_646ce739-f793-4999-abcc-714495e27abd" name="main()" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_66c3fd1a-2c84-4d64-b9f3-9f77a88bb6fe" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_e83feb86-e498-4996-a5fc-e7f298351e48" name="&lt;call UseOperationContractFixedNormalPostTest.main()&gt;" pathCondition="true" lineNumber="-1" charStart="77" charEnd="81" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractFixedNormalPostTest\src\UseOperationContractFixedNormalPostTest.java">
-            <sedStatement xml:id="_55233c36-ec8a-4caf-b806-5ad657939d76" name="int magicNumber = magic(123);" pathCondition="true" lineNumber="-1" charStart="99" charEnd="128" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractFixedNormalPostTest\src\UseOperationContractFixedNormalPostTest.java">
-               <sedMethodContract xml:id="_d646421a-026c-4a87-9833-6089a1442dae" name="result_0 = magic(123) catch(exc_0)
+   <sedTarget xml:id="_1357ff67-666f-4a5f-b171-a625fb6647cd" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_4baa1030-46d0-493b-a177-7f14e8b7c776" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractFixedNormalPostTest\src\UseOperationContractFixedNormalPostTest.java">
+         <sedMethodCall xml:id="_f09b86f7-465f-4b9e-b9fb-20a012606f07" name="&lt;call UseOperationContractFixedNormalPostTest.main()&gt;" pathCondition="true" lineNumber="-1" charStart="77" charEnd="81" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractFixedNormalPostTest\src\UseOperationContractFixedNormalPostTest.java" groupable="true">
+            <sedStatement xml:id="_c111a577-fdcf-479b-a62c-8c56545fa2dd" name="int magicNumber = magic(123);" pathCondition="true" lineNumber="-1" charStart="99" charEnd="128" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractFixedNormalPostTest\src\UseOperationContractFixedNormalPostTest.java">
+               <sedMethodContract xml:id="_a2c0f2e9-b768-4850-8357-6d69ee00846b" name="result_0 = magic(123) catch(exc_0)
 pre: 123 &lt; 0 | 123 &gt;= 0
 post: (   123 &lt; 0
    -&gt;   !exc_0 = null
@@ -13,21 +13,25 @@ post: (   123 &lt; 0
 mod: \if (true)  \then (allLocs)  \else (allLocs)
 \cap \if (123 &gt;= 0)  \then (allLocs)  \else (allLocs)
 termination: diamond" pathCondition="true" lineNumber="-1" charStart="525" charEnd="530" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractFixedNormalPostTest\src\UseOperationContractFixedNormalPostTest.java" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-                  <sedStatement xml:id="_2bb2cacb-a65b-4352-a705-177638d10dfb" name="int magicNumberCopy = magicNumber;" pathCondition="true" lineNumber="-1" charStart="133" charEnd="167" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractFixedNormalPostTest\src\UseOperationContractFixedNormalPostTest.java">
-                     <sedStatement xml:id="_af4bba9b-aa66-47ed-bd67-61834e919d16" name="return magicNumber+magicNumberCopy;" pathCondition="true" lineNumber="-1" charStart="172" charEnd="209" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractFixedNormalPostTest\src\UseOperationContractFixedNormalPostTest.java">
-                        <sedMethodReturn xml:id="_e2425ecd-231c-46c8-9ac1-69c79665c471" name="&lt;return of UseOperationContractFixedNormalPostTest.main()&gt;" pathCondition="true" lineNumber="-1" charStart="77" charEnd="81" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractFixedNormalPostTest\src\UseOperationContractFixedNormalPostTest.java" methodReturnConditionRef="_ccd99ccb-9f40-4706-a5fa-2e12d39bb91c">
-                           <sedTermination xml:id="_55afda1f-0793-4c5a-9107-0773a4dc3ee0" name="&lt;end&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractFixedNormalPostTest\src\UseOperationContractFixedNormalPostTest.java" verified="true">
+                  <sedStatement xml:id="_bc4eed4f-1137-423b-b801-b9d1572722e6" name="int magicNumberCopy = magicNumber;" pathCondition="true" lineNumber="-1" charStart="133" charEnd="167" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractFixedNormalPostTest\src\UseOperationContractFixedNormalPostTest.java">
+                     <sedStatement xml:id="_c98227c4-d7e0-46c4-9945-351e8e3af153" name="return magicNumber+magicNumberCopy;" pathCondition="true" lineNumber="-1" charStart="172" charEnd="209" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractFixedNormalPostTest\src\UseOperationContractFixedNormalPostTest.java">
+                        <sedMethodReturn xml:id="_c7eff62c-1693-4d80-9804-326ed46d9a79" name="&lt;return of UseOperationContractFixedNormalPostTest.main()&gt;" pathCondition="true" lineNumber="-1" charStart="77" charEnd="81" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractFixedNormalPostTest\src\UseOperationContractFixedNormalPostTest.java" methodReturnConditionRef="_8da1e323-685c-495c-8b8b-73790927da6e">
+                           <sedTermination xml:id="_44183e7c-6b72-4cb1-9414-2507fa9bb293" name="&lt;end&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_useOperationContractFixedNormalPostTest\src\UseOperationContractFixedNormalPostTest.java" verified="true">
                            </sedTermination>
+                           <sedGroupStartCondition xml:id="_8da1e323-685c-495c-8b8b-73790927da6e" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                              <sedChildReference nodeIdRef="_c7eff62c-1693-4d80-9804-326ed46d9a79"/>
+                           </sedGroupStartCondition>
                         </sedMethodReturn>
                      </sedStatement>
                   </sedStatement>
                </sedMethodContract>
             </sedStatement>
-            <sedMethodCallMethodReturnCondition xml:id="_ccd99ccb-9f40-4706-a5fa-2e12d39bb91c" name="true" pathCondition="true">
-               <sedChildReference nodeIdRef="_e2425ecd-231c-46c8-9ac1-69c79665c471"/>
+            <sedMethodCallMethodReturnCondition xml:id="_8da1e323-685c-495c-8b8b-73790927da6e" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_c7eff62c-1693-4d80-9804-326ed46d9a79"/>
             </sedMethodCallMethodReturnCondition>
+            <sedGroupEndReference nodeIdRef="_8da1e323-685c-495c-8b8b-73790927da6e"/>
          </sedMethodCall>
-         <sedTerminationEntry nodeIdRef="_55afda1f-0793-4c5a-9107-0773a4dc3ee0"/>
+         <sedTerminationEntry nodeIdRef="_44183e7c-6b72-4cb1-9414-2507fa9bb293"/>
       </sedThread>
    </sedTarget>
 </launch>

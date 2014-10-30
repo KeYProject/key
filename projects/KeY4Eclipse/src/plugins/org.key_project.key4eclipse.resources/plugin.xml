@@ -41,6 +41,9 @@
       <persistent
             value="true">
       </persistent>
+      <attribute
+            name="org.key_project.key4eclipse.resources.ui.marker.attribute.outdated">
+      </attribute>
    </extension>
    <extension
          id="org.key_project.key4eclipse.resources.ui.marker.proofNotClosedMarker"
@@ -55,6 +58,9 @@
       <persistent
             value="true">
       </persistent>
+      <attribute
+            name="org.key_project.key4eclipse.resources.ui.marker.attribute.outdated">
+      </attribute>
    </extension>
    <extension
          id="org.key_project.key4eclipse.resources.ui.marker.problemLoaderExceptionMarker"
@@ -80,6 +86,9 @@
       <persistent
             value="true">
       </persistent>
+      <attribute
+            name="org.key_project.key4eclipse.resources.ui.marker.attribute.outdated">
+      </attribute>
    </extension>
    <extension
          point="org.eclipse.ui.ide.markerResolution">
@@ -162,5 +171,11 @@
             objectClass="org.eclipse.core.resources.IFile"
             state="true">
       </decorator>
+   </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="org.key_project.key4eclipse.resources.builder.KeYResourcesStartup">
+      </startup>
    </extension>
 </plugin>

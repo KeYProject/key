@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call MethodsOnSatisfiable.doSomething()&gt;" pathCondition="true" pathConditionChanged="false">
-      <branchStatement name="if (x_global&gt;=0)" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (x_global&gt;=0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <branchCondition name="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" pathCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="main(x_global);" pathCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="false">
                <methodCall name="&lt;call MethodsOnSatisfiable.main(x_2)&gt;" pathCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="false">
-                  <branchStatement name="if (x_2&gt;=0)" pathCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="false">
+                  <branchStatement name="if (x_2&gt;=0)" pathCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="false" blockOpened="true">
                      <statement name="return 42;" pathCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="false">
                         <methodReturn name="&lt;return of main&gt;" signature="&lt;return of MethodsOnSatisfiable.main(x_2)&gt;" pathCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                            <methodReturn name="&lt;return of doSomething&gt;" signature="&lt;return of MethodsOnSatisfiable.doSomething()&gt;" pathCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))">
                            </methodReturn>
+                           <completedBlockEntry path="/0/0" conditionString="gt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(neglit(1(#))))"/>
+                           <completedBlockEntry path="/0/0/0/0/0/0" conditionString="true"/>
                         </methodReturn>
                      </statement>
+                     <blockCompletionEntry path="/0/0/0/0/0/0/0/0"/>
                   </branchStatement>
                   <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
                </methodCall>
@@ -20,18 +23,23 @@
          <branchCondition name="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="true" branchCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="main(x_global);" pathCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false">
                <methodCall name="&lt;call MethodsOnSatisfiable.main(x_3)&gt;" pathCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false">
-                  <branchStatement name="if (x_3&gt;=0)" pathCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false">
+                  <branchStatement name="if (x_3&gt;=0)" pathCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false" blockOpened="true">
                      <statement name="return -4711;" pathCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false">
                         <methodReturn name="&lt;return of main&gt;" signature="&lt;return of MethodsOnSatisfiable.main(x_3)&gt;" pathCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                            <methodReturn name="&lt;return of doSomething&gt;" signature="&lt;return of MethodsOnSatisfiable.doSomething()&gt;" pathCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))">
                            </methodReturn>
+                           <completedBlockEntry path="/0/0" conditionString="lt(int::select(heap,null,MethodsOnSatisfiable::$x_global),Z(0(#)))"/>
+                           <completedBlockEntry path="/0/0/1/0/0/0" conditionString="true"/>
                         </methodReturn>
                      </statement>
+                     <blockCompletionEntry path="/0/0/1/0/0/0/0/0"/>
                   </branchStatement>
                   <methodReturnEntry path="/0/0/1/0/0/0/0/0"/>
                </methodCall>
             </statement>
          </branchCondition>
+         <blockCompletionEntry path="/0/0/0/0/0/0/0/0"/>
+         <blockCompletionEntry path="/0/0/1/0/0/0/0/0"/>
       </branchStatement>
       <methodReturnEntry path="/0/0/0/0/0/0/0/0/0"/>
       <methodReturnEntry path="/0/0/1/0/0/0/0/0/0"/>

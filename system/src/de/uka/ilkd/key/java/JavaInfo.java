@@ -376,9 +376,9 @@ public final class JavaInfo {
      */
     public KeYJavaType getKeYJavaType(String fullName) {
         KeYJavaType result = getPrimitiveKeYJavaType(fullName);
-        return (result == null ?
-            getTypeByClassName(fullName) :
-            result);
+        return (result == null
+                ? getTypeByClassName(fullName)
+                : result);
     }
 
 
@@ -574,9 +574,8 @@ public final class JavaInfo {
 	ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
 	KeYJavaType clType = getTypeByClassName(className);
 	for(int i=0; i < args.length; i++) {
-        sig = sig.append(getServices().getTypeConverter()
-                .getKeYJavaType(args[i]));
-	}	
+	    sig = sig.append(getServices().getJavaInfo().getKeYJavaType(args[i].sort()));
+	}
 	IProgramMethod pm   = getProgramMethod(clType, methodName, sig, clType);
 	if(pm == null) {
 	    throw new IllegalArgumentException("Program method "+methodName
@@ -970,6 +969,55 @@ public final class JavaInfo {
     public ProgramVariable getAttribute(String attributeName, Sort s) {
 	assert s.extendsTrans(objectSort());
         return getAttribute(attributeName, getKeYJavaType(s));
+    }
+    
+    /*
+     Traverses the type hierarchy to find the first {@link KeYJavaType} in which
+     a field of name {@code fieldName} is declared, starting from parameter {@code kjt}. And
+     then returns a {@link ProgramVariable} for that field/type combination.
+    
+     Type detection in this method is canonical, i.e. selecting a field of name
+     {@code fieldName} on an object of (dynamic) type {@code kjt} during Java program
+     execution would end up in the same type as the type of the returned {@link ProgramVariable}.
+     */
+    public ProgramVariable getCanonicalFieldProgramVariable(String fieldName, KeYJavaType kjt) {
+
+        ImmutableList<ProgramVariable> result = ImmutableSLList.<ProgramVariable>nil();
+
+        if (!(kjt.getSort().extendsTrans(objectSort()))) {
+            return null;
+        }
+
+        if (kjt.getJavaType() instanceof ArrayType) {
+            ProgramVariable var = find(fieldName, getFields(((ArrayDeclaration) kjt.getJavaType())
+                    .getMembers()));
+            if (var != null) {
+                result = result.prepend(var);
+            }
+            var = getAttribute(fieldName, getJavaLangObject());
+            if (var != null) {
+                result = result.prepend(var);
+            }
+            return result.head();
+        }
+
+        // the assert statements below are not for fun, some methods rely
+        // on the correct order
+        ImmutableList<KeYJavaType> hierarchy = kpmi.getAllSupertypes(kjt);
+        assert hierarchy.head() == kjt;
+
+        final Iterator<KeYJavaType> it = hierarchy.iterator();
+        while (it.hasNext()) {
+            KeYJavaType st = it.next();
+            if (st != null) {
+                final ProgramVariable var = getAttribute(fieldName, st);
+                if (var != null) {
+                    return var;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

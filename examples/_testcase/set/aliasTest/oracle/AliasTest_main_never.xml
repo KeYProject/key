@@ -131,6 +131,38 @@ as result of self.main(a,b)&gt;" isReturnValueComputed="true" methodReturnCondit
                         </value>
                      </variable>
                   </termination>
+                  <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                     <value name="self {true}" typeString="AliasTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="a" arrayIndex="-1" isArrayIndex="false">
+                     <value name="a {true}" typeString="AliasTest.IntWrapper" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                           <value name="value {true}" typeString="int" valueString="int::select(heap,a,AliasTest.IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="b" arrayIndex="-1" isArrayIndex="false">
+                     <value name="b {true}" typeString="AliasTest.IntWrapper" valueString="b" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                           <value name="value {true}" typeString="int" valueString="int::select(heap,b,AliasTest.IntWrapper::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="heapBefore_main" arrayIndex="-1" isArrayIndex="false">
+                     <value name="heapBefore_main {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="savedHeapBefore_main" arrayIndex="-1" isArrayIndex="false">
+                     <value name="savedHeapBefore_main {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
                </methodReturn>
             </statement>
          </statement>

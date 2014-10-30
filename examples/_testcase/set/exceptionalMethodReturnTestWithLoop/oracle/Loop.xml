@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.magic(l)&gt;" pathCondition="true" pathConditionChanged="false">
+      <statement name="int x = 3;" pathCondition="true" pathConditionChanged="false">
+         <callStackEntry path="/0"/>
+         <loopStatement name="while ( x&gt;0 )" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+            <callStackEntry path="/0"/>
+            <loopCondition name="x&gt;0" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+               <callStackEntry path="/0"/>
+               <statement name="x--;" pathCondition="true" pathConditionChanged="false">
+                  <callStackEntry path="/0"/>
+                  <branchStatement name="if (this.content==l.content&amp;&amp;x&lt;1)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+                     <callStackEntry path="/0"/>
+                     <branchCondition name="not(equals(l,null))" pathCondition="not(equals(l,null))" pathConditionChanged="true" branchCondition="not(equals(l,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <callStackEntry path="/0"/>
+                        <branchCondition name="not(equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content)))" pathCondition="and(not(equals(l,null)),not(equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content))))" pathConditionChanged="true" branchCondition="not(equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                           <callStackEntry path="/0"/>
+                           <loopCondition name="x&gt;0" pathCondition="and(not(equals(l,null)),not(equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content))))" pathConditionChanged="false" blockOpened="true">
+                              <callStackEntry path="/0"/>
+                              <statement name="x--;" pathCondition="and(not(equals(l,null)),not(equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content))))" pathConditionChanged="false">
+                                 <callStackEntry path="/0"/>
+                                 <branchStatement name="if (this.content==l.content&amp;&amp;x&lt;1)" pathCondition="and(not(equals(l,null)),not(equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content))))" pathConditionChanged="false" blockOpened="false">
+                                    <callStackEntry path="/0"/>
+                                    <loopCondition name="x&gt;0" pathCondition="and(not(equals(l,null)),not(equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content))))" pathConditionChanged="false" blockOpened="true">
+                                       <callStackEntry path="/0"/>
+                                       <statement name="x--;" pathCondition="and(not(equals(l,null)),not(equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content))))" pathConditionChanged="false">
+                                          <callStackEntry path="/0"/>
+                                          <branchStatement name="if (this.content==l.content&amp;&amp;x&lt;1)" pathCondition="and(not(equals(l,null)),not(equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content))))" pathConditionChanged="false" blockOpened="false">
+                                             <callStackEntry path="/0"/>
+                                             <loopCondition name="x&gt;0" pathCondition="and(not(equals(l,null)),not(equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content))))" pathConditionChanged="false" blockOpened="false">
+                                                <callStackEntry path="/0"/>
+                                                <statement name="int j = 3;" pathCondition="and(not(equals(l,null)),not(equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content))))" pathConditionChanged="false">
+                                                   <callStackEntry path="/0"/>
+                                                   <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of self.magic(l)&gt;" pathCondition="and(not(equals(l,null)),not(equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of magic&gt;" signatureIncludingReturnValue="&lt;return of self.magic(l)&gt;" isReturnValueComputed="true" methodReturnCondition="and(not(equals(l,null)),not(equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content))))">
+                                                      <callStackEntry path="/0"/>
+                                                      <termination name="&lt;end&gt;" pathCondition="and(not(equals(l,null)),not(equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                                                      </termination>
+                                                   </methodReturn>
+                                                </statement>
+                                                <completedBlockEntry path="/0/0/0" conditionString="and(not(equals(l,null)),not(equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content))))"/>
+                                             </loopCondition>
+                                             <completedBlockEntry path="/0/0/0/0/0/0/0/0/0/0/0/0" conditionString="true"/>
+                                          </branchStatement>
+                                       </statement>
+                                       <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                       <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
+                                    </loopCondition>
+                                    <completedBlockEntry path="/0/0/0/0/0/0/0/0/0" conditionString="true"/>
+                                    <completedBlockEntry path="/0/0/0/0/0/0/0/0/0/0/0/0" conditionString="and(not(equals(l,null)),not(equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content))))"/>
+                                 </branchStatement>
+                              </statement>
+                              <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
+                           </loopCondition>
+                           <completedBlockEntry path="/0/0/0/0" conditionString="not(equals(l,null))"/>
+                           <completedBlockEntry path="/0/0/0/0/0/0" conditionString="not(equals(l,null))"/>
+                           <completedBlockEntry path="/0/0/0/0/0/0/0/0/0" conditionString="not(equals(l,null))"/>
+                        </branchCondition>
+                        <branchCondition name="equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content))" pathCondition="and(not(equals(l,null)),equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content)))" pathConditionChanged="true" branchCondition="equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                           <callStackEntry path="/0"/>
+                           <loopCondition name="x&gt;0" pathCondition="and(not(equals(l,null)),equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content)))" pathConditionChanged="false" blockOpened="true">
+                              <callStackEntry path="/0"/>
+                              <statement name="x--;" pathCondition="and(not(equals(l,null)),equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content)))" pathConditionChanged="false">
+                                 <callStackEntry path="/0"/>
+                                 <branchStatement name="if (this.content==l.content&amp;&amp;x&lt;1)" pathCondition="and(not(equals(l,null)),equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content)))" pathConditionChanged="false" blockOpened="false">
+                                    <callStackEntry path="/0"/>
+                                    <loopCondition name="x&gt;0" pathCondition="and(not(equals(l,null)),equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content)))" pathConditionChanged="false" blockOpened="true">
+                                       <callStackEntry path="/0"/>
+                                       <statement name="x--;" pathCondition="and(not(equals(l,null)),equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content)))" pathConditionChanged="false">
+                                          <callStackEntry path="/0"/>
+                                          <branchStatement name="if (this.content==l.content&amp;&amp;x&lt;1)" pathCondition="and(not(equals(l,null)),equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content)))" pathConditionChanged="false" blockOpened="true">
+                                             <callStackEntry path="/0"/>
+                                             <statement name="return ;" pathCondition="and(not(equals(l,null)),equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content)))" pathConditionChanged="false">
+                                                <callStackEntry path="/0"/>
+                                                <methodReturn name="&lt;return of magic&gt;" signature="&lt;return of self.magic(l)&gt;" pathCondition="and(not(equals(l,null)),equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content)))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of magic&gt;" signatureIncludingReturnValue="&lt;return of self.magic(l)&gt;" isReturnValueComputed="true" methodReturnCondition="and(not(equals(l,null)),equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content)))">
+                                                   <callStackEntry path="/0"/>
+                                                   <termination name="&lt;end&gt;" pathCondition="and(not(equals(l,null)),equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                                                   </termination>
+                                                   <completedBlockEntry path="/0/0/0" conditionString="and(not(equals(l,null)),equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content)))"/>
+                                                </methodReturn>
+                                                <completedBlockEntry path="/0/0/0/0/0/0/0/1/0/0/0/0" conditionString="true"/>
+                                                <completedBlockEntry path="/0/0/0/0/0/0/0/1/0/0/0/0/0/0" conditionString="true"/>
+                                             </statement>
+                                             <blockCompletionEntry path="/0/0/0/0/0/0/0/1/0/0/0/0/0/0/0"/>
+                                          </branchStatement>
+                                       </statement>
+                                       <blockCompletionEntry path="/0/0/0/0/0/0/0/1/0/0/0/0/0/0/0"/>
+                                       <blockCompletionEntry path="/0/0/0/0/0/0/0/1/0/0/0"/>
+                                    </loopCondition>
+                                    <completedBlockEntry path="/0/0/0/0/0/0/0/1/0" conditionString="true"/>
+                                    <completedBlockEntry path="/0/0/0/0/0/0/0/1/0/0/0/0" conditionString="and(not(equals(l,null)),equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content)))"/>
+                                 </branchStatement>
+                              </statement>
+                              <blockCompletionEntry path="/0/0/0/0/0/0/0/1/0/0/0"/>
+                           </loopCondition>
+                           <completedBlockEntry path="/0/0/0/0" conditionString="not(equals(l,null))"/>
+                           <completedBlockEntry path="/0/0/0/0/0/0" conditionString="not(equals(l,null))"/>
+                           <completedBlockEntry path="/0/0/0/0/0/0/0/1/0" conditionString="not(equals(l,null))"/>
+                        </branchCondition>
+                     </branchCondition>
+                     <branchCondition name="equals(l,null)" pathCondition="equals(l,null)" pathConditionChanged="true" branchCondition="equals(l,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <callStackEntry path="/0"/>
+                        <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call self.magic(l)&gt;&gt;" pathCondition="equals(l,null)" pathConditionChanged="false" methodReturnCondition="equals(l,null)">
+                           <callStackEntry path="/0"/>
+                           <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(l,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                           </termination>
+                           <completedBlockEntry path="/0/0/0" conditionString="equals(l,null)"/>
+                        </exceptionalMethodReturn>
+                        <completedBlockEntry path="/0/0/0/0" conditionString="true"/>
+                        <completedBlockEntry path="/0/0/0/0/0/0" conditionString="true"/>
+                     </branchCondition>
+                     <blockCompletionEntry path="/0/0/0/0/0/0/0/0"/>
+                     <blockCompletionEntry path="/0/0/0/0/0/0/0/1"/>
+                     <blockCompletionEntry path="/0/0/0/0/0/0/1"/>
+                  </branchStatement>
+               </statement>
+               <blockCompletionEntry path="/0/0/0/0/0/0/0/0"/>
+               <blockCompletionEntry path="/0/0/0/0/0/0/0/1"/>
+               <blockCompletionEntry path="/0/0/0/0/0/0/1"/>
+               <blockCompletionEntry path="/0/0"/>
+            </loopCondition>
+            <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+            <blockCompletionEntry path="/0/0/0/0/0/0/0/1/0/0/0/0/0/0/0/0"/>
+            <blockCompletionEntry path="/0/0/0/0/0/0/1/0"/>
+         </loopStatement>
+         <completedBlockEntry path="/0/0/0/0" conditionString="true"/>
+      </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/1/0/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/0/0/1/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/0/1/0/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/0/1/0/0"/>
+</start>

@@ -71,6 +71,7 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
@@ -410,6 +411,18 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       assertTrue("Expected \"" + expected.getName() + "\" but is \"" + current.getName() + "\".", JavaUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
       assertEquals(expected.isPathConditionChanged(), current.isPathConditionChanged());
       assertTrue("Expected \"" + expected.getFormatedPathCondition() + "\" but is \"" + current.getFormatedPathCondition() + "\".", JavaUtil.equalIgnoreWhiteSpace(expected.getFormatedPathCondition(), current.getFormatedPathCondition()));
+      if (compareParent) {
+         if (expected instanceof IExecutionBlockStartNode<?>) {
+            assertTrue(current instanceof IExecutionBlockStartNode<?>);
+            assertEquals(((IExecutionBlockStartNode<?>)expected).isBlockOpened(), ((IExecutionBlockStartNode<?>)current).isBlockOpened());
+            assertBlockCompletions((IExecutionBlockStartNode<?>)expected, (IExecutionBlockStartNode<?>)current);
+         }
+         assertCompletedBlocks(expected, current);
+      }
+      if (expected instanceof IExecutionBaseMethodReturn<?>) {
+         assertTrue(current instanceof IExecutionBaseMethodReturn<?>);
+         assertCallStateVariables((IExecutionBaseMethodReturn<?>) expected, (IExecutionBaseMethodReturn<?>) current, compareVariables, compareConstraints);
+      }
       if (expected instanceof IExecutionBranchCondition) {
          assertTrue("Expected IExecutionBranchCondition but is " + current.getClass() + ".", current instanceof IExecutionBranchCondition);
          assertTrue("Expected \"" + ((IExecutionBranchCondition)expected).getFormatedBranchCondition() + "\" but is \"" + ((IExecutionBranchCondition)current).getFormatedBranchCondition() + "\".", JavaUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)expected).getFormatedBranchCondition(), ((IExecutionBranchCondition)current).getFormatedBranchCondition()));
@@ -519,6 +532,63 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Optionally compare parent
       if (compareParent) {
          assertExecutionNode(expected, current, false, compareVariables, compareCallStack, compareReturnValues, compareConstraints);
+      }
+   }
+
+   /**
+    * Compares the completed blocks.
+    * @param expected The expected {@link IExecutionNode}.
+    * @param current The current {@link IExecutionNode}.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected static void assertCompletedBlocks(IExecutionNode<?> expected, IExecutionNode<?> current) throws ProofInputException {
+      ImmutableList<IExecutionBlockStartNode<?>> expectedEntries = expected.getCompletedBlocks();
+      ImmutableList<IExecutionBlockStartNode<?>> currentEntries = current.getCompletedBlocks();
+      if (expectedEntries != null) {
+         assertNotNull("Completed blocks of \"" + current + "\" should not be null.", currentEntries);
+         assertEquals("Node: " + expected, expectedEntries.size(), currentEntries.size());
+         Iterator<IExecutionBlockStartNode<?>> expectedIter = expectedEntries.iterator();
+         Iterator<IExecutionBlockStartNode<?>> currentIter = currentEntries.iterator();
+         while (expectedIter.hasNext() && currentIter.hasNext()) {
+            IExecutionBlockStartNode<?> expectedNext = expectedIter.next();
+            IExecutionBlockStartNode<?> currentNext = currentIter.next();
+            assertExecutionNode(expectedNext, currentNext, false, false, false, false, false);
+            String expectedCondition = expected.getFormatedBlockCompletionCondition(expectedNext);
+            String currentCondition = current.getFormatedBlockCompletionCondition(currentNext);
+            if (!JavaUtil.equalIgnoreWhiteSpace(expectedCondition, currentCondition)) {
+               assertEquals(expectedCondition, currentCondition);
+            }
+         }
+         assertFalse(expectedIter.hasNext());
+         assertFalse(currentIter.hasNext());
+      }
+      else{
+         assertTrue("Completed block entries of \"" + current + "\" is \"" + currentEntries + "\" but should be null or empty.", currentEntries == null || currentEntries.isEmpty());
+      }
+   }
+
+   /**
+    * Compares the block completions.
+    * @param expected The expected {@link IExecutionBlockStartNode}.
+    * @param current The current {@link IExecutionBlockStartNode}.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected static void assertBlockCompletions(IExecutionBlockStartNode<?> expected, IExecutionBlockStartNode<?> current) throws ProofInputException {
+      ImmutableList<IExecutionNode<?>> expectedEntries = expected.getBlockCompletions();
+      ImmutableList<IExecutionNode<?>> currentEntries = current.getBlockCompletions();
+      if (expectedEntries != null) {
+         assertNotNull("Block completions of \"" + current + "\" should not be null.", currentEntries);
+         assertEquals("Node: " + expected, expectedEntries.size(), currentEntries.size());
+         Iterator<IExecutionNode<?>> expectedIter = expectedEntries.iterator();
+         Iterator<IExecutionNode<?>> currentIter = currentEntries.iterator();
+         while (expectedIter.hasNext() && currentIter.hasNext()) {
+            assertExecutionNode(expectedIter.next(), currentIter.next(), false, false, false, false, false);
+         }
+         assertFalse(expectedIter.hasNext());
+         assertFalse(currentIter.hasNext());
+      }
+      else{
+         assertTrue("Block completion entries of \"" + current + "\" is \"" + currentEntries + "\" but should be null or empty.", currentEntries == null || currentEntries.isEmpty());
       }
    }
 
@@ -668,6 +738,24 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       }
       else {
          assertNull(current);
+      }
+   }
+
+   /**
+    * Makes sure that the given nodes contains the same {@link IExecutionVariable}s of the call state.
+    * @param expected The expected node.
+    * @param current The current node.
+    * @param compareVariables Compare variables?
+    * @param compareConstraints Compare constraints?
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected static void assertCallStateVariables(IExecutionBaseMethodReturn<?> expected, IExecutionBaseMethodReturn<?> current, boolean compareVariables, boolean compareConstraints) throws ProofInputException {
+      if (compareVariables) {
+         assertNotNull(expected);
+         assertNotNull(current);
+         IExecutionVariable[] expectedVariables = expected.getCallStateVariables();
+         IExecutionVariable[] currentVariables = current.getCallStateVariables();
+         assertVariables(expectedVariables, currentVariables, true, true, compareConstraints);
       }
    }
 

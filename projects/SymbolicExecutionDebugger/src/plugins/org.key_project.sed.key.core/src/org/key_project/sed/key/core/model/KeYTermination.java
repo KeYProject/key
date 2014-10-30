@@ -21,6 +21,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.impl.AbstractSEDTermination;
+import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -60,6 +61,11 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYSEDDeb
     * The contained KeY variables.
     */
    private KeYVariable[] variables;
+   
+   /**
+    * The conditions under which a group ending in this node starts.
+    */
+   private SEDMemoryBranchCondition[] groupStartConditions;
 
    /**
     * Constructor.
@@ -270,6 +276,19 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYSEDDeb
       }
       else {
          return null;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public SEDMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
+      synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+         if (groupStartConditions == null) {
+            groupStartConditions = KeYModelUtil.createCompletedBlocksConditions(this);
+         }
+         return groupStartConditions;
       }
    }
 }

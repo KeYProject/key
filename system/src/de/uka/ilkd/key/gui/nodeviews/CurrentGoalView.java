@@ -226,9 +226,6 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         lastHighlightedCaretPos = correctedViewToModel(p);
     }
 
-    /**
-     * makes the last caret position visible (if possible)
-     */
     void restorePosition() {
         int lastHighlightedCaretPosTmp = lastHighlightedCaretPos;
         if (!(lastHighlightedCaretPosTmp < 0 || getDocument() == null
@@ -243,9 +240,9 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     public void setPrinter(Goal goal) {
         filter = new IdentitySequentPrintFilter(goal.sequent());
         setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(null),
-                getMediator().getNotationInfo(),
-                mediator.getServices(),
-                getVisibleTermLabels()));
+                                                    getMediator().getNotationInfo(),
+                                                    mediator.getServices(),
+                                                    getVisibleTermLabels()));
     }
 
     protected SequentPrintFilter getSequentPrintFilter() {
