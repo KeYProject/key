@@ -44,7 +44,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
 
 public class ConsoleUserInterface extends AbstractUserInterface {
     private static final int PROGRESS_BAR_STEPS = 50;
@@ -326,17 +326,18 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        if (batchMode == null || batchMode.isLoadOnly()) {
            return null;
        }
-       final String defaultName =
-               MiscTools.toValidFileName(proof.name().toString()).toString() + fileExtension;
-       File file = new File((new File (Main.getFileNameOnStartUp())).getParent(), defaultName);
-       boolean proofFolderActive = ProofIndependentSettings.DEFAULT_INSTANCE
-                        .getGeneralSettings().storesInDefaultProofFolder();
+       final Pair<File, String> f = fileName(proof, fileExtension);
+       File file = f.first;
+       final String proofSubDir = ProofSaver.PROOF_SUBDIRECTORY;
+       final boolean proofFolderActive = ProofIndependentSettings.DEFAULT_INSTANCE
+                                .getGeneralSettings().storesInDefaultProofFolder();
        String poDir =
                file.getParent().endsWith("src") ?
-                       new File(file.getParent()).getParent() : file.getParent();
+                       new File(file.getParent()).getParent()
+                       : file.getParent();
        String proofDir =
-               (!proofFolderActive || file.getParent().endsWith("/proof")) ?
-               file.getParent() : file.getParent().concat("/proof");
+               (!proofFolderActive || file.getParent().endsWith(proofSubDir)) ?
+               file.getParent() : file.getParent().concat(proofSubDir);
        final File dir = new File(proofDir);
        if (proofFolderActive && !dir.exists() && fileExtension.equals(".proof")) {
            dir.mkdir();

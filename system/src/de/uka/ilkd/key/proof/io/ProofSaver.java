@@ -75,6 +75,7 @@ public class ProofSaver {
    final protected String filename;
    protected Proof proof;
    final protected String internalVersion;
+   public static final String PROOF_SUBDIRECTORY = "/proof";
 
    LogicPrinter printer;
 
