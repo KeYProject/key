@@ -25,6 +25,7 @@ import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.pp.WriterBackend;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /** 
  * this class extends JMenuItem. The objective is to store
@@ -51,13 +52,19 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         StringWriter w = new StringWriter();
         
         WriterBackend backend = new WriterBackend(w, 68);
+        SVInstantiations instantiations;
+        if(ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowUninstantiatedTaclet()) {
+        	instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
+        } else {
+        	instantiations = connectedTo.instantiations();
+        }
         SequentViewLogicPrinter tp = new SequentViewLogicPrinter(new ProgramPrinter(w,
-                connectedTo.instantiations()),
+        	instantiations), //was before: connectedTo.instantiations()
                 notationInfo, backend, services,
                 true,
                 MainWindow.getInstance().getVisibleTermLabels());
         tp.printTaclet(connectedTo.taclet(), 
-        	       connectedTo.instantiations(),
+        	      instantiations, // connectedTo.instantiations(),
         	       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),
 //        	       ProofSettings.DEFAULT_SETTINGS.getViewSettings().getShowWholeTaclet(),
         	       false);
