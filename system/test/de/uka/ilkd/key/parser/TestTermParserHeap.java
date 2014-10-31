@@ -68,6 +68,10 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         String prettySyntax = "heap[a.f := 4][create(a)][memset(empty, 1)][anon(allLocs, heap)]";
         String verboseSyntax = "anon(memset(create(store(heap, a, testTermParserHeap.A::$f, 4), a), empty, 1), allLocs, heap)";
         comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
+
+        prettySyntax = "a.f@h[anon(empty, h2)]";
+        verboseSyntax = "int::select(anon(h, empty, h2), a, testTermParserHeap.A::$f)";
+        comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
     }
 
     /*
@@ -127,14 +131,6 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         compareStringRepresentationAgainstTermRepresentation("(a.next@heap).next.f@h",
                 expectedParseResult,
                 "((a.next@heap)).next.f@h");
-    }
-
-    // resulting from a bug
-    public void testAtAnon() throws Exception {
-        String prettySyntax = "a.f@h[anon({(a, testTermParserHeap.A::$f)}, h2)]";
-        String verboseSyntax = "int::select(anon(h, singleton(a, testTermParserHeap.A::$f), " +
-                "h2), a, testTermParserHeap.A::$f)";
-        comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
     }
 
     /*
