@@ -1815,18 +1815,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         RPAREN
         {
                resolverManager.popLocalVariablesNamespace();
-               if(t2 == null) {
-                  // unguarded version
-	          result = new SLExpression(tb.infiniteUnion(
-	          		declVars.second.toArray(new QuantifiableVariable[declVars.second.size()]), t),
-                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
-               } else {
-                  // guarded version
-                  result = new SLExpression(tb.guardedInfiniteUnion(
-                                                       declVars.second.toArray(new QuantifiableVariable[declVars.second.size()]),
-                                                       t2, t),
-                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
-               }
+               result = translator.translate(JMLTranslator.JMLKeyWord.UNIONINF, declVars, t, t2, javaInfo);
         }
 
     |   pd:DISJOINT LPAREN tlist=storeRefList RPAREN {

@@ -715,6 +715,35 @@ public final class JMLTranslator {
             }
 
         });
+        
+        translationMethods.put(JMLKeyWord.UNIONINF, new JMLTranslationMethod() {
+
+            @Override
+            public SLExpression translate(SLTranslationExceptionManager excManager,
+                            Object... params) throws SLTranslationException {
+
+                checkParameters(params, Pair.class, Term.class, Term.class, JavaInfo.class);
+                @SuppressWarnings("unchecked")
+                Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = (Pair<KeYJavaType, ImmutableList<LogicVariable>>) params[0];
+                Term t = (Term) params[1];
+                Term t2 = (Term) params[2];
+                JavaInfo javaInfo = (JavaInfo) params[3];
+
+                if(t2 == null) {
+                    // unguarded version
+                    return new SLExpression(tb.infiniteUnion(
+                                    declVars.second.toArray(new QuantifiableVariable[declVars.second.size()]), t),
+                                    javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+                } else {
+                    // guarded version
+                    return new SLExpression(tb.guardedInfiniteUnion(
+                                    declVars.second.toArray(new QuantifiableVariable[declVars.second.size()]),
+                                    t2, t),
+                                    javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+                }
+            }
+
+        });
 
         translationMethods.put(JMLKeyWord.SEQ_DEF, new JMLTranslationMethod() {
 
