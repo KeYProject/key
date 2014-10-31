@@ -255,7 +255,7 @@ public abstract class AbstractUserInterface implements UserInterface {
        if (selectedFile == null) {
            defaultName = MiscTools.toValidFileName(proof.name().toString()) + fileExtension;
            selectedFile = new File(jFC.getCurrentDirectory(), defaultName);
-       } else if (selectedFile.getName().endsWith(".proof")) {
+       } else if (selectedFile.getName().endsWith(".proof") && fileExtension.equals(".proof")) {
            defaultName = selectedFile.getName();
        } else {
            defaultName = MiscTools.toValidFileName(proof.name().toString()) + fileExtension;
