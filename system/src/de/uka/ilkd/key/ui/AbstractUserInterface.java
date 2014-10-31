@@ -243,7 +243,7 @@ public abstract class AbstractUserInterface implements UserInterface {
        }
    }
 
-   protected Pair<File, String> fileName(Proof proof, String fileExtension) {
+   protected static Pair<File, String> fileName(Proof proof, String fileExtension) {
        final KeYFileChooser jFC = GuiUtilities.getFileChooser("Choose filename to save proof");
 
        File selectedFile = null;
@@ -258,7 +258,13 @@ public abstract class AbstractUserInterface implements UserInterface {
        } else if (selectedFile.getName().endsWith(".proof") && fileExtension.equals(".proof")) {
            defaultName = selectedFile.getName();
        } else {
-           defaultName = MiscTools.toValidFileName(proof.name().toString()) + fileExtension;
+           String proofName = proof.name().toString();
+           if (proofName.endsWith(".key")) {
+               proofName = proofName.substring(0, proofName.lastIndexOf(".key"));
+           } else if (proofName.endsWith(".proof")) {
+               proofName = proofName.substring(0, proofName.lastIndexOf(".proof"));
+           }
+           defaultName = MiscTools.toValidFileName(proofName) + fileExtension;
            selectedFile = new File(selectedFile.getParentFile(), defaultName);
        }
        return new Pair<File, String>(selectedFile, defaultName);
