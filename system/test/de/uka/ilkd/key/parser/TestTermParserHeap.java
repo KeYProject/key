@@ -132,6 +132,15 @@ public class TestTermParserHeap extends AbstractTestTermParser {
                 "((a.next@heap)).next.f@h");
     }
 
+    // resulting from a bug
+    public void testAtAnon() throws Exception {
+        String prettySyntax = "a.f@h[anon(singleton(a, testTermParserHeap.A::$f), h2)]";
+        String verboseSyntax = "int::select(anon(h, singleton(a, testTermParserHeap.A::$f), " +
+                "h2), a, testTermParserHeap.A::$f)";
+        comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
+    }
+
+
     /*
      * In this test, the @-Operator is applied on a non-select term.
      * This should cause a parser error. This test verifies that the correct
