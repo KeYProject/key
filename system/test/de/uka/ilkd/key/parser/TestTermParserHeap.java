@@ -48,11 +48,16 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         return tf.createTerm(op, params);
     }
 
-    public void testParsePrettyPrintedSelect() throws IOException {
-        String prettySyntax, verboseSyntax;
+    public void testLocationSets() throws IOException {
+        comparePrettySyntaxAgainstVerboseSyntax(
+                "{(a, testTermParserHeap.A::$f)}",
+                "singleton(a,testTermParserHeap.A::$f)",
+                "{(a.f)}");
+    }
 
-        prettySyntax = "a.f";
-        verboseSyntax = "int::select(heap, a, testTermParserHeap.A::$f)";
+    public void testParsePrettyPrintedSelect() throws IOException {
+        String prettySyntax = "a.f";
+        String verboseSyntax = "int::select(heap, a, testTermParserHeap.A::$f)";
         comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
 
         prettySyntax = "a1.f";
@@ -308,9 +313,10 @@ public class TestTermParserHeap extends AbstractTestTermParser {
      * @param verboseSyntax {@link Term} in verbose syntax.
      * @throws IOException
      */
-    private void comparePrettySyntaxAgainstVerboseSyntax(String prettySyntax, String verboseSyntax) throws IOException {
+    private void comparePrettySyntaxAgainstVerboseSyntax(String prettySyntax, String verboseSyntax,
+            String... optionalStringRepresentations) throws IOException {
         Term expectedParseResult = parseTerm(verboseSyntax);
-        compareStringRepresentationAgainstTermRepresentation(prettySyntax, expectedParseResult);
+        compareStringRepresentationAgainstTermRepresentation(prettySyntax, expectedParseResult, optionalStringRepresentations);
     }
 
     /**
