@@ -1,3 +1,9 @@
+example.name = Saddleback Search
+example.file = Saddleback_search.key
+example.additionalFile.1 = Saddleback.java
+example.additionalFile.2 = saddle.dfy
+example.path = Algorithms
+
 This has been proposed by an exercise by Rustan Leino during the
 Marktoberdorf Summer School in 2011.
 
@@ -16,13 +22,9 @@ the value has been found.
 This directory contains the solution in Dafny (saddle.dfy) and in
 Java+JML (Saddleback.java).
 
-The Dafny verifier takes ~ 5s to verify it.
+The Dafny verifier takes ~ 5s to verify it. (Source attached for
+comparison)
 
-The proof cannot be closed automatically by KeY itself at the
-moment. :-( Using the default settings, you can run the proof search
-for some 5000 steps and then call Z3 to close the remaining goals
-quasi-instantaniously.
-
-Update 2011-09-26: If the quantifiers in the sorting preconditions are
-applied in a different order, the proof goes through automatically in
-21662 nodes on 145 branches.
+If the quantifiers in the sorting preconditions are applied in the right
+order, the proof goes through automatically in 21662 nodes on 145 
+branches.
