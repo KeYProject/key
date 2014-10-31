@@ -2699,8 +2699,8 @@ term110 returns [Term _term110 = null]
 @after { _term110 = result; }
     :
         (
-            result = accessterm  |
-            result = update_or_substitution
+            ( LBRACE ~LPAREN ) => result = update_or_substitution |
+            result = accessterm
         ) 
         {
 	/*
@@ -3070,6 +3070,8 @@ atom returns [Term _atom = null]
     |   LPAREN a = term RPAREN
     |   TRUE  { a = getTermFactory().createTerm(Junctor.TRUE); }
     |   FALSE { a = getTermFactory().createTerm(Junctor.FALSE); }
+    |   LBRACE LPAREN obj=equivalence_term COMMA field=equivalence_term RPAREN RBRACE
+            { a = getServices().getTermBuilder().singleton(obj, field); }
     |   a = ifThenElseTerm
     |   a = ifExThenElseTerm
     |   literal=STRING_LITERAL
