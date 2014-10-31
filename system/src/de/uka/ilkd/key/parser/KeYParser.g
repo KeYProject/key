@@ -2933,8 +2933,7 @@ heap_selection_suffix [Term term] returns [Term result]
     { result = heapSelectionSuffix(term, heap); }
     ;
 
-accessterm_bracket_suffix[Term reference] returns [Term result, boolean increaseHeapSuffixCounter]
-@init{ $increaseHeapSuffixCounter = false; }
+accessterm_bracket_suffix[Term reference] returns [Term result, boolean increaseHeapSuffixCounter = false]
     :
     { isHeapTerm(reference) }? tmp = heap_update_suffix[reference] { $result = tmp; }
     | { isSequenceTerm(reference) }? tmp = seq_get_suffix[reference] { $result = tmp; }
