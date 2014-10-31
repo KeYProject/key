@@ -133,9 +133,9 @@ public final class ExampleChooser extends JDialog {
          */
         private static final String ADDITIONAL_FILE_PREFIX = "example.additionalFile.";
 
-        private File directory;
-        private String description;
-        private Properties properties;
+        private final File directory;
+        private final String description;
+        private final Properties properties;
 
         public Example(File file) throws IOException {
             this.directory = file.getParentFile();
@@ -143,6 +143,10 @@ public final class ExampleChooser extends JDialog {
             StringBuilder sb = new StringBuilder();
             extractDescription(file, sb, properties);
             this.description = sb.toString();
+        }
+
+        public File getDirectory() {
+           return directory;
         }
 
         public File getProofFile() {
