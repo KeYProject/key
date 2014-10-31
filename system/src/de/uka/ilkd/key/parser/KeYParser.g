@@ -2461,19 +2461,11 @@ formula returns [Term _formula = null]
         }
     ;
 
-term returns [Term result]
+term returns [Term result] 
     :
-    t = equivalence_term { $result = t; }
-    ;
-catch [TermCreationException ex] {
-    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
-}
-
-equivalence_term returns [Term _equivalence_term = null] 
-@after{ _equivalence_term = a; }
-    :   a=implication_term 
-        (EQV a1=implication_term 
-            { a = getTermFactory().createTerm(Equality.EQV, new Term[]{a, a1});} )*
+    a = implication_term {$result = a;}
+    (EQV a1 = implication_term 
+            { $result = getTermFactory().createTerm(Equality.EQV, new Term[]{$result, a1});} )*
 ;
 catch [TermCreationException ex] {
     keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
@@ -2958,8 +2950,8 @@ heap_update_suffix [Term heap] returns [Term result = heap]
     : // TODO find the right kind of non-terminal for "o.f" and "a[i]"
       // and do not resign to parsing an arbitrary term
     LBRACKET
-    ( (equivalence_term ASSIGN) =>
-       location = location_term ASSIGN value = equivalence_term
+    ( (term ASSIGN) =>
+       location = location_term ASSIGN value = term
         {
            result = getServices().getTermBuilder().store(heap, $location.object, $location.field, value);
         }
@@ -2992,8 +2984,8 @@ location_term returns [Term object, Term field, Term asSingleton]
 @after{ $asSingleton = getTermBuilder().singleton($object, $field);}
     :
     (
-        (LPAREN equivalence_term COMMA) => 
-            LPAREN o = equivalence_term COMMA f = equivalence_term RPAREN
+        (LPAREN term COMMA) => 
+            LPAREN o = term COMMA f = term RPAREN
             { $object = o; $field = f; }
     )
     | t = accessterm
@@ -3256,7 +3248,7 @@ quantifierterm returns [Term _quantifier_term = null]
 braces_term returns [Term result]
 :
     (LBRACE SUBST) => subst = substitutionterm { $result = subst; }
-    | (LBRACE equivalence_term ASSIGN equivalence_term (PARALLEL equivalence_term ASSIGN equivalence_term)*) =>
+    | (LBRACE term ASSIGN term (PARALLEL term ASSIGN term)*) =>
         updateTerm = update_term { $result = updateTerm; }
     | locSet = locset_term {$result = locSet; }
     ; 
@@ -3309,7 +3301,7 @@ update_term returns [Term result]
         
 elementary_update_term returns[Term result]
     :
-    left = equivalence_term ASSIGN right = equivalence_term
+    left = term ASSIGN right = term
     { result = getServices().getTermBuilder().elementary(left, right); }
     ;
         
