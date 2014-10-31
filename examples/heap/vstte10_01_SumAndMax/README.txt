@@ -1,3 +1,7 @@
+example.name = 1 - Sum and Max
+example.path = Benchmarks/VSComp 10
+example.additionalFile.1 = src/SumAndMax.java
+
 The first challenge from the Verified Software Competition (VSComp) at VSTTE'10, organised by Peter Mueller and Natarajan Shankar: 
 
 Given an N-element array of natural numbers, write a program to compute the sum and the maximum of the elements in the array.

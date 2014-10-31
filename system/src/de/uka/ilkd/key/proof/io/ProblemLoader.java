@@ -62,11 +62,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
 
    private Throwable doWork() {
       try {
-          if (getMediator().getUI().isSaveOnly()) {
-              return saveAll();
-          } else {
-              return load();
-          }
+          return load();
       } catch (final ExceptionHandlerException exception) {
           final String errorMessage = "Failed to load "
                   + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
