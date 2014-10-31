@@ -74,17 +74,15 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
 
         /*
-         * Testing a more complicated term in which bracket syntax is applied before and
-         * after @-Operator.
+         * Testing a more complicated term in which bracket syntax is applied
+         * before and after @-Operator.
          */
-        prettySyntax = "a.next.next.next.array[i]@" + complicatedHeapPretty;
+        prettySyntax = "a.next.next.array[i]@" + complicatedHeapPretty;
         verboseSyntax = "int::select(" + complicatedHeapVerbose + ", "
                 + "int[]::select(" + complicatedHeapVerbose + ", "
                 + "testTermParserHeap.A::select(" + complicatedHeapVerbose + ", "
                 + "testTermParserHeap.A::select(" + complicatedHeapVerbose + ", "
-                + "testTermParserHeap.A::select(" + complicatedHeapVerbose + ", "
                 + " a, testTermParserHeap.A::$next)"
-                + ", testTermParserHeap.A::$next)"
                 + ", testTermParserHeap.A::$next)"
                 + ", testTermParserHeap.A::$array)"
                 + ", arr(i))";
