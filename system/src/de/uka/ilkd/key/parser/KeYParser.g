@@ -2907,7 +2907,11 @@ accessterm returns [Term _accessterm = null]
         result = atom { implicitHeapSuffixCounter = globalImplicitHeapSuffixCounter; }
       )
          
-         ( result = accessterm_bracket_suffix[result] { implicitHeapSuffixCounter++; }
+         ( abs = accessterm_bracket_suffix[result]
+             {
+                 result = $abs.result;
+                 if($abs.increaseHeapSuffixCounter) implicitHeapSuffixCounter++;
+             }
          | result = attribute_or_query_suffix[result] { implicitHeapSuffixCounter++; }
          )*
          
@@ -2926,12 +2930,12 @@ heap_selection_suffix [Term term] returns [Term result]
     { result = heapSelectionSuffix(term, heap); }
     ;
 
-accessterm_bracket_suffix[Term reference] returns [Term resultAtAfter]
-@after{resultAtAfter = result;}
+accessterm_bracket_suffix[Term reference] returns [Term result, boolean increaseHeapSuffixCounter]
+@init{ $increaseHeapSuffixCounter = false; }
     :
-    {isHeapTerm(reference)}? result = heap_update_suffix[reference]
-    | {isSequenceTerm(reference)}? result = seq_get_suffix[reference]
-    | result = array_access_suffix[reference]
+    { isHeapTerm(reference) }? tmp = heap_update_suffix[reference] { $result = tmp; }
+    | { isSequenceTerm(reference) }? tmp = seq_get_suffix[reference] { $result = tmp; }
+    | tmp = array_access_suffix[reference] { $result = tmp; $increaseHeapSuffixCounter = true; }
     ;
 
 seq_get_suffix[Term reference] returns [Term result]
