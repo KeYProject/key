@@ -1405,17 +1405,8 @@ options {
         return pm;
     }
 
-
     public void addFunction(Function f) {
         functions().add(f);
-    }
-    
-    /*
-     * Replace standard heap by another heap in an observer function.
-     */
-    protected Term heapSelectionSuffix(Term term, Term heap) throws RecognitionException {
-    	// See file KeYParser.java for implementation.
-        throw new UnsupportedOperationException();
     }
     
     private ImmutableSet<Modality> lookupOperatorSV(String opName, ImmutableSet<Modality> modalities) 
@@ -1452,6 +1443,72 @@ options {
     private static class PairOfStringAndJavaBlock {
       String opName;
       JavaBlock javaBlock;
+    }
+    
+    private static boolean isSelectTerm(Term term) {
+        return term.op().name().toString().endsWith("::select") && term.arity() == 3;
+    }
+
+    private boolean isImplicitHeap(Term t) {
+        return getServices().getTermBuilder().getBaseHeap().equals(t);
+    }
+
+    // This is used for testing in TestTermParserHeap.java
+    public static final String NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE
+            = "Expecting select term before '@', not: ";
+
+    private Term replaceHeap(Term term, Term heap, int depth) throws RecognitionException {
+        if (depth > 0) {
+
+            if (isSelectTerm(term)) {
+
+                if (!isImplicitHeap(term.sub(0))) {
+                    semanticError("Expecting program variable heap as first argument of: " + term);
+                }
+
+                Term[] params = new Term[]{heap, replaceHeap(term.sub(1), heap, depth - 1), term.sub(2)};
+                return (getServices().getTermFactory().createTerm(term.op(), params));
+
+            } else if (term.op() instanceof ObserverFunction) {
+                if (!isImplicitHeap(term.sub(0))) {
+                    semanticError("Expecting program variable heap as first argument of: " + term);
+                }
+
+                Term[] params = new Term[term.arity()];
+                params[0] = heap;
+                params[1] = replaceHeap(term.sub(1), heap, depth - 1);
+                for (int i = 2; i < params.length; i++) {
+                    params[i] = term.sub(i);
+                }
+
+                return (getServices().getTermFactory().createTerm(term.op(), params));
+
+            } else {
+                semanticError(NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE + term);
+                throw new RecognitionException();
+            }
+
+        } else {
+            return term;
+        }
+    }
+
+    /*
+     * Replace standard heap by another heap in an observer function.
+     */
+    protected Term heapSelectionSuffix(Term term, Term heap) throws RecognitionException {
+
+        if (!isHeapTerm(heap)) {
+            semanticError("Expecting term of type Heap but sort is " + heap.sort()
+                    + " for term: " + term);
+        }
+
+        Term result = replaceHeap(term, heap, globalImplicitHeapSuffixCounter);
+
+        // reset globalImplicitHeapSuffixCounter
+        globalImplicitHeapSuffixCounter = 0;
+
+        return result;
     }
 
 }
