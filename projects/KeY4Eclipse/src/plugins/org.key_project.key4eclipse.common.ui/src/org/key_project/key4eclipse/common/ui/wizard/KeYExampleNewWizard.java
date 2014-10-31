@@ -42,7 +42,6 @@ import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.gui.ExampleChooser;
-import de.uka.ilkd.key.gui.ExampleChooser.ShortFile;
 
 /**
  * The "KeY Example" wizard used to create new Java Projects with example
@@ -81,7 +80,7 @@ public class KeYExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
       // Compute next page
       IWizardPage nextPage = super.getNextPage(page);
       // Update project name if required
-      ShortFile example = examplePage.getSelectedExample();
+      ExampleChooser.Example example = examplePage.getSelectedExample();
       if (example != null) {
          if (nextPage instanceof NewJavaProjectWizardPageOne) {
             NewJavaProjectWizardPageOne one = (NewJavaProjectWizardPageOne)nextPage;
@@ -107,8 +106,9 @@ public class KeYExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
    @Override
    protected boolean createExampleContent(IContainer sourceDirectory) throws Exception {
       // List example content
-      File example = examplePage.getSelectedExample().getFile();
-      File[] exampleContent = example.listFiles();
+      ExampleChooser.Example example = examplePage.getSelectedExample();
+      File exampleDirectory = example.getDirectory();
+      File[] exampleContent = exampleDirectory.listFiles();
       // Separate between source and project content
       List<File> projectContent = new LinkedList<File>();
       List<File> sourceContent = new LinkedList<File>();
@@ -142,14 +142,14 @@ public class KeYExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
                }
             }
             // Make sure that no additional folders exist and source root folder content is stored in projects source folder
-            if (example.equals(firstFolder)) {
+            if (exampleDirectory.equals(firstFolder)) {
                // Java file is contained in example root folder
                sourceContent.add(content);
             }
             else {
                // Remove additional folder
                File parent = firstFolder;
-               Assert.isTrue(example.equals(parent.getParentFile()), "Additional deep source folder structures are not supported.");
+               Assert.isTrue(exampleDirectory.equals(parent.getParentFile()), "Additional deep source folder structures are not supported.");
                // Add source content
                CollectionUtil.addAll(sourceContent, parent.listFiles());
                oldNames.add(firstFolder.getName());
