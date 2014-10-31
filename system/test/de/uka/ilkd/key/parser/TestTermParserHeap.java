@@ -65,12 +65,29 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     public void testBracketHeapUpdate() throws IOException {
-        String prettySyntax = "heap[a.f := 4][create(a)][memset(empty, 1)][anon(allLocs, heap)]";
-        String verboseSyntax = "anon(memset(create(store(heap, a, testTermParserHeap.A::$f, 4), a), empty, 1), allLocs, heap)";
+        String complicatedHeapPretty = "heap[a.f := 4][create(a)][memset(empty, 1)][anon(allLocs, heap)]";
+        String complicatedHeapVerbose = "anon(memset(create(store(heap, a, testTermParserHeap.A::$f, 4), a), empty, 1), allLocs, heap)";
+        comparePrettySyntaxAgainstVerboseSyntax(complicatedHeapPretty, complicatedHeapVerbose);
+
+        String prettySyntax = "a.f@h[anon(empty, h2)]";
+        String verboseSyntax = "int::select(anon(h, empty, h2), a, testTermParserHeap.A::$f)";
         comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
 
-        prettySyntax = "a.f@h[anon(empty, h2)]";
-        verboseSyntax = "int::select(anon(h, empty, h2), a, testTermParserHeap.A::$f)";
+        /*
+         * Testing a more complicated term in which bracket syntax is applied before and
+         * after @-Operator.
+         */
+        prettySyntax = "a.next.next.next.array[i]@" + complicatedHeapPretty;
+        verboseSyntax = "int::select(" + complicatedHeapVerbose + ", "
+                + "int[]::select(" + complicatedHeapVerbose + ", "
+                + "testTermParserHeap.A::select(" + complicatedHeapVerbose + ", "
+                + "testTermParserHeap.A::select(" + complicatedHeapVerbose + ", "
+                + "testTermParserHeap.A::select(" + complicatedHeapVerbose + ", "
+                + " a, testTermParserHeap.A::$next)"
+                + ", testTermParserHeap.A::$next)"
+                + ", testTermParserHeap.A::$next)"
+                + ", testTermParserHeap.A::$array)"
+                + ", arr(i))";
         comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
     }
 
