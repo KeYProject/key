@@ -328,6 +328,12 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        }
        final Pair<File, String> f = fileName(proof, fileExtension);
        File file = f.first;
+       String defaultName = f.second;
+
+       final String recDir = file != null ?
+               file.getParent() : new File(Main.getFileNameOnStartUp()).getParent();
+       file = (defaultName != null) ? new File(recDir, defaultName): file;
+
        final String proofSubDir = ProofSaver.PROOF_SUBDIRECTORY;
        final boolean proofFolderActive = ProofIndependentSettings.DEFAULT_INSTANCE
                                 .getGeneralSettings().storesInDefaultProofFolder();
@@ -343,7 +349,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
            dir.mkdir();
        }
        file = new File(fileExtension.equals(".key") ? poDir : proofDir, file.getName());
-       ProofSaver saver = new ProofSaver(proof, file.getPath(), Main.INTERNAL_VERSION);
+       ProofSaver saver = new ProofSaver(proof, file.getAbsolutePath(), Main.INTERNAL_VERSION);
        try {
            saver.save();
        } catch (IOException e) {

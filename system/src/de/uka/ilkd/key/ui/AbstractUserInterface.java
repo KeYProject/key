@@ -259,7 +259,7 @@ public abstract class AbstractUserInterface implements UserInterface {
            defaultName = selectedFile.getName();
        } else {
            defaultName = MiscTools.toValidFileName(proof.name().toString()) + fileExtension;
-           selectedFile = new File(selectedFile, defaultName);
+           selectedFile = new File(selectedFile.getParentFile(), defaultName);
        }
        return new Pair<File, String>(selectedFile, defaultName);
    }
