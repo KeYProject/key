@@ -52,7 +52,14 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         comparePrettySyntaxAgainstVerboseSyntax(
                 "{(a, testTermParserHeap.A::$f)}",
                 "singleton(a,testTermParserHeap.A::$f)",
-                "{(a.f)}");
+                "{(a.f)}", "{a.f}");
+
+        Term actual = parseTerm("{a.f, a.f, a.f}");
+        Term expected = parseTerm("union(union("
+                + "singleton(a,testTermParserHeap.A::$f)"
+                + ",singleton(a,testTermParserHeap.A::$f))"
+                + ",singleton(a,testTermParserHeap.A::$f))");
+        assertEquals(expected, actual);
     }
 
     public void testParsePrettyPrintedSelect() throws IOException {

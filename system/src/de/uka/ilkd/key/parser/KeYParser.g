@@ -2461,38 +2461,13 @@ formula returns [Term _formula = null]
         }
     ;
 
-term returns [Term _term = null]
-@after { _term = result; }
+term returns [Term result]
     :
-        result = elementary_update_term
-        (
-           PARALLEL a = elementary_update_term
-           {
-               result = getTermFactory().createTerm(UpdateJunctor.PARALLEL_UPDATE, result, a);
-           }
-            
-        )*
+    t = equivalence_term { $result = t; }
     ;
 catch [TermCreationException ex] {
     keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
 }
-        
-        
-elementary_update_term returns[Term _elementary_update_term=null]
-@after { _elementary_update_term = result; }
-:
-        result = equivalence_term 
-        (
-            ASSIGN a = equivalence_term
-            {
-                result = getServices().getTermBuilder().elementary(result, a);
-            }
-        )?
-   ;
-catch [TermCreationException ex] {
-    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
-}
-
 
 equivalence_term returns [Term _equivalence_term = null] 
 @after{ _equivalence_term = a; }
@@ -3280,8 +3255,10 @@ quantifierterm returns [Term _quantifier_term = null]
  */
 braces_term returns [Term result]
 :
-      (LBRACE SUBST) => subst = substitutionterm { $result = subst; }
-      |  update = update_or_locset { $result = update; }
+    (LBRACE SUBST) => subst = substitutionterm { $result = subst; }
+    | (LBRACE equivalence_term ASSIGN equivalence_term (PARALLEL equivalence_term ASSIGN equivalence_term)*) =>
+        updateTerm = update_term { $result = updateTerm; }
+    | locSet = locset_term {$result = locSet; }
     ; 
 
 substitutionterm returns [Term _substitution_term = null] 
@@ -3317,17 +3294,24 @@ catch [TermCreationException ex] {
     keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
 }
 
-update_or_locset returns [Term result]
+update_term returns [Term result]
     :
-    (LBRACE RBRACE) => locset_term
-    //{ isHeapTerm(term) }? locationList = location_list { $result = locationList; }
-    | LBRACE u=term RBRACE
-    ( a2=term110  | a2=unary_formula )
-       { $result = getTermFactory().createTerm(UpdateApplication.UPDATE_APPLICATION, u, a2); }
+    LBRACE
+    elem = elementary_update_term { $result = elem; }
+    (
+        PARALLEL elem = elementary_update_term
+        { $result = getTermFactory().createTerm(UpdateJunctor.PARALLEL_UPDATE, $result, elem); }
+    )*
+    RBRACE
+    ( t = term110  | t = unary_formula )
+       { $result = getTermFactory().createTerm(UpdateApplication.UPDATE_APPLICATION, $result, t); }
     ;
-catch [TermCreationException ex] {
-    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
-}
+        
+elementary_update_term returns[Term result]
+    :
+    left = equivalence_term ASSIGN right = equivalence_term
+    { result = getServices().getTermBuilder().elementary(left, right); }
+    ;
         
 bound_variables returns[ImmutableList<QuantifiableVariable> list = ImmutableSLList.<QuantifiableVariable>nil()]
 :
