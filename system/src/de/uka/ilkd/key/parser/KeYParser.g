@@ -163,12 +163,15 @@ options {
    
    /*
     counter variable for parser rules accessterm and heap_selection suffix:
-    - stores nesting depth of alpha::select(h,o,f)-terms created via pretty syntax	
+    - stores nesting depth of alpha::select(heap,o,f)-terms created via pretty syntax	(i.e. terms of the form: o.f)
     - rule accessterm increases the counter
     - rule heap_selection_suffix calls method heapSelectionSuffix(), which resets
       the counter
+    - In case a term similar to o.f1.f2.f3.f4 would occur, this variable should have a value of 4.
+      The non-pretty syntax of this term would look similar to the following:
+          T::select(h, T::select(h, T::select(h, T::select(h, o, f1) , f2) , f3), f4)
    */
-   protected int globalImplicitHeapSuffixCounter = 0;
+   protected int globalSelectNestingDepth = 0;
 
    private int lineOffset=0;
    private int colOffset=0;
@@ -1503,10 +1506,10 @@ options {
                     + " for term: " + term);
         }
 
-        Term result = replaceHeap(term, heap, globalImplicitHeapSuffixCounter);
+        Term result = replaceHeap(term, heap, globalSelectNestingDepth);
 
-        // reset globalImplicitHeapSuffixCounter
-        globalImplicitHeapSuffixCounter = 0;
+        // reset globalSelectNestingDepth
+        globalSelectNestingDepth = 0;
 
         return result;
     }
@@ -2869,7 +2872,7 @@ catch [TermCreationException ex] {
 
 //term120
 accessterm returns [Term _accessterm = null]
-@init{ int implicitHeapSuffixCounter = globalImplicitHeapSuffixCounter; }
+@init{ int selectNestingDepth = globalSelectNestingDepth; }
 @after { _accessterm = result; }
     :
       (MINUS ~NUM_LITERAL) => MINUS result = term110
@@ -2899,26 +2902,26 @@ accessterm returns [Term _accessterm = null]
 	}
       |
       ( {isStaticQuery()}? // look for package1.package2.Class.query(
-        result = static_query { implicitHeapSuffixCounter++; }
+        result = static_query { selectNestingDepth++; }
       |
         {isStaticAttribute()}?            // look for package1.package2.Class.attr
-        result = static_attribute_suffix { implicitHeapSuffixCounter++; }
+        result = static_attribute_suffix { selectNestingDepth++; }
       |
-        result = atom { implicitHeapSuffixCounter = globalImplicitHeapSuffixCounter; }
+        result = atom { selectNestingDepth = globalSelectNestingDepth; }
       )
          
          ( abs = accessterm_bracket_suffix[result]
              {
                  result = $abs.result;
-                 if($abs.increaseHeapSuffixCounter) implicitHeapSuffixCounter++;
+                 if($abs.increaseHeapSuffixCounter) selectNestingDepth++;
              }
-         | result = attribute_or_query_suffix[result] { implicitHeapSuffixCounter++; }
+         | result = attribute_or_query_suffix[result] { selectNestingDepth++; }
          )*
          
-         { globalImplicitHeapSuffixCounter = implicitHeapSuffixCounter; }
+         { globalSelectNestingDepth = selectNestingDepth; }
          
     // at most one heap selection suffix
-    ( result = heap_selection_suffix[result] )? // resets globalImplicitHeapSuffixCounter to zero
+    ( result = heap_selection_suffix[result] )? // resets globalSelectNestingDepth to zero
     ;
 catch [TermCreationException ex] {
     keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
