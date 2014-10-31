@@ -736,7 +736,7 @@ public final class JMLTranslator {
                                     javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
                 } else {
                     // guarded version
-                    return new SLExpression(tb.guardedInfiniteUnion(
+                    return new SLExpression(tb.infiniteUnion(
                                     declVars.second.toArray(new QuantifiableVariable[declVars.second.size()]),
                                     t2, t),
                                     javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
@@ -1064,7 +1064,7 @@ public final class JMLTranslator {
                 final LogicVariable fieldLV
                 = new LogicVariable(new Name("f"), services.getTypeConverter().getHeapLDT().getFieldSort());
                 final Term locSet
-                = tb.guardedSetComprehension(new LogicVariable[]{objLV, fieldLV},
+                = tb.setComprehension(new LogicVariable[]{objLV, fieldLV},
                         reach,
                         o2,
                         tb.var(fieldLV));
