@@ -399,7 +399,7 @@ options {
     private boolean isProblemParser() {
 	return parserMode == ParserMode.PROBLEM;
     }
-    
+
     public void reportError(RecognitionException ex){
         keh.reportException(ex);
     }
@@ -427,12 +427,8 @@ options {
         return services;
     }
     
-    public TermFactory getTermFactory() {
+     public TermFactory getTermFactory() {
        return getServices().getTermFactory();
-    }
-    
-    public TermBuilder getTermBuilder() {
-       return getServices().getTermBuilder();
     }
 
     public NamespaceSet namespaces() {
@@ -2461,15 +2457,51 @@ formula returns [Term _formula = null]
         }
     ;
 
-term returns [Term result] 
+term returns [Term _term = null]
+@after { _term = result; }
     :
-    a = implication_term {$result = a;}
-    (EQV a1 = implication_term 
-            { $result = getTermFactory().createTerm(Equality.EQV, new Term[]{$result, a1});} )*
+        result=elementary_update_term
+        (
+           PARALLEL a=elementary_update_term
+           {
+               result = getTermFactory().createTerm(UpdateJunctor.PARALLEL_UPDATE, result, a);
+           }
+            
+        )*
+    ;
+        catch [TermCreationException ex] {
+              keh.reportException
+		(new KeYSemanticException(input, getSourceName(), ex));
+        }
+        
+        
+elementary_update_term returns[Term _elementary_update_term=null]
+@after { _elementary_update_term = result; }
+:
+        result=equivalence_term 
+        (
+            ASSIGN a=equivalence_term
+            {
+                result = getServices().getTermBuilder().elementary(result, a);
+            }
+        )?
+   ;
+        catch [TermCreationException ex] {
+              keh.reportException
+			(new KeYSemanticException(input, getSourceName(), ex));
+        }
+
+
+equivalence_term returns [Term _equivalence_term = null] 
+@after{ _equivalence_term = a; }
+    :   a=implication_term 
+        (EQV a1=implication_term 
+            { a = getTermFactory().createTerm(Equality.EQV, new Term[]{a, a1});} )*
 ;
-catch [TermCreationException ex] {
-    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
-}
+        catch [TermCreationException ex] {
+              keh.reportException
+                (new KeYSemanticException(input, getSourceName(), ex));
+        }
 
 implication_term returns [Term _implication_term = null] 
 @after{ _implication_term = a; }
@@ -2477,9 +2509,10 @@ implication_term returns [Term _implication_term = null]
         (IMP a1=implication_term 
             { a = getTermFactory().createTerm(Junctor.IMP, new Term[]{a, a1});} )?
 ;
-catch [TermCreationException ex] {
-    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
-}
+        catch [TermCreationException ex] {
+              keh.reportException
+                (new KeYSemanticException(input, getSourceName(), ex));
+        }
 
 disjunction_term returns [Term _disjunction_term = null] 
 @after { _disjunction_term = a; }
@@ -2487,9 +2520,10 @@ disjunction_term returns [Term _disjunction_term = null]
         (OR a1=conjunction_term 
             { a = getTermFactory().createTerm(Junctor.OR, new Term[]{a, a1});} )*
 ;
-catch [TermCreationException ex] {
-    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
-}
+        catch [TermCreationException ex] {
+              keh.reportException
+                (new KeYSemanticException(input, getSourceName(), ex));
+        }
 
 conjunction_term returns [Term _conjunction_term = null] 
 @after { _conjunction_term = a; }
@@ -2665,7 +2699,7 @@ term110 returns [Term _term110 = null]
 @after { _term110 = result; }
     :
         (
-            ( LBRACE ~LPAREN ) => result = braces_term |
+            ( LBRACE ~LPAREN ) => result = update_or_substitution |
             result = accessterm
         ) 
         {
@@ -2899,7 +2933,8 @@ heap_selection_suffix [Term term] returns [Term result]
     { result = heapSelectionSuffix(term, heap); }
     ;
 
-accessterm_bracket_suffix[Term reference] returns [Term result, boolean increaseHeapSuffixCounter = false]
+accessterm_bracket_suffix[Term reference] returns [Term result, boolean increaseHeapSuffixCounter]
+@init{ $increaseHeapSuffixCounter = false; }
     :
     { isHeapTerm(reference) }? tmp = heap_update_suffix[reference] { $result = tmp; }
     | { isSequenceTerm(reference) }? tmp = seq_get_suffix[reference] { $result = tmp; }
@@ -2946,14 +2981,16 @@ catch [TermCreationException ex] {
     keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
 }
 
-heap_update_suffix [Term heap] returns [Term result = heap]
+heap_update_suffix [Term heap] returns [Term result=heap]
     : // TODO find the right kind of non-terminal for "o.f" and "a[i]"
       // and do not resign to parsing an arbitrary term
     LBRACKET
-    ( (term ASSIGN) =>
-       location = location_term ASSIGN value = term
-        {
-           result = getServices().getTermBuilder().store(heap, $location.object, $location.field, value);
+    ( (equivalence_term ASSIGN) =>
+       target=equivalence_term ASSIGN val=equivalence_term
+        {  // TODO at least make some check that it is a select term after all ...
+           Term objectTerm = target.sub(1);
+           Term fieldTerm  = target.sub(2);
+           result = getServices().getTermBuilder().store(heap, objectTerm, fieldTerm, val);
         }
     | id=simple_ident args=argument_list
         {
@@ -2975,45 +3012,6 @@ heap_update_suffix [Term heap] returns [Term result = heap]
 catch [TermCreationException ex] {
     keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
 }
-
-/*
- * Returns a loation, consisting of an object and a field.
- */
-location_term returns [Term object, Term field, Term asSingleton]
-@init{Term term;}
-@after{ $asSingleton = getTermBuilder().singleton($object, $field);}
-    :
-    (
-        (LPAREN term COMMA) => 
-            LPAREN o = term COMMA f = term RPAREN
-            { $object = o; $field = f; }
-    )
-    | t = accessterm
-        {
-            if(isSelectTerm(t)){
-                $object = t.sub(1);
-                $field = t.sub(2);
-            } else {
-                semanticError("Expecting a location (which consists of an object and a field), but found: " + t);
-            }
-        }
-    ;
-
-location_list returns [Term result]
-    :
-    location = location_term
-    { $result = $location.asSingleton; }
-    (
-        COMMA
-        location = location_term
-        { $result = getTermBuilder().union($result, $location.asSingleton); }
-    )*
-    ;
-
-locset_term returns [Term result = getTermBuilder().empty()]
-    :
-    LBRACE (locationList = location_list { $result = locationList; })? RBRACE
-    ;
 
 array_access_suffix [Term arrayReference] returns [Term _array_access_suffix = null] 
 @init{
@@ -3073,7 +3071,8 @@ atom returns [Term _atom = null]
     |   LPAREN a = term RPAREN
     |   TRUE  { a = getTermFactory().createTerm(Junctor.TRUE); }
     |   FALSE { a = getTermFactory().createTerm(Junctor.FALSE); }
-    |   a = locset_term
+    |   LBRACE LPAREN obj=equivalence_term COMMA field=equivalence_term RPAREN RBRACE
+            { a = getServices().getTermBuilder().singleton(obj, field); }
     |   a = ifThenElseTerm
     |   a = ifExThenElseTerm
     |   literal=STRING_LITERAL
@@ -3242,15 +3241,12 @@ quantifierterm returns [Term _quantifier_term = null]
         }
 ;
 
-/*
- * A term surrounded by braces.
- */
-braces_term returns [Term result]
+//term120_2
+update_or_substitution returns [Term _update_or_substitution = null]
+@after{ _update_or_substitution = result; }
 :
-    (LBRACE SUBST) => subst = substitutionterm { $result = subst; }
-    | (LBRACE term ASSIGN term (PARALLEL term ASSIGN term)*) =>
-        updateTerm = update_term { $result = updateTerm; }
-    | locSet = locset_term {$result = locSet; }
+      (LBRACE SUBST) => result = substitutionterm
+      |  result = updateterm
     ; 
 
 substitutionterm returns [Term _substitution_term = null] 
@@ -3282,28 +3278,30 @@ substitutionterm returns [Term _substitution_term = null]
         unbindVars(orig);
    }
 ;
-catch [TermCreationException ex] {
-    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
-}
+        catch [TermCreationException ex] {
+              keh.reportException
+		(new KeYSemanticException(input, getSourceName(), ex));
+        }
 
-update_term returns [Term result]
-    :
-    LBRACE
-    elem = elementary_update_term { $result = elem; }
-    (
-        PARALLEL elem = elementary_update_term
-        { $result = getTermFactory().createTerm(UpdateJunctor.PARALLEL_UPDATE, $result, elem); }
-    )*
-    RBRACE
-    ( t = term110  | t = unary_formula )
-       { $result = getTermFactory().createTerm(UpdateApplication.UPDATE_APPLICATION, $result, t); }
-    ;
-        
-elementary_update_term returns[Term result]
-    :
-    left = term ASSIGN right = term
-    { result = getServices().getTermBuilder().elementary(left, right); }
-    ;
+
+updateterm returns [Term _update_term = null] 
+@init{ Term result = null; }
+@after{ _update_term = result; }
+:
+        LBRACE u=term RBRACE 
+        ( 
+            a2=term110 
+            | 
+            a2=unary_formula 
+        )
+        {   
+	    result = getTermFactory().createTerm(UpdateApplication.UPDATE_APPLICATION, u, a2);
+        }
+   ;
+        catch [TermCreationException ex] {
+              keh.reportException
+		(new KeYSemanticException(input, getSourceName(), ex));
+        }           
         
 bound_variables returns[ImmutableList<QuantifiableVariable> list = ImmutableSLList.<QuantifiableVariable>nil()]
 :
