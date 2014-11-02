@@ -342,16 +342,15 @@ public class WindowUserInterface extends AbstractUserInterface {
            }
            if (errorMsg != null) {
                notify(new GeneralFailureEvent("Saving Proof failed.\n Error: " + errorMsg));
-           }
-           else {
+           } else {
               proof.setProofFile(file);
            }
-       } else if (newDir != null) {
-           if (!newDir.delete()) {
+       } else {
+           if (newDir != null && !newDir.delete()) {
                newDir.deleteOnExit();
            }
+           jFC.resetPath();
        }
-       jFC.resetPath();
        return file;
    }
 
