@@ -1,0 +1,11 @@
+Press CTRL+F to search in sequents.
+Proofs can be quick-saved by pressing F5.
+Use the command line option '--experimental' to activate experimental features.
+Pressing ALT when moving the cursor over a term shows some more information.
+Some rules are not available to the user when One-Step-Simplification is turned on.
+You can search for node numbers or rule names in the proof tree view (press CTRL+SHIFT+F).
+Install an SMT solver to help KeY solve problems; CVC3, CVC4, Simplify, Yices, and Z3 are supported.
+In the mouse menu you can abbreviate terms.
+The latest tool paper on KeY was accepted at VSTTE 2014.
+Running out of memory? Use the command line option --J-Xmx next time you start KeY.
+More help can be found online at http://key-project.org/

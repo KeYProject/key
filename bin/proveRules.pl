@@ -82,6 +82,7 @@ my @failures = ();
 my @errors = ();
 my @missing_proofs = ();
 my %proved_taclets = ();
+my %runtimes = ();
 
 sub check_annotations {
     print "Checking proved annotations in directory $path_to_rules...\n";
@@ -154,8 +155,9 @@ sub runAuto {
     my $starttime = time();
     my @output = `$command`;
     my $result = $?;
+    my $elapsed = time - $starttime;
 
-    print "Time elapsed: " . (time() - $starttime) . " sec\n";
+    print "Time elapsed: " . $elapsed . " sec\n";
 #    print "Return value: $result\n";
 
     my $taclet = "$file";
@@ -166,7 +168,7 @@ sub runAuto {
 	$open_goals = $1 if /^Number of open goals after loading: (.*)$/;	
     }
 
-    return ($result, $taclet, $open_goals);
+    return ($result, $elapsed, $taclet, $open_goals);
 }
 
 sub rerun_proof_obligations {
@@ -183,10 +185,11 @@ sub rerun_proof_obligations {
 
     foreach my $proofName (@files) {
 
-	my ($result, $taclet, $open_goals) = &runAuto($proofName, "auto-loadonly");
+	my ($result, $elapsed, $taclet, $open_goals) = &runAuto($proofName, "auto-loadonly");
 	my $shortName = substr $proofName, length($path_to_proofs);
 
 	$proved_taclets{$taclet} = 1;
+    $runtimes{$shortName} = $elapsed;
 	
 	if ($result == 256 || $open_goals > 0) {
 	    print "Proof failed\n";
@@ -234,27 +237,33 @@ sub write_xml_report {
 
     $failures++ if scalar(@missing_proofs) > 0;
 
+    my $totaltime = 0;
+    $totaltime += $_ foreach (values %runtimes);
+
     print OUT <<HEADER ;
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite errors="$errors" failures="$failures" name="proveRules" tests="$tests" timestamp="$timestamp" host="localhost" time="0.0">
+<testsuite errors="$errors" failures="$failures" name="proveRules" tests="$tests" timestamp="$timestamp" host="localhost" time="$totaltime">
   <properties>
     <property name="directory" value="$path_to_key" />
   </properties>
 HEADER
 
     foreach (@successes) {
+        my $time = $runtimes{$_};
 	print OUT '  <testcase classname="proveRules.run" name="' . 
-	    $_ . '" time="0.0" />'  . "\n";
+	    $_ . '" time="' . $time . '" />'  . "\n";
     }
     foreach (@errors) {
+        my $time = $runtimes{$_};
 	print OUT '  <testcase classname="proveRules.run" name="' . 
-	    $_ . '" time="0.0">'  . "\n";
+	    $_ . '" time="' . $time . '">'  . "\n";
 	print OUT '     <error type="ERR">error during proof for ' .
 	    $_ . "</error>\n  </testcase>\n";
     }
     foreach (@failures) {
+        my $time = $runtimes{$_};
 	print OUT '  <testcase classname="proveRules.run" name="' . 
-	    $_ . '" time="0.0">'  . "\n";
+	    $_ . '" time="' . $time . '">'  . "\n";
 	print OUT '     <failure type="FAIL">proof for ' .
 	    $_ . " failed</failure>\n  </testcase>\n";
     }

@@ -47,7 +47,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
  * fulfilled is that the term matches the structure described by the term of the
  * find-part.
  */
-public final class RewriteTaclet extends FindTaclet {
+public class RewriteTaclet extends FindTaclet {
 
     /** does not pose state restrictions on valid matchings */
     public static final int NONE = 0;
@@ -122,8 +122,21 @@ public final class RewriteTaclet extends FindTaclet {
 			 ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, 
 			 int                       p_applicationRestriction,
 			 ImmutableSet<Choice> choices){
+        this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
+             p_applicationRestriction, choices, false);
+    }	
+
+    public RewriteTaclet(Name name, TacletApplPart applPart,  
+			 ImmutableList<TacletGoalTemplate>  goalTemplates, 
+			 ImmutableList<RuleSet>             ruleSets,
+			 TacletAttributes          attrs,
+			 Term                      find,
+			 ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, 
+			 int                       p_applicationRestriction,
+			 ImmutableSet<Choice> choices,
+             boolean surviveSymbExec){
 	super(name, applPart, goalTemplates, ruleSets, attrs,
-	      find, prefixMap, choices);
+	      find, prefixMap, choices, surviveSymbExec);
 	applicationRestriction = p_applicationRestriction;
 	
 	cacheMatchInfo();
@@ -276,11 +289,9 @@ public final class RewriteTaclet extends FindTaclet {
 	}
 
 	with = syntacticalReplace(with, services, mc, posOfFind);
-	//with = TermBuilder.DF.label(with, term.getLabels());
-	// FIXME: Labeling should be done by somehow using {@link label.ITermLabelWorker}
 
 	if(!with.sort().extendsTrans(maxSort)) {
-	    with = services.getTermBuilder().cast(services, maxSort, with);
+	    with = services.getTermBuilder().cast(maxSort, with);
 	}
 
 	return with;

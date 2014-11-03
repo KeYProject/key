@@ -551,18 +551,15 @@ public final class ProblemInitializer {
             //done
             proofCreated(pa);
           return pa;
-
         } catch (ProofInputException e) {    
             reportException(po, e);
-           
-            throw e;            
+            throw e;
         } finally {
             progressStopped(this);
-        }    
+        }
     }
-    
-    
-    public ProofAggregate startProver(EnvInput envInput, ProofOblInput po) 
+
+    public ProofAggregate startProver(EnvInput envInput, ProofOblInput po)
                 throws ProofInputException {
        return startProver(prepare(envInput), po);
     }

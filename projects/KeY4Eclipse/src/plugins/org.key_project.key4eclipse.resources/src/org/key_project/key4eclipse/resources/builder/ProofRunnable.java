@@ -72,7 +72,9 @@ public class ProofRunnable implements Runnable {
                if(proof != null){
                   pe.setProofClosed(proof.closed());
                   pe.setProofReferences(ProofReferenceUtil.computeProofReferences(proof));
-                  pe.setUsedContracts(KeYResourcesUtil.getUsedContractsProofElements(pe, proofElements));
+                  Pair<List<IFile>, List<String>> usedElementsPair = KeYResourcesUtil.computeUsedProofElements(pe, proofElements);
+                  pe.setUsedContracts(usedElementsPair.first);
+                  pe.setCalledMethods(usedElementsPair.second);
                   pe.setMarkerMsg(generateProofMarkerMessage(pe, proof, proofDuration));
                   pe.setOutdated(false);
                   synchronized (ProofManager.proofsToSave) {

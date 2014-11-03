@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.rule.tacletbuilder.InfFlowMethodContractTacletBuilder;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,15 +69,18 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
 
 
 /**
@@ -89,8 +93,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 
     private static final Name NAME = new Name("Use Operation Contract");
 
-    private Term lastFocusTerm;
-    private Instantiation lastInstantiation;
+    private static Term lastFocusTerm;
+    private static Instantiation lastInstantiation;
 
 
     //-------------------------------------------------------------------------
@@ -303,28 +307,30 @@ public final class UseOperationContractRule implements BuiltInRule {
     /**
      * @return (assumption, anon update, anon heap)
      */
-    private static Triple<Term,Term,Term> createAnonUpdate(LocationVariable heap, IProgramMethod pm,
-	                                     	    	   Term mod,
-	                                     	    	   Services services) {
+    private static AnonUpdateData createAnonUpdate(LocationVariable heap,
+                                                   IProgramMethod pm, 
+	                                     	   Term mod, 
+	                                     	   Services services) {
 	assert pm != null;
 	assert mod != null;
 	final TermBuilder TB = services.getTermBuilder();
 
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Name methodHeapName = new Name(TB.newName(heap+"After_" + pm.getName()));
-	final Function methodHeapFunc = new Function(methodHeapName, heapLDT.targetSort());
+	final Function methodHeapFunc = new Function(methodHeapName, heapLDT.targetSort(), true);
 	services.getNamespaces().functions().addSafely(methodHeapFunc);
+	final Term methodHeap = TB.func(methodHeapFunc);
 	final Name anonHeapName = new Name(TB.newName("anon_" + heap + "_" + pm.getName()));
 	final Function anonHeapFunc = new Function(anonHeapName, heap.sort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
 	final Term anonHeap = TB.label(TB.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
-	final Term assumption = TB.equals(TB.anon(TB.var(heap),
-                                                  mod,
-                                                  anonHeap),
-                                          TB.func(methodHeapFunc));
-	final Term anonUpdate = TB.elementary(heap, TB.func(methodHeapFunc));
+	final Term assumption =
+	        TB.equals(TB.anon(TB.var(heap), mod, anonHeap),
+                          methodHeap); 
+	final Term anonUpdate = TB.elementary(heap, methodHeap);
 
-	return new Triple<Term,Term,Term>(assumption, anonUpdate, anonHeap);
+	return new AnonUpdateData(assumption, anonUpdate, methodHeap,
+	                          TB.getBaseHeap(), anonHeap);
     }
 
     private static Term getFreePost(List<LocationVariable> heapContext, IProgramMethod pm,
@@ -425,7 +431,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
 
-    private Instantiation instantiate(Term focusTerm, Services services) {
+    private static Instantiation instantiate(Term focusTerm, Services services) {
 	//result cached?
 	if(focusTerm == lastFocusTerm) {
 	    return lastInstantiation;
@@ -440,6 +446,78 @@ public final class UseOperationContractRule implements BuiltInRule {
 	return result;
     }
 
+    private static void applyInfFlow(Goal goal,
+                                     final FunctionalOperationContract contract,
+                                     final Instantiation inst,
+                                     final Term self,
+                                     final ImmutableList<Term> params,
+                                     final Term result,
+                                     final Term exception,
+                                     final Term mby,
+                                     final Term atPreUpdates,
+                                     final Term finalPreTerm,
+                                     final ImmutableList<AnonUpdateData> anonUpdateDatas,
+                                     Services services) {
+        if (!InfFlowCheckInfo.isInfFlow(goal)) {
+            return;
+        }
+
+        // prepare information flow analysis
+        assert anonUpdateDatas.size() == 1 : "information flow extension " +
+                                             "is at the moment not " +
+                                             "compatible with the " +
+                                             "non-base-heap setting";
+        AnonUpdateData anonUpdateData = anonUpdateDatas.head();
+
+        final Term heapAtPre = anonUpdateData.methodHeapAtPre;
+        final Term heapAtPost = anonUpdateData.methodHeap;
+
+        // generate proof obligation variables
+        final boolean hasSelf = self != null;
+        final boolean hasRes = result != null;
+        final boolean hasExc = exception != null;
+
+        final StateVars preVars =
+                new StateVars(hasSelf ? self : null,
+                              params,
+                              hasRes ? result : null,
+                              hasExc ? exception : null,
+                              heapAtPre, mby);
+        final StateVars postVars =
+                new StateVars(hasSelf ? self : null,
+                              params,
+                              hasRes ? result : null,
+                              hasExc ? exception : null,
+                              heapAtPost, mby);
+        final ProofObligationVars poVars =
+                new ProofObligationVars(preVars, postVars, services);
+
+        // generate information flow contract application predicate
+        // and associated taclet
+        InfFlowMethodContractTacletBuilder ifContractBuilder =
+                new InfFlowMethodContractTacletBuilder(services);
+        ifContractBuilder.setContract(contract);
+        ifContractBuilder.setContextUpdate(atPreUpdates, inst.u);
+        ifContractBuilder.setProofObligationVars(poVars);
+
+        Term contractApplPredTerm = ifContractBuilder.buildContractApplPredTerm();
+        Taclet informationFlowContractApp = ifContractBuilder.buildTaclet();
+
+        // add term and taclet to post goal
+        goal.addFormula(new SequentFormula(contractApplPredTerm),
+                true,
+                false);
+        goal.addTaclet(informationFlowContractApp,
+                SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+
+        // information flow proofs might get easier if we add the (proved)
+        // method contract precondition as an assumption to the post goal
+        // (in case the precondition cannot be proved easily)
+        goal.addFormula(new SequentFormula(finalPreTerm), true, false);
+        goal.proof().addIFSymbol(contractApplPredTerm);
+        goal.proof().addIFSymbol(informationFlowContractApp);
+        goal.proof().addGoalTemplates(informationFlowContractApp);
+    }
 
 
     //-------------------------------------------------------------------------
@@ -686,28 +764,31 @@ public final class UseOperationContractRule implements BuiltInRule {
         Term wellFormedAnon = null;
         Term atPreUpdates = null;
         Term reachableState = null;
+        ImmutableList<AnonUpdateData> anonUpdateDatas =
+                ImmutableSLList.<AnonUpdateData>nil();
 
         for(LocationVariable heap : heapContext) {
-           final Triple<Term,Term,Term> tAnon;
-           if(!contract.hasModifiesClause(heap)) {
-             tAnon = new Triple<Term,Term,Term>(tb.tt(), tb.skip(), tb.var(heap));
-           }else{
+           final AnonUpdateData tAnon;
+           if (!contract.hasModifiesClause(heap)) {
+             tAnon = new AnonUpdateData(tb.tt(), tb.skip(), tb.var(heap), tb.var(heap), tb.var(heap));
+           } else {
              tAnon = createAnonUpdate(heap, inst.pm, mods.get(heap), services);
            }
-           if(anonAssumption == null) {
-             anonAssumption = tAnon.first;
-           }else{
-             anonAssumption = tb.and(anonAssumption, tAnon.first);
+           anonUpdateDatas = anonUpdateDatas.append(tAnon);
+           if (anonAssumption == null) {
+             anonAssumption = tAnon.assumption;
+           } else {
+             anonAssumption = tb.and(anonAssumption, tAnon.assumption);
            }
-           if(anonUpdate == null) {
-             anonUpdate = tAnon.second;
-           }else{
-             anonUpdate = tb.parallel(anonUpdate, tAnon.second);
+           if (anonUpdate == null) {
+             anonUpdate = tAnon.anonUpdate;
+           } else {
+             anonUpdate = tb.parallel(anonUpdate, tAnon.anonUpdate);
            }
-           if(wellFormedAnon == null) {
-             wellFormedAnon = tb.wellFormed(tAnon.third);
-           }else{
-             wellFormedAnon = tb.and(wellFormedAnon, tb.wellFormed(tAnon.third));
+           if (wellFormedAnon == null) {
+             wellFormedAnon = tb.wellFormed(tAnon.anonHeap);
+           } else {
+             wellFormedAnon = tb.and(wellFormedAnon, tb.wellFormed(tAnon.anonHeap));
            }
            final Term up = tb.elementary(atPreVars.get(heap), tb.var(heap));
            if(atPreUpdates == null) {
@@ -755,24 +836,38 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    reachableState = tb.and(reachableState,
 		                    tb.reachableValue(arg, argKJT));
 	}
-	final ContractPO po
-		= services.getSpecificationRepository()
-		          .getPOForProof(goal.proof());
-	final Term mbyOk;
-	// see #1417
-	if(inst.mod != Modality.BOX && inst.mod != Modality.BOX_TRANSACTION && po != null && mby != null ) {
-//    	mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),
-//    			       TB.lt(mby, po.getMbyAtPre(), services));
-//	    mbyOk = TB.prec(mby, po.getMbyAtPre(), services);
-	    mbyOk = tb.measuredByCheck(mby);
-	} else {
-	    mbyOk = tb.tt();
-	}
-        preGoal.changeFormula(new SequentFormula(
-        			tb.applySequential(new Term[]{inst.u, atPreUpdates},
-        	                                   tb.and(pre,
-                                                       reachableState,
-                                                       mbyOk))),
+
+        Term finalPreTerm;
+        if(!InfFlowCheckInfo.isInfFlow(goal)) {
+            final ContractPO po
+                    = services.getSpecificationRepository()
+                              .getPOForProof(goal.proof());
+
+            final Term mbyOk;
+         // see #1417
+            if(inst.mod != Modality.BOX && inst.mod != Modality.BOX_TRANSACTION && po != null && mby != null ) {
+//          mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),
+//                                 TB.lt(mby, po.getMbyAtPre(), services));
+//              mbyOk = TB.prec(mby, po.getMbyAtPre(), services);
+                mbyOk = tb.measuredByCheck(mby);
+            } else {
+                mbyOk = tb.tt();
+            }
+            finalPreTerm =
+                    tb.applySequential(new Term[]{inst.u, atPreUpdates},
+                                       tb.and(new Term[]{pre,
+                                                         reachableState,
+                                                         mbyOk}));
+        } else {
+            // termination has already been shown in the functional proof,
+            // thus we do not need to show it again in information flow proofs.
+            finalPreTerm =
+                    tb.applySequential(new Term[]{inst.u, atPreUpdates},
+                                                  tb.and(new Term[]{pre,
+                                                                    reachableState}));
+        }
+
+        preGoal.changeFormula(new SequentFormula(finalPreTerm),
                               ruleApp.posInOccurrence());
 
         TermLabelManager.refactorLabels(services, ruleApp.posInOccurrence(), this, preGoal, null);
@@ -809,6 +904,9 @@ public final class UseOperationContractRule implements BuiltInRule {
         	            true,
         	            false);
 
+        applyInfFlow(postGoal, contract, inst, contractSelf, contractParams, contractResult,
+                     tb.var(excVar), mby, atPreUpdates,finalPreTerm, anonUpdateDatas, services);
+
         //create "Exceptional Post" branch
         final StatementBlock excPostSB
             = replaceStatement(jb, new StatementBlock(new Throw(excVar)));
@@ -837,7 +935,9 @@ public final class UseOperationContractRule implements BuiltInRule {
         if(nullGoal != null) {
             final Term actualSelfNotNull
             	= tb.not(tb.equals(inst.actualSelf, tb.NULL()));
-            nullGoal.changeFormula(new SequentFormula(tb.apply(inst.u, actualSelfNotNull, null)),
+            nullGoal.changeFormula(new SequentFormula(tb.apply(inst.u, 
+        					               actualSelfNotNull,
+        					               null)),
         	                   ruleApp.posInOccurrence());
         }
 
@@ -961,4 +1061,21 @@ public final class UseOperationContractRule implements BuiltInRule {
              TB.selfVar(inst.staticType, true) : 
              TB.resultVar(inst.pm, true);
    }
+
+   private static class AnonUpdateData {
+        public final Term assumption, anonUpdate, methodHeap, methodHeapAtPre, anonHeap;
+
+
+        public AnonUpdateData(Term assumption,
+                              Term anonUpdate,
+                              Term methodHeap,
+                              Term methodHeapAtPre,
+                              Term anonHeap) {
+            this.assumption = assumption;
+            this.anonUpdate = anonUpdate;
+            this.methodHeap = methodHeap;
+            this.methodHeapAtPre = methodHeapAtPre;
+            this.anonHeap = anonHeap;
+        }
+    }
 }

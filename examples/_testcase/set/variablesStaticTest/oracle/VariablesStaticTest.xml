@@ -108,6 +108,22 @@
                            </value>
                         </variable>
                      </termination>
+                     <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                        <value name="self {true}" typeString="VariablesStaticTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="heapBefore_main" arrayIndex="-1" isArrayIndex="false">
+                        <value name="heapBefore_main {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="savedHeapBefore_main" arrayIndex="-1" isArrayIndex="false">
+                        <value name="savedHeapBefore_main {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </callStateVariable>
                   </methodReturn>
                </statement>
             </statement>

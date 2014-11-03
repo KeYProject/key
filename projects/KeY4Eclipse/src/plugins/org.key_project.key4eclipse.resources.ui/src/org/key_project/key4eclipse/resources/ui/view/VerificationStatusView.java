@@ -101,6 +101,7 @@ import org.key_project.util.eclipse.swt.viewer.event.IViewerUpdateListener;
 import org.key_project.util.eclipse.swt.viewer.event.ViewerUpdateEvent;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
@@ -154,7 +155,7 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
    /**
     * The protocol used to link to {@link File}s in the local file system.
     */
-   private static final String PROTOCOL_FILE_PREFIX = "file:/";
+   private static final String PROTOCOL_FILE_PREFIX = "file://";
 
    /**
     * The root {@link Composite} which contains all shown content.
@@ -1027,13 +1028,34 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
                sb.append("</ul>" + StringUtil.NEW_LINE);
                sb.append("</li>" + StringUtil.NEW_LINE);
             }
+            if (!status.calledMethods.isEmpty()) {
+               sb.append("<li>" + StringUtil.NEW_LINE);
+               sb.append("Closed world assumption for the dynamic dispatch of the following method calls:" + StringUtil.NEW_LINE);
+               sb.append("<ol>" + StringUtil.NEW_LINE);
+               for (Entry<String, List<IFile>> entry : status.calledMethods.entrySet()) {
+                  SWTUtil.checkCanceled(monitor);
+                  sb.append("<li>" + StringUtil.NEW_LINE);
+                  sb.append(entry.getKey() + StringUtil.NEW_LINE);
+                  sb.append("<ul>" + StringUtil.NEW_LINE);
+                  for (IFile usedByFile : entry.getValue()) {
+                     SWTUtil.checkCanceled(monitor);
+                     sb.append("<li>Used by proof: <a href=\"" + toURL(usedByFile) + "\">" + StringUtil.NEW_LINE);
+                     sb.append(usedByFile.getFullPath());
+                     sb.append("</a></li>" + StringUtil.NEW_LINE);
+                  }
+                  sb.append("</ul>" + StringUtil.NEW_LINE);
+                  sb.append("</li>" + StringUtil.NEW_LINE);
+               }
+               sb.append("</ol>" + StringUtil.NEW_LINE);
+               sb.append("</li>" + StringUtil.NEW_LINE);
+            }
             sb.append("<li>Methods are called in a state satisfying the precondition, assumed for:" + StringUtil.NEW_LINE);
             sb.append("<ol>" + StringUtil.NEW_LINE);
             if (!status.unspecifiedMethods.isEmpty()) {
                sb.append("<li><a href=\"#UnspecifiedMethods\">Unspecified methods</a></li>" + StringUtil.NEW_LINE);
             }
             sb.append("<li>Methods of used APIs</li>" + StringUtil.NEW_LINE);
-            sb.append("<li>Projects in which the source code will be used</li>" + StringUtil.NEW_LINE);
+            sb.append("<li>System in which the source code will be used</li>" + StringUtil.NEW_LINE);
             sb.append("</ol>" + StringUtil.NEW_LINE);
             sb.append("</li>" + StringUtil.NEW_LINE);
             sb.append("<li><i>Source code is compiled using a correct Java compiler.</i></li>" + StringUtil.NEW_LINE);
@@ -1049,7 +1071,7 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
             if (file != null) {
                File localFile = ResourceUtil.getLocation(file);
                return localFile != null ? 
-                      PROTOCOL_FILE_PREFIX + localFile.getAbsolutePath().replace(File.separatorChar, '/') : 
+                      PROTOCOL_FILE_PREFIX + IOUtil.encodeURIPath(localFile.getAbsolutePath()) : 
                       PROTOCOL_RESOURCE + file.getFullPath();
             }
             else {
@@ -1079,18 +1101,20 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
          }
 
          private Color updateStatus(TypeInfo typeInfo, VerificationStatus status, IProgressMonitor monitor) throws Exception {
-            Color color = closedProofColor;
+            Color typeColor = closedProofColor;
             for (MethodInfo methodInfo : typeInfo.getMethods()) {
                SWTUtil.checkCanceled(monitor);
                status.numOfMethods++;
                if (methodInfo.countContracts() >= 1) {
                   status.numOfSpecifiedMethods++;
+                  Color methodColor = closedProofColor;
                   for (ContractInfo contractInfo : methodInfo.getContracts()) {
                      SWTUtil.checkCanceled(monitor);
                      Color contractColor = updateStatus(contractInfo, status);
-                     updateTreeItemColorThreadSave(methodInfo, contractColor);
-                     color = worstColor(color, contractColor);
+                     typeColor = worstColor(typeColor, contractColor);
+                     methodColor = worstColor(methodColor, contractColor);
                   }
+                  updateTreeItemColorThreadSave(methodInfo, methodColor);
                }
                else {
                   List<MethodInfo> list = status.unspecifiedMethods.get(typeInfo);
@@ -1100,7 +1124,7 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
                   }
                   list.add(methodInfo);
                   updateTreeItemColorThreadSave(methodInfo, unspecifiedColor);
-                  color = worstColor(color, unspecifiedColor);
+                  typeColor = worstColor(typeColor, unspecifiedColor);
                }
             }
             for (ObserverFunctionInfo observerFunctionInfo : typeInfo.getObserverFunctions()) {
@@ -1109,16 +1133,16 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
                   SWTUtil.checkCanceled(monitor);
                   Color contractColor = updateStatus(contractInfo, status);
                   updateTreeItemColorThreadSave(observerFunctionInfo, contractColor);
-                  color = worstColor(color, contractColor);
+                  typeColor = worstColor(typeColor, contractColor);
                }
             }
             for (TypeInfo internalTypeInfo : typeInfo.getTypes()) {
                SWTUtil.checkCanceled(monitor);
                Color typeRgb = updateStatus(internalTypeInfo, status, monitor);
-               color = worstColor(color, typeRgb);
+               typeColor = worstColor(typeColor, typeRgb);
             }
-            updateTreeItemColorThreadSave(typeInfo, color);
-            return color;
+            updateTreeItemColorThreadSave(typeInfo, typeColor);
+            return typeColor;
          }
 
          private Color updateStatus(ContractInfo contractInfo, VerificationStatus status) throws Exception {
@@ -1137,6 +1161,18 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
             }
             else {
                status.unprovenContracts.add(contractInfo);
+            }
+            // Called methods
+            List<String> calledMethods = contractInfo.checkCalledMethods();
+            if (calledMethods != null) {
+               for (String calledMethod : calledMethods) {
+                  List<IFile> usedByProofs = status.calledMethods.get(calledMethod);
+                  if (usedByProofs == null) {
+                     usedByProofs = new LinkedList<IFile>();
+                     status.calledMethods.put(calledMethod, usedByProofs);
+                  }
+                  usedByProofs.add(contractInfo.getProofFile());
+               }
             }
             // Unproven dependencies
             List<IFile> unprovenDependencies = contractInfo.checkUnprovenDependencies();
@@ -1347,7 +1383,6 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
    @SuppressWarnings("deprecation")
    protected void handleReportBrowserChanging(LocationEvent event) {
       if (event.location != null) {
-         event.doit = event.location.startsWith("about:blank");
          if (!event.location.startsWith("about:blank#")) {
             IFile[] files = null;
             if (event.location.startsWith(PROTOCOL_RESOURCE)) {
@@ -1359,9 +1394,11 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
             }
             else if (event.location.startsWith(PROTOCOL_FILE_PREFIX)) {
                String location = event.location.substring(PROTOCOL_FILE_PREFIX.length());
-               files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(new Path(location));
+               File locationFile = new File(IOUtil.decodeURIPath(location));
+               files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocation(new Path(locationFile.getAbsolutePath()));
             }
             if (!ArrayUtil.isEmpty(files)) {
+               event.doit = false;
                if (event.location.endsWith(KeYUtil.PROOF_FILE_EXTENSION) ||
                    event.location.endsWith(KeYUtil.KEY_FILE_EXTENSION)) {
                   openProofs(files);
@@ -1507,6 +1544,11 @@ public class VerificationStatusView extends AbstractLinkableViewPart {
        * All recursion cycles.
        */
       private final Set<List<IFile>> cycles = new LinkedHashSet<List<IFile>>();
+      
+      /**
+       * Lists all called methods.
+       */
+      private final Map<String, List<IFile>> calledMethods = new LinkedHashMap<String, List<IFile>>();
    }
    
    /**

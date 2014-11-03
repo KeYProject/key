@@ -32,11 +32,11 @@ public class RewriteTacletBuilder extends FindTacletBuilder{
      * rsp. <code>\add</code>. For efficiency no modalities are allowed above 
      * the <code>\find</code> position  </li>
      * <li> {@link RewriteTaclet#IN_SEQUENT_STATE} the <code>\find</code> part is 
-     * only allowed to match on formulas which are evaulated in the same state as 
+     * only allowed to match on formulas which are evaluated in the same state as
      * the sequent</li>
      *</ul>
      */
-    private int applicationRestriction;
+    protected int applicationRestriction;
 
     public RewriteTacletBuilder setApplicationRestriction
 	( int p_applicationRestriction ) {
@@ -44,6 +44,15 @@ public class RewriteTacletBuilder extends FindTacletBuilder{
 	return this;
     }
 
+
+    /* for information flow purposes; TODO: find better solution */
+    protected boolean surviveSmbExec;
+    
+    public void setSurviveSmbExec(boolean b) {
+        surviveSmbExec = b;
+    }
+    
+    
     /** sets the <I>find</I> of the Taclet that is to build to the given
      * term.
      * @return this RewriteTacletBuilder
@@ -71,7 +80,6 @@ public class RewriteTacletBuilder extends FindTacletBuilder{
     public RewriteTaclet getRewriteTaclet(){
 	if (find==null) {
 	    throw new TacletBuilderException(this, "No find part specified");
-	    
 	}
 	checkBoundInIfAndFind();
 	TacletPrefixBuilder prefixBuilder=new TacletPrefixBuilder(this);
@@ -87,7 +95,8 @@ public class RewriteTacletBuilder extends FindTacletBuilder{
 				 find,
 				 prefixBuilder.getPrefixMap(),
 				 applicationRestriction,
-				 choices);
+				 choices,
+                 surviveSmbExec);
     }
 
     /**

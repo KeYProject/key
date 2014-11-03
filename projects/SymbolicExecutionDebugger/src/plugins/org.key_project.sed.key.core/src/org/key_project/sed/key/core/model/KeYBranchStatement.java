@@ -21,8 +21,11 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
+import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchStatement;
+import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.impl.AbstractSEDBranchStatement;
+import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.java.CollectionUtil;
@@ -72,7 +75,12 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     * The constraints
     */
    private KeYConstraint[] constraints;
-
+   
+   /**
+    * The conditions under which a group ending in this node starts.
+    */
+   private SEDMemoryBranchCondition[] groupStartConditions;
+   
    /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this branch condition is contained.
@@ -386,5 +394,44 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
          }
          return constraints;
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public SEDMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
+      synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+         if (groupStartConditions == null) {
+            groupStartConditions = KeYModelUtil.createCompletedBlocksConditions(this);
+         }
+         return groupStartConditions;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDBranchCondition[] getGroupEndConditions() throws DebugException {
+      synchronized (this) { // Is thread save execution really required?
+         return KeYModelUtil.computeGroupEndConditions(this);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setParent(ISEDDebugNode parent) {
+      super.setParent(parent);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isGroupable() {
+      return executionNode.isBlockOpened();
    }
 }

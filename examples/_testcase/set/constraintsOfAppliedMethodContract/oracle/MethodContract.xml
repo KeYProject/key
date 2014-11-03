@@ -13,7 +13,7 @@
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <branchStatement name="if (m&gt;10)" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (m&gt;10)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <constraint name="wellFormed(heap)"/>
          <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
          <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
@@ -277,9 +277,53 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                               </value>
                            </variable>
                         </termination>
+                        <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                           <value name="self {true}" typeString="MethodContract" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
+                              <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
+                              <constraint name="equals(mul(int::select(heap,self,MethodContract::$h2),k_0),add(mul(result,Z(neglit(1(#)))),int::select(heap,self,MethodContract::$h1)))"/>
+                              <constraint name="not(equals(self,null))"/>
+                              <variable name="h1" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="h1 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h1)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    <constraint name="equals(mul(int::select(heap,self,MethodContract::$h2),k_0),add(mul(result,Z(neglit(1(#)))),int::select(heap,self,MethodContract::$h1)))"/>
+                                 </value>
+                              </variable>
+                              <variable name="h2" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="h2 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h2)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    <constraint name="equals(mul(int::select(heap,self,MethodContract::$h2),k_0),add(mul(result,Z(neglit(1(#)))),int::select(heap,self,MethodContract::$h1)))"/>
+                                 </value>
+                              </variable>
+                              <variable name="l" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="l {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$l)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="m" arrayIndex="-1" isArrayIndex="false">
+                           <value name="m {true}" typeString="int" valueString="m" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              <constraint name="geq(m,Z(1(1(#))))"/>
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="heapBefore_magic" arrayIndex="-1" isArrayIndex="false">
+                           <value name="heapBefore_magic {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              <constraint name="wellFormed(heap)"/>
+                              <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
+                              <constraint name="equals(anon(heap,allLocs,anon_heap_mod&lt;&lt;anonHeapFunction&gt;&gt;),heapAfter_mod)"/>
+                              <constraint name="equals(mul(int::select(heap,self,MethodContract::$h2),k_0),add(mul(result,Z(neglit(1(#)))),int::select(heap,self,MethodContract::$h1)))"/>
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="savedHeapBefore_magic" arrayIndex="-1" isArrayIndex="false">
+                           <value name="savedHeapBefore_magic {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </callStateVariable>
                      </methodReturn>
                   </branchCondition>
                </operationContract>
+               <completedBlockEntry path="/0/0" conditionString="gt(m,Z(0(1(#))))"/>
             </statement>
          </branchCondition>
          <branchCondition name="lt(m,Z(1(1(#))))" pathCondition="lt(m,Z(1(1(#))))" pathConditionChanged="true" branchCondition="lt(m,Z(1(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -399,9 +443,50 @@ termination: diamond" pathCondition="gt(m,Z(0(1(#))))" pathConditionChanged="fal
                         </value>
                      </variable>
                   </termination>
+                  <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                     <value name="self {true}" typeString="MethodContract" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
+                        <constraint name="equals(MethodContract::exactInstance(self),TRUE)"/>
+                        <constraint name="not(equals(self,null))"/>
+                        <variable name="h1" arrayIndex="-1" isArrayIndex="false">
+                           <value name="h1 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h1)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="h2" arrayIndex="-1" isArrayIndex="false">
+                           <value name="h2 {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$h2)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="l" arrayIndex="-1" isArrayIndex="false">
+                           <value name="l {true}" typeString="int" valueString="int::select(heap,self,MethodContract::$l)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="m" arrayIndex="-1" isArrayIndex="false">
+                     <value name="m {true}" typeString="int" valueString="m" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <constraint name="leq(m,Z(0(1(#))))"/>
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="heapBefore_magic" arrayIndex="-1" isArrayIndex="false">
+                     <value name="heapBefore_magic {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        <constraint name="wellFormed(heap)"/>
+                        <constraint name="equals(boolean::select(heap,self,java.lang.Object::&lt;created&gt;),TRUE)"/>
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="savedHeapBefore_magic" arrayIndex="-1" isArrayIndex="false">
+                     <value name="savedHeapBefore_magic {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
                </methodReturn>
+               <completedBlockEntry path="/0/0" conditionString="lt(m,Z(1(1(#))))"/>
             </statement>
          </branchCondition>
+         <blockCompletionEntry path="/0/0/0/0"/>
+         <blockCompletionEntry path="/0/0/1/0"/>
       </branchStatement>
       <methodReturnEntry path="/0/0/0/0/0/0/0"/>
       <methodReturnEntry path="/0/0/1/0/0"/>

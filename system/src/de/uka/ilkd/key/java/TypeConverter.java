@@ -40,7 +40,6 @@ import java.util.Map;
 public final class TypeConverter {
 
     private final TermBuilder tb;
-
     private final Services services;
 
     // Maps LDT names to LDT instances.
@@ -152,12 +151,12 @@ public final class TypeConverter {
             return emb.makeTerm(heapLDT.getHeap(), subs, services);
         } else if (op instanceof TypeCast) {
             TypeCast tc = (TypeCast) op;
-            return tb.cast(services, tc.getKeYJavaType(services).getSort(), subs[0]);
+            return tb.cast(tc.getKeYJavaType(services).getSort(), subs[0]);
         } else {
             Debug.out("typeconverter: no data type model "
-                    + "available to convert:", op, op.getClass());
+                      + "available to convert:", op, op.getClass());
             throw new IllegalArgumentException("TypeConverter could not handle"
-                    + " this operator: " + op);
+                                               + " this operator: " + op);
         }
     }
 

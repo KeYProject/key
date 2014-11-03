@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.model;
 
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
@@ -51,6 +52,12 @@ public interface IExecutionVariable extends IExecutionElement {
     * @return {@code true} is array cell value, {@code false} is a "normal" value.
     */
    public boolean isArrayIndex();
+   
+   /**
+    * Returns the optional additional condition considered during value computation.
+    * @return The optional additional condition considered during value computation.
+    */
+   public Term getAdditionalCondition();
    
    /**
     * Returns the parent {@link IExecutionValue} if available.

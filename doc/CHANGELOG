@@ -1,6 +1,16 @@
 ChangeLog
 =========
 
+Revision 2.4.0:
+===============
+ * Information flow reasoning
+ * Improved test case generation
+ * Support for CVC4 SMT solver backend
+
+Revision 2.2.3:
+===============
+ * Fix concurrency issue introduced in 2.2.2
+
 Revision 2.2.2:
 ===============
  * Support for CVC3 version 2.4.1 SMT backend
@@ -20,14 +30,14 @@ Revision 2.2.0:
      ** changed default semantics of signals_only to include unchecked exceptions
      ** model methods (new implementation)
      ** old clause (variable binder in contract)
-     ** nearly everything parseable 
+     ** nearly everything parseable
  * Verification of a large class of recursive methods
-     ** generalized variants to all ordered sets 
+     ** generalized variants to all ordered sets
  * Proof obligations for specification well-definedness
  * Term labels
  * Rule triggers (extended taclet syntax)
  * More efficient handling of heap disjointness and heap selects
- * Improved reasoning about bounded sums/products 
+ * Improved reasoning about bounded sums/products
  * User Interfaces
      ** rule focus for inner nodes
      ** improved search
@@ -37,7 +47,7 @@ Revision 2.2.0:
  * Reduced memory footprint
  * A lot of bug fixes
  * Java 8 compatibility
- * Re-implemented .key parser 
+ * Re-implemented .key parser
 
 Revision 2.0.2:
 ===============
@@ -72,19 +82,19 @@ Revision 2.0.0:
      ** the \bigint type, mixed integer semantics
      ** weak purity by default
      ** reachability predicate
-     ** \index and \values keywords for enhanced for-loops 
+     ** \index and \values keywords for enhanced for-loops
   * Escape to dynamic logic from within JML
   * MonKeY batch mode
   * GUI changes
      ** new dialog to enter invariants interactively
      ** search in sequents and proof trees
      ** logical symbols in Unicode
-  * Runnable from command line without windowing system 
+  * Runnable from command line without windowing system
   * Improved integration of SMT solvers
      ** SMT-LIB 2.0 backend interface
      ** possible to run multiple solvers in parallel
-     ** support for integer division (Z3 only) 
-  * > 150 bug fixes 
+     ** support for integer division (Z3 only)
+  * > 150 bug fixes
   * Discontinued features
      ** RTSJ support
      ** Test case generation
@@ -94,7 +104,7 @@ Revision 2.0.0:
 Revision 1.6.5:
 ===============
  * Minor bugfixes
- * Java 7 compatibility 
+ * Java 7 compatibility
 
 Revision 1.6.0:
 ===============
@@ -140,14 +150,14 @@ Revision 1.2.0:
 ===============
  * significantly improved proof strategies wrt. quantifier treatment
    and arithmetics
- * improved proof tree view, i.e. 
+ * improved proof tree view, i.e.
      ** hiding of closed subtrees
      ** hiding of intermediate proof steps
-     ** search in proof tree  
+     ** search in proof tree
  * improved proof saving and loading
- * includes _alpha_ version of the visual debugger 
- * various bugfixes 
- 
+ * includes _alpha_ version of the visual debugger
+ * various bugfixes
+
 Revision 1.0.1:
 ===============
   * fixed an installation problem when KeY had not been installed before
@@ -156,10 +166,10 @@ Revision 1.0.0:
 ===============
 
   * KeY-Book examples are based on this version
-    (except Schorr-Waite, which provides a developer version on 
+    (except Schorr-Waite, which provides a developer version on
     the book example site)
-  * new proof-obligation generation framework 
-         * used currently only by the OCL translation; 
+  * new proof-obligation generation framework
+         * used currently only by the OCL translation;
             adaption of JML translation is underway
   * new method lemma rule
   * considerable improvements concerning arithmetics
@@ -175,20 +185,20 @@ Revision 1.0pre1:
   * pre-release of upcoming 1.0
   * several improvements and fixes
 
-      
-Revision 0.99.2: 
+
+Revision 0.99.2:
 ================
    * fixed: Initialisation procedure of the KeY prover
             (KeY did not work properly if installed on a fresh system
-             without a working KeY configuration file) 
+             without a working KeY configuration file)
    * fixed: Source Code Distribution 0.99.1 was way too big
 
-Revision 0.99.1: 
+Revision 0.99.1:
 ================
    * bug fixes concerning JML front-end
 
-Release 0.99: 
+Release 0.99:
 =============
    * first version with the JML front-end
    * support of loop invariants
-   * lots of new stuff 
+   * lots of new stuff

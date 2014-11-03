@@ -29,4 +29,12 @@ public class CallStackPropertySection extends AbstractSEDDebugNodePropertySectio
    protected ISEDDebugNodeTabContent createContent() {
       return new CallStackTabComposite();
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean shouldUseExtraSpace() {
+      return true;
+   }
 }

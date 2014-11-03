@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import de.uka.ilkd.key.logic.Namespace;
@@ -28,7 +27,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 
 /**
  * Used for TESTS ONLY as we allow there to declare program variables global
- * in rule files .
+ * in rule files.
  */
 public class KeYFileForTests extends KeYFile {
     
@@ -45,6 +44,7 @@ public class KeYFileForTests extends KeYFile {
      * assigned to this object according to the given modification strategy.
      * Throws an exception if no initial configuration has been set yet.
      */
+    @Override
     public void read() throws ProofInputException {
 	if (initConfig==null) {
 	    throw new IllegalStateException("KeYFile: InitConfig not set.");
@@ -62,11 +62,9 @@ public class KeYFileForTests extends KeYFile {
             problemParser.problem(); 
 	    initConfig.setTaclets(problemParser.getTaclets()); 
 	    variables = problemParser.namespaces().variables().copy();
-	} catch (antlr.ANTLRException e) {
+	} catch (Exception e) {
 	    throw new ProofInputException(e);
-	} catch (FileNotFoundException ioe) {
-            throw new ProofInputException(ioe);
-        } finally {
+	} finally {
             if (cinp != null) {
         	try {
 	            cinp.close();

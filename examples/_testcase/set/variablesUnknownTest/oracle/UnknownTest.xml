@@ -264,12 +264,96 @@
                                        </value>
                                     </variable>
                                  </termination>
+                                 <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                       <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                          <value name="next {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
+                                          </value>
+                                       </variable>
+                                       <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                          <value name="previous {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
+                                          </value>
+                                       </variable>
+                                    </value>
+                                 </callStateVariable>
+                                 <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </callStateVariable>
+                                 <callStateVariable name="heapBefore_main" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="heapBefore_main {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </callStateVariable>
+                                 <callStateVariable name="savedHeapBefore_main" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="savedHeapBefore_main {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </callStateVariable>
                               </methodReturn>
                            </statement>
+                           <callStateVariable name="u_7" arrayIndex="-1" isArrayIndex="false">
+                              <value name="u_7 {true}" typeString="endless.UnknownTest" valueString="u_9" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="next {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                                 <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </callStateVariable>
+                           <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                              <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </callStateVariable>
+                           <callStateVariable name="u_5" arrayIndex="-1" isArrayIndex="false">
+                              <value name="u_5 {true}" typeString="endless.UnknownTest" valueString="u_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="next {not(equals(u_3,self))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(u_3,self))">
+                                    </value>
+                                 </variable>
+                                 <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </callStateVariable>
+                           <callStateVariable name="heapBefore_&lt;init&gt;_1" arrayIndex="-1" isArrayIndex="false">
+                              <value name="heapBefore_&lt;init&gt;_1 {true}" typeString="Heap" valueString="store(store(store(create(store(store(store(store(create(store(heap,self,endless.UnknownTest::$previous,null),u_3),u_3,endless.UnknownTest::$next,null),u_3,endless.UnknownTest::$previous,null),u_3,java.lang.Object::&lt;initialized&gt;,TRUE),self,endless.UnknownTest::$next,u_3),u_9),u_9,java.lang.Object::&lt;initialized&gt;,FALSE),u_9,endless.UnknownTest::$next,null),u_9,endless.UnknownTest::$previous,null)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </callStateVariable>
+                           <callStateVariable name="savedHeapBefore_&lt;init&gt;_1" arrayIndex="-1" isArrayIndex="false">
+                              <value name="savedHeapBefore_&lt;init&gt;_1 {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </callStateVariable>
                         </methodReturn>
                         <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
                      </methodCall>
                   </statement>
+                  <callStateVariable name="u_1" arrayIndex="-1" isArrayIndex="false">
+                     <value name="u_1 {true}" typeString="endless.UnknownTest" valueString="u_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                           <value name="next {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                           <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="heapBefore_&lt;init&gt;" arrayIndex="-1" isArrayIndex="false">
+                     <value name="heapBefore_&lt;init&gt; {true}" typeString="Heap" valueString="store(store(store(create(store(heap,self,endless.UnknownTest::$previous,null),u_3),u_3,java.lang.Object::&lt;initialized&gt;,FALSE),u_3,endless.UnknownTest::$next,null),u_3,endless.UnknownTest::$previous,null)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
+                  <callStateVariable name="savedHeapBefore_&lt;init&gt;" arrayIndex="-1" isArrayIndex="false">
+                     <value name="savedHeapBefore_&lt;init&gt; {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </callStateVariable>
                </methodReturn>
                <methodReturnEntry path="/0/0/0/0/0"/>
             </methodCall>

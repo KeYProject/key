@@ -47,7 +47,7 @@ public abstract class LDT implements Named {
     private final Namespace functions = new Namespace();
     
     //-------------------------------------------------------------------------
-    //constructors
+    // constructors
     //-------------------------------------------------------------------------
     
     protected LDT(Name name, TermServices services) {
@@ -109,11 +109,11 @@ public abstract class LDT implements Named {
     //-------------------------------------------------------------------------
     
     /*
-    Use this method to instantiate all LDTs. It returns a map taking
-    as input the name of an LDT and returning an instance of that LDT.
-    
-    Is it possible to implement LDTs as singletons? (Kai Wallisch 04/2014)
-    */
+     * Use this method to instantiate all LDTs. It returns a map that takes
+     * as input the name of an LDT and returns an instance of the corresponding LDT.
+     * 
+     * Is it possible to implement LDTs as singletons? (Kai Wallisch 04/2014)
+     */
     public static Map<Name, LDT> getNewLDTInstances(Services s) {
         
         // TreeMap ensures the map is sorted according to the natural order of its keys.
@@ -139,12 +139,10 @@ public abstract class LDT implements Named {
 	return name;
     }
 
-
     @Override
     public final String toString() {
 	return "LDT "+name()+" ("+targetSort() + ")";
     }
-
     
     /** 
      * Returns the sort associated with the LDT.

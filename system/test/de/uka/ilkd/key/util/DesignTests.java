@@ -21,8 +21,6 @@ import java.lang.reflect.Modifier;
 import java.util.Iterator;
 import java.util.LinkedList;
 import junit.framework.TestCase;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
 
 
 /** 

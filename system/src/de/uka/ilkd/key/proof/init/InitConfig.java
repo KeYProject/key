@@ -391,12 +391,12 @@ public class InitConfig {
 
     
     public void setSettings(ProofSettings newSettings) {
-      this.settings = newSettings;	  
-	}
+        this.settings = newSettings;
+    }
     
     
     public ProofSettings getSettings() {
-       return settings;
+        return settings;
     }
 
 

@@ -144,6 +144,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        SEDMemoryLoopStatement ln = new SEDMemoryLoopStatement(target, s1, thread);
        ln.setName("while (x == 1)");
        ln.setPathCondition("pc3");
+       ln.setGroupable(false);
        s1.addChild(ln);
        
        SEDMemoryLoopCondition lc = new SEDMemoryLoopCondition(target, ln, thread);
@@ -185,6 +186,7 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        SEDMemoryMethodCall call = new SEDMemoryMethodCall(target, bnotzero, thread);
        call.setName("foo(result)");
        call.setPathCondition("pc11");
+       call.setGroupable(true);
        bnotzero.addChild(call);
 
        SEDMemoryBranchStatement branch = new SEDMemoryBranchStatement(target, call, thread);
@@ -206,9 +208,24 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        SEDMemoryBranchCondition returnCondition = new SEDMemoryBranchCondition(target, call, thread);
        returnCondition.setName("A Return Condition");
        returnCondition.addChild(returnNegative);
+       returnNegative.addGroupStartCondition(returnCondition);
        call.addMethodReturnCondition(returnCondition);
+       call.addGroupEndCondition(returnCondition);
        returnNegative.setMethodReturnCondition(returnCondition);
        bnegative.addChild(returnNegative);
+       
+       SEDMemoryVariable negativeCallVar = new SEDMemoryVariable(target, et);
+       negativeCallVar.setName("negativeCallVar");
+       returnNegative.addCallStateVariable(negativeCallVar);
+       SEDMemoryValue negativeCallVarValue = new SEDMemoryValue(target, negativeCallVar);
+       negativeCallVarValue.setValueString("negativeCallVarValue");
+       negativeCallVar.setValue(negativeCallVarValue);
+       SEDMemoryVariable negativeCallVarChild = new SEDMemoryVariable(target, et);
+       negativeCallVarChild.setName("negativeCallVarChild");
+       negativeCallVarValue.addVariable(negativeCallVarChild);
+       SEDMemoryValue negativeCallVarChildValue = new SEDMemoryValue(target, negativeCallVarChild);
+       negativeCallVarChildValue.setValueString("negativeCallVarChildValue");
+       negativeCallVarChild.setValue(negativeCallVarChildValue);
        
        SEDMemoryTermination terminationNegative = new SEDMemoryTermination(target, returnNegative, thread, true);
        terminationNegative.setName("<end>");

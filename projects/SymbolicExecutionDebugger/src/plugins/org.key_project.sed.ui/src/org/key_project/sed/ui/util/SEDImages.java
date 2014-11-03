@@ -16,7 +16,10 @@ package org.key_project.sed.ui.util;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.eclipse.debug.core.model.IThread;
+import org.eclipse.debug.internal.ui.DebugPluginImages;
 import org.eclipse.debug.internal.ui.DebugUIPlugin;
+import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
@@ -486,6 +489,19 @@ public final class SEDImages {
           }
           else {
              return getImage(SEDImages.LOOP_INVARIANT_INITIALLY_INVALID);
+          }
+       }
+       else if (element instanceof IThread) {
+          // Oriented on org.eclipse.debug.internal.ui.DefaultLabelProvider#getImageKey(Object)
+          IThread thread = (IThread) element;
+          if (thread.isSuspended()) {
+             return DebugPluginImages.getImage(IDebugUIConstants.IMG_OBJS_THREAD_SUSPENDED);
+          }
+          else if (thread.isTerminated()) {
+             return DebugPluginImages.getImage(IDebugUIConstants.IMG_OBJS_THREAD_TERMINATED);
+          }
+          else {
+             return DebugPluginImages.getImage(IDebugUIConstants.IMG_OBJS_THREAD_RUNNING);
           }
        }
        else {

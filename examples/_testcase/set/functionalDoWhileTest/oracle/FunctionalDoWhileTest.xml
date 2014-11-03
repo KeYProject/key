@@ -3,22 +3,22 @@
    <methodCall name="&lt;call self.main()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
-            <loopStatement name="do ... while ( invert(i)&gt;-3 );" pathCondition="true" pathConditionChanged="false">
+            <loopStatement name="do ... while ( invert(i)&gt;-3 );" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
                   <statement name="i++;" pathCondition="true" pathConditionChanged="false">
-                     <loopCondition name="invert(i)&gt;-3" pathCondition="true" pathConditionChanged="false">
+                     <loopCondition name="invert(i)&gt;-3" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                         <methodCall name="&lt;call self.invert(i_1)&gt;" pathCondition="true" pathConditionChanged="false">
                            <statement name="return i_1*-1;" pathCondition="true" pathConditionChanged="false">
                               <methodReturn name="&lt;return of invert&gt;" signature="&lt;return of self.invert(i_1)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                  <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
                                     <statement name="i++;" pathCondition="true" pathConditionChanged="false">
-                                       <loopCondition name="invert(i)&gt;-3" pathCondition="true" pathConditionChanged="false">
+                                       <loopCondition name="invert(i)&gt;-3" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                                           <methodCall name="&lt;call self.invert(i_2)&gt;" pathCondition="true" pathConditionChanged="false">
                                              <statement name="return i_2*-1;" pathCondition="true" pathConditionChanged="false">
                                                 <methodReturn name="&lt;return of invert&gt;" signature="&lt;return of self.invert(i_2)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                                                    <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
                                                       <statement name="i++;" pathCondition="true" pathConditionChanged="false">
-                                                         <loopCondition name="invert(i)&gt;-3" pathCondition="true" pathConditionChanged="false">
+                                                         <loopCondition name="invert(i)&gt;-3" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                                                             <methodCall name="&lt;call self.invert(i_3)&gt;" pathCondition="true" pathConditionChanged="false">
                                                                <statement name="return i_3*-1;" pathCondition="true" pathConditionChanged="false">
                                                                   <methodReturn name="&lt;return of invert&gt;" signature="&lt;return of self.invert(i_3)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
@@ -28,27 +28,41 @@
                                                                            </termination>
                                                                         </methodReturn>
                                                                      </statement>
+                                                                     <completedBlockEntry path="/0/0/0/0" conditionString="true"/>
+                                                                     <completedBlockEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0" conditionString="true"/>
                                                                   </methodReturn>
                                                                </statement>
                                                                <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                             </methodCall>
+                                                            <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                                            <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                          </loopCondition>
+                                                         <completedBlockEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0" conditionString="true"/>
+                                                         <completedBlockEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0" conditionString="true"/>
                                                       </statement>
                                                    </statement>
                                                 </methodReturn>
                                              </statement>
                                              <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                           </methodCall>
+                                          <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                                          <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                        </loopCondition>
+                                       <completedBlockEntry path="/0/0/0/0/0/0/0" conditionString="true"/>
+                                       <completedBlockEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0" conditionString="true"/>
                                     </statement>
                                  </statement>
                               </methodReturn>
                            </statement>
                            <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0"/>
                         </methodCall>
+                        <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0"/>
+                        <blockCompletionEntry path="/0/0/0/0/0/0"/>
                      </loopCondition>
+                     <completedBlockEntry path="/0/0/0/0/0/0/0" conditionString="true"/>
                   </statement>
                </statement>
+               <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
             </loopStatement>
          </statement>
       </statement>

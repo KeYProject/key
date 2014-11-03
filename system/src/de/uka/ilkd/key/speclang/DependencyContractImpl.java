@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.DependencyContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -498,16 +499,30 @@ public final class DependencyContractImpl implements DependencyContract {
         return null;
     }
 
+    
     @Override
     public boolean transactionApplicableContract() {
         return false;
     }
 
+    
     @Override
     public ProofOblInput createProofObl(InitConfig initConfig,
-            Contract contract) {
-        return new DependencyContractPO(initConfig,
-                (DependencyContract) contract);
+                                     Contract contract) {
+	return new DependencyContractPO(initConfig,
+	                                (DependencyContract)contract);
+    }
+
+
+    @Override
+    public final ContractPO createProofObl(InitConfig initConfig) {
+        return (ContractPO)createProofObl(initConfig, this);
+    }
+
+    
+    @Override
+    public ProofOblInput getProofObl(Services services) {
+        return services.getSpecificationRepository().getPO(this);
     }
 
 
