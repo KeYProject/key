@@ -28,15 +28,14 @@ public class JMLProfilePropertiesPage extends PropertyPage implements
       layout.numColumns=1;
       myComposite.setLayout(layout);
       
-      final GridData data = new GridData();
-      
-
+      GridData data = new GridData();
       data.grabExcessHorizontalSpace = true;
       
       this.useDefaultButton = new Button(myComposite, SWT.CHECK);
       this.useDefaultButton.setText("Use project specific settings");
       this.useDefaultButton.setData(data);
       
+      data = new GridData();
       data.grabExcessHorizontalSpace = true;
       data.grabExcessVerticalSpace = true;
       
