@@ -1815,7 +1815,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         RPAREN
         {
                resolverManager.popLocalVariablesNamespace();
-               result = translator.translate(JMLTranslator.JMLKeyWord.UNIONINF, declVars, t, t2, javaInfo);
+               result = translator.translate(JMLTranslator.JMLKeyWord.UNIONINF, declVars, t, t2, services);
         }
 
     |   pd:DISJOINT LPAREN tlist=storeRefList RPAREN {

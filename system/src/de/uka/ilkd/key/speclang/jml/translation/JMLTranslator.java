@@ -722,12 +722,13 @@ public final class JMLTranslator {
             public SLExpression translate(SLTranslationExceptionManager excManager,
                             Object... params) throws SLTranslationException {
 
-                checkParameters(params, Pair.class, Term.class, Term.class, JavaInfo.class);
+                checkParameters(params, Pair.class, Term.class, Term.class, Services.class);
                 @SuppressWarnings("unchecked")
                 Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = (Pair<KeYJavaType, ImmutableList<LogicVariable>>) params[0];
                 Term t = (Term) params[1];
                 Term t2 = (Term) params[2];
-                JavaInfo javaInfo = (JavaInfo) params[3];
+                Services services = (Services) params[3];
+                JavaInfo javaInfo = services.getJavaInfo();
 
                 if(t2 == null) {
                     // unguarded version
@@ -2064,33 +2065,6 @@ public final class JMLTranslator {
             return new SLExpression(translateQuantifier(qv, cond),resultType);
         }
         
-        /** Provide restriction terms for the declared KeYJavaType */
-        protected Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<QuantifiableVariable> qvs, Services services) {
-            final Type type = kjt.getJavaType();
-            final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
-            Term res = tb.tt();
-            for (QuantifiableVariable qv: qvs) {
-                if (type instanceof PrimitiveType) {
-                    if (type == PrimitiveType.JAVA_BYTE) res = tb.and(res,tb.inByte(tb.var(qv)));
-                    if (type == PrimitiveType.JAVA_SHORT) res = tb.and(res,tb.inShort(tb.var(qv)));
-                    if (type == PrimitiveType.JAVA_CHAR) res = tb.and(res,tb.inChar(tb.var(qv)));
-                    if (type == PrimitiveType.JAVA_INT) res = tb.and(res,tb.inInt(tb.var(qv)));
-                    if (type == PrimitiveType.JAVA_LONG) res = tb.and(res,tb.inLong(tb.var(qv)));
-                } else {
-                    // assume reference type
-                    if (nullable) {
-                        res = tb.and(res,tb.created(tb.var(qv)));
-                    } else {
-                        final Term nonNull = arrayDepth > 0 ?
-                                tb.deepNonNull(tb.var(qv), tb.zTerm(arrayDepth))
-                                : tb.not(tb.equals(tb.var(qv), tb.NULL()));
-                        res = tb.and(res,tb.and(
-                                tb.created(tb.var(qv)), nonNull));
-                    }
-                }
-            }
-            return res;
-        }
 
         public abstract Term combineQuantifiedTerms(Term t1,
                                                     Term t2)
@@ -2503,4 +2477,33 @@ public final class JMLTranslator {
         }
         return translateToJDLTerm(t, functName, services, tb, list, excManager);
     }
+
+    /** Provide restriction terms for the declared KeYJavaType */
+    protected Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<QuantifiableVariable> qvs, Services services) {
+        final Type type = kjt.getJavaType();
+        final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
+        Term res = tb.tt();
+        for (QuantifiableVariable qv: qvs) {
+            if (type instanceof PrimitiveType) {
+                if (type == PrimitiveType.JAVA_BYTE) res = tb.and(res,tb.inByte(tb.var(qv)));
+                if (type == PrimitiveType.JAVA_SHORT) res = tb.and(res,tb.inShort(tb.var(qv)));
+                if (type == PrimitiveType.JAVA_CHAR) res = tb.and(res,tb.inChar(tb.var(qv)));
+                if (type == PrimitiveType.JAVA_INT) res = tb.and(res,tb.inInt(tb.var(qv)));
+                if (type == PrimitiveType.JAVA_LONG) res = tb.and(res,tb.inLong(tb.var(qv)));
+            } else {
+                // assume reference type
+                if (nullable) {
+                    res = tb.and(res,tb.created(tb.var(qv)));
+                } else {
+                    final Term nonNull = arrayDepth > 0 ?
+                            tb.deepNonNull(tb.var(qv), tb.zTerm(arrayDepth))
+                            : tb.not(tb.equals(tb.var(qv), tb.NULL()));
+                    res = tb.and(res,tb.and(
+                            tb.created(tb.var(qv)), nonNull));
+                }
+            }
+        }
+        return res;
+    }
+    
 }
