@@ -30,5 +30,29 @@
             label="JML">
       </hover>
    </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="org.key_project.jmlediting.ui.JMLProjectPropertiesPage"
+            id="org.key_project.jmlediting.ui.jmlprojectproperties"
+            name="JML">
+            <enabledWhen>
+               <adapt type="org.eclipse.core.resources.IProject">
+                  <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.jdt.core.javanature"/>
+               </adapt>         
+            </enabledWhen>
+      </page>
+      <page
+            class="org.key_project.jmlediting.ui.JMLProfilePropertiesPage"
+            id="org.key_project.jmlediting.ui.jmlprojectproperties.profile"
+            name="Profile"
+            category="org.key_project.jmlediting.ui.jmlprojectproperties">
+            <enabledWhen>
+               <adapt type="org.eclipse.core.resources.IProject">
+                  <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.jdt.core.javanature"/>
+               </adapt>         
+            </enabledWhen>
+      </page>
+   </extension>
 
 </plugin>
