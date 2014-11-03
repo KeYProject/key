@@ -21,10 +21,10 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof_references.KeYTypeUtil;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -32,11 +32,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * The default implementation of {@link IExecutionMethodCall}.
  * @author Martin Hentschel
  */
-public class ExecutionMethodCall extends AbstractExecutionStateNode<MethodBodyStatement> implements IExecutionMethodCall {
+public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStatement> implements IExecutionMethodCall {
    /**
-    * The up to know discovered {@link IExecutionMethodReturn}s.
+    * The up to know discovered {@link IExecutionBaseMethodReturn}s.
     */
-   private ImmutableList<IExecutionMethodReturn> methodReturns = ImmutableSLList.nil();
+   private ImmutableList<IExecutionBaseMethodReturn<?>> methodReturns = ImmutableSLList.nil();
 
    /**
     * Constructor.
@@ -55,10 +55,24 @@ public class ExecutionMethodCall extends AbstractExecutionStateNode<MethodBodySt
     */
    @Override
    protected String lazyComputeName() {
+      return INTERNAL_NODE_NAME_START + 
+             "call " + getMethodCallText() + 
+             INTERNAL_NODE_NAME_END;
+   }
+   
+   /**
+    * Computes the method call text.
+    * @return The method call text.
+    */
+   protected String getMethodCallText() {
       MethodReference explicitConstructorMR = getExplicitConstructorMethodReference();
-      return explicitConstructorMR != null ?
-             explicitConstructorMR.toString() :
-             getMethodReference().toString();
+      String call = explicitConstructorMR != null ?
+                    explicitConstructorMR.toString() :
+                    getMethodReference().toString();
+      if (call.endsWith(";")) {
+         call = call.substring(0, call.length() - 1);
+      }
+      return call;
    }
 
    /**
@@ -118,14 +132,6 @@ public class ExecutionMethodCall extends AbstractExecutionStateNode<MethodBodySt
     * {@inheritDoc}
     */
    @Override
-   protected IExecutionVariable[] lazyComputeVariables() {
-      return SymbolicExecutionUtil.createExecutionVariables(this);
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
    public String getElementType() {
       return "Method Call";
    }
@@ -134,18 +140,26 @@ public class ExecutionMethodCall extends AbstractExecutionStateNode<MethodBodySt
     * {@inheritDoc}
     */
    @Override
-   public ImmutableList<IExecutionMethodReturn> getMethodReturns() {
+   public ImmutableList<IExecutionBaseMethodReturn<?>> getMethodReturns() {
       return methodReturns;
    }
    
    /**
-    * Registers the given {@link IExecutionMethodReturn}.
-    * @param methodReturn The {@link IExecutionMethodReturn} to register.
+    * Registers the given {@link IExecutionBaseMethodReturn}.
+    * @param methodReturn The {@link IExecutionBaseMethodReturn} to register.
     */
-   public void addMethodReturn(IExecutionMethodReturn methodReturn) {
+   public void addMethodReturn(IExecutionBaseMethodReturn<?> methodReturn) {
       if (methodReturn != null) {
          assert methodReturn.getMethodCall() == this;
-         methodReturns = methodReturns.prepend(methodReturn);
+         methodReturns = methodReturns.append(methodReturn);
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected IExecutionConstraint[] lazyComputeConstraints() {
+      return SymbolicExecutionUtil.createExecutionConstraints(this);
    }
 }

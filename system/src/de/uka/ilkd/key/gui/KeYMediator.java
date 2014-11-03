@@ -23,12 +23,14 @@ import javax.swing.event.EventListenerList;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
@@ -60,7 +62,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.util.MiscTools;
@@ -153,8 +154,9 @@ public class KeYMediator {
     }
 
     public KeYExceptionHandler getExceptionHandler(){
-	if(getSelectedProof() != null){
-	    return getServices().getExceptionHandler();
+       Proof selectedProof = getSelectedProof();
+	if(selectedProof != null && !selectedProof.isDisposed()){
+	    return selectedProof.getServices().getExceptionHandler();
 	}else{
 	    return defaultExceptionHandler;
 	}
@@ -840,53 +842,60 @@ public class KeYMediator {
        return inAutoMode;
    }
 
-    class KeYMediatorProofTreeListener extends ProofTreeAdapter {
-    	private boolean pruningInProcess;
+   class KeYMediatorProofTreeListener extends ProofTreeAdapter {
+       private boolean pruningInProcess;
 
-    	public void proofClosed(ProofTreeEvent e) {
-    		KeYMediator.this.notify
-    		(new ProofClosedNotificationEvent(e.getSource()));
-    	}
+       public void proofClosed(ProofTreeEvent e) {
+           Proof p = e.getSource();
+           assert p.name().equals(getSelectedProof().name());
+           assert p.closed();
+           if (ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave()
+                   && !p.name().toString().endsWith(".proof")) {
+               assert ui.getMediator().getSelectedProof().name().equals(p.name());
+               ui.saveProof(p, ".proof");
+           }
+           KeYMediator.this.notify(new ProofClosedNotificationEvent(e.getSource()));
+       }
 
-    	public void proofPruningInProcess(ProofTreeEvent e) {
-    		pruningInProcess = true;
-    	}
+       public void proofPruningInProcess(ProofTreeEvent e) {
+           pruningInProcess = true;
+       }
 
-    	public void proofPruned(final ProofTreeEvent e) {
-    		SwingUtilities.invokeLater(new Runnable() {
-    			public void run () {
-    				if (!e.getSource().find(getSelectedNode())) {
-    					keySelectionModel.setSelectedNode(e.getNode());
-    				}
-    			}});
-    		pruningInProcess = false;
-    	}
+       public void proofPruned(final ProofTreeEvent e) {
+           SwingUtilities.invokeLater(new Runnable() {
+               public void run () {
+                   if (!e.getSource().find(getSelectedNode())) {
+                       keySelectionModel.setSelectedNode(e.getNode());
+                   }
+               }});
+           pruningInProcess = false;
+       }
 
-    	public void proofGoalsAdded(ProofTreeEvent e) {
-    		ImmutableList<Goal> newGoals = e.getGoals();
-    		// Check for a closed goal ...
-    		if (newGoals.size() == 0){
-    			// No new goals have been generated ...
-    			closedAGoal();
-    		}
-    	}
+       public void proofGoalsAdded(ProofTreeEvent e) {
+           ImmutableList<Goal> newGoals = e.getGoals();
+           // Check for a closed goal ...
+           if (newGoals.size() == 0){
+               // No new goals have been generated ...
+               closedAGoal();
+           }
+       }
 
-    	public void proofStructureChanged(ProofTreeEvent e) {
-    		if (isInAutoMode() || pruningInProcess) return;
-    		Proof p = e.getSource();
-    		if (p == getSelectedProof()) {
-    			Node sel_node = getSelectedNode();
-    			if (!p.find(sel_node)) {
-    				keySelectionModel.defaultSelection();
-    			} else {
-    				// %%% hack does need to be done proper
-    				// needed top update that the selected node nay have
-    				// changed its status
-    				keySelectionModel.setSelectedNode(sel_node);
-    			}
-    		}
-    	}
-    }
+       public void proofStructureChanged(ProofTreeEvent e) {
+           if (isInAutoMode() || pruningInProcess) return;
+           Proof p = e.getSource();
+           if (p == getSelectedProof()) {
+               Node sel_node = getSelectedNode();
+               if (!p.find(sel_node)) {
+                   keySelectionModel.defaultSelection();
+               } else {
+                   // %%% hack does need to be done proper
+                   // needed top update that the selected node nay have
+                   // changed its status
+                   keySelectionModel.setSelectedNode(sel_node);
+               }
+           }
+       }
+   }
 
     private final class KeYMediatorProofListener implements RuleAppListener,
                                                             AutoModeListener {
@@ -940,6 +949,20 @@ public class KeYMediator {
         });
     }
 
+    /*
+     * Disable certain actions until a proof is loaded.
+     */
+    public void enableWhenProofLoaded(final javax.swing.AbstractButton a) {
+        a.setEnabled(getSelectedProof() != null);
+        addKeYSelectionListener(new KeYSelectionListener() {
+            public void selectedNodeChanged(KeYSelectionEvent e) {}
+            public void selectedProofChanged(KeYSelectionEvent e) {
+                a.setEnabled(
+                    e.getSource().getSelectedProof() != null);
+            }
+        });
+    }
+    
     /**
      * takes a notification event and informs the notification
      * manager

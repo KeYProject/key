@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_851d6b1e-57b5-4dfd-bd0f-c755a70a5dea" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_f1c5880e-d04e-4dd0-a919-926db1e3747d" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_4c89a0c5-1d9a-4025-ac29-56db59c5c0f1" name="self.main(a);" pathCondition="true" lineNumber="-1" charStart="52" charEnd="56" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
+   <sedTarget xml:id="_bf6e60f9-911d-41f4-809f-cd71d07b893d" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_de527484-4869-446a-8551-2bf85f1d043b" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java">
+         <sedMethodCall xml:id="_3a3ac32e-9a9f-4c01-8c47-c0dea5cf7442" name="&lt;call self.main(a)&gt;" pathCondition="true" lineNumber="-1" charStart="52" charEnd="56" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnOneBranchOnly\src\StepOverOnTwoBranches.java" groupable="true">
          </sedMethodCall>
       </sedThread>
    </sedTarget>

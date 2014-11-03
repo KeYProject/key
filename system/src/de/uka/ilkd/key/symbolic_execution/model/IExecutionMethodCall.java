@@ -33,7 +33,7 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodCall;
  * @see SymbolicExecutionTreeBuilder
  * @see ExecutionMethodCall
  */
-public interface IExecutionMethodCall extends IExecutionStateNode<MethodBodyStatement> {
+public interface IExecutionMethodCall extends IExecutionNode<MethodBodyStatement> {
    /**
     * Returns the {@link MethodReference} instance of the called method.
     * @return The {@link MethodReference} of the called method.
@@ -66,8 +66,8 @@ public interface IExecutionMethodCall extends IExecutionStateNode<MethodBodyStat
    public IProgramMethod getExplicitConstructorProgramMethod();
    
    /**
-    * Returns the up to now discovered {@link IExecutionMethodReturn}s.
-    * @return The up to now discovered {@link IExecutionMethodReturn}s.
+    * Returns the up to now discovered {@link IExecutionBaseMethodReturn}s.
+    * @return The up to now discovered {@link IExecutionBaseMethodReturn}s.
     */
-   public ImmutableList<IExecutionMethodReturn> getMethodReturns();
+   public ImmutableList<IExecutionBaseMethodReturn<?>> getMethodReturns();
 }

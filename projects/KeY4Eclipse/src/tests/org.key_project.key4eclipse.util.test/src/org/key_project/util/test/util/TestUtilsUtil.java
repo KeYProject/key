@@ -16,6 +16,7 @@ package org.key_project.util.test.util;
 import static org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable.syncExec;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -52,6 +53,7 @@ import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jdt.ui.wizards.JavaCapabilityConfigurationPage;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Control;
@@ -77,6 +79,7 @@ import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
+import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBotControl;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
@@ -110,6 +113,7 @@ import org.key_project.util.eclipse.setup.SetupStartup;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithException;
@@ -1804,5 +1808,100 @@ public class TestUtilsUtil {
             return styledText.widget.getLocationAtOffset(offset);
          }
       });
+   }
+   
+   /**
+    * Ensures that the given arrays contain the same elements.
+    * @param expected The first array.
+    * @param actual The second array.
+    */
+   public static <T> void assertArrayEquals(T[] expected, T[] actual) {
+      if (expected != null) {
+         assertNotNull(actual);
+         assertEquals(expected.length, actual.length);
+         for (int i = 0; i < expected.length; i++) {
+            assertEquals(expected[i], actual[i]);
+         }
+      }
+      else {
+         assertNull(actual);
+      }
+   }
+
+   /**
+    * Performs {@link WorkbenchUtil#selectAndReveal(IResource)} thread save.
+    * @param file The {@link IFile} to select.
+    */
+   public static void selectAndReveal(final IFile file) {
+      Display.getDefault().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            WorkbenchUtil.selectAndReveal(file);
+         }
+      });
+   }
+
+   /**
+    * Returns the foreground {@link Color}.
+    * @param item The {@link SWTBotTreeItem}.
+    * @return The foreground {@link Color} of the given {@link SWTBotTreeItem}.
+    */
+   public static Color getForeground(final SWTBotTreeItem item) {
+      return syncExec(new Result<Color>() {
+         @Override
+         public Color run() {
+            return item.widget.getForeground();
+         }
+      });
+   }
+
+   /**
+    * Returns the data of the given {@link AbstractSWTBotControl} meaning
+    * {@link Widget#getData()}.
+    * @param control The {@link AbstractSWTBotControl} to read its data.
+    * @return The read data.
+    */
+   public static Object getData(final AbstractSWTBotControl<?> control) {
+      return syncExec(new Result<Object>() {
+         @Override
+         public Object run() {
+            return control.widget.getData();
+         }
+      });
+   }
+
+   /**
+    * Waits until the {@link SWTBotTable} contains at least some rows.
+    * @param bot The {@link SWTBot} to use.
+    * @param table The {@link SWTBotTable} to test.
+    * @param minRowCount The epected minimal number of rows to wait for.
+    */
+   public static void waitUntilTableHasAtLeastRows(SWTBot bot, final SWTBotTable table, final int minRowCount) {
+      bot.waitUntil(new ICondition() {
+         @Override
+         public boolean test() throws Exception {
+            return table.rowCount() >= minRowCount;
+         }
+         
+         @Override
+         public void init(SWTBot bot) {
+         }
+         
+         @Override
+         public String getFailureMessage() {
+            return "Timed out waiting for " + table + " to contain at least " + minRowCount + " rows.";
+         }
+      });
+   }
+
+   /**
+    * Compares the given {@link String}s ignoring white space.
+    * @param expected The expected text.
+    * @param actual The actual text.
+    */
+   public static void assertEqualsIgnoreWhiteSpace(String expected, String actual) {
+      if (!StringUtil.equalIgnoreWhiteSpace(expected, actual)) {
+         assertEquals(expected, actual);
+      }
    }
 }

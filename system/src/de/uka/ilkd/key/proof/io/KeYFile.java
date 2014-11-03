@@ -38,6 +38,7 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import org.antlr.runtime.RecognitionException;
 
 
 /** 
@@ -104,7 +105,7 @@ public class KeYFile implements EnvInput {
                    File file, 
                    ProgressMonitor monitor,
                    Profile profile) {
-	this(name, RuleSource.initRuleFile(file), monitor, profile);
+	this(name, RuleSourceFactory.initRuleFile(file), monitor, profile);
     }
     
 
@@ -113,7 +114,7 @@ public class KeYFile implements EnvInput {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private KeYParserF createDeclParser(InputStream is) throws FileNotFoundException {
+    private KeYParserF createDeclParser(InputStream is) throws IOException {
         return new KeYParserF(ParserMode.DECLARATION,
                              new KeYLexerF(is,
                                           file.toString(),
@@ -132,32 +133,34 @@ public class KeYFile implements EnvInput {
         return input;
     }
     
-    
     protected ProofSettings getPreferences() throws ProofInputException {
         if (initConfig.getSettings() == null) {
-            if (file.isDirectory()) {
-                return null;
-            }
-            try {
-               KeYParserF problemParser
-                    = new KeYParserF(ParserMode.PROBLEM,
-                                    new KeYLexerF(getNewStream(), file.toString(), null));
-               problemParser.profile();
-               ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
-               settings.loadSettingsFromString(problemParser.preferences());
-                return settings;                
-            } catch (antlr.ANTLRException e) {
-                throw new ProofInputException(e);
-            } catch (FileNotFoundException fnfe) {
-                throw new ProofInputException(fnfe);
-            } catch (de.uka.ilkd.key.util.ExceptionHandlerException ehe) {
-                throw new ProofInputException(ehe.getCause().getMessage());
-            }
+            return readPreferences();
         } else {
             return initConfig.getSettings();
         }
     }
     
+    public ProofSettings readPreferences() throws ProofInputException {
+       if (file.isDirectory()) {
+          return null;
+      }
+      try {
+         KeYParserF problemParser
+              = new KeYParserF(ParserMode.PROBLEM,
+                              new KeYLexerF(getNewStream(), file.toString(), null));
+         problemParser.profile();
+         ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
+         settings.loadSettingsFromString(problemParser.preferences());
+          return settings;                
+      } catch (RecognitionException e) {
+          throw new ProofInputException(e);
+      } catch (IOException fnfe) {
+          throw new ProofInputException(fnfe);
+      } catch (de.uka.ilkd.key.util.ExceptionHandlerException ehe) {
+          throw new ProofInputException(ehe.getCause().getMessage());
+      }
+    }
     
     
     //-------------------------------------------------------------------------
@@ -172,7 +175,7 @@ public class KeYFile implements EnvInput {
     
     @Override
     public int getNumberOfChars() {
-	return file.getNumberOfChars();
+	return file.getNumberOfBytes();
     }
     
     
@@ -203,10 +206,10 @@ public class KeYFile implements EnvInput {
                                 null); 
                 problemParser.parseIncludes(); 
                 includes = problemParser.getIncludes();
-            } catch (antlr.ANTLRException e) {
+            } catch (RecognitionException e) {
                 throw new ProofInputException(e);
-            } catch (FileNotFoundException fnfe) {
-                throw new ProofInputException(fnfe);
+            } catch (IOException e) {
+                throw new ProofInputException(e);
             } catch(de.uka.ilkd.key.util.ExceptionHandlerException ehe){
                 throw new ProofInputException(ehe);
             }
@@ -288,7 +291,7 @@ public class KeYFile implements EnvInput {
             javaPathAlreadyParsed = true;
             
             return javaPath;
-        } catch (antlr.ANTLRException e) {
+        } catch (RecognitionException e) {
             throw new ProofInputException(e);
         } catch (IOException ioe) {
             throw new ProofInputException(ioe);
@@ -345,7 +348,7 @@ public class KeYFile implements EnvInput {
             } finally {
                 cinp.close();
             }
-	} catch (antlr.ANTLRException e) {
+	} catch (RecognitionException e) {
 	    throw new ProofInputException(e);
 	} catch (FileNotFoundException fnfe) {
 	    throw new ProofInputException(fnfe);
@@ -369,7 +372,7 @@ public class KeYFile implements EnvInput {
             } finally {
                 is.close();
             }
-	} catch (antlr.ANTLRException e) {
+	} catch (RecognitionException e) {
 	    throw new ProofInputException(e);
 	} catch (FileNotFoundException fnfe) {
             throw new ProofInputException(fnfe);
@@ -392,7 +395,7 @@ public class KeYFile implements EnvInput {
             } finally {
                 is.close();
             }
-	} catch (antlr.ANTLRException e) {
+	} catch (RecognitionException e) {
 	    throw new ProofInputException(e);
 	} catch (FileNotFoundException fnfe) {
             throw new ProofInputException(fnfe);
@@ -431,7 +434,7 @@ public class KeYFile implements EnvInput {
             } finally {
                 cinp.close();
             }
-	} catch (antlr.ANTLRException e) {
+	} catch (RecognitionException e) {
 	    throw new ProofInputException(e);
 	} catch (FileNotFoundException fnfe) {
             throw new ProofInputException(fnfe);
@@ -491,5 +494,10 @@ public class KeYFile implements EnvInput {
     @Override
     public Profile getProfile() {
         return profile;
+    }
+    
+    @Override
+    public File getInitialFile() {
+       return file != null ? file.file() : null;
     }
 }

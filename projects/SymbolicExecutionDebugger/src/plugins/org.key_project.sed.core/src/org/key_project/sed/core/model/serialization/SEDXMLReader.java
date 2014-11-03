@@ -32,6 +32,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugElement;
+import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.jface.resource.StringConverter;
@@ -40,15 +41,24 @@ import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.annotation.ISEDAnnotationType;
 import org.key_project.sed.core.model.ISEDBranchCondition;
+import org.key_project.sed.core.model.ISEDConstraint;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEDValue;
+import org.key_project.sed.core.model.ISEDVariable;
+import org.key_project.sed.core.model.impl.AbstractSEDBaseMethodReturn;
+import org.key_project.sed.core.model.memory.ISEDMemoryBaseMethodReturn;
 import org.key_project.sed.core.model.memory.ISEDMemoryDebugNode;
+import org.key_project.sed.core.model.memory.ISEDMemoryGroupable;
 import org.key_project.sed.core.model.memory.ISEDMemoryStackFrameCompatibleDebugNode;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchStatement;
+import org.key_project.sed.core.model.memory.SEDMemoryConstraint;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
+import org.key_project.sed.core.model.memory.SEDMemoryExceptionalMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryExceptionalTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopBodyTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopCondition;
@@ -173,6 +183,34 @@ public class SEDXMLReader {
                }
                entry.getKey().setCallStack(callStack.toArray(new ISEDDebugNode[callStack.size()]));
             }
+            // Set known terminations
+            Set<Entry<SEDMemoryThread, List<String>>> terminationEntries = handler.getTerminationEntriesMap().entrySet();
+            for (Entry<SEDMemoryThread, List<String>> entry : terminationEntries) {
+               for (String nodeRefId : entry.getValue()) {
+                  ISEDDebugElement element = handler.getElementById(nodeRefId);
+                  if (element == null) {
+                     throw new SAXException("Referenced node with ID \"" + nodeRefId + "\" is not available in model.");
+                  }
+                  if (!(element instanceof ISEDTermination)) {
+                     throw new SAXException("Referenced node with ID \"" + nodeRefId + "\" refers to wrong model object \"" + element + "\".");
+                  }
+                  entry.getKey().addTermination((ISEDTermination)element);
+               }
+            }
+            // Set relevant constraints
+            Set<Entry<SEDMemoryValue, List<String>>> relevantConstraintEntries = handler.getRelevantConstraintsMap().entrySet();
+            for (Entry<SEDMemoryValue, List<String>> entry : relevantConstraintEntries) {
+               for (String constraintRefId : entry.getValue()) {
+                  ISEDDebugElement element = handler.getElementById(constraintRefId);
+                  if (element == null) {
+                     throw new SAXException("Referenced constraint with ID \"" + constraintRefId + "\" is not available in model.");
+                  }
+                  if (!(element instanceof ISEDConstraint)) {
+                     throw new SAXException("Referenced constraint with ID \"" + constraintRefId + "\" refers to wrong model object \"" + element + "\".");
+                  }
+                  entry.getKey().addRelevantConstraint((ISEDConstraint)element);
+               }
+            }
             // Inject child references
             Set<Entry<ISEDMemoryDebugNode, List<ChildReference>>> childReferences = handler.getNodeChildReferences().entrySet();
             for (Entry<ISEDMemoryDebugNode, List<ChildReference>> entry : childReferences) {
@@ -187,17 +225,39 @@ public class SEDXMLReader {
                   entry.getKey().addChild((ISEDDebugNode)element);
                }
             }
+            // Inject group end references
+            Set<Entry<ISEDMemoryGroupable, List<GroupEndReference>>> groupEndReferences = handler.getGroupEndReferences().entrySet();
+            for (Entry<ISEDMemoryGroupable, List<GroupEndReference>> entry : groupEndReferences) {
+               for (GroupEndReference references : entry.getValue()) {
+                  ISEDDebugElement element = handler.getElementById(references.getId());
+                  if (element == null) {
+                     throw new SAXException("Referenced node with ID \"" + references.getId() + "\" is not available in model.");
+                  }
+                  if (!(element instanceof ISEDBranchCondition)) {
+                     throw new SAXException("Referenced node with ID \"" + references.getId() + "\" refers to wrong model object \"" + element + "\".");
+                  }
+                  entry.getKey().addGroupEndCondition((ISEDBranchCondition)element);
+               }
+            }
             // Inject method return conditions
-            Set<Entry<SEDMemoryMethodReturn, String>> returnConditions = handler.getMethodReturnConditionReferences().entrySet();
-            for (Entry<SEDMemoryMethodReturn, String> entry : returnConditions) {
+            Set<Entry<AbstractSEDBaseMethodReturn, String>> returnConditions = handler.getMethodReturnConditionReferences().entrySet();
+            for (Entry<AbstractSEDBaseMethodReturn, String> entry : returnConditions) {
                ISEDDebugElement element = handler.getElementById(entry.getValue());
                if (element == null) {
                   throw new SAXException("Referenced node with ID \"" + entry.getValue() + "\" is not available in model.");
                }
                if (!(element instanceof ISEDBranchCondition)) {
                   throw new SAXException("Referenced node with ID \"" + entry.getValue() + "\" refers to wrong model object \"" + element + "\".");
-               }               
-               entry.getKey().setMethodReturnCondition((ISEDBranchCondition)element);
+               }
+               if (entry.getKey() instanceof SEDMemoryMethodReturn) {
+                  ((SEDMemoryMethodReturn) entry.getKey()).setMethodReturnCondition((ISEDBranchCondition)element);
+               }
+               else if (entry.getKey() instanceof SEDMemoryExceptionalMethodReturn) {
+                  ((SEDMemoryExceptionalMethodReturn) entry.getKey()).setMethodReturnCondition((ISEDBranchCondition)element);
+               }
+               else {
+                  throw new SAXException("Unsupported method return \"" + entry.getKey() + "\".");
+               }
             }
             // Return result
             return handler.getResult();
@@ -248,6 +308,11 @@ public class SEDXMLReader {
        * Maps {@link ISEDMemoryDebugNode} to the IDs of their calls tacks.
        */
       private final Map<ISEDMemoryDebugNode, List<String>> callStackEntriesMap = new HashMap<ISEDMemoryDebugNode, List<String>>();
+      
+      /**
+       * Maps {@link ISEDThread} to the IDs of their known termination nodes.
+       */
+      private final Map<SEDMemoryThread, List<String>> terminationEntriesMap = new HashMap<SEDMemoryThread, List<String>>();
 
       /**
        * Maps the element ID ({@link ISEDDebugElement#getId()}) to the its {@link ISEDDebugElement} instance.
@@ -265,9 +330,19 @@ public class SEDXMLReader {
       private final Map<ISEDMemoryDebugNode, List<ChildReference>> nodeChildReferences = new HashMap<ISEDMemoryDebugNode, List<ChildReference>>();
       
       /**
-       * Maps {@link SEDMemoryMethodReturn}s to their method return conditions.
+       * Maps {@link ISEDMemoryGroupable} to its group end references.
        */
-      private final Map<SEDMemoryMethodReturn, String> methodReturnConditionReferences = new HashMap<SEDMemoryMethodReturn, String>();
+      private final Map<ISEDMemoryGroupable, List<GroupEndReference>> groupEndReferences = new HashMap<ISEDMemoryGroupable, List<GroupEndReference>>();
+      
+      /**
+       * Maps {@link AbstractSEDBaseMethodReturn}s to their method return conditions.
+       */
+      private final Map<AbstractSEDBaseMethodReturn, String> methodReturnConditionReferences = new HashMap<AbstractSEDBaseMethodReturn, String>();
+      
+      /**
+       * Maps {@link SEDMemoryValue}d to the IDs of their relevant constraints.
+       */
+      private Map<SEDMemoryValue, List<String>> relevantConstraintsMap = new HashMap<SEDMemoryValue, List<String>>();
       
       /**
        * {@inheritDoc}
@@ -275,6 +350,7 @@ public class SEDXMLReader {
       @Override
       public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
          ISEDMemoryDebugNode parent = parentStack.peekFirst();
+         IDebugElement parentVariableOrValue = variablesValueStack.peekFirst();
          if (isCallStackEntry(uri, localName, qName)) {
             List<String> callStack = callStackEntriesMap.get(parent);
             if (callStack == null) {
@@ -283,8 +359,49 @@ public class SEDXMLReader {
             }
             callStack.add(getNodeIdRef(attributes));
          }
+         else if (isRelevantConstraint(uri, localName, qName)) {
+            if (parentVariableOrValue instanceof SEDMemoryValue) {
+               List<String> entriesList = relevantConstraintsMap.get((SEDMemoryValue)parentVariableOrValue);
+               if (entriesList == null) {
+                  entriesList = new LinkedList<String>();
+                  relevantConstraintsMap.put((SEDMemoryValue)parentVariableOrValue, entriesList);
+               }
+               entriesList.add(getConstraintIdRef(attributes));
+            }
+            else {
+               throw new SAXException("Can't add relevant constraint to parent.");
+            }
+         }
+         else if (isTerminationEntry(uri, localName, qName)) {
+            if (parent == null) {
+               List<String> entriesList = terminationEntriesMap.get(thread);
+               if (entriesList == null) {
+                  entriesList = new LinkedList<String>();
+                  terminationEntriesMap.put(thread, entriesList);
+               }
+               entriesList.add(getNodeIdRef(attributes));
+            }
+            else {
+               throw new SAXException("Can't add termination entry to parent.");
+            }
+         }
+         else if (isCallStateVariable(uri, localName, qName)) {
+            IVariable variable = createVariable(target, (IStackFrame)parent, uri, localName, qName, attributes);
+            if (variablesValueStack.isEmpty()) {
+               if (parent instanceof ISEDMemoryBaseMethodReturn) {
+                  ((ISEDMemoryBaseMethodReturn)parent).addCallStateVariable(variable);
+                  variablesValueStack.addFirst(variable);
+               }
+               else {
+                  throw new SAXException("Can't add call state variable to parent.");
+               }
+            }
+            else {
+               throw new SAXException("Can't add call state variable to parent.");
+            }
+         }
          else {
-            Object obj = createElement(target, parent != null ? parent : thread, thread, uri, localName, qName, attributes, annotationIdMapping, methodReturnConditionReferences);
+            Object obj = createElement(target, parent != null ? parent : thread, thread, parentVariableOrValue, uri, localName, qName, attributes, annotationIdMapping, methodReturnConditionReferences);
             if (obj instanceof ISEDDebugElement) {
                ISEDDebugElement element = (ISEDDebugElement)obj;
                elementIdMapping.put(element.getId(), element);
@@ -297,9 +414,25 @@ public class SEDXMLReader {
                }
                refs.add((ChildReference)obj);
             }
+            else if (obj instanceof GroupEndReference) {
+               List<GroupEndReference> refs = groupEndReferences.get(parent);
+               if (refs == null) {
+                  refs = new LinkedList<GroupEndReference>();
+                  groupEndReferences.put((ISEDMemoryGroupable) parent, refs);
+               }
+               refs.add((GroupEndReference)obj);
+            }
             else if (obj instanceof SEDMemoryDebugTarget) {
                target = (SEDMemoryDebugTarget)obj;
                result.add(target);
+            }
+            else if (obj instanceof ISEDConstraint) {
+               if (parent != null) {
+                  parent.addConstraint((ISEDConstraint) obj);
+               }
+               else {
+                  thread.addConstraint((ISEDConstraint) obj);
+               }
             }
             else if (obj instanceof IVariable) {
                IVariable variable = (IVariable)obj;
@@ -307,12 +440,14 @@ public class SEDXMLReader {
                   if (parent instanceof ISEDMemoryStackFrameCompatibleDebugNode) {
                      ((ISEDMemoryStackFrameCompatibleDebugNode)parent).addVariable(variable);
                   }
+                  else if (parent == null && thread != null) {
+                     thread.addVariable(variable);
+                  }
                   else {
                      throw new SAXException("Can't add variable to parent.");
                   }
                }
                else {
-                  IDebugElement parentVariableOrValue = variablesValueStack.peekFirst();
                   if (parentVariableOrValue instanceof SEDMemoryValue) {
                      ((SEDMemoryValue)parentVariableOrValue).addVariable(variable);
                   }
@@ -324,7 +459,6 @@ public class SEDXMLReader {
             }
             else if (obj instanceof IValue) {
                IValue value = (IValue)obj;
-               IDebugElement parentVariableOrValue = variablesValueStack.peekFirst();
                if (parentVariableOrValue instanceof SEDMemoryVariable) {
                   ((SEDMemoryVariable)parentVariableOrValue).setValue(value);
                }
@@ -347,6 +481,9 @@ public class SEDXMLReader {
                parentStack.addFirst(child);
                if (isMethodReturnCondition(uri, localName, qName)) {
                   ((SEDMemoryMethodCall)parent).addMethodReturnCondition((ISEDBranchCondition)child);
+               }
+               else if (isGroupStartCondition(uri, localName, qName)) {
+                  parent.addGroupStartCondition((ISEDBranchCondition)child);
                }
                else {
                   if (parent != null) {
@@ -377,10 +514,21 @@ public class SEDXMLReader {
        */
       @Override
       public void endElement(String uri, String localName, String qName) throws SAXException {
-         if (isVariable(uri, localName, qName) || isValue(uri, localName, qName)) {
+         if (isCallStateVariable(uri, localName, qName) || 
+             isVariable(uri, localName, qName) || 
+             isValue(uri, localName, qName)) {
             variablesValueStack.removeFirst();
          }
+         else if (isConstraint(uri, localName, qName)) {
+            // Nothing to do
+         }
+         else if (isRelevantConstraint(uri, localName, qName)) {
+            // Nothing to do
+         }
          else if (isCallStackEntry(uri, localName, qName)) {
+            // Nothing to do
+         }
+         else if (isTerminationEntry(uri, localName, qName)) {
             // Nothing to do
          }
          else if (isAnnotation(uri, localName, qName)) {
@@ -393,6 +541,9 @@ public class SEDXMLReader {
             // Nothing to do
          }
          else if (isChildReferences(uri, localName, qName)) {
+            // Nothing to do
+         }
+         else if (isGroupEndReferences(uri, localName, qName)) {
             // Nothing to do
          }
          else {
@@ -431,7 +582,23 @@ public class SEDXMLReader {
       }
 
       /**
-       * Returns the nod child references.
+       * Returns the mapping of {@link SEDMemoryThread}s to their call stacks.
+       * @return The mapping of {@link SEDMemoryThread}s to their call stacks.
+       */
+      public Map<SEDMemoryThread, List<String>> getTerminationEntriesMap() {
+         return terminationEntriesMap;
+      }
+
+      /**
+       * Returns the mapping of {@link SEDMemoryValue}s to their relevant constraints.
+       * @return The mapping of {@link SEDMemoryValue}s to their relevant constraints.
+       */
+      public Map<SEDMemoryValue, List<String>> getRelevantConstraintsMap() {
+         return relevantConstraintsMap;
+      }
+
+      /**
+       * Returns the node child references.
        * @return The node child references.
        */
       public Map<ISEDMemoryDebugNode, List<ChildReference>> getNodeChildReferences() {
@@ -439,10 +606,18 @@ public class SEDXMLReader {
       }
 
       /**
+       * Returns the group end references.
+       * @return The group end references.
+       */
+      public Map<ISEDMemoryGroupable, List<GroupEndReference>> getGroupEndReferences() {
+         return groupEndReferences;
+      }
+
+      /**
        * Returns the method return conditions.
        * @return The method return conditions.
        */
-      public Map<SEDMemoryMethodReturn, String> getMethodReturnConditionReferences() {
+      public Map<AbstractSEDBaseMethodReturn, String> getMethodReturnConditionReferences() {
          return methodReturnConditionReferences;
       }
 
@@ -457,6 +632,28 @@ public class SEDXMLReader {
    }
    
    /**
+    * Checks if the given tag name represents a constraint.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @return {@code true} represents a constraint, {@code false} represents something else.
+    */
+   protected boolean isConstraint(String uri, String localName, String qName) {
+      return SEDXMLWriter.TAG_CONSTRAINT.equals(qName);
+   }
+
+   /**
+    * Checks if the given tag name represents a relevant constraint.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @return {@code true} represents a constraint, {@code false} represents something else.
+    */
+   protected boolean isRelevantConstraint(String uri, String localName, String qName) {
+      return SEDXMLWriter.TAG_RELEVANT_CONSTRAINT.equals(qName);
+   }
+   
+   /**
     * Checks if the given tag name represents a call stack entry.
     * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
     * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
@@ -465,6 +662,17 @@ public class SEDXMLReader {
     */
    protected boolean isCallStackEntry(String uri, String localName, String qName) {
       return SEDXMLWriter.TAG_CALL_STACK_ENTRY.equals(qName);
+   }
+   
+   /**
+    * Checks if the given tag name represents a termination entry.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @return {@code true} represents a termination entry, {@code false} represents something else.
+    */
+   protected boolean isTerminationEntry(String uri, String localName, String qName) {
+      return SEDXMLWriter.TAG_TERMINATION_ENTRY.equals(qName);
    }
    
    /**
@@ -501,6 +709,17 @@ public class SEDXMLReader {
    }
    
    /**
+    * Checks if the given tag name represents a {@link GroupEndReference}.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @return {@code true} represents an {@link GroupEndReference}, {@code false} represents something else.
+    */
+   protected boolean isGroupEndReferences(String uri, String localName, String qName) {
+      return SEDXMLWriter.TAG_GROUP_END_REFERENCE.equals(qName);
+   }
+   
+   /**
     * Checks if the given tag name represents an {@link ISEDBranchCondition}.
     * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
     * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
@@ -509,6 +728,28 @@ public class SEDXMLReader {
     */
    protected boolean isMethodReturnCondition(String uri, String localName, String qName) {
       return SEDXMLWriter.TAG_METHOD_RETURN_CONDITIONS.equals(qName);
+   }
+   
+   /**
+    * Checks if the given tag name represents an {@link ISEDBranchCondition}.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @return {@code true} represents an {@link ISEDBranchCondition}, {@code false} represents something else.
+    */
+   protected boolean isGroupStartCondition(String uri, String localName, String qName) {
+      return SEDXMLWriter.TAG_GROUP_START_CONDITION.equals(qName);
+   }
+   
+   /**
+    * Checks if the given tag name represents an {@link IVariable}.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @return {@code true} represents an {@link IVariable}, {@code false} represents something else.
+    */
+   protected boolean isCallStateVariable(String uri, String localName, String qName) {
+      return SEDXMLWriter.TAG_CALL_STATE_VARIABLE.equals(qName);
    }
    
    /**
@@ -538,6 +779,7 @@ public class SEDXMLReader {
     * @param target The parent {@link ISEDDebugTarget} or {@code null} if not available.
     * @param parent The parent {@link ISEDDebugNode} or {@code null} if not available.
     * @param thread The parent {@link ISEDThread} or {@code null} if not available.
+    * @param parentVariableOrValue The parent {@link ISEDVariable} / {@link ISEDValue} if available or {@code null} otherwise.
     * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
     * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
     * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
@@ -546,18 +788,22 @@ public class SEDXMLReader {
     * @return The created {@link Object}.
     * @throws SAXException Occurred Exception.
     */
-   protected Object createElement(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes, Map<String, ISEDAnnotation> annotationIdMapping, Map<SEDMemoryMethodReturn, String> methodReturnConditionReferences) throws SAXException {
+   protected Object createElement(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, IDebugElement parentVariableOrValue, String uri, String localName, String qName, Attributes attributes, Map<String, ISEDAnnotation> annotationIdMapping, Map<AbstractSEDBaseMethodReturn, String> methodReturnConditionReferences) throws SAXException {
       if (SEDXMLWriter.TAG_LAUNCH.equals(qName)) {
          return null; // Nothing to do
       }
       else if (SEDXMLWriter.TAG_CHILD_REFERENCE.equals(qName)) {
          return new ChildReference(getNodeIdRef(attributes));
       }
+      else if (SEDXMLWriter.TAG_GROUP_END_REFERENCE.equals(qName)) {
+         return new GroupEndReference(getNodeIdRef(attributes));
+      }
       else if (SEDXMLWriter.TAG_DEBUG_TARGET.equals(qName)) {
          return createDebugTarget(uri, localName, qName, attributes);
       }
       else if (SEDXMLWriter.TAG_BRANCH_CONDITION.equals(qName) ||
-               SEDXMLWriter.TAG_METHOD_RETURN_CONDITIONS.equals(qName)) {
+               SEDXMLWriter.TAG_METHOD_RETURN_CONDITIONS.equals(qName) ||
+               SEDXMLWriter.TAG_GROUP_START_CONDITION.equals(qName)) {
          return createBranchCondition(target, parent, thread, uri, localName, qName, attributes);
       }
       else if (SEDXMLWriter.TAG_BRANCH_STATEMENT.equals(qName)) {
@@ -581,6 +827,9 @@ public class SEDXMLReader {
       else if (SEDXMLWriter.TAG_METHOD_RETURN.equals(qName)) {
          return createMethodReturn(target, parent, thread, uri, localName, qName, attributes, methodReturnConditionReferences);
       }
+      else if (SEDXMLWriter.TAG_EXCEPTIONAL_METHOD_RETURN.equals(qName)) {
+         return createExceptionalMethodReturn(target, parent, thread, uri, localName, qName, attributes, methodReturnConditionReferences);
+      }
       else if (SEDXMLWriter.TAG_STATEMENT.equals(qName)) {
          return createStatement(target, parent, thread, uri, localName, qName, attributes);
       }
@@ -591,10 +840,10 @@ public class SEDXMLReader {
          return createThread(target, uri, localName, qName, attributes);
       }
       else if (SEDXMLWriter.TAG_VARIABLE.equals(qName)) {
-         return createVariable(target, uri, localName, qName, attributes);
+         return createVariable(target, (IStackFrame)parent, uri, localName, qName, attributes);
       }
       else if (SEDXMLWriter.TAG_VALUE.equals(qName)) {
-         return createValue(target, uri, localName, qName, attributes);
+         return createValue(target, (ISEDVariable)parentVariableOrValue, uri, localName, qName, attributes);
       }
       else if (SEDXMLWriter.TAG_METHOD_CONTRACT.equals(qName)) {
          return createMethodContract(target, parent, thread, uri, localName, qName, attributes);
@@ -608,11 +857,20 @@ public class SEDXMLReader {
       else if (SEDXMLWriter.TAG_ANNOTATION_LINK.equals(qName)) {
          return createAnnotationLink(target, parent, thread, uri, localName, qName, attributes, annotationIdMapping);
       }
+      else if (SEDXMLWriter.TAG_CONSTRAINT.equals(qName)) {
+         return createConstraint(target, parent, thread, uri, localName, qName, attributes);
+      }
       else {
          throw new SAXException("Unknown tag \"" + qName + "\".");
       }
    }
    
+   protected SEDMemoryConstraint createConstraint(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
+      SEDMemoryConstraint constraint = new SEDMemoryConstraint(target, getName(attributes));
+      constraint.setId(getId(attributes));
+      return constraint;
+   }
+
    protected ISEDAnnotationLink createAnnotationLink(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes, Map<String, ISEDAnnotation> annotationIdMapping) throws SAXException {
       String sourceId = getAnnotationLinkSource(attributes);
       String targetId = getAnnotationLinkTarget(attributes);
@@ -664,8 +922,8 @@ public class SEDXMLReader {
       return annotation;
    }
 
-   protected SEDMemoryValue createValue(ISEDDebugTarget target, String uri, String localName, String qName, Attributes attributes) {
-      SEDMemoryValue value = new SEDMemoryValue(target);
+   protected SEDMemoryValue createValue(ISEDDebugTarget target, ISEDVariable parent, String uri, String localName, String qName, Attributes attributes) {
+      SEDMemoryValue value = new SEDMemoryValue(target, parent);
       value.setId(getId(attributes));
       value.setAllocated(isAllocated(attributes));
       value.setReferenceTypeName(getReferenceTypeName(attributes));
@@ -674,8 +932,8 @@ public class SEDXMLReader {
       return value;
    }
    
-   protected SEDMemoryVariable createVariable(ISEDDebugTarget target, String uri, String localName, String qName, Attributes attributes) {
-      SEDMemoryVariable variable = new SEDMemoryVariable(target);
+   protected SEDMemoryVariable createVariable(ISEDDebugTarget target, IStackFrame stackFrame, String uri, String localName, String qName, Attributes attributes) {
+      SEDMemoryVariable variable = new SEDMemoryVariable(target, stackFrame);
       variable.setId(getId(attributes));
       variable.setName(getName(attributes));
       variable.setReferenceTypeName(getReferenceTypeName(attributes));
@@ -745,10 +1003,12 @@ public class SEDXMLReader {
     * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
     * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
     * @return The created {@link SEDMemoryExceptionalTermination}.
+    * @throws SAXException Occurred Exception.
     */   
-   protected SEDMemoryExceptionalTermination createExceptionalTermination(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) {
+   protected SEDMemoryExceptionalTermination createExceptionalTermination(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEDMemoryExceptionalTermination termination = new SEDMemoryExceptionalTermination(target, parent, thread, isVerified(attributes));
       fillDebugNode(termination, attributes);
+      fillStackFrame(termination, attributes);
       return termination;
    }
    
@@ -762,10 +1022,12 @@ public class SEDXMLReader {
     * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
     * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
     * @return The created {@link SEDMemoryLoopBodyTermination}.
+    * @throws SAXException Occurred Exception.
     */   
-   protected SEDMemoryLoopBodyTermination createLoopBodyTermination(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) {
+   protected SEDMemoryLoopBodyTermination createLoopBodyTermination(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEDMemoryLoopBodyTermination termination = new SEDMemoryLoopBodyTermination(target, parent, thread, isVerified(attributes));
       fillDebugNode(termination, attributes);
+      fillStackFrame(termination, attributes);
       return termination;
    }
    
@@ -841,8 +1103,32 @@ public class SEDXMLReader {
     * @return The created {@link SEDMemoryMethodReturn}.
     * @throws SAXException Occurred Exception.
     */   
-   protected SEDMemoryMethodReturn createMethodReturn(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes, Map<SEDMemoryMethodReturn, String> methodReturnConditionReferences) throws SAXException {
+   protected SEDMemoryMethodReturn createMethodReturn(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes, Map<AbstractSEDBaseMethodReturn, String> methodReturnConditionReferences) throws SAXException {
       SEDMemoryMethodReturn methodReturn = new SEDMemoryMethodReturn(target, parent, thread);
+      methodReturn.setSourcePath(getSourcePath(attributes));
+      fillDebugNode(methodReturn, attributes);
+      fillStackFrame(methodReturn, attributes);
+      String methodReturnCondition = getMethodReturnCondition(attributes);
+      if (!StringUtil.isEmpty(methodReturnCondition)) {
+         methodReturnConditionReferences.put(methodReturn, methodReturnCondition);
+      }
+      return methodReturn;
+   }
+   
+   /**
+    * Creates a {@link SEDMemoryExceptionalMethodReturn} instance for the content in the given tag.
+    * @param target The parent {@link ISEDDebugTarget} or {@code null} if not available.
+    * @param parent The parent {@link ISEDDebugNode} or {@code null} if not available.
+    * @param thread The parent {@link ISEDThread} or {@code null} if not available.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
+    * @return The created {@link SEDMemoryExceptionalMethodReturn}.
+    * @throws SAXException Occurred Exception.
+    */   
+   protected SEDMemoryExceptionalMethodReturn createExceptionalMethodReturn(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes, Map<AbstractSEDBaseMethodReturn, String> methodReturnConditionReferences) throws SAXException {
+      SEDMemoryExceptionalMethodReturn methodReturn = new SEDMemoryExceptionalMethodReturn(target, parent, thread);
       methodReturn.setSourcePath(getSourcePath(attributes));
       fillDebugNode(methodReturn, attributes);
       fillStackFrame(methodReturn, attributes);
@@ -927,10 +1213,12 @@ public class SEDXMLReader {
     * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
     * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
     * @return The created {@link SEDMemoryTermination}.
+    * @throws SAXException Occurred Exception.
     */   
-   protected SEDMemoryTermination createTermination(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) {
+   protected SEDMemoryTermination createTermination(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       SEDMemoryTermination termination = new SEDMemoryTermination(target, parent, thread, isVerified(attributes));
       fillDebugNode(termination, attributes);
+      fillStackFrame(termination, attributes);
       return termination;
    }
    
@@ -958,8 +1246,11 @@ public class SEDXMLReader {
       node.setId(getId(attributes));
       node.setName(getName(attributes));
       node.setPathCondition(getPathCondition(attributes));
+      if (node instanceof ISEDMemoryGroupable) {
+         ((ISEDMemoryGroupable) node).setGroupable(isGroupable(attributes));
+      }
    }
-   
+
    /**
     * Fills the attributes of the given {@link ISEDMemoryStackFrameCompatibleDebugNode}.
     * @param node The {@link ISEDMemoryStackFrameCompatibleDebugNode} to fill.
@@ -988,6 +1279,15 @@ public class SEDXMLReader {
     */
    protected String getNodeIdRef(Attributes attributes) {
       return attributes.getValue(SEDXMLWriter.ATTRIBUTE_NODE_ID_REF);
+   }
+   
+   /**
+    * Returns the constraint id reference value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getConstraintIdRef(Attributes attributes) {
+      return attributes.getValue(SEDXMLWriter.ATTRIBUTE_CONSTRAINT_ID_REF);
    }
    
    /**
@@ -1043,7 +1343,13 @@ public class SEDXMLReader {
     */
    protected int getLineNumber(Attributes attributes) throws SAXException {
       try {
-         return Integer.parseInt(attributes.getValue(SEDXMLWriter.ATTRIBUTE_LINE_NUMBER));
+         String value = attributes.getValue(SEDXMLWriter.ATTRIBUTE_LINE_NUMBER);
+         if (value != null) {
+            return Integer.parseInt(value);
+         }
+         else {
+            return -1;
+         }
       }
       catch (NumberFormatException e) {
          throw new SAXException(e);
@@ -1058,7 +1364,13 @@ public class SEDXMLReader {
     */
    protected int getCharStart(Attributes attributes) throws SAXException {
       try {
-         return Integer.parseInt(attributes.getValue(SEDXMLWriter.ATTRIBUTE_CHAR_START));
+         String value = attributes.getValue(SEDXMLWriter.ATTRIBUTE_CHAR_START);
+         if (value != null) {
+            return Integer.parseInt(value);
+         }
+         else {
+            return -1;
+         }
       }
       catch (NumberFormatException e) {
          throw new SAXException(e);
@@ -1073,7 +1385,13 @@ public class SEDXMLReader {
     */
    protected int getCharEnd(Attributes attributes) throws SAXException {
       try {
-         return Integer.parseInt(attributes.getValue(SEDXMLWriter.ATTRIBUTE_CHAR_END));
+         String value = attributes.getValue(SEDXMLWriter.ATTRIBUTE_CHAR_END);
+         if (value != null) {
+            return Integer.parseInt(value);
+         }
+         else {
+            return -1;
+         }
       }
       catch (NumberFormatException e) {
          throw new SAXException(e);
@@ -1141,6 +1459,15 @@ public class SEDXMLReader {
     */
    protected boolean isInitiallyValid(Attributes attributes) {
       return Boolean.parseBoolean(attributes.getValue(SEDXMLWriter.ATTRIBUTE_INITIALLY_VALID));
+   }
+   
+   /**
+    * Returns the groupable value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isGroupable(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(SEDXMLWriter.ATTRIBUTE_GROUPABLE));
    }
    
    /**
@@ -1257,6 +1584,33 @@ public class SEDXMLReader {
        * @param id The target ID.
        */
       public ChildReference(String id) {
+         this.id = id;
+      }
+
+      /**
+       * Returns the target ID.
+       * @return The target ID.
+       */
+      public String getId() {
+         return id;
+      }
+   }
+
+   /**
+    * Represents temporary a group end reference.
+    * @author Martin Hentschel
+    */
+   protected static class GroupEndReference {
+      /**
+       * The target ID.
+       */
+      private final String id;
+
+      /**
+       * Constructor.
+       * @param id The target ID.
+       */
+      public GroupEndReference(String id) {
          this.id = id;
       }
 

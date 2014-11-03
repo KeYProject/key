@@ -19,11 +19,17 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.util.Pair;
+
 public class KeYFileChooser {
 
     private final JFileChooser fileChooser;
 
     private boolean saveDialog;
+
+    private File resetFile = null;
 
     public KeYFileChooser(String initDir) {
 	fileChooser = new JFileChooser(new File(initDir)) {
@@ -66,7 +72,7 @@ public class KeYFileChooser {
     }
 
     public void setDialogTitle(String title) {
-	if (title!=null) {
+	if (title != null) {
 	    fileChooser.setDialogTitle (title);
 	} else {
 	    fileChooser.setDialogTitle ("Select file to load");
@@ -80,22 +86,74 @@ public class KeYFileChooser {
 		                         : JFileChooser.FILES_AND_DIRECTORIES);        
     }
 
-    public boolean showSaveDialog(Component parent, String defaultName) {
-	if(defaultName != null) {
-	    File file = new File(fileChooser.getCurrentDirectory(), 
-		    		 defaultName);
-	    fileChooser.setSelectedFile(file);
-	}
-	
+    public Pair<Boolean, File> showSaveDialog(Component parent, String defaultName) {
+        File file = fileChooser.getSelectedFile();
+        final String recDir = file != null ?
+                file.getParent() : fileChooser.getCurrentDirectory().toString();
+        resetFile = (defaultName != null) ? new File(recDir, defaultName): file;
+        fileChooser.setSelectedFile(resetFile);
         setSaveDialog(true);
-	int result = fileChooser.showSaveDialog(parent);
-	return (result == JFileChooser.APPROVE_OPTION);
+        boolean proofFolderActive = ProofIndependentSettings.DEFAULT_INSTANCE
+                         .getGeneralSettings().storesInDefaultProofFolder();
+        final String poDir =
+                resetFile.getParent().endsWith("src") ?
+                        new File(resetFile.getParent()).getParent() : resetFile.getParent();
+        final String proofFolder = ProofSaver.PROOF_SUBDIRECTORY;
+        final String proofDir =
+                (!proofFolderActive || resetFile.getParent().endsWith(proofFolder)) ?
+                resetFile.getParent() : resetFile.getParent().concat(proofFolder);
+        File dir = new File(proofDir);
+        if (proofFolderActive && !dir.exists()) {
+            dir.mkdir();
+        } else {
+            dir = null;
+        }
+        file = new File(defaultName.endsWith(".key") ? poDir : proofDir, resetFile.getName());
+        final boolean res = showSaveDialog(parent, file);
+
+	return new Pair<Boolean, File> (res, dir);
     }
+
+    public void resetPath() {
+        assert resetFile != null;
+        fileChooser.setSelectedFile(resetFile);
+        fileChooser.updateUI();
+        resetFile = null;
+    }
+
+    public File getCurrentDirectory() {
+       return fileChooser.getCurrentDirectory();
+    }
+
+   public boolean showSaveDialog(Component parent, File selectedFile) {
+      if (selectedFile != null) {
+         fileChooser.setSelectedFile(selectedFile);
+         fileChooser.updateUI(); // Might prevent empty filename suggestion?
+      }
+
+      setSaveDialog(true);
+      final boolean autoSave = MainWindow.getInstance().getUserInterface().autoSave();
+      int result = autoSave ? JFileChooser.APPROVE_OPTION : fileChooser.showSaveDialog(parent);
+      return (result == JFileChooser.APPROVE_OPTION);
+   }
 
     public boolean showOpenDialog(Component component) {
         setSaveDialog(false);
+
+        final File file = fileChooser.getSelectedFile() != null ?
+                fileChooser.getSelectedFile() : fileChooser.getCurrentDirectory();
+        resetFile = file;
+        fileChooser.setSelectedFile(file);
+        fileChooser.updateUI();
+
 	int result = fileChooser.showOpenDialog(component);
-	return (result == JFileChooser.APPROVE_OPTION);
+	boolean res = (result == JFileChooser.APPROVE_OPTION);
+	if (!res) {
+	    this.resetPath();
+	} else {
+	    resetFile = null;
+	}
+	return res;
     }
 
     public File getSelectedFile() {
@@ -112,5 +170,4 @@ public class KeYFileChooser {
                 "Save warning", JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE, null, null, null);
     }
-
 }

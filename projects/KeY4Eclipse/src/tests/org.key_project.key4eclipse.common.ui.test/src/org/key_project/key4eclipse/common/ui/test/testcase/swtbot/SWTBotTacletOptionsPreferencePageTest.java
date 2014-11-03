@@ -28,6 +28,8 @@ import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
+import de.uka.ilkd.key.gui.configuration.ChoiceSelector;
+import de.uka.ilkd.key.gui.configuration.ChoiceSelector.ChoiceEntry;
 import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -90,8 +92,8 @@ public class SWTBotTacletOptionsPreferencePageTest extends AbstractSetupTestCase
             tabItem.activate();
             assertTrue(entries.size() >= 2);
             for (String value : entry.getValue()) {
-               SWTBotRadio radio = preferenceShell.bot().radio(value);
-               boolean oldSelected = ObjectUtil.equals(oldDefaultChoices.get(category), radio.getText());
+               SWTBotRadio radio = preferenceShell.bot().radio(toDisplayText(value));
+               boolean oldSelected = ObjectUtil.equals(oldDefaultChoices.get(category), getChoice(radio));
                assertEquals(oldSelected, radio.isSelected());
             }
          }
@@ -101,12 +103,12 @@ public class SWTBotTacletOptionsPreferencePageTest extends AbstractSetupTestCase
             SWTBotTabItem tabItem = preferenceShell.bot().tabItem(category);
             tabItem.activate();
             for (String value : entry.getValue()) {
-               SWTBotRadio radio = preferenceShell.bot().radio(value);
-               boolean oldSelected = ObjectUtil.equals(oldDefaultChoices.get(category), radio.getText());
+               SWTBotRadio radio = preferenceShell.bot().radio(toDisplayText(value));
+               boolean oldSelected = ObjectUtil.equals(oldDefaultChoices.get(category), getChoice(radio));
                // Select radio if not selected before
                if (!oldSelected) {
                   radio.click();
-                  expectedNewValues.put(category, radio.getText());
+                  expectedNewValues.put(category, getChoice(radio));
                }
             }
          }
@@ -126,7 +128,13 @@ public class SWTBotTacletOptionsPreferencePageTest extends AbstractSetupTestCase
          Set<Entry<String, String>> newDefaultChoiceEntries = newDefaultChoices.entrySet();
          for (Entry<String, String> entry : newDefaultChoiceEntries) {
             if (approve) {
-               assertEquals(expectedNewValues.get(entry.getKey()), entry.getValue());
+               String expectedValue = expectedNewValues.get(entry.getKey());
+               if (expectedValue != null) {
+                  assertEquals(expectedValue, entry.getValue());
+               }
+               else {
+                  assertEquals(oldDefaultChoices.get(entry.getKey()), entry.getValue());
+               }
             }
             else {
                assertEquals(oldDefaultChoices.get(entry.getKey()), entry.getValue());
@@ -141,5 +149,25 @@ public class SWTBotTacletOptionsPreferencePageTest extends AbstractSetupTestCase
             preferenceShell.close();
          }
       }
+   }
+
+   /**
+    * Returns the choice represented by the given {@link SWTBotRadio}.
+    * @param radio The {@link SWTBotRadio}.
+    * @return The choice of the given {@link SWTBotRadio}.
+    */
+   protected String getChoice(SWTBotRadio radio) {
+      Object data = TestUtilsUtil.getData(radio);
+      assertTrue(data instanceof ChoiceEntry);
+      return ((ChoiceEntry) data).getChoice();
+   }
+
+   /**
+    * Converts the choice to the shown text.
+    * @param choice The choice.
+    * @return The shown text.
+    */
+   protected String toDisplayText(String choice) {
+      return ChoiceSelector.createChoiceEntry(choice).toString();
    }
 }

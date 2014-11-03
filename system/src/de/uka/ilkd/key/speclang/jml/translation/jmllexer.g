@@ -45,12 +45,14 @@ tokens {
     ACCESSIBLE      = "accessible";
     ASSIGNABLE      = "assignable";
     ENSURES         = "ensures";
-    DECLASSIFY      = "declassify";
     DEPENDS         = "depends";
     MODEL_METHOD_AXIOM    = "model_method_axiom";
     REPRESENTS      = "represents";
     REQUIRES        = "requires";
-    RESPECTS        = "respects";
+    DETERMINES      = "determines";
+    LOOP_DETERMINES = "loop_determines";
+    SEPARATES       = "separates";
+    LOOP_SEPARATES  = "loop_separates";
     SECURE_FOR      = "secure_for";
     SIGNALS         = "signals";
     SIGNALS_ONLY    = "signals_only";
@@ -92,6 +94,7 @@ INDEX : "\\index";
 INTO : "\\into";
 INV : "\\inv";
 INVARIANT_FOR : "\\invariant_for";
+STATIC_INVARIANT_FOR : "\\static_invariant_for";
 IS_INITIALIZED : "\\is_initialized";
 LARROW : "<-";
 LBLNEG : "\\lblneg";
@@ -105,6 +108,7 @@ LOCKSET_LT: "<#";
 LOCKSET_LEQ: "<#=";
 LOGICALAND : "&&";
 LOGICALOR : "||";
+MAP : "\\map";
 MAX_SPACE : "\\max_space"; //KeY extension, not official JML
 MEASURED_BY : "\\measured_by";
 MEMORY_AREA : "\\memoryArea"; //KeY extension, not official JML
@@ -178,10 +182,23 @@ SEQREPLACE : "\\seq_put";
 INDEXOF : "\\seq_indexOf";
 SEQDEF : "\\seq_def";
 
+MAPEMPTY : "\\map_empty";
+MAPEXPRESSION : "\\map_get"
+                | "\\map_override"
+                | "\\map_update" 
+                | "\\map_remove" 
+                | "\\in_domain" 
+                | "\\domain_implies_created" 
+                | "\\map_si" ("ze" | "ingleton")
+                | "\\is_finite";
+SEQ2MAP : "\\seq_2_map";
 
-FROM : "\\from";
-TO : "\\to";
-IF : "\\if";
+DECLASSIFIES : "\\declassifies";
+ERASES : "\\erases";
+NEW_OBJECTS: "\\new_objects";
+BY : "\\by";
+ITSELF : "\\itself";
+
 
 DL_ESCAPE : "\\dl_"  LETTER  ( LETTERORDIGIT )*  ;
 

@@ -62,6 +62,11 @@ public class SuperReference extends JavaNonTerminalProgramElement
         return (prefix == null) ? this : prefix.getFirstElement();
     }
 
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+        return (prefix == null) ? this : prefix.getFirstElementIncludingBlocks();
+    }
+
     /**
      *      Get reference prefix.
      *      @return the reference prefix.

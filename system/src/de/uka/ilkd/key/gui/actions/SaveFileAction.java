@@ -17,10 +17,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import de.uka.ilkd.key.gui.IconFactory;
-import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.util.GuiUtilities;
-import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.proof.Proof;
 
 /**
  * Saves the current selected proof.
@@ -41,20 +39,14 @@ public final class SaveFileAction extends MainWindowAction {
         
         mainWindow.getMediator().enableWhenProofLoaded(this);
     }
-    
+
     public void actionPerformed(ActionEvent e) {
         if (mainWindow.getMediator().ensureProofLoaded()) {
-            final KeYFileChooser jFC = GuiUtilities.getFileChooser("Choose filename to save proof");
-            
-            final String defaultName 
-            	= MiscTools.toValidFileName(mainWindow.getMediator().getSelectedProof()
-                    .name()
-                    .toString());
-            
-            boolean saved = jFC.showSaveDialog(mainWindow, defaultName + ".proof");
-            if (saved) {
-                mainWindow.saveProof(jFC.getSelectedFile());
-            }
+            // Try to save back to file where proof was initially loaded from
+            final Proof selectedProof = mainWindow.getMediator().getSelectedProof();
+            mainWindow.getUserInterface().noAutoSave();
+            mainWindow.getUserInterface().saveProof(selectedProof, ".proof");
+            mainWindow.getUserInterface().resetAutoSave();
         } else {
             mainWindow.popupWarning("No proof.", "Oops...");
         }

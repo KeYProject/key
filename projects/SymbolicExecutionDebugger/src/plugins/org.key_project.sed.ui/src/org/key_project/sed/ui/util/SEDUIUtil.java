@@ -67,7 +67,7 @@ import org.key_project.sed.ui.action.ISEDAnnotationLinkEditAction;
 import org.key_project.sed.ui.edit.ISEDAnnotationEditor;
 import org.key_project.util.eclipse.JobUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
-import org.key_project.util.eclipse.job.AbstractDependingOnObjectJob;
+import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.eclipse.job.ScheduledJobCollector;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ArrayUtil;
@@ -163,8 +163,8 @@ public final class SEDUIUtil {
       ISelection oldSelection = debugView.getViewer().getSelection();
       if (!selection.equals(SWTUtil.toList(oldSelection))) {
          // Change selection in debug view if new elements are selected in a Job because the debug view uses Jobs itself to expand the debug model and it is required to wait for them.
-         AbstractDependingOnObjectJob.cancelJobs(parentPart);
-         Job selectJob = new AbstractDependingOnObjectJob("Synchronizing selection", parentPart) {
+         AbstractDependingOnObjectsJob.cancelJobs(parentPart);
+         Job selectJob = new AbstractDependingOnObjectsJob("Synchronizing selection", parentPart) {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                try {
@@ -213,8 +213,8 @@ public final class SEDUIUtil {
                                         final IDebugView debugView, 
                                         final List<?> toExpand) {
       // Change selection in debug view if new elements are selected in a Job because the debug view uses Jobs itself to expand the debug model and it is required to wait for them.
-      AbstractDependingOnObjectJob.cancelJobs(parentPart);
-      Job selectJob = new AbstractDependingOnObjectJob("Expanding elements", parentPart) {
+      AbstractDependingOnObjectsJob.cancelJobs(parentPart);
+      Job selectJob = new AbstractDependingOnObjectsJob("Expanding elements", parentPart) {
          @Override
          protected IStatus run(IProgressMonitor monitor) {
             try {
@@ -476,14 +476,19 @@ public final class SEDUIUtil {
                      JobUtil.waitFor(job, 10);
                   }
                   // Wait until the element is known by the viewer since sometimes waiting for jobs is not enough.
+                  int numOfTries = 0;
                   while (!treeViewer.getControl().isDisposed() &&
-                         SWTUtil.testFindItem(treeViewer, toInject) == null) {
+                         SWTUtil.testFindItem(treeViewer, toInject) == null &&
+                         numOfTries < 200) { // Try at most for two seconds
                      SWTUtil.checkCanceled(monitor);
                      try {
                         Thread.sleep(10);
                      }
                      catch (InterruptedException e) {
-                     // Nothing to do.
+                        // Nothing to do.
+                     }
+                     finally {
+                        numOfTries++;
                      }
                   }
                   // Update tree path for next loop iteration

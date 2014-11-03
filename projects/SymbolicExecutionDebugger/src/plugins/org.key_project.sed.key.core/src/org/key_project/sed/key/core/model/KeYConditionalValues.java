@@ -14,14 +14,22 @@
 package org.key_project.sed.key.core.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.key_project.sed.core.model.ISEDValue;
+import org.key_project.sed.core.model.ISEDVariable;
 import org.key_project.sed.core.model.impl.AbstractSEDValue;
+import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.StringUtil;
 
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 
 /**
@@ -44,14 +52,20 @@ public class KeYConditionalValues extends AbstractSEDValue {
     * The contained child {@link KeYConditionalValueVariable}s.
     */
    private KeYConditionalValueVariable[] variables;
+   
+   /**
+    * All relevant {@link KeYConstraint}s.
+    */
+   private KeYConstraint[] relevantConstraints;
 
    /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this element is contained.
+    * @param parent The parent {@link ISEDVariable}.
     * @param values The {@link IExecutionValue}s to represent.
     */
-   public KeYConditionalValues(KeYDebugTarget target, IExecutionValue[] values) {
-      super(target);
+   public KeYConditionalValues(KeYDebugTarget target, ISEDVariable parent, IExecutionValue[] values) {
+      super(target, parent);
       Assert.isNotNull(values);
       Assert.isTrue(values.length >= 2);
       this.values = values;
@@ -74,7 +88,7 @@ public class KeYConditionalValues extends AbstractSEDValue {
          if (variables == null) {
             List<KeYConditionalValueVariable> result = new ArrayList<KeYConditionalValueVariable>(values.length);
             for (IExecutionValue value : values){
-               result.add(new KeYConditionalValueVariable(getDebugTarget(), value));
+               result.add(new KeYConditionalValueVariable(getDebugTarget(), getParent().getStackFrame(), value));
             }
             variables = result.toArray(new KeYConditionalValueVariable[result.size()]);
          }
@@ -120,5 +134,34 @@ public class KeYConditionalValues extends AbstractSEDValue {
    @Override
    public boolean isMultiValued() throws DebugException {
       return true;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYConstraint[] getRelevantConstraints() throws DebugException {
+      try {
+         synchronized (this) {
+            if (relevantConstraints == null) {
+               Set<IExecutionConstraint> relevantExecutionConstraints = new HashSet<IExecutionConstraint>();
+               for (IExecutionValue executionValue : values) {
+                  CollectionUtil.addAll(relevantExecutionConstraints, executionValue.getConstraints());
+               }
+               List<KeYConstraint> constraints = new LinkedList<KeYConstraint>();
+               KeYConstraint[] allConstraints = ((IKeYSEDDebugNode<?>)getParent().getStackFrame()).getConstraints();
+               for (KeYConstraint constraint : allConstraints) {
+                  if (relevantExecutionConstraints.remove(constraint.getExecutionConstraint())) {
+                     constraints.add(constraint);
+                  }
+               }
+               relevantConstraints = constraints.toArray(new KeYConstraint[constraints.size()]);
+            }
+            return relevantConstraints;
+         }
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus(e));
+      }
    }
 }

@@ -88,6 +88,11 @@ public class ProgramElementName extends Name
     public SourceElement getFirstElement() {
 	return this;
     }
+
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+       return getFirstElement();
+    }
 	
 	
     /**

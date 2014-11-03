@@ -90,6 +90,9 @@ options {
   import de.uka.ilkd.key.java.recoderext.*;
   import de.uka.ilkd.key.pp.AbbrevMap;
   import de.uka.ilkd.key.pp.LogicPrinter;
+
+  import de.uka.ilkd.key.ldt.SeqLDT;
+  import de.uka.ilkd.key.ldt.IntegerLDT;
   
 }
 
@@ -157,6 +160,18 @@ options {
    private String proofObligation = null;
     
    private int savedGuessing = -1;
+   
+   /*
+    counter variable for parser rules accessterm and heap_selection suffix:
+    - stores nesting depth of alpha::select(heap,o,f)-terms created via pretty syntax	(i.e. terms of the form: o.f)
+    - rule accessterm increases the counter
+    - rule heap_selection_suffix calls method heapSelectionSuffix(), which resets
+      the counter
+    - In case a term similar to o.f1.f2.f3.f4 would occur, this variable should have a value of 4.
+      The non-pretty syntax of this term would look similar to the following:
+          T::select(h, T::select(h, T::select(h, T::select(h, o, f1) , f2) , f3), f4)
+   */
+   protected int globalSelectNestingDepth = 0;
 
    private int lineOffset=0;
    private int colOffset=0;
@@ -584,13 +599,13 @@ options {
             }
             File path=new File(getSourceName().substring(start,end+1)+filename);
             try{ 
-                source = RuleSource.initRuleFile(path.toURL()); 
+                source = RuleSourceFactory.initRuleFile(path.toURL()); 
             }catch(java.net.MalformedURLException e){
                 System.err.println("Exception due to malformed URL of file "+
                                    filename+"\n " +e);
             }
         } else {
-            source = RuleSource.initRuleFile(filename+".key"); 
+            source = RuleSourceFactory.fromBuildInRule(filename+".key"); 
         }
         if (ldt) {
             includes.putLDT(filename, source);
@@ -706,7 +721,7 @@ options {
     				 Sort s, 
     				 boolean makeVariableSV,
             			 boolean makeSkolemTermSV,
-            			 boolean makeTermLabelSV,
+                                 boolean makeTermLabelSV,
             			 SchemaVariableModifierSet mods) 
             			 	throws AmbigiousDeclException {
         if (!skip_schemavariables) {
@@ -729,7 +744,7 @@ options {
                     v = SchemaVariableFactory.createSkolemTermSV(new Name(name), 
                     				                 s);
                 } else if (makeTermLabelSV) {
-                	 v = SchemaVariableFactory.createTermLabelSV(new Name(name));
+                    v = SchemaVariableFactory.createTermLabelSV(new Name(name));
                 } else { v = SchemaVariableFactory.createTermSV(
                 					new Name(name), 
                 					s, 
@@ -787,7 +802,7 @@ options {
 	return result.toString();
     }
 
-    private Operator getAttribute(Sort prefixSort, String attributeName) 
+    private Operator getAttributeInPrefixSort(Sort prefixSort, String attributeName) 
            throws RecognitionException/*SemanticException*/ {
         final JavaInfo javaInfo = getJavaInfo();
 
@@ -830,27 +845,19 @@ options {
                 }
                 // WATCHOUT why not in DECLARATION MODE	   
                 if(!isDeclParser()) {			      	
-                    final ImmutableList<ProgramVariable> vars = 	
-                    javaInfo.getAllAttributes(attributeName, prefixKJT);
-
-                    if (vars.size() == 0) {
-                        semanticError("There is no attribute '" + attributeName + 
-                            "' declared in type '" + prefixSort + "'");
-                    }                    
-
-                    if (LogicPrinter.printInShortForm(attributeName, 
-                            prefixSort, getServices())) {       		   
-                        result = vars.head();
-                    } else {
-                        if (vars.size() > 1) {
-                            semanticError
-                            ("Cannot uniquely determine attribute " + attributeName + 
-                                "\n Please specify the exact type by attaching" +
-                                " @( declaredInType ) to the attribute name." + 
-                                "\n Found attributes of the same name in: " + getTypeList(vars));
+                    ProgramVariable var = javaInfo.getCanonicalFieldProgramVariable(attributeName, prefixKJT);
+                    if (var == null) {
+                        LogicVariable logicalvar = (LogicVariable)namespaces().variables().lookup(attributeName);
+                        if(logicalvar == null) {
+                            semanticError("There is no attribute '" + attributeName + 
+                                "' declared in type '" + prefixSort + "' and no logical variable of that name.");
+	                    } else {
+	                        result = logicalvar;
                         }
+                    } else {
+                        result = var;
                     }
-                }              
+                }
             }
         }
 
@@ -880,12 +887,15 @@ options {
                                            prefix, 
                                            getTermFactory().createTerm(attribute));
         } else {
-            ProgramVariable pv = (ProgramVariable) attribute;
-            if(pv instanceof ProgramConstant) {
-                result = getTermFactory().createTerm(pv);
-            } else if(pv == getServices().getJavaInfo().getArrayLength()) {
+	            if(attribute instanceof LogicVariable) {
+	                Term attrTerm = getTermFactory().createTerm(attribute);
+	                result = getServices().getTermBuilder().dot(Sort.ANY, result, attrTerm);
+	            } else if(attribute instanceof ProgramConstant) {
+                result = getTermFactory().createTerm(attribute);
+            } else if(attribute == getServices().getJavaInfo().getArrayLength()) {
                 result = getServices().getTermBuilder().dotLength(result);
             } else {
+	            ProgramVariable pv = (ProgramVariable) attribute;
             	Function fieldSymbol 
             		= getServices().getTypeConverter()
             		               .getHeapLDT()
@@ -940,6 +950,19 @@ options {
             // may be thrown in cases of invalid java identifiers
             return false;
         } 
+    }
+    
+    protected boolean isHeapTerm(Term term) {
+        return term != null && term.sort() == 
+            getServices().getTypeConverter().getHeapLDT().targetSort();
+    }
+
+    private boolean isSequenceTerm(Term reference) {
+        return reference != null && reference.sort().name().equals(SeqLDT.NAME);
+    }
+
+    private boolean isIntTerm(Term reference) {
+        return reference.sort().name().equals(IntegerLDT.NAME);
     }
     
     private void unbindVars(Namespace orig) {
@@ -1385,11 +1408,9 @@ options {
         return pm;
     }
 
-
     public void addFunction(Function f) {
         functions().add(f);
     }
-
     
     private ImmutableSet<Modality> lookupOperatorSV(String opName, ImmutableSet<Modality> modalities) 
     		throws RecognitionException/*KeYSemanticException*/ {
@@ -1418,13 +1439,79 @@ options {
        return modalities;
     }
 
-    private void semanticError(String message) throws RecognitionException {
+    protected void semanticError(String message) throws RecognitionException {
       throw new KeYSemanticException(input, getSourceName(), message);
     }
 
     private static class PairOfStringAndJavaBlock {
       String opName;
       JavaBlock javaBlock;
+    }
+    
+    private static boolean isSelectTerm(Term term) {
+        return term.op().name().toString().endsWith("::select") && term.arity() == 3;
+    }
+
+    private boolean isImplicitHeap(Term t) {
+        return getServices().getTermBuilder().getBaseHeap().equals(t);
+    }
+
+    // This is used for testing in TestTermParserHeap.java
+    public static final String NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE
+            = "Expecting select term before '@', not: ";
+
+    private Term replaceHeap(Term term, Term heap, int depth) throws RecognitionException {
+        if (depth > 0) {
+
+            if (isSelectTerm(term)) {
+
+                if (!isImplicitHeap(term.sub(0))) {
+                    semanticError("Expecting program variable heap as first argument of: " + term);
+                }
+
+                Term[] params = new Term[]{heap, replaceHeap(term.sub(1), heap, depth - 1), term.sub(2)};
+                return (getServices().getTermFactory().createTerm(term.op(), params));
+
+            } else if (term.op() instanceof ObserverFunction) {
+                if (!isImplicitHeap(term.sub(0))) {
+                    semanticError("Expecting program variable heap as first argument of: " + term);
+                }
+
+                Term[] params = new Term[term.arity()];
+                params[0] = heap;
+                params[1] = replaceHeap(term.sub(1), heap, depth - 1);
+                for (int i = 2; i < params.length; i++) {
+                    params[i] = term.sub(i);
+                }
+
+                return (getServices().getTermFactory().createTerm(term.op(), params));
+
+            } else {
+                semanticError(NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE + term);
+                throw new RecognitionException();
+            }
+
+        } else {
+            return term;
+        }
+    }
+
+    /*
+     * Replace standard heap by another heap in an observer function.
+     */
+    protected Term heapSelectionSuffix(Term term, Term heap) throws RecognitionException {
+
+        if (!isHeapTerm(heap)) {
+            semanticError("Expecting term of type Heap but sort is " + heap.sort()
+                    + " for term: " + term);
+        }
+
+        Term result = replaceHeap(term, heap, globalSelectNestingDepth);
+
+        // reset globalSelectNestingDepth
+        globalSelectNestingDepth = 0;
+
+        return result;
     }
 
 }
@@ -1803,11 +1890,11 @@ one_schema_var_decl
     ( schema_modifiers[mods] ) ?
     {s = Sort.FORMULA;}
     ids = simple_ident_comma_list 
-  | TERMLABEL 
+  | TERMLABEL
     { makeTermLabelSV = true; }
     { mods = new SchemaVariableModifierSet.TermLabelSV (); }
-    ( schema_modifiers[mods] ) ?   
-    ids = simple_ident_comma_list 
+    ( schema_modifiers[mods] ) ?
+    ids = simple_ident_comma_list
   | UPDATE
     { mods = new SchemaVariableModifierSet.FormulaSV (); }
     ( schema_modifiers[mods] ) ?
@@ -1841,7 +1928,7 @@ one_schema_var_decl
                        s,
                        makeVariableSV,
                        makeSkolemTermSV,
-                       makeTermLabelSV, 
+                       makeTermLabelSV,
 		       mods);
    }
  )
@@ -2317,33 +2404,6 @@ array_decls[Pair<Sort,Type> p, boolean checksort] returns [Sort s = null]
             }
         }     
     ;
-    
-
-attrid returns [String attr = "";]
-@init{
-  classRef = "";
-  KeYJavaType kjt = null;
-  boolean brackets = false;
-} : 
-        
-    id = simple_ident 
-       (AT LPAREN classRef = simple_ident_dots (EMPTYBRACKETS {brackets = true;})? RPAREN {
-            if(brackets) classRef += "[]";
-            if (!isDeclParser()) {
-	        kjt = getTypeByClassName(classRef);
-		if(kjt == null)
-                  throw new NotDeclException
-                    ("Class " + classRef + " is unknown.", 
-                     classRef, getSourceName(), getLine(), 
-                     getColumn());
-		classRef = kjt.getFullName();
-            }
-         classRef+="::";
-       })? 
-    {
-	attr = classRef+id;
-    }
-    ;
 
 id_declaration returns [ IdDeclaration idd = null ]
     :
@@ -2639,8 +2699,8 @@ term110 returns [Term _term110 = null]
 @after { _term110 = result; }
     :
         (
-            result = accessterm  |
-            result = update_or_substitution
+            ( LBRACE ~LPAREN ) => result = update_or_substitution |
+            result = accessterm
         ) 
         {
 	/*
@@ -2743,7 +2803,7 @@ static_attribute_suffix returns [Term result = null]
           		className = 
 		   			attributeName.substring(0, attributeName.lastIndexOf("."));	
             }	
-	       	v = getAttribute(getTypeByClassName(className).getSort(), attributeName); 
+	       	v = getAttributeInPrefixSort(getTypeByClassName(className).getSort(), attributeName); 
 	    }
         { result = createAttributeTerm(null, v); }                   
  ;
@@ -2752,92 +2812,67 @@ static_attribute_suffix returns [Term result = null]
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
-
 attribute_or_query_suffix[Term prefix] returns [Term _attribute_or_query_suffix = null]
-@init{
-    Operator v = null;
-    result = prefix;
-    attributeName = "";    
-}    
 @after { _attribute_or_query_suffix = result; }
-    :   
-        DOT 
-        ( 
-           (IDENT (AT LPAREN simple_ident_dots RPAREN)? LPAREN)=>( result = query[prefix])
-           | 
-           attributeName = attrid 
-           {   
-              v = getAttribute(prefix.sort(), attributeName);
-	      result = createAttributeTerm(prefix, v);
-           }   
-        )
- ;
-        catch [TermCreationException ex] {
-              keh.reportException
-		(new KeYSemanticException(input, getSourceName(), ex));
+    :
+    DOT memberName = attrid
+    (result = querySuffix[prefix, memberName] {assert result != null;})?
+    {
+        if(result == null){
+            Operator v = getAttributeInPrefixSort(prefix.sort(), memberName);
+            result = createAttributeTerm(prefix, v);
         }
+    }
+    ;
+catch [TermCreationException ex] {
+    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+}
 
-query [Term prefix] returns [Term result = null] 
+attrid returns [String attr = "";]
+    :
+    // the o.f@(packagename.Classname) syntax has been dropped.
+    // instead, one can write o.(packagename.Classname::f) 
+      id = simple_ident
+        { attr = id; }
+    | LPAREN clss = sort_name DOUBLECOLON id2 = simple_ident RPAREN
+        { attr = clss + "::" + id2; }
+    ;
+    
+querySuffix [Term prefix, String memberName] returns [Term result = null] 
 @init{
-    classRef = "";
+    String classRef, name;
     boolean brackets = false;
 }
     :
-    mid=IDENT (AT LPAREN classRef = simple_ident_dots (EMPTYBRACKETS {brackets = true;} )? RPAREN)? args = argument_list
-    { 
-       if("".equals(classRef)){
+    args = argument_list
+    {
+       if(memberName.indexOf("::") == -1) {
           classRef = prefix.sort().name().toString();
-       }else{
-         if(brackets) classRef += "[]";
-         KeYJavaType kjt = getTypeByClassName(classRef);
-         if(kjt == null)
-           throw new NotDeclException
+          name = memberName;
+       } else {
+          String parts[] = memberName.split("::", 2);
+          classRef = parts[0];
+          name = parts[1];
+       }
+       KeYJavaType kjt = getTypeByClassName(classRef);
+       if(kjt == null)
+          throw new NotDeclException
              ("Class " + classRef + " is unknown.", 
               classRef, getSourceName(), getLine(), 
               getColumn());
-         classRef = kjt.getFullName();
-       }
-       result = getServices().getJavaInfo().getProgramMethodTerm
-                (prefix, mid.getText(), args, classRef);
-    }        
- ;
-        catch [TermCreationException ex] {
-              keh.reportException
-		(new KeYSemanticException(input, getSourceName(), ex));
-        }
+       classRef = kjt.getFullName();
 
-static_query returns [Term result = null] 
-@init{
-    queryRef = "";
-}
-    :
-    queryRef =  staticAttributeOrQueryReference args = argument_list
-    { 
-       int index = queryRef.indexOf(':');
-       String className = queryRef.substring(0, index); 
-       String qname = queryRef.substring(index+2); 
-       result = getServices().getJavaInfo().getProgramMethodTerm(null, qname, args, className);
-       if(result == null && isTermParser()) {
-	  final Sort sort = lookupSort(className);
-          if (sort == null) {
-		semanticError("Could not find matching sort for " + className);
-          }
-          KeYJavaType kjt = getServices().getJavaInfo().getKeYJavaType(sort);
-          if (kjt == null) {
-		semanticError("Found logic sort for " + className + 
-		 " but no corresponding java type!");
-          }          
-       }
-	    
-    }        
+       result = getServices().getJavaInfo().getProgramMethodTerm
+                (prefix, name, args, classRef);
+    }
  ;
-        catch [TermCreationException ex] {
-        keh.reportException
-		(new KeYSemanticException(input, getSourceName(), ex));
-        }
+catch [TermCreationException ex] {
+    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+}
 
 //term120
-accessterm returns [Term _accessterm = null] 
+accessterm returns [Term _accessterm = null]
+@init{ int selectNestingDepth = globalSelectNestingDepth; }
 @after { _accessterm = result; }
     :
       (MINUS ~NUM_LITERAL) => MINUS result = term110
@@ -2867,38 +2902,92 @@ accessterm returns [Term _accessterm = null]
 	}
       |
       ( {isStaticQuery()}? // look for package1.package2.Class.query(
-        result = static_query
+        result = static_query { selectNestingDepth++; }
       |
         {isStaticAttribute()}?            // look for package1.package2.Class.attr
-        result = static_attribute_suffix
+        result = static_attribute_suffix { selectNestingDepth++; }
       |
-        result = atom
+        result = atom { selectNestingDepth = globalSelectNestingDepth; }
       )
-         ( result = array_access_suffix[result]
-         | result = attribute_or_query_suffix[result]
-         | result = heap_update_suffix[result]
+         
+         ( abs = accessterm_bracket_suffix[result]
+             {
+                 result = $abs.result;
+                 if($abs.increaseHeapSuffixCounter) selectNestingDepth++;
+             }
+         | result = attribute_or_query_suffix[result] { selectNestingDepth++; }
          )*
- ;
-        catch [TermCreationException ex] {
-               keh.reportException
-                (new KeYSemanticException(input, getSourceName(), ex));
-        }
+         
+         { globalSelectNestingDepth = selectNestingDepth; }
+         
+    // at most one heap selection suffix
+    ( result = heap_selection_suffix[result] )? // resets globalSelectNestingDepth to zero
+    ;
+catch [TermCreationException ex] {
+    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+}
 
-heap_update_suffix [Term heap] returns [Term _heap_update_suffix = null]
-@init { result = heap; }
-@after { _heap_update_suffix = result; }
+heap_selection_suffix [Term term] returns [Term result]
     :
-    LBRACE
-    result=elementary_heap_update[result]
-    ( PARALLEL result=elementary_heap_update[result] )*
-    RBRACE
+    AT heap=accessterm
+    { result = heapSelectionSuffix(term, heap); }
     ;
 
-elementary_heap_update [Term heap] returns [Term result=heap]
-    : // TODO find the right kind of super non-terminal for "o.f" and "a[i]"
+accessterm_bracket_suffix[Term reference] returns [Term result, boolean increaseHeapSuffixCounter]
+@init{ $increaseHeapSuffixCounter = false; }
+    :
+    { isHeapTerm(reference) }? tmp = heap_update_suffix[reference] { $result = tmp; }
+    | { isSequenceTerm(reference) }? tmp = seq_get_suffix[reference] { $result = tmp; }
+    | tmp = array_access_suffix[reference] { $result = tmp; $increaseHeapSuffixCounter = true; }
+    ;
+
+seq_get_suffix[Term reference] returns [Term result]
+    :
+    LBRACKET
+	indexTerm = logicTermReEntry
+    {
+        if(!isIntTerm(indexTerm)) semanticError("Expecting term of sort " + IntegerLDT.NAME + " as index of sequence " + reference + ", but found: " + indexTerm);
+	    result = getServices().getTermBuilder().seqGet(Sort.ANY, reference, indexTerm);
+    }
+    RBRACKET
+    ;
+        
+static_query returns [Term result = null] 
+@init{
+    queryRef = "";
+}
+    :
+    queryRef =  staticAttributeOrQueryReference args = argument_list
+    { 
+       int index = queryRef.indexOf(':');
+       String className = queryRef.substring(0, index); 
+       String qname = queryRef.substring(index+2); 
+       result = getServices().getJavaInfo().getProgramMethodTerm(null, qname, args, className);
+       if(result == null && isTermParser()) {
+	  final Sort sort = lookupSort(className);
+          if (sort == null) {
+		semanticError("Could not find matching sort for " + className);
+          }
+          KeYJavaType kjt = getServices().getJavaInfo().getKeYJavaType(sort);
+          if (kjt == null) {
+		semanticError("Found logic sort for " + className + 
+		 " but no corresponding java type!");
+          }          
+       }
+	    
+    }        
+ ;
+catch [TermCreationException ex] {
+    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+}
+
+heap_update_suffix [Term heap] returns [Term result=heap]
+    : // TODO find the right kind of non-terminal for "o.f" and "a[i]"
       // and do not resign to parsing an arbitrary term
-    ( (equivalence_term ASSIGN) => target=equivalence_term ASSIGN val=equivalence_term
-        {
+    LBRACKET
+    ( (equivalence_term ASSIGN) =>
+       target=equivalence_term ASSIGN val=equivalence_term
+        {  // TODO at least make some check that it is a select term after all ...
            Term objectTerm = target.sub(1);
            Term fieldTerm  = target.sub(2);
            result = getServices().getTermBuilder().store(heap, objectTerm, fieldTerm, val);
@@ -2918,11 +3007,11 @@ elementary_heap_update [Term heap] returns [Term result=heap]
            }
         }
     )
+    RBRACKET
     ;
-        catch [TermCreationException ex] {
-               keh.reportException
-                (new KeYSemanticException(input, getSourceName(), ex));
-        }
+catch [TermCreationException ex] {
+    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+}
 
 array_access_suffix [Term arrayReference] returns [Term _array_access_suffix = null] 
 @init{
@@ -2982,6 +3071,8 @@ atom returns [Term _atom = null]
     |   LPAREN a = term RPAREN
     |   TRUE  { a = getTermFactory().createTerm(Junctor.TRUE); }
     |   FALSE { a = getTermFactory().createTerm(Junctor.FALSE); }
+    |   LBRACE LPAREN obj=equivalence_term COMMA field=equivalence_term RPAREN RBRACE
+            { a = getServices().getTermBuilder().singleton(obj, field); }
     |   a = ifThenElseTerm
     |   a = ifExThenElseTerm
     |   literal=STRING_LITERAL
@@ -3642,6 +3733,7 @@ varexp[TacletBuilder b]
         | varcond_referencearray[b, negated]
         | varcond_static[b,negated]
         | varcond_staticmethod[b,negated]  
+        | varcond_final[b,negated]
         | varcond_typecheck[b, negated]
         | varcond_constant[b, negated]
         | varcond_label[b, negated]
@@ -3956,6 +4048,14 @@ varcond_enum_const [TacletBuilder b]
    ENUM_CONST LPAREN x=varId RPAREN {
       b.addVariableCondition(new EnumConstantCondition(
 	(SchemaVariable) x));     
+   }
+;
+
+varcond_final [TacletBuilder b, boolean negated]
+:
+   FINAL LPAREN x=varId RPAREN {
+      b.addVariableCondition(new FinalReferenceCondition(
+  (SchemaVariable) x, negated));     
    }
 ;
 
@@ -4424,6 +4524,10 @@ oneJavaSource returns [String s = null]
      }
   |  
      SLASH { b.append("/"); }
+  |  
+     COLON {b.append(":");}
+  |
+     BACKSLASH {b.append("\\");}
   )+ {
     s = b.toString();
   }

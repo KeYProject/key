@@ -13,14 +13,12 @@
 
 package de.uka.ilkd.key.speclang;
 
+import static de.uka.ilkd.key.util.Assert.assertEqualSort;
+import static de.uka.ilkd.key.util.Assert.assertSubSort;
+
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -54,11 +52,14 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.ProofSaver;
-import static de.uka.ilkd.key.util.Assert.*;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Standard implementation of the OperationContract interface.
@@ -509,11 +510,6 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     @Override
-    public Term getMby() {
-        return this.originalMby;
-    }
-
-    @Override
     public Term getMby(ProgramVariable selfVar,
                        ImmutableList<ProgramVariable> paramVars,
                        Services services) {
@@ -565,23 +561,25 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     private String getText(boolean includeHtmlMarkup, Services services) {
-       return getText(pm, 
-                      originalResultVar, 
-                      originalSelfVar, 
-                      originalParamVars, 
-                      originalExcVar, 
-                      hasMby(), 
-                      originalMby, 
-                      originalMods, 
-                      hasRealModifiesClause, 
-                      globalDefs, 
-                      originalPres, 
-                      originalPosts, 
-                      originalAxioms, 
-                      getModality(), 
-                      transactionApplicableContract(), 
-                      includeHtmlMarkup, 
-                      services);
+       return getText(pm,
+                      originalResultVar,
+                      originalSelfVar,
+                      originalParamVars,
+                      originalExcVar,
+                      hasMby(),
+                      originalMby,
+                      originalMods,
+                      hasRealModifiesClause,
+                      globalDefs,
+                      originalPres,
+                      originalPosts,
+                      originalAxioms,
+                      getModality(),
+                      transactionApplicableContract(),
+                      includeHtmlMarkup,
+                      services,
+                      NotationInfo.DEFAULT_PRETTY_SYNTAX,
+                      NotationInfo.DEFAULT_UNICODE_ENABLED);
     }
     
     public static String getText(FunctionalOperationContract contract,
@@ -594,7 +592,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                  List<LocationVariable> heapContext,
                                  Map<LocationVariable,Term> atPres,
                                  boolean includeHtmlMarkup, 
-                                 Services services) {
+                                 Services services,
+                                 boolean usePrettyPrinting, 
+                                 boolean useUnicodeSymbols) {
        ProgramVariable originalSelfVar = contractSelf != null ? (ProgramVariable)contractSelf.op() : null;
        ProgramVariable originalResultVar = resultTerm != null ? (ProgramVariable)resultTerm.op() : null;
        
@@ -668,7 +668,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                       contract.getModality(), 
                       contract.transactionApplicableContract(), 
                       includeHtmlMarkup, 
-                      services);
+                      services,
+                      usePrettyPrinting,
+                      useUnicodeSymbols);
     }
 
     private static String getText(IProgramMethod pm, 
@@ -687,7 +689,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                   Modality modality,
                                   boolean transaction,
                                   boolean includeHtmlMarkup, 
-                                  Services services) {
+                                  Services services,
+                                  boolean usePrettyPrinting, 
+                                  boolean useUnicodeSymbols) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final LocationVariable baseHeap = heapLDT.getHeap();
         final StringBuffer sig = new StringBuffer();
@@ -711,7 +715,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
               sig.append(named.name()).append(", ");
            }
            else if (subst instanceof Term) {
-              sig.append(ProofSaver.printAnything(subst, services)).append(", ");
+              sig.append(LogicPrinter.quickPrintTerm((Term)subst, services, usePrettyPrinting, useUnicodeSymbols).trim()).append(", ");
            }
            else {
               sig.append(subst).append(", ");
@@ -727,12 +731,12 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             sig.append(")");
         }
 
-        final String mby = hasMby ? LogicPrinter.quickPrintTerm(originalMby, services) : null;
+        final String mby = hasMby ? LogicPrinter.quickPrintTerm(originalMby, services, usePrettyPrinting, useUnicodeSymbols) : null;
 
         String mods = "";
         for (LocationVariable h : heapLDT.getAllHeaps()) {
             if (originalMods.get(h) != null) {
-                String printMods = LogicPrinter.quickPrintTerm(originalMods.get(h), services);
+                String printMods = LogicPrinter.quickPrintTerm(originalMods.get(h), services, usePrettyPrinting, useUnicodeSymbols);
                 mods = mods
                         + (includeHtmlMarkup ? "<br><b>" : "\n")
                         + "mod"
@@ -750,7 +754,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
         String globalUpdates = "";
         if (globalDefs!=null){
-            final String printUpdates = LogicPrinter.quickPrintTerm(globalDefs,services);
+            final String printUpdates = LogicPrinter.quickPrintTerm(globalDefs, services, usePrettyPrinting, useUnicodeSymbols);
             globalUpdates = (includeHtmlMarkup? "<br><b>": "\n")
                     + "defs" + (includeHtmlMarkup? "</b> " : ": ")
                     + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printUpdates,false) : printUpdates.trim());
@@ -759,7 +763,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         String pres = "";
         for (LocationVariable h : heapLDT.getAllHeaps()) {
             if (originalPres.get(h) != null) {
-                String printPres = LogicPrinter.quickPrintTerm(originalPres.get(h), services);
+                String printPres = LogicPrinter.quickPrintTerm(originalPres.get(h), services, usePrettyPrinting, useUnicodeSymbols);
                 pres = pres
                         + (includeHtmlMarkup ? "<br><b>" : "\n")
                         + "pre"
@@ -772,7 +776,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         String posts = "";
         for (LocationVariable h : heapLDT.getAllHeaps()) {
             if (originalPosts.get(h) != null) {
-                String printPosts = LogicPrinter.quickPrintTerm(originalPosts.get(h), services);
+                String printPosts = LogicPrinter.quickPrintTerm(originalPosts.get(h), services, usePrettyPrinting, useUnicodeSymbols);
                 posts = posts
                         + (includeHtmlMarkup ? "<br><b>" : "\n")
                         + "post"
@@ -786,7 +790,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         if (originalAxioms != null) {
             for(LocationVariable h : heapLDT.getAllHeaps()) {
                 if(originalAxioms.get(h) != null) {
-                    String printAxioms = LogicPrinter.quickPrintTerm(originalAxioms.get(h), services);
+                    String printAxioms = LogicPrinter.quickPrintTerm(originalAxioms.get(h), services, usePrettyPrinting, useUnicodeSymbols);
                     posts = posts
                             + (includeHtmlMarkup ? "<br><b>" : "\n")
                             + "axiom"
@@ -1265,6 +1269,17 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
 
     @Override
+    public final ContractPO createProofObl(InitConfig initConfig) {
+        return (ContractPO)createProofObl(initConfig, this);
+    }
+
+
+    @Override
+    public ProofOblInput getProofObl(Services services) {
+        return services.getSpecificationRepository().getPO(this);
+    }
+
+    @Override
     public ProofOblInput createProofObl(InitConfig initConfig, Contract contract) {
         return new FunctionalOperationContractPO(initConfig,
                 (FunctionalOperationContract) contract);
@@ -1350,6 +1365,54 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
 
+   @Override
+   public boolean hasSelfVar() {
+      return originalSelfVar != null;
+   }
+
+    @Override
+    public String getBaseName() {
+        return baseName;
+    }
+
+
+    @Override
+    public Term getPre() {
+        assert originalPres.values().size() == 1
+               : "information flow extension not compatible with multi-heap setting";
+        return originalPres.values().iterator().next();
+    }
+
+
+    @Override
+    public Term getPost() {
+        assert originalPosts.values().size() == 1
+               : "information flow extension not compatible with multi-heap setting";
+        return originalPosts.values().iterator().next();
+    }
+
+
+    @Override
+    public Term getMod() {
+        return originalMods.values().iterator().next();
+    }
+
+
+    @Override
+    public Term getMby() {
+        return originalMby;
+    }
+
+
+    @Override
+    public Term getSelf() {
+        if (originalSelfVar == null){
+            assert pm.isStatic() : "missing self variable in non-static method contract";
+            return null;
+        }
+        return TB.var(originalSelfVar);
+    }
+
     @Override
     public boolean hasResultVar() {
        return originalResultVar != null;
@@ -1357,16 +1420,34 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
 
     @Override
-    public boolean hasSelfVar() {
-       return originalSelfVar != null;
+    public ImmutableList<Term> getParams() {
+        if (originalParamVars == null) {
+            return null;
+        }
+        return TB.var(originalParamVars);
     }
 
 
     @Override
+    public Term getResult() {
+        if (originalResultVar == null) {
+            return null;
+        }
+        return TB.var(originalResultVar);
+    }
+
+
+    @Override
+    public Term getExc() {
+        if (originalExcVar == null) {
+            return null;
+        }
+        return TB.var(originalExcVar);
+    }
+
     public KeYJavaType getSpecifiedIn() {
 	    return specifiedIn;
     }
-
 
     @Override
     public OriginalVariables getOrigVars() {

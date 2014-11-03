@@ -151,6 +151,7 @@ public abstract class AbstractExecutionTreeDiagramSaveAsWizard extends BasicNewR
                                             "UTF-8", 
                                             optionsPage != null && optionsPage.isSaveVariables(), 
                                             optionsPage != null && optionsPage.isSaveCallStack(),
+                                            optionsPage != null && optionsPage.isSaveConstraints(),
                                             null);
          getModelPage().setInitialContents(new ByteArrayInputStream(modelContent.getBytes(Charset.forName("UTF-8"))));
          IFile domainFile = getModelPage().createNewFile();

@@ -37,7 +37,8 @@ import de.uka.ilkd.key.util.ExtList;
 
 public final class SeqLDT extends LDT {
     
-    public static final Name NAME = new Name("Seq");    
+    public static final Name NAME = new Name("Seq");
+    public static final Name SEQGET_NAME = new Name("seqGet");
 
     //getters
     private final SortDependingFunction seqGet;
@@ -52,7 +53,6 @@ public final class SeqLDT extends LDT {
     private final Function seqReverse;   
     private final Function seqDef;
     private final Function values;
-    
     
     public SeqLDT(TermServices services) {
 	super(NAME, services);

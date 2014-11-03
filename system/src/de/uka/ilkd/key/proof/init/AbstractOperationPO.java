@@ -55,6 +55,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
@@ -113,7 +114,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     */
    private Term uninterpretedPredicate;
 
-   private InitConfig proofConfig;
+   InitConfig proofConfig;
 
    /**
     * Constructor.
@@ -206,7 +207,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
           // Add uninterpreted predicate
           if (isAddUninterpretedPredicate()) {
               postTerm = tb.and(postTerm,
-                      buildUninterpretedPredicate(paramVars, null, getUninterpretedPredicateName(), proofServices));
+                      buildUninterpretedPredicate(paramVars, formalParamVars, null, getUninterpretedPredicateName(), proofServices));
           }
           ImmutableList<FunctionalOperationContract> lookupContracts = ImmutableSLList.<FunctionalOperationContract>nil();
           ImmutableSet<FunctionalOperationContract> cs = proofServices.getSpecificationRepository().getOperationContracts(getCalleeKeYJavaType(), pm);
@@ -222,27 +223,27 @@ public abstract class AbstractOperationPO extends AbstractPO {
           }
           final Term progPost;
           if(representsFromContract == null) {
-        	  final Term[] updateSubs = new Term[target.arity()];
-        	  int i = 0;
-        	  for (LocationVariable heap : modHeaps) {
-        		  if(target.getStateCount() >= 1) {
-        			  updateSubs[i++] = tb.var(heap);
-        			  if(target.getStateCount() == 2) {
-        				  updateSubs[i++] = tb.var(atPreVars.get(heap));
-        			  }
-        		  }
-        	  }
-        	  if(!target.isStatic()) {
-        		  updateSubs[i++] = tb.var(selfVar);
-        	  }
-        	  for(ProgramVariable paramVar : paramVars) {
-        		  updateSubs[i++] = tb.var(paramVar);
-        	  }
-        	  progPost = tb.apply(tb.elementary(tb.var(resultVar), tb.func(target, updateSubs)), postTerm);
-          }else{
-        	  final Term body = representsFromContract;
-        	  assert body.op() == Equality.EQUALS : "Only fully functional represents clauses for model methods are supported!";
-        	  progPost = tb.apply(tb.elementary(tb.var(resultVar), body.sub(1)), postTerm);        	  
+              final Term[] updateSubs = new Term[target.arity()];
+              int i = 0;
+              for (LocationVariable heap : modHeaps) {
+                  if(target.getStateCount() >= 1) {
+                      updateSubs[i++] = tb.var(heap);
+                      if(target.getStateCount() == 2) {
+                          updateSubs[i++] = tb.var(atPreVars.get(heap));
+                      }
+                  }
+              }
+              if(!target.isStatic()) {
+                  updateSubs[i++] = tb.var(selfVar);
+              }
+              for(ProgramVariable paramVar : paramVars) {
+                  updateSubs[i++] = tb.var(paramVar);
+              }
+              progPost = tb.apply(tb.elementary(tb.var(resultVar), tb.func(target, updateSubs)), postTerm);
+          } else {
+              final Term body = representsFromContract;
+              assert body.op() == Equality.EQUALS : "Only fully functional represents clauses for model methods are supported!";
+              progPost = tb.apply(tb.elementary(tb.var(resultVar), body.sub(1)), postTerm);
           }
           termPOs.add(tb.imp(pre, progPost));
       } else {
@@ -337,7 +338,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
          // Add uninterpreted predicate
          if (isAddUninterpretedPredicate()) {
             postTerm = tb.and(postTerm,
-                              buildUninterpretedPredicate(paramVars, exceptionVar,
+                              buildUninterpretedPredicate(paramVars, formalParamVars, exceptionVar,
                                                           getUninterpretedPredicateName(), proofServices));
          }
 
@@ -506,9 +507,23 @@ public abstract class AbstractOperationPO extends AbstractPO {
    protected Term generateSelfExactType(IProgramMethod pm,
                                         ProgramVariable selfVar,
                                         KeYJavaType selfKJT) {
+       return selfVar == null || pm.isConstructor()
+              ? tb.tt() : generateSelfExactType(pm, tb.var(selfVar), selfKJT);
+   }
+
+   /**
+    * Generates the general assumption which defines the type of self.
+    * @param pm The {@link IProgramMethod} to execute.
+    * @param selfVar The self variable.
+    * @param selfKJT The {@link KeYJavaType} of the self variable.
+    * @return The term representing the general assumption.
+    */
+   protected Term generateSelfExactType(IProgramMethod pm, 
+                                        Term selfVar, 
+                                        KeYJavaType selfKJT) {
       final Term selfExactType = selfVar == null || pm.isConstructor() ?
             tb.tt() :
-            tb.exactInstance(selfKJT.getSort(), tb.var(selfVar));
+            tb.exactInstance(selfKJT.getSort(), selfVar);
       return selfExactType;
    }
 
@@ -524,6 +539,22 @@ public abstract class AbstractOperationPO extends AbstractPO {
       }
       return paramsOK;
    }
+
+    /**
+     * Generates the general assumption that all parameter arguments are valid.
+     *
+     * @param paramVars The parameters {@link ProgramVariable}s.
+     * @return The term representing the general assumption.
+     */
+    protected Term generateParamsOK2(ImmutableList<Term> paramVars) {
+        Term paramsOK = tb.tt();
+        for (Term paramVar : paramVars) {
+            assert paramVar.op() instanceof ProgramVariable;
+            ProgramVariable pv = (ProgramVariable)paramVar.op();
+            paramsOK = tb.and(paramsOK, tb.reachableValue(pv));
+        }
+        return paramsOK;
+    }
 
    protected abstract Term generateMbyAtPreDef(ProgramVariable selfVar,
                                                ImmutableList<ProgramVariable> paramVars, Services services);
@@ -593,11 +624,13 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * Builds a {@link Term} to use in the postcondition of the generated
     * {@link Sequent} which represents the uninterpreted predicate.
     * @param paramVars The parameters {@link ProgramVariable}s.
+    * @param formalParamVars The formal parameters {@link LocationVariable}s.
     * @param exceptionVar The exception variable.
     * @param name The name of the uninterpreted predicate.
     * @return The created uninterpreted predicate.
     */
    protected Term buildUninterpretedPredicate(ImmutableList<ProgramVariable> paramVars,
+                                              ImmutableList<LocationVariable> formalParamVars,
                                               ProgramVariable exceptionVar,
                                               String name,
                                               Services services) {
@@ -606,7 +639,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
          throw new IllegalStateException("The uninterpreted predicate is already available.");
       }
       // Create parameters for predicate SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
-      ImmutableList<Term> arguments = tb.var(paramVars); // Method parameters
+      ImmutableList<Term> arguments = ImmutableSLList.nil(); //tb.var(paramVars); // Method parameters
+      for (LocationVariable formalParam : formalParamVars) {
+         arguments = arguments.prepend(tb.var(formalParam));
+      }
       arguments = arguments.prepend(tb.var(exceptionVar)); // Exception variable (As second argument for the predicate)
       arguments = arguments.prepend(tb.getBaseHeap()); // Heap (As first argument for the predicate)
       // Create non-rigid predicate with signature: SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
@@ -836,10 +872,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
    public void fillSaveProperties(Properties properties) throws IOException {
        super.fillSaveProperties(properties);
        if (isAddUninterpretedPredicate()) {
-           properties.setProperty("addUninterpretedPredicate", isAddUninterpretedPredicate() + "");
+           properties.setProperty(IPersistablePO.PROPERTY_ADD_UNINTERPRETED_PREDICATE, isAddUninterpretedPredicate() + "");
        }
        if (isAddSymbolicExecutionLabel()) {
-          properties.setProperty("addSymbolicExecutionLabel", isAddSymbolicExecutionLabel() + "");
+          properties.setProperty(IPersistablePO.PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL, isAddSymbolicExecutionLabel() + "");
        }
    }
 
@@ -849,7 +885,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @return {@code true} is set, {@code false} is not set.
     */
    protected static boolean isAddUninterpretedPredicate(Properties properties) {
-      String value = properties.getProperty("addUninterpretedPredicate");
+      String value = properties.getProperty(IPersistablePO.PROPERTY_ADD_UNINTERPRETED_PREDICATE);
       return value != null && !value.isEmpty() ? Boolean.valueOf(value) : false;
    }
 
@@ -859,7 +895,29 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @return {@code true} is set, {@code false} is not set.
     */
    protected static boolean isAddSymbolicExecutionLabel(Properties properties) {
-      String value = properties.getProperty("addSymbolicExecutionLabel");
+      String value = properties.getProperty(IPersistablePO.PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL);
       return value != null && !value.isEmpty() ? Boolean.valueOf(value) : false;
+   }
+
+   public ImmutableSet<NoPosTacletApp> getInitialTaclets() {
+        return taclets;
+    }
+
+   /**
+    * Returns the uninterpreted predicate used in the given {@link Proof} if available.
+    * @param proof The {@link Proof} to get its uninterpreted predicate.
+    * @return The uninterpreted predicate or {@code null} if not used.
+    */
+   public static Term getUninterpretedPredicate(Proof proof) {
+      if (proof != null && !proof.isDisposed()) {
+         ProofOblInput problem = proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+         if (problem instanceof AbstractOperationPO) {
+            AbstractOperationPO operationPO = (AbstractOperationPO)problem;
+            if (operationPO.isAddUninterpretedPredicate()) {
+               return operationPO.getUninterpretedPredicate();
+            }
+         }
+      }
+      return null;
    }
 }

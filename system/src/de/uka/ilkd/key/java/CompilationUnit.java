@@ -85,6 +85,11 @@ public class CompilationUnit
         return (getChildCount() > 0) ? getChildAt(0).getFirstElement() : this;
     }
 
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+       return (getChildCount() > 0) ? getChildAt(0).getFirstElementIncludingBlocks() : this;
+    }
+
     public SourceElement getLastElement() {
         return
 	    typeDeclarations.get(typeDeclarations.size()-1);

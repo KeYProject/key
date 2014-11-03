@@ -38,10 +38,12 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
@@ -61,6 +63,7 @@ public class TestJMLTranslator extends TestCase {
     private static Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable,Term>();
 
 
+    @Override
     protected synchronized void setUp() {        
         if (javaInfo == null) {
             javaInfo = new HelperClassForTests().parse(
@@ -75,6 +78,7 @@ public class TestJMLTranslator extends TestCase {
     }
 
 
+    @Override
     protected void tearDown() {
     }
 
@@ -324,7 +328,7 @@ public class TestJMLTranslator extends TestCase {
                 TB.bsum(i,
                         TB.zTerm("0"),
                         TB.zTerm("2147483647"),
-                        TB.var(i), services));
+                        TB.var(i)));
         assertTrue(result != null);
         assertSame(q, result.sub(0).op());
         assertTrue("Result was: " + result + "; \nExpected was: " + expected,
@@ -354,11 +358,49 @@ public class TestJMLTranslator extends TestCase {
                 TB.bsum(i,
                         TB.zTerm("0"),
                         TB.zTerm("2147483647"),
-                        TB.var(i), services);
+                        TB.var(i));
         assertTrue(result != null);
         assertSame(q, result.op());
         assertTrue("Result was: " + result + "; \nExpected was: " + expected,
                    result.equalsModRenaming(expected));
+    }
+    
+    public void testInfiniteUnion() {
+        Term result = null;
+        final String input = "\\infinite_union(Object o; \\empty)";
+        try {
+            result = JMLTranslator.translate(input, testClassType, Term.class, services);
+        } catch (SLTranslationException e) {
+            fail(""+e);
+        }
+        assertNotNull(result);
+        Operator unionOp = services.getTypeConverter().getLocSetLDT().getInfiniteUnion();
+        LogicVariable o =
+                        new LogicVariable(new Name("o"), services.getJavaInfo().getJavaLangObject().getSort());
+        assertSame(unionOp, result.op());
+        Term guard = TB.and( TB.convertToFormula(TB.created(TB.var(o))), TB.not(TB.equals(TB.var(o), TB.NULL())));
+        Term expected = TB.infiniteUnion(new QuantifiableVariable[]{o}, TB.ife(guard, TB.empty(), TB.empty()));
+        assertTrue("Result was: " + result + "; \nExpected was: " + expected,
+                        result.equalsModRenaming(expected));
+    }
+
+    public void testInfiniteUnion2() {
+        Term result = null;
+        final String input = "\\infinite_union(nullable Object o; \\empty)";
+        try {
+            result = JMLTranslator.translate(input, testClassType, Term.class, services);
+        } catch (SLTranslationException e) {
+            fail(""+e);
+        }
+        assertNotNull(result);
+        Operator unionOp = services.getTypeConverter().getLocSetLDT().getInfiniteUnion();
+        LogicVariable o =
+                        new LogicVariable(new Name("o"), services.getJavaInfo().getJavaLangObject().getSort());
+        assertSame(unionOp, result.op());
+        Term guard = TB.or( TB.convertToFormula(TB.created(TB.var(o))), TB.equals(TB.var(o), TB.NULL()));
+        Term expected = TB.infiniteUnion(new QuantifiableVariable[]{o}, TB.ife(guard, TB.empty(), TB.empty()));
+        assertTrue("Result was: " + result + "; \nExpected was: " + expected,
+                        result.equalsModRenaming(expected));
     }
 
 

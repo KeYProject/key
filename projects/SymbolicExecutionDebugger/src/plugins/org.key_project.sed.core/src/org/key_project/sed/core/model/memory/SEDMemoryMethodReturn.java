@@ -19,6 +19,7 @@ import java.util.List;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
 import org.key_project.sed.core.model.ISEDBranchCondition;
+import org.key_project.sed.core.model.ISEDConstraint;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDMethodReturn;
@@ -30,7 +31,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDMethodReturn;
  * information in the memory.
  * @author Martin Hentschel
  */
-public class SEDMemoryMethodReturn extends AbstractSEDMethodReturn implements ISEDMemoryStackFrameCompatibleDebugNode, ISEDMemoryDebugNode {
+public class SEDMemoryMethodReturn extends AbstractSEDMethodReturn implements ISEDMemoryStackFrameCompatibleDebugNode, ISEDMemoryBaseMethodReturn {
    /**
     * The contained child nodes.
     */
@@ -40,6 +41,11 @@ public class SEDMemoryMethodReturn extends AbstractSEDMethodReturn implements IS
     * The contained variables.
     */
    private final List<IVariable> variables = new LinkedList<IVariable>();
+   
+   /**
+    * The contained variables at the call state.
+    */
+   private final List<IVariable> callStateVariables = new LinkedList<IVariable>();
    
    /**
     * The name of this debug node.
@@ -80,6 +86,16 @@ public class SEDMemoryMethodReturn extends AbstractSEDMethodReturn implements IS
     * The method return condition.
     */
    private ISEDBranchCondition methodReturnCondition;
+   
+   /**
+    * The contained {@link ISEDConstraint}s.
+    */
+   private final List<ISEDConstraint> constraints = new LinkedList<ISEDConstraint>();
+   
+   /**
+    * The known group start conditions.
+    */
+   private final List<ISEDBranchCondition> groupStartConditions = new LinkedList<ISEDBranchCondition>();
    
    /**
     * Constructor.
@@ -252,6 +268,22 @@ public class SEDMemoryMethodReturn extends AbstractSEDMethodReturn implements IS
    public IVariable[] getVariables() throws DebugException {
       return variables.toArray(new IVariable[variables.size()]);
    }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addCallStateVariable(IVariable variable) {
+      callStateVariables.add(variable);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IVariable[] getCallStateVariables() throws DebugException {
+      return callStateVariables.toArray(new IVariable[callStateVariables.size()]);
+   }
 
    /**
     * {@inheritDoc}
@@ -299,5 +331,41 @@ public class SEDMemoryMethodReturn extends AbstractSEDMethodReturn implements IS
     */
    public void setMethodReturnCondition(ISEDBranchCondition methodReturnCondition) {
       this.methodReturnCondition = methodReturnCondition;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addConstraint(ISEDConstraint constraint) {
+      if (constraint != null) {
+         constraints.add(constraint);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDConstraint[] getConstraints() throws DebugException {
+      return constraints.toArray(new ISEDConstraint[constraints.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDBranchCondition[] getGroupStartConditions() throws DebugException {
+      return groupStartConditions.toArray(new ISEDBranchCondition[groupStartConditions.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addGroupStartCondition(ISEDBranchCondition groupStartCondition) {
+      if (groupStartCondition != null) {
+         groupStartConditions.add(groupStartCondition);
+      }
    }
 }

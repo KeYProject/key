@@ -15,95 +15,62 @@ package org.key_project.key4eclipse.resources.marker;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.IMarkerResolution2;
+import org.key_project.key4eclipse.common.ui.util.KeYImages;
 import org.key_project.key4eclipse.common.ui.util.StarterUtil;
-import org.key_project.key4eclipse.resources.util.LogUtil;
-import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 
 /**
  * Provides the QuickFixes for the KeY{@link IMarker}.
  * @author Stefan Käsdorf
  */
-public class ProofMarkerResolution implements IMarkerResolution2{
-
-   private String label;
-   private String description;
-   private boolean openInKeY;
-   
+public class ProofMarkerResolution extends AbstractProofMarkerResolution {
    /**
     * Initializes the global variables depending on the given {@link IMarker#getType()}.
     * @param marker - the given {@link IMarker}
     * @throws CoreException 
     */
    public ProofMarkerResolution(IMarker marker) throws CoreException {
-      IFile proofFile = getProofFile(marker);
-      String proofFileName = proofFile.getFullPath().lastSegment();
-      if(MarkerManager.CLOSEDMARKER_ID.equals(marker.getType())){
-         description = "Open proof: " + proofFileName;
-      }
-      else if(MarkerManager.NOTCLOSEDMARKER_ID.equals(marker.getType())){
-         description = "Open proof to close it manually: " + proofFileName;
-      }
-      this.label = "Open proof: " + proofFileName;
+      super(marker);
    }
-   
+
    /**
     * {@inheritDoc}
     */
    @Override
-   public String getLabel() {
-      return label;
+   protected String getClosedMarkerDescriptionPrefix() {
+      return "Open proof: ";
    }
 
-   
    /**
     * {@inheritDoc}
     */
    @Override
-   public void run(IMarker marker) {
-      try {
-         IFile file = getProofFile(marker);
-         if(!openInKeY){
-            StarterUtil.openFileStarter(null, file);
-         }
-         else{
-            KeYUtil.loadAsync(file);
-         }
-      }
-      catch (Exception e) {
-         LogUtil.getLogger().logError(e);
-      }
+   protected String getNotClosedMarkerDescriptionPrefix() {
+      return "Open proof to close it manually: ";
    }
 
-   
    /**
     * {@inheritDoc}
     */
    @Override
-   public String getDescription() {
-      return description;
+   protected String getLabelPrefix() {
+      return "Open proof: ";
    }
 
-   
    /**
     * {@inheritDoc}
     */
    @Override
    public Image getImage() {
-      return null;
+      return KeYImages.getImage(KeYImages.KEY_LOGO);
    }
-   
-   private IFile getProofFile(IMarker marker) throws CoreException{
-      String str = (String) marker.getAttribute(IMarker.SOURCE_ID);
-      IPath proofFilePath = new Path(str);
-      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-      IFile proofFile = root.getFile(proofFilePath);
-      return proofFile;
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void run(IMarker marker, IFile proofFile) throws Exception {
+      StarterUtil.openFileStarter(null, proofFile);
    }
 }

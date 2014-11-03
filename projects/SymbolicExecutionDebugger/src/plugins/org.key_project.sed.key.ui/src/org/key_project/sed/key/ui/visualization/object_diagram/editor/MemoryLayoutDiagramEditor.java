@@ -52,13 +52,13 @@ import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramUti
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.NonPersistableDiagramEditorInput;
 import org.key_project.util.eclipse.WorkbenchUtil;
-import org.key_project.util.eclipse.job.AbstractDependingOnObjectJob;
+import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 
 /**
@@ -96,9 +96,9 @@ public class MemoryLayoutDiagramEditor extends ReadonlyObjectDiagramEditor {
    private Text equivalenceClassesText;
    
    /**
-    * The {@link IExecutionStateNode} which provides the memory layouts.
+    * The {@link IExecutionNode} which provides the memory layouts.
     */
-   private IExecutionStateNode<?> node;
+   private IExecutionNode<?> node;
    
    /**
     * The currently shown {@link ISymbolicLayout}.
@@ -183,9 +183,9 @@ public class MemoryLayoutDiagramEditor extends ReadonlyObjectDiagramEditor {
    public void generateMemoryLayoutsDiagram(IKeYSEDDebugNode<?> node) {
       setLayoutControlsEnabled(false);
       SWTUtil.setText(equivalenceClassesText, null);
-      if (node != null && node.getExecutionNode() instanceof IExecutionStateNode<?>) {
-         this.node = (IExecutionStateNode<?>)node.getExecutionNode();
-         new AbstractDependingOnObjectJob("Computing memory layouts.", this) {
+      if (node != null && node.getExecutionNode() != null) {
+         this.node = node.getExecutionNode();
+         new AbstractDependingOnObjectsJob("Computing memory layouts.", this) {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                try {
@@ -208,7 +208,7 @@ public class MemoryLayoutDiagramEditor extends ReadonlyObjectDiagramEditor {
    }
    
    /**
-    * Initializes the layout controls with the content provided by the {@link IExecutionStateNode}.
+    * Initializes the layout controls with the content provided by the {@link IExecutionNode}.
     * @throws ProofInputException Occurred Exception.
     */
    protected void initLayoutControls() throws ProofInputException {
@@ -233,7 +233,7 @@ public class MemoryLayoutDiagramEditor extends ReadonlyObjectDiagramEditor {
     * @param initial The memory layout mode ({@code true} = initial, {@code false} = current).
     */
    protected void showLayout(final int index, final boolean initial) {
-      new AbstractDependingOnObjectJob("Show " + (initial ? "initial" : "current") + " memory layout " + index + ".", this) {
+      new AbstractDependingOnObjectsJob("Show " + (initial ? "initial" : "current") + " memory layout " + index + ".", this) {
          @Override
          protected IStatus run(IProgressMonitor monitor) {
             try {

@@ -1,24 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_d18977db-c6eb-46cc-9d20-0a60ba756c47" name="main(SimpleNullPointerSplitTest)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_82757fd6-0cbf-4185-91a1-6e3d75569b7e" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_429e1f6b-cb7d-4981-ab3d-6dfc7b0f16ff" name="self.main(instance);" pathCondition="true" lineNumber="-1" charStart="77" charEnd="81" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleNullPointerSplitTest\src\SimpleNullPointerSplitTest.java">
-            <sedStatement xml:id="_2ef92256-c316-41aa-8708-d4fe96c10d02" name="return instance.x;" pathCondition="true" lineNumber="-1" charStart="124" charEnd="142" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleNullPointerSplitTest\src\SimpleNullPointerSplitTest.java">
-               <sedBranchCondition xml:id="_e787254c-7860-4bb6-bced-3cfc6961bb20" name="not(equals(instance,null))" pathCondition="not(equals(instance,null))">
-                  <sedMethodReturn xml:id="_77332c4c-74fd-44f7-9574-d25bdf274e3f" name="&lt;return int::select(heap,instance,SimpleNullPointerSplitTest::$x) as result of self.main(instance);&gt;" pathCondition="not(equals(instance,null))" lineNumber="-1" charStart="77" charEnd="81" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleNullPointerSplitTest\src\SimpleNullPointerSplitTest.java" methodReturnConditionRef="_068cc7dd-0f05-4cea-9f88-9a22c0e3714d">
-                     <sedTermination xml:id="_2809b386-6fa7-42e4-b4ad-ef32ef541c40" name="&lt;end&gt;" pathCondition="not(equals(instance,null))" verified="true">
+   <sedTarget xml:id="_81f3bd5b-ce9f-4ae8-8d46-9206a5541874" name="main(SimpleNullPointerSplitTest)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_5d4e1f5f-71a7-4fa9-b346-7f5d26e34c9f" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleNullPointerSplitTest\src\SimpleNullPointerSplitTest.java">
+         <sedMethodCall xml:id="_14bcca78-d55f-425d-9aa0-f5fb1be47f21" name="&lt;call self.main(instance)&gt;" pathCondition="true" lineNumber="-1" charStart="77" charEnd="81" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleNullPointerSplitTest\src\SimpleNullPointerSplitTest.java" groupable="true">
+            <sedStatement xml:id="_3841b616-a909-41e8-b909-5e06c216b381" name="return instance.x;" pathCondition="true" lineNumber="-1" charStart="124" charEnd="142" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleNullPointerSplitTest\src\SimpleNullPointerSplitTest.java">
+               <sedBranchCondition xml:id="_6325c206-a323-4426-9062-4a62906a642b" name="not(equals(instance,null))" pathCondition="not(equals(instance,null))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleNullPointerSplitTest\src\SimpleNullPointerSplitTest.java">
+                  <sedMethodReturn xml:id="_7932a5ac-dd09-4a97-b781-0e8305cd6229" name="&lt;return int::select(heap,instance,SimpleNullPointerSplitTest::$x) as result of self.main(instance)&gt;" pathCondition="not(equals(instance,null))" lineNumber="-1" charStart="77" charEnd="81" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleNullPointerSplitTest\src\SimpleNullPointerSplitTest.java" methodReturnConditionRef="_6d782e85-e532-4eae-92a3-7d4e0a341839">
+                     <sedTermination xml:id="_b7d15270-a9d4-436b-9e43-aee44cc60249" name="&lt;end&gt;" pathCondition="not(equals(instance,null))" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleNullPointerSplitTest\src\SimpleNullPointerSplitTest.java" verified="true">
                      </sedTermination>
+                     <sedGroupStartCondition xml:id="_6d782e85-e532-4eae-92a3-7d4e0a341839" name="not(equals(instance,null))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                        <sedChildReference nodeIdRef="_7932a5ac-dd09-4a97-b781-0e8305cd6229"/>
+                     </sedGroupStartCondition>
                   </sedMethodReturn>
                </sedBranchCondition>
-               <sedBranchCondition xml:id="_617e4b89-b623-423c-a6f5-b562576d58a3" name="equals(instance,null)" pathCondition="equals(instance,null)">
-                  <sedExceptionalTermination xml:id="_2051246e-839c-4d9b-b23e-76b257c27d5f" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(instance,null)" verified="true">
-                  </sedExceptionalTermination>
+               <sedBranchCondition xml:id="_0a827483-69f9-4cca-95fe-38c30f3f90ba" name="equals(instance,null)" pathCondition="equals(instance,null)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleNullPointerSplitTest\src\SimpleNullPointerSplitTest.java">
+                  <sedExceptionalMethodReturn xml:id="_bcb8a66c-2861-43fe-8993-915ca13b7d26" name="&lt;exceptional return of &lt;call self.main(instance)&gt;&gt;" pathCondition="equals(instance,null)" lineNumber="-1" charStart="77" charEnd="81" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleNullPointerSplitTest\src\SimpleNullPointerSplitTest.java" methodReturnConditionRef="_00ada814-5aee-47c2-a25b-cead669f78a8">
+                     <sedExceptionalTermination xml:id="_7ec2197e-b574-46c4-a488-9105fd3b4874" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(instance,null)" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testSimpleNullPointerSplitTest\src\SimpleNullPointerSplitTest.java" verified="true">
+                     </sedExceptionalTermination>
+                     <sedGroupStartCondition xml:id="_00ada814-5aee-47c2-a25b-cead669f78a8" name="equals(instance,null)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                        <sedChildReference nodeIdRef="_bcb8a66c-2861-43fe-8993-915ca13b7d26"/>
+                     </sedGroupStartCondition>
+                  </sedExceptionalMethodReturn>
                </sedBranchCondition>
             </sedStatement>
-            <sedMethodCallMethodReturnCondition xml:id="_068cc7dd-0f05-4cea-9f88-9a22c0e3714d" name="not(equals(instance,null))" pathCondition="true">
-               <sedChildReference nodeIdRef="_77332c4c-74fd-44f7-9574-d25bdf274e3f"/>
+            <sedMethodCallMethodReturnCondition xml:id="_6d782e85-e532-4eae-92a3-7d4e0a341839" name="not(equals(instance,null))" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_7932a5ac-dd09-4a97-b781-0e8305cd6229"/>
             </sedMethodCallMethodReturnCondition>
+            <sedMethodCallMethodReturnCondition xml:id="_00ada814-5aee-47c2-a25b-cead669f78a8" name="equals(instance,null)" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_bcb8a66c-2861-43fe-8993-915ca13b7d26"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedGroupEndReference nodeIdRef="_6d782e85-e532-4eae-92a3-7d4e0a341839"/>
+            <sedGroupEndReference nodeIdRef="_00ada814-5aee-47c2-a25b-cead669f78a8"/>
          </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_b7d15270-a9d4-436b-9e43-aee44cc60249"/>
+         <sedTerminationEntry nodeIdRef="_7ec2197e-b574-46c4-a488-9105fd3b4874"/>
       </sedThread>
    </sedTarget>
 </launch>

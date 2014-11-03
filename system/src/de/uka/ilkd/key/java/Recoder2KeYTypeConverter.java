@@ -413,7 +413,7 @@ public class Recoder2KeYTypeConverter {
                         	     integerType, 
                         	     superArrayType, 
                         	     false,
-                        	     false));
+                        	     false, false, true));
         FieldDeclaration f = new FieldDeclaration(new Modifier[] {
                 new Public(), new Final() }, new TypeRef(integerType),
                 new FieldSpecification[] { specLength }, false);
@@ -455,8 +455,9 @@ public class Recoder2KeYTypeConverter {
                     initArrayMethodBuilder();
                 }	
 
-                final IProgramMethod prepare = arrayMethodBuilder.getPrepareArrayMethod(
-										       parentReference, length, defaultValue, fields);
+                final IProgramMethod prepare =
+                        arrayMethodBuilder.getPrepareArrayMethod(parentReference, length,
+                                                                 defaultValue, fields);
 
                 members.add(arrayMethodBuilder
                         .getArrayInstanceAllocatorMethod(parentReference));

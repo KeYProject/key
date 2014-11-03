@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_136986bf-71b5-4cc1-96e4-9ddf0585d998" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_87fe8a90-209d-46cd-928e-422c533792f2" name="&lt;start&gt;" pathCondition="true">
+   <sedTarget xml:id="_b27b2a50-2081-4914-90a6-17e6c9f32c34" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_46879cdd-96b6-45f3-bebc-d53266ff004f" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
       </sedThread>
    </sedTarget>
 </launch>
