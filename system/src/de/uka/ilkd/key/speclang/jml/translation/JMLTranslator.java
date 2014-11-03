@@ -2497,7 +2497,7 @@ public final class JMLTranslator {
             } else {
                 // assume reference type
                 if (nullable) {
-                    res = tb.and(res,tb.created(tb.var(qv)));
+                    res = tb.and(res,tb.or(tb.created(tb.var(qv)), tb.equals(tb.var(qv), tb.NULL())));
                 } else {
                     final Term nonNull = arrayDepth > 0 ?
                             tb.deepNonNull(tb.var(qv), tb.zTerm(arrayDepth))
