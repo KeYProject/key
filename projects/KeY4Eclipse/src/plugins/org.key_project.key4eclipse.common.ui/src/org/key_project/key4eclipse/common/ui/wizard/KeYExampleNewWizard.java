@@ -126,7 +126,9 @@ public class KeYExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
          // Check if java files are available
          if (javaFiles.isEmpty()) {
             // No java files, add to project
-            projectContent.add(content);
+            if (!example.getExampleFile().equals(content)) { // Do not add example definition file because only its description will be added later.
+               projectContent.add(content);
+            }
          }
          else {
             // Get package definition
@@ -161,6 +163,10 @@ public class KeYExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
       IProject project = sourceDirectory.getProject();
       ResourceUtil.copyIntoWorkspace(project, opener, projectContent);
       ResourceUtil.copyIntoWorkspace(sourceDirectory, opener, sourceContent);
+      // Create example definition file only with its description
+      if (!StringUtil.isTrimmedEmpty(example.getDescription())) {
+         ResourceUtil.createFile(project.getFile(example.getExampleFile().getName()), new ByteArrayInputStream(example.getDescription().getBytes()), null);
+      }
       // Set source sub directory if required
       if (!StringUtil.isTrimmedEmpty(opener.getSourceSubDirectory())) {
          KeYResourceProperties.setSourceClassPath(project, sourceDirectory.getFullPath().append(opener.getSourceSubDirectory()).toString());
