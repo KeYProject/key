@@ -1447,7 +1447,7 @@ public class TermBuilder {
     }
 
 
-    public Term guardedInfiniteUnion(QuantifiableVariable[] qvs,
+    public Term infiniteUnion(QuantifiableVariable[] qvs,
                          Term guard,
                          Term s) {
         return infiniteUnion(qvs,
@@ -1462,11 +1462,11 @@ public class TermBuilder {
     }
 
 
-    public Term guardedSetComprehension(QuantifiableVariable[] qvs,
+    public Term setComprehension(QuantifiableVariable[] qvs,
                                 Term guard,
                                 Term o,
                                 Term f) {
-        return guardedInfiniteUnion(qvs,
+        return infiniteUnion(qvs,
                                     guard,
                                     singleton(o, f));
     }
