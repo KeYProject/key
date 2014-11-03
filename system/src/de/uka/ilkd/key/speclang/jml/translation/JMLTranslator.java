@@ -715,33 +715,30 @@ public final class JMLTranslator {
             }
 
         });
-        
+
         translationMethods.put(JMLKeyWord.UNIONINF, new JMLTranslationMethod() {
 
             @Override
             public SLExpression translate(SLTranslationExceptionManager excManager,
                             Object... params) throws SLTranslationException {
 
-                checkParameters(params, Pair.class, Term.class, Term.class, Services.class);
+                checkParameters(params, Boolean.class, Pair.class, Term.class, Term.class, Services.class);
+                final boolean nullable = (Boolean) params[0];
                 @SuppressWarnings("unchecked")
-                Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = (Pair<KeYJavaType, ImmutableList<LogicVariable>>) params[0];
-                Term t = (Term) params[1];
-                Term t2 = (Term) params[2];
-                Services services = (Services) params[3];
-                JavaInfo javaInfo = services.getJavaInfo();
+                final Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = (Pair<KeYJavaType, ImmutableList<LogicVariable>>) params[1];
+                final Term t = (Term) params[2];
+                final Term t2 = (Term) params[3];
+                final Services services = (Services) params[4];
+                final JavaInfo javaInfo = services.getJavaInfo();
 
-                if(t2 == null) {
-                    // unguarded version
-                    return new SLExpression(tb.infiniteUnion(
-                                    declVars.second.toArray(new QuantifiableVariable[declVars.second.size()]), t),
-                                    javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
-                } else {
-                    // guarded version
-                    return new SLExpression(tb.infiniteUnion(
-                                    declVars.second.toArray(new QuantifiableVariable[declVars.second.size()]),
-                                    t2, t),
-                                    javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
-                }
+                final Term restr = JMLTranslator.this.typerestrict(declVars.first, nullable, declVars.second, services);
+                final Term guard = t2==null? restr: tb.and(restr, t2);
+
+                return new SLExpression(tb.infiniteUnion(
+                                declVars.second.toArray(new QuantifiableVariable[declVars.second.size()]),
+                                guard, t),
+                                javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+
             }
 
         });
@@ -1086,8 +1083,8 @@ public final class JMLTranslator {
                                 ImmutableList.class, 
                                 Map.class,
                                 Services.class);
-                final ImmutableList<SLExpression> list = (ImmutableList) params[0];
-                final Map<LocationVariable,Term> atPres = (Map) params[1];
+                final ImmutableList<SLExpression> list = (ImmutableList<SLExpression>) params[0];
+                final Map<LocationVariable,Term> atPres = (Map<LocationVariable, Term>) params[1];
                 final Services services = (Services) params[2];
                 final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
 
@@ -1756,6 +1753,13 @@ public final class JMLTranslator {
         }
         return castToReturnType(result, resultClass);
     }
+    
+    /**
+     * For testing only.
+     */
+    static <T> T translate(String jmlExpr, KeYJavaType specInClass, Class<T> resultClass, Services services) throws SLTranslationException {
+        return translate(new PositionedString(jmlExpr), specInClass, null, null, null, null, null, resultClass, services);
+    }
 
 
     <T> T translate(String jmlKeyWordName,
@@ -2157,7 +2161,7 @@ public final class JMLTranslator {
             final KeYJavaType _declsType = (KeYJavaType) params[2];
             de.uka.ilkd.key.java.abstraction.Type declsType =
                     _declsType.getJavaType();
-            ImmutableList<QuantifiableVariable> qvs = (ImmutableList)params[3];
+            ImmutableList<QuantifiableVariable> qvs = (ImmutableList<QuantifiableVariable>)params[3];
             boolean nullable = (Boolean) params[4];
             services = (Services) params[6];
             assert services != null;
@@ -2479,7 +2483,7 @@ public final class JMLTranslator {
     }
 
     /** Provide restriction terms for the declared KeYJavaType */
-    protected Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<QuantifiableVariable> qvs, Services services) {
+    protected Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<? extends QuantifiableVariable> qvs, Services services) {
         final Type type = kjt.getJavaType();
         final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
         Term res = tb.tt();

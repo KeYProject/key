@@ -1566,6 +1566,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     KeYJavaType typ;
     Term t, t2 = null;
     Token tk = null;
+    boolean nullable = false;
     Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = null;
 }
 :
@@ -1804,6 +1805,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         }
     |   UNIONINF
         LPAREN
+        (nullable=boundvarmodifiers)?
         declVars=quantifiedvardecls
         SEMI
         {
@@ -1815,7 +1817,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         RPAREN
         {
                resolverManager.popLocalVariablesNamespace();
-               result = translator.translate(JMLTranslator.JMLKeyWord.UNIONINF, declVars, t, t2, services);
+               result = translator.translate(JMLTranslator.JMLKeyWord.UNIONINF, nullable, declVars, t, t2, services);
         }
 
     |   pd:DISJOINT LPAREN tlist=storeRefList RPAREN {
