@@ -157,6 +157,8 @@ public class DependencyContractCompletion extends AbstractInteractiveRuleApplica
          });
          if (heaps.length >= 1) {
             viewer.setSelection(new StructuredSelection(heaps[0]));
+         } else {
+            setErrorMessage("No heaps available.");
          }
       }
 
