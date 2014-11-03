@@ -106,9 +106,10 @@ public class KeYExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
    @Override
    protected boolean createExampleContent(IContainer sourceDirectory) throws Exception {
       // List example content
-      ExampleChooser.Example example = examplePage.getSelectedExample();
-      File exampleDirectory = example.getDirectory();
-      File[] exampleContent = exampleDirectory.listFiles();
+      final ExampleChooser.Example example = examplePage.getSelectedExample();
+      final File exampleDirectory = example.getDirectory();
+      final File[] exampleContent = exampleDirectory.listFiles();
+      final boolean descriptionAvailable = !StringUtil.isTrimmedEmpty(example.getDescription());
       // Separate between source and project content
       List<File> projectContent = new LinkedList<File>();
       List<File> sourceContent = new LinkedList<File>();
@@ -126,7 +127,7 @@ public class KeYExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
          // Check if java files are available
          if (javaFiles.isEmpty()) {
             // No java files, add to project
-            if (!example.getExampleFile().equals(content)) { // Do not add example definition file because only its description will be added later.
+            if (!descriptionAvailable || !example.getExampleFile().equals(content)) { // Do not add example definition file if description is available because only its description will be added later.
                projectContent.add(content);
             }
          }
@@ -164,7 +165,7 @@ public class KeYExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
       ResourceUtil.copyIntoWorkspace(project, opener, projectContent);
       ResourceUtil.copyIntoWorkspace(sourceDirectory, opener, sourceContent);
       // Create example definition file only with its description
-      if (!StringUtil.isTrimmedEmpty(example.getDescription())) {
+      if (descriptionAvailable) { // Otherwise the README file is directly copied without any modification
          ResourceUtil.createFile(project.getFile(example.getExampleFile().getName()), new ByteArrayInputStream(example.getDescription().getBytes()), null);
       }
       // Set source sub directory if required

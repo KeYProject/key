@@ -521,16 +521,4 @@ public final class ExampleChooser extends JDialog {
 
        return result;
     }
-
-    /**
-     * Read the description stored in an example.
-     *
-     * @deprecated Use {@link Example#getDescription()} instead.
-     *
-     * @param example the example to read out
-     * @return the description stored in the example
-     */
-    public static String readDescription(Example example) {
-        return example.getDescription();
-    }
 }
