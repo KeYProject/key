@@ -123,8 +123,19 @@ public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
          String[] path = example.getPath();
          path = ArrayUtil.add(path, example.getName());
          TestUtilsUtil.selectInTree(newWizard.bot().tree(), path);
-         // Test example information
+         // Test shown tabs
+         newWizard.bot().tabItem("Description").activate();
          assertEquals(example.getDescription(), newWizard.bot().text().getText());
+         if (example.getObligationFile() != null && example.getObligationFile().exists()) {
+            newWizard.bot().tabItem("Proof Obligation").activate();
+            TestUtilsUtil.assertEqualsIgnoreWhiteSpace(IOUtil.readFrom(example.getObligationFile()), newWizard.bot().styledText().getText());
+         }
+         for (File additionalFile : example.getAdditionalFiles()) {
+            if (additionalFile != null && additionalFile.exists()) {
+               newWizard.bot().tabItem(additionalFile.getName()).activate();
+               TestUtilsUtil.assertEqualsIgnoreWhiteSpace(IOUtil.readFrom(additionalFile), newWizard.bot().styledText().getText());
+            }
+         }
          // Select next wizard page
          TestUtilsUtil.clickDirectly(newWizard.bot().button("Next >"));
          // Make sure that project name is valid and change it

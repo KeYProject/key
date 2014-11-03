@@ -112,6 +112,7 @@ import org.key_project.util.eclipse.setup.SetupStartup;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithException;
@@ -1870,5 +1871,16 @@ public class TestUtilsUtil {
             return "Timed out waiting for " + table + " to contain at least " + minRowCount + " rows.";
          }
       });
+   }
+
+   /**
+    * Compares the given {@link String}s ignoring white space.
+    * @param expected The expected text.
+    * @param actual The actual text.
+    */
+   public static void assertEqualsIgnoreWhiteSpace(String expected, String actual) {
+      if (!StringUtil.equalIgnoreWhiteSpace(expected, actual)) {
+         assertEquals(expected, actual);
+      }
    }
 }
