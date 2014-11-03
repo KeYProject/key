@@ -35,7 +35,6 @@ import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.ExampleChooser.ShortFile;
 
 /**
  * This {@link WizardPage} allows to select a KeY example.
@@ -55,7 +54,7 @@ public class KeYExampleWizardPage extends WizardPage {
    /**
     * Maps an example to its description.
     */
-   private Map<ShortFile, String> example2descriptionMap = new HashMap<ShortFile, String>();
+   private Map<ExampleChooser.Example, String> example2descriptionMap = new HashMap<ExampleChooser.Example, String>();
    
    /**
     * Constructor.
@@ -88,7 +87,7 @@ public class KeYExampleWizardPage extends WizardPage {
       });
       examplesViewer.setContentProvider(ArrayContentProvider.getInstance());
       File examplesDir = new File(Main.getExamplesDir());
-      List<ShortFile> examples = ExampleChooser.listExamples(examplesDir);
+      List<ExampleChooser.Example> examples = ExampleChooser.listExamples(examplesDir);
       examplesViewer.setInput(examples);
       if (!examples.isEmpty()) {
          examplesViewer.setSelection(SWTUtil.createSelection(examples.get(0)));
@@ -111,14 +110,14 @@ public class KeYExampleWizardPage extends WizardPage {
     * the selected example has changed.
     */
    protected void updatePageCompletedAndShownDescription() {
-      ShortFile selectedExample = getSelectedExample();
+      ExampleChooser.Example selectedExample = getSelectedExample();
       if (selectedExample != null) {
          // Update page completed state
          setPageComplete(true);
          // Update shown description
          String description = example2descriptionMap.get(selectedExample);
          if (description == null) {
-            description = ExampleChooser.readDescription(selectedExample);
+            description = selectedExample.getDescription();
             example2descriptionMap.put(selectedExample, description);
          }
          SWTUtil.setText(descriptionText, description);
@@ -135,10 +134,10 @@ public class KeYExampleWizardPage extends WizardPage {
     * Returns the selected example.
     * @return The selected example.
     */
-   public ShortFile getSelectedExample() {
+   public ExampleChooser.Example getSelectedExample() {
       Object selected = SWTUtil.getFirstElement(examplesViewer.getSelection());
-      if (selected instanceof ShortFile) {
-         return (ShortFile)selected;
+      if (selected instanceof ExampleChooser.Example) {
+         return (ExampleChooser.Example)selected;
       }
       else {
          return null;

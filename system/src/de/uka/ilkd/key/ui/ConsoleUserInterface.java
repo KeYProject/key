@@ -44,7 +44,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
 
 public class ConsoleUserInterface extends AbstractUserInterface {
     private static final int PROGRESS_BAR_STEPS = 50;
@@ -71,10 +71,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
    public ConsoleUserInterface(BatchMode batchMode, boolean verbose) {
        this(batchMode, verbose? DEBUG: NORMAL);
-   }
-
-   protected String getMacroConsoleOutput() {
-       return "[ APPLY " + getMacro().getClass().getSimpleName() + " ]";
    }
 
    private void finish(Proof proof) {
@@ -330,23 +326,30 @@ public class ConsoleUserInterface extends AbstractUserInterface {
        if (batchMode == null || batchMode.isLoadOnly()) {
            return null;
        }
-       final String defaultName =
-               MiscTools.toValidFileName(proof.name().toString()).toString() + fileExtension;
-       File file = new File((new File (Main.getFileNameOnStartUp())).getParent(), defaultName);
-       boolean proofFolderActive = ProofIndependentSettings.DEFAULT_INSTANCE
-                        .getGeneralSettings().storesInDefaultProofFolder();
+       final Pair<File, String> f = fileName(proof, fileExtension);
+       File file = f.first;
+       String defaultName = f.second;
+
+       final String recDir = file != null ?
+               file.getParent() : new File(Main.getFileNameOnStartUp()).getParent();
+       file = (defaultName != null) ? new File(recDir, defaultName): file;
+
+       final String proofSubDir = ProofSaver.PROOF_SUBDIRECTORY;
+       final boolean proofFolderActive = ProofIndependentSettings.DEFAULT_INSTANCE
+                                .getGeneralSettings().storesInDefaultProofFolder();
        String poDir =
                file.getParent().endsWith("src") ?
-                       new File(file.getParent()).getParent() : file.getParent();
+                       new File(file.getParent()).getParent()
+                       : file.getParent();
        String proofDir =
-               (!proofFolderActive || file.getParent().endsWith("/proof")) ?
-               file.getParent() : file.getParent().concat("/proof");
+               (!proofFolderActive || file.getParent().endsWith(proofSubDir)) ?
+               file.getParent() : file.getParent().concat(proofSubDir);
        final File dir = new File(proofDir);
        if (proofFolderActive && !dir.exists() && fileExtension.equals(".proof")) {
            dir.mkdir();
        }
        file = new File(fileExtension.equals(".key") ? poDir : proofDir, file.getName());
-       ProofSaver saver = new ProofSaver(proof, file.getPath(), Main.INTERNAL_VERSION);
+       ProofSaver saver = new ProofSaver(proof, file.getAbsolutePath(), Main.INTERNAL_VERSION);
        try {
            saver.save();
        } catch (IOException e) {

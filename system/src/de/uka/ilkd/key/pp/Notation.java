@@ -698,5 +698,22 @@ public abstract class Notation {
 	    sp.printSeqSingleton(t, lDelimiter, rDelimiter);
 	}
     }
+    
+    public static final class SeqGetNotation extends Notation {
+
+        public SeqGetNotation() {
+            /*
+             * Not sure what value to choose here.
+             * (Kai Wallisch 10/2014)
+             */
+            super(130);
+        }
+
+        @Override
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            sp.printSeqGet(t);
+        }
+
+    }
 
 }

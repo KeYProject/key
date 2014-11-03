@@ -62,7 +62,6 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractApp;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.EnhancedStringBuffer;
 import de.uka.ilkd.key.util.Pair;
 
@@ -637,21 +636,6 @@ public class Proof implements Named {
         return root.isClosed() && openGoals.isEmpty();
     }
 
-    /**
-     * save proof in file. If autoSave is on, this will potentially overwrite already
-     * existing proof files with the same name. Otherwise the save dialog pops up.
-     * Change: Now for loaded proofs both are turned off by default, i.e. only manual
-     * saving is possible, and the save dialog never pops up automatically (except
-     * for hitting the "Save ..." or "Save current proof" button).
-     */
-	public void saveProof(final UserInterface ui) {
-		// Save proof only if auto save is on and not a loaded proof
-		if (ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave()
-				&& !name().toString().endsWith(".proof")) {
-			assert ui.getMediator().getSelectedProof().name().equals(name());
-			ui.saveProof(this, ".proof");
-		}
-	}
 
     /**
      * This class is responsible for pruning a proof tree at a certain cutting point.

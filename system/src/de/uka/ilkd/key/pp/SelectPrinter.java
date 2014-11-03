@@ -140,6 +140,7 @@ class SelectPrinter extends FieldPrinter {
 
         lp.layouter.print(".");
         lp.markStartSub(2);
+        lp.startTerm(0);
         lp.layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
         lp.markEndSub();
 
@@ -156,6 +157,7 @@ class SelectPrinter extends FieldPrinter {
         lp.markEndSub();
         lp.layouter.print(".");
         lp.markStartSub(2);
+        lp.startTerm(0);
         lp.layouter.print(getPrettySyntaxForFieldConstant(objectTerm, fieldTerm));
         lp.markEndSub();
         printHeap(heapTerm, tacitHeap);

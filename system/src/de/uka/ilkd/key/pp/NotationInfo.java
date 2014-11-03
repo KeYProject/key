@@ -285,6 +285,7 @@ public final class NotationInfo {
         // sequence operators
         final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
 	tbl.put(seqLDT.getSeqLen(), new Notation.Postfix(".length"));
+        tbl.put(SeqLDT.SEQGET_NAME, new Notation.SeqGetNotation());
 	
 	//set operators
 	final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();

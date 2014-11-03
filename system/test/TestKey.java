@@ -24,6 +24,7 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.collection.TestMapAsListFromIntegerToString.class,
         de.uka.ilkd.key.collection.TestLeftistHeapOfInteger.class,
         de.uka.ilkd.key.util.TestLexicographicComparator.class,
+        de.uka.ilkd.key.util.TestVersionStringComparator.class,
         de.uka.ilkd.key.util.TestMiscTools.class,
         de.uka.ilkd.key.util.pp.TestLayouter.class,
         de.uka.ilkd.key.util.TestProofStarter.class
@@ -51,6 +52,7 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.parser.TestParallelParsing.class,
         de.uka.ilkd.key.parser.TestTermParser.class,
         de.uka.ilkd.key.parser.TestTermParserHeap.class,
+        de.uka.ilkd.key.parser.TestTermParserSequence.class,
         de.uka.ilkd.key.parser.TestTacletParser.class,
     };
 
@@ -152,6 +154,7 @@ public class TestKey extends TestSuite {
 
     public static TestSuite createSuite(Class<? extends TestCase>[] testClasses, final String msg) {
         TestSuite suite = new TestSuite() {
+            @Override
             public void run(TestResult result) {
                 System.out.print("[" + msg + "]: ");
                 super.run(result);
@@ -169,7 +172,6 @@ public class TestKey extends TestSuite {
 
     public static junit.framework.Test suite() {
 	de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false;
-	de.uka.ilkd.key.gui.MainWindow.setVisibleMode(false);
 
         TestSuite suite = new TestSuite();
         suite.addTest(createSuite(utilityTests, "Testing Utilities and Collections"));
