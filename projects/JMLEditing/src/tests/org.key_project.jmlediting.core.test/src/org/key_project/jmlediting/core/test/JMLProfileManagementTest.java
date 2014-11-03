@@ -1,6 +1,5 @@
 package org.key_project.jmlediting.core.test;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -21,6 +20,15 @@ public class JMLProfileManagementTest {
       }
       
    }
+   
+   public static class DummyJMLProfile2 implements IJMLProfile {
+
+      @Override
+      public String getName() {
+         return "DummyJMLProfile2";
+      }
+      
+   }
 
    @Test
    public void test() {
@@ -28,14 +36,18 @@ public class JMLProfileManagementTest {
          Set<IJMLProfile> availablesProfiles = JMLProfileManagement.getAvailableProfiles();
          assertTrue("Found no available profiles " + availablesProfiles.getClass(), !availablesProfiles.isEmpty());
          
-         boolean containsDummy = false;
+         boolean containsDummy1 = false;
+         boolean containsDummy2 = false;
          for (IJMLProfile profile : availablesProfiles) {
             if (profile.getName().equals("DummyJMLProfile1")) {
-               containsDummy = true;
+               containsDummy1 = true;
+            }
+            if (profile.getName().equals("DummyJMLProfile2")) {
+               containsDummy2 = true;
             }
          }
          
-         assertTrue("Dummy Profile is not included", containsDummy);
+         assertTrue("Dummy Profiles are not included", containsDummy1 && containsDummy2);
       }
       catch (CoreException e) {
          fail("Get available profiles throwed exception! " + e.getMessage());

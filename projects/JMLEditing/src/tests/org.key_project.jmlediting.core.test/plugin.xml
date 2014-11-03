@@ -6,6 +6,9 @@
       <profile
             class="org.key_project.jmlediting.core.test.JMLProfileManagementTest$DummyJMLProfile1">
       </profile>
+      <profile
+            class="org.key_project.jmlediting.core.test.JMLProfileManagementTest$DummyJMLProfile2">
+      </profile>
    </extension>
 
 </plugin>
