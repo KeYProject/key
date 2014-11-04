@@ -449,7 +449,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             shell.bot().table().select(0,1);
             TestUtilsUtil.clickDirectly(shell.bot().button("Finish"));
             SWTBotStyledText styledText = editor.bot().styledText();
-            assertTrue(styledText.getText().indexOf("xBeforeBlock = 0") != -1);
+            assertTrue(styledText.getText().indexOf("x_Before_BLOCK = 0") != -1);
          }
       };
       doStartProofTest("SWTBotManualRuleApplicationTest_testBlockContract_ApplyMultipleContracts",
@@ -517,7 +517,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             table.select(0);
             TestUtilsUtil.clickDirectly(shell.bot().button("Finish"));
             SWTBotStyledText styledText = editor.bot().styledText();
-            int indexFirstContractApplied = styledText.getText().indexOf("& self.<created>@heap[anon({(self, c)})] = TRUE");
+            int indexFirstContractApplied = styledText.getText().indexOf("disjoint(");
             assertTrue(indexFirstContractApplied != -1);
          }
       };
