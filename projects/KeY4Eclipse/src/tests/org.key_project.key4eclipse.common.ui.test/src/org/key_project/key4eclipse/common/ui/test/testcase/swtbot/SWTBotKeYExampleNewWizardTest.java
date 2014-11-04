@@ -126,12 +126,12 @@ public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
          // Test shown tabs
          newWizard.bot().tabItem("Description").activate();
          assertEquals(example.getDescription(), newWizard.bot().text().getText());
-         if (example.getObligationFile() != null && example.getObligationFile().exists()) {
+         if (IOUtil.exists(example.getObligationFile())) {
             newWizard.bot().tabItem("Proof Obligation").activate();
             TestUtilsUtil.assertEqualsIgnoreWhiteSpace(IOUtil.readFrom(example.getObligationFile()), newWizard.bot().styledText().getText());
          }
          for (File additionalFile : example.getAdditionalFiles()) {
-            if (additionalFile != null && additionalFile.exists()) {
+            if (IOUtil.exists(additionalFile)) {
                newWizard.bot().tabItem(additionalFile.getName()).activate();
                TestUtilsUtil.assertEqualsIgnoreWhiteSpace(IOUtil.readFrom(additionalFile), newWizard.bot().styledText().getText());
             }
@@ -159,14 +159,30 @@ public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
          assertTrue(project.isOpen());
          // Make sure that all example files and folders are copied into project (hierarchy and file content might have changed)
          final Set<String> fileNames = new HashSet<String>();
-         IOUtil.visit(example.getDirectory(), new IOUtil.IFileVisitor() {
-            @Override
-            public void visit(File file) {
-               if (file.isFile()) {
-                  fileNames.add(file.getName());
-               }
+         if (KeYExampleNewWizard.ONLY_SPECIFIED_EXAMPLE_CONTENT) {
+            for (File file : example.getAdditionalFiles()) {
+               fileNames.add(file.getName());
             }
-         });
+            if (IOUtil.exists(example.getObligationFile())) {
+               fileNames.add(example.getObligationFile().getName());
+            }
+            if (IOUtil.exists(example.getExampleFile())) {
+               fileNames.add(example.getExampleFile().getName());
+            }
+            if (IOUtil.exists(example.getProofFile())) {
+               fileNames.add(example.getProofFile().getName());
+            }
+         }
+         else {
+            IOUtil.visit(example.getDirectory(), new IOUtil.IFileVisitor() {
+               @Override
+               public void visit(File file) {
+                  if (file.isFile()) {
+                     fileNames.add(file.getName());
+                  }
+               }
+            });
+         }
          project.accept(new IResourceVisitor() {
             @Override
             public boolean visit(IResource resource) throws CoreException {

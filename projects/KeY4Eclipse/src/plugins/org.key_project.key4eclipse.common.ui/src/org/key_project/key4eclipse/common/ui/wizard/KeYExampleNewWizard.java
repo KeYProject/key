@@ -42,6 +42,7 @@ import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.gui.ExampleChooser;
+import de.uka.ilkd.key.gui.ExampleChooser.Example;
 
 /**
  * The "KeY Example" wizard used to create new Java Projects with example
@@ -49,6 +50,12 @@ import de.uka.ilkd.key.gui.ExampleChooser;
  * @author Martin Hentschel
  */
 public class KeYExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
+   /**
+    * {@code true} add only {@link File}s specified by the {@link Example} to the created Java project.
+    * {@code false} to add all files in the example directory {@link Example#getDescription()} to the created Java project.
+    */
+   public static final boolean ONLY_SPECIFIED_EXAMPLE_CONTENT = false;
+   
    /**
     * The used {@link KeYExampleWizardPage} in which the user selects one example.
     */
@@ -108,7 +115,23 @@ public class KeYExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
       // List example content
       final ExampleChooser.Example example = examplePage.getSelectedExample();
       final File exampleDirectory = example.getDirectory();
-      final File[] exampleContent = exampleDirectory.listFiles();
+      final File[] exampleContent;
+      if (ONLY_SPECIFIED_EXAMPLE_CONTENT) {
+         final List<File> exampleContentList = new LinkedList<File>(example.getAdditionalFiles());
+         if (IOUtil.exists(example.getObligationFile())) {
+            exampleContentList.add(example.getObligationFile());
+         }
+         if (IOUtil.exists(example.getExampleFile())) {
+            exampleContentList.add(example.getExampleFile());
+         }
+         if (IOUtil.exists(example.getProofFile())) {
+            exampleContentList.add(example.getProofFile());
+         }
+         exampleContent = exampleContentList.toArray(new File[exampleContentList.size()]);
+      }
+      else {
+         exampleContent = exampleDirectory.listFiles();
+      }
       final boolean descriptionAvailable = !StringUtil.isTrimmedEmpty(example.getDescription());
       // Separate between source and project content
       List<File> projectContent = new LinkedList<File>();
@@ -152,7 +175,9 @@ public class KeYExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
             else {
                // Remove additional folder
                File parent = firstFolder;
-               Assert.isTrue(exampleDirectory.equals(parent.getParentFile()), "Additional deep source folder structures are not supported.");
+               if (!ONLY_SPECIFIED_EXAMPLE_CONTENT) {
+                  Assert.isTrue(exampleDirectory.equals(parent.getParentFile()), "Additional deep source folder structures are not supported.");
+               }
                // Add source content
                CollectionUtil.addAll(sourceContent, parent.listFiles());
                oldNames.add(firstFolder.getName());
