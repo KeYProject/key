@@ -44,7 +44,7 @@
       </page>
       <page
             class="org.key_project.jmlediting.ui.JMLProfilePropertiesPage"
-            id="org.key_project.jmlediting.ui.jmlprojectproperties.profile"
+            id="org.key_project.jmlediting.ui.propertypages.profile"
             name="Profile"
             category="org.key_project.jmlediting.ui.jmlprojectproperties">
             <enabledWhen>
@@ -52,6 +52,14 @@
                   <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.jdt.core.javanature"/>
                </adapt>         
             </enabledWhen>
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.key_project.jmlediting.ui.JMLProfilePropertiesPage"
+            id="org.key_project.jmlediting.ui.preferences.profile"
+            name="Profile">
       </page>
    </extension>
 
