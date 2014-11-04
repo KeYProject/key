@@ -74,6 +74,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         }	
         
         //read activated choices
+        KeYParserF problemParser = null;
         try {
 
         	ProofSettings settings = getPreferences();
@@ -82,7 +83,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             ParserConfig pc = new ParserConfig
                 (initConfig.getServices(), 
                  initConfig.namespaces());
-            KeYParserF problemParser = new KeYParserF
+            problemParser = new KeYParserF
                 (ParserMode.PROBLEM, new KeYLexerF(getNewStream(), file.toString(),
                         initConfig.getServices().getExceptionHandler()), 
                         pc, pc, null, null);
@@ -94,7 +95,10 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             initConfig.setActivatedChoices(settings.getChoiceSettings()
         	      		                   .getDefaultChoicesAsSet());
             
-        
+        } catch(RecognitionException e) {
+            // problemParser cannot be null here
+            String message = problemParser.getErrorMessage(e);
+            throw new ProofInputException(message, e);
         } catch (Exception e) {
             throw new ProofInputException(e);      
         }     
@@ -203,7 +207,9 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         try {
             lastParser.proof(prl);
         } catch (RecognitionException ex) {
-            throw new ProofInputException(ex);
+            // problemParser cannot be null
+            String message = lastParser.getErrorMessage(ex);
+            throw new ProofInputException(message, ex);
         }
     }
         
