@@ -133,6 +133,13 @@ public final class ExampleChooser extends JDialog {
          */
         private static final String ADDITIONAL_FILE_PREFIX = "example.additionalFile.";
 
+        /**
+         * The {@link Properties} key to specify the path in the tree.
+         * Prefix to specify export files which are not shown as tabs in the example wizard but are extracted to Java projects in the Eclipse integration.
+         * Append 1, 2, 3, ...
+         */
+        private static final String EXPORT_FILE_PREFIX = "example.exportFile.";
+
         private final File exampleFile;
         private final File directory;
         private final String description;
@@ -171,11 +178,21 @@ public final class ExampleChooser extends JDialog {
             return exampleFile;
         }
 
-      public List<File> getAdditionalFiles() {
+        public List<File> getAdditionalFiles() {
             ArrayList<File> result = new ArrayList<File>();
             int i = 1;
             while(properties.containsKey(ADDITIONAL_FILE_PREFIX + i)) {
                 result.add(new File(directory, properties.getProperty(ADDITIONAL_FILE_PREFIX + i)));
+                i++;
+            }
+            return result;
+        }
+
+        public List<File> getExportFiles() {
+            ArrayList<File> result = new ArrayList<File>();
+            int i = 1;
+            while(properties.containsKey(EXPORT_FILE_PREFIX + i)) {
+                result.add(new File(directory, properties.getProperty(EXPORT_FILE_PREFIX + i)));
                 i++;
             }
             return result;

@@ -73,7 +73,7 @@ public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
     */
    protected void doTestAllExamples(boolean srcDir) throws Exception {
       final Set<String> EXAMPLES_WITH_COMPILER_FAILURES = new HashSet<String>();
-      EXAMPLES_WITH_COMPILER_FAILURES.add("08-Java5");
+      EXAMPLES_WITH_COMPILER_FAILURES.add("Java 5 Enhanced-for");
       EXAMPLES_WITH_COMPILER_FAILURES.add("Simple E-Voting");
       EXAMPLES_WITH_COMPILER_FAILURES.add("List with Sequences");
 
@@ -161,6 +161,9 @@ public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
          final Set<String> fileNames = new HashSet<String>();
          if (KeYExampleNewWizard.ONLY_SPECIFIED_EXAMPLE_CONTENT) {
             for (File file : example.getAdditionalFiles()) {
+               fileNames.add(file.getName());
+            }
+            for (File file : example.getExportFiles()) {
                fileNames.add(file.getName());
             }
             if (IOUtil.exists(example.getObligationFile())) {
