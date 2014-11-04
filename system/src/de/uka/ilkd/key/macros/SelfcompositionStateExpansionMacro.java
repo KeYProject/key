@@ -8,7 +8,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.InfFlowContractPO;
+import de.uka.ilkd.key.proof.init.InfFlowPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
@@ -97,7 +97,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
         }
         final ProofOblInput poForProof =
                 services.getSpecificationRepository().getProofOblInput(proof);
-        return (poForProof instanceof InfFlowContractPO) && super.canApplyTo(mediator, goals, posInOcc);
+        return (poForProof instanceof InfFlowPO) && super.canApplyTo(mediator, goals, posInOcc);
     }
 
     @Override

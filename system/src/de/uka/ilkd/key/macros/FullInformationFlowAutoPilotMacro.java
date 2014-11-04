@@ -6,7 +6,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.InfFlowContractPO;
+import de.uka.ilkd.key.proof.init.InfFlowPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 
 public class FullInformationFlowAutoPilotMacro extends DoWhileFinallyMacro {
@@ -113,6 +113,6 @@ public class FullInformationFlowAutoPilotMacro extends DoWhileFinallyMacro {
         }
         final ProofOblInput poForProof =
                 services.getSpecificationRepository().getProofOblInput(proof);
-        return (poForProof instanceof InfFlowContractPO) && super.canApplyTo(mediator, goals, posInOcc);
+        return (poForProof instanceof InfFlowPO) && super.canApplyTo(mediator, goals, posInOcc);
     }
 }
