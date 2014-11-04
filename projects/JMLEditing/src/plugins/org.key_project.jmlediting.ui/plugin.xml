@@ -62,5 +62,14 @@
             name="Profile">
       </page>
    </extension>
+   <extension
+         point="org.key_project.jmlediting.core.profiles">
+      <profile
+            class="org.key_project.jmlediting.ui.JMLProfilePropertiesPage$DummyJMLProfile1">
+      </profile>
+      <profile
+            class="org.key_project.jmlediting.ui.JMLProfilePropertiesPage$DummyJMLProfile2">
+      </profile>
+   </extension>
 
 </plugin>

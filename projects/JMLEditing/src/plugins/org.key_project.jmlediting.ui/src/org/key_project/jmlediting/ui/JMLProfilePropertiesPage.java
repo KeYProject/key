@@ -2,9 +2,10 @@ package org.key_project.jmlediting.ui;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jdt.internal.ui.preferences.PropertyAndPreferencePage;
 import org.eclipse.swt.SWT;
@@ -12,11 +13,15 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
+import org.key_project.jmlediting.core.IJMLProfile;
+import org.key_project.jmlediting.core.JMLProfileManagement;
 
 public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
    private List profilesList;
+   private java.util.List<IJMLProfile> allProfiles;
 
    public static final String JML_PROFILE_PREF_ID = "org.key_project.jmlediting.ui.preferences.profile";
    public static final String JML_PROFILE_PROP_ID = "org.key_project.jmlediting.ui.propertypages.profile";
@@ -25,10 +30,33 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
          "org.key_project.jmleiditing.ui", "profile");
    public static final String DEFAULT_JML_PROFILE = "default_jml_profile";
 
-   public JMLProfilePropertiesPage() {
-      // TODO Auto-generated constructor stub
+   private IPreferenceChangeListener currentPreferenceListener;
 
+   public JMLProfilePropertiesPage() {
+      this.currentPreferenceListener = new IPreferenceChangeListener() {
+
+         @Override
+         public void preferenceChange(PreferenceChangeEvent event) {
+            updateSelection();
+         }
+      };
    }
+
+   @Override
+   public void setVisible(boolean visible) {
+      // Register the preference listener if the dialog is visible
+      // do not generate memory leaks, listener are removed in
+      // performOK and performCancel, here is too late
+      IEclipsePreferences preferences = InstanceScope.INSTANCE
+            .getNode(Activator.PLUGIN_ID);
+      if (visible) {
+         preferences
+               .addPreferenceChangeListener(this.currentPreferenceListener);
+      }
+      super.setVisible(visible);
+   }
+   
+   
 
    @Override
    protected Control createPreferenceContent(Composite parent) {
@@ -40,16 +68,29 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       GridData data;
 
       data = new GridData();
-      data.grabExcessHorizontalSpace = true;
-      data.grabExcessVerticalSpace = true;
+      Label label = new Label(myComposite, SWT.NONE);
+      label.setText("Choose JML Profile from available ones:");
+      label.setLayoutData(data);
+
+      data = new GridData(GridData.FILL_BOTH);
 
       this.profilesList = new List(myComposite, SWT.V_SCROLL | SWT.SINGLE
             | SWT.BORDER);
-      this.profilesList.setData(data);
+      this.profilesList.setLayoutData(data);
 
       this.initUI();
-      
+
       return myComposite;
+   }
+
+   private void setEnabled(boolean enabled) {
+      this.profilesList.setEnabled(enabled);
+
+      // Please dont ask me why I need this call here
+      // But otherwise (at least on mac os) you can not reenable
+      // the list, and, the list stays disables of setEnabled(false)
+      // before
+      this.profilesList.setEnabled(true);
    }
 
    @Override
@@ -63,6 +104,17 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
    }
 
    @Override
+   protected void enableProjectSpecificSettings(
+         boolean useProjectSpecificSettings) {
+      if (!useProjectSpecificSettings) {
+         // Reset selection to default if no project settings
+         this.updateSelection();
+      }
+      this.setEnabled(useProjectSpecificSettings);
+      super.enableProjectSpecificSettings(useProjectSpecificSettings);
+   }
+
+   @Override
    protected String getPreferencePageID() {
       return JML_PROFILE_PREF_ID;
    }
@@ -71,31 +123,122 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
    protected String getPropertyPageID() {
       return JML_PROFILE_PROP_ID;
    }
-   
-   
-   private void initUI() {
-      if (this.isProjectPreferencePage()) {
-         // Project preferences
-         
-      } else {
-         // Gobal preferences
-      // global properties
-         IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
-         String defaultProfile = preferences.get(DEFAULT_JML_PROFILE, null);
-         
+
+   public static class DummyJMLProfile1 implements IJMLProfile {
+
+      @Override
+      public String getName() {
+         return "DummyJMLProfile1";
       }
+
+   }
+
+   public static class DummyJMLProfile2 implements IJMLProfile {
+
+      @Override
+      public String getName() {
+         return "DummyJMLProfile2";
+      }
+
+   }
+
+   private void updateSelection() {
+      String currentProfileName = null;
+      if (this.isProjectPreferencePage() || this.useProjectSettings()) {
+         // Read local project properties if we are in a properties pane and
+         // project specific settings are enabled
+         try {
+            currentProfileName = this.getProject().getPersistentProperty(
+                  PROFILE);
+         }
+         catch (CoreException e) {
+            currentProfileName = null;
+         }
+      }
+      // Read from global preferences if no project specific profile is set
+      if (currentProfileName == null) {
+         // Gobal preferences
+         IEclipsePreferences preferences = InstanceScope.INSTANCE
+               .getNode(Activator.PLUGIN_ID);
+         currentProfileName = preferences.get(DEFAULT_JML_PROFILE, null);
+
+      }
+
+      // Read the profile, if no profile found, use the first one if available
+      IJMLProfile currentProfile = null;
+      if (currentProfileName != null) {
+         currentProfile = JMLProfileManagement
+               .getProfileFromClassName(currentProfileName);
+      }
+      else if (this.allProfiles.size() > 0) {
+         currentProfile = this.allProfiles.get(0);
+      }
+      // Select profile in the list
+      this.profilesList.deselectAll();
+      if (currentProfile != null) {
+         int index = this.allProfiles.indexOf(currentProfile);
+         if (index != -1) {
+            this.profilesList.setSelection(index);
+         }
+         else {
+            this.setErrorMessage("Profile \"" + currentProfile.getName()
+                  + "\" is not available.");
+         }
+      }
+      // Redraw the list because selection is otherwise not always cleared
+      this.profilesList.redraw();
+   }
+
+   private void initUI() {
+      // Get all profiles and set them to the list
+      this.allProfiles = JMLProfileManagement
+            .getAvailableProfilesSortedByName();
+      for (IJMLProfile profile : this.allProfiles) {
+         this.profilesList.add(profile.getName());
+      }
+
+      this.updateSelection();
+
+      // Enable the list in preferences always and in project if project
+      // specific settings are allowed
+      this.setEnabled(!this.isProjectPreferencePage()
+            || this.useProjectSettings());
    }
    
+   @Override
+   public boolean performCancel() {
+      IEclipsePreferences preferences = InstanceScope.INSTANCE
+            .getNode(Activator.PLUGIN_ID);
+      preferences.removePreferenceChangeListener(currentPreferenceListener);
+      return super.performCancel();
+   }
 
    @Override
    public boolean performOk() {
+      IEclipsePreferences preferences = InstanceScope.INSTANCE
+            .getNode(Activator.PLUGIN_ID);
+      preferences.removePreferenceChangeListener(currentPreferenceListener);
+      
+      String selectedProfileName = null;
+      if (this.profilesList.getSelectionIndex() >= 0) {
+         // Can only have one selection
+         selectedProfileName = this.allProfiles
+               .get(this.profilesList.getSelectionIndex()).getClass().getName();
+      }
+
+      // Only write into properties if a selection is available (user is forced
+      // to)
+      if (selectedProfileName == null) {
+         return false;
+      }
+
       if (this.isProjectPreferencePage()) {
          // Project preferences
          IProject project = this.getProject();
          try {
             if (this.useProjectSettings()) {
                // Set property
-               // TODO
+               project.setPersistentProperty(PROFILE, selectedProfileName);
             }
             else {
                // Remove property
@@ -110,8 +253,8 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       }
       else {
          // global properties
-         IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
-         preferences.put(DEFAULT_JML_PROFILE, "TODO");
+         
+         preferences.put(DEFAULT_JML_PROFILE, selectedProfileName);
       }
 
       return super.performOk();
