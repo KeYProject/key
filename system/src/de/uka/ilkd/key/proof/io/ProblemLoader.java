@@ -124,11 +124,12 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
                getMediator().startInterface(true);
                Throwable message = null;
                try {
-                   message = get();                    
+                   message = get();
                } catch (final Exception exception) {
                    message = exception;
-                   getExceptionHandler().reportException(exception.getCause() != null ? 
-                           exception.getCause() : exception);
+                   // has already been reported
+//                   getExceptionHandler().reportException(exception.getCause() != null ?
+//                           exception.getCause() : exception);
                } finally {
                    fireTaskFinished(runTime, message);
                }
