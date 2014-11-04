@@ -5,19 +5,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
 import de.uka.ilkd.key.gui.InteractiveRuleApplicationCompletion;
-import de.uka.ilkd.key.gui.InvariantConfigurator;
-import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.LoopInvariantImpl;
-import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * The {@link InteractiveRuleApplicationCompletion} to treat {@link WhileInvariantRule} in the Eclipse context.
@@ -45,13 +35,6 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
     * @author Martin Hentschel
     */
    public static class Perform extends AbstractInteractiveRuleApplicationCompletionPerform {
-      
-      private final LoopInvariantBuiltInRuleApp loopApp;
-      
-      private final Services services;
-      
-      private LoopInvariant inv;
-     
       /**
        * Constructor.
        * @param app The DefaultBuiltInRuleApp to be completed.
@@ -60,12 +43,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        */
       public Perform(IBuiltInRuleApp app, Goal goal, boolean forced) {
          super(app, goal, forced);
-         
-         services = goal.proof().getServices();
-         
-         loopApp = (LoopInvariantBuiltInRuleApp) app.tryToInstantiate(goal);
-         
-         inv = loopApp.getInvariant();
+         setErrorMessage("Functionality is not available yet.");
       }
 
       /**
@@ -89,35 +67,8 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        */
       @Override
       public void createControl(Composite root) {
-         final While loop = loopApp.getLoopStatement();
-         if(inv == null) {
-          MethodFrame mf = JavaTools.getInnermostMethodFrame(loopApp.programTerm().javaBlock(), services);
-          
-          inv = new LoopInvariantImpl(loop,
-                                     mf == null ? null : mf.getProgramMethod(),
-                                     mf == null || mf.getProgramMethod() == null ? 
-                                           null : mf.getProgramMethod().getContainerType(),
-                                     mf == null ? null : MiscTools.getSelfTerm(JavaTools.getInnermostMethodFrame(
-                                              loopApp.programTerm().javaBlock(), services),
-                                           services),
-                                     null);
-            try {
-             inv = InvariantConfigurator.getInstance().getLoopInvariant(inv,
-                     services, false, loopApp.getHeapContext());  
-            } catch (RuleAbortException e) {
-            }
-         } else {
-            boolean requiresVariant = loopApp.variantRequired()
-                  && !loopApp.variantAvailable();
-          if (!isForced() || !loopApp.invariantAvailable() || requiresVariant) {
-              try {
-                  inv = InvariantConfigurator.getInstance().getLoopInvariant(
-                          inv, services, requiresVariant, loopApp.getHeapContext());
-              } catch (RuleAbortException e) {
-              }
-          }
-         }
-            
+         Label label = new Label(root, SWT.NONE);
+         label.setText("This functionality will be available soon...");
       }
 
       /**
@@ -125,10 +76,7 @@ public class LoopInvariantRuleCompletion extends AbstractInteractiveRuleApplicat
        */
       @Override
       public IBuiltInRuleApp finish() {
-         if(inv != null && isForced()) {
-            services.getSpecificationRepository().addLoopInvariant(inv);
-         }
-         return inv == null ? null : loopApp.setLoopInvariant(inv);
+         return null;
       }
 
       /**
