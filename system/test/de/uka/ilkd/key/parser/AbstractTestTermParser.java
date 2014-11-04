@@ -17,6 +17,8 @@ import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.DefaultExceptionHandler;
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -102,7 +104,7 @@ public abstract class AbstractTestTermParser extends TestCase {
     protected KeYLexerF getLexer(String s) {
         return new KeYLexerF(s,
                 "No file. Call of parser from parser/" + getClass().getSimpleName(),
-                new DefaultExceptionHandler());
+                new KeYRecoderExcHandler());
     }
 
     protected KeYParserF getParser(String s) {
