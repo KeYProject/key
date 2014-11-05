@@ -15,6 +15,7 @@ package org.key_project.key4eclipse.resources.builder;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -94,6 +95,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomUserInterface;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * The ProofManager is responsible for the maintasks during the build. It runs and saves the 
@@ -111,6 +113,7 @@ public class ProofManager {
    private EditorSelection editorSelection;
    private final KeYEnvironment<CustomUserInterface> environment;
    private List<ProofElement> proofQueue = Collections.synchronizedList(new LinkedList<ProofElement>());
+   public static final List<Pair<ProofElement, InputStream>> proofsToSave = Collections.synchronizedList(new LinkedList<Pair<ProofElement, InputStream>>());
 
    
    /**
@@ -720,25 +723,71 @@ public class ProofManager {
          numOfThreads = numOfProofs;
       }
       Thread[] threads = null;
-      if (KeYProjectProperties.isEnableMultiThreading(project) && numOfThreads >= 2) {
+      if (KeYProjectProperties.isEnableMultiThreading(project)) {
          threads = new Thread[numOfThreads];
-         for (int i = 0; i < numOfThreads; i++) {
+         for (int i = 0; i < threads.length; i++) {
 
             ProofRunnable run = new ProofRunnable(project, KeYResourcesUtil.cloneList(proofElements), proofQueue, cloneEnvironment(), monitor);
-            Thread thread = new Thread(run);
-            threads[i] = thread;
+            threads[i] = new Thread(run);
          }
          for(Thread thread : threads){
             thread.start();
          }
-         
-         while(threadsAlive(threads)){
-            ObjectUtil.sleep(10);
-         }
       }
       else{
+         threads = new Thread[1];
          ProofRunnable run = new ProofRunnable(project, proofElements,proofQueue, environment, monitor);
-         run.run();
+         Thread thread = new Thread(run);
+         threads[0] = thread;
+         thread.start();
+      } 
+      boolean threadsAlive = true;
+      while(threadsAlive){
+         threadsAlive = threadsAlive(threads);
+         saveProofs();
+         ObjectUtil.sleep(10);
+      }
+   }
+   
+   
+   private void saveProofs() {
+      Pair<ProofElement, InputStream> proofToSave = null;
+      while((proofToSave = getProofToSave()) != null){
+         try{
+            ProofElement pe = proofToSave.first;
+            InputStream is = proofToSave.second;
+            KeYProjectDelta keyDelta = KeYProjectDeltaManager.getInstance().getDelta(project);
+            keyDelta.addJobChangedFile(pe.getProofFile());
+            saveProof(pe.getProofFile(), is, pe.getProofClosed());
+            keyDelta.addJobChangedFile(pe.getMetaFile());
+            ProofMetaFileWriter.writeMetaFile(pe);
+            MarkerUtil.setMarker(pe);
+         }
+         catch (Exception e){
+            LogUtil.getLogger().logError(e);
+         }
+      }
+   }
+   
+   private void saveProof(IFile proofFile, InputStream is, boolean isClosed) throws CoreException{
+      IFolder proofFolder = KeYResourcesUtil.createFolder(proofFile);
+      if(proofFolder != null && proofFolder.exists()){
+         if (proofFile.exists()) {
+            proofFile.setContents(is, true, true, null);
+         }
+         else {
+            proofFile.create(is, true, null);
+         }
+         KeYResourcesUtil.setProofClosed(proofFile, Boolean.valueOf(isClosed));
+      }
+   }
+   
+   public synchronized Pair<ProofElement, InputStream> getProofToSave(){
+      synchronized (proofsToSave) {
+         if(!proofsToSave.isEmpty()){
+            return proofsToSave.remove(0);
+         }
+         return null;
       }
    }
    
@@ -752,7 +801,6 @@ public class ProofManager {
       }
       return num;
    }
-   
    
    
    /**

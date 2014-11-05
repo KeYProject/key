@@ -7,9 +7,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import static de.uka.ilkd.key.parser.KeYParserF.NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import java.io.IOException;
 
@@ -20,7 +17,7 @@ import java.io.IOException;
  */
 public class TestTermParserHeap extends AbstractTestTermParser {
 
-    private static final String javaPath = System.getProperty("key.home")
+    static final String javaPath = System.getProperty("key.home")
             + File.separator + "examples"
             + File.separator + "_testcase"
             + File.separator + "termParser"
@@ -51,11 +48,15 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         return tf.createTerm(op, params);
     }
 
-    public void testParsePrettyPrintedSelect() throws IOException {
-        String prettySyntax, verboseSyntax;
+    public void testLocationSets() throws IOException {
+        comparePrettySyntaxAgainstVerboseSyntax(
+                "{(a, testTermParserHeap.A::$f)}",
+                "singleton(a,testTermParserHeap.A::$f)");
+    }
 
-        prettySyntax = "a.f";
-        verboseSyntax = "int::select(heap, a, testTermParserHeap.A::$f)";
+    public void testParsePrettyPrintedSelect() throws IOException {
+        String prettySyntax = "a.f";
+        String verboseSyntax = "int::select(heap, a, testTermParserHeap.A::$f)";
         comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
 
         prettySyntax = "a1.f";
@@ -68,8 +69,27 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     public void testBracketHeapUpdate() throws IOException {
-        String prettySyntax = "heap[a.f := 4][create(a)][memset(empty, 1)][anon(allLocs, heap)]";
-        String verboseSyntax = "anon(memset(create(store(heap, a, testTermParserHeap.A::$f, 4), a), empty, 1), allLocs, heap)";
+        String complicatedHeapPretty = "heap[a.f := 4][create(a)][memset(empty, 1)][anon(allLocs, heap)]";
+        String complicatedHeapVerbose = "anon(memset(create(store(heap, a, testTermParserHeap.A::$f, 4), a), empty, 1), allLocs, heap)";
+        comparePrettySyntaxAgainstVerboseSyntax(complicatedHeapPretty, complicatedHeapVerbose);
+
+        String prettySyntax = "a.f@h[anon(empty, h2)]";
+        String verboseSyntax = "int::select(anon(h, empty, h2), a, testTermParserHeap.A::$f)";
+        comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
+
+        /*
+         * Testing a more complicated term in which bracket syntax is applied
+         * before and after @-Operator.
+         */
+        prettySyntax = "a.next.next.array[i]@" + complicatedHeapPretty;
+        verboseSyntax = "int::select(" + complicatedHeapVerbose + ", "
+                + "int[]::select(" + complicatedHeapVerbose + ", "
+                + "testTermParserHeap.A::select(" + complicatedHeapVerbose + ", "
+                + "testTermParserHeap.A::select(" + complicatedHeapVerbose + ", "
+                + " a, testTermParserHeap.A::$next)"
+                + ", testTermParserHeap.A::$next)"
+                + ", testTermParserHeap.A::$array)"
+                + ", arr(i))";
         comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
     }
 
@@ -139,7 +159,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
      */
     public void testVerifyExceptionIfAtOperatorNotPreceededBySelectTerm() {
         try {
-            stringTermParser("(a.f + a.f)@h2").term();
+            getParser("(a.f + a.f)@h2").term();
             fail();
         } catch (Exception e) {
             assertTrue(e.getMessage().contains(NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE));
@@ -270,26 +290,6 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     /**
-     * Remove whitespaces before executing
-     * {@link junit.framework.TestCase#assertEquals(java.lang.String, java.lang.String)}.
-     */
-    private void assertEqualsIgnoreWhitespaces(String expected, String actual) {
-        assertEquals(expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""));
-    }
-
-    /**
-     * Convert a {@link Term} into a {@link String}.
-     *
-     * @param t The {@link Term} that will be converted.
-     */
-    private String printTerm(Term t) throws IOException {
-        LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), services);
-        lp.getNotationInfo().setHidePackagePrefix(false);
-        lp.printTerm(t);
-        return lp.toString();
-    }
-
-    /**
      * Test whether printing is inverse to parsing on a specific {@link String}.
      *
      * @param s Pretty-printed String representation of a term.
@@ -312,9 +312,10 @@ public class TestTermParserHeap extends AbstractTestTermParser {
      * @param verboseSyntax {@link Term} in verbose syntax.
      * @throws IOException
      */
-    private void comparePrettySyntaxAgainstVerboseSyntax(String prettySyntax, String verboseSyntax) throws IOException {
+    private void comparePrettySyntaxAgainstVerboseSyntax(String prettySyntax, String verboseSyntax,
+            String... optionalStringRepresentations) throws IOException {
         Term expectedParseResult = parseTerm(verboseSyntax);
-        compareStringRepresentationAgainstTermRepresentation(prettySyntax, expectedParseResult);
+        compareStringRepresentationAgainstTermRepresentation(prettySyntax, expectedParseResult, optionalStringRepresentations);
     }
 
     /**

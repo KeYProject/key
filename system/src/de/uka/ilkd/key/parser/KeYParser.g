@@ -90,6 +90,9 @@ options {
   import de.uka.ilkd.key.java.recoderext.*;
   import de.uka.ilkd.key.pp.AbbrevMap;
   import de.uka.ilkd.key.pp.LogicPrinter;
+
+  import de.uka.ilkd.key.ldt.SeqLDT;
+  import de.uka.ilkd.key.ldt.IntegerLDT;
   
 }
 
@@ -160,12 +163,15 @@ options {
    
    /*
     counter variable for parser rules accessterm and heap_selection suffix:
-    - stores nesting depth of alpha::select(h,o,f)-terms created via pretty syntax	
+    - stores nesting depth of alpha::select(heap,o,f)-terms created via pretty syntax	(i.e. terms of the form: o.f)
     - rule accessterm increases the counter
     - rule heap_selection_suffix calls method heapSelectionSuffix(), which resets
       the counter
+    - In case a term similar to o.f1.f2.f3.f4 would occur, this variable should have a value of 4.
+      The non-pretty syntax of this term would look similar to the following:
+          T::select(h, T::select(h, T::select(h, T::select(h, o, f1) , f2) , f3), f4)
    */
-   protected int globalImplicitHeapSuffixCounter = 0;
+   protected int globalSelectNestingDepth = 0;
 
    private int lineOffset=0;
    private int colOffset=0;
@@ -950,6 +956,14 @@ options {
         return term != null && term.sort() == 
             getServices().getTypeConverter().getHeapLDT().targetSort();
     }
+
+    private boolean isSequenceTerm(Term reference) {
+        return reference != null && reference.sort().name().equals(SeqLDT.NAME);
+    }
+
+    private boolean isIntTerm(Term reference) {
+        return reference.sort().name().equals(IntegerLDT.NAME);
+    }
     
     private void unbindVars(Namespace orig) {
         if(isGlobalDeclTermParser()) {
@@ -1394,17 +1408,8 @@ options {
         return pm;
     }
 
-
     public void addFunction(Function f) {
         functions().add(f);
-    }
-    
-    /*
-     * Replace standard heap by another heap in an observer function.
-     */
-    protected Term heapSelectionSuffix(Term term, Term heap) throws RecognitionException {
-    	// See file KeYParser.java for implementation.
-        throw new UnsupportedOperationException();
     }
     
     private ImmutableSet<Modality> lookupOperatorSV(String opName, ImmutableSet<Modality> modalities) 
@@ -1441,6 +1446,72 @@ options {
     private static class PairOfStringAndJavaBlock {
       String opName;
       JavaBlock javaBlock;
+    }
+    
+    private static boolean isSelectTerm(Term term) {
+        return term.op().name().toString().endsWith("::select") && term.arity() == 3;
+    }
+
+    private boolean isImplicitHeap(Term t) {
+        return getServices().getTermBuilder().getBaseHeap().equals(t);
+    }
+
+    // This is used for testing in TestTermParserHeap.java
+    public static final String NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE
+            = "Expecting select term before '@', not: ";
+
+    private Term replaceHeap(Term term, Term heap, int depth) throws RecognitionException {
+        if (depth > 0) {
+
+            if (isSelectTerm(term)) {
+
+                if (!isImplicitHeap(term.sub(0))) {
+                    semanticError("Expecting program variable heap as first argument of: " + term);
+                }
+
+                Term[] params = new Term[]{heap, replaceHeap(term.sub(1), heap, depth - 1), term.sub(2)};
+                return (getServices().getTermFactory().createTerm(term.op(), params));
+
+            } else if (term.op() instanceof ObserverFunction) {
+                if (!isImplicitHeap(term.sub(0))) {
+                    semanticError("Expecting program variable heap as first argument of: " + term);
+                }
+
+                Term[] params = new Term[term.arity()];
+                params[0] = heap;
+                params[1] = replaceHeap(term.sub(1), heap, depth - 1);
+                for (int i = 2; i < params.length; i++) {
+                    params[i] = term.sub(i);
+                }
+
+                return (getServices().getTermFactory().createTerm(term.op(), params));
+
+            } else {
+                semanticError(NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE + term);
+                throw new RecognitionException();
+            }
+
+        } else {
+            return term;
+        }
+    }
+
+    /*
+     * Replace standard heap by another heap in an observer function.
+     */
+    protected Term heapSelectionSuffix(Term term, Term heap) throws RecognitionException {
+
+        if (!isHeapTerm(heap)) {
+            semanticError("Expecting term of type Heap but sort is " + heap.sort()
+                    + " for term: " + term);
+        }
+
+        Term result = replaceHeap(term, heap, globalSelectNestingDepth);
+
+        // reset globalSelectNestingDepth
+        globalSelectNestingDepth = 0;
+
+        return result;
     }
 
 }
@@ -2628,8 +2699,8 @@ term110 returns [Term _term110 = null]
 @after { _term110 = result; }
     :
         (
-            result = accessterm  |
-            result = update_or_substitution
+            ( LBRACE ~LPAREN ) => result = update_or_substitution |
+            result = accessterm
         ) 
         {
 	/*
@@ -2801,7 +2872,7 @@ catch [TermCreationException ex] {
 
 //term120
 accessterm returns [Term _accessterm = null]
-@init{ int implicitHeapSuffixCounter = globalImplicitHeapSuffixCounter; }
+@init{ int selectNestingDepth = globalSelectNestingDepth; }
 @after { _accessterm = result; }
     :
       (MINUS ~NUM_LITERAL) => MINUS result = term110
@@ -2831,22 +2902,26 @@ accessterm returns [Term _accessterm = null]
 	}
       |
       ( {isStaticQuery()}? // look for package1.package2.Class.query(
-        result = static_query { implicitHeapSuffixCounter++; }
+        result = static_query { selectNestingDepth++; }
       |
         {isStaticAttribute()}?            // look for package1.package2.Class.attr
-        result = static_attribute_suffix { implicitHeapSuffixCounter++; }
+        result = static_attribute_suffix { selectNestingDepth++; }
       |
-        result = atom { implicitHeapSuffixCounter = globalImplicitHeapSuffixCounter; }
+        result = atom { selectNestingDepth = globalSelectNestingDepth; }
       )
          
-         ( result = accessterm_bracket_suffix[result] { implicitHeapSuffixCounter++; }
-         | result = attribute_or_query_suffix[result] { implicitHeapSuffixCounter++; }
+         ( abs = accessterm_bracket_suffix[result]
+             {
+                 result = $abs.result;
+                 if($abs.increaseHeapSuffixCounter) selectNestingDepth++;
+             }
+         | result = attribute_or_query_suffix[result] { selectNestingDepth++; }
          )*
          
-         { globalImplicitHeapSuffixCounter = implicitHeapSuffixCounter; }
+         { globalSelectNestingDepth = selectNestingDepth; }
          
     // at most one heap selection suffix
-    ( result = heap_selection_suffix[result] )? // resets globalImplicitHeapSuffixCounter to zero
+    ( result = heap_selection_suffix[result] )? // resets globalSelectNestingDepth to zero
     ;
 catch [TermCreationException ex] {
     keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
@@ -2858,11 +2933,23 @@ heap_selection_suffix [Term term] returns [Term result]
     { result = heapSelectionSuffix(term, heap); }
     ;
 
-accessterm_bracket_suffix[Term reference] returns [Term resultAtAfter]
-@after{resultAtAfter = result;}
+accessterm_bracket_suffix[Term reference] returns [Term result, boolean increaseHeapSuffixCounter]
+@init{ $increaseHeapSuffixCounter = false; }
     :
-    {isHeapTerm(reference)}? result = heap_update_suffix[reference]
-    | result = array_access_suffix[reference]
+    { isHeapTerm(reference) }? tmp = heap_update_suffix[reference] { $result = tmp; }
+    | { isSequenceTerm(reference) }? tmp = seq_get_suffix[reference] { $result = tmp; }
+    | tmp = array_access_suffix[reference] { $result = tmp; $increaseHeapSuffixCounter = true; }
+    ;
+
+seq_get_suffix[Term reference] returns [Term result]
+    :
+    LBRACKET
+	indexTerm = logicTermReEntry
+    {
+        if(!isIntTerm(indexTerm)) semanticError("Expecting term of sort " + IntegerLDT.NAME + " as index of sequence " + reference + ", but found: " + indexTerm);
+	    result = getServices().getTermBuilder().seqGet(Sort.ANY, reference, indexTerm);
+    }
+    RBRACKET
     ;
         
 static_query returns [Term result = null] 
@@ -2984,6 +3071,8 @@ atom returns [Term _atom = null]
     |   LPAREN a = term RPAREN
     |   TRUE  { a = getTermFactory().createTerm(Junctor.TRUE); }
     |   FALSE { a = getTermFactory().createTerm(Junctor.FALSE); }
+    |   LBRACE LPAREN obj=equivalence_term COMMA field=equivalence_term RPAREN RBRACE
+            { a = getServices().getTermBuilder().singleton(obj, field); }
     |   a = ifThenElseTerm
     |   a = ifExThenElseTerm
     |   literal=STRING_LITERAL

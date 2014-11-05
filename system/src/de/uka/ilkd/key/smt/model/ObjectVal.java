@@ -158,11 +158,33 @@ public class ObjectVal {
 
 
 	public String get(String field) {
+		//System.out.println(fieldvalues.keySet());
 		return fieldvalues.get(field);
 	}
 
 	public String put(String field, String value) {
 		return fieldvalues.put(field, value);
+	}
+	
+	public String getFieldUsingSimpleName(String name){
+		
+		if(fieldvalues.containsKey(name)){
+			return fieldvalues.get(name);
+		}
+		else{
+			
+			for(String field : fieldvalues.keySet()){
+				if(field.endsWith(name) || field.endsWith(name+"|")){
+					return fieldvalues.get(field);
+				}
+				
+			}
+			
+		}		
+		
+		return null;
+		
+		
 	}
 
 	public String toString(){
