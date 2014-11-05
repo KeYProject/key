@@ -36,6 +36,8 @@ import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.TacletForTests;
+import de.uka.ilkd.key.util.KeYExceptionHandler;
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public class TestClashFreeSubst extends TestCase {
  
@@ -154,7 +156,7 @@ public class TestClashFreeSubst extends TestCase {
 		new KeYLexerF(s,
 			"No file. Call of parser from logic/TestClashFreeSubst.java"),
 		new Recoder2KeY(services,
-			new KeYCrossReferenceServiceConfiguration(services.getExceptionHandler()),
+			new KeYCrossReferenceServiceConfiguration(new KeYRecoderExcHandler()),
 			services.getJavaInfo().rec2key(),
 			new NamespaceSet(),
 			services.getTypeConverter()),

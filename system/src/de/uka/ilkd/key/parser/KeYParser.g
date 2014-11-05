@@ -329,8 +329,7 @@ options {
 	    KeYParserF p =
                 new KeYParserF(ParserMode.TACLET,
                               new KeYLexerF(s,
-                                      "No file. KeYParser.parseTaclet(\n" + s + ")\n",
-                                      null),
+                                      "No file. KeYParser.parseTaclet(\n" + s + ")\n"),
                               services,
                               services.getNamespaces());
 	    return p.taclet(DefaultImmutableSet.<Choice>nil());

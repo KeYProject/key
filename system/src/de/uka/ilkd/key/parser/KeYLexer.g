@@ -51,17 +51,7 @@ lexer grammar KeYLexer;
         public int marker;
     }
 
-    protected KeYExceptionHandler keh = new KeYRecoderExcHandler();
-    protected Stack<SaveStruct> selector;
-
-    // why is keh sometimes null?
-
-    public KeYLexer(CharStream in, KeYExceptionHandler keh) {
-	      this(in);
-	      if(keh != null) { this.keh = keh; }
-	      this.selector = new Stack<SaveStruct>();
-    }
-    
+    protected Stack<SaveStruct> selector = new Stack<SaveStruct>();;
 
     public Stack<SaveStruct> getSelector() {
       return selector;
