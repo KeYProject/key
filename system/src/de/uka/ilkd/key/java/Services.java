@@ -37,8 +37,6 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 /**
  * this is a collection of common services to the KeY prover. Services
@@ -77,11 +75,6 @@ public class Services implements TermServices {
     private final VariableNamer innerVarNamer = new InnerVariableNamer(this);
 
     /**
-     * the exception-handler
-     */
-    private KeYExceptionHandler exceptionHandler;
-
-    /**
      * map of names to counters
      */
     private HashMap<String, Counter> counters;
@@ -114,7 +107,7 @@ public class Services implements TermServices {
      * creates a new Services object with a new TypeConverter and a new
      * JavaInfo object with no information stored at none of these.
      */
-    public Services(Profile profile, KeYExceptionHandler exceptionHandler){
+    public Services(Profile profile){
     	assert profile != null;
     	this.profile = profile;
     	this.counters = new LinkedHashMap<String, Counter>();
@@ -123,21 +116,10 @@ public class Services implements TermServices {
     	this.specRepos = new SpecificationRepository(this);
     	cee = new ConstantExpressionEvaluator(this);
     	typeconverter = new TypeConverter(this);
-    	if(exceptionHandler == null){
-    		this.exceptionHandler = new KeYRecoderExcHandler();
-    	}else{
-    		this.exceptionHandler = exceptionHandler;
-    	}
     	javainfo = new JavaInfo
-    			(new KeYProgModelInfo(this, typeconverter, this.exceptionHandler), this);
+                        (new KeYProgModelInfo(this, typeconverter, null), this);
     	nameRecorder = new NameRecorder();
     }
-
-    // ONLY for tests
-    public Services(Profile profile) {
-    	this(profile, null);
-    }    
-
 
     private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc, KeYRecoderMapping rec2key, 
     		HashMap<String, Counter> counters, ServiceCaches caches) {
@@ -158,16 +140,6 @@ public class Services implements TermServices {
     }
 
 
-    public KeYExceptionHandler getExceptionHandler(){
-    	return exceptionHandler;
-    }
-
-
-    public void setExceptionHandler(KeYExceptionHandler keh){
-    	exceptionHandler = keh;
-    }
-
-    
     /**
      * Returns the TypeConverter associated with this Services object.
      */
@@ -254,7 +226,6 @@ public class Services implements TermServices {
     					copyCounters(), newCaches);
     	s.specRepos = specRepos;
     	s.setTypeConverter(getTypeConverter().copy(s));
-    	s.setExceptionHandler(getExceptionHandler());
     	s.setNamespaces(namespaces.copy());
     	nameRecorder = nameRecorder.copy();
     	s.setJavaModel(getJavaModel());
@@ -283,7 +254,7 @@ public class Services implements TermServices {
     	(!(javainfo.getKeYProgModelInfo().getServConf() 
     			instanceof SchemaCrossReferenceServiceConfiguration),
     			"services: tried to copy schema cross reference service config.");
-    	Services s = new Services(getProfile(), getExceptionHandler());
+        Services s = new Services(getProfile());
     	s.setTypeConverter(getTypeConverter().copy(s));
     	s.setNamespaces(namespaces.copy());
     	nameRecorder = nameRecorder.copy();
@@ -315,7 +286,6 @@ public class Services implements TermServices {
         s.proof = p_proof;
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
-        s.setExceptionHandler(getExceptionHandler());
         s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
         s.setJavaModel(getJavaModel());

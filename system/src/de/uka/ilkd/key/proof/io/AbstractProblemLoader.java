@@ -324,9 +324,7 @@ public abstract class AbstractProblemLoader {
     protected ProblemInitializer createProblemInitializer() {
         UserInterface ui = mediator.getUI();
         return new ProblemInitializer(ui,
-                        new Services(envInput.getProfile(), 
-                                        mediator.getExceptionHandler()),
-                                        ui);
+                        new Services(envInput.getProfile()), ui);
     }
 
     /**

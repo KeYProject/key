@@ -138,8 +138,6 @@ public class KeYMediator {
 
 	addAutoModeListener(proofListener);
 
-	defaultExceptionHandler = new KeYRecoderExcHandler();
-
 	// There may be other interruption listeners, but the interaction
 	// engine listens by default.
 	addInterruptedListener(interactiveProver);
@@ -154,12 +152,12 @@ public class KeYMediator {
     }
 
     public KeYExceptionHandler getExceptionHandler(){
-       Proof selectedProof = getSelectedProof();
-	if(selectedProof != null && !selectedProof.isDisposed()){
-	    return selectedProof.getServices().getExceptionHandler();
-	}else{
+//       Proof selectedProof = getSelectedProof();
+//	if(selectedProof != null && !selectedProof.isDisposed()){
+//	    return selectedProof.getServices().getExceptionHandler();
+//	}else{
 	    return defaultExceptionHandler;
-	}
+//	}
     }
 
     /** returns the variable namespace

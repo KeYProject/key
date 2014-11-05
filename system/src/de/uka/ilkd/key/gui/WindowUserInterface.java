@@ -284,7 +284,7 @@ public class WindowUserInterface extends AbstractUserInterface {
     @Override
     public ProblemInitializer createProblemInitializer(Profile profile) {
         ProblemInitializer pi = new ProblemInitializer(this,
-                new Services(profile, mainWindow.getMediator().getExceptionHandler()), this);
+                new Services(profile), this);
         return pi;
     }
 

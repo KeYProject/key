@@ -75,8 +75,7 @@ public class LemmataHandler implements TacletFilter {
                 Collection<File> filesForAxioms = createFilesForAxioms(options.getFilesForAxioms());
                 
                 final ProblemInitializer problemInitializer = new ProblemInitializer(null,
-                                new Services(profile,
-                                                new KeYRecoderExcHandler()),
+                                new Services(profile),
                                 new Listener());
                 
                 TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(null,
