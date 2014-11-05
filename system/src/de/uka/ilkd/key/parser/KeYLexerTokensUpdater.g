@@ -130,7 +130,7 @@ tokens {
             String text = childTree.getText();
             text = text.substring(1, text.length()-1);
 
-            System.out.println("tokenNames[KeYParser." + name + "] = \"'" + text + "'\";");
+            System.out.println("names[KeYParser." + name + "] = \"'" + text + "'\";");
         }
 
         System.out.println("// ---- end generated token names ----");
