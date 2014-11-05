@@ -128,7 +128,7 @@ public class AutoSaver implements ProverTaskListener {
             // there may be concurrent changes to the proof... whatever
             public void run() {
                 try {
-                    new ProofSaver(proof, filename, de.uka.ilkd.key.gui.Main.INTERNAL_VERSION).save();
+                    new ProofSaver(proof, filename, de.uka.ilkd.key.core.Main.INTERNAL_VERSION).save();
                     Debug.out("File saved: "+filename);
                 } catch (IOException e) {
                     Debug.out("Autosaving file "+filename+" failed.",e);
