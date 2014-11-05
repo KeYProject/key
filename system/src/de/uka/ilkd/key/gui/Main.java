@@ -151,6 +151,10 @@ public final class Main {
     private static final ExperimentalFeature[] EXPERIMENTAL_FEATURES =
         {de.uka.ilkd.key.proof.delayedcut.DelayedCut.FEATURE};
 
+    /**
+     * Save all contracts in selected location to automate the creation
+     * of multiple ".key"-files
+     */
     private static boolean saveAllContracts = false;
 
     private static ProofMacro autoMacro = new SkipMacro();

@@ -18,6 +18,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.key_project.util.eclipse.swt.viewer.AbstractSimpleHTMLLabelProvider;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.Contract;
 
 /**
@@ -44,27 +45,39 @@ public class ContractLabelProvider extends AbstractSimpleHTMLLabelProvider {
      */
     @Override
     protected String getHtml(Object element) {
+       String html = null;
+       String displayName = null;
+       // Convert contract to HTML 
        if (element instanceof Contract) {
-          // Convert contract to HTML 
-          Contract contract = (Contract)element;
-          String html = contract.getHTMLText(services);
-          // Insert contract name into HTML
-          int start = html.indexOf("<html>");
-          if (start >= 0) {
-              // A real border with tile via <fieldset><legend>Title</legend>Content</fieldset> is not supported by Swing
-              int end = html.indexOf("</html>", start + "<html>".length());
-              String text = end >= 0 ?
-                            html.substring(start + "<html>".length(), end) :
-                            html.substring(start + "<html>".length());
-              html = "<html><body><h2>" + 
-                     contract.getDisplayName() + "</h2><br>" + 
-                     text +
-                     "</body></html>";
+          Contract contract = (Contract) element;
+          html = contract.getHTMLText(services);
+          displayName = contract.getDisplayName();
+       }
+       else if (element instanceof BlockContract) {
+          BlockContract bc = (BlockContract) element;
+          html = bc.getHtmlText(services);
+          displayName = bc.getDisplayName();
+       }
+       // Insert contract name into HTML
+       if (displayName != null) {
+          if (html != null) {
+             int start = html.indexOf("<html>");
+             if (start >= 0) {
+                 // A real border with tile via <fieldset><legend>Title</legend>Content</fieldset> is not supported by Swing
+                 int end = html.indexOf("</html>", start + "<html>".length());
+                 String text = end >= 0 ?
+                               html.substring(start + "<html>".length(), end) :
+                               html.substring(start + "<html>".length());
+                 html = "<html><body><h2>" + 
+                        displayName + "</h2><br>" + 
+                        text +
+                        "</body></html>";
+             }
           }
-          return html;
+          else {
+             html = "<html><body><h2>" + displayName + "</h2></body></html>";
+          }
        }
-       else {
-           return null;
-       }
+       return html;
     }
 }

@@ -42,7 +42,7 @@ import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.gui.ExampleChooser;
-import de.uka.ilkd.key.gui.ExampleChooser.ShortFile;
+import de.uka.ilkd.key.gui.ExampleChooser.Example;
 
 /**
  * The "KeY Example" wizard used to create new Java Projects with example
@@ -50,6 +50,12 @@ import de.uka.ilkd.key.gui.ExampleChooser.ShortFile;
  * @author Martin Hentschel
  */
 public class KeYExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
+   /**
+    * {@code true} add only {@link File}s specified by the {@link Example} to the created Java project.
+    * {@code false} to add all files in the example directory {@link Example#getDescription()} to the created Java project.
+    */
+   public static final boolean ONLY_SPECIFIED_EXAMPLE_CONTENT = false;
+   
    /**
     * The used {@link KeYExampleWizardPage} in which the user selects one example.
     */
@@ -81,7 +87,7 @@ public class KeYExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
       // Compute next page
       IWizardPage nextPage = super.getNextPage(page);
       // Update project name if required
-      ShortFile example = examplePage.getSelectedExample();
+      ExampleChooser.Example example = examplePage.getSelectedExample();
       if (example != null) {
          if (nextPage instanceof NewJavaProjectWizardPageOne) {
             NewJavaProjectWizardPageOne one = (NewJavaProjectWizardPageOne)nextPage;
@@ -107,12 +113,32 @@ public class KeYExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
    @Override
    protected boolean createExampleContent(IContainer sourceDirectory) throws Exception {
       // List example content
-      File example = examplePage.getSelectedExample().getFile();
-      File[] exampleContent = example.listFiles();
+      final ExampleChooser.Example example = examplePage.getSelectedExample();
+      final File exampleDirectory = example.getDirectory();
+      final File[] exampleContent;
+      if (ONLY_SPECIFIED_EXAMPLE_CONTENT) {
+         final List<File> exampleContentList = new LinkedList<File>(example.getAdditionalFiles());
+         exampleContentList.addAll(example.getExportFiles());
+         if (IOUtil.exists(example.getObligationFile())) {
+            exampleContentList.add(example.getObligationFile());
+         }
+         if (IOUtil.exists(example.getExampleFile())) {
+            exampleContentList.add(example.getExampleFile());
+         }
+         if (IOUtil.exists(example.getProofFile())) {
+            exampleContentList.add(example.getProofFile());
+         }
+         exampleContent = exampleContentList.toArray(new File[exampleContentList.size()]);
+      }
+      else {
+         exampleContent = exampleDirectory.listFiles();
+      }
+      final boolean descriptionAvailable = !StringUtil.isTrimmedEmpty(example.getDescription());
       // Separate between source and project content
       List<File> projectContent = new LinkedList<File>();
       List<File> sourceContent = new LinkedList<File>();
       Set<String> oldNames = new HashSet<String>();
+      File sourceSubDirectory = null;
       // Separate between source and project content
       for (File content : exampleContent) {
          // List java files
@@ -126,11 +152,14 @@ public class KeYExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
          // Check if java files are available
          if (javaFiles.isEmpty()) {
             // No java files, add to project
-            projectContent.add(content);
+            if (!descriptionAvailable || !example.getExampleFile().equals(content)) { // Do not add example definition file if description is available because only its description will be added later.
+               projectContent.add(content);
+            }
          }
          else {
             // Get package definition
-            File firstJavaFile = javaFiles.get(0);
+            File javaFile = javaFiles.get(0);
+            File firstJavaFile = javaFile;
             String packageDefinition = extractPackage(firstJavaFile);
             // Find source root folder which contains the source files
             File firstFolder = firstJavaFile.getParentFile();
@@ -140,16 +169,25 @@ public class KeYExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
                   Assert.isTrue(ObjectUtil.equals(firstFolder.getName(), packages[i]), "Package \"" + packages[i] + "\" is not in a folder with this name.");
                   firstFolder = firstFolder.getParentFile();
                }
+               Assert.isTrue(sourceSubDirectory == null | firstFolder.equals(sourceSubDirectory), "Different source folders '" + sourceSubDirectory + "' and '" + firstFolder + "' are not supported.");
+               sourceSubDirectory = firstFolder;
+            }
+            else {
+               File newSourceSubDirectory = javaFile.getParentFile();
+               Assert.isTrue(sourceSubDirectory == null | newSourceSubDirectory.equals(sourceSubDirectory), "Different source folders '" + sourceSubDirectory + "' and '" + newSourceSubDirectory + "' are not supported.");
+               sourceSubDirectory = newSourceSubDirectory;
             }
             // Make sure that no additional folders exist and source root folder content is stored in projects source folder
-            if (example.equals(firstFolder)) {
+            if (exampleDirectory.equals(firstFolder)) {
                // Java file is contained in example root folder
                sourceContent.add(content);
             }
             else {
                // Remove additional folder
                File parent = firstFolder;
-               Assert.isTrue(example.equals(parent.getParentFile()), "Additional deep source folder structures are not supported.");
+               if (!ONLY_SPECIFIED_EXAMPLE_CONTENT) {
+                  Assert.isTrue(exampleDirectory.equals(parent.getParentFile()), "Additional deep source folder structures are not supported.");
+               }
                // Add source content
                CollectionUtil.addAll(sourceContent, parent.listFiles());
                oldNames.add(firstFolder.getName());
@@ -159,8 +197,17 @@ public class KeYExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
       // Copy example content into new created Java Project and its source directory
       KeYFileOpener opener = new KeYFileOpener(sourceDirectory, oldNames);
       IProject project = sourceDirectory.getProject();
-      ResourceUtil.copyIntoWorkspace(project, opener, projectContent);
-      ResourceUtil.copyIntoWorkspace(sourceDirectory, opener, sourceContent);
+      if (ONLY_SPECIFIED_EXAMPLE_CONTENT) {
+         ResourceUtil.copyIntoWorkspace(sourceDirectory, opener, sourceSubDirectory != null ? sourceSubDirectory : exampleDirectory, sourceContent);
+      }
+      else {
+         ResourceUtil.copyIntoWorkspace(sourceDirectory, opener, null, sourceContent);
+      }
+      ResourceUtil.copyIntoWorkspace(project, opener, exampleDirectory, projectContent);
+      // Create example definition file only with its description
+      if (descriptionAvailable) { // Otherwise the README file is directly copied without any modification
+         ResourceUtil.createFile(project.getFile(example.getExampleFile().getName()), new ByteArrayInputStream(example.getDescription().getBytes()), null);
+      }
       // Set source sub directory if required
       if (!StringUtil.isTrimmedEmpty(opener.getSourceSubDirectory())) {
          KeYResourceProperties.setSourceClassPath(project, sourceDirectory.getFullPath().append(opener.getSourceSubDirectory()).toString());

@@ -1,3 +1,8 @@
+example.path = Information Flow
+example.name = Declassification - Sum
+example.additionalFile.1 = src/SumExample.java
+
+
 Information flow example.
 
 The example demonstrates precise declassification: the sum of the entries

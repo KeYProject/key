@@ -1145,6 +1145,29 @@ public class LogicPrinter {
     public void printStore(Term t, boolean closingBrace) throws IOException {
         storePrinter.printStore(t, closingBrace);
     }
+    
+    /*
+     * Print a term of the form: T::seqGet(Seq, int).
+     */
+    public void printSeqGet(Term t) throws IOException {
+        if (notationInfo.isPrettySyntax()) {
+            startTerm(2);
+            if (!t.sort().equals(Sort.ANY)) {
+                layouter.print("(" + t.sort().toString() + ")");
+            }
+            markStartSub();
+            printTerm(t.sub(0));
+            markEndSub();
+
+            layouter.print("[");
+            markStartSub();
+            printTerm(t.sub(1));
+            markEndSub();
+            layouter.print("]");
+        } else {
+            printFunctionTerm(t);
+        }
+    }
 
     public void printPostfix(Term t, String postfix) throws IOException {
 	if(notationInfo.isPrettySyntax()) {

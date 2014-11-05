@@ -234,6 +234,9 @@ public final class KeYUtil {
             else {
                 // Make sure that the location is contained in a Java project
                 IProject project = locationToLoad.getProject();
+                if (!JDTUtil.isJavaProject(project)) {
+                   throw new IllegalArgumentException("The project \"" + project.getName() + "\" is no Java project.");
+                }
                 // Get local file for the eclipse resource
                 location = KeYResourceProperties.getSourceClassPathLocation(project);
                 // Get KeY project settings

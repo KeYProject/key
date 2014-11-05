@@ -11,16 +11,20 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.DefaultExceptionHandler;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import junit.framework.TestCase;
 
 /**
- * Common code of classes TestTermParser and TestTermParserHeap.
+ * Common code of classes {@link TestTermParser} and {@link TestTermParserHeap}
+ * and {@link TestTermParserSequence}.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
@@ -30,7 +34,6 @@ public abstract class AbstractTestTermParser extends TestCase {
     protected final TermBuilder tb;
     protected final NamespaceSet nss;
     protected final Services services;
-    protected final Recoder2KeY r2k;
 
     AbstractTestTermParser(String name) {
         super(name);
@@ -38,8 +41,6 @@ public abstract class AbstractTestTermParser extends TestCase {
         tb = services.getTermBuilder();
         tf = tb.tf();
         nss = services.getNamespaces();
-        r2k = new Recoder2KeY(services, nss);
-        r2k.parseSpecialClasses();
     }
 
     Sort lookup_sort(String name) {
@@ -98,21 +99,19 @@ public abstract class AbstractTestTermParser extends TestCase {
         }
     }
 
-    protected KeYParserF stringTermParser(String s) {
-        return new KeYParserF(ParserMode.TERM,
-                new KeYLexerF(s,
-                        "No file. Call of parser from parser/" + getClass().getSimpleName(),
-                        new DefaultExceptionHandler()),
-                r2k,
-                services,
-                nss,
-                new AbbrevMap());
+    protected KeYLexerF getLexer(String s) {
+        return new KeYLexerF(s,
+                "No file. Call of parser from parser/" + getClass().getSimpleName(),
+                new DefaultExceptionHandler());
+    }
 
+    protected KeYParserF getParser(String s) {
+        return new KeYParserF(ParserMode.TERM, getLexer(s), services, nss);
     }
 
     public Term parseTerm(String s) {
         try {
-            return stringTermParser(s).term();
+            return getParser(s).term();
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -123,13 +122,33 @@ public abstract class AbstractTestTermParser extends TestCase {
 
     public Term parseFormula(String s) {
         try {
-            return stringTermParser(s).formula();
+            return getParser(s).formula();
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
             throw new RuntimeException("Exc while Parsing:\n" + sw);
         }
+    }
+    
+    /**
+     * Convert a {@link Term} into a {@link String}.
+     *
+     * @param t The {@link Term} that will be converted.
+     */
+    protected String printTerm(Term t) throws IOException {
+        LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), services);
+        lp.getNotationInfo().setHidePackagePrefix(false);
+        lp.printTerm(t);
+        return lp.toString();
+    }
+    
+    /**
+     * Remove whitespaces before executing
+     * {@link junit.framework.TestCase#assertEquals(java.lang.String, java.lang.String)}.
+     */
+    protected void assertEqualsIgnoreWhitespaces(String expected, String actual) {
+        assertEquals(expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""));
     }
 
     protected abstract Services getServices();

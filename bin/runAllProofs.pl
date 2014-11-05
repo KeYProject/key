@@ -392,6 +392,7 @@ sub runAuto {
   if ($option{'printStatistics'}) {
     $statisticsCmd = "--print-statistics '$option{'printStatistics'}'";
   }
+  my $vmparams = "--J-Xmx2048m";
   my $verbosity = "";
   my $automode = "--auto";
   my $arguments = "";
@@ -399,7 +400,7 @@ sub runAuto {
   if ($option{'verbose'}) { $verbosity = "--verbose 2"; }
   if ($option{'noAuto'}) { $automode = ""; }
   if ($option{'args'}) { $arguments = $option{'args'}; }
-  my $command = "'" . $path_to_key . "/bin/key' $automode $verbosity $statisticsCmd $arguments '$dk'";
+  my $command = "'" . $path_to_key . "/bin/key' $vmparams $automode $verbosity $statisticsCmd $arguments '$dk'";
   print "Command is: $command\n" unless $option{'silent'};
   my $starttime = time();
   my $result = &system_timeout($time_limit, $command);
@@ -426,6 +427,7 @@ sub processReturn {
 sub reloadFile {
     my $file = $_[0];
     print "\nTry to reload proof result $file:\n" unless $option{'silent'};
+    my $vmparams = "--J-Xmx2048m";
 
     my $dk = &getcwd . "/$file";
     unless(-r $dk) {
@@ -434,7 +436,7 @@ sub reloadFile {
 	return;
     }
 
-    my $command = "'" . $path_to_key . "/bin/key' --auto-loadonly '$dk'";
+    my $command = "'" . $path_to_key . "/bin/key' $vmparams --auto-loadonly '$dk'";
     # print "Command is: $command\n";
     my $before = time;
     my $result = &system_timeout($time_limit, $command);

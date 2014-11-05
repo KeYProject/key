@@ -41,7 +41,8 @@ public class ViewSettings implements Settings, Cloneable {
     private static final String USE_UNICODE = "[View]UseUnicodeSymbols";
     private static final String HIDE_PACKAGE_PREFIX = "[View]HidePackagePrefix";
     private static final String CONFIRM_EXIT = "[View]ConfirmExit";
-
+    private static final String SHOW_UNINSTANTIATED_TACLET = "[View]UninstantiatedTaclet";
+    
     /** default max number of displayed tooltip lines is 40 */
     private int maxTooltipLines = 40;
     /** do not print the find, varcond and heuristics part of taclets in
@@ -64,7 +65,9 @@ public class ViewSettings implements Settings, Cloneable {
     private boolean hidePackagePrefix = false;
     /** confirm exiting by default */
     private boolean confirmExit = true;
-
+    /**Show Taclet uninstantiated in tooltip -- for learning  */
+    private boolean showUninstantiatedTaclet = false;
+    
     private LinkedList<SettingsListener> listenerList =
         new LinkedList<SettingsListener>();
 
@@ -370,6 +373,13 @@ public void setUseUnicode(boolean useUnicode) {
     public void setConfirmExit(boolean confirmExit) {
         this.confirmExit = confirmExit;
         fireSettingsChanged();
+    }
+    public boolean getShowUninstantiatedTaclet(){
+	    return showUninstantiatedTaclet;
+    }
+    public void setShowUninstantiatedTaclet(boolean b){
+	this.showUninstantiatedTaclet = b;
+		    fireSettingsChanged();
     }
 
 }

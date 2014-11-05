@@ -897,6 +897,16 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
 
+    @Override
+    public void performActionOnUnsignedShiftRight(UnsignedShiftRight x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new UnsignedShiftRight(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
     // ppp
     public void performActionOnArrayReference(ArrayReference x) {
         DefaultAction def = new DefaultAction(x) {

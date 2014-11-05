@@ -22,6 +22,8 @@ import java.io.InputStream;
 import java.lang.annotation.Target;
 import java.net.URI;
 import java.util.Collection;
+import java.util.Deque;
+import java.util.LinkedList;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -174,9 +176,9 @@ public class ResourceUtil {
     * @param source The {@link File} to copy.
     * @throws CoreException Occurred Exception.
     */
-   public static void copyIntoWorkspace(IContainer target, IFileOpener opener, Collection<File> source) throws CoreException {
+   public static void copyIntoWorkspace(IContainer target, IFileOpener opener, File startDirectory, Collection<File> source) throws CoreException {
       if (source != null) {
-         copyIntoWorkspace(target, opener, source.toArray(new File[source.size()]));
+         copyIntoWorkspace(target, opener, startDirectory, source.toArray(new File[source.size()]));
       }
    }
 
@@ -192,7 +194,7 @@ public class ResourceUtil {
     * @param source The {@link File} to copy.
     * @throws CoreException Occurred Exception.
     */
-   public static void copyIntoWorkspace(IContainer target, IFileOpener opener, File... source) throws CoreException {
+   public static void copyIntoWorkspace(IContainer target, IFileOpener opener, File startDirectory, File... source) throws CoreException {
       try {
          if (source != null) {
             if (target == null) {
@@ -206,16 +208,32 @@ public class ResourceUtil {
             }
             for (File file : source) {
                if (file != null) {
+                  IContainer fileTarget = target;
+                  if (IOUtil.contains(startDirectory, file)) {
+                     Deque<File> parentsBelowStartDirectory = new LinkedList<File>();
+                     File parentFile = file.getParentFile();
+                     while (!startDirectory.equals(parentFile)) {
+                        parentsBelowStartDirectory.addFirst(parentFile);
+                        parentFile = parentFile.getParentFile();
+                     }
+                     for (File parentDirectory : parentsBelowStartDirectory) {
+                        IFolder subFolder = fileTarget.getFolder(new Path(parentDirectory.getName()));
+                        if (!subFolder.exists()) {
+                           subFolder.create(true, true, null);
+                        }
+                        fileTarget = subFolder;
+                     }
+                  }
                   if (file.isFile()) {
-                     IFile targetFile = target.getFile(new Path(file.getName()));
+                     IFile targetFile = fileTarget.getFile(new Path(file.getName()));
                      createFile(targetFile, opener.open(file), null);
                   }
                   else {
-                     IFolder targetFolder = target.getFolder(new Path(file.getName()));
+                     IFolder targetFolder = fileTarget.getFolder(new Path(file.getName()));
                      if (!targetFolder.exists()) {
                         targetFolder.create(true, true, null);
                      }
-                     copyIntoWorkspace(targetFolder, opener, file.listFiles());
+                     copyIntoWorkspace(targetFolder, opener, startDirectory, file.listFiles());
                   }
                }
             }

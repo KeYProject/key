@@ -31,7 +31,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -81,7 +80,6 @@ import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
-import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
@@ -94,7 +92,6 @@ import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
@@ -105,7 +102,7 @@ import de.uka.ilkd.key.util.PreferenceSaver;
 
 public final class MainWindow extends JFrame  {
 
-    private static final long serialVersionUID = 4019709804595371520L;
+    private static final long serialVersionUID = 5853419918923902636L;
 
     private static MainWindow instance = null;
 
@@ -191,9 +188,6 @@ public final class MainWindow extends JFrame  {
         new OneStepSimplificationToggleAction(this);
 
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
-
-    /** Determines if the KeY prover is started in visible mode*/
-    public static boolean visible = true;
 
     /** for locking of threads waiting for the prover to exit */
     public final Object monitor = new Object();
@@ -338,11 +332,6 @@ public final class MainWindow extends JFrame  {
             throw new NullPointerException("KeYMediator is not set.");
         }
         return mediator;
-    }
-
-    @Override
-    public void setVisible(boolean v){
-        super.setVisible(v && visible);
     }
 
     /** initialised, creates GUI and lays out the main frame */
@@ -726,7 +715,7 @@ public final class MainWindow extends JFrame  {
 
         help.add(new AboutAction(this));
         help.add(new KeYProjectHomepageAction(this));
-        help.add(new SystemInfoAction(this));
+//        help.add(new SystemInfoAction(this));
         help.add(new LicenseAction(this));
         return help;
     }
@@ -840,29 +829,6 @@ public final class MainWindow extends JFrame  {
      */
     public CurrentGoalView getGoalView() {
         return currentGoalView;
-    }
-
-    /** saves a proof */
-    public void saveProof(File proofFile) {
-        final String filename = proofFile.getAbsolutePath();
-        final Proof proof = getMediator().getSelectedProof();
-        ProofSaver saver =
-                new ProofSaver(proof, filename, Main.INTERNAL_VERSION);
-        String errorMsg ;
-
-        try {
-            errorMsg = saver.save();
-        } catch(IOException e){
-            errorMsg = e.toString();
-        }
-
-        if (errorMsg != null) {
-            notify(new GeneralFailureEvent
-                    ("Saving Proof failed.\n Error: " + errorMsg));
-        }
-        else {
-           proof.setProofFile(proofFile);
-        }
     }
 
     public void addProblem(final de.uka.ilkd.key.proof.ProofAggregate plist) {
@@ -1390,10 +1356,6 @@ public final class MainWindow extends JFrame  {
         }
     }
 
-
-    public static void setVisibleMode(boolean visible) {
-	MainWindow.visible = visible;
-    }
 
     public TaskTree getProofList() {
 	return proofList;
