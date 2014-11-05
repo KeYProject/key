@@ -495,12 +495,14 @@ options {
     }
 
     private int getLine() {
-        return state.tokenStartLine;
-    }   
+        Token token = ((TokenStream)input).LT(1);
+        return token.getLine();
+    }
 
     private int getColumn() {
-        return state.tokenStartCharPositionInLine;
-    }   
+        Token token = ((TokenStream)input).LT(1);
+        return token.getCharPositionInLine();
+    }
 
     private void resetSkips() {
        skip_schemavariables = false;
