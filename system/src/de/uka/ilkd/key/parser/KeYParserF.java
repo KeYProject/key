@@ -67,7 +67,7 @@ public class KeYParserF extends KeYParser {
      * @return an error message for that exception
      */
     public String getErrorMessage(RecognitionException e) {
-        return getErrorMessage(e, tokenNames);
+        return getErrorMessage(e, KeYLexerTokens.getTokennames());
     }
 
 }
