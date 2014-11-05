@@ -21,6 +21,7 @@ import java.awt.dnd.DropTarget;
 
 import javax.swing.SwingUtilities;
 
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.PosInSequent;

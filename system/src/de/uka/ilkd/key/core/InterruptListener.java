@@ -11,18 +11,12 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.core;
 
-/** The KeYSelectionListener is notified if the proof or the node the
- * user works with has changed.
- */
-public interface KeYSelectionListener {
+import java.util.EventListener;
 
-    /** focused node has changed */
-    void selectedNodeChanged(KeYSelectionEvent e);
+public interface InterruptListener extends EventListener {
 
-    /** the selected proof has changed (e.g. a new proof has been
-     * loaded) */ 
-    void selectedProofChanged(KeYSelectionEvent e);
-
+    public void interruptionPerformed();
+    
 }

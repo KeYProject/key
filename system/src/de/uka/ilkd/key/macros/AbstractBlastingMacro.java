@@ -3,7 +3,7 @@ package de.uka.ilkd.key.macros;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;

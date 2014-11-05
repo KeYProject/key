@@ -16,6 +16,7 @@
  */
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.Proof;
 
 public class DefaultTaskFinishedInfo implements TaskFinishedInfo {

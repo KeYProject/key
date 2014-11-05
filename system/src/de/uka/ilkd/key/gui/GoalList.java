@@ -39,6 +39,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.prooftree.DisableGoal;
 import de.uka.ilkd.key.logic.Sequent;

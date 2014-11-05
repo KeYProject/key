@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.core;
 
 import java.util.ArrayList;
 import java.util.Collections;

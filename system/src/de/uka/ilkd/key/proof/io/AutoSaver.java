@@ -16,8 +16,8 @@ package de.uka.ilkd.key.proof.io;
 import java.io.File;
 import java.io.IOException;
 
-import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.TaskFinishedInfo;
+import de.uka.ilkd.key.core.ProverTaskListener;
+import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.Debug;
 

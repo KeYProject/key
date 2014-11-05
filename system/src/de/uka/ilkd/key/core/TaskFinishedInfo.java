@@ -11,12 +11,25 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.core;
 
-import java.util.EventListener;
+import de.uka.ilkd.key.proof.Proof;
 
-public interface InterruptListener extends EventListener {
+/**
+ * An information object with additional information about the 
+ * finished task.
+ */
+public interface TaskFinishedInfo {
+    Object getSource();
 
-    public void interruptionPerformed();
+    Object getResult();
+
+    long getTime();
+    
+    int getAppliedRules();
+
+    int getClosedGoals();
+
+    Proof getProof();
     
 }

@@ -11,25 +11,19 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.core;
 
-import de.uka.ilkd.key.proof.Proof;
 
-/**
- * An information object with additional information about the 
- * finished task.
+/** The KeYSelectionListener is notified if the proof or the node the
+ * user works with has changed.
  */
-public interface TaskFinishedInfo {
-    Object getSource();
+public interface KeYSelectionListener {
 
-    Object getResult();
+    /** focused node has changed */
+    void selectedNodeChanged(KeYSelectionEvent e);
 
-    long getTime();
-    
-    int getAppliedRules();
+    /** the selected proof has changed (e.g. a new proof has been
+     * loaded) */ 
+    void selectedProofChanged(KeYSelectionEvent e);
 
-    int getClosedGoals();
-
-    Proof getProof();
-    
 }
