@@ -12,6 +12,7 @@
 //
 package de.uka.ilkd.key.gui.actions;
 
+import de.uka.ilkd.key.core.AutoModeListener;
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
