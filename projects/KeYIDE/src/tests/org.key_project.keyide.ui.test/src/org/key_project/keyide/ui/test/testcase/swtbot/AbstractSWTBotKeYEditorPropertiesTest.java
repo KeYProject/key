@@ -81,7 +81,7 @@ public abstract class AbstractSWTBotKeYEditorPropertiesTest extends AbstractSWTB
             pSteps.assertNodeTab(editor, keyEditor, propertiesView, mediator, mediator.getSelectedNode());
          }
       };
-      doEditorTest(projectName, pathToSourceFilesInBundle, contractName, false, steps);
+      doEditorTest(projectName, pathToSourceFilesInBundle, true, contractName, false, steps);
    }
    
    /**

@@ -133,11 +133,20 @@ public final class ExampleChooser extends JDialog {
          */
         private static final String ADDITIONAL_FILE_PREFIX = "example.additionalFile.";
 
+        /**
+         * The {@link Properties} key to specify the path in the tree.
+         * Prefix to specify export files which are not shown as tabs in the example wizard but are extracted to Java projects in the Eclipse integration.
+         * Append 1, 2, 3, ...
+         */
+        private static final String EXPORT_FILE_PREFIX = "example.exportFile.";
+
+        private final File exampleFile;
         private final File directory;
         private final String description;
         private final Properties properties;
 
         public Example(File file) throws IOException {
+            this.exampleFile = file;
             this.directory = file.getParentFile();
             this.properties = new Properties();
             StringBuilder sb = new StringBuilder();
@@ -165,11 +174,25 @@ public final class ExampleChooser extends JDialog {
             return description;
         }
 
+        public File getExampleFile() {
+            return exampleFile;
+        }
+
         public List<File> getAdditionalFiles() {
             ArrayList<File> result = new ArrayList<File>();
             int i = 1;
             while(properties.containsKey(ADDITIONAL_FILE_PREFIX + i)) {
                 result.add(new File(directory, properties.getProperty(ADDITIONAL_FILE_PREFIX + i)));
+                i++;
+            }
+            return result;
+        }
+
+        public List<File> getExportFiles() {
+            ArrayList<File> result = new ArrayList<File>();
+            int i = 1;
+            while(properties.containsKey(EXPORT_FILE_PREFIX + i)) {
+                result.add(new File(directory, properties.getProperty(EXPORT_FILE_PREFIX + i)));
                 i++;
             }
             return result;
@@ -514,17 +537,5 @@ public final class ExampleChooser extends JDialog {
         }
 
        return result;
-    }
-
-    /**
-     * Read the description stored in an example.
-     *
-     * @deprecated Use {@link Example#getDescription()} instead.
-     *
-     * @param example the example to read out
-     * @return the description stored in the example
-     */
-    public static String readDescription(Example example) {
-        return example.getDescription();
     }
 }

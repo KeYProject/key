@@ -99,25 +99,28 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
             resultHeaps = heaps[0].terms;
         }
 
-        // find corresponding step
-        for (PosInOccurrence step : steps) {
-            boolean match = true;
-            for(int j = 0; j<resultHeaps.length; j++) {
-               if (!step.subTerm().sub(j).equals(resultHeaps[j])) {
-                  match = false;
-                  break;
-               }
+        return findCorrespondingStep(steps, resultHeaps);
+    }
+    
+    public static PosInOccurrence findCorrespondingStep(List<PosInOccurrence> steps, Term[] resultHeaps) {
+       // find corresponding step
+       for (PosInOccurrence step : steps) {
+           boolean match = true;
+           for(int j = 0; j<resultHeaps.length; j++) {
+              if (!step.subTerm().sub(j).equals(resultHeaps[j])) {
+                 match = false;
+                 break;
+              }
+           }
+           if(match) {
+               return step;
             }
-            if(match) {
-                return step;
-             }
-        }
-
-        assert false;
-        return null;
+       }
+       assert false;
+       return null;
     }
 
-    private static void extractHeaps(List<LocationVariable> heapContext,
+    public static void extractHeaps(List<LocationVariable> heapContext,
             List<PosInOccurrence> steps, final TermStringWrapper[] heaps,
             final LogicPrinter lp) {
         int i = 0;
@@ -148,11 +151,11 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
         }
     }
 
-    private static final class TermStringWrapper {
-        final Term[] terms;
+    public static final class TermStringWrapper {
+        public final Term[] terms;
         final String string;
 
-        TermStringWrapper(Term[] terms, String string) {
+        public TermStringWrapper(Term[] terms, String string) {
             this.terms = terms;
             this.string = string;
         }

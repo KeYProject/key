@@ -33,8 +33,8 @@ import org.key_project.key4eclipse.common.ui.wizard.KeYExampleNewWizard;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -73,7 +73,7 @@ public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
     */
    protected void doTestAllExamples(boolean srcDir) throws Exception {
       final Set<String> EXAMPLES_WITH_COMPILER_FAILURES = new HashSet<String>();
-      EXAMPLES_WITH_COMPILER_FAILURES.add("08-Java5");
+      EXAMPLES_WITH_COMPILER_FAILURES.add("Java 5 Enhanced-for");
       EXAMPLES_WITH_COMPILER_FAILURES.add("Simple E-Voting");
       EXAMPLES_WITH_COMPILER_FAILURES.add("List with Sequences");
 
@@ -109,29 +109,37 @@ public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       // Close welcome view
       TestUtilsUtil.closeWelcomeView(bot);
-      int examplesCount = -1;
-      int i = 0;
-      do {
+      // Get examples
+      File examplesDir = new File(Main.getExamplesDir());
+      List<ExampleChooser.Example> examples = ExampleChooser.listExamples(examplesDir);
+      for (final ExampleChooser.Example example : examples) {
          // Open wizard
          bot.menu("File").menu("New").menu("Example...").click();
          SWTBotShell newWizard = bot.shell("New Example");
          // Select new wizard
          TestUtilsUtil.selectInTree(newWizard.bot().tree(), "KeY", "KeY Example");
          TestUtilsUtil.clickDirectly(newWizard.bot().button("Next >"));
-         // Test number of examples
-         if (examplesCount < 0) {
-            examplesCount = newWizard.bot().list().getItems().length;
-            assertTrue("No examples available.", examplesCount >= 1);
-         }
-         else {
-            assertEquals(examplesCount, newWizard.bot().list().getItems().length);
-         }
          // Select example to create
-         newWizard.bot().list().select(i);
-         final String example = newWizard.bot().list().selection()[0];
+         String[] path = example.getPath();
+         path = ArrayUtil.add(path, example.getName());
+         TestUtilsUtil.selectInTree(newWizard.bot().tree(), path);
+         // Test shown tabs
+         newWizard.bot().tabItem("Description").activate();
+         assertEquals(example.getDescription(), newWizard.bot().text().getText());
+         if (IOUtil.exists(example.getObligationFile())) {
+            newWizard.bot().tabItem("Proof Obligation").activate();
+            TestUtilsUtil.assertEqualsIgnoreWhiteSpace(IOUtil.readFrom(example.getObligationFile()), newWizard.bot().styledText().getText());
+         }
+         for (File additionalFile : example.getAdditionalFiles()) {
+            if (IOUtil.exists(additionalFile)) {
+               newWizard.bot().tabItem(additionalFile.getName()).activate();
+               TestUtilsUtil.assertEqualsIgnoreWhiteSpace(IOUtil.readFrom(additionalFile), newWizard.bot().styledText().getText());
+            }
+         }
+         // Select next wizard page
          TestUtilsUtil.clickDirectly(newWizard.bot().button("Next >"));
          // Make sure that project name is valid and change it
-         assertEquals(example, newWizard.bot().text().getText());
+         assertEquals(example.getName(), newWizard.bot().text().getText());
          String projectName = "SWTBotKeYExampleNewWizardTest_" + example + (srcDir ? "_src" : "_project");
          if (srcDir) {
             newWizard.bot().radio("Create separate folders for sources and class files").click();
@@ -149,26 +157,35 @@ public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
          IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
          assertTrue(project.exists());
          assertTrue(project.isOpen());
-         // Find example
-         File examplesDir = new File(Main.getExamplesDir());
-         List<ExampleChooser.Example> examples = ExampleChooser.listExamples(examplesDir);
-         final ExampleChooser.Example exampleData = CollectionUtil.search(examples, new IFilter<ExampleChooser.Example>() {
-            @Override
-            public boolean select(ExampleChooser.Example element) {
-               return element.getName().equals(example);
-            }
-         });
-         assertNotNull(exampleData);
          // Make sure that all example files and folders are copied into project (hierarchy and file content might have changed)
          final Set<String> fileNames = new HashSet<String>();
-         IOUtil.visit(exampleData.getDirectory(), new IOUtil.IFileVisitor() {
-            @Override
-            public void visit(File file) {
-               if (file.isFile()) {
-                  fileNames.add(file.getName());
-               }
+         if (KeYExampleNewWizard.ONLY_SPECIFIED_EXAMPLE_CONTENT) {
+            for (File file : example.getAdditionalFiles()) {
+               fileNames.add(file.getName());
             }
-         });
+            for (File file : example.getExportFiles()) {
+               fileNames.add(file.getName());
+            }
+            if (IOUtil.exists(example.getObligationFile())) {
+               fileNames.add(example.getObligationFile().getName());
+            }
+            if (IOUtil.exists(example.getExampleFile())) {
+               fileNames.add(example.getExampleFile().getName());
+            }
+            if (IOUtil.exists(example.getProofFile())) {
+               fileNames.add(example.getProofFile().getName());
+            }
+         }
+         else {
+            IOUtil.visit(example.getDirectory(), new IOUtil.IFileVisitor() {
+               @Override
+               public void visit(File file) {
+                  if (file.isFile()) {
+                     fileNames.add(file.getName());
+                  }
+               }
+            });
+         }
          project.accept(new IResourceVisitor() {
             @Override
             public boolean visit(IResource resource) throws CoreException {
@@ -176,15 +193,14 @@ public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
                return true;
             }
          });
-         assertTrue("Missing files: " + CollectionUtil.toString(fileNames) + " of example \"" + example + "\".", fileNames.isEmpty());
-         i++;
+         assertTrue("Missing files: " + CollectionUtil.toString(fileNames) + " of example \"" + example.getName() + "\".", fileNames.isEmpty());
          // Make sure that the project can be compiled
-         if (!EXAMPLES_WITH_COMPILER_FAILURES.contains(example)) {
+         if (!EXAMPLES_WITH_COMPILER_FAILURES.contains(example.getName())) {
             IMarker[] problems = project.findMarkers(IJavaModelMarker.JAVA_MODEL_PROBLEM_MARKER, true, IResource.DEPTH_INFINITE);
             for (IMarker marker : problems) {
                Integer severityType = (Integer) marker.getAttribute(IMarker.SEVERITY);
                if (severityType.intValue() == IMarker.SEVERITY_ERROR) {
-                  fail("Problems available at example \"" + example + "\": " + marker.getAttributes());
+                  fail("Problems available at example \"" + example.getName() + "\": " + marker.getAttributes());
                }
             }
          }
@@ -206,13 +222,12 @@ public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
                      }
                   }
                   catch (Exception e) {
-                     fail("Loading of " + resource + " failed in example \"" + example + "\" stored in \"" + exampleData.getDirectory() + "\".");
+                     fail("Loading of " + resource + " failed in example \"" + example.getName() + "\" stored in \"" + example.getDirectory() + "\".");
                   }
                }
                return true;
             }
          });
       }
-      while (i < examplesCount);
    }
 }

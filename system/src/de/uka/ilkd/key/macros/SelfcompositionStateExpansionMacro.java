@@ -1,10 +1,15 @@
 package de.uka.ilkd.key.macros;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.InfFlowPO;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
@@ -67,6 +72,32 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
         } else {
             return true;
         }
+    }
+    
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>
+     * This compound macro is applicable if and only if the first macro is applicable.
+     * If there is no first macro, this is not applicable.
+     */
+    @Override
+    public boolean canApplyTo(KeYMediator mediator,
+                              ImmutableList<Goal> goals,
+                              PosInOccurrence posInOcc) {
+
+        final Proof proof = mediator.getSelectedProof();
+        if (proof == null) {
+            return false;
+        }
+        final Services services = proof.getServices();
+        if (services == null) {
+            return false;
+        }
+        final ProofOblInput poForProof =
+                services.getSpecificationRepository().getProofOblInput(proof);
+        return (poForProof instanceof InfFlowPO) && super.canApplyTo(mediator, goals, posInOcc);
     }
 
     @Override

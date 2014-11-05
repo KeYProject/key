@@ -31,7 +31,7 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.SimpleBlockContract;
 
 // TODO Clean up.
-class BlockContractSelectionPanel extends JPanel {
+public class BlockContractSelectionPanel extends JPanel {
 
     private static final long serialVersionUID = 1681443715264203991L;
 
@@ -137,19 +137,33 @@ class BlockContractSelectionPanel extends JPanel {
     public BlockContract getContract()
     {
         final Object[] selection = contractList.getSelectedValues();
-        if (selection.length == 0) {
-            return null;
-        }
-        else if (selection.length == 1) {
-            return (BlockContract) selection[0];
-        }
-        else {
-            ImmutableSet<BlockContract> contracts = DefaultImmutableSet.nil();
-            for (Object contract : selection) {
-                contracts = contracts.add((BlockContract) contract);
-            }
-            return SimpleBlockContract.combine(contracts, services);
-        }
+        return computeContract(services, selection);
     }
 
+    /**
+     * <p>
+     * Computes the selected {@link BlockContract}.
+     * </p>
+     * <p>
+     * This method is also used by the KeYIDE (Eclipse) to ensure the same behavior.
+     * </p>
+     * @param services The {@link Services}
+     * @param selection The selected contracts.
+     * @return The selected {@link BlockContract} or {@code null} if not available.
+     */
+    public static BlockContract computeContract(Services services, Object[] selection) {
+       if (selection.length == 0) {
+           return null;
+       }
+       else if (selection.length == 1) {
+           return (BlockContract) selection[0];
+       }
+       else {
+           ImmutableSet<BlockContract> contracts = DefaultImmutableSet.nil();
+           for (Object contract : selection) {
+               contracts = contracts.add((BlockContract) contract);
+           }
+           return SimpleBlockContract.combine(contracts, services);
+       }
+    }
 }

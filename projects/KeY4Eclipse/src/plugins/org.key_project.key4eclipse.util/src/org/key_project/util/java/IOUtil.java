@@ -718,7 +718,7 @@ public final class IOUtil {
     * characters they represent. Incomplete escape sequences are ignored and 
     * invalid UTF-8 encoded bytes are treated as extended ASCII characters.
     * @param uriPath The URI path to decode.
-    * @return The decoed URI path.
+    * @return The decoded URI path.
     */
    public static String decodeURIPath(String uriPath) {
       if (uriPath != null) {
@@ -727,5 +727,14 @@ public final class IOUtil {
       else {
          return null;
       }
+   }
+
+   /**
+    * Checks if the given {@link File} exists.
+    * @param file The {@link File} to check.
+    * @return {@code true} {@link File} is not {@code null} and exists, {@code false} otherwise.
+    */
+   public static boolean exists(File file) {
+      return file != null && file.exists();
    }
 }
