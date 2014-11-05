@@ -16,7 +16,6 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
-import de.uka.ilkd.key.util.DefaultExceptionHandler;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 import java.io.IOException;

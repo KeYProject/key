@@ -459,10 +459,14 @@ public class TestDeclParser extends TestCase {
 	  fail("Parsed in ambigious declaration");
 	} catch(RuntimeException e){
 	    if(!(e.getCause() instanceof AmbigiousDeclException)){
+	        e.printStackTrace();
 		fail("Unexpected excpetion. Testcase failed." +e);
 	    }
 	} catch(RecognitionException re) {
-	    fail("Unexpected excpetion. Testcase failed." + re);
+	    if(!(re instanceof AmbigiousDeclException)) {
+	        re.printStackTrace();
+	        fail("Unexpected recognition excpetion. Testcase failed." + re);
+	    }
 	} 
 	
     }
