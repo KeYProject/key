@@ -2832,9 +2832,18 @@ attribute_or_query_suffix[Term prefix] returns [Term _attribute_or_query_suffix 
     DOT memberName = attrid
     (result = querySuffix[prefix, memberName] {assert result != null;})?
     {
-        if(result == null){
-            Operator v = getAttributeInPrefixSort(prefix.sort(), memberName);
-            result = createAttributeTerm(prefix, v);
+        if(result == null)  {
+            if(prefix.sort() == getServices().getTypeConverter().getSeqLDT().targetSort()) {
+                if("length".equals(memberName)) {
+                    result = getServices().getTermBuilder().seqLen(prefix);
+                } else {
+                    semanticError("There is no attribute '" + memberName +
+                                  "' for sequences (Seq), only 'length' is supported.");
+                }
+            } else {
+                Operator v = getAttributeInPrefixSort(prefix.sort(), memberName);
+                result = createAttributeTerm(prefix, v);
+            }
         }
     }
     ;
