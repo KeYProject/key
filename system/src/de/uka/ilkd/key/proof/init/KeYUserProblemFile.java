@@ -84,8 +84,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
                 (initConfig.getServices(), 
                  initConfig.namespaces());
             problemParser = new KeYParserF
-                (ParserMode.PROBLEM, new KeYLexerF(getNewStream(), file.toString(),
-                        initConfig.getServices().getExceptionHandler()), 
+                (ParserMode.PROBLEM, new KeYLexerF(getNewStream(), file.toString()),
                         pc, pc, null, null);
             problemParser.parseWith();            
         
@@ -126,8 +125,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
                 new CountingBufferedReader
                     (getNewStream(),monitor,getNumberOfChars()/100);
 	    DeclPicker lexer = new DeclPicker(new KeYLexerF(cinp,
-		    file.toString(),
-		    initConfig.getServices().getExceptionHandler()));
+		    file.toString()));
 
             final ParserConfig normalConfig 
                 = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
@@ -255,7 +253,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     * @throws Exception Occurred Exception.
     */
    protected Profile readProfileFromFile() throws Exception {
-      KeYParserF problemParser = new KeYParserF(ParserMode.GLOBALDECL, new KeYLexerF(getNewStream(), file.toString(), null));
+      KeYParserF problemParser = new KeYParserF(ParserMode.GLOBALDECL, new KeYLexerF(getNewStream(), file.toString()));
       problemParser.profile();
       String profileName = problemParser.getProfileName();
       if (profileName != null && !profileName.isEmpty()) {

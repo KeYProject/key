@@ -117,8 +117,7 @@ public class KeYFile implements EnvInput {
     private KeYParserF createDeclParser(InputStream is) throws IOException {
         return new KeYParserF(ParserMode.DECLARATION,
                              new KeYLexerF(is,
-                                          file.toString(),
-                                          initConfig.getServices().getExceptionHandler()),
+                                          file.toString()),
                              initConfig.getServices(),
                              initConfig.namespaces());
     }
@@ -149,7 +148,7 @@ public class KeYFile implements EnvInput {
       try {
             problemParser =
                     new KeYParserF(ParserMode.PROBLEM,
-                              new KeYLexerF(getNewStream(), file.toString(), null));
+                              new KeYLexerF(getNewStream(), file.toString()));
          problemParser.profile();
          ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
          settings.loadSettingsFromString(problemParser.preferences());
@@ -202,8 +201,7 @@ public class KeYFile implements EnvInput {
                 // numbers. Somebody please fix that. /Woj
                 problemParser = new KeYParserF(ParserMode.PROBLEM,
                         new KeYLexerF(getNewStream(),
-                                file.toString(),
-                                null),
+                                file.toString()),
                                 pc, 
                                 pc, 
                                 null, 
@@ -271,8 +269,7 @@ public class KeYFile implements EnvInput {
         try {
             problemParser = new KeYParserF(ParserMode.PROBLEM,
                                                     new KeYLexerF(getNewStream(),
-                                                                 file.toString(),
-                                                                 null));
+                                                                 file.toString()));
             
             problemParser.profile(); // skip profile
             problemParser.preferences(); // skip preferences
@@ -334,9 +331,7 @@ public class KeYFile implements EnvInput {
             try {
                 problemParser = new KeYParserF(ParserMode.PROBLEM,
                         new KeYLexerF(cinp,
-                                file.toString(),
-                                initConfig.getServices()
-                                .getExceptionHandler()), 
+                                file.toString()),
                                 schemaConfig, 
                                 normalConfig, 
                                 initConfig.getTaclet2Builder(), 
@@ -432,9 +427,7 @@ public class KeYFile implements EnvInput {
             try {
                 problemParser = new KeYParserF(ParserMode.PROBLEM,
                         new KeYLexerF(cinp,
-                                file.toString(),
-                                initConfig.getServices()
-                                .getExceptionHandler()), 
+                                file.toString()),
                                 schemaConfig,
                                 normalConfig,
                                 initConfig.getTaclet2Builder(),

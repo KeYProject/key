@@ -51,8 +51,7 @@ public class TestDeclParser extends TestCase {
 	String sorts = "\\sorts{boolean;int;LocSet;}";
 	KeYParserF basicSortsParser = new KeYParserF(ParserMode.DECLARATION,
 		new KeYLexerF(sorts,
-			"No file. Call of parser from logic/TestClashFreeSubst.java",
-			null),
+			"No file. Call of parser from logic/TestClashFreeSubst.java"),
 		serv, nss);
 	try {
 	    basicSortsParser.parseSorts();
@@ -67,8 +66,7 @@ public class TestDeclParser extends TestCase {
     private KeYParserF stringParser(String s) {
 	return new KeYParserF(ParserMode.DECLARATION,
 		new KeYLexerF(s,
-			"No file. Call of parser from parser/TestDeclParser.java",
-			null),
+			"No file. Call of parser from parser/TestDeclParser.java"),
 		serv, nss);
     }
 

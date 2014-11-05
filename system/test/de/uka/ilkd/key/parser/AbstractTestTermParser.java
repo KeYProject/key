@@ -63,8 +63,7 @@ public abstract class AbstractTestTermParser extends TestCase {
         new Recoder2KeY(services, nss).parseSpecialClasses();
         return new KeYParserF(ParserMode.DECLARATION,
                 new KeYLexerF(s,
-                        "No file. Call of parser from parser/TestTermParser.java",
-                        null),
+                        "No file. Call of parser from parser/TestTermParser.java"),
                 services, nss);
     }
 
@@ -86,8 +85,7 @@ public abstract class AbstractTestTermParser extends TestCase {
                     nss).parseSpecialClasses();
             return new KeYParserF(ParserMode.PROBLEM,
                     new KeYLexerF(s,
-                            "No file. Call of parser from parser/TestTermParser.java",
-                            null),
+                            "No file. Call of parser from parser/TestTermParser.java"),
                     new ParserConfig(services, nss),
                     new ParserConfig(services, nss),
                     null,
@@ -102,8 +100,7 @@ public abstract class AbstractTestTermParser extends TestCase {
 
     protected KeYLexerF getLexer(String s) {
         return new KeYLexerF(s,
-                "No file. Call of parser from parser/" + getClass().getSimpleName(),
-                new KeYRecoderExcHandler());
+                "No file. Call of parser from parser/" + getClass().getSimpleName());
     }
 
     protected KeYParserF getParser(String s) {

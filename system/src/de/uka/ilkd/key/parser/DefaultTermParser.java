@@ -83,10 +83,7 @@ public final class DefaultTermParser {
         KeYParserF parser = null;
         try{
             parser
-                = new KeYParserF(ParserMode.TERM, new KeYLexerF(
-		                in,
-		                "",
-		                services.getExceptionHandler()),
+                = new KeYParserF(ParserMode.TERM, new KeYLexerF(in, ""),
 				new Recoder2KeY (services, nss),
                                 services, 
                                 nss, 

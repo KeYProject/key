@@ -196,6 +196,12 @@ lexer grammar KeYLexer;
 
 }
 
+//@rulecatch {
+//    catch(RecognitionException e) {
+//        throw e;
+//    }
+//}
+
 /**
  * The common lexer for declarations, terms, formulae, Taclets, etc.
  */

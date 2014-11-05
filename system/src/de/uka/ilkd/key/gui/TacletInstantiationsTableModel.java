@@ -232,8 +232,7 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
         KeYParserF parser = null;
         try {
             parser =
-                new KeYParserF (ParserMode.DECLARATION, new KeYLexerF ( s, "",
-                                 services.getExceptionHandler() ),
+                new KeYParserF (ParserMode.DECLARATION, new KeYLexerF ( s, ""),
                                  services,   // should not be needed
                                  nss );
             return parser.id_declaration ();

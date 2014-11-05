@@ -66,8 +66,7 @@ public class TestClashFreeSubst extends TestCase {
 	String sorts = "\\sorts{boolean;int;LocSet;}";
 	KeYParserF basicSortsParser = new KeYParserF(ParserMode.DECLARATION,
 		new KeYLexerF(sorts,
-			"No file. Call of parser from logic/TestClashFreeSubst.java",
-			null),
+			"No file. Call of parser from logic/TestClashFreeSubst.java"),
 		services, nss);
 	try {
 	    basicSortsParser.parseSorts();
@@ -134,8 +133,7 @@ public class TestClashFreeSubst extends TestCase {
 
 	return new KeYParserF(ParserMode.DECLARATION,
 		new KeYLexerF(s,
-			"No file. Call of parser from logic/TestClashFreeSubst.java",
-			null),
+			"No file. Call of parser from logic/TestClashFreeSubst.java"),
 		services, nss);
     }
 
@@ -154,8 +152,7 @@ public class TestClashFreeSubst extends TestCase {
     private KeYParserF stringTermParser(String s) {
 	return new KeYParserF(ParserMode.GLOBALDECL,
 		new KeYLexerF(s,
-			"No file. Call of parser from logic/TestClashFreeSubst.java",
-			null),
+			"No file. Call of parser from logic/TestClashFreeSubst.java"),
 		new Recoder2KeY(services,
 			new KeYCrossReferenceServiceConfiguration(services.getExceptionHandler()),
 			services.getJavaInfo().rec2key(),
