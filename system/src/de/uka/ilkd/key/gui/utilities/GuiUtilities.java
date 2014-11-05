@@ -16,21 +16,17 @@ package de.uka.ilkd.key.gui.utilities;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
 import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.util.Debug;
 
 public final class GuiUtilities {
     
@@ -53,49 +49,6 @@ public final class GuiUtilities {
             ((JScrollPane) pane).getViewport().setBackground(Color.white);
         }
         pane.setMinimumSize(new java.awt.Dimension(150,0));
-    }
-
-    /**
-     * Invoke a runnable object on the AWT event thread and wait for the
-     * execution to finish.
-     * 
-     * If an exception occurs during the run, the trace is printed to stderr.
-     * 
-     * @param runner
-     *            Runnable capturing code to execute on the awt thread.
-     */
-    public static void invokeAndWait(Runnable runner) {
-        if (SwingUtilities.isEventDispatchThread()) runner.run();
-        else {
-            try{
-                SwingUtilities.invokeAndWait(runner);
-            } catch(InterruptedException e) {
-            	Debug.out(e);
-//                System.err.println(e);
-//                e.printStackTrace();
-            } catch(InvocationTargetException ite) {
-                Throwable targetExc = ite.getTargetException();
-                System.err.println(targetExc);
-                targetExc.printStackTrace();
-                ite.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * Invoke a runnable object on the AWT event thread. Does not wait
-     * necessarily for it to finish. If the current thread is already the event
-     * queue, the {@link Runnable} object is simply executed.
-     * 
-     * @param runnable
-     *            Runnable capturing code to execute on the awt thread.
-     */
-    public static void invokeOnEventQueue(Runnable runnable) {
-        if(EventQueue.isDispatchThread()) {
-            runnable.run();
-        } else {
-            SwingUtilities.invokeLater(runnable);
-        }
     }
 
     public static void copyHighlightToClipboard(CurrentGoalView view, PosInSequent pos) {

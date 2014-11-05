@@ -100,6 +100,7 @@ import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
+import de.uka.ilkd.key.util.ThreadUtilities;
 
 public final class MainWindow extends JFrame  {
 
@@ -505,7 +506,7 @@ public final class MainWindow extends JFrame  {
      * Make the status line display a standard message, make progress bar and abort button invisible
      */
     public void setStandardStatusLine() {
-        GuiUtilities.invokeOnEventQueue(new Runnable() {
+        ThreadUtilities.invokeOnEventQueue(new Runnable() {
             @Override
 	    public void run() {
 		setStandardStatusLineImmediately();
@@ -531,7 +532,7 @@ public final class MainWindow extends JFrame  {
      * the progress bar range to the given value, set the current progress to zero
      */
     public void setStatusLine(final String str, final int max) {
-        GuiUtilities.invokeOnEventQueue(new Runnable() {
+        ThreadUtilities.invokeOnEventQueue(new Runnable() {
             @Override
 	    public void run() {
 		setStatusLineImmediately(str, max);
@@ -843,7 +844,7 @@ public final class MainWindow extends JFrame  {
                 updateSequentView();
             }
         };
-        GuiUtilities.invokeAndWait(guiUpdater);
+        ThreadUtilities.invokeAndWait(guiUpdater);
     }
 
     private Proof setUpNewProof(Proof proof) {

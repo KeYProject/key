@@ -31,7 +31,6 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
@@ -66,6 +65,7 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.ThreadUtilities;
 
 
 public class KeYMediator {
@@ -331,7 +331,7 @@ public class KeYMediator {
             Runnable swingProzac = new Runnable() {
                public void run() { setProofHelper(pp); }
             };
-            GuiUtilities.invokeAndWait(swingProzac);
+            ThreadUtilities.invokeAndWait(swingProzac);
         }
     }
 
@@ -813,7 +813,7 @@ public class KeYMediator {
             }
          }
       };
-      GuiUtilities.invokeAndWait(interfaceSignaller);
+      ThreadUtilities.invokeAndWait(interfaceSignaller);
    }
 
    public void startInterface(boolean fullStop) {
@@ -829,7 +829,7 @@ public class KeYMediator {
                 keySelectionModel.fireSelectedProofChanged();
          }
       };
-      GuiUtilities.invokeAndWait(interfaceSignaller);
+      ThreadUtilities.invokeAndWait(interfaceSignaller);
    }
 
    
