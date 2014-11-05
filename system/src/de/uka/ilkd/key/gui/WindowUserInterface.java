@@ -167,12 +167,9 @@ public class WindowUserInterface extends AbstractUserInterface {
             }
         } else if (info.getSource() instanceof ProblemLoader) {
             resetStatus(this);
+            Throwable result = (Throwable) info.getResult();
             if (info.getResult() != null) {
-                final KeYExceptionHandler exceptionHandler = ((ProblemLoader) info
-                        .getSource()).getExceptionHandler();
-                ExceptionDialog.showDialog(
-                        mainWindow, exceptionHandler.getExceptions());
-                exceptionHandler.clear();
+                ExceptionDialog.showDialog(mainWindow, result);
             } else if (getMediator().getUI().isSaveOnly()) {
                 mainWindow.displayResults("Finished Saving!");
             } else {
@@ -381,5 +378,5 @@ public class WindowUserInterface extends AbstractUserInterface {
       mainWindow.setStandardStatusLine();
    }
 
-  
+
 }

@@ -195,7 +195,9 @@ public abstract class AbstractProblemLoader {
                             if (ui.selectProofObligation(initConfig)) {
                                 return null;
                             } else {
-                                return new ProblemLoaderException(this, "Aborted.");
+                                // That message would be reported otherwise. Undesired.
+                                // return new ProblemLoaderException(this, "Aborted.");
+                                return null;
                             }
                         }
                         else {
