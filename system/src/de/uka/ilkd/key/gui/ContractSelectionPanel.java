@@ -21,7 +21,15 @@ import java.awt.event.MouseListener;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -36,7 +44,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 /**
  * A panel for selecting contracts.
  */
-class ContractSelectionPanel extends JPanel {
+public class ContractSelectionPanel extends JPanel {
 
     /**
      *
@@ -192,18 +200,33 @@ class ContractSelectionPanel extends JPanel {
 
     public Contract getContract() {
         final Object[] selection = contractList.getSelectedValues();
-        if(selection.length == 0) {
-            return null;
-        } else if(selection.length == 1) {
-            return (Contract) selection[0];
-        } else {
-            ImmutableSet<FunctionalOperationContract> contracts
-            	= DefaultImmutableSet.<FunctionalOperationContract>nil();
-            for(Object contract : selection) {
-        	contracts = contracts.add((FunctionalOperationContract) contract);
-            }
-            return services.getSpecificationRepository()
-                           .combineOperationContracts(contracts);
-        }
+        return computeContract(services, selection);
+    }
+    
+    /**
+     * <p>
+     * Computes the selected {@link Contract}.
+     * </p>
+     * <p>
+     * This method is also used by the KeYIDE (Eclipse) to ensure the same behavior.
+     * </p>
+     * @param services The {@link Services}
+     * @param selection The selected contracts.
+     * @return The selected {@link Contract} or {@code null} if not available.
+     */
+    public static Contract computeContract(Services services, Object[] selection) {
+       if(selection.length == 0) {
+          return null;
+      } else if(selection.length == 1) {
+          return (Contract) selection[0];
+      } else {
+          ImmutableSet<FunctionalOperationContract> contracts
+             = DefaultImmutableSet.<FunctionalOperationContract>nil();
+          for(Object contract : selection) {
+       contracts = contracts.add((FunctionalOperationContract) contract);
+          }
+          return services.getSpecificationRepository()
+                         .combineOperationContracts(contracts);
+      }
     }
 }
