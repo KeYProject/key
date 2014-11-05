@@ -1,4 +1,4 @@
-package org.key_project.key4eclipse.resources.util;
+package org.key_project.key4eclipse.resources.builder;
 
 import java.util.LinkedList;
 import java.util.List;

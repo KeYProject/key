@@ -52,6 +52,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.resources.builder.KeYProjectBuildJob;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.resources.decorator.ProofFileLightweightLabelDecorator;
+import org.key_project.key4eclipse.resources.io.ProofReferenceException;
 import org.key_project.key4eclipse.resources.nature.KeYProjectNature;
 import org.key_project.key4eclipse.resources.util.event.IKeYResourcePropertyListener;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
@@ -62,13 +63,21 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
+import de.uka.ilkd.key.speclang.ClassAxiom;
+import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 
 /**
@@ -79,7 +88,6 @@ public class KeYResourcesUtil {
    public static final String PROOF_FOLDER_NAME = "proofs";
    public static final String PROOF_FILE_EXTENSION = "proof";
    public static final String META_FILE_EXTENSION = "proofmeta";
-   public static final String LAST_CHANGES_FILE = ".lastChanges";
    
    
    /**
@@ -121,6 +129,96 @@ public class KeYResourcesUtil {
       return false;
    }
    
+
+   /**
+    * Returns the {@link KeYJavaType} for the given {@link IProofReference}.
+    * @param proofRef - the {@link IProofReference} to use
+    * @return the {@link KeYJavaType}
+    * @throws ProofReferenceException 
+    */
+   public static KeYJavaType getKeYJavaType(IProofReference<?> proofRef) throws ProofReferenceException{
+      KeYJavaType kjt = null;
+      Object target = proofRef.getTarget();
+      if(IProofReference.ACCESS.equals(proofRef.getKind())){
+         if(target instanceof IProgramVariable){//TODO: analyseDependencies von Martin benutzt auch diese Methode. Soll dort wirklich der typ der Variable zurück gegeben werden oder auch der container?
+            IProgramVariable progVar = (IProgramVariable) target;
+            if (progVar instanceof LocationVariable) {
+               kjt = ((LocationVariable) progVar).getContainerType();
+            }
+            else if (progVar instanceof ProgramConstant) {
+               kjt = ((ProgramConstant) progVar).getContainerType();
+            }
+         }
+         else {
+            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected IProgramVariable");
+         }
+      }
+      else if(IProofReference.CALL_METHOD.equals(proofRef.getKind()) || 
+              IProofReference.INLINE_METHOD.equals(proofRef.getKind())){
+         if(target instanceof IProgramMethod){
+            IProgramMethod progMeth = (IProgramMethod) target;
+            kjt = progMeth.getContainerType();
+         }
+         else {
+            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected IProgramMethod");
+         }
+      }
+      else if(IProofReference.USE_AXIOM.equals(proofRef.getKind())){
+         if(target instanceof ClassAxiom){
+            ClassAxiom classAx = (ClassAxiom) target;
+            kjt = classAx.getKJT();
+         }
+         else {
+            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected ClassAxiom");
+         }
+      }
+      else if(IProofReference.USE_CONTRACT.equals(proofRef.getKind())){
+         if(target instanceof Contract){
+            Contract contract = (Contract) target;
+            kjt = contract.getKJT();
+         }
+         else {
+            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected Contract");
+         }
+      }
+      else if(IProofReference.USE_INVARIANT.equals(proofRef.getKind())){
+         if(target instanceof ClassInvariant){
+            ClassInvariant classInv = (ClassInvariant) target;
+            kjt = classInv.getKJT();
+         }
+         else {
+            throw new ProofReferenceException("Wrong target type " + target.getClass() + " found. Expected ClassInvariant");
+         }
+      }
+      else {
+         throw new ProofReferenceException("Unknow proof reference kind found: " + proofRef.getKind());
+      }
+      return kjt;
+   }
+   
+   public static boolean filterProofReference(IProofReference<?> proofReference) {
+      try {
+         KeYJavaType kjt = getKeYJavaType(proofReference);
+         if(filterKeYJavaType(kjt)){
+            return true;
+         }
+      }
+      catch (ProofReferenceException e) {
+         LogUtil.getLogger().logError(e);
+         return true;
+      }
+      return false;
+   }
+   
+   public static Set<IProofReference<?>> filterProofReferences(Set<IProofReference<?>> proofReferences) {
+      Set<IProofReference<?>> filteredReferences = new HashSet<IProofReference<?>>();
+      for(IProofReference<?> proofReference : proofReferences){
+         if(!filterProofReference(proofReference)){
+            filteredReferences.add(proofReference);
+         }
+      }
+      return filteredReferences;
+   }
    
    public static List<IFile> getUsedContractsProofElements(ProofElement pe, List<ProofElement> proofElements){
       LinkedList<IFile> usedContracts = new LinkedList<IFile>();
@@ -284,14 +382,6 @@ public class KeYResourcesUtil {
    }
    
    
-   public static <T> void mergeLists(List<T> dest, List<T> inserts){ // TODO: Move to CollectionUtil
-      for(T t : inserts){
-         if(!dest.contains(t)){
-            dest.add(t);
-         }
-      }
-   }
-   
    public static <K,V> void mergeMaps(Map<K,V> dest, Map<K,V> inserts){
       for(Map.Entry<K, V> entry : inserts.entrySet()){
          K key = entry.getKey();
@@ -300,15 +390,6 @@ public class KeYResourcesUtil {
             dest.put(key, value);
          }
       }
-   }
-   
-   
-   public static <T> List<T> arrayToList(T[] array){ // TODO: Move to CollectionUtil
-      List<T> list = new LinkedList<T>();
-      for(T t : array){
-         list.add(t);
-      }
-      return list;
    }
    
    /**
@@ -737,16 +818,6 @@ public class KeYResourcesUtil {
       return new LinkedList<IFile>();
    }
    
-
-   public static boolean isLastChangesFile(IFile file) {
-      if (file != null) {
-         return LAST_CHANGES_FILE.equals(file.getName()) &&
-                file.getParent() instanceof IFolder &&
-                KeYResourcesUtil.isProofFolder((IFolder)file.getParent());
-      }
-      return false;
-   }
-   
    
    public static void synchronizeProject(IProject project){
       if(!project.isSynchronized(IResource.DEPTH_INFINITE)){
@@ -757,5 +828,22 @@ public class KeYResourcesUtil {
             LogUtil.getLogger().logError(e);
          }
       }
+   }
+   
+   
+   public static String parametersToString(ImmutableArray<ParameterDeclaration> parameters){
+      String parameterString = "";
+      for(ParameterDeclaration parameter : parameters){
+         parameterString += parameter.getTypeReference().getName() + ";";
+      }
+      return parameterString;
+   }
+   
+
+   public static String removeLineBreaks(String str){
+      str = str.replaceAll("\r\n", " ");
+      str = str.replaceAll("\r", " ");
+      str = str.replaceAll("\n", " ");
+      return str;
    }
 }

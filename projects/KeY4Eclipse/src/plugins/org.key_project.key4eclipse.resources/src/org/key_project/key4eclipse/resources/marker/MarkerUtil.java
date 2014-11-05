@@ -21,9 +21,9 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
-import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.StringUtil;
 
 /**
@@ -268,7 +268,7 @@ public class MarkerUtil {
       for(String type : types){
          if(CLOSEDMARKER_ID.equals(type) || NOTCLOSEDMARKER_ID.equals(type) || PROBLEMLOADEREXCEPTIONMARKER_ID.equals(type) || RECURSIONMARKER_ID.equals(type)){
             try {
-               markerList.addAll(KeYResourcesUtil.arrayToList(res.findMarkers(type, true, depth)));
+               markerList.addAll(CollectionUtil.arrayToList(res.findMarkers(type, true, depth)));
             }
             catch (CoreException e) {
                LogUtil.getLogger().logError(e);

@@ -54,7 +54,7 @@ public class BuilderTests extends AbstractResourceTest {
    @Test
    public void testFullBuildSingleThreadAddMethod() throws CoreException, InterruptedException, IOException{
       IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testFullBuildSingleThreadAddMethod", true, false, false, false, 1, false);
-      testAddMethod(project);
+      testAddMethod(project, false);
       project.close(null);
    }
    
@@ -105,7 +105,7 @@ public class BuilderTests extends AbstractResourceTest {
    @Test
    public void testFullBuildMultipleThreadsAddMethod() throws CoreException, InterruptedException, IOException{
       IProject project = KeY4EclipseResourcesTestUtil.initializeTest("testFullBuildMultipleThreadsAddMethod", true, false, false, true, 2, false);
-      testAddMethod(project);
+      testAddMethod(project, false);
       project.close(null);
    }
    
@@ -156,7 +156,7 @@ public class BuilderTests extends AbstractResourceTest {
    @Test
    public void testEfficientBuildSingleThreadAddMethod() throws CoreException, InterruptedException, IOException{
       IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildSingleThreadAddMethod", true, false, true, false, 1, false);
-      testAddMethod(project);
+      testAddMethod(project, true);
       project.close(null);
    }
    
@@ -242,7 +242,7 @@ public class BuilderTests extends AbstractResourceTest {
    @Test
    public void testEfficientBuildMultipleThreadsAddMethod() throws CoreException, InterruptedException, IOException{
       IProject project = KeY4EclipseResourcesTestUtil.initializeTest("BuilderTests_testEfficientBuildMultipleThreadsAddMethod", true, false, true, true, 2, false);
-      testAddMethod(project);
+      testAddMethod(project, true);
       project.close(null);
    }
    
@@ -389,7 +389,7 @@ public class BuilderTests extends AbstractResourceTest {
       assertTrue(proofFile1.exists() && metaFile1.exists());
    }
    
-   private void testAddMethod(IProject project) throws CoreException, IOException{
+   private void testAddMethod(IProject project, boolean buildEfficient) throws CoreException, IOException{
       IFolder proofFolder = KeY4EclipseResourcesTestUtil.getProofFolder(project);
       IFile javaFile = KeY4EclipseResourcesTestUtil.getFile(
             project.getFullPath().append("src").append("add").append("method").append("AddMethodTest.java"));
@@ -431,8 +431,14 @@ public class BuilderTests extends AbstractResourceTest {
       assertTrue(proofFile0.exists() && metaFile0.exists());
       assertTrue(proofFile1.exists() && metaFile1.exists());
 
-      assertTrue(proofFile0modStamp != proofFile0.getLocalTimeStamp());
-      assertTrue(metaFile0modStamp != metaFile0.getLocalTimeStamp());
+      if (buildEfficient) {
+         assertTrue(proofFile0modStamp == proofFile0.getLocalTimeStamp());
+         assertTrue(metaFile0modStamp == metaFile0.getLocalTimeStamp());
+      }
+      else {
+         assertTrue(proofFile0modStamp != proofFile0.getLocalTimeStamp());
+         assertTrue(metaFile0modStamp != metaFile0.getLocalTimeStamp());
+      }
    }
    
    
@@ -535,13 +541,17 @@ public class BuilderTests extends AbstractResourceTest {
       assertTrue(proofFile0.exists() && metaFile0.exists());
       assertTrue(proofFile1.exists() && metaFile1.exists());
 
-      assertTrue(proofFile0modStamp != proofFile0.getLocalTimeStamp());
-      assertTrue(metaFile0modStamp != metaFile0.getLocalTimeStamp());
       if(efficientBuild){
+         assertTrue(proofFile0modStamp == proofFile0.getLocalTimeStamp());
+         assertTrue(metaFile0modStamp == metaFile0.getLocalTimeStamp());
+         
          assertTrue(proofFile1modStamp == proofFile1.getLocalTimeStamp());
          assertTrue(metaFile1modStamp == metaFile1.getLocalTimeStamp());
       }
       else{
+         assertTrue(proofFile0modStamp != proofFile0.getLocalTimeStamp());
+         assertTrue(metaFile0modStamp != metaFile0.getLocalTimeStamp());
+         
          assertTrue(proofFile1modStamp != proofFile1.getLocalTimeStamp());
          assertTrue(metaFile1modStamp != metaFile1.getLocalTimeStamp());  
       }
@@ -562,10 +572,7 @@ public class BuilderTests extends AbstractResourceTest {
       assertTrue(!proofFile.exists());
       assertTrue(!metaFile.exists());
       
-//      int oldBuildCount = buildListener.getBuildCount();
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/BuilderTests/testFileDeleted/", project.getFolder("src"));
-      // TODO: Wait until buildListener.getBuildCount() > oldBuildCount 
-      // TODO: Wait until Job is done
       
       assertTrue(javaFile.exists());
       
@@ -667,7 +674,7 @@ public class BuilderTests extends AbstractResourceTest {
       KeY4EclipseResourcesTestUtil.assertCleanProofFolder(proofFolder);
       assertTrue(!proofFile.exists() && !metaFile.exists());
       
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/BuilderTests/testEfficientTypeChanged", project.getFolder("src"));
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/BuilderTests/testEfficientTypeChanged/base", project.getFolder("src"));
       
       assertTrue(javaFile0.exists() && javaFile1.exists());
       
@@ -680,7 +687,7 @@ public class BuilderTests extends AbstractResourceTest {
       long proofFilemodStamp = proofFile.getLocalTimeStamp();
       long metaFilemodStamp = metaFile.getLocalTimeStamp();
       
-      InputStream is = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/BuilderTests/testEfficientTypeChanged/type/changed/A.java");
+      InputStream is = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/BuilderTests/testEfficientTypeChanged/update/A.java");
       javaFile1.setContents(is, IResource.FORCE, null);
       is.close();
       
@@ -712,7 +719,7 @@ public class BuilderTests extends AbstractResourceTest {
       KeY4EclipseResourcesTestUtil.assertCleanProofFolder(proofFolder);
       assertTrue(!proofFile.exists() && !metaFile.exists());
       
-      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/BuilderTests/testEfficientSubTypeChanged", project.getFolder("src"));
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/BuilderTests/testEfficientSubTypeChanged/base", project.getFolder("src"));
       
       assertTrue(javaFile0.exists() && javaFile1.exists() && javaFile2.exists());
       
@@ -725,7 +732,7 @@ public class BuilderTests extends AbstractResourceTest {
       long proofFileModStamp = proofFile.getLocalTimeStamp();
       long metaFileModStamp = metaFile.getLocalTimeStamp();
       
-      InputStream is = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/BuilderTests/testEfficientSubTypeChanged/subType/changed/B.java");
+      InputStream is = BundleUtil.openInputStream(Activator.PLUGIN_ID, "data/BuilderTests/testEfficientSubTypeChanged/update/B.java");
       javaFile2.setContents(is, IResource.FORCE, null);
       is.close();
       
@@ -828,7 +835,7 @@ public class BuilderTests extends AbstractResourceTest {
       assertTrue(proofFolder.exists());
       assertTrue(proofFile.exists() && metaFile.exists());
       
-      assertTrue(proofFile.getLocalTimeStamp() != proofFileModStamp);
-      assertTrue(metaFile.getLocalTimeStamp() != metaFileModStamp);
+      assertTrue(proofFile.getLocalTimeStamp() == proofFileModStamp);
+      assertTrue(metaFile.getLocalTimeStamp() == metaFileModStamp);
    }
 }

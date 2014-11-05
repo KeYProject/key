@@ -13,6 +13,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.key_project.key4eclipse.resources.io.ProofMetaReferences;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -74,6 +75,9 @@ public class ProofRunnable implements Runnable {
                   pe.setProofReferences(ProofReferenceUtil.computeProofReferences(proof));
                   pe.setUsedContracts(KeYResourcesUtil.getUsedContractsProofElements(pe, proofElements));
                   pe.setMarkerMsg(generateProofMarkerMessage(pe, proof, proofDuration));
+                  ProofMetaReferences references = new ProofMetaReferences();
+                  references.createFromProofElement(pe, environment);
+                  pe.setProofMetaReferences(references);
                   pe.setOutdated(false);
                   synchronized (ProofManager.proofsToSave) {
                      ProofManager.proofsToSave.add(new Pair<ProofElement, InputStream>(pe, generateSaveProof(proof, pe.getProofFile())));
@@ -85,7 +89,8 @@ public class ProofRunnable implements Runnable {
          }
          environment.dispose();
    }
-   
+
+
    private ProofElement getProofToDo() {
       ProofElement pe = null;
       synchronized (proofsToDo) {

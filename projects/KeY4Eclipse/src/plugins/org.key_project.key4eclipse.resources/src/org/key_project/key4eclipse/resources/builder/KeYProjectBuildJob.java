@@ -31,7 +31,6 @@ import org.key_project.key4eclipse.resources.log.LogManager;
 import org.key_project.key4eclipse.resources.log.LogRecord;
 import org.key_project.key4eclipse.resources.log.LogRecordKind;
 import org.key_project.key4eclipse.resources.property.KeYProjectProperties;
-import org.key_project.key4eclipse.resources.util.EditorSelection;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 
@@ -59,7 +58,6 @@ public class KeYProjectBuildJob extends Job{
       }
       if(buildType != KeYProjectBuildJob.AUTO_BUILD && buildType != KeYProjectBuildJob.FULL_BUILD ){
          KeYProjectDelta keyDelta = KeYProjectDeltaManager.getInstance().getDelta(project);
-         keyDelta.update(null);
          keyDelta.setIsBuilding(true);
       }
       cancelProjectJobs();

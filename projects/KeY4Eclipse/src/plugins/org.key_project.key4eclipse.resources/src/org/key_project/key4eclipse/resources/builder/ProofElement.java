@@ -22,6 +22,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileReader;
 import org.key_project.key4eclipse.resources.io.ProofMetaFileTypeElement;
+import org.key_project.key4eclipse.resources.io.ProofMetaReferences;
 import org.key_project.key4eclipse.resources.marker.MarkerUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 
@@ -57,6 +58,7 @@ public class ProofElement {
    private ProofOblInput proofObl;
    private boolean proofClosed;
    private LinkedHashSet<IProofReference<?>> proofReferences;
+   private ProofMetaReferences proofMetaReferences;
    private List<IFile> usedContracts;
 
    private List<ProofMetaFileTypeElement> typeElements;
@@ -80,6 +82,7 @@ public class ProofElement {
       this.proofObl = null;
       
       this.proofReferences = new LinkedHashSet<IProofReference<?>>();
+      this.proofMetaReferences = null;
       
       this.proofFileMD5 = null;
       this.markerMsg = null;
@@ -100,6 +103,7 @@ public class ProofElement {
             this.proofClosed = pmfr.getProofClosed();
             this.usedContracts = pmfr.getUsedContracts();
             this.typeElements = pmfr.getTypeElements();
+            this.proofMetaReferences = pmfr.getReferences();
 
             if(!hasMarker()){
                MarkerUtil.setMarker(this);
@@ -199,6 +203,12 @@ public class ProofElement {
    }
    public void setProofReferences(LinkedHashSet<IProofReference<?>> proofReferences){
       this.proofReferences = proofReferences;
+   }
+   public ProofMetaReferences getProofMetaReferences(){
+      return proofMetaReferences;
+   }
+   public void setProofMetaReferences(ProofMetaReferences proofMetaReferences){
+      this.proofMetaReferences  = proofMetaReferences;
    }
    public List<IFile> getUsedContracts() {
       return usedContracts;

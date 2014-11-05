@@ -42,6 +42,7 @@ public class ProofMetaFileReader {
    private final LinkedList<ProofMetaFileTypeElement> typeElemens = new LinkedList<ProofMetaFileTypeElement>();
    private final LinkedList<IFile> usedContracts = new LinkedList<IFile>();
    private final List<ProofMetaFileAssumption> assumptions = new LinkedList<ProofMetaFileAssumption>();
+   private final ProofMetaReferences references = new ProofMetaReferences();
 
    /**
     * The Constructor that automatically reads the given meta{@link IFile} and Provides the content.
@@ -146,6 +147,106 @@ public class ProofMetaFileReader {
             }
             assumptions.add(new ProofMetaFileAssumption(getKind(attributes), getName(attributes), getTarget(attributes), getType(attributes)));
             parentStack.addFirst(ProofMetaFileWriter.TAG_ASSUMPTION);
+         }
+         else if (ProofMetaFileWriter.TAG_REFERENCES.equals(qName)) {
+            Object parent = parentStack.peekFirst();
+            if (!ProofMetaFileWriter.TAG_PROOF_META_FILE.equals(parent)) {
+               throw new SAXException(ProofMetaFileWriter.TAG_REFERENCES  + " has to be a child of " + ProofMetaFileWriter.TAG_PROOF_META_FILE + ".");
+            }
+            references.setContract(getRep(attributes));
+            parentStack.addFirst(ProofMetaFileWriter.TAG_REFERENCES);
+         }
+         else if (ProofMetaFileWriter.TAG_AXIOM_REFERENCE.equals(qName)){
+            Object parent = parentStack.peekFirst();
+            if (!ProofMetaFileWriter.TAG_REFERENCES.equals(parent)) {
+               throw new SAXException(ProofMetaFileWriter.TAG_AXIOM_REFERENCE  + " has to be a child of " + ProofMetaFileWriter.TAG_REFERENCES + ".");
+            }
+            ProofMetaReferenceAxiom axiom = new ProofMetaReferenceAxiom(getKJT(attributes), getName(attributes), getRep(attributes));
+            references.setAxiom(axiom);
+            parentStack.addFirst(ProofMetaFileWriter.TAG_AXIOM_REFERENCE);
+         }
+         else if (ProofMetaFileWriter.TAG_INVARIANT_REFERENCE.equals(qName)){
+            Object parent = parentStack.peekFirst();
+            if (!ProofMetaFileWriter.TAG_REFERENCES.equals(parent)) {
+               throw new SAXException(ProofMetaFileWriter.TAG_INVARIANT_REFERENCE  + " has to be a child of " + ProofMetaFileWriter.TAG_REFERENCES + ".");
+            }
+            ProofMetaReferenceInvariant invariant = new ProofMetaReferenceInvariant(getKJT(attributes), getName(attributes), getRep(attributes));
+            references.setInvariant(invariant);
+            parentStack.addFirst(ProofMetaFileWriter.TAG_INVARIANT_REFERENCE);
+         }
+         else if (ProofMetaFileWriter.TAG_ACCESS_REFERENCES.equals(qName)) {
+            Object parent = parentStack.peekFirst();
+            if (!ProofMetaFileWriter.TAG_REFERENCES.equals(parent)) {
+               throw new SAXException(ProofMetaFileWriter.TAG_ACCESS_REFERENCES  + " has to be a child of " + ProofMetaFileWriter.TAG_REFERENCES + ".");
+            }
+            parentStack.addFirst(ProofMetaFileWriter.TAG_ACCESS_REFERENCES);
+         }
+         else if (ProofMetaFileWriter.TAG_ACCESS_REFERENCE.equals(qName)) {
+            Object parent = parentStack.peekFirst();
+            if (!ProofMetaFileWriter.TAG_ACCESS_REFERENCES.equals(parent)) {
+               throw new SAXException(ProofMetaFileWriter.TAG_ACCESS_REFERENCE  + " has to be a child of " + ProofMetaFileWriter.TAG_ACCESS_REFERENCES + ".");
+            }
+            ProofMetaReferenceAccess access = new ProofMetaReferenceAccess(getKJT(attributes), getName(attributes), getSrc(attributes));
+            references.addAccess(access);
+            parentStack.addFirst(ProofMetaFileWriter.TAG_ACCESS_REFERENCE);
+         }
+         else if (ProofMetaFileWriter.TAG_CALLMETHOD_REFERENCES.equals(qName)) {
+            Object parent = parentStack.peekFirst();
+            if (!ProofMetaFileWriter.TAG_REFERENCES.equals(parent)) {
+               throw new SAXException(ProofMetaFileWriter.TAG_CALLMETHOD_REFERENCES  + " has to be a child of " + ProofMetaFileWriter.TAG_REFERENCES + ".");
+            }
+            parentStack.addFirst(ProofMetaFileWriter.TAG_CALLMETHOD_REFERENCES);
+         }
+         else if (ProofMetaFileWriter.TAG_CALLMETHOD_REFERENCE.equals(qName)) {
+            Object parent = parentStack.peekFirst();
+            if (!ProofMetaFileWriter.TAG_CALLMETHOD_REFERENCES.equals(parent)) {
+               throw new SAXException(ProofMetaFileWriter.TAG_CALLMETHOD_REFERENCE  + " has to be a child of " + ProofMetaFileWriter.TAG_CALLMETHOD_REFERENCES + ".");
+            }
+            ProofMetaReferenceCallMethod callMethod = new ProofMetaReferenceCallMethod(getKJT(attributes), getName(attributes), getParameters(attributes), getSrc(attributes), new LinkedList<ProofMetaReferenceMethod>());
+            references.addCallMethod(callMethod);
+            parentStack.addFirst(callMethod);
+         }
+         else if (ProofMetaFileWriter.TAG_SUBMETHOD_REFERENCE.equals(qName)) {
+            Object parent = parentStack.peekFirst();
+            if(!(parent instanceof ProofMetaReferenceCallMethod)) {
+               throw new SAXException(ProofMetaFileWriter.TAG_SUBMETHOD_REFERENCE  + " has to be a child of " + ProofMetaFileWriter.TAG_CALLMETHOD_REFERENCE + ".");
+            }
+            ProofMetaReferenceCallMethod callMethod = (ProofMetaReferenceCallMethod) parent;
+            ProofMetaReferenceMethod subMethod = new ProofMetaReferenceMethod(getKJT(attributes), getName(attributes), getParameters(attributes), getSrc(attributes));
+            callMethod.addSubMethod(subMethod);
+            parentStack.addFirst(ProofMetaFileWriter.TAG_SUBMETHOD_REFERENCE);
+         }
+         else if (ProofMetaFileWriter.TAG_INLINEMETHOD_REFERENCES.equals(qName)) {
+            Object parent = parentStack.peekFirst();
+            if (!ProofMetaFileWriter.TAG_REFERENCES.equals(parent)) {
+               throw new SAXException(ProofMetaFileWriter.TAG_INLINEMETHOD_REFERENCES  + " has to be a child of " + ProofMetaFileWriter.TAG_REFERENCES + ".");
+            }
+            parentStack.addFirst(ProofMetaFileWriter.TAG_INLINEMETHOD_REFERENCES);
+         }
+         else if (ProofMetaFileWriter.TAG_INLINEMETHOD_REFERENCE.equals(qName)) {
+            Object parent = parentStack.peekFirst();
+            if (!ProofMetaFileWriter.TAG_INLINEMETHOD_REFERENCES.equals(parent)) {
+               throw new SAXException(ProofMetaFileWriter.TAG_INLINEMETHOD_REFERENCE  + " has to be a child of " + ProofMetaFileWriter.TAG_INLINEMETHOD_REFERENCES + ".");
+            }
+            ProofMetaReferenceMethod inlineMethod = new ProofMetaReferenceMethod(getKJT(attributes), getName(attributes), getParameters(attributes), getSrc(attributes));
+            references.addInlineMethod(inlineMethod);
+            parentStack.addFirst(ProofMetaFileWriter.TAG_INLINEMETHOD_REFERENCE);
+         }
+         else if (ProofMetaFileWriter.TAG_CONTRACT_REFERENCES.equals(qName)) {
+            Object parent = parentStack.peekFirst();
+            if (!ProofMetaFileWriter.TAG_REFERENCES.equals(parent)) {
+               throw new SAXException(ProofMetaFileWriter.TAG_CONTRACT_REFERENCES  + " has to be a child of " + ProofMetaFileWriter.TAG_REFERENCES + ".");
+            }
+            parentStack.addFirst(ProofMetaFileWriter.TAG_CONTRACT_REFERENCES);
+         }
+         else if (ProofMetaFileWriter.TAG_CONTRACT_REFERENCE.equals(qName)) {
+            Object parent = parentStack.peekFirst();
+            if (!ProofMetaFileWriter.TAG_CONTRACT_REFERENCES.equals(parent)) {
+               throw new SAXException(ProofMetaFileWriter.TAG_CONTRACT_REFERENCE  + " has to be a child of " + ProofMetaFileWriter.TAG_CONTRACT_REFERENCES + ".");
+            }
+            ProofMetaReferenceContract contract = new ProofMetaReferenceContract(getName(attributes), getRep(attributes));
+            references.addContract(contract);
+            parentStack.addFirst(ProofMetaFileWriter.TAG_CONTRACT_REFERENCE);
          }
          else {
             throw new SAXException("Unsupported element " + qName + ".");
@@ -254,6 +355,43 @@ public class ProofMetaFileReader {
       }
       
       /**
+       * Returns the kjt name.
+       * @param attributes The attributes to read from.
+       * @return The read value.
+       */
+      protected String getKJT(Attributes attributes) {
+         return attributes.getValue(ProofMetaFileWriter.ATTRIBUTE_KJT);
+      }
+      
+      /**
+       * Returns the source code.
+       * @param attributes The attributes to read from.
+       * @return The read value.
+       */
+      protected String getSrc(Attributes attributes) {
+         return attributes.getValue(ProofMetaFileWriter.ATTRIBUTE_SRC);
+      }
+      
+      /**
+       * Returns the parameters.
+       * @param attributes The attributes to read from.
+       * @return The read value.
+       */
+      protected String getParameters(Attributes attributes) {
+         return attributes.getValue(ProofMetaFileWriter.ATTRIBUTE_PARAMETERS);
+      }
+      
+      /**
+       * Returns the representation.
+       * @param attributes The attributes to read from.
+       * @return The read value.
+       */
+      protected String getRep(Attributes attributes) {
+         return attributes.getValue(ProofMetaFileWriter.ATTRIBUTE_REP);
+      }
+      
+      
+      /**
        * Returns the proof file value.
        * @param attributes The attributes to read from.
        * @return The read value.
@@ -302,5 +440,9 @@ public class ProofMetaFileReader {
    
    public List<ProofMetaFileAssumption> getAssumptions() {
       return assumptions;
+   }
+   
+   public ProofMetaReferences getReferences() {
+      return references;
    }
 }
