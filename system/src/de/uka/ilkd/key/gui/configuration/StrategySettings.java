@@ -13,13 +13,13 @@
 
 package de.uka.ilkd.key.gui.configuration;
 
+import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.Properties;
 
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.AppliedRuleStopCondition;
 import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
-import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
@@ -171,7 +171,7 @@ public class StrategySettings implements Settings, Cloneable {
      */
     protected void fireSettingsChanged() {
         for (SettingsListener aListenerList : listenerList) {
-            aListenerList.settingsChanged(new GUIEvent(this));
+            aListenerList.settingsChanged(new EventObject(this));
         }
     }
 

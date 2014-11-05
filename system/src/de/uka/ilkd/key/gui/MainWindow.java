@@ -34,6 +34,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EventObject;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -909,7 +910,7 @@ public final class MainWindow extends JFrame  {
         }
 
         @Override
-        public void modalDialogOpened(GUIEvent e) {
+        public void modalDialogOpened(EventObject e) {
 
             if (e.getSource() instanceof ApplyTacletDialog) {
                 // disable all elements except the sequent window (drag'n'drop !) ...
@@ -925,7 +926,7 @@ public final class MainWindow extends JFrame  {
 
         /** invoked if a frame that wants modal access is closed */
         @Override
-        public void modalDialogClosed(GUIEvent e) {
+        public void modalDialogClosed(EventObject e) {
             if (e.getSource() instanceof ApplyTacletDialog) {
                 // enable all previously diabled elements ...
                 enableMenuBar(MainWindow.this.getJMenuBar(), true);
@@ -939,7 +940,7 @@ public final class MainWindow extends JFrame  {
         }
 
         @Override
-        public void shutDown(GUIEvent e) {
+        public void shutDown(EventObject e) {
             MainWindow.this.notify(new ExitKeYEvent());
             MainWindow.this.setVisible(false);
         }
@@ -1052,7 +1053,7 @@ public final class MainWindow extends JFrame  {
 
         /** invoked when the strategy of a proof has been changed */
         @Override
-        public synchronized void settingsChanged ( GUIEvent e ) {
+        public synchronized void settingsChanged ( EventObject e ) {
             if ( proof.getSettings().getStrategySettings() == e.getSource()) {
                 // updateAutoModeConfigButton();
             }

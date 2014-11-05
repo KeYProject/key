@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EventObject;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,7 +29,6 @@ import java.util.Vector;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
@@ -179,7 +179,7 @@ public class Proof implements Named {
         settingsListener =
                         new SettingsListener () {
             @Override
-            public void settingsChanged ( GUIEvent config ) {
+            public void settingsChanged ( EventObject config ) {
                 updateStrategyOnGoals();
             }
         };

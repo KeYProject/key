@@ -30,6 +30,7 @@ import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
+import java.util.EventObject;
 import java.util.LinkedList;
 
 /**
@@ -84,7 +85,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
              * invoked if a frame that wants modal access is opened
              */
             @Override
-            public void modalDialogOpened(GUIEvent e) {
+            public void modalDialogOpened(EventObject e) {
 
                 // enable textual DnD in case that the opened model dialog
                 // is the ApplyTacletDialog
@@ -100,7 +101,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
              * invoked if a frame that wants modal access is closed
              */
             @Override
-            public void modalDialogClosed(GUIEvent e) {
+            public void modalDialogClosed(EventObject e) {
                 if (e.getSource() instanceof ApplyTacletDialog) {
                     // disable drag'n'drop ...
                     listener.setModalDragNDropEnabled(false);
@@ -116,7 +117,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
              * invoked if the user wants to abort the proving session
              */
             @Override
-            public void shutDown(GUIEvent e) {
+            public void shutDown(EventObject e) {
             }
         };
 

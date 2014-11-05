@@ -21,6 +21,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.EventObject;
 import java.util.List;
 import java.util.WeakHashMap;
 
@@ -325,16 +326,16 @@ public class GoalList extends JList {
         private static final long serialVersionUID = -1826501525753975124L;
 
     /** invoked if a frame that wants modal access is opened */
-	public void modalDialogOpened(GUIEvent e) {
+	public void modalDialogOpened(EventObject e) {
 	    setEnabled(false);
 	}
 
 	/** invoked if a frame that wants modal access is closed */
-	public void modalDialogClosed(GUIEvent e) {
+	public void modalDialogClosed(EventObject e) {
 	    setEnabled(true);
 	}
 
-	public void shutDown(GUIEvent e) {
+	public void shutDown(EventObject e) {
 	}
 
     }

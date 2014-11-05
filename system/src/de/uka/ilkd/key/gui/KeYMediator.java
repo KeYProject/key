@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.gui;
 
+import java.util.EventObject;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -668,21 +669,21 @@ public class KeYMediator {
      * @param src Object that is the asking component
      */
     public synchronized void requestModalAccess(Object src) {
-	fireModalDialogOpened(new GUIEvent(src));
+	fireModalDialogOpened(new EventObject(src));
     }
 
     /** called if no more modal access is needed
     * @param src Object that is the asking component
      */
     public synchronized void freeModalAccess(Object src) {
-	fireModalDialogClosed(new GUIEvent(src));
+	fireModalDialogClosed(new EventObject(src));
     }
 
     /** fires the request of a GUI component for modal access
      * this can be used to disable all views even if the GUI component
      * has no built in modal support
      */
-    public synchronized void fireModalDialogOpened(GUIEvent e) {
+    public synchronized void fireModalDialogOpened(EventObject e) {
 	Object[] listeners = listenerList.getListenerList();
 	for (int i = listeners.length-2; i>=0; i-=2) {
 	    if (listeners[i] == GUIListener.class) {
@@ -694,7 +695,7 @@ public class KeYMediator {
     /** fires that a GUI component that has asked for modal access
      * has been closed, so views can be enabled again
      */
-    public synchronized void fireModalDialogClosed(GUIEvent e) {
+    public synchronized void fireModalDialogClosed(EventObject e) {
 	Object[] listeners = listenerList.getListenerList();
 	for (int i = listeners.length-2; i>=0; i-=2) {
 	    if (listeners[i] == GUIListener.class) {
@@ -705,7 +706,7 @@ public class KeYMediator {
 
     /** Fires the shut down event.
      */
-    public synchronized void fireShutDown(GUIEvent e) {
+    public synchronized void fireShutDown(EventObject e) {
 	Object[] listeners = listenerList.getListenerList();
 	for (int i = listeners.length-2; i>=0; i-=2) {
 	    if (listeners[i] == GUIListener.class) {

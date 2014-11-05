@@ -15,13 +15,13 @@ package de.uka.ilkd.key.gui.smt;
 
 
 import java.util.Collection;
+import java.util.EventObject;
 import java.util.LinkedHashSet;
 import java.util.Properties;
 
 
 
 
-import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.configuration.SettingsConverter;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
@@ -146,7 +146,7 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.gui.configurat
         
         public void fireSettingsChanged() {
                 for (SettingsListener aListenerList : listeners) {
-                        aListenerList.settingsChanged(new GUIEvent(this));
+                        aListenerList.settingsChanged(new EventObject(this));
                 }
    
         }

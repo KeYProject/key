@@ -13,11 +13,12 @@
 
 package de.uka.ilkd.key.gui.configuration;
 
-import de.uka.ilkd.key.gui.GUIEvent;
+import java.util.EventObject;
+
 
 
 /** This interface is implemented by objects that listen to settings
- * object. An object implementing the settins interface will call the
+ * object. An object implementing the settings interface will call the
  * method settingChanged of the listener
  */
 public interface SettingsListener {
@@ -26,5 +27,5 @@ public interface SettingsListener {
      * state has changed
      * @param e the Event sent to the listener
      */
-    void settingsChanged(GUIEvent e);
+    void settingsChanged(EventObject e);
 }
