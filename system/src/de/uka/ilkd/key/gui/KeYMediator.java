@@ -62,8 +62,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.util.MiscTools;
 
 
@@ -90,8 +88,6 @@ public class KeYMediator {
      * interaction is relative to this model
      */
     private KeYSelectionModel keySelectionModel;
-
-    private KeYExceptionHandler defaultExceptionHandler;
 
     private boolean minimizeInteraction; // minimize user interaction
 
@@ -149,15 +145,6 @@ public class KeYMediator {
      */
     public NotationInfo getNotationInfo() {
 	return notationInfo;
-    }
-
-    public KeYExceptionHandler getExceptionHandler(){
-//       Proof selectedProof = getSelectedProof();
-//	if(selectedProof != null && !selectedProof.isDisposed()){
-//	    return selectedProof.getServices().getExceptionHandler();
-//	}else{
-	    return defaultExceptionHandler;
-//	}
     }
 
     /** returns the variable namespace

@@ -37,6 +37,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 /**
  * this is a collection of common services to the KeY prover. Services
@@ -116,8 +117,8 @@ public class Services implements TermServices {
     	this.specRepos = new SpecificationRepository(this);
     	cee = new ConstantExpressionEvaluator(this);
     	typeconverter = new TypeConverter(this);
-    	javainfo = new JavaInfo
-                        (new KeYProgModelInfo(this, typeconverter, null), this);
+    	javainfo = new JavaInfo(new KeYProgModelInfo(this, typeconverter,
+    	                                             new KeYRecoderExcHandler()), this);
     	nameRecorder = new NameRecorder();
     }
 
