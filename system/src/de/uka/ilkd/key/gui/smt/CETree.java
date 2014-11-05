@@ -63,7 +63,8 @@ public class CETree {
 	public CETree(Model model) {
 		super();
 		this.model = model;
-		model.addAliases();
+		model.removeUnnecessaryObjects();
+		model.addAliases();		
 		initTree();
 	}
 

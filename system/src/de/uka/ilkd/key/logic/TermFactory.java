@@ -65,7 +65,7 @@ public final class TermFactory {
 	if(op == null) {
 	    throw new TermCreationException("null-Operator at TermFactory");
 	}
-	
+
 	final Term newTerm 
 		= (labels == null || labels.isEmpty() ? 
 				new TermImpl(op, subs, boundVars, javaBlock) : 

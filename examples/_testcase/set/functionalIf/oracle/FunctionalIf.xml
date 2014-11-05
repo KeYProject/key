@@ -2,7 +2,7 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call self.min(i,j)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="int result;" pathCondition="true" pathConditionChanged="false">
-         <branchStatement name="if (invert(i)&lt;invert(j))" pathCondition="true" pathConditionChanged="false">
+         <branchStatement name="if (invert(i)&lt;invert(j))" pathCondition="true" pathConditionChanged="false" blockOpened="true">
             <methodCall name="&lt;call self.invert(a)&gt;" pathCondition="true" pathConditionChanged="false">
                <statement name="return a*-1;" pathCondition="true" pathConditionChanged="false">
                   <methodReturn name="&lt;return of invert&gt;" signature="&lt;return of self.invert(a)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
@@ -17,6 +17,7 @@
                                           </termination>
                                        </methodReturn>
                                     </statement>
+                                    <completedBlockEntry path="/0/0/0" conditionString="lt(j,i)"/>
                                  </statement>
                               </branchCondition>
                               <branchCondition name="geq(j,i)" pathCondition="geq(j,i)" pathConditionChanged="true" branchCondition="geq(j,i)" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -27,6 +28,7 @@
                                           </termination>
                                        </methodReturn>
                                     </statement>
+                                    <completedBlockEntry path="/0/0/0" conditionString="geq(j,i)"/>
                                  </statement>
                               </branchCondition>
                            </methodReturn>
@@ -37,6 +39,8 @@
                </statement>
                <methodReturnEntry path="/0/0/0/0/0/0"/>
             </methodCall>
+            <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
+            <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/1/0"/>
          </branchStatement>
       </statement>
       <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0"/>

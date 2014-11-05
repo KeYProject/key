@@ -56,7 +56,7 @@ public class KeYExampleUtil {
      */
     public static File getExampleProof() {
        String exampleDir = Main.getExamplesDir();
-       return new File(exampleDir, "02-Subset" + File.separator + "project.key");
+       return new File(exampleDir, "firstTouch" + File.separator + "02-Subset" + File.separator + "project.key");
     }
 
     /**

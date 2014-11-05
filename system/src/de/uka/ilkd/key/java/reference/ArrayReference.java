@@ -221,6 +221,11 @@ public class ArrayReference extends JavaNonTerminalProgramElement
         return (prefix == null) ? this : prefix.getFirstElement();
     }
 
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+       return (prefix == null) ? this : prefix.getFirstElementIncludingBlocks();
+    }
+
     /** calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
      * @param v the Visitor

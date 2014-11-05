@@ -41,6 +41,9 @@ public final class PrimitiveHeapTermFeature extends BinaryTermFeature {
         while (!isPrimitive && it.hasNext()) {
             isPrimitive = (it.next() == t.op());
         }
+        // the location variables which are created in the block contract rule
+        // also need to be classified primitive
+        isPrimitive = isPrimitive || (t.op() instanceof LocationVariable);
         return isPrimitive;
     }
 }

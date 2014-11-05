@@ -43,6 +43,7 @@ public class ProofMetaFileReader {
    private final LinkedList<IFile> usedContracts = new LinkedList<IFile>();
    private final List<ProofMetaFileAssumption> assumptions = new LinkedList<ProofMetaFileAssumption>();
    private final ProofMetaReferences references = new ProofMetaReferences();
+   private final List<String> calledMethods = new LinkedList<String>();
 
    /**
     * The Constructor that automatically reads the given meta{@link IFile} and Provides the content.
@@ -147,6 +148,21 @@ public class ProofMetaFileReader {
             }
             assumptions.add(new ProofMetaFileAssumption(getKind(attributes), getName(attributes), getTarget(attributes), getType(attributes)));
             parentStack.addFirst(ProofMetaFileWriter.TAG_ASSUMPTION);
+         }
+         else if (ProofMetaFileWriter.TAG_CALLED_METHODS.equals(qName)) {
+            Object parent = parentStack.peekFirst();
+            if (!ProofMetaFileWriter.TAG_PROOF_META_FILE.equals(parent)) {
+               throw new SAXException(ProofMetaFileWriter.TAG_CALLED_METHODS  + " has to be a child of " + ProofMetaFileWriter.TAG_PROOF_META_FILE + ".");
+            }
+            parentStack.addFirst(ProofMetaFileWriter.TAG_CALLED_METHODS);
+         }
+         else if (ProofMetaFileWriter.TAG_CALLED_METHOD.equals(qName)) {
+            Object parent = parentStack.peekFirst();
+            if (!ProofMetaFileWriter.TAG_CALLED_METHODS.equals(parent)) {
+               throw new SAXException(ProofMetaFileWriter.TAG_CALLED_METHOD  + " has to be a child of " + ProofMetaFileWriter.TAG_CALLED_METHODS + ".");
+            }
+            calledMethods.add(getFullQualifiedName(attributes));
+            parentStack.addFirst(ProofMetaFileWriter.TAG_CALLED_METHOD);
          }
          else if (ProofMetaFileWriter.TAG_REFERENCES.equals(qName)) {
             Object parent = parentStack.peekFirst();
@@ -344,6 +360,15 @@ public class ProofMetaFileReader {
       protected String getType(Attributes attributes) {
          return attributes.getValue(ProofMetaFileWriter.ATTRIBUTE_TYPE);
       }
+
+      /**
+       * Returns the ful qualified name value.
+       * @param attributes The attributes to read from.
+       * @return The read value.
+       */
+      protected String getFullQualifiedName(Attributes attributes) {
+         return attributes.getValue(ProofMetaFileWriter.ATTRIBUTE_FULL_QUALIFIED_NAME);
+      }
       
       /**
        * Returns the MD5 value.
@@ -444,5 +469,9 @@ public class ProofMetaFileReader {
    
    public ProofMetaReferences getReferences() {
       return references;
+   }
+
+   public List<String> getCalledMethods() {
+      return calledMethods;
    }
 }

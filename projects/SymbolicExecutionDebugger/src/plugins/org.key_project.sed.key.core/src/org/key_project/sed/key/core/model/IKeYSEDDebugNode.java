@@ -59,4 +59,11 @@ public interface IKeYSEDDebugNode<E extends IExecutionNode<?>> extends ISEDDebug
     */
    @Override
    public KeYConstraint[] getConstraints() throws DebugException;
+
+   /**
+    * It is valid to set the parent as long it was not defined before.
+    * So a parent might be set lazily later but can never be changed.
+    * @param parent The new parent to set.
+    */
+   public void setParent(ISEDDebugNode parent);
 }

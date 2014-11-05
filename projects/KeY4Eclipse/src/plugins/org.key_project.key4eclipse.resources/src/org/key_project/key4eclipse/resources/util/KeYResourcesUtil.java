@@ -64,6 +64,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.ClassTree;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -79,6 +81,7 @@ import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * @author Stefan Käsdorf
@@ -129,7 +132,7 @@ public class KeYResourcesUtil {
       return false;
    }
    
-
+   
    /**
     * Returns the {@link KeYJavaType} for the given {@link IProofReference}.
     * @param proofRef - the {@link IProofReference} to use
@@ -196,6 +199,7 @@ public class KeYResourcesUtil {
       return kjt;
    }
    
+   
    public static boolean filterProofReference(IProofReference<?> proofReference) {
       try {
          KeYJavaType kjt = getKeYJavaType(proofReference);
@@ -220,24 +224,42 @@ public class KeYResourcesUtil {
       return filteredReferences;
    }
    
-   public static List<IFile> getUsedContractsProofElements(ProofElement pe, List<ProofElement> proofElements){
-      LinkedList<IFile> usedContracts = new LinkedList<IFile>();
+   
+   /**
+    * Computes the used contracts and called methods.
+    * @param pe The {@link ProofElement}.
+    * @param proofElements The {@link List} of all available {@link ProofElement}s.
+    * @return A {@link Pair} of the used contracts and the called methods.
+    */
+   public static Pair<List<IFile>, List<String>> computeUsedProofElements(ProofElement pe, List<ProofElement> proofElements){
+      List<IFile> usedContracts = new LinkedList<IFile>();
+      List<String> calledMethods = new LinkedList<String>();
       HashSet<IProofReference<?>> proofReferences = pe.getProofReferences();
       if(proofReferences != null && !proofReferences.isEmpty()){
          for(IProofReference<?> proofRef : proofReferences){
             Object target = proofRef.getTarget();
-            if(IProofReference.USE_CONTRACT.equals(proofRef.getKind()) && target instanceof Contract){
+            if (IProofReference.USE_CONTRACT.equals(proofRef.getKind()) && target instanceof Contract){
                Contract contract = (Contract) target;
-               for(ProofElement proofElement : proofElements){
-                  if(contract.getName().equals(proofElement.getContract().getName())){
-                     usedContracts.add(proofElement.getProofFile());
-                     break;
+               ImmutableSet<Contract> contracts = pe.getSpecificationRepository().splitContract(contract);
+               for (Contract atomicContract : contracts) {
+                  for(ProofElement proofElement : proofElements){
+                     if(atomicContract.getName().equals(proofElement.getContract().getName())){
+                        usedContracts.add(proofElement.getProofFile());
+                        break;
+                     }
                   }
+               }
+            }
+            else if (IProofReference.CALL_METHOD.equals(proofRef.getKind())) {
+               if (target instanceof IProgramMethod) {
+                  IProgramMethod pm = (IProgramMethod) target;
+                  String displayName = ClassTree.getDisplayName(pe.getKeYEnvironment().getServices(), pm);
+                  calledMethods.add(pm.getContainerType().getFullName() + "#" + displayName);
                }
             }
          }
       }
-      return usedContracts;
+      return new Pair<List<IFile>, List<String>>(usedContracts, calledMethods);
    }
    
    
@@ -382,6 +404,7 @@ public class KeYResourcesUtil {
    }
    
    
+
    public static <K,V> void mergeMaps(Map<K,V> dest, Map<K,V> inserts){
       for(Map.Entry<K, V> entry : inserts.entrySet()){
          K key = entry.getKey();
@@ -392,6 +415,7 @@ public class KeYResourcesUtil {
       }
    }
    
+
    /**
     * Creates the folder for the given {@link IFile}
     * @param file - the {@link IFile} to use
@@ -818,7 +842,7 @@ public class KeYResourcesUtil {
       return new LinkedList<IFile>();
    }
    
-   
+
    public static void synchronizeProject(IProject project){
       if(!project.isSynchronized(IResource.DEPTH_INFINITE)){
          try {

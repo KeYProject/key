@@ -121,7 +121,7 @@ public class ProofManager {
       this.keyDelta = KeYProjectDeltaManager.getInstance().getDelta(project);
       this.editorSelection = editorSelection;
       try {
-         File location = KeYUtil.getSourceLocation(project);
+         File location = KeYResourceProperties.getSourceClassPathLocation(project);
          File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
          List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
          environment = KeYEnvironment.load(location, classPaths, bootClassPath);

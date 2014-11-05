@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.gui;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -21,7 +22,9 @@ import java.util.Properties;
 import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
@@ -32,14 +35,16 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractUserInterface;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * This class is the starting point for the extraction of a unified
@@ -67,10 +72,6 @@ public class WindowUserInterface extends AbstractUserInterface {
         completions.add(new LoopInvariantRuleCompletion());
         completions.add(new BlockContractCompletion(mainWindow));
         this.numOfInvokedMacros = 0;
-    }
-
-    protected String getMacroConsoleOutput() {
-        return "Applying: " + getMacro().getClass().getSimpleName();
     }
 
     public void loadProblem(File file, List<File> classPath,
@@ -102,14 +103,12 @@ public class WindowUserInterface extends AbstractUserInterface {
 
     @Override
     public void reportException(Object sender, ProofOblInput input, Exception e) {
-        reportStatus(
-                sender, input.name() + " failed");
+        reportStatus(sender, input.name() + " failed");
     }
 
     @Override
     public void reportStatus(Object sender, String status, int progress) {
-        mainWindow.setStatusLine(
-                status, progress);
+        mainWindow.setStatusLine(status, progress);
     }
 
     @Override
@@ -174,6 +173,8 @@ public class WindowUserInterface extends AbstractUserInterface {
                 ExceptionDialog.showDialog(
                         mainWindow, exceptionHandler.getExceptions());
                 exceptionHandler.clear();
+            } else if (getMediator().getUI().isSaveOnly()) {
+                mainWindow.displayResults("Finished Saving!");
             } else {
                 KeYMediator mediator = mainWindow.getMediator();
                 mediator.getNotationInfo().refresh(mediator.getServices());
@@ -251,7 +252,7 @@ public class WindowUserInterface extends AbstractUserInterface {
 
     @Override
     public void completeAndApplyTacletMatch(ApplyTacletDialogModel[] models,
-            Goal goal) {
+                                            Goal goal) {
         new TacletMatchCompletionDialog(mainWindow, models, goal, mainWindow.getMediator());
     }
 
@@ -286,8 +287,7 @@ public class WindowUserInterface extends AbstractUserInterface {
     @Override
     public ProblemInitializer createProblemInitializer(Profile profile) {
         ProblemInitializer pi = new ProblemInitializer(this,
-                new Services(profile, mainWindow.getMediator().getExceptionHandler()),
-                this);
+                new Services(profile, mainWindow.getMediator().getExceptionHandler()), this);
         return pi;
     }
 
@@ -303,7 +303,7 @@ public class WindowUserInterface extends AbstractUserInterface {
     * {@inheritDoc}
     */
    @Override
-   public DefaultProblemLoader load(Profile profile, File file, List<File> classPath,
+   public AbstractProblemLoader load(Profile profile, File file, List<File> classPath,
                                     File bootClassPath, Properties poPropertiesToForce) throws ProblemLoaderException {
       if (file != null) {
          mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());
@@ -319,6 +319,41 @@ public class WindowUserInterface extends AbstractUserInterface {
       return mainWindow.getProofList().containsProof(proof);
    }
 
+   @Override
+   public File saveProof(Proof proof, String fileExtension) {
+       final MainWindow mainWindow = MainWindow.getInstance();
+       final KeYFileChooser jFC = GuiUtilities.getFileChooser("Choose filename to save proof");
+
+       Pair<File, String> f = fileName(proof, fileExtension);
+       final Pair<Boolean, File> res = jFC.showSaveDialog(mainWindow, f.second);
+       final boolean saved = res.first;
+       final File newDir = res.second;
+       File file = null;
+       if (saved) {
+           file = jFC.getSelectedFile();
+           final String filename = file.getAbsolutePath();
+           ProofSaver saver =
+                   new ProofSaver(proof, filename, Main.INTERNAL_VERSION);
+           String errorMsg;
+           try {
+               errorMsg = saver.save();
+           } catch (IOException e) {
+               errorMsg = e.toString();
+           }
+           if (errorMsg != null) {
+               notify(new GeneralFailureEvent("Saving Proof failed.\n Error: " + errorMsg));
+           } else {
+              proof.setProofFile(file);
+           }
+       } else {
+           if (newDir != null && !newDir.delete()) {
+               newDir.deleteOnExit();
+           }
+           jFC.resetPath();
+       }
+       return file;
+   }
+
    /**
     * {@inheritDoc}
     */
@@ -332,8 +367,8 @@ public class WindowUserInterface extends AbstractUserInterface {
            // Run the garbage collector.
            Runtime r = Runtime.getRuntime();
            r.gc();
-       }
-   }
+        }
+    }
 
    @Override
    public boolean selectProofObligation(InitConfig initConfig) {

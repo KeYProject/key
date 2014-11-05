@@ -8,8 +8,11 @@ import recoder.java.expression.Operator;
 import recoder.list.generic.ASTArrayList;
 
 /**
- * Used by the parser to handle JML function symbols.
- * They all start with an escape symbol "\\".
+ * Handles JML expressions that begin with an escape character '\'.
+ * 
+ * Escaped identifiers in JML code are usually (always?) function symbols.
+ * JML function symbols begin with an escape character, to distinguish them
+ * from Java function symbols that might occur in an annotated source code.
  * 
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */

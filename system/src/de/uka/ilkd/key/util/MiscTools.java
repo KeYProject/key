@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -37,6 +39,7 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -145,6 +148,23 @@ public final class MiscTools {
 
 
     // =======================================================
+    // Methods operating on Arrays
+    // =======================================================
+    
+    /**
+     * Concatenates two arrays.
+     * The second array may have an entry type that is a
+     * subtype of the first one.
+     */
+    public static <S,T extends S> S[] concat(S[] s1, T[] s2) {
+        S[] res = Arrays.copyOf(s1, s1.length+s2.length);
+        for (int i= 0; i < s2.length; i++)
+            res[i+s1.length] = s2[i];
+        return res;
+    }
+
+
+    // =======================================================
     // Methods operating on Collections
     // =======================================================
 
@@ -231,6 +251,8 @@ public final class MiscTools {
      * This method only operates on Strings, not on real files!
      * Note that it treats Strings case-sensitive.
      * The resulting filename always uses UNIX directory delimiters.
+     * Raises a RuntimeException if no relative path could be found
+     * (may happen on Windows systems).
      */
     public static String makeFilenameRelative(String origFilename, String toFilename){
         final List<String> origFileNameSections = disectFilename(origFilename);
@@ -325,6 +347,12 @@ public final class MiscTools {
              .replace("]", ")");
         return s;
     }
+
+    public static Name toValidVariableName(String s) {
+        s = s.replaceAll("\\s|\\.|::\\$|::|<|>|/|\\(|\\)|,", "_");
+        return new Name(s);
+    }
+
 
     /**
      * Join the string representations of a collection of objects into onw
@@ -622,6 +650,18 @@ public final class MiscTools {
 	}
     }
 
+    public static ImmutableList<Term> toTermList(Iterable<ProgramVariable> list,
+                                                 TermBuilder tb) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for (ProgramVariable pv : list) {
+            if (pv != null) {
+                Term t = tb.var(pv);
+                result = result.append(t);
+            }
+        }
+        return result;
+    }
+    
     /**
      * read an input stream to its end into a string.
      *
@@ -638,5 +678,16 @@ public final class MiscTools {
             sb.append(new String(buffer, 0, read));
         }
         return sb.toString();
+    }
+
+    public static ImmutableList<Term> filterOutDuplicates(ImmutableList<Term> localIns,
+                                                          ImmutableList<Term> localOuts) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for (Term localIn : localIns) {
+            if (!localOuts.contains(localIn)) {
+                result = result.append(localIn);
+            }
+        }
+        return result;
     }
 }

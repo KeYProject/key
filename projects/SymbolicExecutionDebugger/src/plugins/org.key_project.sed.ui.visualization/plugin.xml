@@ -183,6 +183,24 @@
                     id="org.key_project.sed.ui.visualization.annotationLinks.tab"
                     label="Annotation Links">
               </propertyTab>
+              <propertyTab
+                    afterTab="org.key_project.sed.ui.visualization.annotationLinks.tab"
+                    category="Graphiti"
+                    id="org.key_project.sed.ui.visualization.groupStarts.tab"
+                    label="Group Starts">
+              </propertyTab>
+              <propertyTab
+                    afterTab="org.key_project.sed.ui.visualization.groupStarts.tab"
+                    category="Graphiti"
+                    id="org.key_project.sed.ui.visualization.groupEnds.tab"
+                    label="Group Ends">
+              </propertyTab>
+              <propertyTab
+                    afterTab="org.key_project.sed.ui.visualization.node.tab"
+                    category="Graphiti"
+                    id="org.key_project.sed.ui.visualization.callState.tab"
+                    label="Call State">
+              </propertyTab>
           </propertyTabs>
       </extension>
        
@@ -223,6 +241,24 @@
                     filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiReadonlyDebugNodeTreeFilter"
                     id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiConstraintsPropertySection"
                     tab="org.key_project.sed.ui.visualization.constraints.tab">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiGroupEndConditionsPropertySection"
+                    filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiGroupEndTreeFilter"
+                    id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiGroupEndConditionsPropertySection"
+                    tab="org.key_project.sed.ui.visualization.groupEnds.tab">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiGroupStartConditionsPropertySection"
+                    filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiGroupStartTreeFilter"
+                    id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiGroupStartConditionsPropertySection"
+                    tab="org.key_project.sed.ui.visualization.groupStarts.tab">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiCallStatePropertySection"
+                    filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiBaseMethodReturnTreeFilter"
+                    id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiCallStatePropertySection"
+                    tab="org.key_project.sed.ui.visualization.callState.tab">
               </propertySection>
           </propertySections>
       </extension>    

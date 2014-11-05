@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.XMLUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -56,6 +57,8 @@ public class ProofMetaFileWriter {
    public static final String TAG_ASSUMPTIONS = "assumptions";
    public static final String TAG_ASSUMPTION = "assumption";
    public static final String TAG_MARKER_MESSAGE = "markerMessage";
+   public static final String TAG_CALLED_METHODS = "calledMethods";
+   public static final String TAG_CALLED_METHOD = "calledMethod";
    public static final String TAG_REFERENCES = "references";
    public static final String TAG_AXIOM_REFERENCE = "axiomReference";
    public static final String TAG_INVARIANT_REFERENCE = "invariantReference";
@@ -79,7 +82,7 @@ public class ProofMetaFileWriter {
    public static final String ATTRIBUTE_KIND = "kind";
    public static final String ATTRIBUTE_TARGET = "target";
    public static final String ATTRIBUTE_TYPE = "type";
-   
+   public static final String ATTRIBUTE_FULL_QUALIFIED_NAME = "fullQualifiedName";
    public static final String ATTRIBUTE_KJT = "kjt";
    public static final String ATTRIBUTE_SRC = "src";
    public static final String ATTRIBUTE_PARAMETERS = "parameters";
@@ -109,14 +112,14 @@ public class ProofMetaFileWriter {
                metaIFile.create(new ByteArrayInputStream(bytes), true, null);
             }
             else {
-               ResourceAttributes resAttr = metaIFile.getResourceAttributes();
-               resAttr.setReadOnly(false);
-               metaIFile.setResourceAttributes(resAttr);
+               // Make sure that file is not read-only for compatibility with older relases. But do not set read-only flag because it requires admin rights on Mac OS to delete it.
+               if (metaIFile.isReadOnly()) {
+                  ResourceAttributes resAttr = metaIFile.getResourceAttributes();
+                  resAttr.setReadOnly(false);
+                  metaIFile.setResourceAttributes(resAttr);
+               }
                metaIFile.setContents(new ByteArrayInputStream(bytes), true, true, null);
             }
-            ResourceAttributes resAttr = metaIFile.getResourceAttributes();
-            resAttr.setReadOnly(true);
-            metaIFile.setResourceAttributes(resAttr);
          }
       };
       ResourcesPlugin.getWorkspace().run(operation, null, IWorkspace.AVOID_UPDATE, null);
@@ -136,6 +139,7 @@ public class ProofMetaFileWriter {
       appendMarkerMessage(pe, 1, sb);
       appendUsedTypes(pe, 1, types, sb);
       appendUsedContracts(pe, 1, sb);
+      appendCalledMethods(pe, 1, sb);
       appendAssumptions(pe, 1, assumptions, sb);
       appendReferences(pe.getProofMetaReferences(), 1, sb);
       XMLUtil.appendEndTag(0, TAG_PROOF_META_FILE, sb);
@@ -188,7 +192,7 @@ public class ProofMetaFileWriter {
    
    private static void appendUsedContracts(ProofElement pe, int level, StringBuffer sb) {
       List<IFile> usedContractsProofElements = pe.getUsedContracts();
-      if (!usedContractsProofElements.isEmpty()) {
+      if (!CollectionUtil.isEmpty(usedContractsProofElements)) {
          XMLUtil.appendStartTag(level, TAG_USED_CONTRACTS, null, sb);
          for (IFile usedContractProofElement : usedContractsProofElements) {
             Map<String, String> attributeValues = new LinkedHashMap<String, String>();
@@ -196,6 +200,19 @@ public class ProofMetaFileWriter {
             XMLUtil.appendEmptyTag(level + 1, TAG_USED_CONTRACT, attributeValues, sb);
          }
          XMLUtil.appendEndTag(level, TAG_USED_CONTRACTS, sb);
+      }
+   }
+   
+   private static void appendCalledMethods(ProofElement pe, int level, StringBuffer sb) {
+      List<String> calledMethods = pe.getCalledMethods();
+      if (!CollectionUtil.isEmpty(calledMethods)) {
+         XMLUtil.appendStartTag(level, TAG_CALLED_METHODS, null, sb);
+         for (String calledMethod : calledMethods) {
+            Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+            attributeValues.put(ATTRIBUTE_FULL_QUALIFIED_NAME, calledMethod);
+            XMLUtil.appendEmptyTag(level + 1, TAG_CALLED_METHOD, attributeValues, sb);
+         }
+         XMLUtil.appendEndTag(level, TAG_CALLED_METHODS, sb);
       }
    }
 

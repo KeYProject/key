@@ -206,7 +206,9 @@ public class ProofStarter {
            final Profile profile = proof.getInitConfig().getProfile();
            final StrategyFactory factory = profile.getDefaultStrategyFactory();
            if (strategyProperties == null) {
-              strategyProperties = factory.getSettingsDefinition().getDefaultPropertiesFactory().createDefaultStrategyProperties();
+              strategyProperties =
+                      factory.getSettingsDefinition().getDefaultPropertiesFactory()
+                      .createDefaultStrategyProperties();
            }
 
            if (proof.getProofIndependentSettings().getGeneralSettings().oneStepSimplification()) {

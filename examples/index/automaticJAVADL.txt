@@ -487,6 +487,8 @@ provable: ./standard_key/strings/substring2.key
 provable: ./standard_key/strings/substring3.key
 provable: ./standard_key/strings/substring4.key
 provable: ./standard_key/strings/substring5.key
+provable: ./standard_key/types/disjoint.key
+
 provable: ./_testcase/classpath/classpath.key
 
 notprovable: ./heap/inconsistent_represents/MyClass_m.key

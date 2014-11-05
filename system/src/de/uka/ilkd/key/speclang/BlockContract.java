@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.speclang;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import java.util.*;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -34,6 +35,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -84,6 +86,8 @@ public interface BlockContract extends SpecificationElement {
 
     public void visit(Visitor visitor);
 
+    public String getUniqueName();
+
     public String getHtmlText(Services services);
 
     // TODO Find better name: Creates a new block contract with the given changes.
@@ -91,9 +95,70 @@ public interface BlockContract extends SpecificationElement {
                                 Map<LocationVariable,Term> newPreconditions,
                                 Map<LocationVariable,Term> newPostconditions,
                                 Map<LocationVariable,Term> newModifiesClauses,
+                                final ImmutableList<InfFlowSpec> newInfFlowSpecs,
                                 Variables newVariables);
 
     public BlockContract setBlock(StatementBlock newBlock);
+
+    /**
+     * Returns the method in which the block is located.
+     */
+    public IProgramMethod getTarget();
+
+
+    /**
+     * Tells whether the contract contains a measured_by clause.
+     */
+    public boolean hasMby();
+
+
+    public boolean hasInfFlowSpecs();
+
+
+    public void setInstantiationSelf(Term selfInstantiation);
+
+
+    /**
+     * Returns the term internally used for self or a newly instantiated one.
+     * Use with care - it is likely that this is *not* the right "self" for you.
+     */
+    public Term getInstantiationSelfTerm(TermServices services);
+
+
+    /**
+     * Returns the original precondition of the contract.
+     */
+    Term getPre(Services services);
+
+
+    /**
+     * Returns the original postcondition of the contract.
+     */
+    Term getPost(Services services);
+
+
+    /**
+     * Returns the original modifies clause of the contract.
+     */
+    Term getMod(Services services);
+
+
+    /**
+     * Returns the original information flow specification clause of the contract.
+     */
+    public ImmutableList<InfFlowSpec> getInfFlowSpecs();
+
+
+    /**
+     * Returns the original used variables like self, result etc..
+     */
+    public Variables getVariables();
+
+
+    /**
+     * Returns the original used variables like self, result etc. as terms.
+     */
+    public Terms getVariablesAsTerms(Services services);
 
     public BlockContract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
 
@@ -102,9 +167,10 @@ public interface BlockContract extends SpecificationElement {
     public static class Variables {
         private final TermServices services;
 
-        public static Variables create(final StatementBlock block, final List<Label> labels,
-                                       final IProgramMethod method, final Services services)
-        {
+        public static Variables create(final StatementBlock block,
+                                       final List<Label> labels,
+                                       final IProgramMethod method,
+                                       final Services services) {
             return new VariablesCreator(block, labels, method, services).create();
         }
 
@@ -147,10 +213,10 @@ public interface BlockContract extends SpecificationElement {
             return result;
         }
 
-        public Terms termify(final Term self)
+        public Terms termify(Term self)
         {
             return new BlockContract.Terms(
-                self, /*var(variables.self),*/
+                self,
                 termifyFlags(breakFlags),
                 termifyFlags(continueFlags),
                 termifyVariable(returnFlag),
@@ -170,12 +236,9 @@ public interface BlockContract extends SpecificationElement {
             return result;
         }
 
-        private Map<LocationVariable, Term>
-                        termifyRemembranceVariables(final Map<LocationVariable,
-                                                    LocationVariable> remembranceVariables)
-        {
-            final Map<LocationVariable, Term> result =
-                    new LinkedHashMap<LocationVariable, Term>();
+        private Map<LocationVariable, Term> termifyRemembranceVariables(
+                    final Map<LocationVariable, LocationVariable> remembranceVariables) {
+            final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
             for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable
                     : remembranceVariables.entrySet()) {
                 result.put(remembranceVariable.getKey(),
@@ -202,7 +265,7 @@ public interface BlockContract extends SpecificationElement {
         private static final String CONTINUE_FLAG_BASE_NAME = "continued";
         private static final String RETURN_FLAG_NAME = "returned";
         private static final String FLAG_INFIX = "To";
-        private static final String REMEMBRANCE_SUFFIX = "BeforeBlock";
+        private static final String REMEMBRANCE_SUFFIX = "Before_BLOCK";
 
         private final StatementBlock block;
         private final List<Label> labels;
@@ -212,8 +275,7 @@ public interface BlockContract extends SpecificationElement {
         private ProgramVariable returnFlag;
 
         public VariablesCreator(final StatementBlock block, final List<Label> labels,
-                                final IProgramMethod method, final Services services)
-        {
+                                final IProgramMethod method, final Services services) {
             super(services.getTermFactory(), services);
             this.block = block;
             this.labels = labels;
@@ -236,8 +298,7 @@ public interface BlockContract extends SpecificationElement {
             );
         }
 
-        private void createAndStoreFlags()
-        {
+        private void createAndStoreFlags() {
             final OuterBreakContinueAndReturnCollector collector =
                     new OuterBreakContinueAndReturnCollector(block, labels, services);
             collector.collect();
@@ -254,8 +315,7 @@ public interface BlockContract extends SpecificationElement {
             returnFlag = returnOccurred ? createFlag(RETURN_FLAG_NAME) : null;
         }
 
-        private Set<Label> collectLabels(final List<? extends LabelJumpStatement> jumps)
-        {
+        private Set<Label> collectLabels(final List<? extends LabelJumpStatement> jumps) {
             final Set<Label> result = new LinkedHashSet<Label>();
             for (LabelJumpStatement jump : jumps) {
                 result.add(jump.getLabel());
@@ -264,8 +324,7 @@ public interface BlockContract extends SpecificationElement {
         }
 
         private Map<Label, ProgramVariable> createFlags(final Set<Label> labels,
-                                                        final String baseName)
-        {
+                                                        final String baseName) {
             final Map<Label, ProgramVariable> result = new LinkedHashMap<Label, ProgramVariable>();
             for (Label label : labels) {
                 final String suffix = label == null ? "" : FLAG_INFIX + label;
@@ -284,7 +343,7 @@ public interface BlockContract extends SpecificationElement {
             final Map<LocationVariable, LocationVariable> result =
                     new LinkedHashMap<LocationVariable, LocationVariable>();
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                result.put(heap, heapAtPreVar(heap + REMEMBRANCE_SUFFIX, heap.sort(), false));
+                result.put(heap, heapAtPreVar(heap + "_" + REMEMBRANCE_SUFFIX, heap.sort(), false));
             }
             return result;
         }
@@ -298,15 +357,14 @@ public interface BlockContract extends SpecificationElement {
             for (ProgramVariable localOutVariable : localOutVariables) {
                 result.put(
                     (LocationVariable) localOutVariable,
-                    createVariable(localOutVariable.name() + REMEMBRANCE_SUFFIX,
+                    createVariable(localOutVariable.name() + "_" + REMEMBRANCE_SUFFIX,
                                    localOutVariable.getKeYJavaType())
                 );
             }
             return result;
         }
 
-        private LocationVariable createVariable(final String name, final KeYJavaType type)
-        {
+        private LocationVariable createVariable(final String name, final KeYJavaType type) {
             return new LocationVariable(new ProgramElementName(name), type);
         }
 

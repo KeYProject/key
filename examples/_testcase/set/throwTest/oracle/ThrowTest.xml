@@ -2,9 +2,12 @@
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call self.main()&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="throw new RuntimeException ();" pathCondition="true" pathConditionChanged="false">
-         <termination name="&lt;uncaught java.lang.RuntimeException&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-         </termination>
+         <exceptionalMethodReturn name="&lt;throw java.lang.RuntimeException&gt;" signature="&lt;exceptional return of &lt;call self.main()&gt;&gt;" pathCondition="true" pathConditionChanged="false" methodReturnCondition="true">
+            <termination name="&lt;uncaught java.lang.RuntimeException&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+            </termination>
+         </exceptionalMethodReturn>
       </statement>
+      <methodReturnEntry path="/0/0/0"/>
    </methodCall>
-   <terminationEntry path="/0/0/0"/>
+   <terminationEntry path="/0/0/0/0"/>
 </start>

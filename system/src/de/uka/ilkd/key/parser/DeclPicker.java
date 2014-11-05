@@ -23,7 +23,7 @@ public class DeclPicker extends LegacyCommonTokenStream {
 
   /** Stream to read tokens from */
   public DeclPicker(KeYLexerF in) {
-      super(in.getKeYLexer());
+      super(in);
   }
 
   public int begin() {
