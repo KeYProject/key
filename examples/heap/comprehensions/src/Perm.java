@@ -1,3 +1,11 @@
+/**
+ * Compute a sum of integers through the order given by an iterator.
+ * The exact order is not known, except for the fact that each element
+ * is selected exactly once.
+ * For simplicity, this implementation uses an array instead of a
+ * (generic) collection type.
+ * @author Daniel Bruns
+ */
 class Perm {
 
   int[] a;
@@ -29,8 +37,11 @@ class Perm {
     @
     @ ghost \seq c; // a permuted by perm
     @ invariant \dl_seqPerm(b,c);
-    @ invariant (\forall int i; 0 <= i && i < a.length;
+    @ invariant (\forall int i; 0 <= i && i < c.length;
     @               (int)c[i] == (int)b[(int)perm[i]]);
+    @ invariant (\forall int i; 0 <= i && i < c.length;
+    @               c[i] == (int)c[i]);
+    @ invariant c.length == a.length;
     @*/
 
   /*@ normal_behavior
