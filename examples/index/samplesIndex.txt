@@ -37,6 +37,7 @@ heap/vstte10_04_Queens/README.txt
 heap/vstte10_05_Queue/README.txt
 
 heap/fm12_01_LRS/README.txt
+heap/permutedSum/README
 
 heap/vacid0_01_SparseArray/README.txt
 heap/vacid0_05_RedBlackTrees/README.txt
