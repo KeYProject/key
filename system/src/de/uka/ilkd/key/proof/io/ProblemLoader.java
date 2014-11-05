@@ -64,7 +64,8 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
 
    private Throwable doWork() {
       try {
-          return load();
+          load();
+          return null;
       } catch (Throwable exception) {
           final String errorMessage = "Failed to load "
                   + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
