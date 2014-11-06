@@ -379,7 +379,6 @@ public final class ExampleChooser extends JDialog {
             fis.close();
             return new String(buffer);
         } catch (IOException e) {
-            e.printStackTrace();
             return "<Error reading file: " + f + ">";
         }
     }
