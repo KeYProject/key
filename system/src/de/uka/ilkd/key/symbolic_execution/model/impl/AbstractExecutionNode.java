@@ -256,7 +256,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
     * {@inheritDoc}
     */
    @Override
-   public IExecutionVariable[] getVariables() {
+   public IExecutionVariable[] getVariables() throws ProofInputException {
       synchronized (this) {
          if (variables == null) {
             variables = lazyComputeVariables();
@@ -269,8 +269,9 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
     * Computes the variables lazily when {@link #getVariables()} is 
     * called the first time.
     * @return The {@link IExecutionVariable}s of the current state.
+    * @throws ProofInputException 
     */
-   protected IExecutionVariable[] lazyComputeVariables() {
+   protected IExecutionVariable[] lazyComputeVariables() throws ProofInputException {
       return SymbolicExecutionUtil.createExecutionVariables(this);
    }
 
@@ -278,7 +279,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
     * {@inheritDoc}
     */
    @Override
-   public IExecutionVariable[] getVariables(Term condition) {
+   public IExecutionVariable[] getVariables(Term condition) throws ProofInputException {
       synchronized (this) {
          IExecutionVariable[] result = conditionalVariables.get(condition);
          if (result == null) {
@@ -294,8 +295,9 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
     * called the first time.
     * @param condition A {@link Term} specifying some additional constraints to consider.
     * @return The {@link IExecutionVariable}s of the current state under the given condition.
+    * @throws ProofInputException 
     */
-   protected IExecutionVariable[] lazyComputeVariables(Term condition) {
+   protected IExecutionVariable[] lazyComputeVariables(Term condition) throws ProofInputException {
       return SymbolicExecutionUtil.createExecutionVariables(this, condition);
    }
 
