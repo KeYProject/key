@@ -269,6 +269,7 @@ public final class ExampleChooser extends JDialog {
 	            }
 		});
 	exampleList.addMouseListener(new MouseAdapter() {
+        @Override
 	    public void mouseClicked(MouseEvent e){
 		if(e.getClickCount() == 2){
 		    loadButton.doClick();
@@ -299,6 +300,7 @@ public final class ExampleChooser extends JDialog {
 	//create "load" button
 	loadButton = new JButton("Load Example");
 	loadButton.addActionListener(new ActionListener() {
+        @Override
 	    public void actionPerformed(ActionEvent e) {
 	        assert selectedExample != null;
 		fileToLoad = selectedExample.getObligationFile();
@@ -311,6 +313,7 @@ public final class ExampleChooser extends JDialog {
 	//create "load proof" button
         loadProofButton = new JButton("Load Proof");
         loadProofButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 assert selectedExample != null;
                 assert selectedExample.hasProof();
@@ -323,6 +326,7 @@ public final class ExampleChooser extends JDialog {
 	//create "cancel" button
 	cancelButton = new JButton("Cancel");
 	cancelButton.addActionListener(new ActionListener() {
+        @Override
 	    public void actionPerformed(ActionEvent e) {
 	        fileToLoad = null;
 		setVisible(false);
@@ -330,6 +334,7 @@ public final class ExampleChooser extends JDialog {
 	});
 	buttonPanel.add(cancelButton);
         ActionListener escapeListener = new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent event) {
                 if(event.getActionCommand().equals("ESC")) {
                     cancelButton.doClick();
@@ -431,7 +436,11 @@ public final class ExampleChooser extends JDialog {
 
             if(example != selectedExample) {
                 addTab(example.getDescription().toString(), "Description", true);
-                addTab(fileAsString(example.getObligationFile()), "Proof Obligation", false);
+                final String fileAsString = fileAsString(example.getObligationFile());
+                final int p = fileAsString.lastIndexOf("\\problem");
+                if (p >= 0) {
+                    addTab(fileAsString.substring(p), "Proof Obligation", false);
+                }
                 for (File file : example.getAdditionalFiles()) {
                     addTab(fileAsString(file), file.getName(), false);
                 }
