@@ -22,7 +22,7 @@ class Perm {
         @ assignable pIdx;
         @*/
       while (hasNext())
-          s+= a[next()];
+          s+= next();
       return s;
   }
 
@@ -52,8 +52,7 @@ class Perm {
 
   /*@ normal_behavior
     @ requires pIdx < a.length;
-    @ ensures 0 <= \result && \result < a.length;
-    @ ensures \result == (int)perm[\old(pIdx)];
+    @ ensures \result == (int)c[\old(pIdx)];
     @ ensures pIdx == \old(pIdx)+1;
     @ assignable pIdx;
     @*/
