@@ -22,7 +22,6 @@ heap/SmansEtAl/README.txt
 heap/Transactions/README.txt
 heap/inconsistent_represents/README.txt
 heap/information_flow/README.txt
-heap/linkedListSimple/README.txt
 heap/list/README.txt
 heap/list_ghost/README.txt
 heap/list_seq/README.txt
