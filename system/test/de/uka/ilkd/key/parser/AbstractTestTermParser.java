@@ -150,6 +150,10 @@ public abstract class AbstractTestTermParser extends TestCase {
     protected void assertEqualsIgnoreWhitespaces(String expected, String actual) {
         assertEquals(expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""));
     }
+    
+    protected void assertEqualsIgnoreWhitespaces(String message, String expected, String actual) {
+        assertEquals(message, expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""));
+    }
 
     protected abstract Services getServices();
 

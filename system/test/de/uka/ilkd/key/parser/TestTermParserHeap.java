@@ -322,7 +322,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
      * Takes a {@link String} and a {@link Term} and checks whether they can be
      * transformed into each other by the operations parsing and printing.
      *
-     * @param expectedPrettySyntax Expected result after pretty-printing
+     * @param prettySyntax Expected result after pretty-printing
      * {@code expectedParseResult}.
      * @param expectedParseResult Expected result after parsing
      * {@code expectedPrettySyntax}.
@@ -330,18 +330,11 @@ public class TestTermParserHeap extends AbstractTestTermParser {
      * representations will be tested for correct parsing.
      * @throws IOException
      */
-    private void compareStringRepresentationAgainstTermRepresentation(String expectedPrettySyntax, Term expectedParseResult,
+    private void compareStringRepresentationAgainstTermRepresentation(String prettySyntax, Term expectedParseResult,
             String... optionalStringRepresentations) throws IOException {
-        Term parsedPrettySyntax = parseTerm(expectedPrettySyntax);
-        assertEquals(expectedParseResult, parsedPrettySyntax);
 
-        String printedSyntax = printTerm(expectedParseResult);
-        // compare the string representations, but remove whitespaces
-        assertEqualsIgnoreWhitespaces(expectedPrettySyntax, printedSyntax);
-
-        // parse printed term again and see if result is still the same
-        Term parsedPrintedSyntax = parseTerm(printedSyntax);
-        assertEquals(expectedParseResult, parsedPrintedSyntax);
+        verifyParsing(expectedParseResult, prettySyntax);
+        verifyPrettyPrinting(prettySyntax, expectedParseResult);
 
         /*
          * Optionally, further string representations of the same term will be parsed here.
@@ -349,6 +342,27 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         for (int i = 0; i < optionalStringRepresentations.length; i++) {
             assertEquals(expectedParseResult, parseTerm(optionalStringRepresentations[i]));
         }
+    }
+
+    private void verifyPrettyPrinting(String expectedPrettySyntax, Term expectedParseResult) throws IOException {
+        // check whether pretty-printing the parsed term yields the original pretty syntax again
+        String printedSyntax = printTerm(expectedParseResult);
+        String message = "\nAssertion failed while pretty-printing a term:\n"
+                + expectedParseResult
+                + "\nExpected pretty-syntax is: \"" + expectedPrettySyntax
+                + "\"\nBut pretty-printing resulted in: \"" + printedSyntax
+                + "\"\n(whitespaces are ignored during comparison of the above strings)\n";
+        assertEqualsIgnoreWhitespaces(message, expectedPrettySyntax, printedSyntax);
+    }
+
+    private void verifyParsing(Term expectedParseResult, String expectedPrettySyntax) {
+        // check whether parsing pretty-syntax produces the correct term
+        Term parsedPrettySyntax = parseTerm(expectedPrettySyntax);
+        String message = "\nAssertion failed while parsing pretty syntax. "
+                + "Parsed string \"" + expectedPrettySyntax + "\", which results in term:\n"
+                + parsedPrettySyntax + "\nBut expected parse result is:\n"
+                + expectedParseResult + "\n";
+        assertEquals(message, expectedParseResult, parsedPrettySyntax);
     }
 
 }
