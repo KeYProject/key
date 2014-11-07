@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <variable name="y" arrayIndex="-1" isArrayIndex="false">
+      <value name="y" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false">
+      </value>
+   </variable>
+   <methodCall name="&lt;call LocalVariablesTest.main(y)&gt;" pathCondition="true" pathConditionChanged="false">
+      <variable name="y" arrayIndex="-1" isArrayIndex="false">
+         <value name="y" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false">
+         </value>
+      </variable>
+      <statement name="int main = y-2;" pathCondition="true" pathConditionChanged="false">
+         <variable name="y" arrayIndex="-1" isArrayIndex="false">
+            <value name="y" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false">
+            </value>
+         </variable>
+         <statement name="int subResult = sub(main);" pathCondition="true" pathConditionChanged="false">
+            <variable name="y" arrayIndex="-1" isArrayIndex="false">
+               <value name="y" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false">
+               </value>
+            </variable>
+            <variable name="main" arrayIndex="-1" isArrayIndex="false">
+               <value name="main" typeString="int" valueString="add(Z(neglit(2(#))),y)" isValueAnObject="false" isValueUnknown="false">
+               </value>
+            </variable>
+            <methodCall name="&lt;call LocalVariablesTest.sub(x_1)&gt;" pathCondition="true" pathConditionChanged="false">
+               <variable name="y" arrayIndex="-1" isArrayIndex="false">
+                  <value name="y" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false">
+                  </value>
+               </variable>
+               <variable name="x_1" arrayIndex="-1" isArrayIndex="false">
+                  <value name="x_1" typeString="int" valueString="add(Z(neglit(2(#))),y)" isValueAnObject="false" isValueUnknown="false">
+                  </value>
+               </variable>
+               <statement name="int sub = x_1+2;" pathCondition="true" pathConditionChanged="false">
+                  <variable name="y" arrayIndex="-1" isArrayIndex="false">
+                     <value name="y" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false">
+                     </value>
+                  </variable>
+                  <variable name="x_1" arrayIndex="-1" isArrayIndex="false">
+                     <value name="x_1" typeString="int" valueString="add(Z(neglit(2(#))),y)" isValueAnObject="false" isValueUnknown="false">
+                     </value>
+                  </variable>
+                  <statement name="return sub_1;" pathCondition="true" pathConditionChanged="false">
+                     <variable name="y" arrayIndex="-1" isArrayIndex="false">
+                        <value name="y" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false">
+                        </value>
+                     </variable>
+                     <variable name="sub_1" arrayIndex="-1" isArrayIndex="false">
+                        <value name="sub_1" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false">
+                        </value>
+                     </variable>
+                     <methodReturn name="&lt;return of sub&gt;" signature="&lt;return of LocalVariablesTest.sub(x_1)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                        <variable name="y" arrayIndex="-1" isArrayIndex="false">
+                           <value name="y" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false">
+                           </value>
+                        </variable>
+                        <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                           <value name="x" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false">
+                           </value>
+                        </variable>
+                        <statement name="return subResult;" pathCondition="true" pathConditionChanged="false">
+                           <variable name="y" arrayIndex="-1" isArrayIndex="false">
+                              <value name="y" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false">
+                              </value>
+                           </variable>
+                           <variable name="subResult" arrayIndex="-1" isArrayIndex="false">
+                              <value name="subResult" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false">
+                              </value>
+                           </variable>
+                           <methodReturn name="&lt;return of main&gt;" signature="&lt;return of LocalVariablesTest.main(y)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                              <variable name="y" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="y" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false">
+                                 </value>
+                              </variable>
+                              <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                                 <variable name="y" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="y" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false">
+                                    </value>
+                                 </variable>
+                              </termination>
+                              <callStateVariable name="y" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="y" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false">
+                                 </value>
+                              </callStateVariable>
+                           </methodReturn>
+                        </statement>
+                        <callStateVariable name="y" arrayIndex="-1" isArrayIndex="false">
+                           <value name="y" typeString="int" valueString="y" isValueAnObject="false" isValueUnknown="false">
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="x_1" arrayIndex="-1" isArrayIndex="false">
+                           <value name="x_1" typeString="int" valueString="add(Z(neglit(2(#))),y)" isValueAnObject="false" isValueUnknown="false">
+                           </value>
+                        </callStateVariable>
+                     </methodReturn>
+                  </statement>
+               </statement>
+               <methodReturnEntry path="/0/0/0/0/0/0/0"/>
+            </methodCall>
+         </statement>
+      </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0/0/0"/>
+</start>

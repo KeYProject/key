@@ -657,7 +657,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
          // Make sure that the correct taclet options are defined.
          originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
          // Create proof environment for symbolic execution
-         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, useOperationContracts, false, false, false, false, false);
+         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, useOperationContracts, false, false, false, false, false, false);
          setOneStepSimplificationEnabled(null, true);
          // Resume
          resume(env.getUi(), env.getBuilder(), oraclePathInBaseDir + symbolicExecutionOracleFileName, keyRepDirectory);

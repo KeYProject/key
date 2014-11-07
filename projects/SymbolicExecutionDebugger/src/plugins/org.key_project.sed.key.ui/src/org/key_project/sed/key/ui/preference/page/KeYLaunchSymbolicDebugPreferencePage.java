@@ -15,6 +15,7 @@ package org.key_project.sed.key.ui.preference.page;
 
 import org.eclipse.debug.internal.ui.SWTFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -57,19 +58,12 @@ public class KeYLaunchSymbolicDebugPreferencePage extends FieldEditorPreferenceP
       Group group = SWTFactory.createGroup(getFieldEditorParent(), "Symbolic Execution Tree", 1, 1, GridData.FILL_HORIZONTAL);
       final Composite spacer = SWTFactory.createComposite(group, 1, 1, GridData.FILL_HORIZONTAL);
       BooleanFieldEditor returnEdit = new BooleanFieldEditor(KeYSEDPreferences.SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, "&Show method return values in debug nodes", SWT.NONE, spacer);
-      returnEdit.fillIntoGrid(spacer, 2);
       addField(returnEdit);
-      BooleanFieldEditor varEdit = new BooleanFieldEditor(KeYSEDPreferences.SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, "Show &variables of selected debug node", SWT.NONE, spacer);
-      varEdit.fillIntoGrid(spacer, 2);
-      addField(varEdit);
       BooleanFieldEditor mergeEdit = new BooleanFieldEditor(KeYSEDPreferences.MERGE_BRANCH_CONDITIONS, "&Merge branch conditions", SWT.NONE, spacer);
-      mergeEdit.fillIntoGrid(spacer, 2);
       addField(mergeEdit);
       final ObservableBooleanFieldEditor ppEdit = new ObservableBooleanFieldEditor(KeYSEDPreferences.USE_PRETTY_PRINTING, "Use &pretty printing", SWT.NONE, spacer);
-      ppEdit.fillIntoGrid(spacer, 2);
       addField(ppEdit);
       final BooleanFieldEditor unicodeEdit = new BooleanFieldEditor(KeYSEDPreferences.USE_UNICODE, "Use &unicode symbols", SWT.NONE, spacer);
-      unicodeEdit.fillIntoGrid(spacer, 2);
       addField(unicodeEdit);
       ppEdit.addFieldEditorValueListener(new IFieldEditorValueListener() {
          @Override
@@ -78,14 +72,33 @@ public class KeYLaunchSymbolicDebugPreferencePage extends FieldEditorPreferenceP
          }
       });
       BooleanFieldEditor sigEdit = new BooleanFieldEditor(KeYSEDPreferences.SHOW_SIGNATURE_ON_METHOD_RETURN_NODES, "Show signature instead of only the name on method &return nodes", SWT.NONE, spacer);
-      sigEdit.fillIntoGrid(spacer, 2);
       addField(sigEdit);
 
+      group = SWTFactory.createGroup(getFieldEditorParent(), "Variables", 1, 1, GridData.FILL_HORIZONTAL);
+      final Composite variablesSpacer = SWTFactory.createComposite(group, 2, 1, GridData.FILL_HORIZONTAL);
+      final ObservableBooleanFieldEditor varEdit = new ObservableBooleanFieldEditor(KeYSEDPreferences.SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, "Show &variables of selected debug node", SWT.NONE, variablesSpacer);
+      varEdit.fillIntoGrid(variablesSpacer, 2);
+      addField(varEdit);
+      final ComboFieldEditor variablesEditor = new ComboFieldEditor(KeYSEDPreferences.VARIABLES_ARE_COMPUTED_FROM_UPDATES, "Variables &computation", new String[][] {{"Based on visible type structure", "false"}, {"Based on sequent", "true"}}, variablesSpacer);
+      addField(variablesEditor);
+      varEdit.addFieldEditorValueListener(new IFieldEditorValueListener() {
+         @Override
+         public void shownValueChanged(FieldEditorValueEvent e) {
+            variablesEditor.setEnabled(varEdit.getBooleanValue(), variablesSpacer);
+         }
+      });
       
       group = SWTFactory.createGroup(getFieldEditorParent(), "KeY", 1, 1, GridData.FILL_HORIZONTAL);
       Composite keySpacer = SWTFactory.createComposite(group, 1, 1, GridData.FILL_HORIZONTAL);
       BooleanFieldEditor mainWindowEdit = new BooleanFieldEditor(KeYSEDPreferences.SHOW_KEY_MAIN_WINDOW, "Show &KeY's main window (only for experienced user)", SWT.NONE, keySpacer);
-      mainWindowEdit.fillIntoGrid(keySpacer, 2);
       addField(mainWindowEdit);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void adjustGridLayout() {
+      // Nothing to do
    }
 }

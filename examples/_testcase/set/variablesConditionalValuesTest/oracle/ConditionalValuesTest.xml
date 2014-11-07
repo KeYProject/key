@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <variable name="x" arrayIndex="-1" isArrayIndex="false">
+      <value name="x" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false">
+      </value>
+   </variable>
+   <variable name="y" arrayIndex="-1" isArrayIndex="false">
+      <value name="y" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false">
+      </value>
+   </variable>
+   <methodCall name="&lt;call ConditionalValuesTest.main(x,y)&gt;" pathCondition="true" pathConditionChanged="false">
+      <variable name="x" arrayIndex="-1" isArrayIndex="false">
+         <value name="x {or(and(equals(x,null),equals(y,null)),and(equals(x,null),not(equals(y,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(and(equals(x,null),equals(y,null)),and(equals(x,null),not(equals(y,null))))">
+         </value>
+         <value name="x {or(and(not(equals(x,null)),equals(y,null)),and(not(equals(x,null)),not(equals(y,null))))}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="or(and(not(equals(x,null)),equals(y,null)),and(not(equals(x,null)),not(equals(y,null))))">
+         </value>
+      </variable>
+      <variable name="y" arrayIndex="-1" isArrayIndex="false">
+         <value name="y {or(and(equals(x,null),equals(y,null)),and(not(equals(x,null)),equals(y,null)))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(and(equals(x,null),equals(y,null)),and(not(equals(x,null)),equals(y,null)))">
+         </value>
+         <value name="y {or(and(equals(x,null),not(equals(y,null))),and(not(equals(x,null)),not(equals(y,null))))}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="or(and(equals(x,null),not(equals(y,null))),and(not(equals(x,null)),not(equals(y,null))))">
+         </value>
+      </variable>
+      <statement name="x.value=2;" pathCondition="true" pathConditionChanged="false">
+         <variable name="x" arrayIndex="-1" isArrayIndex="false">
+            <value name="x {or(and(equals(x,null),equals(y,null)),and(equals(x,null),not(equals(y,null))))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(and(equals(x,null),equals(y,null)),and(equals(x,null),not(equals(y,null))))">
+            </value>
+            <value name="x {or(and(not(equals(x,null)),equals(y,null)),and(not(equals(x,null)),not(equals(y,null))))}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="or(and(not(equals(x,null)),equals(y,null)),and(not(equals(x,null)),not(equals(y,null))))">
+            </value>
+         </variable>
+         <variable name="y" arrayIndex="-1" isArrayIndex="false">
+            <value name="y {or(and(equals(x,null),equals(y,null)),and(not(equals(x,null)),equals(y,null)))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="or(and(equals(x,null),equals(y,null)),and(not(equals(x,null)),equals(y,null)))">
+            </value>
+            <value name="y {or(and(equals(x,null),not(equals(y,null))),and(not(equals(x,null)),not(equals(y,null))))}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="or(and(equals(x,null),not(equals(y,null))),and(not(equals(x,null)),not(equals(y,null))))">
+            </value>
+         </variable>
+         <branchCondition name="not(equals(x,null))" pathCondition="not(equals(x,null))" pathConditionChanged="true" branchCondition="not(equals(x,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <variable name="x" arrayIndex="-1" isArrayIndex="false">
+               <value name="x {true}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="y" arrayIndex="-1" isArrayIndex="false">
+               <value name="y {equals(y,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(y,null)">
+               </value>
+               <value name="y {not(equals(y,null))}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(y,null))">
+               </value>
+            </variable>
+            <statement name="y.value=3;" pathCondition="not(equals(x,null))" pathConditionChanged="false">
+               <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                  <value name="x {true}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                        <value name="value {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="y" arrayIndex="-1" isArrayIndex="false">
+                  <value name="y {equals(y,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(y,null)">
+                  </value>
+                  <value name="y {not(equals(y,null))}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(y,null))">
+                  </value>
+               </variable>
+               <branchCondition name="not(equals(y,null))" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="true" branchCondition="not(equals(y,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                     <value name="x {true}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                           <value name="value {equals(y,x)}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(y,x)">
+                           </value>
+                           <value name="value {not(equals(y,x))}" typeString="int" valueString="int::select(heap,x,ConditionalValuesTest::$value)" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(y,x))">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="y" arrayIndex="-1" isArrayIndex="false">
+                     <value name="y {equals(y,x)}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="equals(y,x)">
+                        <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                           <value name="value {equals(y,x)}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(y,x)">
+                           </value>
+                        </variable>
+                     </value>
+                     <value name="y {not(equals(y,x))}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(y,x))">
+                     </value>
+                  </variable>
+                  <statement name="return x.value+y.value;" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false">
+                     <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                        <value name="x {true}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                              <value name="value {equals(y,x)}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(y,x)">
+                              </value>
+                              <value name="value {not(equals(y,x))}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(y,x))">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <variable name="y" arrayIndex="-1" isArrayIndex="false">
+                        <value name="y {equals(y,x)}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="equals(y,x)">
+                           <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                              <value name="value {equals(y,x)}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(y,x)">
+                              </value>
+                           </variable>
+                        </value>
+                        <value name="y {not(equals(y,x))}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(y,x))">
+                           <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                              <value name="value {not(equals(y,x))}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(y,x))">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of ConditionalValuesTest.main(x,y)&gt;" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(not(equals(x,null)),not(equals(y,null)))">
+                        <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                           <value name="x {true}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="value {equals(y,x)}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(y,x)">
+                                 </value>
+                                 <value name="value {not(equals(y,x))}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(y,x))">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                        <variable name="y" arrayIndex="-1" isArrayIndex="false">
+                           <value name="y {equals(y,x)}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="equals(y,x)">
+                              <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="value {equals(y,x)}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(y,x)">
+                                 </value>
+                              </variable>
+                           </value>
+                           <value name="y {not(equals(y,x))}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(y,x))">
+                              <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="value {not(equals(y,x))}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(y,x))">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                        <termination name="&lt;end&gt;" pathCondition="and(not(equals(x,null)),not(equals(y,null)))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                           <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                              <value name="x {true}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="value {equals(y,x)}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(y,x)">
+                                    </value>
+                                    <value name="value {not(equals(y,x))}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(y,x))">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </variable>
+                           <variable name="y" arrayIndex="-1" isArrayIndex="false">
+                              <value name="y {equals(y,x)}" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false" conditionString="equals(y,x)">
+                                 <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="value {equals(y,x)}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(y,x)">
+                                    </value>
+                                 </variable>
+                              </value>
+                              <value name="y {not(equals(y,x))}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(y,x))">
+                                 <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="value {not(equals(y,x))}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(y,x))">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </variable>
+                        </termination>
+                        <callStateVariable name="x" arrayIndex="-1" isArrayIndex="false">
+                           <value name="x" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false">
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="y" arrayIndex="-1" isArrayIndex="false">
+                           <value name="y" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false">
+                           </value>
+                        </callStateVariable>
+                     </methodReturn>
+                  </statement>
+               </branchCondition>
+               <branchCondition name="equals(y,null)" pathCondition="and(not(equals(x,null)),equals(y,null))" pathConditionChanged="true" branchCondition="equals(y,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                     <value name="x" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false">
+                        <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                           <value name="value" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="y" arrayIndex="-1" isArrayIndex="false">
+                     <value name="y" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                     </value>
+                  </variable>
+                  <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call ConditionalValuesTest.main(x,y)&gt;&gt;" pathCondition="and(not(equals(x,null)),equals(y,null))" pathConditionChanged="false" methodReturnCondition="and(not(equals(x,null)),equals(y,null))">
+                     <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                        <value name="x" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false">
+                           <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                              <value name="value" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <variable name="y" arrayIndex="-1" isArrayIndex="false">
+                        <value name="y" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                        </value>
+                     </variable>
+                     <variable name="n_4" arrayIndex="-1" isArrayIndex="false">
+                        <value name="n_4" typeString="java.lang.NullPointerException" valueString="n_7" isValueAnObject="false" isValueUnknown="false">
+                           <variable name="message" arrayIndex="-1" isArrayIndex="false">
+                              <value name="message" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                              </value>
+                           </variable>
+                           <variable name="cause" arrayIndex="-1" isArrayIndex="false">
+                              <value name="cause" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="and(not(equals(x,null)),equals(y,null))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                        <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                           <value name="x" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false">
+                              <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="value" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                        <variable name="y" arrayIndex="-1" isArrayIndex="false">
+                           <value name="y" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                           </value>
+                        </variable>
+                     </termination>
+                     <callStateVariable name="x" arrayIndex="-1" isArrayIndex="false">
+                        <value name="x" typeString="ConditionalValuesTest" valueString="x" isValueAnObject="true" isValueUnknown="false">
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="y" arrayIndex="-1" isArrayIndex="false">
+                        <value name="y" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                        </value>
+                     </callStateVariable>
+                  </exceptionalMethodReturn>
+               </branchCondition>
+            </statement>
+         </branchCondition>
+         <branchCondition name="equals(x,null)" pathCondition="equals(x,null)" pathConditionChanged="true" branchCondition="equals(x,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <variable name="x" arrayIndex="-1" isArrayIndex="false">
+               <value name="x {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="y" arrayIndex="-1" isArrayIndex="false">
+               <value name="y {equals(y,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(y,null)">
+               </value>
+               <value name="y {not(equals(y,null))}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(y,null))">
+               </value>
+            </variable>
+            <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call ConditionalValuesTest.main(x,y)&gt;&gt;" pathCondition="equals(x,null)" pathConditionChanged="false" methodReturnCondition="equals(x,null)">
+               <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                  <value name="x {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="y" arrayIndex="-1" isArrayIndex="false">
+                  <value name="y {equals(y,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(y,null)">
+                  </value>
+                  <value name="y {not(equals(y,null))}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(y,null))">
+                  </value>
+               </variable>
+               <variable name="n" arrayIndex="-1" isArrayIndex="false">
+                  <value name="n {true}" typeString="java.lang.NullPointerException" valueString="n_3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <variable name="message" arrayIndex="-1" isArrayIndex="false">
+                        <value name="message {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="cause" arrayIndex="-1" isArrayIndex="false">
+                        <value name="cause {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(x,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                  <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                     <value name="x {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="y" arrayIndex="-1" isArrayIndex="false">
+                     <value name="y {equals(y,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(y,null)">
+                     </value>
+                     <value name="y {not(equals(y,null))}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(y,null))">
+                     </value>
+                  </variable>
+               </termination>
+               <callStateVariable name="x" arrayIndex="-1" isArrayIndex="false">
+                  <value name="x {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </callStateVariable>
+               <callStateVariable name="y" arrayIndex="-1" isArrayIndex="false">
+                  <value name="y {equals(y,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(y,null)">
+                  </value>
+                  <value name="y {not(equals(y,null))}" typeString="ConditionalValuesTest" valueString="y" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(y,null))">
+                  </value>
+               </callStateVariable>
+            </exceptionalMethodReturn>
+         </branchCondition>
+      </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/1/0"/>
+      <methodReturnEntry path="/0/0/1/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/1/0/0"/>
+   <terminationEntry path="/0/0/1/0/0"/>
+</start>
