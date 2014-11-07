@@ -11,21 +11,10 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.core;
 
-import de.uka.ilkd.key.proof.ProofEvent;
+public interface RuleAppListener {
 
-
-public interface AutoModeListener {
-
-    /** 
-     * invoked if automatic execution has started
-     */
-    void autoModeStarted(ProofEvent e);
-    
-    /**
-     * invoked if automatic execution has stopped
-     */
-    void autoModeStopped(ProofEvent e);
-    
+    /** invoked when a rule has been applied */
+    void ruleApplied(de.uka.ilkd.key.proof.ProofEvent e);
 }

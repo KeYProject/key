@@ -11,18 +11,21 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.core;
 
-/** The KeYSelectionListener is notified if the proof or the node the
- * user works with has changed.
- */
-public interface KeYSelectionListener {
+import de.uka.ilkd.key.proof.ProofEvent;
 
-    /** focused node has changed */
-    void selectedNodeChanged(KeYSelectionEvent e);
 
-    /** the selected proof has changed (e.g. a new proof has been
-     * loaded) */ 
-    void selectedProofChanged(KeYSelectionEvent e);
+public interface AutoModeListener {
 
+    /** 
+     * invoked if automatic execution has started
+     */
+    void autoModeStarted(ProofEvent e);
+    
+    /**
+     * invoked if automatic execution has stopped
+     */
+    void autoModeStopped(ProofEvent e);
+    
 }

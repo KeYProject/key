@@ -11,29 +11,19 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-/** an event that indicates gui actions */
-package de.uka.ilkd.key.gui;
-import java.util.EventObject;
+package de.uka.ilkd.key.core;
 
-public class GUIEvent extends EventObject {
-    
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -7158097246804870506L;
 
-    /** creates a new gui event 
-     * @param source Object that is the source of the event
-     */
-    public GUIEvent(Object source) {
-	super(source);
-    }
+/** The KeYSelectionListener is notified if the proof or the node the
+ * user works with has changed.
+ */
+public interface KeYSelectionListener {
 
-    /** the source that caused the event 
-     * @return the source that caused the event 
-     */
-    public Object getSource() {
-	return super.getSource();
-    }
+    /** focused node has changed */
+    void selectedNodeChanged(KeYSelectionEvent e);
+
+    /** the selected proof has changed (e.g. a new proof has been
+     * loaded) */ 
+    void selectedProofChanged(KeYSelectionEvent e);
 
 }

@@ -26,6 +26,7 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.pp.NotationInfo;

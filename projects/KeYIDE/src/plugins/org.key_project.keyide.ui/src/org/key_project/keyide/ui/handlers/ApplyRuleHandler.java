@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.Event;
 import org.key_project.keyide.ui.editor.BuiltInRuleCommandContributionItem;
 import org.key_project.keyide.ui.editor.TacletCommandContributionItem;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.TacletApp;

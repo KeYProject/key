@@ -11,8 +11,9 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.core;
 
+import java.util.EventObject;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -23,6 +24,10 @@ import javax.swing.event.EventListenerList;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
+import de.uka.ilkd.key.gui.GUIListener;
+import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
+import de.uka.ilkd.key.gui.TacletMatchCompletionDialog;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
@@ -30,7 +35,6 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
@@ -65,6 +69,7 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.ThreadUtilities;
 
 
 public class KeYMediator {
@@ -330,7 +335,7 @@ public class KeYMediator {
             Runnable swingProzac = new Runnable() {
                public void run() { setProofHelper(pp); }
             };
-            GuiUtilities.invokeAndWait(swingProzac);
+            ThreadUtilities.invokeAndWait(swingProzac);
         }
     }
 
@@ -668,21 +673,21 @@ public class KeYMediator {
      * @param src Object that is the asking component
      */
     public synchronized void requestModalAccess(Object src) {
-	fireModalDialogOpened(new GUIEvent(src));
+	fireModalDialogOpened(new EventObject(src));
     }
 
     /** called if no more modal access is needed
     * @param src Object that is the asking component
      */
     public synchronized void freeModalAccess(Object src) {
-	fireModalDialogClosed(new GUIEvent(src));
+	fireModalDialogClosed(new EventObject(src));
     }
 
     /** fires the request of a GUI component for modal access
      * this can be used to disable all views even if the GUI component
      * has no built in modal support
      */
-    public synchronized void fireModalDialogOpened(GUIEvent e) {
+    public synchronized void fireModalDialogOpened(EventObject e) {
 	Object[] listeners = listenerList.getListenerList();
 	for (int i = listeners.length-2; i>=0; i-=2) {
 	    if (listeners[i] == GUIListener.class) {
@@ -694,7 +699,7 @@ public class KeYMediator {
     /** fires that a GUI component that has asked for modal access
      * has been closed, so views can be enabled again
      */
-    public synchronized void fireModalDialogClosed(GUIEvent e) {
+    public synchronized void fireModalDialogClosed(EventObject e) {
 	Object[] listeners = listenerList.getListenerList();
 	for (int i = listeners.length-2; i>=0; i-=2) {
 	    if (listeners[i] == GUIListener.class) {
@@ -705,7 +710,7 @@ public class KeYMediator {
 
     /** Fires the shut down event.
      */
-    public synchronized void fireShutDown(GUIEvent e) {
+    public synchronized void fireShutDown(EventObject e) {
 	Object[] listeners = listenerList.getListenerList();
 	for (int i = listeners.length-2; i>=0; i-=2) {
 	    if (listeners[i] == GUIListener.class) {
@@ -812,7 +817,7 @@ public class KeYMediator {
             }
          }
       };
-      GuiUtilities.invokeAndWait(interfaceSignaller);
+      ThreadUtilities.invokeAndWait(interfaceSignaller);
    }
 
    public void startInterface(boolean fullStop) {
@@ -828,7 +833,7 @@ public class KeYMediator {
                 keySelectionModel.fireSelectedProofChanged();
          }
       };
-      GuiUtilities.invokeAndWait(interfaceSignaller);
+      ThreadUtilities.invokeAndWait(interfaceSignaller);
    }
 
    

@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import java.awt.event.ActionListener;
 import java.io.*;

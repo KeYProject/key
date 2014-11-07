@@ -250,4 +250,4 @@ $JAVA $JAVA_OPTIONS $keysysprops \
 -Dkey.home="$KEY_HOME" \
 -Dsun.awt.exception.handler=de.uka.ilkd.key.gui.ExceptionalHandler \
 -splash:"$KEY_HOME/system/resources/de/uka/ilkd/key/gui/images/key22.gif" \
--classpath "$keyclasspath" de.uka.ilkd.key.gui.Main "$@"
+-classpath "$keyclasspath" de.uka.ilkd.key.core.Main "$@"

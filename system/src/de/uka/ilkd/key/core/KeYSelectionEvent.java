@@ -11,7 +11,8 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.core;
+
 
 /** An event that indicates that the users focused node or proof has
  * changed */ 

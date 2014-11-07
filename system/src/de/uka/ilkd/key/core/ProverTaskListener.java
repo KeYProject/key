@@ -11,7 +11,8 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.core;
+
 
 /**
  * Listener for longer tasks, which may be run in a separate worker thread.

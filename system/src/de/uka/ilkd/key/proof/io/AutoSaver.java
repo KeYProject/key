@@ -16,8 +16,8 @@ package de.uka.ilkd.key.proof.io;
 import java.io.File;
 import java.io.IOException;
 
-import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.TaskFinishedInfo;
+import de.uka.ilkd.key.core.ProverTaskListener;
+import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.Debug;
 
@@ -128,7 +128,7 @@ public class AutoSaver implements ProverTaskListener {
             // there may be concurrent changes to the proof... whatever
             public void run() {
                 try {
-                    new ProofSaver(proof, filename, de.uka.ilkd.key.gui.Main.INTERNAL_VERSION).save();
+                    new ProofSaver(proof, filename, de.uka.ilkd.key.core.Main.INTERNAL_VERSION).save();
                     Debug.out("File saved: "+filename);
                 } catch (IOException e) {
                     Debug.out("Autosaving file "+filename+" failed.",e);

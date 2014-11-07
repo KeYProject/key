@@ -14,7 +14,7 @@
 /**
  * 
  */
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.core;
 
 import de.uka.ilkd.key.proof.Proof;
 
