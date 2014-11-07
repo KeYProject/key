@@ -23,7 +23,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -67,11 +66,15 @@ import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.ObjectUtil;
 
+import recoder.ModelException;
+import recoder.parser.ParseException;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ClassTree;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.java.JavaSourceElement;
+import de.uka.ilkd.key.java.PosConvertException;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -85,6 +88,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof_references.KeYTypeUtil;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomUserInterface;
@@ -152,37 +156,90 @@ public class ProofManager {
    private void handleProblemLoaderException(ProblemLoaderException e) throws CoreException{
       IResource res = project;
       int lineNumber = -1;
-      if(e.getOrigin() != null){
-         String originPath = e.getOrigin().getFile().getAbsolutePath();
-         StringBuffer sb = new StringBuffer(e.getMessage());
-         int indexOfOriginPath = sb.indexOf(originPath);
-         if(indexOfOriginPath != -1){
-            sb.delete(0, indexOfOriginPath);
-            StringBuffer tmpSb = new StringBuffer(sb.toString().toLowerCase(Locale.US));
-            int indexOfOriginPathEnd = tmpSb.indexOf(".java") + 5;
-            if(indexOfOriginPathEnd != -1){
-               String errorFilePath = sb.substring(0, indexOfOriginPathEnd);
-               IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(errorFilePath));
-               if(file != null && file.exists()){
-                  sb.delete(0, indexOfOriginPathEnd);
-                  int indexOfLine = sb.indexOf("line ");
-                  int indexOfColumn = sb.indexOf(", column");
-                  if(indexOfLine != -1 && indexOfColumn != -1 && indexOfLine < indexOfColumn){
-                     String lineNumberStr = sb.substring(indexOfLine+5, indexOfColumn);
-                     int lineNumberInt = Integer.parseInt(lineNumberStr);
-                     if(lineNumberInt != -1){
-                        res = file;
-                        lineNumber = lineNumberInt;
-                     }
+      String markerMessage = e.getMessage();
+      if (e.getCause() instanceof PosConvertException) {
+         PosConvertException pce = (PosConvertException) e.getCause();
+         if (pce.getCause() instanceof ModelException) {
+            ModelException me = (ModelException) pce.getCause();
+            markerMessage = me.getMessage();
+         }
+         else {
+            markerMessage = pce.getMessage();
+         }
+         lineNumber = pce.getLine();
+         StringBuffer sb = new StringBuffer(markerMessage);
+         int fileIndex = sb.lastIndexOf(" in FILE:");
+         if (fileIndex >= 0) {
+            sb.delete(0, fileIndex + 9);
+            IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(sb.toString()));
+            if (file.exists()) {
+               res = file;
+            }
+         }
+      }
+      else if (e.getCause() instanceof ConvertException) {
+         ConvertException ce = (ConvertException) e.getCause();
+         if (ce.getCause() instanceof RuntimeException) {
+            RuntimeException re = (RuntimeException) ce.getCause();
+            markerMessage = re.getMessage();
+            StringBuffer sb = new StringBuffer(re.getMessage());
+            int lineBreakIndex = sb.indexOf(")\n");
+            if (lineBreakIndex >= 0) {
+               sb.delete(0, lineBreakIndex + 2);
+               int lineIndex = sb.indexOf(", line ");
+               if (lineIndex >= 0) {
+                  String pathStr = sb.substring(0, lineIndex);
+                  IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(pathStr));
+                  if (file.exists()) {
+                     res = file;
+                  }
+                  sb.delete(0, lineIndex + 7);
+                  int columnIndex = sb.indexOf(", column ");
+                  if (columnIndex >= 0) {
+                     String lineStr = sb.substring(0, columnIndex);
+                     lineNumber = Integer.parseInt(lineStr);
+                  }
+               }
+               
+            }
+         }
+         else if (ce.getCause() instanceof ParseException) {
+            ParseException pe = (ParseException) ce.getCause();
+            markerMessage = pe.getMessage();
+            StringBuffer sb = new StringBuffer(pe.getMessage());
+            int errorIndex = sb.indexOf("Error in file ");
+            if (errorIndex >= 0) {
+               sb.delete(0, 14);
+               int pathEndIndex = sb.indexOf(": ");
+               if (pathEndIndex >= 0) {
+                  String path = sb.substring(0, pathEndIndex);
+                  IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(path));
+                  if (file.exists()) {
+                     res = file;
+                  }
+                  sb.delete(0, pathEndIndex + 2);
+                  int lineIndex = sb.indexOf("\" at line ");
+                  int columnIndex = sb.indexOf(", column ");
+                  if (lineIndex >= 0 && columnIndex >= 0) {
+                     sb.delete(0, lineIndex + 10);
+                     columnIndex = sb.indexOf(", column ");
+                     String lineStr = sb.substring(0, columnIndex);
+                     lineNumber = Integer.parseInt(lineStr);
                   }
                }
             }
          }
       }
+      else if (e.getCause() instanceof SLTranslationException) {
+         SLTranslationException slte = (SLTranslationException) e.getCause();
+         res = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(new Path(slte.getFileName()));
+         lineNumber = slte.getLine();
+         markerMessage = slte.getMessage();
+      }
       synchronized (keyDelta.lock) {
          keyDelta.resetDelta();
       }
-      MarkerUtil.setProblemLoaderExceptionMarker(res, lineNumber, e.getMessage());
+      MarkerUtil.setProblemLoaderExceptionMarker(res, lineNumber, markerMessage);
    }
    
 

@@ -200,28 +200,87 @@ public class KeYResourcesUtil {
    }
    
    
-   public static boolean filterProofReference(IProofReference<?> proofReference) {
-      try {
-         KeYJavaType kjt = getKeYJavaType(proofReference);
-         if(filterKeYJavaType(kjt)){
-            return true;
-         }
-      }
-      catch (ProofReferenceException e) {
-         LogUtil.getLogger().logError(e);
-         return true;
-      }
-      return false;
-   }
-   
    public static Set<IProofReference<?>> filterProofReferences(Set<IProofReference<?>> proofReferences) {
       Set<IProofReference<?>> filteredReferences = new HashSet<IProofReference<?>>();
       for(IProofReference<?> proofReference : proofReferences){
-         if(!filterProofReference(proofReference)){
-            filteredReferences.add(proofReference);
+         try {
+            KeYJavaType kjt = getKeYJavaType(proofReference);
+            if(!filterKeYJavaType(kjt)){
+               filteredReferences.add(proofReference);
+            }
+         }
+         catch (ProofReferenceException e) {
+            LogUtil.getLogger().logError(e);
          }
       }
       return filteredReferences;
+   }
+   
+   
+   public static List<IProofReference<?>> sortProofReferences(Set<IProofReference<?>> proofReferences, String... sortOrder) {
+      if (proofReferences != null && sortOrder != null && sortOrder.length > 0) {
+         List<IProofReference<?>> sortedReferences = new LinkedList<IProofReference<?>>();
+         List<IProofReference<?>> axiomList = new LinkedList<IProofReference<?>>();
+         List<IProofReference<?>> invList = new LinkedList<IProofReference<?>>();
+         List<IProofReference<?>> accessList = new LinkedList<IProofReference<?>>();
+         List<IProofReference<?>> callMethodList = new LinkedList<IProofReference<?>>();
+         List<IProofReference<?>> inlineMethodList = new LinkedList<IProofReference<?>>();
+         List<IProofReference<?>> contractList = new LinkedList<IProofReference<?>>();
+         for (IProofReference<?> ref : proofReferences) {
+            if (IProofReference.USE_AXIOM.equals(ref.getKind())) {
+               axiomList.add(ref);
+            }
+            else if (IProofReference.USE_INVARIANT.equals(ref.getKind())) {
+               invList.add(ref);
+            }
+            else if (IProofReference.ACCESS.equals(ref.getKind())) {
+               accessList.add(ref);
+            }
+            else if (IProofReference.CALL_METHOD.equals(ref.getKind())) {
+               callMethodList.add(ref);
+            }
+            else if (IProofReference.INLINE_METHOD.equals(ref.getKind())) {
+               inlineMethodList.add(ref);
+            }
+            else if (IProofReference.USE_CONTRACT.equals(ref.getKind())) {
+               contractList.add(ref);
+            }
+         }
+         for (String kind : sortOrder) {
+            if (IProofReference.USE_AXIOM.equals(kind)) {
+               sortedReferences.addAll(axiomList);
+               axiomList = new LinkedList<IProofReference<?>>();
+            }
+            else if (IProofReference.USE_INVARIANT.equals(kind)) {
+               sortedReferences.addAll(invList);
+               invList = new LinkedList<IProofReference<?>>();
+            }
+            else if (IProofReference.ACCESS.equals(kind)) {
+               sortedReferences.addAll(accessList);
+               accessList = new LinkedList<IProofReference<?>>();
+            }
+            else if (IProofReference.CALL_METHOD.equals(kind)) {
+               sortedReferences.addAll(callMethodList);
+               callMethodList = new LinkedList<IProofReference<?>>();
+            }
+            else if (IProofReference.INLINE_METHOD.equals(kind)) {
+               sortedReferences.addAll(inlineMethodList);
+               inlineMethodList = new LinkedList<IProofReference<?>>();
+            }
+            else if (IProofReference.USE_CONTRACT.equals(kind)) {
+               sortedReferences.addAll(contractList);
+               contractList = new LinkedList<IProofReference<?>>();
+            }
+         }
+         sortedReferences.addAll(axiomList);
+         sortedReferences.addAll(invList);
+         sortedReferences.addAll(accessList);
+         sortedReferences.addAll(callMethodList);
+         sortedReferences.addAll(inlineMethodList);
+         sortedReferences.addAll(contractList);
+         return sortedReferences;
+      }
+      return null;
    }
    
    

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.key_project.key4eclipse.resources.builder.ProofElement;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
@@ -52,7 +51,7 @@ public class ProofMetaReferences {
       
    public void createFromProofElement(ProofElement pe, KeYEnvironment<?> env) {
       contract = pe.getContract().toString();
-      Set<IProofReference<?>> references = KeYResourcesUtil.filterProofReferences(pe.getProofReferences());
+      List<IProofReference<?>> references = KeYResourcesUtil.sortProofReferences(KeYResourcesUtil.filterProofReferences(pe.getProofReferences()), IProofReference.USE_AXIOM, IProofReference.USE_INVARIANT, IProofReference.ACCESS, IProofReference.CALL_METHOD, IProofReference.INLINE_METHOD, IProofReference.USE_CONTRACT);
       for(IProofReference<?> proofRef : references){
          if(IProofReference.USE_AXIOM.equals(proofRef.getKind())){
             ClassAxiom classAxiom = (ClassAxiom) proofRef.getTarget();
@@ -137,7 +136,7 @@ public class ProofMetaReferences {
             String name = methodDecl.getFullName();
             if(name.indexOf("<") == -1 || name.indexOf("<init>") >= 0){
                String methodParameters = KeYResourcesUtil.parametersToString(methodDecl.getParameters());
-               if(!containsMethod(kjt.getFullName(), name, methodParameters)){
+               if(!containsMethod(kjt.getFullName(), name, methodParameters) && !containsCallMethodOrSubImplementation(kjt.getFullName(), name, methodParameters)){
                   StringWriter sw = new StringWriter();
                   try{
                      ProofMetaReferencesPrettyPrinter pp = new ProofMetaReferencesPrettyPrinter(sw, true);
@@ -162,6 +161,7 @@ public class ProofMetaReferences {
       }
    }
    
+   
    private List<ProofMetaReferenceMethod> createSubMethods(ImmutableList<KeYJavaType> subKjts, String refName, String refParameters) {
       List<ProofMetaReferenceMethod> subMethods = new LinkedList<ProofMetaReferenceMethod>();
       for(KeYJavaType kjt : subKjts){
@@ -178,7 +178,7 @@ public class ProofMetaReferences {
                      StringWriter sw = new StringWriter();
                      try{
                         ProofMetaReferencesPrettyPrinter pp = new ProofMetaReferencesPrettyPrinter(sw, true);
-                        pp.printMethodDeclaration(methodDecl);
+                        pp.printInlineMethodDeclaration(methodDecl);
                      }
                      catch (IOException e){
                         LogUtil.getLogger().logError(e);
@@ -193,6 +193,7 @@ public class ProofMetaReferences {
       }
       return subMethods;
    }
+   
    
    private boolean containsAccess(String kjt, String name){
       for(ProofMetaReferenceAccess access : accesses){
@@ -213,9 +214,25 @@ public class ProofMetaReferences {
    }
    
    private boolean containsCallMethod(String kjt, String methodName, String parameters){
-      for(ProofMetaReferenceMethod method : callMethods){
+      for(ProofMetaReferenceCallMethod method : callMethods){
          if(method.getKjt().equals(kjt) && method.getName().equals(methodName) && method.getParameters().equals(parameters)){
             return true;
+         }
+      }
+      return false;
+   }
+   
+   private boolean containsCallMethodOrSubImplementation(String kjt, String methodName, String parameters) {
+      for(ProofMetaReferenceCallMethod method : callMethods){
+         if(method.getKjt().equals(kjt) && method.getName().equals(methodName) && method.getParameters().equals(parameters)){
+            return true;
+         }
+         else {
+            for(ProofMetaReferenceMethod subImpl : method.getSubImpl()) {
+               if(subImpl.getKjt().equals(kjt) && subImpl.getName().equals(methodName) && subImpl.getParameters().equals(parameters)){
+                  return true;
+               }
+            }
          }
       }
       return false;

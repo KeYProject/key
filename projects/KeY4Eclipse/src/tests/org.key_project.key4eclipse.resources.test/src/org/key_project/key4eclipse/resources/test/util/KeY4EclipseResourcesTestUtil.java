@@ -18,6 +18,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -331,5 +334,11 @@ public class KeY4EclipseResourcesTestUtil {
       public int getMetaFileCount() {
          return metaFileCount;
       }
+   }
+   
+   
+   public static long getCreationTime(IResource res) throws IOException {
+      BasicFileAttributes attr = Files.readAttributes(res.getLocation().toFile().toPath(), BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+      return attr.creationTime().toMillis();
    }
 }

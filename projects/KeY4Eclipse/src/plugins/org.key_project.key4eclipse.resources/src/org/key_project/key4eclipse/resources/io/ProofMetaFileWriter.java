@@ -276,8 +276,7 @@ public class ProofMetaFileWriter {
       List<ProofMetaReferenceCallMethod> callMethods = references.getCallMethods();
       List<ProofMetaReferenceMethod> inlineMethods = references.getInlineMethods();
       List<ProofMetaReferenceContract> contracts = references.getContracts();
-      if(contract != null && 
-            (axiom != null || invariant != null || !accesses.isEmpty() || !callMethods.isEmpty() || !inlineMethods.isEmpty() || !contracts.isEmpty())){
+      if(contract != null){
          Map<String, String> attributeValues = new LinkedHashMap<String, String>();
          attributeValues.put(ATTRIBUTE_REP, contract);
          XMLUtil.appendStartTag(level, TAG_REFERENCES, attributeValues, sb);

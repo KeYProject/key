@@ -47,7 +47,7 @@ public class ProofMetaReferencesComparator {
 
 
    private boolean contractChanged() {
-      if (references.getContract().equals(pe.getContract().toString())) {
+      if (pe.getContract().toString().equals(references.getContract())) {
          return false;
       }
       return true;
