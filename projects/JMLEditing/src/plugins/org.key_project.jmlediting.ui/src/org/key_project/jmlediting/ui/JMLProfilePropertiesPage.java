@@ -15,7 +15,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.key_project.jmlediting.core.IJMLProfile;
+import org.key_project.jmlediting.core.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.JMLProfileManagement;
+import org.key_project.jmlediting.core.PropertyNames;
 
 /**
  * The {@link JMLProfilePropertiesPage} implements a properties and preferences
@@ -61,7 +63,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
          @Override
          public void preferenceChange(final PreferenceChangeEvent event) {
-            updateSelection();
+            updateSelection(false);
          }
       };
    }
@@ -120,7 +122,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
          this.profilesList.add(profile.getName());
       }
 
-      this.updateSelection();
+      this.updateSelection(false);
 
       // Enable the list in preferences always and in project if project
       // specific settings are allowed
@@ -158,12 +160,12 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
    @Override
    protected void enableProjectSpecificSettings(
          boolean useProjectSpecificSettings) {
+      super.enableProjectSpecificSettings(useProjectSpecificSettings);
       if (!useProjectSpecificSettings) {
          // Reset selection to default if no project settings
-         this.updateSelection();
+         this.updateSelection(true);
       }
       this.setListEnabled(useProjectSpecificSettings);
-      super.enableProjectSpecificSettings(useProjectSpecificSettings);
    }
 
    @Override
@@ -176,59 +178,28 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       return JML_PROFILE_PROP_ID;
    }
 
-   public static class DummyJMLProfile1 implements IJMLProfile {
-
-      @Override
-      public String getName() {
-         return "DummyJMLProfile1";
-      }
-
-   }
-
-   public static class DummyJMLProfile2 implements IJMLProfile {
-
-      @Override
-      public String getName() {
-         return "DummyJMLProfile2";
-      }
-
-   }
-
    /**
     * Updates the selected profile in the list of profiles to match the profile
     * in the properties or preferences (with respect whether the pane is used
     * for preferences or properties).
     */
-   private void updateSelection() {
-      String currentProfileName = null;
-      if (this.isProjectPreferencePage() || this.useProjectSettings()) {
+   private void updateSelection(boolean forceDefault) {
+      IJMLProfile currentProfile = null;
+      if ((this.isProjectPreferencePage() || this.useProjectSettings()) &&!forceDefault) {
          // Read local project properties if we are in a properties pane and
          // project specific settings are enabled
-         try {
-            currentProfileName = this.getProject().getPersistentProperty(
-                  PropertyNames.PROFILE);
-         }
-         catch (CoreException e) {
-            currentProfileName = null;
-         }
+         currentProfile = JMLPreferencesHelper.getProjectJMLProfile(this
+               .getProject());
       }
       // Read from global preferences if no project specific profile is set
-      if (currentProfileName == null) {
+      if (currentProfile == null) {
          // Gobal preferences
-         IEclipsePreferences preferences = InstanceScope.INSTANCE
-               .getNode(Activator.PLUGIN_ID);
-         currentProfileName = preferences.get(
-               PropertyNames.DEFAULT_JML_PROFILE, null);
+         currentProfile = JMLPreferencesHelper.getDefaultJMLProfile();
 
       }
-
-      // Read the profile, if no profile found, use the first one if available
-      IJMLProfile currentProfile = null;
-      if (currentProfileName != null) {
-         currentProfile = JMLProfileManagement
-               .getProfileFromClassName(currentProfileName);
-      }
-      else if (this.allProfiles.size() > 0) {
+      
+      //if no profile found, use the first one if available
+      if (currentProfile == null && this.allProfiles.size() > 0) {
          currentProfile = this.allProfiles.get(0);
       }
       // Select profile in the list
@@ -265,16 +236,16 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       preferences
             .removePreferenceChangeListener(this.currentPreferenceListener);
 
-      String selectedProfileName = null;
+      IJMLProfile selectedProfile = null;
       if (this.profilesList.getSelectionIndex() >= 0) {
          // Can only have one selection
-         selectedProfileName = this.allProfiles
-               .get(this.profilesList.getSelectionIndex()).getClass().getName();
+         selectedProfile = this.allProfiles.get(this.profilesList
+               .getSelectionIndex());
       }
 
       // Only write into properties if a selection is available (user is forced
-      // to)
-      if (selectedProfileName == null) {
+      // to),
+      if (selectedProfile == null && !this.useProjectSettings()) {
          return false;
       }
 
@@ -283,13 +254,18 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
          IProject project = this.getProject();
          try {
             if (this.useProjectSettings()) {
+               // Only write into properties if a selection is available (user
+               // is forced
+               // to)
+               if (selectedProfile == null) {
+                  return false;
+               }
                // Set property
-               project.setPersistentProperty(PropertyNames.PROFILE,
-                     selectedProfileName);
+               JMLPreferencesHelper.setProjectJMLProfile(project, selectedProfile);
             }
             else {
                // Remove property
-               project.setPersistentProperty(PropertyNames.PROFILE, null);
+               JMLPreferencesHelper.setProjectJMLProfile(project, null);
             }
          }
          catch (CoreException e) {
@@ -297,9 +273,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
          }
       }
       else {
-         // global properties
-         preferences
-               .put(PropertyNames.DEFAULT_JML_PROFILE, selectedProfileName);
+         JMLPreferencesHelper.setDefaultJMLProfile(selectedProfile);
       }
 
       return super.performOk();

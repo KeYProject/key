@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.ui;
+package org.key_project.jmlediting.core;
 
 import org.eclipse.core.runtime.QualifiedName;
 

@@ -59,7 +59,7 @@ public final class JMLProfileManagement {
          for (IConfigurationElement elem : extension.getConfigurationElements()) {
             String profileClass = elem.getAttribute("class");
             // Try to read cahe
-            IJMLProfile profile = getProfileFromClassName(profileClass);
+            IJMLProfile profile = getProfileFromCache(profileClass);
             if (profile == null) {
                try {
                   Object profileO = elem.createExecutableExtension("class");
@@ -94,9 +94,19 @@ public final class JMLProfileManagement {
       });
       return profiles;
    }
+   
+   private static IJMLProfile getProfileFromCache(String className) {
+      return profileCache.get(className);
+   }
 
    public static IJMLProfile getProfileFromClassName(String className) {
-      IJMLProfile profile = profileCache.get(className);
+      IJMLProfile profile = getProfileFromCache(className);
+      if (profile == null) {
+         // Maybe the user did not call getAvailableProfiles, so the cache is not filled up
+         // Try this
+         getAvailableProfiles();
+         profile = getProfileFromCache(className);
+      }
       return profile;
    }
 
