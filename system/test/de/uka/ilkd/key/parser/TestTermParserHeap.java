@@ -200,7 +200,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
     }
 
-    public void testQueries() throws Exception {
+    public void testQueryBasic() throws Exception {
         comparePrettySyntaxAgainstVerboseSyntax("a.query(i)", "testTermParserHeap.A::query(heap, a, i)");
         comparePrettySyntaxAgainstVerboseSyntax("a.query(i)@h", "testTermParserHeap.A::query(h, a, i)");
         comparePrettySyntaxAgainstVerboseSyntax("a.query(a.f)@h", "testTermParserHeap.A::query(h, a, "
@@ -226,7 +226,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
                 + "testTermParserHeap.A::select(heap, a, testTermParserHeap.A::$next))");
     }
 
-    public void testQueriesInheritance() throws Exception {
+    public void testQueryInheritance() throws Exception {
         compareStringRepresentationAgainstTermRepresentation("a.query(i)",
                 parseTerm("testTermParserHeap.A::query(heap, a, i)"),
                 "a.(testTermParserHeap.A::query)(i)");

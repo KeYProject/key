@@ -844,7 +844,7 @@ options {
                         "\\javaSource section.");
                 }
                 // WATCHOUT why not in DECLARATION MODE	   
-                if(!isDeclParser()) {			      	
+                if(!isDeclParser()) {
                     ProgramVariable var = javaInfo.getCanonicalFieldProgramVariable(attributeName, prefixKJT);
                     if (var == null) {
                         LogicVariable logicalvar = (LogicVariable)namespaces().variables().lookup(attributeName);
@@ -877,7 +877,7 @@ options {
             if (!inSchemaMode()) {
                 semanticError("Schemavariables may only occur inside taclets.");
             }
-	    SchemaVariable sv = (SchemaVariable) attribute;            
+            SchemaVariable sv = (SchemaVariable) attribute;            
             if(sv.sort() instanceof ProgramSVSort 
                 || sv.sort() == AbstractTermTransformer.METASORT) {
                 semanticError("Cannot use schema variable " + sv + " as an attribute"); 
