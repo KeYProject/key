@@ -2699,7 +2699,7 @@ term110 returns [Term _term110 = null]
 @after { _term110 = result; }
     :
         (
-            ( LBRACE ~LPAREN ) => result = update_or_substitution |
+            result = braces_term |
             result = accessterm
         ) 
         {
@@ -3080,8 +3080,6 @@ atom returns [Term _atom = null]
     |   LPAREN a = term RPAREN
     |   TRUE  { a = getTermFactory().createTerm(Junctor.TRUE); }
     |   FALSE { a = getTermFactory().createTerm(Junctor.FALSE); }
-    |   LBRACE LPAREN obj=equivalence_term COMMA field=equivalence_term RPAREN RBRACE
-            { a = getServices().getTermBuilder().singleton(obj, field); }
     |   a = ifThenElseTerm
     |   a = ifExThenElseTerm
     |   literal=STRING_LITERAL
@@ -3250,13 +3248,24 @@ quantifierterm returns [Term _quantifier_term = null]
         }
 ;
 
-//term120_2
-update_or_substitution returns [Term _update_or_substitution = null]
+/*
+ * A term that is surrounded by braces: {}
+ */
+braces_term returns [Term _update_or_substitution = null]
 @after{ _update_or_substitution = result; }
 :
       (LBRACE SUBST) => result = substitutionterm
+      | (LBRACE LPAREN) => result = locset_term
       |  result = updateterm
-    ; 
+    ;
+    
+locset_term returns [Term result]
+    :
+    LBRACE LPAREN obj=equivalence_term COMMA field=equivalence_term RPAREN RBRACE
+            { $result = getServices().getTermBuilder().singleton(obj, field); }
+    ;
+
+
 
 substitutionterm returns [Term _substitution_term = null] 
 @init{
