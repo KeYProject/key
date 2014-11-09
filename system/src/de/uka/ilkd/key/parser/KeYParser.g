@@ -3255,13 +3255,21 @@ braces_term returns [Term _update_or_substitution = null]
 @after{ _update_or_substitution = result; }
 :
       (LBRACE SUBST) => result = substitutionterm
-      | (LBRACE LPAREN) => result = locset_term
+      | (LBRACE (LPAREN | RBRACE)) => result = locset_term
       |  result = updateterm
     ;
     
-locset_term returns [Term result]
+locset_term returns [Term result = getServices().getTermBuilder().empty()]
     :
-    LBRACE LPAREN obj=equivalence_term COMMA field=equivalence_term RPAREN RBRACE
+    LBRACE
+        ( l = location_term { $result = l; }
+        ( COMMA l = location_term { $result = getServices().getTermBuilder().union($result, l); } )* )?
+    RBRACE
+    ;
+    
+location_term returns[Term result]
+    :
+    LPAREN obj=equivalence_term COMMA field=equivalence_term RPAREN
             { $result = getServices().getTermBuilder().singleton(obj, field); }
     ;
 

@@ -49,9 +49,15 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     public void testLocationSets() throws IOException {
-        comparePrettySyntaxAgainstVerboseSyntax(
-                "{(a, testTermParserHeap.A::$f)}",
-                "singleton(a,testTermParserHeap.A::$f)");
+        String pp = "{(a, testTermParserHeap.A::$f)}";
+        String verbose = "singleton(a,testTermParserHeap.A::$f)";
+        comparePrettySyntaxAgainstVerboseSyntax(pp, verbose);
+
+        verifyParsing(parseTerm("empty"), "{}");
+
+        pp = "{(a, testTermParserHeap.A::$f), (a, testTermParserHeap.A::$f), (a, testTermParserHeap.A::$f)}";
+        Term expected = parseTerm("union(union(singleton(a,testTermParserHeap.A::$f),singleton(a,testTermParserHeap.A::$f)),singleton(a,testTermParserHeap.A::$f))");
+        verifyParsing(expected, pp);
     }
 
     public void testParsePrettyPrintedSelect() throws IOException {
