@@ -53,7 +53,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         String verbose = "singleton(a,testTermParserHeap.A::$f)";
         comparePrettySyntaxAgainstVerboseSyntax(pp, verbose);
 
-        verifyParsing(parseTerm("empty"), "{}");
+        comparePrettySyntaxAgainstVerboseSyntax("{}", "empty");
 
         pp = "{(a, testTermParserHeap.A::$f), (a, testTermParserHeap.A::$f), (a, testTermParserHeap.A::$f)}";
         Term expected = parseTerm("union(union(singleton(a,testTermParserHeap.A::$f),singleton(a,testTermParserHeap.A::$f)),singleton(a,testTermParserHeap.A::$f))");
@@ -75,11 +75,11 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     public void testBracketHeapUpdate() throws IOException {
-        String complicatedHeapPretty = "heap[a.f := 4][create(a)][memset(empty, 1)][anon(allLocs, heap)]";
+        String complicatedHeapPretty = "heap[a.f := 4][create(a)][memset({}, 1)][anon(allLocs, heap)]";
         String complicatedHeapVerbose = "anon(memset(create(store(heap, a, testTermParserHeap.A::$f, 4), a), empty, 1), allLocs, heap)";
         comparePrettySyntaxAgainstVerboseSyntax(complicatedHeapPretty, complicatedHeapVerbose);
 
-        String prettySyntax = "a.f@h[anon(empty, h2)]";
+        String prettySyntax = "a.f@h[anon({}, h2)]";
         String verboseSyntax = "int::select(anon(h, empty, h2), a, testTermParserHeap.A::$f)";
         comparePrettySyntaxAgainstVerboseSyntax(prettySyntax, verboseSyntax);
 
