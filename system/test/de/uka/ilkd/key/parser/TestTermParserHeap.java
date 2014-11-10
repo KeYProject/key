@@ -239,8 +239,9 @@ public class TestTermParserHeap extends AbstractTestTermParser {
                 parseTerm("testTermParserHeap.A1::queryRedefined(heap, a1)"),
                 "a1.(testTermParserHeap.A1::queryRedefined)()");
 
-//        compareStringRepresentationAgainstTermRepresentation("a1.(testTermParserHeap.A::queryRedefined)()",
-//                parseTerm("testTermParserHeap.A::queryRedefined(heap, a1)"));
+        compareStringRepresentationAgainstTermRepresentation("a1.(testTermParserHeap.A::queryRedefined)()",
+                parseTerm("testTermParserHeap.A::queryRedefined(heap, a1)"));
+        
 //        compareStringRepresentationAgainstTermRepresentation("a1.queryOverridden()",
 //                parseTerm("testTermParserHeap.A::queryOverridden(heap, a1)"));
     }

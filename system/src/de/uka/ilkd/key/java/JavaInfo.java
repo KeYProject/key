@@ -542,6 +542,36 @@ public final class JavaInfo {
         return kpmi.getProgramMethod(classType, methodName, signature, context);
     }
 
+    public IProgramMethod getProgramMethod(KeYJavaType classType,
+            String methodName,
+            ImmutableArray<? extends Type> signature,
+            KeYJavaType context) {
+        return getProgramMethod(classType, methodName, signature.toImmutableList(), context);
+    }
+    
+    /**
+     * returns the program method defined in the KeYJavaType of the program
+     * variable clv, with the name m, and the KeYJavaTypes of the given array
+     * of program variables as signatures.
+     * @param classType the KeYJavaType of the class where to look for the
+     *  method
+     * @param methodName the name of the method
+     * @param args an array of ProgramVariables as the arguments of the
+     * method
+     * @param context the KeYJavaType of the class context from <em>where</em>
+     *  the method is called
+     * @return a matching program method
+     */
+    public IProgramMethod getProgramMethod(KeYJavaType classType,
+	    				  String methodName,
+	    				  ProgramVariable[] args,
+	    				  KeYJavaType context){
+        ImmutableList<Type> types = ImmutableSLList.<Type>nil();
+        for (int i = args.length - 1; i>=0; i--) {
+            types = types.prepend(args[i].getKeYJavaType());
+        }
+        return getProgramMethod(classType, methodName, types, context);
+    }
 
     public IProgramMethod getToplevelPM(KeYJavaType kjt,
 	    			       String methodName,
@@ -672,31 +702,6 @@ public final class JavaInfo {
 	}
 
         return result;
-    }
-
-
-    /**
-     * returns the program method defined in the KeYJavaType of the program
-     * variable clv, with the name m, and the KeYJavaTypes of the given array
-     * of program variables as signatures.
-     * @param classType the KeYJavaType of the class where to look for the
-     *  method
-     * @param methodName the name of the method
-     * @param args an array of ProgramVariables as the arguments of the
-     * method
-     * @param context the KeYJavaType of the class context from <em>where</em>
-     *  the method is called
-     * @return a matching program method
-     */
-    public IProgramMethod getProgramMethod(KeYJavaType classType,
-	    				  String methodName,
-	    				  ProgramVariable[] args,
-	    				  KeYJavaType context){
-        ImmutableList<Type> types = ImmutableSLList.<Type>nil();
-        for (int i = args.length - 1; i>=0; i--) {
-            types = types.prepend(args[i].getKeYJavaType());
-        }
-        return getProgramMethod(classType, methodName, types, context);
     }
 
     /** gets an array of expression and returns a list of types */
@@ -1351,6 +1356,14 @@ public final class JavaInfo {
            staticInvs.put(target, inv);
         }
         return inv;
+    }
+
+    public boolean isCanonicalProgramMethod(IProgramMethod method, KeYJavaType context) {
+        String name = method.getName().toString();
+        KeYJavaType containerType = method.getContainerType();
+        ImmutableArray<KeYJavaType> paramTypes = method.getParamTypes();
+        IProgramMethod canonicalMethod = getProgramMethod(containerType, name, paramTypes, context);
+        return method.equals(canonicalMethod);
     }
 
     /**
