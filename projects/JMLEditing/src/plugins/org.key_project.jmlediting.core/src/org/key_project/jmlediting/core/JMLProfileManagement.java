@@ -1,6 +1,5 @@
 package org.key_project.jmlediting.core;
 
-import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -22,8 +21,20 @@ import org.eclipse.core.runtime.Platform;
  * @author Moritz Lichter
  *
  */
-public class JMLProfileManagement {
+public final class JMLProfileManagement {
 
+   /**
+    * Private constructor to prohibit creating objects of this class.
+    */
+   private JMLProfileManagement() {
+
+   }
+
+   /**
+    * A map implementing a cache for the profile objects. The cache caches the
+    * created object for class names of the configuration. The cache also
+    * ensures that only one profile objects exists for a class.
+    */
    private static Map<String, IJMLProfile> profileCache = new HashMap<String, IJMLProfile>();
 
    /**
@@ -48,7 +59,7 @@ public class JMLProfileManagement {
          for (IConfigurationElement elem : extension.getConfigurationElements()) {
             String profileClass = elem.getAttribute("class");
             // Try to read cahe
-            IJMLProfile profile = getProfileFromClassName(profileClass);
+            IJMLProfile profile = getProfileFromCache(profileClass);
             if (profile == null) {
                try {
                   Object profileO = elem.createExecutableExtension("class");
@@ -77,15 +88,25 @@ public class JMLProfileManagement {
       Collections.sort(profiles, new Comparator<IJMLProfile>() {
 
          @Override
-         public int compare(IJMLProfile o1, IJMLProfile o2) {
+         public int compare(final IJMLProfile o1, final IJMLProfile o2) {
             return o1.getName().compareTo(o2.getName());
          }
       });
       return profiles;
    }
+   
+   private static IJMLProfile getProfileFromCache(String className) {
+      return profileCache.get(className);
+   }
 
    public static IJMLProfile getProfileFromClassName(String className) {
-      IJMLProfile profile = profileCache.get(className);
+      IJMLProfile profile = getProfileFromCache(className);
+      if (profile == null) {
+         // Maybe the user did not call getAvailableProfiles, so the cache is not filled up
+         // Try this
+         getAvailableProfiles();
+         profile = getProfileFromCache(className);
+      }
       return profile;
    }
 
