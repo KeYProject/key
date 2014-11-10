@@ -972,54 +972,28 @@ public final class JavaInfo {
     }
     
     /*
-     Traverses the type hierarchy to find the first {@link KeYJavaType} in which
-     a field of name {@code fieldName} is declared, starting from parameter {@code kjt}. And
-     then returns a {@link ProgramVariable} for that field/type combination.
+     * Traverses the type hierarchy to find the first {@link KeYJavaType} in which
+     * a field of name {@code fieldName} is declared, starting from parameter {@code kjt}. And
+     * then returns a {@link ProgramVariable} for that field/type combination.
     
-     Type detection in this method is canonical, i.e. selecting a field of name
-     {@code fieldName} on an object of (dynamic) type {@code kjt} during Java program
-     execution would end up in the same type as the type of the returned {@link ProgramVariable}.
+     * Type detection in this method is canonical, i.e. selecting a field of name
+     * {@code fieldName} on an object of (dynamic) type {@code kjt} during Java program
+     * execution would end up in the same type as the type of the returned {@link ProgramVariable}.
      */
     public ProgramVariable getCanonicalFieldProgramVariable(String fieldName, KeYJavaType kjt) {
-
-        ImmutableList<ProgramVariable> result = ImmutableSLList.<ProgramVariable>nil();
-
-        if (!(kjt.getSort().extendsTrans(objectSort()))) {
-            return null;
-        }
-
+        ImmutableList<ProgramVariable> allAttributes = getAllAttributes(fieldName, kjt, false);
         if (kjt.getJavaType() instanceof ArrayType) {
-            ProgramVariable var = find(fieldName, getFields(((ArrayDeclaration) kjt.getJavaType())
-                    .getMembers()));
-            if (var != null) {
-                result = result.prepend(var);
-            }
-            var = getAttribute(fieldName, getJavaLangObject());
-            if (var != null) {
-                result = result.prepend(var);
-            }
-            return result.head();
+            return allAttributes.head();
+        } else {
+            return allAttributes.reverse().head();
         }
-
-        // the assert statements below are not for fun, some methods rely
-        // on the correct order
-        ImmutableList<KeYJavaType> hierarchy = kpmi.getAllSupertypes(kjt);
-        assert hierarchy.head() == kjt;
-
-        final Iterator<KeYJavaType> it = hierarchy.iterator();
-        while (it.hasNext()) {
-            KeYJavaType st = it.next();
-            if (st != null) {
-                final ProgramVariable var = getAttribute(fieldName, st);
-                if (var != null) {
-                    return var;
-                }
-            }
-        }
-
-        return null;
     }
 
+    public ImmutableList<ProgramVariable> getAllAttributes(String programName,
+                                                  KeYJavaType type) {
+        return getAllAttributes(programName, type, true);
+    }
+    
     /**
      * returns a list of all attributes with the given program name
      * declared in one of <tt>type</tt>'s sub- or supertype including
@@ -1032,10 +1006,15 @@ public final class JavaInfo {
      * in a program
      * @param type the KeYJavaType specifying the part of the hierarchy
      * where to look for
+     * @param traverseSubtypes The method will visit subtypes of {@code type}
+     * while traversing its type hierarchy iff this is set to true. Otherwise
+     * only supertypes will be visited.
      * @return list of found attributes with name <tt>programName</tt>
      */
     public ImmutableList<ProgramVariable> getAllAttributes(String programName,
-                                                  KeYJavaType type) {
+                                                  KeYJavaType type,
+                                                  boolean traverseSubtypes) {
+        
         ImmutableList<ProgramVariable> result =
             ImmutableSLList.<ProgramVariable>nil();
 
@@ -1056,8 +1035,11 @@ public final class JavaInfo {
 
         // the assert statements below are not for fun, some methods rely
         // on the correct order
-        ImmutableList<KeYJavaType> hierarchy = kpmi.getAllSubtypes(type);
-        assert !hierarchy.contains(type);
+        ImmutableList<KeYJavaType> hierarchy = ImmutableSLList.<KeYJavaType>nil();
+        if (traverseSubtypes) {
+            hierarchy = kpmi.getAllSubtypes(type);
+            assert !hierarchy.contains(type);
+        }
 
         hierarchy = hierarchy.prepend(kpmi.getAllSupertypes(type));
         assert hierarchy.head() == type;
