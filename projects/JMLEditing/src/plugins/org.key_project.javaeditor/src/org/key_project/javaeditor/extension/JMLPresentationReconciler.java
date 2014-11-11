@@ -1,0 +1,59 @@
+package org.key_project.javaeditor.extension;
+
+import org.eclipse.jface.text.TextAttribute;
+import org.eclipse.jface.text.presentation.IPresentationDamager;
+import org.eclipse.jface.text.presentation.IPresentationReconciler;
+import org.eclipse.jface.text.presentation.IPresentationRepairer;
+import org.eclipse.jface.text.presentation.PresentationReconciler;
+import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
+import org.eclipse.swt.graphics.Color;
+
+public class JMLPresentationReconciler extends PresentationReconciler {
+   /**
+    * the {@link IPresentationReconciler} the JavaEditor is using
+    */
+   private IPresentationReconciler javaEditorPresentationReconciler;
+   
+   /**
+    * Creates an Instance of JMLPresentationReconciler
+    * @param javaEditorPresentationReconciler the IPresentationReconciler the javaEditor uses
+    */
+   public JMLPresentationReconciler(IPresentationReconciler javaEditorPresentationReconciler) {
+      super();
+      this.javaEditorPresentationReconciler=javaEditorPresentationReconciler;
+      DefaultDamagerRepairer dr= new DefaultDamagerRepairer(new SingleTokenScanner(new TextAttribute(Color.ORANGE)));
+      
+   }
+   
+   /**
+    * Returns a damager for the requested ContentType, redirects to the OriginalJavaEditor Reconciler
+    * for other than JML ContentTypes
+    * @param contentType the contentType for which the Damager is requested
+    * @return a Damager for the specific Content Type
+    */
+   @Override
+   public IPresentationDamager getDamager(String contentType) {
+      if(contentType!="JMLMultiLine")
+         if(contentType!="JMLSingleLine")
+            return javaEditorPresentationReconciler.getDamager(contentType);
+         else return null; //TODO: JMLSingleLine Damager
+      return null; //TODO JMLMultiLine Damager
+   }
+   
+   /**
+    * Returns a repairer for the requestedContentType, redirects to the OriginalJavaEditor Reconciler
+    * for other than JML ContentTypes
+    * @param contentType the contentType for which the Repairer is requested
+    * @return a Repairer for the specific Content Type
+    */
+   @Override
+   public IPresentationRepairer getRepairer(String contentType) {
+      if(contentType!="JMLMultiLine")
+         if(contentType!="JMLSingleLine")
+            return javaEditorPresentationReconciler.getRepairer(contentType);
+         else return null; //TODO JML SingleLineRepairer
+      else return null; // TODO JML MultiLineRepairer
+   }
+   
+   
+}
