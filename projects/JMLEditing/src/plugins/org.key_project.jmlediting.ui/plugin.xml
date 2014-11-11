@@ -53,13 +53,35 @@
                </adapt>         
             </enabledWhen>
       </page>
+      <page
+            category="org.key_project.jmlediting.ui.jmlprojectproperties"
+            class="org.key_project.jmlediting.ui.JMLColorPropertyPreferencePage"
+            id="org.key_project.jmlediting.ui.propertypages.color"
+            name="Color">
+         <enabledWhen>
+            <adapt
+                  type="org.eclipse.core.resources.IProject">
+               <test
+                     property="org.eclipse.core.resources.projectNature"
+                     value="org.eclipse.jdt.core.javanature">
+               </test>
+            </adapt>
+         </enabledWhen>
+      </page>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
+            category="org.eclipse.jdt.ui.preferences.JavaBasePreferencePage"
             class="org.key_project.jmlediting.ui.JMLProfilePropertiesPage"
             id="org.key_project.jmlediting.ui.preferences.profile"
-            name="Profile">
+            name="JMLProfile">
+      </page>
+      <page
+            category="org.key_project.jmlediting.ui.preferences.profile"
+            class="org.key_project.jmlediting.ui.JMLColorPropertyPreferencePage"
+            id="org.key_project.jmlediting.ui.preferences.color"
+            name="Color">
       </page>
    </extension>
 
