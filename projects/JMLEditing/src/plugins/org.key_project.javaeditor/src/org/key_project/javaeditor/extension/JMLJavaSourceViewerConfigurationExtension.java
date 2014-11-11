@@ -122,18 +122,15 @@ public class JMLJavaSourceViewerConfigurationExtension implements
    }
 
    /**
+    * creates a JMLPresentationReconciler based on the currentResult and returns it
     *@{inheritDoc}
     */
    @Override
    public IPresentationReconciler getPresentationReconciler(
          ISourceViewer sourceViewer, IPresentationReconciler currentResult) {
     //TODO: create PresentationReconciler, install damagers and Repairers for JML ContentTypes
-      PresentationReconciler presReconciler = new PresentationReconciler(); //new Reconciler to Modify
-      /* NEED: access to configured ContentTypes of JavaSourceViewerConfiguration
-         to get Damager and Repairers of currentResult, to add them to reconciler
-         Problem: original Config is not accessible via the Extension.
-      */
-      return presReconciler;
+      JMLPresentationReconciler JMLReconciler = new JMLPresentationReconciler(currentResult);
+      return JMLReconciler;
    }
 
    /**
