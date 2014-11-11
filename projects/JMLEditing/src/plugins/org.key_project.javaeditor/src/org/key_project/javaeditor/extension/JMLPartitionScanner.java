@@ -22,6 +22,7 @@ public class JMLPartitionScanner extends RuleBasedPartitionScanner{
     */
    static final String JMLSingleLine = "JML_SINGLE_LINE";
    
+   @SuppressWarnings({ "rawtypes", "unchecked" })
    public JMLPartitionScanner(){
       super();
       IToken singleLineJML = new Token(JMLSingleLine);
