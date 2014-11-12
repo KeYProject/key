@@ -2398,7 +2398,11 @@ public final class SymbolicExecutionUtil {
                                                               Term additionalAntecedent,
                                                               Term newSuccedent,
                                                               boolean addResultLabel) {
-      return createSequentToProveWithNewSuccedent(node, node.getAppliedRuleApp().posInOccurrence(), additionalAntecedent, newSuccedent, addResultLabel);
+      return createSequentToProveWithNewSuccedent(node, 
+                                                  node.getAppliedRuleApp() != null ? node.getAppliedRuleApp().posInOccurrence() : null, 
+                                                  additionalAntecedent, 
+                                                  newSuccedent, 
+                                                  addResultLabel);
    }
 
    /**

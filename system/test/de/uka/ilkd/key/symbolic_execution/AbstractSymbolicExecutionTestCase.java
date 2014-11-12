@@ -1850,22 +1850,22 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ProblemLoaderException Occurred Exception
     */
    protected SymbolicExecutionEnvironment<CustomUserInterface> doSETTest(File baseDir,
-                                                                                String javaPathInBaseDir,
-                                                                                String baseContractName,
-                                                                                String oraclePathInBaseDirFile,
-                                                                                boolean includeConstraints,
-                                                                                boolean includeVariables,
-                                                                                boolean includeCallStack,
-                                                                                boolean includeReturnValues,
-                                                                                int maximalNumberOfExecutedSetNodes,
-                                                                                boolean mergeBranchConditions,
-                                                                                boolean useOperationContracts,
-                                                                                boolean useLoopInvariants,
-                                                                                boolean nonExecutionBranchHidingSideProofs,
-                                                                                boolean aliasChecks,
-                                                                                boolean useUnicode,
-                                                                                boolean usePrettyPrinting,
-                                                                                boolean variablesAreOnlyComputedFromUpdates) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+                                                                         String javaPathInBaseDir,
+                                                                         String baseContractName,
+                                                                         String oraclePathInBaseDirFile,
+                                                                         boolean includeConstraints,
+                                                                         boolean includeVariables,
+                                                                         boolean includeCallStack,
+                                                                         boolean includeReturnValues,
+                                                                         int maximalNumberOfExecutedSetNodes,
+                                                                         boolean mergeBranchConditions,
+                                                                         boolean useOperationContracts,
+                                                                         boolean useLoopInvariants,
+                                                                         boolean nonExecutionBranchHidingSideProofs,
+                                                                         boolean aliasChecks,
+                                                                         boolean useUnicode,
+                                                                         boolean usePrettyPrinting,
+                                                                         boolean variablesAreOnlyComputedFromUpdates) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       HashMap<String, String> originalTacletOptions = null;
       try {
          // Make sure that parameter are valid.
