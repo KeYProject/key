@@ -7,8 +7,8 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.junit.Test;
-import org.key_project.jmlediting.core.IJMLProfile;
-import org.key_project.jmlediting.core.JMLProfileManagement;
+import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 
 public class JMLProfileManagementTest {
 

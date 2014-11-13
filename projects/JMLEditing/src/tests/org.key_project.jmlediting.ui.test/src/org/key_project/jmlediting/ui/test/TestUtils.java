@@ -16,7 +16,8 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotList;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.key_project.jmlediting.core.IJMLProfile;
+import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.ui.test.preferencepages.ProfilePropertiesTest;
 
 public class TestUtils {
 

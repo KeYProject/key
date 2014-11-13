@@ -33,8 +33,8 @@
    <extension
          point="org.eclipse.ui.propertyPages">
       <page
-            class="org.key_project.jmlediting.ui.JMLProjectPropertiesPage"
-            id="org.key_project.jmlediting.ui.jmlprojectproperties"
+            class="org.key_project.jmlediting.ui.preferencepages.JMLProjectPropertiesPage"
+            id="org.key_project.jmlediting.ui.properties.jml"
             name="JML">
             <enabledWhen>
                <adapt type="org.eclipse.core.resources.IProject">
@@ -43,10 +43,10 @@
             </enabledWhen>
       </page>
       <page
-            class="org.key_project.jmlediting.ui.JMLProfilePropertiesPage"
-            id="org.key_project.jmlediting.ui.propertypages.profile"
+            class="org.key_project.jmlediting.ui.preferencepages.JMLProfilePropertiesPage"
+            id="org.key_project.jmlediting.ui.properties.profile"
             name="Profile"
-            category="org.key_project.jmlediting.ui.jmlprojectproperties">
+            category="org.key_project.jmlediting.ui.properties.jml">
             <enabledWhen>
                <adapt type="org.eclipse.core.resources.IProject">
                   <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.jdt.core.javanature"/>
@@ -54,9 +54,9 @@
             </enabledWhen>
       </page>
       <page
-            category="org.key_project.jmlediting.ui.jmlprojectproperties"
-            class="org.key_project.jmlediting.ui.JMLColorPropertyPreferencePage"
-            id="org.key_project.jmlediting.ui.propertypages.color"
+            category="org.key_project.jmlediting.ui.properties.jml"
+            class="org.key_project.jmlediting.ui.preferencepages.JMLColorPropertyPreferencePage"
+            id="org.key_project.jmlediting.ui.properties.color"
             name="Color">
          <enabledWhen>
             <adapt
@@ -72,14 +72,19 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            category="org.eclipse.jdt.ui.preferences.JavaBasePreferencePage"
-            class="org.key_project.jmlediting.ui.JMLProfilePropertiesPage"
-            id="org.key_project.jmlediting.ui.preferences.profile"
-            name="JMLProfile">
+            class="org.key_project.jmlediting.ui.preferencepages.JMLProjectPropertiesPage"
+            id="org.key_project.jmlediting.ui.preferences.jml"
+            name="JML">
       </page>
       <page
-            category="org.key_project.jmlediting.ui.preferences.profile"
-            class="org.key_project.jmlediting.ui.JMLColorPropertyPreferencePage"
+            category="org.key_project.jmlediting.ui.preferences.jml"
+            class="org.key_project.jmlediting.ui.preferencepages.JMLProfilePropertiesPage"
+            id="org.key_project.jmlediting.ui.preferences.profile"
+            name="Profile">
+      </page>
+      <page
+            category="org.key_project.jmlediting.ui.preferences.jml"
+            class="org.key_project.jmlediting.ui.preferencepages.JMLColorPropertyPreferencePage"
             id="org.key_project.jmlediting.ui.preferences.color"
             name="Color">
       </page>

@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.core;
+package org.key_project.jmlediting.core.profile;
 
 /**
  * Defines a profile for a JML variant.

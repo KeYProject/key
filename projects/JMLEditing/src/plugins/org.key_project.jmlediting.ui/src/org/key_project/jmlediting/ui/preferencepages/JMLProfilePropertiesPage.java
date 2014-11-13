@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.ui;
+package org.key_project.jmlediting.ui.preferencepages;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -14,10 +14,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
-import org.key_project.jmlediting.core.IJMLProfile;
-import org.key_project.jmlediting.core.JMLPreferencesHelper;
-import org.key_project.jmlediting.core.JMLProfileManagement;
-import org.key_project.jmlediting.core.PropertyNames;
+import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
+import org.key_project.jmlediting.core.profile.JMLProfileManagement;
+import org.key_project.jmlediting.ui.Activator;
 
 /**
  * The {@link JMLProfilePropertiesPage} implements a properties and preferences
@@ -150,12 +150,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
    @Override
    protected boolean hasProjectSpecificOptions(final IProject project) {
       // We have project specific options if a property is set on the project
-      try {
-         return project.getPersistentProperty(PropertyNames.PROFILE) != null;
-      }
-      catch (CoreException e) {
-         return false;
-      }
+     return JMLPreferencesHelper.hasProjectJMLProfile(project);
    }
 
    @Override
