@@ -21,7 +21,7 @@ import org.key_project.jmlediting.ui.test.preferencepages.ProfilePropertiesTest;
 
 public class TestUtils {
 
-   static  IProject getProjectWithName(String name) {
+   public static  IProject getProjectWithName(String name) {
       IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
       for (IProject p : projects) {
         if ( p.getName().equals(name)) {
@@ -31,31 +31,31 @@ public class TestUtils {
       return null;
    }
 
-   static void prepareWorkbench(SWTWorkbenchBot bot) {
+   public static void prepareWorkbench(SWTWorkbenchBot bot) {
      // bot.resetWorkbench();
    
       try {
+         // In the case that the welcome page opens, close it
          bot.viewByTitle("Welcome").close();
       } catch (WidgetNotFoundException e) {
-         e.printStackTrace();
       }
       
-      bot.waitUntil(waitForMenu(ProfilePropertiesTest.bot.activeShell(),
+      bot.waitUntil(waitForMenu(bot.activeShell(),
            WidgetMatcherFactory.<MenuItem>withMnemonic("File")));
    }
 
-   static IProject createEmptyJavaProject(SWTWorkbenchBot bot,String name) {
+   public static IProject createEmptyJavaProject(SWTWorkbenchBot bot,String name) {
       bot.menu("File").
       menu("New").
       menu("Java Project").click();
       bot.textWithLabel("&Project name:").setText(name);
-      SWTBotShell activeShell = ProfilePropertiesTest.bot.activeShell();
+      SWTBotShell activeShell = bot.activeShell();
       bot.button("Finish").click();
       bot.waitUntil(shellCloses(activeShell));
       return getProjectWithName(name);
    }
 
-   static  void openJMLProfileProperties(SWTWorkbenchBot bot, final String PROJECT_NAME) {
+   public static  void openJMLProfileProperties(SWTWorkbenchBot bot, final String PROJECT_NAME) {
       bot.tree().getTreeItem(PROJECT_NAME).contextMenu("Properties").click(); //.select();
       
       bot.sleep(100);
@@ -64,7 +64,7 @@ public class TestUtils {
       bot.tree().getTreeItem("JML").expand().getNode("Profile").select();
    }
 
-   static void validateProfileListSelection(IJMLProfile expectedProfile,
+   public static void validateProfileListSelection(IJMLProfile expectedProfile,
          SWTBotList profileList) {
       // Now the global default should be selected
       // Unfortunately, we only get the names of the selection from swt bot

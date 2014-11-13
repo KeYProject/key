@@ -19,7 +19,7 @@ public class ProfilePropertiesTest2 {
 
    static SWTWorkbenchBot bot = new SWTWorkbenchBot();
    
-   private static final String PROJECT_NAME = "TestProperties";
+   private static final String PROJECT_NAME = "TestProperties2";
    
    private static final List<IJMLProfile> ALL_PROFILES = JMLProfileManagement.getAvailableProfilesSortedByName();
    
