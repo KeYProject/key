@@ -834,7 +834,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertNotNull(current);
          // Compare variable
          assertEquals(expected.isArrayIndex(), current.isArrayIndex());
-         assertEquals(expected.getArrayIndex(), current.getArrayIndex());
+         assertEquals(expected.getArrayIndexString(), current.getArrayIndexString());
          assertEquals(expected.getName(), current.getName());
          // Compare parent
          if (compareParent) {

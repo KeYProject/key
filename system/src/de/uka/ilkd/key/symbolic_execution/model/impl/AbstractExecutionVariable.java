@@ -30,7 +30,7 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
    /**
     * The index in the parent array.
     */
-   private final int arrayIndex;
+   private final Term arrayIndex;
    
    /**
     * An optional additional condition to consider.
@@ -58,7 +58,7 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
                                     Node proofNode, 
                                     IProgramVariable programVariable, 
                                     IExecutionValue parentValue, 
-                                    int arrayIndex, 
+                                    Term arrayIndex, 
                                     Term additionalCondition,
                                     PosInOccurrence modalityPIO) {
       super(settings, mediator, proofNode);
@@ -87,7 +87,7 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
          return SymbolicExecutionUtil.getDisplayString(pv);
       }
       else {
-         return "[" + arrayIndex + "]";
+         return "[" + getArrayIndexString() + "]";
       }
    }
 
@@ -103,7 +103,7 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
     * {@inheritDoc}
     */
    @Override
-   public int getArrayIndex() {
+   public Term getArrayIndex() {
       return arrayIndex;
    }
 
@@ -111,8 +111,16 @@ public abstract class AbstractExecutionVariable extends AbstractExecutionElement
     * {@inheritDoc}
     */
    @Override
+   public String getArrayIndexString() {
+      return arrayIndex != null ? formatTerm(arrayIndex, getServices()) : null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public boolean isArrayIndex() {
-      return getArrayIndex() >= 0;
+      return getArrayIndex() != null;
    }
    
    /**

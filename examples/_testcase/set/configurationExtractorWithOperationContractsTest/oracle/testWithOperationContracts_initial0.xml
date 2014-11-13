@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
    <state name="One Step Simplification resulting in return add_1;">
-      <value name="exc_2" programVariable="exc_2" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
-      <value name="result_0" programVariable="result_0" isArrayIndex="false" arrayIndex="-1" value="add(Z(3(#)),ConfigurationExtractorWithOperationContractsTest_IntWrapper_value_1&lt;&lt;selectSK&gt;&gt;)" type="int"/>
-      <association name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" target="o1"/>
-      <association name="y" programVariable="y" isArrayIndex="false" arrayIndex="-1" target="o2"/>
+      <value name="exc_2" programVariable="exc_2" isArrayIndex="false" value="null" type="Null"/>
+      <value name="result_0" programVariable="result_0" isArrayIndex="false" value="add(Z(3(#)),ConfigurationExtractorWithOperationContractsTest_IntWrapper_value_1&lt;&lt;selectSK&gt;&gt;)" type="int"/>
+      <association name="x" programVariable="x" isArrayIndex="false" target="o1"/>
+      <association name="y" programVariable="y" isArrayIndex="false" target="o2"/>
    </state>
    <object xml:id="o1" name="x" type="ConfigurationExtractorWithOperationContractsTest.IntWrapper">
    </object>

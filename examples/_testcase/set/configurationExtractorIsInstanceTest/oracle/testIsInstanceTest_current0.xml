@@ -6,7 +6,7 @@
       <term term="null"/>
    </equivalenceClass>
    <state name="return 1;">
-      <value name="IsInstanceTest::A" programVariable="IsInstanceTest::A" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
-      <value name="obj" programVariable="obj" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
+      <value name="IsInstanceTest::A" programVariable="IsInstanceTest::A" isArrayIndex="false" value="null" type="Null"/>
+      <value name="obj" programVariable="obj" isArrayIndex="false" value="null" type="Null"/>
    </state>
 </model>

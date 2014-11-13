@@ -92,21 +92,21 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
    protected IExecutionVariable[] createExpectedEqualCaseVariables() {
       ExecutionNodeReader.KeYlessVariable[] result = new ExecutionNodeReader.KeYlessVariable[3];
       // self
-      result[0] = new ExecutionNodeReader.KeYlessVariable(null, false, -1, "self");
+      result[0] = new ExecutionNodeReader.KeYlessVariable(null, false, null, "self");
       ExecutionNodeReader.KeYlessValue selfValue = new ExecutionNodeReader.KeYlessValue(result[0], "Number", "self", "self {true}", false, true, "true");
       result[0].addValue(selfValue);
-      ExecutionNodeReader.KeYlessVariable selfContentVar = new ExecutionNodeReader.KeYlessVariable(selfValue, false, -1, "content");
+      ExecutionNodeReader.KeYlessVariable selfContentVar = new ExecutionNodeReader.KeYlessVariable(selfValue, false, null, "content");
       selfContentVar.addValue(new ExecutionNodeReader.KeYlessValue(selfContentVar, "int", "int::select(heap,n,Number::$content)", "content {true}", false, false, "true"));
       selfValue.addChildVariable(selfContentVar);
       // n
-      result[1] = new ExecutionNodeReader.KeYlessVariable(null, false, -1, "n");
+      result[1] = new ExecutionNodeReader.KeYlessVariable(null, false, null, "n");
       ExecutionNodeReader.KeYlessValue nValue = new ExecutionNodeReader.KeYlessValue(result[1], "Number", "n", "n {true}", false, true, "true");
       result[1].addValue(nValue);
-      ExecutionNodeReader.KeYlessVariable nContentVar = new ExecutionNodeReader.KeYlessVariable(nValue, false, -1, "content");
+      ExecutionNodeReader.KeYlessVariable nContentVar = new ExecutionNodeReader.KeYlessVariable(nValue, false, null, "content");
       nContentVar.addValue(new ExecutionNodeReader.KeYlessValue(nContentVar, "int", "int::select(heap,n,Number::$content)", "content {true}", false, false, "true"));
       nValue.addChildVariable(nContentVar);
       // exc
-      result[2] = new ExecutionNodeReader.KeYlessVariable(null, false, -1, "exc");
+      result[2] = new ExecutionNodeReader.KeYlessVariable(null, false, null, "exc");
       result[2].addValue(new ExecutionNodeReader.KeYlessValue(result[2], "Null", "null", "exc {true}", false, false, "true"));
       return result;
    }
@@ -118,21 +118,21 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
    protected IExecutionVariable[] createExpectedNotEqualCaseVariables() {
       ExecutionNodeReader.KeYlessVariable[] result = new ExecutionNodeReader.KeYlessVariable[3];
       // self
-      result[0] = new ExecutionNodeReader.KeYlessVariable(null, false, -1, "self");
+      result[0] = new ExecutionNodeReader.KeYlessVariable(null, false, null, "self");
       ExecutionNodeReader.KeYlessValue selfValue = new ExecutionNodeReader.KeYlessValue(result[0], "Number", "self", "self {true}", false, true, "true");
       result[0].addValue(selfValue);
-      ExecutionNodeReader.KeYlessVariable selfContentVar = new ExecutionNodeReader.KeYlessVariable(selfValue, false, -1, "content");
+      ExecutionNodeReader.KeYlessVariable selfContentVar = new ExecutionNodeReader.KeYlessVariable(selfValue, false, null, "content");
       selfContentVar.addValue(new ExecutionNodeReader.KeYlessValue(selfContentVar, "int", "int::select(heap,self,Number::$content)", "content {true}", false, false, "true"));
       selfValue.addChildVariable(selfContentVar);
       // n
-      result[1] = new ExecutionNodeReader.KeYlessVariable(null, false, -1, "n");
+      result[1] = new ExecutionNodeReader.KeYlessVariable(null, false, null, "n");
       ExecutionNodeReader.KeYlessValue nValue = new ExecutionNodeReader.KeYlessValue(result[1], "Number", "n", "n {true}", false, true, "true");
       result[1].addValue(nValue);
-      ExecutionNodeReader.KeYlessVariable nContentVar = new ExecutionNodeReader.KeYlessVariable(nValue, false, -1, "content");
+      ExecutionNodeReader.KeYlessVariable nContentVar = new ExecutionNodeReader.KeYlessVariable(nValue, false, null, "content");
       nContentVar.addValue(new ExecutionNodeReader.KeYlessValue(nContentVar, "int", "int::select(heap,n,Number::$content)", "content {true}", false, false, "true"));
       nValue.addChildVariable(nContentVar);
       // exc
-      result[2] = new ExecutionNodeReader.KeYlessVariable(null, false, -1, "exc");
+      result[2] = new ExecutionNodeReader.KeYlessVariable(null, false, null, "exc");
       result[2].addValue(new ExecutionNodeReader.KeYlessValue(result[2], "Null", "null", "exc {true}", false, false, "true"));
       return result;
    }
@@ -144,18 +144,18 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
    protected IExecutionVariable[] createExpectedNullCaseVariables() {
       ExecutionNodeReader.KeYlessVariable[] result = new ExecutionNodeReader.KeYlessVariable[3];
       // self
-      result[0] = new ExecutionNodeReader.KeYlessVariable(null, false, -1, "self");
+      result[0] = new ExecutionNodeReader.KeYlessVariable(null, false, null, "self");
       ExecutionNodeReader.KeYlessValue selfValue = new ExecutionNodeReader.KeYlessValue(result[0], "Number", "self", "self {true}", false, true, "true");
       result[0].addValue(selfValue);
-      ExecutionNodeReader.KeYlessVariable selfContentVar = new ExecutionNodeReader.KeYlessVariable(selfValue, false, -1, "content");
+      ExecutionNodeReader.KeYlessVariable selfContentVar = new ExecutionNodeReader.KeYlessVariable(selfValue, false, null, "content");
       selfContentVar.addValue(new ExecutionNodeReader.KeYlessValue(selfContentVar, "int", "int::select(heap,self,Number::$content)", "content {true}", false, false, "true"));
       selfValue.addChildVariable(selfContentVar);
       // n
-      result[1] = new ExecutionNodeReader.KeYlessVariable(null, false, -1, "n");
+      result[1] = new ExecutionNodeReader.KeYlessVariable(null, false, null, "n");
       ExecutionNodeReader.KeYlessValue nValue = new ExecutionNodeReader.KeYlessValue(result[1], "Null", "null", "n {true}", false, false, "true");
       result[1].addValue(nValue);
       // exc
-      result[2] = new ExecutionNodeReader.KeYlessVariable(null, false, -1, "exc");
+      result[2] = new ExecutionNodeReader.KeYlessVariable(null, false, null, "exc");
       result[2].addValue(new ExecutionNodeReader.KeYlessValue(result[2], "Null", "null", "exc {true}", false, false, "true"));
       return result;
    }

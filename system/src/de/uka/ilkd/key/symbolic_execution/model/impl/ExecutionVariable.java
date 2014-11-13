@@ -97,7 +97,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
             proofNode, 
             programVariable, 
             parentValue, 
-            -1, 
+            null, 
             additionalCondition,
             modalityPIO);
       assert programVariable != null;
@@ -118,7 +118,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
                             Node proofNode, 
                             PosInOccurrence modalityPIO, 
                             ExecutionValue parentValue, 
-                            int arrayIndex,
+                            Term arrayIndex,
                             ExecutionValue lengthValue,
                             Term additionalCondition) {
       super(parentNode.getSettings(), 
@@ -347,8 +347,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
             }
             else {
                // Special handling for array indices.
-               Term idx = services.getTermBuilder().zTerm("" + getArrayIndex());
-               return services.getTermBuilder().dotArr(parentTerm, idx);
+               return services.getTermBuilder().dotArr(parentTerm, getArrayIndex());
             }
          }
       }

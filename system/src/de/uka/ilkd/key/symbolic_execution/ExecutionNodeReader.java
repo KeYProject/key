@@ -614,7 +614,7 @@ public class ExecutionNodeReader {
                                             Attributes attributes) {
       return new KeYlessVariable(parentValue, 
                                  isArrayIndex(attributes), 
-                                 getArrayIndex(attributes), 
+                                 getArrayIndexString(attributes), 
                                  getName(attributes));
    }
    
@@ -950,8 +950,8 @@ public class ExecutionNodeReader {
     * @param attributes The {@link Attributes} which provides the content.
     * @return The value.
     */
-   protected int getArrayIndex(Attributes attributes) {
-      return Integer.parseInt(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_ARRAY_INDEX));
+   protected String getArrayIndexString(Attributes attributes) {
+      return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_ARRAY_INDEX);
    }
 
    /**
@@ -2527,7 +2527,7 @@ public class ExecutionNodeReader {
       /**
        * The array index.
        */
-      private final int arrayIndex;
+      private final String arrayIndexString;
       
       /**
        * The contained values.
@@ -2538,17 +2538,17 @@ public class ExecutionNodeReader {
        * Constructor.
        * @param parentVariable The parent {@link IExecutionValue} if available.
        * @param isArrayIndex The is array flag.
-       * @param arrayIndex The array index.
+       * @param arrayIndexString The array index.
        * @param name The name.
        */
       public KeYlessVariable(IExecutionValue parentValue, 
                              boolean isArrayIndex, 
-                             int arrayIndex, 
+                             String arrayIndexString, 
                              String name) {
          super(name);
          this.parentValue = parentValue;
          this.isArrayIndex = isArrayIndex;
-         this.arrayIndex = arrayIndex;
+         this.arrayIndexString = arrayIndexString;
       }
       
       /**
@@ -2579,8 +2579,16 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public int getArrayIndex() {
-         return arrayIndex;
+      public Term getArrayIndex() {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getArrayIndexString() {
+         return arrayIndexString;
       }
 
       /**

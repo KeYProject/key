@@ -6,6 +6,31 @@ package de.uka.ilkd.key.symbolic_execution;
  */
 public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: examples/_testcase/set/variablesVariableArrayIndex
+    */
+   public void testVariableArrayIndex() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/variablesVariableArrayIndex/test/VariableArrayIndex.java", 
+                "VariableArrayIndex", 
+                "magic", 
+                "array != null && array.length >= 1 && index >= 0 && index < array.length",
+                "examples/_testcase/set/variablesVariableArrayIndex/oracle/VariableArrayIndex.xml",
+                false,
+                true,
+                false,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                true);
+   }
+
+   /**
     * Tests example: examples/_testcase/set/variablesConditionalValuesTest
     */
    public void testVariablesConditionalValuesTest_next() throws Exception {

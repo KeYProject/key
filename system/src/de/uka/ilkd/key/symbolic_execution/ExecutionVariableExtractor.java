@@ -337,16 +337,16 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
       private final ProgramVariable programVariable;
 
       /**
-       * The array index or {@code -1} if a {@link ProgramVariable} is used instead.
+       * The array index or {@code null} if a {@link ProgramVariable} is used instead.
        */
-      private final int arrayIndex;
+      private final Term arrayIndex;
 
       /**
        * Constructor.
        * @param programVariable The {@link ProgramVariable} or {@code null} if an array index is used instead.
-       * @param arrayIndex The array index or {@code -1} if a {@link ProgramVariable} is used instead.
+       * @param arrayIndex The array index or {@code null} if a {@link ProgramVariable} is used instead.
        */
-      public LocationDefinition(ProgramVariable programVariable, int arrayIndex) {
+      public LocationDefinition(ProgramVariable programVariable, Term arrayIndex) {
          this.programVariable = programVariable;
          this.arrayIndex = arrayIndex;
       }
@@ -359,7 +359,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          if (obj instanceof LocationDefinition) {
             LocationDefinition other = (LocationDefinition)obj;
             return programVariable == other.programVariable &&
-                   arrayIndex == other.arrayIndex;
+                   JavaUtil.equals(arrayIndex, other.arrayIndex);
          }
          else {
             return false;
@@ -373,7 +373,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
       public int hashCode() {
          int result = 17;
          result = 31 * result + (programVariable != null ? programVariable.hashCode() : 0);
-         result = 31 * result + arrayIndex;
+         result = 31 * result + (arrayIndex != null ? arrayIndex.hashCode() : 0);
          return result;
       }
    }
@@ -401,7 +401,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                                     Node proofNode, 
                                     PosInOccurrence modalityPIO,
                                     IProgramVariable programVariable,
-                                    int arrayIndex,
+                                    Term arrayIndex,
                                     Term additionalCondition) {
          super(parentNode.getSettings(), 
                parentNode.getMediator(), 
@@ -467,7 +467,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                                         Node proofNode, 
                                         PosInOccurrence modalityPIO,
                                         IProgramVariable programVariable,
-                                        int arrayIndex,
+                                        Term arrayIndex,
                                         Term additionalCondition,
                                         ExtractedExecutionValue parentValue) {
          super(parentNode.getSettings(), 

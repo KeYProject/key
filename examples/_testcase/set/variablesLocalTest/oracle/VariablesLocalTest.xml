@@ -1,196 +1,196 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <variable name="heapAtPre" arrayIndex="-1" isArrayIndex="false">
+   <variable name="heapAtPre" isArrayIndex="false">
       <value name="heapAtPre {true}" typeString="Heap" valueString="heapAtPre" isValueAnObject="false" isValueUnknown="false" conditionString="true">
       </value>
    </variable>
    <methodCall name="&lt;call self.main()&gt;" pathCondition="true" pathConditionChanged="false">
-      <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+      <variable name="exc" isArrayIndex="false">
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
       <statement name="int a = 2;" pathCondition="true" pathConditionChanged="false">
-         <variable name="self" arrayIndex="-1" isArrayIndex="false">
+         <variable name="self" isArrayIndex="false">
             <value name="self {true}" typeString="VariablesLocalTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
-         <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+         <variable name="exc" isArrayIndex="false">
             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
          <statement name="int b = 3;" pathCondition="true" pathConditionChanged="false">
-            <variable name="self" arrayIndex="-1" isArrayIndex="false">
+            <variable name="self" isArrayIndex="false">
                <value name="self {true}" typeString="VariablesLocalTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+            <variable name="exc" isArrayIndex="false">
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <variable name="a" arrayIndex="-1" isArrayIndex="false">
+            <variable name="a" isArrayIndex="false">
                <value name="a {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <statement name="int sum = sum(a,b);" pathCondition="true" pathConditionChanged="false">
-               <variable name="self" arrayIndex="-1" isArrayIndex="false">
+               <variable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="VariablesLocalTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+               <variable name="exc" isArrayIndex="false">
                   <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <variable name="a" arrayIndex="-1" isArrayIndex="false">
+               <variable name="a" isArrayIndex="false">
                   <value name="a {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <variable name="b" arrayIndex="-1" isArrayIndex="false">
+               <variable name="b" isArrayIndex="false">
                   <value name="b {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <methodCall name="&lt;call self.sum(a_1,b_1)&gt;" pathCondition="true" pathConditionChanged="false">
-                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="self" isArrayIndex="false">
                      <value name="self {true}" typeString="VariablesLocalTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="exc" isArrayIndex="false">
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <variable name="a_1" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="a_1" isArrayIndex="false">
                      <value name="a_1 {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <variable name="b_1" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="b_1" isArrayIndex="false">
                      <value name="b_1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <statement name="int result = a_1+b_1;" pathCondition="true" pathConditionChanged="false">
-                     <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="self" isArrayIndex="false">
                         <value name="self {true}" typeString="VariablesLocalTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <variable name="a_1" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="a_1" isArrayIndex="false">
                         <value name="a_1 {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <variable name="b_1" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="b_1" isArrayIndex="false">
                         <value name="b_1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="exc" isArrayIndex="false">
                         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <statement name="return result_1;" pathCondition="true" pathConditionChanged="false">
-                        <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="self" isArrayIndex="false">
                            <value name="self {true}" typeString="VariablesLocalTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="a_1" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="a_1" isArrayIndex="false">
                            <value name="a_1 {true}" typeString="int" valueString="a_1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="b_1" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="b_1" isArrayIndex="false">
                            <value name="b_1 {true}" typeString="int" valueString="b_1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="exc" isArrayIndex="false">
                            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="result_1" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="result_1" isArrayIndex="false">
                            <value name="result_1 {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                         <methodReturn name="&lt;return of sum&gt;" signature="&lt;return of self.sum(a_1,b_1)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
-                           <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="self" isArrayIndex="false">
                               <value name="self {true}" typeString="VariablesLocalTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
-                           <variable name="a_1" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="a_1" isArrayIndex="false">
                               <value name="a_1 {true}" typeString="int" valueString="a_1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
-                           <variable name="b_1" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="b_1" isArrayIndex="false">
                               <value name="b_1 {true}" typeString="int" valueString="b_1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
-                           <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="exc" isArrayIndex="false">
                               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
-                           <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="x" isArrayIndex="false">
                               <value name="x {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                            <statement name="return sum_1;" pathCondition="true" pathConditionChanged="false">
-                              <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="self" isArrayIndex="false">
                                  <value name="self {true}" typeString="VariablesLocalTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
-                              <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="exc" isArrayIndex="false">
                                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
-                              <variable name="sum_1" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="sum_1" isArrayIndex="false">
                                  <value name="sum_1 {true}" typeString="int" valueString="Z(5(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
-                                 <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="self" isArrayIndex="false">
                                     <value name="self {true}" typeString="VariablesLocalTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
-                                 <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="exc" isArrayIndex="false">
                                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
-                                    <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                    <variable name="exc" isArrayIndex="false">
                                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                        </value>
                                     </variable>
                                  </termination>
-                                 <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                                 <callStateVariable name="self" isArrayIndex="false">
                                     <value name="self {true}" typeString="VariablesLocalTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </callStateVariable>
-                                 <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                 <callStateVariable name="exc" isArrayIndex="false">
                                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </callStateVariable>
-                                 <callStateVariable name="heapBefore_main" arrayIndex="-1" isArrayIndex="false">
+                                 <callStateVariable name="heapBefore_main" isArrayIndex="false">
                                     <value name="heapBefore_main {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </callStateVariable>
-                                 <callStateVariable name="savedHeapBefore_main" arrayIndex="-1" isArrayIndex="false">
+                                 <callStateVariable name="savedHeapBefore_main" isArrayIndex="false">
                                     <value name="savedHeapBefore_main {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </callStateVariable>
                               </methodReturn>
                            </statement>
-                           <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                           <callStateVariable name="self" isArrayIndex="false">
                               <value name="self {true}" typeString="VariablesLocalTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               </value>
                            </callStateVariable>
-                           <callStateVariable name="a_1" arrayIndex="-1" isArrayIndex="false">
+                           <callStateVariable name="a_1" isArrayIndex="false">
                               <value name="a_1 {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </callStateVariable>
-                           <callStateVariable name="b_1" arrayIndex="-1" isArrayIndex="false">
+                           <callStateVariable name="b_1" isArrayIndex="false">
                               <value name="b_1 {true}" typeString="int" valueString="Z(3(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </callStateVariable>
-                           <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <callStateVariable name="exc" isArrayIndex="false">
                               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </callStateVariable>
-                           <callStateVariable name="heapBefore_sum" arrayIndex="-1" isArrayIndex="false">
+                           <callStateVariable name="heapBefore_sum" isArrayIndex="false">
                               <value name="heapBefore_sum {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </callStateVariable>
-                           <callStateVariable name="savedHeapBefore_sum" arrayIndex="-1" isArrayIndex="false">
+                           <callStateVariable name="savedHeapBefore_sum" isArrayIndex="false">
                               <value name="savedHeapBefore_sum {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </callStateVariable>
