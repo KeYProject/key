@@ -28,6 +28,7 @@ import org.key_project.jmlediting.core.PropertyNames;
  * @author Moritz Lichter
  *
  */
+@SuppressWarnings("restriction")
 public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
    /**
