@@ -6,11 +6,14 @@ import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.IPresentationRepairer;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.graphics.*;
 
 public class JMLPresentationReconciler extends PresentationReconciler {
    /**
     * the {@link IPresentationReconciler} the JavaEditor is using
     */
+   private DefaultDamagerRepairer dr;
    private IPresentationReconciler javaEditorPresentationReconciler;
    
    /**
@@ -20,9 +23,11 @@ public class JMLPresentationReconciler extends PresentationReconciler {
    public JMLPresentationReconciler(IPresentationReconciler javaEditorPresentationReconciler) {
       super();
       this.javaEditorPresentationReconciler=javaEditorPresentationReconciler;
-    //  
-    DefaultDamagerRepairer dr= new DefaultDamagerRepairer(new SingleTokenScanner(new TextAttribute(null)));
-      
+      dr= new DefaultDamagerRepairer(new SingleTokenScanner(new TextAttribute(new Color(Display.getCurrent(),new RGB(200,200,200)))));
+      this.setDamager(dr, "JMLMultiline");
+      this.setDamager(dr, "JMLSingleLine");
+      this.setRepairer(dr, "JMLSingleLine");
+      this.setRepairer(dr, "JMLMultiLine");
    }
    
    /**
@@ -36,8 +41,7 @@ public class JMLPresentationReconciler extends PresentationReconciler {
       if(contentType!="JMLMultiLine")
          if(contentType!="JMLSingleLine")
             return javaEditorPresentationReconciler.getDamager(contentType);
-         else return null; //TODO: JMLSingleLine Damager
-      return null; //TODO JMLMultiLine Damager
+      return this.getDamager(contentType);
    }
    
    /**
@@ -51,8 +55,7 @@ public class JMLPresentationReconciler extends PresentationReconciler {
       if(contentType!="JMLMultiLine")
          if(contentType!="JMLSingleLine")
             return javaEditorPresentationReconciler.getRepairer(contentType);
-         else return null; //TODO JML SingleLineRepairer
-      else return null; // TODO JML MultiLineRepairer
+      return this.getRepairer(contentType);
    }
    
    

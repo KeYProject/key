@@ -30,7 +30,6 @@ public class JMLPartitionScanner extends RuleBasedPartitionScanner{
       super();
       IToken singleLineJML = new Token(JMLSingleLine);
       IToken multiLineJML = new Token(JMLMultiLine);
-      
       List rules = new ArrayList();
       
       rules.add(new EndOfLineRule("//@", singleLineJML));

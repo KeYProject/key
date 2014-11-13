@@ -2,37 +2,15 @@ package org.key_project.jmlediting.core.editor;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextAttribute;
+import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
+import org.eclipse.jface.text.rules.Token;
 
-public class SingleTokenScanner implements ITokenScanner {
+public class SingleTokenScanner extends BufferedRuleBasedScanner {
 
    public SingleTokenScanner(TextAttribute textAttribute) {
       // TODO Auto-generated constructor stub
+      setDefaultReturnToken(new Token(textAttribute));
    }
-
-   @Override
-   public void setRange(IDocument document, int offset, int length) {
-      // TODO Auto-generated method stub
-      
-   }
-
-   @Override
-   public IToken nextToken() {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
-   @Override
-   public int getTokenOffset() {
-      // TODO Auto-generated method stub
-      return 0;
-   }
-
-   @Override
-   public int getTokenLength() {
-      // TODO Auto-generated method stub
-      return 0;
-   }
-
 }

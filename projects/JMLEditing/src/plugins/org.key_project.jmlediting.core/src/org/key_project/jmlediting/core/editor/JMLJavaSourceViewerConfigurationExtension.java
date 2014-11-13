@@ -115,7 +115,6 @@ public class JMLJavaSourceViewerConfigurationExtension implements
    @Override
    public IReconciler getReconciler(ISourceViewer sourceViewer,
          IReconciler currentResult) {
-      // TODO ggf anpassen
       return currentResult;
    }
 
@@ -126,7 +125,6 @@ public class JMLJavaSourceViewerConfigurationExtension implements
    @Override
    public IPresentationReconciler getPresentationReconciler(
          ISourceViewer sourceViewer, IPresentationReconciler currentResult) {
-    //TODO: create PresentationReconciler, install damagers and Repairers for JML ContentTypes
       JMLPresentationReconciler JMLReconciler = new JMLPresentationReconciler(currentResult);
       return JMLReconciler;
    }
