@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.ui.test;
+package org.key_project.jmlediting.ui.test.preferencepages;
 
 import static org.junit.Assert.assertTrue;
 
@@ -10,9 +10,10 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotList;
 import org.junit.Test;
-import org.key_project.jmlediting.core.IJMLProfile;
-import org.key_project.jmlediting.core.JMLPreferencesHelper;
-import org.key_project.jmlediting.core.JMLProfileManagement;
+import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
+import org.key_project.jmlediting.core.profile.JMLProfileManagement;
+import org.key_project.jmlediting.ui.test.TestUtils;
 
 public class ProfilePropertiesTest {
 

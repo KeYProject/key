@@ -1,9 +1,11 @@
-package org.key_project.jmlediting.core;
+package org.key_project.jmlediting.core.profile;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.key_project.jmlediting.core.Activator;
+import org.key_project.jmlediting.core.PropertyNames;
 
 public class JMLPreferencesHelper {
 
@@ -26,6 +28,10 @@ public class JMLPreferencesHelper {
          currentProfileName = null;
       }
       return JMLProfileManagement.getProfileFromClassName(currentProfileName);
+   }
+   
+   public static boolean hasProjectJMLProfile(final IProject project) {
+      return getProjectJMLProfile(project) != null;
    }
 
    public static void setProjectJMLProfile(
