@@ -1,4 +1,4 @@
-package org.key_project.javaeditor.extension;
+package org.key_project.jmlediting.core.editor;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextAttribute;

@@ -1,4 +1,4 @@
-package org.key_project.javaeditor.extension;
+package org.key_project.jmlediting.core.editor;
 
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.presentation.IPresentationDamager;
@@ -6,7 +6,6 @@ import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.IPresentationRepairer;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
-import org.eclipse.swt.graphics.Color;
 
 public class JMLPresentationReconciler extends PresentationReconciler {
    /**
@@ -21,7 +20,8 @@ public class JMLPresentationReconciler extends PresentationReconciler {
    public JMLPresentationReconciler(IPresentationReconciler javaEditorPresentationReconciler) {
       super();
       this.javaEditorPresentationReconciler=javaEditorPresentationReconciler;
-      DefaultDamagerRepairer dr= new DefaultDamagerRepairer(new SingleTokenScanner(new TextAttribute(Color.ORANGE)));
+    //  
+    DefaultDamagerRepairer dr= new DefaultDamagerRepairer(new SingleTokenScanner(new TextAttribute(null)));
       
    }
    

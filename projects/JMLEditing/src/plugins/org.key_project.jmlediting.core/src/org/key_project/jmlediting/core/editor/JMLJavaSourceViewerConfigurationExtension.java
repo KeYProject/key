@@ -1,4 +1,4 @@
-package org.key_project.javaeditor.extension;
+package org.key_project.jmlediting.core.editor;
 
 import org.eclipse.jdt.ui.text.IColorManager;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -14,15 +14,13 @@ import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 import org.eclipse.jface.text.hyperlink.IHyperlinkPresenter;
 import org.eclipse.jface.text.information.IInformationPresenter;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
-import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.quickassist.IQuickAssistAssistant;
 import org.eclipse.jface.text.reconciler.IReconciler;
-import org.eclipse.jface.text.reconciler.Reconciler;
-import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.source.IAnnotationHover;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.key_project.javaeditor.extension.IJavaSourceViewerConfigurationExtension;
 
 /**
  * @author David Giessing
@@ -347,5 +345,6 @@ public class JMLJavaSourceViewerConfigurationExtension implements
          boolean currentResult) {
       return currentResult;
    }
+
 
 }
