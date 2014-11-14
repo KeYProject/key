@@ -42,7 +42,6 @@ import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.util.eclipse.job.AbstractDependingOnObjectsJob;
 import org.key_project.util.java.ObjectUtil;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.PostPredicateTermLabel;
@@ -52,7 +51,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil;
 import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.BranchResult;
 import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.PredicateEvaluationResult;
@@ -273,18 +271,11 @@ public class PostconditionComposite implements IDisposable {
     */
    protected Term removeUninterpretedPredicate(Node node, Term term) {
       Proof proof = node.proof();
-      Services services = proof.getServices();
-      ProofOblInput problem = services.getSpecificationRepository().getProofOblInput(proof);
-      if (problem instanceof AbstractOperationPO) {
-         AbstractOperationPO aopo = (AbstractOperationPO) problem;
-         if (aopo.isAddUninterpretedPredicate()) {
-            Term uninterpretedPredicate = aopo.getUninterpretedPredicate();
-            if (uninterpretedPredicate != null) {
-               term = removeUninterpretedPredicate(services.getTermBuilder(), 
-                                                   term, 
-                                                   uninterpretedPredicate);
-            }
-         }
+      Term predicate = AbstractOperationPO.getUninterpretedPredicate(proof);
+      if (predicate != null) {
+         term = removeUninterpretedPredicate(proof.getServices().getTermBuilder(), 
+                                             term, 
+                                             predicate);
       }
       return term;
    }
