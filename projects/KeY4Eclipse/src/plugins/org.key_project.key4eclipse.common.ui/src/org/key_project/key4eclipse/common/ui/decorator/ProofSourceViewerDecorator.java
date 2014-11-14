@@ -13,6 +13,8 @@
 
 package org.key_project.key4eclipse.common.ui.decorator;
 
+import java.io.IOException;
+
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.JFaceTextUtil;
 import org.eclipse.jface.text.TextPresentation;
@@ -29,6 +31,7 @@ import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
@@ -57,12 +60,12 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    /**
     * The {@link ISourceViewer} to decorate.
     */
-   private ISourceViewer viewer;
+   private final ISourceViewer viewer;
    
    /**
     * The {@link StyledText} provided by {@link #viewer} via {@link ISourceViewer#getTextWidget()}.
     */
-   private StyledText viewerText;
+   private final StyledText viewerText;
    
    /**
     * The currently shown node.
@@ -155,6 +158,47 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    }
    
    /**
+    * Shows the given {@link Term} with help of the given {@link KeYMediator}
+    * in the decorated {@link ISourceViewer}.
+    * @param term The {@link Term} to show.
+    * @param services The {@link Services} to use.
+    * @param mediator The {@link KeYMediator} to use.
+    * @return The shown text.
+    */
+   public String showTerm(Term term, Services services, KeYMediator mediator) {
+      this.node = null;
+      filter = null;
+      printer = new LogicPrinter(new ProgramPrinter(null), 
+                                 mediator.getNotationInfo(), 
+                                 services);
+      String str = computeText(mediator, term, printer);
+      viewer.setDocument(new Document(str));
+      return str;
+   }
+   
+   /**
+    * Computes the text to show in the {@link KeYEditor}} which consists
+    * of the sequent including the applied rule.
+    * @param mediator The {@link KeYMediator} to use.
+    * @param node The {@link Node} to use.
+    * @param filter The {@link SequentPrintFilter} to use.
+    * @param printer The {@link LogicPrinter} to use.
+    * @return The text to show.
+    */
+   public static String computeText(KeYMediator mediator, 
+                                    Term term, 
+                                    LogicPrinter printer) {
+      try {
+         printer.printTerm(term);
+         String s = printer.toString();
+         return StringUtil.trimRight(s);
+      }
+      catch (IOException e) {
+         return e.getMessage();
+      }
+   }
+   
+   /**
     * Computes the text to show in the {@link KeYEditor}} which consists
     * of the sequent including the applied rule.
     * @param mediator The {@link KeYMediator} to use.
@@ -168,14 +212,12 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
                                     SequentPrintFilter filter, 
                                     LogicPrinter printer) {
       
-        printer.printSequent (filter);
-        String s = printer.toString();
-             printer=null;
-        RuleApp app = node.getAppliedRuleApp();
-             s += "\nNode Nr "+node.serialNr()+"\n";
-             s += ruleToString(mediator, app, true);
-
-        return s;
+      printer.printSequent(filter);
+      String s = printer.toString();
+      RuleApp app = node.getAppliedRuleApp();
+      s += "\nNode Nr " + node.serialNr() + "\n";
+      s += ruleToString(mediator, app, true);
+      return s;
    }
    
    public static String ruleToString(KeYMediator mediator, RuleApp app, boolean withHeadder) {
@@ -212,8 +254,8 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
    protected void setGreenBackground(PosInOccurrence pos){
       initializeValuesForGreenBackground();
       if (pos != null) {
-         ImmutableList<Integer> path = printer.getPositionTable().pathForPosition(pos, filter);
-         Range range = printer.getPositionTable().rangeForPath(path);
+         ImmutableList<Integer> path = printer.getInitialPositionTable().pathForPosition(pos, filter);
+         Range range = printer.getInitialPositionTable().rangeForPath(path);
          marked1.start = range.start();
          marked1.length = range.end()-range.start();
          TextPresentation.applyTextPresentation(textPresentation, viewerText);
@@ -227,7 +269,6 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
       textPresentation = new TextPresentation();
       textPresentation.addStyleRange(marked1);
       viewer.changeTextPresentation(textPresentation, true);
-      
    }
 
    /**
@@ -239,7 +280,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
       PosInSequent oldPos = selectedPosInSequent;
       int textOffset = JFaceTextUtil.getOffsetForCursorLocation(viewer);
       if (textOffset >= 0) {
-         selectedPosInSequent = printer.getPositionTable().getPosInSequent(textOffset, filter);
+         selectedPosInSequent = printer.getInitialPositionTable().getPosInSequent(textOffset, filter);
       }
       else {
          selectedPosInSequent = null;
@@ -259,7 +300,7 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
       initializeValuesForHover();
       
       int textOffset = JFaceTextUtil.getOffsetForCursorLocation(viewer);
-      Range range = printer.getPositionTable().rangeForIndex(textOffset);
+      Range range = printer.getInitialPositionTable().rangeForIndex(textOffset);
       Range firstStatement = printer.getPositionTable().firstStatementRangeForIndex(textOffset);
       
       if(firstStatement != null){
@@ -330,5 +371,29 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     */
    public PosInSequent getSelectedPosInSequent() {
       return selectedPosInSequent;
+   }
+
+   /**
+    * Returns the used {@link LogicPrinter}.
+    * @return The used {@link LogicPrinter}.
+    */
+   protected LogicPrinter getPrinter() {
+      return printer;
+   }
+
+   /**
+    * Returns the {@link ISourceViewer} in which this decorator is used.
+    * @return The {@link ISourceViewer} in which this decorator is used.
+    */
+   protected ISourceViewer getViewer() {
+      return viewer;
+   }
+
+   /**
+    * Returns the {@link StyledText} of {@link #getViewer()}.
+    * @return The {@link StyledText} of {@link #getViewer()}.
+    */
+   protected StyledText getViewerText() {
+      return viewerText;
    }
 }

@@ -23,6 +23,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
+import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.test.testcase.swtbot.AbstractKeYDebugTargetTestCase;
@@ -64,6 +65,9 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
             // Select method return
             selectMethodReturn(debugTree);
             steps.assertMethodReturn(debugTree, propertiesView, tabs);
+            // Select termination
+            selectTermination(debugTree);
+            steps.assertTermination(debugTree, propertiesView, tabs);
             // Select launch
             selectLaunch(debugTree);
             steps.assertLaunch(debugTree, propertiesView, tabs);
@@ -134,6 +138,15 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
    }
 
    /**
+    * Selects an {@link ISEDTermination}.
+    * @param debugTree The {@link SWTBotTree} to select in.
+    * @throws Exception Occurred Exception.
+    */
+   protected void selectTermination(SWTBotTree debugTree) throws Exception {
+      TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 5);
+   }
+
+   /**
     * Defines the test steps to execute via {@link AbstractSWTBotKeYPropertyTabTest#doFlatStepsTest(ITestSteps)}.
     * @author Martin Hentschel
     */
@@ -173,6 +186,15 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
        * @throws Exception Occurred Exception
        */
       public void assertMethodReturn(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception;
+
+      /**
+       * Do some assertions on an {@link ISEDTermination}.
+       * @param debugTree The debug tree.
+       * @param propertiesView The properties view.
+       * @param tabs The properties view tabs.
+       * @throws Exception Occurred Exception
+       */
+      public void assertTermination(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception;
 
       /**
        * Do some assertions on an {@link ILaunch}.

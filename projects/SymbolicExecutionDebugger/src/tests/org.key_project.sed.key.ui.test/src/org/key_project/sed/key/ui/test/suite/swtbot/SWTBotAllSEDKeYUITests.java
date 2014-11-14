@@ -20,10 +20,12 @@ import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotCustomizationTabTes
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotGraphitiCustomizationTabTest;
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotGraphitiKeYTabTest;
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotGraphitiMainTabTest;
+import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotGraphitiPostconditionTabTest;
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotKeYSourceCodeLookupTest;
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotKeYTabTest;
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotMainTabTest;
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotOpenProofTest;
+import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotPostconditionTabTest;
 import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotSideProofsViewTest;
 
 /**
@@ -36,11 +38,13 @@ import org.key_project.sed.key.ui.test.testcase.swtbot.SWTBotSideProofsViewTest;
    SWTBotGraphitiCustomizationTabTest.class,
    SWTBotGraphitiKeYTabTest.class,
    SWTBotGraphitiMainTabTest.class,
+   SWTBotGraphitiPostconditionTabTest.class,
    SWTBotKeYSourceCodeLookupTest.class,
    SWTBotKeYTabTest.class,
    SWTBotMainTabTest.class,
    SWTBotAddKeYWatchpointTest.class,
    SWTBotOpenProofTest.class,
+   SWTBotPostconditionTabTest.class,
    SWTBotSideProofsViewTest.class
 })
 public class SWTBotAllSEDKeYUITests {

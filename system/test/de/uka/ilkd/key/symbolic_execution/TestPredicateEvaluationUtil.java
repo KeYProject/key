@@ -95,7 +95,7 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
          while (iter.hasNext()) {
             IExecutionNode<?> next = iter.next();
             if (next instanceof IExecutionTermination) {
-               PredicateEvaluationResult result = PredicateEvaluationUtil.evaluate(next.getProofNode(), PostPredicateTermLabel.NAME);
+               PredicateEvaluationResult result = PredicateEvaluationUtil.evaluate(next.getProofNode(), PostPredicateTermLabel.NAME, false, false);
                currentResults.add(result);
                if (CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
                   System.out.println("\nFound Result:");

@@ -51,6 +51,11 @@ public class SWTBotGraphitiMainTabTest extends AbstractSWTBotGraphitiKeYProperty
          }
 
          @Override
+         public void assertTermination(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertFalse(tabs.hasTabItem("Main"));
+         }
+
+         @Override
          public void assertLaunch(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
             assertFalse(tabs.hasTabItem("Main"));
          }

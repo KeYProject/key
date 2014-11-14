@@ -17,18 +17,19 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.junit.Test;
 import org.key_project.util.test.util.SWTBotTabbedPropertyList;
+import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
- * Tests the property page tab "Customization".
+ * Tests the property page tab "Postcondition".
  * @author Martin Hentschel
  */
-public class SWTBotCustomizationTabTest extends AbstractSWTBotKeYPropertyTabTest {
+public class SWTBotPostconditionTabTest extends AbstractSWTBotKeYPropertyTabTest {
    /**
-    * Tests the shown values and the existence of tab "Customization".
+    * Tests the shown values and the existence of tab "KeY".
     */
    @Test
    public void testValuesAndTabExistence() throws Exception {
-      doFlatStepsTest("SWTBotCustomizationTabTest_testValuesAndTabExistence", createFixedExampleSteps());
+      doFlatStepsTest("SWTBotPostconditionTabTest_testValuesAndTabExistence", createFixedExampleSteps());
    }
    
    /**
@@ -39,32 +40,35 @@ public class SWTBotCustomizationTabTest extends AbstractSWTBotKeYPropertyTabTest
       return new ITestSteps() {
          @Override
          public void assertThread(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
-            assertFalse(tabs.hasTabItem("Customization"));
+            assertFalse(tabs.selectTabItem("Postcondition"));
          }
          
          @Override
          public void assertStatement(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
-            assertFalse(tabs.hasTabItem("Customization"));
+            assertFalse(tabs.selectTabItem("Postcondition"));
          }
          
          @Override
          public void assertDebugTarget(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
-            assertTrue(tabs.selectTabItem("Customization"));
+            assertFalse(tabs.hasTabItem("Postcondition"));
          }
 
          @Override
          public void assertMethodReturn(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
-            assertFalse(tabs.hasTabItem("Customization"));
-         }
-
-         @Override
-         public void assertTermination(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
-            assertFalse(tabs.hasTabItem("Main"));
+            assertFalse(tabs.selectTabItem("Postcondition"));
          }
 
          @Override
          public void assertLaunch(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
-            assertTrue(tabs.selectTabItem("Customization"));
+            assertFalse(tabs.hasTabItem("Postcondition"));
+         }
+
+         @Override
+         public void assertTermination(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertTrue(tabs.selectTabItem("Postcondition"));
+            TestUtilsUtil.waitForJobs();
+            assertEquals("true", propertiesView.bot().styledText(0).getText());
+            assertEquals("true", propertiesView.bot().styledText(1).getText());
          }
       };
    }

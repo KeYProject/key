@@ -2894,16 +2894,30 @@ public final class SymbolicExecutionUtil {
     */
    public static Term computePathCondition(Node node,
                                            boolean improveReadability) throws ProofInputException {
-      if (node != null) {
-         final Services services = node.proof().getServices();
+      return computePathCondition(null, node, improveReadability);
+   }
+
+   /**
+    * Computes the path condition between the given {@link Node}s.
+    * @param parentNode The {@link Node} to stop path condition computation at.
+    * @param childNode The {@link Node} to compute its path condition back to the parent.
+    * @param improveReadability {@code true} improve readability, {@code false} do not improve readability.
+    * @return The computed path condition.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public static Term computePathCondition(Node parentNode,
+                                           Node childNode,
+                                           boolean improveReadability) throws ProofInputException {
+      if (childNode != null) {
+         final Services services = childNode.proof().getServices();
          Term pathCondition = services.getTermBuilder().tt();
-         while (node != null) {
-            Node parent = node.parent();
+         while (childNode != null && childNode != parentNode) {
+            Node parent = childNode.parent();
             if (parent != null && parent.childrenCount() >= 2) {
-               Term branchCondition = computeBranchCondition(node, improveReadability);
+               Term branchCondition = computeBranchCondition(childNode, improveReadability);
                pathCondition = services.getTermBuilder().and(branchCondition, pathCondition);
             }
-            node = parent;
+            childNode = parent;
          }
          if (services.getTermBuilder().ff().equals(pathCondition)) {
             throw new ProofInputException("Path condition computation failed because the result is false.");

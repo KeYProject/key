@@ -79,6 +79,15 @@ public class AbstractSWTBotGraphitiKeYPropertyTabTest extends AbstractSWTBotKeYP
    }
    
    /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void selectTermination(SWTBotTree debugTree) throws Exception {
+      super.selectTermination(debugTree);
+      TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
+   }
+
+   /**
     * Does some test steps on an opened diagram in an editable editor.
     * @param steps The test steps to execute.
     * @throws Exception Occurred Exception.

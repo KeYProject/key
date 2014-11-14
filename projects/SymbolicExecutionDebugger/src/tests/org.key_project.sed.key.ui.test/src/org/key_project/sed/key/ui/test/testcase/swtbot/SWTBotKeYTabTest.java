@@ -67,6 +67,13 @@ public class SWTBotKeYTabTest extends AbstractSWTBotKeYPropertyTabTest {
          public void assertLaunch(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
             assertFalse(tabs.hasTabItem("KeY"));
          }
+
+         @Override
+         public void assertTermination(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertTrue(tabs.selectTabItem("KeY"));
+            assertFalse(propertiesView.bot().text(0).getText().isEmpty());
+            assertFalse(propertiesView.bot().styledText(0).getText().isEmpty());
+         }
       };
    }
 }
