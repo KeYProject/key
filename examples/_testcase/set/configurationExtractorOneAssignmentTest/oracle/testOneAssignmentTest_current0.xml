@@ -6,14 +6,14 @@
       <term term="null"/>
    </equivalenceClass>
    <state name="return this.first.value+this.second.value+tempX.value+tempY.value;">
-      <value name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
-      <value name="tempX" programVariable="tempX" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
-      <value name="tempY" programVariable="tempY" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
-      <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+      <value name="x" programVariable="x" isArrayIndex="false" value="null" type="Null"/>
+      <value name="tempX" programVariable="tempX" isArrayIndex="false" value="null" type="Null"/>
+      <value name="tempY" programVariable="tempY" isArrayIndex="false" value="null" type="Null"/>
+      <association name="self" programVariable="self" isArrayIndex="false" target="o1"/>
    </state>
    <object xml:id="o1" name="self" type="OneAssignmentTest">
-      <value name="y" programVariable="y" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
-      <value name="second" programVariable="second" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
-      <value name="first" programVariable="first" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
+      <value name="y" programVariable="y" isArrayIndex="false" value="null" type="Null"/>
+      <value name="second" programVariable="second" isArrayIndex="false" value="null" type="Null"/>
+      <value name="first" programVariable="first" isArrayIndex="false" value="null" type="Null"/>
    </object>
 </model>

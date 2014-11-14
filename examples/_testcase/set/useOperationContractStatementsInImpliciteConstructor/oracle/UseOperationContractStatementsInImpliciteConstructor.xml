@@ -1,70 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <variable name="heapAtPre" arrayIndex="-1" isArrayIndex="false">
+   <variable name="heapAtPre" isArrayIndex="false">
       <value name="heapAtPre {true}" typeString="Heap" valueString="heapAtPre" isValueAnObject="false" isValueUnknown="false" conditionString="true">
       </value>
    </variable>
    <methodCall name="&lt;call self.average(array)&gt;" pathCondition="true" pathConditionChanged="false">
-      <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+      <variable name="exc" isArrayIndex="false">
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
       <branchStatement name="if (array!=null)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
-         <variable name="self" arrayIndex="-1" isArrayIndex="false">
+         <variable name="self" isArrayIndex="false">
             <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
-         <variable name="array" arrayIndex="-1" isArrayIndex="false">
+         <variable name="array" isArrayIndex="false">
             <value name="array {equals(array,null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="equals(array,null)">
             </value>
             <value name="array {not(equals(array,null))}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(array,null))">
-               <variable name="length" arrayIndex="-1" isArrayIndex="false">
+               <variable name="length" isArrayIndex="false">
                   <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
             </value>
          </variable>
-         <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+         <variable name="exc" isArrayIndex="false">
             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
          <callStackEntry path="/0"/>
          <branchCondition name="not(equals(array,null))" pathCondition="not(equals(array,null))" pathConditionChanged="true" branchCondition="not(equals(array,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <variable name="self" arrayIndex="-1" isArrayIndex="false">
+            <variable name="self" isArrayIndex="false">
                <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <variable name="array" arrayIndex="-1" isArrayIndex="false">
+            <variable name="array" isArrayIndex="false">
                <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                  <variable name="length" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="length" isArrayIndex="false">
                      <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                </value>
             </variable>
-            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+            <variable name="exc" isArrayIndex="false">
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <variable name="x" arrayIndex="-1" isArrayIndex="false">
+            <variable name="x" isArrayIndex="false">
                <value name="x {true}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <callStackEntry path="/0"/>
             <statement name="int sum = sum(array);" pathCondition="not(equals(array,null))" pathConditionChanged="false">
-               <variable name="self" arrayIndex="-1" isArrayIndex="false">
+               <variable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <variable name="array" arrayIndex="-1" isArrayIndex="false">
+               <variable name="array" isArrayIndex="false">
                   <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                     <variable name="length" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="length" isArrayIndex="false">
                         <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
                </variable>
-               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+               <variable name="exc" isArrayIndex="false">
                   <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
@@ -77,146 +77,146 @@ post: result_0
 &amp; exc_0 = null
 mod: allLocs
 termination: diamond" pathCondition="not(equals(array,null))" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" selfTerm="self" contractParameters="array" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="self" isArrayIndex="false">
                      <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <variable name="array" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="array" isArrayIndex="false">
                      <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                        <variable name="length" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="length" isArrayIndex="false">
                            <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
                   </variable>
-                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="exc" isArrayIndex="false">
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <callStackEntry path="/0"/>
                   <statement name="return sum_1/array.length;" pathCondition="not(equals(array,null))" pathConditionChanged="false">
-                     <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="self" isArrayIndex="false">
                         <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <variable name="array" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="array" isArrayIndex="false">
                         <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                           <variable name="length" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="length" isArrayIndex="false">
                               <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                         </value>
                      </variable>
-                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="exc" isArrayIndex="false">
                         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <variable name="heap" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="heap" isArrayIndex="false">
                         <value name="heap {true}" typeString="Heap" valueString="heapAfter_sum" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <variable name="sum_1" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="sum_1" isArrayIndex="false">
                         <value name="sum_1 {true}" typeString="int" valueString="result_0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <callStackEntry path="/0"/>
                      <branchCondition name="equals(length(array),Z(0(#)))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(0(#)))))" pathConditionChanged="true" branchCondition="equals(length(array),Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
-                        <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="self" isArrayIndex="false">
                            <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="array" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="array" isArrayIndex="false">
                            <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                              <variable name="length" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="length" isArrayIndex="false">
                                  <value name="length {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                            </value>
                         </variable>
-                        <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="exc" isArrayIndex="false">
                            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="heap" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="heap" isArrayIndex="false">
                            <value name="heap {true}" typeString="Heap" valueString="heapAfter_sum" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                         <exceptionalMethodReturn name="&lt;throw java.lang.ArithmeticException&gt;" signature="&lt;exceptional return of &lt;call self.average(array)&gt;&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(0(#)))))" pathConditionChanged="false" methodReturnCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(0(#)))))">
-                           <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="self" isArrayIndex="false">
                               <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
-                           <variable name="array" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="array" isArrayIndex="false">
                               <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                 <variable name="length" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="length" isArrayIndex="false">
                                     <value name="length {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                               </value>
                            </variable>
-                           <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="exc" isArrayIndex="false">
                               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
-                           <variable name="a" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="a" isArrayIndex="false">
                               <value name="a {true}" typeString="java.lang.ArithmeticException" valueString="a_3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                            <callStackEntry path="/0"/>
                            <termination name="&lt;uncaught java.lang.ArithmeticException&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),equals(length(array),Z(0(#)))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-                              <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="exc" isArrayIndex="false">
                                  <value name="exc {true}" typeString="java.lang.ArithmeticException" valueString="a_3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                            </termination>
-                           <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                           <callStateVariable name="self" isArrayIndex="false">
                               <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               </value>
                            </callStateVariable>
-                           <callStateVariable name="array" arrayIndex="-1" isArrayIndex="false">
+                           <callStateVariable name="array" isArrayIndex="false">
                               <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                 <variable name="length" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="length" isArrayIndex="false">
                                     <value name="length {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                               </value>
                            </callStateVariable>
-                           <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <callStateVariable name="exc" isArrayIndex="false">
                               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </callStateVariable>
-                           <callStateVariable name="heapBefore_average" arrayIndex="-1" isArrayIndex="false">
+                           <callStateVariable name="heapBefore_average" isArrayIndex="false">
                               <value name="heapBefore_average {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </callStateVariable>
-                           <callStateVariable name="savedHeapBefore_average" arrayIndex="-1" isArrayIndex="false">
+                           <callStateVariable name="savedHeapBefore_average" isArrayIndex="false">
                               <value name="savedHeapBefore_average {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </callStateVariable>
                         </exceptionalMethodReturn>
                      </branchCondition>
                      <branchCondition name="not(equals(length(array),Z(0(#))))" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(0(#))))))" pathConditionChanged="true" branchCondition="not(equals(length(array),Z(0(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
-                        <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="self" isArrayIndex="false">
                            <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="array" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="array" isArrayIndex="false">
                            <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                              <variable name="length" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="length" isArrayIndex="false">
                                  <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                            </value>
                         </variable>
-                        <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="exc" isArrayIndex="false">
                            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="heap" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="heap" isArrayIndex="false">
                            <value name="heap {true}" typeString="Heap" valueString="heapAfter_sum" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="x_1" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="x_1" isArrayIndex="false">
                            <value name="x_1 {gt(result_0,Z(neglit(1(#))))}" typeString="int" valueString="quotient_3" isValueAnObject="false" isValueUnknown="false" conditionString="gt(result_0,Z(neglit(1(#))))">
                            </value>
                            <value name="x_1 {lt(result_0,Z(0(#)))}" typeString="int" valueString="mul(quotient_2,Z(neglit(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="lt(result_0,Z(0(#)))">
@@ -233,58 +233,58 @@ as result of self.average(array)&gt;" isReturnValueComputed="true" methodReturnC
                            </methodReturnValue>
                            <methodReturnValue name="mul(quotient_3,Z(neglit(1(#)))) {lt(result_0,Z(0(#)))}" returnValueString="mul(quotient_3,Z(neglit(1(#))))" hasCondition="true" conditionString="lt(result_0,Z(0(#)))">
                            </methodReturnValue>
-                           <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="self" isArrayIndex="false">
                               <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
-                           <variable name="array" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="array" isArrayIndex="false">
                               <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                 <variable name="length" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="length" isArrayIndex="false">
                                     <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                               </value>
                            </variable>
-                           <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="exc" isArrayIndex="false">
                               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
-                           <variable name="heap" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="heap" isArrayIndex="false">
                               <value name="heap {true}" typeString="Heap" valueString="heapAfter_sum" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                            <callStackEntry path="/0"/>
                            <termination name="&lt;end&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(0(#))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
-                              <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="exc" isArrayIndex="false">
                                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
-                              <variable name="heap" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="heap" isArrayIndex="false">
                                  <value name="heap {true}" typeString="Heap" valueString="heapAfter_sum" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                            </termination>
-                           <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                           <callStateVariable name="self" isArrayIndex="false">
                               <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               </value>
                            </callStateVariable>
-                           <callStateVariable name="array" arrayIndex="-1" isArrayIndex="false">
+                           <callStateVariable name="array" isArrayIndex="false">
                               <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                 <variable name="length" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="length" isArrayIndex="false">
                                     <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                               </value>
                            </callStateVariable>
-                           <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <callStateVariable name="exc" isArrayIndex="false">
                               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </callStateVariable>
-                           <callStateVariable name="heapBefore_average" arrayIndex="-1" isArrayIndex="false">
+                           <callStateVariable name="heapBefore_average" isArrayIndex="false">
                               <value name="heapBefore_average {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </callStateVariable>
-                           <callStateVariable name="savedHeapBefore_average" arrayIndex="-1" isArrayIndex="false">
+                           <callStateVariable name="savedHeapBefore_average" isArrayIndex="false">
                               <value name="savedHeapBefore_average {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </callStateVariable>
@@ -296,79 +296,79 @@ as result of self.average(array)&gt;" isReturnValueComputed="true" methodReturnC
             </statement>
          </branchCondition>
          <branchCondition name="equals(array,null)" pathCondition="equals(array,null)" pathConditionChanged="true" branchCondition="equals(array,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <variable name="self" arrayIndex="-1" isArrayIndex="false">
+            <variable name="self" isArrayIndex="false">
                <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <variable name="array" arrayIndex="-1" isArrayIndex="false">
+            <variable name="array" isArrayIndex="false">
                <value name="array {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+            <variable name="exc" isArrayIndex="false">
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <variable name="x" arrayIndex="-1" isArrayIndex="false">
+            <variable name="x" isArrayIndex="false">
                <value name="x {true}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <callStackEntry path="/0"/>
             <statement name="throw new IllegalArgumentException (&quot;Array can&apos;t be null.&quot;);" pathCondition="equals(array,null)" pathConditionChanged="false">
-               <variable name="self" arrayIndex="-1" isArrayIndex="false">
+               <variable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <variable name="array" arrayIndex="-1" isArrayIndex="false">
+               <variable name="array" isArrayIndex="false">
                   <value name="array {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+               <variable name="exc" isArrayIndex="false">
                   <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <callStackEntry path="/0"/>
                <exceptionalMethodReturn name="&lt;throw java.lang.IllegalArgumentException&gt;" signature="&lt;exceptional return of &lt;call self.average(array)&gt;&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" methodReturnCondition="equals(array,null)">
-                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="self" isArrayIndex="false">
                      <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <variable name="array" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="array" isArrayIndex="false">
                      <value name="array {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="exc" isArrayIndex="false">
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <variable name="i" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="i" isArrayIndex="false">
                      <value name="i {true}" typeString="java.lang.IllegalArgumentException" valueString="i_3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <callStackEntry path="/0"/>
                   <termination name="&lt;uncaught java.lang.IllegalArgumentException&gt;" pathCondition="equals(array,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="exc" isArrayIndex="false">
                         <value name="exc {true}" typeString="java.lang.IllegalArgumentException" valueString="i_3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </termination>
                   <completedBlockEntry path="/0/0" conditionString="equals(array,null)"/>
-                  <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                  <callStateVariable name="self" isArrayIndex="false">
                      <value name="self {true}" typeString="UseOperationContractStatementsInImpliciteConstructor" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      </value>
                   </callStateVariable>
-                  <callStateVariable name="array" arrayIndex="-1" isArrayIndex="false">
+                  <callStateVariable name="array" isArrayIndex="false">
                      <value name="array {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </callStateVariable>
-                  <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <callStateVariable name="exc" isArrayIndex="false">
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </callStateVariable>
-                  <callStateVariable name="heapBefore_average" arrayIndex="-1" isArrayIndex="false">
+                  <callStateVariable name="heapBefore_average" isArrayIndex="false">
                      <value name="heapBefore_average {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </callStateVariable>
-                  <callStateVariable name="savedHeapBefore_average" arrayIndex="-1" isArrayIndex="false">
+                  <callStateVariable name="savedHeapBefore_average" isArrayIndex="false">
                      <value name="savedHeapBefore_average {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </callStateVariable>

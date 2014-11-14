@@ -43,9 +43,15 @@ public interface IExecutionVariable extends IExecutionElement {
    
    /**
     * Returns the index in the parent array if an array cell value is represented.
-    * @return The index in the parent array or {@code -1} if no array cell value is represented.
+    * @return The index in the parent array or {@code null} if no array cell value is represented.
     */
-   public int getArrayIndex();
+   public Term getArrayIndex();
+   
+   /**
+    * Returns the human readable index in the parent array if an array cell value is represented.
+    * @return The human readable index in the parent array or {@code null} if no array cell value is represented.
+    */
+   public String getArrayIndexString();
    
    /**
     * Checks if the current value is part of a parent array.

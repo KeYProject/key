@@ -5,18 +5,18 @@
       <term term="null"/>
    </equivalenceClass>
    <state name="{}">
-      <value name="k" programVariable="k" isArrayIndex="false" arrayIndex="-1" value="k" type="int"/>
-      <value name="NextLevel::m" programVariable="NextLevel::m" isArrayIndex="false" arrayIndex="-1" value="Z(1(#))" type="int"/>
-      <value name="StaticMember::s" programVariable="StaticMember::s" isArrayIndex="false" arrayIndex="-1" value="int::select(heap,self,StaticMember::$h)" type="int"/>
-      <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>
-      <association name="StaticMember::r" programVariable="StaticMember::r" isArrayIndex="false" arrayIndex="-1" target="o2"/>
+      <value name="k" programVariable="k" isArrayIndex="false" value="k" type="int"/>
+      <value name="NextLevel::m" programVariable="NextLevel::m" isArrayIndex="false" value="Z(1(#))" type="int"/>
+      <value name="StaticMember::s" programVariable="StaticMember::s" isArrayIndex="false" value="int::select(heap,self,StaticMember::$h)" type="int"/>
+      <association name="self" programVariable="self" isArrayIndex="false" target="o1"/>
+      <association name="StaticMember::r" programVariable="StaticMember::r" isArrayIndex="false" target="o2"/>
    </state>
    <object xml:id="o1" name="self" type="StaticMember">
-      <value name="h" programVariable="h" isArrayIndex="false" arrayIndex="-1" value="int::select(heap,self,StaticMember::$h)" type="int"/>
-      <value name="l" programVariable="l" isArrayIndex="false" arrayIndex="-1" value="add(int::select(heap,null,NextLevel::$m),int::select(heap,Refer::select(heap,null,StaticMember::$r),Refer::$x))" type="int"/>
+      <value name="h" programVariable="h" isArrayIndex="false" value="int::select(heap,self,StaticMember::$h)" type="int"/>
+      <value name="l" programVariable="l" isArrayIndex="false" value="add(int::select(heap,null,NextLevel::$m),int::select(heap,Refer::select(heap,null,StaticMember::$r),Refer::$x))" type="int"/>
    </object>
    <object xml:id="o2" name="Refer::select(heap,null,StaticMember::$r)" type="Refer">
-      <value name="nl" programVariable="nl" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
-      <value name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" value="int::select(heap,Refer::select(heap,null,StaticMember::$r),Refer::$x)" type="int"/>
+      <value name="nl" programVariable="nl" isArrayIndex="false" value="null" type="Null"/>
+      <value name="x" programVariable="x" isArrayIndex="false" value="int::select(heap,Refer::select(heap,null,StaticMember::$r),Refer::$x)" type="int"/>
    </object>
 </model>

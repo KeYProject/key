@@ -148,7 +148,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement> ext
     * {@inheritDoc}
     */
    @Override
-   public IExecutionVariable[] getCallStateVariables() {
+   public IExecutionVariable[] getCallStateVariables() throws ProofInputException {
       synchronized (this) {
          if (callStateVariables == null) {
             callStateVariables = lazyComputeCallStateVariables();
@@ -161,8 +161,9 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement> ext
     * Computes the variables lazily when {@link #getCallStateVariables()} is 
     * called the first time.
     * @return The {@link IExecutionVariable}s of the state when the method has been called.
+    * @throws ProofInputException 
     */
-   protected IExecutionVariable[] lazyComputeCallStateVariables() {
+   protected IExecutionVariable[] lazyComputeCallStateVariables() throws ProofInputException {
       // Get relevant information in current node
       Node proofNode = methodCall.getProofNode();
       assert proofNode.childrenCount() == 1;

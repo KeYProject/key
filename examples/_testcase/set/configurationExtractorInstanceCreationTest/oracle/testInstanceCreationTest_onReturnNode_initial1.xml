@@ -5,9 +5,9 @@
       <term term="InstanceCreationTest::select(heap,self,InstanceCreationTest::$next)"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in {}">
-      <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+      <association name="self" programVariable="self" isArrayIndex="false" target="o1"/>
    </state>
    <object xml:id="o1" name="self" type="InstanceCreationTest">
-      <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+      <association name="next" programVariable="next" isArrayIndex="false" target="o1"/>
    </object>
 </model>

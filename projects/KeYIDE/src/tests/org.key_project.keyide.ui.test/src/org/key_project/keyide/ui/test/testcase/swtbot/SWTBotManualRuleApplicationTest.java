@@ -26,9 +26,9 @@ import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
-import de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
+import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
+import de.uka.ilkd.key.proof.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;

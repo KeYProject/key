@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
    <state name="One Step Simplification resulting in return 42;">
-      <association name="array" programVariable="array" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+      <association name="array" programVariable="array" isArrayIndex="false" target="o1"/>
    </state>
    <object xml:id="o1" name="array" type="int[]">
-      <value name="length" programVariable="length" isArrayIndex="false" arrayIndex="-1" value="Z(1(#))" type="int"/>
-      <value name="[0]" isArrayIndex="true" arrayIndex="0" value="Z(2(4(#)))" type="int"/>
+      <value name="length" programVariable="length" isArrayIndex="false" value="Z(1(#))" type="int"/>
+      <value name="[Z(0(#))]" isArrayIndex="true" arrayIndex="Z(0(#))" value="Z(2(4(#)))" type="int"/>
    </object>
 </model>

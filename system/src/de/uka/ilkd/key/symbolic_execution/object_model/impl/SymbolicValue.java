@@ -34,7 +34,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
    /**
     * The array index.
     */
-   private final int arrayIndex;
+   private final Term arrayIndex;
    
    /**
     * The {@link IProgramVariable}.
@@ -60,13 +60,13 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
     * @param settings The {@link IModelSettings} to use.
     */
    public SymbolicValue(Services services, 
-                        int arrayIndex, 
+                        Term arrayIndex, 
                         Term value, 
                         Term condition, 
                         IModelSettings settings) {
       super(settings);
       assert services != null;
-      assert arrayIndex >= 0;
+      assert arrayIndex != null;
       this.services = services;
       this.programVariable = null;
       this.arrayIndex = arrayIndex;
@@ -93,7 +93,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
       this.services = services;
       this.programVariable = programVariable;
       this.value = value;
-      this.arrayIndex = -1;
+      this.arrayIndex = null;
       this.condition = condition;
    }
 
@@ -105,7 +105,7 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
       StringBuffer sb = new StringBuffer();
       if (isArrayIndex()) {
          sb.append("[");
-         sb.append(getArrayIndex());
+         sb.append(getArrayIndexString());
          sb.append("]");
       }
       else {
@@ -124,14 +124,14 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
     */
    @Override
    public boolean isArrayIndex() {
-      return arrayIndex >= 0;
+      return arrayIndex != null;
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public int getArrayIndex() {
+   public Term getArrayIndex() {
       return arrayIndex;
    }
 
@@ -206,5 +206,13 @@ public class SymbolicValue extends AbstractElement implements ISymbolicValue {
    @Override
    public String getConditionString() {
       return condition != null ? formatTerm(condition, services) : null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getArrayIndexString() {
+      return arrayIndex != null ? formatTerm(arrayIndex, services) : null;
    }
 }

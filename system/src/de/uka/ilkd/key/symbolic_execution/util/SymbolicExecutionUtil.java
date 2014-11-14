@@ -121,6 +121,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.ExecutionVariableExtractor;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -665,8 +666,9 @@ public final class SymbolicExecutionUtil {
     * root {@link IExecutionVariable}s.
     * @param node The {@link IExecutionNode} to create variables for.
     * @return The created {@link IExecutionVariable}s.
+    * @throws ProofInputException 
     */
-   public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node) {
+   public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node) throws ProofInputException {
       return createExecutionVariables(node, null);
    }
 
@@ -676,8 +678,9 @@ public final class SymbolicExecutionUtil {
     * @param node The {@link IExecutionNode} to create variables for.
     * @param condition A {@link Term} specifying some additional constraints to consider.
     * @return The created {@link IExecutionVariable}s.
+    * @throws ProofInputException 
     */
-   public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node, Term condition) {
+   public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node, Term condition) throws ProofInputException {
       if (node != null) {
          return createExecutionVariables(node, node.getProofNode(), node.getModalityPIO(), condition);
       }
@@ -694,11 +697,34 @@ public final class SymbolicExecutionUtil {
     * @param modalityPIO The {@link PosInOccurrence} of the modality of interest.
     * @param condition A {@link Term} specifying some additional constraints to consider.
     * @return The created {@link IExecutionVariable}s.
+    * @throws ProofInputException 
     */
    public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node, 
                                                                Node proofNode, 
                                                                PosInOccurrence modalityPIO, 
-                                                               Term condition) {
+                                                               Term condition) throws ProofInputException {
+      if (node.getSettings().isVariablesAreOnlyComputedFromUpdates()) {
+         ExecutionVariableExtractor extractor = new ExecutionVariableExtractor(proofNode, modalityPIO, node, condition);
+         return extractor.analyse();
+      }
+      else {
+         return createAllExecutionVariables(node, proofNode, modalityPIO, condition);
+      }
+   }
+
+   /**
+    * Creates for the given {@link IExecutionNode} the contained
+    * root {@link IExecutionVariable}s.
+    * @param node The {@link IExecutionNode} to create variables for.
+    * @param proofNode The proof {@link Node} to work with.
+    * @param modalityPIO The {@link PosInOccurrence} of the modality of interest.
+    * @param condition A {@link Term} specifying some additional constraints to consider.
+    * @return The created {@link IExecutionVariable}s.
+    */
+   public static IExecutionVariable[] createAllExecutionVariables(IExecutionNode<?> node, 
+                                                                  Node proofNode, 
+                                                                  PosInOccurrence modalityPIO, 
+                                                                  Term condition) {
       if (proofNode != null) {
          List<IProgramVariable> variables = new LinkedList<IProgramVariable>();
          // Add self variable
@@ -851,10 +877,10 @@ public final class SymbolicExecutionUtil {
          Function function = (Function)locationTerm.op();
          // Make sure that the function is not an array
          if (heapLDT.getArr() != function) {
-            String typeName = heapLDT.getClassName(function);
+            String typeName = HeapLDT.getClassName(function);
             KeYJavaType type = services.getJavaInfo().getKeYJavaType(typeName);
             if (type != null) {
-               String fieldName = heapLDT.getPrettyFieldName(function);
+               String fieldName = HeapLDT.getPrettyFieldName(function);
                result = services.getJavaInfo().getAttribute(fieldName, type);
             }
          }
@@ -867,22 +893,15 @@ public final class SymbolicExecutionUtil {
     * @param services The {@link Services} to use.
     * @param heapLDT The {@link HeapLDT} to use.
     * @param arrayIndexTerm The {@link Term} to extract the array index from.
-    * @return The array index or {@code -1} if the term defines no array index.
+    * @return The array index or {@code null} if the term defines no array index.
     */
-   public static int getArrayIndex(Services services, HeapLDT heapLDT, Term arrayIndexTerm) {
+   public static Term getArrayIndex(Services services, HeapLDT heapLDT, Term arrayIndexTerm) {
       // Make sure that the term is an array index
       if (arrayIndexTerm.op() == heapLDT.getArr() && arrayIndexTerm.subs().size() == 1) {
-         Term sub = arrayIndexTerm.sub(0);
-         // Make sure that the defined index is an integer
-         if (services.getTypeConverter().getIntegerLDT().getNumberSymbol() == sub.op()) {
-            return Integer.parseInt(SymbolicExecutionUtil.formatTerm(sub, services, false, true));
-         }
-         else {
-            return -1;
-         }
+         return arrayIndexTerm.sub(0);
       }
       else {
-         return -1;
+         return null;
       }
    }
 
@@ -2372,7 +2391,7 @@ public final class SymbolicExecutionUtil {
                                                               Term additionalAntecedent,
                                                               Term newSuccedent,
                                                               boolean addResultLabel) {
-      return createSequentToProveWithNewSuccedent(node, node.getAppliedRuleApp().posInOccurrence(), additionalAntecedent, newSuccedent, addResultLabel);
+      return createSequentToProveWithNewSuccedent(node, node.getAppliedRuleApp() != null ? node.getAppliedRuleApp().posInOccurrence() : null, additionalAntecedent, newSuccedent, addResultLabel);
    }
 
    /**
