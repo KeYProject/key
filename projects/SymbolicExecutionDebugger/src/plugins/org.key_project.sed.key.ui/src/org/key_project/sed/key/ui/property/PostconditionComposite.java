@@ -248,7 +248,7 @@ public class PostconditionComposite implements IDisposable {
                                                          executionNode.getServices(), 
                                                          executionNode.getMediator(), 
                                                          branchResult);
-         viewerGroup.setForeground(viewerDecorator.getColor(value)); // Does not work on Microsoft windows
+         viewerGroup.setBackground(viewerDecorator.getColor(value));
       }
       // Add legend
       addLegend();
