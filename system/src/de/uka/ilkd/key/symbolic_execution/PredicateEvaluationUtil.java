@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermTransformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -156,12 +157,19 @@ public final class PredicateEvaluationUtil {
       Object replaceObject = tacletGoal.replaceWithExpressionAsObject();
       if (replaceObject instanceof Term) {
          Term replaceTerm = (Term) replaceObject;
-         // Replace meta constructs
          if (replaceTerm.op() instanceof TermTransformer) {
+            // Replace meta constructs
             Services services = node.proof().getServices();
             SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(services, tacletApp.instantiations(), tacletApp.posInOccurrence(), tacletApp.taclet());
             replaceTerm.execPostOrder(visitor);
             replaceTerm = visitor.getTerm();
+         }
+         else if (replaceTerm.op() instanceof SchemaVariable) {
+            // Replace schema variables
+            Object instantiation = tacletApp.instantiations().getInstantiation((SchemaVariable)replaceTerm.op());
+            if (instantiation instanceof Term) {
+               replaceTerm = (Term)instantiation;
+            }
          }
          // Check for true/false terms
          if (replaceTerm.op() == Junctor.TRUE) {
