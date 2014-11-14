@@ -55,6 +55,8 @@ public class ProfilePropertiesTest2 {
       
       bot.button("Cancel").click();
       
+      
+      
         
    }
 

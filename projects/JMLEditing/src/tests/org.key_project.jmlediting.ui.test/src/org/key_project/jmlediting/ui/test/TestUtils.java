@@ -55,8 +55,8 @@ public class TestUtils {
       return getProjectWithName(name);
    }
 
-   public static  void openJMLProfileProperties(SWTWorkbenchBot bot, final String PROJECT_NAME) {
-      bot.tree().getTreeItem(PROJECT_NAME).contextMenu("Properties").click(); //.select();
+   public static  void openJMLProfileProperties(SWTWorkbenchBot bot, final String projectName) {
+      bot.tree().getTreeItem(projectName).contextMenu("Properties").click(); //.select();
       
       bot.sleep(100);
    

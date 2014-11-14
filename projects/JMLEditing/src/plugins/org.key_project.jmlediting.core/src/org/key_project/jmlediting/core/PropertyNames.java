@@ -21,6 +21,9 @@ public final class PropertyNames {
     */
    public static final String DEFAULT_JML_PROFILE = "default_jml_profile";
 
+   /**
+    * No instantiations.
+    */
    private PropertyNames() {
 
    }

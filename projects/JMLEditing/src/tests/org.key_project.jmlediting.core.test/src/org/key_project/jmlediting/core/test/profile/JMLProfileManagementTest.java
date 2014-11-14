@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.core.test;
+package org.key_project.jmlediting.core.test.profile;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -19,6 +19,11 @@ public class JMLProfileManagementTest {
          return "DummyJMLProfile1";
       }
 
+      @Override
+      public String getIdentifier() {
+         return this.getClass().getName();
+      }
+
    }
 
    public static class DummyJMLProfile2 implements IJMLProfile {
@@ -26,6 +31,10 @@ public class JMLProfileManagementTest {
       @Override
       public String getName() {
          return "DummyJMLProfile2";
+      }
+      @Override
+      public String getIdentifier() {
+         return this.getClass().getName();
       }
 
    }

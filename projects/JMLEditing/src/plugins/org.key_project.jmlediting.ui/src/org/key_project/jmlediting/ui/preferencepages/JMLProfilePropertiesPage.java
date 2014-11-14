@@ -181,7 +181,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
     */
    private void updateSelection(boolean forceDefault) {
       IJMLProfile currentProfile = null;
-      if ((this.isProjectPreferencePage() || this.useProjectSettings()) &&!forceDefault) {
+      if (!forceDefault && (this.isProjectPreferencePage() || this.useProjectSettings())) {
          // Read local project properties if we are in a properties pane and
          // project specific settings are enabled
          currentProfile = JMLPreferencesHelper.getProjectJMLProfile(this

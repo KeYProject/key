@@ -7,11 +7,18 @@ package org.key_project.jmlediting.core.profile;
  *
  */
 public interface IJMLProfile {
-   
+
    /**
     * 
     * @return the name of the profile
     */
-   public String getName();
+   String getName();
+
+   /**
+    * Returns a identifier for the profile which should be unique.
+    * 
+    * @return the identifier
+    */
+   String getIdentifier();
 
 }

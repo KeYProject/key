@@ -4,10 +4,10 @@
    <extension
          point="org.key_project.jmlediting.core.profiles">
       <profile
-            class="org.key_project.jmlediting.core.test.JMLProfileManagementTest$DummyJMLProfile1">
+            class="org.key_project.jmlediting.core.test.profile.JMLProfileManagementTest$DummyJMLProfile1">
       </profile>
       <profile
-            class="org.key_project.jmlediting.core.test.JMLProfileManagementTest$DummyJMLProfile2">
+            class="org.key_project.jmlediting.core.test.profile.JMLProfileManagementTest$DummyJMLProfile2">
       </profile>
    </extension>
 

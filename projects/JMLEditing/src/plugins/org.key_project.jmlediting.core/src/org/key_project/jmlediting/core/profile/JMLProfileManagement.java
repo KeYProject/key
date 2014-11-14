@@ -32,8 +32,8 @@ public final class JMLProfileManagement {
 
    /**
     * A map implementing a cache for the profile objects. The cache caches the
-    * created object for class names of the configuration. The cache also
-    * ensures that only one profile objects exists for a class.
+    * created object by identifier. The cache also ensures that only one profile
+    * objects exists for an identifier.
     */
    private static Map<String, IJMLProfile> profileCache = new HashMap<String, IJMLProfile>();
 
@@ -57,31 +57,37 @@ public final class JMLProfileManagement {
       // Now check all provided extension points
       for (IExtension extension : extensionPoint.getExtensions()) {
          for (IConfigurationElement elem : extension.getConfigurationElements()) {
-            String profileClass = elem.getAttribute("class");
-            // Try to read cahe
-            IJMLProfile profile = getProfileFromCache(profileClass);
-            if (profile == null) {
-               try {
-                  Object profileO = elem.createExecutableExtension("class");
-                  if (profileO instanceof IJMLProfile) {
-                     profile = (IJMLProfile) profileO;
-                     profileCache.put(profileClass, profile);
+
+            try {
+               Object profileO = elem.createExecutableExtension("class");
+               if (profileO instanceof IJMLProfile) {
+                  IJMLProfile profile = (IJMLProfile) profileO;
+                  if (!profileCache.containsKey(profile.getIdentifier())) {
+                     profileCache.put(profile.getIdentifier(), profile);
+                     availableProfiles.add(profile);
+                  } else {
+                     // An object for this identifier has already been created
+                     // reuse it from the cache and throw away the created one
+                     availableProfiles.add(profileCache.get(profile.getIdentifier()));
                   }
                }
-               catch (CoreException e) {
-                  // TODO Auto-generated catch block
-                  e.printStackTrace();
-               }
+
             }
-            if (profile != null) {
-               availableProfiles.add(profile);
+            catch (CoreException e) {
+               // Ignore this invalid extension
             }
+
          }
       }
 
       return Collections.unmodifiableSet(availableProfiles);
    }
 
+   /**
+    * Returns all available JML profiles sorted by their names.
+    * 
+    * @return the sorted list of profiles
+    */
    public static List<IJMLProfile> getAvailableProfilesSortedByName() {
       List<IJMLProfile> profiles = new ArrayList<IJMLProfile>(
             getAvailableProfiles());
@@ -94,18 +100,23 @@ public final class JMLProfileManagement {
       });
       return profiles;
    }
-   
-   private static IJMLProfile getProfileFromCache(String className) {
-      return profileCache.get(className);
-   }
 
-   public static IJMLProfile getProfileFromClassName(String className) {
-      IJMLProfile profile = getProfileFromCache(className);
+   /**
+    * Returns the IJMLProfile for the given identifier or null if no profile is
+    * found for the identifier.
+    * 
+    * @param identifier
+    *           the identifer of the profile
+    * @return the profile or null
+    */
+   public static IJMLProfile getProfileFromIdentifier(final String identifier) {
+      IJMLProfile profile = profileCache.get(identifier);
       if (profile == null) {
-         // Maybe the user did not call getAvailableProfiles, so the cache is not filled up
+         // Maybe the user did not call getAvailableProfiles, so the cache is
+         // not filled up
          // Try this
          getAvailableProfiles();
-         profile = getProfileFromCache(className);
+         profile = profileCache.get(identifier);
       }
       return profile;
    }
