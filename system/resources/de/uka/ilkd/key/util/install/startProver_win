@@ -32,7 +32,7 @@ if not .%OS%.==.Windows_NT. goto WIN95
 :WINNT
 SET PATH=%JDK%\bin;%PATH%
 
-"%JDK%\bin\java" -Dkey.home="%KEY_HOME%" -Dkey.simplify.logdir="%KEY_SIMPLIFY_LOG_DIR%" "%JAVA_OPTIONS%" -cp "%keyclasspath%" de.uka.ilkd.key.gui.Main %1 %2 %3 %4 %5 %6 %7
+"%JDK%\bin\java" -Dkey.home="%KEY_HOME%" -Dkey.simplify.logdir="%KEY_SIMPLIFY_LOG_DIR%" "%JAVA_OPTIONS%" -cp "%keyclasspath%" de.uka.ilkd.key.core.Main %1 %2 %3 %4 %5 %6 %7
 exit /b
 
 :WIN95
@@ -58,7 +58,7 @@ goto RETURN_TO_CALLER
 if .%1.==.-recursive. shift 1
 rem This Java command specifies the MaxPermSize parameter directly because under Win95/98/Me
 rem it is impossible to assign an environment variable value containing an equal sign (=)
-"%JDK%\bin\java" -Dkey.home="%KEY_HOME%"  -Dkey.simplify.logdir="%KEY_SIMPLIFY_LOG_DIR%" "%JAVA_OPTIONS%" "-XX:MaxPermSize=64m" -cp "%keyclasspath%" de.uka.ilkd.key.gui.Main %1 %2 %3 %4 %5 %6 %7
+"%JDK%\bin\java" -Dkey.home="%KEY_HOME%"  -Dkey.simplify.logdir="%KEY_SIMPLIFY_LOG_DIR%" "%JAVA_OPTIONS%" "-XX:MaxPermSize=64m" -cp "%keyclasspath%" de.uka.ilkd.key.core.Main %1 %2 %3 %4 %5 %6 %7
 
 :MISSING_LIBRARY
 echo Missing Library. Please copy all libraries to %KEY_LIB%.
