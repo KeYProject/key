@@ -2494,6 +2494,7 @@ public final class JMLTranslator {
                 if (type == PrimitiveType.JAVA_CHAR) res = tb.and(res,tb.inChar(tb.var(qv)));
                 if (type == PrimitiveType.JAVA_INT) res = tb.and(res,tb.inInt(tb.var(qv)));
                 if (type == PrimitiveType.JAVA_LONG) res = tb.and(res,tb.inLong(tb.var(qv)));
+                if (type == PrimitiveType.JAVA_LOCSET) res = tb.and(res,tb.disjoint(tb.var(qv), tb.freshLocs(tb.getBaseHeap())));
             } else {
                 // assume reference type
                 if (nullable) {

@@ -142,4 +142,4 @@ $JAVA $JAVA_OPTIONS $keysysprops \
 -Dkey.simplify.logdir="$KEY_SIMPLIFY_LOG_DIR" \
 -Dkey.ics.logdir="$KEY_ICS_LOG_DIR" \
 -Dsun.awt.exception.handler=de.uka.ilkd.key.gui.ExceptionalHandler \
--classpath "$keyclasspath" de.uka.ilkd.key.gui.Main $keyarg
+-classpath "$keyclasspath" de.uka.ilkd.key.core.Main $keyarg

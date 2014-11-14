@@ -16,21 +16,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.charset.Charset;
 
 import org.antlr.runtime.ANTLRReaderStream;
 import org.antlr.runtime.ANTLRStringStream;
 
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 /*
  * Extends generated class {@link KeYLexer} with custom constructors.
  */
 public class KeYLexerF extends KeYLexer {
-    public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
-
     public KeYLexerF(InputStream file, String fileName, KeYExceptionHandler keh) throws IOException {
-        this(new InputStreamReader(file, DEFAULT_CHARSET), fileName, keh);
+        this(new InputStreamReader(file, Main.DEFAULT_CHARSET), fileName, keh);
     }
 
     public KeYLexerF(Reader file, String fileName, KeYExceptionHandler keh)

@@ -1,328 +1,328 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <variable name="heapAtPre" arrayIndex="-1" isArrayIndex="false">
+   <variable name="heapAtPre" isArrayIndex="false">
       <value name="heapAtPre {true}" typeString="Heap" valueString="heapAtPre" isValueAnObject="false" isValueUnknown="false" conditionString="true">
       </value>
    </variable>
    <methodCall name="&lt;call self.main()&gt;" pathCondition="true" pathConditionChanged="false">
-      <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+      <variable name="exc" isArrayIndex="false">
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
       <statement name="this.previous=null;" pathCondition="true" pathConditionChanged="false">
-         <variable name="self" arrayIndex="-1" isArrayIndex="false">
+         <variable name="self" isArrayIndex="false">
             <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-               <variable name="next" arrayIndex="-1" isArrayIndex="false">
+               <variable name="next" isArrayIndex="false">
                   <value name="next {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                   </value>
                </variable>
-               <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+               <variable name="previous" isArrayIndex="false">
                   <value name="previous {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                   </value>
                </variable>
             </value>
          </variable>
-         <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+         <variable name="exc" isArrayIndex="false">
             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
          <statement name="this.next=new UnknownTest ();" pathCondition="true" pathConditionChanged="false">
-            <variable name="self" arrayIndex="-1" isArrayIndex="false">
+            <variable name="self" isArrayIndex="false">
                <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                  <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="next" isArrayIndex="false">
                      <value name="next {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                      </value>
                   </variable>
-                  <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="previous" isArrayIndex="false">
                      <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                </value>
             </variable>
-            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+            <variable name="exc" isArrayIndex="false">
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <methodCall name="&lt;call UnknownTest()&gt;" pathCondition="true" pathConditionChanged="false">
-               <variable name="self" arrayIndex="-1" isArrayIndex="false">
+               <variable name="self" isArrayIndex="false">
                   <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                     <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="next" isArrayIndex="false">
                         <value name="next {or(and(not(equals(u_3,self)),or(equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null),not(equals(boolean::select(heap,endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),java.lang.Object::&lt;created&gt;),TRUE)))),and(not(equals(u_3,self)),not(equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null))))}" isValueAnObject="false" isValueUnknown="true" conditionString="or(and(not(equals(u_3,self)),or(equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null),not(equals(boolean::select(heap,endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),java.lang.Object::&lt;created&gt;),TRUE)))),and(not(equals(u_3,self)),not(equals(endless.UnknownTest::select(heap,self,endless.UnknownTest::$next),null))))">
                         </value>
                      </variable>
-                     <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="previous" isArrayIndex="false">
                         <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
                </variable>
-               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+               <variable name="exc" isArrayIndex="false">
                   <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <variable name="u_1" arrayIndex="-1" isArrayIndex="false">
+               <variable name="u_1" isArrayIndex="false">
                   <value name="u_1 {true}" typeString="endless.UnknownTest" valueString="u_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                     <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="next" isArrayIndex="false">
                         <value name="next {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="previous" isArrayIndex="false">
                         <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
                </variable>
                <methodReturn name="&lt;return of UnknownTest&gt;" signature="&lt;return of UnknownTest()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
-                  <variable name="u_1" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="u_1" isArrayIndex="false">
                      <value name="u_1 {true}" typeString="endless.UnknownTest" valueString="u_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                        <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="next" isArrayIndex="false">
                            <value name="next {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="previous" isArrayIndex="false">
                            <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
                   </variable>
-                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="exc" isArrayIndex="false">
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <statement name="this.next.next=new UnknownTest ();" pathCondition="true" pathConditionChanged="false">
-                     <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="self" isArrayIndex="false">
                         <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                           <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="next" isArrayIndex="false">
                               <value name="next {true}" typeString="endless.UnknownTest" valueString="u_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                 <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="next" isArrayIndex="false">
                                     <value name="next {not(equals(u_3,self))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(u_3,self))">
                                     </value>
                                  </variable>
-                                 <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="previous" isArrayIndex="false">
                                     <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                               </value>
                            </variable>
-                           <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="previous" isArrayIndex="false">
                               <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                         </value>
                      </variable>
-                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="exc" isArrayIndex="false">
                         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <methodCall name="&lt;call UnknownTest()&gt;" pathCondition="true" pathConditionChanged="false">
-                        <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="self" isArrayIndex="false">
                            <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                              <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="next" isArrayIndex="false">
                                  <value name="next {not(equals(u_9,self))}" typeString="endless.UnknownTest" valueString="u_3" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(u_9,self))">
-                                    <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                    <variable name="next" isArrayIndex="false">
                                        <value name="next {not(equals(u_3,self))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(u_3,self))">
                                        </value>
                                     </variable>
-                                    <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                    <variable name="previous" isArrayIndex="false">
                                        <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                        </value>
                                     </variable>
                                  </value>
                               </variable>
-                              <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="previous" isArrayIndex="false">
                                  <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                            </value>
                         </variable>
-                        <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="exc" isArrayIndex="false">
                            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="u_5" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="u_5" isArrayIndex="false">
                            <value name="u_5 {true}" typeString="endless.UnknownTest" valueString="u_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                              <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="next" isArrayIndex="false">
                                  <value name="next {not(equals(u_3,self))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(u_3,self))">
                                  </value>
                               </variable>
-                              <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="previous" isArrayIndex="false">
                                  <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                            </value>
                         </variable>
-                        <variable name="u_7" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="u_7" isArrayIndex="false">
                            <value name="u_7 {true}" typeString="endless.UnknownTest" valueString="u_9" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                              <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="next" isArrayIndex="false">
                                  <value name="next {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
-                              <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="previous" isArrayIndex="false">
                                  <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                            </value>
                         </variable>
                         <methodReturn name="&lt;return of UnknownTest&gt;" signature="&lt;return of UnknownTest()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
-                           <variable name="u_7" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="u_7" isArrayIndex="false">
                               <value name="u_7 {true}" typeString="endless.UnknownTest" valueString="u_9" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                 <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="next" isArrayIndex="false">
                                     <value name="next {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
-                                 <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="previous" isArrayIndex="false">
                                     <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                               </value>
                            </variable>
-                           <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="exc" isArrayIndex="false">
                               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
-                           <variable name="u_5" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="u_5" isArrayIndex="false">
                               <value name="u_5 {true}" typeString="endless.UnknownTest" valueString="u_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                 <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="next" isArrayIndex="false">
                                     <value name="next {not(equals(u_3,self))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(u_3,self))">
                                     </value>
                                  </variable>
-                                 <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="previous" isArrayIndex="false">
                                     <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                               </value>
                            </variable>
                            <statement name="return this.next.next;" pathCondition="true" pathConditionChanged="false">
-                              <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="self" isArrayIndex="false">
                                  <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                    <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                    <variable name="next" isArrayIndex="false">
                                        <value name="next {and(not(equals(u_3,self)),not(equals(u_9,self)))}" typeString="endless.UnknownTest" valueString="u_3" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(u_3,self)),not(equals(u_9,self)))">
-                                          <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                          <variable name="next" isArrayIndex="false">
                                              <value name="next {true}" typeString="endless.UnknownTest" valueString="u_9" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                                <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                                <variable name="next" isArrayIndex="false">
                                                    <value name="next {and(not(equals(u_3,self)),not(equals(u_9,self)))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(u_3,self)),not(equals(u_9,self)))">
                                                    </value>
                                                 </variable>
-                                                <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                                <variable name="previous" isArrayIndex="false">
                                                    <value name="previous {and(not(equals(u_3,self)),not(equals(u_9,self)))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(u_3,self)),not(equals(u_9,self)))">
                                                    </value>
                                                 </variable>
                                              </value>
                                           </variable>
-                                          <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                          <variable name="previous" isArrayIndex="false">
                                              <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                              </value>
                                           </variable>
                                        </value>
                                     </variable>
-                                    <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                    <variable name="previous" isArrayIndex="false">
                                        <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                        </value>
                                     </variable>
                                  </value>
                               </variable>
-                              <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="exc" isArrayIndex="false">
                                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
-                                 <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="self" isArrayIndex="false">
                                     <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                       <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                       <variable name="next" isArrayIndex="false">
                                           <value name="next {and(not(equals(u_3,self)),not(equals(u_9,self)))}" typeString="endless.UnknownTest" valueString="u_3" isValueAnObject="true" isValueUnknown="false" conditionString="and(not(equals(u_3,self)),not(equals(u_9,self)))">
-                                             <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                             <variable name="next" isArrayIndex="false">
                                                 <value name="next {true}" typeString="endless.UnknownTest" valueString="u_9" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                                   <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                                   <variable name="next" isArrayIndex="false">
                                                       <value name="next {and(not(equals(u_3,self)),not(equals(u_9,self)))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(u_3,self)),not(equals(u_9,self)))">
                                                       </value>
                                                    </variable>
-                                                   <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                                   <variable name="previous" isArrayIndex="false">
                                                       <value name="previous {and(not(equals(u_3,self)),not(equals(u_9,self)))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(u_3,self)),not(equals(u_9,self)))">
                                                       </value>
                                                    </variable>
                                                 </value>
                                              </variable>
-                                             <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                             <variable name="previous" isArrayIndex="false">
                                                 <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                                 </value>
                                              </variable>
                                           </value>
                                        </variable>
-                                       <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                       <variable name="previous" isArrayIndex="false">
                                           <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                           </value>
                                        </variable>
                                     </value>
                                  </variable>
-                                 <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="exc" isArrayIndex="false">
                                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
-                                    <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                    <variable name="exc" isArrayIndex="false">
                                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                        </value>
                                     </variable>
                                  </termination>
-                                 <callStateVariable name="self" arrayIndex="-1" isArrayIndex="false">
+                                 <callStateVariable name="self" isArrayIndex="false">
                                     <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                       <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                       <variable name="next" isArrayIndex="false">
                                           <value name="next {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                                           </value>
                                        </variable>
-                                       <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                       <variable name="previous" isArrayIndex="false">
                                           <value name="previous {true}" isValueAnObject="false" isValueUnknown="true" conditionString="true">
                                           </value>
                                        </variable>
                                     </value>
                                  </callStateVariable>
-                                 <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                 <callStateVariable name="exc" isArrayIndex="false">
                                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </callStateVariable>
-                                 <callStateVariable name="heapBefore_main" arrayIndex="-1" isArrayIndex="false">
+                                 <callStateVariable name="heapBefore_main" isArrayIndex="false">
                                     <value name="heapBefore_main {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </callStateVariable>
-                                 <callStateVariable name="savedHeapBefore_main" arrayIndex="-1" isArrayIndex="false">
+                                 <callStateVariable name="savedHeapBefore_main" isArrayIndex="false">
                                     <value name="savedHeapBefore_main {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </callStateVariable>
                               </methodReturn>
                            </statement>
-                           <callStateVariable name="u_7" arrayIndex="-1" isArrayIndex="false">
+                           <callStateVariable name="u_7" isArrayIndex="false">
                               <value name="u_7 {true}" typeString="endless.UnknownTest" valueString="u_9" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                 <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="next" isArrayIndex="false">
                                     <value name="next {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
-                                 <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="previous" isArrayIndex="false">
                                     <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                               </value>
                            </callStateVariable>
-                           <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <callStateVariable name="exc" isArrayIndex="false">
                               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </callStateVariable>
-                           <callStateVariable name="u_5" arrayIndex="-1" isArrayIndex="false">
+                           <callStateVariable name="u_5" isArrayIndex="false">
                               <value name="u_5 {true}" typeString="endless.UnknownTest" valueString="u_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                                 <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="next" isArrayIndex="false">
                                     <value name="next {not(equals(u_3,self))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(u_3,self))">
                                     </value>
                                  </variable>
-                                 <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="previous" isArrayIndex="false">
                                     <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                               </value>
                            </callStateVariable>
-                           <callStateVariable name="heapBefore_&lt;init&gt;_1" arrayIndex="-1" isArrayIndex="false">
+                           <callStateVariable name="heapBefore_&lt;init&gt;_1" isArrayIndex="false">
                               <value name="heapBefore_&lt;init&gt;_1 {true}" typeString="Heap" valueString="store(store(store(create(store(store(store(store(create(store(heap,self,endless.UnknownTest::$previous,null),u_3),u_3,endless.UnknownTest::$next,null),u_3,endless.UnknownTest::$previous,null),u_3,java.lang.Object::&lt;initialized&gt;,TRUE),self,endless.UnknownTest::$next,u_3),u_9),u_9,java.lang.Object::&lt;initialized&gt;,FALSE),u_9,endless.UnknownTest::$next,null),u_9,endless.UnknownTest::$previous,null)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </callStateVariable>
-                           <callStateVariable name="savedHeapBefore_&lt;init&gt;_1" arrayIndex="-1" isArrayIndex="false">
+                           <callStateVariable name="savedHeapBefore_&lt;init&gt;_1" isArrayIndex="false">
                               <value name="savedHeapBefore_&lt;init&gt;_1 {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </callStateVariable>
@@ -330,27 +330,27 @@
                         <methodReturnEntry path="/0/0/0/0/0/0/0/0"/>
                      </methodCall>
                   </statement>
-                  <callStateVariable name="u_1" arrayIndex="-1" isArrayIndex="false">
+                  <callStateVariable name="u_1" isArrayIndex="false">
                      <value name="u_1 {true}" typeString="endless.UnknownTest" valueString="u_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                        <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="next" isArrayIndex="false">
                            <value name="next {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="previous" isArrayIndex="false">
                            <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
                   </callStateVariable>
-                  <callStateVariable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <callStateVariable name="exc" isArrayIndex="false">
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </callStateVariable>
-                  <callStateVariable name="heapBefore_&lt;init&gt;" arrayIndex="-1" isArrayIndex="false">
+                  <callStateVariable name="heapBefore_&lt;init&gt;" isArrayIndex="false">
                      <value name="heapBefore_&lt;init&gt; {true}" typeString="Heap" valueString="store(store(store(create(store(heap,self,endless.UnknownTest::$previous,null),u_3),u_3,java.lang.Object::&lt;initialized&gt;,FALSE),u_3,endless.UnknownTest::$next,null),u_3,endless.UnknownTest::$previous,null)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </callStateVariable>
-                  <callStateVariable name="savedHeapBefore_&lt;init&gt;" arrayIndex="-1" isArrayIndex="false">
+                  <callStateVariable name="savedHeapBefore_&lt;init&gt;" isArrayIndex="false">
                      <value name="savedHeapBefore_&lt;init&gt; {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </callStateVariable>

@@ -15,6 +15,7 @@ package de.uka.ilkd.key.core;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.ServiceLoader;
 
@@ -572,4 +573,6 @@ public final class Main {
         public static final byte HIGH = 2;
         public static final byte DEBUG = 4;
     }
+
+    public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 }

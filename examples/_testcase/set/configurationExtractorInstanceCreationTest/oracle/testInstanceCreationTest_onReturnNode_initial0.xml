@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
    <state name="One Step Simplification resulting in {}">
-      <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+      <association name="self" programVariable="self" isArrayIndex="false" target="o1"/>
    </state>
    <object xml:id="o1" name="self" type="InstanceCreationTest">
-      <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o2"/>
+      <association name="next" programVariable="next" isArrayIndex="false" target="o2"/>
    </object>
    <object xml:id="o2" name="InstanceCreationTest::select(heap,self,InstanceCreationTest::$next)" type="InstanceCreationTest">
    </object>

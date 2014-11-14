@@ -11,11 +11,11 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.proof.io;
 
 import java.io.*;
 
-import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
 public class CountingBufferedReader extends BufferedReader {
@@ -25,7 +25,7 @@ public class CountingBufferedReader extends BufferedReader {
     private ProgressMonitor monitor=ProgressMonitor.Empty.getInstance();
 
     public CountingBufferedReader(InputStream in) {
-	super(new InputStreamReader(in, KeYLexerF.DEFAULT_CHARSET));
+	super(new InputStreamReader(in, Main.DEFAULT_CHARSET));
 	chars = 0;
 	step  = 1;
     }
@@ -47,7 +47,7 @@ public class CountingBufferedReader extends BufferedReader {
     }
 
     public CountingBufferedReader(InputStream in, int size, int step) {
-	super(new InputStreamReader(in, KeYLexerF.DEFAULT_CHARSET), size);
+	super(new InputStreamReader(in, Main.DEFAULT_CHARSET), size);
 	this.step=(step == 0 ? 1 : step);
 	chars=0;
     }

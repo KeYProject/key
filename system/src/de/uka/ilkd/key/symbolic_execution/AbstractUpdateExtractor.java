@@ -302,8 +302,8 @@ public abstract class AbstractUpdateExtractor {
                }
             }
             else {
-               int arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, selectArgument.sub(2));
-               if (arrayIndex >= 0) {
+               Term arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, selectArgument.sub(2));
+               if (arrayIndex != null) {
                   locationsToFill.add(new ExtractLocationParameter(arrayIndex, selectArgument.sub(1)));
                }
                else {
@@ -338,8 +338,8 @@ public abstract class AbstractUpdateExtractor {
             }
          }
          else {
-            int arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, term.sub(2));
-            if (arrayIndex >= 0) {
+            Term arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, term.sub(2));
+            if (arrayIndex != null) {
                locationsToFill.add(new ExtractLocationParameter(arrayIndex, term.sub(1)));
             }
             else {
@@ -451,8 +451,8 @@ public abstract class AbstractUpdateExtractor {
                   }
                }
                else {
-                  int arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, term.sub(2));
-                  if (arrayIndex >= 0) {
+                  Term arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, term.sub(2));
+                  if (arrayIndex != null) {
                      if (selectTerm.op() instanceof ProgramVariable) {
                         toFill.add(new ExtractLocationParameter((ProgramVariable)selectTerm.op(), true));
                      }
@@ -548,9 +548,9 @@ public abstract class AbstractUpdateExtractor {
       private final ProgramVariable programVariable;
       
       /**
-       * The array index or {@code -1} if a {@link ProgramVariable} is used instead.
+       * The array index or {@code null} if a {@link ProgramVariable} is used instead.
        */
-      private final int arrayIndex;
+      private final Term arrayIndex;
       
       /**
        * An optional parent object represented as {@link Term}. If it is {@code null} an {@link IProgramVariable} of the state is represented.
@@ -615,7 +615,7 @@ public abstract class AbstractUpdateExtractor {
          this.programVariable = programVariable;
          this.parentTerm = parentTerm;
          this.preVariable = createLocationVariable("Pre" + preVariableIndex++, parentTerm != null ? parentTerm.sort() : programVariable.sort());
-         this.arrayIndex = -1;
+         this.arrayIndex = null;
          this.stateMember = stateMember;
       }
       
@@ -625,7 +625,7 @@ public abstract class AbstractUpdateExtractor {
        * @param parentTerm The parent object represented as {@link Term}.
        * @throws ProofInputException Occurred Exception.
        */
-      public ExtractLocationParameter(int arrayIndex, 
+      public ExtractLocationParameter(Term arrayIndex, 
                                       Term parentTerm) throws ProofInputException {
          assert parentTerm != null;
          this.programVariable = null;
@@ -659,14 +659,14 @@ public abstract class AbstractUpdateExtractor {
        * @return {@code true} is array index, {@code false} is {@link ProgramVariable}. 
        */
       public boolean isArrayIndex() {
-         return arrayIndex >= 0;
+         return arrayIndex != null;
       }
       
       /**
        * Returns the array index.
        * @return The array index.
        */
-      public int getArrayIndex() {
+      public Term getArrayIndex() {
          return arrayIndex;
       }
 
@@ -696,8 +696,7 @@ public abstract class AbstractUpdateExtractor {
       public Term createPreValueTerm() {
          if (parentTerm != null) {
             if (isArrayIndex()) {
-               Term idx = getServices().getTermBuilder().zTerm("" + arrayIndex);
-               return getServices().getTermBuilder().dotArr(parentTerm, idx);
+               return getServices().getTermBuilder().dotArr(parentTerm, arrayIndex);
             }
             else {
                if (getServices().getJavaInfo().getArrayLength() == programVariable) {
@@ -790,7 +789,7 @@ public abstract class AbstractUpdateExtractor {
       public boolean equals(Object obj) {
          if (obj instanceof ExtractLocationParameter) {
             ExtractLocationParameter other = (ExtractLocationParameter)obj;
-            return arrayIndex == other.arrayIndex &&
+            return JavaUtil.equals(arrayIndex, other.arrayIndex) &&
                    stateMember == other.stateMember &&
                    JavaUtil.equals(parentTerm, other.parentTerm) &&
                    JavaUtil.equals(programVariable, other.programVariable);
@@ -806,7 +805,7 @@ public abstract class AbstractUpdateExtractor {
       @Override
       public int hashCode() {
          int result = 17;
-         result = 31 * result + arrayIndex;
+         result = 31 * result + (arrayIndex != null ? arrayIndex.hashCode() : 0);
          result = 31 * result + (stateMember ? 1 : 0);
          result = 31 * result + (parentTerm != null ? parentTerm.hashCode() : 0);
          result = 31 * result + (programVariable != null ? programVariable.hashCode() : 0);
@@ -919,9 +918,9 @@ public abstract class AbstractUpdateExtractor {
       private final ProgramVariable programVariable;
 
       /**
-       * The array index or {@code -1} if a {@link ProgramVariable} is used instead.
+       * The array index or {@code null} if a {@link ProgramVariable} is used instead.
        */
-      private final int arrayIndex;
+      private final Term arrayIndex;
       
       /**
        * An optional parent object or {@code null} if it is a value/association of the state.
@@ -962,7 +961,7 @@ public abstract class AbstractUpdateExtractor {
          this.parent = parent;
          this.value = value;
          this.condition = condition;
-         this.arrayIndex = -1;
+         this.arrayIndex = null;
          this.stateMember = stateMember;
       }
 
@@ -974,7 +973,7 @@ public abstract class AbstractUpdateExtractor {
        * @param condition An optional condition under which the value is valid.
        * @param stateMember Defines if this location should explicitly be shown on the state.
        */
-      public ExecutionVariableValuePair(int arrayIndex, 
+      public ExecutionVariableValuePair(Term arrayIndex, 
                                         Term parent, 
                                         Term value, 
                                         Term condition,
@@ -1018,14 +1017,14 @@ public abstract class AbstractUpdateExtractor {
        * @return {@code true} is array index, {@code false} is {@link ProgramVariable}. 
        */
       public boolean isArrayIndex() {
-         return arrayIndex >= 0;
+         return arrayIndex != null;
       }
 
       /**
        * Returns the array index.
        * @return The array index.
        */
-      public int getArrayIndex() {
+      public Term getArrayIndex() {
          return arrayIndex;
       }
 
@@ -1052,7 +1051,7 @@ public abstract class AbstractUpdateExtractor {
       public boolean equals(Object obj) {
          if (obj instanceof ExecutionVariableValuePair) {
             ExecutionVariableValuePair other = (ExecutionVariableValuePair)obj;
-            return isArrayIndex() ? getArrayIndex() == other.getArrayIndex() : getProgramVariable().equals(other.getProgramVariable()) &&
+            return isArrayIndex() ? getArrayIndex().equals(other.getArrayIndex()) : getProgramVariable().equals(other.getProgramVariable()) &&
                    getParent() != null ? getParent().equals(other.getParent()) : other.getParent() == null &&
                    getCondition() != null ? getCondition().equals(other.getCondition()) : other.getCondition() == null &&
                    getValue().equals(other.getValue());
@@ -1068,7 +1067,7 @@ public abstract class AbstractUpdateExtractor {
       @Override
       public int hashCode() {
          int result = 17;
-         result = 31 * result + (isArrayIndex() ? getArrayIndex() : getProgramVariable().hashCode());
+         result = 31 * result + (isArrayIndex() ? getArrayIndex().hashCode() : getProgramVariable().hashCode());
          result = 31 * result + (getParent() != null ? getParent().hashCode() : 0);
          result = 31 * result + (getCondition() != null ? getCondition().hashCode() : 0);
          result = 31 * result + getValue().hashCode();

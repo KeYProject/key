@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
    <state name="One Step Simplification resulting in return obj.x;">
-      <association name="obj" programVariable="obj" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+      <association name="obj" programVariable="obj" isArrayIndex="false" target="o1"/>
    </state>
    <object xml:id="o1" name="obj" type="EmptyPathConditionAndNoUpdates">
    </object>
