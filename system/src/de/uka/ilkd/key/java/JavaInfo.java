@@ -523,7 +523,7 @@ public final class JavaInfo {
 	    				ImmutableList<KeYJavaType> signature) {
 	return kpmi.getConstructor(kjt, signature);
     }
-
+    
     /**
      * returns the program methods defined in the given KeYJavaType with name
      * m and the list of types as signature of the method
@@ -601,12 +601,37 @@ public final class JavaInfo {
 	    			     String methodName,
 				     Term[] args,
 				     String className) {
-	ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
-	KeYJavaType clType = getTypeByClassName(className);
+	ImmutableList<KeYJavaType> argList = ImmutableSLList.<KeYJavaType>nil();
 	for(int i=0; i < args.length; i++) {
-	    sig = sig.append(getServices().getJavaInfo().getKeYJavaType(args[i].sort()));
+	    argList = argList.append(getServices().getJavaInfo().getKeYJavaType(args[i].sort()));
 	}
-	IProgramMethod pm   = getProgramMethod(clType, methodName, sig, clType);
+
+        IProgramMethod pm = null;
+        KeYJavaType classKJT = getTypeByClassName(className);
+        if (prefix == null) {
+            /*
+             * Method is referenced from a static context.
+             */
+            pm = getProgramMethod(classKJT, methodName, argList, classKJT);
+        } else {
+            /*
+             * Method is referenced from a non-static context.
+             */
+            ImmutableList<KeYJavaType> allSupertypes = kpmi.getAllSupertypes(classKJT).reverse();
+            Iterator iterator = allSupertypes.iterator();
+            while (iterator.hasNext() && pm == null) {
+                KeYJavaType next = (KeYJavaType) iterator.next();
+                pm = getProgramMethod(next, methodName, argList, next);
+                if (pm != null && pm.isPrivate() && !next.equals(classKJT)) {
+                    /*
+                     * Private methods from supertypes are not visible in their
+                     * subtypes. They will not be selected here.
+                     */
+                    pm = null;
+                }
+            }
+        }
+
 	if(pm == null) {
 	    throw new IllegalArgumentException("Program method "+methodName
 					       +" in "+className+" not found.");

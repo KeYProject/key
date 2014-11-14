@@ -2816,7 +2816,7 @@ attribute_or_query_suffix[Term prefix] returns [Term _attribute_or_query_suffix 
 @after { _attribute_or_query_suffix = result; }
     :
     DOT memberName = attrid
-    (result = querySuffix[prefix, memberName] {assert result != null;})?
+    (result = query_suffix[prefix, memberName] {assert result != null;})?
     {
         if(result == null)  {
             if(prefix.sort() == getServices().getTypeConverter().getSeqLDT().targetSort()) {
@@ -2847,7 +2847,7 @@ attrid returns [String attr = "";]
         { attr = clss + "::" + id2; }
     ;
     
-querySuffix [Term prefix, String memberName] returns [Term result = null] 
+query_suffix [Term prefix, String memberName] returns [Term result = null] 
 @init{
     String classRef, name;
     boolean brackets = false;
@@ -2871,8 +2871,7 @@ querySuffix [Term prefix, String memberName] returns [Term result = null]
               getColumn());
        classRef = kjt.getFullName();
 
-       result = getServices().getJavaInfo().getProgramMethodTerm
-                (prefix, name, args, classRef);
+       result = getServices().getJavaInfo().getProgramMethodTerm(prefix, name, args, classRef);
     }
  ;
 catch [TermCreationException ex] {
