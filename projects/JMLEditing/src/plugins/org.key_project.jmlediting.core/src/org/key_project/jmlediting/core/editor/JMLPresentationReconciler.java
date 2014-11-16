@@ -23,11 +23,13 @@ public class JMLPresentationReconciler extends PresentationReconciler {
    public JMLPresentationReconciler(IPresentationReconciler javaEditorPresentationReconciler) {
       super();
       this.javaEditorPresentationReconciler=javaEditorPresentationReconciler;
-      dr= new DefaultDamagerRepairer(new SingleTokenScanner(new TextAttribute(new Color(Display.getCurrent(),new RGB(200,200,200)))));
-      this.setDamager(dr, "JMLMultiline");
-      this.setDamager(dr, "JMLSingleLine");
-      this.setRepairer(dr, "JMLSingleLine");
-      this.setRepairer(dr, "JMLMultiLine");
+      JMLPartitionScanner ps = new JMLPartitionScanner();
+      dr= new DefaultDamagerRepairer(new SingleTokenScanner(new TextAttribute(new Color(Display.getCurrent(),new RGB(255,0,0)))));
+      this.setDamager(dr,ps.JMLSingleLine);
+      this.setDamager(dr, ps.JMLMultiLine);
+      this.setRepairer(dr, ps.JMLSingleLine);
+      this.setRepairer(dr, ps.JMLSingleLine);
+      //
    }
    
    /**
@@ -38,10 +40,10 @@ public class JMLPresentationReconciler extends PresentationReconciler {
     */
    @Override
    public IPresentationDamager getDamager(String contentType) {
-      if(contentType!="JMLMultiLine")
-         if(contentType!="JMLSingleLine")
+     if(!contentType.equals("JMLMultiLine"))
+         if(!contentType.equals("JMLSingleLine"))
             return javaEditorPresentationReconciler.getDamager(contentType);
-      return this.getDamager(contentType);
+      return dr;
    }
    
    /**
@@ -52,10 +54,10 @@ public class JMLPresentationReconciler extends PresentationReconciler {
     */
    @Override
    public IPresentationRepairer getRepairer(String contentType) {
-      if(contentType!="JMLMultiLine")
-         if(contentType!="JMLSingleLine")
-            return javaEditorPresentationReconciler.getRepairer(contentType);
-      return this.getRepairer(contentType);
+     // if(!contentType.equals("JMLMultiLine"))
+       //  if(!contentType.equals("JMLSingleLine"))
+         //   return javaEditorPresentationReconciler.getRepairer(contentType);
+      return dr;
    }
    
    

@@ -10,23 +10,23 @@ import org.eclipse.jface.text.rules.Token;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JMLPartitionScanner extends RuleBasedPartitionScanner{
+public class JMLPartitionScanner extends RuleBasedPartitionScanner {
    
    /**
-    * Identifier for JML Multi Line Code
+    * Identifier for JML Multi Line Code.
     */
    static final String JMLMultiLine = "JML_MULTI_LINE";
    
    /**
-    * Identifier for JML Single Line Code
+    * Identifier for JML Single Line Code.
     */
    static final String JMLSingleLine = "JML_SINGLE_LINE";
    
    /**
-    * Creates a JMLPartitionScanner that Detects SingleLine and Multiline JML Code
+    * Creates a JMLPartitionScanner that Detects SingleLine and Multiline JML Code.
     */
    @SuppressWarnings({ "rawtypes", "unchecked" })
-   public JMLPartitionScanner(){
+   public JMLPartitionScanner() {
       super();
       IToken singleLineJML = new Token(JMLSingleLine);
       IToken multiLineJML = new Token(JMLMultiLine);

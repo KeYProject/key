@@ -2,5 +2,14 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="org.key_project.jmlediting.core.profiles" name="JML Profiles" schema="schema/org.key_project.jmlediting.core.profiles.exsd"/>
+   <extension
+         point="org.key_project.javaeditor.javaConfigurationExtensions">
+      <javaConfigurationExtensions
+            class="org.key_project.jmlediting.ui.extension.JMLSourceViewerConfigurationExtension"
+            defaultEnabled="true"
+            id="org.key_project.jmlediting.core.javaConfigurationExtensions1"
+            name="org.key_project.jmlediting.core.javaConfigurationExtensions1">
+      </javaConfigurationExtensions>
+   </extension>
 
 </plugin>
