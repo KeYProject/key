@@ -15,10 +15,10 @@ package de.uka.ilkd.key.proof.io;
 import java.io.File;
 import java.util.List;
 
-import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.TaskFinishedInfo;
+import de.uka.ilkd.key.core.DefaultTaskFinishedInfo;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.ProverTaskListener;
+import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.proof.init.Profile;
 import java.util.Properties;

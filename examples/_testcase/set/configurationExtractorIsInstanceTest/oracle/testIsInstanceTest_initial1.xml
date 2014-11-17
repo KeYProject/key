@@ -5,8 +5,8 @@
       <term term="IsInstanceTest::select(heap,null,IsInstanceTest::$A)"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in return 1;">
-      <association name="IsInstanceTest::A" programVariable="IsInstanceTest::A" isArrayIndex="false" arrayIndex="-1" target="o1"/>
-      <association name="obj" programVariable="obj" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+      <association name="IsInstanceTest::A" programVariable="IsInstanceTest::A" isArrayIndex="false" target="o1"/>
+      <association name="obj" programVariable="obj" isArrayIndex="false" target="o1"/>
    </state>
    <object xml:id="o1" name="obj" type="IsInstanceTest">
    </object>

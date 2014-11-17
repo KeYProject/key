@@ -22,7 +22,7 @@ import org.key_project.key4eclipse.util.KeYExampleUtil;
 import org.osgi.framework.BundleContext;
 
 import de.uka.ilkd.key.gui.ExampleChooser;
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.gui.configuration.PathConfig;

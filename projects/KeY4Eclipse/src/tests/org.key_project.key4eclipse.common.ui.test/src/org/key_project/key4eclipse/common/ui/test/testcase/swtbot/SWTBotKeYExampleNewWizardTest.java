@@ -39,8 +39,8 @@ import org.key_project.util.java.IOUtil;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.ExampleChooser;
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomUserInterface;
 
@@ -73,7 +73,7 @@ public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
     */
    protected void doTestAllExamples(boolean srcDir) throws Exception {
       final Set<String> EXAMPLES_WITH_COMPILER_FAILURES = new HashSet<String>();
-      EXAMPLES_WITH_COMPILER_FAILURES.add("08-Java5");
+      EXAMPLES_WITH_COMPILER_FAILURES.add("Java 5 Enhanced-for");
       EXAMPLES_WITH_COMPILER_FAILURES.add("Simple E-Voting");
       EXAMPLES_WITH_COMPILER_FAILURES.add("List with Sequences");
 
@@ -126,12 +126,12 @@ public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
          // Test shown tabs
          newWizard.bot().tabItem("Description").activate();
          assertEquals(example.getDescription(), newWizard.bot().text().getText());
-         if (example.getObligationFile() != null && example.getObligationFile().exists()) {
+         if (IOUtil.exists(example.getObligationFile())) {
             newWizard.bot().tabItem("Proof Obligation").activate();
             TestUtilsUtil.assertEqualsIgnoreWhiteSpace(IOUtil.readFrom(example.getObligationFile()), newWizard.bot().styledText().getText());
          }
          for (File additionalFile : example.getAdditionalFiles()) {
-            if (additionalFile != null && additionalFile.exists()) {
+            if (IOUtil.exists(additionalFile)) {
                newWizard.bot().tabItem(additionalFile.getName()).activate();
                TestUtilsUtil.assertEqualsIgnoreWhiteSpace(IOUtil.readFrom(additionalFile), newWizard.bot().styledText().getText());
             }
@@ -159,14 +159,33 @@ public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
          assertTrue(project.isOpen());
          // Make sure that all example files and folders are copied into project (hierarchy and file content might have changed)
          final Set<String> fileNames = new HashSet<String>();
-         IOUtil.visit(example.getDirectory(), new IOUtil.IFileVisitor() {
-            @Override
-            public void visit(File file) {
-               if (file.isFile()) {
-                  fileNames.add(file.getName());
-               }
+         if (KeYExampleNewWizard.ONLY_SPECIFIED_EXAMPLE_CONTENT) {
+            for (File file : example.getAdditionalFiles()) {
+               fileNames.add(file.getName());
             }
-         });
+            for (File file : example.getExportFiles()) {
+               fileNames.add(file.getName());
+            }
+            if (IOUtil.exists(example.getObligationFile())) {
+               fileNames.add(example.getObligationFile().getName());
+            }
+            if (IOUtil.exists(example.getExampleFile())) {
+               fileNames.add(example.getExampleFile().getName());
+            }
+            if (IOUtil.exists(example.getProofFile())) {
+               fileNames.add(example.getProofFile().getName());
+            }
+         }
+         else {
+            IOUtil.visit(example.getDirectory(), new IOUtil.IFileVisitor() {
+               @Override
+               public void visit(File file) {
+                  if (file.isFile()) {
+                     fileNames.add(file.getName());
+                  }
+               }
+            });
+         }
          project.accept(new IResourceVisitor() {
             @Override
             public boolean visit(IResource resource) throws CoreException {

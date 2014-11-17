@@ -25,7 +25,7 @@ import org.key_project.keyide.ui.util.KeYIDEUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.TacletApp;

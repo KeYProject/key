@@ -53,13 +53,13 @@ import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotStepReturnTest;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+   SWTBotLaunchDefaultPreferencesTest.class,
    SWTBotContractTest.class,
    SWTBotKeYDebugTargetProofFileTest.class,
    SWTBotKeYDebugTargetTest.class,
    SWTBotKeYLaunchConfigurationDelegateTest.class,
    SWTBotKeYModelThreadSaveChildAccessTest.class,
    SWTBotKeYSourceLookupParticipantTest.class,
-   SWTBotLaunchDefaultPreferencesTest.class,
    SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest.class,
    SWTBotStepOverTest.class,
    SWTBotStepReturnTest.class,

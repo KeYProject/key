@@ -94,7 +94,6 @@ public class ProofSaver {
       this.filename = filename;
       this.proof = proof;
       this.internalVersion = internalVersion;
-      
    }
 
    public void setProof(Proof p) {

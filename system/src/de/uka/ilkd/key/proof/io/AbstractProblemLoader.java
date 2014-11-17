@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Properties;
 import org.antlr.runtime.MismatchedTokenException;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.parser.KeYLexer;

@@ -116,6 +116,10 @@ Loading program rules dealing with JML's \bigint datatype can be disabled.
 Loading rules dealing with sequences can be disabled.
 </entry>
 
+<entry key="moreSeqRules">
+This option allows more fine-grained control over rules dealing with sequences. By default, it is disabled because the additional rules are known to have a negative impact on overall performance. Activate this option if your problem is concerned with permutations or information flow. 
+</entry>
+
 <entry key="reach">
 Loading rules dealing with reachability can be disabled.
 </entry>

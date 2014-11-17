@@ -14,11 +14,13 @@ package de.uka.ilkd.key.parser;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 
-import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.ANTLRReaderStream;
 import org.antlr.runtime.ANTLRStringStream;
+
+import de.uka.ilkd.key.core.Main;
 
 /*
  * Extends generated class {@link KeYLexer} with custom constructors.
@@ -26,7 +28,7 @@ import org.antlr.runtime.ANTLRStringStream;
 public class KeYLexerF extends KeYLexer {
 
     public KeYLexerF(InputStream file, String fileName) throws IOException {
-        super(getStream(new ANTLRInputStream(file), fileName));
+        this(new InputStreamReader(file, Main.DEFAULT_CHARSET), fileName);
     }
 
     public KeYLexerF(Reader file, String fileName)

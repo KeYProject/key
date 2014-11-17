@@ -69,10 +69,10 @@ import org.key_project.util.bean.IBean;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.ArrayUtil;
 
-import de.uka.ilkd.key.gui.AutoModeListener;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.KeYSelectionEvent;
-import de.uka.ilkd.key.gui.KeYSelectionListener;
+import de.uka.ilkd.key.core.AutoModeListener;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;

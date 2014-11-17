@@ -22,9 +22,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringBufferInputStream;
 import java.net.URL;
+import java.util.EventObject;
 import java.util.Properties;
 
-import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
@@ -275,7 +275,7 @@ public class ProofSettings {
 	 * state has changed
 	 * @param e the Event sent to the listener
 	 */
-	public void settingsChanged(GUIEvent e) {	    
+	public void settingsChanged(EventObject e) {	    
 	    saveSettings();
 	}
     }

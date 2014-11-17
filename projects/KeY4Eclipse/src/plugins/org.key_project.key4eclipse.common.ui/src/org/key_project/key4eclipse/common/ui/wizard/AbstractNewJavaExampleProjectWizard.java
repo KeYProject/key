@@ -18,6 +18,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.internal.ui.wizards.NewWizardMessages;
 import org.eclipse.jdt.ui.wizards.NewJavaProjectWizardPageOne;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.swt.widgets.Display;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 
 /**
@@ -67,8 +68,13 @@ public abstract class AbstractNewJavaExampleProjectWizard extends AbstractNewJav
       if (shouldSetInitialProjectName()) {
          for (IWizardPage page : getPages()) {
             if (page instanceof NewJavaProjectWizardPageOne) {
-               NewJavaProjectWizardPageOne one = (NewJavaProjectWizardPageOne)page;
-               one.setProjectName(getExampleName());
+               final NewJavaProjectWizardPageOne one = (NewJavaProjectWizardPageOne)page;
+               Display.getDefault().asyncExec(new Runnable() {
+                  @Override
+                  public void run() {
+                     one.setProjectName(getExampleName());
+                  }
+               });
             }
          }
       }

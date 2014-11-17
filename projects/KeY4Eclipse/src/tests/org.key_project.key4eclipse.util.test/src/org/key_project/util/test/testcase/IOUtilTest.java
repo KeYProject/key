@@ -49,6 +49,22 @@ import org.key_project.util.test.util.TestUtilsUtil;
  */
 public class IOUtilTest extends TestCase {
    /**
+    * Tests {@link IOUtil#exists(File)}
+    */
+   @Test
+   public void testExists() throws IOException {
+      assertFalse(IOUtil.exists(null));
+      File tempFile = File.createTempFile("IOUtilTest_", ".testExists");
+      assertTrue(IOUtil.exists(tempFile));
+      tempFile.delete();
+      assertFalse(IOUtil.exists(tempFile));
+      File tempDir = IOUtil.createTempDirectory("IOUtilTest_", ".testExists");
+      assertTrue(IOUtil.exists(tempDir));
+      IOUtil.delete(tempDir);
+      assertFalse(IOUtil.exists(tempDir));
+   }
+   
+   /**
     * {@link IOUtil#encodeURIPath(String)}.
     */
    @Test

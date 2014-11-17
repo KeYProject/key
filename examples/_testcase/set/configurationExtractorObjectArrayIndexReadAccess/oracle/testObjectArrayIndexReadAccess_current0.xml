@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
    <state name="return 42;">
-      <association name="array" programVariable="array" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+      <association name="array" programVariable="array" isArrayIndex="false" target="o1"/>
    </state>
    <object xml:id="o1" name="array" type="IntWrapper[]">
-      <value name="length" programVariable="length" isArrayIndex="false" arrayIndex="-1" value="Z(1(#))" type="int"/>
-      <association name="[0]" isArrayIndex="true" arrayIndex="0" target="o2"/>
+      <value name="length" programVariable="length" isArrayIndex="false" value="Z(1(#))" type="int"/>
+      <association name="[Z(0(#))]" isArrayIndex="true" arrayIndex="Z(0(#))" target="o2"/>
    </object>
    <object xml:id="o2" name="IntWrapper::select(heap,array,arr(Z(0(#))))" type="IntWrapper">
-      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="Z(2(4(#)))" type="int"/>
+      <value name="value" programVariable="value" isArrayIndex="false" value="Z(2(4(#)))" type="int"/>
    </object>
 </model>

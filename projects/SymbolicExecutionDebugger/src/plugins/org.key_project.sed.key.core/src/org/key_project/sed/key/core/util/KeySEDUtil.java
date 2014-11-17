@@ -51,6 +51,7 @@ import org.key_project.util.jdt.JDTUtil;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
 /**
  * Provides static utility methods for the Symbolic Execution Debugger
@@ -162,6 +163,11 @@ public final class KeySEDUtil {
      * The key of the attribute "show signature on method return nodes" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
      */
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_SIGNATURE_ON_MEHTOD_RETURN_NODES = "org.key_project.sed.key.core.launch.sed.key.attribute.showSignatureOnMethodReturnNodes";
+
+    /**
+     * The key of the attribute about how variables are computed in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_VARIABLES_ARE_COMPUTED_FROM_UPDATES = "org.key_project.sed.key.core.launch.sed.key.attribute.variablesAreOnlyComputedFromUpdates";;
 
     /**
      * The launch mode supported by the Symbolic Execution Debugger based on KeY.
@@ -358,6 +364,16 @@ public final class KeySEDUtil {
      */
     public static boolean isShowSignatureOnMethodReturnNodes(ILaunchConfiguration configuration) throws CoreException {
         return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_SIGNATURE_ON_MEHTOD_RETURN_NODES, KeYSEDPreferences.isShowSignatureOnMethodReturnNodes()) : KeYSEDPreferences.isShowSignatureOnMethodReturnNodes();
+    }
+    
+    /**
+     * Checks if variables are computed from updates or the visible memory structure.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return  {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
+     * @throws CoreException Occurred Exception.
+     */
+    public static boolean isVariablesAreOnlyComputedFromUpdates(ILaunchConfiguration configuration) throws CoreException {
+        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_VARIABLES_ARE_COMPUTED_FROM_UPDATES, KeYSEDPreferences.isVariablesAreOnlyComputedFromUpdates()) : KeYSEDPreferences.isVariablesAreOnlyComputedFromUpdates();
     }
 
     /**

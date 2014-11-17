@@ -27,7 +27,7 @@ import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -64,6 +64,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionMethodReturn;
@@ -246,18 +247,20 @@ public class SymbolicExecutionTreeBuilder {
     * @param mergeBranchConditions {@code true} merge branch conditions which means that a branch condition never contains another branch condition or {@code false} allow that branch conditions contains branch conditions.
     * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
     * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
+    * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
     */
    public SymbolicExecutionTreeBuilder(KeYMediator mediator, 
                                        Proof proof,
                                        boolean mergeBranchConditions,
                                        boolean useUnicode,
-                                       boolean usePrettyPrinting) {
+                                       boolean usePrettyPrinting,
+                                       boolean variablesAreOnlyComputedFromUpdates) {
       assert mediator != null;
       assert proof != null;
       this.mediator = mediator;
       this.proof = proof;
       this.isUninterpretedPredicateUsed = AbstractOperationPO.getUninterpretedPredicate(getProof()) != null;
-      this.settings = new TreeSettings(mergeBranchConditions, useUnicode, usePrettyPrinting);
+      this.settings = new TreeSettings(mergeBranchConditions, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates);
       this.exceptionVariable = SymbolicExecutionUtil.extractExceptionVariable(proof);
       this.startNode = new ExecutionStart(settings, mediator, proof.root());
       this.keyNodeMapping.put(proof.root(), this.startNode);

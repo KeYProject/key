@@ -29,7 +29,6 @@ import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
-import de.uka.ilkd.key.proof.CountingBufferedReader;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;

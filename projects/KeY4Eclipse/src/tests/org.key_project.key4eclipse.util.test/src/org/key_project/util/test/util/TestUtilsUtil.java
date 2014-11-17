@@ -122,7 +122,7 @@ import org.key_project.util.test.Activator;
 import org.key_project.util.test.util.internal.ContextMenuHelper;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.java.JavaInfo;
