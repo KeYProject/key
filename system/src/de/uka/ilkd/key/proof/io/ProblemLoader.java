@@ -15,10 +15,10 @@ package de.uka.ilkd.key.proof.io;
 import java.io.File;
 import java.util.List;
 
-import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.TaskFinishedInfo;
+import de.uka.ilkd.key.core.DefaultTaskFinishedInfo;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.ProverTaskListener;
+import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
@@ -62,11 +62,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
 
    private Throwable doWork() {
       try {
-          if (getMediator().getUI().isSaveOnly()) {
-              return saveAll();
-          } else {
-              return load();
-          }
+          return load();
       } catch (final ExceptionHandlerException exception) {
           final String errorMessage = "Failed to load "
                   + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
@@ -100,7 +96,8 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
     */
    protected void reportException(final Throwable message) {
        if (message != null) {
-           getExceptionHandler().reportException(message);
+           getMediator().getExceptionHandler().reportException(message); // XXX otherwise everything breaks
+//           getMediator().getUI().notify(new ExceptionFailureEvent(message.toString(),message));
        }
    }
 

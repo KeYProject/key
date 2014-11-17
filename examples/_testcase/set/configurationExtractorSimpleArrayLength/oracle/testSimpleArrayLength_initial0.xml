@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
    <state name="One Step Simplification resulting in return 42;">
-      <association name="array" programVariable="array" isArrayIndex="false" arrayIndex="-1" target="o1"/>
-      <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o2"/>
+      <association name="array" programVariable="array" isArrayIndex="false" target="o1"/>
+      <association name="self" programVariable="self" isArrayIndex="false" target="o2"/>
    </state>
    <object xml:id="o1" name="array" type="java.lang.Object[]">
-      <value name="length" programVariable="length" isArrayIndex="false" arrayIndex="-1" value="Z(1(#))" type="int"/>
+      <value name="length" programVariable="length" isArrayIndex="false" value="Z(1(#))" type="int"/>
    </object>
    <object xml:id="o2" name="self" type="SimpleArrayLength">
    </object>

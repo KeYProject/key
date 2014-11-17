@@ -427,13 +427,18 @@ public final class KeYModelUtil {
     * @return The contained {@link KeYVariable}s as debug model representation.
     */
    public static KeYVariable[] createCallStateVariables(IKeYSEDDebugNode<?> debugNode, 
-                                                        IExecutionBaseMethodReturn<?> executionNode) {
-      if (executionNode != null && !executionNode.isDisposed() && debugNode != null) {
-         IExecutionVariable[] variables = executionNode.getCallStateVariables();
-         return createVariables(debugNode, variables);
+                                                        IExecutionBaseMethodReturn<?> executionNode) throws DebugException {
+      try {
+         if (executionNode != null && !executionNode.isDisposed() && debugNode != null) {
+            IExecutionVariable[] variables = executionNode.getCallStateVariables();
+            return createVariables(debugNode, variables);
+         }
+         else {
+            return new KeYVariable[0];
+         }
       }
-      else {
-         return new KeYVariable[0];
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute call state variables.", e));
       }
    }
 
@@ -445,13 +450,18 @@ public final class KeYModelUtil {
     * @return The contained {@link KeYVariable}s as debug model representation.
     */
    public static KeYVariable[] createVariables(IKeYSEDDebugNode<?> debugNode, 
-                                               IExecutionNode<?> executionNode) {
-      if (executionNode != null && !executionNode.isDisposed() && debugNode != null) {
-         IExecutionVariable[] variables = executionNode.getVariables();
-         return createVariables(debugNode, variables);
+                                               IExecutionNode<?> executionNode) throws DebugException {
+      try {
+         if (executionNode != null && !executionNode.isDisposed() && debugNode != null) {
+            IExecutionVariable[] variables = executionNode.getVariables();
+            return createVariables(debugNode, variables);
+         }
+         else {
+            return new KeYVariable[0];
+         }
       }
-      else {
-         return new KeYVariable[0];
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute variables.", e));
       }
    }
 
@@ -535,11 +545,11 @@ public final class KeYModelUtil {
     */
    public static SEDMemoryBranchCondition[] createCompletedBlocksConditions(IKeYSEDDebugNode<?> child) throws DebugException {
       try {
-         ImmutableList<IExecutionNode<?>> completedBlocks = child.getExecutionNode().getCompletedBlocks();
+         ImmutableList<IExecutionBlockStartNode<?>> completedBlocks = child.getExecutionNode().getCompletedBlocks();
          if (completedBlocks != null && completedBlocks.size() >= 1) {
             SEDMemoryBranchCondition[] result = new SEDMemoryBranchCondition[completedBlocks.size()];
             int i = 0;
-            for (IExecutionNode<?> completedBlock : completedBlocks) {
+            for (IExecutionBlockStartNode<?> completedBlock : completedBlocks) {
                IKeYSEDDebugNode<?> parent = child.getDebugTarget().getDebugNode(completedBlock);
                Assert.isNotNull(parent);
                result[i] = new SEDMemoryBranchCondition(child.getDebugTarget(), parent, child.getThread());

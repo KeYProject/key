@@ -16,12 +16,14 @@ package de.uka.ilkd.key.util;
 import java.io.*;
 import java.net.URL;
 import java.util.Random;
+import de.uka.ilkd.key.util.net.NetworkUtils;
 
 
 public final class TipOfTheDay {
 
+    private final static boolean USE_INTERNET = true;
     private final static Random r = new Random();
-    private final static String[] TIPS = getTips();
+    private final static String[] TIPS = getTips(USE_INTERNET);
 
 
     /**
@@ -32,23 +34,45 @@ public final class TipOfTheDay {
     }
 
     /**
-     * Read strings from file
+     * Read strings from file and the internet.
+     * @param online whether to read from the internet
      */
-    private static String[] getTips() {
-        String res = "";
+    private static String[] getTips(boolean online) {
         try {
-            final KeYResourceManager krm = KeYResourceManager.getManager();
-            final URL tipsUrl = krm.getResourceFile(TipOfTheDay.class, "tipsOfTheDay");
-            final InputStream is = new BufferedInputStream(tipsUrl.openStream());
-            int c;
-            while ((c=is.read()) !=-1) {
-                res += (char)c;
+            String[] res = getTipsFromFile();
+            if (online) {
+                res = MiscTools.concat(res, getTipsOnline());
             }
-            is.close();
-            return res.split("\n");
+            return res;
         } catch (IOException e) {
             return new String[]{""};
         }
+    }
+
+    private static String[] getTipsFromFile() throws IOException {
+        String res = "";
+        final KeYResourceManager krm = KeYResourceManager.getManager();
+        final URL tipsUrl = krm.getResourceFile(TipOfTheDay.class, "tipsOfTheDay");
+        final InputStream is = new BufferedInputStream(tipsUrl.openStream());
+        int c;
+        while ((c=is.read()) !=-1) {
+            res += (char)c;
+        }
+        is.close();
+        return res.split("\n");
+    }
+    
+    private static String[] getTipsOnline() throws IOException {
+        return new String[]{checkLatestVersion()};
+    }
+    
+    private static String checkLatestVersion() {
+        final String latestVersion = NetworkUtils.getLatestVersion();
+        final String currentVersion = KeYResourceManager.getManager().getVersion();
+        final VersionStringComparator vsc = new VersionStringComparator();
+        final boolean versionOK = vsc.compare(currentVersion, latestVersion) < 0;
+        if (versionOK) return "You are using an up-to-date version of KeY; good for you.";
+        else return "It seems that you are using an old version of KeY. The current stable version is "+latestVersion;
     }
 
 }

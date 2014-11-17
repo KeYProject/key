@@ -10,15 +10,16 @@ import java.util.Vector;
 import javax.swing.SwingWorker;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.InterruptListener;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.InterruptListener;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.ProverTaskListener;
+import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -32,6 +33,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.SingleProof;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
@@ -44,7 +47,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 	private SolverLauncher launcher;
 	private Vector<Proof> proofs;
 	private Proof originalProof;
-	
+
 	public TGWorker(TGInfoDialog tgInfoDialog){
 		this.tgInfoDialog = tgInfoDialog;
 	}
@@ -152,8 +155,8 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 			return null;
 		}
 		launcher.launch(solvers, problems, proof.getServices());
-//		ModelGenerator mg = new ModelGenerator(proofs.get(0).root().sequent(), 3, getMediator());
-//		mg.launch();
+		//		ModelGenerator mg = new ModelGenerator(proofs.get(0).root().sequent(), 3, getMediator());
+		//		mg.launch();
 		return null;
 	}
 
@@ -195,7 +198,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 		getMediator().setProof(originalProof);
 	}
 
-	
+
 
 	private KeYMediator getMediator(){
 		return MainWindow.getInstance().getMediator();
@@ -241,13 +244,19 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 					return null;
 				}
 			}
-		}		
+		}	
+		InitConfig initConfig = oldProof.getInitConfig().deepCopy();
 		final Proof proof = new Proof("Test Case for NodeNr: "
-				+ node.serialNr(), newSequent, "", oldProof.getInitConfig().createTacletIndex(), 
-				oldProof.getInitConfig().createBuiltInRuleIndex(),
-				oldProof.getInitConfig() );
+				+ node.serialNr(), newSequent, "", initConfig.createTacletIndex(), 
+				initConfig.createBuiltInRuleIndex(),
+				initConfig.deepCopy() );
 		proof.setEnv(oldProof.getEnv());
 		proof.setNamespaces(oldProof.getNamespaces());
+
+		Services services = getMediator().getServices();
+		SpecificationRepository spec = services.getSpecificationRepository();
+		spec.registerProof(spec.getProofOblInput(oldProof), proof);
+
 		return proof;
 	}
 
@@ -331,7 +340,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 		}
 		return res;
 	}
-	
+
 	public Proof getOriginalProof(){
 		return originalProof;
 	}

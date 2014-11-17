@@ -36,7 +36,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
@@ -155,7 +155,10 @@ public class ExecutionNodeReader {
                   if (returnEntry == null) {
                      throw new SAXException("Can't find completed block entry \"" + pair.first + "\" in parsed symbolic execution tree.");
                   }
-                  entry.getKey().addCompletedBlock(returnEntry, pair.second);
+                  else if (!(returnEntry instanceof IExecutionBlockStartNode<?>)) {
+                     throw new SAXException("Found completed block entry is not an instance of IExecutionBlockStartNode.");
+                  }
+                  entry.getKey().addCompletedBlock((IExecutionBlockStartNode<?>)returnEntry, pair.second);
                }
             }
             // Construct block completions
@@ -611,7 +614,7 @@ public class ExecutionNodeReader {
                                             Attributes attributes) {
       return new KeYlessVariable(parentValue, 
                                  isArrayIndex(attributes), 
-                                 getArrayIndex(attributes), 
+                                 getArrayIndexString(attributes), 
                                  getName(attributes));
    }
    
@@ -947,8 +950,8 @@ public class ExecutionNodeReader {
     * @param attributes The {@link Attributes} which provides the content.
     * @return The value.
     */
-   protected int getArrayIndex(Attributes attributes) {
-      return Integer.parseInt(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_ARRAY_INDEX));
+   protected String getArrayIndexString(Attributes attributes) {
+      return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_ARRAY_INDEX);
    }
 
    /**
@@ -1141,12 +1144,12 @@ public class ExecutionNodeReader {
       /**
        * The completed blocks.
        */
-      private ImmutableList<IExecutionNode<?>> completedBlocks = ImmutableSLList.nil();
+      private ImmutableList<IExecutionBlockStartNode<?>> completedBlocks = ImmutableSLList.nil();
 
       /**
        * The formated conditions under which a block is completed.
        */
-      private final Map<IExecutionNode<?>, String> formatedCompletedBlockConditions = new LinkedHashMap<IExecutionNode<?>, String>();
+      private final Map<IExecutionBlockStartNode<?>, String> formatedCompletedBlockConditions = new LinkedHashMap<IExecutionBlockStartNode<?>, String>();
       
       /**
        * Constructor.
@@ -1329,7 +1332,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public ImmutableList<IExecutionNode<?>> getCompletedBlocks() throws ProofInputException {
+      public ImmutableList<IExecutionBlockStartNode<?>> getCompletedBlocks() {
          return completedBlocks;
       }
 
@@ -1337,7 +1340,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public Term getBlockCompletionCondition(IExecutionNode<?> completedNode) throws ProofInputException {
+      public Term getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode) throws ProofInputException {
          return null;
       }
 
@@ -1345,7 +1348,7 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public String getFormatedBlockCompletionCondition(IExecutionNode<?> completedNode) throws ProofInputException {
+      public String getFormatedBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode) throws ProofInputException {
          return formatedCompletedBlockConditions.get(completedNode);
       }
 
@@ -1354,7 +1357,7 @@ public class ExecutionNodeReader {
        * @param completedBlock The completed block.
        * @param formatedCondition The formated condition under which the block is completed.
        */
-      public void addCompletedBlock(IExecutionNode<?> completedBlock, String formatedCondition) {
+      public void addCompletedBlock(IExecutionBlockStartNode<?> completedBlock, String formatedCondition) {
          if (completedBlock != null) {
             completedBlocks = completedBlocks.append(completedBlock);
             formatedCompletedBlockConditions.put(completedBlock, formatedCondition);
@@ -2524,7 +2527,7 @@ public class ExecutionNodeReader {
       /**
        * The array index.
        */
-      private final int arrayIndex;
+      private final String arrayIndexString;
       
       /**
        * The contained values.
@@ -2535,17 +2538,17 @@ public class ExecutionNodeReader {
        * Constructor.
        * @param parentVariable The parent {@link IExecutionValue} if available.
        * @param isArrayIndex The is array flag.
-       * @param arrayIndex The array index.
+       * @param arrayIndexString The array index.
        * @param name The name.
        */
       public KeYlessVariable(IExecutionValue parentValue, 
                              boolean isArrayIndex, 
-                             int arrayIndex, 
+                             String arrayIndexString, 
                              String name) {
          super(name);
          this.parentValue = parentValue;
          this.isArrayIndex = isArrayIndex;
-         this.arrayIndex = arrayIndex;
+         this.arrayIndexString = arrayIndexString;
       }
       
       /**
@@ -2576,8 +2579,16 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public int getArrayIndex() {
-         return arrayIndex;
+      public Term getArrayIndex() {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getArrayIndexString() {
+         return arrayIndexString;
       }
 
       /**

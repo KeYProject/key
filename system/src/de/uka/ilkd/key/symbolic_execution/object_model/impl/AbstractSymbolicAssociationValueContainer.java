@@ -69,15 +69,15 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
    @Override
    public ISymbolicAssociation getAssociation(final IProgramVariable programVariable, 
                                               final boolean isArrayIndex, 
-                                              final int arrayIndex,
+                                              final Term arrayIndex,
                                               final Term condition) {
       return JavaUtil.search(associations, new IFilter<ISymbolicAssociation>() {
          @Override
          public boolean select(ISymbolicAssociation element) {
             return element.getProgramVariable() == programVariable &&
                    element.isArrayIndex() == isArrayIndex &&
-                   element.getArrayIndex() == arrayIndex &&
-                   element.getCondition() == condition;
+                   JavaUtil.equals(element.getArrayIndex(), arrayIndex)  &&
+                   JavaUtil.equals(element.getCondition(), condition);
          }
       });
    }
@@ -104,15 +104,15 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
    @Override
    public ISymbolicValue getValue(final IProgramVariable programVariable, 
                                   final boolean isArrayIndex, 
-                                  final int arrayIndex,
+                                  final Term arrayIndex,
                                   final Term condition) {
       return JavaUtil.search(values, new IFilter<ISymbolicValue>() {
          @Override
          public boolean select(ISymbolicValue element) {
             return element.getProgramVariable() == programVariable &&
                    element.isArrayIndex() == isArrayIndex &&
-                   element.getArrayIndex() == arrayIndex &&
-                   element.getCondition() == condition;
+                   JavaUtil.equals(element.getArrayIndex(), arrayIndex)  &&
+                   JavaUtil.equals(element.getCondition(), condition);
          }
       });
    }

@@ -13,6 +13,7 @@
 
 package org.key_project.key4eclipse.common.ui.composite;
 
+import java.util.EventObject;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,9 +45,8 @@ import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.XMLUtil;
 
-import de.uka.ilkd.key.gui.AutoModeListener;
-import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.AutoModeListener;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
@@ -100,7 +100,7 @@ public class StrategySettingsComposite extends Composite {
     */
    private SettingsListener settingsListener = new SettingsListener() {
       @Override
-      public void settingsChanged(GUIEvent e) {
+      public void settingsChanged(EventObject e) {
          updateShownFormThreadSave();
       }
    };

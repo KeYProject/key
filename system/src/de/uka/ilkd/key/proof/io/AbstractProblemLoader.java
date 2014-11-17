@@ -13,13 +13,10 @@
 
 package de.uka.ilkd.key.proof.io;
 
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
@@ -27,31 +24,22 @@ import java.util.Map;
 import java.util.Properties;
 import org.antlr.runtime.MismatchedTokenException;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
-import de.uka.ilkd.key.proof.init.InfFlowPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.ui.UserInterface;
@@ -132,10 +120,6 @@ public abstract class AbstractProblemLoader {
      */
     private Proof proof;
 
-    private static String INDEX_FILE = "automaticInfFlow.txt";
-
-    private static String IF_INDEX_FILE = "automaticMacroInfFlow.txt";
-    
     /**
      * Maps internal error codes of the parser to human readable strings.
      * The integers refer to the common MismatchedTokenExceptions,
@@ -198,35 +182,43 @@ public abstract class AbstractProblemLoader {
             envInput = createEnvInput();
             problemInitializer = createProblemInitializer();
             initConfig = createInitConfig();
-            // Read proof obligation settings
-            LoadedPOContainer poContainer = createProofObligationContainer();
-            try {
-                if (poContainer == null) {
-                    if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
-                        if (mediator.getUI().selectProofObligation(initConfig)) {
+            final UserInterface ui = mediator.getUI();
+            if (ui.isSaveOnly()) {
+                ui.saveAll(initConfig, file);
+                return null;
+            } else {
+                // Read proof obligation settings
+                LoadedPOContainer poContainer = createProofObligationContainer();
+                try {
+                    if (poContainer == null) {
+                        if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
+                            if (ui.selectProofObligation(initConfig)) {
+                                return null;
+                            } else {
+                                return new ProblemLoaderException(this, "Aborted.");
+                            }
+                        }
+                        else {
+                            // Do not instantiate any proof but allow the user of the DefaultProblemLoader
+                            // to access the loaded InitConfig.
                             return null;
-                        } else {
-                            return new ProblemLoaderException(this, "Aborted.");
                         }
                     }
-                    else {
-                        return null; // Do not instantiate any proof but allow the user of the DefaultProblemLoader to access the loaded InitConfig.
+                    // Create proof and apply rules again if possible
+                    proof = createProof(poContainer);
+                    if (proof != null) {
+                        replayProof(proof);
                     }
+                    // this message is propagated to the top level in console mode
+                    return null; // Everything fine
                 }
-                // Create proof and apply rules again if possible
-                proof = createProof(poContainer);
-                if (proof != null) {
-                    replayProof(proof);
-                }
-                // this message is propagated to the top level in console mode
-                return null; // Everything fine
-            }         
-            finally {
-                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
-                .setOneStepSimplification(oneStepSimplifier);
-                getMediator().resetNrGoalsClosedByHeuristics();
-                if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
-                    ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
+                finally {
+                    ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                    .setOneStepSimplification(oneStepSimplifier);
+                    getMediator().resetNrGoalsClosedByHeuristics();
+                    if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
+                        ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
+                    }
                 }
             }
         }
@@ -282,94 +274,6 @@ public abstract class AbstractProblemLoader {
         }
         // default
         return new ProblemLoaderException(this, "Loading proof input failed", e);
-    }
-
-    private File chooseFile(ContractPO po) {
-        final String fName;
-        if (po instanceof InfFlowPO) {
-            fName = IF_INDEX_FILE;
-        } else {
-            fName = INDEX_FILE;
-        }
-        return new File("examples/index/", fName);
-    }
-
-    private void writeToFile(String path, File file) {
-        String examplesPath = "examples/";
-        boolean inExampleDir = 0 <= path.indexOf(examplesPath);
-        String prefix =
-                        file.getName().endsWith(IF_INDEX_FILE) && path.contains("insecure") ?
-                                        "notprovable: " : "provable: ";
-        path = "./" +
-                        (inExampleDir ?
-                                        path.substring(path.indexOf(examplesPath) + examplesPath.length()) : path);
-        try {
-            PrintWriter w = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
-            w.println(prefix + path);
-            w.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private ImmutableSet<String> getFileNames(File file) {
-        ImmutableSet<String> result = DefaultImmutableSet.<String>nil();
-        boolean foundValidJavaFiles = false;
-        if (file.isDirectory()) {
-            for (File f: file.listFiles()) {
-                if (!f.isDirectory() && f.getName().endsWith(".java")) {
-                    foundValidJavaFiles = true;
-                    result = result.add(f.getName().substring(0, f.getName().indexOf(".")));
-                }
-            }
-        } else if (file.getName().endsWith(".java")) {
-            foundValidJavaFiles = true;
-            result = result.add(getFile().getName()
-                            .substring(0, getFile().getName().indexOf(".")));
-        }
-        if (!foundValidJavaFiles) {
-            throw new IllegalArgumentException(
-                            "Specified file is no valid directory or java-file!");
-        }
-        return result;
-    }
-
-    public Throwable saveAll() {
-        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
-        try {
-            envInput = createEnvInput();
-            problemInitializer = createProblemInitializer();
-            initConfig = createInitConfig();
-            final SpecificationRepository specRepos =
-                            initConfig.getServices().getSpecificationRepository();
-            final UserInterface ui = getMediator().getUI();
-            final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
-            ImmutableSet<String> fileNames = getFileNames(getFile());
-            for (KeYJavaType kjt: javaInfo.getAllKeYJavaTypes()) {
-                if (!fileNames.contains(kjt.getName())) {
-                    // skip
-                } else {
-                    for (IObserverFunction target: specRepos.getContractTargets(kjt)) {
-                        for (Contract c: specRepos.getContracts(kjt, target)) {
-                            final ContractPO po = c.createProofObl(initConfig);
-                            po.readProblem();
-                            for (Proof p: po.getPO().getProofs()) {
-                                p.removeInfFlowProofSymbols();
-                                p.setEnv(new ProofEnvironment(initConfig));
-                                ui.getMediator().getSelectionModel().setProof(p);
-                                specRepos.registerProof(po, p);
-                                final File poFile = ui.saveProof(p, ".key");
-                                final String path = poFile.getPath();
-                                writeToFile(path, chooseFile(po));
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (Throwable e) {
-            return new ProblemLoaderException(this, e);
-        }
-        return null;
     }
 
     /**
@@ -528,7 +432,7 @@ public abstract class AbstractProblemLoader {
         return proofList.getProof(poContainer.getProofNum());
     }
 
-    protected void replayProof(Proof proof) throws ProofInputException {
+    protected void replayProof(Proof proof) throws ProofInputException, ProblemLoaderException {
         mediator.setProof(proof);
 
         mediator.stopInterface(true); // first stop (above) is not enough

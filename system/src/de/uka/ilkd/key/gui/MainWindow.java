@@ -31,10 +31,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EventObject;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,6 +68,11 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.core.AutoModeListener;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
@@ -81,7 +86,6 @@ import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
-import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
@@ -94,7 +98,6 @@ import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
@@ -102,10 +105,11 @@ import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
+import de.uka.ilkd.key.util.ThreadUtilities;
 
 public final class MainWindow extends JFrame  {
 
-    private static final long serialVersionUID = 4019709804595371520L;
+    private static final long serialVersionUID = 5853419918923902636L;
 
     private static MainWindow instance = null;
 
@@ -191,9 +195,6 @@ public final class MainWindow extends JFrame  {
         new OneStepSimplificationToggleAction(this);
 
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
-
-    /** Determines if the KeY prover is started in visible mode*/
-    public static boolean visible = true;
 
     /** for locking of threads waiting for the prover to exit */
     public final Object monitor = new Object();
@@ -338,11 +339,6 @@ public final class MainWindow extends JFrame  {
             throw new NullPointerException("KeYMediator is not set.");
         }
         return mediator;
-    }
-
-    @Override
-    public void setVisible(boolean v){
-        super.setVisible(v && visible);
     }
 
     /** initialised, creates GUI and lays out the main frame */
@@ -515,7 +511,7 @@ public final class MainWindow extends JFrame  {
      * Make the status line display a standard message, make progress bar and abort button invisible
      */
     public void setStandardStatusLine() {
-        GuiUtilities.invokeOnEventQueue(new Runnable() {
+        ThreadUtilities.invokeOnEventQueue(new Runnable() {
             @Override
 	    public void run() {
 		setStandardStatusLineImmediately();
@@ -541,7 +537,7 @@ public final class MainWindow extends JFrame  {
      * the progress bar range to the given value, set the current progress to zero
      */
     public void setStatusLine(final String str, final int max) {
-        GuiUtilities.invokeOnEventQueue(new Runnable() {
+        ThreadUtilities.invokeOnEventQueue(new Runnable() {
             @Override
 	    public void run() {
 		setStatusLineImmediately(str, max);
@@ -726,7 +722,7 @@ public final class MainWindow extends JFrame  {
 
         help.add(new AboutAction(this));
         help.add(new KeYProjectHomepageAction(this));
-        help.add(new SystemInfoAction(this));
+//        help.add(new SystemInfoAction(this));
         help.add(new LicenseAction(this));
         return help;
     }
@@ -842,29 +838,6 @@ public final class MainWindow extends JFrame  {
         return currentGoalView;
     }
 
-    /** saves a proof */
-    public void saveProof(File proofFile) {
-        final String filename = proofFile.getAbsolutePath();
-        final Proof proof = getMediator().getSelectedProof();
-        ProofSaver saver =
-                new ProofSaver(proof, filename, Main.INTERNAL_VERSION);
-        String errorMsg ;
-
-        try {
-            errorMsg = saver.save();
-        } catch(IOException e){
-            errorMsg = e.toString();
-        }
-
-        if (errorMsg != null) {
-            notify(new GeneralFailureEvent
-                    ("Saving Proof failed.\n Error: " + errorMsg));
-        }
-        else {
-           proof.setProofFile(proofFile);
-        }
-    }
-
     public void addProblem(final de.uka.ilkd.key.proof.ProofAggregate plist) {
         Runnable guiUpdater = new Runnable() {
             @Override
@@ -876,7 +849,7 @@ public final class MainWindow extends JFrame  {
                 updateSequentView();
             }
         };
-        GuiUtilities.invokeAndWait(guiUpdater);
+        ThreadUtilities.invokeAndWait(guiUpdater);
     }
 
     private Proof setUpNewProof(Proof proof) {
@@ -943,7 +916,7 @@ public final class MainWindow extends JFrame  {
         }
 
         @Override
-        public void modalDialogOpened(GUIEvent e) {
+        public void modalDialogOpened(EventObject e) {
 
             if (e.getSource() instanceof ApplyTacletDialog) {
                 // disable all elements except the sequent window (drag'n'drop !) ...
@@ -959,7 +932,7 @@ public final class MainWindow extends JFrame  {
 
         /** invoked if a frame that wants modal access is closed */
         @Override
-        public void modalDialogClosed(GUIEvent e) {
+        public void modalDialogClosed(EventObject e) {
             if (e.getSource() instanceof ApplyTacletDialog) {
                 // enable all previously diabled elements ...
                 enableMenuBar(MainWindow.this.getJMenuBar(), true);
@@ -973,7 +946,7 @@ public final class MainWindow extends JFrame  {
         }
 
         @Override
-        public void shutDown(GUIEvent e) {
+        public void shutDown(EventObject e) {
             MainWindow.this.notify(new ExitKeYEvent());
             MainWindow.this.setVisible(false);
         }
@@ -1086,7 +1059,7 @@ public final class MainWindow extends JFrame  {
 
         /** invoked when the strategy of a proof has been changed */
         @Override
-        public synchronized void settingsChanged ( GUIEvent e ) {
+        public synchronized void settingsChanged ( EventObject e ) {
             if ( proof.getSettings().getStrategySettings() == e.getSource()) {
                 // updateAutoModeConfigButton();
             }
@@ -1390,10 +1363,6 @@ public final class MainWindow extends JFrame  {
         }
     }
 
-
-    public static void setVisibleMode(boolean visible) {
-	MainWindow.visible = visible;
-    }
 
     public TaskTree getProofList() {
 	return proofList;

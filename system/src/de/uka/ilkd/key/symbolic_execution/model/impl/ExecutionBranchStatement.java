@@ -16,7 +16,7 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.If;

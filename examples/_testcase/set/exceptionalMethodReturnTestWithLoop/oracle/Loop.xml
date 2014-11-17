@@ -50,7 +50,6 @@
                                  </branchStatement>
                               </statement>
                               <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
-                              <blockCompletionEntry path="/0/0/0/0/0/0/0/0"/>
                            </loopCondition>
                            <completedBlockEntry path="/0/0/0/0" conditionString="not(equals(l,null))"/>
                            <completedBlockEntry path="/0/0/0/0/0/0" conditionString="not(equals(l,null))"/>
@@ -92,7 +91,6 @@
                                  </branchStatement>
                               </statement>
                               <blockCompletionEntry path="/0/0/0/0/0/0/0/1/0/0/0"/>
-                              <blockCompletionEntry path="/0/0/0/0/0/0/0/1"/>
                            </loopCondition>
                            <completedBlockEntry path="/0/0/0/0" conditionString="not(equals(l,null))"/>
                            <completedBlockEntry path="/0/0/0/0/0/0" conditionString="not(equals(l,null))"/>

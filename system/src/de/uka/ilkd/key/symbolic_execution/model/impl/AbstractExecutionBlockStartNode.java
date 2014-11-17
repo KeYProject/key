@@ -2,7 +2,7 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
@@ -66,7 +66,6 @@ public abstract class AbstractExecutionBlockStartNode<S extends SourceElement> e
       if (blockCompletion != null && !blockCompletions.contains(blockCompletion)) {
          if (blockCompletion instanceof AbstractExecutionNode<?>) {
             blockCompletions = blockCompletions.append(blockCompletion);
-            ((AbstractExecutionNode<?>) blockCompletion).addCompletedBlock(this);
          }
          else {
             throw new IllegalArgumentException("Unsupported block completion: " + blockCompletion);

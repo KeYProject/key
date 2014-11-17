@@ -18,8 +18,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.IconFactory;
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.util.UnicodeHelper;
 

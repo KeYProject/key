@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.gui.smt;
 
 import java.util.Collection;
+import java.util.EventObject;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -21,7 +22,6 @@ import java.util.LinkedList;
 import java.util.Properties;
 import java.util.Map.Entry;
 
-import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.configuration.SettingsConverter;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 
@@ -331,7 +331,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
       
       public void fireSettingsChanged() {
               for (SettingsListener aListenerList : listeners) {
-                      aListenerList.settingsChanged(new GUIEvent(this));
+                      aListenerList.settingsChanged(new EventObject(this));
               }
  
       }

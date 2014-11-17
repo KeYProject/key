@@ -75,13 +75,14 @@ public class KeYRecoderExcHandler extends AbstractKeYExceptionHandler
     }
    
     
+    @Override
     public int getErrorThreshold() {
         return recoderErrorThreshold;
     }
     
     
     @Override    
-    public void setErrorThreshold(int maxCount) {
+    public final void setErrorThreshold(int maxCount) {
         if (maxCount < 0) {
             throw new IllegalArgumentException("Recoder: Threshold should be >= 0");
         }

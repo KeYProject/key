@@ -63,7 +63,7 @@ import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.jdt.JDTUtil;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;

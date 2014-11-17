@@ -24,7 +24,7 @@ import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.util.SWTBotTabbedPropertyList;
 import org.key_project.util.test.util.TestUtilsUtil;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -81,7 +81,7 @@ public abstract class AbstractSWTBotKeYEditorPropertiesTest extends AbstractSWTB
             pSteps.assertNodeTab(editor, keyEditor, propertiesView, mediator, mediator.getSelectedNode());
          }
       };
-      doEditorTest(projectName, pathToSourceFilesInBundle, contractName, false, steps);
+      doEditorTest(projectName, pathToSourceFilesInBundle, true, contractName, false, steps);
    }
    
    /**

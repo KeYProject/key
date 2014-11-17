@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Properties;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
@@ -90,6 +90,12 @@ public interface UserInterface
      */
     void loadProblem(File file, List<File> classPath, File bootClassPath);
 
+    public void noAutoSave();
+
+    public void resetAutoSave();
+
+    public boolean autoSave();
+
     void setSaveOnly(boolean s);
 
     boolean isSaveOnly();
@@ -103,6 +109,8 @@ public interface UserInterface
     public ProverTaskListener getListener();
 
     boolean applyMacro();
+
+    public void saveAll(InitConfig initConfig, File file) throws ProofInputException;
 
     /** 
      * called to open the build in examples 
@@ -213,6 +221,13 @@ public interface UserInterface
      */
     void removeProof(Proof proof);
 
+    /**
+     * save proof in file. If autoSave is on, this will potentially overwrite already
+     * existing proof files with the same name. Otherwise the save dialog pops up.
+     * For loaded proofs both are turned off by default, i.e. only manual saving is
+     * possible, and the save dialog never pops up automatically (except for hitting
+     * the "Save ..." or "Save current proof" button).
+     */
     File saveProof(Proof proof, String fileExtension);
     
     /**

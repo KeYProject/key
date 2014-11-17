@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
@@ -71,6 +72,11 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
    private Button showSignatureOnMethodReturnNodes;
    
    /**
+    * Defines how variables are computed.
+    */
+   private CCombo variablesAreOnlyComputedFromUpdatesCombo;
+   
+   /**
     * Constructor.
     * @param parent The parent {@link Composite}.
     * @param style The style.
@@ -96,14 +102,6 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       showMethodReturnValuesInDebugNodesButton = widgetFactory.createButton(symbolicExecutionTreeGroup, "&Show method return values in debug nodes", SWT.CHECK);
       showMethodReturnValuesInDebugNodesButton.setEnabled(isEditable());
       showMethodReturnValuesInDebugNodesButton.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(SelectionEvent e) {
-            updateLaunchConfigurationDialog();
-         }
-      });
-      showVariablesOfSelectedDebugNodeButton = widgetFactory.createButton(symbolicExecutionTreeGroup, "&Show &variables of selected debug node", SWT.CHECK);
-      showVariablesOfSelectedDebugNodeButton.setEnabled(isEditable());
-      showVariablesOfSelectedDebugNodeButton.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
             updateLaunchConfigurationDialog();
@@ -142,6 +140,32 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
             updateLaunchConfigurationDialog();
          }
       });
+      // Variables
+      Group variablesGroup = widgetFactory.createGroup(composite, "Variables");
+      variablesGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      variablesGroup.setLayout(new GridLayout(2, false));
+      showVariablesOfSelectedDebugNodeButton = widgetFactory.createButton(variablesGroup, "&Show &variables of selected debug node", SWT.CHECK);
+      GridData showVariablesOfSelectedDebugNodeButtonData = new GridData();
+      showVariablesOfSelectedDebugNodeButtonData.horizontalSpan = 2;
+      showVariablesOfSelectedDebugNodeButton.setLayoutData(showVariablesOfSelectedDebugNodeButtonData);
+      showVariablesOfSelectedDebugNodeButton.setEnabled(isEditable());
+      showVariablesOfSelectedDebugNodeButton.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            updateShowVariablesEnabledState();
+            updateLaunchConfigurationDialog();
+         }
+      });
+      widgetFactory.createLabel(variablesGroup, "Variables &computation");
+      variablesAreOnlyComputedFromUpdatesCombo = widgetFactory.createCCombo(variablesGroup, SWT.READ_ONLY | SWT.BORDER);
+      variablesAreOnlyComputedFromUpdatesCombo.add("Based on visible type structure");
+      variablesAreOnlyComputedFromUpdatesCombo.add("Based on sequent");
+      variablesAreOnlyComputedFromUpdatesCombo.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            updateLaunchConfigurationDialog();
+         }
+      });
       // KeY
       Group keyGroup = widgetFactory.createGroup(composite, "KeY");
       keyGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -155,6 +179,14 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
          }
       });
       updatePrettyPrintingDependingEnabledStates();
+      updateShowVariablesEnabledState();
+   }
+
+   /**
+    * Updates the enabled state of settings depending on shown variables.
+    */
+   protected void updateShowVariablesEnabledState() {
+      variablesAreOnlyComputedFromUpdatesCombo.setEnabled(isEditable() && showVariablesOfSelectedDebugNodeButton.getSelection());
    }
 
    /**
@@ -185,7 +217,9 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
          useUnicodeButton.setSelection(KeySEDUtil.isUseUnicode(configuration));
          usePrettyPrintingButton.setSelection(KeySEDUtil.isUsePrettyPrinting(configuration));
          showSignatureOnMethodReturnNodes.setSelection(KeySEDUtil.isShowSignatureOnMethodReturnNodes(configuration));
+         variablesAreOnlyComputedFromUpdatesCombo.setText(KeySEDUtil.isVariablesAreOnlyComputedFromUpdates(configuration) ? "Based on sequent" : "Based on visible type structure");
          updatePrettyPrintingDependingEnabledStates();
+         updateShowVariablesEnabledState();
       } 
       catch (CoreException e) {
          LogUtil.getLogger().logError(e);
@@ -204,7 +238,9 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       useUnicodeButton.setSelection(launchSettings.isUseUnicode());
       usePrettyPrintingButton.setSelection(launchSettings.isUsePrettyPrinting());
       showSignatureOnMethodReturnNodes.setSelection(launchSettings.isShowSignatureOnMethodReturnNodes());
+      variablesAreOnlyComputedFromUpdatesCombo.setText(launchSettings.isVariablesAreOnlyComputedFromUpdates() ? "Based on sequent" : "Based on visible type structure");
       updatePrettyPrintingDependingEnabledStates();
+      updateShowVariablesEnabledState();
    }
 
    /**
@@ -219,5 +255,6 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_UNICODE, useUnicodeButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING, usePrettyPrintingButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_SIGNATURE_ON_MEHTOD_RETURN_NODES, showSignatureOnMethodReturnNodes.getSelection());
+      configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_VARIABLES_ARE_COMPUTED_FROM_UPDATES, "Based on sequent".equals(variablesAreOnlyComputedFromUpdatesCombo.getText()));
    }
 }

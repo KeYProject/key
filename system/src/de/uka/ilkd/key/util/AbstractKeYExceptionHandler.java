@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.util;
 
-import java.util.*;
+import java.util.List;
+import de.uka.ilkd.key.collection.ArrayListNoDuplicates;
 
 
 public abstract class AbstractKeYExceptionHandler implements KeYExceptionHandler {
@@ -21,24 +22,24 @@ public abstract class AbstractKeYExceptionHandler implements KeYExceptionHandler
     protected List<Throwable> exceptions = null; 
 
     public AbstractKeYExceptionHandler() {
-	exceptions = new LinkedList<Throwable>();
+	exceptions = new ArrayListNoDuplicates<Throwable>();
     }
 
     
     @Override
     public void reportException(Throwable e) {
-	exceptions.add(e);
+        exceptions.add(e);
     }
 
     
     @Override    
     public List<Throwable> getExceptions() {
-	return exceptions;
+        return exceptions;
     }
 
         
     @Override    
     public void clear() {
-	exceptions.clear();
+        exceptions.clear();
     }
 }

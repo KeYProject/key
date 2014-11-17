@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EventObject;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,9 +29,8 @@ import java.util.Vector;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.gui.Main;
-import de.uka.ilkd.key.gui.RuleAppListener;
+import de.uka.ilkd.key.core.Main;
+import de.uka.ilkd.key.core.RuleAppListener;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
@@ -62,7 +62,6 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractApp;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.EnhancedStringBuffer;
 import de.uka.ilkd.key.util.Pair;
 
@@ -180,7 +179,7 @@ public class Proof implements Named {
         settingsListener =
                         new SettingsListener () {
             @Override
-            public void settingsChanged ( GUIEvent config ) {
+            public void settingsChanged ( EventObject config ) {
                 updateStrategyOnGoals();
             }
         };
@@ -637,21 +636,6 @@ public class Proof implements Named {
         return root.isClosed() && openGoals.isEmpty();
     }
 
-    /**
-     * save proof in file. If autoSave is on, this will potentially overwrite already
-     * existing proof files with the same name. Otherwise the save dialog pops up.
-     * Change: Now for loaded proofs both are turned off by default, i.e. only manual
-     * saving is possible, and the save dialog never pops up automatically (except
-     * for hitting the "Save ..." or "Save current proof" button).
-     */
-	public void saveProof(final UserInterface ui) {
-		// Save proof only if auto save is on and not a loaded proof
-		if (ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave()
-				&& !name().toString().endsWith(".proof")) {
-			assert ui.getMediator().getSelectedProof().name().equals(name());
-			ui.saveProof(this, ".proof");
-		}
-	}
 
     /**
      * This class is responsible for pruning a proof tree at a certain cutting point.

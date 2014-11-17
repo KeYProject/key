@@ -15,6 +15,7 @@ package de.uka.ilkd.key.gui.configuration;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -34,6 +35,7 @@ public class ViewSelector extends JDialog {
     private static final long serialVersionUID = 5271280688046955444L;
     private JTextField maxTooltipLinesInputField;
     private JCheckBox showWholeTacletCB;
+    private JCheckBox showUninstantiatedTacletCB;
 
     /** 
      * creates a new ViewSelector
@@ -62,6 +64,7 @@ public class ViewSelector extends JDialog {
 				.getMaxTooltipLines();
 		boolean showWholeTaclet = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
 				.getShowWholeTaclet();
+    	boolean showUninstantiatedTaclet = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowUninstantiatedTaclet();
     	
     	getContentPane().setLayout(new BorderLayout());
 	
@@ -76,13 +79,25 @@ public class ViewSelector extends JDialog {
 				+ "suppressed. </font></html>"));
 		maxLinesPanel.add(maxTooltipLinesInputField);
 		
+		JPanel showUninstantiatedTacletPanel = new JPanel();
+		showUninstantiatedTacletPanel.setLayout(new BoxLayout(showUninstantiatedTacletPanel,
+				BoxLayout.X_AXIS));
+		showUninstantiatedTacletCB = new JCheckBox("show uninstantiated taclet "
+				+ "recommended for unexperienced users", showUninstantiatedTaclet);
+	 	showUninstantiatedTacletPanel.add(showUninstantiatedTacletCB);
+		
 		JPanel showWholeTacletPanel = new JPanel();
 	 	showWholeTacletPanel.setLayout(new BoxLayout(showWholeTacletPanel,
 				BoxLayout.X_AXIS));
 	 	showWholeTacletCB = new JCheckBox("pretty-print whole Taclet including "
 				+ "'name', 'find', 'varCond' and 'heuristics'", showWholeTaclet);
 	 	showWholeTacletPanel.add(showWholeTacletCB);
-	
+	 	
+	 	JPanel tacletOptionsPanel = new JPanel();
+	 	tacletOptionsPanel.setLayout(new GridLayout(2, 1));
+	 	tacletOptionsPanel.add(showWholeTacletPanel);
+	 	tacletOptionsPanel.add(showUninstantiatedTacletPanel);
+	 	
 	 	JButton okButton = new JButton("OK");
 		okButton.setMnemonic(KeyEvent.VK_ENTER);
 	
@@ -96,6 +111,8 @@ public class ViewSelector extends JDialog {
 			    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setMaxTooltipLines(maxSteps);
 			    boolean ifind = showWholeTacletCB.isSelected();
 			    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setShowWholeTaclet(ifind);
+			    boolean uninstTaclet = showUninstantiatedTacletCB.isSelected();
+			    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setShowUninstantiatedTaclet(uninstTaclet);
 			    setVisible(false);
                             dispose();
 	 		}
@@ -109,8 +126,10 @@ public class ViewSelector extends JDialog {
 //			    ProofSettings dflt=ProofSettings.DEFAULT_SETTINGS;
 			    ProofIndependentSettings dflt=ProofIndependentSettings.DEFAULT_INSTANCE;
 			    boolean ifind = showWholeTacletCB.isSelected();
+			    boolean uninstTaclet = showUninstantiatedTacletCB.isSelected();
 			    dflt.getViewSettings().setMaxTooltipLines(maxSteps);
 			    dflt.getViewSettings().setShowWholeTaclet(ifind);
+			    dflt.getViewSettings().setShowUninstantiatedTaclet(uninstTaclet);
 			    //temporary solution, stores more than wanted %%%% 
 			    dflt.saveSettings();
 			    setVisible(false);
@@ -134,7 +153,8 @@ public class ViewSelector extends JDialog {
 		getContentPane().setLayout(new BoxLayout(getContentPane(), 
 							 BoxLayout.Y_AXIS));
 		getContentPane().add(maxLinesPanel);
-		getContentPane().add(showWholeTacletPanel);
+		getContentPane().add(tacletOptionsPanel);
+		//getContentPane().add(showWholeTacletPanel);
 		getContentPane().add(buttonPanel);
 	
 		updateButtons();

@@ -16,7 +16,6 @@ package de.uka.ilkd.key.symbolic_execution.model;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
@@ -113,15 +112,16 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
    /**
     * Returns the variable value pairs of the current state.
     * @return The variable value pairs.
+    * @throws ProofInputException Occurred Exception.
     */
-   public IExecutionVariable[] getVariables();
+   public IExecutionVariable[] getVariables() throws ProofInputException;
    
    /**
     * Returns the variable value pairs of the current state under the given condition.
     * @param condition A {@link Term} specifying some additional constraints to consider.
     * @return The variable value pairs.
     */
-   public IExecutionVariable[] getVariables(Term condition);
+   public IExecutionVariable[] getVariables(Term condition) throws ProofInputException;
    
    /**
     * Returns the number of memory layouts.
@@ -156,22 +156,22 @@ public interface IExecutionNode<S extends SourceElement> extends IExecutionEleme
    public ISymbolicLayout getCurrentLayout(int layoutIndex) throws ProofInputException;
    
    /**
-    * Returns all code blocks completed by this {@link IExecutionNode}.
-    * @return All code blocks completed by this {@link IExecutionNode}.
+    * Returns all code blocks completed by this {@link IExecutionBlockStartNode}.
+    * @return All code blocks completed by this {@link IExecutionBlockStartNode}.
     */
-   public ImmutableList<IExecutionNode<?>> getCompletedBlocks() throws ProofInputException;
+   public ImmutableList<IExecutionBlockStartNode<?>> getCompletedBlocks();
    
    /**
-    * Returns the condition under which this node completes the code block of the given {@link IExecutionNode}.
-    * @param completedNode The completed {@link IExecutionNode} for which the condition is requested.
-    * @return The condition under which this node completes the code block of the given {@link IExecutionNode}.
+    * Returns the condition under which this node completes the code block of the given {@link IExecutionBlockStartNode}.
+    * @param completedNode The completed {@link IExecutionBlockStartNode} for which the condition is requested.
+    * @return The condition under which this node completes the code block of the given {@link IExecutionBlockStartNode}.
     */
-   public Term getBlockCompletionCondition(IExecutionNode<?> completedNode) throws ProofInputException;
+   public Term getBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode) throws ProofInputException;
    
    /**
-    * Returns the human readable condition under which this node completes the code block of the given {@link IExecutionNode}.
-    * @param completedNode The completed {@link IExecutionNode} for which the condition is requested.
-    * @return The human readable condition under which this node completes the code block of the given {@link IExecutionNode}.
+    * Returns the human readable condition under which this node completes the code block of the given {@link IExecutionBlockStartNode}.
+    * @param completedNode The completed {@link IExecutionBlockStartNode} for which the condition is requested.
+    * @return The human readable condition under which this node completes the code block of the given {@link IExecutionBlockStartNode}.
     */
-   public String getFormatedBlockCompletionCondition(IExecutionNode<?> completedNode) throws ProofInputException;
+   public String getFormatedBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode) throws ProofInputException;
 }

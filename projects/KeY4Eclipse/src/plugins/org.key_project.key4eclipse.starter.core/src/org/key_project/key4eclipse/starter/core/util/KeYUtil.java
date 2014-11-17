@@ -68,7 +68,7 @@ import org.key_project.util.jdt.JDTUtil;
 import recoder.parser.JavaCharStream;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.gui.notification.NotificationEventID;
@@ -234,6 +234,9 @@ public final class KeYUtil {
             else {
                 // Make sure that the location is contained in a Java project
                 IProject project = locationToLoad.getProject();
+                if (!JDTUtil.isJavaProject(project)) {
+                   throw new IllegalArgumentException("The project \"" + project.getName() + "\" is no Java project.");
+                }
                 // Get local file for the eclipse resource
                 location = KeYResourceProperties.getSourceClassPathLocation(project);
                 // Get KeY project settings

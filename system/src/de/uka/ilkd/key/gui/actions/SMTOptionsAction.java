@@ -15,13 +15,13 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.EventObject;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 
-import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
@@ -58,7 +58,7 @@ public SMTOptionsAction(MainWindow mainWindow) {
             SettingsListener listener = new SettingsListener(){
 
                 @Override
-                public void settingsChanged(GUIEvent event) {
+                public void settingsChanged(EventObject event) {
                         if(event.getSource() instanceof ProofIndependentSMTSettings ||
                                 event.getSource() instanceof ProofDependentSMTSettings)
                         mainWindow.updateSMTSelectMenu();

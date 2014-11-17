@@ -295,7 +295,8 @@ public class SMTObjTranslator implements SMTTranslator {
 		
 		if(proofInfo.getTypeOfClassUnderTest()!=null){
 			     Sort sort = proofInfo.getTypeOfClassUnderTest().getSort();
-			     addTypePredicate(sort);
+			     //System.out.println("Sort: "+sort);
+			     forceAddTypePredicate(sort);
 			     SMTFunction tp = getTypePredicate(sort.name().toString());
 			     if(tp!=null){
 			    	 
@@ -1638,6 +1639,10 @@ public class SMTObjTranslator implements SMTTranslator {
 		if (!appearsInPO(s)) {
 			return;
 		}
+		forceAddTypePredicate(s);
+	}
+	
+	private void forceAddTypePredicate(Sort s){
 		String id = s.name().toString();
 		String name = getTypePredicateName(id);
 		if (!typePredicates.containsKey(name)) {
