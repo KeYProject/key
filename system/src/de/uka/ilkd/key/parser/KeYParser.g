@@ -844,8 +844,7 @@ options {
         }
 
         if ( result == null && !("length".equals(attributeName)) ) {
-            throw new NotDeclException ("Attribute ", attributeName,
-                getSourceName(), getLine(), getColumn());
+            throw new NotDeclException (input, "Attribute ", attributeName);
         }
         return result;
     }
@@ -1139,12 +1138,10 @@ options {
         // not found
         if (args==null) {
             throw new NotDeclException
-                ("(program) variable or constant", varfunc_name,
-                 getSourceName(), getLine(), getColumn());
+                (input, "(program) variable or constant", varfunc_name);
         } else {
             throw new NotDeclException
-                ("function or static query", varfunc_name,
-                 getSourceName(), getLine(), getColumn());
+                (input, "function or static query", varfunc_name);
         }
     }
 
@@ -1602,8 +1599,7 @@ activated_choice @init{
         name = cat.getText()+":"+choice_.getText();
         c = (Choice) choices().lookup(new Name(name));
         if(c==null){
-            throw new NotDeclException("Option", choice_.getText(),
-                                       getSourceName(), choice_.getLine(), choice_.getCharPositionInLine());
+            throw new NotDeclException(input, "Option", choice_.getText());
         }else{
             activatedChoices=activatedChoices.add(c);
         }
@@ -2377,11 +2373,7 @@ any_sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> result = null
             if(checkSort) {
                 s = lookupSort(name);
                 if(s == null) {
-                  throw new NotDeclException("sort", 
-                                           name, 
-                                           getSourceName(), 
-                                           getLine(),  
-                                           getColumn()); 
+                  throw new NotDeclException(input, "sort", name);
                 }
             }
             
@@ -2784,10 +2776,7 @@ staticAttributeOrQueryReference returns [String attrReference = ""]
         {   KeYJavaType kjt = null;
             kjt = getTypeByClassName(attrReference);
             if (kjt == null) {
-                throw new NotDeclException
-                    ("Class " + attrReference + " is unknown.", 
-                     attrReference, getSourceName(), getLine(), 
-                     getColumn());
+                throw new NotDeclException(input, "Class", attrReference);
             }	        
             attrReference = kjt.getSort().name().toString();            
             match(input, DOT, null);
@@ -2878,10 +2867,7 @@ querySuffix [Term prefix, String memberName] returns [Term result = null]
        }
        KeYJavaType kjt = getTypeByClassName(classRef);
        if(kjt == null)
-          throw new NotDeclException
-             ("Class " + classRef + " is unknown.", 
-              classRef, getSourceName(), getLine(), 
-              getColumn());
+          throw new NotDeclException(input, "Class", classRef);
        classRef = kjt.getFullName();
 
        result = getServices().getJavaInfo().getProgramMethodTerm
@@ -3156,10 +3142,8 @@ abbreviation returns [Term _abbreviation=null]
             {
                 a =  scm.getTerm(sc);
                 if(a==null){
-                    throw new NotDeclException
-                        ("abbreviation", sc, 
-                         getSourceName(), getLine(), getColumn());
-                }                                
+                    throw new NotDeclException(input, "abbreviation", sc);
+                }
             }
         )
     ;
@@ -3564,8 +3548,7 @@ varId returns [ParsableVariable v = null]
         {   
             v = (ParsableVariable) variables().lookup(new Name(id.getText()));
             if (v == null) {
-                throw new NotDeclException("variable", id.getText(), 
-                                           getSourceName(), id.getLine(), id.getCharPositionInLine());
+                throw new NotDeclException(input, "variable", id.getText());
             }
         } 
   ;
@@ -4212,8 +4195,7 @@ option returns [Choice c=null]
         {
             c = (Choice) choices().lookup(new Name(cat.getText()+":"+choice_.getText()));
             if(c==null) {
-                throw new NotDeclException
-			("Option", choice_.getText(), getSourceName(), choice_.getLine(), choice_.getCharPositionInLine());
+                throw new NotDeclException(input, "Option", choice_.getText());
 	    }
         }
     ;
@@ -4297,7 +4279,7 @@ ruleset[Vector rs]
         {   
             RuleSet h = (RuleSet) ruleSets().lookup(new Name(id.getText()));
             if (h == null) {
-                throw new NotDeclException("ruleset", id.getText(), getSourceName(), id.getLine(), id.getCharPositionInLine());
+                throw new NotDeclException(input, "ruleset", id.getText());
             }
             rs.add(h);
         }
