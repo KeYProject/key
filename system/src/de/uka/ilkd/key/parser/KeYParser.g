@@ -2845,6 +2845,7 @@ attrid returns [String attr = "";]
         { attr = id; }
     | LPAREN clss = sort_name DOUBLECOLON id2 = simple_ident RPAREN
         { attr = clss + "::" + id2; }
+    | ( STAR { attr = "*"; System.out.println("*"); } )+
     ;
     
 query_suffix [Term prefix, String memberName] returns [Term result = null] 
