@@ -94,17 +94,19 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortedOperator;
+import de.uka.ilkd.key.logic.op.TermTransformer;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof_references.KeYTypeUtil;
@@ -2180,6 +2182,7 @@ public final class SymbolicExecutionUtil {
             }
             // Add additional equivalenz term to antecedent with the replace object which must be equal to the find term 
             Term replaceTerm = (Term)goalTemplate.replaceWithExpressionAsObject();
+            replaceTerm = instantiateReplaceTerm(replaceTerm, app, services);
             replaceTerm = services.getTermBuilder().equals(replaceTerm, app.posInOccurrence().subTerm());
             replaceTerm = services.getTermBuilder().applyUpdatePairsSequential(app.instantiations().getUpdateContext(), replaceTerm);
             if (!newAntecedents.contains(replaceTerm)) {
@@ -2209,6 +2212,32 @@ public final class SymbolicExecutionUtil {
          condition = improveReadability(condition, services);
       }
       return condition;
+   }
+   
+   /**
+    * Instantiates the given replace {@link Term} of the applied {@link TacletApp}.
+    * @param replaceTerm The replace {@link Term} to instantiate.
+    * @param tacletApp The {@link TacletApp} to consider.
+    * @param services The {@link Services} to use.
+    * @return The instantiated replace {@link Term}.
+    */
+   public static Term instantiateReplaceTerm(Term replaceTerm, TacletApp tacletApp, Services services) {
+      if (replaceTerm != null) {
+         if (replaceTerm.op() instanceof TermTransformer) {
+            // Replace meta constructs
+            SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(services, tacletApp.instantiations(), tacletApp.posInOccurrence(), tacletApp.taclet());
+            replaceTerm.execPostOrder(visitor);
+            replaceTerm = visitor.getTerm();
+         }
+         else if (replaceTerm.op() instanceof SchemaVariable) {
+            // Replace schema variables
+            Object instantiation = tacletApp.instantiations().getInstantiation((SchemaVariable)replaceTerm.op());
+            if (instantiation instanceof Term) {
+               replaceTerm = (Term)instantiation;
+            }
+         }
+      }
+      return replaceTerm;
    }
    
    /**
@@ -2755,66 +2784,76 @@ public final class SymbolicExecutionUtil {
          }
       }
       else {
-         List<Term> newChildren = new LinkedList<Term>();
-         boolean changed = false;
-         for (int i = 0; i < term.arity(); i++) {
-            Term oldChild = term.sub(i);
-            Term newChild = replaceSkolemConstants(sequent, oldChild, services);
-            if (newChild != oldChild) {
-               changed = true;
-            }
-            newChildren.add(newChild);
-         }
-         if (changed) {
-            if (term.op() == Junctor.NOT) {
-               // Create new NOT term using build in simplification of TermBuilder.
-               assert newChildren.size() == 1;
-               assert term.boundVars().isEmpty();
-               assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
-               Term result = services.getTermBuilder().not(newChildren.get(0));
-               if (term.hasLabels()) {
-                  result = services.getTermBuilder().label(result, term.getLabels());
-               }
-               return result;
-            }
-            else if (term.op() == Junctor.OR) {
-               // Create new OR term using build in simplification of TermBuilder.
-               assert term.boundVars().isEmpty();
-               assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
-               Term result = services.getTermBuilder().or(newChildren);
-               if (term.hasLabels()) {
-                  result = services.getTermBuilder().label(result, term.getLabels());
-               }
-               return result;
-            }
-            else if (term.op() == Junctor.AND) {
-               // Create new AND term using build in simplification of TermBuilder.
-               assert term.boundVars().isEmpty();
-               assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
-               Term result = services.getTermBuilder().and(newChildren);
-               if (term.hasLabels()) {
-                  result = services.getTermBuilder().label(result, term.getLabels());
-               }
-               return result;
-            }
-            else if (term.op() == Junctor.IMP) {
-               // Create new IMP term using build in simplification of TermBuilder.
-               assert newChildren.size() == 2;
-               assert term.boundVars().isEmpty();
-               assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
-               return services.getTermBuilder().imp(newChildren.get(0), newChildren.get(1), term.getLabels());
-            }
-            else {
-               // Create new term in general.
-               return services.getTermFactory().createTerm(term.op(),
-                                                           new ImmutableArray<Term>(newChildren),
-                                                           term.boundVars(),
-                                                           term.javaBlock(),
-                                                           term.getLabels());
-            }
+         if (isSkolemConstant(term)) {
+            // Skolem term
+            List<Term> replacements = findSkolemReplacements(sequent, term);
+            return !replacements.isEmpty() ? 
+                   replacements.get(0) : // Any of the replacements can be used, for simplicity use the first one. Alternatively may the one with the lowest depth or with least symbols might be used.
+                   term;
          }
          else {
-            return term;
+            // No skolem term
+            List<Term> newChildren = new LinkedList<Term>();
+            boolean changed = false;
+            for (int i = 0; i < term.arity(); i++) {
+               Term oldChild = term.sub(i);
+               Term newChild = replaceSkolemConstants(sequent, oldChild, services);
+               if (newChild != oldChild) {
+                  changed = true;
+               }
+               newChildren.add(newChild);
+            }
+            if (changed) {
+               if (term.op() == Junctor.NOT) {
+                  // Create new NOT term using build in simplification of TermBuilder.
+                  assert newChildren.size() == 1;
+                  assert term.boundVars().isEmpty();
+                  assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
+                  Term result = services.getTermBuilder().not(newChildren.get(0));
+                  if (term.hasLabels()) {
+                     result = services.getTermBuilder().label(result, term.getLabels());
+                  }
+                  return result;
+               }
+               else if (term.op() == Junctor.OR) {
+                  // Create new OR term using build in simplification of TermBuilder.
+                  assert term.boundVars().isEmpty();
+                  assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
+                  Term result = services.getTermBuilder().or(newChildren);
+                  if (term.hasLabels()) {
+                     result = services.getTermBuilder().label(result, term.getLabels());
+                  }
+                  return result;
+               }
+               else if (term.op() == Junctor.AND) {
+                  // Create new AND term using build in simplification of TermBuilder.
+                  assert term.boundVars().isEmpty();
+                  assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
+                  Term result = services.getTermBuilder().and(newChildren);
+                  if (term.hasLabels()) {
+                     result = services.getTermBuilder().label(result, term.getLabels());
+                  }
+                  return result;
+               }
+               else if (term.op() == Junctor.IMP) {
+                  // Create new IMP term using build in simplification of TermBuilder.
+                  assert newChildren.size() == 2;
+                  assert term.boundVars().isEmpty();
+                  assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
+                  return services.getTermBuilder().imp(newChildren.get(0), newChildren.get(1), term.getLabels());
+               }
+               else {
+                  // Create new term in general.
+                  return services.getTermFactory().createTerm(term.op(),
+                                                              new ImmutableArray<Term>(newChildren),
+                                                              term.boundVars(),
+                                                              term.javaBlock(),
+                                                              term.getLabels());
+               }
+            }
+            else {
+               return term;
+            }
          }
       }
    }
