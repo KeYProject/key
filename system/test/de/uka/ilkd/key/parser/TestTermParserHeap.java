@@ -49,7 +49,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     public void testAllFieldsSelector() throws IOException {
-        System.out.println(parseTerm("a.*"));
+        comparePrettySyntaxAgainstVerboseSyntax("a.* ", "allFields(a)");
     }
 
     public void testLocationSets() throws IOException {

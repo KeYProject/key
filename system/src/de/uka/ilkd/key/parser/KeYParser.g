@@ -2815,7 +2815,8 @@ static_attribute_suffix returns [Term result = null]
 attribute_or_query_suffix[Term prefix] returns [Term _attribute_or_query_suffix = null]
 @after { _attribute_or_query_suffix = result; }
     :
-    DOT memberName = attrid
+    DOT ( STAR { result = services.getTermBuilder().allFields(prefix); }
+    | ( memberName = attrid
     (result = query_suffix[prefix, memberName] {assert result != null;})?
     {
         if(result == null)  {
@@ -2831,7 +2832,7 @@ attribute_or_query_suffix[Term prefix] returns [Term _attribute_or_query_suffix 
                 result = createAttributeTerm(prefix, v);
             }
         }
-    }
+    } ) )
     ;
 catch [TermCreationException ex] {
     keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
@@ -2845,7 +2846,6 @@ attrid returns [String attr = "";]
         { attr = id; }
     | LPAREN clss = sort_name DOUBLECOLON id2 = simple_ident RPAREN
         { attr = clss + "::" + id2; }
-    | ( STAR { attr = "*"; System.out.println("*"); } )+
     ;
     
 query_suffix [Term prefix, String memberName] returns [Term result = null] 
