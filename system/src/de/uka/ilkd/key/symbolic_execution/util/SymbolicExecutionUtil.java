@@ -2615,7 +2615,7 @@ public final class SymbolicExecutionUtil {
          List<Term> toCheck = new LinkedList<Term>(result);
          while (!toCheck.isEmpty()) {
             Term skolemConstant = toCheck.remove(0);
-            List<Term> replacements = findSkolemReplacements(sequent, skolemConstant);
+            List<Term> replacements = findSkolemReplacements(sequent, skolemConstant, null);
             for (Term replacement : replacements) {
                Set<Term> checkResult = collectSkolemConstantsNonRecursive(replacement);
                for (Term checkConstant : checkResult) {
@@ -2749,7 +2749,7 @@ public final class SymbolicExecutionUtil {
       int skolemCheck = checkSkolemEquality(term);
       if (skolemCheck == -1) {
          TermBuilder tb = services.getTermBuilder();
-         List<Term> replacements = findSkolemReplacements(sequent, term);
+         List<Term> replacements = findSkolemReplacements(sequent, term.sub(0), term);
          if (!replacements.isEmpty()) {
             Term other = term.sub(1);
             List<Term> newTerms = new LinkedList<Term>();
@@ -2765,7 +2765,7 @@ public final class SymbolicExecutionUtil {
       }
       else if (skolemCheck == 1) {
          TermBuilder tb = services.getTermBuilder();
-         List<Term> replacements = findSkolemReplacements(sequent, term);
+         List<Term> replacements = findSkolemReplacements(sequent, term.sub(1), term);
          if (!replacements.isEmpty()) {
             Term other = term.sub(0);
             List<Term> newTerms = new LinkedList<Term>();
@@ -2782,7 +2782,7 @@ public final class SymbolicExecutionUtil {
       else {
          if (isSkolemConstant(term)) {
             // Skolem term
-            List<Term> replacements = findSkolemReplacements(sequent, term);
+            List<Term> replacements = findSkolemReplacements(sequent, term, null);
             return !replacements.isEmpty() ? 
                    replacements.get(0) : // Any of the replacements can be used, for simplicity use the first one. Alternatively may the one with the lowest depth or with least symbols might be used.
                    term;
@@ -2858,20 +2858,25 @@ public final class SymbolicExecutionUtil {
     * Utility method of {@link #replaceSkolemConstants(Sequent, Term, Services)} to
     * find all equality parts of the given skolem constant.
     * @param sequent The {@link Sequent} which provides the skolem equalities.
-    * @param skolemEquality The skolem equality to solve.
+    * @param skolemConstant The skolem constant to solve.
+    * @param skolemEquality The optional skolem equality to ignore.
     * @return The equality parts of the given skolem equality.
     */
-   private static List<Term> findSkolemReplacements(Sequent sequent, Term skolemEquality) {
+   private static List<Term> findSkolemReplacements(Sequent sequent, Term skolemConstant, Term skolemEquality) {
       List<Term> result = new LinkedList<Term>();
       for (SequentFormula sf : sequent) {
          Term term = sf.formula();
          if (term != skolemEquality) {
             int skolemCheck = checkSkolemEquality(term);
             if (skolemCheck == -1) {
-               result.add(term.sub(1));
+               if (term.sub(0).equals(skolemConstant)) {
+                  result.add(term.sub(1));
+               }
             }
             else if (skolemCheck == 1) {
-               result.add(term.sub(0));
+               if (term.sub(1).equals(skolemConstant)) {
+                  result.add(term.sub(0));
+               }
             }
          }
       }
