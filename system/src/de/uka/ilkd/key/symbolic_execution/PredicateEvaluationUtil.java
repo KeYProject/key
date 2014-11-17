@@ -10,20 +10,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.TermTransformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
@@ -156,21 +152,7 @@ public final class PredicateEvaluationUtil {
                                          Map<TermLabel, PredicateResult> results) {
       Object replaceObject = tacletGoal.replaceWithExpressionAsObject();
       if (replaceObject instanceof Term) {
-         Term replaceTerm = (Term) replaceObject;
-         if (replaceTerm.op() instanceof TermTransformer) {
-            // Replace meta constructs
-            Services services = node.proof().getServices();
-            SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(services, tacletApp.instantiations(), tacletApp.posInOccurrence(), tacletApp.taclet());
-            replaceTerm.execPostOrder(visitor);
-            replaceTerm = visitor.getTerm();
-         }
-         else if (replaceTerm.op() instanceof SchemaVariable) {
-            // Replace schema variables
-            Object instantiation = tacletApp.instantiations().getInstantiation((SchemaVariable)replaceTerm.op());
-            if (instantiation instanceof Term) {
-               replaceTerm = (Term)instantiation;
-            }
-         }
+         Term replaceTerm = SymbolicExecutionUtil.instantiateReplaceTerm((Term) replaceObject, tacletApp, node.proof().getServices());
          // Check for true/false terms
          if (replaceTerm.op() == Junctor.TRUE) {
             updatePredicateResult(label, new PredicateResult(PredicateValue.TRUE, node), results);
