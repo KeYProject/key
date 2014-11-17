@@ -94,7 +94,9 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortedOperator;
+import de.uka.ilkd.key.logic.op.TermTransformer;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -2180,6 +2182,7 @@ public final class SymbolicExecutionUtil {
             }
             // Add additional equivalenz term to antecedent with the replace object which must be equal to the find term 
             Term replaceTerm = (Term)goalTemplate.replaceWithExpressionAsObject();
+            replaceTerm = instantiateReplaceTerm(replaceTerm, app, services);
             replaceTerm = services.getTermBuilder().equals(replaceTerm, app.posInOccurrence().subTerm());
             replaceTerm = services.getTermBuilder().applyUpdatePairsSequential(app.instantiations().getUpdateContext(), replaceTerm);
             if (!newAntecedents.contains(replaceTerm)) {
@@ -2209,6 +2212,32 @@ public final class SymbolicExecutionUtil {
          condition = improveReadability(condition, services);
       }
       return condition;
+   }
+   
+   /**
+    * Instantiates the given replace {@link Term} of the applied {@link TacletApp}.
+    * @param replaceTerm The replace {@link Term} to instantiate.
+    * @param tacletApp The {@link TacletApp} to consider.
+    * @param services The {@link Services} to use.
+    * @return The instantiated replace {@link Term}.
+    */
+   public static Term instantiateReplaceTerm(Term replaceTerm, TacletApp tacletApp, Services services) {
+      if (replaceTerm != null) {
+         if (replaceTerm.op() instanceof TermTransformer) {
+            // Replace meta constructs
+            SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(services, tacletApp.instantiations(), tacletApp.posInOccurrence(), tacletApp.taclet());
+            replaceTerm.execPostOrder(visitor);
+            replaceTerm = visitor.getTerm();
+         }
+         else if (replaceTerm.op() instanceof SchemaVariable) {
+            // Replace schema variables
+            Object instantiation = tacletApp.instantiations().getInstantiation((SchemaVariable)replaceTerm.op());
+            if (instantiation instanceof Term) {
+               replaceTerm = (Term)instantiation;
+            }
+         }
+      }
+      return replaceTerm;
    }
    
    /**
