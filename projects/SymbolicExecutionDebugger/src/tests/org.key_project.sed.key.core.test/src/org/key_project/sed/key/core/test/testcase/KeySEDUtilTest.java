@@ -71,11 +71,11 @@ public class KeySEDUtilTest extends AbstractSetupTestCase {
         ILaunchConfiguration thirdConfigurationPartDifferent = KeySEDUtil.createConfiguration(secondMethod, new Position(9, 10), new Position(11, 12));
         assertNotNull(thirdConfigurationPartDifferent);
         // Create configurations for files
-        ILaunchConfiguration firstFileConfiguration = KeySEDUtil.createConfiguration((IFile)firstMethod.getUnderlyingResource());
+        ILaunchConfiguration firstFileConfiguration = KeySEDUtil.createConfiguration((IFile)firstMethod.getUnderlyingResource(), null);
         assertNotNull(firstFileConfiguration);
-        ILaunchConfiguration secondFileConfiguration = KeySEDUtil.createConfiguration((IFile)secondMethod.getUnderlyingResource());
+        ILaunchConfiguration secondFileConfiguration = KeySEDUtil.createConfiguration((IFile)secondMethod.getUnderlyingResource(), null);
         assertNotNull(secondFileConfiguration);
-        ILaunchConfiguration thirdFileConfiguration = KeySEDUtil.createConfiguration((IFile)secondMethod.getUnderlyingResource());
+        ILaunchConfiguration thirdFileConfiguration = KeySEDUtil.createConfiguration((IFile)secondMethod.getUnderlyingResource(), null);
         assertNotNull(thirdFileConfiguration);
         // Test null
         List<ILaunchConfiguration> result = KeySEDUtil.searchLaunchConfigurations(null, null, null);
@@ -142,12 +142,19 @@ public class KeySEDUtilTest extends AbstractSetupTestCase {
         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/banking", banking);
         // Get method
         IMethod method = TestUtilsUtil.getJdtMethod(javaProject, "banking.PayCard", "charge", Signature.C_INT + "");
-        // Create configuration without method range
+        // Create configuration without method range and without method
         IFile file = (IFile)method.getUnderlyingResource();
-        ILaunchConfiguration configuration = KeySEDUtil.createConfiguration(file);
+        ILaunchConfiguration configuration = KeySEDUtil.createConfiguration(file, null);
         assertNotNull(configuration);
         assertEquals(file.getFullPath().toString(), KeySEDUtil.getFileToLoadValue(configuration));
         assertFalse(KeySEDUtil.isNewDebugSession(configuration));
+        assertNull(KeySEDUtil.findMethod(configuration));
+        // Create configuration without method range but with method
+        configuration = KeySEDUtil.createConfiguration(file, method);
+        assertNotNull(configuration);
+        assertEquals(file.getFullPath().toString(), KeySEDUtil.getFileToLoadValue(configuration));
+        assertFalse(KeySEDUtil.isNewDebugSession(configuration));
+        assertEquals(method, KeySEDUtil.findMethod(configuration));
     }
     
     /**

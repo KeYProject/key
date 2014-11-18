@@ -501,10 +501,11 @@ public final class KeySEDUtil {
     /**
      * Creates a new {@link ILaunchConfiguration}.
      * @param file The {@link IFile} to launch.
+     * @param method The optional {@link IMethod}.
      * @return The new created {@link ILaunchConfiguration}.
      * @throws CoreException Occurred Exception.
      */
-    public static ILaunchConfiguration createConfiguration(IFile file) throws CoreException {
+    public static ILaunchConfiguration createConfiguration(IFile file, IMethod method) throws CoreException {
         ILaunchConfiguration config = null;
         ILaunchConfigurationWorkingCopy wc = null;
         ILaunchConfigurationType configType = getConfigurationType();
@@ -513,6 +514,11 @@ public final class KeySEDUtil {
         wc = configType.newInstance(null, LaunchUtil.getLaunchManager().generateLaunchConfigurationName(name));
         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_NEW_DEBUG_SESSION, false);
         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_FILE_TO_LOAD, path);
+        if (method != null) {
+           wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PROJECT, KeySEDUtil.getProjectValue(method));
+           wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TYPE, KeySEDUtil.getTypeValue(method));
+           wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD, KeySEDUtil.getMethodValue(method));
+        }
         wc.setMappedResources(new IResource[] {file});
         config = wc.doSave();
         return config;
