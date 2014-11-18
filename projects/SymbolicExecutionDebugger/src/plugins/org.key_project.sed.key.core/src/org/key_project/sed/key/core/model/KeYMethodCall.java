@@ -414,8 +414,9 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
          Assert.isTrue(methodReturn.getMethodCall() == this);
          IKeYBaseMethodReturn oldReturn = knownMethodReturns.put(methodReturn.getExecutionNode(), methodReturn);
          Assert.isTrue(oldReturn == null);
-//         if(!isCollapsed())
+//         if(!isCollapsed()) {
 //            setCollapsed(true);
+//         }
       }
    }
 

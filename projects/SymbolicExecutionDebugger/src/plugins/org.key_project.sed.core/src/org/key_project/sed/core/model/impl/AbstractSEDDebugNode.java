@@ -385,6 +385,7 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
                   result = startConditions[i];
                }
             }
+            i++;
          }
          // Return last branch condition if not of them is collapsed.
          if (result == null && startConditions.length >= 1) {

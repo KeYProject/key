@@ -19,10 +19,11 @@ import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddShapeFeature;
-import org.eclipse.graphiti.internal.ExternalPictogramLink;
 import org.eclipse.graphiti.mm.GraphicsAlgorithmContainer;
+import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Image;
 import org.eclipse.graphiti.mm.algorithms.Polyline;
+import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.Font;
@@ -38,11 +39,13 @@ import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
+import org.eclipse.graphiti.util.ColorConstant;
 
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDMethodCall;
+import org.key_project.sed.core.model.ISEDGroupable;
 import org.key_project.sed.core.util.NodeUtil;
+import org.key_project.sed.core.util.SEDGroupPreorderIterator;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeStyleUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
@@ -97,6 +100,48 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
     */
    @Override
    public PictogramElement add(IAddContext context) {
+      ISEDDebugNode addedNode = (ISEDDebugNode) context.getNewObject();
+
+      IPeCreateService peCreateService = Graphiti.getPeCreateService();
+      IGaService gaService = Graphiti.getGaService();
+      
+      Diagram targetDiagram = (Diagram) context.getTargetContainer();
+
+      if(addedNode instanceof ISEDGroupable) {
+         ISEDGroupable groupStart = (ISEDGroupable) addedNode;
+         if(groupStart.isGroupable()) {
+            ContainerShape container = peCreateService.createContainerShape(targetDiagram, true);
+   
+            Rectangle rect = gaService.createRectangle(container);
+            
+            ColorConstant color = new ColorConstant(102, 80, 180);
+            if(groupStart.isCollapsed()) {
+               SEDGroupPreorderIterator iter = new SEDGroupPreorderIterator(groupStart);
+               try {
+                  color = iter.allBranchesFinished() ? new ColorConstant(102, 180, 0) : new ColorConstant(255, 102, 0);
+               }
+               catch (DebugException e) {
+                  LogUtil.getLogger().logError(e);
+               }
+            }
+            
+            rect.setForeground(manageColor(color));
+            rect.setLineWidth(2);
+            rect.setFilled(false);
+            link(container, addedNode);
+            
+            GraphicsAlgorithm ga = createNode(context).getGraphicsAlgorithm();
+   
+            gaService.setLocationAndSize(rect, context.getX(), context.getY() + ga.getHeight() / 2, ga.getWidth(), ga.getHeight());
+   
+            return container;
+         }
+      }
+      
+      return createNode(context);
+   }
+   
+   private PictogramElement createNode(IAddContext context) {
       ISEDDebugNode addedNode = (ISEDDebugNode) context.getNewObject();
       
       Diagram targetDiagram = (Diagram) context.getTargetContainer();
@@ -172,13 +217,14 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
       ISEDDebugNode parentNode = NodeUtil.getParent((ISEDDebugNode) getBusinessObjectForPictogramElement(nodeContainer));
       if(parentNode != null)
       {
-         PictogramElement pe = parentNode instanceof ISEDMethodCall ? 
+         PictogramElement pe = parentNode instanceof ISEDGroupable && ((ISEDGroupable)parentNode).isGroupable() ? 
                getFeatureProvider().getAllPictogramElementsForBusinessObject(parentNode)[1] :
                getFeatureProvider().getPictogramElementForBusinessObject(parentNode);
             
          if (pe == null) {
             throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't find PictogramElement for \"" + pe + "\"."));
          }
+         
          if (!(pe instanceof AnchorContainer)) {
             throw new DebugException(LogUtil.getLogger().createErrorStatus("Parent PictogramElement \"" + pe + "\" is no AnchorContainer."));
          }
