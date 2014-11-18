@@ -48,6 +48,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
     * @param rule The {@link Rule} which is applied.
     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param hint An optional hint passed from the active rule to describe the term which should be created.
     * @param tacletTerm The optional taclet {@link Term}.
     * @return The required {@link RefactoringScope}.
     */
@@ -56,6 +57,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
                                                   Term applicationTerm,
                                                   Rule rule,
                                                   Goal goal,
+                                                  Object hint,
                                                   Term tacletTerm);
 
    /**
@@ -65,15 +67,17 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
     * @param rule The {@link Rule} which is applied.
     * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param hint An optional hint passed from the active rule to describe the term which should be created.
     * @param tacletTerm The optional taclet {@link Term}.
     * @param term The {@link Term} which is now refactored.
     * @param labels The new labels the {@link Term} will have after the refactoring.
     */
-   public void refactoreLabels(TermServices services,
+   public void refactoreLabels(Services services,
                                PosInOccurrence applicationPosInOccurrence,
                                Term applicationTerm,
                                Rule rule,
                                Goal goal,
+                               Object hint,
                                Term tacletTerm,
                                Term term,
                                List<TermLabel> labels);

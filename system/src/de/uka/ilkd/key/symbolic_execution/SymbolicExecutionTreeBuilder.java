@@ -64,8 +64,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionNode;
@@ -1023,12 +1023,14 @@ public class SymbolicExecutionTreeBuilder {
             Map<JavaPair, ImmutableList<IExecutionNode<?>>> newBlockMap = new LinkedHashMap<JavaPair, ImmutableList<IExecutionNode<?>>>();
             if (oldBlockMap != null) {
                for (Entry<JavaPair, ImmutableList<IExecutionNode<?>>> entry : oldBlockMap.entrySet()) {
-                  boolean done = isAfterBlockReached(stackSize, innerMostMethodFrame, activeStatement, entry.getKey());
-                  if (done) {
-                     completedBlocks.put(entry.getKey(), entry.getValue());
-                  }
-                  else {
-                     newBlockMap.put(entry.getKey(), entry.getValue());
+                  if (!isContained(entry.getValue(), node)) { // Ensure that with stepwise execution loops are not completed by their own.
+                     boolean done = isAfterBlockReached(stackSize, innerMostMethodFrame, activeStatement, entry.getKey());
+                     if (done) {
+                        completedBlocks.put(entry.getKey(), entry.getValue());
+                     }
+                     else {
+                        newBlockMap.put(entry.getKey(), entry.getValue());
+                     }
                   }
                }
             }
@@ -1039,6 +1041,24 @@ public class SymbolicExecutionTreeBuilder {
       return completedBlocks;
    }
    
+   /**
+    * Checks if one of the give {@link IExecutionNode}s represents the given {@link Node}.
+    * @param list The {@link IExecutionNode}s to check.
+    * @param node The {@link Node} to check for.
+    * @return {@code true} is contained, {@code false} is not contained.
+    */
+   protected boolean isContained(ImmutableList<IExecutionNode<?>> list, Node node) {
+      boolean contained = false;
+      Iterator<IExecutionNode<?>> iter = list.iterator();
+      while (!contained && iter.hasNext()) {
+         IExecutionNode<?> next = iter.next();
+         if (next.getProofNode() == node) {
+            contained = true;
+         }
+      }
+      return contained;
+   }
+
    /**
     * Checks if the after block condition is fulfilled.
     * @param currentStackSize The current stack size.

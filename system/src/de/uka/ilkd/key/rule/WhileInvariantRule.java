@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.rule.tacletbuilder.InfFlowLoopInvariantTacletBuilder;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -62,12 +61,13 @@ import de.uka.ilkd.key.macros.WellDefinednessMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.init.IFProofObligationVars;
-import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.init.StateVars;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvariantTransformer;
+import de.uka.ilkd.key.rule.tacletbuilder.InfFlowLoopInvariantTacletBuilder;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopWellDefinedness;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
@@ -76,7 +76,15 @@ import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
 public final class WhileInvariantRule implements BuiltInRule {
+    /**
+     * The hint used to refactor the initial invariant.
+     */
+    public static final String INITIAL_INVARIANT_ONLY_HINT = "onlyInitialInvariant";
 
+    /**
+     * The unit used to refactor the guard true body.
+     */
+    public static final String GUARD_TRUE_BODY_HINT = "guardTrueBody";
 
     public static final WhileInvariantRule INSTANCE = new WhileInvariantRule();
 
@@ -580,10 +588,15 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
-    private SequentFormula initFormula(Instantiation inst, final Term invTerm,
-                                       Term reachableState, TermServices services) {
+    private SequentFormula initFormula(Instantiation inst, 
+                                       final Term invTerm,
+                                       Term reachableState, 
+                                       Services services,
+                                       Goal initGoal) {
         final TermBuilder tb = services.getTermBuilder();
-        return new SequentFormula(tb.apply(inst.u, tb.and(invTerm, reachableState), null));
+        Term sfTerm = tb.apply(inst.u, tb.and(invTerm, reachableState), null);
+        sfTerm = TermLabelManager.refactorTerm(services, null, sfTerm, this, initGoal, INITIAL_INVARIANT_ONLY_HINT, null);
+        return new SequentFormula(sfTerm);
     }
 
     private Term useCaseFormula(Services services, RuleApp ruleApp,
@@ -633,9 +646,9 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                 Term reachableState,
                                                 Goal initGoal) {
         initGoal.setBranchLabel("Invariant Initially Valid");
-        initGoal.changeFormula(initFormula(inst, invTerm, reachableState, services),
+        initGoal.changeFormula(initFormula(inst, invTerm, reachableState, services, initGoal),
                                ruleApp.posInOccurrence());
-        TermLabelManager.refactorLabels(services, ruleApp.posInOccurrence(), this, initGoal, null);
+        TermLabelManager.refactorLabels(services, ruleApp.posInOccurrence(), this, initGoal, null, null);
     }
 
 
@@ -662,9 +675,10 @@ public final class WhileInvariantRule implements BuiltInRule {
                 true, 
                 false);
 
-        final Term guardTrueBody = bodyTerm(services, ruleApp, applicationSequent,
-                                            inst, invTerm, frameCondition, variantPO,
-                                            bodyGoal, guardJb, guardTrueTerm); 
+        Term guardTrueBody = bodyTerm(services, ruleApp, applicationSequent,
+                                      inst, invTerm, frameCondition, variantPO,
+                                      bodyGoal, guardJb, guardTrueTerm); 
+        guardTrueBody = TermLabelManager.refactorTerm(services, null, guardTrueBody, this, bodyGoal, GUARD_TRUE_BODY_HINT, null);
 
         bodyGoal.changeFormula(new SequentFormula(tb.applySequential(uBeforeLoopDefAnonVariant, 
                                                                      guardTrueBody)), 
@@ -865,8 +879,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             }
             final Term m = mods.get(heap);
             final Term fc;
-          if (tb.strictlyNothing().equals(m) &&
-                  heap == services.getTypeConverter().getHeapLDT().getHeap()) {
+          if (tb.strictlyNothing().equals(m)) {
                 fc = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoop.get(heap)); 
             } else{
                 fc = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), m);

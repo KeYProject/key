@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.rule.tacletbuilder.InfFlowMethodContractTacletBuilder;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +77,7 @@ import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.InfFlowMethodContractTacletBuilder;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
@@ -87,6 +87,10 @@ import de.uka.ilkd.key.util.Pair;
  * Implements the rule which inserts operation contracts for a method call.
  */
 public final class UseOperationContractRule implements BuiltInRule {
+    /**
+     * Hint to refactor the final pre term.
+     */
+    public static final String FINAL_PRE_TERM_HINT = "finalPreTerm";
 
     public static final UseOperationContractRule INSTANCE
                                             = new UseOperationContractRule();
@@ -867,10 +871,11 @@ public final class UseOperationContractRule implements BuiltInRule {
                                                                     reachableState}));
         }
 
+        finalPreTerm = TermLabelManager.refactorTerm(services, null, finalPreTerm, this, preGoal, FINAL_PRE_TERM_HINT, null);
         preGoal.changeFormula(new SequentFormula(finalPreTerm),
                               ruleApp.posInOccurrence());
 
-        TermLabelManager.refactorLabels(services, ruleApp.posInOccurrence(), this, preGoal, null);
+        TermLabelManager.refactorLabels(services, ruleApp.posInOccurrence(), this, preGoal, null, null);
 
         //create "Post" branch
 	final StatementBlock resultAssign;
@@ -941,7 +946,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         	                   ruleApp.posInOccurrence());
         }
 
-        TermLabelManager.refactorLabels(services, ruleApp.posInOccurrence(), this, nullGoal, null);
+        TermLabelManager.refactorLabels(services, ruleApp.posInOccurrence(), this, nullGoal, null, null);
 
 
 

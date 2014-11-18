@@ -66,91 +66,57 @@ public class TestTermLabelManager extends TestCase {
    /**
     * Tests {@link TermLabelManager#refactorLabels(Services, PosInOccurrence, Rule, Goal, Term)}
     */
-   public void testRefactorLabels_childrenAndGrandchildren_allRules() {
-      try {
-        doRefactoringTestLogging(true, true, RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE);
-    } catch (ProblemLoaderException e) {
-        fail();
-    }
+   public void testRefactorLabels_childrenAndGrandchildren_allRules() throws ProblemLoaderException {
+      doRefactoringTestLogging(true, true, RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE);
    }
 
    /**
     * Tests {@link TermLabelManager#refactorLabels(Services, PosInOccurrence, Rule, Goal, Term)}
     */
-   public void testRefactorLabels_childrenAndGrandchildren_ruleSpecific() {
-      try {
-        doRefactoringTestLogging(true, false, RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE, "rule");
-    } catch (ProblemLoaderException e) {
-        fail();
-    }
+   public void testRefactorLabels_childrenAndGrandchildren_ruleSpecific() throws ProblemLoaderException {
+      doRefactoringTestLogging(true, false, RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE, "rule");
    }
 
    /**
     * Tests {@link TermLabelManager#refactorLabels(Services, PosInOccurrence, Rule, Goal, Term)}
     */
-   public void testRefactorLabels_directChildren_allRules() {
-      try {
-        doRefactoringTestLogging(true, true, RefactoringScope.APPLICATION_DIRECT_CHILDREN);
-    } catch (ProblemLoaderException e) {
-        fail();
-    }
+   public void testRefactorLabels_directChildren_allRules() throws ProblemLoaderException {
+      doRefactoringTestLogging(true, true, RefactoringScope.APPLICATION_DIRECT_CHILDREN);
    }
 
    /**
     * Tests {@link TermLabelManager#refactorLabels(Services, PosInOccurrence, Rule, Goal, Term)}
     */
-   public void testRefactorLabels_directChildren_ruleSpecific() {
-      try {
-        doRefactoringTestLogging(true, false, RefactoringScope.APPLICATION_DIRECT_CHILDREN, "rule");
-    } catch (ProblemLoaderException e) {
-        fail();
-    }
+   public void testRefactorLabels_directChildren_ruleSpecific() throws ProblemLoaderException {
+      doRefactoringTestLogging(true, false, RefactoringScope.APPLICATION_DIRECT_CHILDREN, "rule");
    }
 
    /**
     * Tests {@link TermLabelManager#refactorLabels(Services, PosInOccurrence, Rule, Goal, Term)}
     */
-   public void testRefactorLabels_none_allRules() {
-      try {
-        doRefactoringTestLogging(false, false, RefactoringScope.NONE);
-    } catch (ProblemLoaderException e) {
-        fail();
-    }
-
+   public void testRefactorLabels_none_allRules() throws ProblemLoaderException {
+      doRefactoringTestLogging(false, false, RefactoringScope.NONE);
    }
 
    /**
     * Tests {@link TermLabelManager#refactorLabels(Services, PosInOccurrence, Rule, Goal, Term)}
     */
-   public void testRefactorLabels_none_ruleSpecific() {
-      try {
-        doRefactoringTestLogging(false, false, RefactoringScope.NONE, "rule");
-    } catch (ProblemLoaderException e) {
-        fail();
-    }
+   public void testRefactorLabels_none_ruleSpecific() throws ProblemLoaderException {
+      doRefactoringTestLogging(false, false, RefactoringScope.NONE, "rule");
    }
 
    /**
     * Tests {@link TermLabelManager#refactorLabels(Services, PosInOccurrence, Rule, Goal, Term)}
     */
-   public void testRefactorLabels_sequent_allRules() {
-      try {
-        doRefactoringTestLogging(true, true, RefactoringScope.SEQUENT);
-    } catch (ProblemLoaderException e) {
-        fail();
-    }
-
+   public void testRefactorLabels_sequent_allRules() throws ProblemLoaderException {
+      doRefactoringTestLogging(true, true, RefactoringScope.SEQUENT);
    }
 
    /**
     * Tests {@link TermLabelManager#refactorLabels(Services, PosInOccurrence, Rule, Goal, Term)}
     */
-   public void testRefactorLabels_sequent_ruleSpecific() {
-      try {
-        doRefactoringTestLogging(true, false, RefactoringScope.SEQUENT, "rule");
-    } catch (ProblemLoaderException e) {
-        fail();
-    }
+   public void testRefactorLabels_sequent_ruleSpecific() throws ProblemLoaderException {
+      doRefactoringTestLogging(true, false, RefactoringScope.SEQUENT, "rule");
    }
 
    protected void doRefactoringTestLogging(boolean ruleChanged,
@@ -177,12 +143,12 @@ public class TestTermLabelManager extends TestCase {
       Rule rule = new DummyRule("rule");
       Term taclet = TB.tt();
       Goal goal = createGoal(initConfig, sequent);
-      TermLabelManager.refactorLabels(services, pos, rule, goal, taclet);
+      TermLabelManager.refactorLabels(services, pos, rule, goal, null, taclet);
       compareSequents(sequent, goal.sequent(), ruleChanged, scope);
       // Test other not supported rule
       rule = new DummyRule("notSupportedRule");
       goal = createGoal(initConfig, sequent);
-      TermLabelManager.refactorLabels(services, pos, rule, goal, taclet);
+      TermLabelManager.refactorLabels(services, pos, rule, goal, null, taclet);
       compareSequents(sequent, goal.sequent(), notSupportedRuleChanged, scope);
    }
 
@@ -709,12 +675,12 @@ public class TestTermLabelManager extends TestCase {
       }
 
       @Override
-      public RefactoringScope defineRefactoringScope(TermServices services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Term tacletTerm) {
+      public RefactoringScope defineRefactoringScope(TermServices services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm) {
          return scope;
       }
 
       @Override
-      public void refactoreLabels(TermServices services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Term tacletTerm, Term term, List<TermLabel> labels) {
+      public void refactoreLabels(Services services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm, Term term, List<TermLabel> labels) {
          List<TermLabel> changedLabels = new LinkedList<TermLabel>();
          for (TermLabel label : labels) {
             if (label.name().toString().endsWith("-CHANGED")) {

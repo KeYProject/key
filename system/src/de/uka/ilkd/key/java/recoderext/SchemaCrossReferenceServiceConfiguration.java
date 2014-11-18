@@ -16,12 +16,12 @@ package de.uka.ilkd.key.java.recoderext;
 
 import recoder.ProgramFactory;
 import recoder.service.SourceInfo;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public class SchemaCrossReferenceServiceConfiguration
     extends KeYCrossReferenceServiceConfiguration {
   
-    public SchemaCrossReferenceServiceConfiguration(KeYExceptionHandler keh) {
+    public SchemaCrossReferenceServiceConfiguration(KeYRecoderExcHandler keh) {
 	super(keh);
     }
 

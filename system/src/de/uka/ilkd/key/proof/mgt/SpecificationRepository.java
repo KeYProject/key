@@ -79,6 +79,7 @@ import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.speclang.StatementWellDefinedness;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
@@ -543,8 +544,11 @@ public final class SpecificationRepository {
      * Creates a new contract if there is none yet.
      * @param inv initially clause
      * @param kjt constructors of this type are added a post-condition
+     * @throws SLTranslationException during contract construction from history
+     *    constraint
      */
-    private void createContractsFromInitiallyClause(InitiallyClause inv, KeYJavaType kjt) {
+    private void createContractsFromInitiallyClause(InitiallyClause inv, KeYJavaType kjt)
+                throws SLTranslationException {
         if (!kjt.equals(inv.getKJT()))
             inv = inv.setKJT(kjt);
         for (IProgramMethod pm : services.getJavaInfo().getConstructors(kjt)) {
@@ -559,8 +563,7 @@ public final class SpecificationRepository {
                                 .add((FunctionalOperationContract) old);
                 }
                 if (oldFuncContracts.isEmpty()) {
-                    final FunctionalOperationContract iniContr = cf.func(pm,
-                            inv);
+                    final FunctionalOperationContract iniContr = cf.func(pm, inv);
                     addContractNoInheritance(iniContr);
                     assert getContracts(kjt, pm).size() ==
                             (WellDefinednessCheck.isOn() ? 2 : 1) + oldContracts.size();
@@ -1003,8 +1006,9 @@ public final class SpecificationRepository {
     /**
      * Adds postconditions raising from initially clauses to all constructors.
      * <b>Warning</b>: To be called after all contracts have been registered.
+     * @throws SLTranslationException may be thrown during contract extraction
      */
-    public void createContractsFromInitiallyClauses() {
+    public void createContractsFromInitiallyClauses() throws SLTranslationException {
         for (KeYJavaType kjt : initiallyClauses.keySet()) {
             for (InitiallyClause inv : initiallyClauses.get(kjt)) {
                 createContractsFromInitiallyClause(inv, kjt);

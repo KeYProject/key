@@ -280,13 +280,8 @@ public class ContractFactory {
         }
     }
 
-    public FunctionalOperationContract func (IProgramMethod pm, InitiallyClause ini){
-        try {
+    public FunctionalOperationContract func (IProgramMethod pm, InitiallyClause ini) throws SLTranslationException{
             return new JMLSpecFactory(services).initiallyClauseToContract(ini, pm);
-        } catch (SLTranslationException e) {
-            services.getExceptionHandler().reportException(e);
-            return null;
-        }
     }
 
     public FunctionalOperationContract func (String baseName,
@@ -388,7 +383,7 @@ public class ContractFactory {
         Map<LocationVariable,Boolean> hasMod = new LinkedHashMap<LocationVariable,Boolean>();
         Map<LocationVariable,Term> posts =
                 new LinkedHashMap<LocationVariable, Term>(t.originalPosts.size());
-        for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
            hasMod.put(h, false);
            Term oriPost = t.originalPosts.get(h);
            if(oriPost != null) {
@@ -400,7 +395,7 @@ public class ContractFactory {
 
         Map<LocationVariable,Term> axioms = new LinkedHashMap<LocationVariable,Term>();
         if(t.originalAxioms != null) { // TODO: what about the others?
-            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
                 Term oriAxiom = t.originalAxioms.get(h);
                 if(oriAxiom != null) {
                     axioms.put(h,tb.imp(atPreify(t.originalPres.get(h), t.originalAtPreVars),
@@ -429,7 +424,7 @@ public class ContractFactory {
                     t.originalParamVars,
                     services)
                     : null;
-            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
                 Term otherPre = other.getPre(h, t.originalSelfVar,
                         t.originalParamVars,
                         t.originalAtPreVars,
@@ -490,7 +485,7 @@ public class ContractFactory {
                 }
             }
 
-            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
                 Term a1 = deps.get(h);
                 Term a2 = other.getDep(h, false,
                                        t.originalSelfVar,
