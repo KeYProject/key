@@ -4472,7 +4472,7 @@ problem returns [ Term _problem = null ]
                    proofObligation = "";
                }
            }
-        )?
+        )? EOF
    ;
    
 bootClassPath returns [String _boot_class_path = null]
