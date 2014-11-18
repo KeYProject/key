@@ -4557,7 +4557,7 @@ oneJavaSource returns [String s = null]
 
 
 profile:
-        (PROFILE profileName=string_literal SEMI)? 
+        (PROFILE profileName=string_literal { this.profileName = profileName; } SEMI)? 
 ;
 
 preferences returns [String _preferences = null]
