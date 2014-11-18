@@ -292,7 +292,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
    @Override
    public ProblemInitializer createProblemInitializer(Profile profile) {
       ProblemInitializer pi = new ProblemInitializer(this,
-            new Services(profile, mediator.getExceptionHandler()),
+            new Services(profile),
             this);
       return pi;
    }

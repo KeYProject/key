@@ -129,9 +129,9 @@ public abstract class AbstractUserInterface implements UserInterface {
     }
 
     @Override
-    public ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput, 
+    public ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput,
           ProofAggregate proofList, InitConfig initConfig) {
-       final ProofEnvironment env = new ProofEnvironment(initConfig); 
+       final ProofEnvironment env = new ProofEnvironment(initConfig);
        env.addProofEnvironmentListener(this);
        env.registerProof(proofOblInput, proofList);
        return env;
@@ -280,19 +280,25 @@ public abstract class AbstractUserInterface implements UserInterface {
                                      File bootClassPath,
                                      Properties poPropertiesToForce) throws ProblemLoaderException {
        AbstractProblemLoader loader = null;
-       ProblemLoaderException result = null;
        try {
           getMediator().stopInterface(true);
           loader = new SingleThreadProblemLoader(file, classPath, bootClassPath, profile,
                                                  getMediator(), false, poPropertiesToForce);
-          result = loader.load();
+          loader.load();
           return loader;
        }
-       catch (ProblemLoaderException e) {
-          if (loader != null && loader.getProof() != null) {
-             loader.getProof().dispose();
-          }
-          throw e;
+       catch(ProblemLoaderException e) {
+           if (loader != null && loader.getProof() != null) {
+               loader.getProof().dispose();
+           }
+           // rethrow that exception
+           throw e;
+       }
+       catch (Throwable e) {
+           if (loader != null && loader.getProof() != null) {
+               loader.getProof().dispose();
+           }
+           throw new ProblemLoaderException(loader, e);
        }
        finally {
           getMediator().startInterface(true);

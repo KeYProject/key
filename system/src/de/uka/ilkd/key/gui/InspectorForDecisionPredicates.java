@@ -87,8 +87,8 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
     public static Term translate(Services services, String toBeChecked){
         try {
             KeYParserF parser =
-                    new KeYParserF (ParserMode.TERM, new KeYLexerF ( new StringReader ( toBeChecked ), "",
-                                     services.getExceptionHandler() ),
+                    new KeYParserF (ParserMode.TERM,
+                                     new KeYLexerF ( new StringReader ( toBeChecked ), ""),
                                      services,   // should not be needed
                                      services.getNamespaces() );
                 return parser.term();

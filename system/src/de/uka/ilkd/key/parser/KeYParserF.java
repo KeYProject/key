@@ -15,6 +15,7 @@ package de.uka.ilkd.key.parser;
 import java.util.HashMap;
 
 import org.antlr.runtime.LegacyCommonTokenStream;
+import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.TokenStream;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -53,6 +54,20 @@ public class KeYParserF extends KeYParser {
 
     public KeYParserF(ParserMode mode, KeYLexerF keYLexerF, Services services, NamespaceSet nss) {
         super(mode, new LegacyCommonTokenStream(keYLexerF), services, nss);
+    }
+
+    /**
+     * Gets a better error message for a recognition exception from the parser.
+     *
+     * {@link #getErrorMessage(RecognitionException, String[])} is used for
+     * that.
+     *
+     * @param e
+     *            the raised exception, not <code>null</code>
+     * @return an error message for that exception
+     */
+    public String getErrorMessage(RecognitionException e) {
+        return getErrorMessage(e, KeYLexerTokens.getTokennames());
     }
 
 }
