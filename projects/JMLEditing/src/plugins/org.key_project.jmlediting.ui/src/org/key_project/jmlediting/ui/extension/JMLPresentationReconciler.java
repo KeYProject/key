@@ -40,7 +40,8 @@ public class JMLPresentationReconciler extends PresentationReconciler {
     */
    @Override
    public IPresentationDamager getDamager(String contentType) {
-     if(!contentType.equals("JML_MULTI_LINE"))
+      System.out.println("ContentType is: " +contentType);
+      if(!contentType.equals("JML_MULTI_LINE"))
          if(!contentType.equals("JML_SINGLE_LINE"))
             return javaEditorPresentationReconciler.getDamager(contentType);
      return dr;
@@ -54,6 +55,7 @@ public class JMLPresentationReconciler extends PresentationReconciler {
     */
    @Override
    public IPresentationRepairer getRepairer(String contentType) {
+      System.out.println("ContentType is: " +contentType);
       if(!contentType.equals("JML_MULTI_LINE"))
          if(!contentType.equals("JML_SINGLE_LINE"))
             return javaEditorPresentationReconciler.getRepairer(contentType);
