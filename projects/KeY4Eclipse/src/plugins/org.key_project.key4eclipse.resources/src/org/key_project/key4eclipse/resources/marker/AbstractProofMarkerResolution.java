@@ -15,10 +15,17 @@ package org.key_project.key4eclipse.resources.marker;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.ui.IMarkerResolution2;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
+import org.key_project.util.java.StringUtil;
+import org.key_project.util.jdt.JDTUtil;
 
 /**
  * Provides the QuickFixes for the KeY{@link IMarker}.
@@ -98,7 +105,43 @@ public abstract class AbstractProofMarkerResolution implements IMarkerResolution
       }
    }
    
+   /**
+    * Performs the marker resolution.
+    * @param marker The {@link IMarker}.
+    * @param proofFile The {@link IFile} which contains the proof.
+    * @throws Exception Occurred Exception.
+    */
    protected abstract void run(IMarker marker, IFile proofFile) throws Exception;
+
+   /**
+    * Returns the {@link IMethod} specified by the {@link IMarker} if available.
+    * @param marker The {@link IMarker}.
+    * @param proofFile The {@link IFile} which contains the proof.
+    * @return The specified {@link IMethod} or {@code null} if not available.
+    * @throws JavaModelException Occurred Exception.
+    */
+   protected IMethod findMethod(IMarker marker, IFile proofFile) throws JavaModelException {
+      IMethod result = null;
+      if (proofFile != null && marker != null) {
+         String type = marker.getAttribute(MarkerUtil.TYPE, null);
+         String methodName = marker.getAttribute(MarkerUtil.METHOD_NAME, null);
+         String methodParameters = marker.getAttribute(MarkerUtil.METHOD_PARAMETERS, null);
+         if (!StringUtil.isTrimmedEmpty(type) && !StringUtil.isTrimmedEmpty(methodName)) {
+            IProject project = proofFile.getProject();
+            if (JDTUtil.isJavaProject(project)) {
+               IJavaProject javaProject = JDTUtil.getJavaProject(project);
+               IType jdtType = javaProject.findType(type);
+               if (jdtType != null) {
+                  String[] parameters = !StringUtil.isTrimmedEmpty(methodParameters) ?
+                                        methodParameters.split(";") :
+                                        new String[0];
+                  result = JDTUtil.findJDTMethod(jdtType, methodName, parameters);
+               }
+            }
+         }
+      }
+      return result;
+   }
    
    /**
     * {@inheritDoc}

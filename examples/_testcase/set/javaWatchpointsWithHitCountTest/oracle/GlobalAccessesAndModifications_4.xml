@@ -46,9 +46,7 @@
                      </statement>
                   </methodCall>
                </statement>
-               <blockCompletionEntry path="/0/0/0"/>
             </loopCondition>
-            <completedBlockEntry path="/0/0/0/0" conditionString="true"/>
          </statement>
       </loopStatement>
    </methodCall>

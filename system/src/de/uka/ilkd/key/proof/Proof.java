@@ -1085,21 +1085,23 @@ public class Proof implements Named {
         }
     }
 
-    final static class SideProofStatistics {
-        int nodes = 0;
-        int branches = 0;
-        int interactiveSteps = 0;
-        int quantifierInstantiations = 0;
-        int ossApps = 0;
-        int totalRuleApps = 0;
-        int smtSolverApps = 0;
-        int dependencyContractApps = 0;
-        int operationContractApps = 0;
-        int loopInvApps = 0;
-        long autoModeTime = 0;
-        float timePerStep = 0;
+    private final static class SideProofStatistics {
+        private final int sideProofs;
+        private final int nodes;
+        private final int branches;
+        private final int interactiveSteps;
+        private final int quantifierInstantiations;
+        private final int ossApps;
+        private final int totalRuleApps;
+        private final int smtSolverApps;
+        private final int dependencyContractApps;
+        private final int operationContractApps;
+        private final int loopInvApps;
+        private final long autoModeTime;
+        private final float timePerStep;
 
-        private SideProofStatistics(int nodes,
+        private SideProofStatistics(int sideProofs,
+                                    int nodes,
                                     int branches,
                                     int interactiveSteps,
                                     int quantifierInstantiations,
@@ -1109,8 +1111,8 @@ public class Proof implements Named {
                                     int dependencyContractApps,
                                     int operationContractApps,
                                     int loopInvApps,
-                                    long autoModeTime,
-                                    float timePerStep) {
+                                    long autoModeTime) {
+            this.sideProofs = sideProofs;
             this.nodes = nodes;
             this.branches = branches;
             this.interactiveSteps = interactiveSteps;
@@ -1122,11 +1124,11 @@ public class Proof implements Named {
             this.operationContractApps = operationContractApps;
             this.loopInvApps = loopInvApps;
             this.autoModeTime = autoModeTime;
-            this.timePerStep = timePerStep;
+            this.timePerStep = nodes<=sideProofs? .0f: (autoModeTime/(float)(nodes-sideProofs));
         }
 
-        static SideProofStatistics create(SideProofStatistics stat) {
-            return new SideProofStatistics(stat.nodes,
+        private static SideProofStatistics create(SideProofStatistics stat) {
+            return new SideProofStatistics(1, stat.nodes,
                                            stat.branches,
                                            stat.interactiveSteps,
                                            stat.quantifierInstantiations,
@@ -1136,12 +1138,11 @@ public class Proof implements Named {
                                            stat.dependencyContractApps,
                                            stat.operationContractApps,
                                            stat.loopInvApps,
-                                           stat.autoModeTime,
-                                           stat.timePerStep);
+                                           stat.autoModeTime);
         }
 
-        static SideProofStatistics create(Statistics stat) {
-            return new SideProofStatistics(stat.nodes,
+        private static SideProofStatistics create(Statistics stat) {
+            return new SideProofStatistics(1, stat.nodes,
                                            stat.branches,
                                            stat.interactiveSteps,
                                            stat.quantifierInstantiations,
@@ -1151,12 +1152,12 @@ public class Proof implements Named {
                                            stat.dependencyContractApps,
                                            stat.operationContractApps,
                                            stat.loopInvApps,
-                                           stat.autoModeTime,
-                                           stat.timePerStep);
+                                           stat.autoModeTime);
         }
 
-        SideProofStatistics add(SideProofStatistics stat) {
-        	return new SideProofStatistics(this.nodes + stat.nodes,
+        private SideProofStatistics add(SideProofStatistics stat) {
+        	return new SideProofStatistics(this.sideProofs + stat.sideProofs,
+        	                                    this.nodes + stat.nodes,
                                                this.branches + stat.branches,
                                                this.interactiveSteps + stat.interactiveSteps,
                                                this.quantifierInstantiations + stat.quantifierInstantiations,
@@ -1166,12 +1167,11 @@ public class Proof implements Named {
                                                this.dependencyContractApps + stat.dependencyContractApps,
                                                this.operationContractApps + stat.operationContractApps,
                                                this.loopInvApps + stat.loopInvApps,
-                                               this.autoModeTime + stat.autoModeTime,
-                                               this.nodes != 0 ? this.autoModeTime/(float)this.nodes : 0);
+                                               this.autoModeTime + stat.autoModeTime);
         }
 
-        SideProofStatistics add(Statistics stat) {
-        	return new SideProofStatistics(this.nodes + stat.nodes,
+        private SideProofStatistics add(Statistics stat) {
+        	return new SideProofStatistics(this.sideProofs+1, this.nodes + stat.nodes,
                                                this.branches + stat.branches,
                                                this.interactiveSteps + stat.interactiveSteps,
                                                this.quantifierInstantiations + stat.quantifierInstantiations,
@@ -1181,13 +1181,13 @@ public class Proof implements Named {
                                                this.dependencyContractApps + stat.dependencyContractApps,
                                                this.operationContractApps + stat.operationContractApps,
                                                this.loopInvApps + stat.loopInvApps,
-                                               this.autoModeTime + stat.autoModeTime,
-                                               this.nodes != 0 ? this.autoModeTime/(float)this.nodes : 0);
+                                               this.autoModeTime + stat.autoModeTime);
         }
 
-        void setAutoModeTime(long autoTime) {
-            this.autoModeTime = autoTime;
-            this.timePerStep = this.nodes != 0 ? this.autoModeTime/(float)this.nodes : 0;
+        private SideProofStatistics setAutoModeTime(long autoTime) {
+            return new SideProofStatistics(sideProofs, nodes, branches, interactiveSteps,
+                            quantifierInstantiations, ossApps, totalRuleApps, smtSolverApps,
+                            dependencyContractApps, operationContractApps, loopInvApps, autoTime);
         }
     }
 
@@ -1320,14 +1320,14 @@ public class Proof implements Named {
             this.interactiveSteps = tmpInteractive;
             this.quantifierInstantiations = tmpQuant;
             this.ossApps = tmpOss;
-            this.totalRuleApps = tmpNodes + tmpOssCaptured;
+            this.totalRuleApps = tmpNodes + tmpOssCaptured -1;
             this.smtSolverApps = tmpSmt;
             this.dependencyContractApps = tmpDep;
             this.operationContractApps = tmpContr;
             this.loopInvApps = tmpInv;
             this.autoModeTime = proof.getAutoModeTime();
             this.time = System.currentTimeMillis() - Main.getStartTime();
-            timePerStep = autoModeTime/(float)nodes;
+            timePerStep = nodes<=1? .0f: (autoModeTime/(float)(nodes-1));
 
             generateSummary(proof);
         }
@@ -1338,9 +1338,8 @@ public class Proof implements Named {
             if (sideProofs) {
                 final long autoTime = proof.getAutoModeTime()
                         + proof.sideProofStatistics.autoModeTime;
-                final SideProofStatistics side = proof.sideProofStatistics.add(this);
-                side.setAutoModeTime(autoTime);
-                stat = Statistics.create(proof.sideProofStatistics);
+                final SideProofStatistics side = proof.sideProofStatistics.add(this).setAutoModeTime(autoTime);
+                stat = Statistics.create(side);
             } else {
                 stat = this;
             }

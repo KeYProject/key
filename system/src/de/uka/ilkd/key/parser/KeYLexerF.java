@@ -21,23 +21,23 @@ import org.antlr.runtime.ANTLRReaderStream;
 import org.antlr.runtime.ANTLRStringStream;
 
 import de.uka.ilkd.key.core.Main;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
 
 /*
  * Extends generated class {@link KeYLexer} with custom constructors.
  */
 public class KeYLexerF extends KeYLexer {
-    public KeYLexerF(InputStream file, String fileName, KeYExceptionHandler keh) throws IOException {
-        this(new InputStreamReader(file, Main.DEFAULT_CHARSET), fileName, keh);
+
+    public KeYLexerF(InputStream file, String fileName) throws IOException {
+        this(new InputStreamReader(file, Main.DEFAULT_CHARSET), fileName);
     }
 
-    public KeYLexerF(Reader file, String fileName, KeYExceptionHandler keh)
+    public KeYLexerF(Reader file, String fileName)
             throws IOException {
-        super(getStream(new ANTLRReaderStream(file), fileName), keh);
+        super(getStream(new ANTLRReaderStream(file), fileName));
     }
 
-    public KeYLexerF(String file, String fileName, KeYExceptionHandler keh) {
-        super(getStream(new ANTLRStringStream(file), fileName), keh);
+    public KeYLexerF(String file, String fileName) {
+        super(getStream(new ANTLRStringStream(file), fileName));
     }
 
     /*

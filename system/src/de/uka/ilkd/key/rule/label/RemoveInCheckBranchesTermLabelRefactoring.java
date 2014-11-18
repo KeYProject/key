@@ -18,6 +18,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -71,6 +72,7 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
                                                   Term applicationTerm,
                                                   Rule rule,
                                                   Goal goal,
+                                                  Object hint, 
                                                   Term tacletTerm) {
       if (goal != null) {
          if (rule instanceof UseOperationContractRule &&
@@ -95,10 +97,12 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
     * {@inheritDoc}
     */
    @Override
-   public void refactoreLabels(TermServices services,
+   public void refactoreLabels(Services services,
                                PosInOccurrence applicationPosInOccurrence,
                                Term applicationTerm,
-                               Rule rule,Goal goal,
+                               Rule rule,
+                               Goal goal,
+                               Object hint, 
                                Term tacletTerm,
                                Term term,
                                List<TermLabel> labels) {

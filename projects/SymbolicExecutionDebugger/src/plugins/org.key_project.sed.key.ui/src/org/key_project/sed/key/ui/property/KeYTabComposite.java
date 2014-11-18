@@ -112,6 +112,11 @@ public class KeYTabComposite extends Composite {
          name = keyNode.serialNr() + ": " + keyNode.name(); // Copied from ProofRenderer
       }
       SWTUtil.setText(nodeText, name);
-      sequentViewerDecorator.showNode(keyNode, mediator);
+      if (keyNode != null && !keyNode.proof().isDisposed()) {
+         sequentViewerDecorator.showNode(keyNode, mediator);
+      }
+      else {
+         sequentViewerDecorator.showNode(null, mediator);
+      }
    }
 }
