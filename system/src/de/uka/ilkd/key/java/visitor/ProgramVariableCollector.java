@@ -52,7 +52,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
 
     protected void collectHeapVariables() {
        HeapLDT ldt = services.getTypeConverter().getHeapLDT();
-       for(LocationVariable heap: ldt.getAllHeaps()) {
+       for(LocationVariable heap: ldt.getAllHeaps(services)) {
           result.add(heap);
        }
     }
@@ -93,7 +93,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         Map<LocationVariable,Term> atPres = x.getInternalAtPres();
 
         //invariants
-        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
            Term inv = x.getInvariant(heap, selfTerm, atPres, services);
            if(inv != null) {
               inv.execPostOrder(tpvc);
@@ -101,7 +101,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         }
 
         //modifies
-        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
            Term mod = x.getModifies(heap, selfTerm, atPres, services);
            if(mod != null) {
               mod.execPostOrder(tpvc);
@@ -109,7 +109,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         }
 
        //information flow (TODO: does this really belong here?)
-        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
             ImmutableList<InfFlowSpec> infFlowSpecs =
                    x.getInfFlowSpecs(heap, selfTerm, atPres, services);
             if (infFlowSpecs != null) {
@@ -140,19 +140,19 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     @Override
     public void performActionOnBlockContract(BlockContract x) {
         TermProgramVariableCollector collector = services.getFactory().create(services);
-        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
             Term precondition = x.getPrecondition(heap, services);
             if (precondition != null) {
                 precondition.execPostOrder(collector);
             }
         }
-        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
             Term postcondition = x.getPostcondition(heap, services);
             if (postcondition != null) {
                 postcondition.execPostOrder(collector);
             }
         }
-        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
             Term modifiesClause = x.getModifiesClause(heap, services);
             if (modifiesClause != null) {
                 modifiesClause.execPostOrder(collector);

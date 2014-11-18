@@ -368,7 +368,7 @@ public final class SimpleBlockContract implements BlockContract {
         stringBuilder.append(variables.exception);
         stringBuilder.append(")");
         String mods = "";
-        for (LocationVariable heap : heapLDT.getAllHeaps()) {
+        for (LocationVariable heap : heapLDT.getAllHeaps(services)) {
             if (modifiesClauses.get(heap) != null) {
                 mods = mods + "<br><b>mod" + (heap == baseHeap ? "" : "[" + heap + "]") + "</b> "
                         + LogicPrinter.escapeHTML(
@@ -380,7 +380,7 @@ public final class SimpleBlockContract implements BlockContract {
             }
         }
         String pres = "";
-        for (LocationVariable heap : heapLDT.getAllHeaps()) {
+        for (LocationVariable heap : heapLDT.getAllHeaps(services)) {
             if (preconditions.get(heap) != null) {
                 pres = pres + "<br><b>pre" + (heap == baseHeap ? "" : "[" + heap + "]") + "</b> "
                         + LogicPrinter.escapeHTML(
@@ -389,7 +389,7 @@ public final class SimpleBlockContract implements BlockContract {
             }
         }
         String posts = "";
-        for (LocationVariable heap : heapLDT.getAllHeaps()) {
+        for (LocationVariable heap : heapLDT.getAllHeaps(services)) {
             if (postconditions.get(heap) != null) {
                 posts = posts + "<br><b>post" + (heap == baseHeap ? "" : "[" + heap + "]") + "</b> "
                          + LogicPrinter.escapeHTML(
@@ -587,7 +587,7 @@ public final class SimpleBlockContract implements BlockContract {
                                                       ? extends S> newRemembranceHeaps,
                                             final Services services) {
             if (newRemembranceHeaps != null) {
-                for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
                     if (newRemembranceHeaps.get(heap) != null) {
                         final LocationVariable oldRemembranceHeap = oldRemembranceHeaps.get(heap);
                         final S newRemembranceHeap = newRemembranceHeaps.get(heap);
@@ -706,7 +706,7 @@ public final class SimpleBlockContract implements BlockContract {
             this.signalsOnly = signalsOnly;
             this.diverges = diverges;
             this.assignables = assignables;
-            this.heaps = services.getTypeConverter().getHeapLDT().getAllHeaps();
+            this.heaps = services.getTypeConverter().getHeapLDT().getAllHeaps(services);
             this.hasMod = hasMod;
         }
 
@@ -993,7 +993,7 @@ public final class SimpleBlockContract implements BlockContract {
                 addConditionsFrom(contract);
             }
             Map<LocationVariable,Boolean> hasMod = new LinkedHashMap<LocationVariable, Boolean>();
-            for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
             	boolean hm = false;
                 for (int i = 1; i < contracts.length && !hm; i++) {
                     hm = contracts[i].hasModifiesClause(heap);
@@ -1009,7 +1009,7 @@ public final class SimpleBlockContract implements BlockContract {
 
         private void addConditionsFrom(final BlockContract contract)
         {
-            for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
                 final Term precondition = addPreconditionFrom(contract, heap);
                 addPostconditionFrom(precondition, contract, heap);
                 addModifiesClauseFrom(contract, heap);

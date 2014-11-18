@@ -37,7 +37,7 @@ public final class PrimitiveHeapTermFeature extends BinaryTermFeature {
     protected boolean filter(Term t, Services services) {
         // t.op() is the base heap or another primitive heap variable
         boolean isPrimitive = false;
-        Iterator<LocationVariable> it = heapLDT.getAllHeaps().iterator();
+        Iterator<LocationVariable> it = heapLDT.getAllHeaps(services).iterator();
         while (!isPrimitive && it.hasNext()) {
             isPrimitive = (it.next() == t.op());
         }

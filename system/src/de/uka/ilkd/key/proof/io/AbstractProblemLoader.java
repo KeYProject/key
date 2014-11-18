@@ -171,10 +171,9 @@ public abstract class AbstractProblemLoader {
      * and to re-apply rules on it if possible.
      * @throws ProofInputException Occurred Exception.
      * @throws IOException Occurred Exception.
+     * @throws ProblemLoaderException Occurred Exception.
      */
-    public ProblemLoaderException load() throws ProblemLoaderException {
-        // TODO: returns AND throws exceptions?
-        try {
+    public void load() throws ProofInputException, IOException, ProblemLoaderException {
             // Read environment
             boolean oneStepSimplifier =
                             ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
@@ -185,7 +184,6 @@ public abstract class AbstractProblemLoader {
             final UserInterface ui = mediator.getUI();
             if (ui.isSaveOnly()) {
                 ui.saveAll(initConfig, file);
-                return null;
             } else {
                 // Read proof obligation settings
                 LoadedPOContainer poContainer = createProofObligationContainer();
@@ -193,15 +191,17 @@ public abstract class AbstractProblemLoader {
                     if (poContainer == null) {
                         if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
                             if (ui.selectProofObligation(initConfig)) {
-                                return null;
+                                return;
                             } else {
-                                return new ProblemLoaderException(this, "Aborted.");
+                                // That message would be reported otherwise. Undesired.
+                                // return new ProblemLoaderException(this, "Aborted.");
+                                return;
                             }
                         }
                         else {
                             // Do not instantiate any proof but allow the user of the DefaultProblemLoader
                             // to access the loaded InitConfig.
-                            return null;
+                            return;
                         }
                     }
                     // Create proof and apply rules again if possible
@@ -210,7 +210,7 @@ public abstract class AbstractProblemLoader {
                         replayProof(proof);
                     }
                     // this message is propagated to the top level in console mode
-                    return null; // Everything fine
+                    return; // Everything fine
                 }
                 finally {
                     ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
@@ -221,12 +221,8 @@ public abstract class AbstractProblemLoader {
                     }
                 }
             }
-        }
-        catch (Exception e) { // TODO give more specific exception message
-            throw recoverParserErrorMessage(e);
-        }
     }
-    
+
     /**
      * Find first 'non-wrapper' exception type in cause chain.
      */
@@ -328,9 +324,7 @@ public abstract class AbstractProblemLoader {
     protected ProblemInitializer createProblemInitializer() {
         UserInterface ui = mediator.getUI();
         return new ProblemInitializer(ui,
-                        new Services(envInput.getProfile(), 
-                                        mediator.getExceptionHandler()),
-                                        ui);
+                        new Services(envInput.getProfile()), ui);
     }
 
     /**

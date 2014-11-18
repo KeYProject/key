@@ -47,7 +47,6 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractUserInterface;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -171,12 +170,9 @@ public class WindowUserInterface extends AbstractUserInterface {
             }
         } else if (info.getSource() instanceof ProblemLoader) {
             resetStatus(this);
+            Throwable result = (Throwable) info.getResult();
             if (info.getResult() != null) {
-                final KeYExceptionHandler exceptionHandler = ((ProblemLoader) info
-                        .getSource()).getExceptionHandler();
-                ExceptionDialog.showDialog(
-                        mainWindow, exceptionHandler.getExceptions());
-                exceptionHandler.clear();
+                ExceptionDialog.showDialog(mainWindow, result);
             } else if (getMediator().getUI().isSaveOnly()) {
                 mainWindow.displayResults("Finished Saving!");
             } else {
@@ -291,7 +287,7 @@ public class WindowUserInterface extends AbstractUserInterface {
     @Override
     public ProblemInitializer createProblemInitializer(Profile profile) {
         ProblemInitializer pi = new ProblemInitializer(this,
-                new Services(profile, mainWindow.getMediator().getExceptionHandler()), this);
+                new Services(profile), this);
         return pi;
     }
 
@@ -385,5 +381,5 @@ public class WindowUserInterface extends AbstractUserInterface {
       mainWindow.setStandardStatusLine();
    }
 
-  
+
 }

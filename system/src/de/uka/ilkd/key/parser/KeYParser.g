@@ -135,7 +135,6 @@ options {
    private HashSet usedChoiceCategories = new LinkedHashSet();
    private HashMap taclet2Builder;
    private AbbrevMap scm;
-   private KeYExceptionHandler keh = null;
    
    
    private String filename;
@@ -209,7 +208,6 @@ options {
 
    public KeYParser(ParserMode mode, TokenStream lexer, Services services) {
        this(mode, lexer);
-       this.keh = services.getExceptionHandler();
    }
 
    /* Most general constructor, should only be used internally */
@@ -221,8 +219,6 @@ options {
         this.lexer = lexer;
         this.parserMode = mode;
  	this.services = services;
-	if(services != null)
-          this.keh = services.getExceptionHandler();
 	this.nss = nss;
     if (this.isTacletParser()) {
         switchToSchemaMode();
@@ -309,11 +305,6 @@ options {
         	}
         }
         
-        if (normalConfig != null){
-            this.keh = normalConfig.services().getExceptionHandler();
-        } else{
-            this.keh = new KeYRecoderExcHandler();
-        }
     }
 
     public KeYParser(ParserMode mode, TokenStream lexer) {
@@ -327,7 +318,6 @@ options {
 	switchToNormalMode();
         this.taclet2Builder = null;
         this.taclets = new LinkedHashMap<RuleKey, Taclet>();
-        this.keh = new KeYRecoderExcHandler();
     }
 
 
@@ -339,8 +329,7 @@ options {
 	    KeYParserF p =
                 new KeYParserF(ParserMode.TACLET,
                               new KeYLexerF(s,
-                                      "No file. KeYParser.parseTaclet(\n" + s + ")\n",
-                                      null),
+                                      "No file. KeYParser.parseTaclet(\n" + s + ")\n"),
                               services,
                               services.getNamespaces());
 	    return p.taclet(DefaultImmutableSet.<Choice>nil());
@@ -352,15 +341,6 @@ options {
 	}
     }
 
-    public void recover( RecognitionException ex, BitSet tokenSet ) /*throws TokenStreamException*/ {
-     input.consume();
-     int ttype = input.LA(1);
-     while (ttype != Token.EOF && !tokenSet.member(ttype)) {
-       input.consume();
-       ttype = input.LA(1);
-     }
-    }
-    
     public String getSourceName() {
     	if (super.getSourceName() == null) {
     		return filename;
@@ -400,8 +380,8 @@ options {
 	return parserMode == ParserMode.PROBLEM;
     }
 
-    public void reportError(RecognitionException ex){
-        keh.reportException(ex);
+    public void raiseException(RecognitionException ex) throws RecognitionException {
+        throw ex;
     }
 
     public ImmutableSet<Choice> getActivatedChoices(){
@@ -514,12 +494,14 @@ options {
     }
 
     private int getLine() {
-        return state.tokenStartLine;
-    }   
+        Token token = ((TokenStream)input).LT(1);
+        return token.getLine();
+    }
 
     private int getColumn() {
-        return state.tokenStartCharPositionInLine;
-    }   
+        Token token = ((TokenStream)input).LT(1);
+        return token.getCharPositionInLine();
+    }
 
     private void resetSkips() {
        skip_schemavariables = false;
@@ -824,7 +806,7 @@ options {
                 try {
                     result = javaInfo.getArrayLength();
                 } catch(Exception ex) {
-                    keh.reportException
+                    raiseException
                        (new KeYSemanticException(input, getSourceName(), ex));
                 }
             } else if(attributeName.equals("<inv>")) {
@@ -1514,7 +1496,38 @@ options {
         return result;
     }
 
+    /* ---- antlr stuff ---- (Exception handling) */
+
+    @Override
+    public void reportError(RecognitionException ex) {
+        // dont do anything
+    }
+
+    public void recover(IntStream input, RecognitionException re) {
+        throw new RuntimeException(re);
+    }
+
+    /** Not currently used */
+    @Override
+    public Object recoverFromMismatchedSet(IntStream input,
+            RecognitionException e, BitSet follow) throws RecognitionException {
+        // comment says it is never used, still make sure ...
+        throw e;
+    }
+
+    protected Object recoverFromMismatchedToken(IntStream input, int ttype,
+            BitSet follow) throws RecognitionException {
+        throw new MismatchedTokenException(ttype, input);
+    }
+
 }
+
+@rulecatch {
+    catch(RecognitionException e) {
+        throw e;
+    }
+}
+
 
 // WATCHOUT Don't remove this. Ever!!! 
 // Although it's not called, it is necessary for antlr to produce the 
@@ -2470,7 +2483,7 @@ term returns [Term _term = null]
         )*
     ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
         
@@ -2487,7 +2500,7 @@ elementary_update_term returns[Term _elementary_update_term=null]
         )?
    ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 			(new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -2499,7 +2512,7 @@ equivalence_term returns [Term _equivalence_term = null]
             { a = getTermFactory().createTerm(Equality.EQV, new Term[]{a, a1});} )*
 ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -2510,7 +2523,7 @@ implication_term returns [Term _implication_term = null]
             { a = getTermFactory().createTerm(Junctor.IMP, new Term[]{a, a1});} )?
 ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -2521,7 +2534,7 @@ disjunction_term returns [Term _disjunction_term = null]
             { a = getTermFactory().createTerm(Junctor.OR, new Term[]{a, a1});} )*
 ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -2533,7 +2546,7 @@ conjunction_term returns [Term _conjunction_term = null]
             
 ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -2544,7 +2557,7 @@ term60 returns [Term _term_60 = null]
     |   a = equality_term
 ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -2556,7 +2569,7 @@ unary_formula returns [Term _unary_formula = null]
     |   a = modality_dl_term
 ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -2595,7 +2608,7 @@ equality_term returns [Term _equality_term = null]
         })?
  ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -2659,7 +2672,7 @@ logicTermReEntry returns [Term _logic_term_re_entry = null]
               })?
 ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -2672,7 +2685,7 @@ weak_arith_op_term returns [Term _weak_arith_op_term = null]
                 })*
 ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -2684,7 +2697,7 @@ strong_arith_op_term returns [Term _strong_arith_op_term = null]
                 })*
 ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -2808,7 +2821,7 @@ static_attribute_suffix returns [Term result = null]
         { result = createAttributeTerm(null, v); }                   
  ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -2834,7 +2847,7 @@ attribute_or_query_suffix[Term prefix] returns [Term _attribute_or_query_suffix 
     }
     ;
 catch [TermCreationException ex] {
-    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+    raiseException(new KeYSemanticException(input, getSourceName(), ex));
 }
 
 attrid returns [String attr = "";]
@@ -2876,7 +2889,7 @@ querySuffix [Term prefix, String memberName] returns [Term result = null]
     }
  ;
 catch [TermCreationException ex] {
-    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+    raiseException(new KeYSemanticException(input, getSourceName(), ex));
 }
 
 //term120
@@ -2933,7 +2946,7 @@ accessterm returns [Term _accessterm = null]
     ( result = heap_selection_suffix[result] )? // resets globalSelectNestingDepth to zero
     ;
 catch [TermCreationException ex] {
-    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+    raiseException(new KeYSemanticException(input, getSourceName(), ex));
 }
 
 heap_selection_suffix [Term term] returns [Term result]
@@ -2987,7 +3000,7 @@ static_query returns [Term result = null]
     }        
  ;
 catch [TermCreationException ex] {
-    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+    raiseException(new KeYSemanticException(input, getSourceName(), ex));
 }
 
 heap_update_suffix [Term heap] returns [Term result=heap]
@@ -3019,7 +3032,7 @@ heap_update_suffix [Term heap] returns [Term result=heap]
     RBRACKET
     ;
 catch [TermCreationException ex] {
-    keh.reportException(new KeYSemanticException(input, getSourceName(), ex));
+    raiseException(new KeYSemanticException(input, getSourceName(), ex));
 }
 
 array_access_suffix [Term arrayReference] returns [Term _array_access_suffix = null] 
@@ -3062,7 +3075,7 @@ array_access_suffix [Term arrayReference] returns [Term _array_access_suffix = n
     }            
     ;
         catch [TermCreationException ex] {
-               keh.reportException
+               raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -3091,7 +3104,7 @@ atom returns [Term _atom = null]
     ) (LGUILLEMETS labels = label {if (labels.size() > 0) {a = getServices().getTermBuilder().label(a, labels);} } RGUILLEMETS)?
     ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -3128,7 +3141,7 @@ single_label returns [TermLabel label=null]
                                 .getTermLabelManager().parseLabel(labelName, parameters);
           }
       } catch(TermLabelException ex) {
-          keh.reportException
+          raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
       }
   }
@@ -3170,7 +3183,7 @@ ifThenElseTerm returns [Term _if_then_else_term = null]
         }
  ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
         
@@ -3208,7 +3221,7 @@ ifExThenElseTerm returns [Term _if_ex_then_else_term = null]
         }
  ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }        
 
@@ -3288,7 +3301,7 @@ substitutionterm returns [Term _substitution_term = null]
    }
 ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -3308,7 +3321,7 @@ updateterm returns [Term _update_term = null]
         }
    ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }           
         
@@ -3401,7 +3414,7 @@ modality_dl_term returns [Term _modality_dl_term = null]
    )
    ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -3518,7 +3531,7 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
         }
 ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -3531,7 +3544,7 @@ specialTerm returns [Term _special_term = null]
        result = metaTerm
    ;
         catch [TermCreationException ex] {
-              keh.reportException
+              raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -3659,7 +3672,7 @@ seq returns [Sequent s] :
         { s = Sequent.createSequent(ant, suc); }
     ;
      catch [RuntimeException ex] {
-         keh.reportException
+         raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
      }
      
@@ -4322,7 +4335,7 @@ metaTerm returns [Term result = null]
         ) 
  ;
      catch [TermCreationException ex] {
-         keh.reportException
+         raiseException
 	    (new KeYSemanticException(input, getSourceName(), ex));
         }
 
@@ -4544,7 +4557,7 @@ oneJavaSource returns [String s = null]
 
 
 profile:
-        (PROFILE profileName=string_literal SEMI)? 
+        (PROFILE profileName=string_literal { this.profileName = profileName; } SEMI)? 
 ;
 
 preferences returns [String _preferences = null]
