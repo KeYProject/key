@@ -264,7 +264,7 @@ public class InvariantConfigurator {
                 loopInvTexts[INV_IDX] = new LinkedHashMap<String,String>();
                 final Map<LocationVariable,Term> atPres = loopInv.getInternalAtPres();
 
-                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
                     final Term i = loopInv.getInvariant(heap, loopInv.getInternalSelfTerm(), atPres, services);
 
                     if (i == null) {
@@ -277,7 +277,7 @@ public class InvariantConfigurator {
 
                 loopInvTexts[MOD_IDX] = new LinkedHashMap<String,String>();
 
-                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
                     final Term modifies = loopInv.getModifies(heap, loopInv.getInternalSelfTerm(), atPres, services);
 
                     if (modifies == null) {
@@ -299,7 +299,7 @@ public class InvariantConfigurator {
 
                 loopInvTexts[IF_PRE_IDX] = new LinkedHashMap<String,String>();
 
-                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
                   final ImmutableList<InfFlowSpec>
                           infFlowSpecs = loopInv.getInfFlowSpecs(heap, loopInv.getInternalSelfTerm(), atPres, services);
 
@@ -316,7 +316,7 @@ public class InvariantConfigurator {
 
                 loopInvTexts[IF_POST_IDX] = new LinkedHashMap<String,String>();
 
-                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
                   final ImmutableList<InfFlowSpec>
                           infFlowSpecs = loopInv.getInfFlowSpecs(heap, loopInv.getInternalSelfTerm(), atPres, services);
 
@@ -333,7 +333,7 @@ public class InvariantConfigurator {
 
                 loopInvTexts[IF_OO_IDX] = new LinkedHashMap<String,String>();
 
-                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
                   final ImmutableList<InfFlowSpec>
                           infFlowSpecs = loopInv.getInfFlowSpecs(heap, loopInv.getInternalSelfTerm(), atPres, services);
 
@@ -610,7 +610,7 @@ public class InvariantConfigurator {
 
                 JTabbedPane invPane = new JTabbedPane(JTabbedPane.BOTTOM);
                 JTabbedPane modPane = new JTabbedPane(JTabbedPane.BOTTOM);
-                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
                     final String k = heap.name().toString();
                     String title = String.format("Invariant%s - Status: ", heap == services.getTypeConverter().getHeapLDT().getHeap() ? "" : "["+k+"]");
                     String errorMessage = invMsgs == null? "OK" : invMsgs.get(k);
@@ -652,7 +652,7 @@ public class InvariantConfigurator {
                 Map<String,String> varMsgs = new LinkedHashMap<String,String>();
                 Map<String,Color> varColors = new LinkedHashMap<String,Color>();
                 
-                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
                     final String k = heap.name().toString();
                     setOK(invMsgs, invColors, k);
                     setOK(modMsgs, modColors, k);
@@ -850,7 +850,7 @@ public class InvariantConfigurator {
                 Map<String,Color>  modCols = new LinkedHashMap<String,Color>();
                 Map<String,String> respErrors = new LinkedHashMap<String,String>();
                 Map<String,Color>  respCols = new LinkedHashMap<String,Color>();
-                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
                     try {
                         invariantTerm.put(heap, parseInvariant(heap));
                         setOK(invErrors,invCols,heap.toString());

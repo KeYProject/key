@@ -865,8 +865,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             }
             final Term m = mods.get(heap);
             final Term fc;
-          if (tb.strictlyNothing().equals(m) &&
-                  heap == services.getTypeConverter().getHeapLDT().getHeap()) {
+          if (tb.strictlyNothing().equals(m)) {
                 fc = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoop.get(heap)); 
             } else{
                 fc = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), m);
