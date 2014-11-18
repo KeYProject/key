@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.op.Function;
@@ -692,15 +693,19 @@ public final class SideProofUtil {
     */
    public static Term extractOperatorTerm(Node node, final Operator operator) {
       assert node != null;
-      // Search formula with the given operator in sequent
+      // Search formula with the given operator in sequent (or in some cases below the updates)
       SequentFormula sf = JavaUtil.search(node.sequent(), new IFilter<SequentFormula>() {
          @Override
          public boolean select(SequentFormula element) {
-            return JavaUtil.equals(element.formula().op(), operator);
+            Term term = element.formula();
+            term = TermBuilder.goBelowUpdates(term);
+            return JavaUtil.equals(term.op(), operator);
          }
       });
       if (sf != null) {
-         return sf.formula();
+         Term term = sf.formula();
+         term = TermBuilder.goBelowUpdates(term);
+         return term;
       }
       else {
          return null;

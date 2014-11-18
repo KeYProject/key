@@ -246,7 +246,7 @@ mod[savedHeap]: allLocs" pathCondition="true" pathConditionChanged="false" initi
                                  </value>
                               </variable>
                               <variable name="low" isArrayIndex="false">
-                                 <value name="low {true}" typeString="int" valueString="add(E_Loop_low_5&lt;&lt;selectSK&gt;&gt;,i_0)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 <value name="low {true}" typeString="int" valueString="add(int::select(anon_heap_LOOP,self,E_Loop::$low),i_0)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                            </value>
