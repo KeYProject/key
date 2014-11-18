@@ -635,7 +635,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         initGoal.setBranchLabel("Invariant Initially Valid");
         initGoal.changeFormula(initFormula(inst, invTerm, reachableState, services),
                                ruleApp.posInOccurrence());
-        TermLabelManager.refactorLabels(services, ruleApp.posInOccurrence(), this, initGoal, null);
+        TermLabelManager.refactorLabels(services, ruleApp.posInOccurrence(), this, initGoal, null, null);
     }
 
 
