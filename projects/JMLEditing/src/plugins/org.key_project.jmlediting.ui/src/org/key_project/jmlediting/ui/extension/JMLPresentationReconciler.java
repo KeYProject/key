@@ -23,13 +23,11 @@ public class JMLPresentationReconciler extends PresentationReconciler {
    public JMLPresentationReconciler(IPresentationReconciler javaEditorPresentationReconciler) {
       super();
       this.javaEditorPresentationReconciler=javaEditorPresentationReconciler;
-      JMLPartitionScanner ps = new JMLPartitionScanner();
       dr= new DefaultDamagerRepairer(new SingleTokenScanner(new TextAttribute(new Color(Display.getCurrent(),new RGB(255,0,0)))));
-      this.setDamager(dr,ps.JMLSingleLine);
-      this.setDamager(dr, ps.JMLMultiLine);
-      this.setRepairer(dr, ps.JMLSingleLine);
-      this.setRepairer(dr, ps.JMLSingleLine);
-      //
+      this.setDamager(dr,JMLPartitionScanner.JML_SINGLE_LINE);
+      this.setDamager(dr, JMLPartitionScanner.JML_MULTI_LINE);
+      this.setRepairer(dr, JMLPartitionScanner.JML_SINGLE_LINE);
+      this.setRepairer(dr, JMLPartitionScanner.JML_MULTI_LINE);
    }
    
    /**
@@ -41,8 +39,8 @@ public class JMLPresentationReconciler extends PresentationReconciler {
    @Override
    public IPresentationDamager getDamager(String contentType) {
       System.out.println("ContentType is: " +contentType);
-      if(!contentType.equals("JML_MULTI_LINE"))
-         if(!contentType.equals("JML_SINGLE_LINE"))
+      if(!contentType.equals("__jml_multi_line"))
+         if(!contentType.equals("__jml_single_line"))
             return javaEditorPresentationReconciler.getDamager(contentType);
      return dr;
    }
@@ -56,11 +54,10 @@ public class JMLPresentationReconciler extends PresentationReconciler {
    @Override
    public IPresentationRepairer getRepairer(String contentType) {
       System.out.println("ContentType is: " +contentType);
-      if(!contentType.equals("JML_MULTI_LINE"))
-         if(!contentType.equals("JML_SINGLE_LINE"))
+      if(!contentType.equals("__jml_multi_line"))
+         if(!contentType.equals("__jml_single_line"))
             return javaEditorPresentationReconciler.getRepairer(contentType);
       return dr;
    }
-   
    
 }

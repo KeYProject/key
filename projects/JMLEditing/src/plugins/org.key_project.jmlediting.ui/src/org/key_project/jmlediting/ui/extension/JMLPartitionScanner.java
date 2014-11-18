@@ -15,12 +15,12 @@ public class JMLPartitionScanner extends RuleBasedPartitionScanner {
    /**
     * Identifier for JML MultiLine Code.
     */
-   static final String JMLMultiLine = "JML_MULTI_LINE";
+   public static final String JML_MULTI_LINE = "__jml_multi_line";
    
    /**
     * Identifier for JML Single Line Code.
     */
-   static final String JMLSingleLine = "JML_SINGLE_LINE";
+   public static final String JML_SINGLE_LINE = "__jml_single_line";
    
    /**
     * Creates a JMLPartitionScanner that Detects SingleLine and MultiLine JML Code.
@@ -28,8 +28,8 @@ public class JMLPartitionScanner extends RuleBasedPartitionScanner {
    @SuppressWarnings({ "rawtypes", "unchecked" })
    public JMLPartitionScanner() {
       super();
-      IToken singleLineJML = new Token(JMLSingleLine);
-      IToken multiLineJML = new Token(JMLMultiLine);
+      IToken singleLineJML = new Token(JML_SINGLE_LINE);
+      IToken multiLineJML = new Token(JML_MULTI_LINE);
       List rules = new ArrayList();
       
       rules.add(new EndOfLineRule("//@", singleLineJML));
