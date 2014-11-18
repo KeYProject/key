@@ -17,7 +17,6 @@ import java.io.File;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.parser.DeclPicker;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserConfig;
@@ -124,8 +123,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             CountingBufferedReader cinp = 
                 new CountingBufferedReader
                     (getNewStream(),monitor,getNumberOfChars()/100);
-	    DeclPicker lexer = new DeclPicker(new KeYLexerF(cinp,
-		    file.toString()));
+            KeYLexerF lexer = new KeYLexerF(cinp, file.toString());
 
             final ParserConfig normalConfig 
                 = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
@@ -157,12 +155,9 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 	       
 	    }
 
-            problemHeader = lexer.getCapturedText();
-            if(problemHeader != null &&
-               problemHeader.lastIndexOf(searchS) != -1){
-                problemHeader = problemHeader.substring(
-                    0, problemHeader.lastIndexOf(searchS));
-            }
+            problemHeader = problemParser.getProblemHeader();
+            // removed unnecessary check, keep it as assertion
+            assert problemHeader != null && problemHeader.lastIndexOf(searchS) == -1;
 
             initConfig.setTaclets(problemParser.getTaclets());
             lastParser = problemParser;

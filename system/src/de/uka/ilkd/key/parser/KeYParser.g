@@ -36,7 +36,6 @@ options {
   import de.uka.ilkd.key.parser.SchemaVariableModifierSet;
   import de.uka.ilkd.key.parser.UnfittingReplacewithException;
   import de.uka.ilkd.key.parser.ParserMode;
-  import de.uka.ilkd.key.parser.DeclPicker;
   import de.uka.ilkd.key.parser.IdDeclaration;
   import de.uka.ilkd.key.parser.ParserConfig;
 
@@ -157,6 +156,7 @@ options {
 
    private String chooseContract = null;
    private String proofObligation = null;
+   private String problemHeader = null;
     
    private int savedGuessing = -1;
    
@@ -180,7 +180,6 @@ options {
    private JavaReader javaReader;
 
    // if this is used then we can capture parts of the input for later use
-   private DeclPicker capturer = null;
    private IProgramMethod pm = null;
 
    private LinkedHashMap<RuleKey, Taclet> taclets = new LinkedHashMap<RuleKey, Taclet>();
@@ -289,9 +288,6 @@ options {
                      HashMap taclet2Builder,
                      ImmutableSet<Taclet> taclets) { 
         this(lexer, null, null, mode);
-        if (lexer instanceof DeclPicker) {
-            this.capturer = (DeclPicker) lexer;
-        }
         if (normalConfig!=null)
         scm = new AbbrevMap();
         this.schemaConfig = schemaConfig;
@@ -309,9 +305,6 @@ options {
 
     public KeYParser(ParserMode mode, TokenStream lexer) {
         this(lexer, null, null, mode);
-        if (lexer instanceof DeclPicker) {
-            this.capturer = (DeclPicker) lexer;
-        }
         scm = new AbbrevMap();
         this.schemaConfig = null;
         this.normalConfig = null;       
@@ -354,6 +347,9 @@ options {
     
     public String getProofObligation() {
         return proofObligation;
+    }
+    public String getProblemHeader() {
+        return problemHeader;
     }
     
     public String getProfileName() {
@@ -4397,23 +4393,23 @@ one_invariant[ParsableVariable selfVar]
 ;
 
 problem returns [ Term _problem = null ]
-@init{
+@init {
+    int beginPos = 0;
     choices=DefaultImmutableSet.<Choice>nil();
     chooseContract = this.chooseContract;
     proofObligation = this.proofObligation;
 }
-@after { _problem = a; this.chooseContract = chooseContract; this.proofObligation = proofObligation; }
-    :
-       { if (capturer != null) capturer.mark(); }
+@after { 
+    _problem = a; 
+    this.chooseContract = chooseContract; 
+    this.proofObligation = proofObligation; 
+}
+   :
 
-     profile
-
-   	{ if (profileName != null && capturer != null) capturer.mark(); }
+        profile
 
         (pref = preferences)
-        { if ((pref!=null) && (capturer != null)) capturer.begin(); }
-        
-
+           { beginPos = input.index(); }
 
         string = bootClassPath
         // the result is of no importance here (strange enough)        
@@ -4455,19 +4451,16 @@ problem returns [ Term _problem = null ]
             )*
             RBRACE {choices=DefaultImmutableSet.<Choice>nil();}
         ) *
-        { if (capturer != null) capturer.capture(); }
+
+        { problemHeader = lexer.toString(beginPos, input.index()-1); }
+
         ((PROBLEM LBRACE 
-            {switchToNormalMode(); 
-	     //if (capturer != null) capturer.capture();
-	    }
+            { switchToNormalMode(); }
                 a = formula
             RBRACE) 
-           | 
+           |
            CHOOSECONTRACT (chooseContract=string_literal SEMI)?
            {
-	       if (capturer != null) {
-	            capturer.capture();
-	       }
 	       if(chooseContract == null) {
 	           chooseContract = "";
 	       }
@@ -4475,14 +4468,11 @@ problem returns [ Term _problem = null ]
            | 
            PROOFOBLIGATION  (proofObligation=string_literal SEMI)?
            {
-               if (capturer != null) {
-                    capturer.capture();
-               }
                if(proofObligation == null) {
                    proofObligation = "";
                }
            }
-	)?
+        )?
    ;
    
 bootClassPath returns [String _boot_class_path = null]
