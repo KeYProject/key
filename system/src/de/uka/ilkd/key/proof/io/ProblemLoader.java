@@ -21,8 +21,6 @@ import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.util.ExceptionHandlerException;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
 import java.util.Properties;
 
 import javax.swing.SwingWorker;
@@ -53,25 +51,27 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
        fireTaskStarted();
 
        final long currentTime = System.currentTimeMillis();
-       final Throwable message = doWork();
-       long runTime = System.currentTimeMillis() - currentTime;
+       Throwable message;
+       try {
+           message = doWork();
+       } catch(Throwable ex) {
+           message = ex;
+       }
 
+       long runTime = System.currentTimeMillis() - currentTime;
        fireTaskFinished(runTime, message);
-       reportException(message);
    }
 
    private Throwable doWork() {
       try {
-          return load();
-      } catch (final ExceptionHandlerException exception) {
+          load();
+          return null;
+      } catch (Throwable exception) {
           final String errorMessage = "Failed to load "
                   + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
           getMediator().getUI().notify(new ExceptionFailureEvent(errorMessage, exception));
           getMediator().getUI().reportStatus(this, errorMessage);
           return exception;
-      } catch (final Throwable throwable) {
-          reportException(throwable);
-          return throwable;
       }
    }
 
@@ -90,21 +90,17 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
        }
    }
 
-   /**
-    * Report exceptions here, do not throw them.
-    * @param message
-    */
-   protected void reportException(final Throwable message) {
-       if (message != null) {
-           getMediator().getExceptionHandler().reportException(message); // XXX otherwise everything breaks
-//           getMediator().getUI().notify(new ExceptionFailureEvent(message.toString(),message));
-       }
-   }
-
-   public KeYExceptionHandler getExceptionHandler() {
-       return getMediator().getExceptionHandler();
-   }
-
+    /**
+     * Launch a loading process asynchronously (on a swingworker thread).
+     *
+     * The start is announced by invoking
+     * {@link ProverTaskListener#taskStarted(String, int)} on the registered
+     * listener.
+     *
+     * Termination is announced by invoking
+     * {@link ProverTaskListener#taskFinished(TaskFinishedInfo)} on the
+     * registered listener.
+     */
    public void runAsynchronously() {
        final SwingWorker<Throwable, Void> worker =
                new SwingWorker<Throwable, Void>() {
@@ -124,11 +120,10 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
                getMediator().startInterface(true);
                Throwable message = null;
                try {
-                   message = get();                    
-               } catch (final Exception exception) {
+                   message = get();
+               } catch (final Throwable exception) {
+                   // catch exception if something has been thrown in the meantime
                    message = exception;
-                   getExceptionHandler().reportException(exception.getCause() != null ? 
-                           exception.getCause() : exception);
                } finally {
                    fireTaskFinished(runTime, message);
                }

@@ -24,6 +24,8 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+
 import org.antlr.runtime.RecognitionException;
 
 
@@ -78,12 +80,10 @@ public final class DefaultTermParser {
                       AbbrevMap scm)
         throws ParserException
     {
+        KeYParserF parser = null;
         try{
-            KeYParserF parser
-                = new KeYParserF(ParserMode.TERM, new KeYLexerF(
-		                in,
-		                "",
-		                services.getExceptionHandler()),
+            parser
+                = new KeYParserF(ParserMode.TERM, new KeYLexerF(in, ""),
 				new Recoder2KeY (services, nss),
                                 services, 
                                 nss, 
@@ -94,7 +94,9 @@ public final class DefaultTermParser {
 	        throw new ParserException("Expected sort "+sort+", but parser returns sort "+result.sort()+".", null);
         return result;
         } catch (RecognitionException re) {
-            throw new ParserException(re.getMessage(), new Location(re));
+            // problemParser cannot be null since exception is thrown during parsing.
+            String message = parser.getErrorMessage(re);
+            throw new ParserException(message, new Location(re));
         } catch (IOException tse) {
             throw new ParserException(tse.getMessage(), null);
         }
