@@ -1,5 +1,10 @@
 package org.key_project.jmlediting.core.profile;
 
+import java.util.Set;
+
+import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorSpecification;
+import org.key_project.jmlediting.core.profile.syntax.IJMLGenericSpecification;
+
 /**
  * Defines a profile for a JML variant.
  * 
@@ -20,5 +25,8 @@ public interface IJMLProfile {
     * @return the identifier
     */
    String getIdentifier();
+   
+   Set<IJMLBehaviorSpecification> getSupportedBehaviors();
+   Set<IJMLGenericSpecification> getSupportedGenerics();
 
 }

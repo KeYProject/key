@@ -7,34 +7,24 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.junit.Test;
+import org.key_project.jmlediting.core.profile.ConfigurableJMLProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 
 public class JMLProfileManagementTest {
 
-   public static class DummyJMLProfile1 implements IJMLProfile {
+   public static class DummyJMLProfile1 extends ConfigurableJMLProfile {
 
-      @Override
-      public String getName() {
-         return "DummyJMLProfile1";
-      }
-
-      @Override
-      public String getIdentifier() {
-         return this.getClass().getName();
+      public DummyJMLProfile1() {
+         super( "DummyJMLProfile1",DummyJMLProfile1.class.getName());
       }
 
    }
 
-   public static class DummyJMLProfile2 implements IJMLProfile {
+   public static class DummyJMLProfile2 extends ConfigurableJMLProfile {
 
-      @Override
-      public String getName() {
-         return "DummyJMLProfile2";
-      }
-      @Override
-      public String getIdentifier() {
-         return this.getClass().getName();
+      public DummyJMLProfile2() {
+         super( "DummyJMLProfile2",DummyJMLProfile2.class.getName());
       }
 
    }
