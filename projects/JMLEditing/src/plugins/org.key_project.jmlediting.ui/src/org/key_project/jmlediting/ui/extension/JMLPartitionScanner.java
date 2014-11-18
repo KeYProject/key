@@ -1,7 +1,9 @@
 package org.key_project.jmlediting.ui.extension;
 
+import org.eclipse.jdt.internal.ui.text.JavaPartitionScanner;
 import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IPredicateRule;
+import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.MultiLineRule;
 import org.eclipse.jface.text.rules.RuleBasedPartitionScanner;
@@ -10,7 +12,7 @@ import org.eclipse.jface.text.rules.Token;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JMLPartitionScanner extends RuleBasedPartitionScanner {
+public class JMLPartitionScanner extends JavaPartitionScanner {
    
    /**
     * Identifier for JML MultiLine Code.
@@ -30,13 +32,15 @@ public class JMLPartitionScanner extends RuleBasedPartitionScanner {
       super();
       IToken singleLineJML = new Token(JML_SINGLE_LINE);
       IToken multiLineJML = new Token(JML_MULTI_LINE);
-      List rules = new ArrayList();
+      IRule[] rules =new IRule[fRules.length+2];
+            
+      rules[0]=new EndOfLineRule("//@", singleLineJML);
+      rules[1]=new MultiLineRule("/*@", "@*/", multiLineJML);
       
-      rules.add(new EndOfLineRule("//@", singleLineJML));
-      rules.add(new MultiLineRule("/*@", "@*/", multiLineJML));
-      IPredicateRule[] result = new IPredicateRule[rules.size()];
-      rules.toArray(result);
-      setPredicateRules(result);
+      for(int i=0;i<fRules.length;i++){
+         rules[i+2] = fRules[i];
+      }
+      setRules(rules);
       
       
       

@@ -27,8 +27,7 @@ public class JMLSourceViewerConfigurationExtension extends
       if(currentResult.getClass().equals(JMLPresentationReconciler.class))//if Method was called
          return currentResult;                                      // earlier there is nothing
       else{                                                         // to change
-         IPresentationReconciler JMLPresentationReconciler = new JMLPresentationReconciler(
-            currentResult);
+         IPresentationReconciler JMLPresentationReconciler = new JMLPresentationReconciler();
          return JMLPresentationReconciler;
       }
    }
