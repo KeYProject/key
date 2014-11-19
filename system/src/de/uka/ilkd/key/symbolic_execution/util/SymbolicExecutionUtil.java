@@ -3491,4 +3491,44 @@ public final class SymbolicExecutionUtil {
          return contained;
       }
    }
+   
+   /**
+    * Creates recursive a term which can be used to determine the value
+    * of {@link #getProgramVariable()}.
+    * @param services The {@link Services} to use.
+    * @return The created term.
+    */
+   public static Term createSelectTerm(IExecutionVariable variable) {
+      final Services services = variable.getServices();
+      if (SymbolicExecutionUtil.isStaticVariable(variable.getProgramVariable())) {
+         // Static field access
+         Function function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)variable.getProgramVariable(), services);
+         return services.getTermBuilder().staticDot(variable.getProgramVariable().sort(), function);
+      }
+      else {
+         if (variable.getParentValue() == null) {
+            // Direct access to a variable, so return it as term
+            return services.getTermBuilder().var((ProgramVariable)variable.getProgramVariable());
+         }
+         else {
+            Term parentTerm = variable.getParentValue().getVariable().createSelectTerm();
+            if (variable.getProgramVariable() != null) {
+               if (services.getJavaInfo().getArrayLength() == variable.getProgramVariable()) {
+                  // Special handling for length attribute of arrays
+                  Function function = services.getTypeConverter().getHeapLDT().getLength();
+                  return services.getTermBuilder().func(function, parentTerm);
+               }
+               else {
+                  // Field access on the parent variable
+                  Function function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)variable.getProgramVariable(), services);
+                  return services.getTermBuilder().dot(variable.getProgramVariable().sort(), parentTerm, function);
+               }
+            }
+            else {
+               // Special handling for array indices.
+               return services.getTermBuilder().dotArr(parentTerm, variable.getArrayIndex());
+            }
+         }
+      }
+   }
 }

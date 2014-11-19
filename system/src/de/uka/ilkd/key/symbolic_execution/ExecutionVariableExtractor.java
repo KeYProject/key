@@ -441,6 +441,14 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          }
          return values;
       }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Term createSelectTerm() {
+         return SymbolicExecutionUtil.createSelectTerm(this);
+      }
    }
    
    /**
@@ -494,6 +502,14 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
       @Override
       public IExecutionValue[] getValues() throws ProofInputException {
          return values.toArray(new IExecutionValue[values.size()]);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Term createSelectTerm() {
+         return SymbolicExecutionUtil.createSelectTerm(this);
       }
    }
    
