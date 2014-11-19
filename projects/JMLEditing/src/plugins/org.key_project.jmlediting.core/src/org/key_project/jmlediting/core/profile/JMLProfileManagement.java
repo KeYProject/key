@@ -57,9 +57,20 @@ public final class JMLProfileManagement {
       // Now check all provided extension points
       for (IExtension extension : extensionPoint.getExtensions()) {
          for (IConfigurationElement elem : extension.getConfigurationElements()) {
-
             try {
                Object profileO = elem.createExecutableExtension("class");
+               // Check whether we get an provider or a profile directly
+               if (profileO instanceof IJMLProfileProvider) {
+                  // Load to profile
+                  IJMLProfileProvider provider = (IJMLProfileProvider) profileO;
+                  try {
+                     IJMLProfile profile = provider.provideProfile();
+                     profileO = profile;
+                  } catch (CoreException e) {
+                     e.printStackTrace();
+                     throw new RuntimeException("Failed to load profile from " + profileO, e);
+                  }
+               }
                if (profileO instanceof IJMLProfile) {
                   IJMLProfile profile = (IJMLProfile) profileO;
                   if (!profileCache.containsKey(profile.getIdentifier())) {
@@ -74,7 +85,9 @@ public final class JMLProfileManagement {
 
             }
             catch (CoreException e) {
-               // Ignore this invalid extension
+               // Invalid class of the extension object
+               e.printStackTrace();
+               throw new RuntimeException("Got invalid extension object");
             }
 
          }

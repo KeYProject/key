@@ -45,8 +45,6 @@ public final class JMLPreferencesHelper {
     * 
     * @param profile
     *           the profile to set
-    * @throws NullPointerException
-    *            if profile is null
     */
    public static void setDefaultJMLProfile(final IJMLProfile profile) {
       if (profile == null) {

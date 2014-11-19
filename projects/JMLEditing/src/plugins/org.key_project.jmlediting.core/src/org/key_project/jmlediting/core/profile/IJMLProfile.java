@@ -25,8 +25,21 @@ public interface IJMLProfile {
     * @return the identifier
     */
    String getIdentifier();
-   
+
+   /**
+    * Returns a set of all supported behaviors of this profile. The returned set
+    * is not allowed to be modified and is not null.
+    * 
+    * @return the set of supported behaviors
+    */
    Set<IJMLBehaviorSpecification> getSupportedBehaviors();
+
+   /**
+    * Returns a set of all supported generics of this profile. The returned set
+    * is not allowed to be modified and is not null.
+    * 
+    * @return the set of supported behaviors
+    */
    Set<IJMLGenericSpecification> getSupportedGenerics();
 
 }

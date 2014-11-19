@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<profile_wrapper xmlns:xsi="http://www.w3.org/2001.XMLSchema-instance" 
+	xsi:schemaLocation="platform:/plugin/org.key_project.jmlediting.core/resources/jml_profile.xsd">
+	
+	<profile name="JML Reference" id="org.key_project.jmlediting.profile.jmlref">
+		
+		<behavior_spec>
+			<keyword name="behavior"/>
+			<keyword name="behaviour"/>			
+		</behavior_spec>
+		
+		<generic_spec keyword="ensures"/>	
+	</profile>
+	
+		
+</profile_wrapper>

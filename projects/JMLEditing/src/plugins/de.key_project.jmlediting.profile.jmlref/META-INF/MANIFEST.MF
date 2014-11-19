@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: JML Reference Profile
-Bundle-SymbolicName: org.key_project.jmlediting.profile.jmlref
+Bundle-SymbolicName: org.key_project.jmlediting.profile.jmlref;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: de.key_project.jmlediting.profile.jmlref.Activator
 Require-Bundle: org.eclipse.core.runtime,

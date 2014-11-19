@@ -9,6 +9,9 @@
       <profile
             class="org.key_project.jmlediting.core.test.profile.JMLProfileManagementTest$DummyJMLProfile2">
       </profile>
+      <profile_provider
+            class="org.key_project.jmlediting.core.test.profile.JMLProfileManagementTest$DummyJMLProfile3Provider">
+      </profile_provider>
    </extension>
 
 </plugin>

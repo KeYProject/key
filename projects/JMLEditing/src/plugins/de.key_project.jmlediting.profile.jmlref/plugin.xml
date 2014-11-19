@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.key_project.jmlediting.core.profiles">
+      <profile_provider
+            class="de.key_project.jmlediting.profile.jmlref.JMLReferenceProfileProvider">
+      </profile_provider>
+   </extension>
+
+</plugin>
