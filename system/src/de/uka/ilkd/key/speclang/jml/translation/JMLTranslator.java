@@ -2482,7 +2482,10 @@ public final class JMLTranslator {
         return translateToJDLTerm(t, functName, services, tb, list, excManager);
     }
 
-    /** Provide restriction terms for the declared KeYJavaType */
+    /** Provide restriction terms for the declared KeYJavaType 
+     *  Note that these restrictions only apply to the JML to DL translation.
+     *  See also {@link TermBuilder#reachableValue(Term, KeYJavaType)}. 
+     */
     protected Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<? extends QuantifiableVariable> qvs, Services services) {
         final Type type = kjt.getJavaType();
         final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
