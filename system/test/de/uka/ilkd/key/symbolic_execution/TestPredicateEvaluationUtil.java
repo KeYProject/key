@@ -7,13 +7,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.uka.ilkd.key.logic.label.PostPredicateTermLabel;
+import de.uka.ilkd.key.logic.label.PredicateTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.BranchResult;
 import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.PredicateEvaluationResult;
 import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.PredicateResult;
 import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.PredicateValue;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.ui.CustomUserInterface;
@@ -24,18 +27,73 @@ import de.uka.ilkd.key.ui.CustomUserInterface;
  */
 public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCase {
    /**
-    * Tests example: examples/_testcase/set/postPredicateDifferentBranchesTest
+    * Tests example: examples/_testcase/set/predicateArraySumWhile
+    */
+   public void testArraySumWhile() throws Exception {
+      // Create expected results
+      ExpectedPredicateEvaluationResult initialResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(9)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(10)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(7)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(8)", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult preservesResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(14)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(17)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(11)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(13)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(16)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(12)", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(2)", PredicateValue.TRUE)));
+      // Perform test
+      doPredicateEvaluationTest("examples/_testcase/set/predicateArraySumWhile/test/ArraySumWhile.java", 
+                                "ArraySumWhile[ArraySumWhile::sum([I)].JML operation contract.0", 
+                                "examples/_testcase/set/predicateArraySumWhile/oracle/ArraySumWhile.xml",
+                                false,
+                                true,
+                                initialResult,
+                                preservesResult,
+                                terminationResult);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/predicateSimpleInstanceMethodContractApplication
+    */
+   public void testSimpleInstanceMethodContractApplication() throws Exception {
+      // Create expected results
+      ExpectedPredicateEvaluationResult preResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(6)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(8)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(7)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(4)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(9)", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(3)", PredicateValue.TRUE)));
+      // Perform test
+      doPredicateEvaluationTest("examples/_testcase/set/predicateSimpleInstanceMethodContractApplication/test/SimpleInstanceMethodContractApplication.java", 
+                                "SimpleInstanceMethodContractApplication[SimpleInstanceMethodContractApplication::main(SimpleInstanceMethodContractApplication)].JML normal_behavior operation contract.0", 
+                                "examples/_testcase/set/predicateSimpleInstanceMethodContractApplication/oracle/SimpleInstanceMethodContractApplication.xml",
+                                true,
+                                false,
+                                preResult,
+                                terminationResult);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/predicateSimpleMethodContractApplication
+    */
+   public void testSimpleMethodContractApplication() throws Exception {
+      // Create expected results
+      ExpectedPredicateEvaluationResult preResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(8)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(4)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(6)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(7)", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(3)", PredicateValue.TRUE)));
+      // Perform test
+      doPredicateEvaluationTest("examples/_testcase/set/predicateSimpleMethodContractApplication/test/SimpleMethodContractApplication.java", 
+                                "SimpleMethodContractApplication[SimpleMethodContractApplication::main()].JML normal_behavior operation contract.0", 
+                                "examples/_testcase/set/predicateSimpleMethodContractApplication/oracle/SimpleMethodContractApplication.xml",
+                                true,
+                                false,
+                                preResult,
+                                terminationResult);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/predicateDifferentBranchesTest
     */
    public void testDifferentBranchesTest() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult firstResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PostPredicateTermLabel.NAME + "(0)", PredicateValue.TRUE), new ExpectedPredicateResult(PostPredicateTermLabel.NAME + "(1)", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult secondResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PostPredicateTermLabel.NAME + "(0)", PredicateValue.FALSE), new ExpectedPredicateResult(PostPredicateTermLabel.NAME + "(1)", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult thirdResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PostPredicateTermLabel.NAME + "(1)", PredicateValue.FALSE)));
-      ExpectedPredicateEvaluationResult fourthResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PostPredicateTermLabel.NAME + "(1)", PredicateValue.FALSE)));
+      ExpectedPredicateEvaluationResult firstResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1)", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult secondResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(0)", PredicateValue.FALSE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1)", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult thirdResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1)", PredicateValue.FALSE)));
+      ExpectedPredicateEvaluationResult fourthResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1)", PredicateValue.FALSE)));
       // Perform test
-      doPredicateEvaluationTest("examples/_testcase/set/postPredicateDifferentBranchesTest/test/DifferentBranchesTest.java", 
+      doPredicateEvaluationTest("examples/_testcase/set/predicateDifferentBranchesTest/test/DifferentBranchesTest.java", 
                                 "DifferentBranchesTest[DifferentBranchesTest::main([I)].JML normal_behavior operation contract.0", 
-                                "examples/_testcase/set/postPredicateDifferentBranchesTest/oracle/DifferentBranchesTest.xml",
+                                "examples/_testcase/set/predicateDifferentBranchesTest/oracle/DifferentBranchesTest.xml",
+                                false,
+                                false,
                                 firstResult,
                                 secondResult,
                                 thirdResult,
@@ -43,17 +101,19 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
    }
    
    /**
-    * Tests example: examples/_testcase/set/postPredicateMultiplePredicateResults
+    * Tests example: examples/_testcase/set/predicateMultiplePredicateResults
     */
    public void testMultiplePredicateResultsTest() throws Exception {
       // Create expected results
-      ExpectedBranchResult goal102 = new ExpectedBranchResult(new ExpectedPredicateResult(PostPredicateTermLabel.NAME + "(0)", PredicateValue.FALSE), new ExpectedPredicateResult(PostPredicateTermLabel.NAME + "(1)", PredicateValue.TRUE));
-      ExpectedBranchResult goal95 = new ExpectedBranchResult(new ExpectedPredicateResult(PostPredicateTermLabel.NAME + "(0)", PredicateValue.TRUE), new ExpectedPredicateResult(PostPredicateTermLabel.NAME + "(1)", PredicateValue.TRUE));
+      ExpectedBranchResult goal102 = new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(0)", PredicateValue.FALSE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1)", PredicateValue.TRUE));
+      ExpectedBranchResult goal95 = new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1)", PredicateValue.TRUE));
       ExpectedPredicateEvaluationResult expectedResult = new ExpectedPredicateEvaluationResult(goal102, goal95);
       // Perform test
-      doPredicateEvaluationTest("examples/_testcase/set/postPredicateMultiplePredicateResults/test/MultiplePredicateResultsTest.java", 
+      doPredicateEvaluationTest("examples/_testcase/set/predicateMultiplePredicateResults/test/MultiplePredicateResultsTest.java", 
                                 "MultiplePredicateResultsTest[MultiplePredicateResultsTest::main(MultiplePredicateResultsTest,MultiplePredicateResultsTest)].JML normal_behavior operation contract.0", 
-                                "examples/_testcase/set/postPredicateMultiplePredicateResults/oracle/MultiplePredicateResultsTest.xml",
+                                "examples/_testcase/set/predicateMultiplePredicateResults/oracle/MultiplePredicateResultsTest.xml",
+                                false,
+                                false,
                                 expectedResult);
    }
    
@@ -62,12 +122,16 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
     * @param javaPathInBaseDir The path to the java file inside the base directory.
     * @param baseContractName The name of the contract.
     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
+    * @param useOperationContracts Use operation contracts?
+    * @param useLoopInvariants Use loop invariants?
     * @param expectedResults The expected results.
     * @throws Exception Occurred Exception.
     */
    protected void doPredicateEvaluationTest(String javaPathInBaseDir,
                                             String baseContractName,
                                             String oraclePathInBaseDirFile,
+                                            boolean useOperationContracts,
+                                            boolean useLoopInvariants,
                                             ExpectedPredicateEvaluationResult... expectedResults) throws Exception {
       SymbolicExecutionEnvironment<CustomUserInterface> env = null;
       try {
@@ -82,8 +146,8 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
                          false,
                          ALL_IN_ONE_RUN,
                          false,
-                         false,
-                         false,
+                         useOperationContracts,
+                         useLoopInvariants,
                          false,
                          false,
                          false,
@@ -94,8 +158,21 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
          ExecutionNodePreorderIterator iter = new ExecutionNodePreorderIterator(env.getBuilder().getStartNode());
          while (iter.hasNext()) {
             IExecutionNode<?> next = iter.next();
+            Node nodeToEvaluate;
             if (next instanceof IExecutionTermination) {
-               PredicateEvaluationResult result = PredicateEvaluationUtil.evaluate(next.getProofNode(), PostPredicateTermLabel.NAME, false, false);
+               nodeToEvaluate = next.getProofNode();
+            }
+            else if (next instanceof IExecutionOperationContract) {
+               nodeToEvaluate = next.getProofNode().child(2); // Precondition branch
+            }
+            else if (next instanceof IExecutionLoopInvariant) {
+               nodeToEvaluate = next.getProofNode().child(0); // Initial
+            }
+            else {
+               nodeToEvaluate = null;
+            }
+            if (nodeToEvaluate != null) {
+               PredicateEvaluationResult result = PredicateEvaluationUtil.evaluate(nodeToEvaluate, PredicateTermLabel.NAME, false, false);
                currentResults.add(result);
                if (CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
                   System.out.println("\nFound Result:");

@@ -2008,7 +2008,7 @@ public final class SymbolicExecutionUtil {
          if (loopConditionModalityTerm.op() != Modality.BOX ||
              loopConditionModalityTerm.sub(0).op() != Equality.EQUALS ||
              !(loopConditionModalityTerm.sub(0).sub(0).op() instanceof LocationVariable) ||
-             loopConditionModalityTerm.sub(0).sub(1) != (childIndex == 1 ? services.getTermBuilder().TRUE() : services.getTermBuilder().FALSE())) {
+             loopConditionModalityTerm.sub(0).sub(1).op() != (childIndex == 1 ? services.getTermBuilder().TRUE().op() : services.getTermBuilder().FALSE().op())) {
             throw new ProofInputException("Implementation of WhileInvariantRule has changed."); 
          }
          // Create formula which contains the value interested in.

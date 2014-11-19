@@ -47,7 +47,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.label.PostPredicateTermLabel;
+import de.uka.ilkd.key.logic.label.PredicateTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -730,7 +730,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
    /**
     * Labels all predicates in the given {@link Term} and its children with
-    * a {@link PostPredicateTermLabel}.
+    * a {@link PredicateTermLabel}.
     * @param services The {@link Services} to use.
     * @param term The {@link Term} to label.
     * @return The labeled {@link Term}.
@@ -758,8 +758,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
          else {
             ImmutableArray<TermLabel> oldLabels = term.getLabels();
             TermLabel[] newLabels = oldLabels.toArray(new TermLabel[oldLabels.size() + 1]);
-            int labelID = services.getCounter(PostPredicateTermLabel.PROOF_COUNTER_NAME).getCountPlusPlus();
-            newLabels[oldLabels.size()] = new PostPredicateTermLabel(labelID);
+            int labelID = services.getCounter(PredicateTermLabel.PROOF_COUNTER_NAME).getCountPlusPlus();
+            newLabels[oldLabels.size()] = new PredicateTermLabel(labelID);
             return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock(), new ImmutableArray<TermLabel>(newLabels));
          }
       }

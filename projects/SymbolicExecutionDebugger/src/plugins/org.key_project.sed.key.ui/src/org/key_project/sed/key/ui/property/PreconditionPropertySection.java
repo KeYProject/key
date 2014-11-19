@@ -17,18 +17,19 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.key.core.model.IKeYTerminationNode;
+import org.key_project.sed.key.core.model.KeYMethodContract;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
  * {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s.
  * @author Martin Hentschel
  */
-public class PostconditionPropertySection extends AbstractPredicatePropertySection {
+public class PreconditionPropertySection extends AbstractPredicatePropertySection {
    /**
     * {@inheritDoc}
     */
    @Override
-   protected IKeYTerminationNode<?> getDebugNode() {
+   protected KeYMethodContract getDebugNode() {
       Object object = SWTUtil.getFirstElement(getSelection());
       return getDebugNode(object);
    }
@@ -38,8 +39,8 @@ public class PostconditionPropertySection extends AbstractPredicatePropertySecti
     * @param object The given {@link Object}.
     * @return The {@link IKeYTerminationNode} or {@code null} if conversion is not possible.
     */
-   public static IKeYTerminationNode<?> getDebugNode(Object object) {
-      return object instanceof IKeYTerminationNode<?> ? (IKeYTerminationNode<?>)object : null;
+   public static KeYMethodContract getDebugNode(Object object) {
+      return object instanceof KeYMethodContract ? (KeYMethodContract)object : null;
    }
 
    /**
@@ -47,6 +48,6 @@ public class PostconditionPropertySection extends AbstractPredicatePropertySecti
     */
    @Override
    protected AbstractPredicateComposite createContentComposite(Composite parent) {
-      return new PostconditionComposite(parent, getWidgetFactory());
+      return new PreconditionComposite(parent, getWidgetFactory());
    }
 }

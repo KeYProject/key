@@ -23,7 +23,6 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -86,7 +85,7 @@ public final class PredicateEvaluationUtil {
          if (pio != null) {
             Term term = pio.subTerm();
             if (term != null) {
-               TermLabel label = getPredicateLabel(term, termLabelName);
+               TermLabel label = term.getLabel(termLabelName);
                if (label != null) {
                   Taclet taclet = ((TacletApp) tacletApp).taclet();
                   if (taclet.goalTemplates().size() >= 1) { // Not a closing taclet
@@ -102,6 +101,9 @@ public final class PredicateEvaluationUtil {
                         i++;
                      }
                   }
+                  else {
+                     updatePredicateResult(label, new PredicateResult(PredicateValue.TRUE, node), currentResults);
+                  }
                }
             }
          }
@@ -110,7 +112,7 @@ public final class PredicateEvaluationUtil {
          OneStepSimplifierRuleApp app = (OneStepSimplifierRuleApp) node.getAppliedRuleApp();
          for (RuleApp protocolApp : app.getProtocol()) {
             if (protocolApp instanceof TacletApp && protocolApp.posInOccurrence() != null) {
-               TermLabel label = getPredicateLabel(protocolApp.posInOccurrence().subTerm(), termLabelName);
+               TermLabel label = protocolApp.posInOccurrence().subTerm().getLabel(termLabelName);
                if (label != null) {
                   TacletApp tacletApp = (TacletApp) protocolApp;
                   Taclet taclet = tacletApp.taclet();
@@ -155,10 +157,20 @@ public final class PredicateEvaluationUtil {
          Term replaceTerm = SymbolicExecutionUtil.instantiateReplaceTerm((Term) replaceObject, tacletApp, node.proof().getServices());
          // Check for true/false terms
          if (replaceTerm.op() == Junctor.TRUE) {
-            updatePredicateResult(label, new PredicateResult(PredicateValue.TRUE, node), results);
+            if (tacletApp.posInOccurrence().isInAntec()) {
+               updatePredicateResult(label, new PredicateResult(PredicateValue.FALSE, node), results);
+            }
+            else {
+               updatePredicateResult(label, new PredicateResult(PredicateValue.TRUE, node), results);
+            }
          }
          else if (replaceTerm.op() == Junctor.FALSE) {
-            updatePredicateResult(label, new PredicateResult(PredicateValue.FALSE, node), results);
+            if (tacletApp.posInOccurrence().isInAntec()) {
+               updatePredicateResult(label, new PredicateResult(PredicateValue.TRUE, node), results);
+            }
+            else {
+               updatePredicateResult(label, new PredicateResult(PredicateValue.FALSE, node), results);
+            }
          }
       }
    }
@@ -170,36 +182,16 @@ public final class PredicateEvaluationUtil {
     * @param results The {@link Map} with all available {@link PredicateResult}s.
     */
    private static void updatePredicateResult(TermLabel label, PredicateResult result, Map<TermLabel, PredicateResult> results) {
-      PredicateResult oldResult = results.get(label);
-      if (oldResult != null) {
-         if (!oldResult.getValue().equals(result.getValue())) {
-            PredicateResult newResult = new PredicateResult(PredicateValue.UNKNOWN, oldResult.getNodes(), result.getNodes());
-            results.put(label, newResult);
-         }
-      }
-      else {
+//      PredicateResult oldResult = results.get(label);
+//      if (oldResult != null) {
+//         if (!oldResult.getValue().equals(result.getValue())) {
+//            PredicateResult newResult = new PredicateResult(PredicateValue.UNKNOWN, oldResult.getNodes(), result.getNodes());
+//            results.put(label, newResult);
+//         }
+//      }
+//      else {
          results.put(label, result);
-      }
-   }
-   
-   /**
-    * Returns the first {@link TermLabel} with the given {@link Name}.
-    * @param term The {@link Term}.
-    * @param termLabelName The {@link Name}.
-    * @return The found {@link TermLabel} or {@code null} otherwise.
-    */
-   public static TermLabel getPredicateLabel(Term term, final Name termLabelName) {
-      if (term.hasLabels()) {
-         return JavaUtil.search(term.getLabels(), new IFilter<TermLabel>() {
-            @Override
-            public boolean select(TermLabel element) {
-               return JavaUtil.equals(element.name(), termLabelName);
-            }
-         });
-      }
-      else {
-         return null;
-      }
+//      }
    }
    
    /**
@@ -360,7 +352,7 @@ public final class PredicateEvaluationUtil {
        * @return The found {@link TermLabel} or {@code null} otherwise.
        */
       public TermLabel getPredicateLabel(Term term) {
-         return PredicateEvaluationUtil.getPredicateLabel(term, termLabelName);
+         return term.getLabel(termLabelName);
       }
 
       /**

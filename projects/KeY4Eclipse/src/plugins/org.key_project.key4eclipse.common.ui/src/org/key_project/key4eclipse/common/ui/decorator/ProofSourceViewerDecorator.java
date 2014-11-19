@@ -34,12 +34,15 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
+import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
+import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -171,14 +174,26 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     * @param term The {@link Term} to show.
     * @param services The {@link Services} to use.
     * @param mediator The {@link KeYMediator} to use.
+    * @param visibleLabels Optional definition of visible {@link TermLabel}s.
     * @return The shown text.
     */
-   public String showTerm(Term term, Services services, KeYMediator mediator) {
+   public String showTerm(Term term, 
+                          Services services, 
+                          KeYMediator mediator, 
+                          VisibleTermLabels visibleLabels) {
       this.node = null;
       filter = null;
-      printer = new LogicPrinter(new ProgramPrinter(null), 
-                                 mediator.getNotationInfo(), 
-                                 services);
+      if (visibleLabels != null) {
+         printer = new SequentViewLogicPrinter(new ProgramPrinter(null), 
+                                               mediator.getNotationInfo(), 
+                                               services,
+                                               visibleLabels);
+      }
+      else {
+         printer = new LogicPrinter(new ProgramPrinter(null), 
+                                    mediator.getNotationInfo(), 
+                                    services);
+      }
       String str = computeText(mediator, term, printer);
       viewer.setDocument(new Document(str));
       return str;

@@ -18,19 +18,19 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 
 /**
- * Label attached to a predicate for instance in the post condition.
+ * Label attached to a predicates for instance in postconditions, loop invariants or precondition checks of applied operation contracts.
  */
-public class PostPredicateTermLabel implements TermLabel {
+public class PredicateTermLabel implements TermLabel {
    /**
     * The unique name of this label.
     */
-   public static final Name NAME = new Name("Post");
+   public static final Name NAME = new Name("P");
 
    /**
     * The name used in {@link Services#getCounter(String)} to keep track
     * of the already used IDs.
     */
-   public static final String PROOF_COUNTER_NAME = "POST_LABEL_COUNTER";
+   public static final String PROOF_COUNTER_NAME = "P_LABEL_COUNTER";
    
    /**
     * The unique ID of this term label in the {@link Sequent}.
@@ -41,7 +41,7 @@ public class PostPredicateTermLabel implements TermLabel {
     * Constructor.
     * @param id The unique ID of this term label in the {@link Sequent}.
     */
-   public PostPredicateTermLabel(int id) {
+   public PredicateTermLabel(int id) {
        this.id = id;
    }
 

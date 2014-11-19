@@ -82,9 +82,9 @@ public final class WhileInvariantRule implements BuiltInRule {
     public static final String INITIAL_INVARIANT_ONLY_HINT = "onlyInitialInvariant";
 
     /**
-     * The unit used to refactor the guard true body.
+     * The unit used to refactor the full invariant.
      */
-    public static final String GUARD_TRUE_BODY_HINT = "guardTrueBody";
+    public static final String FULL_INVARIANT_TERM_HINT = "fullInvariant";
 
     public static final WhileInvariantRule INSTANCE = new WhileInvariantRule();
 
@@ -579,9 +579,11 @@ public final class WhileInvariantRule implements BuiltInRule {
                     (Name) new ProgramElementName(sv.name().toString()), 
                     services);
         }
+        Term fullInvariant = tb.and(invTerm, frameCondition, variantPO);
+        fullInvariant = TermLabelManager.refactorTerm(services, null, fullInvariant, this, bodyGoal, FULL_INVARIANT_TERM_HINT, null);
         Term bodyTerm = wir.transform(this, bodyGoal, applicationSequent,
                                       ruleApp.posInOccurrence(), inst.progPost,
-                                      tb.and(invTerm, frameCondition, variantPO),
+                                      fullInvariant,
                                       svInst, services);
         final Term guardTrueBody = tb.imp(tb.box(guardJb,guardTrueTerm), bodyTerm);
         return guardTrueBody;
@@ -678,7 +680,6 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term guardTrueBody = bodyTerm(services, ruleApp, applicationSequent,
                                       inst, invTerm, frameCondition, variantPO,
                                       bodyGoal, guardJb, guardTrueTerm); 
-        guardTrueBody = TermLabelManager.refactorTerm(services, null, guardTrueBody, this, bodyGoal, GUARD_TRUE_BODY_HINT, null);
 
         bodyGoal.changeFormula(new SequentFormula(tb.applySequential(uBeforeLoopDefAnonVariant, 
                                                                      guardTrueBody)), 

@@ -13,12 +13,9 @@
 
 package org.key_project.sed.key.ui.property;
 
-import org.eclipse.graphiti.dt.IDiagramTypeProvider;
-import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.platform.IDiagramEditor;
 import org.eclipse.graphiti.ui.platform.GFPropertySection;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPart;
@@ -28,14 +25,15 @@ import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 
 /**
- * {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s.
+ * Basic {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s
+ * in a {@link AbstractPredicateComposite}.
  * @author Martin Hentschel
  */
-public class KeYGraphitiDebugNodePropertySection extends GFPropertySection {
+public abstract class AbstractPredicateGraphitiPropertySection extends GFPropertySection {
    /**
     * The shown content.
     */
-   private KeYTabComposite contentComposite;
+   private AbstractPredicateComposite contentComposite;
    
    /**
     * {@inheritDoc}
@@ -43,7 +41,25 @@ public class KeYGraphitiDebugNodePropertySection extends GFPropertySection {
    @Override
    public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
       super.createControls(parent, tabbedPropertySheetPage);
-      contentComposite = new KeYTabComposite(parent, SWT.NONE, getWidgetFactory());
+      contentComposite = createContentComposite(parent);
+   }
+   
+   /**
+    * Creates the {@link AbstractPredicateComposite} to show.
+    * @param parent The parent {@link Composite}.
+    * @return The created {@link AbstractPredicateComposite}.
+    */
+   protected abstract AbstractPredicateComposite createContentComposite(Composite parent);
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void dispose() {
+      if (contentComposite != null) {
+         contentComposite.dispose();
+      }
+      super.dispose();
    }
 
    /**
@@ -55,32 +71,19 @@ public class KeYGraphitiDebugNodePropertySection extends GFPropertySection {
    }
    
    /**
-    * Returns the {@link ISEDDebugNode} to show.
-    * @return The {@link ISEDDebugNode} to show or {@code null} if no one should be shown.
+    * Returns the {@link IKeYSEDDebugNode} to show.
+    * @return The {@link IKeYSEDDebugNode} to show or {@code null} if no one should be shown.
     */
    public IKeYSEDDebugNode<?> getDebugNode() {
       return getDebugNode(getSelectedPictogramElement());
    }
    
    /**
-    * Returns the {@link ISEDDebugNode} to show.
+    * Returns the {@link IKeYSEDDebugNode} to show.
     * @param pe The currently selected {@link PictogramElement}.
-    * @return The {@link ISEDDebugNode} to show or {@code null} if no one should be shown.
+    * @return The {@link IKeYSEDDebugNode} to show or {@code null} if no one should be shown.
     */
-   public IKeYSEDDebugNode<?> getDebugNode(PictogramElement pe) {
-      IKeYSEDDebugNode<?> node = null;
-      if (pe != null) {
-         IDiagramTypeProvider diagramProvider = getDiagramTypeProvider();
-         if (diagramProvider != null) {
-            IFeatureProvider featureProvider = diagramProvider.getFeatureProvider();
-            if (featureProvider != null) {
-               Object bo = diagramProvider.getFeatureProvider().getBusinessObjectForPictogramElement(pe);
-               node = KeYDebugNodePropertySection.getDebugNode(bo);
-            }
-         }
-      }
-      return node;
-   }
+   public abstract IKeYSEDDebugNode<?> getDebugNode(PictogramElement pe);
 
    /**
     * <p>

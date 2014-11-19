@@ -322,6 +322,18 @@
                   label="Postcondition">
             </propertyTab>
             <propertyTab
+                  afterTab="org.key_project.sed.ui.key.tab"
+                  category="Debug"
+                  id="org.key_project.sed.ui.loopInvariant.tab"
+                  label="Loop Invariant">
+            </propertyTab>
+            <propertyTab
+                  afterTab="org.key_project.sed.ui.key.tab"
+                  category="Debug"
+                  id="org.key_project.sed.ui.precondition.tab"
+                  label="Precondition">
+            </propertyTab>
+            <propertyTab
                   category="Debug"
                   id="org.key_project.sed.ui.main.tab"
                   image="icons/logo16.gif"
@@ -353,6 +365,18 @@
                   tab="org.key_project.sed.ui.postcondition.tab">
             </propertySection>
             <propertySection
+                  class="org.key_project.sed.key.ui.property.LoopInvariantPropertySection"
+                  filter="org.key_project.sed.key.ui.property.LoopInvariantTreeFilter"
+                  id="org.key_project.sed.key.ui.property.LoopInvariantPropertySection"
+                  tab="org.key_project.sed.ui.loopInvariant.tab">
+            </propertySection>
+            <propertySection
+                  class="org.key_project.sed.key.ui.property.PreconditionPropertySection"
+                  filter="org.key_project.sed.key.ui.property.PreconditionTreeFilter"
+                  id="org.key_project.sed.key.ui.property.PreconditionPropertySection"
+                  tab="org.key_project.sed.ui.precondition.tab">
+            </propertySection>
+            <propertySection
                   class="org.key_project.sed.key.ui.property.MainKeYDebugTargetPropertySection"
                   filter="org.key_project.sed.key.ui.property.KeYDebugTargetTreeFilter"
                   id="org.key_project.sed.key.ui.property.KeYDebugTargetPropertySection"
@@ -382,6 +406,18 @@
                   id="org.key_project.sed.ui.visualization.postcondition.tab"
                   label="Postcondition">
             </propertyTab>
+            <propertyTab
+                  afterTab="org.key_project.sed.ui.visualization.key.tab"
+                  category="Graphiti"
+                  id="org.key_project.sed.ui.visualization.loopInvariant.tab"
+                  label="Loop Invariant">
+            </propertyTab>
+            <propertyTab
+                  afterTab="org.key_project.sed.ui.visualization.key.tab"
+                  category="Graphiti"
+                  id="org.key_project.sed.ui.visualization.precondition.tab"
+                  label="Precondition">
+            </propertyTab>
          </propertyTabs>
       </extension>
       <extension
@@ -399,6 +435,18 @@
                   filter="org.key_project.sed.key.ui.property.PostconditionGraphitiTreeFilter"
                   id="org.key_project.sed.key.ui.property.PostconditionGraphitiPropertySection"
                   tab="org.key_project.sed.ui.visualization.postcondition.tab">
+            </propertySection>
+            <propertySection
+                  class="org.key_project.sed.key.ui.property.LoopInvariantGraphitiPropertySection"
+                  filter="org.key_project.sed.key.ui.property.LoopInvariantGraphitiTreeFilter"
+                  id="org.key_project.sed.key.ui.property.LoopInvariantGraphitiPropertySection"
+                  tab="org.key_project.sed.ui.visualization.loopInvariant.tab">
+            </propertySection>
+            <propertySection
+                  class="org.key_project.sed.key.ui.property.PreconditionGraphitiPropertySection"
+                  filter="org.key_project.sed.key.ui.property.PreconditionGraphitiTreeFilter"
+                  id="org.key_project.sed.key.ui.property.PreconditionGraphitiPropertySection"
+                  tab="org.key_project.sed.ui.visualization.precondition.tab">
             </propertySection>
          </propertySections>
       </extension>

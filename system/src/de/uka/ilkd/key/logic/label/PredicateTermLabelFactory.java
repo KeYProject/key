@@ -16,9 +16,9 @@ package de.uka.ilkd.key.logic.label;
 import java.util.List;
 
 /**
- * A factory for creating {@link PostPredicateTermLabel} objects.
+ * A factory for creating {@link PredicateTermLabel} objects.
  */
-public class PostPredicateTermLabelFactory implements TermLabelFactory<PostPredicateTermLabel> {
+public class PredicateTermLabelFactory implements TermLabelFactory<PredicateTermLabel> {
     /**
      * {@inheritDoc}
      *
@@ -26,19 +26,19 @@ public class PostPredicateTermLabelFactory implements TermLabelFactory<PostPredi
      * This method accepts single arguments which can be parsed as an integer.
      */
     @Override
-    public PostPredicateTermLabel parseInstance(List<String> parameters) throws TermLabelException {
+    public PredicateTermLabel parseInstance(List<String> parameters) throws TermLabelException {
         if (parameters == null || parameters.size() != 1) {
-            throw new TermLabelException("Label " + PostPredicateTermLabel.NAME +
+            throw new TermLabelException("Label " + PredicateTermLabel.NAME +
                     " requires exactly one Integer-Parameter with its ID.");
         }
         Integer val;
         try {
             val = Integer.valueOf(parameters.get(0));
         } catch (NumberFormatException e) {
-            throw new TermLabelException("Label " + PostPredicateTermLabel.NAME +
+            throw new TermLabelException("Label " + PredicateTermLabel.NAME +
                     " requires exactly one Integer-Parameter with its ID.", e);
         }
 
-        return new PostPredicateTermLabel(val);
+        return new PredicateTermLabel(val);
     }
 }

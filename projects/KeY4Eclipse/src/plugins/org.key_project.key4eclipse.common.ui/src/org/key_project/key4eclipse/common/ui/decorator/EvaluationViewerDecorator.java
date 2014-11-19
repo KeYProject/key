@@ -13,17 +13,20 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
+import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PositionTable;
 import de.uka.ilkd.key.pp.Range;
+import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.BranchResult;
 import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.PredicateResult;
 import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.PredicateValue;
@@ -103,9 +106,15 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
    public PredicateValue showTerm(Term term, 
                                   Services services, 
                                   KeYMediator mediator, 
-                                  BranchResult branchResult) {
+                                  final BranchResult branchResult) {
       // Show Term
-      String text = showTerm(term, services, mediator);
+      VisibleTermLabels visibleTermLabels = new VisibleTermLabels() {
+         @Override
+         public boolean contains(Name name) {
+            return !ObjectUtil.equals(name, branchResult.getTermLabelName());
+         }
+      };
+      String text = showTerm(term, services, mediator, visibleTermLabels);
       // Highlight results of all terms
       LogicPrinter printer = getPrinter();
       PositionTable pt = printer.getPositionTable();

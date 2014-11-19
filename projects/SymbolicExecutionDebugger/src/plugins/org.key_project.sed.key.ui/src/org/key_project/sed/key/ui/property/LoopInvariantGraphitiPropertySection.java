@@ -13,33 +13,36 @@
 
 package org.key_project.sed.key.ui.property;
 
+import org.eclipse.graphiti.dt.IDiagramTypeProvider;
+import org.eclipse.graphiti.features.IFeatureProvider;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.key.core.model.IKeYTerminationNode;
-import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 
 /**
  * {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s.
  * @author Martin Hentschel
  */
-public class PostconditionPropertySection extends AbstractPredicatePropertySection {
+public class LoopInvariantGraphitiPropertySection extends AbstractPredicateGraphitiPropertySection {
    /**
     * {@inheritDoc}
     */
    @Override
-   protected IKeYTerminationNode<?> getDebugNode() {
-      Object object = SWTUtil.getFirstElement(getSelection());
-      return getDebugNode(object);
-   }
-   
-   /**
-    * Converts the given {@link Object} into an {@link IKeYTerminationNode} if possible.
-    * @param object The given {@link Object}.
-    * @return The {@link IKeYTerminationNode} or {@code null} if conversion is not possible.
-    */
-   public static IKeYTerminationNode<?> getDebugNode(Object object) {
-      return object instanceof IKeYTerminationNode<?> ? (IKeYTerminationNode<?>)object : null;
+   public IKeYSEDDebugNode<?> getDebugNode(PictogramElement pe) {
+      IKeYSEDDebugNode<?> node = null;
+      if (pe != null) {
+         IDiagramTypeProvider diagramProvider = getDiagramTypeProvider();
+         if (diagramProvider != null) {
+            IFeatureProvider featureProvider = diagramProvider.getFeatureProvider();
+            if (featureProvider != null) {
+               Object bo = diagramProvider.getFeatureProvider().getBusinessObjectForPictogramElement(pe);
+               node = LoopInvariantPropertySection.getDebugNode(bo);
+            }
+         }
+      }
+      return node;
    }
 
    /**
@@ -47,6 +50,6 @@ public class PostconditionPropertySection extends AbstractPredicatePropertySecti
     */
    @Override
    protected AbstractPredicateComposite createContentComposite(Composite parent) {
-      return new PostconditionComposite(parent, getWidgetFactory());
+      return new LoopInvariantComposite(parent, getWidgetFactory());
    }
 }
