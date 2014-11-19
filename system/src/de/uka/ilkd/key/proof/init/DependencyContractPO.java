@@ -186,6 +186,17 @@ public final class DependencyContractPO extends AbstractPO
                 }
        }
 
+       Term permsFor = tb.tt();
+       if(heapCount == 2 && proofServices.getTypeConverter().getHeapLDT().getPermissionHeap() != null) {
+           int stateCount = contract.getTarget().getStateCount();
+           for(int i=0;i<stateCount;i++) {
+               LocationVariable h = heaps.get(i);
+               LocationVariable p = heaps.get(i+stateCount);
+               final Term pf = tb.permissionsFor(p, h);
+               permsFor = tb.and(permsFor, pf);
+           }
+       }
+
        //register the variables and anon heap so they are declared in proof 
        //header if the proof is saved to a file
        register(selfVar, proofServices);	
@@ -230,7 +241,7 @@ public final class DependencyContractPO extends AbstractPO
        final Term pre = tb.and(
              buildFreePre(heaps, selfVar,
                    contract.getKJT(), paramVars, wellFormedHeaps, proofServices),
-                   contract.getPre(heapLDT.getHeap(), selfVar, paramVars,
+                   permsFor, contract.getPre(heapLDT.getHeap(), selfVar, paramVars,
                          null, proofServices));
 
        assert heaps.size() == heapCount * contract.getTarget().getStateCount();

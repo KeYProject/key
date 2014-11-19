@@ -5,6 +5,7 @@ public class Object {
     
     /*@ public normal_behavior
       @   assignable \nothing;
+      @   assignable<permissions> \nothing;
       @*/
     public /*@ pure @*/ Object() {}
     

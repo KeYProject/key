@@ -109,6 +109,10 @@ public final class TypeConverter {
         return (HeapLDT) getLDT(HeapLDT.NAME);
     }
 
+    public PermissionLDT getPermissionLDT() {
+        return (PermissionLDT) getLDT(PermissionLDT.NAME);
+    }
+
     public SeqLDT getSeqLDT() {
 	return (SeqLDT) getLDT(SeqLDT.NAME);
     }

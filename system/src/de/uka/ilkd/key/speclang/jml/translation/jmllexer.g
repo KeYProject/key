@@ -128,6 +128,7 @@ OLD : "\\old";
 // ONLY_CAPTURED: "\\only_captured";
 OTHER : "\\other";
 OUTER_SCOPE : "\\outerScope"; //KeY extension, not official JML
+PERMISSION : "\\permission";
 PLUS : "+";
 PRE : "\\pre";
 PRIVATEDATA : "\\private_data";
