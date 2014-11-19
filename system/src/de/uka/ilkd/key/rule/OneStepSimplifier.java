@@ -396,6 +396,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
     private SequentFormula simplifyConstrainedFormula(
                     Services services,
                     SequentFormula cf,
+                    boolean inAntecedent,
                     Map<Term,PosInOccurrence> context,
                     /*out*/ List<PosInOccurrence> ifInsts,
                     Protocol protocol) {
@@ -407,7 +408,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
         for(int i = 0; i < indices.length; i++) {
             PosInOccurrence pos = new PosInOccurrence(cf,
                             PosInTerm.getTopLevel(),
-                            true);
+                            inAntecedent);
             result = simplifyPosOrSub(services, pos, i, protocol);
             if(result != null) {
                 return result;
@@ -425,6 +426,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
      */
     private Instantiation computeInstantiation(Services services,
                     SequentFormula cf,
+                    boolean inAntecedent,
                     Sequent seq,
                     Protocol protocol) {
         //collect context formulas (potential if-insts for replace-known)
@@ -453,6 +455,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
         while(true) {
             simplifiedCf = simplifyConstrainedFormula(services,
                             simplifiedCf,
+                            inAntecedent,
                             context,
                             ifInsts,
                             protocol);
@@ -476,14 +479,14 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
     /**
      * Tells whether the passed formula can be simplified
      */
-    private boolean applicableTo(Services services, SequentFormula cf) {
+    private boolean applicableTo(Services services, SequentFormula cf, boolean inAntecedent) {
         final Boolean b = applicabilityCache.get(cf);
         if(b != null) {
             return b.booleanValue();
         } else {
             //try one simplification step without replace-known
             final SequentFormula simplifiedCf
-            = simplifyConstrainedFormula(services, cf, null, null, null);
+            = simplifyConstrainedFormula(services, cf, inAntecedent, null, null, null);
             final boolean result = simplifiedCf != null
                             && !simplifiedCf.equals(cf);
             applicabilityCache.put(cf, Boolean.valueOf(result));
@@ -529,7 +532,8 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
 
         //applicable to the formula?
         return applicableTo(goal.proof().getServices(),
-                        pio.constrainedFormula());
+                        pio.constrainedFormula(),
+                        pio.isInAntec());
     }
 
     @Override
@@ -549,6 +553,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
         final Instantiation inst
             = computeInstantiation(services,
                     pos.constrainedFormula(),
+                    pos.isInAntec(),
                     goal.sequent(),
                     protocol);
 
