@@ -1153,7 +1153,7 @@ public class Recoder2KeYConverter {
         			    KeYJavaType.VOID_TYPE,
         			    positionInfo(cd),
         			    heapSort,
-        			    heapLDT == null ? 1 : heapLDT.getAllHeaps(services).size() - 1);
+        			    heapLDT == null ? 1 : heapLDT.getAllHeaps().size() - 1);
         insertToMap(cd, result);
         return result;
     }
@@ -1177,7 +1177,7 @@ public class Recoder2KeYConverter {
                 containerKJT, KeYJavaType.VOID_TYPE,
                 PositionInfo.UNDEFINED,
                 heapSort,
-                heapLDT == null ? 1 : heapLDT.getAllHeaps(services).size() - 1);
+                heapLDT == null ? 1 : heapLDT.getAllHeaps().size() - 1);
         insertToMap(dc, result);
         return result;
     }
@@ -1325,7 +1325,7 @@ public class Recoder2KeYConverter {
         	    		       containerType,
                     		       returnKJT, positionInfo(md),
                     		       heapSort,
-                    		       heapLDT == null ? 1 : heapLDT.getAllHeaps(services).size() - 1);
+                    		       heapLDT == null ? 1 : heapLDT.getAllHeaps().size() - 1);
 
             insertToMap(md, result);
         }
