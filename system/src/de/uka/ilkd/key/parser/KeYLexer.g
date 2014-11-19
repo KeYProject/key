@@ -319,6 +319,7 @@ lexer grammar KeYLexer;
 	UNIQUE : '\\unique';
 
 	RULES : '\\rules';
+	AXIOMS : '\\axioms';
         PROBLEM : '\\problem';
         CHOOSECONTRACT : '\\chooseContract';
         PROOFOBLIGATION : '\\proofObligation';
