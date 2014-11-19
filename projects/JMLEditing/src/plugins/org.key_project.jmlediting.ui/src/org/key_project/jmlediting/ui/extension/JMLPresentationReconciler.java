@@ -11,21 +11,16 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.graphics.*;
 
 public class JMLPresentationReconciler extends JavaPresentationReconciler {
-   /**
-    * the {@link IPresentationReconciler} the JavaEditor is using
-    */
    
+   private IPresentationReconciler javaPR;
    /**
-    * Creates an Instance of JMLPresentationReconciler
-    * @param javaEditorPresentationReconciler the IPresentationReconciler the javaEditor uses
+    * Creates an Instance of JMLPresentationReconciler which is the standard
+    * JavaPresentationReconciler with added Damagers and Repairers for
+    * JML ContentTypes 
     */
-   public JMLPresentationReconciler() {
+   public JMLPresentationReconciler(IPresentationReconciler currentResult) {
       super();
-      DefaultDamagerRepairer dr= new DefaultDamagerRepairer(new SingleTokenScanner(new TextAttribute(new Color(Display.getCurrent(),new RGB(255,0,0)))));
-      this.setDamager(dr,JMLPartitionScanner.JML_SINGLE_LINE);
-      this.setDamager(dr, JMLPartitionScanner.JML_MULTI_LINE);
-      this.setRepairer(dr, JMLPartitionScanner.JML_SINGLE_LINE);
-      this.setRepairer(dr, JMLPartitionScanner.JML_MULTI_LINE);
+      //this.javaPR=javaPR;
+      
    }
-   
 }

@@ -10,4 +10,5 @@ public class SingleTokenScanner extends BufferedRuleBasedScanner {
       // TODO Auto-generated constructor stub
       setDefaultReturnToken(new Token(textAttribute));
    }
+   
 }

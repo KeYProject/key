@@ -30,17 +30,16 @@ public class JMLPartitionScanner extends JavaPartitionScanner {
    @SuppressWarnings({ "rawtypes", "unchecked" })
    public JMLPartitionScanner() {
       super();
+       
       IToken singleLineJML = new Token(JML_SINGLE_LINE);
       IToken multiLineJML = new Token(JML_MULTI_LINE);
-      IRule[] rules =new IRule[fRules.length+2];
-            
+      IPredicateRule[] rules =new IPredicateRule[fRules.length+2];
+        
       rules[0]=new EndOfLineRule("//@", singleLineJML);
       rules[1]=new MultiLineRule("/*@", "@*/", multiLineJML);
-      
-      for(int i=0;i<fRules.length;i++){
-         rules[i+2] = fRules[i];
-      }
-      setRules(rules);
+      for(int i=0;i<fRules.length;i++)
+         rules[i+2]=(IPredicateRule)fRules[i];
+      setPredicateRules(rules);
       
       
       
