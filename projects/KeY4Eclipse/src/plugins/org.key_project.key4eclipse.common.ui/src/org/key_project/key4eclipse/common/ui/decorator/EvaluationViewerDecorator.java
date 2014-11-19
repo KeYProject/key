@@ -1,5 +1,7 @@
 package org.key_project.key4eclipse.common.ui.decorator;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,6 +12,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
+import org.key_project.key4eclipse.common.ui.util.LogUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -106,52 +109,71 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
       // Highlight results of all terms
       LogicPrinter printer = getPrinter();
       PositionTable pt = printer.getPositionTable();
-      TextPresentation textPresentation = new TextPresentation();
-      Map<Term, TermHighlighting> highlightings = new HashMap<Term, TermHighlighting>();
-      List<StyleRange> lastRanges = fillTermRanges(term, pt, textPresentation, branchResult, text.length(), highlightings, ImmutableSLList.<Integer>nil());
-      if (lastRanges != null) {
-         for (StyleRange lastRange : lastRanges) {
-            textPresentation.addStyleRange(lastRange);
-         }
+      Map<Term, PredicateValue> termValueMap = new HashMap<Term, PredicateValue>();
+      List<StyleRange> styleRanges = new LinkedList<StyleRange>();
+      fillTermRanges(term, pt, branchResult, text.length(), termValueMap, ImmutableSLList.<Integer>nil(), styleRanges);
+      try {
+         TextPresentation textPresentation = createTextPresentation(styleRanges);
+         TextPresentation.applyTextPresentation(textPresentation, getViewerText());
+         getViewer().changeTextPresentation(textPresentation, true);
       }
-      TextPresentation.applyTextPresentation(textPresentation, getViewerText());
-      getViewer().changeTextPresentation(textPresentation, true);
+      catch (Exception e) {
+         LogUtil.getLogger().logError(e);
+      }
       // Return term result
-      TermHighlighting termHighlighting = highlightings.get(term);
-      return termHighlighting != null ? termHighlighting.getValue() : PredicateValue.UNKNOWN;
+      PredicateValue value = termValueMap.get(term);
+      return value != null ? value : PredicateValue.UNKNOWN;
    }
    
+   /**
+    * Creates the {@link TextPresentation} to show.
+    * @param styleRanges The {@link StyleRange} to consider.
+    * @return The created {@link TextPresentation}.
+    */
+   private TextPresentation createTextPresentation(List<StyleRange> styleRanges) {
+      // Ensure that StyleRanges are in the correct order.
+      Collections.sort(styleRanges, new Comparator<StyleRange>() {
+         @Override
+         public int compare(StyleRange o1, StyleRange o2) {
+            return o1.start - o2.start;
+         }
+      });
+      // Create TextPresentation
+      TextPresentation textPresentation = new TextPresentation();
+      for (StyleRange styleRange : styleRanges) {
+         textPresentation.addStyleRange(styleRange);
+      }
+      return textPresentation;
+   }
+
    /**
     * Utility method used by {@link #showTerm(Term, Services, KeYMediator, BranchResult)}
     * to fill the {@link TextPresentation} to highlight {@link PredicateValue}s recursively.
     * @param term The current {@link Term}.
     * @param positionTable The {@link PositionTable} to use.
-    * @param textPresentation The {@link TextPresentation} to fill.
     * @param branchResult The {@link BranchResult} to use.
     * @param textLength The length of the complete text.
-    * @param highlightings The already computed {@link TermHighlighting}s.
+    * @param termValueMap The already computed {@link PredicateValue}s.
     * @param path The path to the current {@link Term}.
-    * @return An optional {@link List} of not yet added {@link StyleRange}s in document order still needs to be added to the {@link TextPresentation}.
+    * @param styleRanges The {@link List} with found {@link StyleRange}s to fill.
     */
-   protected List<StyleRange> fillTermRanges(Term term, 
-                                             PositionTable positionTable, 
-                                             TextPresentation textPresentation, 
-                                             BranchResult branchResult,
-                                             int textLength,
-                                             Map<Term, TermHighlighting> highlightings,
-                                             ImmutableList<Integer> path) {
+   protected void fillTermRanges(Term term, 
+                                 PositionTable positionTable, 
+                                 BranchResult branchResult,
+                                 int textLength,
+                                 Map<Term, PredicateValue> termValueMap,
+                                 ImmutableList<Integer> path,
+                                 List<StyleRange> styleRanges) {
       TermLabel label = branchResult.getPredicateLabel(term);
       if (label != null) {
          // The BranchResult knows the result of the current Term.
          PredicateResult predicateResult = branchResult.getResult(label);
-         PredicateValue value = predicateResult != null ? predicateResult.getValue() : null;
+         PredicateValue value = predicateResult != null ? predicateResult.getValue() : PredicateValue.UNKNOWN;
          Color color = getColor(value);
          Range range = positionTable.rangeForPath(path, textLength);
          StyleRange styleRange = new StyleRange(range.start(), range.length(), color, null);
-         highlightings.put(term, new TermHighlighting(value, styleRange.start, styleRange.start + styleRange.length));
-         List<StyleRange> lastRanges = new LinkedList<StyleRange>();
-         lastRanges.add(styleRange);
-         return lastRanges;
+         termValueMap.put(term, value);
+         styleRanges.add(styleRange);
       }
       else if (term.op() instanceof Junctor) {
          // Junctors are supported.
@@ -162,64 +184,74 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
          else if (junctor.arity() == 2) {
             Term sub0 = term.sub(0);
             Term sub1 = term.sub(1);
-            List<StyleRange> firstRanges = fillTermRanges(sub0, positionTable, textPresentation, branchResult, textLength, highlightings, path.append(0));
-            if (firstRanges != null) {
-               List<StyleRange> secondRanges = fillTermRanges(sub1, positionTable, textPresentation, branchResult, textLength, highlightings, path.append(1));
-               if (secondRanges != null) {
-                  TermHighlighting high0 = highlightings.get(sub0);
-                  TermHighlighting high1 = highlightings.get(sub1);
-                  assert high0 != null;
-                  assert high1 != null;
-                  PredicateValue junctorResult;
-                  if (junctor == Junctor.AND) {
-                     junctorResult = PredicateValue.and(high0.getValue(), high1.getValue());
-                  }
-                  else if (junctor == Junctor.IMP) {
-                     junctorResult = PredicateValue.imp(high0.getValue(), high1.getValue());
-                  }
-                  else if (junctor == Junctor.OR) {
-                     junctorResult = PredicateValue.or(high0.getValue(), high1.getValue());
-                  }
-                  else {
-                     throw new RuntimeException("Junctor '" + junctor + "' is not supported.");
-                  }
-                  Color color = getColor(junctorResult);
-                  StyleRange styleRange = new StyleRange(high0.getEnd(), 
-                                                         high1.getStart() - high0.getEnd(), 
-                                                         color, 
-                                                         null);
-                  highlightings.put(term, new TermHighlighting(junctorResult, high0.getStart(), high1.getEnd()));
-                  for (StyleRange first: firstRanges) {
-                     textPresentation.addStyleRange(first);
-                  }
-                  textPresentation.addStyleRange(styleRange);
-                  return secondRanges;
-               }
+            fillTermRanges(sub0, positionTable, branchResult, textLength, termValueMap, path.append(0), styleRanges);
+            fillTermRanges(sub1, positionTable, branchResult, textLength, termValueMap, path.append(1), styleRanges);
+            PredicateValue leftValue = termValueMap.get(sub0);
+            PredicateValue rightValue = termValueMap.get(sub1);
+            assert leftValue != null;
+            assert rightValue != null;
+            PredicateValue junctorResult;
+            if (junctor == Junctor.AND) {
+               junctorResult = PredicateValue.and(leftValue, rightValue);
+            }
+            else if (junctor == Junctor.IMP) {
+               junctorResult = PredicateValue.imp(leftValue, rightValue);
+            }
+            else if (junctor == Junctor.OR) {
+               junctorResult = PredicateValue.or(leftValue, rightValue);
+            }
+            else {
+               throw new RuntimeException("Junctor '" + junctor + "' is not supported.");
+            }
+            // Style range for operator
+            Color color = getColor(junctorResult);
+            Range leftChildRange = positionTable.rangeForPath(path.append(0), textLength);
+            Range rightChildRange = positionTable.rangeForPath(path.append(1), textLength);
+            StyleRange styleRange = new StyleRange(leftChildRange.end(), 
+                                                   rightChildRange.start() - leftChildRange.end(), 
+                                                   color, 
+                                                   null);
+            termValueMap.put(term, junctorResult);
+            styleRanges.add(styleRange);
+            // Style range for additional space on the left (e.g. opening brackets)
+            Range junctorRange = positionTable.rangeForPath(path, textLength);
+            if (junctorRange.start() < leftChildRange.start()) {
+               StyleRange leftStyleRange = new StyleRange(junctorRange.start(), 
+                                                          leftChildRange.start() - junctorRange.start(), 
+                                                          color, 
+                                                          null);
+               styleRanges.add(leftStyleRange);
+            }
+            // Style range for additional space on the left (e.g. closing brackets)
+            if (junctorRange.end() > rightChildRange.end()) {
+               StyleRange leftStyleRange = new StyleRange(rightChildRange.end(), 
+                                                          junctorRange.end() - rightChildRange.end(), 
+                                                          color, 
+                                                          null);
+               styleRanges.add(leftStyleRange);
             }
          }
          else if (junctor.arity() == 1) {
             Term sub = term.sub(0);
-            List<StyleRange> subRanges = fillTermRanges(sub, positionTable, textPresentation, branchResult, textLength, highlightings, path.append(0));
-            if (subRanges != null) {
-               TermHighlighting high = highlightings.get(sub);
-               assert high != null;
-               PredicateValue junctorResult;
-               if (junctor == Junctor.NOT) {
-                  junctorResult = PredicateValue.not(high.getValue());
-               }
-               else {
-                  throw new RuntimeException("Junctor '" + junctor + "' is not supported.");
-               }
-               Color color = getColor(junctorResult);
-               Range range = positionTable.rangeForPath(path, textLength);
-               StyleRange styleRange = new StyleRange(range.start(), 
-                                                      high.getStart() - range.start(), 
-                                                      color, 
-                                                      null);
-               highlightings.put(term, new TermHighlighting(junctorResult, range.start(), high.getEnd()));
-               subRanges.add(0, styleRange);
-               return subRanges;
+            fillTermRanges(sub, positionTable, branchResult, textLength, termValueMap, path.append(0), styleRanges);
+            PredicateValue childValue = termValueMap.get(sub);
+            assert childValue != null;
+            PredicateValue junctorResult;
+            if (junctor == Junctor.NOT) {
+               junctorResult = PredicateValue.not(childValue);
             }
+            else {
+               throw new RuntimeException("Junctor '" + junctor + "' is not supported.");
+            }
+            Color color = getColor(junctorResult);
+            Range range = positionTable.rangeForPath(path, textLength);
+            Range childRange = positionTable.rangeForPath(path.append(0), textLength);
+            StyleRange styleRange = new StyleRange(range.start(), 
+                                                   childRange.start() - range.start(), 
+                                                   color, 
+                                                   null);
+            termValueMap.put(term, junctorResult);
+            styleRanges.add(styleRange);
          }
          else if (junctor.arity() == 0) {
             PredicateValue value;
@@ -235,14 +267,10 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
             Color color = getColor(value);
             Range range = positionTable.rangeForPath(path, textLength);
             StyleRange styleRange = new StyleRange(range.start(), range.length(), color, null);
-            highlightings.put(term, new TermHighlighting(value, styleRange.start, styleRange.start + styleRange.length));
-            List<StyleRange> lastRanges = new LinkedList<StyleRange>();
-            lastRanges.add(styleRange);
-            return lastRanges;
+            termValueMap.put(term, value);
+            styleRanges.add(styleRange);
          }
       }
-      // Term is not supported
-      return null;
    }
 
    /**
@@ -259,64 +287,6 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
       }
       else {
          return unknownColor;
-      }
-   }
-   
-   /**
-    * Utility class used by {@link EvaluationViewerDecorator#fillTermRanges(Term, PositionTable, TextPresentation, BranchResult, int, Map, ImmutableList)}
-    * to represent an already computed {@link Term} highlighting.
-    * @author Martin Hentschel
-    */
-   protected static class TermHighlighting {
-      /**
-       * The {@link PredicateValue}.
-       */
-      private final PredicateValue value;
-      
-      /**
-       * The start index.
-       */
-      private final int start;
-      
-      /**
-       * The end index.
-       */
-      private final int end;
-      
-      /**
-       * Constructor.
-       * @param value The {@link PredicateValue}.
-       * @param start The start index.
-       * @param end The end index.
-       */
-      public TermHighlighting(PredicateValue value, int start, int end) {
-         this.value = value;
-         this.start = start;
-         this.end = end;
-      }
-
-      /**
-       * Returns the {@link PredicateValue}.
-       * @return The {@link PredicateValue}.
-       */
-      public PredicateValue getValue() {
-         return value;
-      }
-
-      /**
-       * Returns the start index.
-       * @return The start index.
-       */
-      public int getStart() {
-         return start;
-      }
-
-      /**
-       * Returns the end index.
-       * @return The end index.
-       */
-      public int getEnd() {
-         return end;
       }
    }
 }
