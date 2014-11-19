@@ -159,15 +159,7 @@ public final class NotationInfo {
      */
     private HashMap<Object, Notation> notationTable;
 
-    /**
-     * Caches for the different kinds of notations.
-     * If a cache is yet unused, a shallow clone
-     * of the current notation table is produced and assigned to it.
-     */
-    private HashMap<Object, Notation> defaultNotationCache = null;
-    private HashMap<Object, Notation> fancyNotationCache = null;
-    private HashMap<Object, Notation> veryFancyNotationCache = null;
-    
+ 
     /**
      * Maps terms to abbreviations and reverse.
      */
@@ -184,7 +176,7 @@ public final class NotationInfo {
     //-------------------------------------------------------------------------    
 
     public NotationInfo() {
-    	createDefaultNotationTable();
+    	this.notationTable = createDefaultNotation();
     }
     
     
@@ -197,13 +189,9 @@ public final class NotationInfo {
     /** Register the standard set of notations (that can be defined without
      * a services object).
      */
-    private void createDefaultNotationTable() {
-        if (defaultNotationCache != null){
-            notationTable = defaultNotationCache;
-            return;
-        }
-    defaultNotationCache = new LinkedHashMap<Object,Notation>();
-    HashMap<Object,Notation> tbl = defaultNotationCache;
+    private HashMap<Object, Notation> createDefaultNotation() {
+
+    HashMap<Object,Notation> tbl = new LinkedHashMap<Object,Notation>();;
 	
 	tbl.put(Junctor.TRUE ,new Notation.Constant("true", PRIORITY_ATOM));
 	tbl.put(Junctor.FALSE,new Notation.Constant("false", PRIORITY_ATOM));
@@ -237,7 +225,7 @@ public final class NotationInfo {
 	
 	tbl.put(Sort.CAST_NAME, new Notation.CastFunction("(",")",PRIORITY_CAST, PRIORITY_BOTTOM));
 	tbl.put(TermLabel.class, new Notation.LabelNotation("<<", ">>", PRIORITY_LABEL));
-	this.notationTable = tbl;
+	return tbl;
     }
         
     
@@ -245,14 +233,9 @@ public final class NotationInfo {
      * Adds notations that can only be defined when a services object is 
      * available.
      */
-    @SuppressWarnings("unchecked")
-    private void addFancyNotations(Services services) {
-        if (fancyNotationCache != null){
-            notationTable = fancyNotationCache;
-            return;
-        }
-        fancyNotationCache = (HashMap<Object,Notation>) defaultNotationCache.clone();
-    HashMap<Object,Notation> tbl = fancyNotationCache; 
+    private HashMap<Object,Notation> createPrettyNotation(Services services) {
+
+    HashMap<Object,Notation> tbl = createDefaultNotation();
      
 	//arithmetic operators
 	final IntegerLDT integerLDT 
@@ -304,21 +287,16 @@ public final class NotationInfo {
 	tbl.put(charListLDT.getClCons(), new CharListNotation());
 	tbl.put(charListLDT.getClEmpty(), new Notation.Constant("\"\"",PRIORITY_BOTTOM));
 
-	this.notationTable = tbl;
+	return tbl;
     }
     
     /**
      * Add notations with Unicode symbols.
      * @param services
      */
-    @SuppressWarnings("unchecked")
-    private void addVeryFancyNotations(Services services){
-        if (veryFancyNotationCache != null){
-            notationTable = veryFancyNotationCache;
-            return;
-        }
-        veryFancyNotationCache = (HashMap<Object, Notation>) fancyNotationCache.clone();
-        HashMap<Object,Notation> tbl = veryFancyNotationCache;
+    private HashMap<Object,Notation> createUnicodeNotation(Services services){
+    
+        HashMap<Object,Notation> tbl = createPrettyNotation(services);
         
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();  
         final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
@@ -348,7 +326,7 @@ public final class NotationInfo {
         tbl.put(seqLDT.getSeqSingleton(), new Notation.SeqSingletonNotation(""+UnicodeHelper.SEQ_SINGLETON_L,""+UnicodeHelper.SEQ_SINGLETON_R));
 
         tbl.put(TermLabel.class, new Notation.LabelNotation(""+UnicodeHelper.FLQQ, ""+UnicodeHelper.FRQQ, PRIORITY_LABEL));
-        this.notationTable = tbl;
+        return tbl;
     }
 
 
@@ -363,13 +341,16 @@ public final class NotationInfo {
     public void refresh(Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         this.unicodeEnabled = useUnicodeSymbols;
         this.prettySyntax = usePrettyPrinting;
-        createDefaultNotationTable();
-        assert defaultNotationCache != null;
         if (usePrettyPrinting && services != null) {
-            addFancyNotations(services);
             if (useUnicodeSymbols) {
-                addVeryFancyNotations(services);
+               this.notationTable = createUnicodeNotation(services);
             }
+            else {
+               this.notationTable = createPrettyNotation(services);
+            }
+        }
+        else {
+           this.notationTable = createDefaultNotation();
         }
         hidePackagePrefix = DEFAULT_HIDE_PACKAGE_PREFIX;
     }
