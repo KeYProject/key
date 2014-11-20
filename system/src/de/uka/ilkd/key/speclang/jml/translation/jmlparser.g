@@ -407,15 +407,15 @@ decreasesclause returns [Term result = null] throws SLTranslationException
 
 requiresclause returns [Term result = null] throws SLTranslationException
 :
-    (REQUIRES|PRECONDITION|REQUIRES_RED|PRE_RED) result=predornot
-            { result = translator.translate("requires", Term.class, result, services); }
+    req:REQUIRES result=predornot
+            { result = translator.translate(req.getText(), Term.class, result, services); }
     ;
 
 
 ensuresclause returns [Term result = null] throws SLTranslationException
 :
-    (ENSURES|POST|ENSURES_RED|POST_RED) result=predornot
-            { result = translator.translate("ensures", Term.class, result, services); }
+    ens:ENSURES result=predornot
+            { result = translator.translate(ens.getText(), Term.class, result, services); }
     ;
 
 axiomsclause returns [Term result = null] throws SLTranslationException
@@ -561,7 +561,7 @@ signalsclause returns [Term result=null] throws SLTranslationException
     LogicVariable eVar = null;
 }
 :
-	(SIGNALS|EXSURES|SIGNALS_RED|EXSURES_RED) LPAREN excType=referencetype (id:IDENT { vName = id.getText(); })? RPAREN
+	sig:SIGNALS LPAREN excType=referencetype (id:IDENT { vName = id.getText(); })? RPAREN
 	{
 	    if (vName != null) {
 		eVar = new LogicVariable(new Name(vName), excType.getSort());
@@ -574,7 +574,7 @@ signalsclause returns [Term result=null] throws SLTranslationException
 	    if (vName != null) {
 		resolverManager.popLocalVariablesNamespace();
 	    }
-            result = translator.translate("signals", Term.class, result, eVar, excVar, excType, services);
+            result = translator.translate(sig.getText(), Term.class, result, eVar, excVar, excType, services);
 	}
     ;
 
@@ -585,12 +585,12 @@ throws SLTranslationException {
     KeYJavaType type = null;
 }
 :
-    (SIGNALS_ONLY|SIGNALS_ONLY_RED)
+    sigo:SIGNALS_ONLY
     (   NOTHING
       | type = referencetype { typeList = typeList.append(type); }
         (COMMA type = referencetype { typeList = typeList.append(type); })*
     )
-    { result = translator.translate("signals_only", Term.class, typeList, this.excVar, services); }
+    { result = translator.translate(sigo.getText(), Term.class, typeList, this.excVar, services); }
     ;
 
 

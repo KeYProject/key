@@ -52,30 +52,18 @@ tokens {
     DECREASES       = "decreases";
     DEPENDS         = "depends";  //KeY extension, deprecated?
     DETERMINES      = "determines";  //KeY extension, not official JML
-    DIVERGES        = "diverges";
-    DIVERGES_RED    = "diverges_redundantly";
     ENSURES         = "ensures";
-    ENSURES_RED     = "ensures_redundantly";
-    EXSURES         = "exsures";
-    EXSURES_RED     = "exsures_redundantly";
     LOOP_DETERMINES = "loop_determines";  //KeY extension, not official JML
     LOOP_SEPARATES  = "loop_separates";  //KeY extension, deprecated
     MODEL_METHOD_AXIOM    = "model_method_axiom";  //KeY extension, not official JML
     NON_NULL        = "non_null";
     NULLABLE        = "nullable";
-    POST            = "post";
-    POST_RED        = "post_redundantly";
-    PRECONDITION    = "pre";
-    PRE_RED         = "pre_redundantly";
     REPRESENTS      = "represents";
     REQUIRES        = "requires";
-    REQUIRES_RED    = "requires_redundantly";
     RETURNS         = "returns";  //KeY extension, not official JML
     SEPARATES       = "separates";  //KeY extension, not official JML
     SIGNALS         = "signals";
-    SIGNALS_RED     = "signals_redundantly";
     SIGNALS_ONLY    = "signals_only";
-    SIGNALS_ONLY_RED = "signals_only_redundantly";
 
     /* JML keywords prefixed with a backslash */
     ALLFIELDS            = "\\all_fields";  //KeY extension, not official JML
