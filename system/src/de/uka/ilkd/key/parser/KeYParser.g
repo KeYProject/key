@@ -572,20 +572,11 @@ options {
     private void addInclude(String filename, boolean relativePath, boolean ldt){
         RuleSource source=null;
         if (relativePath) {
-            int end = getSourceName().lastIndexOf(File.separator);
-            int start = 0;
-            filename = filename.replace('/', File.separatorChar);
-            filename = filename.replace('\\', File.separatorChar);
-            if(getSourceName().startsWith("file:")){
-                start = 5;
-            }
-            File path=new File(getSourceName().substring(start,end+1)+filename);
-            try{ 
-                source = RuleSourceFactory.initRuleFile(path.toURL()); 
-            }catch(java.net.MalformedURLException e){
-                System.err.println("Exception due to malformed URL of file "+
-                                   filename+"\n " +e);
-            }
+               filename = filename.replace('/', File.separatorChar); // Not required for Windows, but whatsoever
+               filename = filename.replace('\\', File.separatorChar); // Special handling for Linux
+               File parent = new File(getSourceName()).getParentFile();
+               File path = new File(parent, filename);
+               source = RuleSourceFactory.initRuleFile(path); 
         } else {
             source = RuleSourceFactory.fromBuildInRule(filename+".key"); 
         }
