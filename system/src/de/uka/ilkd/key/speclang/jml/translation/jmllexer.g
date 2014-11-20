@@ -49,8 +49,8 @@ tokens {
     ASSIGNABLE      = "assignable";
     BREAKS          = "breaks";
     CONTINUES       = "continues";
-    DECREASES       = "decreases";
-    DEPENDS         = "depends";  //KeY extension, deprecated?
+    DECREASES       = "decreases"; // internal translation for 'measured_by'
+    DEPENDS         = "depends";  // internal translation for 'accessible'
     DETERMINES      = "determines";  //KeY extension, not official JML
     ENSURES         = "ensures";
     LOOP_DETERMINES = "loop_determines";  //KeY extension, not official JML

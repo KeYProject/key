@@ -601,8 +601,8 @@ requires_clause
 
 requires_keyword
 :
-    REQUIRES |
-    REQUIRES_RED
+    REQUIRES | REQUIRES_RED | PRE | PRE_RED
+    
 ;
 
 
@@ -793,6 +793,7 @@ measured_by_clause
 @init { result = r; }
 @after { r = result; }
 :
+// TODO: this is confusing. why not keep 'measured_by'?
     measured_by_keyword result=expression { result = result.prepend("decreases "); }
 ;
 
@@ -816,8 +817,7 @@ ensures_clause
 
 ensures_keyword
 :
-	ENSURES
-    |   ENSURES_RED
+	ENSURES | ENSURES_RED | POST | POST_RED
 ;
 
 
