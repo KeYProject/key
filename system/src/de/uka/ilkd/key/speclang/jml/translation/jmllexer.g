@@ -74,7 +74,6 @@ tokens {
     BSUM                 = "\\bsum";  //KeY extension, not official JML
     BY                   = "\\by";
     CREATED              = "\\created";
-    CURRENT_MEMORY_AREA  = "\\currentMemoryArea"; //KeY extension, not official JML
     DECLASSIFIES         = "\\declassifies";
     DISJOINT             = "\\disjoint";
     DOMAIN_IMPLIES_CREATED = "\\domain_implies_created";
@@ -94,8 +93,6 @@ tokens {
     INV                  = "\\inv";
     INVARIANT_FOR        = "\\invariant_for";
     IN_DOMAIN            = "\\in_domain";
-    IN_IMMORTAL_MEMORY   = "\\inImmortalMemory"; //KeY extension, not official JML
-    IN_OUTER_SCOPE       = "\\inOuterScope"; //KeY extension, not official JML
     IS_FINITE            = "\\is_finite";
     IS_INITIALIZED       = "\\is_initialized";
     ITSELF               = "\\itself";
@@ -114,9 +111,7 @@ tokens {
     MAP_SIZE             = "\\map_size";
     MAP_UPDATE           =  "\\map_update";
     MAX                  = "\\max";
-    MAX_SPACE            = "\\max_space"; //KeY extension, not official JML
     MEASURED_BY          = "\\measured_by";
-    MEMORY_AREA          = "\\memoryArea"; //KeY extension, not official JML
     MIN                  = "\\min";
     NEWELEMSFRESH        = "\\new_elems_fresh";
     NEW_OBJECTS          = "\\new_objects";
@@ -128,16 +123,13 @@ tokens {
     NUM_OF               = "\\num_of";
     OLD                  = "\\old";
     OTHER                = "\\other";
-    OUTER_SCOPE          = "\\outerScope"; //KeY extension, not official JML
     PRE                  = "\\pre";
     PRIVATEDATA          = "\\private_data";
     PRODUCT              = "\\product";
     REACH                = "\\reach";
     REACHLOCS            = "\\reachLocs";
     REAL                 = "\\real";
-    REENTRANT_SCOPE      = "\\reentrantScope"; //KeY extension, not official JML
     RESULT               = "\\result";
-    RIGIDWORKINGSPACE    = "\\rigid_working_space"; //KeY extension, not official JML
     SAME                 = "\\same";
     SEQ                  = "\\seq";
     SEQ2MAP              = "\\seq_2_map";
