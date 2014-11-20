@@ -670,18 +670,23 @@ options {
       resetSkips();
     }  
 
-    public Term parseProblem() throws RecognitionException/*, 
-    				      TokenStreamException*/ {
-      resetSkips();
-      skipSorts(); 
-      skipFuncs();
-      skipTransformers();
-      skipPreds();
-      skipRuleSets();
-      //skipVars(); 
-      skipTaclets();
-      return problem();
-    }
+    public Term parseProblem() throws RecognitionException {
+        resetSkips();
+        skipSorts();
+        skipFuncs();
+        skipTransformers();
+        skipPreds();
+        skipRuleSets();
+        //skipVars();
+        skipTaclets();
+        Term result = problem();
+        // The parser may be ok if a totally unexpected token has turned up
+        // We better check that either the file has ended or a "\proof" follows.
+        if(input.LA(1) != EOF && input.LA(1) != PROOF) {
+            throw new NoViableAltException("after problem", -1, -1, input);
+        }
+        return result;
+      }
 
     public void parseIncludes() throws RecognitionException/*, 
     				        TokenStreamException*/ {
@@ -4472,7 +4477,7 @@ problem returns [ Term _problem = null ]
                    proofObligation = "";
                }
            }
-        )? EOF
+        )?
    ;
    
 bootClassPath returns [String _boot_class_path = null]

@@ -119,6 +119,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             throw new IllegalStateException("KeYUserProblemFile: InitConfig not set.");
         }
         
+        KeYParserF problemParser = null;
         try {
             CountingBufferedReader cinp = 
                 new CountingBufferedReader
@@ -130,37 +131,37 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             final ParserConfig schemaConfig 
                 = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
             
-            KeYParserF problemParser
-                    = new KeYParserF(ParserMode.PROBLEM,
+            problemParser = new KeYParserF(ParserMode.PROBLEM,
                                     lexer,
                                     schemaConfig, 
                                     normalConfig,
                                     initConfig.getTaclet2Builder(),
                                     initConfig.getTaclets()); 
+
             problemTerm = problemParser.parseProblem();
-            String searchS = "\\problem";
+
 	    if(problemTerm == null) {
 	       boolean chooseDLContract = problemParser.getChooseContract() != null;
           boolean proofObligation = problemParser.getProofObligation() != null;
-	       if(chooseDLContract) {
-  	         searchS = "\\chooseContract";
-	       }
-	       else if (proofObligation) {
-	            searchS = "\\proofObligation";
-	       }
-	       else {
+                if(!chooseDLContract && !proofObligation) {
 	         throw new ProofInputException(
 	                 "No \\problem or \\chooseContract or \\proofObligation in the input file!");
 	       }
-	       
 	    }
 
             problemHeader = problemParser.getProblemHeader();
-            // removed unnecessary check, keep it as assertion
-            assert problemHeader != null && problemHeader.lastIndexOf(searchS) == -1;
+            // removed unnecessary check, keep them as assertions. (MU, Nov 14)
+            assert problemHeader != null;
+            assert problemHeader.lastIndexOf("\\problem") == -1;
+            assert problemHeader.lastIndexOf("\\proofObligation") == -1;
+            assert problemHeader.lastIndexOf("\\chooseContract") == -1;
 
             initConfig.setTaclets(problemParser.getTaclets());
             lastParser = problemParser;
+        } catch(RecognitionException e) {
+            // problemParser cannot be null here
+            String message = problemParser.getErrorMessage(e);
+            throw new ProofInputException(message, e);
         } catch (Exception e) {
             throw new ProofInputException(e);
         }
