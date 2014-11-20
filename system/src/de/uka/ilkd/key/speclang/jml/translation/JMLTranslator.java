@@ -227,6 +227,7 @@ public final class JMLTranslator {
 
                     @Override
                     public JMLTranslationMethod get(Object key) {
+                        if (key == null) throw new IllegalArgumentException("null");
                         JMLTranslationMethod m = super.get(key);
                         if (m != null) {
                             return m;
