@@ -118,15 +118,13 @@ tokens {
     NOT_SPECIFIED        = "\\not_specified";
     NUM_OF               = "\\num_of";
     OLD                  = "\\old";
-    OTHER                = "\\other";  //KeY extension, not official JML
     PRE                  = "\\pre";
-    PRIVATEDATA          = "\\private_data";  //KeY extension, not official JML
     PRODUCT              = "\\product";
     REACH                = "\\reach";
     REACHLOCS            = "\\reachLocs";  //KeY extension, not official JML
     REAL                 = "\\real";
     RESULT               = "\\result";
-    SAME                 = "\\same";  //KeY extension, not official JML
+    SAME                 = "\\same";
     SEQ                  = "\\seq";  //KeY extension, not official JML
     SEQ2MAP              = "\\seq_2_map";  //KeY extension, not official JML
     SEQCONCAT            = "\\seq_concat";  //KeY extension, not official JML
