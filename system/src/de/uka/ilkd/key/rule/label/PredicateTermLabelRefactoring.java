@@ -15,6 +15,9 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.AbstractOperationPO;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
@@ -39,7 +42,7 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
     */
    @Override
    public RefactoringScope defineRefactoringScope(TermServices services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm) {
-      if (shouldRefactor(hint)) {
+      if (shouldRefactor(goal, hint)) {
          return RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE;
       }
       else {
@@ -49,13 +52,31 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
    
    /**
     * Checks if the given hint requires a refactoring.
+    * @param goal The {@link Goal}.
     * @param hint The hint to check.
     * @return {@code true} perform refactoring, {@code false} do not perform refactoring.
     */
-   protected boolean shouldRefactor(Object hint) {
-      return WhileInvariantRule.INITIAL_INVARIANT_ONLY_HINT.equals(hint) ||
+   protected boolean shouldRefactor(Goal goal, Object hint) {
+      if (goal != null) {
+         Proof proof = goal.proof();
+         if (WhileInvariantRule.INITIAL_INVARIANT_ONLY_HINT.equals(hint) ||
              WhileInvariantRule.FULL_INVARIANT_TERM_HINT.equals(hint) ||
-             UseOperationContractRule.FINAL_PRE_TERM_HINT.equals(hint);
+             UseOperationContractRule.FINAL_PRE_TERM_HINT.equals(hint)) {
+            ProofOblInput problem = proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+            if (problem instanceof AbstractOperationPO) {
+               return ((AbstractOperationPO) problem).isAddSymbolicExecutionLabel();
+            }
+            else {
+               return false;
+            }
+         }
+         else {
+            return false;
+         }
+      }
+      else {
+         return false;
+      }
    }
 
    /**
@@ -71,7 +92,7 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
                                Term tacletTerm, 
                                Term term, 
                                List<TermLabel> labels) {
-      if (shouldRefactor(hint)) {
+      if (shouldRefactor(goal, hint)) {
          if (isPredicate(term)) {
             TermLabel existingLabel = term.getLabel(PredicateTermLabel.NAME);
             if (existingLabel == null) {

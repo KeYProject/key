@@ -39,6 +39,69 @@ import de.uka.ilkd.key.ui.CustomUserInterface;
  */
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: examples/_testcase/set/allNodeTypesTest in the Java Profile
+    */
+   public void testAllNodeTypesTest_JavaProfile_NoOneStepSimplification() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/allNodeTypesTest/test/AllNodeTypesTest_VerificationProfile_NoOneStepSimplification.proof", 
+                "examples/_testcase/set/allNodeTypesTest/oracle/AllNodeTypesTest_VerificationProfile_NoOneStepSimplification.xml", 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/allNodeTypesTest in the Java Profile
+    */
+   public void testAllNodeTypesTest_JavaProfile() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/allNodeTypesTest/test/AllNodeTypesTest_VerificationProfile.proof", 
+                "examples/_testcase/set/allNodeTypesTest/oracle/AllNodeTypesTest_VerificationProfile.xml", 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/allNodeTypesTest in the Symbolic Execution Profile
+    */
+   public void testAllNodeTypesTest_SymbolicExecutionProfile() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/allNodeTypesTest/test/AllNodeTypesTest.proof", 
+                "examples/_testcase/set/allNodeTypesTest/oracle/AllNodeTypesTest.xml", 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false, 
+                false);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/loopStatementBlockTest
     */
    public void testLoopStatementBlockTest_nestedLoop() throws Exception {
