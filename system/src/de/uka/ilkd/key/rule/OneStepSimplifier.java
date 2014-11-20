@@ -33,6 +33,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -310,10 +311,10 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
      * @param protocol
      * @param services TODO
      */
-    private Term replaceKnownHelper(Map<Term,PosInOccurrence> map,
+    private Term replaceKnownHelper(Map<TermReplacementKey,PosInOccurrence> map,
                     Term in,
                     /*out*/ List<PosInOccurrence> ifInsts, Protocol protocol, TermServices services) {
-        final PosInOccurrence pos = map.get(in);
+        final PosInOccurrence pos = map.get(new TermReplacementKey(in));
         if(pos != null) {
             ifInsts.add(pos);
             if(protocol != null) {
@@ -356,7 +357,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
     private SequentFormula replaceKnown(
                     TermServices services,
                     SequentFormula cf,
-                    Map<Term,PosInOccurrence> context,
+                    Map<TermReplacementKey,PosInOccurrence> context,
                     /*out*/ List<PosInOccurrence> ifInsts,
                     Protocol protocol) {
         if(context == null) {
@@ -397,7 +398,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
                     Services services,
                     SequentFormula cf,
                     boolean inAntecedent,
-                    Map<Term,PosInOccurrence> context,
+                    Map<TermReplacementKey,PosInOccurrence> context,
                     /*out*/ List<PosInOccurrence> ifInsts,
                     Protocol protocol) {
         SequentFormula result = replaceKnown(services, cf, context, ifInsts, protocol);
@@ -430,19 +431,19 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
                     Sequent seq,
                     Protocol protocol) {
         //collect context formulas (potential if-insts for replace-known)
-        final Map<Term,PosInOccurrence> context
-            = new LinkedHashMap<Term,PosInOccurrence>();
+        final Map<TermReplacementKey,PosInOccurrence> context
+            = new LinkedHashMap<TermReplacementKey,PosInOccurrence>();
         for(SequentFormula ante : seq.antecedent()) {
             if(!ante.equals(cf) && ante.formula().op() != Junctor.TRUE) {
                 context.put(
-                                ante.formula(),
+                                new TermReplacementKey(ante.formula()),
                                 new PosInOccurrence(ante, PosInTerm.getTopLevel(), true));
             }
         }
         for(SequentFormula succ : seq.succedent()) {
             if(!succ.equals(cf) && succ.formula().op() != Junctor.FALSE) {
                 context.put(
-                                succ.formula(),
+                                new TermReplacementKey(succ.formula()),
                                 new PosInOccurrence(succ, PosInTerm.getTopLevel(), false));
             }
         }
@@ -661,5 +662,61 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
     @Override
     public OneStepSimplifierRuleApp createApp(PosInOccurrence pos, TermServices services) {
         return new OneStepSimplifierRuleApp(this, pos);
+    }
+    
+    /**
+     * Instances of this class are used in the {@link Map} of
+     * {@link OneStepSimplifier#replaceKnown(TermServices, SequentFormula, Map, List, Protocol)}
+     * to forece the same behavior as in Taclet rules where
+     * names of logical variables and {@link TermLabel}s are ignored.
+     * @author Martin Hentschel
+     */
+    private static class TermReplacementKey {
+       /**
+        * The {@link Term} to represent.
+        */
+       private final Term term;
+
+       /**
+        * Constructor.
+        * @param term The {@link Term} to represent.
+        */
+       public TermReplacementKey(Term term) {
+          assert term != null;
+          this.term = term;
+       }
+
+       /**
+        * {@inheritDoc}
+        */
+      @Override
+      public int hashCode() {
+         return term.op().hashCode(); // Allow more conflicts to ensure that naming and term labels are ignored.
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean equals(Object obj) {
+         if (obj instanceof TermReplacementKey) {
+            obj = ((TermReplacementKey) obj).term;
+         }
+         if (obj instanceof Term) {
+            Term t = (Term) obj;
+            return term.equalsModRenaming(t); // Ignore naming and term labels in the way a taclet rule does.
+         }
+         else {
+            return false;
+         }
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String toString() {
+         return term.toString();
+      }
     }
 }
