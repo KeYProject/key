@@ -1603,11 +1603,6 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 	    }
 	}
     |
-	CREATED LPAREN result=expression RPAREN
-	{
-		raiseNotSupported("\\created is deliberately not supported in this KeY version, you should not need it");
-	}
-    |
 	NONNULLELEMENTS LPAREN result=expression RPAREN
 	{
 	    t = result.getTerm();
