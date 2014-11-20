@@ -36,6 +36,7 @@ public final class JMLProfileManagement {
     * objects exists for an identifier.
     */
    private static Map<String, IJMLProfile> profileCache = new HashMap<String, IJMLProfile>();
+   private static Map<IJMLProfileProvider, IJMLProfile> providerCache = new HashMap<IJMLProfileProvider, IJMLProfile>();
 
    /**
     * Returns a set of all JML profiles which are available. The set may be
@@ -63,12 +64,21 @@ public final class JMLProfileManagement {
                if (profileO instanceof IJMLProfileProvider) {
                   // Load to profile
                   IJMLProfileProvider provider = (IJMLProfileProvider) profileO;
-                  try {
-                     IJMLProfile profile = provider.provideProfile();
+                  // Cache the profiles per provider bevause providing may be expensive
+                  IJMLProfile profile = providerCache.get(provider);
+                  if (profile == null) {
+                     try {
+                        profile = provider.provideProfile();
+                        profileO = profile;
+                        providerCache.put(provider, profile);
+                     }
+                     catch (CoreException e) {
+                        e.printStackTrace();
+                        throw new RuntimeException(
+                              "Failed to load profile from " + profileO, e);
+                     }
+                  } else {
                      profileO = profile;
-                  } catch (CoreException e) {
-                     e.printStackTrace();
-                     throw new RuntimeException("Failed to load profile from " + profileO, e);
                   }
                }
                if (profileO instanceof IJMLProfile) {
@@ -76,10 +86,12 @@ public final class JMLProfileManagement {
                   if (!profileCache.containsKey(profile.getIdentifier())) {
                      profileCache.put(profile.getIdentifier(), profile);
                      availableProfiles.add(profile);
-                  } else {
+                  }
+                  else {
                      // An object for this identifier has already been created
                      // reuse it from the cache and throw away the created one
-                     availableProfiles.add(profileCache.get(profile.getIdentifier()));
+                     availableProfiles.add(profileCache.get(profile
+                           .getIdentifier()));
                   }
                }
 

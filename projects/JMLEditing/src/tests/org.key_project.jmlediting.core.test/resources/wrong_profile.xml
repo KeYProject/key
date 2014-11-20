@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<profile name="JML Reference" id="org.key_project.jmlediting.profile.jmlref">
+<profile name="WrongProfile">
 	
 	<behavior_spec>
 		<keyword name="behavior"/>
 		<keyword name="behaviour"/>
 	</behavior_spec>
 	
-	<generic_spec keyword="ensures"/>
+	<generic_spec />
 </profile>
+	

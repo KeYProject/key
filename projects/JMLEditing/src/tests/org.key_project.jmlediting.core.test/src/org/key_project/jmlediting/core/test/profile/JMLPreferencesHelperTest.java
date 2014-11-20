@@ -24,6 +24,7 @@ public class JMLPreferencesHelperTest {
    
    @Test
    public void testSetDefaultProfile() {
+      assertTrue("No default profile returned but some was available", JMLPreferencesHelper.getDefaultJMLProfile() != null);
       IJMLProfile defaultProf = profiles.get(0);
       JMLPreferencesHelper.setDefaultJMLProfile(defaultProf);
       assertTrue("Default profile is not correct", JMLPreferencesHelper.getDefaultJMLProfile() == defaultProf);

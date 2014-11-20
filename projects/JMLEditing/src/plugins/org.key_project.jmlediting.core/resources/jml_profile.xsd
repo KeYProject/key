@@ -11,16 +11,20 @@
 	</xs:complexType>
 	
 	<xs:complexType name="behavior_spec">
-		<xs:element name="keyword" type="keyword" minOccurs="1"/> 
+		<xs:sequence>
+			<xs:element name="keyword" type="keyword" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>			
 	</xs:complexType>
 	
 	<xs:complexType name="profile">
-		<xs:attribute name="name" type="xs:string" use="required"/>
-		<xs:attribute name="id" type="xs:string" use="required"/>		
 		<xs:sequence>
-			<xs:element name="generic_spec" type="generic_spec"/>
+			<xs:element name="behavior_spec" type="behavior_spec" maxOccurs="unbounded"/>
+			<xs:element name="generic_spec" type="generic_spec" maxOccurs="unbounded"/>
 		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute name="id" type="xs:string" use="required"/>	
 	</xs:complexType>
 	
+	<xs:element name="profile" type="profile"/>
 	
 </xs:schema>

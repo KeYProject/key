@@ -1,17 +1,29 @@
-package org.key_project.jmlediting.core.profile.persistence;
+package org.key_project.jmlediting.core.profile.persistence.impl;
 
-import static org.key_project.jmlediting.core.profile.persistence.JMLProfileXMLConstants.*;
+import static org.key_project.jmlediting.core.profile.persistence.impl.JMLProfileXMLConstants.BEHAVIOR_SPEC;
+import static org.key_project.jmlediting.core.profile.persistence.impl.JMLProfileXMLConstants.GENERIC_SPEC;
+import static org.key_project.jmlediting.core.profile.persistence.impl.JMLProfileXMLConstants.ID;
+import static org.key_project.jmlediting.core.profile.persistence.impl.JMLProfileXMLConstants.KEYWORD;
+import static org.key_project.jmlediting.core.profile.persistence.impl.JMLProfileXMLConstants.NAME;
+import static org.key_project.jmlediting.core.profile.persistence.impl.JMLProfileXMLConstants.PROFILE;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 
 import org.key_project.jmlediting.core.profile.ConfigurableJMLProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.profile.persistence.AbstractJMLProfileXMLParser;
 import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorSpecification;
 import org.key_project.jmlediting.core.profile.syntax.IJMLGenericSpecification;
 import org.key_project.jmlediting.core.profile.syntax.impl.JMLBehaviorSpecification;
@@ -27,13 +39,17 @@ public class JMLProfileXMLParser extends AbstractJMLProfileXMLParser {
    
    
    @Override
-   public IJMLProfile parseProfile(InputSource source) throws IOException, SAXException, IllegalProfileXMLException {
+   public IJMLProfile parseProfile(InputSource source) throws IOException, SAXException {
       
       try {
          DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
          Document document = builder.parse(source);
-         Element wrapper = (Element) ensureSingleElement(document, PROFILE_WRAPPER);
-         Element profile = (Element) ensureSingleElement(wrapper, PROFILE);
+         SchemaFactory sf = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
+         Schema schema = sf.newSchema(new URL("platform:/plugin/org.key_project.jmlediting.core/resources/jml_profile.xsd"));
+         Validator validator = schema.newValidator();
+         validator.validate(new DOMSource(document));
+         
+         Element profile = (Element) ensureSingleElement(document, PROFILE);
          return parseProfile(profile);
       }
       catch (ParserConfigurationException e) {
@@ -42,65 +58,37 @@ public class JMLProfileXMLParser extends AbstractJMLProfileXMLParser {
       
    }
    
-   
-   protected IJMLProfile parseProfile(Element element) throws IllegalProfileXMLException {
-      if (!element.hasAttribute(NAME)) {
-         throw new IllegalProfileXMLException("profile definition required name attribute");
-      }
-      if (!element.hasAttribute(ID)) {
-         throw new IllegalProfileXMLException("profile definition required id attribute");
-      }
-      
-      
+   protected IJMLProfile parseProfile(Element element)  {
       final ConfigurableJMLProfile profile = new ConfigurableJMLProfile(element.getAttribute(NAME), element.getAttribute(ID));
-      
       for (Node node : new NodeListIterable(element.getElementsByTagName(GENERIC_SPEC))) {
          profile.addSupportGeneric(parseGenericSpecification((Element) node));
       }
       for (Node node : new NodeListIterable(element.getElementsByTagName(BEHAVIOR_SPEC))) {
          profile.addSupportedBehavior(parseBehaviorSpecification((Element) node));
       }
-      
       return profile;
    }
    
-   protected IJMLBehaviorSpecification parseBehaviorSpecification(Element element) throws IllegalProfileXMLException {
+   protected IJMLBehaviorSpecification parseBehaviorSpecification(Element element)  {
       Set<String> keywords = new HashSet<String>();
       for (Node node : new NodeListIterable(element.getElementsByTagName(KEYWORD))) {
          keywords.add(parseKeyword((Element) node));
-      }
-      
+      }  
       return new JMLBehaviorSpecification(keywords);
    }
    
-   protected String parseKeyword(Element element) throws IllegalProfileXMLException {
+   protected String parseKeyword(Element element) {
       return element.getAttribute(NAME);
    }
    
-   protected IJMLGenericSpecification parseGenericSpecification(Element element) throws IllegalProfileXMLException{
-      if (!element.hasAttribute(KEYWORD)) {
-         throw new IllegalProfileXMLException("generic_spec definition does not contain the keyword attribute");
-      }
+   protected IJMLGenericSpecification parseGenericSpecification(Element element) {
       String keyword = element.getAttribute(KEYWORD);
-      if (keyword.length() == 0) {
-         throw new IllegalProfileXMLException("keyword for generic_spec definition is empty");
-      }
       return new JMLGenericSpecification(keyword);
    }
    
-   private static Node ensureSingleElement(Element elem, String name) throws IllegalProfileXMLException{
-      NodeList list = elem.getElementsByTagName(name);
-      if (list.getLength() != 1) {
-         throw new IllegalProfileXMLException("Excatly one element of name " + name + " is required");
-      }
-      return list.item(0);
-   }
    
-   private static Node ensureSingleElement(Document elem, String name) throws IllegalProfileXMLException{
+   private static Node ensureSingleElement(Document elem, String name) {
       NodeList list = elem.getElementsByTagName(name);
-      if (list.getLength() != 1) {
-         throw new IllegalProfileXMLException("Excatly one element of name " + name + " is required");
-      }
       return list.item(0);
    }
 

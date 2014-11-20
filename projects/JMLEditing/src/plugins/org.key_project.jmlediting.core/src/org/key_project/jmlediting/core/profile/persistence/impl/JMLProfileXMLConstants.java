@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.core.profile.persistence;
+package org.key_project.jmlediting.core.profile.persistence.impl;
 
 public final class JMLProfileXMLConstants {
    

@@ -1,5 +1,7 @@
 package org.key_project.jmlediting.ui.preferencepages;
 
+import java.util.NoSuchElementException;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -190,14 +192,15 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       // Read from global preferences if no project specific profile is set
       if (currentProfile == null) {
          // Gobal preferences
+         try {
          currentProfile = JMLPreferencesHelper.getDefaultJMLProfile();
+         } catch (NoSuchElementException e) {
+            this.setErrorMessage("No JML Profile available");
+            return;
+         }
 
       }
       
-      //if no profile found, use the first one if available
-      if (currentProfile == null && this.allProfiles.size() > 0) {
-         currentProfile = this.allProfiles.get(0);
-      }
       // Select profile in the list
       this.profilesList.deselectAll();
       if (currentProfile != null) {

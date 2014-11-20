@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<profile name="JML Reference" id="org.key_project.jmlediting.profile.jmlref">
+<profile name="TestProfile1" id="org.key_project.jmlediting.core.test.profile1">
 	
 	<behavior_spec>
 		<keyword name="behavior"/>

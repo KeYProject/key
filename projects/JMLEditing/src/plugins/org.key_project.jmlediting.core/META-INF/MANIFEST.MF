@@ -18,4 +18,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.jmlediting.core.profile,
+ org.key_project.jmlediting.core.profile.persistence,
  org.key_project.jmlediting.core.profile.syntax

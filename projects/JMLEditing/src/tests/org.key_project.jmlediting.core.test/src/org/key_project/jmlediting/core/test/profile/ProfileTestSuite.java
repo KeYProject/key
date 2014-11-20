@@ -7,7 +7,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
    JMLProfileManagementTest.class,
-   JMLPreferencesHelperTest.class
+   JMLPreferencesHelperTest.class,
+   XMLParserTest.class
 })
 public class ProfileTestSuite {
 

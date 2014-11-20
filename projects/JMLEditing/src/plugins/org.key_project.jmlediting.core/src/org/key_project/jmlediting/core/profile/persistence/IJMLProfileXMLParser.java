@@ -11,8 +11,8 @@ import org.xml.sax.SAXException;
 
 public interface IJMLProfileXMLParser {
 
-   IJMLProfile parseProfile(URI uri) throws MalformedURLException, IOException, SAXException, IllegalProfileXMLException;
-   IJMLProfile parseProfile(File file) throws IOException, SAXException, IllegalProfileXMLException;
-   IJMLProfile parseProfile(InputSource source) throws IOException, SAXException, IllegalProfileXMLException;
+   IJMLProfile parseProfile(URI uri) throws MalformedURLException, IOException, SAXException;
+   IJMLProfile parseProfile(File file) throws IOException, SAXException;
+   IJMLProfile parseProfile(InputSource source) throws IOException, SAXException;
    
 }
