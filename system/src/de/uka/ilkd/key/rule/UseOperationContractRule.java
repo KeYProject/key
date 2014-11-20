@@ -337,6 +337,16 @@ public final class UseOperationContractRule implements BuiltInRule {
 	                          TB.getBaseHeap(), anonHeap);
     }
 
+    /**
+     * Construct a free postcondition for the given method,
+     * i.e., a postcondition that is always true as guaranteed by the Java language
+     * and is not required to be checked by the callee.
+     * For constructors, it states that the self term is created and not null in the poststate
+     * and it has not been created in the prestate.
+     * For regular methods, it states that the return value is in range,
+     * meaning created or null for reference types, inInt(), etc., for integer types,
+     * and for location sets containing only locations that belong to created objects.
+     */
     private static Term getFreePost(List<LocationVariable> heapContext, IProgramMethod pm,
 	    		     	    KeYJavaType kjt,
 	    		     	    Term resultTerm,

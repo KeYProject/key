@@ -213,6 +213,7 @@ lexer grammar KeYLexer;
 	TERM : '\\term';
 	UPDATE : '\\update';
 	VARIABLES : '\\variables';
+	VARIABLE : '\\variable';
 	SKOLEMTERM : '\\skolemTerm';
 	SKOLEMFORMULA : '\\skolemFormula';
 	TERMLABEL : '\\termlabel';

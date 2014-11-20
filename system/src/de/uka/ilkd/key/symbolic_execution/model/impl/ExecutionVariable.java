@@ -25,11 +25,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -164,7 +161,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
             siteProofCondition = tb.and(siteProofCondition, getAdditionalCondition());
          }
          if (getParentValue() != null || SymbolicExecutionUtil.isStaticVariable(getProgramVariable())) {
-            siteProofSelectTerm = createSelectTerm(services);
+            siteProofSelectTerm = createSelectTerm();
             if (getParentValue() != null) { // Is null at static variables
                siteProofCondition = tb.and(siteProofCondition, getParentValue().getCondition());
             }
@@ -315,42 +312,11 @@ public class ExecutionVariable extends AbstractExecutionVariable {
    }
    
    /**
-    * Creates recursive a term which can be used to determine the value
-    * of {@link #getProgramVariable()}.
-    * @param services The {@link Services} to use.
-    * @return The created term.
+    * {@inheritDoc}
     */
-   protected Term createSelectTerm(Services services) {
-      if (SymbolicExecutionUtil.isStaticVariable(getProgramVariable())) {
-         // Static field access
-         Function function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)getProgramVariable(), services);
-         return services.getTermBuilder().staticDot(getProgramVariable().sort(), function);
-      }
-      else {
-         if (getParentValue() == null) {
-            // Direct access to a variable, so return it as term
-            return services.getTermBuilder().var((ProgramVariable)getProgramVariable());
-         }
-         else {
-            Term parentTerm = getParentValue().getVariable().createSelectTerm(services);
-            if (getProgramVariable() != null) {
-               if (services.getJavaInfo().getArrayLength() == getProgramVariable()) {
-                  // Special handling for length attribute of arrays
-                  Function function = services.getTypeConverter().getHeapLDT().getLength();
-                  return services.getTermBuilder().func(function, parentTerm);
-               }
-               else {
-                  // Field access on the parent variable
-                  Function function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)getProgramVariable(), services);
-                  return services.getTermBuilder().dot(getProgramVariable().sort(), parentTerm, function);
-               }
-            }
-            else {
-               // Special handling for array indices.
-               return services.getTermBuilder().dotArr(parentTerm, getArrayIndex());
-            }
-         }
-      }
+   @Override
+   public Term createSelectTerm() {
+      return SymbolicExecutionUtil.createSelectTerm(this);
    }
 
    /**

@@ -1922,7 +1922,7 @@ one_schema_var_decl
   | (    TERM
          { mods = new SchemaVariableModifierSet.TermSV (); }
          ( schema_modifiers[mods] ) ?
-      | (VARIABLES
+      | ( (VARIABLES | VARIABLE)
          { makeVariableSV = true; }
          { mods = new SchemaVariableModifierSet.VariableSV (); }
          ( schema_modifiers[mods] ) ?)

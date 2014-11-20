@@ -323,10 +323,6 @@ public final class HeapLDT extends LDT {
         return heaps;
     }
 
-    public ImmutableList<LocationVariable> getAllHeaps(Services services) {
-        return heaps;
-    }
-
     public LocationVariable getHeapForName(Name name) {
         for (LocationVariable h : getAllHeaps()) {
             if (h.name().equals(name)) {
@@ -367,7 +363,7 @@ public final class HeapLDT extends LDT {
 	    } else {
 		    if(fieldPV.isModel()) {
 			int heapCount = 0;
-			for(LocationVariable heap : getAllHeaps(services)) {
+			for(LocationVariable heap : getAllHeaps()) {
 			   if(heap == getSavedHeap()) {
 			      continue;
 			   }
