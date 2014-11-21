@@ -62,6 +62,7 @@ lexer grammar KeYJMLPreLexer;
 	CONTINUES			: 'continues';
 	CONTINUE_BEHAVIOR 	: 'continue_behavior';
     CONTINUE_BEHAVIOUR 	: 'continue_behaviour';
+    DEBUG   : 'debug';
     DECREASES  			: 'decreases';
     DECREASES_REDUNDANTLY  	: 'decreases_redundantly';
     DECREASING  		: 'decreasing';

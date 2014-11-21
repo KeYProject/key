@@ -250,6 +250,7 @@ methodlevel_element[ImmutableList<String> mods]
     |   result=assert_statement[mods]
     |   result=assume_statement[mods]
     |   result=nowarn_pragma[mods]
+    |   result=debug_statement[mods]
     |   result=block_specification[mods]
 ;
 
@@ -1271,6 +1272,17 @@ nowarn_pragma[ImmutableList<String> mods]
     }
 ;
 
+
+debug_statement[ImmutableList<String> mods]
+  returns [ImmutableList<TextualJMLConstruct> result = null]
+  throws SLTranslationException
+:
+    DEBUG ps=expression
+    {
+  raiseNotSupported("debug statements");
+  result = ImmutableSLList.<TextualJMLConstruct>nil();
+    }
+;
 
 
 //-----------------------------------------------------------------------------
