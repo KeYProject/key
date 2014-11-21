@@ -315,6 +315,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
      */
     private Term replaceKnownHelper(Map<TermReplacementKey,PosInOccurrence> map,
                                     Term in,
+                                    boolean inAntecedent,
                                     /*out*/ List<PosInOccurrence> ifInsts, 
                                     Protocol protocol, 
                                     Services services,
@@ -323,7 +324,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
         if(pos != null) {
             ifInsts.add(pos);
             if(protocol != null) {
-                protocol.add(makeReplaceKnownTacletApp(in, pos));
+                protocol.add(makeReplaceKnownTacletApp(in, inAntecedent, pos));
             }
             Term result = pos.isInAntec() ? services.getTermBuilder().tt() : services.getTermBuilder().ff();
             ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(services, 
@@ -349,7 +350,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
             Term[] subs = new Term[in.arity()];
             boolean changed = false;
             for(int i = 0; i < subs.length; i++) {
-                subs[i] = replaceKnownHelper(map, in.sub(i), ifInsts, protocol, services, goal);
+                subs[i] = replaceKnownHelper(map, in.sub(i), inAntecedent, ifInsts, protocol, services, goal);
                 if(subs[i] != in.sub(i)) {
                     changed = true;
                 }
@@ -378,6 +379,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
     private SequentFormula replaceKnown(
                     Services services,
                     SequentFormula cf,
+                    boolean inAntecedent,
                     Map<TermReplacementKey,PosInOccurrence> context,
                     /*out*/ List<PosInOccurrence> ifInsts,
                     Protocol protocol,
@@ -387,7 +389,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
         }
         final Term formula = cf.formula();
         final Term simplifiedFormula
-            = replaceKnownHelper(context, formula, ifInsts, protocol, services, goal);
+            = replaceKnownHelper(context, formula, inAntecedent, ifInsts, protocol, services, goal);
         if(simplifiedFormula.equals(formula)) {
             return null;
         } else {
@@ -395,7 +397,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
         }
     }
 
-    private RuleApp makeReplaceKnownTacletApp(Term formula, PosInOccurrence pio) {
+    private RuleApp makeReplaceKnownTacletApp(Term formula, boolean inAntecedent, PosInOccurrence pio) {
         FindTaclet taclet;
         if(pio.isInAntec()) {
             taclet = (FindTaclet) lastProof.getInitConfig().lookupActiveTaclet(new Name("replace_known_left"));
@@ -405,9 +407,12 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
 
         SVInstantiations svi = SVInstantiations.EMPTY_SVINSTANTIATIONS;
         FormulaSV sv = SchemaVariableFactory.createFormulaSV(new Name("b"));
-        svi.add(sv, formula, lastProof.getServices());
+        svi.add(sv, pio.constrainedFormula().formula(), lastProof.getServices());
 
-        TacletApp ta = PosTacletApp.createPosTacletApp(taclet, svi, pio, lastProof.getServices());
+        PosInOccurrence applicatinPIO = new PosInOccurrence(new SequentFormula(formula), 
+                                                            PosInTerm.getTopLevel(), // TODO: This should be the precise sub term
+                                                            inAntecedent); // It is required to create a new PosInOccurrence because formula and pio.constrainedFormula().formula() are only equals module renamings and term labels
+        TacletApp ta = PosTacletApp.createPosTacletApp(taclet, svi, applicatinPIO, lastProof.getServices());
         return ta;
     }
 
@@ -424,7 +429,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
                     /*out*/ List<PosInOccurrence> ifInsts,
                     Protocol protocol,
                     Goal goal) {
-        SequentFormula result = replaceKnown(services, cf, context, ifInsts, protocol, goal);
+        SequentFormula result = replaceKnown(services, cf, inAntecedent, context, ifInsts, protocol, goal);
         if(result != null) {
             return result;
         }
@@ -449,14 +454,14 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
      * @param protocol
      */
     private Instantiation computeInstantiation(Services services,
-                    SequentFormula cf,
-                    boolean inAntecedent,
-                    Sequent seq,
-                    Protocol protocol,
-                    Goal goal) {
+                                               PosInOccurrence ossPIO,
+                                               Sequent seq,
+                                               Protocol protocol,
+                                               Goal goal) {
         //collect context formulas (potential if-insts for replace-known)
         final Map<TermReplacementKey,PosInOccurrence> context
             = new LinkedHashMap<TermReplacementKey,PosInOccurrence>();
+        final SequentFormula cf = ossPIO.constrainedFormula();
         for(SequentFormula ante : seq.antecedent()) {
             if(!ante.equals(cf) && ante.formula().op() != Junctor.TRUE) {
                 context.put(
@@ -480,7 +485,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
         while(true) {
             simplifiedCf = simplifyConstrainedFormula(services,
                             simplifiedCf,
-                            inAntecedent,
+                            ossPIO.isInAntec(),
                             context,
                             ifInsts,
                             protocol,
@@ -577,13 +582,11 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
         Protocol protocol = new Protocol();
 
         // get instantiation
-        final Instantiation inst
-            = computeInstantiation(services,
-                    pos.constrainedFormula(),
-                    pos.isInAntec(),
-                    goal.sequent(),
-                    protocol,
-                    goal);
+        final Instantiation inst = computeInstantiation(services,
+                                                        pos,
+                                                        goal.sequent(),
+                                                        protocol,
+                                                        goal);
 
         ((OneStepSimplifierRuleApp)ruleApp).setProtocol(protocol);
 
