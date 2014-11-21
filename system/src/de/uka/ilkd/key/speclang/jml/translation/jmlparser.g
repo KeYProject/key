@@ -1919,7 +1919,7 @@ quantifier returns [Token token = null] :
   | PRODUCT
   | SUM
   )
-    { token = LT(-1); }
+    { token = LT(0); }
   ;
 
 specquantifiedexpression returns [SLExpression result = null] throws SLTranslationException

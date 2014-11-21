@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.rule.tacletbuilder.InfFlowMethodContractTacletBuilder;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +77,7 @@ import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.InfFlowMethodContractTacletBuilder;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
@@ -333,6 +333,16 @@ public final class UseOperationContractRule implements BuiltInRule {
 	                          TB.getBaseHeap(), anonHeap);
     }
 
+    /**
+     * Construct a free postcondition for the given method,
+     * i.e., a postcondition that is always true as guaranteed by the Java language
+     * and is not required to be checked by the callee.
+     * For constructors, it states that the self term is created and not null in the poststate
+     * and it has not been created in the prestate.
+     * For regular methods, it states that the return value is in range,
+     * meaning created or null for reference types, inInt(), etc., for integer types,
+     * and for location sets containing only locations that belong to created objects.
+     */
     private static Term getFreePost(List<LocationVariable> heapContext, IProgramMethod pm,
 	    		     	    KeYJavaType kjt,
 	    		     	    Term resultTerm,
@@ -870,7 +880,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         preGoal.changeFormula(new SequentFormula(finalPreTerm),
                               ruleApp.posInOccurrence());
 
-        TermLabelManager.refactorLabels(services, ruleApp.posInOccurrence(), this, preGoal, null);
+        TermLabelManager.refactorLabels(services, ruleApp.posInOccurrence(), this, preGoal, null, null);
 
         //create "Post" branch
 	final StatementBlock resultAssign;
@@ -941,7 +951,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         	                   ruleApp.posInOccurrence());
         }
 
-        TermLabelManager.refactorLabels(services, ruleApp.posInOccurrence(), this, nullGoal, null);
+        TermLabelManager.refactorLabels(services, ruleApp.posInOccurrence(), this, nullGoal, null, null);
 
 
 

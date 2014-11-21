@@ -232,7 +232,7 @@ public final class JMLTranslator {
                         if (m != null) {
                             return m;
                         } else {
-                            throw new IllegalArgumentException(key.toString());
+                            throw new IllegalArgumentException(key == null ? "(null)" : key.toString());
                         }
                     }
                 };
@@ -1771,11 +1771,7 @@ public final class JMLTranslator {
             JMLKeyWord jmlKeyWord = JMLKeyWord.jmlValueOf(jmlKeyWordName);
             JMLTranslationMethod m = translationMethods.get(jmlKeyWord);
             if (m == null) {
-                throw excManager.createException(
-                        "Unknown JML-keyword or unknown translation for "
-                        + "JML-keyword \"" + jmlKeyWordName
-                        + "\". The keyword seems "
-                        + "not to be supported yet.");
+                throw new IllegalArgumentException();
             }
             Object result = m.translate(excManager, params);
             resultClass.cast(result);
@@ -2483,7 +2479,10 @@ public final class JMLTranslator {
         return translateToJDLTerm(t, functName, services, tb, list, excManager);
     }
 
-    /** Provide restriction terms for the declared KeYJavaType */
+    /** Provide restriction terms for the declared KeYJavaType 
+     *  Note that these restrictions only apply to the JML to DL translation.
+     *  See also {@link TermBuilder#reachableValue(Term, KeYJavaType)}. 
+     */
     protected Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<? extends QuantifiableVariable> qvs, Services services) {
         final Type type = kjt.getJavaType();
         final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
