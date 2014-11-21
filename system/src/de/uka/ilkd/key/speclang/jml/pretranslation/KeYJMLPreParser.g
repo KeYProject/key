@@ -1450,6 +1450,11 @@ assert_statement[ImmutableList<String> mods]
     {
 	result = ImmutableSLList.<TextualJMLConstruct>nil().append(TextualJMLSpecCase.assert2blockContract(mods,ps));
     }
+    |
+    UNREACHABLE
+    {
+  result = ImmutableSLList.<TextualJMLConstruct>nil().append(TextualJMLSpecCase.assert2blockContract(mods,new PositionedString("false")));
+    }
 ;
 
 

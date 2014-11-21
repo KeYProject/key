@@ -50,10 +50,10 @@ tokens {
     BREAKS          = "breaks";
     CONTINUES       = "continues";
     DECREASES       = "decreases"; // internal translation for 'measured_by'
-    DEPENDS         = "depends";  // internal translation for 'accessible'
+    DEPENDS         = "depends";  // internal translation for 'accessible' on model fields
     DETERMINES      = "determines";  //KeY extension, not official JML
     ENSURES         = "ensures";
-    LOOP_DETERMINES = "loop_determines";  //KeY extension, not official JML
+    LOOP_DETERMINES = "loop_determines";  // internal translation for 'determines' in loop invariants
     LOOP_SEPARATES  = "loop_separates";  //KeY extension, deprecated
     MODEL_METHOD_AXIOM    = "model_method_axiom";  //KeY extension, not official JML
     NON_NULL        = "non_null";

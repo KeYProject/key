@@ -155,6 +155,7 @@ lexer grammar KeYJMLPreLexer;
     TRANSIENT 			: 'transient';
     TWO_STATE			: 'two_state' ;
     UNINITIALIZED 		: 'uninitialized';
+    UNREACHABLE   : 'unreachable';
     VOLATILE 			: 'volatile';
     WHEN 			: 'when';
     WHEN_RED 			: 'when_redundantly';
