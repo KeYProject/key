@@ -36,7 +36,6 @@ options {
   import de.uka.ilkd.key.parser.SchemaVariableModifierSet;
   import de.uka.ilkd.key.parser.UnfittingReplacewithException;
   import de.uka.ilkd.key.parser.ParserMode;
-  import de.uka.ilkd.key.parser.DeclPicker;
   import de.uka.ilkd.key.parser.IdDeclaration;
   import de.uka.ilkd.key.parser.ParserConfig;
 
@@ -157,6 +156,7 @@ options {
 
    private String chooseContract = null;
    private String proofObligation = null;
+   private String problemHeader = null;
     
    private int savedGuessing = -1;
    
@@ -180,7 +180,6 @@ options {
    private JavaReader javaReader;
 
    // if this is used then we can capture parts of the input for later use
-   private DeclPicker capturer = null;
    private IProgramMethod pm = null;
 
    private LinkedHashMap<RuleKey, Taclet> taclets = new LinkedHashMap<RuleKey, Taclet>();
@@ -289,9 +288,6 @@ options {
                      HashMap taclet2Builder,
                      ImmutableSet<Taclet> taclets) { 
         this(lexer, null, null, mode);
-        if (lexer instanceof DeclPicker) {
-            this.capturer = (DeclPicker) lexer;
-        }
         if (normalConfig!=null)
         scm = new AbbrevMap();
         this.schemaConfig = schemaConfig;
@@ -309,9 +305,6 @@ options {
 
     public KeYParser(ParserMode mode, TokenStream lexer) {
         this(lexer, null, null, mode);
-        if (lexer instanceof DeclPicker) {
-            this.capturer = (DeclPicker) lexer;
-        }
         scm = new AbbrevMap();
         this.schemaConfig = null;
         this.normalConfig = null;       
@@ -354,6 +347,9 @@ options {
     
     public String getProofObligation() {
         return proofObligation;
+    }
+    public String getProblemHeader() {
+        return problemHeader;
     }
     
     public String getProfileName() {
@@ -665,18 +661,23 @@ options {
       resetSkips();
     }  
 
-    public Term parseProblem() throws RecognitionException/*, 
-    				      TokenStreamException*/ {
-      resetSkips();
-      skipSorts(); 
-      skipFuncs();
-      skipTransformers();
-      skipPreds();
-      skipRuleSets();
-      //skipVars(); 
-      skipTaclets();
-      return problem();
-    }
+    public Term parseProblem() throws RecognitionException {
+        resetSkips();
+        skipSorts();
+        skipFuncs();
+        skipTransformers();
+        skipPreds();
+        skipRuleSets();
+        //skipVars();
+        skipTaclets();
+        Term result = problem();
+        // The parser may be ok if a totally unexpected token has turned up
+        // We better check that either the file has ended or a "\proof" follows.
+        if(input.LA(1) != EOF && input.LA(1) != PROOF) {
+            throw new NoViableAltException("after problem", -1, -1, input);
+        }
+        return result;
+      }
 
     public void parseIncludes() throws RecognitionException/*, 
     				        TokenStreamException*/ {
@@ -835,8 +836,7 @@ options {
         }
 
         if ( result == null && !("length".equals(attributeName)) ) {
-            throw new NotDeclException ("Attribute ", attributeName,
-                getSourceName(), getLine(), getColumn());
+            throw new NotDeclException (input, "Attribute ", attributeName);
         }
         return result;
     }
@@ -1130,12 +1130,10 @@ options {
         // not found
         if (args==null) {
             throw new NotDeclException
-                ("(program) variable or constant", varfunc_name,
-                 getSourceName(), getLine(), getColumn());
+                (input, "(program) variable or constant", varfunc_name);
         } else {
             throw new NotDeclException
-                ("function or static query", varfunc_name,
-                 getSourceName(), getLine(), getColumn());
+                (input, "function or static query", varfunc_name);
         }
     }
 
@@ -1593,8 +1591,7 @@ activated_choice @init{
         name = cat.getText()+":"+choice_.getText();
         c = (Choice) choices().lookup(new Name(name));
         if(c==null){
-            throw new NotDeclException("Option", choice_.getText(),
-                                       getSourceName(), choice_.getLine(), choice_.getCharPositionInLine());
+            throw new NotDeclException(input, "Option", choice_.getText());
         }else{
             activatedChoices=activatedChoices.add(c);
         }
@@ -2368,11 +2365,7 @@ any_sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> result = null
             if(checkSort) {
                 s = lookupSort(name);
                 if(s == null) {
-                  throw new NotDeclException("sort", 
-                                           name, 
-                                           getSourceName(), 
-                                           getLine(),  
-                                           getColumn()); 
+                  throw new NotDeclException(input, "sort", name);
                 }
             }
             
@@ -2775,10 +2768,7 @@ staticAttributeOrQueryReference returns [String attrReference = ""]
         {   KeYJavaType kjt = null;
             kjt = getTypeByClassName(attrReference);
             if (kjt == null) {
-                throw new NotDeclException
-                    ("Class " + attrReference + " is unknown.", 
-                     attrReference, getSourceName(), getLine(), 
-                     getColumn());
+                throw new NotDeclException(input, "Class", attrReference);
             }	        
             attrReference = kjt.getSort().name().toString();            
             match(input, DOT, null);
@@ -2869,10 +2859,7 @@ querySuffix [Term prefix, String memberName] returns [Term result = null]
        }
        KeYJavaType kjt = getTypeByClassName(classRef);
        if(kjt == null)
-          throw new NotDeclException
-             ("Class " + classRef + " is unknown.", 
-              classRef, getSourceName(), getLine(), 
-              getColumn());
+          throw new NotDeclException(input, "Class", classRef);
        classRef = kjt.getFullName();
 
        result = getServices().getJavaInfo().getProgramMethodTerm
@@ -3147,10 +3134,8 @@ abbreviation returns [Term _abbreviation=null]
             {
                 a =  scm.getTerm(sc);
                 if(a==null){
-                    throw new NotDeclException
-                        ("abbreviation", sc, 
-                         getSourceName(), getLine(), getColumn());
-                }                                
+                    throw new NotDeclException(input, "abbreviation", sc);
+                }
             }
         )
     ;
@@ -3555,8 +3540,7 @@ varId returns [ParsableVariable v = null]
         {   
             v = (ParsableVariable) variables().lookup(new Name(id.getText()));
             if (v == null) {
-                throw new NotDeclException("variable", id.getText(), 
-                                           getSourceName(), id.getLine(), id.getCharPositionInLine());
+                throw new NotDeclException(input, "variable", id.getText());
             }
         } 
   ;
@@ -4203,8 +4187,7 @@ option returns [Choice c=null]
         {
             c = (Choice) choices().lookup(new Name(cat.getText()+":"+choice_.getText()));
             if(c==null) {
-                throw new NotDeclException
-			("Option", choice_.getText(), getSourceName(), choice_.getLine(), choice_.getCharPositionInLine());
+                throw new NotDeclException(input, "Option", choice_.getText());
 	    }
         }
     ;
@@ -4288,7 +4271,7 @@ ruleset[Vector rs]
         {   
             RuleSet h = (RuleSet) ruleSets().lookup(new Name(id.getText()));
             if (h == null) {
-                throw new NotDeclException("ruleset", id.getText(), getSourceName(), id.getLine(), id.getCharPositionInLine());
+                throw new NotDeclException(input, "ruleset", id.getText());
             }
             rs.add(h);
         }
@@ -4406,23 +4389,23 @@ one_invariant[ParsableVariable selfVar]
 ;
 
 problem returns [ Term _problem = null ]
-@init{
+@init {
+    int beginPos = 0;
     choices=DefaultImmutableSet.<Choice>nil();
     chooseContract = this.chooseContract;
     proofObligation = this.proofObligation;
 }
-@after { _problem = a; this.chooseContract = chooseContract; this.proofObligation = proofObligation; }
-    :
-       { if (capturer != null) capturer.mark(); }
+@after { 
+    _problem = a; 
+    this.chooseContract = chooseContract; 
+    this.proofObligation = proofObligation; 
+}
+   :
 
-     profile
-
-   	{ if (profileName != null && capturer != null) capturer.mark(); }
+        profile
 
         (pref = preferences)
-        { if ((pref!=null) && (capturer != null)) capturer.begin(); }
-        
-
+           { beginPos = input.index(); }
 
         string = bootClassPath
         // the result is of no importance here (strange enough)        
@@ -4464,19 +4447,16 @@ problem returns [ Term _problem = null ]
             )*
             RBRACE {choices=DefaultImmutableSet.<Choice>nil();}
         ) *
-        { if (capturer != null) capturer.capture(); }
+
+        { problemHeader = lexer.toString(beginPos, input.index()-1); }
+
         ((PROBLEM LBRACE 
-            {switchToNormalMode(); 
-	     //if (capturer != null) capturer.capture();
-	    }
+            { switchToNormalMode(); }
                 a = formula
             RBRACE) 
-           | 
+           |
            CHOOSECONTRACT (chooseContract=string_literal SEMI)?
            {
-	       if (capturer != null) {
-	            capturer.capture();
-	       }
 	       if(chooseContract == null) {
 	           chooseContract = "";
 	       }
@@ -4484,14 +4464,11 @@ problem returns [ Term _problem = null ]
            | 
            PROOFOBLIGATION  (proofObligation=string_literal SEMI)?
            {
-               if (capturer != null) {
-                    capturer.capture();
-               }
                if(proofObligation == null) {
                    proofObligation = "";
                }
            }
-	)?
+        )?
    ;
    
 bootClassPath returns [String _boot_class_path = null]

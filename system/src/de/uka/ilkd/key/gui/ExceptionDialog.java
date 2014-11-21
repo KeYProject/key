@@ -46,6 +46,8 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.antlr.runtime.RecognitionException;
+
 import de.uka.ilkd.key.parser.KeYSemanticException;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.parser.ParserException;
@@ -97,15 +99,17 @@ public class ExceptionDialog extends JDialog {
 				    ((antlr.RecognitionException) exc).getLine(),
 				    ((antlr.RecognitionException) exc).getColumn());
         }
-        if  (exc instanceof org.antlr.runtime.RecognitionException) {
+        else if  (exc instanceof org.antlr.runtime.RecognitionException) {
+            org.antlr.runtime.RecognitionException recEx =
+                    (org.antlr.runtime.RecognitionException) exc;
             // ANTLR 3 - Recognition Exception.
             String filename = "";
             if(exc instanceof KeYSemanticException) {
                 filename = ((KeYSemanticException)exc).getFilename();
+            } else if(recEx.input != null) {
+                filename = recEx.input.getSourceName();
             }
 
-            org.antlr.runtime.RecognitionException recEx =
-                    (org.antlr.runtime.RecognitionException) exc;
             location = new Location(filename, recEx.line, recEx.charPositionInLine);
         }
 	else if (exc instanceof ParserException) {
