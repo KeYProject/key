@@ -1,11 +1,6 @@
 package org.key_project.jmlediting.core.profile.persistence.impl;
 
-import static org.key_project.jmlediting.core.profile.persistence.impl.JMLProfileXMLConstants.BEHAVIOR_SPEC;
-import static org.key_project.jmlediting.core.profile.persistence.impl.JMLProfileXMLConstants.GENERIC_SPEC;
-import static org.key_project.jmlediting.core.profile.persistence.impl.JMLProfileXMLConstants.ID;
-import static org.key_project.jmlediting.core.profile.persistence.impl.JMLProfileXMLConstants.KEYWORD;
-import static org.key_project.jmlediting.core.profile.persistence.impl.JMLProfileXMLConstants.NAME;
-import static org.key_project.jmlediting.core.profile.persistence.impl.JMLProfileXMLConstants.PROFILE;
+import static org.key_project.jmlediting.core.profile.persistence.impl.JMLProfileXMLConstants.*;
 
 import java.io.IOException;
 import java.net.URL;
@@ -83,11 +78,17 @@ public class JMLProfileXMLParser extends AbstractJMLProfileXMLParser {
    
    protected IJMLGenericSpecification parseGenericSpecification(Element element) {
       String keyword = element.getAttribute(KEYWORD);
-      return new JMLGenericSpecification(keyword);
+      String description = ensureSingleElement(element, DESCRIPTION).getTextContent();
+      return new JMLGenericSpecification(keyword, description);
    }
    
    
    private static Node ensureSingleElement(Document elem, String name) {
+      NodeList list = elem.getElementsByTagName(name);
+      return list.item(0);
+   }
+   
+   private static Node ensureSingleElement(Element elem, String name) {
       NodeList list = elem.getElementsByTagName(name);
       return list.item(0);
    }

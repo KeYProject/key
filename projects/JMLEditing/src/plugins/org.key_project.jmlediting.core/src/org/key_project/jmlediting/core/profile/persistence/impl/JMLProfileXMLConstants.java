@@ -13,5 +13,6 @@ public final class JMLProfileXMLConstants {
    public static final String GENERIC_SPEC = "generic_spec";
    public static final String KEYWORD="keyword";
    public static final String BEHAVIOR_SPEC = "behavior_spec";
+   public static final String DESCRIPTION="description";
 
 }

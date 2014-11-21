@@ -7,5 +7,11 @@ public interface IJMLGenericSpecification {
     * @return
     */
    String getKeyword();
+   
+   /**
+    * Returns the description for this keyword.
+    * @return
+    */
+   String getDescription();
 
 }

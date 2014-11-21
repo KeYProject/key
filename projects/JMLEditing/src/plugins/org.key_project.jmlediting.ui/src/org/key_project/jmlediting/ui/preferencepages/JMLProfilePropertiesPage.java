@@ -10,8 +10,11 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChange
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jdt.internal.ui.preferences.PropertyAndPreferencePage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -20,6 +23,7 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.jmlediting.ui.Activator;
+import org.key_project.jmlediting.ui.profileEditor.ProfileEditorDialog;
 
 /**
  * The {@link JMLProfilePropertiesPage} implements a properties and preferences
@@ -46,6 +50,8 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
     * The list which shows all profile names to the user.
     */
    private org.eclipse.swt.widgets.List profilesList;
+   private Button newProfileButton;
+   private Button editProfileButton;
    /**
     * The list of the profiles, in the same order as shown in the list.
     */
@@ -92,23 +98,59 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       final Composite myComposite = new Composite(parent, SWT.NONE);
 
       final GridLayout layout = new GridLayout();
-      layout.numColumns = 1;
+      layout.numColumns = 2;
       myComposite.setLayout(layout);
 
       GridData data;
 
       data = new GridData();
+      data.horizontalSpan = 2;
       Label label = new Label(myComposite, SWT.NONE);
       label.setText("Choose JML Profile from available ones:");
       label.setLayoutData(data);
 
       data = new GridData(GridData.FILL_BOTH);
+      data.horizontalSpan = 1;
+      data.verticalSpan = 2;
 
       this.profilesList = new List(myComposite, SWT.V_SCROLL | SWT.SINGLE
             | SWT.BORDER);
       this.profilesList.setLayoutData(data);
+      
+      data = new GridData();
+      data.horizontalSpan = 1;
+      data.verticalAlignment = SWT.TOP;
+      data.horizontalAlignment = SWT.FILL;
+      
+      this.newProfileButton = new Button(myComposite, SWT.PUSH);
+      this.newProfileButton.setText(" New ... ");
+      this.newProfileButton.setLayoutData(data);
+      
+      data = new GridData();
+      data.horizontalSpan = 1;
+      data.verticalAlignment = SWT.TOP;
+      data.horizontalAlignment = SWT.FILL;
+      
+      this.editProfileButton = new Button(myComposite, SWT.PUSH);
+      this.editProfileButton.setText(" Edit ... ");
+      this.editProfileButton.setLayoutData(data);
 
       this.initUI();
+      
+      
+      this.newProfileButton.addSelectionListener(new SelectionListener() {
+         
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            ProfileEditorDialog d = new ProfileEditorDialog(JMLProfilePropertiesPage.this.getShell());
+            d.setProfile(allProfiles.get(0));
+            d.open();
+         }
+         
+         @Override
+         public void widgetDefaultSelected(SelectionEvent e) {
+         }
+      });
 
       return myComposite;
    }
@@ -147,6 +189,9 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       // the list, and, the list stays disables of setEnabled(false)
       // before
       this.profilesList.setEnabled(true);
+      
+      this.newProfileButton.setEnabled(enabled);
+      this.editProfileButton.setEnabled(enabled);
    }
 
    @Override

@@ -43,6 +43,7 @@ public class XMLParserTest {
       assertEquals("Wrong supported behavior keywords", new HashSet<String>(bSpec.getKeywords()), new HashSet<String>(Arrays.asList("behavior", "behaviour")));
       IJMLGenericSpecification gSpec = profile.getSupportedGenerics().iterator().next();
       assertEquals("Wrong supported generic keyword", "ensures", gSpec.getKeyword());
+      assertEquals("Wrong description", "ensures description", gSpec.getDescription());
    }
    
    @Test(expected=SAXException.class)
