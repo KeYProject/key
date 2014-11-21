@@ -2,8 +2,8 @@ package org.key_project.jmlediting.core.profile;
 
 import java.util.Set;
 
-import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorSpecification;
-import org.key_project.jmlediting.core.profile.syntax.IJMLGenericSpecification;
+import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IJMLKeyword;
 
 /**
  * Defines a profile for a JML variant.
@@ -32,7 +32,7 @@ public interface IJMLProfile {
     * 
     * @return the set of supported behaviors
     */
-   Set<IJMLBehaviorSpecification> getSupportedBehaviors();
+   Set<IJMLBehaviorKeyword> getSupportedBehaviors();
 
    /**
     * Returns a set of all supported generics of this profile. The returned set
@@ -40,6 +40,6 @@ public interface IJMLProfile {
     * 
     * @return the set of supported behaviors
     */
-   Set<IJMLGenericSpecification> getSupportedGenerics();
+   Set<IJMLKeyword> getSupportedGenerics();
 
 }

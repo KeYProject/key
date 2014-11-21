@@ -9,8 +9,8 @@ import org.junit.Test;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.AbstractJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
-import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorSpecification;
-import org.key_project.jmlediting.core.profile.syntax.IJMLGenericSpecification;
+import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IJMLKeyword;
 
 public class JMLProfileManagementTest {
 

@@ -55,10 +55,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
     * The list which shows all profile names to the user.
     */
    private Table profilesList;
-   private Button newProfileButton;
-   private Button editProfileButton;
-   private Button importProfileButton;
-   private Button exportProfileButton;
+   private Button viewProfileButton;
    /**
     * The list of the profiles, in the same order as shown in the list.
     */
@@ -139,18 +136,12 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       data.verticalAlignment = SWT.TOP;
       data.horizontalAlignment = SWT.FILL;
 
-      this.newProfileButton = this.createTableSideButton(myComposite,
-            " New ... ");
-      this.editProfileButton = this.createTableSideButton(myComposite,
-            " Edit ... ");
-      this.importProfileButton = this.createTableSideButton(myComposite,
-            " Import ... ");
-      this.exportProfileButton = this.createTableSideButton(myComposite,
-            " Export ... ");
+      this.viewProfileButton = this.createTableSideButton(myComposite,
+            " View ... ");
 
       this.initUI();
 
-      this.newProfileButton.addSelectionListener(new SelectionListener() {
+      this.viewProfileButton.addSelectionListener(new SelectionListener() {
 
          @Override
          public void widgetSelected(SelectionEvent e) {
@@ -236,8 +227,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       // before
       this.profilesList.setEnabled(true);
 
-      this.newProfileButton.setEnabled(enabled);
-      this.editProfileButton.setEnabled(enabled);
+      this.viewProfileButton.setEnabled(enabled);
    }
 
    @Override
@@ -339,7 +329,6 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
             break;
          }
       }
-      System.out.println("Selected Profile: " + selectedProfile);
 
       // Only write into properties if a selection is available (user is forced
       // to),

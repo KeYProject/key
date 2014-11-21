@@ -4,8 +4,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorSpecification;
-import org.key_project.jmlediting.core.profile.syntax.IJMLGenericSpecification;
+import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IJMLKeyword;
 
 /**
  * Implements a basic {@link AbstractJMLProfile}. It is not configurable but this is not
@@ -27,11 +27,11 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
    /**
     * The set of supported behaviors.
     */
-   protected final Set<IJMLBehaviorSpecification> supportedBehaviors;
+   protected final Set<IJMLBehaviorKeyword> supportedBehaviors;
    /**
     * The set of supported generics.
     */
-   protected final Set<IJMLGenericSpecification> supportedGenerics;
+   protected final Set<IJMLKeyword> supportedGenerics;
 
    /**
     * Creates a new {@link AbstractJMLProfile} with given name and identifier and
@@ -48,8 +48,8 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
     *           the supported generic specifications
     */
    public AbstractJMLProfile(final String name, final String identifier,
-         Set<IJMLBehaviorSpecification> supportedBehaviorSpecs,
-         Set<IJMLGenericSpecification> supportedGenericSpecs) {
+         Set<IJMLBehaviorKeyword> supportedBehaviorSpecs,
+         Set<IJMLKeyword> supportedGenericSpecs) {
       super();
       if (identifier == null) {
          throw new NullPointerException(
@@ -60,14 +60,14 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
       }
       this.name = name;
       this.identifier = identifier;
-      this.supportedBehaviors = new HashSet<IJMLBehaviorSpecification>(
+      this.supportedBehaviors = new HashSet<IJMLBehaviorKeyword>(
             supportedBehaviorSpecs);
-      this.supportedGenerics = new HashSet<IJMLGenericSpecification>(
+      this.supportedGenerics = new HashSet<IJMLKeyword>(
             supportedGenericSpecs);
    }
    
    public AbstractJMLProfile(final String name, final String identifier) {
-      this(name, identifier, Collections.<IJMLBehaviorSpecification>emptySet(),Collections.<IJMLGenericSpecification>emptySet());
+      this(name, identifier, Collections.<IJMLBehaviorKeyword>emptySet(),Collections.<IJMLKeyword>emptySet());
    }
 
    @Override
@@ -81,12 +81,12 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
    }
 
    @Override
-   public Set<IJMLBehaviorSpecification> getSupportedBehaviors() {
+   public Set<IJMLBehaviorKeyword> getSupportedBehaviors() {
       return Collections.unmodifiableSet(this.supportedBehaviors);
    }
 
    @Override
-   public Set<IJMLGenericSpecification> getSupportedGenerics() {
+   public Set<IJMLKeyword> getSupportedGenerics() {
       return Collections.unmodifiableSet(this.supportedGenerics);
    }
 

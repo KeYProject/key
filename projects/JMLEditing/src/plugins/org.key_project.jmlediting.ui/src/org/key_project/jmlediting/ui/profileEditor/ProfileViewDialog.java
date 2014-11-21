@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.core.profile.syntax.IJMLGenericSpecification;
+import org.key_project.jmlediting.core.profile.syntax.IJMLKeyword;
 
 public class ProfileViewDialog extends StatusDialog {
    
@@ -24,8 +24,7 @@ public class ProfileViewDialog extends StatusDialog {
    private Table supportedGenericSpecifications;
    private TableColumn genericKeywordTableColumn;
    private TableColumn genericDescriptionTableColumn;
-   
-   private Button editButton;
+
 
    public ProfileViewDialog(Shell parent) {
       super(parent);
@@ -61,11 +60,6 @@ public class ProfileViewDialog extends StatusDialog {
       this.genericDescriptionTableColumn.setText("Description");
       this.genericDescriptionTableColumn.setWidth(200);
       
-      data = new GridData(SWT.RIGHT, SWT.TOP, false, false, 1, 1);
-      this.editButton = new Button(myComposite, SWT.PUSH);
-      this.editButton.setText(" Edit ... ");
-      this.editButton.setLayoutData(data);
-      
       if (this.profileToEdit != null) {
          this.setProfile(this.profileToEdit);
       }
@@ -83,7 +77,7 @@ public class ProfileViewDialog extends StatusDialog {
      
       this.supportedGenericSpecifications.removeAll();
       
-      for (IJMLGenericSpecification gSpec : this.profileToEdit.getSupportedGenerics()) {
+      for (IJMLKeyword gSpec : this.profileToEdit.getSupportedGenerics()) {
         TableItem item = new TableItem(this.supportedGenericSpecifications, 0);
         item.setText(gSpecToTableData(gSpec));
       }
@@ -91,7 +85,7 @@ public class ProfileViewDialog extends StatusDialog {
       
    }
    
-   private String[] gSpecToTableData(IJMLGenericSpecification gSpec) {
+   private String[] gSpecToTableData(IJMLKeyword gSpec) {
       String sourceDescription = gSpec.getDescription();
       if (sourceDescription.length() > 200) {
          sourceDescription = sourceDescription.substring(0, 196);

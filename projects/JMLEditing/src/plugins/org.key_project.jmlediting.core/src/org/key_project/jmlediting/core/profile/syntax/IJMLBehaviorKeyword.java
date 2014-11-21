@@ -2,7 +2,7 @@ package org.key_project.jmlediting.core.profile.syntax;
 
 import java.util.Set;
 
-public interface IJMLBehaviorSpecification {
+public interface IJMLBehaviorKeyword {
 
    /**
     * Returns the set of keywords which introduces the specification. A set
