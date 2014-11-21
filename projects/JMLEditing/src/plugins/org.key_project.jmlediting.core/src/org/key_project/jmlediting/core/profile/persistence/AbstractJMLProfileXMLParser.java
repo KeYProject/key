@@ -10,15 +10,25 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-public abstract class AbstractJMLProfileXMLParser implements IJMLProfileXMLParser {
+/**
+ * An abstract implementation for the {@link IJMLProfileXMLParser} which
+ * redirects all parse methods to a single one which is left open for other
+ * classes to implement.
+ * 
+ * @author Moritz Lichter
+ *
+ */
+public abstract class AbstractJMLProfileXMLParser implements
+      IJMLProfileXMLParser {
 
    @Override
-   public IJMLProfile parseProfile(URI uri) throws MalformedURLException, IOException, SAXException {
+   public IJMLProfile parseProfile(final URI uri) throws MalformedURLException,
+         IOException, SAXException {
       return this.parseProfile(new InputSource(uri.toURL().openStream()));
    }
 
    @Override
-   public IJMLProfile parseProfile(File file) throws IOException, SAXException {
+   public IJMLProfile parseProfile(final File file) throws IOException, SAXException {
       return this.parseProfile(new InputSource(new FileInputStream(file)));
    }
 

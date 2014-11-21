@@ -7,5 +7,19 @@
 		<keyword name="behaviour"/>
 	</behavior_spec>
 	
+	<behavior_spec>
+		<keyword name="normal_behavior"/>
+		<keyword name="normal_behaviour"/>		
+	</behavior_spec>
+	
+	<behavior_spec>
+		<keyword name="exceptional_behavior"/>
+		<keyword name="exceptional_behaviour"/>		
+	</behavior_spec>
+
+	<generic_spec keyword="required"/>	
 	<generic_spec keyword="ensures"/>
+	<generic_spec keyword="assignable"/>
+	
+			
 </profile>
