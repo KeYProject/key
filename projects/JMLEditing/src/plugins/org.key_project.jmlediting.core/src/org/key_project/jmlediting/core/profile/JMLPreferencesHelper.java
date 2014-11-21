@@ -6,6 +6,8 @@ import java.util.NoSuchElementException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.key_project.jmlediting.core.Activator;
 import org.key_project.jmlediting.core.PropertyNames;
@@ -138,4 +140,25 @@ public final class JMLPreferencesHelper {
       project.setPersistentProperty(PropertyNames.PROFILE, profileIdentifier);
    }
 
+   public static IPreferenceChangeListener buildDefaultProfilePreferencesListener(
+         final IPreferenceChangeListener listener) {
+      IPreferenceChangeListener filteredlistener = new IPreferenceChangeListener() {
+
+         @Override
+         public void preferenceChange(PreferenceChangeEvent event) {
+            if (event.getKey().equals(PropertyNames.DEFAULT_JML_PROFILE)) {
+               listener.preferenceChange(event);
+            }
+         }
+      };
+      InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID)
+            .addPreferenceChangeListener(filteredlistener);
+
+      return listener;
+   }
+   
+   public static void removeDefaultProfilePreferencesListener(
+         final IPreferenceChangeListener listener) {
+      InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).removePreferenceChangeListener(listener);
+   }
 }

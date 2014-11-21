@@ -19,7 +19,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -72,13 +71,6 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
     * Creates a new {@link JMLProfilePropertiesPage}.
     */
    public JMLProfilePropertiesPage() {
-      this.currentPreferenceListener = new IPreferenceChangeListener() {
-
-         @Override
-         public void preferenceChange(final PreferenceChangeEvent event) {
-            updateSelection(false);
-         }
-      };
    }
 
    @Override
@@ -87,10 +79,14 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       // do not generate memory leaks, listener are removed in
       // performOK and performCancel, here is too late
       if (visible) {
-         IEclipsePreferences preferences = InstanceScope.INSTANCE
-               .getNode(Activator.PLUGIN_ID);
-         preferences
-               .addPreferenceChangeListener(this.currentPreferenceListener);
+         this.currentPreferenceListener = JMLPreferencesHelper
+               .buildDefaultProfilePreferencesListener(new IPreferenceChangeListener() {
+
+                  @Override
+                  public void preferenceChange(final PreferenceChangeEvent event) {
+                     updateSelection(false);
+                  }
+               });
       }
       super.setVisible(visible);
    }
@@ -175,12 +171,12 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
          TableItem item = new TableItem(this.profilesList, 0);
          item.setText(new String[] { profile.getName() });
       }
-      
+
       // Make sure that only one profile is available at a single time
       this.profilesList.addListener(SWT.Selection, new Listener() {
          public void handleEvent(Event event) {
             if (event.detail == SWT.CHECK) {
-               TableItem item = (TableItem)event.item;
+               TableItem item = (TableItem) event.item;
                if (item.getChecked()) {
                   for (TableItem item2 : profilesList.getItems()) {
                      if (item != item2) {
@@ -188,8 +184,9 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
                      }
                   }
                   setErrorMessage(null);
-               } else {
-                  boolean nothingChecked =true;
+               }
+               else {
+                  boolean nothingChecked = true;
                   for (TableItem item2 : profilesList.getItems()) {
                      if (item2.getChecked()) {
                         nothingChecked = false;
@@ -202,7 +199,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
                }
             }
          }
-       });
+      });
 
       this.updateSelection(false);
 
@@ -265,7 +262,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
    private void updateSelection(boolean forceDefault) {
       IJMLProfile currentProfile = null;
       if (!forceDefault
-            && (this.isProjectPreferencePage() || this.useProjectSettings())) {
+            && (this.isProjectPreferencePage() && this.useProjectSettings())) {
          // Read local project properties if we are in a properties pane and
          // project specific settings are enabled
          currentProfile = JMLPreferencesHelper.getProjectJMLProfile(this
@@ -302,23 +299,23 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       this.profilesList.redraw();
    }
 
+   private void removePreferencesListener() {
+      JMLPreferencesHelper
+            .removeDefaultProfilePreferencesListener(this.currentPreferenceListener);
+   }
+
    @Override
    public boolean performCancel() {
-      // Remove preferences listener
-      IEclipsePreferences preferences = InstanceScope.INSTANCE
-            .getNode(Activator.PLUGIN_ID);
-      preferences
-            .removePreferenceChangeListener(this.currentPreferenceListener);
-      return super.performCancel();
+      boolean cancel = super.performCancel();
+      if (cancel) {
+         // Remove preferences listener
+         this.removePreferencesListener();
+      }
+      return cancel;
    }
 
    @Override
    public boolean performOk() {
-      // Remove preference listener
-      IEclipsePreferences preferences = InstanceScope.INSTANCE
-            .getNode(Activator.PLUGIN_ID);
-      preferences
-            .removePreferenceChangeListener(this.currentPreferenceListener);
 
       IJMLProfile selectedProfile = null;
       for (int i = 0; i < this.profilesList.getItemCount(); i++) {
@@ -364,7 +361,12 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
          JMLPreferencesHelper.setDefaultJMLProfile(selectedProfile);
       }
 
-      return super.performOk();
+      boolean ok = super.performOk();
+      if (ok) {
+         // Window is closed, remove listener
+         this.removePreferencesListener();
+      }
+      return ok;
    }
 
 }
