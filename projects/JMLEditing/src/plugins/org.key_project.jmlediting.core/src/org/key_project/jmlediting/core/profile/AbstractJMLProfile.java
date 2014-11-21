@@ -8,13 +8,13 @@ import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorSpecification;
 import org.key_project.jmlediting.core.profile.syntax.IJMLGenericSpecification;
 
 /**
- * Implements a basic {@link JMLProfile}. It is not configurable but this is not
+ * Implements a basic {@link AbstractJMLProfile}. It is not configurable but this is not
  * an invariant of this class. Subclasses may be able to be configured.
  * 
  * @author Moritz Lichter
  *
  */
-public class JMLProfile implements IJMLProfile {
+public abstract class AbstractJMLProfile implements IJMLProfile {
 
    /**
     * The name of the profile.
@@ -34,7 +34,7 @@ public class JMLProfile implements IJMLProfile {
    protected final Set<IJMLGenericSpecification> supportedGenerics;
 
    /**
-    * Creates a new {@link JMLProfile} with given name and identifier and
+    * Creates a new {@link AbstractJMLProfile} with given name and identifier and
     * supported specifications. The specifications will be copied, so the sets
     * cannot be modified from outside.
     * 
@@ -47,7 +47,7 @@ public class JMLProfile implements IJMLProfile {
     * @param supportedGenericSpecs
     *           the supported generic specifications
     */
-   public JMLProfile(final String name, final String identifier,
+   public AbstractJMLProfile(final String name, final String identifier,
          Set<IJMLBehaviorSpecification> supportedBehaviorSpecs,
          Set<IJMLGenericSpecification> supportedGenericSpecs) {
       super();
@@ -64,6 +64,10 @@ public class JMLProfile implements IJMLProfile {
             supportedBehaviorSpecs);
       this.supportedGenerics = new HashSet<IJMLGenericSpecification>(
             supportedGenericSpecs);
+   }
+   
+   public AbstractJMLProfile(final String name, final String identifier) {
+      this(name, identifier, Collections.<IJMLBehaviorSpecification>emptySet(),Collections.<IJMLGenericSpecification>emptySet());
    }
 
    @Override
@@ -84,64 +88,6 @@ public class JMLProfile implements IJMLProfile {
    @Override
    public Set<IJMLGenericSpecification> getSupportedGenerics() {
       return Collections.unmodifiableSet(this.supportedGenerics);
-   }
-
-   @Override
-   public IConfigurableJMLProfile isConfigurable() {
-      return null;
-   }
-
-   @Override
-   public int hashCode() {
-      final int prime = 31;
-      int result = 1;
-      result = prime * result
-            + ((identifier == null) ? 0 : identifier.hashCode());
-      result = prime * result + ((name == null) ? 0 : name.hashCode());
-      result = prime
-            * result
-            + ((supportedBehaviors == null) ? 0 : supportedBehaviors.hashCode());
-      result = prime * result
-            + ((supportedGenerics == null) ? 0 : supportedGenerics.hashCode());
-      return result;
-   }
-
-   @Override
-   public boolean equals(Object obj) {
-      if (this == obj)
-         return true;
-      if (obj == null)
-         return false;
-      if (getClass() != obj.getClass())
-         return false;
-      JMLProfile other = (JMLProfile) obj;
-
-      if (identifier == null) {
-         if (other.identifier != null)
-            return false;
-      }
-      else if (!identifier.equals(other.identifier))
-         return false;
-
-      if (name == null) {
-         if (other.name != null)
-            return false;
-      }
-      else if (!name.equals(other.name))
-         return false;
-      if (supportedBehaviors == null) {
-         if (other.supportedBehaviors != null)
-            return false;
-      }
-      else if (!supportedBehaviors.equals(other.supportedBehaviors))
-         return false;
-      if (supportedGenerics == null) {
-         if (other.supportedGenerics != null)
-            return false;
-      }
-      else if (!supportedGenerics.equals(other.supportedGenerics))
-         return false;
-      return true;
    }
 
 }

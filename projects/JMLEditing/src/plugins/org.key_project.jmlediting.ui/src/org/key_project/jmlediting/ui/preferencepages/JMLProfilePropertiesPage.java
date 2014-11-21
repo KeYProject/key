@@ -28,7 +28,7 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.jmlediting.ui.Activator;
-import org.key_project.jmlediting.ui.profileEditor.ProfileEditorDialog;
+import org.key_project.jmlediting.ui.profileEditor.ProfileViewDialog;
 
 /**
  * The {@link JMLProfilePropertiesPage} implements a properties and preferences
@@ -154,7 +154,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
          @Override
          public void widgetSelected(SelectionEvent e) {
-            ProfileEditorDialog d = new ProfileEditorDialog(
+            ProfileViewDialog d = new ProfileViewDialog(
                   JMLProfilePropertiesPage.this.getShell());
             d.setProfile(allProfiles.get(0));
             d.open();

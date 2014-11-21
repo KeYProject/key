@@ -42,16 +42,4 @@ public interface IJMLProfile {
     */
    Set<IJMLGenericSpecification> getSupportedGenerics();
 
-   /**
-    * Checks whether is profile is configurable. If it is, it returns an
-    * {@link IConfigurableJMLProfile} which can be configured. It is not
-    * necessary, that this is the same object, but it is required that changes
-    * made to the returned {@link IConfigurableJMLProfile} also affect this
-    * object. If the profile is not configurable, this methods returns null.
-    * 
-    * @return null if the profile is not configurable and otherwise an
-    *         configurable profile
-    */
-   IConfigurableJMLProfile isConfigurable();
-
 }

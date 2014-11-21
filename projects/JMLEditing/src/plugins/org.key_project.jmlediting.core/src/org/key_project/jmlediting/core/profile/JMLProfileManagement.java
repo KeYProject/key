@@ -36,8 +36,7 @@ public final class JMLProfileManagement {
     * objects exists for an identifier.
     */
    private static Map<String, IJMLProfile> profileCache = new HashMap<String, IJMLProfile>();
-   private static Map<IJMLProfileProvider, IJMLProfile> providerCache = new HashMap<IJMLProfileProvider, IJMLProfile>();
-
+  
    /**
     * Returns a set of all JML profiles which are available. The set may be
     * empty.
@@ -60,27 +59,6 @@ public final class JMLProfileManagement {
          for (IConfigurationElement elem : extension.getConfigurationElements()) {
             try {
                Object profileO = elem.createExecutableExtension("class");
-               // Check whether we get an provider or a profile directly
-               if (profileO instanceof IJMLProfileProvider) {
-                  // Load to profile
-                  IJMLProfileProvider provider = (IJMLProfileProvider) profileO;
-                  // Cache the profiles per provider bevause providing may be expensive
-                  IJMLProfile profile = providerCache.get(provider);
-                  if (profile == null) {
-                     try {
-                        profile = provider.provideProfile();
-                        profileO = profile;
-                        providerCache.put(provider, profile);
-                     }
-                     catch (CoreException e) {
-                        e.printStackTrace();
-                        throw new RuntimeException(
-                              "Failed to load profile from " + profileO, e);
-                     }
-                  } else {
-                     profileO = profile;
-                  }
-               }
                if (profileO instanceof IJMLProfile) {
                   IJMLProfile profile = (IJMLProfile) profileO;
                   if (!profileCache.containsKey(profile.getIdentifier())) {
@@ -99,7 +77,7 @@ public final class JMLProfileManagement {
             catch (CoreException e) {
                // Invalid class of the extension object
                e.printStackTrace();
-               throw new RuntimeException("Got invalid extension object");
+               throw new RuntimeException("Got invalid extension object ");
             }
 
          }

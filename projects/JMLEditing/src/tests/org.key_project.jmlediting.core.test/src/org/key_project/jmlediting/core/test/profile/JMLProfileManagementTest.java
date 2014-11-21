@@ -1,20 +1,20 @@
 package org.key_project.jmlediting.core.test.profile;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
+import java.util.Collections;
 import java.util.Set;
 
-import org.eclipse.core.runtime.CoreException;
 import org.junit.Test;
-import org.key_project.jmlediting.core.profile.ConfigurableJMLProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.core.profile.IJMLProfileProvider;
+import org.key_project.jmlediting.core.profile.AbstractJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
+import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorSpecification;
+import org.key_project.jmlediting.core.profile.syntax.IJMLGenericSpecification;
 
 public class JMLProfileManagementTest {
 
-   public static class DummyJMLProfile1 extends ConfigurableJMLProfile {
+   public static class DummyJMLProfile1 extends AbstractJMLProfile {
 
       public DummyJMLProfile1() {
          super( "DummyJMLProfile1",DummyJMLProfile1.class.getName());
@@ -22,7 +22,7 @@ public class JMLProfileManagementTest {
 
    }
 
-   public static class DummyJMLProfile2 extends ConfigurableJMLProfile {
+   public static class DummyJMLProfile2 extends AbstractJMLProfile {
 
       public DummyJMLProfile2() {
          super( "DummyJMLProfile2",DummyJMLProfile2.class.getName());
@@ -30,14 +30,6 @@ public class JMLProfileManagementTest {
 
    }
    
-   public static class DummyJMLProfile3Provider implements IJMLProfileProvider {
-
-      @Override
-      public IJMLProfile provideProfile() throws CoreException {
-         return new ConfigurableJMLProfile("DummyJMLProfile3", DummyJMLProfile3Provider.class.getName());
-      }
-      
-   }
    
   
 
@@ -51,7 +43,6 @@ public class JMLProfileManagementTest {
 
       boolean containsDummy1 = false;
       boolean containsDummy2 = false;
-      boolean containsDummy3 = false;
       for (IJMLProfile profile : availablesProfiles) {
          if (profile.getName().equals("DummyJMLProfile1")) {
             containsDummy1 = true;
@@ -59,13 +50,10 @@ public class JMLProfileManagementTest {
          if (profile.getName().equals("DummyJMLProfile2")) {
             containsDummy2 = true;
          }
-         if (profile.getName().equals("DummyJMLProfile3")) {
-            containsDummy3 = true;
-         }
       }
 
       assertTrue("Dummy Profiles are not included", containsDummy1
-            && containsDummy2 && containsDummy3);
+            && containsDummy2);
 
    }
 

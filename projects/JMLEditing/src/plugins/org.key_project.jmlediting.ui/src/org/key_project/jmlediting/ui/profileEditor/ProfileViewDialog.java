@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.IJMLGenericSpecification;
 
-public class ProfileEditorDialog extends StatusDialog {
+public class ProfileViewDialog extends StatusDialog {
    
    
    private IJMLProfile profileToEdit;
@@ -27,7 +27,7 @@ public class ProfileEditorDialog extends StatusDialog {
    
    private Button editButton;
 
-   public ProfileEditorDialog(Shell parent) {
+   public ProfileViewDialog(Shell parent) {
       super(parent);
       this.setTitle("JML Profile Editor");
       this.setShellStyle(super.getShellStyle() | SWT.RESIZE);
@@ -89,8 +89,6 @@ public class ProfileEditorDialog extends StatusDialog {
       }
       
       
-      boolean editable = profile.isConfigurable() != null;
-      this.supportedGenericSpecifications.setEnabled(editable);
    }
    
    private String[] gSpecToTableData(IJMLGenericSpecification gSpec) {
