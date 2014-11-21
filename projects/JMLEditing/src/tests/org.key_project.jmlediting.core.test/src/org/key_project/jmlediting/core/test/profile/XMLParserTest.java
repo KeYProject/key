@@ -11,15 +11,15 @@ import java.util.HashSet;
 
 import org.junit.Test;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.core.profile.persistence.IJMLProfileXMLParser;
-import org.key_project.jmlediting.core.profile.persistence.JMLProfileXMLParserFactory;
+import org.key_project.jmlediting.core.profile.persistence.IProfileXMLParser;
+import org.key_project.jmlediting.core.profile.persistence.ProfileXMLFactory;
 import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorSpecification;
 import org.key_project.jmlediting.core.profile.syntax.IJMLGenericSpecification;
 import org.xml.sax.SAXException;
 
 public class XMLParserTest {
 
-   private static URI getProfileURI(String name) {
+   public static URI getProfileURI(String name) {
       try {
          return new URI("platform:/plugin/org.key_project.jmlediting.core.test/resources/" + name);
       } catch (Exception e) {
@@ -29,7 +29,7 @@ public class XMLParserTest {
    
    @Test
    public void testParseProfile() throws MalformedURLException, IOException, SAXException {
-      IJMLProfileXMLParser parser = JMLProfileXMLParserFactory.createParser();
+      IProfileXMLParser parser = ProfileXMLFactory.createParser();
       IJMLProfile profile = parser.parseProfile(getProfileURI("test_profile1.xml"));
       
       // Now assert the content
@@ -48,7 +48,7 @@ public class XMLParserTest {
    
    @Test(expected=SAXException.class)
    public void testParseWrongProfile() throws MalformedURLException, IOException, SAXException {
-      JMLProfileXMLParserFactory.createParser().parseProfile(getProfileURI("wrong_profile.xml"));
+      ProfileXMLFactory.createParser().parseProfile(getProfileURI("wrong_profile.xml"));
    }
 
 }

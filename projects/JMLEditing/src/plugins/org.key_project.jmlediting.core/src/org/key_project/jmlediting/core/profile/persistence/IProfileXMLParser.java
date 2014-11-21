@@ -9,7 +9,7 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-public interface IJMLProfileXMLParser {
+public interface IProfileXMLParser {
 
    IJMLProfile parseProfile(URI uri) throws MalformedURLException, IOException, SAXException;
    IJMLProfile parseProfile(File file) throws IOException, SAXException;

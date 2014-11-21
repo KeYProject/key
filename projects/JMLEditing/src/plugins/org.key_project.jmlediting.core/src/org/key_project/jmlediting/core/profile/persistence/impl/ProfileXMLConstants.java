@@ -1,12 +1,11 @@
 package org.key_project.jmlediting.core.profile.persistence.impl;
 
-public final class JMLProfileXMLConstants {
+public final class ProfileXMLConstants {
    
-   private JMLProfileXMLConstants() {
+   private ProfileXMLConstants() {
       
    }
    
-   public static final String PROFILE_WRAPPER = "profile_wrapper";
    public static final String PROFILE="profile";
    public static final String NAME="name";
    public static final String ID="id";

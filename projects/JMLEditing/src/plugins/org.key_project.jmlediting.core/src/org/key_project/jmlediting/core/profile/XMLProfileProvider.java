@@ -6,7 +6,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.key_project.jmlediting.core.Activator;
-import org.key_project.jmlediting.core.profile.persistence.impl.JMLProfileXMLParser;
+import org.key_project.jmlediting.core.profile.persistence.impl.ProfileXMLParser;
 
 /**
  * The {@link XMLProfileProvider} provides a jml profile from reading it from an
@@ -39,7 +39,7 @@ public class XMLProfileProvider implements IJMLProfileProvider {
    @Override
    public IJMLProfile provideProfile() throws CoreException {
       // Parse the profile and return it
-      JMLProfileXMLParser parser = new JMLProfileXMLParser();
+      ProfileXMLParser parser = new ProfileXMLParser();
       try {
          return parser.parseProfile(this.uri);
       }

@@ -11,15 +11,15 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- * An abstract implementation for the {@link IJMLProfileXMLParser} which
+ * An abstract implementation for the {@link IProfileXMLParser} which
  * redirects all parse methods to a single one which is left open for other
  * classes to implement.
  * 
  * @author Moritz Lichter
  *
  */
-public abstract class AbstractJMLProfileXMLParser implements
-      IJMLProfileXMLParser {
+public abstract class AbstractProfileXMLParser implements
+      IProfileXMLParser {
 
    @Override
    public IJMLProfile parseProfile(final URI uri) throws MalformedURLException,

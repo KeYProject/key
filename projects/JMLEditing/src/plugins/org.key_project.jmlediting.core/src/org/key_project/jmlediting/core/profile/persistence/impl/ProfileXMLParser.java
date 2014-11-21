@@ -1,6 +1,6 @@
 package org.key_project.jmlediting.core.profile.persistence.impl;
 
-import static org.key_project.jmlediting.core.profile.persistence.impl.JMLProfileXMLConstants.*;
+import static org.key_project.jmlediting.core.profile.persistence.impl.ProfileXMLConstants.*;
 
 import java.io.IOException;
 import java.net.URL;
@@ -18,7 +18,7 @@ import javax.xml.validation.Validator;
 
 import org.key_project.jmlediting.core.profile.ConfigurableJMLProfile;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.core.profile.persistence.AbstractJMLProfileXMLParser;
+import org.key_project.jmlediting.core.profile.persistence.AbstractProfileXMLParser;
 import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorSpecification;
 import org.key_project.jmlediting.core.profile.syntax.IJMLGenericSpecification;
 import org.key_project.jmlediting.core.profile.syntax.impl.JMLBehaviorSpecification;
@@ -30,7 +30,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-public class JMLProfileXMLParser extends AbstractJMLProfileXMLParser {
+public class ProfileXMLParser extends AbstractProfileXMLParser {
    
    
    @Override

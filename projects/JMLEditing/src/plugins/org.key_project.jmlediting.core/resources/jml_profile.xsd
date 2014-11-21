@@ -20,8 +20,8 @@
 	
 	<xs:complexType name="profile">
 		<xs:sequence>
-			<xs:element name="behavior_spec" type="behavior_spec" maxOccurs="unbounded"/>
-			<xs:element name="generic_spec" type="generic_spec" maxOccurs="unbounded"/>
+			<xs:element name="behavior_spec" type="behavior_spec" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="generic_spec" type="generic_spec" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string" use="required"/>
 		<xs:attribute name="id" type="xs:string" use="required"/>	

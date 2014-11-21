@@ -19,4 +19,32 @@ public class JMLBehaviorSpecification implements IJMLBehaviorSpecification {
       return Collections.unmodifiableSet(this.keywords);
    }
 
+   @Override
+   public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((keywords == null) ? 0 : keywords.hashCode());
+      return result;
+   }
+
+   @Override
+   public boolean equals(Object obj) {
+      if (this == obj)
+         return true;
+      if (obj == null)
+         return false;
+      if (getClass() != obj.getClass())
+         return false;
+      JMLBehaviorSpecification other = (JMLBehaviorSpecification) obj;
+      if (keywords == null) {
+         if (other.keywords != null)
+            return false;
+      }
+      else if (!keywords.equals(other.keywords))
+         return false;
+      return true;
+   }
+   
+   
+
 }
