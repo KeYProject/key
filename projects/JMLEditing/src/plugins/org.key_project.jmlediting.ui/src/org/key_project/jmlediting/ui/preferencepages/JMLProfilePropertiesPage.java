@@ -17,8 +17,13 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
@@ -49,9 +54,11 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
    /**
     * The list which shows all profile names to the user.
     */
-   private org.eclipse.swt.widgets.List profilesList;
+   private Table profilesList;
    private Button newProfileButton;
    private Button editProfileButton;
+   private Button importProfileButton;
+   private Button exportProfileButton;
    /**
     * The list of the profiles, in the same order as shown in the list.
     */
@@ -91,6 +98,14 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       super.setVisible(visible);
    }
 
+   private Button createTableSideButton(Composite myComposite, String name) {
+      Button button = new Button(myComposite, SWT.PUSH);
+      button.setText(name);
+      button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1));
+
+      return button;
+   }
+
    @Override
    protected Control createPreferenceContent(final Composite parent) {
       // Initialize the UI
@@ -106,47 +121,45 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       data = new GridData();
       data.horizontalSpan = 2;
       Label label = new Label(myComposite, SWT.NONE);
-      label.setText("Choose JML Profile from available ones:");
+      label.setText("Choose active JML Profile from available ones:");
       label.setLayoutData(data);
 
       data = new GridData(GridData.FILL_BOTH);
       data.horizontalSpan = 1;
-      data.verticalSpan = 2;
+      data.verticalSpan = 4;
 
-      this.profilesList = new List(myComposite, SWT.V_SCROLL | SWT.SINGLE
-            | SWT.BORDER);
+      this.profilesList = new Table(myComposite, SWT.V_SCROLL | SWT.SINGLE
+            | SWT.FULL_SELECTION | SWT.CHECK | SWT.BORDER);
       this.profilesList.setLayoutData(data);
-      
+      this.profilesList.setLinesVisible(true);
+      this.profilesList.setHeaderVisible(true);
+
       data = new GridData();
       data.horizontalSpan = 1;
       data.verticalAlignment = SWT.TOP;
       data.horizontalAlignment = SWT.FILL;
-      
-      this.newProfileButton = new Button(myComposite, SWT.PUSH);
-      this.newProfileButton.setText(" New ... ");
-      this.newProfileButton.setLayoutData(data);
-      
-      data = new GridData();
-      data.horizontalSpan = 1;
-      data.verticalAlignment = SWT.TOP;
-      data.horizontalAlignment = SWT.FILL;
-      
-      this.editProfileButton = new Button(myComposite, SWT.PUSH);
-      this.editProfileButton.setText(" Edit ... ");
-      this.editProfileButton.setLayoutData(data);
+
+      this.newProfileButton = this.createTableSideButton(myComposite,
+            " New ... ");
+      this.editProfileButton = this.createTableSideButton(myComposite,
+            " Edit ... ");
+      this.importProfileButton = this.createTableSideButton(myComposite,
+            " Import ... ");
+      this.exportProfileButton = this.createTableSideButton(myComposite,
+            " Export ... ");
 
       this.initUI();
-      
-      
+
       this.newProfileButton.addSelectionListener(new SelectionListener() {
-         
+
          @Override
          public void widgetSelected(SelectionEvent e) {
-            ProfileEditorDialog d = new ProfileEditorDialog(JMLProfilePropertiesPage.this.getShell());
+            ProfileEditorDialog d = new ProfileEditorDialog(
+                  JMLProfilePropertiesPage.this.getShell());
             d.setProfile(allProfiles.get(0));
             d.open();
          }
-         
+
          @Override
          public void widgetDefaultSelected(SelectionEvent e) {
          }
@@ -163,9 +176,42 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       // Get all profiles and set them to the list
       this.allProfiles = JMLProfileManagement
             .getAvailableProfilesSortedByName();
+      TableColumn nameColumn = new TableColumn(this.profilesList, SWT.LEFT);
+      nameColumn.setMoveable(false);
+      nameColumn.setWidth(300);
+      nameColumn.setText("Profile Name");
       for (IJMLProfile profile : this.allProfiles) {
-         this.profilesList.add(profile.getName());
+         TableItem item = new TableItem(this.profilesList, 0);
+         item.setText(new String[] { profile.getName() });
       }
+      
+      // Make sure that only one profile is available at a single time
+      this.profilesList.addListener(SWT.Selection, new Listener() {
+         public void handleEvent(Event event) {
+            if (event.detail == SWT.CHECK) {
+               TableItem item = (TableItem)event.item;
+               if (item.getChecked()) {
+                  for (TableItem item2 : profilesList.getItems()) {
+                     if (item != item2) {
+                        item2.setChecked(false);
+                     }
+                  }
+                  setErrorMessage(null);
+               } else {
+                  boolean nothingChecked =true;
+                  for (TableItem item2 : profilesList.getItems()) {
+                     if (item2.getChecked()) {
+                        nothingChecked = false;
+                        break;
+                     }
+                  }
+                  if (nothingChecked) {
+                     setErrorMessage("Please select an active profile");
+                  }
+               }
+            }
+         }
+       });
 
       this.updateSelection(false);
 
@@ -189,7 +235,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       // the list, and, the list stays disables of setEnabled(false)
       // before
       this.profilesList.setEnabled(true);
-      
+
       this.newProfileButton.setEnabled(enabled);
       this.editProfileButton.setEnabled(enabled);
    }
@@ -197,7 +243,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
    @Override
    protected boolean hasProjectSpecificOptions(final IProject project) {
       // We have project specific options if a property is set on the project
-     return JMLPreferencesHelper.hasProjectJMLProfile(project);
+      return JMLPreferencesHelper.hasProjectJMLProfile(project);
    }
 
    @Override
@@ -228,7 +274,8 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
     */
    private void updateSelection(boolean forceDefault) {
       IJMLProfile currentProfile = null;
-      if (!forceDefault && (this.isProjectPreferencePage() || this.useProjectSettings())) {
+      if (!forceDefault
+            && (this.isProjectPreferencePage() || this.useProjectSettings())) {
          // Read local project properties if we are in a properties pane and
          // project specific settings are enabled
          currentProfile = JMLPreferencesHelper.getProjectJMLProfile(this
@@ -238,20 +285,23 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       if (currentProfile == null) {
          // Gobal preferences
          try {
-         currentProfile = JMLPreferencesHelper.getDefaultJMLProfile();
-         } catch (NoSuchElementException e) {
+            currentProfile = JMLPreferencesHelper.getDefaultJMLProfile();
+         }
+         catch (NoSuchElementException e) {
             this.setErrorMessage("No JML Profile available");
             return;
          }
 
       }
-      
+
       // Select profile in the list
-      this.profilesList.deselectAll();
+      for (TableItem item : this.profilesList.getItems()) {
+         item.setChecked(false);
+      }
       if (currentProfile != null) {
          int index = this.allProfiles.indexOf(currentProfile);
          if (index != -1) {
-            this.profilesList.setSelection(index);
+            this.profilesList.getItem(index).setChecked(true);
          }
          else {
             this.setErrorMessage("Profile \"" + currentProfile.getName()
@@ -281,11 +331,15 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
             .removePreferenceChangeListener(this.currentPreferenceListener);
 
       IJMLProfile selectedProfile = null;
-      if (this.profilesList.getSelectionIndex() >= 0) {
+      for (int i = 0; i < this.profilesList.getItemCount(); i++) {
+
          // Can only have one selection
-         selectedProfile = this.allProfiles.get(this.profilesList
-               .getSelectionIndex());
+         if (this.profilesList.getItem(i).getChecked()) {
+            selectedProfile = this.allProfiles.get(i);
+            break;
+         }
       }
+      System.out.println("Selected Profile: " + selectedProfile);
 
       // Only write into properties if a selection is available (user is forced
       // to),
@@ -305,7 +359,8 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
                   return false;
                }
                // Set property
-               JMLPreferencesHelper.setProjectJMLProfile(project, selectedProfile);
+               JMLPreferencesHelper.setProjectJMLProfile(project,
+                     selectedProfile);
             }
             else {
                // Remove property
