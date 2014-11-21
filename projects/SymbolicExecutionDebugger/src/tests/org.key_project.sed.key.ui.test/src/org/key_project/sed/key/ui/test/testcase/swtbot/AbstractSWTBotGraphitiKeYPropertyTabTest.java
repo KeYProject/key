@@ -73,6 +73,15 @@ public class AbstractSWTBotGraphitiKeYPropertyTabTest extends AbstractSWTBotKeYP
     * {@inheritDoc}
     */
    @Override
+   protected void selectMethodContract(SWTBotTree debugTree) {
+      super.selectMethodContract(debugTree);
+      TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    protected void selectLaunch(SWTBotTree debugTree) {
       super.selectLaunch(debugTree);
       TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
@@ -84,6 +93,24 @@ public class AbstractSWTBotGraphitiKeYPropertyTabTest extends AbstractSWTBotKeYP
    @Override
    protected void selectTermination(SWTBotTree debugTree) throws Exception {
       super.selectTermination(debugTree);
+      TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void selectLoopInvariant(SWTBotTree debugTree) throws Exception {
+      super.selectLoopInvariant(debugTree);
+      TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void selectLoopBodyTermination(SWTBotTree debugTree) throws Exception {
+      super.selectLoopBodyTermination(debugTree);
       TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
    }
 

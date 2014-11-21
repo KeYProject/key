@@ -19,16 +19,16 @@ import org.junit.Test;
 import org.key_project.util.test.util.SWTBotTabbedPropertyList;
 
 /**
- * Tests the property page tab "KeY" in a Symbolic Execution Tree diagram.
+ * Tests the property page tab "Postcondition" in a Symbolic Execution Tree diagram.
  * @author Martin Hentschel
  */
-public class SWTBotGraphitiKeYTabTest extends AbstractSWTBotGraphitiKeYPropertyTabTest {
+public class SWTBotGraphitiLoopInvariantTabTest extends AbstractSWTBotGraphitiKeYPropertyTabTest {
    /**
-    * Tests the shown values and the existence of tab "KeY".
+    * Tests the shown values and the existence of tab "Postcondition".
     */
    @Test
    public void testValuesAndTabExistence() throws Exception {
-      doAllNodeTypesTest("SWTBotGraphitiCallStackTabTest_testValuesAndTabExistence", SWTBotKeYTabTest.createAllNodeTypesSteps());
+      doAllNodeTypesTest("SWTBotGraphitiLoopInvariantTabTest_testValuesAndTabExistence", SWTBotLoopInvariantTabTest.createAllNodeTypesSteps());
    }
    
    /**
@@ -40,17 +40,17 @@ public class SWTBotGraphitiKeYTabTest extends AbstractSWTBotGraphitiKeYPropertyT
       doInDiagramEditorTest(new IEditorTestSteps() {
          @Override
          public void assertThread(SWTBotGefEditor editor, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
-            assertFalse(tabs.hasTabItem("KeY"));
+            assertFalse(tabs.hasTabItem("Precondition"));
          }
          
          @Override
          public void assertStatement(SWTBotGefEditor editor, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
-            assertFalse(tabs.hasTabItem("KeY"));
+            assertFalse(tabs.hasTabItem("Precondition"));
          }
          
          @Override
          public void assertDiagram(SWTBotGefEditor editor, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
-            assertFalse(tabs.hasTabItem("KeY"));
+            assertFalse(tabs.hasTabItem("Precondition"));
          }
       });
    }

@@ -28,7 +28,7 @@ public class SWTBotGraphitiPostconditionTabTest extends AbstractSWTBotGraphitiKe
     */
    @Test
    public void testValuesAndTabExistence() throws Exception {
-      doFlatStepsTest("SWTBotGraphitiPostconditionTabTest_testValuesAndTabExistence", SWTBotPostconditionTabTest.createFixedExampleSteps());
+      doAllNodeTypesTest("SWTBotGraphitiPostconditionTabTest_testValuesAndTabExistence", SWTBotPostconditionTabTest.createAllNodeTypesSteps());
    }
    
    /**

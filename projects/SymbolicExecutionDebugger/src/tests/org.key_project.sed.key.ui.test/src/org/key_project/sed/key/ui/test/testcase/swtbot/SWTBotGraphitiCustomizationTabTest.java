@@ -29,7 +29,7 @@ public class SWTBotGraphitiCustomizationTabTest extends AbstractSWTBotGraphitiKe
     */
    @Test
    public void testValuesAndTabExistence() throws Exception {
-      doFlatStepsTest("SWTBotGraphitiCustomizationTabTest_testValuesAndTabExistence", new ITestSteps() {
+      doAllNodeTypesTest("SWTBotGraphitiCustomizationTabTest_testValuesAndTabExistence", new ITestSteps() {
          @Override
          public void assertThread(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
             assertFalse(tabs.hasTabItem("Customization"));
@@ -52,11 +52,26 @@ public class SWTBotGraphitiCustomizationTabTest extends AbstractSWTBotGraphitiKe
 
          @Override
          public void assertTermination(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
-            assertFalse(tabs.hasTabItem("Main"));
+            assertFalse(tabs.hasTabItem("Customization"));
          }
 
          @Override
          public void assertLaunch(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertFalse(tabs.hasTabItem("Customization"));
+         }
+
+         @Override
+         public void assertMethodContract(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertFalse(tabs.hasTabItem("Customization"));
+         }
+
+         @Override
+         public void assertLoopInvariant(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertFalse(tabs.hasTabItem("Customization"));
+         }
+
+         @Override
+         public void assertLoopBodyTermination(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
             assertFalse(tabs.hasTabItem("Customization"));
          }
       });

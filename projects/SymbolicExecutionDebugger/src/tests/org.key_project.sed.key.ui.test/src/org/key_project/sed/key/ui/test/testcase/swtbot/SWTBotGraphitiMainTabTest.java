@@ -29,7 +29,7 @@ public class SWTBotGraphitiMainTabTest extends AbstractSWTBotGraphitiKeYProperty
     */
    @Test
    public void testValuesAndTabExistence() throws Exception {
-      doFlatStepsTest("SWTBotGraphitiMainTabTest_testValuesAndTabExistence", new ITestSteps() {
+      doAllNodeTypesTest("SWTBotGraphitiMainTabTest_testValuesAndTabExistence", new ITestSteps() {
          @Override
          public void assertThread(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
             assertFalse(tabs.hasTabItem("Main"));
@@ -57,6 +57,21 @@ public class SWTBotGraphitiMainTabTest extends AbstractSWTBotGraphitiKeYProperty
 
          @Override
          public void assertLaunch(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertFalse(tabs.hasTabItem("Main"));
+         }
+
+         @Override
+         public void assertMethodContract(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertFalse(tabs.hasTabItem("Main"));
+         }
+
+         @Override
+         public void assertLoopInvariant(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertFalse(tabs.hasTabItem("Main"));
+         }
+
+         @Override
+         public void assertLoopBodyTermination(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
             assertFalse(tabs.hasTabItem("Main"));
          }
       });

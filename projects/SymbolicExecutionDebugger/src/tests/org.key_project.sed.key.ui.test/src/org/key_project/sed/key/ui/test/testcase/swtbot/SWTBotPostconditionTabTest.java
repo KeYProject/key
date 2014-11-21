@@ -29,14 +29,14 @@ public class SWTBotPostconditionTabTest extends AbstractSWTBotKeYPropertyTabTest
     */
    @Test
    public void testValuesAndTabExistence() throws Exception {
-      doFlatStepsTest("SWTBotPostconditionTabTest_testValuesAndTabExistence", createFixedExampleSteps());
+      doAllNodeTypesTest("SWTBotPostconditionTabTest_testValuesAndTabExistence", createAllNodeTypesSteps());
    }
    
    /**
     * Creates the test steps to execute.
     * @return The created test steps.
     */
-   public static ITestSteps createFixedExampleSteps() {
+   public static ITestSteps createAllNodeTypesSteps() {
       return new ITestSteps() {
          @Override
          public void assertThread(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
@@ -67,8 +67,22 @@ public class SWTBotPostconditionTabTest extends AbstractSWTBotKeYPropertyTabTest
          public void assertTermination(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
             assertTrue(tabs.selectTabItem("Postcondition"));
             TestUtilsUtil.waitForJobs();
-            assertEquals("true", propertiesView.bot().styledText(0).getText());
-            assertEquals("true", propertiesView.bot().styledText(1).getText());
+            assertEquals("exc = null", propertiesView.bot().styledText(0).getText());
+         }
+
+         @Override
+         public void assertMethodContract(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertFalse(tabs.hasTabItem("Postcondition"));
+         }
+
+         @Override
+         public void assertLoopInvariant(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertFalse(tabs.selectTabItem("Postcondition"));
+         }
+
+         @Override
+         public void assertLoopBodyTermination(SWTBotTree debugTree, SWTBotView propertiesView, SWTBotTabbedPropertyList tabs) throws Exception {
+            assertFalse(tabs.selectTabItem("Postcondition"));
          }
       };
    }
