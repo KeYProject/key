@@ -6,6 +6,9 @@
       <profile_provider
             class="de.key_project.jmlediting.profile.jmlref.JMLReferenceProfileProvider">
       </profile_provider>
+      <profile_provider
+            class="de.key_project.jmlediting.profile.jmlref.JMLReferenceProfileProvider2">
+      </profile_provider>
    </extension>
 
 </plugin>
