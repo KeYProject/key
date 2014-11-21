@@ -4448,7 +4448,11 @@ problem returns [ Term _problem = null ]
             RBRACE {choices=DefaultImmutableSet.<Choice>nil();}
         ) *
 
-        { problemHeader = lexer.toString(beginPos, input.index()-1); }
+        { if(input.index() == 0) {
+             problemHeader = "";
+          } else {
+             problemHeader = lexer.toString(beginPos, input.index()-1);
+          } }
 
         ((PROBLEM LBRACE 
             { switchToNormalMode(); }
