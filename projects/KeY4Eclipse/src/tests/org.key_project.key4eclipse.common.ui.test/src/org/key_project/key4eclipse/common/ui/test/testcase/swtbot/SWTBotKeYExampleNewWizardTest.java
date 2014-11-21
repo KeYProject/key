@@ -76,6 +76,7 @@ public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
       EXAMPLES_WITH_COMPILER_FAILURES.add("Java 5 Enhanced-for");
       EXAMPLES_WITH_COMPILER_FAILURES.add("Simple E-Voting");
       EXAMPLES_WITH_COMPILER_FAILURES.add("List with Sequences");
+      EXAMPLES_WITH_COMPILER_FAILURES.add("Permuted Sum");
 
       final Set<String> BROKEN_PROOF_FILE_PATHES = new HashSet<String>();
       BROKEN_PROOF_FILE_PATHES.add("/SWTBotKeYExampleNewWizardTest_Transaction_project/JML operation contract (id_ 9 - Transaction__Transaction).proof");
