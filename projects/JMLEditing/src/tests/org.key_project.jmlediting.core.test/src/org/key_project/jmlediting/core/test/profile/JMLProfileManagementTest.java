@@ -10,7 +10,7 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.AbstractJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
 import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IJMLKeyword;
+import org.key_project.jmlediting.core.profile.syntax.ISpecificationStatementKeyword;
 
 public class JMLProfileManagementTest {
 

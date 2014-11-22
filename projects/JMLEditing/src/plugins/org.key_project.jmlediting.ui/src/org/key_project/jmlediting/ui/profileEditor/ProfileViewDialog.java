@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.core.profile.syntax.IJMLKeyword;
+import org.key_project.jmlediting.core.profile.syntax.ISpecificationStatementKeyword;
 
 public class ProfileViewDialog extends StatusDialog {
    
@@ -77,7 +77,7 @@ public class ProfileViewDialog extends StatusDialog {
      
       this.supportedGenericSpecifications.removeAll();
       
-      for (IJMLKeyword gSpec : this.profileToEdit.getSupportedGenerics()) {
+      for (ISpecificationStatementKeyword gSpec : this.profileToEdit.getSupportedGenerics()) {
         TableItem item = new TableItem(this.supportedGenericSpecifications, 0);
         item.setText(gSpecToTableData(gSpec));
       }
@@ -85,7 +85,7 @@ public class ProfileViewDialog extends StatusDialog {
       
    }
    
-   private String[] gSpecToTableData(IJMLKeyword gSpec) {
+   private String[] gSpecToTableData(ISpecificationStatementKeyword gSpec) {
       String sourceDescription = gSpec.getDescription();
       if (sourceDescription.length() > 200) {
          sourceDescription = sourceDescription.substring(0, 196);

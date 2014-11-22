@@ -6,7 +6,7 @@ import java.util.Set;
 
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IJMLKeyword;
+import org.key_project.jmlediting.core.profile.syntax.ISpecificationStatementKeyword;
 
 import de.key_project.jmlediting.profile.jmlref.behavior.BehaviorKeyword;
 import de.key_project.jmlediting.profile.jmlref.behavior.ExceptionalBehaviorKeyword;
@@ -17,11 +17,11 @@ import de.key_project.jmlediting.profile.jmlref.keyword.RequiresKeyword;
 
 public class JMLReferenceProfile implements IJMLProfile {
    
-   private static final Set<IJMLKeyword> SUPPORTED_KEYWORDS;
+   private static final Set<ISpecificationStatementKeyword> SUPPORTED_KEYWORDS;
    private static final Set<IJMLBehaviorKeyword> SUPPORTED_BEHAVIOR_KEYWORDS; 
    
    static {
-      Set<IJMLKeyword> supportedKeywords = new HashSet<IJMLKeyword>();
+      Set<ISpecificationStatementKeyword> supportedKeywords = new HashSet<ISpecificationStatementKeyword>();
       supportedKeywords.add(new AssignableKeyword());
       supportedKeywords.add(new EnsuresKeyword());
       supportedKeywords.add(new RequiresKeyword());
@@ -53,7 +53,7 @@ public class JMLReferenceProfile implements IJMLProfile {
    }
 
    @Override
-   public Set<IJMLKeyword> getSupportedGenerics() {
+   public Set<ISpecificationStatementKeyword> getSupportedGenerics() {
       return SUPPORTED_KEYWORDS;
    }
 

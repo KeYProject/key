@@ -1,8 +1,8 @@
 package de.key_project.jmlediting.profile.jmlref.keyword;
 
-import org.key_project.jmlediting.core.profile.syntax.IJMLKeyword;
+import org.key_project.jmlediting.core.profile.syntax.ISpecificationStatementKeyword;
 
-public class AssignableKeyword implements IJMLKeyword {
+public class AssignableKeyword implements ISpecificationStatementKeyword {
 
    @Override
    public String getKeyword() {

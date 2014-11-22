@@ -3,7 +3,7 @@ package org.key_project.jmlediting.core.profile;
 import java.util.Set;
 
 import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IJMLKeyword;
+import org.key_project.jmlediting.core.profile.syntax.ISpecificationStatementKeyword;
 
 /**
  * Defines a profile for a JML variant.
@@ -40,6 +40,6 @@ public interface IJMLProfile {
     * 
     * @return the set of supported behaviors
     */
-   Set<IJMLKeyword> getSupportedGenerics();
+   Set<ISpecificationStatementKeyword> getSupportedGenerics();
 
 }

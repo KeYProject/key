@@ -4,7 +4,7 @@ import java.util.Set;
 
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IJMLKeyword;
+import org.key_project.jmlediting.core.profile.syntax.ISpecificationStatementKeyword;
 
 public class KeyProfile implements IJMLProfile {
 
@@ -25,7 +25,7 @@ public class KeyProfile implements IJMLProfile {
    }
 
    @Override
-   public Set<IJMLKeyword> getSupportedGenerics() {
+   public Set<ISpecificationStatementKeyword> getSupportedGenerics() {
       // TODO Auto-generated method stub
       return null;
    }

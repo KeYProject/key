@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IJMLKeyword;
+import org.key_project.jmlediting.core.profile.syntax.ISpecificationStatementKeyword;
 
 /**
  * Implements a basic {@link AbstractJMLProfile}. It is not configurable but this is not
@@ -31,7 +31,7 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
    /**
     * The set of supported generics.
     */
-   protected final Set<IJMLKeyword> supportedGenerics;
+   protected final Set<ISpecificationStatementKeyword> supportedGenerics;
 
    /**
     * Creates a new {@link AbstractJMLProfile} with given name and identifier and
@@ -49,7 +49,7 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
     */
    public AbstractJMLProfile(final String name, final String identifier,
          Set<IJMLBehaviorKeyword> supportedBehaviorSpecs,
-         Set<IJMLKeyword> supportedGenericSpecs) {
+         Set<ISpecificationStatementKeyword> supportedGenericSpecs) {
       super();
       if (identifier == null) {
          throw new NullPointerException(
@@ -62,12 +62,12 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
       this.identifier = identifier;
       this.supportedBehaviors = new HashSet<IJMLBehaviorKeyword>(
             supportedBehaviorSpecs);
-      this.supportedGenerics = new HashSet<IJMLKeyword>(
+      this.supportedGenerics = new HashSet<ISpecificationStatementKeyword>(
             supportedGenericSpecs);
    }
    
    public AbstractJMLProfile(final String name, final String identifier) {
-      this(name, identifier, Collections.<IJMLBehaviorKeyword>emptySet(),Collections.<IJMLKeyword>emptySet());
+      this(name, identifier, Collections.<IJMLBehaviorKeyword>emptySet(),Collections.<ISpecificationStatementKeyword>emptySet());
    }
 
    @Override
@@ -86,7 +86,7 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
    }
 
    @Override
-   public Set<IJMLKeyword> getSupportedGenerics() {
+   public Set<ISpecificationStatementKeyword> getSupportedGenerics() {
       return Collections.unmodifiableSet(this.supportedGenerics);
    }
 
