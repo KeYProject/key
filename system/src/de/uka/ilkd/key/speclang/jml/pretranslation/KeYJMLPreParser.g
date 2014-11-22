@@ -183,17 +183,19 @@ classlevel_comment
     mods = ImmutableSLList.<String>nil();
 }
 :
+    /* there may be some modifiers after the declarations */
+
+    mods=modifiers
     (
-        options { greedy = false; }
-    	:
-    	mods=modifiers
-    	list=classlevel_element[mods]
-    	{
-	    if(list!=null) {
-		result = result.append(list);
-	    }
-	}
-    )* EOF
+      list=classlevel_element[mods]
+      {
+          if(list!=null) {
+             result = result.append(list);
+          }
+      }
+      mods=modifiers
+    )*
+    EOF
 ;
 
 
@@ -219,7 +221,6 @@ classlevel_element[ImmutableList<String> mods]
     |   result=assert_statement[mods] //RecodeR workaround
     |   result=assume_statement[mods] //RecodeR workaround
     |   result=nowarn_pragma[mods]
-    |   EOF
 ;
 
 
