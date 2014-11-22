@@ -231,26 +231,50 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     public void testQueryInheritance() throws Exception {
-        compareStringRepresentationAgainstTermRepresentation("a.query(i)",
-                parseTerm("testTermParserHeap.A::query(heap, a, i)"),
+        comparePrettySyntaxAgainstVerboseSyntax("a.query(i)",
+                "testTermParserHeap.A::query(heap, a, i)",
                 "a.(testTermParserHeap.A::query)(i)");
 
-        compareStringRepresentationAgainstTermRepresentation("a1.query(i)",
-                parseTerm("testTermParserHeap.A::query(heap, a1, i)"),
+        // test public query defined in superclass, which is not overridden
+        comparePrettySyntaxAgainstVerboseSyntax("a1.query(i)",
+                "testTermParserHeap.A::query(heap, a1, i)",
                 "a1.(testTermParserHeap.A::query)(i)");
 
-        compareStringRepresentationAgainstTermRepresentation("a1.queryRedefined()",
-                parseTerm("testTermParserHeap.A1::queryRedefined(heap, a1)"),
+        // test redefined (private) query
+        comparePrettySyntaxAgainstVerboseSyntax("a1.queryRedefined()",
+                "testTermParserHeap.A1::queryRedefined(heap, a1)",
                 "a1.(testTermParserHeap.A1::queryRedefined)()");
 
-        compareStringRepresentationAgainstTermRepresentation("a1.(testTermParserHeap.A::queryRedefined)()",
-                parseTerm("testTermParserHeap.A::queryRedefined(heap, a1)"));
+        // test redefined (private) query - explicitly reference query from superclass
+        comparePrettySyntaxAgainstVerboseSyntax("a1.(testTermParserHeap.A::queryRedefined)()",
+                "testTermParserHeap.A::queryRedefined(heap, a1)");
 
-        compareStringRepresentationAgainstTermRepresentation("a1.queryOverridden()",
-                parseTerm("testTermParserHeap.A::queryOverridden(heap, a1)"));
+        // test overridden (public) query
+        comparePrettySyntaxAgainstVerboseSyntax("a1.queryOverridden()",
+                "testTermParserHeap.A::queryOverridden(heap, a1)");
 
-        compareStringRepresentationAgainstTermRepresentation("a1.toString()@h",
-                parseTerm("java.lang.Object::toString(h, a1)"));
+        // test whether toString() query inherited from java.lang.Object gets parsed correctly
+        comparePrettySyntaxAgainstVerboseSyntax("a1.toString()@h",
+                "java.lang.Object::toString(h, a1)");
+
+        // refer to lowest class in type hierarchy for a overridden query
+        Term t1 = parseTerm("a1.(testTermParserHeap.A1::queryOverridden)()");
+        Term t2 = parseTerm("testTermParserHeap.A1::queryOverridden(heap,a1)");
+        assertEquals(t2, t1);
+
+        // refer to lowest class in type hierarchy for a overridden query with non-standard heap
+        t1 = parseTerm("a1.(testTermParserHeap.A1::queryOverridden)()@h");
+        t2 = parseTerm("testTermParserHeap.A1::queryOverridden(h,a1)");
+        assertEquals(t2, t1);
+
+        // test a static query
+        comparePrettySyntaxAgainstVerboseSyntax("testTermParserHeap.A1.staticQuery(a)@h",
+                "testTermParserHeap.A1::staticQuery(h,a)",
+                "a1.staticQuery(a)@h");
+
+        // test an overridden query with several arguments
+        comparePrettySyntaxAgainstVerboseSyntax("a1.queryOverriddenWithArguments(i,a,a1)@h",
+                "testTermParserHeap.A::queryOverriddenWithArguments(h,a1,i,a,a1)");
     }
 
     /*

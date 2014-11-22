@@ -27,6 +27,8 @@ public class NotDeclException extends RecognitionException {
     String addtl;
     private String fileName;
     
+    public NotDeclException(){}
+
     public NotDeclException(String cat, Token t, String filename) {
 	this.cat      = cat;
 	this.fileName = filename;

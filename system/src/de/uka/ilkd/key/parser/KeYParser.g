@@ -1160,9 +1160,7 @@ options {
                 ("(program) variable or constant", varfunc_name,
                  getSourceName(), getLine(), getColumn());
         } else {
-            throw new NotDeclException
-                ("function or static query", varfunc_name,
-                 getSourceName(), getLine(), getColumn());
+            throw new QueryNotDeclaredException(varfunc_name, args, getSourceName(), getLine(), getColumn());
         }
     }
 
@@ -2856,7 +2854,10 @@ query_suffix [Term prefix, String memberName] returns [Term result = null]
     :
     args = argument_list
     {
-       if(memberName.indexOf("::") == -1) {
+       // true in case class name is not explicitly mentioned as part of memberName
+       boolean implicitClassName = memberName.indexOf("::") == -1;
+       
+       if(implicitClassName) {
           classRef = prefix.sort().name().toString();
           name = memberName;
        } else {
@@ -2872,7 +2873,7 @@ query_suffix [Term prefix, String memberName] returns [Term result = null]
               getColumn());
        classRef = kjt.getFullName();
 
-       result = getServices().getJavaInfo().getProgramMethodTerm(prefix, name, args, classRef);
+       result = getServices().getJavaInfo().getProgramMethodTerm(prefix, name, args, classRef, implicitClassName);
     }
  ;
 catch [TermCreationException ex] {
@@ -2971,7 +2972,7 @@ static_query returns [Term result = null]
        int index = queryRef.indexOf(':');
        String className = queryRef.substring(0, index); 
        String qname = queryRef.substring(index+2); 
-       result = getServices().getJavaInfo().getProgramMethodTerm(null, qname, args, className);
+       result = getServices().getJavaInfo().getStaticProgramMethodTerm(qname, args, className);
        if(result == null && isTermParser()) {
 	  final Sort sort = lookupSort(className);
           if (sort == null) {

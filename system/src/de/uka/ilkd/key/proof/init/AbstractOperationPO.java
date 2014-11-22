@@ -323,7 +323,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
              // Need to add assumptions about the transaction depth
              try {
                  final Term depthTerm =
-                         proofServices.getJavaInfo().getProgramMethodTerm(null, "getTransactionDepth", new Term[0], "javacard.framework.JCSystem");
+                         proofServices.getJavaInfo().getStaticProgramMethodTerm("getTransactionDepth", new Term[0], "javacard.framework.JCSystem");
                  final Term depthValue = transactionFlag ? tb.one() : tb.zero();
                  pre = tb.and(pre, tb.equals(depthTerm, depthValue));
              }catch(IllegalArgumentException iae) {

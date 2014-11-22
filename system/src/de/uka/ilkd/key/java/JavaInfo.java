@@ -595,16 +595,26 @@ public final class JavaInfo {
 		                      new KeYJavaType[pm.getNumParams()]));
 	return getToplevelPM(kjt, methodName, sig);
     }
-
+    
+    public Term getStaticProgramMethodTerm(String methodName, Term[] args, String className) {
+        ImmutableList<KeYJavaType> argList = ImmutableSLList.<KeYJavaType>nil();
+        for (int i = 0; i < args.length; i++) {
+            argList = argList.append(getServices().getJavaInfo().getKeYJavaType(args[i].sort()));
+        }
+        KeYJavaType classKJT = getTypeByClassName(className);
+        IProgramMethod pm = getProgramMethod(classKJT, methodName, argList, classKJT);
+        return getTermFromProgramMethod(pm, methodName, className, args, null);
+    }
 
     public Term getProgramMethodTerm(Term prefix,
-	    			     String methodName,
-				     Term[] args,
-				     String className) {
-	ImmutableList<KeYJavaType> argList = ImmutableSLList.<KeYJavaType>nil();
-	for(int i=0; i < args.length; i++) {
-	    argList = argList.append(getServices().getJavaInfo().getKeYJavaType(args[i].sort()));
-	}
+            String methodName,
+            Term[] args,
+            String className,
+            boolean traverseHierarchy) {
+        ImmutableList<KeYJavaType> argList = ImmutableSLList.<KeYJavaType>nil();
+        for (int i = 0; i < args.length; i++) {
+            argList = argList.append(getServices().getJavaInfo().getKeYJavaType(args[i].sort()));
+        }
 
         IProgramMethod pm = null;
         KeYJavaType classKJT = getTypeByClassName(className);
@@ -617,49 +627,62 @@ public final class JavaInfo {
             /*
              * Method is referenced from a non-static context.
              */
-            ImmutableList<KeYJavaType> allSupertypes = kpmi.getAllSupertypes(classKJT).reverse();
-            Iterator iterator = allSupertypes.iterator();
-            while (iterator.hasNext() && pm == null) {
-                KeYJavaType next = (KeYJavaType) iterator.next();
-                pm = getProgramMethod(next, methodName, argList, next);
-                if (pm != null && pm.isPrivate() && !next.equals(classKJT)) {
-                    /*
-                     * Private methods from supertypes are not visible in their
-                     * subtypes. They will not be selected here.
-                     */
-                    pm = null;
+            if (traverseHierarchy) {
+                /* 
+                 * Traverse type hierarchy to find a method with the specified name.
+                 */
+                ImmutableList<KeYJavaType> allSupertypes = kpmi.getAllSupertypes(classKJT).reverse();
+                Iterator iterator = allSupertypes.iterator();
+                while (iterator.hasNext() && pm == null) {
+                    KeYJavaType next = (KeYJavaType) iterator.next();
+                    pm = getProgramMethod(next, methodName, argList, next);
+                    if (pm != null && pm.isPrivate() && !next.equals(classKJT)) {
+                        /*
+                         * Private methods from supertypes are not visible in their
+                         * subtypes. They will not be selected here.
+                         */
+                        pm = null;
+                    }
                 }
+            } else {
+                /* 
+                 * Do not traverse type hierarchy. pm stays null in case classKJT
+                 * does not contain a method with the specified name.
+                 */
+                pm = getProgramMethod(classKJT, methodName, argList, classKJT);
             }
         }
-
-	if(pm == null) {
-	    throw new IllegalArgumentException("Program method "+methodName
-					       +" in "+className+" not found.");
-	}
-	Term[] subs = new Term[pm.getHeapCount(services)*pm.getStateCount() + args.length + (pm.isStatic() ? 0 : 1)];
-	int offset = 0;
-	for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
-		if(offset >= pm.getHeapCount(services)) {
-			break;
-		}
-		subs[offset++] = services.getTermBuilder().var(heap);
-	}
-	if(!pm.isStatic()) {
-	  subs[offset++] = prefix;
-	}
-	for(int i=0; offset < subs.length; i++, offset++) {
-        subs[offset] = args[i];
-	}
-	className = translateArrayType(className);
-	assert pm.getReturnType() != null;
-	if(pm.isVoid()) {
-	    throw new IllegalArgumentException("Program method "+methodName
-					       +" in "+className+" must have"
-					       +" a non-void type.");
-	}
-	return services.getTermBuilder().tf().createTerm(pm, subs);
+        return getTermFromProgramMethod(pm, methodName, className, args, prefix);
     }
 
+    private Term getTermFromProgramMethod(IProgramMethod pm, String methodName, String className, Term[] args, Term prefix) throws IllegalArgumentException {
+        if (pm == null) {
+            throw new IllegalArgumentException("Program method " + methodName
+                    + " in " + className + " not found.");
+        }
+        Term[] subs = new Term[pm.getHeapCount(services) * pm.getStateCount() + args.length + (pm.isStatic() ? 0 : 1)];
+        int offset = 0;
+        for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
+            if (offset >= pm.getHeapCount(services)) {
+                break;
+            }
+            subs[offset++] = services.getTermBuilder().var(heap);
+        }
+        if (!pm.isStatic()) {
+            subs[offset++] = prefix;
+        }
+        for (int i = 0; offset < subs.length; i++, offset++) {
+            subs[offset] = args[i];
+        }
+        className = translateArrayType(className);
+        assert pm.getReturnType() != null;
+        if (pm.isVoid()) {
+            throw new IllegalArgumentException("Program method " + methodName
+                    + " in " + className + " must have"
+                    + " a non-void type.");
+        }
+        return services.getTermBuilder().tf().createTerm(pm, subs);
+    }
 
     /**
      * returns all direct supertypes (local declared types in extends and
