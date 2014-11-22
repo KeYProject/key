@@ -1416,7 +1416,7 @@ public final class JavaInfo {
              */
             ImmutableList<KeYJavaType> allSupertypes = kpmi.getAllSupertypes(context);
             Iterator<KeYJavaType> iterator = allSupertypes.iterator();
-            iterator.next(); // skip first element, which we already considered
+            iterator.next(); // skip first element (it equals context and was already processed above)
             while (iterator.hasNext()) {
                 KeYJavaType next = iterator.next();
                 IProgramMethod programMethod = getProgramMethod(next, name, paramTypes, context);
