@@ -2,6 +2,7 @@ package org.key_project.jmlediting.profile.key;
 
 import java.util.Set;
 
+import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorKeyword;
 import org.key_project.jmlediting.core.profile.syntax.ISpecificationStatementKeyword;
@@ -25,7 +26,13 @@ public class KeyProfile implements IJMLProfile {
    }
 
    @Override
-   public Set<ISpecificationStatementKeyword> getSupportedGenerics() {
+   public Set<ISpecificationStatementKeyword> getSupportedSpecificationStatementKeywords() {
+      // TODO Auto-generated method stub
+      return null;
+   }
+
+   @Override
+   public IJMLParser createParser() {
       // TODO Auto-generated method stub
       return null;
    }

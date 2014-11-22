@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.key_project.jmlediting.core.parser.DefaultJMLParser;
+import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorKeyword;
 import org.key_project.jmlediting.core.profile.syntax.ISpecificationStatementKeyword;
@@ -53,8 +55,13 @@ public class JMLReferenceProfile implements IJMLProfile {
    }
 
    @Override
-   public Set<ISpecificationStatementKeyword> getSupportedGenerics() {
+   public Set<ISpecificationStatementKeyword> getSupportedSpecificationStatementKeywords() {
       return SUPPORTED_KEYWORDS;
+   }
+
+   @Override
+   public IJMLParser createParser() {
+      return new DefaultJMLParser(this);
    }
 
 }

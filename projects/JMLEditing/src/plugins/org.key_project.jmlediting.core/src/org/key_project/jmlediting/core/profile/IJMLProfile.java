@@ -2,6 +2,7 @@ package org.key_project.jmlediting.core.profile;
 
 import java.util.Set;
 
+import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorKeyword;
 import org.key_project.jmlediting.core.profile.syntax.ISpecificationStatementKeyword;
 
@@ -40,6 +41,8 @@ public interface IJMLProfile {
     * 
     * @return the set of supported behaviors
     */
-   Set<ISpecificationStatementKeyword> getSupportedGenerics();
+   Set<ISpecificationStatementKeyword> getSupportedSpecificationStatementKeywords();
+   
+   IJMLParser createParser();
 
 }

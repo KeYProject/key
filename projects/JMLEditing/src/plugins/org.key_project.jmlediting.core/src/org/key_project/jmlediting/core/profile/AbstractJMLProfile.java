@@ -86,7 +86,7 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
    }
 
    @Override
-   public Set<ISpecificationStatementKeyword> getSupportedGenerics() {
+   public Set<ISpecificationStatementKeyword> getSupportedSpecificationStatementKeywords() {
       return Collections.unmodifiableSet(this.supportedGenerics);
    }
 

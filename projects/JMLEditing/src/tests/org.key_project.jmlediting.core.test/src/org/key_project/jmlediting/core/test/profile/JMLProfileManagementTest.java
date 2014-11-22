@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.junit.Test;
+import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.AbstractJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
@@ -17,7 +18,12 @@ public class JMLProfileManagementTest {
    public static class DummyJMLProfile1 extends AbstractJMLProfile {
 
       public DummyJMLProfile1() {
-         super( "DummyJMLProfile1",DummyJMLProfile1.class.getName());
+         super("DummyJMLProfile1", DummyJMLProfile1.class.getName());
+      }
+
+      @Override
+      public IJMLParser createParser() {
+         return null;
       }
 
    }
@@ -25,13 +31,15 @@ public class JMLProfileManagementTest {
    public static class DummyJMLProfile2 extends AbstractJMLProfile {
 
       public DummyJMLProfile2() {
-         super( "DummyJMLProfile2",DummyJMLProfile2.class.getName());
+         super("DummyJMLProfile2", DummyJMLProfile2.class.getName());
+      }
+
+      @Override
+      public IJMLParser createParser() {
+         return null;
       }
 
    }
-   
-   
-  
 
    @Test
    public void test() {

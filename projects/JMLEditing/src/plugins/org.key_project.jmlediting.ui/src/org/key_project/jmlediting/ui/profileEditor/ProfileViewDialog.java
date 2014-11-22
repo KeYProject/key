@@ -77,7 +77,7 @@ public class ProfileViewDialog extends StatusDialog {
      
       this.supportedGenericSpecifications.removeAll();
       
-      for (ISpecificationStatementKeyword gSpec : this.profileToEdit.getSupportedGenerics()) {
+      for (ISpecificationStatementKeyword gSpec : this.profileToEdit.getSupportedSpecificationStatementKeywords()) {
         TableItem item = new TableItem(this.supportedGenericSpecifications, 0);
         item.setText(gSpecToTableData(gSpec));
       }
