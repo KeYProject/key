@@ -1238,7 +1238,8 @@ public class LogicPrinter {
                     // in case arity > 1 we assume fieldName refers to a query (method call)
                     Term object = t.sub(1);
                     KeYJavaType keYJavaType = javaInfo.getKeYJavaType(object.sort());
-                    if (javaInfo.isCanonicalProgramMethod((IProgramMethod) obs, keYJavaType)) {
+                    if (javaInfo.isCanonicalProgramMethod((IProgramMethod) obs, keYJavaType)
+                            || obs.isStatic()) {
                         layouter.print(fieldName);
                     } else {
                         layouter.print("(" + t.op() + ")");

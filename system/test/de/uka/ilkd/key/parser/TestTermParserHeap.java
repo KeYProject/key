@@ -257,15 +257,13 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         comparePrettySyntaxAgainstVerboseSyntax("a1.toString()@h",
                 "java.lang.Object::toString(h, a1)");
 
-        // refer to lowest class in type hierarchy for a overridden query
-        Term t1 = parseTerm("a1.(testTermParserHeap.A1::queryOverridden)()");
-        Term t2 = parseTerm("testTermParserHeap.A1::queryOverridden(heap,a1)");
-        assertEquals(t2, t1);
+        // test query with explicitly specified classname
+        comparePrettySyntaxAgainstVerboseSyntax("a1.(testTermParserHeap.A1::queryOverridden)()",
+                "testTermParserHeap.A1::queryOverridden(heap,a1)");
 
-        // refer to lowest class in type hierarchy for a overridden query with non-standard heap
-        t1 = parseTerm("a1.(testTermParserHeap.A1::queryOverridden)()@h");
-        t2 = parseTerm("testTermParserHeap.A1::queryOverridden(h,a1)");
-        assertEquals(t2, t1);
+        // test query with explicitly specified classname in combination with a non-standard heap
+        comparePrettySyntaxAgainstVerboseSyntax("a1.(testTermParserHeap.A1::queryOverridden)()@h",
+                "testTermParserHeap.A1::queryOverridden(h,a1)");
 
         // test a static query
         comparePrettySyntaxAgainstVerboseSyntax("testTermParserHeap.A1.staticQuery(a)@h",
