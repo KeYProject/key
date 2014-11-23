@@ -18,7 +18,7 @@ static int staticMethod() {
 /*@ pure */ private int queryRedefined() { return 0; }
 
 /*@ pure */ public int queryOverriddenWithArguments(int i, A a, A1 a1) { return 0; }
-
+public int arrayQuery(A[] a) { return 0; }
 }
 
 class A1 extends A {
@@ -29,6 +29,5 @@ private  int f;
 /*@ pure */ private int queryRedefined() { return 1; }
 
 /*@ pure */ public int queryOverriddenWithArguments(int i, A a, A1 a1) { return 0; }
-public static int staticQuery(A a) { return 0; }
 
 }

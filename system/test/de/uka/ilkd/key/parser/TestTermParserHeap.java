@@ -33,6 +33,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         parseDecls("\\programVariables {int i;}");
         parseDecls("\\programVariables {testTermParserHeap.A a;}");
         parseDecls("\\programVariables {testTermParserHeap.A1 a1;}");
+        parseDecls("\\programVariables {testTermParserHeap.A[] array;}");
     }
 
     @Override
@@ -228,6 +229,14 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
         comparePrettySyntaxAgainstVerboseSyntax("(a.next@heap).getNext()@h", "testTermParserHeap.A::getNext(h, "
                 + "testTermParserHeap.A::select(heap, a, testTermParserHeap.A::$next))");
+
+        // test a query whose argument is an array variable
+        comparePrettySyntaxAgainstVerboseSyntax("a1.arrayQuery(array)",
+                "testTermParserHeap.A::arrayQuery(heap,a1,array)");
+
+        // test a query on an array element
+        comparePrettySyntaxAgainstVerboseSyntax("array[i].arrayQuery(array)",
+                "testTermParserHeap.A::arrayQuery(heap,testTermParserHeap.A::select(heap,array,arr(i)),array)");
     }
 
     public void testQueryInheritance() throws Exception {
@@ -257,18 +266,13 @@ public class TestTermParserHeap extends AbstractTestTermParser {
         comparePrettySyntaxAgainstVerboseSyntax("a1.toString()@h",
                 "java.lang.Object::toString(h, a1)");
 
-        // test query with explicitly specified classname
+        // test overridden query with explicitly specified classname
         comparePrettySyntaxAgainstVerboseSyntax("a1.(testTermParserHeap.A1::queryOverridden)()",
                 "testTermParserHeap.A1::queryOverridden(heap,a1)");
 
-        // test query with explicitly specified classname in combination with a non-standard heap
+        // test overridden query with explicitly specified classname in combination with a non-standard heap
         comparePrettySyntaxAgainstVerboseSyntax("a1.(testTermParserHeap.A1::queryOverridden)()@h",
                 "testTermParserHeap.A1::queryOverridden(h,a1)");
-
-        // test a static query
-        comparePrettySyntaxAgainstVerboseSyntax("testTermParserHeap.A1.staticQuery(a)@h",
-                "testTermParserHeap.A1::staticQuery(h,a)",
-                "a1.staticQuery(a)@h");
 
         // test an overridden query with several arguments
         comparePrettySyntaxAgainstVerboseSyntax("a1.queryOverriddenWithArguments(i,a,a1)@h",
@@ -285,7 +289,9 @@ public class TestTermParserHeap extends AbstractTestTermParser {
 
         // static method access
         comparePrettySyntaxAgainstVerboseSyntax("testTermParserHeap.A.staticMethod()",
-                "testTermParserHeap.A::staticMethod(heap)");
+                "testTermParserHeap.A::staticMethod(heap)",
+                "a.staticMethod()",
+                "a1.staticMethod()");
 
         // static array access
         comparePrettySyntaxAgainstVerboseSyntax("testTermParserHeap.A.staticArray[0]",
