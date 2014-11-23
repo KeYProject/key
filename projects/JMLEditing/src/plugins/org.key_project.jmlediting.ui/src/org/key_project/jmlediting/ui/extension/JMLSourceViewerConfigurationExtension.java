@@ -1,55 +1,78 @@
 package org.key_project.jmlediting.ui.extension;
+
 import java.util.LinkedList;
 import java.util.ListIterator;
 
-import org.eclipse.jdt.internal.ui.text.JavaPresentationReconciler;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
-import org.eclipse.jface.text.presentation.PresentationReconciler;
-import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.javaeditor.extension.DefaultJavaSourceViewerConfigurationExtension;
 import org.key_project.javaeditor.extension.IJavaSourceViewerConfigurationExtension;
 
 /**
  * An {@link IJavaSourceViewerConfigurationExtension} to support JML.
  * 
- * @author Martin Hentschel
+ * @author Martin Hentschel, David Giessing
  */
-   
+
 public class JMLSourceViewerConfigurationExtension extends
       DefaultJavaSourceViewerConfigurationExtension {
-   
-   
-   IDocument document;      
-      
-   public JMLSourceViewerConfigurationExtension(){
-      
+
+   IDocument document;
+
+   public JMLSourceViewerConfigurationExtension() {
+
    }
+
+   /**
+    * seeks the Documents text for JML Single Line comments
+    * 
+    * @return A Linked List of JML Comment sections which is empty if there are
+    *         no singleLineComments
+    */
+   public LinkedList<Comment> findSingleLineJMLComment()
+         throws BadLocationException {
+      String text = document.get();
+      int begin;
+      int end;
+      int lastIndex = 0;
+      LinkedList<Comment> singleLineComments = new LinkedList<Comment>();
+
+      while (true) {
+         begin = text.indexOf("//@", lastIndex);
+         if (begin == -1)
+            return singleLineComments;
+         end = document.getLineLength(document.getLineOfOffset(begin));
+         singleLineComments.add(new Comment(begin, end));
+         if (document.getNumberOfLines() == document.getLineOfOffset(begin))
+            return singleLineComments;
+      }
+   }
+
    /**
     * seeks the Documents text for JML Multi Line comments
     * 
     * @return A Linked List of JML Comment sections
     */
-   public LinkedList<Comment> findCommentOffsets() {
+   public LinkedList<Comment> findMultilineJMLComments() {
       String text = document.get();
       int lastIndex = 0;
       int begin;
       int end;
       LinkedList<Comment> comments = new LinkedList<Comment>();
+
       while (lastIndex > -1) {
          begin = text.indexOf("/*@", lastIndex);
-         if (begin > -1)                           //Stop searching When End of File is reached
+         if (begin > -1) // Stop searching When End of File is reached
             lastIndex = begin;
          else
             return comments;
          end = text.indexOf("@*/", lastIndex);
-         if (lastIndex > -1)                       //Stop searching When End of File is reached
+         if (lastIndex > -1) // Stop searching When End of File is reached
             lastIndex = end;
-         else return comments;
+         else
+            return comments;
          end = end - begin;
          System.out.println("Comment found: Begin: " + begin + " length: "
                + end);
@@ -58,40 +81,48 @@ public class JMLSourceViewerConfigurationExtension extends
       System.out.println(text.indexOf("/*@"));
       return comments;
    }
+
    /**
-    * isInJMLcomment checks whether an offset position is inside a JML Multiline Comment Section
-    * @param offset The offset to check whether it is in a JML Comment
-    * @return true if offset is in JML Multiline Comment false if not
+    * isInJMLcomment checks whether an offset position is inside a JML Multiline
+    * Comment Section
+    * 
+    * @param offset
+    *           The offset to check whether it is in a JML Comment
+    * @return true if offset is in a JML Comment, false if not
+    * @throws BadLocationException
     */
-   public boolean isInJMLcomment(int offset){
-      LinkedList<Comment> comments = findCommentOffsets();
+   public boolean isInJMLcomment(int offset) throws BadLocationException {
+      LinkedList<Comment> comments = findMultilineJMLComments();
+      comments.addAll(findSingleLineJMLComment());
       int commentOffset;
       int commentLength;
-         for(ListIterator<Comment> i=comments.listIterator(); i.hasNext(); i.next()){
-            commentOffset=i.next().offset;
-            commentLength=i.next().length;
-               if(commentOffset<=offset&&commentLength+commentOffset>=offset)
-                  return true;
+      for (ListIterator<Comment> i = comments.listIterator(); i.hasNext(); i
+            .next()) {
+         commentOffset = i.next().offset;
+         commentLength = i.next().length;
+         if (commentOffset <= offset && commentLength + commentOffset >= offset)
+            return true;
       }
-         return false;
+      return false;
    }
-  
+
    /**
     * {@inheritDoc}
     */
    @Override
    public int getTabWidth(ISourceViewer sourceViewer, int currentResult) {
-      this.document=sourceViewer.getDocument();//TODO is this Method called only once? 
-      findCommentOffsets();
+      this.document = sourceViewer.getDocument();// TODO is this Method called
+                                                 // only once?
+      findMultilineJMLComments();
       return currentResult * 2;
    }
 
    @Override
    public IPresentationReconciler getPresentationReconciler(
          ISourceViewer sourceViewer, IPresentationReconciler currentResult) {
-         return currentResult;
-      }
-   
+      return currentResult;
+   }
+
    /**
     * @return extendedContentTypes A List of the previously defined
     *         ContentTypes, with JMLMultiLine content at first position in the
@@ -101,9 +132,12 @@ public class JMLSourceViewerConfigurationExtension extends
    @Override
    public String[] getConfiguredContentTypes(ISourceViewer sourceViewer,
          String[] currentResult) {
-      if (currentResult[0].equals(JMLPartitionScanner.JML_MULTI_LINE)) //if Method was called
-         return currentResult;                                         //previously there is
-      else {                                                           // nothing to change
+      if (currentResult[0].equals(JMLPartitionScanner.JML_MULTI_LINE)) // if
+                                                                       // Method
+                                                                       // was
+                                                                       // called
+         return currentResult; // previously there is
+      else { // nothing to change
          String[] extendedContentTypes = new String[currentResult.length + 2];
          extendedContentTypes[0] = JMLPartitionScanner.JML_MULTI_LINE;
          extendedContentTypes[1] = JMLPartitionScanner.JML_SINGLE_LINE;
