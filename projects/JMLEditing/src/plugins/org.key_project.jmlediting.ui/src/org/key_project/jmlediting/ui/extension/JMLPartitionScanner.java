@@ -1,5 +1,6 @@
 package org.key_project.jmlediting.ui.extension;
 
+import org.eclipse.jdt.internal.ui.text.FastJavaPartitionScanner;
 import org.eclipse.jdt.internal.ui.text.JavaPartitionScanner;
 import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IPredicateRule;
@@ -12,7 +13,7 @@ import org.eclipse.jface.text.rules.Token;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JMLPartitionScanner extends JavaPartitionScanner {
+public class JMLPartitionScanner extends RuleBasedPartitionScanner {
    
    /**
     * Identifier for JML MultiLine Code.
@@ -27,7 +28,7 @@ public class JMLPartitionScanner extends JavaPartitionScanner {
    /**
     * Creates a JMLPartitionScanner that Detects SingleLine and MultiLine JML Code.
     */
-   @SuppressWarnings({ "rawtypes", "unchecked" })
+   @SuppressWarnings({ })
    public JMLPartitionScanner() {
       super();
        

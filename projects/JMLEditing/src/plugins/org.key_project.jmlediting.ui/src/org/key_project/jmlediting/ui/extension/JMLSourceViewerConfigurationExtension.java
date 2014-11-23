@@ -1,6 +1,9 @@
 package org.key_project.jmlediting.ui.extension;
-
+import java.util.LinkedList;
 import org.eclipse.jdt.internal.ui.text.JavaPresentationReconciler;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
@@ -14,40 +17,52 @@ import org.key_project.javaeditor.extension.IJavaSourceViewerConfigurationExtens
  * 
  * @author Martin Hentschel
  */
+   
 public class JMLSourceViewerConfigurationExtension extends
       DefaultJavaSourceViewerConfigurationExtension {
+   
+   
+   IDocument document;      
+      
+   public JMLSourceViewerConfigurationExtension(){
+      
+   }
+   
+   public LinkedList<Comment> findCommentOffsets(){
+      String text =document.get();
+      int lastIndex=0;
+      int begin;
+      int end;
+      LinkedList<Comment> comments= new LinkedList();
+      while(lastIndex>-1){
+       begin= text.indexOf("/*@",lastIndex);
+       lastIndex=begin;
+       end=text.indexOf("@*/",lastIndex);
+       lastIndex=end;
+       end=end-begin;
+       System.out.println("Comment found: Begin: "+begin+" End: "+end);
+       comments.add(new Comment(begin,end));
+      }
+      System.out.println(text.indexOf("/*@"));
+   return comments;   
+   }
+  
    /**
     * {@inheritDoc}
     */
    @Override
    public int getTabWidth(ISourceViewer sourceViewer, int currentResult) {
-      //TODO is this Method called only once? 
+      this.document=sourceViewer.getDocument();//TODO is this Method called only once? 
+      findCommentOffsets();
       return currentResult * 2;
    }
 
    @Override
    public IPresentationReconciler getPresentationReconciler(
          ISourceViewer sourceViewer, IPresentationReconciler currentResult) {
-     /* if(currentResult.getClass().equals(JMLPresentationReconciler.class))//if Method was called
-         System.out.println(sourceViewer.getDocument().getDocumentPartitioner().toString());
-         return currentResult; }                                     // earlier there is nothing
-      else{ */
-      for(int i=0;i< sourceViewer.getDocument().getLegalContentTypes().length;i++)
-         System.out.println(sourceViewer.getDocument().getLegalContentTypes()[i]);                                                      // to change
-         PresentationReconciler JMLPresentationReconciler = (PresentationReconciler) currentResult;
-         JMLPartitionScanner js= new JMLPartitionScanner();
-         System.out.println("Constructor JML PresReconciler");
-         DefaultDamagerRepairer dr= new DefaultDamagerRepairer(js);
-         System.out.println(this.getPartitioning());
-         JMLPresentationReconciler.setDamager(dr,JMLPartitionScanner.JML_SINGLE_LINE);
-         JMLPresentationReconciler.setDamager(dr, JMLPartitionScanner.JML_MULTI_LINE);
-         JMLPresentationReconciler.setRepairer(dr, JMLPartitionScanner.JML_SINGLE_LINE);
-         JMLPresentationReconciler.setRepairer(dr, JMLPartitionScanner.JML_MULTI_LINE);
-        // JMLPresentationReconciler.install(sourceViewer);
-         return JMLPresentationReconciler;
-         //return currentResult;
+         PresentationReconciler javarc =(PresentationReconciler)currentResult;
+         return currentResult;
       }
-   //}
    
    /**
     * @return extendedContentTypes A List of the previously defined
@@ -57,20 +72,16 @@ public class JMLSourceViewerConfigurationExtension extends
     */
    @Override
    public String[] getConfiguredContentTypes(ISourceViewer sourceViewer,
-         String[] currentResult) { 
-      System.out.println("Got content Types");
+         String[] currentResult) {
       if (currentResult[0].equals(JMLPartitionScanner.JML_MULTI_LINE)) //if Method was called
          return currentResult;                                         //previously there is
       else {                                                           // nothing to change
          String[] extendedContentTypes = new String[currentResult.length + 2];
-         extendedContentTypes[0] = currentResult[0];
-         extendedContentTypes[1] = JMLPartitionScanner.JML_MULTI_LINE;
-         extendedContentTypes[2] = JMLPartitionScanner.JML_SINGLE_LINE;
-         for (int i = 1; i < currentResult.length; i++) {
+         extendedContentTypes[0] = JMLPartitionScanner.JML_MULTI_LINE;
+         extendedContentTypes[1] = JMLPartitionScanner.JML_SINGLE_LINE;
+         for (int i = 0; i < currentResult.length; i++) {
             extendedContentTypes[i + 2] = currentResult[i];
          }
-         for(int i=0;i< extendedContentTypes.length;i++)
-            System.out.println(extendedContentTypes[i]);
          return extendedContentTypes;
       }
    }
