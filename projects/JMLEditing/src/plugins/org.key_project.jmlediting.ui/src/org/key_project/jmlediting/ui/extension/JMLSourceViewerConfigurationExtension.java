@@ -30,8 +30,7 @@ public class JMLSourceViewerConfigurationExtension extends
     */
    @Override
    public int getTabWidth(ISourceViewer sourceViewer, int currentResult) {
-      this.document = sourceViewer.getDocument();// TODO is this Method called
-                                                 // only once?
+      this.document = sourceViewer.getDocument();
       return currentResult * 2;
    }
 
@@ -50,10 +49,7 @@ public class JMLSourceViewerConfigurationExtension extends
    @Override
    public String[] getConfiguredContentTypes(ISourceViewer sourceViewer,
          String[] currentResult) {
-      if (currentResult[0].equals(JMLPartitionScanner.JML_MULTI_LINE)) // if
-                                                                       // Method
-                                                                       // was
-                                                                       // called
+      if (currentResult[0].equals(JMLPartitionScanner.JML_MULTI_LINE)) // if Method was called only once
          return currentResult; // previously there is
       else { // nothing to change
          String[] extendedContentTypes = new String[currentResult.length + 2];

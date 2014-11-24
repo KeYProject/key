@@ -14,37 +14,7 @@ public class JMLLocator {
       this.document=doc;
    }
    
-   /**
-    * seeks the Documents text for JML Single Line comments
-    * 
-    * @return A Linked List of JML Comment sections which is empty if there are
-    *         no singleLineComments
-    */
-   public LinkedList<Comment> findSingleLineJMLComment()
-         throws BadLocationException {
-      String text = document.get();
-      int begin;
-      int end;
-      int lastIndex = 0;
-      LinkedList<Comment> singleLineComments = new LinkedList<Comment>();
-
-      while (true) {
-         begin = text.indexOf("//@", lastIndex);
-         if (begin == -1)
-            return singleLineComments;
-         end = document.getLineLength(document.getLineOfOffset(begin));
-         singleLineComments.add(new Comment(begin, end));
-         if (document.getNumberOfLines() == document.getLineOfOffset(begin))
-            return singleLineComments;
-      }
-   }
-
-   /**
-    * seeks the Documents text for JML Multi Line comments
-    * 
-    * @return A Linked List of JML Comment sections
-    */
-   public LinkedList<Comment> findMultilineJMLComments() {
+   public LinkedList<Comment> findMultiLineComments(String CommentOpener){
       String text = document.get();
       int lastIndex = 0;
       int begin;
@@ -52,12 +22,12 @@ public class JMLLocator {
       LinkedList<Comment> comments = new LinkedList<Comment>();
 
       while (lastIndex > -1) {
-         begin = text.indexOf("/*@", lastIndex);
+         begin = text.indexOf(CommentOpener, lastIndex);
          if (begin > -1) // Stop searching When End of File is reached
             lastIndex = begin;
          else
             return comments;
-         end = text.indexOf("@*/", lastIndex);
+         end = text.indexOf("*/", lastIndex);
          if (lastIndex > -1) // Stop searching When End of File is reached
             lastIndex = end;
          else
@@ -67,8 +37,31 @@ public class JMLLocator {
                + end);
          comments.add(new Comment(begin, end));
       }
-      System.out.println(text.indexOf("/*@"));
       return comments;
+   }
+   /**
+    * seeks the Documents text for JML Single Line comments
+    * 
+    * @return A Linked List of JML Comment sections which is empty if there are
+    *         no singleLineComments
+    */
+   public LinkedList<Comment> findSingleLineComments(String CommentOpener)
+         throws BadLocationException {
+      String text = document.get();
+      int begin;
+      int end;
+      int lastIndex = 0;
+      LinkedList<Comment> singleLineComments = new LinkedList<Comment>();
+
+      while (true) {
+         begin = text.indexOf(CommentOpener, lastIndex);
+         if (begin == -1)
+            return singleLineComments;
+         end = document.getLineLength(document.getLineOfOffset(begin));
+         singleLineComments.add(new Comment(begin, end));
+         if (document.getNumberOfLines() == document.getLineOfOffset(begin))
+            return singleLineComments;
+      }
    }
 
    /**
@@ -81,8 +74,8 @@ public class JMLLocator {
     * @throws BadLocationException
     */
    public boolean isInJMLcomment(int offset) throws BadLocationException {
-      LinkedList<Comment> comments = findMultilineJMLComments();
-      comments.addAll(findSingleLineJMLComment());
+      LinkedList<Comment> comments = findMultiLineComments("/*@");
+      comments.addAll(findSingleLineComments("//@"));
       int commentOffset;
       int commentLength;
       for (ListIterator<Comment> i = comments.listIterator(); i.hasNext(); i
