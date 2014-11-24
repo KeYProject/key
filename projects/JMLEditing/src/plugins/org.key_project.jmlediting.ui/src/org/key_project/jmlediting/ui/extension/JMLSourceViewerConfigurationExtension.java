@@ -1,14 +1,10 @@
 package org.key_project.jmlediting.ui.extension;
 
 import org.eclipse.jdt.internal.ui.text.JavaPresentationReconciler;
-import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
-import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.javaeditor.extension.DefaultJavaSourceViewerConfigurationExtension;
 import org.key_project.javaeditor.extension.IJavaSourceViewerConfigurationExtension;
@@ -32,20 +28,26 @@ public class JMLSourceViewerConfigurationExtension extends
    @Override
    public IPresentationReconciler getPresentationReconciler(
          ISourceViewer sourceViewer, IPresentationReconciler currentResult) {
+     /* if(currentResult.getClass().equals(JMLPresentationReconciler.class))//if Method was called
+         System.out.println(sourceViewer.getDocument().getDocumentPartitioner().toString());
+         return currentResult; }                                     // earlier there is nothing
+      else{ */
+      for(int i=0;i< sourceViewer.getDocument().getLegalContentTypes().length;i++)
+         System.out.println(sourceViewer.getDocument().getLegalContentTypes()[i]);                                                      // to change
          PresentationReconciler JMLPresentationReconciler = (PresentationReconciler) currentResult;
          JMLPartitionScanner js= new JMLPartitionScanner();
          System.out.println("Constructor JML PresReconciler");
-         FastPartitioner JMLPartitioner = new FastPartitioner(js,JMLPartitionScanner.getLegalContentTypes());
-         JMLPartitioner.connect(sourceViewer.getDocument());
-         sourceViewer.getDocument().setDocumentPartitioner((JMLPartitioner)); 
-         DefaultDamagerRepairer dr= new DefaultDamagerRepairer(new SingleTokenScanner
-               (new TextAttribute(this.getColorManager().getColor(new RGB (255,0,0)))));
+         DefaultDamagerRepairer dr= new DefaultDamagerRepairer(js);
+         System.out.println(this.getPartitioning());
          JMLPresentationReconciler.setDamager(dr,JMLPartitionScanner.JML_SINGLE_LINE);
          JMLPresentationReconciler.setDamager(dr, JMLPartitionScanner.JML_MULTI_LINE);
          JMLPresentationReconciler.setRepairer(dr, JMLPartitionScanner.JML_SINGLE_LINE);
          JMLPresentationReconciler.setRepairer(dr, JMLPartitionScanner.JML_MULTI_LINE);
+        // JMLPresentationReconciler.install(sourceViewer);
          return JMLPresentationReconciler;
+         //return currentResult;
       }
+   //}
    
    /**
     * @return extendedContentTypes A List of the previously defined
@@ -55,7 +57,8 @@ public class JMLSourceViewerConfigurationExtension extends
     */
    @Override
    public String[] getConfiguredContentTypes(ISourceViewer sourceViewer,
-         String[] currentResult) {
+         String[] currentResult) { 
+      System.out.println("Got content Types");
       if (currentResult[0].equals(JMLPartitionScanner.JML_MULTI_LINE)) //if Method was called
          return currentResult;                                         //previously there is
       else {                                                           // nothing to change
@@ -66,6 +69,8 @@ public class JMLSourceViewerConfigurationExtension extends
          for (int i = 1; i < currentResult.length; i++) {
             extendedContentTypes[i + 2] = currentResult[i];
          }
+         for(int i=0;i< extendedContentTypes.length;i++)
+            System.out.println(extendedContentTypes[i]);
          return extendedContentTypes;
       }
    }

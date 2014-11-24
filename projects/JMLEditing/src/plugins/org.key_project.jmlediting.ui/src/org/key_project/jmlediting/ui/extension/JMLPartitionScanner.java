@@ -3,11 +3,15 @@ package org.key_project.jmlediting.ui.extension;
 import org.eclipse.jdt.internal.ui.text.JavaPartitionScanner;
 import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IPredicateRule;
+import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.MultiLineRule;
+import org.eclipse.jface.text.rules.RuleBasedPartitionScanner;
 import org.eclipse.jface.text.rules.Token;
 
-@SuppressWarnings("restriction")
+import java.util.ArrayList;
+import java.util.List;
+
 public class JMLPartitionScanner extends JavaPartitionScanner {
    
    /**
@@ -40,8 +44,6 @@ public class JMLPartitionScanner extends JavaPartitionScanner {
       
       
    }
-   public static String [] getLegalContentTypes(){
-      return new String[]{JavaPartitionScanner.JAVA_CHARACTER,JavaPartitionScanner.JAVA_DOC, JavaPartitionScanner.JAVA_MULTI_LINE_COMMENT,
-            JavaPartitionScanner.JAVA_SINGLE_LINE_COMMENT, JavaPartitionScanner.JAVA_STRING, JMLPartitionScanner.JML_MULTI_LINE, JMLPartitionScanner.JML_SINGLE_LINE};
-      }
+   
+
 }
