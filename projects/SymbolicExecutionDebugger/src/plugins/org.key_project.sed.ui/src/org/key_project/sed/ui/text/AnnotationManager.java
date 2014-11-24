@@ -220,12 +220,14 @@ public class AnnotationManager implements IDisposable {
             ITextEditor te = (ITextEditor)editor;
             IDocumentProvider provider = te.getDocumentProvider();
             IAnnotationModel model = provider.getAnnotationModel(editor.getEditorInput());
-            Iterator<?> iter = model.getAnnotationIterator();
-            while (iter.hasNext()) {
-               Object next = iter.next();
-               if (next instanceof SymbolicallyReachedAnnotation) {
-                  SymbolicallyReachedAnnotation annotation = (SymbolicallyReachedAnnotation)next;
-                  removeTarget(model, annotation, target);
+            if (model != null) {
+               Iterator<?> iter = model.getAnnotationIterator();
+               while (iter.hasNext()) {
+                  Object next = iter.next();
+                  if (next instanceof SymbolicallyReachedAnnotation) {
+                     SymbolicallyReachedAnnotation annotation = (SymbolicallyReachedAnnotation)next;
+                     removeTarget(model, annotation, target);
+                  }
                }
             }
          }
