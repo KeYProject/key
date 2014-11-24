@@ -5,13 +5,13 @@
          <operationContract name="result_0 = magic() catch(exc_0)
 pre: true
 post: result_0 = 42 &amp; exc_0 = null
-mod: empty, creates no new objects
+mod: {}, creates no new objects
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
             <statement name="int second = magic();" pathCondition="true" pathConditionChanged="false">
                <operationContract name="result_1 = magic() catch(exc_1)
 pre: true
 post: result_1 = 42 &amp; exc_1 = null
-mod: empty, creates no new objects
+mod: {}, creates no new objects
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_1" exceptionTerm="exc_1" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
                   <branchStatement name="if (first_1==42)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
                      <statement name="return first_1+second_1;" pathCondition="true" pathConditionChanged="false">
