@@ -27,7 +27,7 @@ import org.key_project.util.java.SwingUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
 
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.Goal;
@@ -35,7 +35,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.Contract;
@@ -567,13 +567,13 @@ public class MonKeYProof extends Bean {
                           KeYUtil.runWithoutResultDialog(new KeYUtil.IRunnableWithMainWindow() {
                              @Override
                              public void run(MainWindow main) throws Exception {
-                                DefaultProblemLoader loader = main.getUserInterface().load(null, new File(proofDirectory, getProofFileName()), null, bootClassPathFile, null);
+                                AbstractProblemLoader loader = main.getUserInterface().load(null, new File(proofDirectory, getProofFileName()), null, bootClassPathFile, null);
                                 setResult(loader.getProof());
                              }
                           });
                        }
                        else {
-                          DefaultProblemLoader loader = environment.getUi().load(null, new File(proofDirectory, getProofFileName()), null, bootClassPathFile, null);
+                          AbstractProblemLoader loader = environment.getUi().load(null, new File(proofDirectory, getProofFileName()), null, bootClassPathFile, null);
                           setResult(loader.getProof());
                        }
                    }

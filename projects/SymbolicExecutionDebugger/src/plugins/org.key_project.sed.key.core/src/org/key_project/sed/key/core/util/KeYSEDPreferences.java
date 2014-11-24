@@ -66,6 +66,11 @@ public class KeYSEDPreferences {
     * Preference key to define that the full signature will be shown on method return nodes.
     */
    public static final String SHOW_SIGNATURE_ON_METHOD_RETURN_NODES = "org.key_project.sed.key.core.preference.showSignatureOnMethodReturnNodes";
+
+   /**
+    * Preference key to define how variables are computed.
+    */
+   public static final String VARIABLES_ARE_COMPUTED_FROM_UPDATES = "org.key_project.sed.key.core.preference.variablesAreOnlyComputedFromUpdates";
    
    /**
     * Returns the managed {@link IPreferenceStore}.
@@ -329,5 +334,37 @@ public class KeYSEDPreferences {
     */
    public static void setDefaultShowSignatureOnMethodReturnNodes(boolean defaultValue) {
       getStore().setDefault(SHOW_SIGNATURE_ON_METHOD_RETURN_NODES, defaultValue);
+   }
+   
+   /**
+    * Checks if variables are computed from sequent or visible type structure.
+    * @return Use pretty printing?
+    */
+   public static boolean isVariablesAreOnlyComputedFromUpdates() {
+      return getStore().getBoolean(VARIABLES_ARE_COMPUTED_FROM_UPDATES);
+   }
+   
+   /**
+    * Checks if variables are computed from sequent or visible type structure by default.
+    * @return Use pretty printing?
+    */
+   public static boolean isDefaultVariablesAreOnlyComputedFromUpdates() {
+      return getStore().getDefaultBoolean(VARIABLES_ARE_COMPUTED_FROM_UPDATES);
+   }
+   
+   /**
+    * Sets if variables are computed from sequent or visible type structure.
+    * @param value Use pretty printing?
+    */
+   public static void setVariablesAreOnlyComputedFromUpdates(boolean value) {
+      getStore().setValue(VARIABLES_ARE_COMPUTED_FROM_UPDATES, value);
+   }
+   
+   /**
+    * Sets if variables are computed from sequent or visible type structure by default.
+    * @param defaultValue Use pretty printing?
+    */
+   public static void setDefaultVariablesAreOnlyComputedFromUpdates(boolean defaultValue) {
+      getStore().setDefault(VARIABLES_ARE_COMPUTED_FROM_UPDATES, defaultValue);
    }
 }

@@ -40,7 +40,6 @@ import java.util.Map;
 public final class TypeConverter {
 
     private final TermBuilder tb;
-
     private final Services services;
 
     // Maps LDT names to LDT instances.

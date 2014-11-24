@@ -17,7 +17,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -26,7 +26,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.ui.CustomUserInterface;
@@ -186,7 +186,7 @@ public class KeYEnvironment<U extends UserInterface> {
       if (makeMainWindowVisible && !main.isVisible()) {
           main.setVisible(true);
       }
-      DefaultProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, null);
+      AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, null);
       InitConfig initConfig = loader.getInitConfig();
       return new KeYEnvironment<UserInterface>(main.getUserInterface(), initConfig, loader.getProof());
    }
@@ -259,7 +259,7 @@ public class KeYEnvironment<U extends UserInterface> {
                                                           Properties poPropertiesToForce,
                                                           IUserInterfaceCustomization customization) throws ProblemLoaderException {
       CustomUserInterface ui = new CustomUserInterface(false, customization);
-      DefaultProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath, poPropertiesToForce); 
+      AbstractProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath, poPropertiesToForce); 
       InitConfig initConfig = loader.getInitConfig();
       return new KeYEnvironment<CustomUserInterface>(ui, initConfig, loader.getProof());
    }

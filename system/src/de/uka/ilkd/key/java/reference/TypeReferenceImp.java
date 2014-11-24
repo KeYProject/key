@@ -84,6 +84,11 @@ public abstract class TypeReferenceImp
         return (prefix == null) ? name : prefix.getFirstElement();
     }
 
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+        return (prefix == null) ? name : prefix.getFirstElementIncludingBlocks();
+    }
+
     /**
      *      Returns the number of children of this node.
      *      @return an int giving the number of children of this node

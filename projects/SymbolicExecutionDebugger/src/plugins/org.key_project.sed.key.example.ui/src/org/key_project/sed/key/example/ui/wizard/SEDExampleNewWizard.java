@@ -26,7 +26,7 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.key_project.key4eclipse.common.ui.wizard.AbstractNewJavaProjectWizard;
+import org.key_project.key4eclipse.common.ui.wizard.AbstractNewJavaExampleProjectWizard;
 import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
 import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYClassPathEntryKind;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
@@ -40,28 +40,13 @@ import org.key_project.util.eclipse.swt.SWTUtil;
  * @author Martin Hentschel
  */
 @SuppressWarnings("restriction")
-public class SEDExampleNewWizard extends AbstractNewJavaProjectWizard {
+public class SEDExampleNewWizard extends AbstractNewJavaExampleProjectWizard {
    /**
     * {@inheritDoc}
     */
    @Override
    protected String getExampleName() {
       return "SED Examples";
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void addPages() {
-      super.addPages();
-      // Set initial project name.
-      for (IWizardPage page : getPages()) {
-         if (page instanceof NewJavaProjectWizardPageOne) {
-            NewJavaProjectWizardPageOne one = (NewJavaProjectWizardPageOne)page;
-            one.setProjectName(getExampleName());
-         }
-      }
    }
 
    /**

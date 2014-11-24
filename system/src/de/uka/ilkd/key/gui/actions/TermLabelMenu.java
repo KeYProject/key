@@ -13,8 +13,8 @@
 
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.gui.KeYSelectionEvent;
-import de.uka.ilkd.key.gui.KeYSelectionListener;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
@@ -56,7 +56,13 @@ public class TermLabelMenu extends JMenu {
         visibleTermLabels = new VisibleTermLabels() {
             @Override
             public boolean contains(Name name) {
-                return displayLabelsCheckBox.isSelected() && checkBoxMap.get(name).isSelected();
+                if (displayLabelsCheckBox.isSelected()) {
+                   TermLabelCheckBox checkedName = checkBoxMap.get(name);
+                   return checkedName != null && checkedName.isSelected();
+                }
+                else {
+                   return false;
+                }
             }
         };
 

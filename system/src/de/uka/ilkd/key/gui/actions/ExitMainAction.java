@@ -17,10 +17,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowListener;
+import java.util.EventObject;
 
 import javax.swing.JOptionPane;
 
-import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
@@ -82,7 +82,7 @@ public class ExitMainAction extends MainWindowAction {
      */
     public void exitMainWithoutInteraction() {
         mainWindow.getRecentFiles().store(PathConfig.getRecentFileStorage());
-        getMediator().fireShutDown(new GUIEvent(this));
+        getMediator().fireShutDown(new EventObject(this));
 
         System.out.println("Have a nice day.");
         mainWindow.savePreferences(mainWindow);

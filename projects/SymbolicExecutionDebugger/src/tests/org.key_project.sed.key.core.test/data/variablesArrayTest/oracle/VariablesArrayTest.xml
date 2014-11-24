@@ -1,101 +1,185 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_1c061d02-70cf-4638-88c3-49f4c815c3d5" name="main()" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_6dffe1d5-6c4b-4cb6-84c3-0fa6b0f7a447" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testVariablesArrayTest\src\VariablesArrayTest.java">
-         <sedVariable xml:id="_8d82402f-3821-407c-94c4-aabe4e6d9810" name="heapAtPre" referenceTypeName="Heap">
-            <sedValue xml:id="_74c47d03-c050-4fb3-a386-ad841fa984e8" referenceTypeName="Heap" valueString="heapAtPre" allocated="true" multiValued="false">
+   <sedTarget xml:id="_55130580-4dd4-495b-be79-0bcfd7b11417" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_54029e40-dbe8-4944-9234-f9c0d87c2406" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testVariablesArrayTest\src\VariablesArrayTest.java">
+         <sedVariable xml:id="_9214f14b-bf5c-41b5-8368-77b506be2de6" name="heapAtPre" referenceTypeName="Heap">
+            <sedValue xml:id="_33c72561-91be-4aeb-854a-7a90da26c678" referenceTypeName="Heap" valueString="heapAtPre" allocated="true" multiValued="false">
             </sedValue>
          </sedVariable>
-         <sedMethodCall xml:id="_e4eef18a-9289-45cf-913e-4cb05ede9d85" name="&lt;call self.main()&gt;" pathCondition="true" lineNumber="-1" charStart="49" charEnd="53" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testVariablesArrayTest\src\VariablesArrayTest.java">
-            <sedVariable xml:id="_d6c5f073-1102-4c9e-9c54-3943c4ec0160" name="exc" referenceTypeName="Null">
-               <sedValue xml:id="_85a3ecf2-03aa-4bbd-9e7a-80f84497e4f1" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+         <sedMethodCall xml:id="_62af78b0-79c2-40c6-87d8-b9e54e6cee11" name="&lt;call self.main()&gt;" pathCondition="true" lineNumber="-1" charStart="49" charEnd="53" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testVariablesArrayTest\src\VariablesArrayTest.java" groupable="true">
+            <sedVariable xml:id="_9b212a52-a3f6-4125-ab69-aaf5e7f8b3e2" name="exc" referenceTypeName="Null">
+               <sedValue xml:id="_174ff63a-9eaa-401b-bff2-b49c6cab3b68" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
                </sedValue>
             </sedVariable>
-            <sedStatement xml:id="_c6a05172-5f3c-4d79-9bd2-d739f7e28521" name="int[][] multiArray = new int[2][];" pathCondition="true" lineNumber="-1" charStart="61" charEnd="95" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testVariablesArrayTest\src\VariablesArrayTest.java">
-               <sedVariable xml:id="_f2bf4e10-771c-41d8-8511-e261ef8028f4" name="self" referenceTypeName="VariablesArrayTest">
-                  <sedValue xml:id="_5c7f04d7-38f3-4f79-a1b8-4b672870da9e" referenceTypeName="VariablesArrayTest" valueString="self" allocated="true" multiValued="false">
+            <sedStatement xml:id="_64f16524-cd04-446a-b017-0925ccf8e245" name="int[][] multiArray = new int[2][];" pathCondition="true" lineNumber="-1" charStart="61" charEnd="95" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testVariablesArrayTest\src\VariablesArrayTest.java">
+               <sedVariable xml:id="_ff56b57a-024a-4fb3-baed-13b8284615a1" name="self" referenceTypeName="VariablesArrayTest">
+                  <sedValue xml:id="_4a449385-c87b-40fb-ba81-5be36a5d951d" referenceTypeName="VariablesArrayTest" valueString="self" allocated="true" multiValued="false">
                   </sedValue>
                </sedVariable>
-               <sedVariable xml:id="_c3a09a4d-f66f-46f1-a254-4353eb7b4551" name="exc" referenceTypeName="Null">
-                  <sedValue xml:id="_7e1caaf6-7c4e-4605-8593-86f0356cfe6b" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+               <sedVariable xml:id="_5c847f44-f176-4b18-b77a-3cfb08038b88" name="exc" referenceTypeName="Null">
+                  <sedValue xml:id="_da94df70-6147-48f0-87a6-32ad4771ee70" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
                   </sedValue>
                </sedVariable>
-               <sedStatement xml:id="_32188bfe-27ff-4940-b06e-5ded853490f3" name="multiArray[0]=new int[]{1,2 };" pathCondition="true" lineNumber="-1" charStart="99" charEnd="132" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testVariablesArrayTest\src\VariablesArrayTest.java">
-                  <sedVariable xml:id="_6c3acb20-2b92-4f3c-8798-ecfa7c3b753d" name="self" referenceTypeName="VariablesArrayTest">
-                     <sedValue xml:id="_e8447d04-5c48-45ac-81d6-5c3a3fec90da" referenceTypeName="VariablesArrayTest" valueString="self" allocated="true" multiValued="false">
+               <sedStatement xml:id="_78ce0638-ff42-4ee4-945a-ed7141305bef" name="multiArray[0]=new int[]{1,2 };" pathCondition="true" lineNumber="-1" charStart="99" charEnd="132" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testVariablesArrayTest\src\VariablesArrayTest.java">
+                  <sedVariable xml:id="_d309e0be-8985-4cd1-baa7-191c707e8e1f" name="self" referenceTypeName="VariablesArrayTest">
+                     <sedValue xml:id="_36743bee-c75c-482b-8105-8603b05e8084" referenceTypeName="VariablesArrayTest" valueString="self" allocated="true" multiValued="false">
                      </sedValue>
                   </sedVariable>
-                  <sedVariable xml:id="_fc079b05-5232-4f5e-bbe5-8a360e88d04d" name="exc" referenceTypeName="Null">
-                     <sedValue xml:id="_dbed54ca-7ddb-4bf9-ba44-cbb584b769bb" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                  <sedVariable xml:id="_a2e64e33-0232-42ce-8793-d22b1193dcb1" name="exc" referenceTypeName="Null">
+                     <sedValue xml:id="_283d02f1-4288-4017-b6bf-d9d9aeec2479" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
                      </sedValue>
                   </sedVariable>
-                  <sedVariable xml:id="_593f6bc8-0ef6-4072-a33d-bc5fb8348b14" name="multiArray" referenceTypeName="int[][]">
-                     <sedValue xml:id="_05c67710-11d8-477e-9e39-908a5b296e94" referenceTypeName="int[][]" valueString="x_arr_arr_2" allocated="true" multiValued="false">
-                        <sedVariable xml:id="_54dd8305-394b-4a98-9d23-09e6e1b5df45" name="length" referenceTypeName="int">
-                           <sedValue xml:id="_140d4d60-dfd7-43f1-8868-31ed0a54cb58" referenceTypeName="int" valueString="Z(2(#))" allocated="true" multiValued="false">
+                  <sedVariable xml:id="_577792aa-3dff-4e58-9f3d-b3f935b96314" name="multiArray" referenceTypeName="int[][]">
+                     <sedValue xml:id="_7f8a8e8a-8c34-46b0-944e-ce5099d1dcc6" referenceTypeName="int[][]" valueString="x_arr_arr_2" allocated="true" multiValued="false">
+                        <sedVariable xml:id="_3fd2e0a7-a6c6-4258-90a2-72056d2e2847" name="length" referenceTypeName="int">
+                           <sedValue xml:id="_257fef1f-7c3c-456d-b64c-56c15c7560f7" referenceTypeName="int" valueString="Z(2(#))" allocated="true" multiValued="false">
+                           </sedValue>
+                        </sedVariable>
+                        <sedVariable xml:id="_433a545a-9321-4c42-8f19-a9707a6981f6" name="[0]" referenceTypeName="Null">
+                           <sedValue xml:id="_fb3dcfae-49a3-43e9-85eb-65ee805c2663" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                           </sedValue>
+                        </sedVariable>
+                        <sedVariable xml:id="_d6a46ac6-b339-48f1-8e7c-98943dcdbc21" name="[1]" referenceTypeName="Null">
+                           <sedValue xml:id="_c9edba5a-b284-427b-b6e3-3994e823a7a0" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
                            </sedValue>
                         </sedVariable>
                      </sedValue>
                   </sedVariable>
-                  <sedStatement xml:id="_96789c99-3c05-4386-8fde-a912f243e25e" name="multiArray[1]=new int[]{3,4,5 };" pathCondition="true" lineNumber="-1" charStart="136" charEnd="172" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testVariablesArrayTest\src\VariablesArrayTest.java">
-                     <sedVariable xml:id="_4b2a1a40-0e90-4277-915f-7580045ed22d" name="self" referenceTypeName="VariablesArrayTest">
-                        <sedValue xml:id="_bb7f34ce-ac4a-414b-ae33-13b08f8722ca" referenceTypeName="VariablesArrayTest" valueString="self" allocated="true" multiValued="false">
+                  <sedStatement xml:id="_38ad73e4-6de0-4190-aab1-7995c4ed5e62" name="multiArray[1]=new int[]{3,4,5 };" pathCondition="true" lineNumber="-1" charStart="136" charEnd="172" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testVariablesArrayTest\src\VariablesArrayTest.java">
+                     <sedVariable xml:id="_f75658f0-2a1b-4ce3-83fd-a2e7d13e13e0" name="self" referenceTypeName="VariablesArrayTest">
+                        <sedValue xml:id="_45741f6b-fbef-49d0-af73-f15bea87c977" referenceTypeName="VariablesArrayTest" valueString="self" allocated="true" multiValued="false">
                         </sedValue>
                      </sedVariable>
-                     <sedVariable xml:id="_03b5e656-cf09-4257-afd0-ef4360b0e8f2" name="exc" referenceTypeName="Null">
-                        <sedValue xml:id="_84cef323-a671-42ee-ad0d-871a909b8eba" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                     <sedVariable xml:id="_65a65745-2712-46e9-937d-d08c5881d93d" name="exc" referenceTypeName="Null">
+                        <sedValue xml:id="_ce1e1c75-cd69-4b30-8afc-cbcc8354ac21" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
                         </sedValue>
                      </sedVariable>
-                     <sedVariable xml:id="_2e5b8e65-8eec-476a-a6fe-a12dd008e658" name="multiArray" referenceTypeName="int[][]">
-                        <sedValue xml:id="_e11e0279-deee-4af1-b9bc-0fc829376a2b" referenceTypeName="int[][]" valueString="x_arr_arr_2" allocated="true" multiValued="false">
-                           <sedVariable xml:id="_dbfcfac9-7804-41dc-b56e-a26b6c2cd8e5" name="length" referenceTypeName="int">
-                              <sedValue xml:id="_e16440e6-0cfb-4683-a6b7-28b07065f6c1" referenceTypeName="int" valueString="Z(2(#))" allocated="true" multiValued="false">
+                     <sedVariable xml:id="_77a4a3ab-4332-408f-8b19-02cd0f92f716" name="multiArray" referenceTypeName="int[][]">
+                        <sedValue xml:id="_9381ca7d-52bf-4d76-9afb-9bcdd06becc7" referenceTypeName="int[][]" valueString="x_arr_arr_2" allocated="true" multiValued="false">
+                           <sedVariable xml:id="_6b268a18-4030-45c4-8594-4d13c54d5e1f" name="length" referenceTypeName="int">
+                              <sedValue xml:id="_b0597bab-df02-4df8-843a-6967284c5044" referenceTypeName="int" valueString="Z(2(#))" allocated="true" multiValued="false">
+                              </sedValue>
+                           </sedVariable>
+                           <sedVariable xml:id="_d856e232-4863-4965-9748-931bf896bc2a" name="[0]" referenceTypeName="int[]">
+                              <sedValue xml:id="_97e523e0-6b62-43f0-ba73-19e9b93fb9b3" referenceTypeName="int[]" valueString="x_arr_4" allocated="true" multiValued="false">
+                                 <sedVariable xml:id="_014148a1-47e6-4772-bba8-d4cf3af5535c" name="length" referenceTypeName="int">
+                                    <sedValue xml:id="_a9a04f56-28ec-4bb7-a30d-3c8bf8df53e1" referenceTypeName="int" valueString="Z(2(#))" allocated="true" multiValued="false">
+                                    </sedValue>
+                                 </sedVariable>
+                                 <sedVariable xml:id="_076480f0-02ef-4d92-96c6-dcfc2b428da6" name="[0]" referenceTypeName="int">
+                                    <sedValue xml:id="_3c75efcd-e3f2-4dbe-b078-e84b4f449752" referenceTypeName="int" valueString="Z(1(#))" allocated="true" multiValued="false">
+                                    </sedValue>
+                                 </sedVariable>
+                                 <sedVariable xml:id="_4d7fc7e2-0d48-41cd-bb83-d7105caedfcb" name="[1]" referenceTypeName="int">
+                                    <sedValue xml:id="_5719667b-44f8-4293-a27d-72a80c359ea2" referenceTypeName="int" valueString="Z(2(#))" allocated="true" multiValued="false">
+                                    </sedValue>
+                                 </sedVariable>
+                              </sedValue>
+                           </sedVariable>
+                           <sedVariable xml:id="_f82cc92c-569b-4ce9-883d-eb35e5b1da3e" name="[1]" referenceTypeName="Null">
+                              <sedValue xml:id="_1baec999-57e6-4f97-8b2e-62e08c35d6de" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
                               </sedValue>
                            </sedVariable>
                         </sedValue>
                      </sedVariable>
-                     <sedStatement xml:id="_dff4aab8-2387-406f-b5bc-6acf94204783" name="return multiArray[0][0]+multiArray[0][1]+multiArray[1][0]+multiArray[1][1]+multiArray[1][2];" pathCondition="true" lineNumber="-1" charStart="176" charEnd="286" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testVariablesArrayTest\src\VariablesArrayTest.java">
-                        <sedVariable xml:id="_badaa0b0-4c8d-4510-b713-f23fa0170884" name="self" referenceTypeName="VariablesArrayTest">
-                           <sedValue xml:id="_414eae86-d255-4329-a1c2-123a093ad5c8" referenceTypeName="VariablesArrayTest" valueString="self" allocated="true" multiValued="false">
+                     <sedStatement xml:id="_015cc72b-a2a9-4665-a428-6dcabfcaa413" name="return multiArray[0][0]+multiArray[0][1]+multiArray[1][0]+multiArray[1][1]+multiArray[1][2];" pathCondition="true" lineNumber="-1" charStart="176" charEnd="286" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testVariablesArrayTest\src\VariablesArrayTest.java">
+                        <sedVariable xml:id="_1470d8ef-930b-4766-ab2a-5e7334db3615" name="self" referenceTypeName="VariablesArrayTest">
+                           <sedValue xml:id="_8792ed48-a142-4980-b9d6-e267134ebece" referenceTypeName="VariablesArrayTest" valueString="self" allocated="true" multiValued="false">
                            </sedValue>
                         </sedVariable>
-                        <sedVariable xml:id="_cacd5680-8d5c-437d-a00e-9727b1ccf0ed" name="exc" referenceTypeName="Null">
-                           <sedValue xml:id="_fc659f8a-e8ed-47c9-be06-6f3f879a0466" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                        <sedVariable xml:id="_e9ae0e0e-fb41-4f61-9852-74d5bdb63eff" name="exc" referenceTypeName="Null">
+                           <sedValue xml:id="_4be0a738-e40e-4eca-a5b3-a7d7d7f8d34b" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
                            </sedValue>
                         </sedVariable>
-                        <sedVariable xml:id="_e02d7c4d-8215-4b5f-82de-8f3b33960745" name="multiArray" referenceTypeName="int[][]">
-                           <sedValue xml:id="_ce922451-853f-4660-8862-f13c0762892b" referenceTypeName="int[][]" valueString="x_arr_arr_2" allocated="true" multiValued="false">
-                              <sedVariable xml:id="_3ddaa800-055e-4eb5-aba1-d27324127537" name="length" referenceTypeName="int">
-                                 <sedValue xml:id="_2267541b-8143-40eb-ac28-38508a532232" referenceTypeName="int" valueString="Z(2(#))" allocated="true" multiValued="false">
+                        <sedVariable xml:id="_b6e87b22-ea94-40c7-b8d2-98dd3d1e31bf" name="multiArray" referenceTypeName="int[][]">
+                           <sedValue xml:id="_c613c4e4-369a-4a15-8cd4-4dcc213451d0" referenceTypeName="int[][]" valueString="x_arr_arr_2" allocated="true" multiValued="false">
+                              <sedVariable xml:id="_cf35d7c3-21b9-4d7a-aab2-a10131d30dc8" name="length" referenceTypeName="int">
+                                 <sedValue xml:id="_ba2722c9-80a8-43b4-b3af-7eb9bcf9f18a" referenceTypeName="int" valueString="Z(2(#))" allocated="true" multiValued="false">
+                                 </sedValue>
+                              </sedVariable>
+                              <sedVariable xml:id="_e43f8fab-3f98-4631-91a6-26e4ea617db0" name="[0]" referenceTypeName="int[]">
+                                 <sedValue xml:id="_81eaa6ca-7a9e-41c8-93b6-431aafc206e0" referenceTypeName="int[]" valueString="x_arr_4" allocated="true" multiValued="false">
+                                    <sedVariable xml:id="_ee41fdfa-3180-4300-aba7-04918a7e7775" name="length" referenceTypeName="int">
+                                       <sedValue xml:id="_808d2852-d36e-45e2-9432-22cae89ecafd" referenceTypeName="int" valueString="Z(2(#))" allocated="true" multiValued="false">
+                                       </sedValue>
+                                    </sedVariable>
+                                    <sedVariable xml:id="_1cb0a325-bdb6-4906-8783-ff4495bde7f8" name="[0]" referenceTypeName="int">
+                                       <sedValue xml:id="_52580450-3fbf-47e4-8fbe-7c78b7325b85" referenceTypeName="int" valueString="Z(1(#))" allocated="true" multiValued="false">
+                                       </sedValue>
+                                    </sedVariable>
+                                    <sedVariable xml:id="_73cadf32-350f-4b45-ac76-a3ab0315bcd9" name="[1]" referenceTypeName="int">
+                                       <sedValue xml:id="_828e0860-f418-477a-8057-b8c5ed80422b" referenceTypeName="int" valueString="Z(2(#))" allocated="true" multiValued="false">
+                                       </sedValue>
+                                    </sedVariable>
+                                 </sedValue>
+                              </sedVariable>
+                              <sedVariable xml:id="_3ccd898a-ee09-47e1-9963-f3d4215f6e57" name="[1]" referenceTypeName="int[]">
+                                 <sedValue xml:id="_28ad2cfc-3695-44c3-8d93-b441235d6c77" referenceTypeName="int[]" valueString="x_arr_9" allocated="true" multiValued="false">
+                                    <sedVariable xml:id="_145e0f03-7cc9-447c-ab76-2051b7865f5c" name="length" referenceTypeName="int">
+                                       <sedValue xml:id="_a51058ec-44b9-4e5f-b708-27fdad3b90eb" referenceTypeName="int" valueString="Z(3(#))" allocated="true" multiValued="false">
+                                       </sedValue>
+                                    </sedVariable>
+                                    <sedVariable xml:id="_b7d4a616-7c2d-44d4-85b2-52ba5f6dc014" name="[0]" referenceTypeName="int">
+                                       <sedValue xml:id="_bb741ea3-c770-413a-ac0a-440b47ae0dae" referenceTypeName="int" valueString="Z(3(#))" allocated="true" multiValued="false">
+                                       </sedValue>
+                                    </sedVariable>
+                                    <sedVariable xml:id="_d89f4960-cf5a-43b6-b03f-3cefab69fa00" name="[1]" referenceTypeName="int">
+                                       <sedValue xml:id="_ec884a23-5456-4424-a8b6-64547428e6b4" referenceTypeName="int" valueString="Z(4(#))" allocated="true" multiValued="false">
+                                       </sedValue>
+                                    </sedVariable>
+                                    <sedVariable xml:id="_7e81e888-b538-45ac-b4ca-96a702470e69" name="[2]" referenceTypeName="int">
+                                       <sedValue xml:id="_7bd9ee6b-adda-4a79-99cb-364d444527b8" referenceTypeName="int" valueString="Z(5(#))" allocated="true" multiValued="false">
+                                       </sedValue>
+                                    </sedVariable>
                                  </sedValue>
                               </sedVariable>
                            </sedValue>
                         </sedVariable>
-                        <sedMethodReturn xml:id="_d874628a-6e4f-478f-b41a-b5d86aac4f17" name="&lt;return of self.main()&gt;" pathCondition="true" lineNumber="-1" charStart="49" charEnd="53" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testVariablesArrayTest\src\VariablesArrayTest.java" methodReturnConditionRef="_17e33f7e-9926-476c-b410-7d898fc4bd3c">
-                           <sedVariable xml:id="_ce0ea287-6fec-4a98-b4c4-1b09b3a8377b" name="self" referenceTypeName="VariablesArrayTest">
-                              <sedValue xml:id="_9c3dcf09-5fb1-442e-8d9a-2bb266a258fe" referenceTypeName="VariablesArrayTest" valueString="self" allocated="true" multiValued="false">
+                        <sedMethodReturn xml:id="_8280d85f-a4d5-47f8-9850-1b9f70009d00" name="&lt;return of self.main()&gt;" pathCondition="true" lineNumber="-1" charStart="49" charEnd="53" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testVariablesArrayTest\src\VariablesArrayTest.java" methodReturnConditionRef="_aad5e583-f784-4062-8e6e-cace893472bd">
+                           <sedVariable xml:id="_fd255e2e-d07c-497a-b247-8967245658a6" name="self" referenceTypeName="VariablesArrayTest">
+                              <sedValue xml:id="_712ee4e9-fc00-4ef3-9051-8d7a86af5703" referenceTypeName="VariablesArrayTest" valueString="self" allocated="true" multiValued="false">
                               </sedValue>
                            </sedVariable>
-                           <sedVariable xml:id="_4f4eb02c-6981-4a6a-aab2-80b93a0753fd" name="exc" referenceTypeName="Null">
-                              <sedValue xml:id="_e9cd7c88-1e2d-4f2c-ab3a-7bbcc11b065c" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                           <sedVariable xml:id="_979d5174-96fa-4df6-9111-127e36889ffb" name="exc" referenceTypeName="Null">
+                              <sedValue xml:id="_e9416909-066c-45b2-b2c3-114b247319c1" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
                               </sedValue>
                            </sedVariable>
-                           <sedTermination xml:id="_6cd26ad1-6e70-4be5-b5c2-9909d8f2ba78" name="&lt;end&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testVariablesArrayTest\src\VariablesArrayTest.java" verified="true">
-                              <sedVariable xml:id="_607b3d27-0c96-4e95-95e3-c48b1a61b548" name="exc" referenceTypeName="Null">
-                                 <sedValue xml:id="_b25d0b9f-61e6-4c4f-b039-10d8bf656be6" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                           <sedCallStateVariable xml:id="_2230a543-1edb-408b-b044-adda87af8461" name="self" referenceTypeName="VariablesArrayTest">
+                              <sedValue xml:id="_b04c1af6-59f6-4f54-b0a3-25f7f5fa203c" referenceTypeName="VariablesArrayTest" valueString="self" allocated="true" multiValued="false">
+                              </sedValue>
+                           </sedCallStateVariable>
+                           <sedCallStateVariable xml:id="_4b5105da-27f1-4ee6-97e9-48795a14a52d" name="exc" referenceTypeName="Null">
+                              <sedValue xml:id="_6cd5a4c1-c196-4755-af8e-a50a297c1e8a" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                              </sedValue>
+                           </sedCallStateVariable>
+                           <sedCallStateVariable xml:id="_41849c13-7700-4ea0-bd05-4aa80be6d503" name="heapBefore_main" referenceTypeName="Heap">
+                              <sedValue xml:id="_777f7a11-60e9-4da0-add6-0697335bbbb6" referenceTypeName="Heap" valueString="heap" allocated="true" multiValued="false">
+                              </sedValue>
+                           </sedCallStateVariable>
+                           <sedCallStateVariable xml:id="_e6016278-09ad-42ef-b93e-a2795f38882a" name="savedHeapBefore_main" referenceTypeName="Heap">
+                              <sedValue xml:id="_853efef3-157e-4543-8474-9e2d9e918445" referenceTypeName="Heap" valueString="savedHeap" allocated="true" multiValued="false">
+                              </sedValue>
+                           </sedCallStateVariable>
+                           <sedTermination xml:id="_6e4b10e5-596c-4c2e-9209-1ef6e100496b" name="&lt;end&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testVariablesArrayTest\src\VariablesArrayTest.java" verified="true">
+                              <sedVariable xml:id="_f934b3a7-1ed0-434b-a8f8-a43e35365262" name="exc" referenceTypeName="Null">
+                                 <sedValue xml:id="_ab714bbb-f2b0-4b2b-b443-718b5bf02975" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
                                  </sedValue>
                               </sedVariable>
                            </sedTermination>
+                           <sedGroupStartCondition xml:id="_aad5e583-f784-4062-8e6e-cace893472bd" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                              <sedChildReference nodeIdRef="_8280d85f-a4d5-47f8-9850-1b9f70009d00"/>
+                           </sedGroupStartCondition>
                         </sedMethodReturn>
                      </sedStatement>
                   </sedStatement>
                </sedStatement>
             </sedStatement>
-            <sedMethodCallMethodReturnCondition xml:id="_17e33f7e-9926-476c-b410-7d898fc4bd3c" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
-               <sedChildReference nodeIdRef="_d874628a-6e4f-478f-b41a-b5d86aac4f17"/>
+            <sedMethodCallMethodReturnCondition xml:id="_aad5e583-f784-4062-8e6e-cace893472bd" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_8280d85f-a4d5-47f8-9850-1b9f70009d00"/>
             </sedMethodCallMethodReturnCondition>
+            <sedGroupEndReference nodeIdRef="_aad5e583-f784-4062-8e6e-cace893472bd"/>
          </sedMethodCall>
-         <sedTerminationEntry nodeIdRef="_6cd26ad1-6e70-4be5-b5c2-9909d8f2ba78"/>
+         <sedTerminationEntry nodeIdRef="_6e4b10e5-596c-4c2e-9209-1ef6e100496b"/>
       </sedThread>
    </sedTarget>
 </launch>

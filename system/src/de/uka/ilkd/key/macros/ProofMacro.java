@@ -14,9 +14,9 @@
 package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.TaskFinishedInfo;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.ProverTaskListener;
+import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -150,6 +150,14 @@ public interface ProofMacro {
     public boolean canApplyTo(KeYMediator mediator,
                               Node node,
                               PosInOccurrence posInOcc);
+    
+    /**
+     * Can this macro be applied with no {@link PosInOccurrence} given?
+     * This method is necessary because we need to check global applicability
+     * even when no proof is loaded (e.g., in GUI initialization).
+     * Fixes bug #1495
+     */
+    public boolean isApplicableWithoutPosition();
 
     /**
      * Apply this macro.

@@ -4,17 +4,15 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.key_project.key4eclipse.resources.io.ProofMetaFileWriter;
-import org.key_project.key4eclipse.resources.marker.MarkerUtil;
 import org.key_project.key4eclipse.resources.util.KeYResourcesUtil;
 import org.key_project.key4eclipse.resources.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -22,7 +20,7 @@ import org.key_project.util.java.StringUtil;
 
 import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.SingleProof;
@@ -37,18 +35,17 @@ import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomUserInterface;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 
 public class ProofRunnable implements Runnable {
    
-   private IProject project;
    private List<ProofElement> proofElements;
    private List<ProofElement> proofsToDo;
    private final KeYEnvironment<CustomUserInterface> environment;
    private final IProgressMonitor monitor;
    
    public ProofRunnable(IProject project, List<ProofElement> proofElements, List<ProofElement> proofsToDo, KeYEnvironment<CustomUserInterface> environment, IProgressMonitor monitor){
-      this.project = project;
       this.proofsToDo = Collections.synchronizedList(proofsToDo);
       this.proofElements = proofElements;
       this.environment = environment;
@@ -74,15 +71,14 @@ public class ProofRunnable implements Runnable {
                long proofDuration = System.currentTimeMillis()-proofStart;
                if(proof != null){
                   pe.setProofClosed(proof.closed());
-                  pe.setOutdated(false);
                   pe.setProofReferences(ProofReferenceUtil.computeProofReferences(proof));
-                  pe.setUsedContracts(KeYResourcesUtil.getUsedContractsProofElements(pe, proofElements));
+                  Pair<List<IFile>, List<String>> usedElementsPair = KeYResourcesUtil.computeUsedProofElements(pe, proofElements);
+                  pe.setUsedContracts(usedElementsPair.first);
+                  pe.setCalledMethods(usedElementsPair.second);
                   pe.setMarkerMsg(generateProofMarkerMessage(pe, proof, proofDuration));
-                  try{
-                     save(proof,pe);
-                     MarkerUtil.setMarker(pe);
-                  } catch (Exception e){
-                     LogUtil.getLogger().logError(e);
+                  pe.setOutdated(false);
+                  synchronized (ProofManager.proofsToSave) {
+                     ProofManager.proofsToSave.add(new Pair<ProofElement, InputStream>(pe, generateSaveProof(proof, pe.getProofFile())));
                   }
                   proof.dispose();
                }
@@ -234,23 +230,13 @@ public class ProofRunnable implements Runnable {
       return sb.toString();
    }
    
-   private void save(Proof proof, ProofElement pe) throws Exception {
-      ByteArrayOutputStream out = generateSaveProof(proof, pe.getProofFile());
-      IFile proofFile = pe.getProofFile();
-      KeYProjectDelta keyDelta = KeYProjectDeltaManager.getInstance().getDelta(project);
-      keyDelta.addJobChangedFile(proofFile);
-      saveProof(out, proofFile, pe.getProofClosed());
-      keyDelta.addJobChangedFile(pe.getMetaFile());
-      ProofMetaFileWriter.writeMetaFile(pe);
-   }
-   
    /**
     * Creates the {@link ByteOutputStream} for the given {@link Proof}.
     * @param proof - the {@link Proof} to use
     * @return the {@link ByteOutputStream} for the given {@link Proof}
     * @throws CoreException
     */
-   private ByteArrayOutputStream generateSaveProof(Proof proof, IFile file) {
+   private InputStream generateSaveProof(Proof proof, IFile file) {
       Assert.isNotNull(proof);
       try {
          File location = ResourceUtil.getLocation(file);
@@ -261,30 +247,10 @@ public class ProofRunnable implements Runnable {
          if (errorMessage != null) {
             return null;
          }
-         return out;
+         return new ByteArrayInputStream(out.toByteArray());
       }
       catch (IOException e) {
          return null;
-      }
-   }
-   
-   /**
-    * Saves the given {@link ByteOutputStream} into the proof{@link IFile} of the given {@link ProofElement}.
-    * @param out - the {@link ByteArrayOutputStream} to use
-    * @param pe - the {@link ProofElement} to use
-    * @throws CoreException
-    */
-   private void saveProof(ByteArrayOutputStream out, IFile proofFile, boolean proofClosed) throws CoreException{
-      // Save proof file content
-      IFolder proofFolder = KeYResourcesUtil.createFolder(proofFile);
-      if(proofFolder != null && proofFolder.exists()){
-         if (proofFile.exists()) {
-            proofFile.setContents(new ByteArrayInputStream(out.toByteArray()), true, true, null);
-         }
-         else {
-            proofFile.create(new ByteArrayInputStream(out.toByteArray()), true, null);
-         }
-         KeYResourcesUtil.setProofClosed(proofFile, Boolean.valueOf(proofClosed));
       }
    }
 }

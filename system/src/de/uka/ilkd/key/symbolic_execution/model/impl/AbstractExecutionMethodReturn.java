@@ -3,16 +3,20 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -40,6 +44,11 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement> ext
     * The human readable method return condition to reach this node from its calling {@link IExecutionMethodCall}.
     */
    private String formatedMethodReturnCondition;
+   
+   /**
+    * The variable value pairs of the state when the method has been called.
+    */
+   private IExecutionVariable[] callStateVariables;
    
    /**
     * Constructor.
@@ -109,7 +118,7 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement> ext
    }
 
    /**
-    * Computes the path condition lazily when {@link #getMethodReturnCondition()}
+    * Computes the method return condition lazily when {@link #getMethodReturnCondition()}
     * or {@link #getFormatedMethodReturnCondition()} is called the first time.
     * @throws ProofInputException Occurred Exception
     */
@@ -133,5 +142,47 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement> ext
          // Format path condition
          formatedMethodReturnCondition = formatTerm(methodReturnCondition, services);
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IExecutionVariable[] getCallStateVariables() throws ProofInputException {
+      synchronized (this) {
+         if (callStateVariables == null) {
+            callStateVariables = lazyComputeCallStateVariables();
+         }
+         return callStateVariables;
+      }
+   }
+
+   /**
+    * Computes the variables lazily when {@link #getCallStateVariables()} is 
+    * called the first time.
+    * @return The {@link IExecutionVariable}s of the state when the method has been called.
+    * @throws ProofInputException 
+    */
+   protected IExecutionVariable[] lazyComputeCallStateVariables() throws ProofInputException {
+      // Get relevant information in current node
+      Node proofNode = methodCall.getProofNode();
+      assert proofNode.childrenCount() == 1;
+      PosInOccurrence originalPIO = methodCall.getModalityPIO();
+      int index = originalPIO.isInAntec() ?
+                  proofNode.sequent().antecedent().indexOf(originalPIO.constrainedFormula()) :
+                  proofNode.sequent().succedent().indexOf(originalPIO.constrainedFormula());
+      // Search relevant position in child node
+      Node childNode = proofNode.child(0);
+      SequentFormula nodeSF = originalPIO.isInAntec() ?
+                              childNode.sequent().antecedent().get(index) :
+                              childNode.sequent().succedent().get(index);
+      PosInOccurrence modalityPIO = new PosInOccurrence(nodeSF, originalPIO.posInTerm(), originalPIO.isInAntec());
+      Term modalityTerm = modalityPIO.subTerm();
+      while (modalityTerm.op() instanceof UpdateApplication) {
+         modalityPIO = modalityPIO.down(1);
+         modalityTerm = modalityPIO.subTerm();
+      }
+      // Compute variables
+      return SymbolicExecutionUtil.createExecutionVariables(this, childNode, modalityPIO, null);
    }
 }

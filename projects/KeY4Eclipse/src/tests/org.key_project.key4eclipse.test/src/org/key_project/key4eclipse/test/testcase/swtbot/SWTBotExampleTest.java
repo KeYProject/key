@@ -24,8 +24,8 @@ import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
 import org.key_project.swtbot.swing.bot.SwingBotJButton;
 import org.key_project.swtbot.swing.bot.SwingBotJDialog;
 import org.key_project.swtbot.swing.bot.SwingBotJFrame;
-import org.key_project.swtbot.swing.bot.SwingBotJList;
 import org.key_project.swtbot.swing.bot.SwingBotJMenu;
+import org.key_project.swtbot.swing.bot.SwingBotJTree;
 import org.key_project.util.test.testcase.AbstractSetupTestCase;
 import org.key_project.util.test.util.TestUtilsUtil;
 import org.key_project.util.test.util.TestUtilsUtil.MethodTreatment;
@@ -54,9 +54,9 @@ public class SWTBotExampleTest extends AbstractSetupTestCase {
             SwingBotJMenu fileMenu = frame.bot().jMenuBar().menu("File");
             fileMenu.item("Load Example").click();
             SwingBotJDialog dialog = frame.bot().jDialog("Load Example");
-            SwingBotJList list = dialog.bot().jList();
+            SwingBotJTree tree = dialog.bot().jTree();
             // Select example
-            list.select(5);
+            tree.select("Dynamic Frames", "Cell");
             // Close dialog and load example
             SwingBotJButton loadButton = dialog.bot().jButton("Load Example");
             loadButton.clickAndWait();

@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;

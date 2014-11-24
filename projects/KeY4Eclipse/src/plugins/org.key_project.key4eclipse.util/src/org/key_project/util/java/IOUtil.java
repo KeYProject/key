@@ -33,6 +33,7 @@ import javax.swing.Icon;
 import javax.swing.filechooser.FileSystemView;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Display;
@@ -693,5 +694,47 @@ public final class IOUtil {
             target.close();
          }
       }   
+   }
+   
+   /**
+    * Encodes the given path as URI path by escaping special characters
+    * like spaces.
+    * @param path The path to encode.
+    * @return The encoded URI path.
+    */
+   public static String encodeURIPath(String path) {
+      if (path != null) {
+         URI uri = URI.createFileURI(path);
+         return uri.devicePath();
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Decodes the given URI path by interpreting three-digit escape sequences as 
+    * the bytes of a UTF-8 encoded character and replacing them with the 
+    * characters they represent. Incomplete escape sequences are ignored and 
+    * invalid UTF-8 encoded bytes are treated as extended ASCII characters.
+    * @param uriPath The URI path to decode.
+    * @return The decoded URI path.
+    */
+   public static String decodeURIPath(String uriPath) {
+      if (uriPath != null) {
+         return URI.decode(uriPath);
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Checks if the given {@link File} exists.
+    * @param file The {@link File} to check.
+    * @return {@code true} {@link File} is not {@code null} and exists, {@code false} otherwise.
+    */
+   public static boolean exists(File file) {
+      return file != null && file.exists();
    }
 }

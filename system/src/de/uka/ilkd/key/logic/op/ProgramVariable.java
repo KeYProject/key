@@ -163,6 +163,10 @@ public abstract class ProgramVariable extends AbstractSortedOperator
 	return this;
     }
 
+    @Override
+    public SourceElement getFirstElementIncludingBlocks() {
+       return getFirstElement();
+    }
     
     @Override    
     public SourceElement getLastElement(){

@@ -15,14 +15,14 @@ package de.uka.ilkd.key.macros;
 
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.ApplyStrategy;
-import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.ProverTaskListener;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 
 /**
  * The Class TryCloseMacro tries to close goals. Goals are either closed or left
@@ -81,6 +81,11 @@ public class TryCloseMacro extends AbstractProofMacro {
         return goals != null && !goals.isEmpty();
     }
 
+    @Override
+    public boolean isApplicableWithoutPosition() {
+        return true;
+    }
+    
     /*
      * Run the automation on the goal. Retreat if not successful.
      */

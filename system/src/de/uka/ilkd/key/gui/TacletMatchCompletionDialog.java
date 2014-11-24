@@ -34,6 +34,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.utilities.BracketMatchingTextArea;
 import de.uka.ilkd.key.logic.Namespace;

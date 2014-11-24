@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
+import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.Properties;
 
-import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.configuration.SettingsConverter;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 
@@ -31,7 +31,7 @@ public class LemmaGeneratorSettings implements de.uka.ilkd.key.gui.configuration
  
         private void fireSettingsChanged(){
                 for(SettingsListener listener : listeners){
-                        listener.settingsChanged(new GUIEvent(this));
+                        listener.settingsChanged(new EventObject(this));
                 }
         }
 

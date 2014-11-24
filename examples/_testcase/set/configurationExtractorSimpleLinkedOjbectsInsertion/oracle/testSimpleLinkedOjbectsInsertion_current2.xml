@@ -5,18 +5,18 @@
       <term term="SimpleLinkedOjbectsInsertion::select(heap,SimpleLinkedOjbectsInsertion::select(heap,x,SimpleLinkedOjbectsInsertion::$next),SimpleLinkedOjbectsInsertion::$next)"/>
    </equivalenceClass>
    <state name="return x.value+x.next.value+x.next.next.value+x.next.next.next.value;">
-      <association name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+      <association name="x" programVariable="x" isArrayIndex="false" target="o1"/>
    </state>
    <object xml:id="o1" name="x" type="SimpleLinkedOjbectsInsertion">
-      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="Z(3(#))" type="int"/>
-      <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o2"/>
+      <value name="value" programVariable="value" isArrayIndex="false" value="Z(3(#))" type="int"/>
+      <association name="next" programVariable="next" isArrayIndex="false" target="o2"/>
    </object>
    <object xml:id="o2" name="s_5" type="SimpleLinkedOjbectsInsertion">
-      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="Z(4(#))" type="int"/>
-      <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o3"/>
+      <value name="value" programVariable="value" isArrayIndex="false" value="Z(4(#))" type="int"/>
+      <association name="next" programVariable="next" isArrayIndex="false" target="o3"/>
    </object>
    <object xml:id="o3" name="SimpleLinkedOjbectsInsertion::select(heap,x,SimpleLinkedOjbectsInsertion::$next)" type="SimpleLinkedOjbectsInsertion">
-      <value name="value" programVariable="value" isArrayIndex="false" arrayIndex="-1" value="Z(2(#))" type="int"/>
-      <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+      <value name="value" programVariable="value" isArrayIndex="false" value="Z(2(#))" type="int"/>
+      <association name="next" programVariable="next" isArrayIndex="false" target="o1"/>
    </object>
 </model>

@@ -14,35 +14,40 @@
 package de.uka.ilkd.key.gui;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
 import javax.swing.JOptionPane;
 
-import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.Main;
+import de.uka.ilkd.key.core.TaskFinishedInfo;
+import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
+import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractUserInterface;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
-import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -71,10 +76,6 @@ public class WindowUserInterface extends AbstractUserInterface {
         completions.add(new LoopInvariantRuleCompletion());
         completions.add(new BlockContractCompletion(mainWindow));
         this.numOfInvokedMacros = 0;
-    }
-
-    protected String getMacroConsoleOutput() {
-        return "Applying: " + getMacro().getClass().getSimpleName();
     }
 
     public void loadProblem(File file, List<File> classPath,
@@ -306,7 +307,7 @@ public class WindowUserInterface extends AbstractUserInterface {
     * {@inheritDoc}
     */
    @Override
-   public DefaultProblemLoader load(Profile profile, File file, List<File> classPath,
+   public AbstractProblemLoader load(Profile profile, File file, List<File> classPath,
                                     File bootClassPath, Properties poPropertiesToForce) throws ProblemLoaderException {
       if (file != null) {
          mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());
@@ -326,23 +327,34 @@ public class WindowUserInterface extends AbstractUserInterface {
    public File saveProof(Proof proof, String fileExtension) {
        final MainWindow mainWindow = MainWindow.getInstance();
        final KeYFileChooser jFC = GuiUtilities.getFileChooser("Choose filename to save proof");
-       final String defaultName = MiscTools.toValidFileName(proof.name().toString()).toString();
-       boolean autoSave = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave();
-       final Pair<Boolean, Pair<File, Boolean>> res =
-               jFC.showSaveDialog(mainWindow, defaultName + fileExtension, autoSave);
+
+       Pair<File, String> f = fileName(proof, fileExtension);
+       final Pair<Boolean, File> res = jFC.showSaveDialog(mainWindow, f.second);
        final boolean saved = res.first;
-       final boolean newDir = res.second.second;
+       final File newDir = res.second;
        File file = null;
        if (saved) {
            file = jFC.getSelectedFile();
-           mainWindow.saveProof(jFC.getSelectedFile());
-       } else if (newDir) {
-           final File dir = res.second.first;
-           if (!dir.delete()) {
-               dir.deleteOnExit();
+           final String filename = file.getAbsolutePath();
+           ProofSaver saver =
+                   new ProofSaver(proof, filename, Main.INTERNAL_VERSION);
+           String errorMsg;
+           try {
+               errorMsg = saver.save();
+           } catch (IOException e) {
+               errorMsg = e.toString();
            }
+           if (errorMsg != null) {
+               notify(new GeneralFailureEvent("Saving Proof failed.\n Error: " + errorMsg));
+           } else {
+              proof.setProofFile(file);
+           }
+       } else {
+           if (newDir != null && !newDir.delete()) {
+               newDir.deleteOnExit();
+           }
+           jFC.resetPath();
        }
-       jFC.resetPath();
        return file;
    }
 

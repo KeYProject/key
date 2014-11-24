@@ -111,6 +111,7 @@ public final class JMLTranslator {
         ARRAY_REF ("array reference"),
         INV ("\\inv"),
         INV_FOR ("\\invariant_for"),
+        STATIC_INV_FOR ("\\static_invariant_for"),
         CAST ("cast"),
         CONDITIONAL ("conditional"),
         FRESH ("\\fresh"),
@@ -715,6 +716,33 @@ public final class JMLTranslator {
 
         });
 
+        translationMethods.put(JMLKeyWord.UNIONINF, new JMLTranslationMethod() {
+
+            @Override
+            public SLExpression translate(SLTranslationExceptionManager excManager,
+                            Object... params) throws SLTranslationException {
+
+                checkParameters(params, Boolean.class, Pair.class, Term.class, Term.class, Services.class);
+                final boolean nullable = (Boolean) params[0];
+                @SuppressWarnings("unchecked")
+                final Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = (Pair<KeYJavaType, ImmutableList<LogicVariable>>) params[1];
+                final Term t = (Term) params[2];
+                final Term t2 = (Term) params[3];
+                final Services services = (Services) params[4];
+                final JavaInfo javaInfo = services.getJavaInfo();
+
+                final Term restr = JMLTranslator.this.typerestrict(declVars.first, nullable, declVars.second, services);
+                final Term guard = t2==null? restr: tb.and(restr, t2);
+
+                return new SLExpression(tb.infiniteUnion(
+                                declVars.second.toArray(new QuantifiableVariable[declVars.second.size()]),
+                                guard, t),
+                                javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+
+            }
+
+        });
+
         translationMethods.put(JMLKeyWord.SEQ_DEF, new JMLTranslationMethod() {
 
             @Override
@@ -818,6 +846,23 @@ public final class JMLTranslator {
                 IObserverFunction inv = services.getJavaInfo().getInv();
                 Term obj = ((SLExpression) params[1]).getTerm();
                 return new SLExpression(tb.func(inv, tb.getBaseHeap(), obj));
+            }
+        });
+
+        translationMethods.put(JMLKeyWord.STATIC_INV_FOR,
+                new JMLTranslationMethod() {
+
+            @Override
+            public SLExpression translate(
+                    SLTranslationExceptionManager excManager,
+                    Object... params)
+                            throws SLTranslationException {
+                checkParameters(params, Services.class, KeYJavaType.class);
+                final Services services = (Services)params[0];
+                final TermBuilder tb = services.getTermBuilder();
+                final KeYJavaType kjt = (KeYJavaType) params[1];
+                final Term term = tb.staticInv(kjt);
+                return new SLExpression(term);
             }
         });
 
@@ -1017,7 +1062,7 @@ public final class JMLTranslator {
                 final LogicVariable fieldLV
                 = new LogicVariable(new Name("f"), services.getTypeConverter().getHeapLDT().getFieldSort());
                 final Term locSet
-                = tb.guardedSetComprehension(new LogicVariable[]{objLV, fieldLV},
+                = tb.setComprehension(new LogicVariable[]{objLV, fieldLV},
                         reach,
                         o2,
                         tb.var(fieldLV));
@@ -1038,8 +1083,8 @@ public final class JMLTranslator {
                                 ImmutableList.class, 
                                 Map.class,
                                 Services.class);
-                final ImmutableList<SLExpression> list = (ImmutableList) params[0];
-                final Map<LocationVariable,Term> atPres = (Map) params[1];
+                final ImmutableList<SLExpression> list = (ImmutableList<SLExpression>) params[0];
+                final Map<LocationVariable,Term> atPres = (Map<LocationVariable, Term>) params[1];
                 final Services services = (Services) params[2];
                 final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
 
@@ -1708,6 +1753,13 @@ public final class JMLTranslator {
         }
         return castToReturnType(result, resultClass);
     }
+    
+    /**
+     * For testing only.
+     */
+    static <T> T translate(String jmlExpr, KeYJavaType specInClass, Class<T> resultClass, Services services) throws SLTranslationException {
+        return translate(new PositionedString(jmlExpr), specInClass, null, null, null, null, null, resultClass, services);
+    }
 
 
     <T> T translate(String jmlKeyWordName,
@@ -2017,33 +2069,6 @@ public final class JMLTranslator {
             return new SLExpression(translateQuantifier(qv, cond),resultType);
         }
         
-        /** Provide restriction terms for the declared KeYJavaType */
-        protected Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<QuantifiableVariable> qvs, Services services) {
-            final Type type = kjt.getJavaType();
-            final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
-            Term res = tb.tt();
-            for (QuantifiableVariable qv: qvs) {
-                if (type instanceof PrimitiveType) {
-                    if (type == PrimitiveType.JAVA_BYTE) res = tb.and(res,tb.inByte(tb.var(qv)));
-                    if (type == PrimitiveType.JAVA_SHORT) res = tb.and(res,tb.inShort(tb.var(qv)));
-                    if (type == PrimitiveType.JAVA_CHAR) res = tb.and(res,tb.inChar(tb.var(qv)));
-                    if (type == PrimitiveType.JAVA_INT) res = tb.and(res,tb.inInt(tb.var(qv)));
-                    if (type == PrimitiveType.JAVA_LONG) res = tb.and(res,tb.inLong(tb.var(qv)));
-                } else {
-                    // assume reference type
-                    if (nullable) {
-                        res = tb.and(res,tb.created(tb.var(qv)));
-                    } else {
-                        final Term nonNull = arrayDepth > 0 ?
-                                tb.deepNonNull(tb.var(qv), tb.zTerm(arrayDepth))
-                                : tb.not(tb.equals(tb.var(qv), tb.NULL()));
-                        res = tb.and(res,tb.and(
-                                tb.created(tb.var(qv)), nonNull));
-                    }
-                }
-            }
-            return res;
-        }
 
         public abstract Term combineQuantifiedTerms(Term t1,
                                                     Term t2)
@@ -2136,7 +2161,7 @@ public final class JMLTranslator {
             final KeYJavaType _declsType = (KeYJavaType) params[2];
             de.uka.ilkd.key.java.abstraction.Type declsType =
                     _declsType.getJavaType();
-            ImmutableList<QuantifiableVariable> qvs = (ImmutableList)params[3];
+            ImmutableList<QuantifiableVariable> qvs = (ImmutableList<QuantifiableVariable>)params[3];
             boolean nullable = (Boolean) params[4];
             services = (Services) params[6];
             assert services != null;
@@ -2456,4 +2481,34 @@ public final class JMLTranslator {
         }
         return translateToJDLTerm(t, functName, services, tb, list, excManager);
     }
+
+    /** Provide restriction terms for the declared KeYJavaType */
+    protected Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<? extends QuantifiableVariable> qvs, Services services) {
+        final Type type = kjt.getJavaType();
+        final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
+        Term res = tb.tt();
+        for (QuantifiableVariable qv: qvs) {
+            if (type instanceof PrimitiveType) {
+                if (type == PrimitiveType.JAVA_BYTE) res = tb.and(res,tb.inByte(tb.var(qv)));
+                if (type == PrimitiveType.JAVA_SHORT) res = tb.and(res,tb.inShort(tb.var(qv)));
+                if (type == PrimitiveType.JAVA_CHAR) res = tb.and(res,tb.inChar(tb.var(qv)));
+                if (type == PrimitiveType.JAVA_INT) res = tb.and(res,tb.inInt(tb.var(qv)));
+                if (type == PrimitiveType.JAVA_LONG) res = tb.and(res,tb.inLong(tb.var(qv)));
+                if (type == PrimitiveType.JAVA_LOCSET) res = tb.and(res,tb.disjoint(tb.var(qv), tb.freshLocs(tb.getBaseHeap())));
+            } else {
+                // assume reference type
+                if (nullable) {
+                    res = tb.and(res,tb.or(tb.created(tb.var(qv)), tb.equals(tb.var(qv), tb.NULL())));
+                } else {
+                    final Term nonNull = arrayDepth > 0 ?
+                            tb.deepNonNull(tb.var(qv), tb.zTerm(arrayDepth))
+                            : tb.not(tb.equals(tb.var(qv), tb.NULL()));
+                    res = tb.and(res,tb.and(
+                            tb.created(tb.var(qv)), nonNull));
+                }
+            }
+        }
+        return res;
+    }
+    
 }

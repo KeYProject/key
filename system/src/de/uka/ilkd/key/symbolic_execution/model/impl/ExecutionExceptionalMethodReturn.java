@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.Throw;
@@ -24,7 +24,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionExceptionalMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -65,14 +64,6 @@ public class ExecutionExceptionalMethodReturn extends AbstractExecutionMethodRet
       return INTERNAL_NODE_NAME_START + "throw " +
              exceptionType +
              INTERNAL_NODE_NAME_END;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected IExecutionVariable[] lazyComputeVariables() {
-      return SymbolicExecutionUtil.createExecutionVariables(this);
    }
 
    /**

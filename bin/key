@@ -122,7 +122,7 @@ keysysprops=""
 keyoptions=""
 
 #default values for Java Options Xmx and Xms
-javaOptionXmx="-Xmx4096m";
+javaOptionXmx="-Xmx1024m";
 javaOptionXms="-Xms256m";
 
 while [ $# -ne 0 ]; do
@@ -248,8 +248,6 @@ export PATH
 $JAVA $JAVA_OPTIONS $keysysprops \
 -ea:de.uka.ilkd.key... $javaOptionXms $javaOptionXmx \
 -Dkey.home="$KEY_HOME" \
--Dkey.simplify.logdir="$KEY_SIMPLIFY_LOG_DIR" \
--Dkey.ics.logdir="$KEY_ICS_LOG_DIR" \
 -Dsun.awt.exception.handler=de.uka.ilkd.key.gui.ExceptionalHandler \
 -splash:"$KEY_HOME/system/resources/de/uka/ilkd/key/gui/images/key22.gif" \
--classpath "$keyclasspath" de.uka.ilkd.key.gui.Main "$@"
+-classpath "$keyclasspath" de.uka.ilkd.key.core.Main "$@"

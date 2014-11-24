@@ -23,7 +23,7 @@ import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.property.ProofPropertySection;
 import org.key_project.util.test.util.SWTBotTabbedPropertyList;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.util.Pair;
 

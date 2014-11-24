@@ -26,6 +26,7 @@ import org.key_project.key4eclipse.resources.marker.MarkerUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
@@ -58,8 +59,11 @@ public class ProofElement {
    private boolean proofClosed;
    private LinkedHashSet<IProofReference<?>> proofReferences;
    private List<IFile> usedContracts;
+   private List<String> calledMethods;
 
    private List<ProofMetaFileTypeElement> typeElements;
+   
+   private final SpecificationRepository specificationRepository;
    
    public ProofElement(IFile javaFile, SourceLocation scl , KeYEnvironment<CustomUserInterface> environment, IFolder proofFolder, IFile proofFile, IFile metaFile, IMarker proofMarker, List<IMarker> recursionMarker, Contract contract){
       this.javaFile = javaFile;
@@ -86,6 +90,7 @@ public class ProofElement {
       this.proofClosed = false;
       this.usedContracts = new LinkedList<IFile>();
       this.typeElements = new LinkedList<ProofMetaFileTypeElement>();
+      this.specificationRepository = environment.getSpecificationRepository();
       init();
    }
    
@@ -207,13 +212,18 @@ public class ProofElement {
       this.usedContracts = usedContracts;
    }
 
-   
    public List<ProofMetaFileTypeElement> getTypeElements() {
       return typeElements;
    }
    
-   
-   
+   public List<String> getCalledMethods() {
+      return calledMethods;
+   }
+
+   public void setCalledMethods(List<String> calledMethods) {
+      this.calledMethods = calledMethods;
+   }
+
    @Override
    public String toString(){
       return contract.getName();
@@ -262,5 +272,10 @@ public class ProofElement {
          }
       }
       return false;
+   }
+
+
+   public SpecificationRepository getSpecificationRepository() {
+      return specificationRepository;
    }
 }

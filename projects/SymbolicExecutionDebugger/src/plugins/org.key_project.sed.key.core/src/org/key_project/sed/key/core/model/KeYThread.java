@@ -24,6 +24,7 @@ import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDThread;
+import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.key.core.breakpoints.KeYBreakpointManager;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
@@ -31,8 +32,8 @@ import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.AutoModeListener;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.AutoModeListener;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
 import de.uka.ilkd.key.proof.Goal;
@@ -111,6 +112,11 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * The up to know discovered {@link ISEDTermination} nodes.
     */
    private final Map<IExecutionTermination, ISEDTermination> knownTerminations = new HashMap<IExecutionTermination, ISEDTermination>();
+   
+   /**
+    * The conditions under which a group ending in this node starts.
+    */
+   private SEDMemoryBranchCondition[] groupStartConditions;
 
    /**
     * Constructor.
@@ -251,7 +257,6 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
          try {
             // Inform UI that the process is resumed
             super.resume();
-            getDebugTarget().threadResumed(this);
          }
          catch (DebugException exception) {
             LogUtil.getLogger().logError(exception);
@@ -275,7 +280,6 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
          finally {
             try {
                super.suspend();
-               getDebugTarget().threadSuspended(this);
             }
             catch (DebugException e1) {
                LogUtil.getLogger().logError(e1);
@@ -352,7 +356,6 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
       if (canResume()) {
          // Inform UI that the process is resumed
          super.resume();
-         getDebugTarget().threadResumed(this);
          // Run auto mode
          runAutoMode(keyNode,
                      KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), 
@@ -448,7 +451,6 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
       if (canSuspend()) {
          getUi().stopAutoMode();
          super.suspend();
-         getDebugTarget().threadSuspended(this);
       }
    }
 
@@ -711,5 +713,26 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
       else {
          return null;
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public SEDMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
+      synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+         if (groupStartConditions == null) {
+            groupStartConditions = KeYModelUtil.createCompletedBlocksConditions(this);
+         }
+         return groupStartConditions;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setParent(ISEDDebugNode parent) {
+      super.setParent(parent);
    }
 }

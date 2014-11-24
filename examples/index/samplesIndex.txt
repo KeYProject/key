@@ -1,0 +1,55 @@
+#
+# List most important files first!
+#
+
+firstTouch/01-Agatha/README.txt
+firstTouch/02-Subset/README.txt
+# removed duplicate directory!
+# firstTouch/03-SumAndMax/README.txt
+heap/vstte10_01_SumAndMax/FIRSTTOUCH.txt
+# moved to competitions below
+# firstTouch/04-LinkedList/README.txt
+# 05 seems to be broken ... deactivated
+# firstTouch/05-ReverseArray/README.txt
+firstTouch/06-BinarySearch/README.txt
+firstTouch/07-Cell/README.txt
+firstTouch/08-Java5/README.txt
+heap/removeDups/README.txt
+firstTouch/09-Quicktour/README.txt
+firstTouch/10-SITA/README.txt
+
+heap/SmansEtAl/README.txt
+heap/Transactions/README.txt
+heap/inconsistent_represents/README.txt
+heap/information_flow/README.txt
+heap/list/README.txt
+heap/list_ghost/README.txt
+heap/list_seq/README.txt
+heap/observer/README.txt
+heap/simple/README.txt
+heap/saddleback_search/README.txt
+
+heap/vstte10_01_SumAndMax/README.txt
+heap/vstte10_02_Invert/README.txt
+heap/vstte10_03_LinkedList/README.txt
+heap/vstte10_04_Queens/README.txt
+heap/vstte10_05_Queue/README.txt
+
+heap/fm12_01_LRS/README.txt
+heap/permutedSum/README
+
+heap/vacid0_01_SparseArray/README.txt
+heap/vacid0_05_RedBlackTrees/README.txt
+heap/WeideEtAl_01_AddAndMultiply/README.txt
+heap/WeideEtAl_02_BinarySearch/README.txt
+
+firstTouch/000InformationFlow--MiniExamples/README.txt
+firstTouch/001InformationFlow--Sum/README.txt
+firstTouch/002InformationFlow--MethodContracts/README.txt
+firstTouch/003InformationFlow--ToyVoting/README.txt
+firstTouch/004InformationFlow--SimpleEvoting/README.txt
+firstTouch/005InformationFlow--ToyBanking/README.txt
+firstTouch/006InformationFlow--NewObjects/README.txt
+firstTouch/007InformationFlow--LoopInvariants/README.txt
+firstTouch/008InformationFlow--BlockContracts/README.txt
+

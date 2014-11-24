@@ -21,8 +21,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
@@ -30,7 +30,9 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -46,26 +48,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVa
  * The default implementation of {@link IExecutionVariable}.
  * @author Martin Hentschel
  */
-public class ExecutionVariable extends AbstractExecutionElement implements IExecutionVariable {
+public class ExecutionVariable extends AbstractExecutionVariable {
    /**
     * The parent {@link IExecutionNode} which provides this {@link ExecutionVariable}.
     */
    private final IExecutionNode<?> parentNode;
-   
-   /**
-    * The represented {@link IProgramVariable} which value is shown.
-    */
-   private final IProgramVariable programVariable;
-   
-   /**
-    * The parent {@link ExecutionValue} or {@code null} if not available.
-    */
-   private final ExecutionValue parentValue;
-   
-   /**
-    * The index in the parent array.
-    */
-   private final int arrayIndex;
    
    /**
     * The {@link ExecutionValue} from which the array length was computed.
@@ -81,10 +68,14 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     * Constructor for a "normal" value.
     * @param parentNode The parent {@link IExecutionNode} which provides this {@link ExecutionVariable}.
     * @param programVariable The represented {@link IProgramVariable} which value is shown.
+    * @param additionalCondition An optional additional condition to consider.
     */
    public ExecutionVariable(IExecutionNode<?> parentNode,
-                            IProgramVariable programVariable) {
-      this(parentNode, null, programVariable);
+                            Node proofNode, 
+                            PosInOccurrence modalityPIO, 
+                            IProgramVariable programVariable,
+                            Term additionalCondition) {
+      this(parentNode, proofNode, modalityPIO, null, programVariable, additionalCondition);
    }
    
    /**
@@ -93,16 +84,25 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     * @param parentNode The parent {@link IExecutionNode} which provides this {@link ExecutionVariable}.
     * @param parentValue The parent {@link ExecutionValue} or {@code null} if not available.
     * @param programVariable The represented {@link IProgramVariable} which value is shown.
+    * @param additionalCondition An optional additional condition to consider.
     */
    public ExecutionVariable(IExecutionNode<?> parentNode,
+                            Node proofNode, 
+                            PosInOccurrence modalityPIO, 
                             ExecutionValue parentValue, 
-                            IProgramVariable programVariable) {
-      super(parentNode.getSettings(), parentNode.getMediator(), parentNode.getProofNode());
+                            IProgramVariable programVariable,
+                            Term additionalCondition) {
+      super(parentNode.getSettings(), 
+            parentNode.getMediator(), 
+            proofNode, 
+            programVariable, 
+            parentValue, 
+            null, 
+            additionalCondition,
+            modalityPIO);
       assert programVariable != null;
+      assert modalityPIO != null;
       this.parentNode = parentNode;
-      this.parentValue = parentValue;
-      this.programVariable = programVariable;
-      this.arrayIndex = -1;
       this.lengthValue = null;
    }
 
@@ -112,31 +112,26 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     * @param parentValue The parent {@link ExecutionValue} or {@code null} if not available.
     * @param arrayIndex The index in the parent array.
     * @param lengthValue The {@link ExecutionValue} from which the array length was computed.
+    * @param additionalCondition An optional additional condition to consider.
     */
    public ExecutionVariable(IExecutionNode<?> parentNode,
+                            Node proofNode, 
+                            PosInOccurrence modalityPIO, 
                             ExecutionValue parentValue, 
-                            int arrayIndex,
-                            ExecutionValue lengthValue) {
-      super(parentNode.getSettings(), parentNode.getMediator(), parentNode.getProofNode());
-      this.programVariable = null;
+                            Term arrayIndex,
+                            ExecutionValue lengthValue,
+                            Term additionalCondition) {
+      super(parentNode.getSettings(), 
+            parentNode.getMediator(), 
+            proofNode, 
+            null, 
+            parentValue, 
+            arrayIndex, 
+            additionalCondition,
+            modalityPIO);
+      assert modalityPIO != null;
       this.parentNode = parentNode;
-      this.parentValue = parentValue;
-      this.arrayIndex = arrayIndex;
       this.lengthValue = lengthValue;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected String lazyComputeName() throws ProofInputException {
-      IProgramVariable pv = getProgramVariable();
-      if (pv != null) {
-         return SymbolicExecutionUtil.getDisplayString(pv);
-      }
-      else {
-         return "[" + arrayIndex + "]";
-      }
    }
 
    /**
@@ -165,6 +160,9 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          SiteProofVariableValueInput sequentToProve;
          Term siteProofSelectTerm = null;
          Term siteProofCondition = parentNode.getPathCondition();
+         if (getAdditionalCondition() != null) {
+            siteProofCondition = tb.and(siteProofCondition, getAdditionalCondition());
+         }
          if (getParentValue() != null || SymbolicExecutionUtil.isStaticVariable(getProgramVariable())) {
             siteProofSelectTerm = createSelectTerm(services);
             if (getParentValue() != null) { // Is null at static variables
@@ -173,10 +171,10 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
             if (lengthValue != null) {
                siteProofCondition = tb.and(siteProofCondition, lengthValue.getCondition());
             }
-            sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(services, getProofNode(), getParentNode().getModalityPIO(), siteProofCondition, siteProofSelectTerm, true); 
+            sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(services, getProofNode(), getModalityPIO(), siteProofCondition, siteProofSelectTerm, true); 
          }
          else {
-            sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(services, getProofNode(), getParentNode().getModalityPIO(), siteProofCondition, getProgramVariable());
+            sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(services, getProofNode(), getModalityPIO(), siteProofCondition, getProgramVariable());
          }
          ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
                                                                              sequentToProve.getSequentToProve(), 
@@ -335,7 +333,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          }
          else {
             Term parentTerm = getParentValue().getVariable().createSelectTerm(services);
-            if (programVariable != null) {
+            if (getProgramVariable() != null) {
                if (services.getJavaInfo().getArrayLength() == getProgramVariable()) {
                   // Special handling for length attribute of arrays
                   Function function = services.getTypeConverter().getHeapLDT().getLength();
@@ -349,8 +347,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
             }
             else {
                // Special handling for array indices.
-               Term idx = services.getTermBuilder().zTerm("" + arrayIndex);
-               return services.getTermBuilder().dotArr(parentTerm, idx);
+               return services.getTermBuilder().dotArr(parentTerm, getArrayIndex());
             }
          }
       }
@@ -360,42 +357,10 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     * {@inheritDoc}
     */
    @Override
-   public IProgramVariable getProgramVariable() {
-      return programVariable;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public int getArrayIndex() {
-      return arrayIndex;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isArrayIndex() {
-      return getArrayIndex() >= 0;
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public String getElementType() {
-      return "Variable";
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
    public ExecutionValue getParentValue() {
-      return parentValue;
+      return (ExecutionValue)super.getParentValue();
    }
-   
+
    /**
     * Returns the parent {@link IExecutionNode} which provides this {@link ExecutionVariable}.
     * @return The parent {@link IExecutionNode} which provides this {@link ExecutionVariable}.

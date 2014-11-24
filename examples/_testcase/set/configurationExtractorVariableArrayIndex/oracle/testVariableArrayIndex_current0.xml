@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <state name="{}">
+      <association name="self" programVariable="self" isArrayIndex="false" target="o2"/>
+   </state>
+   <object xml:id="o1" name="int[]::select(heap,self,VariableArrayIndex::$array)" type="int[]">
+      <value name="length" programVariable="length" isArrayIndex="false" value="length(int[]::select(heap,self,VariableArrayIndex::$array))" type="int"/>
+      <value name="[int::select(heap,self,VariableArrayIndex::$index)]" isArrayIndex="true" arrayIndex="int::select(heap,self,VariableArrayIndex::$index)" value="Z(2(4(#)))" type="int"/>
+   </object>
+   <object xml:id="o2" name="self" type="VariableArrayIndex">
+      <value name="index" programVariable="index" isArrayIndex="false" value="int::select(heap,self,VariableArrayIndex::$index)" type="int"/>
+      <association name="array" programVariable="array" isArrayIndex="false" target="o1"/>
+   </object>
+</model>

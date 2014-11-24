@@ -8,12 +8,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.testgen.TGInfoDialog;
 import de.uka.ilkd.key.gui.testgen.TestGenerationSettings;
@@ -23,6 +25,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -31,12 +34,29 @@ import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.model.Heap;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.model.ObjectVal;
+import de.uka.ilkd.key.testgen.oracle.OracleGenerator;
+import de.uka.ilkd.key.testgen.oracle.OracleMethod;
+import de.uka.ilkd.key.testgen.oracle.OracleTermCall;
 
 /**
  * @author gladisch
  * @author herda
  */
 public class TestCaseGenerator {
+	private static final String NULLABLE = "/*@ nullable */";
+	public static final String ALL_OBJECTS = "allObjects";
+	public static final String ALL_INTS = "allInts";
+	public static final String ALL_BOOLS = "allBools";
+	public static final String ALL_HEAPS = "allHeaps";
+	public static final String ALL_FIELDS = "allFields";
+	public static final String ALL_SEQ = "allSeq";
+	public static final String ALL_LOCSETS = "allLocSets";
+	
+	public static final String OBJENESIS_NAME = "objenesis-2.1.jar";
+	
+	public static final String OLDMap = "old";
+	
+	public static final String TAB = "   ";
 	private Services services;
 	private Proof proof;
 	static int fileCounter = 0;
@@ -60,6 +80,9 @@ public class TestCaseGenerator {
 	private String fileName;
 	private String MUTName;
 	private ProofInfo info;
+	private OracleGenerator oracleGenerator;
+	private List<OracleMethod> oracleMethods;
+	private String oracleMethodCall;
 	private final Map<Sort, StringBuffer> sortDummyClass;
 	final String DummyPostfix = "DummyImpl";
 	// TODO: in future remove this string and provide the file in the
@@ -74,13 +97,19 @@ public class TestCaseGenerator {
 	        + "   echo \"Copy openjml.jar into the directory with test files.\"\n"
 	        + "fi\n";
 	
-	private String createCompileWithOpenJML(String path){
+	private String createCompileWithOpenJML(String openJMLPath, String objenesisPath){
 		return "#!/bin/bash\n\n"
-		        + "if [ -e \""+path+File.separator+"openjml.jar\" ]\n"
-		        + "then\n"
-		        + "   java -jar "+path+File.separator+"openjml.jar -cp \".\" -rac *.java\n"
+		        + "if [ -e \""+openJMLPath+File.separator+"openjml.jar\" ] \n"
+		        + "then\n" 
+		        + "   if [ -e \""+objenesisPath+File.separator+OBJENESIS_NAME+"\" ]\n"
+		        + "   then\n"
+		        + "      java -jar "+openJMLPath+File.separator+"openjml.jar -cp \"."+objenesisPath+File.separator+OBJENESIS_NAME+"\" -rac *.java\n"
+		        + "   else\n"
+		        + "      echo \"objenesis-2.1.jar not found!\"\n"
+		        + "   fi\n"
 		        + "else\n"
 		        + "   echo \"openjml.jar not found!\"\n"
+		        
 		        + "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"\n"
 		        + "   echo \"Copy openjml.jar into the directory with test files.\"\n"
 		        + "fi\n";
@@ -89,21 +118,26 @@ public class TestCaseGenerator {
 	// KeY-project
 	private String executeWithOpenJML;
 
-	private String createExecuteWithOpenJML(String path){
+	private String createExecuteWithOpenJML(String path, String objenesisPath){
 		return "#!/bin/bash\n"
 		        + "if [ -e \""+path+File.separator+"jmlruntime.jar\" ]\n"
 		        + "then"
 		        + "  if [ -e \""+path+File.separator+"jmlspecs.jar\" ]\n"
 		        + "  then\n"
-		        + "   if [ \"$1\" = \"\" ] ; then\n"
-		        + "    echo \"Provide the test driver as an argument (without .java postfix). For example:\"\n"
-		        + "    echo \"  executeWithOpenJML.sh TestGeneric0 \"\n"
-		        + "    echo \"Make sure that jmlruntime.jar and jmlspecs.jar are in the\"\n"
-		        + "    echo \"current directory.\"\n"
-		        + "    quit\n"
-		        + "   else\n"
-		        + "     java -cp "+path+File.separator+"jmlruntime.jar:"+path+File.separator+"jmlspecs.jar:. $1\n"
-		        + "   fi\n"
+		        + "     if [ -e \""+objenesisPath+File.separator+OBJENESIS_NAME+"\" ]\n"
+		        + "     then\n"
+		        + "        if [ \"$1\" = \"\" ] ; then\n"
+		        + "           echo \"Provide the test driver as an argument (without .java postfix). For example:\"\n"
+		        + "           echo \"  executeWithOpenJML.sh TestGeneric0 \"\n"
+		        + "           echo \"Make sure that jmlruntime.jar and jmlspecs.jar are in the\"\n"
+		        + "           echo \"current directory.\"\n"
+		        + "           quit\n"
+		        + "        else\n"
+		        + "           java -cp "+objenesisPath+File.separator+OBJENESIS_NAME+":"+path+File.separator+"jmlruntime.jar:"+path+File.separator+"jmlspecs.jar:. $1\n"
+		        + "        fi\n"
+		        + "      else\n"
+		        + "         echo \"objenesis-2.1.jar not found!\"\n"
+		        + "      fi\n"
 		        + "else\n"
 		        + "  echo \"jmlspecs.jar not found!\"\n"
 		        + "  echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\"\n"
@@ -131,9 +165,43 @@ public class TestCaseGenerator {
 		info = new ProofInfo(proof);
 		MUTName = info.getMUT().getFullName();	
 		rflCreator = new ReflectionClassCreator();
-		executeWithOpenJML = createExecuteWithOpenJML(settings.getOpenjmlPath());
-		compileWithOpenJML = createCompileWithOpenJML(settings.getOpenjmlPath());		
+		executeWithOpenJML = createExecuteWithOpenJML(settings.getOpenjmlPath(),settings.getObjenesisPath());
+		compileWithOpenJML = createCompileWithOpenJML(settings.getOpenjmlPath(), settings.getObjenesisPath());
+		oracleGenerator  =new OracleGenerator(services,rflCreator, useRFL);
+		if(junitFormat){
+			//System.out.println("Translating oracle");
+			try{
+				oracleMethods = new LinkedList<OracleMethod>();
+				oracleMethodCall = getOracleAssertion(oracleMethods);
+				
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
 	}
+	
+	
+	
+	private Set<ObjectVal> getPrestateObjects(Model m){
+		
+		Set<ObjectVal> result  =new HashSet<ObjectVal>();
+		
+		Set<String> refs = oracleGenerator.getPrestateTerms();
+		try{
+			for(String ref : refs){
+				result.addAll(m.getNecessaryPrestateObjects(ref));
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		
+		return result;
+		
+		
+	}
+	
+	
 	
 	public String getMUTCall(){
 		IProgramMethod m = info.getMUT();		
@@ -433,7 +501,30 @@ public class TestCaseGenerator {
 		TestCaseGenerator.fileCounter++;
 		return testCase.toString();
 	}
+	
+	
+	
+	protected String getOracleAssertion(List<OracleMethod> oracleMethods){		
+		Term postcondition = getPostCondition();
+		
+		OracleMethod oracle = oracleGenerator.generateOracleMethod(postcondition);
+		
+		
+		
+		OracleTermCall oracleCall = new OracleTermCall(oracle, oracle.getArgs());
+		
+		oracleMethods.add(oracle);
+		oracleMethods.addAll(oracleGenerator.getOracleMethods());
+		
+		System.out.println("Modifier Set: "+oracleGenerator.getOracleLocationSet(info.getAssignable()));
+		
+		
+		return "assertTrue("+oracleCall.toString()+");";
+	}
 
+	private Term getPostCondition() {
+		return info.getPostCondition();
+	}
 	public String generateJUnitTestSuite(Collection<SMTSolver> problemSolvers) {
 		
 		fileName = "TestGeneric" + TestCaseGenerator.fileCounter;
@@ -462,9 +553,19 @@ public class TestCaseGenerator {
 						testMethod
 						        .append("   //Test preamble: creating objects and intializing test data"
 						                + generateTestCase(m) + "\n\n");
+						
+						//info.getCode();
+						
+						testMethod.append(TAB+"//Other variables\n" + getOtherVariables(m)+"\n");
 						testMethod
 						        .append("   //Calling the method under test\n   "
-						                + mut + "\n");
+						                + info.getCode() + "\n");
+						
+						
+						if(junitFormat){
+							testMethod.append("   //calling the test oracle\n"+TAB+oracleMethodCall+"\n");
+						}
+						
 						testMethod.append(" }\n\n");
 						i++;
 						success = true;
@@ -489,6 +590,15 @@ public class TestCaseGenerator {
 		}
 		testSuite.append(getMainMethod(fileName, i) + "\n\n");
 		testSuite.append(testMethods);
+		
+		if(junitFormat){
+			for(OracleMethod m : oracleMethods){
+				testSuite.append("\n\n");
+				testSuite.append(m);
+			}
+		}
+		
+		
 		testSuite.append("\n}");
 		writeToFile(fileName + ".java", testSuite);
 		logger.writeln("Writing test file to:" + directory + modDir
@@ -504,6 +614,56 @@ public class TestCaseGenerator {
 		TestCaseGenerator.fileCounter++;
 		return testSuite.toString();
 	}
+	
+	private String getOtherVariables(Model m) {
+		String result = "";
+		
+		for(Term c : oracleGenerator.getConstants()){
+			if(!m.getConstants().containsKey(c.toString())){
+				String init = "null";
+				if(c.sort().equals(services.getTypeConverter().getIntegerLDT().targetSort())){
+					init = "0";
+				}
+				else if(c.sort().equals(services.getTypeConverter().getBooleanLDT().targetSort())){
+					init = "false";
+				}
+				
+				result += "\n"+TAB+ c.sort().name() + " " + c + " = " + init + ";";
+				result += "\n"+TAB+ c.sort().name() + " " + getPreName(c.toString()) + " = " + init + ";";
+				
+			}
+		}
+		return result;
+	}
+	private boolean isInPrestate(Collection<? extends ObjectVal> prestate, ObjectVal o){
+		return true;
+	}
+	
+	private boolean isInPrestate(Collection<? extends ObjectVal> prestate, String name){
+		
+		
+		
+		return true;
+// TODO return only needed objects		
+//		for(ObjectVal o : prestate){
+//			String oName = createObjectName(o);
+//			if(oName.equals(name)){
+//				return true;
+//			}
+//		}
+//		
+//		return false;
+	}
+	
+	public String generateModifierSetAssertions(Model m){
+		StringBuffer res  =new StringBuffer();
+		
+		res.append(TAB + "//Modifier set assertions");
+		
+		
+		
+		return res.toString();
+	}
 
 	public String generateTestCase(Model m) {
 /*		if(useRFL){
@@ -513,6 +673,9 @@ public class TestCaseGenerator {
 			}
 		}
 */
+		m.removeUnnecessaryObjects();
+		
+		Set<String> objects = new HashSet<String>();
 		
 		final List<Assignment> assignments = new LinkedList<Assignment>();
 		Heap heap = null;
@@ -522,7 +685,12 @@ public class TestCaseGenerator {
 				break;
 			}
 		}
+		
+		//Set<ObjectVal> prestate = getPrestateObjects(m);
+		Set<ObjectVal> prestate = new HashSet<ObjectVal>();
 		if (heap != null) {
+			
+			
 			// create objects
 			for (final ObjectVal o : heap.getObjects()) {
 				if (o.getName().equals("#o0")) {
@@ -543,8 +711,13 @@ public class TestCaseGenerator {
 					}else
 						right = "new " + type + "()";
 				}
-				assignments.add(new Assignment(type, o.getName().replace("#",
-				        "_"), right));
+				
+				String objName = createObjectName(o);
+				objects.add(objName);
+				assignments.add(new Assignment(type, objName, right));
+				if(junitFormat && isInPrestate(prestate, o)){
+					assignments.add(new Assignment(type, getPreName(objName), right));
+				}
 			}
 		}
 		// init constants
@@ -567,10 +740,13 @@ public class TestCaseGenerator {
 					} else {
 						type = "Object";
 					}
-					type = "/*@ nullable */ " + type;
+					type = NULLABLE +" "+ type;
 				}
 				val = translateValueExpression(val);
 				assignments.add(new Assignment(type, c, val));
+				if(junitFormat && type.startsWith(NULLABLE) && isInPrestate(prestate, val)){
+					assignments.add(new Assignment(type, getPreName(c), getPreName(val)));
+				}
 			}
 		}
 		// init fields
@@ -579,7 +755,7 @@ public class TestCaseGenerator {
 				if (o.getName().equals("#o0")) {
 					continue;
 				}
-				final String receiverObject = o.getName().replace("#", "_");
+				final String receiverObject = createObjectName(o);
 				for (final String f : o.getFieldvalues().keySet()) {
 					if (f.contains("<") || f.contains(">")) {
 						continue;
@@ -594,13 +770,23 @@ public class TestCaseGenerator {
 					final String rcObjType = getSafeType(o.getSort());
 					assignments
 					        .add(new Assignment(new RefEx(rcObjType,receiverObject,vType,fieldName), val));
+					
+					if(junitFormat && isInPrestate(prestate, o)){
+						//if value that is pointed to is object and in prestate then use prestate object
+						if(!vType.equals("int") && !vType.equals("boolean") && isInPrestate(prestate, val)){
+							val = getPreName(val);
+						}					
+						assignments
+				        .add(new Assignment(new RefEx(rcObjType,getPreName(receiverObject),vType,fieldName), val));
+					}
+					
 				}
 				if (o.getSort() != null
 				        && o.getSort().name().toString().endsWith("[]")) {
 					
 					String safeType = getSafeType(o.getSort());
 					rflCreator.addSort(safeType);
-					System.out.println("Added sort (init array fields):"+safeType);					
+					//System.out.println("Added sort (init array fields):"+safeType);					
 
 					for (int i = 0; i < o.getLength(); i++) {
 						final String fieldName = "[" + i + "]";
@@ -608,16 +794,48 @@ public class TestCaseGenerator {
 						val = translateValueExpression(val);
 						assignments.add(new Assignment(receiverObject + fieldName, val));
 						//assignments.add(new Assignment("",new RefArrayEx("","",name,""+i), val));
+						
+						if(junitFormat && isInPrestate(prestate, o)){
+							assignments.add(new Assignment(getPreName(receiverObject) + fieldName, val));
+						}
+						
+						
 					}
 				}
 			}
 		}
+		
 		final StringBuffer result = new StringBuffer();
 		for (final Assignment a : assignments) {
 			result.append("\n   ");
 			result.append(a.toString(useRFL));
 		}
+		
+		if(junitFormat){
+			result.append("\n");
+			result.append(createOldMap(objects)+"\n");
+			result.append(createBoolSet()+"\n");
+			result.append(createIntSet()+"\n");
+			result.append(createObjSet(heap)+"\n");			
+		}
+				
+		
 		return result.toString();
+	}
+	
+	private String createOldMap(Set<String> objNames){
+		String result = "\n"+TAB+"Map<Object,Object> "+OLDMap+" = new HashMap<Object,Object>()";
+		for(String o : objNames){
+			result += "\n"+TAB+OLDMap+".put("+getPreName(o)+","+o+");";
+		}
+		return result;
+	}
+	
+	private String getPreName(String val) {
+		return OracleGenerator.PRE_STRING+val;
+	}
+	private String createObjectName(final ObjectVal o) {
+		return o.getName().replace("#", "_");
 	}
 	
 	private String getTypeOfValue(Heap heap, Model m, String val){
@@ -634,6 +852,7 @@ public class TestCaseGenerator {
 					        */
 					type = "Object";
 				} else {
+					//System.out.println(o);
 					type = o.getSort().name().toString();
 				}
 			} else {
@@ -658,7 +877,12 @@ public class TestCaseGenerator {
 		          " * @author herda\n" +
 		          " */\n";
 		if (junitFormat) {
-			res += "import junit.framework.*;\n" + " public class " + className
+			res += "import junit.framework.*;\n"
+					+ "import java.util.List;\n"
+					+ "import java.util.LinkedList;\n"
+					+ "import java.util.Map;\n"
+					+ "import java.util.HashMap;\n"
+					+ " public class " + className
 			        + " extends junit.framework.TestCase {\n\n" + " public "
 			        + className + "(){}\n"
 			        + " public static junit.framework.TestSuite suite () {\n"
@@ -698,6 +922,57 @@ public class TestCaseGenerator {
 		}
 		return null;
 	}
+	
+	private String createBoolSet(){
+		
+		StringBuffer res = new StringBuffer();		
+		//bool
+		String allbool = ALL_BOOLS;
+		res.append('\n');
+		res.append(TAB+"List<Boolean> "+allbool +"= new LinkedList<Boolean>();\n");
+		res.append(TAB+allbool+".add(true);\n");
+		res.append(TAB+allbool+".add(false);\n");
+		return res.toString();		
+	}
+	
+	private String createIntSet(){
+		
+		StringBuffer res  = new StringBuffer();
+		long size = ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().intBound;
+		
+		long low = (long) - Math.pow(2, size-1);
+		long hi = (long) (Math.pow(2, size-1)-1);
+		
+		String allint = ALL_INTS;
+		res.append(TAB+"List<Integer> "+allint +"= new LinkedList<Integer>();\n");
+		
+		for(long i = low; i <= hi; i++ ){			
+			res.append(TAB+allint+".add("+i+");\n");			
+		}	
+		
+		return res.toString();		
+	}
+	
+	private String createObjSet(Heap h){
+		
+		StringBuffer res  = new StringBuffer();		
+		
+		res.append(TAB+"List<Object> "+ALL_OBJECTS +"= new LinkedList<Object>();\n");
+		
+		for(ObjectVal o : h.getObjects()){
+			String name = o.getName();
+			if(name.equals("#o0")){
+				continue;
+			}
+			name = name.replace("#", "_");
+			res.append(TAB+ALL_OBJECTS+".add("+name+");\n");
+			
+		}			
+		
+		return res.toString();		
+	}
+	
+	
 
 	public String getSafeType(Sort sort) {
 		if (sort == null) {

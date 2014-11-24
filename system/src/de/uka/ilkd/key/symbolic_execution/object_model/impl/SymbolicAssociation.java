@@ -34,7 +34,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
    /**
     * The array index.
     */
-   private final int arrayIndex;
+   private final Term arrayIndex;
    
    /**
     * The {@link IProgramVariable}.
@@ -60,7 +60,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
     * @param settings The {@link IModelSettings} to use.
     */
    public SymbolicAssociation(Services services, 
-                              int arrayIndex, 
+                              Term arrayIndex, 
                               ISymbolicObject target, 
                               Term condition,
                               IModelSettings settings) {
@@ -94,7 +94,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
       this.services = services;
       this.programVariable = programVariable;
       this.target = target;
-      this.arrayIndex = -1;
+      this.arrayIndex = null;
       this.condition = condition;
    }
    
@@ -106,7 +106,7 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
       StringBuffer sb = new StringBuffer();
       if (isArrayIndex()) {
          sb.append("[");
-         sb.append(getArrayIndex());
+         sb.append(getArrayIndexString());
          sb.append("]");
       }
       else {
@@ -125,14 +125,14 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
     */
    @Override
    public boolean isArrayIndex() {
-      return arrayIndex >= 0;
+      return arrayIndex != null;
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public int getArrayIndex() {
+   public Term getArrayIndex() {
       return arrayIndex;
    }
 
@@ -182,5 +182,13 @@ public class SymbolicAssociation extends AbstractElement implements ISymbolicAss
    @Override
    public String getConditionString() {
       return condition != null ? formatTerm(condition, services) : null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getArrayIndexString() {
+      return arrayIndex != null ? formatTerm(arrayIndex, services) : null;
    }
 }

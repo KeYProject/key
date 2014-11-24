@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -30,6 +31,11 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
     * The return value.
     */
    private final Term returnValue;
+   
+   /**
+    * The {@link PosInOccurrence} of the modality of interest.
+    */
+   private final PosInOccurrence modalityPIO;
 
    /**
     * The return value as human readable {@link String}.
@@ -57,12 +63,15 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
    public ExecutionMethodReturnValue(ITreeSettings settings,
                                      KeYMediator mediator, 
                                      Node proofNode, 
+                                     PosInOccurrence modalityPIO,
                                      Term returnValue, 
                                      Term condition) {
       super(settings, mediator, proofNode);
       assert returnValue != null;
+      assert modalityPIO != null;
       this.returnValue = returnValue;
       this.condition = condition;
+      this.modalityPIO = modalityPIO;
    }
 
    /**
@@ -153,5 +162,13 @@ public class ExecutionMethodReturnValue extends AbstractExecutionElement impleme
       else {
          return null;
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public PosInOccurrence getModalityPIO() {
+      return modalityPIO;
    }
 }

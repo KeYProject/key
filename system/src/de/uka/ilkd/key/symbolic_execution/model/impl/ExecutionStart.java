@@ -15,7 +15,7 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -25,7 +25,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -91,14 +90,6 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement> impleme
       if (termination != null) {
          terminations = terminations.append(termination);
       }
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected IExecutionVariable[] lazyComputeVariables() {
-      return SymbolicExecutionUtil.createExecutionVariables(this);
    }
 
    /**

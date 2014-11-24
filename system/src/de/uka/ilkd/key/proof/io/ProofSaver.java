@@ -75,6 +75,7 @@ public class ProofSaver {
    final protected String filename;
    protected Proof proof;
    final protected String internalVersion;
+   public static final String PROOF_SUBDIRECTORY = "/proof";
 
    LogicPrinter printer;
 
@@ -93,7 +94,6 @@ public class ProofSaver {
       this.filename = filename;
       this.proof = proof;
       this.internalVersion = internalVersion;
-      
    }
 
    public void setProof(Proof p) {
@@ -265,7 +265,7 @@ public class ProofSaver {
                    // add new relative path
                    final String absPath = tmp.substring(k,j);
                    final String relPath = tryToMakeFilenameRelative(absPath, basePath);
-                   relPathString = relPathString+" \"" + relPath +"\"";
+                   relPathString = relPathString+" \"" + escapeCharacters(relPath) +"\"";
                    i = j+1;
                }
                tmp2 = tmp2 + s + relPathString + ";";

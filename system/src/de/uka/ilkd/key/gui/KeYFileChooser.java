@@ -20,6 +20,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.util.Pair;
 
 public class KeYFileChooser {
@@ -27,8 +28,6 @@ public class KeYFileChooser {
     private final JFileChooser fileChooser;
 
     private boolean saveDialog;
-
-    private static final String PROOF_SUBDIRECTORY = "/proof";
 
     private File resetFile = null;
 
@@ -87,33 +86,32 @@ public class KeYFileChooser {
 		                         : JFileChooser.FILES_AND_DIRECTORIES);        
     }
 
-    public Pair<Boolean, Pair<File, Boolean>> showSaveDialog(Component parent,
-                                                             String defaultName,
-                                                             boolean autoSave) {
+    public Pair<Boolean, File> showSaveDialog(Component parent, String defaultName) {
         File file = fileChooser.getSelectedFile();
-        String recDir = file != null ?
+        final String recDir = file != null ?
                 file.getParent() : fileChooser.getCurrentDirectory().toString();
         resetFile = (defaultName != null) ? new File(recDir, defaultName): file;
         fileChooser.setSelectedFile(resetFile);
         setSaveDialog(true);
         boolean proofFolderActive = ProofIndependentSettings.DEFAULT_INSTANCE
                          .getGeneralSettings().storesInDefaultProofFolder();
-        String poDir =
+        final String poDir =
                 resetFile.getParent().endsWith("src") ?
                         new File(resetFile.getParent()).getParent() : resetFile.getParent();
-        String proofDir =
-                (!proofFolderActive || resetFile.getParent().endsWith(PROOF_SUBDIRECTORY)) ?
-                resetFile.getParent() : resetFile.getParent().concat(PROOF_SUBDIRECTORY);
-        final File dir = new File(proofDir);
-        boolean newDir = proofFolderActive && !dir.exists();
-        if (newDir) {
+        final String proofFolder = ProofSaver.PROOF_SUBDIRECTORY;
+        final String proofDir =
+                (!proofFolderActive || resetFile.getParent().endsWith(proofFolder)) ?
+                resetFile.getParent() : resetFile.getParent().concat(proofFolder);
+        File dir = new File(proofDir);
+        if (proofFolderActive && !dir.exists()) {
             dir.mkdir();
+        } else {
+            dir = null;
         }
         file = new File(defaultName.endsWith(".key") ? poDir : proofDir, resetFile.getName());
-        final boolean res = showSaveDialog(parent, file, autoSave);
+        final boolean res = showSaveDialog(parent, file);
 
-	return new Pair<Boolean, Pair<File, Boolean>> (res,
-	                                               new Pair<File, Boolean> (dir, newDir));
+	return new Pair<Boolean, File> (res, dir);
     }
 
     public void resetPath() {
@@ -127,13 +125,14 @@ public class KeYFileChooser {
        return fileChooser.getCurrentDirectory();
     }
 
-   public boolean showSaveDialog(Component parent, File selectedFile, boolean autoSave) {
+   public boolean showSaveDialog(Component parent, File selectedFile) {
       if (selectedFile != null) {
          fileChooser.setSelectedFile(selectedFile);
          fileChooser.updateUI(); // Might prevent empty filename suggestion?
       }
 
       setSaveDialog(true);
+      final boolean autoSave = MainWindow.getInstance().getUserInterface().autoSave();
       int result = autoSave ? JFileChooser.APPROVE_OPTION : fileChooser.showSaveDialog(parent);
       return (result == JFileChooser.APPROVE_OPTION);
    }

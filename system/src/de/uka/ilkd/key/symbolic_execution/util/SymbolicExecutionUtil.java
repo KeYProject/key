@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -30,7 +31,6 @@ import java.util.Set;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Expression;
@@ -38,6 +38,7 @@ import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
@@ -62,6 +63,8 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -91,12 +94,15 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortedOperator;
+import de.uka.ilkd.key.logic.op.TermTransformer;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -117,6 +123,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.ExecutionVariableExtractor;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -126,7 +133,6 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
-import java.util.Iterator;
 
 /**
  * Provides utility methods for symbolic execution with KeY.
@@ -620,12 +626,12 @@ public final class SymbolicExecutionUtil {
          Sequent sequent = proofNode.sequent();
          for (SequentFormula sf : sequent.antecedent()) {
             if (!containsSymbolicExecutionLabel(sf.formula())) {
-               constraints.add(new ExecutionConstraint(node.getSettings(), node.getMediator(), proofNode, sf.formula()));
+               constraints.add(new ExecutionConstraint(node.getSettings(), node.getMediator(), proofNode, node.getModalityPIO(), sf.formula()));
             }
          }
          for (SequentFormula sf : sequent.succedent()) {
             if (!containsSymbolicExecutionLabel(sf.formula())) {
-               constraints.add(new ExecutionConstraint(node.getSettings(), node.getMediator(), proofNode, tb.not(sf.formula())));
+               constraints.add(new ExecutionConstraint(node.getSettings(), node.getMediator(), proofNode, node.getModalityPIO(), tb.not(sf.formula())));
             }
          }
          return constraints.toArray(new IExecutionConstraint[constraints.size()]);
@@ -662,22 +668,76 @@ public final class SymbolicExecutionUtil {
     * root {@link IExecutionVariable}s.
     * @param node The {@link IExecutionNode} to create variables for.
     * @return The created {@link IExecutionVariable}s.
+    * @throws ProofInputException 
     */
-   public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node) {
+   public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node) throws ProofInputException {
+      return createExecutionVariables(node, null);
+   }
+
+   /**
+    * Creates for the given {@link IExecutionNode} the contained
+    * root {@link IExecutionVariable}s.
+    * @param node The {@link IExecutionNode} to create variables for.
+    * @param condition A {@link Term} specifying some additional constraints to consider.
+    * @return The created {@link IExecutionVariable}s.
+    * @throws ProofInputException 
+    */
+   public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node, Term condition) throws ProofInputException {
       if (node != null) {
-         Node proofNode = node.getProofNode();
+         return createExecutionVariables(node, node.getProofNode(), node.getModalityPIO(), condition);
+      }
+      else {
+         return new IExecutionVariable[0];
+      }
+   }
+
+   /**
+    * Creates for the given {@link IExecutionNode} the contained
+    * root {@link IExecutionVariable}s.
+    * @param node The {@link IExecutionNode} to create variables for.
+    * @param proofNode The proof {@link Node} to work with.
+    * @param modalityPIO The {@link PosInOccurrence} of the modality of interest.
+    * @param condition A {@link Term} specifying some additional constraints to consider.
+    * @return The created {@link IExecutionVariable}s.
+    * @throws ProofInputException 
+    */
+   public static IExecutionVariable[] createExecutionVariables(IExecutionNode<?> node, 
+                                                               Node proofNode, 
+                                                               PosInOccurrence modalityPIO, 
+                                                               Term condition) throws ProofInputException {
+      if (node.getSettings().isVariablesAreOnlyComputedFromUpdates()) {
+         ExecutionVariableExtractor extractor = new ExecutionVariableExtractor(proofNode, modalityPIO, node, condition);
+         return extractor.analyse();
+      }
+      else {
+         return createAllExecutionVariables(node, proofNode, modalityPIO, condition);
+      }
+   }
+
+   /**
+    * Creates for the given {@link IExecutionNode} the contained
+    * root {@link IExecutionVariable}s.
+    * @param node The {@link IExecutionNode} to create variables for.
+    * @param proofNode The proof {@link Node} to work with.
+    * @param modalityPIO The {@link PosInOccurrence} of the modality of interest.
+    * @param condition A {@link Term} specifying some additional constraints to consider.
+    * @return The created {@link IExecutionVariable}s.
+    */
+   public static IExecutionVariable[] createAllExecutionVariables(IExecutionNode<?> node, 
+                                                                  Node proofNode, 
+                                                                  PosInOccurrence modalityPIO, 
+                                                                  Term condition) {
+      if (proofNode != null) {
          List<IProgramVariable> variables = new LinkedList<IProgramVariable>();
          // Add self variable
-         IProgramVariable selfVar = findSelfTerm(proofNode, node.getModalityPIO());
+         IProgramVariable selfVar = findSelfTerm(proofNode, modalityPIO);
          if (selfVar != null) {
             variables.add(selfVar);
          }
          // Add method parameters
-         Node callNode = findMethodCallNode(node.getProofNode(), node.getModalityPIO());
-         if (callNode != null
-                 && callNode.getNodeInfo().getActiveStatement() instanceof MethodBodyStatement) {
-            MethodBodyStatement mbs =
-                    (MethodBodyStatement)callNode.getNodeInfo().getActiveStatement();
+         Node callNode = findMethodCallNode(proofNode, modalityPIO);
+         if (callNode != null && callNode.getNodeInfo().getActiveStatement() instanceof MethodBodyStatement) {
+            MethodBodyStatement mbs = (MethodBodyStatement)callNode.getNodeInfo().getActiveStatement();
             for (Expression e : mbs.getArguments()) {
                if (e instanceof IProgramVariable) {
                   variables.add((IProgramVariable)e);
@@ -694,7 +754,7 @@ public final class SymbolicExecutionUtil {
          IExecutionVariable[] result = new IExecutionVariable[variables.size()];
          int i = 0;
          for (IProgramVariable var : variables) {
-            result[i] = new ExecutionVariable(node, var);
+            result[i] = new ExecutionVariable(node, proofNode, modalityPIO, var, condition);
             i++;
          }
          return result;
@@ -819,10 +879,10 @@ public final class SymbolicExecutionUtil {
          Function function = (Function)locationTerm.op();
          // Make sure that the function is not an array
          if (heapLDT.getArr() != function) {
-            String typeName = heapLDT.getClassName(function);
+            String typeName = HeapLDT.getClassName(function);
             KeYJavaType type = services.getJavaInfo().getKeYJavaType(typeName);
             if (type != null) {
-               String fieldName = heapLDT.getPrettyFieldName(function);
+               String fieldName = HeapLDT.getPrettyFieldName(function);
                result = services.getJavaInfo().getAttribute(fieldName, type);
             }
          }
@@ -835,22 +895,15 @@ public final class SymbolicExecutionUtil {
     * @param services The {@link Services} to use.
     * @param heapLDT The {@link HeapLDT} to use.
     * @param arrayIndexTerm The {@link Term} to extract the array index from.
-    * @return The array index or {@code -1} if the term defines no array index.
+    * @return The array index or {@code null} if the term defines no array index.
     */
-   public static int getArrayIndex(Services services, HeapLDT heapLDT, Term arrayIndexTerm) {
+   public static Term getArrayIndex(Services services, HeapLDT heapLDT, Term arrayIndexTerm) {
       // Make sure that the term is an array index
       if (arrayIndexTerm.op() == heapLDT.getArr() && arrayIndexTerm.subs().size() == 1) {
-         Term sub = arrayIndexTerm.sub(0);
-         // Make sure that the defined index is an integer
-         if (services.getTypeConverter().getIntegerLDT().getNumberSymbol() == sub.op()) {
-            return Integer.parseInt(SymbolicExecutionUtil.formatTerm(sub, services, false, true));
-         }
-         else {
-            return -1;
-         }
+         return arrayIndexTerm.sub(0);
       }
       else {
-         return -1;
+         return null;
       }
    }
 
@@ -909,7 +962,7 @@ public final class SymbolicExecutionUtil {
             else {
                MethodBodyStatement mbs = (MethodBodyStatement)statement;
                IProgramMethod pm = mbs.getProgramMethod(node.proof().getServices());
-               return isNotImplicite(node.proof().getServices(), pm);
+               return isNotImplicit(node.proof().getServices(), pm);
             }
          }
          else {
@@ -925,9 +978,9 @@ public final class SymbolicExecutionUtil {
     * Checks if the given {@link IProgramMethod} is not implicit.
     * @param services The {@link Services} to use.
     * @param pm The {@link IProgramMethod} to check.
-    * @return {@code true} is not implicite, {@code false} is implicite 
+    * @return {@code true} is not implicit, {@code false} is implicit 
     */
-   public static boolean isNotImplicite(Services services, IProgramMethod pm) {
+   public static boolean isNotImplicit(Services services, IProgramMethod pm) {
       if (pm != null) {
          if (KeYTypeUtil.isImplicitConstructor(pm)) {
             IProgramMethod explicitConstructor = KeYTypeUtil.findExplicitConstructor(services, pm);
@@ -973,53 +1026,6 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * <p>
-    * Checks if the given {@link SourceElement} which represents a {@link LoopStatement} is executed
-    * the first time in proof node or if it is a higher loop iteration.
-    * </p>
-    * <p>
-    * The reason why such checks are required is that KeY's tacklet sometimes create
-    * a copy in further loop iteration without a source code position and sometimes
-    * is the original loop reused. The expected behavior of KeY should be to
-    * reuse the original loop all the time to save memory. But the symbolic
-    * execution tree should contain the loop statement only when it is executed
-    * the first time and in further iterations only the checked loop condition.
-    * For this reason is this check required.
-    * </p>
-    * <p>
-    * <b>Attention:</b> This check requires to iterate over parent {@link Node}s
-    * and can not be decided locally in the current {@link Node}.
-    * This is a performance deficit.
-    * </p>
-    * @param node The current {@link Node} of the proof tree.
-    * @param ruleApp The applied rule in {@link Node}.
-    * @param statement The active {@link LoopStatement} of {@link Node} to check.
-    * @return {@code true} it is the first loop iteration, {@code false} it is a second or higher loop iteration.
-    */
-   public static boolean isFirstLoopIteration(Node node, RuleApp ruleApp, SourceElement statement) {
-      // Compute stack size of current node
-      int stackSize = computeStackSize(ruleApp);
-      // Iterate over all parents until another loop iteration is found or the current method was called
-      boolean firstLoop = true;
-      Node parent = node.parent();
-      while (firstLoop && parent != null) {
-         // Check if the current parent node treats the same loop
-         SourceElement activeStatement = parent.getNodeInfo().getActiveStatement();
-         firstLoop = activeStatement != statement;
-         // Define parent for next iteration
-         parent = parent.parent();
-         // Check if the next parent is the method call of the current method, in this case iteration can stop
-         if (isMethodCallNode(parent, parent.getAppliedRuleApp(),
-                              parent.getNodeInfo().getActiveStatement(), true) &&
-             computeStackSize(parent.getAppliedRuleApp()) < stackSize) {
-            // Stop iteration because further parents are before the current method is called
-            parent = null;
-         }
-      }
-      return firstLoop;
-   }
-
-   /**
     * Checks if the given node should be represented as statement.
     * @param node The current {@link Node} in the proof tree of KeY.
     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
@@ -1033,7 +1039,7 @@ public final class SymbolicExecutionUtil {
              posInfo.getEndPosition() != Position.UNDEFINED &&
              posInfo.getEndPosition().getLine() >= 0 &&  // Filter out statements where source code is missing.
              !(statement instanceof EmptyStatement) && // Filter out empty statements
-             !(statement instanceof StatementBlock && ((StatementBlock)statement).isEmpty()); // FIlter out empty blocks
+             !(statement instanceof StatementBlock && ((StatementBlock)statement).isEmpty()); // Filter out empty blocks
    }
    
    /**
@@ -1057,7 +1063,7 @@ public final class SymbolicExecutionUtil {
          Contract contract = ((AbstractContractRuleApp)ruleApp).getInstantiation();
          if (contract instanceof OperationContract) {
             IProgramMethod target = ((OperationContract)contract).getTarget();
-            return isNotImplicite(node.proof().getServices(), target);
+            return isNotImplicit(node.proof().getServices(), target);
          }
          else {
             return false;
@@ -1460,8 +1466,8 @@ public final class SymbolicExecutionUtil {
          else if (isExceptionalMethodReturnNode(node, ruleApp)) {
             return !isInImplicitMethod(node, ruleApp);
          }
-         else if (isLoopStatement(node, ruleApp, statement, posInfo)) { 
-            return isFirstLoopIteration(node, ruleApp, statement);
+         else if (isLoopStatement(node, ruleApp, statement, posInfo)) { // This check is redundant to the loop iteration check, but is faster
+            return true;
          }
          else if (isBranchStatement(node, ruleApp, statement, posInfo) ||
                   isMethodCallNode(node, ruleApp, statement) ||
@@ -1470,8 +1476,7 @@ public final class SymbolicExecutionUtil {
             return true;
          }
          else if (hasLoopCondition(node, ruleApp, statement)) {
-            return ((LoopStatement)statement).getGuardExpression().getPositionInfo()
-                        != PositionInfo.UNDEFINED &&
+            return ((LoopStatement)statement).getGuardExpression().getPositionInfo() != PositionInfo.UNDEFINED &&
                    !isDoWhileLoopCondition(node, statement) && 
                    !isForLoopCondition(node, statement);
          }
@@ -2177,6 +2182,7 @@ public final class SymbolicExecutionUtil {
             }
             // Add additional equivalenz term to antecedent with the replace object which must be equal to the find term 
             Term replaceTerm = (Term)goalTemplate.replaceWithExpressionAsObject();
+            replaceTerm = instantiateReplaceTerm(replaceTerm, app, services);
             replaceTerm = services.getTermBuilder().equals(replaceTerm, app.posInOccurrence().subTerm());
             replaceTerm = services.getTermBuilder().applyUpdatePairsSequential(app.instantiations().getUpdateContext(), replaceTerm);
             if (!newAntecedents.contains(replaceTerm)) {
@@ -2206,6 +2212,32 @@ public final class SymbolicExecutionUtil {
          condition = improveReadability(condition, services);
       }
       return condition;
+   }
+   
+   /**
+    * Instantiates the given replace {@link Term} of the applied {@link TacletApp}.
+    * @param replaceTerm The replace {@link Term} to instantiate.
+    * @param tacletApp The {@link TacletApp} to consider.
+    * @param services The {@link Services} to use.
+    * @return The instantiated replace {@link Term}.
+    */
+   public static Term instantiateReplaceTerm(Term replaceTerm, TacletApp tacletApp, Services services) {
+      if (replaceTerm != null) {
+         if (replaceTerm.op() instanceof TermTransformer) {
+            // Replace meta constructs
+            SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(services, tacletApp.instantiations(), tacletApp.posInOccurrence(), tacletApp.taclet());
+            replaceTerm.execPostOrder(visitor);
+            replaceTerm = visitor.getTerm();
+         }
+         else if (replaceTerm.op() instanceof SchemaVariable) {
+            // Replace schema variables
+            Object instantiation = tacletApp.instantiations().getInstantiation((SchemaVariable)replaceTerm.op());
+            if (instantiation instanceof Term) {
+               replaceTerm = (Term)instantiation;
+            }
+         }
+      }
+      return replaceTerm;
    }
    
    /**
@@ -2388,7 +2420,7 @@ public final class SymbolicExecutionUtil {
                                                               Term additionalAntecedent,
                                                               Term newSuccedent,
                                                               boolean addResultLabel) {
-      return createSequentToProveWithNewSuccedent(node, node.getAppliedRuleApp().posInOccurrence(), additionalAntecedent, newSuccedent, addResultLabel);
+      return createSequentToProveWithNewSuccedent(node, node.getAppliedRuleApp() != null ? node.getAppliedRuleApp().posInOccurrence() : null, additionalAntecedent, newSuccedent, addResultLabel);
    }
 
    /**
@@ -2583,7 +2615,7 @@ public final class SymbolicExecutionUtil {
          List<Term> toCheck = new LinkedList<Term>(result);
          while (!toCheck.isEmpty()) {
             Term skolemConstant = toCheck.remove(0);
-            List<Term> replacements = findSkolemReplacements(sequent, skolemConstant);
+            List<Term> replacements = findSkolemReplacements(sequent, skolemConstant, null);
             for (Term replacement : replacements) {
                Set<Term> checkResult = collectSkolemConstantsNonRecursive(replacement);
                for (Term checkConstant : checkResult) {
@@ -2717,7 +2749,7 @@ public final class SymbolicExecutionUtil {
       int skolemCheck = checkSkolemEquality(term);
       if (skolemCheck == -1) {
          TermBuilder tb = services.getTermBuilder();
-         List<Term> replacements = findSkolemReplacements(sequent, term);
+         List<Term> replacements = findSkolemReplacements(sequent, term.sub(0), term);
          if (!replacements.isEmpty()) {
             Term other = term.sub(1);
             List<Term> newTerms = new LinkedList<Term>();
@@ -2733,7 +2765,7 @@ public final class SymbolicExecutionUtil {
       }
       else if (skolemCheck == 1) {
          TermBuilder tb = services.getTermBuilder();
-         List<Term> replacements = findSkolemReplacements(sequent, term);
+         List<Term> replacements = findSkolemReplacements(sequent, term.sub(1), term);
          if (!replacements.isEmpty()) {
             Term other = term.sub(0);
             List<Term> newTerms = new LinkedList<Term>();
@@ -2748,66 +2780,76 @@ public final class SymbolicExecutionUtil {
          }
       }
       else {
-         List<Term> newChildren = new LinkedList<Term>();
-         boolean changed = false;
-         for (int i = 0; i < term.arity(); i++) {
-            Term oldChild = term.sub(i);
-            Term newChild = replaceSkolemConstants(sequent, oldChild, services);
-            if (newChild != oldChild) {
-               changed = true;
-            }
-            newChildren.add(newChild);
-         }
-         if (changed) {
-            if (term.op() == Junctor.NOT) {
-               // Create new NOT term using build in simplification of TermBuilder.
-               assert newChildren.size() == 1;
-               assert term.boundVars().isEmpty();
-               assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
-               Term result = services.getTermBuilder().not(newChildren.get(0));
-               if (term.hasLabels()) {
-                  result = services.getTermBuilder().label(result, term.getLabels());
-               }
-               return result;
-            }
-            else if (term.op() == Junctor.OR) {
-               // Create new OR term using build in simplification of TermBuilder.
-               assert term.boundVars().isEmpty();
-               assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
-               Term result = services.getTermBuilder().or(newChildren);
-               if (term.hasLabels()) {
-                  result = services.getTermBuilder().label(result, term.getLabels());
-               }
-               return result;
-            }
-            else if (term.op() == Junctor.AND) {
-               // Create new AND term using build in simplification of TermBuilder.
-               assert term.boundVars().isEmpty();
-               assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
-               Term result = services.getTermBuilder().and(newChildren);
-               if (term.hasLabels()) {
-                  result = services.getTermBuilder().label(result, term.getLabels());
-               }
-               return result;
-            }
-            else if (term.op() == Junctor.IMP) {
-               // Create new IMP term using build in simplification of TermBuilder.
-               assert newChildren.size() == 2;
-               assert term.boundVars().isEmpty();
-               assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
-               return services.getTermBuilder().imp(newChildren.get(0), newChildren.get(1), term.getLabels());
-            }
-            else {
-               // Create new term in general.
-               return services.getTermFactory().createTerm(term.op(),
-                                                           new ImmutableArray<Term>(newChildren),
-                                                           term.boundVars(),
-                                                           term.javaBlock(),
-                                                           term.getLabels());
-            }
+         if (isSkolemConstant(term)) {
+            // Skolem term
+            List<Term> replacements = findSkolemReplacements(sequent, term, null);
+            return !replacements.isEmpty() ? 
+                   replacements.get(0) : // Any of the replacements can be used, for simplicity use the first one. Alternatively may the one with the lowest depth or with least symbols might be used.
+                   term;
          }
          else {
-            return term;
+            // No skolem term
+            List<Term> newChildren = new LinkedList<Term>();
+            boolean changed = false;
+            for (int i = 0; i < term.arity(); i++) {
+               Term oldChild = term.sub(i);
+               Term newChild = replaceSkolemConstants(sequent, oldChild, services);
+               if (newChild != oldChild) {
+                  changed = true;
+               }
+               newChildren.add(newChild);
+            }
+            if (changed) {
+               if (term.op() == Junctor.NOT) {
+                  // Create new NOT term using build in simplification of TermBuilder.
+                  assert newChildren.size() == 1;
+                  assert term.boundVars().isEmpty();
+                  assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
+                  Term result = services.getTermBuilder().not(newChildren.get(0));
+                  if (term.hasLabels()) {
+                     result = services.getTermBuilder().label(result, term.getLabels());
+                  }
+                  return result;
+               }
+               else if (term.op() == Junctor.OR) {
+                  // Create new OR term using build in simplification of TermBuilder.
+                  assert term.boundVars().isEmpty();
+                  assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
+                  Term result = services.getTermBuilder().or(newChildren);
+                  if (term.hasLabels()) {
+                     result = services.getTermBuilder().label(result, term.getLabels());
+                  }
+                  return result;
+               }
+               else if (term.op() == Junctor.AND) {
+                  // Create new AND term using build in simplification of TermBuilder.
+                  assert term.boundVars().isEmpty();
+                  assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
+                  Term result = services.getTermBuilder().and(newChildren);
+                  if (term.hasLabels()) {
+                     result = services.getTermBuilder().label(result, term.getLabels());
+                  }
+                  return result;
+               }
+               else if (term.op() == Junctor.IMP) {
+                  // Create new IMP term using build in simplification of TermBuilder.
+                  assert newChildren.size() == 2;
+                  assert term.boundVars().isEmpty();
+                  assert term.javaBlock() == JavaBlock.EMPTY_JAVABLOCK;
+                  return services.getTermBuilder().imp(newChildren.get(0), newChildren.get(1), term.getLabels());
+               }
+               else {
+                  // Create new term in general.
+                  return services.getTermFactory().createTerm(term.op(),
+                                                              new ImmutableArray<Term>(newChildren),
+                                                              term.boundVars(),
+                                                              term.javaBlock(),
+                                                              term.getLabels());
+               }
+            }
+            else {
+               return term;
+            }
          }
       }
    }
@@ -2816,20 +2858,25 @@ public final class SymbolicExecutionUtil {
     * Utility method of {@link #replaceSkolemConstants(Sequent, Term, Services)} to
     * find all equality parts of the given skolem constant.
     * @param sequent The {@link Sequent} which provides the skolem equalities.
-    * @param skolemEquality The skolem equality to solve.
+    * @param skolemConstant The skolem constant to solve.
+    * @param skolemEquality The optional skolem equality to ignore.
     * @return The equality parts of the given skolem equality.
     */
-   private static List<Term> findSkolemReplacements(Sequent sequent, Term skolemEquality) {
+   private static List<Term> findSkolemReplacements(Sequent sequent, Term skolemConstant, Term skolemEquality) {
       List<Term> result = new LinkedList<Term>();
       for (SequentFormula sf : sequent) {
          Term term = sf.formula();
          if (term != skolemEquality) {
             int skolemCheck = checkSkolemEquality(term);
             if (skolemCheck == -1) {
-               result.add(term.sub(1));
+               if (term.sub(0).equals(skolemConstant)) {
+                  result.add(term.sub(1));
+               }
             }
             else if (skolemCheck == 1) {
-               result.add(term.sub(0));
+               if (term.sub(1).equals(skolemConstant)) {
+                  result.add(term.sub(0));
+               }
             }
          }
       }
@@ -3304,5 +3351,144 @@ public final class SymbolicExecutionUtil {
     */
    public static boolean hasApplicableRules(Goal goal) {
       return goal.getRuleAppManager().peekNext() != null;
+   }
+
+   /**
+    * Computes the call stack size and the second statement
+    * similar to {@link NodeInfo#computeActiveStatement(SourceElement)}.
+    * @param ruleApp The {@link RuleApp}.
+    * @return The computed call stack size and the second statement if available.
+    */
+   public static Pair<Integer, SourceElement> computeSecondStatement(RuleApp ruleApp) {
+      if (ruleApp != null) {
+         // Find inner most block
+         SourceElement firstStatement = NodeInfo.computeFirstStatement(ruleApp);
+         Deque<StatementBlock> blocks = new LinkedList<StatementBlock>();
+         int methodFrameCount = 0;
+         if (firstStatement != null) {
+            if (firstStatement instanceof StatementBlock) {
+               blocks.addFirst((StatementBlock) firstStatement);
+            }
+            SourceElement lastStatement = null;
+            while (firstStatement instanceof ProgramPrefix && 
+                   lastStatement != firstStatement) {
+               lastStatement = firstStatement;
+               firstStatement = firstStatement.getFirstElementIncludingBlocks();
+               if (lastStatement instanceof MethodFrame) {
+                  blocks.clear(); // Only block of inner most method frames are of interest.
+                  methodFrameCount++;
+               }
+               if (firstStatement instanceof StatementBlock) {
+                  blocks.addFirst((StatementBlock) firstStatement);
+               }
+            }
+         }
+         // Compute second statement
+         StatementBlock block = null;
+         while (!blocks.isEmpty() && (block == null || block.getChildCount() < 2)) {
+            block = blocks.removeFirst();
+         }
+         if (block != null && block.getChildCount() >= 2) {
+            return new Pair<Integer, SourceElement>(methodFrameCount, block.getChildAt(1));
+         }
+         else {
+            return new Pair<Integer, SourceElement>(methodFrameCount, null);
+         }
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Compares the given {@link SourceElement}s including their {@link PositionInfo}s.
+    * @param first The first {@link SourceElement}.
+    * @param second The second {@link SourceElement}.
+    * @return {@code true} both are equal and at the same {@link PositionInfo}, {@code false} otherwise.
+    */
+   public static boolean equalsWithPosition(SourceElement first, SourceElement second) {
+      if (first != null && second != null) {
+         if (first instanceof While) {
+            if (second instanceof While) {
+               // Special treatment for while because its position info is lost during prove, but maintained in its guard.
+               return first.equals(second) &&
+                      equalsWithPosition(((While) first).getGuard(), ((While) second).getGuard());
+            }
+            else {
+               return false;
+            }
+         }
+         else {
+            // Compare all source elements including ints position info
+            return first.equals(second) &&
+                   JavaUtil.equals(first.getPositionInfo(), second.getPositionInfo());
+         }
+      }
+      else {
+         return first == null && second == null;
+      }
+   }
+
+   /**
+    * Checks if the given {@link ProgramElement} contains the given {@link SourceElement}.
+    * @param toSearchIn The {@link ProgramElement} to search in.
+    * @param toSearch The {@link SourceElement} to search.
+    * @param services The {@link Services} to use.
+    * @return {@code true} contained, {@code false} not contained.
+    */
+   public static boolean containsStatement(ProgramElement toSearchIn, SourceElement toSearch, Services services) {
+      if (toSearchIn != null) {
+         ContainsStatementVisitor visitor = new ContainsStatementVisitor(toSearchIn, toSearch, services);
+         visitor.start();
+         return visitor.isContained();
+      }
+      else {
+         return false;
+      }
+   }
+   
+   /**
+    * Utilits class used by {@link SymbolicExecutionUtil#containsStatement(MethodFrame, ProgramElement, Services)}.
+    * @author Martin Hentschel
+    */
+   private static class ContainsStatementVisitor extends JavaASTVisitor {
+      /**
+       * The {@link ProgramElement} to search.
+       */
+      private final SourceElement toSearch;
+      
+      /**
+       * The result.
+       */
+      private boolean contained = false;
+      
+      /**
+       * Constructor.
+       * @param root The {@link ProgramElement} to start search in.
+       * @param toSearch The {@link SourceElement} to search.
+       * @param services The {@link Services} to use.
+       */
+      public ContainsStatementVisitor(ProgramElement root, SourceElement toSearch, Services services) {
+         super(root, services);
+         this.toSearch = toSearch;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      protected void doDefaultAction(SourceElement se) {
+         if (equalsWithPosition(se, toSearch)) { // Comparison by == is not possible since loops are recreated
+            contained = true;
+         }
+      }
+
+      /**
+       * Returns the result.
+       * @return {@code true} contained, {@code false} not contained.
+       */
+      public boolean isContained() {
+         return contained;
+      }
    }
 }

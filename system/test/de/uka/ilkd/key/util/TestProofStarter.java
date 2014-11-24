@@ -2,8 +2,9 @@ package de.uka.ilkd.key.util;
 
 import java.io.File;
 
-import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomUserInterface;
@@ -50,6 +51,9 @@ public class TestProofStarter extends AbstractSymbolicExecutionTestCase {
          ApplyStrategyInfo info = ps.start();
          assertNotNull(info);
          assertTrue(proof.closed());
+      } catch (ProblemLoaderException e) {
+          // TODO: this exception was unhandled before -- expected???
+          fail();
       }
       finally {
          setOneStepSimplificationEnabled(null, originalOneStepSimplification);

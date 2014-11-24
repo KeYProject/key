@@ -19,20 +19,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.uka.ilkd.key.gui.ApplyStrategy;
-import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -42,7 +40,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturnValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
@@ -277,7 +274,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                      Term returnValue = SideProofUtil.extractOperatorValue(goal, input.getOperator());
                      assert returnValue != null;
                      returnValue = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), returnValue, services);
-                     return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), returnValue, null)};
+                     return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), getModalityPIO(), returnValue, null)};
                   }
                   else {
                      // Group equal values of different branches
@@ -296,7 +293,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                      // Create result
                      if (valueNodeMap.size() == 1) {
                         Term returnValue = valueNodeMap.keySet().iterator().next();
-                        return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), returnValue, null)};
+                        return new IExecutionMethodReturnValue[] {new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), getModalityPIO(), returnValue, null)};
                      }
                      else {
                         IExecutionMethodReturnValue[] result = new IExecutionMethodReturnValue[valueNodeMap.size()];
@@ -312,7 +309,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                               condition = SymbolicExecutionUtil.simplify(info.getProof(), condition);
                            }
                            condition = SymbolicExecutionUtil.improveReadability(condition, info.getProof().getServices());
-                           result[i] = new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), entry.getKey(), condition);
+                           result[i] = new ExecutionMethodReturnValue(getSettings(), getMediator(), getProofNode(), getModalityPIO(), entry.getKey(), condition);
                            i++;
                         }
                         return result;
@@ -370,18 +367,6 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
              (returnValue != null ? " " + returnValue + "as result" : "") +
              (!JavaUtil.isTrimmedEmpty(methodName) ? " of " + methodName : "") +
              INTERNAL_NODE_NAME_END;
-   }
-   
-   /**
-    * Starts a site proof for the given {@link Sequent}.
-    * @param sequentToProve The {@link Sequent} to prove.
-    * @return The proof result represented as {@link ApplyStrategyInfo} instance.
-    * @throws ProofInputException Occurred Exception
-    * {@inheritDoc}
-    */
-   @Override
-   protected IExecutionVariable[] lazyComputeVariables() {
-      return SymbolicExecutionUtil.createExecutionVariables(this);
    }
 
    /**

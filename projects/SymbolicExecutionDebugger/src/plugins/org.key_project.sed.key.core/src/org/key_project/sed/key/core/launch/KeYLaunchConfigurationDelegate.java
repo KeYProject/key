@@ -53,7 +53,7 @@ import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
@@ -94,6 +94,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           boolean usePrettyPrinting = KeySEDUtil.isUsePrettyPrinting(configuration);
           boolean useUnicode = usePrettyPrinting && KeySEDUtil.isUseUnicode(configuration);
           boolean showSignatureOnMethodReturnNodes = KeySEDUtil.isShowSignatureOnMethodReturnNodes(configuration);
+          boolean variablesAreOnlyComputedFromUpdates = KeySEDUtil.isVariablesAreOnlyComputedFromUpdates(configuration);
           Position methodRangeStart = new KeYUtil.CursorPosition(KeySEDUtil.getMethodRangeStartLine(configuration), KeySEDUtil.getMethodRangeStartColumn(configuration));
           Position methodRangeEnd = new KeYUtil.CursorPosition(KeySEDUtil.getMethodRangeEndLine(configuration), KeySEDUtil.getMethodRangeEndColumn(configuration));
           // Determine location and class path entries
@@ -110,7 +111,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
              bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
              classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
              // Get local file for the eclipse resource
-             location = KeYUtil.getSourceLocation(project);
+             location = KeYResourceProperties.getSourceClassPathLocation(project);
              Assert.isNotNull(location, "The resource \"" + method.getResource() + "\" is not local.");
           }
           else {
@@ -142,7 +143,8 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                                              bootClassPath, 
                                                              useUnicode,
                                                              usePrettyPrinting,
-                                                             showSignatureOnMethodReturnNodes); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
+                                                             showSignatureOnMethodReturnNodes,
+                                                             variablesAreOnlyComputedFromUpdates); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
           // Validate proof settings
           if (newDebugSession) {
              if (method == null) {
@@ -242,7 +244,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                                                String launchConfigurationName, 
                                                                KeYLaunchSettings settings) throws Exception {
        // Load location
-       DefaultProblemLoader loader = ui.load(SymbolicExecutionJavaProfile.getDefaultInstance(), settings.getLocation(), settings.getClassPaths(), settings.getBootClassPath(), SymbolicExecutionTreeBuilder.createPoPropertiesToForce()); 
+       AbstractProblemLoader loader = ui.load(SymbolicExecutionJavaProfile.getDefaultInstance(), settings.getLocation(), settings.getClassPaths(), settings.getBootClassPath(), SymbolicExecutionTreeBuilder.createPoPropertiesToForce()); 
        InitConfig initConfig = loader.getInitConfig();
        // Try to reuse already instantiated proof
        Proof proof = loader.getProof();
@@ -253,7 +255,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           proof = ui.createProof(initConfig, input);
        }
        // Create symbolic execution tree builder
-       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof, settings.isMergeBranchConditions(), settings.isUseUnicode(), settings.isUsePrettyPrinting());
+       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof, settings.isMergeBranchConditions(), settings.isUseUnicode(), settings.isUsePrettyPrinting(), settings.isVariablesAreOnlyComputedFromUpdates());
        builder.analyse();
        // Create environment used for symbolic execution
        return new SymbolicExecutionEnvironment<UserInterface>(ui, initConfig, builder);

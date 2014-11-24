@@ -5,9 +5,11 @@
          <operationContract name="result_0 = magic(x, y) catch(exc_0)
 pre: x &gt;= 0 &amp; y &lt; 0 | !(x &gt;= 0 &amp; y &lt; 0)
 post: (   x &gt;= 0 &amp; y &lt; 0
-   -&gt; result_0 = subFirst(x, y) &amp; exc_0 = null)
+   -&gt;   result_0 = ComplexPrecondition.subFirst(x, y)
+      &amp; exc_0 = null)
 &amp; (   !(x &gt;= 0 &amp; y &lt; 0)
-   -&gt; result_0 = subSecond(x, y) &amp; exc_0 = null)
+   -&gt;   result_0 = ComplexPrecondition.subSecond(x, y)
+      &amp; exc_0 = null)
 mod: \if (true)  \then (empty)  \else (allLocs)
 \cap \if (!(x &gt;= 0 &amp; y &lt; 0))
          \then (empty)

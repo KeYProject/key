@@ -15,8 +15,8 @@ package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.ProverTaskListener;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -88,6 +88,10 @@ public abstract class AbstractProofMacro implements ProofMacro {
         return applyTo(mediator, getGoals(node), posInOcc, listener);
     }
 
+    @Override
+    public boolean isApplicableWithoutPosition() {
+        return false;
+    }
 
     @Override
     public final javax.swing.KeyStroke getKeyStroke() {

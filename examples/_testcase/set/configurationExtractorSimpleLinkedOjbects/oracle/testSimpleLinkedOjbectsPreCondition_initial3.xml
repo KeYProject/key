@@ -6,9 +6,9 @@
       <term term="SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next)"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in return x.value+x.next.value+x.next.next.value;">
-      <association name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+      <association name="x" programVariable="x" isArrayIndex="false" target="o1"/>
    </state>
    <object xml:id="o1" name="x" type="SimpleLinkedOjbects">
-      <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+      <association name="next" programVariable="next" isArrayIndex="false" target="o1"/>
    </object>
 </model>

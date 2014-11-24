@@ -17,9 +17,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.EventObject;
 import java.util.Properties;
 
-import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmaGeneratorSettings;
 import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.gui.testgen.TestGenerationSettings;
@@ -55,7 +55,7 @@ public class ProofIndependentSettings implements SettingsListener {
         }
 
         @Override
-        public void settingsChanged(GUIEvent e) {
+        public void settingsChanged(EventObject e) {
                saveSettings();
 
         }

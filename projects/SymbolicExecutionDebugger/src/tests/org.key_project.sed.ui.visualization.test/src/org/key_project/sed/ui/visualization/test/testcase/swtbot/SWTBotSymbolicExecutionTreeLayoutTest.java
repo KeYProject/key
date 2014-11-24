@@ -50,16 +50,11 @@ public class SWTBotSymbolicExecutionTreeLayoutTest extends AbstractSymbolicExecu
 
          @Override
          public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
-//            assertDiagram(bot, project, "Number2.set", "data/Number2/oracle", null);
-//            SWTBotGefEditor editor = new SWTGefBot().gefEditor("Number2.set_diagram");
-//            SWTBotGefEditor editor = new SWTGefBot().gefEditor("data/Number2/oracle/Number2.set_diagram");
-//            SWTBotGefEditor editor = new SWTGefBot().gefEditor("Empty Diagram");
-//            editor = editor.select("<call self.equals(n)>");//.clickContextMenu("Collapse");
-//            assertDiagram(bot, project, "Number2.set", "data/Number2/oracle", null);
-//            assertDiagram(bot, project, "Number2.set", "data/Number2/oracle", "Collapsed");
+            assertDiagram(bot, project, "Number2.set", "data/Number2/oracle", null);
             SWTBotGefEditor editor = TestVisualizationUtil.getSymbolicExecutionTreeViewGefEditor(bot);
             editor.select("<call self.equals(n)>");
             editor.clickContextMenu("Collapse");
+            assertDiagram(bot, project, "Number2.set", "data/Number2/oracle", "Collapsed");
          }
 
       };

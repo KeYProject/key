@@ -193,6 +193,8 @@
                 <copy todir="${target.folder}/examples" failonerror="true" overwrite="true">
                         <fileset dir="${key.rep}/examples/">
                                 <include name="firstTouch/"/>
+                                <include name="heap/"/>
+                                <include name="index/"/>
                         </fileset>
                 </copy> 
 	</target>

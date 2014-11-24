@@ -67,11 +67,7 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
         m2.collect(rightTerm);
         final ImmutableList<Term> literalsRightTerm = m2.getResult();
 
-        if (literalsLeftTerm.size() > literalsRightTerm.size()) {
-            return true;
-        } else {
-            return super.lessThan(literalsLeftTerm, literalsRightTerm, caches);
-        }
+        return super.lessThan(literalsLeftTerm, literalsRightTerm, caches);
     }
 
 

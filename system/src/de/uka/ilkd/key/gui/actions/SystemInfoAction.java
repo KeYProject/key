@@ -22,7 +22,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 
 public class SystemInfoAction extends MainWindowAction {

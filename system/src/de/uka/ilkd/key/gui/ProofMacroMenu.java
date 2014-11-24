@@ -16,7 +16,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ServiceLoader;
 import javax.swing.*;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 
@@ -48,10 +48,8 @@ import de.uka.ilkd.key.macros.ProofMacro;
  */
 public class ProofMacroMenu extends JMenu {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -5436200313524574310L;
+
+    private static final long serialVersionUID = -5946657022043894399L;
 
     /**
      * The loader used to access the providers for macros.
@@ -84,6 +82,32 @@ public class ProofMacroMenu extends JMenu {
             }
         }
 
+        mediator.enableWhenProofLoaded(this);
+        this.numberOfMacros = count;
+    }
+    
+
+    /**
+     * Instantiates a new proof macro menu.
+     * Only to be used in the {@link MainWindow}.
+     *
+     * Only macros applicable at any PosInOccurrence are added as menu items.
+     *
+     * @param mediator the mediator of the current proof.
+     */
+    ProofMacroMenu(KeYMediator mediator) {
+        super("Strategy macros");
+
+        int count = 0;
+        for (ProofMacro macro : loader) {
+            if (macro.isApplicableWithoutPosition()) {
+                JMenuItem menuItem = createMenuItem(macro, mediator, null);
+                add(menuItem);
+                count++;
+            }
+        }
+
+        mediator.enableWhenProofLoaded(this);
         this.numberOfMacros = count;
     }
 

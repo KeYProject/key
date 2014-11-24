@@ -17,7 +17,6 @@ import java.util.*;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
@@ -142,7 +141,7 @@ public class ChoiceSettings implements Settings, Cloneable {
 	Iterator<SettingsListener> it = listenerList.iterator();
 	ProofSettings.DEFAULT_SETTINGS.saveSettings();
 	while (it.hasNext()) {
-	    it.next().settingsChanged(new GUIEvent(this));
+	    it.next().settingsChanged(new EventObject(this));
 	}
     }
     

@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.gui.configuration;
 
+import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.Properties;
 
-import de.uka.ilkd.key.gui.GUIEvent;
 
 
 /** This class encapsulates the information about the active
@@ -53,12 +53,12 @@ public class GeneralSettings implements Settings, Cloneable {
     /** launches the rightclick the macro menu. on by default. */
     private boolean rightClickMacros = true;
 
-    /** by default, proofs are stored in a default proof folder (as a sub directory)). */
-    private boolean defaultProofFolder = true;
+    /** proofs are stored in a default proof folder (as a sub directory)). */
+    private boolean defaultProofFolder = false;
 
-    /** by default, side-proofs are stored automatically without a save dialog pop up
+    /** side-proofs are stored automatically without a save dialog pop up
      * when leaving a side-proof. */
-    private boolean autoSave = true;
+    private boolean autoSave = false;
 
     /** JML is active by default */
     private boolean useJML = true;
@@ -217,7 +217,7 @@ public class GeneralSettings implements Settings, Cloneable {
      */
     protected void fireSettingsChanged() {
         for (SettingsListener aListenerList : listenerList) {
-            aListenerList.settingsChanged(new GUIEvent(this));
+            aListenerList.settingsChanged(new EventObject(this));
         }
     }
 

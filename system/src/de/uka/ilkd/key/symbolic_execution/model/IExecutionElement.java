@@ -13,8 +13,9 @@
 
 package de.uka.ilkd.key.symbolic_execution.model;
 
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
@@ -55,6 +56,12 @@ public interface IExecutionElement {
     * @return The {@link Node} in KeY's proof tree which is represented by this execution tree node.
     */
    public Node getProofNode();
+   
+   /**
+    * Returns the {@link PosInOccurrence} of the modality of interest including updates.
+    * @return The {@link PosInOccurrence} of the modality of interest including updates.
+    */
+   public PosInOccurrence getModalityPIO();
    
    /**
     * Returns the {@link NodeInfo} of {@link #getProofNode()}.
