@@ -38,11 +38,6 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
     * An optional additional condition.
     */
    private final Term additionalCondition;
-
-   /**
-    * The path condition.
-    */
-   private final Term pathCondition;
    
    /**
     * The layout term.
@@ -92,11 +87,6 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
       currentLocations.addAll(temporaryCurrentLocations);
       // Create location predicate
       layoutTerm = createLocationPredicateAndTerm(currentLocations);
-      // Compute values
-      if (additionalCondition != null) {
-         pathCondition = getServices().getTermBuilder().and(pathCondition, pathCondition);
-      }
-      this.pathCondition = pathCondition;
       // Create state variables
       this.allStateVariables = new LinkedHashMap<LocationDefinition, StateExecutionVariable>();
       for (ExtractLocationParameter location : currentLocations) {
@@ -422,7 +412,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
             synchronized (allStateVariables) {
                if (values == null) {
                   // Compute values
-                  Set<ExecutionVariableValuePair> pairs = computeVariableValuePairs(pathCondition, layoutTerm, currentLocations, true);
+                  Set<ExecutionVariableValuePair> pairs = computeVariableValuePairs(getAdditionalCondition(), layoutTerm, currentLocations, true);
                   // Analyze tree structure of pairs
                   Map<LocationDefinition, List<ExecutionVariableValuePair>> topVariables = new LinkedHashMap<LocationDefinition, List<ExecutionVariableValuePair>>();
                   Map<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>> contentMap = new LinkedHashMap<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>>();
