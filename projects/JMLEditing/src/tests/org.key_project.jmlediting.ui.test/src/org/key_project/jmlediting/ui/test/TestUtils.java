@@ -2,22 +2,20 @@ package org.key_project.jmlediting.ui.test;
 
 import static org.eclipse.swtbot.swt.finder.waits.Conditions.shellCloses;
 import static org.eclipse.swtbot.swt.finder.waits.Conditions.waitForMenu;
-import static org.eclipse.swtbot.swt.finder.waits.Conditions.waitForShell;
 import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
-import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotList;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.ui.test.preferencepages.ProfilePropertiesTest;
 
 public class TestUtils {
 
@@ -65,12 +63,17 @@ public class TestUtils {
    }
 
    public static void validateProfileListSelection(IJMLProfile expectedProfile,
-         SWTBotList profileList) {
+         SWTBotTable profileList) {
       // Now the global default should be selected
       // Unfortunately, we only get the names of the selection from swt bot
-      String[] selectedProfile = profileList.selection();
-      assertTrue("Not excately one profile selected", selectedProfile.length == 1);
-      assertTrue("The selected profile does not match expected one", selectedProfile[0].equals(expectedProfile.getName()));
+      List<String> selectedProfiles = new ArrayList<String>(1);
+      for (int i = 0; i < profileList.rowCount(); i++) {
+         if(profileList.getTableItem(i).isChecked()) {
+            selectedProfiles.add(profileList.getTableItem(i).getText());
+         }
+      }
+      assertTrue("Not excately one profile selected", selectedProfiles.size() == 1);
+      assertTrue("The selected profile does not match expected one", selectedProfiles.get(0).equals(expectedProfile.getName()));
    }
 
 }

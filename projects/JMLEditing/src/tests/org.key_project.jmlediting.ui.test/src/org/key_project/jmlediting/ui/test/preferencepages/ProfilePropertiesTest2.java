@@ -8,7 +8,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotList;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.junit.Test;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
@@ -36,7 +36,7 @@ public class ProfilePropertiesTest2 {
       TestUtils.openJMLProfileProperties(bot, PROJECT_NAME);
       
       SWTBotCheckBox enableProjectSettingsBox = bot.checkBox();
-      SWTBotList profileList = bot.list();
+      SWTBotTable profileList = bot.table();
       
 
       bot.sleep(100);

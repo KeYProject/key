@@ -1,54 +1,128 @@
 package org.key_project.jmlediting.ui.extension;
 
-import org.eclipse.jdt.internal.ui.text.JavaPresentationReconciler;
+import java.util.LinkedList;
+import java.util.ListIterator;
+
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
-import org.eclipse.jface.text.presentation.PresentationReconciler;
-import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.javaeditor.extension.DefaultJavaSourceViewerConfigurationExtension;
 import org.key_project.javaeditor.extension.IJavaSourceViewerConfigurationExtension;
 
 /**
  * An {@link IJavaSourceViewerConfigurationExtension} to support JML.
  * 
- * @author Martin Hentschel
+ * @author Martin Hentschel, David Giessing
  */
+
 public class JMLSourceViewerConfigurationExtension extends
       DefaultJavaSourceViewerConfigurationExtension {
+
+   IDocument document;
+
+   public JMLSourceViewerConfigurationExtension() {
+
+   }
+
+   /**
+    * seeks the Documents text for JML Single Line comments
+    * 
+    * @return A Linked List of JML Comment sections which is empty if there are
+    *         no singleLineComments
+    */
+   public LinkedList<Comment> findSingleLineJMLComment()
+         throws BadLocationException {
+      String text = document.get();
+      int begin;
+      int end;
+      int lastIndex = 0;
+      LinkedList<Comment> singleLineComments = new LinkedList<Comment>();
+
+      while (true) {
+         begin = text.indexOf("//@", lastIndex);
+         if (begin == -1)
+            return singleLineComments;
+         end = document.getLineLength(document.getLineOfOffset(begin));
+         singleLineComments.add(new Comment(begin, end));
+         if (document.getNumberOfLines() == document.getLineOfOffset(begin))
+            return singleLineComments;
+      }
+   }
+
+   /**
+    * seeks the Documents text for JML Multi Line comments
+    * 
+    * @return A Linked List of JML Comment sections
+    */
+   public LinkedList<Comment> findMultilineJMLComments() {
+      String text = document.get();
+      int lastIndex = 0;
+      int begin;
+      int end;
+      LinkedList<Comment> comments = new LinkedList<Comment>();
+
+      while (lastIndex > -1) {
+         begin = text.indexOf("/*@", lastIndex);
+         if (begin > -1) // Stop searching When End of File is reached
+            lastIndex = begin;
+         else
+            return comments;
+         end = text.indexOf("@*/", lastIndex);
+         if (lastIndex > -1) // Stop searching When End of File is reached
+            lastIndex = end;
+         else
+            return comments;
+         end = end - begin;
+         System.out.println("Comment found: Begin: " + begin + " length: "
+               + end);
+         comments.add(new Comment(begin, end));
+      }
+      System.out.println(text.indexOf("/*@"));
+      return comments;
+   }
+
+   /**
+    * isInJMLcomment checks whether an offset position is inside a JML Multiline
+    * Comment Section
+    * 
+    * @param offset
+    *           The offset to check whether it is in a JML Comment
+    * @return true if offset is in a JML Comment, false if not
+    * @throws BadLocationException
+    */
+   public boolean isInJMLcomment(int offset) throws BadLocationException {
+      LinkedList<Comment> comments = findMultilineJMLComments();
+      comments.addAll(findSingleLineJMLComment());
+      int commentOffset;
+      int commentLength;
+      for (ListIterator<Comment> i = comments.listIterator(); i.hasNext(); i
+            .next()) {
+         commentOffset = i.next().offset;
+         commentLength = i.next().length;
+         if (commentOffset <= offset && commentLength + commentOffset >= offset)
+            return true;
+      }
+      return false;
+   }
+
    /**
     * {@inheritDoc}
     */
    @Override
    public int getTabWidth(ISourceViewer sourceViewer, int currentResult) {
-      //TODO is this Method called only once? 
+      this.document = sourceViewer.getDocument();// TODO is this Method called
+                                                 // only once?
+      findMultilineJMLComments();
       return currentResult * 2;
    }
 
    @Override
    public IPresentationReconciler getPresentationReconciler(
          ISourceViewer sourceViewer, IPresentationReconciler currentResult) {
-     /* if(currentResult.getClass().equals(JMLPresentationReconciler.class))//if Method was called
-         System.out.println(sourceViewer.getDocument().getDocumentPartitioner().toString());
-         return currentResult; }                                     // earlier there is nothing
-      else{ */
-      for(int i=0;i< sourceViewer.getDocument().getLegalContentTypes().length;i++)
-         System.out.println(sourceViewer.getDocument().getLegalContentTypes()[i]);                                                      // to change
-         PresentationReconciler JMLPresentationReconciler = (PresentationReconciler) currentResult;
-         JMLPartitionScanner js= new JMLPartitionScanner();
-         System.out.println("Constructor JML PresReconciler");
-         DefaultDamagerRepairer dr= new DefaultDamagerRepairer(js);
-         System.out.println(this.getPartitioning());
-         JMLPresentationReconciler.setDamager(dr,JMLPartitionScanner.JML_SINGLE_LINE);
-         JMLPresentationReconciler.setDamager(dr, JMLPartitionScanner.JML_MULTI_LINE);
-         JMLPresentationReconciler.setRepairer(dr, JMLPartitionScanner.JML_SINGLE_LINE);
-         JMLPresentationReconciler.setRepairer(dr, JMLPartitionScanner.JML_MULTI_LINE);
-        // JMLPresentationReconciler.install(sourceViewer);
-         return JMLPresentationReconciler;
-         //return currentResult;
-      }
-   //}
-   
+      return currentResult;
+   }
+
    /**
     * @return extendedContentTypes A List of the previously defined
     *         ContentTypes, with JMLMultiLine content at first position in the
@@ -57,20 +131,19 @@ public class JMLSourceViewerConfigurationExtension extends
     */
    @Override
    public String[] getConfiguredContentTypes(ISourceViewer sourceViewer,
-         String[] currentResult) { 
-      System.out.println("Got content Types");
-      if (currentResult[0].equals(JMLPartitionScanner.JML_MULTI_LINE)) //if Method was called
-         return currentResult;                                         //previously there is
-      else {                                                           // nothing to change
+         String[] currentResult) {
+      if (currentResult[0].equals(JMLPartitionScanner.JML_MULTI_LINE)) // if
+                                                                       // Method
+                                                                       // was
+                                                                       // called
+         return currentResult; // previously there is
+      else { // nothing to change
          String[] extendedContentTypes = new String[currentResult.length + 2];
-         extendedContentTypes[0] = currentResult[0];
-         extendedContentTypes[1] = JMLPartitionScanner.JML_MULTI_LINE;
-         extendedContentTypes[2] = JMLPartitionScanner.JML_SINGLE_LINE;
-         for (int i = 1; i < currentResult.length; i++) {
+         extendedContentTypes[0] = JMLPartitionScanner.JML_MULTI_LINE;
+         extendedContentTypes[1] = JMLPartitionScanner.JML_SINGLE_LINE;
+         for (int i = 0; i < currentResult.length; i++) {
             extendedContentTypes[i + 2] = currentResult[i];
          }
-         for(int i=0;i< extendedContentTypes.length;i++)
-            System.out.println(extendedContentTypes[i]);
          return extendedContentTypes;
       }
    }

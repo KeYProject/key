@@ -9,6 +9,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotList;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.junit.Test;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
@@ -43,7 +44,7 @@ public class ProfilePropertiesTest {
       TestUtils.openJMLProfileProperties(bot,PROJECT_NAME);
       
       SWTBotCheckBox enableProjectSettingsBox = bot.checkBox();
-      SWTBotList profileList = bot.list();
+      SWTBotTable profileList = bot.table();
       
       // Now we are in a profile properties page
       // Because this project is null, we require that there are no project specific settings
@@ -51,7 +52,10 @@ public class ProfilePropertiesTest {
       assertTrue("Can select profiles without project specific settings", !profileList.isEnabled());
       
       // Check that all profiles are shown to the user
-      String[] items = profileList.getItems();
+      String[] items = new String[profileList.rowCount()];
+      for (int i = 0; i < profileList.rowCount(); i++) {
+         items[i] = profileList.getTableItem(i).getText(0);
+      }
       assertTrue("List of profiles does not contain all profiles", items.length == ALL_PROFILES.size());
       for (int i = 0; i < ALL_PROFILES.size(); i++) {
          assertTrue("List does not contain profiles in sorted order", items[i].equals(ALL_PROFILES.get(i).getName()));
@@ -65,8 +69,9 @@ public class ProfilePropertiesTest {
       
       // Lets select a new one
       int newIndex = ALL_PROFILES.size() -1;
-      bot.list().select(newIndex);
+      profileList.getTableItem(newIndex).check();
       
+      bot.sleep(500);
       
       // Apply the properties
       bot.button("OK").click();
