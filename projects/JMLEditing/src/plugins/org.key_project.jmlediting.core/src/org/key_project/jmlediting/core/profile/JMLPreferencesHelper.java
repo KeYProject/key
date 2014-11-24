@@ -161,4 +161,22 @@ public final class JMLPreferencesHelper {
          final IPreferenceChangeListener listener) {
       InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).removePreferenceChangeListener(listener);
    }
+
+   /**
+    * Returns the JML profile which has been set to the project as project
+    * specific profile. It a specific profile is not set, this method returns
+    * the default one.
+    * 
+    * @param project
+    *           the project to get the profile for
+    * @return the project specific profile or the default
+    */
+   public static IJMLProfile getProjectActiveJMLProfile(IProject project) {
+      IJMLProfile result = getProjectJMLProfile(project);
+      
+      if (result == null) {
+         result = getDefaultJMLProfile();
+      }
+      return result;
+   }
 }
