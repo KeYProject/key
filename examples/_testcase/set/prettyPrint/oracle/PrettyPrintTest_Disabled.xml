@@ -200,7 +200,7 @@ mod: false" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initially
                </branchCondition>
                <branchCondition name="equals(x_0,Z(neglit(1(#))))" pathCondition="and(leq(x,Z(neglit(1(#)))),equals(x_0,Z(neglit(1(#)))))" pathConditionChanged="true" branchCondition="equals(x_0,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
                   <variable name="x" isArrayIndex="false">
-                     <value name="x {true}" typeString="int" valueString="Z(neglit(1(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="x {true}" typeString="int" valueString="x_0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <variable name="exc" isArrayIndex="false">

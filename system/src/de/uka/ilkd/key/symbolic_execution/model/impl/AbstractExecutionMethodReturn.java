@@ -183,6 +183,6 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement> ext
          modalityTerm = modalityPIO.subTerm();
       }
       // Compute variables
-      return SymbolicExecutionUtil.createExecutionVariables(this, childNode, modalityPIO, null);
+      return SymbolicExecutionUtil.createExecutionVariables(this, childNode, modalityPIO, getMethodReturnCondition());
    }
 }

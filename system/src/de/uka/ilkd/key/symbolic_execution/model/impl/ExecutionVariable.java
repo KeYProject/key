@@ -158,9 +158,12 @@ public class ExecutionVariable extends AbstractExecutionVariable {
          // Start site proof to extract the value of the result variable.
          SiteProofVariableValueInput sequentToProve;
          Term siteProofSelectTerm = null;
-         Term siteProofCondition = parentNode.getPathCondition();
+         Term siteProofCondition;
          if (getAdditionalCondition() != null) {
-            siteProofCondition = tb.and(siteProofCondition, getAdditionalCondition());
+            siteProofCondition = getAdditionalCondition();
+         }
+         else {
+            siteProofCondition = tb.tt();
          }
          if (getParentValue() != null || SymbolicExecutionUtil.isStaticVariable(getProgramVariable())) {
             siteProofSelectTerm = createSelectTerm();
