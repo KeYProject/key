@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Test;
 import org.key_project.key4eclipse.resources.test.util.KeY4EclipseResourcesTestUtil;
 import org.key_project.key4eclipse.resources.ui.test.util.KeY4EclipseResourcesUiTestUtil;
@@ -43,16 +44,24 @@ public class SWTBotKeYProjectWizardTest extends AbstractSetupTestCase {
     */
    @Test
    public void testKeYProjectWizard() throws CoreException, InterruptedException{
-      bot = new SWTWorkbenchBot();
-      TestUtilsUtil.closeWelcomeView(bot);
-      createKeYProject(bot, "SWTBotKeYProjectWizardTest_testKeYProjectWizard");
-      
-      IWorkspace workspace = ResourcesPlugin.getWorkspace();
-      
-      KeY4EclipseResourcesTestUtil.waitBuild();
-      
-      IProject project = workspace.getRoot().getProject("SWTBotKeYProjectWizardTest_testKeYProjectWizard");
-      KeY4EclipseResourcesUiTestUtil.assertKeYNature(project);
+      IPerspectiveDescriptor originalPerspective = TestUtilsUtil.getActivePerspective();
+      try {
+         TestUtilsUtil.openJavaPerspective(); // Ensure that Java perspective is shown to avoid perspective switches
+         
+         bot = new SWTWorkbenchBot();
+         TestUtilsUtil.closeWelcomeView(bot);
+         createKeYProject(bot, "SWTBotKeYProjectWizardTest_testKeYProjectWizard");
+         
+         IWorkspace workspace = ResourcesPlugin.getWorkspace();
+         
+         KeY4EclipseResourcesTestUtil.waitBuild();
+         
+         IProject project = workspace.getRoot().getProject("SWTBotKeYProjectWizardTest_testKeYProjectWizard");
+         KeY4EclipseResourcesUiTestUtil.assertKeYNature(project);
+      }
+      finally {
+         TestUtilsUtil.openPerspective(originalPerspective);
+      }
    }
    
    

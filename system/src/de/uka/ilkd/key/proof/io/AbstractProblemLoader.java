@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
 import org.antlr.runtime.MismatchedTokenException;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -101,6 +102,11 @@ public abstract class AbstractProblemLoader {
     private final Properties poPropertiesToForce;
 
     /**
+     * {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
+     */
+    private final boolean forceNewProfileOfNewProofs;
+    
+    /**
      * The instantiated {@link EnvInput} which describes the file to load.
      */
     private EnvInput envInput;
@@ -146,6 +152,7 @@ public abstract class AbstractProblemLoader {
      * @param classPath The optional class path entries to use.
      * @param bootClassPath An optional boot class path.
      * @param profileOfNewProofs The {@link Profile} to use for new {@link Proof}s.
+     * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
      * @param mediator The {@link KeYMediator} to use.
      * @param askUiToSelectAProofObligationIfNotDefinedByLoadedFile {@code true} to call {@link UserInterface#selectProofObligation(InitConfig)} if no {@link Proof} is defined by the loaded proof or {@code false} otherwise which still allows to work with the loaded {@link InitConfig}.
      */
@@ -153,6 +160,7 @@ public abstract class AbstractProblemLoader {
                                  List<File> classPath, 
                                  File bootClassPath,
                                  Profile profileOfNewProofs, 
+                                 boolean forceNewProfileOfNewProofs,
                                  KeYMediator mediator,
                                  boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
                                  Properties poPropertiesToForce) {
@@ -162,6 +170,7 @@ public abstract class AbstractProblemLoader {
         this.bootClassPath = bootClassPath;
         this.mediator = mediator;
         this.profileOfNewProofs = profileOfNewProofs != null ? profileOfNewProofs : AbstractProfile.getDefaultProfile();
+        this.forceNewProfileOfNewProofs = forceNewProfileOfNewProofs;
         this.askUiToSelectAProofObligationIfNotDefinedByLoadedFile = askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
         this.poPropertiesToForce = poPropertiesToForce;
     }
@@ -323,8 +332,8 @@ public abstract class AbstractProblemLoader {
      */
     protected ProblemInitializer createProblemInitializer() {
         UserInterface ui = mediator.getUI();
-        return new ProblemInitializer(ui,
-                        new Services(envInput.getProfile()), ui);
+        Profile profile = forceNewProfileOfNewProofs ? profileOfNewProofs : envInput.getProfile();
+        return new ProblemInitializer(ui, new Services(profile), ui);
     }
 
     /**

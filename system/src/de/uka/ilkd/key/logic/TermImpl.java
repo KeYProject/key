@@ -563,6 +563,11 @@ class TermImpl implements Term {
     }
 
     @Override
+    public TermLabel getLabel(Name termLabelName) {
+       return null;
+    }
+
+    @Override
     public ImmutableArray<TermLabel> getLabels() {
         return EMPTY_LABEL_LIST;
     }

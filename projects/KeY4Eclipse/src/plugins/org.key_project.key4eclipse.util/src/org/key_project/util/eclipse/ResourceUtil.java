@@ -233,7 +233,7 @@ public class ResourceUtil {
                      if (!targetFolder.exists()) {
                         targetFolder.create(true, true, null);
                      }
-                     copyIntoWorkspace(targetFolder, opener, startDirectory, file.listFiles());
+                     copyIntoWorkspace(targetFolder, opener, file, file.listFiles());
                   }
                }
             }

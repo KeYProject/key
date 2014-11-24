@@ -69,6 +69,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import de.uka.ilkd.key.speclang.WellDefinednessCheck.POTerms;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.pp.Backend;
@@ -1878,7 +1879,7 @@ public class LogicPrinter {
      * this method with a null returning body if position information
      * is not computed there.
      */
-    public InitialPositionTable getPositionTable() {
+    public PositionTable getPositionTable() {
         if (pure) {
             return null;
         }
@@ -1895,7 +1896,7 @@ public class LogicPrinter {
         if (pure) {
             return null;
         }
-        return ((PosTableStringBackend)backend).getPositionTable();
+        return ((PosTableStringBackend)backend).getInitialPositionTable();
     }
 
     /** Returns the ProgramPrinter
@@ -2217,7 +2218,14 @@ public class LogicPrinter {
         /** Returns the constructed position table.
          *  @return the constructed position table
          */
-        public InitialPositionTable getPositionTable() {
+        public PositionTable getPositionTable() {
+            return posTbl;
+        }
+
+        /** Returns the constructed position table.
+         *  @return the constructed position table
+         */
+        public InitialPositionTable getInitialPositionTable() {
             return initPosTbl;
         }
 

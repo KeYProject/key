@@ -34,6 +34,7 @@ import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
@@ -254,6 +255,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
             Node methodReturnNode = findMethodReturnNode(getProofNode());
             if (methodReturnNode != null) {
                // Start site proof to extract the value of the result variable.
+               final ProofEnvironment sideProofEnv = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
                SiteProofVariableValueInput input = SymbolicExecutionUtil.createExtractReturnVariableValueSequent(services,
                                                                                                                  mbs.getBodySourceAsTypeReference(),
                                                                                                                  mbs.getProgramMethod(services),
@@ -262,12 +264,12 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                                                                                                                  getProofNode(),
                                                                                                                  resultVar);
                ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
+                                                                                   sideProofEnv,
                                                                                    input.getSequentToProve(), 
                                                                                    StrategyProperties.METHOD_NONE,
                                                                                    StrategyProperties.LOOP_NONE,
                                                                                    StrategyProperties.QUERY_OFF,
-                                                                                   StrategyProperties.SPLITTING_NORMAL,
-                                                                                   true);
+                                                                                   StrategyProperties.SPLITTING_NORMAL);
                try {
                   if (info.getProof().openGoals().size() == 1) {
                      Goal goal = info.getProof().openGoals().head();
