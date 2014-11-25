@@ -55,13 +55,13 @@ public class JMLLocator {
                continue;
          }
          else if(text.charAt(i)=='/'){          //if Second / is detected SingleLineComment was found
-            begin=i;
-            i=text.indexOf(System.getProperty("line.separator"),begin);  //set index to end of line
+            begin=i-1;
+            i=text.indexOf(System.getProperty("line.separator"),begin+1);  //set index to end of line
             comments.add(new Comment(begin,i+1));                        //add found comment to list of comments
             state=false;                                                 //return to no Prefix State
          }
          else if(text.charAt(i)=='*'){             //if * is detected in / Prefix state MultilineComment was found
-            begin=i;
+            begin=i-1;
          i=text.indexOf("*/",begin)+1;             //set index to end of MultilineComment
          comments.add(new Comment(begin,i+1));     //add comment
          state=false;                              //return to no prefix state
