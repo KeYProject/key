@@ -7,6 +7,7 @@ import org.key_project.jmlediting.core.dom.Visibility;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 
 import de.key_project.jmlediting.profile.jmlref.JMLReferenceProfile;
+import static org.junit.Assert.fail;
 import static org.key_project.jmlediting.core.parser.DomBuildUtils.*;
 
 public class MethodSpecificationParserTest {
@@ -39,6 +40,15 @@ public class MethodSpecificationParserTest {
                   buildStatementSpec("assignable", "x")));
       testMethodSpecification(string2, result2);
    }
+   
+   @Test
+   public void testWrongMethodSpecification() {
+      testWrongMethodSpecification("behavior ensures true; behavior assignable x;");
+      testWrongMethodSpecification("behavior ensuresx true;");
+      testWrongMethodSpecification("public normal_behavior ensures true; also");
+      testWrongMethodSpecification("also ensures true; behavior ensures x;");
+      testWrongMethodSpecification("protected behavior also ensures y;");
+   }
 
    private static void testMethodSpecification(String text,
          IMethodSpecification result) throws ParserException {
@@ -49,9 +59,18 @@ public class MethodSpecificationParserTest {
          IMethodSpecification result, boolean compareOffsets)
          throws ParserException {
       IMethodSpecification parseResult = ProfileWrapper.testProfile
-            .createParser().parseMethodSpecification(text, 0, text.length());
+            .createParser().parseMethodSpecification(text, 0, text.length(), true);
       DomCompareUtils.equalsMethodSpecification(result, parseResult,
             compareOffsets);
+   }
+   
+   private static void testWrongMethodSpecification(String text) {
+      try {
+         ProfileWrapper.testProfile.createParser().parseMethodSpecification(text, 0, text.length(), true);
+      } catch (ParserException e) {
+         return;
+      }
+      fail("Parse method specification did not throw an exception");
    }
 
 }
