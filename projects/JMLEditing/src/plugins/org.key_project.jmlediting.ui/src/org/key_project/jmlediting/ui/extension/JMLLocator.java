@@ -1,7 +1,6 @@
 package org.key_project.jmlediting.ui.extension;
 
-import java.util.LinkedList;
-import java.util.ListIterator;
+import java.util.ArrayList;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -14,61 +13,8 @@ public class JMLLocator {
       this.document = doc;
    }
 
-   public LinkedList<Comment> findMultilineTokens(String CommentOpener,
-         String CommentCloser) {
-      String text = document.get();
-      int lastIndex = 0;
-      int begin;
-      int end;
-      LinkedList<Comment> comments = new LinkedList<Comment>();
-
-      while (lastIndex > -1) {
-         begin = text.indexOf(CommentOpener, lastIndex);
-         if (begin > -1) // Stop searching When End of File is reached
-            lastIndex = begin;
-         else
-            return comments;
-         end = text.indexOf(CommentCloser, lastIndex);
-         if (lastIndex > -1) // Stop searching When End of File is reached
-            lastIndex = end;
-         else
-            return comments;
-         end = end - begin;
-         System.out.println("Comment found: Begin: " + begin + " length: "
-               + end);
-         comments.add(new Comment(begin, end));
-      }
-      return comments;
-   }
-
    /**
-    * seeks the Documents text for JML Single Line comments
-    * 
-    * @return A Linked List of JML Comment sections which is empty if there are
-    *         no singleLineComments
-    */
-   public LinkedList<Comment> findSingleLineComments(String CommentOpener)
-         throws BadLocationException {
-      String text = document.get();
-      int begin;
-      int end;
-      int lastIndex = 0;
-      LinkedList<Comment> singleLineComments = new LinkedList<Comment>();
-
-      while (true) {
-         begin = text.indexOf(CommentOpener, lastIndex);
-         if (begin == -1)
-            return singleLineComments;
-         end = document.getLineLength(document.getLineOfOffset(begin));
-         singleLineComments.add(new Comment(begin, end));
-         if (document.getNumberOfLines() == document.getLineOfOffset(begin))
-            return singleLineComments;
-      }
-   }
-
-   /**
-    * isInJMLcomment checks whether an offset position is inside a JML Multiline
-    * Comment Section
+    * isInJMLcomment checks whether an offset position is inside a JMLComment
     * 
     * @param offset
     *           The offset to check whether it is in a JML Comment
@@ -76,46 +22,57 @@ public class JMLLocator {
     * @throws BadLocationException
     */
    public boolean isInJMLcomment(int offset) throws BadLocationException {
-      LinkedList<Comment> comments = findMultilineTokens("/*@", "*/");
-      comments.addAll(findSingleLineComments("//@"));
-      int commentOffset;
-      int commentLength;
-      Comment actual;
-      ListIterator<Comment> i = comments.listIterator();
-      while (i.hasNext()) {
-         actual = i.next();
-         commentOffset = actual.offset;
-         commentLength = actual.length;
-         if (commentOffset <= offset && commentLength + commentOffset >= offset)
+      ArrayList<Comment> jmlcomments = findJMLComments();
+      for(Comment c:jmlcomments)
+         if(c.offset<=offset&&offset<=c.end)
             return true;
-      }
       return false;
    }
 
-   public LinkedList<Comment> getLegalComments() throws BadLocationException {
-      LinkedList<Comment> jmlComments = findMultilineTokens("/*@", "*/");
-      LinkedList<Comment> javaComments = findMultilineTokens("/*", "*/");
-      LinkedList<Comment> jmlSingleLineComments = findSingleLineComments("//@");
-      LinkedList<Comment> javaSingleLineComments = findSingleLineComments("//");
-      LinkedList<Comment> strings = findMultilineTokens("\"", "\"");
-      LinkedList<Comment> cleanedList = new LinkedList<Comment>();
-      ListIterator<Comment> j = javaComments.listIterator();
-      ListIterator<Comment> i = jmlComments.listIterator();
-      Comment jmlComment;
-      Comment javaComment;
-      while (i.hasNext()) {
-         jmlComment = i.next();
-         javaComment = j.next();
+   /**
+    * Uses an Automata to search All Kind of Valid JMLComments in document
+    * 
+    * @return An ArrayList with Type Comment that consists of all valid
+    *         JMLComments in the Document
+    */
+   public ArrayList<Comment> findJMLComments() {
+      boolean state = false; // false is the default state, true is the state
+                             // where a "/" was recognized
+      String text = document.get();
+      int begin = 0;
+      ArrayList<Comment> comments = new ArrayList<Comment>();
+      ArrayList<Comment> jmlcomments = new ArrayList<Comment>();
 
-         if (jmlComment.getOffset() != j.next().getOffset())
-            cleanedList.add(j.next()); // TODO:
+      for (int i = 0; i < text.length() - 1; i++) {
+         if (!state) {                             //if no Prefix sign was detected
+            if (text.charAt(i) == '"') {           //if actual sign is a StringOpener find the end of the String
+               i = text.indexOf("\"", i + 1) + 1;  // and change index from where to process
+               if (i == -1)                        // if EndOfFile is reached stop the loop
+                  break;
+            }
+            else if (text.charAt(i) == '/')        //if / was detected change State into / Prefix State
+               state = true;
+            else
+               continue;
+         }
+         else if(text.charAt(i)=='/'){          //if Second / is detected SingleLineComment was found
+            begin=i;
+            i=text.indexOf(System.getProperty("line.seperator"),begin);  //set index to end of line
+            comments.add(new Comment(begin,i+1));                        //add found comment to list of comments
+            state=false;                                                 //return to no Prefix State
+         }
+         else if(text.charAt(i)=='*'){             //if * is detected in / Prefix state MultilineComment was found
+            begin=i;
+         i=text.indexOf("*/",begin)+1;             //set index to end of MultilineComment
+         comments.add(new Comment(begin,i+1));     //add comment
+         state=false;                              //return to no prefix state
+         }
+         else state=false;                         //failure return to no prefix state
       }
-
-      for (ListIterator<Comment> k = jmlComments.listIterator(); k.hasNext(); k
-            .next()) {
-
-      }
-      return null;
+      for(Comment c:comments)                  //filter for jml comments, a comment is a JML comment if the 3rd sign is an @
+         if(text.charAt(c.offset+2)=='@')
+            jmlcomments.add(c);
+      
+      return jmlcomments;
    }
-
 }

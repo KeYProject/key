@@ -3,18 +3,18 @@ package org.key_project.jmlediting.ui.extension;
 public class Comment {
 
    int offset;
-   int length;
+   int end;
    
    public Comment(int offset, int length){
       this.offset=offset;
-      this.length=length;
+      this.end=length;
    }
    
    public int getLength() {
-      return length;
+      return end;
    }
    
    public int getOffset() {
-      return offset;
+      return end;
    }
 }
