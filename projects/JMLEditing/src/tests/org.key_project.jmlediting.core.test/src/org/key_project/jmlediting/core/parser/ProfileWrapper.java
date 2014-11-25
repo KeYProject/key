@@ -1,0 +1,12 @@
+package org.key_project.jmlediting.core.parser;
+
+import org.junit.BeforeClass;
+import org.key_project.jmlediting.core.profile.IJMLProfile;
+
+import de.key_project.jmlediting.profile.jmlref.JMLReferenceProfile;
+
+public class ProfileWrapper {
+   
+   public static IJMLProfile testProfile = new JMLReferenceProfile();
+
+}

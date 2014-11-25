@@ -9,15 +9,8 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 
 import de.key_project.jmlediting.profile.jmlref.JMLReferenceProfile;
 
-public class JMLParserTest {
+public class SpecificationStatementParserTest {
 
-   private static IJMLProfile testProfile;
-   
-   @BeforeClass
-   public static void initProfile() {
-      testProfile = new JMLReferenceProfile();
-   }
-   
    @Test
    public void testParseSpecificationKeyword() throws ParserException {
       testParseSpecification("  ensures x < y; ", "ensures", "x < y", 2, 15);
@@ -41,10 +34,10 @@ public class JMLParserTest {
    }
    
    private void testParseSpecification(String specText, String expectedKeyword, String expectedContent, int expctedStartOffset, int expectedEndOffset) throws ParserException {
-      IJMLParser parser = testProfile.createParser();
+      IJMLParser parser = ProfileWrapper.testProfile.createParser();
       
      
-      ISpecificationStatement statement = parser.parseSpecificationStatement(specText, 0, specText.length() -1);
+      ISpecificationStatement statement = parser.parseSpecificationStatement(specText, 0, specText.length());
       
       assertEquals("Wrong specification keyword parsed", expectedKeyword, statement.getKeyword().getKeyword());
       assertEquals("Wrong content", expectedContent, statement.getContent());
@@ -54,7 +47,7 @@ public class JMLParserTest {
    
    private void testParseWrongSpecification(String specText) {
       try {
-         testProfile.createParser().parseSpecificationStatement(specText, 0, specText.length()-1);
+         ProfileWrapper.testProfile.createParser().parseSpecificationStatement(specText, 0, specText.length());
       } catch (ParserException e) {
          return;
       }

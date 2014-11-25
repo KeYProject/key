@@ -18,6 +18,7 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorKeyword;
 import org.key_project.jmlediting.core.profile.syntax.ISpecificationStatementKeyword;
+import org.key_project.jmlediting.ui.extension.JMLLocator;
 
 /**
  * An {@link IJavaCompletionProposalComputer} to support JML.
@@ -35,9 +36,9 @@ public class JMLCompletionProposalComputer implements IJavaCompletionProposalCom
 		try {
 		   //add proposals only if Content Assist is invoked in JML Code
 //		   String contentType = context.getDocument().getContentType(context.getInvocationOffset());
-		   
-		   //TODO only add Proposals, when contentType is "JML" 
-//		   if (contentType.equals(JMLPartitionScanner.JML_MULTI_LINE) || contentType.equals(JMLPartitionScanner.JML_SINGLE_LINE)) {
+
+		   JMLLocator locator = new JMLLocator(context.getDocument());
+		   if (locator.isInJMLcomment(context.getInvocationOffset())) {
 		      //TODO how to get current IProject? -> Hard Coded "Test"-Project for testing other Code...
 		      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		      IProject currentProject = root.getProjects()[0];
@@ -71,7 +72,7 @@ public class JMLCompletionProposalComputer implements IJavaCompletionProposalCom
 		            result.add(new CompletionProposal(keyword, proposalOffset, prefixLength, keyword.length()));
 		         }
 		      }
-//		   }
+		   }
 		}
       catch (Exception e) {
          e.printStackTrace();

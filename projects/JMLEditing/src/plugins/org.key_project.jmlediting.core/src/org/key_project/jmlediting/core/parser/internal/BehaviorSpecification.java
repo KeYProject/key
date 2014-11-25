@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.key_project.jmlediting.core.dom.IBehaviorSpecification;
 import org.key_project.jmlediting.core.dom.ISpecificationStatement;
+import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Visibility;
 import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorKeyword;
 
@@ -45,6 +46,11 @@ public class BehaviorSpecification extends ASTNode implements IBehaviorSpecifica
    @Override
    public Visibility getVisibility() {
       return this.visibility;
+   }
+
+   @Override
+   public int getType() {
+      return NodeTypes.BEHAVIOR_SPECIFICATION;
    }
 
 }
