@@ -78,10 +78,12 @@ public class JMLLocator {
       comments.addAll(findSingleLineComments("//@"));
       int commentOffset;
       int commentLength;
+      Comment actual;
       for (ListIterator<Comment> i = comments.listIterator(); i.hasNext(); i
             .next()) {
-         commentOffset = i.next().offset;
-         commentLength = i.next().length;
+         actual=i.next();
+         commentOffset = actual.offset;
+         commentLength = actual.length;
          if (commentOffset <= offset && commentLength + commentOffset >= offset)
             return true;
       }
