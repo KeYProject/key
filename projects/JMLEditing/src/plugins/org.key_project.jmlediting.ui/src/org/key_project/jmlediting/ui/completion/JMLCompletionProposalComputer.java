@@ -41,14 +41,8 @@ public class JMLCompletionProposalComputer implements IJavaCompletionProposalCom
 		   JMLLocator locator = new JMLLocator(context.getDocument());
 		   if (locator.isInJMLcomment(context.getInvocationOffset())) {
 
-		      IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		      IWorkbenchPage activePage = window.getActivePage();
-		      IEditorPart editorPart = activePage.getActiveEditor();
-		      IProject currentProject = getCurrentProject(editorPart);
-		      
-		      //TODO how to get current IProject? -> Hard Coded "Test"-Project for testing other Code...
-//		      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-//		      IProject currentProject = root.getProjects()[0];
+		      //getCurrentProject
+		      IProject currentProject = getCurrentProject();
 		      
 		      //Load the specific JMLProfile for the current Project.
 		      IJMLProfile currentJMLProfile = JMLPreferencesHelper.getProjectActiveJMLProfile(currentProject);
@@ -101,9 +95,13 @@ public class JMLCompletionProposalComputer implements IJavaCompletionProposalCom
 	public void sessionEnded() {
 	}
 	
-   public static IProject getCurrentProject(IEditorPart part) {
+   public static IProject getCurrentProject() {
       IProject project = null;
-      IResource resource = (IResource) part.getEditorInput().getAdapter(IResource.class);
+      
+      IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+      IWorkbenchPage activePage = window.getActivePage();
+      IEditorPart editorPart = activePage.getActiveEditor();
+      IResource resource = (IResource) editorPart.getEditorInput().getAdapter(IResource.class);
       if (resource != null) {
          project = resource.getProject();
       }
