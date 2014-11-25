@@ -36,7 +36,8 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
    /**
     * The ID of the page when acting as properties page.
     */
-   public static final String JML_COLOUR_PROP_ID = "org.key_project.jmlediting.ui.propertypages.colour";
+   public static final String JML_COLOUR_PROP_ID =
+         "org.key_project.jmlediting.ui.propertypages.colour";
 
    /**
     * The name of the JML profile property of a project.
@@ -59,13 +60,12 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
    /**
     * A {@link ColorSelector} which selects the Color for the JML-Comments
     */
-   private ColorSelector CommentColor;
+   private ColorSelector commentColor;
 
    /**
     * Creates a new {@link JMLProfilePropertiesPage}.
     */
    public JMLColorPropertyPreferencePage() {
-
       this.currentPreferenceListener = new IPreferenceChangeListener() {
 
          @Override
@@ -98,7 +98,8 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
       final Composite myComposite = new Composite(parent, SWT.NONE);
 
       final GridLayout layout = new GridLayout();
-      layout.numColumns = 1;
+      layout.numColumns = 2;
+      
       myComposite.setLayout(layout);
 
       GridData data;
@@ -108,7 +109,7 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
       label.setText("Choose JML comment color:");
       label.setLayoutData(data);
 
-      CommentColor = new ColorSelector(myComposite);
+      commentColor = new ColorSelector(myComposite);
 
       IEclipsePreferences preferences = InstanceScope.INSTANCE
             .getNode(Activator.PLUGIN_ID);
@@ -147,7 +148,7 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
          // project specific settings are enabled
          try {
             color = this.getProject().getPersistentProperty(COMMENT_COLOR);
-         }
+             }
          catch (CoreException e) {
             color = null;
          }
@@ -158,7 +159,7 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
          color = preferences.get(COMMENT_COLOR.getLocalName(), null);
       }
 
-      CommentColor.setColorValue(StringtoRGB(color));
+      commentColor.setColorValue(StringtoRGB(color));
    }
 
    @Override
@@ -212,9 +213,14 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
       return color;
    }
 
+   public void getColor(){
+      
+   }
+   
+   
    @Override
    public void performDefaults() {
-      CommentColor.setColorValue(DEFAULT_JML_COMMENT_COLOR);
+      commentColor.setColorValue(DEFAULT_JML_COMMENT_COLOR);
       super.performDefaults();
 
    }
@@ -242,7 +248,7 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
          try {
             if (this.useProjectSettings()) {
                // Set property
-               project.setPersistentProperty(COMMENT_COLOR, CommentColor
+               project.setPersistentProperty(COMMENT_COLOR, commentColor
                      .getColorValue().toString());
 
             }
@@ -257,7 +263,7 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
       }
       else {
          // global properties
-         preferences.put(COMMENT_COLOR.getLocalName(), CommentColor
+         preferences.put(COMMENT_COLOR.getLocalName(), commentColor
                .getColorValue().toString());
 
       }
@@ -282,7 +288,7 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
          try {
             if (this.useProjectSettings()) {
                // Set property
-               project.setPersistentProperty(COMMENT_COLOR, CommentColor
+               project.setPersistentProperty(COMMENT_COLOR, commentColor
                      .getColorValue().toString());
 
             }
@@ -297,7 +303,7 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
       }
       else {
          // global properties
-         preferences.put(COMMENT_COLOR.getLocalName(), CommentColor
+         preferences.put(COMMENT_COLOR.getLocalName(), commentColor
                .getColorValue().toString());
 
       }
