@@ -154,7 +154,7 @@ public final class PredicateEvaluationUtil {
                                          Map<TermLabel, PredicateResult> results) {
       Object replaceObject = tacletGoal.replaceWithExpressionAsObject();
       if (replaceObject instanceof Term) {
-         Term replaceTerm = SymbolicExecutionUtil.instantiateReplaceTerm((Term) replaceObject, tacletApp, node.proof().getServices());
+         Term replaceTerm = SymbolicExecutionUtil.instantiateTerm((Term) replaceObject, tacletApp, node.proof().getServices());
          // Check for true/false terms
          if (replaceTerm.op() == Junctor.TRUE) {
             if (tacletApp.posInOccurrence().isInAntec()) {

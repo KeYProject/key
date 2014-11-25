@@ -119,7 +119,6 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
@@ -2160,15 +2159,14 @@ public final class SymbolicExecutionUtil {
       TacletGoalTemplate goalTemplate = app.taclet().goalTemplates().take(app.taclet().goalTemplates().size() - 1 - childIndex).head();
       // Apply instantiations of schema variables to sequent of goal template
       Services services = node.proof().getServices();
-      SVInstantiations instantiations = app.instantiations();
       // List additions
-      ImmutableList<Term> antecedents = listSemisequentTerms(services, instantiations, goalTemplate.sequent().antecedent());
-      ImmutableList<Term> succedents = listSemisequentTerms(services, instantiations, goalTemplate.sequent().succedent());
+      ImmutableList<Term> antecedents = listSemisequentTerms(services, app, goalTemplate.sequent().antecedent());
+      ImmutableList<Term> succedents = listSemisequentTerms(services, app, goalTemplate.sequent().succedent());
       // List replacements
       if (!NodeInfo.isSymbolicExecution(app.taclet())) {
          if (goalTemplate.replaceWithExpressionAsObject() instanceof Sequent) {
-            antecedents = antecedents.append(listSemisequentTerms(services, instantiations, ((Sequent)goalTemplate.replaceWithExpressionAsObject()).antecedent()));
-            succedents = succedents.append(listSemisequentTerms(services, instantiations, ((Sequent)goalTemplate.replaceWithExpressionAsObject()).succedent()));
+            antecedents = antecedents.append(listSemisequentTerms(services, app, ((Sequent)goalTemplate.replaceWithExpressionAsObject()).antecedent()));
+            succedents = succedents.append(listSemisequentTerms(services, app, ((Sequent)goalTemplate.replaceWithExpressionAsObject()).succedent()));
          }
          else if (goalTemplate.replaceWithExpressionAsObject() instanceof Term) {
             // Make sure that an PosTacletApp was applied
@@ -2188,7 +2186,7 @@ public final class SymbolicExecutionUtil {
             }
             // Add additional equivalenz term to antecedent with the replace object which must be equal to the find term 
             Term replaceTerm = (Term)goalTemplate.replaceWithExpressionAsObject();
-            replaceTerm = instantiateReplaceTerm(replaceTerm, app, services);
+            replaceTerm = instantiateTerm(replaceTerm, app, services);
             replaceTerm = services.getTermBuilder().equals(replaceTerm, app.posInOccurrence().subTerm());
             replaceTerm = services.getTermBuilder().applyUpdatePairsSequential(app.instantiations().getUpdateContext(), replaceTerm);
             if (!newAntecedents.contains(replaceTerm)) {
@@ -2223,31 +2221,63 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Instantiates the given replace {@link Term} of the applied {@link TacletApp}.
-    * @param replaceTerm The replace {@link Term} to instantiate.
+    * Instantiates the given {@link Term} of the applied {@link TacletApp}.
+    * @param term The {@link Term} to instantiate.
     * @param tacletApp The {@link TacletApp} to consider.
     * @param services The {@link Services} to use.
-    * @return The instantiated replace {@link Term}.
+    * @return The instantiated {@link Term} or {@code null} if no {@link Term} was given.
     */
-   public static Term instantiateReplaceTerm(Term replaceTerm, TacletApp tacletApp, Services services) {
-      if (replaceTerm != null) {
-         if (replaceTerm.op() instanceof TermTransformer) {
-            // Replace meta constructs
-            SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(services, tacletApp.instantiations(), tacletApp.posInOccurrence(), tacletApp.taclet());
-            replaceTerm.execPostOrder(visitor);
-            replaceTerm = visitor.getTerm();
-         }
-         else if (replaceTerm.op() instanceof SchemaVariable) {
-            // Replace schema variables
-            Object instantiation = tacletApp.instantiations().getInstantiation((SchemaVariable)replaceTerm.op());
-            if (instantiation instanceof Term) {
-               replaceTerm = (Term)instantiation;
+   public static Term instantiateTerm(Term term, 
+                                      TacletApp tacletApp, 
+                                      Services services) {
+      if (term != null) {
+         return instantiateTermRecursive(term, tacletApp, services);
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Utility method used by {@link #instantiateTerm(Term, TacletApp, Services)}.
+    * @param term The {@link Term} to instantiate.
+    * @param tacletApp The {@link TacletApp} to consider.
+    * @param services The {@link Services} to use.
+    * @return The instantiated {@link Term}.
+    */
+   private static Term instantiateTermRecursive(Term term, 
+                                                TacletApp tacletApp, 
+                                                Services services) {
+      if (term.op() instanceof TermTransformer) {
+         // Replace meta constructs
+         SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(services, tacletApp.instantiations(), tacletApp.posInOccurrence(), tacletApp.taclet());
+         term.execPostOrder(visitor);
+         return visitor.getTerm();
+      }
+      else if (term.op() instanceof SchemaVariable) {
+         // Replace schema variables
+         return tacletApp.instantiations().getTermInstantiation((SchemaVariable)term.op(), tacletApp.instantiations().getExecutionContext(), services);
+      }
+      else {
+         Term[] newSubs = new Term[term.arity()];
+         boolean changed = false;
+         for (int i = 0; i < newSubs.length; i++) {
+            Term oldSub = term.sub(i);
+            Term newSub = instantiateTermRecursive(oldSub, tacletApp, services);
+            if (!oldSub.equals(newSub)) {
+               newSubs[i] = newSub;
+               changed = true;
+            }
+            else {
+               newSubs[i] = oldSub;
             }
          }
+         return changed ? 
+                services.getTermFactory().createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(), term.javaBlock(), term.getLabels()) : 
+                term;
       }
-      return replaceTerm;
    }
-   
+
    /**
     * Starts the side proof and evaluates the {@link Sequent} to prove into a single {@link Term}.
     * @param services The {@link Services} to use.
@@ -2290,18 +2320,17 @@ public final class SymbolicExecutionUtil {
    /**
     * Applies the schema variable instantiations on the given {@link Semisequent}.
     * @param services The {@link Services} to use.
-    * @param svInst The schema variable instantiations.
+    * @param tacletApp The {@link TacletApp} to consider.
     * @param semisequent The {@link Semisequent} to apply instantiations on.
     * @return The list of created {@link Term}s in which schema variables are replaced with the instantiation.
     */
    private static ImmutableList<Term> listSemisequentTerms(Services services, 
-                                                           SVInstantiations svInst, 
+                                                           TacletApp tacletApp, 
                                                            Semisequent semisequent) {
       ImmutableList<Term> terms = ImmutableSLList.nil();
       for (SequentFormula sf : semisequent) {
-         SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(services, svInst, null, null);
-         sf.formula().execPostOrder(visitor);
-         terms = terms.append(visitor.getTerm());
+         Term term = instantiateTerm(sf.formula(), tacletApp, services);
+         terms = terms.append(term);
       }
       return terms;
    }
