@@ -9,12 +9,13 @@ import org.eclipse.jface.text.IDocument;
 public class JMLLocator {
 
    private IDocument document;
-   
-   public JMLLocator(IDocument doc){
-      this.document=doc;
+
+   public JMLLocator(IDocument doc) {
+      this.document = doc;
    }
-   
-   public LinkedList<Comment> findMultilineTokens(String CommentOpener, String CommentCloser){
+
+   public LinkedList<Comment> findMultilineTokens(String CommentOpener,
+         String CommentCloser) {
       String text = document.get();
       int lastIndex = 0;
       int begin;
@@ -39,6 +40,7 @@ public class JMLLocator {
       }
       return comments;
    }
+
    /**
     * seeks the Documents text for JML Single Line comments
     * 
@@ -79,9 +81,9 @@ public class JMLLocator {
       int commentOffset;
       int commentLength;
       Comment actual;
-      for (ListIterator<Comment> i = comments.listIterator(); i.hasNext(); i
-            .next()) {
-         actual=i.next();
+      ListIterator<Comment> i = comments.listIterator();
+      while (i.hasNext()) {
+         actual = i.next();
          commentOffset = actual.offset;
          commentLength = actual.length;
          if (commentOffset <= offset && commentLength + commentOffset >= offset)
@@ -89,23 +91,29 @@ public class JMLLocator {
       }
       return false;
    }
-   public LinkedList<Comment> getLegalComments() throws BadLocationException{
+
+   public LinkedList<Comment> getLegalComments() throws BadLocationException {
       LinkedList<Comment> jmlComments = findMultilineTokens("/*@", "*/");
       LinkedList<Comment> javaComments = findMultilineTokens("/*", "*/");
-      LinkedList<Comment> jmlSingleLineComments=findSingleLineComments("//@");
-      LinkedList<Comment> javaSingleLineComments=findSingleLineComments("//");
-      LinkedList<Comment> strings=findMultilineTokens("\"", "\"");
-      LinkedList<Comment> cleanedList=new LinkedList<Comment>();
-      ListIterator<Comment>j=javaComments.listIterator();
-      ListIterator<Comment> i=jmlComments.listIterator();
-      
-      while(i.hasNext()){
-         if(i.next().getOffset()!=j.next().getOffset())
-            cleanedList.add(j.next()); //TODO:
+      LinkedList<Comment> jmlSingleLineComments = findSingleLineComments("//@");
+      LinkedList<Comment> javaSingleLineComments = findSingleLineComments("//");
+      LinkedList<Comment> strings = findMultilineTokens("\"", "\"");
+      LinkedList<Comment> cleanedList = new LinkedList<Comment>();
+      ListIterator<Comment> j = javaComments.listIterator();
+      ListIterator<Comment> i = jmlComments.listIterator();
+      Comment jmlComment;
+      Comment javaComment;
+      while (i.hasNext()) {
+         jmlComment = i.next();
+         javaComment = j.next();
+
+         if (jmlComment.getOffset() != j.next().getOffset())
+            cleanedList.add(j.next()); // TODO:
       }
-      
-      for(ListIterator<Comment> k=jmlComments.listIterator();k.hasNext();k.next()){
-         
+
+      for (ListIterator<Comment> k = jmlComments.listIterator(); k.hasNext(); k
+            .next()) {
+
       }
       return null;
    }
