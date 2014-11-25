@@ -18,17 +18,17 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 
 
 public class SLTranslationException extends ProofInputException {
-      
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 6600131411834400587L;
     private final String fileName;
     private final Position pos;
-    
-        
-    public SLTranslationException(String message, 
-                                  String fileName, 
+
+
+    public SLTranslationException(String message,
+                                  String fileName,
                                   Position pos) {
         super(message);
         assert fileName != null;
@@ -36,30 +36,30 @@ public class SLTranslationException extends ProofInputException {
         this.fileName = fileName;
         this.pos      = pos;
     }
-    
-    
+
+
     public SLTranslationException(String message,
                                   String fileName,
                                   Position pos,
-                                  StackTraceElement[] stackTrace) {
+                                  Throwable cause) {
         this(message, fileName, pos);
-        setStackTrace(stackTrace);
+        initCause(cause);
     }
-    
-    
+
+
     public SLTranslationException(String message,
                                   String fileName,
                                   int line,
                                   int column) {
         this(message, fileName, new Position(line, column));
     }
-   
-    
+
+
     public SLTranslationException(String message) {
         this(message, "no file", Position.UNDEFINED);
     }
-    
-    
+
+
     public SLTranslationException(String message, Throwable cause) {
         this(message);
         initCause(cause);
@@ -69,18 +69,18 @@ public class SLTranslationException extends ProofInputException {
     public String getFileName() {
         return fileName;
     }
-    
+
 
     public Position getPosition() {
     	return pos;
-    }	
-    
-    
+    }
+
+
     public int getLine() {
         return pos.getLine();
     }
-    
-    
+
+
     public int getColumn() {
         return pos.getColumn();
     }
