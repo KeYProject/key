@@ -14,7 +14,7 @@ public class JMLLocator {
       this.document=doc;
    }
    
-   public LinkedList<Comment> findMultiLineComments(String CommentOpener){
+   public LinkedList<Comment> findMultilineTokens(String CommentOpener, String CommentCloser){
       String text = document.get();
       int lastIndex = 0;
       int begin;
@@ -27,7 +27,7 @@ public class JMLLocator {
             lastIndex = begin;
          else
             return comments;
-         end = text.indexOf("*/", lastIndex);
+         end = text.indexOf(CommentCloser, lastIndex);
          if (lastIndex > -1) // Stop searching When End of File is reached
             lastIndex = end;
          else
@@ -74,7 +74,7 @@ public class JMLLocator {
     * @throws BadLocationException
     */
    public boolean isInJMLcomment(int offset) throws BadLocationException {
-      LinkedList<Comment> comments = findMultiLineComments("/*@");
+      LinkedList<Comment> comments = findMultilineTokens("/*@", "*/");
       comments.addAll(findSingleLineComments("//@"));
       int commentOffset;
       int commentLength;
@@ -86,6 +86,26 @@ public class JMLLocator {
             return true;
       }
       return false;
+   }
+   public LinkedList<Comment> getLegalComments() throws BadLocationException{
+      LinkedList<Comment> jmlComments = findMultilineTokens("/*@", "*/");
+      LinkedList<Comment> javaComments = findMultilineTokens("/*", "*/");
+      LinkedList<Comment> jmlSingleLineComments=findSingleLineComments("//@");
+      LinkedList<Comment> javaSingleLineComments=findSingleLineComments("//");
+      LinkedList<Comment> strings=findMultilineTokens("\"", "\"");
+      LinkedList<Comment> cleanedList=new LinkedList<Comment>();
+      ListIterator<Comment>j=javaComments.listIterator();
+      ListIterator<Comment> i=jmlComments.listIterator();
+      
+      while(i.hasNext()){
+         if(i.next().getOffset()!=j.next().getOffset())
+            cleanedList.add(j.next()); //TODO:
+      }
+      
+      for(ListIterator<Comment> i=jmlComments.listIterator();i.hasNext();i.next()){
+         
+      }
+      return null;
    }
 
 }
