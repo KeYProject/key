@@ -102,7 +102,7 @@ public class JMLLocator {
             cleanedList.add(j.next()); //TODO:
       }
       
-      for(ListIterator<Comment> i=jmlComments.listIterator();i.hasNext();i.next()){
+      for(ListIterator<Comment> k=jmlComments.listIterator();k.hasNext();k.next()){
          
       }
       return null;
