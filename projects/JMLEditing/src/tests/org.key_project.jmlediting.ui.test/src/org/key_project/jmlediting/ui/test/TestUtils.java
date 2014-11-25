@@ -52,7 +52,24 @@ public class TestUtils {
       bot.waitUntil(shellCloses(activeShell));
       return getProjectWithName(name);
    }
-
+   
+   public static void createEmptyPackage(SWTWorkbenchBot bot, String name) {
+      bot.menu("File").menu("New").menu("Package").click();
+      bot.textWithLabel("&Name:").setText("name");
+      SWTBotShell activeShell = bot.activeShell();
+      bot.button("Finish").click();
+      bot.waitUntil(shellCloses(activeShell));
+   }
+   
+   public static void createEmptyClass(SWTWorkbenchBot bot, String packageName, String className) {
+      bot.menu("File").menu("New").menu("Class").click();
+      bot.textWithLabel("&Package:").setText(packageName);
+      bot.textWithLabel("&Name:").setText(className);
+      SWTBotShell activeShell = bot.activeShell();
+      bot.button("Finish").click();
+      bot.waitUntil(shellCloses(activeShell));
+   }
+   
    public static  void openJMLProfileProperties(SWTWorkbenchBot bot, final String projectName) {
       bot.tree().getTreeItem(projectName).contextMenu("Properties").click(); //.select();
       
