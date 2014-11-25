@@ -67,36 +67,35 @@ public class ProofInfo {
 		return po.getContract();
 	}
 
-	public Term getPostCondition(){
+	public Term getPostCondition2(){
 		Contract c = getContract();
 		if(c instanceof FunctionalOperationContract){
 			FunctionalOperationContract t = (FunctionalOperationContract) c;
 			OriginalVariables orig = t.getOrigVars();
 			Term post = t.getPost(services.getTypeConverter().getHeapLDT().getHeap(), orig.self, orig.params, orig.result, orig.exception, orig.atPres, services);
-			
-			post = findPostCondition(getPO(), post);			
-			if(post!=null){
-				return post;
-			}
+			//System.out.println("Alt post: "+getPostCondition2());
+			return post;
 			
 		}
 		//no post <==> true
 		return services.getTermBuilder().tt();
 	}
 	
-	public Term findPostCondition(Term po, Term post){
-		if(po.equalsModRenaming(post)){
-			return po;
+	public Term getPostCondition(){
+		Term t = getPO();
+		Term post = services.getTermBuilder().tt();
+		try{
+			post = t.sub(1).sub(1).sub(0);
+		}catch(Exception e){
+			System.err.println("Could not get PostCondition");
 		}
-		Term result = null;
-		for(Term sub : po.subs()){
-			result = findPostCondition(sub, post);
-			if(result != null){
-				return result;
-			}
-		}
-		return result;
+		
+		return post;
+		
+		
 	}
+	
+	
 	
 
 	public Term getPreConTerm(){
@@ -139,6 +138,8 @@ public class ProofInfo {
 	public Term getPO() {
 		return proof.root().sequent().succedent().get(0).formula();
 	}
+	
+	
 	
 	
 	
