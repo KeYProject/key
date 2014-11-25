@@ -364,9 +364,46 @@ public class TermLabelManager {
                                                              ImmutableArray<Term> newTermSubs,
                                                              ImmutableArray<QuantifiableVariable> newTermBoundVars,
                                                              JavaBlock newTermJavaBlock) {
+      Term applicationTerm = applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
+      return instantiateLabels(services, applicationTerm, applicationPosInOccurrence, rule, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock);
+   }
+
+   /**
+    * <p>
+    * Computes the {@link TermLabel} to add to a new {@link Term} while
+    * a {@link Rule} is currently active. The labels of the new {@link Term}
+    * are computed just before the term is created.
+    * </p>
+    * <p>
+    * This method delegates the request to the {@link TermLabelManager}
+    * of the given {@link Services} if possible. Otherwise no labels are returned.
+    * </p>
+    * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
+    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
+    * @param rule The {@link Rule} which is applied.
+    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param hint An optional hint passed from the active rule to describe the term which should be created.
+    * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate the new {@link Term} for the new proof node or {@code null} in case of built in rules.
+    * @param newTermOp The new {@link Operator} of the {@link Term} to create.
+    * @param newTermSubs The optional children of the {@link Term} to create.
+    * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
+    * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
+    * @return The {@link TermLabel}s to add to the new {@link Term} which should be created.
+    */
+   public static ImmutableArray<TermLabel> instantiateLabels(Services services,
+                                                             Term applicationTerm,
+                                                             PosInOccurrence applicationPosInOccurrence,
+                                                             Rule rule,
+                                                             Goal goal,
+                                                             Object hint,
+                                                             Term tacletTerm,
+                                                             Operator newTermOp,
+                                                             ImmutableArray<Term> newTermSubs,
+                                                             ImmutableArray<QuantifiableVariable> newTermBoundVars,
+                                                             JavaBlock newTermJavaBlock) {
       TermLabelManager manager = getTermLabelManager(services);
       if (manager != null) {
-         Term applicationTerm = applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
          return manager.instantiateLabels(services,
                                           applicationPosInOccurrence,
                                           applicationTerm,

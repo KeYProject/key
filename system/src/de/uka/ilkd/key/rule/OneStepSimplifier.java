@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -33,6 +34,8 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -310,16 +313,35 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
      * @param protocol
      * @param services TODO
      */
-    private Term replaceKnownHelper(Map<Term,PosInOccurrence> map,
-                    Term in,
-                    /*out*/ List<PosInOccurrence> ifInsts, Protocol protocol, TermServices services) {
-        final PosInOccurrence pos = map.get(in);
+    private Term replaceKnownHelper(Map<TermReplacementKey,PosInOccurrence> map,
+                                    Term in,
+                                    boolean inAntecedent,
+                                    /*out*/ List<PosInOccurrence> ifInsts, 
+                                    Protocol protocol, 
+                                    Services services,
+                                    Goal goal) {
+        final PosInOccurrence pos = map.get(new TermReplacementKey(in));
         if(pos != null) {
             ifInsts.add(pos);
             if(protocol != null) {
-                protocol.add(makeReplaceKnownTacletApp(in, pos));
+                protocol.add(makeReplaceKnownTacletApp(in, inAntecedent, pos));
             }
-            return pos.isInAntec() ? services.getTermBuilder().tt() : services.getTermBuilder().ff();
+            Term result = pos.isInAntec() ? services.getTermBuilder().tt() : services.getTermBuilder().ff();
+            ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(services, 
+                                                                                  in,
+                                                                                  pos, // TODO: pos.subTerm() == in should be true which is currently not the case (labels are missing)
+                                                                                  this, 
+                                                                                  goal, 
+                                                                                  null, 
+                                                                                  null, 
+                                                                                  result.op(), 
+                                                                                  result.subs(), 
+                                                                                  result.boundVars(), 
+                                                                                  result.javaBlock());
+            if (labels != null && !labels.isEmpty()) {
+               result = services.getTermBuilder().label(result, labels);
+            }
+            return result;
         } else if(in.op() instanceof Modality
                         || in.op() instanceof UpdateApplication
                         || in.op() instanceof Transformer) {
@@ -328,7 +350,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
             Term[] subs = new Term[in.arity()];
             boolean changed = false;
             for(int i = 0; i < subs.length; i++) {
-                subs[i] = replaceKnownHelper(map, in.sub(i), ifInsts, protocol, services);
+                subs[i] = replaceKnownHelper(map, in.sub(i), inAntecedent, ifInsts, protocol, services, goal);
                 if(subs[i] != in.sub(i)) {
                     changed = true;
                 }
@@ -337,7 +359,8 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
                 return services.getTermBuilder().tf().createTerm(in.op(),
                                 subs,
                                 in.boundVars(),
-                                in.javaBlock());
+                                in.javaBlock(),
+                                in.getLabels());
             } else {
                 return in;
             }
@@ -354,17 +377,19 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
      * @param protocol
      */
     private SequentFormula replaceKnown(
-                    TermServices services,
+                    Services services,
                     SequentFormula cf,
-                    Map<Term,PosInOccurrence> context,
+                    boolean inAntecedent,
+                    Map<TermReplacementKey,PosInOccurrence> context,
                     /*out*/ List<PosInOccurrence> ifInsts,
-                    Protocol protocol) {
+                    Protocol protocol,
+                    Goal goal) {
         if(context == null) {
             return null;
         }
         final Term formula = cf.formula();
         final Term simplifiedFormula
-            = replaceKnownHelper(context, formula, ifInsts, protocol, services);
+            = replaceKnownHelper(context, formula, inAntecedent, ifInsts, protocol, services, goal);
         if(simplifiedFormula.equals(formula)) {
             return null;
         } else {
@@ -372,7 +397,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
         }
     }
 
-    private RuleApp makeReplaceKnownTacletApp(Term formula, PosInOccurrence pio) {
+    private RuleApp makeReplaceKnownTacletApp(Term formula, boolean inAntecedent, PosInOccurrence pio) {
         FindTaclet taclet;
         if(pio.isInAntec()) {
             taclet = (FindTaclet) lastProof.getInitConfig().lookupActiveTaclet(new Name("replace_known_left"));
@@ -382,9 +407,12 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
 
         SVInstantiations svi = SVInstantiations.EMPTY_SVINSTANTIATIONS;
         FormulaSV sv = SchemaVariableFactory.createFormulaSV(new Name("b"));
-        svi.add(sv, formula, lastProof.getServices());
+        svi.add(sv, pio.constrainedFormula().formula(), lastProof.getServices());
 
-        TacletApp ta = PosTacletApp.createPosTacletApp(taclet, svi, pio, lastProof.getServices());
+        PosInOccurrence applicatinPIO = new PosInOccurrence(new SequentFormula(formula), 
+                                                            PosInTerm.getTopLevel(), // TODO: This should be the precise sub term
+                                                            inAntecedent); // It is required to create a new PosInOccurrence because formula and pio.constrainedFormula().formula() are only equals module renamings and term labels
+        TacletApp ta = PosTacletApp.createPosTacletApp(taclet, svi, applicatinPIO, lastProof.getServices());
         return ta;
     }
 
@@ -396,10 +424,12 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
     private SequentFormula simplifyConstrainedFormula(
                     Services services,
                     SequentFormula cf,
-                    Map<Term,PosInOccurrence> context,
+                    boolean inAntecedent,
+                    Map<TermReplacementKey,PosInOccurrence> context,
                     /*out*/ List<PosInOccurrence> ifInsts,
-                    Protocol protocol) {
-        SequentFormula result = replaceKnown(services, cf, context, ifInsts, protocol);
+                    Protocol protocol,
+                    Goal goal) {
+        SequentFormula result = replaceKnown(services, cf, inAntecedent, context, ifInsts, protocol, goal);
         if(result != null) {
             return result;
         }
@@ -407,7 +437,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
         for(int i = 0; i < indices.length; i++) {
             PosInOccurrence pos = new PosInOccurrence(cf,
                             PosInTerm.getTopLevel(),
-                            true);
+                            inAntecedent);
             result = simplifyPosOrSub(services, pos, i, protocol);
             if(result != null) {
                 return result;
@@ -424,23 +454,25 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
      * @param protocol
      */
     private Instantiation computeInstantiation(Services services,
-                    SequentFormula cf,
-                    Sequent seq,
-                    Protocol protocol) {
+                                               PosInOccurrence ossPIO,
+                                               Sequent seq,
+                                               Protocol protocol,
+                                               Goal goal) {
         //collect context formulas (potential if-insts for replace-known)
-        final Map<Term,PosInOccurrence> context
-            = new LinkedHashMap<Term,PosInOccurrence>();
+        final Map<TermReplacementKey,PosInOccurrence> context
+            = new LinkedHashMap<TermReplacementKey,PosInOccurrence>();
+        final SequentFormula cf = ossPIO.constrainedFormula();
         for(SequentFormula ante : seq.antecedent()) {
             if(!ante.equals(cf) && ante.formula().op() != Junctor.TRUE) {
                 context.put(
-                                ante.formula(),
+                                new TermReplacementKey(ante.formula()),
                                 new PosInOccurrence(ante, PosInTerm.getTopLevel(), true));
             }
         }
         for(SequentFormula succ : seq.succedent()) {
             if(!succ.equals(cf) && succ.formula().op() != Junctor.FALSE) {
                 context.put(
-                                succ.formula(),
+                                new TermReplacementKey(succ.formula()),
                                 new PosInOccurrence(succ, PosInTerm.getTopLevel(), false));
             }
         }
@@ -453,9 +485,11 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
         while(true) {
             simplifiedCf = simplifyConstrainedFormula(services,
                             simplifiedCf,
+                            ossPIO.isInAntec(),
                             context,
                             ifInsts,
-                            protocol);
+                            protocol,
+                            goal);
             if(simplifiedCf != null && !list.contains(simplifiedCf)) {
                 list = list.prepend(simplifiedCf);
             } else {
@@ -476,14 +510,14 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
     /**
      * Tells whether the passed formula can be simplified
      */
-    private boolean applicableTo(Services services, SequentFormula cf) {
+    private boolean applicableTo(Services services, SequentFormula cf, boolean inAntecedent, Goal goal) {
         final Boolean b = applicabilityCache.get(cf);
         if(b != null) {
             return b.booleanValue();
         } else {
             //try one simplification step without replace-known
             final SequentFormula simplifiedCf
-            = simplifyConstrainedFormula(services, cf, null, null, null);
+            = simplifyConstrainedFormula(services, cf, inAntecedent, null, null, null, goal);
             final boolean result = simplifiedCf != null
                             && !simplifiedCf.equals(cf);
             applicabilityCache.put(cf, Boolean.valueOf(result));
@@ -529,7 +563,9 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
 
         //applicable to the formula?
         return applicableTo(goal.proof().getServices(),
-                        pio.constrainedFormula());
+                        pio.constrainedFormula(),
+                        pio.isInAntec(),
+                        goal);
     }
 
     @Override
@@ -546,11 +582,11 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
         Protocol protocol = new Protocol();
 
         // get instantiation
-        final Instantiation inst
-            = computeInstantiation(services,
-                    pos.constrainedFormula(),
-                    goal.sequent(),
-                    protocol);
+        final Instantiation inst = computeInstantiation(services,
+                                                        pos,
+                                                        goal.sequent(),
+                                                        protocol,
+                                                        goal);
 
         ((OneStepSimplifierRuleApp)ruleApp).setProtocol(protocol);
 
@@ -656,5 +692,61 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
     @Override
     public OneStepSimplifierRuleApp createApp(PosInOccurrence pos, TermServices services) {
         return new OneStepSimplifierRuleApp(this, pos);
+    }
+    
+    /**
+     * Instances of this class are used in the {@link Map} of
+     * {@link OneStepSimplifier#replaceKnown(TermServices, SequentFormula, Map, List, Protocol)}
+     * to forece the same behavior as in Taclet rules where
+     * names of logical variables and {@link TermLabel}s are ignored.
+     * @author Martin Hentschel
+     */
+    private static class TermReplacementKey {
+       /**
+        * The {@link Term} to represent.
+        */
+       private final Term term;
+
+       /**
+        * Constructor.
+        * @param term The {@link Term} to represent.
+        */
+       public TermReplacementKey(Term term) {
+          assert term != null;
+          this.term = term;
+       }
+
+       /**
+        * {@inheritDoc}
+        */
+      @Override
+      public int hashCode() {
+         return term.op().hashCode(); // Allow more conflicts to ensure that naming and term labels are ignored.
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean equals(Object obj) {
+         if (obj instanceof TermReplacementKey) {
+            obj = ((TermReplacementKey) obj).term;
+         }
+         if (obj instanceof Term) {
+            Term t = (Term) obj;
+            return term.equalsModRenaming(t); // Ignore naming and term labels in the way a taclet rule does.
+         }
+         else {
+            return false;
+         }
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String toString() {
+         return term.toString();
+      }
     }
 }

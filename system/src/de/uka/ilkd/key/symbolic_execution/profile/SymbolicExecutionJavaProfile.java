@@ -18,6 +18,8 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.PredicateTermLabel;
+import de.uka.ilkd.key.logic.label.PredicateTermLabelFactory;
 import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabelFactory;
@@ -27,6 +29,8 @@ import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.label.PredicateTermLabelRefactoring;
+import de.uka.ilkd.key.rule.label.StayAlwaysTermLabelPolicy;
 import de.uka.ilkd.key.rule.label.StayOnOperatorTermLabelPolicy;
 import de.uka.ilkd.key.rule.label.RemoveInCheckBranchesTermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.LoopBodyTermLabelUpdate;
@@ -89,6 +93,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
     */
    public static ImmutableList<TermLabelConfiguration> getSymbolicExecutionTermLabelConfigurations() {
       ImmutableList<TermLabelPolicy> symExcPolicies = ImmutableSLList.<TermLabelPolicy>nil().prepend(new StayOnOperatorTermLabelPolicy());
+      ImmutableList<TermLabelPolicy> postPolicies = ImmutableSLList.<TermLabelPolicy>nil().prepend(new StayAlwaysTermLabelPolicy());
 
       ImmutableList<TermLabelUpdate> lbUps = ImmutableSLList.<TermLabelUpdate>nil().prepend(new LoopBodyTermLabelUpdate());
       ImmutableList<TermLabelUpdate> nbUps = ImmutableSLList.<TermLabelUpdate>nil().prepend(new LoopInvariantNormalBehaviorTermLabelUpdate());
@@ -97,6 +102,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
       ImmutableList<TermLabelRefactoring> lbRefs = ImmutableSLList.<TermLabelRefactoring>nil().prepend(new RemoveInCheckBranchesTermLabelRefactoring(ParameterlessTermLabel.LOOP_BODY_LABEL_NAME));
       ImmutableList<TermLabelRefactoring> nbRefs = ImmutableSLList.<TermLabelRefactoring>nil().prepend(new RemoveInCheckBranchesTermLabelRefactoring(ParameterlessTermLabel.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME));
       ImmutableList<TermLabelRefactoring> seRefs = ImmutableSLList.<TermLabelRefactoring>nil().prepend(new RemoveInCheckBranchesTermLabelRefactoring(SymbolicExecutionTermLabel.NAME));
+      ImmutableList<TermLabelRefactoring> postRefs = ImmutableSLList.<TermLabelRefactoring>nil().prepend(new PredicateTermLabelRefactoring());
 
       ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
       result = result.prepend(new TermLabelConfiguration(ParameterlessTermLabel.LOOP_BODY_LABEL_NAME,
@@ -123,6 +129,14 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
                                                          null,
                                                          seUps,
                                                          seRefs));
+      result = result.prepend(new TermLabelConfiguration(PredicateTermLabel.NAME,
+                                                         new PredicateTermLabelFactory(),
+                                                         null,
+                                                         postPolicies,
+                                                         null,
+                                                         null,
+                                                         null,
+                                                         postRefs));
       return result;
    }
 

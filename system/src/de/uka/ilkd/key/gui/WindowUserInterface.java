@@ -304,11 +304,12 @@ public class WindowUserInterface extends AbstractUserInterface {
     */
    @Override
    public AbstractProblemLoader load(Profile profile, File file, List<File> classPath,
-                                    File bootClassPath, Properties poPropertiesToForce) throws ProblemLoaderException {
+                                     File bootClassPath, Properties poPropertiesToForce, 
+                                     boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
       if (file != null) {
          mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());
       }
-      return super.load(profile, file, classPath, bootClassPath, poPropertiesToForce);
+      return super.load(profile, file, classPath, bootClassPath, poPropertiesToForce, forceNewProfileOfNewProofs);
    }
 
    /**

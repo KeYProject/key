@@ -227,11 +227,12 @@ public final class JMLTranslator {
 
                     @Override
                     public JMLTranslationMethod get(Object key) {
+                        if (key == null) throw new IllegalArgumentException("null");
                         JMLTranslationMethod m = super.get(key);
                         if (m != null) {
                             return m;
                         } else {
-                            throw new IllegalArgumentException(key.toString());
+                            throw new IllegalArgumentException(key == null ? "(null)" : key.toString());
                         }
                     }
                 };
@@ -1770,11 +1771,7 @@ public final class JMLTranslator {
             JMLKeyWord jmlKeyWord = JMLKeyWord.jmlValueOf(jmlKeyWordName);
             JMLTranslationMethod m = translationMethods.get(jmlKeyWord);
             if (m == null) {
-                throw excManager.createException(
-                        "Unknown JML-keyword or unknown translation for "
-                        + "JML-keyword \"" + jmlKeyWordName
-                        + "\". The keyword seems "
-                        + "not to be supported yet.");
+                throw new IllegalArgumentException();
             }
             Object result = m.translate(excManager, params);
             resultClass.cast(result);

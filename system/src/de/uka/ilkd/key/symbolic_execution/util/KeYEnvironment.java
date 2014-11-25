@@ -163,7 +163,7 @@ public class KeYEnvironment<U extends UserInterface> {
                                                                 List<File> classPaths,
                                                                 File bootClassPath,
                                                                 boolean makeMainWindowVisible) throws ProblemLoaderException {
-      return loadInMainWindow(null, location, classPaths, bootClassPath, makeMainWindowVisible);
+      return loadInMainWindow(null, location, classPaths, bootClassPath, false, makeMainWindowVisible);
    }
    
    /**
@@ -174,6 +174,7 @@ public class KeYEnvironment<U extends UserInterface> {
     * @param classPaths The class path entries to use.
     * @param bootClassPath The boot class path to use.
     * @param makeMainWindowVisible Make KeY's {@link MainWindow} visible if it is not already visible?
+    * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */
@@ -181,12 +182,13 @@ public class KeYEnvironment<U extends UserInterface> {
                                                                 File location,
                                                                 List<File> classPaths,
                                                                 File bootClassPath,
+                                                                boolean forceNewProfileOfNewProofs,
                                                                 boolean makeMainWindowVisible) throws ProblemLoaderException {
       MainWindow main = MainWindow.getInstance();
       if (makeMainWindowVisible && !main.isVisible()) {
           main.setVisible(true);
       }
-      AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, null);
+      AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, null, forceNewProfileOfNewProofs);
       InitConfig initConfig = loader.getInitConfig();
       return new KeYEnvironment<UserInterface>(main.getUserInterface(), initConfig, loader.getProof());
    }
@@ -203,7 +205,7 @@ public class KeYEnvironment<U extends UserInterface> {
    public static KeYEnvironment<CustomUserInterface> load(File location,
                                                           List<File> classPaths,
                                                           File bootClassPath) throws ProblemLoaderException {
-      return load(null, location, classPaths, bootClassPath);
+      return load(null, location, classPaths, bootClassPath, false);
    }
    
    /**
@@ -220,7 +222,7 @@ public class KeYEnvironment<U extends UserInterface> {
                                                           List<File> classPaths,
                                                           File bootClassPath,
                                                           IUserInterfaceCustomization customization) throws ProblemLoaderException {
-      return load(null, location, classPaths, bootClassPath, null, customization);
+      return load(null, location, classPaths, bootClassPath, null, customization, false);
    }
    
    /**
@@ -230,14 +232,16 @@ public class KeYEnvironment<U extends UserInterface> {
     * @param location The location to load.
     * @param classPaths The class path entries to use.
     * @param bootClassPath The boot class path to use.
+    * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */
    public static KeYEnvironment<CustomUserInterface> load(Profile profile,
                                                           File location,
                                                           List<File> classPaths,
-                                                          File bootClassPath) throws ProblemLoaderException {
-      return load(profile, location, classPaths, bootClassPath, null, null);
+                                                          File bootClassPath,
+                                                          boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
+      return load(profile, location, classPaths, bootClassPath, null, null, forceNewProfileOfNewProofs);
    }
    
    /**
@@ -249,6 +253,7 @@ public class KeYEnvironment<U extends UserInterface> {
     * @param bootClassPath The boot class path to use.
     * @param poPropertiesToForce Some optional PO {@link Properties} to force.
     * @param customization An optional {@link IUserInterfaceCustomization}.
+    * @param forceNewProfileOfNewProofs {@code} true {@link #profileOfNewProofs} will be used as {@link Profile} of new proofs, {@code false} {@link Profile} specified by problem file will be used for new proofs.
     * @return The {@link KeYEnvironment} which contains all references to the loaded location.
     * @throws ProblemLoaderException Occurred Exception
     */
@@ -257,9 +262,10 @@ public class KeYEnvironment<U extends UserInterface> {
                                                           List<File> classPaths,
                                                           File bootClassPath,
                                                           Properties poPropertiesToForce,
-                                                          IUserInterfaceCustomization customization) throws ProblemLoaderException {
+                                                          IUserInterfaceCustomization customization,
+                                                          boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
       CustomUserInterface ui = new CustomUserInterface(false, customization);
-      AbstractProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath, poPropertiesToForce); 
+      AbstractProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath, poPropertiesToForce, forceNewProfileOfNewProofs); 
       InitConfig initConfig = loader.getInitConfig();
       return new KeYEnvironment<CustomUserInterface>(ui, initConfig, loader.getProof());
    }

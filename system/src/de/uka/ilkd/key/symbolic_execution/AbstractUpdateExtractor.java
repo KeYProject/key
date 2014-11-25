@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
@@ -880,15 +881,16 @@ public abstract class AbstractUpdateExtractor {
          additionalUpdates = additionalUpdates.append(evp.createPreUpdate());
       }
       ImmutableList<Term> newUpdates = ImmutableSLList.<Term>nil().append(getServices().getTermBuilder().parallel(additionalUpdates));
+      final ProofEnvironment sideProofEnv = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
       Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, modalityPio, layoutCondition, layoutTerm, newUpdates, false);
       // Instantiate and run proof
       ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
+                                                                          sideProofEnv,
                                                                           sequent, 
                                                                           StrategyProperties.METHOD_CONTRACT,
                                                                           StrategyProperties.LOOP_INVARIANT,
                                                                           StrategyProperties.QUERY_ON,
-                                                                          StrategyProperties.SPLITTING_NORMAL,
-                                                                          true);
+                                                                          StrategyProperties.SPLITTING_NORMAL);
       try {
          // Extract values and objects from result predicate and store them in variable value pairs
          Set<ExecutionVariableValuePair> pairs = new LinkedHashSet<ExecutionVariableValuePair>();

@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
@@ -151,14 +152,18 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     */
    protected ExecutionValue[] lazyComputeValues() throws ProofInputException {
       if (!isDisposed()) {
-         final Services services = getServices();
+         final ProofEnvironment sideProofEnv = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
+         final Services services = sideProofEnv.getServicesForEnvironment();
          final TermBuilder tb = services.getTermBuilder();
          // Start site proof to extract the value of the result variable.
          SiteProofVariableValueInput sequentToProve;
          Term siteProofSelectTerm = null;
-         Term siteProofCondition = parentNode.getPathCondition();
+         Term siteProofCondition;
          if (getAdditionalCondition() != null) {
-            siteProofCondition = tb.and(siteProofCondition, getAdditionalCondition());
+            siteProofCondition = getAdditionalCondition();
+         }
+         else {
+            siteProofCondition = tb.tt();
          }
          if (getParentValue() != null || SymbolicExecutionUtil.isStaticVariable(getProgramVariable())) {
             siteProofSelectTerm = createSelectTerm();
@@ -174,12 +179,12 @@ public class ExecutionVariable extends AbstractExecutionVariable {
             sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(services, getProofNode(), getModalityPIO(), siteProofCondition, getProgramVariable());
          }
          ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
+                                                                             sideProofEnv,
                                                                              sequentToProve.getSequentToProve(), 
                                                                              StrategyProperties.METHOD_NONE,
                                                                              StrategyProperties.LOOP_NONE,
                                                                              StrategyProperties.QUERY_OFF,
-                                                                             StrategyProperties.SPLITTING_DELAYED,
-                                                                             true);
+                                                                             StrategyProperties.SPLITTING_DELAYED);
          try {
             List<ExecutionValue> result = new ArrayList<ExecutionValue>(info.getProof().openGoals().size());
             // Group values of the branches
@@ -263,10 +268,10 @@ public class ExecutionVariable extends AbstractExecutionVariable {
          boolean unknownValue = false;
          if (siteProofSelectTerm != null) {
             if (SymbolicExecutionUtil.isNullSort(value.sort(), services)) { 
-               unknownValue = SymbolicExecutionUtil.isNull(services, getProofNode(), siteProofCondition, siteProofSelectTerm); // Check if the symbolic value is not null, if it fails the value is treated as unknown
+               unknownValue = SymbolicExecutionUtil.isNull(getProofNode(), siteProofCondition, siteProofSelectTerm); // Check if the symbolic value is not null, if it fails the value is treated as unknown
             }
             else {
-               unknownValue = SymbolicExecutionUtil.isNotNull(services, getProofNode(), siteProofCondition, siteProofSelectTerm); // Check if the symbolic value is not null, if it fails the value is treated as unknown
+               unknownValue = SymbolicExecutionUtil.isNotNull(getProofNode(), siteProofCondition, siteProofSelectTerm); // Check if the symbolic value is not null, if it fails the value is treated as unknown
             }
          }
          // Add to result list

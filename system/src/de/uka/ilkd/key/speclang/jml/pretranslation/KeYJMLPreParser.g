@@ -183,17 +183,19 @@ classlevel_comment
     mods = ImmutableSLList.<String>nil();
 }
 :
+    /* there may be some modifiers after the declarations */
+
+    mods=modifiers
     (
-        options { greedy = false; }
-    	:
-    	mods=modifiers
-    	list=classlevel_element[mods]
-    	{
-	    if(list!=null) {
-		result = result.append(list);
-	    }
-	}
-    )* EOF
+      list=classlevel_element[mods]
+      {
+          if(list!=null) {
+             result = result.append(list);
+          }
+      }
+      mods=modifiers
+    )*
+    EOF
 ;
 
 
@@ -219,7 +221,6 @@ classlevel_element[ImmutableList<String> mods]
     |   result=assert_statement[mods] //RecodeR workaround
     |   result=assume_statement[mods] //RecodeR workaround
     |   result=nowarn_pragma[mods]
-    |   EOF
 ;
 
 
@@ -250,6 +251,7 @@ methodlevel_element[ImmutableList<String> mods]
     |   result=assert_statement[mods]
     |   result=assume_statement[mods]
     |   result=nowarn_pragma[mods]
+    |   result=debug_statement[mods]
     |   result=block_specification[mods]
 ;
 
@@ -601,8 +603,8 @@ requires_clause
 
 requires_keyword
 :
-    REQUIRES |
-    REQUIRES_RED
+    REQUIRES | REQUIRES_RED | PRE | PRE_RED
+    
 ;
 
 
@@ -793,6 +795,7 @@ measured_by_clause
 @init { result = r; }
 @after { r = result; }
 :
+// TODO: this is confusing. why not keep 'measured_by'?
     measured_by_keyword result=expression { result = result.prepend("decreases "); }
 ;
 
@@ -816,8 +819,7 @@ ensures_clause
 
 ensures_keyword
 :
-	ENSURES
-    |   ENSURES_RED
+	ENSURES | ENSURES_RED | POST | POST_RED
 ;
 
 
@@ -1272,6 +1274,17 @@ nowarn_pragma[ImmutableList<String> mods]
 ;
 
 
+debug_statement[ImmutableList<String> mods]
+  returns [ImmutableList<TextualJMLConstruct> result = null]
+  throws SLTranslationException
+:
+    DEBUG ps=expression
+    {
+  raiseNotSupported("debug statements");
+  result = ImmutableSLList.<TextualJMLConstruct>nil();
+    }
+;
+
 
 //-----------------------------------------------------------------------------
 //set statements
@@ -1449,6 +1462,11 @@ assert_statement[ImmutableList<String> mods]
     assert_keyword ps=expression
     {
 	result = ImmutableSLList.<TextualJMLConstruct>nil().append(TextualJMLSpecCase.assert2blockContract(mods,ps));
+    }
+    |
+    UNREACHABLE
+    {
+  result = ImmutableSLList.<TextualJMLConstruct>nil().append(TextualJMLSpecCase.assert2blockContract(mods,new PositionedString("false")));
     }
 ;
 
