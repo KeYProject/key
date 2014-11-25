@@ -18,6 +18,7 @@ import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorKeyword;
 import org.key_project.jmlediting.core.profile.syntax.ISpecificationStatementKeyword;
 import org.key_project.jmlediting.ui.extension.JMLLocator;
+import org.key_project.util.jmlediting.JMLUtil;
 
 /**
  * An {@link IJavaCompletionProposalComputer} to support JML.
@@ -36,11 +37,11 @@ public class JMLCompletionProposalComputer implements IJavaCompletionProposalCom
 		List<ICompletionProposal> result = new LinkedList<ICompletionProposal>();
 		try {
 		   //add proposals only if Content Assist is invoked in JML Code
-		   JMLLocator locator = new JMLLocator(context.getDocument());
+		   JMLLocator locator = new JMLLocator(context.getDocument().get());
 		   if (locator.isInJMLcomment(context.getInvocationOffset())) {
 
 		      //getCurrentProject
-		      IProject currentProject = org.key_project.util.jmlediting.JMLUtil.getCurrentProject();
+		      IProject currentProject = JMLUtil.getCurrentProject();
 		      
 		      //Load the specific JMLProfile for the current Project.
 		      IJMLProfile currentJMLProfile = JMLPreferencesHelper.getProjectActiveJMLProfile(currentProject);

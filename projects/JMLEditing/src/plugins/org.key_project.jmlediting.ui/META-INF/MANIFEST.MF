@@ -13,7 +13,9 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jdt.ui;bundle-version="3.10.1",
  org.key_project.jmlediting.core;bundle-version="1.0.0",
  org.key_project.util;bundle-version="1.0.0",
- org.key_project.javaeditor;bundle-version="1.0.0"
+ org.key_project.javaeditor;bundle-version="1.0.0",
+ org.junit
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: KeY Project
+Export-Package: org.key_project.jmlediting.ui.extension
