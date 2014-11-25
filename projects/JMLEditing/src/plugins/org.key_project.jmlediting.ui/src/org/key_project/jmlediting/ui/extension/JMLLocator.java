@@ -7,10 +7,10 @@ import org.eclipse.jface.text.IDocument;
 
 public class JMLLocator {
 
-   private IDocument document;
+   private String text;
 
-   public JMLLocator(IDocument doc) {
-      this.document = doc;
+   public JMLLocator(String text) {
+      this.text = text;
    }
 
    /**
@@ -38,7 +38,6 @@ public class JMLLocator {
    public ArrayList<Comment> findJMLComments() {
       boolean state = false; // false is the default state, true is the state
                              // where a "/" was recognized
-      String text = document.get();
       int begin = 0;
       ArrayList<Comment> comments = new ArrayList<Comment>();
       ArrayList<Comment> jmlcomments = new ArrayList<Comment>();
@@ -57,7 +56,7 @@ public class JMLLocator {
          }
          else if(text.charAt(i)=='/'){          //if Second / is detected SingleLineComment was found
             begin=i;
-            i=text.indexOf(System.getProperty("line.seperator"),begin);  //set index to end of line
+            i=text.indexOf(System.getProperty("line.separator"),begin);  //set index to end of line
             comments.add(new Comment(begin,i+1));                        //add found comment to list of comments
             state=false;                                                 //return to no Prefix State
          }
@@ -69,6 +68,7 @@ public class JMLLocator {
          }
          else state=false;                         //failure return to no prefix state
       }
+      
       for(Comment c:comments)                  //filter for jml comments, a comment is a JML comment if the 3rd sign is an @
          if(text.charAt(c.offset+2)=='@')
             jmlcomments.add(c);
