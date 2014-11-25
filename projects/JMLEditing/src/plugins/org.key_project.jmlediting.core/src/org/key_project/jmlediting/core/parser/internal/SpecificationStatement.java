@@ -1,6 +1,7 @@
 package org.key_project.jmlediting.core.parser.internal;
 
 import org.key_project.jmlediting.core.dom.ISpecificationStatement;
+import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.profile.syntax.ISpecificationStatementKeyword;
 
 public class SpecificationStatement extends ASTNode implements ISpecificationStatement{
@@ -24,6 +25,11 @@ public class SpecificationStatement extends ASTNode implements ISpecificationSta
    @Override
    public String getContent() {
       return this.content;
+   }
+
+   @Override
+   public int getType() {
+      return NodeTypes.SPECIFICATION_STATEMENT;
    }
    
 }

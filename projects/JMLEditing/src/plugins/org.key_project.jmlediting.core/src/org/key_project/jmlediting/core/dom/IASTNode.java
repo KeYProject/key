@@ -5,4 +5,6 @@ public interface IASTNode {
    int getStartOffset();
    int getEndOffset();
    
+   int getType();
+   
 }
