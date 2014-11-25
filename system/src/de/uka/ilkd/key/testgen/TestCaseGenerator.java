@@ -555,8 +555,9 @@ public class TestCaseGenerator {
 						                + generateTestCase(m) + "\n\n");
 						
 						//info.getCode();
-						
-						testMethod.append(TAB+"//Other variables\n" + getOtherVariables(m)+"\n");
+						if(junitFormat){
+							testMethod.append(TAB+"//Other variables\n" + getOtherVariables(m)+"\n");
+						}
 						testMethod
 						        .append("   //Calling the method under test\n   "
 						                + info.getCode() + "\n");
@@ -617,6 +618,8 @@ public class TestCaseGenerator {
 	
 	private String getOtherVariables(Model m) {
 		String result = "";
+		
+		
 		
 		for(Term c : oracleGenerator.getConstants()){
 			if(!m.getConstants().containsKey(c.toString())){

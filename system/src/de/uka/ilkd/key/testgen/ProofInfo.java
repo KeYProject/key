@@ -2,19 +2,16 @@ package de.uka.ilkd.key.testgen;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.HashSet;
-import java.util.Set;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
@@ -76,11 +73,31 @@ public class ProofInfo {
 			FunctionalOperationContract t = (FunctionalOperationContract) c;
 			OriginalVariables orig = t.getOrigVars();
 			Term post = t.getPost(services.getTypeConverter().getHeapLDT().getHeap(), orig.self, orig.params, orig.result, orig.exception, orig.atPres, services);
-			return post;
+			
+			post = findPostCondition(getPO(), post);			
+			if(post!=null){
+				return post;
+			}
+			
 		}
 		//no post <==> true
 		return services.getTermBuilder().tt();
 	}
+	
+	public Term findPostCondition(Term po, Term post){
+		if(po.equalsModRenaming(post)){
+			return po;
+		}
+		Term result = null;
+		for(Term sub : po.subs()){
+			result = findPostCondition(sub, post);
+			if(result != null){
+				return result;
+			}
+		}
+		return result;
+	}
+	
 
 	public Term getPreConTerm(){
 		Contract c = getContract();		
@@ -103,8 +120,9 @@ public class ProofInfo {
 		
 		Term f = getPO();
 		JavaBlock block = getJavaBlock(f);
-		getUpdate(f);
+	//	getUpdate(f);
 		StringWriter sw = new StringWriter();
+		sw.write("   "+getUpdate(f)+"\n");
 		PrettyPrinter pw = new CustomPrettyPrinter(sw,false);
 		
 		try {
@@ -125,18 +143,38 @@ public class ProofInfo {
 	
 	
 	
-	public void getUpdate(Term t){
+	public String getUpdate(Term t){
 		if(t.op() instanceof UpdateApplication){
 			//UpdateApplication u = (UpdateApplication) t.op();
-			System.out.println(UpdateApplication.getUpdate(t));
+			return processUpdate(UpdateApplication.getUpdate(t));
 		}
 		else{
+			String result = "";
 			for(Term s : t.subs()){
-				getUpdate(s);
+				result += getUpdate(s);
 			}
+			return result;
 		}
+		
 	}
 	
+	
+	
+
+	private String processUpdate(Term update) {
+		if(update.op() instanceof ElementaryUpdate){			
+			ElementaryUpdate up = (ElementaryUpdate) update.op();			
+			if(up.lhs().sort().extendsTrans(services.getTypeConverter().getHeapLDT().targetSort())){
+				return "";
+			}			
+			return "   \n"+up.lhs().sort()+" "+up.lhs().toString()+" = "+update.sub(0)+";";
+		}
+		String result = "";
+		for(Term sub : update.subs()){
+			result += processUpdate(sub);
+		}
+		return result;
+	}
 
 	public JavaBlock getJavaBlock(Term t){		
 		if(t.isContainsJavaBlockRecursive()){

@@ -54,6 +54,9 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 
 	@Override
 	public Void doInBackground() {
+		
+		getMediator().setInteractive(false);
+		getMediator().startInterface(false);
 
 		TestGenerationSettings settings =
 		        ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings();
