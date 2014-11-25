@@ -48,6 +48,7 @@ import javax.swing.event.ListSelectionListener;
 
 import org.antlr.runtime.RecognitionException;
 
+import de.uka.ilkd.key.java.ParseExceptionInFile;
 import de.uka.ilkd.key.parser.KeYSemanticException;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.parser.ParserException;
@@ -114,11 +115,25 @@ public class ExceptionDialog extends JDialog {
         }
 	else if (exc instanceof ParserException) {
 	    location = ((ParserException) exc).getLocation();
+	} else if (exc instanceof ParseExceptionInFile) {
+	    // This kind of exception has a filename but no line/col information
+	    // Retrieve the latter from the cause. location remains null if
+	    // no line/col is available in cause.
+	    if(exc.getCause() != null) {
+	        location = getLocation(exc.getCause());
+	        if(location != null) {
+	            String filename = ((ParseExceptionInFile)exc).getFilename();
+	            location = new Location(filename, location.getLine(), location.getColumn());
+	        }
+	    }
 	} else if (exc instanceof ParseException) {
 	    ParseException pexc = (ParseException)exc;
 	    Token token = pexc.currentToken;
-	    // TODO find out filename here
-	    location = token==null? null: new Location("", token.next.beginLine, token.next.beginColumn);
+	    if(token == null) {
+	        location = null;
+	    } else {
+	        location = new Location("", token.next.beginLine, token.next.beginColumn);
+	    }
         } else if (exc instanceof SLTranslationException) {
             SLTranslationException ste = (SLTranslationException) exc;
             location = new Location(ste.getFileName(), 
