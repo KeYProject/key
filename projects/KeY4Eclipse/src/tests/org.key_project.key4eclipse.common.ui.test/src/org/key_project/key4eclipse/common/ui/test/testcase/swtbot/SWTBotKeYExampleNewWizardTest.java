@@ -223,6 +223,7 @@ public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
                      }
                   }
                   catch (Exception e) {
+                     System.out.println("Broken: " + resource.getFullPath().toString());
                      fail("Loading of " + resource + " failed in example \"" + example.getName() + "\" stored in \"" + example.getDirectory() + "\".");
                   }
                }
