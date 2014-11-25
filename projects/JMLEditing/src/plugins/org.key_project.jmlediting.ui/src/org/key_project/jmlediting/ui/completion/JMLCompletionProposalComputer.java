@@ -1,22 +1,18 @@
 package org.key_project.jmlediting.ui.completion;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorKeyword;
@@ -29,6 +25,8 @@ import org.key_project.jmlediting.ui.extension.JMLLocator;
  * @author Thomas Glaser
  */
 public class JMLCompletionProposalComputer implements IJavaCompletionProposalComputer {
+   private static final List<String> CUSTOM_PROPOSALS = Arrays.asList(new String[] {"also"});
+   
 	@Override
 	public void sessionStarted() {
 	}
@@ -41,14 +39,8 @@ public class JMLCompletionProposalComputer implements IJavaCompletionProposalCom
 		   JMLLocator locator = new JMLLocator(context.getDocument());
 		   if (locator.isInJMLcomment(context.getInvocationOffset())) {
 
-		      IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		      IWorkbenchPage activePage = window.getActivePage();
-		      IEditorPart editorPart = activePage.getActiveEditor();
-		      IProject currentProject = getCurrentProject(editorPart);
-		      
-		      //TODO how to get current IProject? -> Hard Coded "Test"-Project for testing other Code...
-//		      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-//		      IProject currentProject = root.getProjects()[0];
+		      //getCurrentProject
+		      IProject currentProject = org.key_project.util.jmlediting.JMLUtil.getCurrentProject();
 		      
 		      //Load the specific JMLProfile for the current Project.
 		      IJMLProfile currentJMLProfile = JMLPreferencesHelper.getProjectActiveJMLProfile(currentProject);
@@ -60,7 +52,7 @@ public class JMLCompletionProposalComputer implements IJavaCompletionProposalCom
 		      //compute the offset for replacing the prefix
 		      int proposalOffset = context.getInvocationOffset() - prefix.length();
 		      
-		      //Iterate through the supported Behaviors defined in JMLProfile
+		      //Iterate through the supported behaviors defined in JMLProfile
 		      for (IJMLBehaviorKeyword behavior: currentJMLProfile.getSupportedBehaviors()) {
 		         Set<String> keywords = behavior.getKeywords();
 		         //check for all spellings
@@ -71,9 +63,16 @@ public class JMLCompletionProposalComputer implements IJavaCompletionProposalCom
 		            }
 		         }
 		      }
-		      //Iterate through all generic Keywords defined in JMLProfile
+		      //Iterate through all generic keywords defined in JMLProfile
 		      for (ISpecificationStatementKeyword generic: currentJMLProfile.getSupportedSpecificationStatementKeywords()) {
 		         String keyword = generic.getKeyword();
+		         //ignore not possible suggestions
+		         if (keyword.startsWith(prefix)) {
+		            result.add(new CompletionProposal(keyword, proposalOffset, prefixLength, keyword.length()));
+		         }
+		      }
+		      //Iterate through all JML-Profile independent keywords, like "also"
+		      for (String keyword: CUSTOM_PROPOSALS) {
 		         //ignore not possible suggestions
 		         if (keyword.startsWith(prefix)) {
 		            result.add(new CompletionProposal(keyword, proposalOffset, prefixLength, keyword.length()));
@@ -100,13 +99,4 @@ public class JMLCompletionProposalComputer implements IJavaCompletionProposalCom
 	@Override
 	public void sessionEnded() {
 	}
-	
-   public static IProject getCurrentProject(IEditorPart part) {
-      IProject project = null;
-      IResource resource = (IResource) part.getEditorInput().getAdapter(IResource.class);
-      if (resource != null) {
-         project = resource.getProject();
-      }
-      return project;
-   }
 }
