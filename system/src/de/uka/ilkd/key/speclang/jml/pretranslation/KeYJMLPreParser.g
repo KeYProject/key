@@ -108,7 +108,7 @@ options {
         try {
             return classlevel_comment();
         } catch(RecognitionException e) {
-	    throw excManager.convertException(e);
+	    throw excManager.convertException(getErrorMessage(e, KeYJMLPreLexerTokens.getTokennames()), e);
         }
     }
 
@@ -118,7 +118,7 @@ options {
         try {
             return methodlevel_comment();
         } catch(RecognitionException e) {
-	    throw excManager.convertException(e);
+	    throw excManager.convertException(getErrorMessage(e, KeYJMLPreLexerTokens.getTokennames()), e);
         }
     }
 
