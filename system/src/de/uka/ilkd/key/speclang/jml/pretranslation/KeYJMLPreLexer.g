@@ -330,6 +330,7 @@ EMPTYBRACKETS : '[]';
         
 
 COMMA : ',' ;
+DOT : '.' ;
 
 JAVAOPERATOR
     :
