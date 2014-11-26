@@ -13,7 +13,10 @@
 
 package de.uka.ilkd.key.symbolic_execution;
 
+import java.io.File;
+
 import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
@@ -21,6 +24,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.ui.CustomUserInterface;
 
@@ -42,9 +46,33 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests example: examples/_testcase/set/allNodeTypesTest in the Java Profile
     */
    public void testAllNodeTypesTest_JavaProfile_NoOneStepSimplification() throws Exception {
+      doJavaProfileTest("examples/_testcase/set/allNodeTypesTest/test/AllNodeTypesTest_VerificationProfile_NoOneStepSimplification.proof", 
+                        "examples/_testcase/set/allNodeTypesTest/oracle/AllNodeTypesTest_VerificationProfile_NoOneStepSimplification.xml");
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/allNodeTypesTest in the Java Profile
+    */
+   public void testAllNodeTypesTest_JavaProfile() throws Exception {
+      doJavaProfileTest("examples/_testcase/set/allNodeTypesTest/test/AllNodeTypesTest_VerificationProfile.proof", 
+                        "examples/_testcase/set/allNodeTypesTest/oracle/AllNodeTypesTest_VerificationProfile.xml");
+   }
+   
+   /**
+    * Loads an existing proof file performed in the {@link JavaProfile}.
+    * @param proofFilePathInBaseDir The path to the proof file inside the base directory.
+    * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
+    * @throws Exception Occurred Exception.
+    */
+   protected void doJavaProfileTest(String proofFilePathInBaseDir,
+                                    String oraclePathInBaseDirFile) throws Exception {
+      // Ensure that JavaProfile was used before
+      KeYEnvironment<?> env = KeYEnvironment.load(JavaProfile.getDefaultInstance(), new File(keyRepDirectory, proofFilePathInBaseDir), null, null, true);
+      env.dispose();
+      // Test symbolic execution
       doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/allNodeTypesTest/test/AllNodeTypesTest_VerificationProfile_NoOneStepSimplification.proof", 
-                "examples/_testcase/set/allNodeTypesTest/oracle/AllNodeTypesTest_VerificationProfile_NoOneStepSimplification.xml", 
+                proofFilePathInBaseDir, 
+                oraclePathInBaseDirFile, 
                 false, 
                 false, 
                 false, 
@@ -57,15 +85,10 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false, 
                 false, 
                 false);
-   }
-   
-   /**
-    * Tests example: examples/_testcase/set/allNodeTypesTest in the Java Profile
-    */
-   public void testAllNodeTypesTest_JavaProfile() throws Exception {
+      // Test symbolic execution again when symbolic execution profile was used before.
       doSETTest(keyRepDirectory, 
-                "examples/_testcase/set/allNodeTypesTest/test/AllNodeTypesTest_VerificationProfile.proof", 
-                "examples/_testcase/set/allNodeTypesTest/oracle/AllNodeTypesTest_VerificationProfile.xml", 
+                proofFilePathInBaseDir, 
+                oraclePathInBaseDirFile, 
                 false, 
                 false, 
                 false, 
