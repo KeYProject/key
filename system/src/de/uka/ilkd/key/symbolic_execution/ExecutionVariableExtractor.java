@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -23,6 +25,7 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * Extracts the current state and represents it as {@link IExecutionVariable}s.
@@ -157,12 +160,14 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
     * @param pairs The {@link ExecutionVariableValuePair}s to represent.
     * @param contentMap The {@link Map} providing child content information.
     * @param parentValue The optional parent {@link IExecutionValue}.
+    * @param alreadyVisitedObjects The value {@link Term}s of already visited objects on the current path in the variable-value-hierarchy.
     * @return The created {@link IExecutionVariable}.
     * @throws ProofInputException Occurred Exception.
     */
-   protected IExecutionVariable createVariablesValueStructure(List<ExecutionVariableValuePair> pairs, 
-                                                              Map<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>> contentMap,
-                                                              ExtractedExecutionValue parentValue) throws ProofInputException {
+   protected IExecutionVariable createVariablesValueStructure(final List<ExecutionVariableValuePair> pairs, 
+                                                              final Map<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>> contentMap,
+                                                              final ExtractedExecutionValue parentValue,
+                                                              final ImmutableList<Term> alreadyVisitedObjects) throws ProofInputException {
       assert !pairs.isEmpty();
       // Create variable
       ExecutionVariableValuePair firstPair = pairs.get(0);
@@ -178,7 +183,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
       }
       // Fill variable with values
       List<IExecutionValue> values = new LinkedList<IExecutionValue>();
-      createValues(variable, pairs, firstPair, contentMap, values);
+      createValues(variable, pairs, firstPair, contentMap, values, alreadyVisitedObjects);
       variable.setValues(values);
       return variable;
    }
@@ -190,13 +195,15 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
     * @param firstPair The first entry in the {@link ExecutionVariableValuePair}s.
     * @param contentMap The content {@link Map}.
     * @param valueListToFill The result {@link List} to fill.
+    * @param alreadyVisitedObjects The value {@link Term}s of already visited objects on the current path in the variable-value-hierarchy.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void createValues(IExecutionVariable variable, 
-                               List<ExecutionVariableValuePair> pairs, 
-                               ExecutionVariableValuePair firstPair, 
-                               Map<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>> contentMap,
-                               List<IExecutionValue> valueListToFill) throws ProofInputException {
+   protected void createValues(final IExecutionVariable variable, 
+                               final List<ExecutionVariableValuePair> pairs, 
+                               final ExecutionVariableValuePair firstPair, 
+                               final Map<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>> contentMap,
+                               final List<IExecutionValue> valueListToFill,
+                               final ImmutableList<Term> alreadyVisitedObjects) throws ProofInputException {
       // Group pairs with same value but with different conditions
       Map<Term, List<ExecutionVariableValuePair>> groupedPairs = new LinkedHashMap<Term, List<ExecutionVariableValuePair>>();
       for (ExecutionVariableValuePair pair : pairs) {
@@ -220,11 +227,14 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                                                                         pair.getCondition(), 
                                                                         pair.getValue());
             valueListToFill.add(value);
-            ParentDefinition parentDef = new ParentDefinition(pair.getValue(), pair.getCondition());
-            Map<LocationDefinition, List<ExecutionVariableValuePair>> content = contentMap.get(parentDef);
-            if (content != null) {
-               for (List<ExecutionVariableValuePair> child : content.values()) {
-                  createVariablesValueStructure(child, contentMap, value);
+            Pair<Boolean, ImmutableList<Term>> cycleCheckResult = updateAlreadyVisitedObjects(alreadyVisitedObjects, pair.getValue());
+            if (!cycleCheckResult.first) { // No cycle detected
+               ParentDefinition parentDef = new ParentDefinition(pair.getValue(), pair.getCondition());
+               Map<LocationDefinition, List<ExecutionVariableValuePair>> content = contentMap.get(parentDef);
+               if (content != null) {
+                  for (List<ExecutionVariableValuePair> child : content.values()) {
+                     createVariablesValueStructure(child, contentMap, value, cycleCheckResult.second);
+                  }
                }
             }
          }
@@ -255,13 +265,38 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                                                                         comboundPathCondition, 
                                                                         group.get(0).getValue());
             valueListToFill.add(value);
-            if (!childContentMap.isEmpty()) {
-               for (List<ExecutionVariableValuePair> child : childContentMap.values()) {
-                  createVariablesValueStructure(child, contentMap, value);
+            Pair<Boolean, ImmutableList<Term>> cycleCheckResult = updateAlreadyVisitedObjects(alreadyVisitedObjects, group.get(0).getValue());
+            if (!cycleCheckResult.first) { // No cycle detected
+               if (!childContentMap.isEmpty()) {
+                  for (List<ExecutionVariableValuePair> child : childContentMap.values()) {
+                     createVariablesValueStructure(child, contentMap, value, cycleCheckResult.second);
+                  }
                }
             }
          }
       }
+   }
+   
+   /**
+    * Updates the already visited objects list if required.
+    * @param alreadyVisitedObjects The value {@link Term}s of already visited objects on the current path in the variable-value-hierarchy.
+    * @param value The current value.
+    * @return The new already visited objects list or the original one if the current value is not an object.
+    */
+   protected Pair<Boolean, ImmutableList<Term>> updateAlreadyVisitedObjects(final ImmutableList<Term> alreadyVisitedObjects, Term value) {
+      ImmutableList<Term> alreadyVisitedObjectsForChildren = alreadyVisitedObjects;
+      boolean cycleDetected = false;
+      if (value != null &&
+          SymbolicExecutionUtil.hasReferenceSort(getServices(), value) &&
+          !SymbolicExecutionUtil.isNullSort(value.sort(), getServices())) {
+         if (!alreadyVisitedObjects.contains(value)) {
+            alreadyVisitedObjectsForChildren = alreadyVisitedObjectsForChildren.prepend(value);
+         }
+         else {
+            cycleDetected = true;
+         }
+      }
+      return new Pair<Boolean, ImmutableList<Term>>(cycleDetected, alreadyVisitedObjectsForChildren);
    }
    
    /**
@@ -423,7 +458,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                      List<IExecutionValue> values = new LinkedList<IExecutionValue>();
                      StateExecutionVariable variable = allStateVariables.get(new LocationDefinition(firstPair.getProgramVariable(), firstPair.getArrayIndex()));
                      assert variable != null;
-                     createValues(variable, pairsList, firstPair, contentMap, values);
+                     createValues(variable, pairsList, firstPair, contentMap, values, ImmutableSLList.<Term>nil());
                      variable.values = values.toArray(new IExecutionValue[values.size()]);
                   }
                }
