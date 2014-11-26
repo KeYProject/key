@@ -157,20 +157,10 @@ public final class PredicateEvaluationUtil {
          Term replaceTerm = SymbolicExecutionUtil.instantiateTerm((Term) replaceObject, tacletApp, node.proof().getServices());
          // Check for true/false terms
          if (replaceTerm.op() == Junctor.TRUE) {
-            if (tacletApp.posInOccurrence().isInAntec()) {
-               updatePredicateResult(label, new PredicateResult(PredicateValue.FALSE, node), results);
-            }
-            else {
-               updatePredicateResult(label, new PredicateResult(PredicateValue.TRUE, node), results);
-            }
+            updatePredicateResult(label, new PredicateResult(PredicateValue.TRUE, node), results);
          }
          else if (replaceTerm.op() == Junctor.FALSE) {
-            if (tacletApp.posInOccurrence().isInAntec()) {
-               updatePredicateResult(label, new PredicateResult(PredicateValue.TRUE, node), results);
-            }
-            else {
-               updatePredicateResult(label, new PredicateResult(PredicateValue.FALSE, node), results);
-            }
+            updatePredicateResult(label, new PredicateResult(PredicateValue.FALSE, node), results);
          }
       }
    }
