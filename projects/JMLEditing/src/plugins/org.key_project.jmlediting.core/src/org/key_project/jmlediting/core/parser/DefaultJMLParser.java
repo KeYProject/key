@@ -90,8 +90,8 @@ public class DefaultJMLParser implements IJMLParser {
       int startOffset=begin;
       int endOffset = specCaseList.get(
             specCaseList.size() - 1).getEndOffset();
-      if (requireComplete && endOffset < end) {
-         int completeEnd = skipWhiteSpacesOrAt(text, endOffset +1, end);
+      if (requireComplete) {
+         int completeEnd = skipWhiteSpacesOrAt(text, endOffset, end);
          if (completeEnd < end) {
             throw new ParserException("Parsing method specification cannot parse complete test " + completeEnd + " < " + end, text, endOffset);
          }
