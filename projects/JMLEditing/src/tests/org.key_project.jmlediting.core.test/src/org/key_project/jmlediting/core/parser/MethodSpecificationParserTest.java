@@ -1,14 +1,14 @@
 package org.key_project.jmlediting.core.parser;
 
-import org.junit.BeforeClass;
+import static org.junit.Assert.fail;
+import static org.key_project.jmlediting.core.parser.DomBuildUtils.buildBehaviorSpec;
+import static org.key_project.jmlediting.core.parser.DomBuildUtils.buildLightweightSpec;
+import static org.key_project.jmlediting.core.parser.DomBuildUtils.buildMethodSpec;
+import static org.key_project.jmlediting.core.parser.DomBuildUtils.buildStatementSpec;
+
 import org.junit.Test;
 import org.key_project.jmlediting.core.dom.IMethodSpecification;
 import org.key_project.jmlediting.core.dom.Visibility;
-import org.key_project.jmlediting.core.profile.IJMLProfile;
-
-import de.key_project.jmlediting.profile.jmlref.JMLReferenceProfile;
-import static org.junit.Assert.fail;
-import static org.key_project.jmlediting.core.parser.DomBuildUtils.*;
 
 public class MethodSpecificationParserTest {
 
