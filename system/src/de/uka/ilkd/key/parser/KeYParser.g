@@ -1132,7 +1132,8 @@ options {
             throw new NotDeclException
                 (input, "(program) variable or constant", varfunc_name);
         } else {
-            throw new QueryNotDeclaredException(varfunc_name, args, getSourceName(), getLine(), getColumn());
+            throw new NotDeclException
+                (input, "function or static query", varfunc_name);
         }
     }
 
@@ -3265,8 +3266,6 @@ location_term returns[Term result]
     LPAREN obj=equivalence_term COMMA field=equivalence_term RPAREN
             { $result = getServices().getTermBuilder().singleton(obj, field); }
     ;
-
-
 
 substitutionterm returns [Term _substitution_term = null] 
 @init{

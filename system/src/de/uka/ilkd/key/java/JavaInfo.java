@@ -523,7 +523,7 @@ public final class JavaInfo {
 	    				ImmutableList<KeYJavaType> signature) {
 	return kpmi.getConstructor(kjt, signature);
     }
-    
+
     /**
      * returns the program methods defined in the given KeYJavaType with name
      * m and the list of types as signature of the method
@@ -595,7 +595,7 @@ public final class JavaInfo {
 		                      new KeYJavaType[pm.getNumParams()]));
 	return getToplevelPM(kjt, methodName, sig);
     }
-    
+
     public Term getStaticProgramMethodTerm(String methodName, Term[] args, String className) {
         ImmutableList<KeYJavaType> argList = ImmutableSLList.<KeYJavaType>nil();
         for (int i = 0; i < args.length; i++) {
@@ -1067,7 +1067,6 @@ public final class JavaInfo {
     public ImmutableList<ProgramVariable> getAllAttributes(String programName,
                                                   KeYJavaType type,
                                                   boolean traverseSubtypes) {
-        
         ImmutableList<ProgramVariable> result =
             ImmutableSLList.<ProgramVariable>nil();
 

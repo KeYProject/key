@@ -1264,7 +1264,6 @@ public class LogicPrinter {
             } else {
                 layouter.print(fieldName);
             }
-            
 
             // must the heap be printed at all: no, if default heap.
             final Term heapTerm = t.sub(0);
