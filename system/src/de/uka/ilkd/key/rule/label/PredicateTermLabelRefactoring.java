@@ -7,11 +7,14 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.PredicateTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortedOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
@@ -41,7 +44,13 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
     * {@inheritDoc}
     */
    @Override
-   public RefactoringScope defineRefactoringScope(TermServices services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm) {
+   public RefactoringScope defineRefactoringScope(Services services, 
+                                                  PosInOccurrence applicationPosInOccurrence, 
+                                                  Term applicationTerm, 
+                                                  Rule rule, 
+                                                  Goal goal, 
+                                                  Object hint, 
+                                                  Term tacletTerm) {
       if (shouldRefactor(goal, hint)) {
          return RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE;
       }
@@ -97,10 +106,22 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
             TermLabel existingLabel = term.getLabel(PredicateTermLabel.NAME);
             if (existingLabel == null) {
                int labelID = services.getCounter(PredicateTermLabel.PROOF_COUNTER_NAME).getCountPlusPlus();
-               labels.add(new PredicateTermLabel(labelID));
+               int labelSubID = services.getCounter(PredicateTermLabel.PROOF_COUNTER_SUB_PREFIX + labelID).getCountPlusPlus();
+               labels.add(new PredicateTermLabel(labelID, labelSubID));
             }
          }
       }
+   }
+   
+   /**
+    * Checks if the given {@link SequentFormula} is a predicate.
+    * @param sequentFormula The {@link SequentFormula} to check.
+    * @return {@code true} is predicate, {@code false} is something else.
+    */
+   public static boolean isPredicate(SequentFormula sequentFormula) {
+      return sequentFormula != null ? 
+             isPredicate(sequentFormula.formula()) : 
+             false;
    }
    
    /**
@@ -108,12 +129,33 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
     * @param term The {@link Term} to check.
     * @return {@code true} is predicate, {@code false} is something else.
     */
-   protected boolean isPredicate(Term term) {
-      if (term.op() instanceof Junctor) {
-         return term.op() == Junctor.TRUE || term.op() == Junctor.FALSE;
+   public static boolean isPredicate(Term term) {
+      return term != null ? 
+             isPredicate(term.op()) : 
+             false;
+   }
+   
+   /**
+    * Checks if the given {@link Operator} is a predicate.
+    * @param term The {@link Operator} to check.
+    * @return {@code true} is predicate, {@code false} is something else.
+    */
+   public static boolean isPredicate(Operator operator) {
+      if (operator == Equality.EQV) {
+         return false;
       }
-      if (term.op() instanceof SortedOperator) {
-         return ((SortedOperator) term.op()).sort() == Sort.FORMULA;
+      else if (operator instanceof Junctor) {
+         return operator == Junctor.TRUE || operator == Junctor.FALSE;
+      }
+      else if (operator == AbstractTermTransformer.META_EQ ||
+               operator == AbstractTermTransformer.META_GEQ ||
+               operator == AbstractTermTransformer.META_GREATER ||
+               operator == AbstractTermTransformer.META_LEQ ||
+               operator == AbstractTermTransformer.META_LESS) {
+         return true; // These Meta constructs evaluate always to true or false
+      }
+      else if (operator instanceof SortedOperator) {
+         return ((SortedOperator) operator).sort() == Sort.FORMULA;
       }
       else {
          return false;

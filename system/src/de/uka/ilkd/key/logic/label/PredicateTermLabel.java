@@ -31,6 +31,12 @@ public class PredicateTermLabel implements TermLabel {
     * of the already used IDs.
     */
    public static final String PROOF_COUNTER_NAME = "P_LABEL_COUNTER";
+
+   /**
+    * The prefix of the name used in {@link Services#getCounter(String)} to 
+    * keep track of the already used sub IDs.
+    */
+   public static final String PROOF_COUNTER_SUB_PREFIX = "P_LABEL_SUB_COUNTER_";
    
    /**
     * The unique ID of this term label in the {@link Sequent}.
@@ -38,11 +44,18 @@ public class PredicateTermLabel implements TermLabel {
    private final int id;
 
    /**
+    * The unique sub id of the given id.
+    */
+   private final int subId;
+   
+   /**
     * Constructor.
     * @param id The unique ID of this term label in the {@link Sequent}.
+    * @param subId The unique sub id of the given id.
     */
-   public PredicateTermLabel(int id) {
+   public PredicateTermLabel(int id, int subId) {
        this.id = id;
+       this.subId = subId;
    }
 
    /**
@@ -56,7 +69,7 @@ public class PredicateTermLabel implements TermLabel {
     * {@inheritDoc}
     */
    public String toString() {
-       return NAME.toString() + "(" + getId() + ")";
+       return NAME.toString() + "(" + getId() + ", " + getSubId() + ")";
    }
 
    /**
@@ -66,6 +79,7 @@ public class PredicateTermLabel implements TermLabel {
    public Object getChild(int i) {
 	   switch (i) {
 	      case 0 : return getId();
+         case 1 : return getSubId();
   	      default : return null;
 	   }
    }
@@ -75,7 +89,7 @@ public class PredicateTermLabel implements TermLabel {
     */
    @Override
    public int getChildCount() {
-      return 1;
+      return 2;
    }
 
    /**
@@ -84,6 +98,14 @@ public class PredicateTermLabel implements TermLabel {
     */
    public int getId() {
       return id;
+   }
+
+   /**
+    * Returns the unique sub id of the given id.
+    * @return The unique sub id of the given id.
+    */
+   public int getSubId() {
+      return subId;
    }
 
    /**

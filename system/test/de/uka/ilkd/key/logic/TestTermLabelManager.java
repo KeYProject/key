@@ -675,7 +675,7 @@ public class TestTermLabelManager extends TestCase {
       }
 
       @Override
-      public RefactoringScope defineRefactoringScope(TermServices services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm) {
+      public RefactoringScope defineRefactoringScope(Services services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm) {
          return scope;
       }
 
@@ -757,20 +757,20 @@ public class TestTermLabelManager extends TestCase {
       private List<TermLabel> log = new LinkedList<TermLabel>();
 
       @Override
-      public boolean keepLabel(TermServices services,
-                               PosInOccurrence applicationPosInOccurrence,
-                               Term applicationTerm,
-                               Rule rule,
-                               Goal goal,
-                               Object hint,
-                               Term tacletTerm,
-                               Operator newTermOp,
-                               ImmutableArray<Term> newTermSubs,
-                               ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                               JavaBlock newTermJavaBlock,
-                               TermLabel label) {
+      public TermLabel keepLabel(Services services,
+                                 PosInOccurrence applicationPosInOccurrence,
+                                 Term applicationTerm,
+                                 Rule rule,
+                                 Goal goal,
+                                 Object hint,
+                                 Term tacletTerm,
+                                 Operator newTermOp,
+                                 ImmutableArray<Term> newTermSubs,
+                                 ImmutableArray<QuantifiableVariable> newTermBoundVars,
+                                 JavaBlock newTermJavaBlock,
+                                 TermLabel label) {
          log.add(label);
-         return true;
+         return label;
       }
 
       public List<TermLabel> getLog() {

@@ -24,6 +24,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
@@ -90,8 +91,8 @@ public class SuccTaclet extends FindTaclet{
        if (gt instanceof AntecSuccTacletGoalTemplate) {
           Sequent replWith = ((AntecSuccTacletGoalTemplate)gt).replaceWith();
 
-          replaceAtPos(replWith.succedent(), currentSequent, posOfFind, services, matchCond);
-          addToAntec(replWith.antecedent(), currentSequent, null, services, matchCond, posOfFind);	   	    	    
+          replaceAtPos(replWith.succedent(), currentSequent, posOfFind, services, matchCond, new TacletLabelHint(TacletOperation.REPLACE_AT_SUCCEDENT, replWith));
+          addToAntec(replWith.antecedent(), currentSequent, null, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.REPLACE_TO_ANTECEDENT, replWith));	   	    	    
        } 
     }
 
@@ -109,8 +110,8 @@ public class SuccTaclet extends FindTaclet{
           PosInOccurrence posOfFind,
           Services services,
           MatchConditions matchCond) {
-       addToAntec(add.antecedent(), currentSequent, null, services, matchCond, posOfFind);
-       addToSucc(add.succedent(), currentSequent, posOfFind, services, matchCond, posOfFind);
+       addToAntec(add.antecedent(), currentSequent, null, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add));
+       addToSucc(add.succedent(), currentSequent, posOfFind, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add));
     }
 
     /** toString for the find part */

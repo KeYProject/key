@@ -541,7 +541,7 @@ public class TermLabelManager {
     * @param policies The {@link TermLabelPolicy} instances to perform.
     * @param newLabels The result {@link List} with the {@link TermLabel}s of the new {@link Term}.
     */
-   protected void performTermLabelPolicies(TermServices services,
+   protected void performTermLabelPolicies(Services services,
                                            PosInOccurrence applicationPosInOccurrence,
                                            Term applicationTerm,
                                            Rule rule,
@@ -557,8 +557,11 @@ public class TermLabelManager {
       if (applicationTerm.hasLabels() && !policies.isEmpty()) {
          for (TermLabel label : applicationTerm.getLabels()) {
             TermLabelPolicy policy = policies.get(label.name());
-            if (policy != null && policy.keepLabel(services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, label)) {
-               newLabels.add(label);
+            if (policy != null) {
+               label = policy.keepLabel(services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, label);
+               if (label != null) {
+                  newLabels.add(label);
+               }
             }
          }
       }
@@ -911,7 +914,7 @@ public class TermLabelManager {
     * @param tacletTerm The optional taclet {@link Term}.
     * @return The {@link RefactoringsContainer} with the {@link TermLabelRefactoring}s to consider.
     */
-   protected RefactoringsContainer computeRefactorings(TermServices services,
+   protected RefactoringsContainer computeRefactorings(Services services,
                                                        PosInOccurrence applicationPosInOccurrence,
                                                        Term applicationTerm,
                                                        Rule rule,
