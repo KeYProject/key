@@ -17,7 +17,6 @@ import java.io.File;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.parser.DeclPicker;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserConfig;
@@ -74,6 +73,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         }	
         
         //read activated choices
+        KeYParserF problemParser = null;
         try {
 
         	ProofSettings settings = getPreferences();
@@ -82,9 +82,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             ParserConfig pc = new ParserConfig
                 (initConfig.getServices(), 
                  initConfig.namespaces());
-            KeYParserF problemParser = new KeYParserF
-                (ParserMode.PROBLEM, new KeYLexerF(getNewStream(), file.toString(),
-                        initConfig.getServices().getExceptionHandler()), 
+            problemParser = new KeYParserF
+                (ParserMode.PROBLEM, new KeYLexerF(getNewStream(), file.toString()),
                         pc, pc, null, null);
             problemParser.parseWith();            
         
@@ -94,7 +93,10 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             initConfig.setActivatedChoices(settings.getChoiceSettings()
         	      		                   .getDefaultChoicesAsSet());
             
-        
+        } catch(RecognitionException e) {
+            // problemParser cannot be null here
+            String message = problemParser.getErrorMessage(e);
+            throw new ProofInputException(message, e);
         } catch (Exception e) {
             throw new ProofInputException(e);      
         }     
@@ -117,53 +119,49 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             throw new IllegalStateException("KeYUserProblemFile: InitConfig not set.");
         }
         
+        KeYParserF problemParser = null;
         try {
             CountingBufferedReader cinp = 
                 new CountingBufferedReader
                     (getNewStream(),monitor,getNumberOfChars()/100);
-	    DeclPicker lexer = new DeclPicker(new KeYLexerF(cinp,
-		    file.toString(),
-		    initConfig.getServices().getExceptionHandler()));
+            KeYLexerF lexer = new KeYLexerF(cinp, file.toString());
 
             final ParserConfig normalConfig 
                 = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
             final ParserConfig schemaConfig 
                 = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
             
-            KeYParserF problemParser
-                    = new KeYParserF(ParserMode.PROBLEM,
+            problemParser = new KeYParserF(ParserMode.PROBLEM,
                                     lexer,
                                     schemaConfig, 
                                     normalConfig,
                                     initConfig.getTaclet2Builder(),
                                     initConfig.getTaclets()); 
+
             problemTerm = problemParser.parseProblem();
-            String searchS = "\\problem";
+
 	    if(problemTerm == null) {
 	       boolean chooseDLContract = problemParser.getChooseContract() != null;
           boolean proofObligation = problemParser.getProofObligation() != null;
-	       if(chooseDLContract) {
-  	         searchS = "\\chooseContract";
-	       }
-	       else if (proofObligation) {
-	            searchS = "\\proofObligation";
-	       }
-	       else {
+                if(!chooseDLContract && !proofObligation) {
 	         throw new ProofInputException(
 	                 "No \\problem or \\chooseContract or \\proofObligation in the input file!");
 	       }
-	       
 	    }
 
-            problemHeader = lexer.getCapturedText();
-            if(problemHeader != null &&
-               problemHeader.lastIndexOf(searchS) != -1){
-                problemHeader = problemHeader.substring(
-                    0, problemHeader.lastIndexOf(searchS));
-            }
+            problemHeader = problemParser.getProblemHeader();
+            // removed unnecessary check, keep them as assertions. (MU, Nov 14)
+            assert problemHeader != null;
+            assert problemHeader.lastIndexOf("\\problem") == -1;
+            assert problemHeader.lastIndexOf("\\proofObligation") == -1;
+            assert problemHeader.lastIndexOf("\\chooseContract") == -1;
 
             initConfig.setTaclets(problemParser.getTaclets());
             lastParser = problemParser;
+        } catch(RecognitionException e) {
+            // problemParser cannot be null here
+            String message = problemParser.getErrorMessage(e);
+            throw new ProofInputException(message, e);
         } catch (Exception e) {
             throw new ProofInputException(e);
         }
@@ -203,7 +201,9 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         try {
             lastParser.proof(prl);
         } catch (RecognitionException ex) {
-            throw new ProofInputException(ex);
+            // problemParser cannot be null
+            String message = lastParser.getErrorMessage(ex);
+            throw new ProofInputException(message, ex);
         }
     }
         
@@ -249,7 +249,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     * @throws Exception Occurred Exception.
     */
    protected Profile readProfileFromFile() throws Exception {
-      KeYParserF problemParser = new KeYParserF(ParserMode.GLOBALDECL, new KeYLexerF(getNewStream(), file.toString(), null));
+      KeYParserF problemParser = new KeYParserF(ParserMode.GLOBALDECL, new KeYLexerF(getNewStream(), file.toString()));
       problemParser.profile();
       String profileName = problemParser.getProfileName();
       if (profileName != null && !profileName.isEmpty()) {

@@ -36,6 +36,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.DefaultBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -171,15 +172,17 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
             varFirst = false;
          }
          // Compute sequent for side proof to compute query in.
+         final ProofEnvironment sideProofEnv = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(goal.proof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
+         final Services sideProofServices = sideProofEnv.getServicesForEnvironment();
          Sequent sequentToProve = SideProofUtil.computeGeneralSequentToProve(goal.sequent(), pio.constrainedFormula());
-         Function newPredicate = createResultFunction(services, varTerm.sort());
-         final TermBuilder tb = services.getTermBuilder();
+         Function newPredicate = createResultFunction(sideProofServices, varTerm.sort());
+         final TermBuilder tb = sideProofServices.getTermBuilder();
          Term newTerm = tb.func(newPredicate, varTerm);
-         Term newModalityTerm = services.getTermFactory().createTerm(modalityTerm.op(), new ImmutableArray<Term>(newTerm), modalityTerm.boundVars(), modalityTerm.javaBlock(), modalityTerm.getLabels());
+         Term newModalityTerm = sideProofServices.getTermFactory().createTerm(modalityTerm.op(), new ImmutableArray<Term>(newTerm), modalityTerm.boundVars(), modalityTerm.javaBlock(), modalityTerm.getLabels());
          Term newModalityWithUpdatesTerm = tb.applySequential(updates, newModalityTerm);
          sequentToProve = sequentToProve.addFormula(new SequentFormula(newModalityWithUpdatesTerm), false, false).sequent();
          // Compute results and their conditions
-         List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap = computeResultsAndConditions(services, goal, sequentToProve, newPredicate);
+         List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap = computeResultsAndConditions(services, goal, sideProofEnv, sequentToProve, newPredicate);
          // Create new single goal in which the query is replaced by the possible results
          ImmutableList<Goal> goals = goal.split(1);
          Goal resultGoal = goals.head();

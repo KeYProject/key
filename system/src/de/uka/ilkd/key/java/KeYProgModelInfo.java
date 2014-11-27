@@ -45,7 +45,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public class KeYProgModelInfo{
 
@@ -56,10 +56,10 @@ public class KeYProgModelInfo{
     private TypeConverter typeConverter;
     private HashMap<KeYJavaType, HashMap<String, IProgramMethod>> implicits =
         new LinkedHashMap<KeYJavaType, HashMap<String, IProgramMethod>>();
-    private KeYExceptionHandler exceptionHandler = null;
+    private KeYRecoderExcHandler exceptionHandler = null;
 
     public KeYProgModelInfo(Services services, TypeConverter typeConverter,
-            KeYExceptionHandler keh){
+            KeYRecoderExcHandler keh){
  	this(services, new KeYCrossReferenceServiceConfiguration(keh),
 	     new KeYRecoderMapping(), typeConverter);
 	exceptionHandler = keh;
@@ -82,7 +82,7 @@ public class KeYProgModelInfo{
 	return sc;
     }
 
-    public KeYExceptionHandler getExceptionHandler(){
+    public KeYRecoderExcHandler getExceptionHandler(){
 	return exceptionHandler;
     }
 

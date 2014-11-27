@@ -200,7 +200,7 @@ mod: false" pathCondition="x &lt; 0" pathConditionChanged="false" initiallyValid
                </branchCondition>
                <branchCondition name="x_0 = -1" pathCondition="x &lt;= -1 &amp; x_0 = -1" pathConditionChanged="true" branchCondition="x_0 = -1" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
                   <variable name="x" isArrayIndex="false">
-                     <value name="x {true}" typeString="int" valueString="-1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     <value name="x {true}" typeString="int" valueString="x_0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                   <variable name="exc" isArrayIndex="false">

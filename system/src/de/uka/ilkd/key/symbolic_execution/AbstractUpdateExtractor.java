@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
@@ -248,7 +249,9 @@ public abstract class AbstractUpdateExtractor {
             final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
             ProgramVariable var = (ProgramVariable)eu.lhs();
             if (!SymbolicExecutionUtil.isHeap(var, heapLDT)) {
-               if (!isImplicitProgramVariable(var) && !objectsToIgnore.contains(getServices().getTermBuilder().var(var))) {
+               if (!isImplicitProgramVariable(var) && 
+                   !objectsToIgnore.contains(getServices().getTermBuilder().var(var)) &&
+                   !hasFreeVariables(updateTerm)) {
                   locationsToFill.add(new ExtractLocationParameter(var, true));
                }
                if (SymbolicExecutionUtil.hasReferenceSort(getServices(), updateTerm.sub(0))) {
@@ -297,14 +300,17 @@ public abstract class AbstractUpdateExtractor {
          if (heapLDT.getSortOfSelect(selectArgument.op()) != null) {
             ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, selectArgument.sub(2));
             if (var != null) {
-               if (!isImplicitProgramVariable(var)) {
+               if (!isImplicitProgramVariable(var) && 
+                   !hasFreeVariables(selectArgument.sub(2))) {
                   locationsToFill.add(new ExtractLocationParameter(var, selectArgument.sub(1)));
                }
             }
             else {
                Term arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, selectArgument.sub(2));
                if (arrayIndex != null) {
-                  locationsToFill.add(new ExtractLocationParameter(arrayIndex, selectArgument.sub(1)));
+                  if (!hasFreeVariables(arrayIndex)) {
+                     locationsToFill.add(new ExtractLocationParameter(arrayIndex, selectArgument.sub(1)));
+                  }
                }
                else {
                   throw new ProofInputException("Unsupported select statement \"" + term + "\".");
@@ -313,7 +319,8 @@ public abstract class AbstractUpdateExtractor {
          }
          else if (selectArgument.op() instanceof IProgramVariable) {
             ProgramVariable var = (ProgramVariable)selectArgument.op();
-            if (!isImplicitProgramVariable(var)) {
+            if (!isImplicitProgramVariable(var) && 
+                !hasFreeVariables(selectArgument)) {
                locationsToFill.add(new ExtractLocationParameter(var, false));
             }
          }
@@ -328,7 +335,7 @@ public abstract class AbstractUpdateExtractor {
          // Add select value term to result
          ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, term.sub(2));
          if (var != null) {
-            if (!isImplicitProgramVariable(var)) {
+            if (!isImplicitProgramVariable(var) && !hasFreeVariables(term.sub(2))) {
                if (var.isStatic()) {
                   locationsToFill.add(new ExtractLocationParameter(var, true));
                }
@@ -339,7 +346,7 @@ public abstract class AbstractUpdateExtractor {
          }
          else {
             Term arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, term.sub(2));
-            if (arrayIndex != null) {
+            if (arrayIndex != null && !hasFreeVariables(arrayIndex)) {
                locationsToFill.add(new ExtractLocationParameter(arrayIndex, term.sub(1)));
             }
             else {
@@ -375,7 +382,16 @@ public abstract class AbstractUpdateExtractor {
          }
       }
    }
-   
+
+   /**
+    * Checks if the given {@link Term} has free variables.
+    * @param term The {@link Term} to check.
+    * @return {@code true} has free variables, {@code false} does not have free variables.
+    */
+   protected boolean hasFreeVariables(Term term) {
+      return term != null && !term.freeVars().isEmpty();
+   }
+
    /**
     * Computes for each location (value/association of an object) used in the 
     * given {@link Sequent} the {@link Term}s which allows to compute the object 
@@ -426,7 +442,8 @@ public abstract class AbstractUpdateExtractor {
          ProgramVariable var = (ProgramVariable)term.op();
          if (!SymbolicExecutionUtil.isHeap(var, heapLDT) && 
              !isImplicitProgramVariable(var) && 
-             !objectsToIgnore.contains(term)) {
+             !objectsToIgnore.contains(term) &&
+             !hasFreeVariables(term)) {
             toFill.add(new ExtractLocationParameter(var, true));
          }
       }
@@ -438,7 +455,8 @@ public abstract class AbstractUpdateExtractor {
                 !SymbolicExecutionUtil.isSkolemConstant(selectTerm)) {
                ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, term.sub(2));
                if (var != null) {
-                  if (!isImplicitProgramVariable(var)) {
+                  if (!isImplicitProgramVariable(var) &&
+                      !hasFreeVariables(term.sub(2))) {
                      if (var.isStatic()) {
                         toFill.add(new ExtractLocationParameter(var, true));
                      }
@@ -452,7 +470,7 @@ public abstract class AbstractUpdateExtractor {
                }
                else {
                   Term arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, term.sub(2));
-                  if (arrayIndex != null) {
+                  if (arrayIndex != null && !hasFreeVariables(arrayIndex)) {
                      if (selectTerm.op() instanceof ProgramVariable) {
                         toFill.add(new ExtractLocationParameter((ProgramVariable)selectTerm.op(), true));
                      }
@@ -465,7 +483,8 @@ public abstract class AbstractUpdateExtractor {
             }
          }
          else if (heapLDT.getLength() == term.op()) {
-            if (!objectsToIgnore.contains(term.sub(0))) {
+            if (!objectsToIgnore.contains(term.sub(0)) &&
+                !hasFreeVariables(term)) {
                ProgramVariable var = getServices().getJavaInfo().getArrayLength();
                toFill.add(new ExtractLocationParameter(var, term.sub(0)));
             }
@@ -862,15 +881,16 @@ public abstract class AbstractUpdateExtractor {
          additionalUpdates = additionalUpdates.append(evp.createPreUpdate());
       }
       ImmutableList<Term> newUpdates = ImmutableSLList.<Term>nil().append(getServices().getTermBuilder().parallel(additionalUpdates));
+      final ProofEnvironment sideProofEnv = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
       Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, modalityPio, layoutCondition, layoutTerm, newUpdates, false);
       // Instantiate and run proof
       ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
+                                                                          sideProofEnv,
                                                                           sequent, 
                                                                           StrategyProperties.METHOD_CONTRACT,
                                                                           StrategyProperties.LOOP_INVARIANT,
                                                                           StrategyProperties.QUERY_ON,
-                                                                          StrategyProperties.SPLITTING_NORMAL,
-                                                                          true);
+                                                                          StrategyProperties.SPLITTING_NORMAL);
       try {
          // Extract values and objects from result predicate and store them in variable value pairs
          Set<ExecutionVariableValuePair> pairs = new LinkedHashSet<ExecutionVariableValuePair>();

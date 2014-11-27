@@ -1216,7 +1216,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
       // Load java file
-      KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null);
+      KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null, true);
       // Start proof
       final Contract contract = environment.getServices().getSpecificationRepository().getContractByName(baseContractName);
       assertTrue(contract instanceof FunctionalOperationContract);
@@ -1270,7 +1270,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
       // Load java file
-      KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null);
+      KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null, true);
       // Search method to proof
       IProgramMethod pm = searchProgramMethod(environment.getServices(), containerTypeName, methodFullName);
       // Start proof
@@ -1316,7 +1316,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       File proofFile = new File(baseDir, proofPathInBaseDir);
       assertTrue(proofFile.exists());
       // Load java file
-      KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), proofFile, null, null, SymbolicExecutionTreeBuilder.createPoPropertiesToForce(), null);
+      KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), proofFile, null, null, SymbolicExecutionTreeBuilder.createPoPropertiesToForce(), null, true);
       Proof proof = environment.getLoadedProof();
       assertNotNull(proof);
       // Set strategy and goal chooser to use for auto mode
@@ -1370,7 +1370,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
       // Load java file
-      KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null);
+      KeYEnvironment<CustomUserInterface> environment = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null, true);
       // Search method to proof
       IProgramMethod pm = searchProgramMethod(environment.getServices(), containerTypeName, methodFullName);
       // Start proof
@@ -1435,7 +1435,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          ProofSaver saver = new ProofSaver(env.getProof(), tempFile.getAbsolutePath(), Main.INTERNAL_VERSION);
          assertNull(saver.save());
          // Load proof from saved *.proof file
-         reloadedEnv = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), tempFile, null, null);
+         reloadedEnv = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), tempFile, null, null, true);
          Proof reloadedProof = reloadedEnv.getLoadedProof();
          assertNotSame(env.getProof(), reloadedProof);
          // Recreate symbolic execution tree
@@ -1850,22 +1850,22 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ProblemLoaderException Occurred Exception
     */
    protected SymbolicExecutionEnvironment<CustomUserInterface> doSETTest(File baseDir,
-                                                                                String javaPathInBaseDir,
-                                                                                String baseContractName,
-                                                                                String oraclePathInBaseDirFile,
-                                                                                boolean includeConstraints,
-                                                                                boolean includeVariables,
-                                                                                boolean includeCallStack,
-                                                                                boolean includeReturnValues,
-                                                                                int maximalNumberOfExecutedSetNodes,
-                                                                                boolean mergeBranchConditions,
-                                                                                boolean useOperationContracts,
-                                                                                boolean useLoopInvariants,
-                                                                                boolean nonExecutionBranchHidingSideProofs,
-                                                                                boolean aliasChecks,
-                                                                                boolean useUnicode,
-                                                                                boolean usePrettyPrinting,
-                                                                                boolean variablesAreOnlyComputedFromUpdates) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+                                                                         String javaPathInBaseDir,
+                                                                         String baseContractName,
+                                                                         String oraclePathInBaseDirFile,
+                                                                         boolean includeConstraints,
+                                                                         boolean includeVariables,
+                                                                         boolean includeCallStack,
+                                                                         boolean includeReturnValues,
+                                                                         int maximalNumberOfExecutedSetNodes,
+                                                                         boolean mergeBranchConditions,
+                                                                         boolean useOperationContracts,
+                                                                         boolean useLoopInvariants,
+                                                                         boolean nonExecutionBranchHidingSideProofs,
+                                                                         boolean aliasChecks,
+                                                                         boolean useUnicode,
+                                                                         boolean usePrettyPrinting,
+                                                                         boolean variablesAreOnlyComputedFromUpdates) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       HashMap<String, String> originalTacletOptions = null;
       try {
          // Make sure that parameter are valid.

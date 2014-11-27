@@ -42,6 +42,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -270,11 +271,12 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             symbolicObjectsResultingInCurrentState = sortTerms(symbolicObjectsResultingInCurrentState); // Sort terms alphabetically. This guarantees that in equivalence classes the representative term is for instance self.next and not self.next.next.
             symbolicObjectsResultingInCurrentState.add(getServices().getTermBuilder().NULL()); // Add null because it can happen that a object is null and this option must be included in equivalence class computation
             // Compute a Sequent with the initial conditions of the proof without modality
+            final ProofEnvironment sideProofEnv = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
             Sequent initialConditionsSequent = createSequentForEquivalenceClassComputation();
             ApplyStrategyInfo info = null;
             try {
                // Instantiate proof in which equivalent classes of symbolic objects are computed.
-               ProofStarter equivalentClassesProofStarter = SideProofUtil.createSideProof(getProof(), initialConditionsSequent, true);
+               ProofStarter equivalentClassesProofStarter = SideProofUtil.createSideProof(sideProofEnv, initialConditionsSequent);
                // Apply cut rules to compute equivalent classes
                applyCutRules(equivalentClassesProofStarter, symbolicObjectsResultingInCurrentState);
                // Finish proof automatically

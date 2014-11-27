@@ -6,6 +6,81 @@ package de.uka.ilkd.key.symbolic_execution;
  */
 public class TestExecutionVariableExtractor extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: examples/_testcase/set/variablesConditionalCycle
+    */
+   public void testVariablesConditionalCycle() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/variablesConditionalCycle/test/VariablesConditionalCycle.java", 
+                "VariablesConditionalCycle", 
+                "main", 
+                null,
+                "examples/_testcase/set/variablesConditionalCycle/oracle/VariablesConditionalCycle.xml",
+                false,
+                true,
+                false,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                true);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/variablesSimpleCycle
+    */
+   public void testVariablesSimpleCycle() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/variablesSimpleCycle/test/VariablesSimpleCycle.java", 
+                "VariablesSimpleCycle", 
+                "main", 
+                "something != null",
+                "examples/_testcase/set/variablesSimpleCycle/oracle/VariablesSimpleCycle.xml",
+                false,
+                true,
+                false,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                true);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/variablesWithQuantifier
+    */
+   public void testVariablesWithQuantifier() throws Exception {
+      doSETTest(keyRepDirectory, 
+                "examples/_testcase/set/variablesWithQuantifier/test/EnoughInfoReturn.java", 
+                "EnoughInfoReturn", 
+                "passwordChecker", 
+                "passwords != null",
+                "examples/_testcase/set/variablesWithQuantifier/oracle/EnoughInfoReturn.xml",
+                false,
+                true,
+                false,
+                false,
+                DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+                false,
+                false,
+                true,
+                false,
+                false,
+                false,
+                false,
+                true);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/variablesVariableArrayIndex
     */
    public void testVariableArrayIndex() throws Exception {

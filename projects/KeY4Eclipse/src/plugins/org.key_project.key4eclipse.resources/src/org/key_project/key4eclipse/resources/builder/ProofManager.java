@@ -160,7 +160,7 @@ public class ProofManager {
    private void handleProblemLoaderException(ProblemLoaderException e) throws CoreException{
       IResource res = project;
       int lineNumber = -1;
-      if(e.getOrigin() != null){
+      if(e.getOrigin() != null && e.getOrigin().getFile() != null){
          String originPath = e.getOrigin().getFile().getAbsolutePath();
          StringBuffer sb = new StringBuffer(e.getMessage());
          int indexOfOriginPath = sb.indexOf(originPath);

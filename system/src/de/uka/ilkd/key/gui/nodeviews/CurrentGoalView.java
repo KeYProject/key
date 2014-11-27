@@ -157,7 +157,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         }
 
         updateHighlights.clear();
-        Range[] ranges = getLogicPrinter().getPositionTable().getUpdateRanges();
+        Range[] ranges = getLogicPrinter().getInitialPositionTable().getUpdateRanges();
 
         if (ranges != null) {
             for (Range range : ranges) {

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call SimpleMethodContractApplication.main()&gt;" pathCondition="true" pathConditionChanged="false">
+      <statement name="return doubleValue(21);" pathCondition="true" pathConditionChanged="false">
+         <operationContract name="result_0 = doubleValue(21) catch(exc_0)
+pre: 21 &gt;= 0 &amp; \forall int x; true
+post: result_0 = javaMulInt(21, 2) &amp; exc_0 = null
+mod: empty, creates no new objects
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" contractParameters="Z(1(2(#)))" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+            <methodReturn name="&lt;return of main&gt;" signature="&lt;return of SimpleMethodContractApplication.main()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+               <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+               </termination>
+            </methodReturn>
+         </operationContract>
+      </statement>
+      <methodReturnEntry path="/0/0/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0"/>
+</start>

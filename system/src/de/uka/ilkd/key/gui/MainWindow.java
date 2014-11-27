@@ -895,7 +895,7 @@ public final class MainWindow extends JFrame  {
             assert EventQueue.isDispatchThread() : "toolbar enabled from wrong thread";
             if (doNotReenable == null) {
                 // bug #1105 occurred
-                System.err.println("toolbar enabled w/o prior disable");
+                Debug.out("toolbar enabled w/o prior disable");
                 return;
             }
 

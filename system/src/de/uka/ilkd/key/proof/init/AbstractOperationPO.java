@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -45,11 +46,15 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.label.PredicateTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -706,6 +711,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
                                           atPreVars.keySet().contains(getSavedHeap(services)), sb);
 
       // create program term
+      if (addSymbolicExecutionLabel) {
+         postTerm = labelPostTerm(services, postTerm);
+      }
       Term programTerm = tb.prog(getTerminationMarker(), jb, postTerm);
 
       // label modality if required
@@ -720,7 +728,47 @@ public abstract class AbstractOperationPO extends AbstractPO {
       return tb.apply(update, programTerm, null);
    }
 
-    /**
+   /**
+    * Labels all predicates in the given {@link Term} and its children with
+    * a {@link PredicateTermLabel}.
+    * @param services The {@link Services} to use.
+    * @param term The {@link Term} to label.
+    * @return The labeled {@link Term}.
+    */
+   protected Term labelPostTerm(Services services, Term term) {
+      if (term != null) {
+         final TermFactory tf = services.getTermFactory();
+         if (Junctor.AND == term.op() ||
+             Junctor.IMP == term.op() ||
+             Junctor.NOT == term.op() ||
+             Junctor.OR == term.op()) {
+            Term[] newSubs = new Term[term.arity()];
+            boolean subsChanged = false;
+            for (int i = 0; i < newSubs.length; i++) {
+               Term oldTerm = term.sub(i);
+               newSubs[i] = labelPostTerm(services, oldTerm);
+               if (oldTerm != newSubs[i]) {
+                  subsChanged = true;
+               }
+            }
+            return subsChanged ?
+                   tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(), term.javaBlock(), term.getLabels()) :
+                   term;
+         }
+         else {
+            ImmutableArray<TermLabel> oldLabels = term.getLabels();
+            TermLabel[] newLabels = oldLabels.toArray(new TermLabel[oldLabels.size() + 1]);
+            int labelID = services.getCounter(PredicateTermLabel.PROOF_COUNTER_NAME).getCountPlusPlus();
+            newLabels[oldLabels.size()] = new PredicateTermLabel(labelID);
+            return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock(), new ImmutableArray<TermLabel>(newLabels));
+         }
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
     * Returns the base heap.
     * @return The {@link LocationVariable} of the base heap.
     */

@@ -16,7 +16,8 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
-import de.uka.ilkd.key.util.DefaultExceptionHandler;
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -62,8 +63,7 @@ public abstract class AbstractTestTermParser extends TestCase {
         new Recoder2KeY(services, nss).parseSpecialClasses();
         return new KeYParserF(ParserMode.DECLARATION,
                 new KeYLexerF(s,
-                        "No file. Call of parser from parser/TestTermParser.java",
-                        null),
+                        "No file. Call of parser from parser/TestTermParser.java"),
                 services, nss);
     }
 
@@ -85,8 +85,7 @@ public abstract class AbstractTestTermParser extends TestCase {
                     nss).parseSpecialClasses();
             return new KeYParserF(ParserMode.PROBLEM,
                     new KeYLexerF(s,
-                            "No file. Call of parser from parser/TestTermParser.java",
-                            null),
+                            "No file. Call of parser from parser/TestTermParser.java"),
                     new ParserConfig(services, nss),
                     new ParserConfig(services, nss),
                     null,
@@ -101,8 +100,7 @@ public abstract class AbstractTestTermParser extends TestCase {
 
     protected KeYLexerF getLexer(String s) {
         return new KeYLexerF(s,
-                "No file. Call of parser from parser/" + getClass().getSimpleName(),
-                new DefaultExceptionHandler());
+                "No file. Call of parser from parser/" + getClass().getSimpleName());
     }
 
     protected KeYParserF getParser(String s) {

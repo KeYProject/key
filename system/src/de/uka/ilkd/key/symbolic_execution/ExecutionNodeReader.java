@@ -2630,6 +2630,14 @@ public class ExecutionNodeReader {
       public PosInOccurrence getModalityPIO() {
          return null;
       }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Term createSelectTerm() {
+         return null;
+      }
    }
    
    /**
