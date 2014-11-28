@@ -37,13 +37,39 @@ public final class Nodes {
          IKeyword keyword, String keywordInstance) {
       return new KeywordNode(startOffset, endOffset, keyword, keywordInstance);
    }
-   
+
    public static boolean isString(IASTNode node) {
       return node.getType() == NodeTypes.STRING;
    }
-   
+
    public static boolean isKeyword(IASTNode node) {
       return node.getType() == NodeTypes.KEYWORD;
+   }
+
+   public static IASTNode getDepthMostNodeWithPosition(final int position,
+         IASTNode node) {
+      return node.serach(new INodeSearcher<IASTNode>() {
+
+         @Override
+         public IASTNode searchNode(IASTNode node) {
+            if (node.getStartOffset() <= position
+                  && position <= node.getEndOffset()) {
+               return node;
+            }
+            return null;
+         }
+
+         @Override
+         public IASTNode selectChild(List<IASTNode> children) {
+            for (IASTNode node : children) {
+               if (node.getStartOffset() <= position
+                     && position <= node.getEndOffset()) {
+                  return node;
+               }
+            }
+            return null;
+         }
+      });
    }
 
 }

@@ -4,8 +4,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.core.dom.INodeSearcher;
 
-public abstract class PrimitiveNode implements IASTNode {
+public abstract class PrimitiveNode extends AbstractASTNode {
 
    private final int startOffset;
    private final int endOffset;
@@ -30,4 +31,8 @@ public abstract class PrimitiveNode implements IASTNode {
    public List<IASTNode> getChildren() {
       return Collections.emptyList();
    }
+
+   public <T> T serach(INodeSearcher<T> searcher) {
+      return searcher.searchNode(this);
+   };
 }

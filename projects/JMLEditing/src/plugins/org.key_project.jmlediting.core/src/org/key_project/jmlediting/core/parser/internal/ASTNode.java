@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
 
-public class ASTNode implements IASTNode{
+public class ASTNode extends AbstractASTNode{
    
    private final int type;
    private final int startOffset;

@@ -11,4 +11,6 @@ public interface IASTNode {
    
    List<IASTNode> getChildren();
    
+   <T> T serach(INodeSearcher<T> searcher);
+   
 }
