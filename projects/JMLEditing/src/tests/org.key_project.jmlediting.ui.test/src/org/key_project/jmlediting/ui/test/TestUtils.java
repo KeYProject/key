@@ -55,19 +55,31 @@ public class TestUtils {
    
    public static void createEmptyPackage(SWTWorkbenchBot bot, String name) {
       bot.menu("File").menu("New").menu("Package").click();
-      bot.textWithLabel("&Name:").setText("name");
+      bot.textWithLabel("&Name:").setText(name);
       SWTBotShell activeShell = bot.activeShell();
+      bot.sleep(500);
       bot.button("Finish").click();
       bot.waitUntil(shellCloses(activeShell));
    }
    
    public static void createEmptyClass(SWTWorkbenchBot bot, String packageName, String className) {
+      System.out.println("--------------start createEmptyClass");
+      System.out.println(bot.activeShell().getText());
+      try {
+         bot.activeShell().setFocus();
+         bot.menu("File").setFocus();
+         System.out.println(bot.menu("File"));
       bot.menu("File").menu("New").menu("Class").click();
-      bot.textWithLabel("&Package:").setText(packageName);
-      bot.textWithLabel("&Name:").setText(className);
-      SWTBotShell activeShell = bot.activeShell();
-      bot.button("Finish").click();
-      bot.waitUntil(shellCloses(activeShell));
+      }catch(Exception e) {
+         e.printStackTrace();
+      }
+      bot.sleep(2000);
+//      bot.textWithLabel("&Package:").setText(packageName);
+//      bot.textWithLabel("&Name:").setText(className);
+//      SWTBotShell activeShell = bot.activeShell();
+//      bot.sleep(2000);
+//      bot.button("Finish").click();
+//      bot.waitUntil(shellCloses(activeShell));
    }
    
    public static  void openJMLProfileProperties(SWTWorkbenchBot bot, final String projectName) {

@@ -78,7 +78,6 @@ public class JMLLocator {
                      }
                      else {
                         position = end + 1;
-                        state = ScannerState.DEFAULT;
                      }
                      break;
                   case '*':

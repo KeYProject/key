@@ -1,5 +1,8 @@
 package org.key_project.jmlediting.ui.extension;
 
+import javax.swing.text.Document;
+
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -17,6 +20,8 @@ import org.eclipse.swt.widgets.Display;
 public class JMLPresentationDamagerRepairer implements IPresentationDamager, IPresentationRepairer {
    private final DefaultDamagerRepairer wrappedInstance;
 
+   IDocument doc;
+   
    public JMLPresentationDamagerRepairer(DefaultDamagerRepairer wrappedInstance) {
       super();
       this.wrappedInstance = wrappedInstance;
@@ -24,7 +29,14 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager, IPr
 
    @Override
    public void createPresentation(TextPresentation presentation, ITypedRegion damage) {
-      boolean jml = true;
+      boolean jml=false;
+      try {
+         jml = '@'==doc.getChar(damage.getOffset()+2);
+      }
+      catch (BadLocationException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
       if (jml) {
          TextAttribute ta = new TextAttribute(new Color(Display.getDefault(), 255, 0, 0));
          addRange(presentation, damage.getOffset(), damage.getLength(), ta);
@@ -38,6 +50,7 @@ System.out.println("createPresentation");
 
    @Override
    public void setDocument(IDocument document) {
+      doc=document;
       wrappedInstance.setDocument(document);
    }
 

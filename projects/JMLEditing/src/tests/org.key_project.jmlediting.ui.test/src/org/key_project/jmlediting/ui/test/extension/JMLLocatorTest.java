@@ -16,12 +16,11 @@ private static final String eol = System.getProperty("line.separator");
    private static final String PACKAGE_NAME = "jml.test";
    private static final String CLASS_NAME = "TextClass";
    private static final String EDITOR_TEXT = "package " + PACKAGE_NAME + ";" + eol + eol + 
-         "public class " + CLASS_NAME + " {" + eol + eol + 
-         "//@ requieres"+ eol+
-         "\t /*@ " + eol + "\t * " + eol + "\t */" + eol +
+         "public class " + CLASS_NAME + " {" + eol + eol +
+         "\t /*@ blabla *x " + eol + "\t * " + eol + "\t */" + eol +
          "\tpublic static void main(String[] args) {" + eol +
          "//normal " + eol + "\t" + eol +
-         "String temp=\"//@\" ensures \";"+eol+
+         "String temp=\"//@ ensures \" \";"+eol+
          "//@ requires blabla"+eol+
          "\t\tSystem.out.println(\"Hello World\");" + eol +
          "\t}" + eol + "}" + eol;
@@ -44,8 +43,8 @@ private static final String eol = System.getProperty("line.separator");
       assertTrue(locator.isInJMLcomment(EDITOR_TEXT.indexOf("/*@")+3));    //Test whether JML Multiline Comment is recognized
       assertFalse(locator.isInJMLcomment(EDITOR_TEXT.indexOf("//")+3));    //Test whether JavaComment is recognized as JMLComment
       assertFalse(locator.isInJMLcomment(0));                              //Test
-      //assertFalse(locator.isInJMLcomment(EDITOR_TEXT.indexOf("//@"+3)));   //Test whether JMLComment in String is detected
-      assertTrue(locator.isInJMLcomment(EDITOR_TEXT.indexOf("//@")+3));
+      assertFalse(locator.isInJMLcomment(EDITOR_TEXT.indexOf("//@"+3)));   //Test whether JMLComment in String is detected
+      assertTrue(locator.isInJMLcomment(EDITOR_TEXT.indexOf("//@",EDITOR_TEXT.indexOf("ensures"))+1));
 
    }
 

@@ -49,7 +49,7 @@ public class DefaultJMLParser implements IJMLParser {
 
    @Override
    public IMethodSpecification parseMethodSpecification(String text, int start,
-         int end) throws ParserException{
+         int end, boolean requireComplete) throws ParserException {
       // Temporary implementation, does not support redundant specs
       int alsoStart = skipWhiteSpacesOrAt(text, start, end);
       int alsoEnd = getIdentifier(text, alsoStart, end);
@@ -62,10 +62,11 @@ public class DefaultJMLParser implements IJMLParser {
          position = alsoEnd;
       }
       List<ISpecificationCase> specCaseList = new ArrayList<ISpecificationCase>();
-      ISpecificationCase specCase = this.parseSpecificationCase(text, position, end);
+      ISpecificationCase specCase = this.parseSpecificationCase(text, position,
+            end);
       specCaseList.add(specCase);
-      position = specCase.getEndOffset() +1;
-      
+      position = specCase.getEndOffset() + 1;
+
       while (true) {
          try {
             alsoStart = skipWhiteSpacesOrAt(text, position, end);
@@ -77,7 +78,8 @@ public class DefaultJMLParser implements IJMLParser {
             specCase = this.parseSpecificationCase(text, alsoEnd, end);
             specCaseList.add(specCase);
             position = specCase.getEndOffset() + 1;
-         } catch (ParserException e) {
+         }
+         catch (ParserException e) {
             break;
          }
       }
@@ -85,9 +87,19 @@ public class DefaultJMLParser implements IJMLParser {
          begin = specCaseList.get(0).getStartOffset();
       }
       
-      return new MethodSpecification(begin, specCaseList.get(specCaseList.size()-1).getEndOffset() , isExtendingSpecification, specCaseList);
+      int startOffset=begin;
+      int endOffset = specCaseList.get(
+            specCaseList.size() - 1).getEndOffset();
+      if (requireComplete) {
+         int completeEnd = skipWhiteSpacesOrAt(text, endOffset, end);
+         if (completeEnd < end) {
+            throw new ParserException("Parsing method specification cannot parse complete test " + completeEnd + " < " + end, text, endOffset);
+         }
+      }
+
+      return new MethodSpecification(startOffset, endOffset, isExtendingSpecification,
+            specCaseList);
    }
-   
 
    @Override
    public ISpecificationCase parseSpecificationCase(String text, int start,
@@ -116,12 +128,12 @@ public class DefaultJMLParser implements IJMLParser {
       // We need to parse at least one statement
       ISpecificationStatement spec = parseSpecificationStatement(text, start,
             end);
-      int position = spec.getEndOffset() +1;
+      int position = spec.getEndOffset() + 1;
       statements.add(spec);
       while (true) {
          try {
             spec = parseSpecificationStatement(text, position, end);
-            position = spec.getEndOffset() +1;
+            position = spec.getEndOffset() + 1;
             statements.add(spec);
          }
          catch (ParserException e) {
@@ -157,10 +169,14 @@ public class DefaultJMLParser implements IJMLParser {
       // Parse specification statements
       List<ISpecificationStatement> statements = new ArrayList<ISpecificationStatement>();
       int position = keywordEnd + 1;
+      // require one statement
+      ISpecificationStatement statement = parseSpecificationStatement(text,
+            position, end);
+      statements.add(statement);
+      position = statement.getEndOffset() + 1;
       while (true) {
          try {
-            ISpecificationStatement statement = parseSpecificationStatement(
-                  text, position, end);
+            statement = parseSpecificationStatement(text, position, end);
             statements.add(statement);
             position = statement.getEndOffset() + 1;
          }
@@ -168,10 +184,9 @@ public class DefaultJMLParser implements IJMLParser {
             break;
          }
       }
-      int endOffset = keywordEnd - 1;
-      if (statements.size() > 0) {
-         endOffset = statements.get(statements.size() - 1).getEndOffset();
-      }
+
+      int endOffset = statements.get(statements.size() - 1).getEndOffset();
+
       return new BehaviorSpecification(start, endOffset, visibility.t,
             usedKeyword, statements);
    }
