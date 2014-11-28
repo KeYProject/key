@@ -31,7 +31,7 @@ public class JMLLocator {
    }
 
    private static enum ScannerState {
-      IN_STRING, IN_COMMENT, DEFAULT
+      IN_STRING, IN_COMMENT, IN_CHAR, DEFAULT
    }
 
    /**
@@ -57,6 +57,10 @@ public class JMLLocator {
             case '"':
                state = ScannerState.IN_STRING;
                position += 1;
+               break;
+            case'\'':
+               state = ScannerState.IN_CHAR;
+               position +=1;
                break;
             case '/':
                if (position < content.length - 1) {
@@ -101,13 +105,10 @@ public class JMLLocator {
                      position += 2;
                      break;
                   default:
-                     position += 2;
+                     position += 1;
                      break;
                   }
                }
-               break;
-            case '\\':
-               position+=2;
                break;
             default:
                position += 1;
@@ -129,6 +130,16 @@ public class JMLLocator {
             }
             
             break;
+         case IN_CHAR:
+            switch(c){
+            case '\\':
+               position+=2;
+               break;
+            case '\'':
+               state=ScannerState.DEFAULT;
+               position+=1;
+            }
+            break;
          default:
             throw new AssertionError("Invalid Enum State");
          }
@@ -137,7 +148,7 @@ public class JMLLocator {
       for (Comment c : comments)
          // filter for jml comments, a comment is a JML comment if the 3rd sign
          // is an @
-         if (text.charAt(c.offset + 2) == '@')
+         if ((text.length()-1<c.offset+2)&&text.charAt(c.offset + 2) == '@')
             jmlcomments.add(c);
 
       return jmlcomments;
