@@ -102,9 +102,12 @@ public final class PredicateEvaluationUtil {
     * @return {@code true} is {@link Junctor}, {@code false} is something else.
     */
    public static boolean isLogicOperator(Operator operator) {
-      // TODO: Support <=> and quantors
+      // TODO: Quantors
       if (operator instanceof Junctor) {
          return operator != Junctor.TRUE && operator != Junctor.FALSE;
+      }
+      else if (operator == Equality.EQV) {
+         return true;
       }
       else {
          return false;
@@ -269,15 +272,14 @@ public final class PredicateEvaluationUtil {
          findLabelReplacements(sf, label.name(), label.getId(), succedentReplacements);
       }
       if (!antecedentReplacements.isEmpty() && !succedentReplacements.isEmpty()) {
-//         Term left = tb.and(antecedentReplacements);
-//         Term right = tb.or(succedentReplacements);
-//         if (antecedentRuleApplication) {
-//            return tb.and(left, tb.not(right));
-//         }
-//         else {
-//            return tb.and(tb.not(left), right);
-//         }
-         throw new UnsupportedOperationException();
+         Term left = tb.and(antecedentReplacements);
+         Term right = tb.or(succedentReplacements);
+         if (antecedentRuleApplication) {
+            throw new UnsupportedOperationException();
+         }
+         else {
+            return tb.and(tb.not(left), right);
+         }
       }
       else if (!antecedentReplacements.isEmpty()) {
          Term left = tb.and(antecedentReplacements);
@@ -653,7 +655,8 @@ public final class PredicateEvaluationUtil {
          // If direct label result is not available try to compute it. (e.g. because of or/and label was replaced by sequent top level formuals)
          if (term.op() == Junctor.AND ||
              term.op() == Junctor.IMP ||
-             term.op() == Junctor.OR) {
+             term.op() == Junctor.OR ||
+             term.op() == Equality.EQV) {
             Term leftTerm = term.sub(0);
             Term rightTerm = term.sub(1);
             TermLabel leftLabel = leftTerm.getLabel(termLabelName);
@@ -673,6 +676,9 @@ public final class PredicateEvaluationUtil {
             }
             else if (term.op() == Junctor.OR) {
                resultValue = PredicateValue.or(leftValue, rightValue);
+            }
+            else if (term.op() == Equality.EQV) {
+               resultValue = PredicateValue.eqv(leftValue, rightValue);
             }
             else {
                throw new IllegalStateException("Operator '" + term.op() + "' is not supported.");
@@ -830,6 +836,15 @@ public final class PredicateEvaluationUtil {
          else {
             return UNKNOWN;
          }
+      }
+
+      /**
+       * Computes the {@code eqv} value.
+       * @param value The {@link PredicateValue}.
+       * @return The computed {@code not} value.
+       */
+      public static PredicateValue eqv(PredicateValue left, PredicateValue right) {
+         return or(and(left, right), and(not(left), not(right)));
       }
    }
 }

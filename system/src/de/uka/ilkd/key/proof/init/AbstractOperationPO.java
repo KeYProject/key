@@ -63,6 +63,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil;
 
 /**
  * <p>
@@ -738,10 +739,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
    protected Term labelPostTerm(Services services, Term term) {
       if (term != null) {
          final TermFactory tf = services.getTermFactory();
-         if (Junctor.AND == term.op() ||
-             Junctor.IMP == term.op() ||
-             Junctor.NOT == term.op() ||
-             Junctor.OR == term.op()) {
+         if (PredicateEvaluationUtil.isLogicOperator(term.op())) {
             Term[] newSubs = new Term[term.arity()];
             boolean subsChanged = false;
             for (int i = 0; i < newSubs.length; i++) {

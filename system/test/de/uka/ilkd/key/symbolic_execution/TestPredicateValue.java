@@ -9,6 +9,32 @@ import junit.framework.TestCase;
  */
 public class TestPredicateValue extends TestCase {
    /**
+    * Tests {@link PredicateValue#eqv(PredicateValue, PredicateValue)}.
+    */
+   public void testEqv() {
+      // true
+      assertEquals(PredicateValue.TRUE, PredicateValue.eqv(PredicateValue.TRUE, PredicateValue.TRUE));
+      assertEquals(PredicateValue.FALSE, PredicateValue.eqv(PredicateValue.TRUE, PredicateValue.FALSE));
+      assertEquals(PredicateValue.UNKNOWN, PredicateValue.eqv(PredicateValue.TRUE, PredicateValue.UNKNOWN));
+      assertEquals(PredicateValue.UNKNOWN, PredicateValue.eqv(PredicateValue.TRUE, null));
+      // false
+      assertEquals(PredicateValue.FALSE, PredicateValue.eqv(PredicateValue.FALSE, PredicateValue.TRUE));
+      assertEquals(PredicateValue.TRUE, PredicateValue.eqv(PredicateValue.FALSE, PredicateValue.FALSE));
+      assertEquals(PredicateValue.UNKNOWN, PredicateValue.eqv(PredicateValue.FALSE, PredicateValue.UNKNOWN));
+      assertEquals(PredicateValue.UNKNOWN, PredicateValue.eqv(PredicateValue.FALSE, null));
+      // unknown
+      assertEquals(PredicateValue.UNKNOWN, PredicateValue.eqv(PredicateValue.UNKNOWN, PredicateValue.TRUE));
+      assertEquals(PredicateValue.UNKNOWN, PredicateValue.eqv(PredicateValue.UNKNOWN, PredicateValue.FALSE));
+      assertEquals(PredicateValue.UNKNOWN, PredicateValue.eqv(PredicateValue.UNKNOWN, PredicateValue.UNKNOWN));
+      assertEquals(PredicateValue.UNKNOWN, PredicateValue.eqv(PredicateValue.UNKNOWN, null));
+      // null
+      assertEquals(PredicateValue.UNKNOWN, PredicateValue.eqv(null, PredicateValue.TRUE));
+      assertEquals(PredicateValue.UNKNOWN, PredicateValue.eqv(null, PredicateValue.FALSE));
+      assertEquals(PredicateValue.UNKNOWN, PredicateValue.eqv(null, PredicateValue.UNKNOWN));
+      assertEquals(PredicateValue.UNKNOWN, PredicateValue.eqv(null, null));
+   }
+   
+   /**
     * Tests {@link PredicateValue#and(PredicateValue, PredicateValue)}.
     */
    public void testAnd() {
