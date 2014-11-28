@@ -20,7 +20,7 @@ private static final String eol = System.getProperty("line.separator");
          "\t /*@ blabla *x " + eol + "\t * " + eol + "\t */" + eol +
          "\tpublic static void main(String[] args) {" + eol +
          "//normal " + eol + "\t" + eol +
-         "String temp=\"//@ ensures \" \";"+eol+
+         "String temp=\"//@ ensures \" ;"+eol+
          "//@ requires blabla"+eol+
          "\t\tSystem.out.println(\"Hello World\");" + eol +
          "\t}" + eol + "}" + eol;

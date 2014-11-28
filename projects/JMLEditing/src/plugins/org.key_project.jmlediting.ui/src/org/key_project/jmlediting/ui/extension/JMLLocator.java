@@ -88,9 +88,13 @@ public class JMLLocator {
                   default:
                      position += 1;
                      state = ScannerState.DEFAULT;
+                     break;
                   }
                }
-               default: position+=1;
+               break;
+               default:
+                  position+=1;
+                  break;
             }
             break;
          case IN_COMMENT:
@@ -128,7 +132,6 @@ public class JMLLocator {
                position += 1;
                break;
             }
-            
             break;
          case IN_CHAR:
             switch(c){
@@ -138,6 +141,10 @@ public class JMLLocator {
             case '\'':
                state=ScannerState.DEFAULT;
                position+=1;
+               break;
+            default:
+               position+=1;
+               break;
             }
             break;
          default:
@@ -148,7 +155,7 @@ public class JMLLocator {
       for (Comment c : comments)
          // filter for jml comments, a comment is a JML comment if the 3rd sign
          // is an @
-         if ((text.length()-1<c.offset+2)&&text.charAt(c.offset + 2) == '@')
+         if ((text.length()-1>=c.offset+2)&&text.charAt(c.offset + 2) == '@')
             jmlcomments.add(c);
 
       return jmlcomments;

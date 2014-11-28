@@ -2,11 +2,14 @@ package org.key_project.jmlediting.ui.extension;
 
 import javax.swing.text.Document;
 
+import org.eclipse.jdt.ui.text.IJavaPartitions;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.BadPositionCategoryException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITypedRegion;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.TextPresentation;
 import org.eclipse.jface.text.presentation.IPresentationDamager;
@@ -30,8 +33,9 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager, IPr
    @Override
    public void createPresentation(TextPresentation presentation, ITypedRegion damage) {
       boolean jml=false;
+      JMLLocator locator = new JMLLocator(doc.get());
       try {
-         jml = '@'==doc.getChar(damage.getOffset()+2);
+         jml= locator.isInJMLcomment(damage.getOffset());
       }
       catch (BadLocationException e) {
          // TODO Auto-generated catch block
@@ -45,7 +49,6 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager, IPr
          // Normal Java Comment
          wrappedInstance.createPresentation(presentation, damage);
       }
-System.out.println("createPresentation");
    }
 
    @Override
@@ -56,7 +59,6 @@ System.out.println("createPresentation");
 
    @Override
    public IRegion getDamageRegion(ITypedRegion partition, DocumentEvent event, boolean documentPartitioningChanged) {
-System.out.println("getDamageRegion");
       return wrappedInstance.getDamageRegion(partition, event, documentPartitioningChanged);
    }
 
