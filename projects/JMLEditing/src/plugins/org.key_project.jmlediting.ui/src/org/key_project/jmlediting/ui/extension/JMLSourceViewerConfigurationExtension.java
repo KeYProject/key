@@ -34,15 +34,19 @@ public class JMLSourceViewerConfigurationExtension extends
    }
 
    @Override
-   public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer, IPresentationReconciler currentResult) {
-      PresentationReconciler reconciler = (PresentationReconciler)currentResult;
-      // Replace DefaultDamagerRepairer in currentResult to support JML 
-      DefaultDamagerRepairer dr= (DefaultDamagerRepairer)reconciler.getDamager(IJavaPartitions.JAVA_MULTI_LINE_COMMENT);
-      JMLPresentationDamagerRepairer newDR = new JMLPresentationDamagerRepairer(dr);
+   public IPresentationReconciler getPresentationReconciler(
+         ISourceViewer sourceViewer, IPresentationReconciler currentResult) {
+      PresentationReconciler reconciler = (PresentationReconciler) currentResult;
+      // Replace DefaultDamagerRepairer in currentResult to support JML
+      DefaultDamagerRepairer dr = (DefaultDamagerRepairer) reconciler
+            .getDamager(IJavaPartitions.JAVA_MULTI_LINE_COMMENT);
+      JMLPresentationDamagerRepairer newDR = new JMLPresentationDamagerRepairer(
+            dr);
       reconciler.setDamager(newDR, IJavaPartitions.JAVA_MULTI_LINE_COMMENT);
       reconciler.setRepairer(newDR, IJavaPartitions.JAVA_MULTI_LINE_COMMENT);
-      // Replace DefaultDamagerRepairer in currentResult to support JML 
-      dr= (DefaultDamagerRepairer)reconciler.getDamager(IJavaPartitions.JAVA_SINGLE_LINE_COMMENT);
+      // Replace DefaultDamagerRepairer in currentResult to support JML
+      dr = (DefaultDamagerRepairer) reconciler
+            .getDamager(IJavaPartitions.JAVA_SINGLE_LINE_COMMENT);
       newDR = new JMLPresentationDamagerRepairer(dr);
       reconciler.setDamager(newDR, IJavaPartitions.JAVA_SINGLE_LINE_COMMENT);
       reconciler.setRepairer(newDR, IJavaPartitions.JAVA_SINGLE_LINE_COMMENT);
@@ -58,16 +62,6 @@ public class JMLSourceViewerConfigurationExtension extends
    @Override
    public String[] getConfiguredContentTypes(ISourceViewer sourceViewer,
          String[] currentResult) {
-      if (currentResult[0].equals(JMLPartitionScanner.JML_MULTI_LINE)) // if Method was called only once
-         return currentResult; // previously there is
-      else { // nothing to change
-         String[] extendedContentTypes = new String[currentResult.length + 2];
-         extendedContentTypes[0] = JMLPartitionScanner.JML_MULTI_LINE;
-         extendedContentTypes[1] = JMLPartitionScanner.JML_SINGLE_LINE;
-         for (int i = 0; i < currentResult.length; i++) {
-            extendedContentTypes[i + 2] = currentResult[i];
-         }
-         return extendedContentTypes;
-      }
+      return currentResult;
    }
 }
