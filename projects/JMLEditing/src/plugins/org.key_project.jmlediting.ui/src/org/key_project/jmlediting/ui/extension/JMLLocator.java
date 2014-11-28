@@ -5,7 +5,13 @@ import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-
+/**
+ * 
+ * @author David Giessing
+ * Class for finding JML Comments in a given String.
+ * This class does not take care of changes to the String!
+ * If the String changes a new Instance of the JMLLocator is needed
+ */
 public class JMLLocator {
 
    private String text;
@@ -35,7 +41,9 @@ public class JMLLocator {
    }
 
    /**
-    * Uses an Automata to search All Kind of Valid JMLComments in document
+    * Uses an Automata to search All Kind of Valid Comments in the given String
+    * afterwards it creates the returned ArrayList by only Adding Comments with an @ as 3rd character
+    * which is when the comment is a JMLComment
     * 
     * @return An ArrayList with Type Comment that consists of all valid
     *         JMLComments in the Document
@@ -91,6 +99,7 @@ public class JMLLocator {
                      break;
                   }
                }
+               else break mainloop;
                break;
                default:
                   position+=1;
@@ -113,6 +122,7 @@ public class JMLLocator {
                      break;
                   }
                }
+               else break mainloop;
                break;
             default:
                position += 1;

@@ -20,26 +20,47 @@ private static final String eol = System.getProperty("line.separator");
          "\t /*@ blabla *x " + eol + "\t * " + eol + "\t */" + eol +
          "\tpublic static void main(String[] args) {" + eol +
          "//normal " + eol + "\t" + eol +
-         "String temp=\"//@ ensures \" ;"+eol+
+         "Char x= \'bjkb \\' \'"+eol+
+         "String temp=\"//@ ensures \\ \" ;"+eol+
          "//@ requires blabla"+eol+
          "\t\tSystem.out.println(\"Hello World\");" + eol +
-         "\t}" + eol + "}" + eol;
-   private JMLLocator locator;
-   
-
-   @Before
-   public void setup() throws Exception {
-      locator = new JMLLocator(EDITOR_TEXT);
-      
-   }
-
+         "\t}" + eol + "}" + eol+"//";
+   private static final String TEXT2 = "package " + PACKAGE_NAME + ";" + eol + eol + 
+         "public class " + CLASS_NAME + " {" + eol + eol +
+         "\t /*@ blabla *x " + eol + "\t * " + eol + "\t */" + eol +
+         "\tpublic static void main(String[] args) {" + eol +
+         "//normal " + eol + "\t" + eol +
+         "Char x= \'bjkb \\' \'"+eol+
+         "/a"+eol+
+         "String temp=\"//@ ensures \\ \" ;"+eol+
+         "//@ requires blabla"+eol+
+         "\t\tSystem.out.println(\"Hello World\");" + eol +
+         "\t}" + eol + "}" + eol+"/";
+   private static final String TEXT3 = "package " + PACKAGE_NAME + ";" + eol + eol + 
+         "public class " + CLASS_NAME + " {" + eol + eol +
+         "\t /*@ blabla *x " + eol + "\t * " + eol + "\t */" + eol +
+         "\tpublic static void main(String[] args) {" + eol +
+         "//normal " + eol + "\t" + eol +
+         "Char x= \'bjkb \\' \'"+eol+
+         "/a"+eol+
+         "String temp=\"//@ ensures \\ \" ;"+eol+
+         "//@ requires blabla"+eol+
+         "\t\tSystem.out.println(\"Hello World\");" + eol +
+         "\t}" + eol + "}" + eol+"/*   *";
+   private JMLLocator locator= new JMLLocator(EDITOR_TEXT);
+         
    @Test
    public void findCommentsTest() {
+      assertFalse(locator.findJMLComments().isEmpty());
+      locator= new JMLLocator(TEXT2);
+      assertFalse(locator.findJMLComments().isEmpty());
+      locator= new JMLLocator(TEXT3);
       assertFalse(locator.findJMLComments().isEmpty());
    }
 
    @Test
    public void isInJMLTest() throws BadLocationException {
+      locator=new JMLLocator(EDITOR_TEXT);
       assertTrue(locator.isInJMLcomment(EDITOR_TEXT.indexOf("/*@")+3));    //Test whether JML Multiline Comment is recognized
       assertFalse(locator.isInJMLcomment(EDITOR_TEXT.indexOf("//")+3));    //Test whether JavaComment is recognized as JMLComment
       assertFalse(locator.isInJMLcomment(0));                              //Test
