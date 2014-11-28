@@ -1,13 +1,14 @@
 package org.key_project.jmlediting.core.parser;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.key_project.jmlediting.core.dom.ISpecificationStatement;
-import org.key_project.jmlediting.core.profile.IJMLProfile;
-
-import de.key_project.jmlediting.profile.jmlref.JMLReferenceProfile;
+import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.core.dom.IKeywordNode;
+import org.key_project.jmlediting.core.dom.IStringNode;
+import org.key_project.jmlediting.core.dom.Nodes;
 
 public class SpecificationStatementParserTest {
 
@@ -22,6 +23,7 @@ public class SpecificationStatementParserTest {
    
    @Test
    public void testParseWrongSpecificationKeywords() {
+      testParseWrongSpecification("  ");
       testParseWrongSpecification(" ensures ");
       testParseWrongSpecification(" emsures x;");
       testParseWrongSpecification("ensuresx == y;");
@@ -37,17 +39,25 @@ public class SpecificationStatementParserTest {
       IJMLParser parser = ProfileWrapper.testProfile.createParser();
       
      
-      ISpecificationStatement statement = parser.parseSpecificationStatement(specText, 0, specText.length());
+      IASTNode statement = parser.parse(specText, 0, specText.length());
+      assertEquals("More than one keyword parsed", 1, statement.getChildren().size());
       
-      assertEquals("Wrong specification keyword parsed", expectedKeyword, statement.getKeyword().getKeyword());
-      assertEquals("Wrong content", expectedContent, statement.getContent());
+      IASTNode keywordNode = statement.getChildren().get(0).getChildren().get(0);
+      IASTNode keywordContentNode = statement.getChildren().get(0).getChildren().get(1);
+      IASTNode stringNode = keywordContentNode.getChildren().get(0);
+      
+      assertTrue("Keyword node is not keyword", Nodes.isKeyword(keywordNode));
+      assertTrue("Content is not string", Nodes.isString(stringNode));
+      
+      assertEquals("Wrong specification keyword parsed", expectedKeyword, ((IKeywordNode)keywordNode).getKeywordInstance());
+      assertEquals("Wrong content", expectedContent, ((IStringNode)stringNode).getString());
       assertEquals("Wrong start offset", expctedStartOffset, statement.getStartOffset());
       assertEquals("Wrong end offset", expectedEndOffset, statement.getEndOffset());
    }
    
    private void testParseWrongSpecification(String specText) {
       try {
-         ProfileWrapper.testProfile.createParser().parseSpecificationStatement(specText, 0, specText.length());
+         ProfileWrapper.testProfile.createParser().parse(specText, 0, specText.length());
       } catch (ParserException e) {
          return;
       }

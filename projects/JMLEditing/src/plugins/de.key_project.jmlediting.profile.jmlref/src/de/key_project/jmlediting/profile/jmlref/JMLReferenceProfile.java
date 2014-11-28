@@ -7,8 +7,7 @@ import java.util.Set;
 import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorKeyword;
-import org.key_project.jmlediting.core.profile.syntax.ISpecificationStatementKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 
 import de.key_project.jmlediting.profile.jmlref.behavior.BehaviorKeyword;
 import de.key_project.jmlediting.profile.jmlref.behavior.ExceptionalBehaviorKeyword;
@@ -18,22 +17,18 @@ import de.key_project.jmlediting.profile.jmlref.keyword.EnsuresKeyword;
 import de.key_project.jmlediting.profile.jmlref.keyword.RequiresKeyword;
 
 public class JMLReferenceProfile implements IJMLProfile {
-   
-   private static final Set<ISpecificationStatementKeyword> SUPPORTED_KEYWORDS;
-   private static final Set<IJMLBehaviorKeyword> SUPPORTED_BEHAVIOR_KEYWORDS; 
-   
+
+   private static final Set<IKeyword> SUPPORTED_KEYWORDS;
+
    static {
-      Set<ISpecificationStatementKeyword> supportedKeywords = new HashSet<ISpecificationStatementKeyword>();
+      Set<IKeyword> supportedKeywords = new HashSet<IKeyword>();
       supportedKeywords.add(new AssignableKeyword());
       supportedKeywords.add(new EnsuresKeyword());
       supportedKeywords.add(new RequiresKeyword());
+      supportedKeywords.add(new BehaviorKeyword());
+      supportedKeywords.add(new ExceptionalBehaviorKeyword());
+      supportedKeywords.add(new NormalBehaviorKeyword());
       SUPPORTED_KEYWORDS = Collections.unmodifiableSet(supportedKeywords);
-      
-      Set<IJMLBehaviorKeyword> supportedBehaviorKeywords = new HashSet<IJMLBehaviorKeyword>();
-      supportedBehaviorKeywords.add(new BehaviorKeyword());
-      supportedBehaviorKeywords.add(new ExceptionalBehaviorKeyword());
-      supportedBehaviorKeywords.add(new NormalBehaviorKeyword());
-      SUPPORTED_BEHAVIOR_KEYWORDS = Collections.unmodifiableSet(supportedBehaviorKeywords);
    }
 
    public JMLReferenceProfile() {
@@ -50,12 +45,7 @@ public class JMLReferenceProfile implements IJMLProfile {
    }
 
    @Override
-   public Set<IJMLBehaviorKeyword> getSupportedBehaviors() {
-      return SUPPORTED_BEHAVIOR_KEYWORDS;
-   }
-
-   @Override
-   public Set<ISpecificationStatementKeyword> getSupportedSpecificationStatementKeywords() {
+   public Set<IKeyword> getSupportedKeywords() {
       return SUPPORTED_KEYWORDS;
    }
 

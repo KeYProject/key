@@ -19,6 +19,5 @@ Bundle-ActivationPolicy: lazy
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.jmlediting.core.dom,
  org.key_project.jmlediting.core.parser,
- org.key_project.jmlediting.core.parser.internal;x-friends:="org.key_project.jmlediting.core.test",
  org.key_project.jmlediting.core.profile,
  org.key_project.jmlediting.core.profile.syntax

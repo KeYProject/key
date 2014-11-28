@@ -2,16 +2,13 @@ package org.key_project.jmlediting.core.test.profile;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.Collections;
 import java.util.Set;
 
 import org.junit.Test;
 import org.key_project.jmlediting.core.parser.IJMLParser;
-import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.AbstractJMLProfile;
+import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
-import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorKeyword;
-import org.key_project.jmlediting.core.profile.syntax.ISpecificationStatementKeyword;
 
 public class JMLProfileManagementTest {
 

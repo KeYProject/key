@@ -8,11 +8,8 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChang
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jdt.internal.ui.preferences.PropertyAndPreferencePage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -24,7 +21,6 @@ import org.eclipse.swt.widgets.TableItem;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileManagement;
-import org.key_project.jmlediting.ui.profileEditor.ProfileViewDialog;
 
 /**
  * The {@link JMLProfilePropertiesPage} implements a properties and preferences
@@ -51,7 +47,6 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
     * The list which shows all profile names to the user.
     */
    private Table profilesList;
-   private Button viewProfileButton;
    /**
     * The list of the profiles, in the same order as shown in the list.
     */
@@ -81,19 +76,11 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
                   @Override
                   public void preferenceChange(final PreferenceChangeEvent event) {
-                     updateSelection(false);
+                     updateSelection();
                   }
                });
       }
       super.setVisible(visible);
-   }
-
-   private Button createTableSideButton(Composite myComposite, String name) {
-      Button button = new Button(myComposite, SWT.PUSH);
-      button.setText(name);
-      button.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1));
-
-      return button;
    }
 
    @Override
@@ -101,7 +88,6 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       // Initialize the UI
       // Create a list for the profile with a label
       final Composite myComposite = new Composite(parent, SWT.NONE);
-
       final GridLayout layout = new GridLayout();
       layout.numColumns = 2;
       myComposite.setLayout(layout);
@@ -129,26 +115,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       data.verticalAlignment = SWT.TOP;
       data.horizontalAlignment = SWT.FILL;
 
-      this.viewProfileButton = this.createTableSideButton(myComposite,
-            " View ... ");
-
       this.initUI();
-
-      this.viewProfileButton.addSelectionListener(new SelectionListener() {
-
-         @Override
-         public void widgetSelected(SelectionEvent e) {
-            ProfileViewDialog d = new ProfileViewDialog(
-                  JMLProfilePropertiesPage.this.getShell());
-            d.setProfile(allProfiles.get(0));
-            d.open();
-         }
-
-         @Override
-         public void widgetDefaultSelected(SelectionEvent e) {
-         }
-      });
-
       return myComposite;
    }
 
@@ -198,12 +165,16 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
          }
       });
 
-      this.updateSelection(false);
+   }
 
+   @Override
+   protected void doStatusChanged() {
       // Enable the list in preferences always and in project if project
       // specific settings are allowed
       this.setListEnabled(!this.isProjectPreferencePage()
             || this.useProjectSettings());
+
+      this.updateSelection();
    }
 
    /**
@@ -220,8 +191,6 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       // the list, and, the list stays disables of setEnabled(false)
       // before
       this.profilesList.setEnabled(true);
-
-      this.viewProfileButton.setEnabled(enabled);
    }
 
    @Override
@@ -236,7 +205,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       super.enableProjectSpecificSettings(useProjectSpecificSettings);
       if (!useProjectSpecificSettings) {
          // Reset selection to default if no project settings
-         this.updateSelection(true);
+         this.updateSelection();
       }
       this.setListEnabled(useProjectSpecificSettings);
    }
@@ -256,14 +225,16 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
     * in the properties or preferences (with respect whether the pane is used
     * for preferences or properties).
     */
-   private void updateSelection(boolean forceDefault) {
+   private void updateSelection() {
       IJMLProfile currentProfile = null;
-      if (!forceDefault
-            && (this.isProjectPreferencePage() && this.useProjectSettings())) {
+      System.out.println("Project " + this.isProjectPreferencePage()
+            + " Settings: " + this.useProjectSettings());
+      if ((this.isProjectPreferencePage() && this.useProjectSettings())) {
          // Read local project properties if we are in a properties pane and
          // project specific settings are enabled
          currentProfile = JMLPreferencesHelper.getProjectJMLProfile(this
                .getProject());
+         System.out.println("Project profile: " + currentProfile);
       }
       // Read from global preferences if no project specific profile is set
       if (currentProfile == null) {
@@ -277,6 +248,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
          }
 
       }
+      System.out.println("Final profile: " + currentProfile);
 
       // Select profile in the list
       for (TableItem item : this.profilesList.getItems()) {

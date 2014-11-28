@@ -3,8 +3,7 @@ package org.key_project.jmlediting.core.profile;
 import java.util.Set;
 
 import org.key_project.jmlediting.core.parser.IJMLParser;
-import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorKeyword;
-import org.key_project.jmlediting.core.profile.syntax.ISpecificationStatementKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 
 /**
  * Defines a profile for a JML variant.
@@ -28,21 +27,21 @@ public interface IJMLProfile {
    String getIdentifier();
 
    /**
-    * Returns a set of all supported behaviors of this profile. The returned set
+    * Returns a set of all supported keywords of this profile. The returned set
     * is not allowed to be modified and is not null.
     * 
     * @return the set of supported behaviors
     */
-   Set<IJMLBehaviorKeyword> getSupportedBehaviors();
+   Set<IKeyword> getSupportedKeywords();
 
    /**
-    * Returns a set of all supported generics of this profile. The returned set
-    * is not allowed to be modified and is not null.
+    * Creates a new parser to parse JML for this profile. A parser created with
+    * this method must only be used once. This allows the parser to cover some
+    * state. But implementations of this method may return the same object
+    * everytime if state is no problem.
     * 
-    * @return the set of supported behaviors
+    * @return a new parser to parse JML according to this profile
     */
-   Set<ISpecificationStatementKeyword> getSupportedSpecificationStatementKeywords();
-   
    IJMLParser createParser();
 
 }

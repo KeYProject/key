@@ -1,17 +1,21 @@
 package de.key_project.jmlediting.profile.jmlref.keyword;
 
-import org.key_project.jmlediting.core.profile.syntax.ISpecificationStatementKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 
-public class RequiresKeyword implements ISpecificationStatementKeyword {
+public class RequiresKeyword extends AbstractGenericSpecificationKeyword {
 
-   @Override
-   public String getKeyword() {
-      return "requires";
+   public RequiresKeyword() {
+      super("requires");
    }
 
    @Override
    public String getDescription() {
       return "A requires clause specifies a precondition of method or constructor.";
+   }
+
+   @Override
+   public IKeywordParser createParser() {
+      return new DefaultGenericSpecificationKeywordParser();
    }
 
 }
