@@ -16,7 +16,7 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorKeyword;
-import org.key_project.jmlediting.core.profile.syntax.ISpecificationStatementKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.ui.extension.JMLLocator;
 import org.key_project.util.jmlediting.JMLUtil;
 
@@ -65,8 +65,8 @@ public class JMLCompletionProposalComputer implements IJavaCompletionProposalCom
 		         }
 		      }
 		      //Iterate through all generic keywords defined in JMLProfile
-		      for (ISpecificationStatementKeyword generic: currentJMLProfile.getSupportedSpecificationStatementKeywords()) {
-		         String keyword = generic.getKeyword();
+		      for (IKeyword generic: currentJMLProfile.getSupportedKeywords()) {
+		         String keyword = generic.getKeywords();
 		         //ignore not possible suggestions
 		         if (keyword.startsWith(prefix)) {
 		            result.add(new CompletionProposal(keyword, proposalOffset, prefixLength, keyword.length()));

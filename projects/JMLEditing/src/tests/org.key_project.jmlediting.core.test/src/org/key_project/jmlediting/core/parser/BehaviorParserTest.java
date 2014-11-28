@@ -1,59 +1,47 @@
 package org.key_project.jmlediting.core.parser;
 
 import static org.junit.Assert.fail;
+import static org.key_project.jmlediting.core.parser.DomBuildUtils.buildKeywordSequence;
+import static org.key_project.jmlediting.core.parser.DomBuildUtils.buildKeywordSpec;
 
 import org.junit.Test;
-import org.key_project.jmlediting.core.dom.IBehaviorSpecification;
-import org.key_project.jmlediting.core.dom.Visibility;
+import org.key_project.jmlediting.core.dom.IASTNode;
 
 public class BehaviorParserTest {
 
    @Test
    public void testParseBehavior() throws ParserException {
       String parseText1 = "behavior ensures x = y;";
-      IBehaviorSpecification result1 = DomBuildUtils.buildBehaviorSpec(
-            Visibility.DEFAULT, "behavior", 0, 22,
-            DomBuildUtils.buildStatementSpec("ensures", 9, 22, "x = y"));
+      IASTNode result1 = buildKeywordSequence(0,22, 
+           buildKeywordSpec("behavior", 0),
+           buildKeywordSpec("ensures", 9, 22, "x = y"));
       testParseBehaviorSpecification(parseText1, result1);
       String parseText2 = "normal_behavior ensures true; requires false;  ";
-      IBehaviorSpecification result2 = DomBuildUtils.buildBehaviorSpec(
-            Visibility.DEFAULT, "normal_behavior", 0, 44,
-            DomBuildUtils.buildStatementSpec("ensures", 16, 28, "true"),
-            DomBuildUtils.buildStatementSpec("requires", 30, 44, "false"));
-      testParseBehaviorSpecification(parseText2, result2);
-   }
-
-   @Test
-   public void testParseBehaviorWithVisibility() throws ParserException {
-      String parseText1 = " public behavior @ assignable z;  ";
-      IBehaviorSpecification result1 = DomBuildUtils.buildBehaviorSpec(
-            Visibility.PUBLIC, "behavior", 1, 31,
-            DomBuildUtils.buildStatementSpec("assignable", 19, 31, "z"));
-      testParseBehaviorSpecification(parseText1, result1);
-      String parseText2 = "protected exceptional_behavior ensures true;";
-      IBehaviorSpecification result2 = DomBuildUtils.buildBehaviorSpec(
-            Visibility.PROTECTED, "exceptional_behavior", 0, 43, DomBuildUtils.buildStatementSpec("ensures", 31, 43,"true"));
+      IASTNode result2 = buildKeywordSequence(0, 44,
+            buildKeywordSpec("normal_behavior",0),
+            buildKeywordSpec("ensures", 16, 28, "true"),
+            buildKeywordSpec("requires", 30, 44, "false"));
       testParseBehaviorSpecification(parseText2, result2);
    }
    
    @Test
    public void testParseWrongBehaviors() {
-      testParseWrongBehaviorSpecification("publi behavior ensures true;");
-      testParseWrongBehaviorSpecification("public normal_behavior");
-      testParseWrongBehaviorSpecification("public nor_behavior ensures true;");
+      testParseWrongBehaviorSpecification("behavior esures true;");
+      testParseWrongBehaviorSpecification("normal_behavir");
+      testParseWrongBehaviorSpecification("nor_behavior ensures true;");
    }
 
    private static void testParseBehaviorSpecification(String text,
-         IBehaviorSpecification result) throws ParserException {
+         IASTNode result) throws ParserException {
       IJMLParser parser = ProfileWrapper.testProfile.createParser();
-      IBehaviorSpecification parseResult = parser.parseBehaviorSpecification(
+      IASTNode parseResult = parser.parse(
             text, 0, text.length());
-      DomCompareUtils.equalsBehaviorSpecification(result, parseResult, false);
+      DomCompareUtils.compareIASTNode(result, parseResult, false);
    }
 
    private static void testParseWrongBehaviorSpecification(String text) {
       try {
-         ProfileWrapper.testProfile.createParser().parseBehaviorSpecification(
+         ProfileWrapper.testProfile.createParser().parse(
                text, 0, text.length());
       }
       catch (ParserException e) {
