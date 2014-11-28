@@ -1,17 +1,12 @@
 package org.key_project.jmlediting.ui.test.preferencepages;
 
-import static org.eclipse.swtbot.swt.finder.waits.Conditions.waitForMenu;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory;
-import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotList;
 import org.junit.Test;
 import org.key_project.jmlediting.ui.preferencepages.JMLColorPropertyPreferencePage;
 import org.key_project.jmlediting.ui.test.TestUtils;
@@ -40,7 +35,7 @@ public class TestJMLColorPropertyPreferencePage {
       bot.tree().getTreeItem("JML").expand().getNode("Color").select();
       
       SWTBotCheckBox enableProjectSettingsBox = bot.checkBox();
-      SWTBotButton CommentColor = bot.buttonWithTooltip("CommentColor");
+      SWTBotButton CommentColor = bot.buttonWithId(JMLColorPropertyPreferencePage.TEST_KEY, "CommentColor");
       
       
       bot.sleep(100);
@@ -54,28 +49,41 @@ public class TestJMLColorPropertyPreferencePage {
       enableProjectSettingsBox.select();
       assertTrue("Cannot select profiles with project specific settings", CommentColor.isEnabled());
 
-      bot.sleep(100);
-      bot.checkBox("Enable project specific settings").click();      
+      //System.out.println("The Name of the Properties Shell is: " + bot.activeShell().getText());
       // Lets select a new color
       
       //TODO: Select a new Color
       
-      CommentColor.click();
-      bot.button("OK").click();
-     
+      /*
+      bot.sleep(1000);
+      //CommentColor.click();
+     // bot.sleep(1000);
       
-      //Apply Color
-      bot.button("Apply").click();
-            
-      System.out.println(CommentColor.foregroundColor());
-      // Apply the properties
+      //SWTBotShell colorShell = bot.activeShell();
+      
+     // System.out.println("The Name of the Color Shell is: " + colorShell.getText());
+      
+      //System.out.println("The ID of a Button is: " + colorShell.bot().button().getId());
+      //System.out.println("The ID of another Button is: " + colorShell.bot().button().getId());
+      
+     // bot.activeShell();
+      bot.sleep(1000);
       bot.button("OK").click();
+     // bot.waitUntil(shellCloses(colorShell));
+      
+      bot.sleep(1000);
+            */
+      
+      // Apply the properties
+      
+      bot.button("Apply").click();
       
       // Now check that this is ok
 
       try {
          String color = project.getPersistentProperty(JMLColorPropertyPreferencePage.COMMENT_COLOR);
          assertTrue("Selected Wrong Color", color.equals(JMLColorPropertyPreferencePage.DEFAULT_JML_COMMENT_COLOR.toString()));
+         System.out.println("Selected Right Color");
       }
       catch (CoreException e) {
 
@@ -93,6 +101,7 @@ public class TestJMLColorPropertyPreferencePage {
       try {
          String color = project.getPersistentProperty(JMLColorPropertyPreferencePage.COMMENT_COLOR);
          assertTrue("The Color is not the Default Color", color.equals(JMLColorPropertyPreferencePage.DEFAULT_JML_COMMENT_COLOR.toString()));
+         System.out.println("The Default Color is ok");
       }
       catch (CoreException e) {
 
