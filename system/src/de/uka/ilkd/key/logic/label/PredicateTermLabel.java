@@ -41,21 +41,15 @@ public class PredicateTermLabel implements TermLabel {
    /**
     * The unique ID of this term label in the {@link Sequent}.
     */
-   private final int id;
-
-   /**
-    * The unique sub id of the given id.
-    */
-   private final int subId;
+   private final String id;
    
    /**
     * Constructor.
-    * @param id The unique ID of this term label in the {@link Sequent}.
-    * @param subId The unique sub id of the given id.
+    * @param majorId The major part of the unique ID.
+    * @param minorId The minor part of the unique ID.
     */
-   public PredicateTermLabel(int id, int subId) {
-       this.id = id;
-       this.subId = subId;
+   public PredicateTermLabel(int majorId, int minorId) {
+       this.id = majorId + "." + minorId;
    }
 
    /**
@@ -69,7 +63,7 @@ public class PredicateTermLabel implements TermLabel {
     * {@inheritDoc}
     */
    public String toString() {
-       return NAME.toString() + "(" + getId() + ", " + getSubId() + ")";
+       return NAME.toString() + "(" + getId() + ")";
    }
 
    /**
@@ -79,7 +73,6 @@ public class PredicateTermLabel implements TermLabel {
    public Object getChild(int i) {
 	   switch (i) {
 	      case 0 : return getId();
-         case 1 : return getSubId();
   	      default : return null;
 	   }
    }
@@ -89,23 +82,33 @@ public class PredicateTermLabel implements TermLabel {
     */
    @Override
    public int getChildCount() {
-      return 2;
+      return 1;
    }
 
    /**
     * Returns the unique ID of this label in the {@link Sequent}.
     * @return The unique ID of this label in the {@link Sequent}.
     */
-   public int getId() {
+   public String getId() {
       return id;
    }
-
+   
    /**
-    * Returns the unique sub id of the given id.
-    * @return The unique sub id of the given id.
+    * Returns the major part of the unique ID.
+    * @return The major part of the unique ID.
     */
-   public int getSubId() {
-      return subId;
+   public int getMajorId() {
+      int index = id.indexOf(".");
+      return Integer.parseInt(id.substring(0, index));
+   }
+   
+   /**
+    * Returns the minor part of the unique ID.
+    * @return The minor part of the unique ID.
+    */
+   public int getMinorId() {
+      int index = id.indexOf(".");
+      return Integer.parseInt(id.substring(index + 1));
    }
 
    /**

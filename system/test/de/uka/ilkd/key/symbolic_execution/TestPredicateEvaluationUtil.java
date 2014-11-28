@@ -32,9 +32,9 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
 //    */
 //   public void testArraySumWhile() throws Exception {
 //      // Create expected results
-//      ExpectedPredicateEvaluationResult initialResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(9, 0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(10, 0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(7, 0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(8, 0)", PredicateValue.TRUE)));
-//      ExpectedPredicateEvaluationResult preservesResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(14, 0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(17, 0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(11, 0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(13, 0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(16, 0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(12, 0)", PredicateValue.TRUE)));
-//      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(0, 0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1, 0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(2, 0)", PredicateValue.TRUE)));
+//      ExpectedPredicateEvaluationResult initialResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(9.0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(10.0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(7.0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(8.0)", PredicateValue.TRUE)));
+//      ExpectedPredicateEvaluationResult preservesResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(14.0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(17.0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(11.0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(13.0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(16.0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(12.0)", PredicateValue.TRUE)));
+//      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(0.0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1.0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(2.0)", PredicateValue.TRUE)));
 //      // Perform test
 //      doPredicateEvaluationTest("examples/_testcase/set/predicateArraySumWhile/test/ArraySumWhile.java", 
 //                                "ArraySumWhile[ArraySumWhile::sum([I)].JML operation contract.0", 
@@ -51,8 +51,8 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
     */
    public void testSimpleInstanceMethodContractApplication() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult preResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(6, 0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(8, 0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(7, 0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(4, 0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(9, 0)", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1, 0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(0, 0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(3, 0)", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult preResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(6.0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(8.0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(7.0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(4.0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(9.0)", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1.0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(0.0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(3.0)", PredicateValue.TRUE)));
       // Perform test
       doPredicateEvaluationTest("examples/_testcase/set/predicateSimpleInstanceMethodContractApplication/test/SimpleInstanceMethodContractApplication.java", 
                                 "SimpleInstanceMethodContractApplication[SimpleInstanceMethodContractApplication::main(SimpleInstanceMethodContractApplication)].JML normal_behavior operation contract.0", 
@@ -68,8 +68,8 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
     */
    public void testSimpleMethodContractApplication() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult preResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(8, 0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(4, 0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(6, 0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(7, 0)", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1, 0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(3, 0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(0, 0)", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult preResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(8.0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(4.0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(6.0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(7.0)", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1.0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(3.0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(0.0)", PredicateValue.TRUE)));
       // Perform test
       doPredicateEvaluationTest("examples/_testcase/set/predicateSimpleMethodContractApplication/test/SimpleMethodContractApplication.java", 
                                 "SimpleMethodContractApplication[SimpleMethodContractApplication::main()].JML normal_behavior operation contract.0", 
@@ -85,10 +85,10 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
     */
    public void testDifferentBranchesTest() throws Exception {
       // Create expected results
-      ExpectedPredicateEvaluationResult firstResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(0, 0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1, 0)", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult secondResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(0, 0)", PredicateValue.FALSE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1, 0)", PredicateValue.TRUE)));
-      ExpectedPredicateEvaluationResult thirdResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1, 0)", PredicateValue.FALSE)));
-      ExpectedPredicateEvaluationResult fourthResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1, 0)", PredicateValue.FALSE)));
+      ExpectedPredicateEvaluationResult firstResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(0.0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1.0)", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult secondResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(0.0)", PredicateValue.FALSE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1.0)", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult thirdResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1.0)", PredicateValue.FALSE)));
+      ExpectedPredicateEvaluationResult fourthResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1.0)", PredicateValue.FALSE)));
       // Perform test
       doPredicateEvaluationTest("examples/_testcase/set/predicateDifferentBranchesTest/test/DifferentBranchesTest.java", 
                                 "DifferentBranchesTest[DifferentBranchesTest::main([I)].JML normal_behavior operation contract.0", 
@@ -106,8 +106,8 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
     */
    public void testMultiplePredicateResultsTest() throws Exception {
       // Create expected results
-      ExpectedBranchResult goal102 = new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(0, 0)", PredicateValue.FALSE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1, 0)", PredicateValue.TRUE));
-      ExpectedBranchResult goal95 = new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(0, 0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1, 0)", PredicateValue.TRUE));
+      ExpectedBranchResult goal102 = new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(0.0)", PredicateValue.FALSE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1.0)", PredicateValue.TRUE));
+      ExpectedBranchResult goal95 = new ExpectedBranchResult(new ExpectedPredicateResult(PredicateTermLabel.NAME + "(0.0)", PredicateValue.TRUE), new ExpectedPredicateResult(PredicateTermLabel.NAME + "(1.0)", PredicateValue.TRUE));
       ExpectedPredicateEvaluationResult expectedResult = new ExpectedPredicateEvaluationResult(goal102, goal95);
       // Perform test
       doPredicateEvaluationTest("examples/_testcase/set/predicateMultiplePredicateResults/test/MultiplePredicateResultsTest.java", 

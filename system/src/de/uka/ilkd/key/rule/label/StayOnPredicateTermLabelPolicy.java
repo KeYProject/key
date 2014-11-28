@@ -55,8 +55,8 @@ public class StayOnPredicateTermLabelPolicy implements TermLabelPolicy {
             // Replace label with a new one with increased sub ID.
             if (newLabelIdRequired) {
                PredicateTermLabel pLabel = (PredicateTermLabel) label;
-               int labelSubID = services.getCounter(PredicateTermLabel.PROOF_COUNTER_SUB_PREFIX + pLabel.getId()).getCountPlusPlus();
-               label = new PredicateTermLabel(pLabel.getId(), labelSubID);
+               int labelSubID = services.getCounter(PredicateTermLabel.PROOF_COUNTER_SUB_PREFIX + pLabel.getMajorId()).getCountPlusPlus();
+               label = new PredicateTermLabel(pLabel.getMajorId(), labelSubID);
             }
          }
          return label;
