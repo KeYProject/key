@@ -245,7 +245,10 @@ IDENT
     )*
 ;
 
-BODY
+fragment NEST_START : '{' '|' ;
+NEST_END : '|}' ;
+
+fragment BODY
 @init {
     int braceCounter = 0;
     boolean ignoreAt = false;
@@ -267,6 +270,10 @@ BODY
     )* {braceCounter == 0}?=> '}'
 ;
 
+BRACE_DISPATCH :
+   ( '{' ~ '|') => BODY { $type = BODY; }
+ | NEST_START { $type = NEST_START; }
+ ;
 
 SEMICOLON
 :
@@ -323,10 +330,7 @@ EMPTYBRACKETS : '[]';
         
 
 COMMA : ',' ;
-JAVASEPARATOR
-    :
-       '{' | '}' | ';' | '.'
-    ;
+DOT : '.' ;
 
 JAVAOPERATOR
     :
@@ -337,16 +341,6 @@ JAVAOPERATOR
         | '^=' | '%='  | '<<=' | '>>=' | '>>>='
     ;
 
-
-NEST_START
-:
-    '{|'
-;
-
-NEST_END
-:
-    '|}'
-;
 
 JMLSPECIALSYMBOL
     :
