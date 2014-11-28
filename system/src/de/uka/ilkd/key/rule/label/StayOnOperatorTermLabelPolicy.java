@@ -46,6 +46,7 @@ public class StayOnOperatorTermLabelPolicy implements TermLabelPolicy {
                               ImmutableArray<Term> newTermSubs,
                               ImmutableArray<QuantifiableVariable> newTermBoundVars,
                               JavaBlock newTermJavaBlock,
+                              ImmutableArray<TermLabel> newTermOriginalLabels,
                               TermLabel label) {
       return applicationTerm != null && newTermOp == applicationTerm.op() ? label : null;
    }

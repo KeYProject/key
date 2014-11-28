@@ -70,7 +70,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
       KeYEnvironment<?> env = KeYEnvironment.load(JavaProfile.getDefaultInstance(), new File(keyRepDirectory, proofFilePathInBaseDir), null, null, true);
       env.dispose();
       // Test symbolic execution
-      doSETTest(keyRepDirectory, 
+      doSETTestAndDispose(keyRepDirectory, 
                 proofFilePathInBaseDir, 
                 oraclePathInBaseDirFile, 
                 false, 
@@ -86,7 +86,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 false, 
                 false);
       // Test symbolic execution again when symbolic execution profile was used before.
-      doSETTest(keyRepDirectory, 
+      doSETTestAndDispose(keyRepDirectory, 
                 proofFilePathInBaseDir, 
                 oraclePathInBaseDirFile, 
                 false, 
@@ -107,7 +107,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests example: examples/_testcase/set/allNodeTypesTest in the Symbolic Execution Profile
     */
    public void testAllNodeTypesTest_SymbolicExecutionProfile() throws Exception {
-      doSETTest(keyRepDirectory, 
+      doSETTestAndDispose(keyRepDirectory, 
                 "examples/_testcase/set/allNodeTypesTest/test/AllNodeTypesTest.proof", 
                 "examples/_testcase/set/allNodeTypesTest/oracle/AllNodeTypesTest.xml", 
                 false, 
@@ -578,7 +578,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests example: examples/_testcase/set/verificationProofFile_VerifyNumber
     */
    public void testVerifyNumberNormal() throws Exception {
-      doSETTest(keyRepDirectory,
+      doSETTestAndDispose(keyRepDirectory,
                 "examples/_testcase/set/verificationProofFile_VerifyNumber/test/VerifyNumberNormal.proof",
                 "examples/_testcase/set/verificationProofFile_VerifyNumber/oracle/VerifyNumberNormal.xml",
                 false,
@@ -599,7 +599,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests example: examples/_testcase/set/verificationProofFile_VerifyMin
     */
    public void testVerifyMinTrueBranch() throws Exception {
-      doSETTest(keyRepDirectory,
+      doSETTestAndDispose(keyRepDirectory,
                 "examples/_testcase/set/verificationProofFile_VerifyMin/test/VerifyMinTrueBranch.proof",
                 "examples/_testcase/set/verificationProofFile_VerifyMin/oracle/VerifyMinTrueBranch.xml",
                 false,
@@ -620,7 +620,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Tests example: examples/_testcase/set/verificationProofFile_VerifyMin
     */
    public void testVerifyMin() throws Exception {
-      doSETTest(keyRepDirectory,
+      doSETTestAndDispose(keyRepDirectory,
                 "examples/_testcase/set/verificationProofFile_VerifyMin/test/VerifyMin.proof",
                 "examples/_testcase/set/verificationProofFile_VerifyMin/oracle/VerifyMin.xml",
                 false,

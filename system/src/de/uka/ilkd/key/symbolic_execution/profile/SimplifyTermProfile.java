@@ -85,7 +85,7 @@ public class SimplifyTermProfile extends JavaProfile {
                Term tacletTerm, Operator newTermOp,
                ImmutableArray<Term> newTermSubs,
                ImmutableArray<QuantifiableVariable> newTermBoundVars,
-               JavaBlock newTermJavaBlock, TermLabel label) {
+               JavaBlock newTermJavaBlock, ImmutableArray<TermLabel> newTermOriginalLabels, TermLabel label) {
             return label;
          }
        });

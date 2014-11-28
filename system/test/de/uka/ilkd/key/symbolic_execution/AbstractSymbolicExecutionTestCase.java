@@ -1683,21 +1683,75 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws SAXException Occurred Exception
     * @throws ProblemLoaderException Occurred Exception
     */
-   protected void doSETTest(File baseDir,
-                            String proofFilePathInBaseDir,
-                            String oraclePathInBaseDirFile,
-                            boolean includeConstraints,
-                            boolean includeVariables,
-                            boolean includeCallStack,
-                            boolean includeReturnValues,
-                            boolean mergeBranchConditions,
-                            boolean useOperationContracts,
-                            boolean useLoopInvariants,
-                            boolean nonExecutionBranchHidingSideProofs,
-                            boolean aliasChecks,
-                            boolean useUnicode,
-                            boolean usePrettyPrinting,
-                            boolean variablesAreOnlyComputedFromUpdates) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+   protected void doSETTestAndDispose(File baseDir,
+                                      String proofFilePathInBaseDir,
+                                      String oraclePathInBaseDirFile,
+                                      boolean includeConstraints,
+                                      boolean includeVariables,
+                                      boolean includeCallStack,
+                                      boolean includeReturnValues,
+                                      boolean mergeBranchConditions,
+                                      boolean useOperationContracts,
+                                      boolean useLoopInvariants,
+                                      boolean nonExecutionBranchHidingSideProofs,
+                                      boolean aliasChecks,
+                                      boolean useUnicode,
+                                      boolean usePrettyPrinting,
+                                      boolean variablesAreOnlyComputedFromUpdates) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+      SymbolicExecutionEnvironment<CustomUserInterface> env = doSETTest(baseDir, proofFilePathInBaseDir, oraclePathInBaseDirFile, includeConstraints, includeVariables, includeCallStack, includeReturnValues, mergeBranchConditions, useOperationContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates);
+      if (env != null) {
+         env.dispose();
+      }
+   }
+
+   /**
+    * Executes a test with the following steps:
+    * <ol>
+    *    <li>Load java file</li>
+    *    <li>Instantiate proof for method in container type</li>
+    *    <li>Try to close proof in auto mode</li>
+    *    <li>Create symbolic execution tree</li>
+    *    <li>Create new oracle file in temporary directory {@link #tempNewOracleDirectory} if it is defined</li>
+    *    <li>Load oracle file</li>
+    *    <li>Compare created symbolic execution tree with oracle model</li>
+    * </ol>
+    * @param baseDir The base directory which contains test and oracle file.
+    * @param proofFilePathInBaseDir The path to the proof file inside the base directory.
+    * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
+    * @param includeConstraints Include constraints?
+    * @param includeVariables Include variables?
+    * @param includeCallStack Include call stack?
+    * @param includeReturnValues Include method return values?
+    * @param mergeBranchConditions Merge branch conditions?
+    * @param useOperationContracts Use operation contracts?
+    * @param useLoopInvariants Use loop invariants?
+    * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
+    * @param aliasChecks Do alias checks?
+    * @param useUnicode {@code true} use unicode characters, {@code false} do not use unicode characters.
+    * @param usePrettyPrinting {@code true} use pretty printing, {@code false} do not use pretty printing.
+    * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
+    * @return The tested {@link SymbolicExecutionEnvironment}.
+    * @throws ProofInputException Occurred Exception
+    * @throws IOException Occurred Exception
+    * @throws ParserConfigurationException Occurred Exception
+    * @throws SAXException Occurred Exception
+    * @throws ProblemLoaderException Occurred Exception
+    */
+   protected SymbolicExecutionEnvironment<CustomUserInterface> doSETTest(File baseDir,
+                                                                         String proofFilePathInBaseDir,
+                                                                         String oraclePathInBaseDirFile,
+                                                                         boolean includeConstraints,
+                                                                         boolean includeVariables,
+                                                                         boolean includeCallStack,
+                                                                         boolean includeReturnValues,
+                                                                         boolean mergeBranchConditions,
+                                                                         boolean useOperationContracts,
+                                                                         boolean useLoopInvariants,
+                                                                         boolean nonExecutionBranchHidingSideProofs,
+                                                                         boolean aliasChecks,
+                                                                         boolean useUnicode,
+                                                                         boolean usePrettyPrinting,
+                                                                         boolean variablesAreOnlyComputedFromUpdates) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
       SymbolicExecutionEnvironment<CustomUserInterface> env = null;
       try {
@@ -1724,9 +1778,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       finally {
          // Restore original options
          setOneStepSimplificationEnabled(null, originalOneStepSimplification);
-         if (env != null) {
-            env.dispose();
-         }
+         return env;
       }
    }
    

@@ -58,6 +58,7 @@ public interface TermLabelPolicy {
     * @param newTermSubs The optional children of the {@link Term} to create.
     * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
     * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
+    * @param newTermOriginalLabels The original {@link TermLabel}s.
     * @param label The {@link TermLabel} to decide if it should be kept or dropped.
     * @return The {@link TermLabel} to keep which might be a different one (e.g. with changed parameters) or {@code null} if the {@link TermLabel} should be dropped.
     */
@@ -72,5 +73,6 @@ public interface TermLabelPolicy {
                               ImmutableArray<Term> newTermSubs,
                               ImmutableArray<QuantifiableVariable> newTermBoundVars,
                               JavaBlock newTermJavaBlock,
+                              ImmutableArray<TermLabel> newTermOriginalLabels,
                               TermLabel label);
 }

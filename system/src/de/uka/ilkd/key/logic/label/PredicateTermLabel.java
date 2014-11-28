@@ -44,12 +44,28 @@ public class PredicateTermLabel implements TermLabel {
    private final String id;
    
    /**
+    * The optional previous ID of the label this one is derived from.
+    */
+   private final String beforeId;
+   
+   /**
     * Constructor.
     * @param majorId The major part of the unique ID.
     * @param minorId The minor part of the unique ID.
     */
    public PredicateTermLabel(int majorId, int minorId) {
+       this(majorId, minorId, null);
+   }
+   
+   /**
+    * Constructor.
+    * @param majorId The major part of the unique ID.
+    * @param minorId The minor part of the unique ID.
+    * @param beforeId The optional previous ID of the label this one is derived from.
+    */
+   public PredicateTermLabel(int majorId, int minorId, String beforeId) {
        this.id = majorId + "." + minorId;
+       this.beforeId = beforeId;
    }
 
    /**
@@ -63,7 +79,11 @@ public class PredicateTermLabel implements TermLabel {
     * {@inheritDoc}
     */
    public String toString() {
-       return NAME.toString() + "(" + getId() + ")";
+       return NAME.toString() + 
+              "(" + 
+             getId() + 
+             (beforeId != null ? ", " + beforeId : "") +
+             ")";
    }
 
    /**
@@ -73,6 +93,7 @@ public class PredicateTermLabel implements TermLabel {
    public Object getChild(int i) {
 	   switch (i) {
 	      case 0 : return getId();
+	      case 1 : return getBeforeId();
   	      default : return null;
 	   }
    }
@@ -82,7 +103,12 @@ public class PredicateTermLabel implements TermLabel {
     */
    @Override
    public int getChildCount() {
-      return 1;
+      if (beforeId != null) {
+         return 2;
+      }
+      else {
+         return 1;
+      }
    }
 
    /**
@@ -109,6 +135,14 @@ public class PredicateTermLabel implements TermLabel {
    public int getMinorId() {
       int index = id.indexOf(".");
       return Integer.parseInt(id.substring(index + 1));
+   }
+
+   /**
+    * Returns the optional previous ID of the label this one is derived from.
+    * @return The optional previous ID of the label this one is derived from.
+    */
+   public String getBeforeId() {
+      return beforeId;
    }
 
    /**
