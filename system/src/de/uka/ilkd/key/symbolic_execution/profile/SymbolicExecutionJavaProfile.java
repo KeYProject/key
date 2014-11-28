@@ -30,7 +30,7 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.label.PredicateTermLabelRefactoring;
-import de.uka.ilkd.key.rule.label.StayAlwaysTermLabelPolicy;
+import de.uka.ilkd.key.rule.label.StayOnPredicateTermLabelPolicy;
 import de.uka.ilkd.key.rule.label.StayOnOperatorTermLabelPolicy;
 import de.uka.ilkd.key.rule.label.RemoveInCheckBranchesTermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.LoopBodyTermLabelUpdate;
@@ -93,7 +93,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
     */
    public static ImmutableList<TermLabelConfiguration> getSymbolicExecutionTermLabelConfigurations() {
       ImmutableList<TermLabelPolicy> symExcPolicies = ImmutableSLList.<TermLabelPolicy>nil().prepend(new StayOnOperatorTermLabelPolicy());
-      ImmutableList<TermLabelPolicy> postPolicies = ImmutableSLList.<TermLabelPolicy>nil().prepend(new StayAlwaysTermLabelPolicy());
+      ImmutableList<TermLabelPolicy> postPolicies = ImmutableSLList.<TermLabelPolicy>nil().prepend(new StayOnPredicateTermLabelPolicy());
 
       ImmutableList<TermLabelUpdate> lbUps = ImmutableSLList.<TermLabelUpdate>nil().prepend(new LoopBodyTermLabelUpdate());
       ImmutableList<TermLabelUpdate> nbUps = ImmutableSLList.<TermLabelUpdate>nil().prepend(new LoopInvariantNormalBehaviorTermLabelUpdate());

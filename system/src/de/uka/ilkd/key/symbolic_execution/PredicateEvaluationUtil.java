@@ -10,11 +10,21 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.PredicateTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.SortedOperator;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -38,6 +48,70 @@ public final class PredicateEvaluationUtil {
    }
    
    /**
+    * Checks if the given {@link SequentFormula} is a predicate.
+    * @param sequentFormula The {@link SequentFormula} to check.
+    * @return {@code true} is predicate, {@code false} is something else.
+    */
+   public static boolean isPredicate(SequentFormula sequentFormula) {
+      return sequentFormula != null ? 
+             isPredicate(sequentFormula.formula()) : 
+             false;
+   }
+   
+   /**
+    * Checks if the given {@link Term} is a predicate.
+    * @param term The {@link Term} to check.
+    * @return {@code true} is predicate, {@code false} is something else.
+    */
+   public static boolean isPredicate(Term term) {
+      return term != null ? 
+             isPredicate(term.op()) : 
+             false;
+   }
+   
+   /**
+    * Checks if the given {@link Operator} is a predicate.
+    * @param operator The {@link Operator} to check.
+    * @return {@code true} is predicate, {@code false} is something else.
+    */
+   public static boolean isPredicate(Operator operator) {
+      if (operator == Equality.EQV) {
+         return false;
+      }
+      else if (operator instanceof Junctor) {
+         return operator == Junctor.TRUE || operator == Junctor.FALSE;
+      }
+      else if (operator == AbstractTermTransformer.META_EQ ||
+               operator == AbstractTermTransformer.META_GEQ ||
+               operator == AbstractTermTransformer.META_GREATER ||
+               operator == AbstractTermTransformer.META_LEQ ||
+               operator == AbstractTermTransformer.META_LESS) {
+         return true; // These Meta constructs evaluate always to true or false
+      }
+      else if (operator instanceof SortedOperator) {
+         return ((SortedOperator) operator).sort() == Sort.FORMULA;
+      }
+      else {
+         return false;
+      }
+   }
+   
+   /**
+    * Checks if the given {@link Operator} is a {@link Junctor}.
+    * @param operator The {@link Operator} to check.
+    * @return {@code true} is {@link Junctor}, {@code false} is something else.
+    */
+   public static boolean isLogicOperator(Operator operator) {
+      // TODO: Support <=> and quantors
+      if (operator instanceof Junctor) {
+         return operator != Junctor.TRUE && operator != Junctor.FALSE;
+      }
+      else {
+         return false;
+      }
+   }
+   
+   /**
     * Evaluates the truth values in the subtree of the given {@link Node}
     * for predicates labeled with the given {@link TermLabel} name.
     * @param node The {@link Node} to start evaluation at.
@@ -52,8 +126,8 @@ public final class PredicateEvaluationUtil {
                                                     boolean useUnicode,
                                                     boolean usePrettyPrinting) throws ProofInputException {
       PredicateEvaluationResult result = new PredicateEvaluationResult();
-      Deque<Map<TermLabel, PredicateResult>> evaluationStack = new LinkedList<Map<TermLabel,PredicateResult>>();
-      evaluationStack.addFirst(new HashMap<TermLabel, PredicateResult>());
+      Deque<Map<String, IPredicateInstruction>> evaluationStack = new LinkedList<Map<String, IPredicateInstruction>>();
+      evaluationStack.addFirst(new HashMap<String, IPredicateInstruction>());
       evaluateNode(node, useUnicode, usePrettyPrinting, node, termLabelName, evaluationStack, result);
       return result;
    }
@@ -73,10 +147,10 @@ public final class PredicateEvaluationUtil {
                                     final boolean usePrettyPrinting,
                                     final Node node, 
                                     final Name termLabelName, 
-                                    final Deque<Map<TermLabel, PredicateResult>> evaluationStack, 
+                                    final Deque<Map<String, IPredicateInstruction>> evaluationStack, 
                                     final PredicateEvaluationResult result) throws ProofInputException {
       // Create new stack entry
-      final Map<TermLabel, PredicateResult> currentResults = evaluationStack.getFirst();
+      final Map<String, IPredicateInstruction> currentResults = evaluationStack.getFirst();
       // Analyze applied rule
       boolean childrenAlreadyTreated = false;
       if (node.getAppliedRuleApp() instanceof TacletApp) {
@@ -86,14 +160,14 @@ public final class PredicateEvaluationUtil {
             Term term = pio.subTerm();
             if (term != null) {
                TermLabel label = term.getLabel(termLabelName);
-               if (label != null) {
+               if (label instanceof PredicateTermLabel) {
                   Taclet taclet = ((TacletApp) tacletApp).taclet();
                   if (taclet.goalTemplates().size() >= 1) { // Not a closing taclet
                      childrenAlreadyTreated = true;
                      int i = 0;
                      for (TacletGoalTemplate tacletGoal : taclet.goalTemplates()) {
-                        Map<TermLabel, PredicateResult> childResults = new HashMap<TermLabel, PredicateResult>(currentResults);
-                        analyzeTacletGoal(node, tacletApp, tacletGoal, label, childResults);
+                        Map<String, IPredicateInstruction> childResults = new HashMap<String, IPredicateInstruction>(currentResults);
+                        analyzeTacletGoal(node, node.child(i), tacletApp, tacletGoal, (PredicateTermLabel) label, childResults);
                         // Evaluate children with branch specific Taclet result
                         evaluationStack.addFirst(childResults);
                         evaluateNode(evaluationNode, useUnicode, usePrettyPrinting, node.child(i), termLabelName, evaluationStack, result);
@@ -102,7 +176,12 @@ public final class PredicateEvaluationUtil {
                      }
                   }
                   else {
-                     updatePredicateResult(label, new PredicateResult(PredicateValue.TRUE, node), currentResults);
+                     if (pio.isInAntec()) {
+                        updatePredicateResult((PredicateTermLabel) label, new PredicateResult(PredicateValue.FALSE, node), currentResults);
+                     }
+                     else {
+                        updatePredicateResult((PredicateTermLabel) label, new PredicateResult(PredicateValue.TRUE, node), currentResults);
+                     }
                   }
                }
             }
@@ -113,11 +192,11 @@ public final class PredicateEvaluationUtil {
          for (RuleApp protocolApp : app.getProtocol()) {
             if (protocolApp instanceof TacletApp && protocolApp.posInOccurrence() != null) {
                TermLabel label = protocolApp.posInOccurrence().subTerm().getLabel(termLabelName);
-               if (label != null) {
+               if (label instanceof PredicateTermLabel) {
                   TacletApp tacletApp = (TacletApp) protocolApp;
                   Taclet taclet = tacletApp.taclet();
                   assert taclet.goalTemplates().size() == 1;
-                  analyzeTacletGoal(node, tacletApp, taclet.goalTemplates().head(), label, currentResults);
+                  analyzeTacletGoal(node, null, tacletApp, taclet.goalTemplates().head(), (PredicateTermLabel) label, currentResults);
                }
             }
          }
@@ -132,7 +211,7 @@ public final class PredicateEvaluationUtil {
       else if (!childrenAlreadyTreated) {
          // Evaluate children in case that branch specific Taclet results are not available and thus not evaluated yet.
          for (int i = 0; i < childCount; i++) {
-            evaluationStack.addFirst(new HashMap<TermLabel, PredicateResult>(currentResults));
+            evaluationStack.addFirst(new HashMap<String, IPredicateInstruction>(currentResults));
             evaluateNode(evaluationNode, useUnicode, usePrettyPrinting, node.child(i), termLabelName, evaluationStack, result);
             evaluationStack.removeFirst();
          }
@@ -141,57 +220,114 @@ public final class PredicateEvaluationUtil {
    
    /**
     * Analyzes the given {@link TacletGoalTemplate}.
-    * @param node The current {@link Node}.
+    * @param parent The current {@link Node} on which the rule was applied.
+    * @param child The child node created by the given {@link TacletApp}.
     * @param tacletApp The {@link TacletApp}.
     * @param tacletGoal The {@link TacletGoalTemplate}.
-    * @param label The {@link TermLabel}.
+    * @param label The {@link PredicateTermLabel}.
     * @param results The {@link Map} with all available {@link PredicateResult}s.
     */
-   private static void analyzeTacletGoal(Node node, 
+   private static void analyzeTacletGoal(Node parent, 
+                                         Node child,
                                          TacletApp tacletApp, 
                                          TacletGoalTemplate tacletGoal, 
-                                         TermLabel label, 
-                                         Map<TermLabel, PredicateResult> results) {
-      Object replaceObject = tacletGoal.replaceWithExpressionAsObject();
-      if (replaceObject instanceof Term) {
-         Term replaceTerm = SymbolicExecutionUtil.instantiateTerm((Term) replaceObject, tacletApp, node.proof().getServices());
-         // Check for true/false terms
-         if (replaceTerm.op() == Junctor.TRUE) {
-            if (tacletApp.posInOccurrence().isInAntec()) {
-               updatePredicateResult(label, new PredicateResult(PredicateValue.FALSE, node), results);
-            }
-            else {
-               updatePredicateResult(label, new PredicateResult(PredicateValue.TRUE, node), results);
-            }
+                                         PredicateTermLabel label, 
+                                         Map<String, IPredicateInstruction> results) {
+      boolean truthValueEvaluationRequired = true;
+      if (child != null) {
+         Term replacement = checkForNewMinorIds(child.sequent(), label, tacletApp.posInOccurrence().isInAntec(), child.proof().getServices().getTermBuilder());
+         if (replacement != null) {
+            updatePredicateResult(label, new TermPredicateInstruction(replacement), results);
+            truthValueEvaluationRequired = false;
          }
-         else if (replaceTerm.op() == Junctor.FALSE) {
-            if (tacletApp.posInOccurrence().isInAntec()) {
-               updatePredicateResult(label, new PredicateResult(PredicateValue.TRUE, node), results);
+      }
+      if (truthValueEvaluationRequired) {
+         Object replaceObject = tacletGoal.replaceWithExpressionAsObject();
+         if (replaceObject instanceof Term) {
+            Term replaceTerm = SymbolicExecutionUtil.instantiateTerm((Term) replaceObject, tacletApp, parent.proof().getServices());
+            // Check for true/false terms
+            if (replaceTerm.op() == Junctor.TRUE) {
+               updatePredicateResult(label, new PredicateResult(PredicateValue.TRUE, parent), results);
             }
-            else {
-               updatePredicateResult(label, new PredicateResult(PredicateValue.FALSE, node), results);
+            else if (replaceTerm.op() == Junctor.FALSE) {
+               updatePredicateResult(label, new PredicateResult(PredicateValue.FALSE, parent), results);
             }
          }
       }
    }
 
-   /**
-    * Updates the {@link PredicateResult} of the given {@link TermLabel}.
-    * @param label The {@link TermLabel} to update its {@link PredicateResult}.
-    * @param result The new {@link PredicateResult}.
-    * @param results The {@link Map} with all available {@link PredicateResult}s.
-    */
-   private static void updatePredicateResult(TermLabel label, PredicateResult result, Map<TermLabel, PredicateResult> results) {
-//      PredicateResult oldResult = results.get(label);
-//      if (oldResult != null) {
-//         if (!oldResult.getValue().equals(result.getValue())) {
-//            PredicateResult newResult = new PredicateResult(PredicateValue.UNKNOWN, oldResult.getNodes(), result.getNodes());
-//            results.put(label, newResult);
+   protected static Term checkForNewMinorIds(Sequent sequent, 
+                                             PredicateTermLabel label,
+                                             boolean antecedentRuleApplication,
+                                             TermBuilder tb) {
+      List<Term> antecedentReplacements = new LinkedList<Term>();
+      List<Term> succedentReplacements = new LinkedList<Term>();
+      for (SequentFormula sf : sequent.antecedent()) {
+         findLabelReplacements(sf, label.name(), label.getId(), antecedentReplacements);
+      }
+      for (SequentFormula sf : sequent.succedent()) {
+         findLabelReplacements(sf, label.name(), label.getId(), succedentReplacements);
+      }
+      if (!antecedentReplacements.isEmpty() && !succedentReplacements.isEmpty()) {
+//         Term left = tb.and(antecedentReplacements);
+//         Term right = tb.or(succedentReplacements);
+//         if (antecedentRuleApplication) {
+//            return tb.and(left, tb.not(right));
 //         }
-//      }
-//      else {
-         results.put(label, result);
-//      }
+//         else {
+//            return tb.and(tb.not(left), right);
+//         }
+         throw new UnsupportedOperationException();
+      }
+      else if (!antecedentReplacements.isEmpty()) {
+         Term left = tb.and(antecedentReplacements);
+         if (antecedentRuleApplication) {
+            return left;
+         }
+         else {
+            return tb.not(left);
+         }
+      }
+      else if (!succedentReplacements.isEmpty()) {
+         Term right = tb.or(succedentReplacements);
+         if (!antecedentRuleApplication) {
+            return right;
+         }
+         else {
+            return tb.not(right);
+         }
+      }
+      else {
+         return null;
+      }
+   }
+   
+   protected static void findLabelReplacements(final SequentFormula sf, 
+                                               final Name labelName,
+                                               final String labelId, 
+                                               final List<Term> resultToFill) {
+      sf.formula().execPreOrder(new DefaultVisitor() {
+         @Override
+         public void visit(Term visited) {
+            TermLabel visitedLabel = visited.getLabel(labelName);
+            if (visitedLabel instanceof PredicateTermLabel) {
+               PredicateTermLabel pLabel = (PredicateTermLabel) visitedLabel;
+               if (JavaUtil.equals(pLabel.getBeforeId(), labelId)) {
+                  resultToFill.add(visited);
+               }
+            }
+         }
+      });
+   }
+
+   /**
+    * Updates the {@link IPredicateInstruction} of the given {@link TermLabel}.
+    * @param label The {@link PredicateTermLabel} to update its {@link IPredicateInstruction}.
+    * @param result The new {@link IPredicateInstruction}.
+    * @param results The {@link Map} with all available {@link IPredicateInstruction}s.
+    */
+   private static void updatePredicateResult(PredicateTermLabel label, IPredicateInstruction result, Map<String, IPredicateInstruction> results) {
+      results.put(label.getId(), result);
    }
    
    /**
@@ -251,7 +387,7 @@ public final class PredicateEvaluationUtil {
       /**
        * All predicate results.
        */
-      private final Map<TermLabel, PredicateResult> results;
+      private final Map<String, IPredicateInstruction> results;
       
       /**
        * The leaf {@link Node}.
@@ -275,14 +411,14 @@ public final class PredicateEvaluationUtil {
       
       /**
        * Constructor. 
-       * @param leafNode All predicate results.
-       * @param results The leaf {@link Node}.
+       * @param leafNode The leaf {@link Node}.
+       * @param results All predicate results.
        * @param condition The condition under which the leaf {@link Node} is reached from the analyzed {@link Node}.
        * @param conditionString The human readable condition under which the leaf {@link Node} is reached from the analyzed {@link Node}.
        * @param termLabelName The {@link Name} of the {@link TermLabel} to consider.
        */
       public BranchResult(Node leafNode, 
-                          Map<TermLabel, PredicateResult> results,
+                          Map<String, IPredicateInstruction> results,
                           Term condition,
                           String conditionString,
                           Name termLabelName) {
@@ -300,17 +436,17 @@ public final class PredicateEvaluationUtil {
        * Returns all predicate results.
        * @return All predicate results.
        */
-      public Map<TermLabel, PredicateResult> getResults() {
+      public Map<String, IPredicateInstruction> getResults() {
          return Collections.unmodifiableMap(results);
       }
       
       /**
-       * Returns the {@link PredicateResult} for the given {@link TermLabel}.
-       * @param termLabel The {@link TermLabel}.
+       * Returns the {@link PredicateResult} for the given {@link PredicateTermLabel}.
+       * @param termLabel The {@link PredicateTermLabel}.
        * @return The found {@link PredicateResult} or {@code null} if not available.
        */
-      public PredicateResult getResult(TermLabel termLabel) {
-         return results.get(termLabel);
+      public IPredicateInstruction getResult(PredicateTermLabel termLabel) {
+         return termLabel != null ? results.get(termLabel.getId()) : null;
       }
       
       /**
@@ -347,12 +483,13 @@ public final class PredicateEvaluationUtil {
       }
 
       /**
-       * Returns the first {@link TermLabel} with {@link Name} {@link #getTermLabelName()}.
+       * Returns the first {@link PredicateTermLabel} with {@link Name} {@link #getTermLabelName()}.
        * @param term The {@link Term}.
-       * @return The found {@link TermLabel} or {@code null} otherwise.
+       * @return The found {@link PredicateTermLabel} or {@code null} otherwise.
        */
-      public TermLabel getPredicateLabel(Term term) {
-         return term.getLabel(termLabelName);
+      public PredicateTermLabel getPredicateLabel(Term term) {
+         TermLabel label = term.getLabel(termLabelName);
+         return label instanceof PredicateTermLabel ? (PredicateTermLabel) label : null;
       }
 
       /**
@@ -365,7 +502,7 @@ public final class PredicateEvaluationUtil {
          sb.append(leafNode.serialNr());
          sb.append("\n");
          boolean afterFirst = false;
-         for (Entry<TermLabel, PredicateResult> entry : results.entrySet()) {
+         for (Entry<String, IPredicateInstruction> entry : results.entrySet()) {
             if (afterFirst) {
                sb.append("\n");
             }
@@ -374,10 +511,31 @@ public final class PredicateEvaluationUtil {
             }
             sb.append(entry.getKey());
             sb.append(" = ");
+            sb.append(entry.getValue().evaluate(termLabelName, results));
+            sb.append(" :: ");
             sb.append(entry.getValue());
          }
          return sb.toString();
       }
+
+      /**
+       * Evaluates the given {@link PredicateTermLabel}.
+       * @param termLabel The {@link PredicateTermLabel} to evaluate.
+       * @return The evaluation result.
+       */
+      public PredicateResult evaluate(PredicateTermLabel termLabel) {
+         if (termLabel != null) {
+            IPredicateInstruction instruction = getResult(termLabel);
+            return instruction != null ? instruction.evaluate(termLabelName, results) : null;
+         }
+         else {
+            return null;
+         }
+      }
+   }
+   
+   public static interface IPredicateInstruction {
+      public PredicateResult evaluate(Name termLabelName, Map<String, IPredicateInstruction> results);
    }
    
    /**
@@ -385,7 +543,7 @@ public final class PredicateEvaluationUtil {
     * <b>This class needs to be unmodifiable.</b>
     * @author Martin Hentschel
     */
-   public static class PredicateResult {
+   public static class PredicateResult implements IPredicateInstruction {
       /**
        * The truth value.
        */
@@ -458,6 +616,84 @@ public final class PredicateEvaluationUtil {
             }
          }
          return sb.toString();
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public PredicateResult evaluate(Name termLabelName, Map<String, IPredicateInstruction> results) {
+         return this;
+      }
+   }
+   
+   public static class TermPredicateInstruction implements IPredicateInstruction {
+      private final Term term;
+
+      public TermPredicateInstruction(Term term) {
+         assert term != null;
+         this.term = term;
+      }
+
+      @Override
+      public String toString() {
+         return term.toString();
+      }
+
+      @Override
+      public PredicateResult evaluate(Name termLabelName, Map<String, IPredicateInstruction> results) {
+         TermLabel label = term.getLabel(termLabelName);
+         // Return direct label result if available
+         if (label instanceof PredicateTermLabel) {
+            IPredicateInstruction instruction = results.get(((PredicateTermLabel) label).getId());
+            if (instruction != null) {
+               return instruction.evaluate(termLabelName, results);
+            }
+         }
+         // If direct label result is not available try to compute it. (e.g. because of or/and label was replaced by sequent top level formuals)
+         if (term.op() == Junctor.AND ||
+             term.op() == Junctor.IMP ||
+             term.op() == Junctor.OR) {
+            Term leftTerm = term.sub(0);
+            Term rightTerm = term.sub(1);
+            TermLabel leftLabel = leftTerm.getLabel(termLabelName);
+            TermLabel rightLabel = rightTerm.getLabel(termLabelName);
+            IPredicateInstruction leftInstruction = leftLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) leftLabel).getId()) : null;
+            IPredicateInstruction rightInstruction = rightLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) rightLabel).getId()) : null;
+            PredicateResult leftResult = leftInstruction != null ? leftInstruction.evaluate(termLabelName, results) : null;
+            PredicateResult rightResult = rightInstruction != null ? rightInstruction.evaluate(termLabelName, results) : null;
+            PredicateValue leftValue = leftResult != null ? leftResult.getValue() : null;
+            PredicateValue rightValue = rightResult != null ? rightResult.getValue() : null;
+            PredicateValue resultValue;
+            if (term.op() == Junctor.AND) {
+               resultValue = PredicateValue.and(leftValue, rightValue);
+            }
+            else if (term.op() == Junctor.IMP) {
+               resultValue = PredicateValue.imp(leftValue, rightValue);
+            }
+            else if (term.op() == Junctor.OR) {
+               resultValue = PredicateValue.or(leftValue, rightValue);
+            }
+            else {
+               throw new IllegalStateException("Operator '" + term.op() + "' is not supported.");
+            }
+            return new PredicateResult(resultValue, 
+                                       leftResult != null ? leftResult.getNodes() : null,
+                                       rightResult != null ? rightResult.getNodes() : null);
+         }
+         else if (term.op() == Junctor.NOT) {
+            Term argumentTerm = term.sub(0);
+            TermLabel argumentLabel = argumentTerm.getLabel(termLabelName);
+            IPredicateInstruction argumentInstruction = argumentLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) argumentLabel).getId()) : null;
+            PredicateResult argumentResult = argumentInstruction != null ? argumentInstruction.evaluate(termLabelName, results) : null;
+            PredicateValue argumentValue = argumentResult != null ? argumentResult.getValue() : null;
+            PredicateValue resultValue = PredicateValue.not(argumentValue);
+            return new PredicateResult(resultValue, 
+                                       argumentResult != null ? argumentResult.getNodes() : null);
+         }
+         else {
+            return null;
+         }
       }
    }
    

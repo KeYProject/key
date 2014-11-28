@@ -36,6 +36,7 @@ import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.util.TermHelper;
+import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
@@ -259,7 +260,8 @@ public class RewriteTaclet extends FindTaclet {
                          IntIterator it,
                          Services services,
                          MatchConditions mc,
-                         Sort maxSort) {
+                         Sort maxSort,
+                         TacletLabelHint labelHint) {
 	if (it.hasNext()) {
 	    int sub = it.next();
 
@@ -277,7 +279,8 @@ public class RewriteTaclet extends FindTaclet {
 				      it,
 				      services,
 				      mc,
-			    	      newMaxSort);
+			    	      newMaxSort,
+			    	     labelHint);
 		}
 	    }
 
@@ -288,7 +291,7 @@ public class RewriteTaclet extends FindTaclet {
 	            				  term.getLabels());
 	}
 
-	with = syntacticalReplace(with, services, mc, posOfFind);
+	with = syntacticalReplace(with, services, mc, posOfFind, labelHint);
 
 	if(!with.sort().extendsTrans(maxSort)) {
 	    with = services.getTermBuilder().cast(maxSort, with);
@@ -313,7 +316,8 @@ public class RewriteTaclet extends FindTaclet {
 	                       it,
 	                       services,
 	                       matchCond,
-	                       term.sort());
+	                       term.sort(),
+	                       new TacletLabelHint(rwTemplate));
 	if(term == formula) {
 	    return posOfFind.constrainedFormula();
 	} else {
@@ -384,12 +388,12 @@ public class RewriteTaclet extends FindTaclet {
          SequentChangeInfo currentSequent, PosInOccurrence posOfFind,
          Services services, MatchConditions matchCond) {
       if (posOfFind.isInAntec()) {
-         addToAntec(add.antecedent(), currentSequent, posOfFind, services, matchCond, posOfFind);
-         addToSucc(add.succedent(), currentSequent, null, services, matchCond, posOfFind);
+         addToAntec(add.antecedent(), currentSequent, posOfFind, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add));
+         addToSucc(add.succedent(), currentSequent, null, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add));
       }
       else {
-         addToAntec(add.antecedent(), currentSequent, null, services, matchCond, posOfFind);
-         addToSucc(add.succedent(), currentSequent, posOfFind, services, matchCond, posOfFind);
+         addToAntec(add.antecedent(), currentSequent, null, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add));
+         addToSucc(add.succedent(), currentSequent, posOfFind, services, matchCond, posOfFind, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add));
       }
    }
     

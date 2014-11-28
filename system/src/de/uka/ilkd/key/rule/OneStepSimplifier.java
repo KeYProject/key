@@ -337,7 +337,8 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
                                                                                   result.op(), 
                                                                                   result.subs(), 
                                                                                   result.boundVars(), 
-                                                                                  result.javaBlock());
+                                                                                  result.javaBlock(),
+                                                                                  result.getLabels());
             if (labels != null && !labels.isEmpty()) {
                result = services.getTermBuilder().label(result, labels);
             }

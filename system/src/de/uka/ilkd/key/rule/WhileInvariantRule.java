@@ -610,7 +610,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                 TermLabelManager.instantiateLabels(services, ruleApp.posInOccurrence(), this, useGoal,
                                                    "UseModality", null, inst.progPost.op(),
                                                    new ImmutableArray<Term>(inst.progPost.sub(0)),
-                                                   null, useJavaBlock);
+                                                   null, useJavaBlock, inst.progPost.getLabels());
         Term restPsi = tb.prog((Modality)inst.progPost.op(), useJavaBlock, inst.progPost.sub(0),
                                instantiateLabels);
         Term guardFalseRestPsi = tb.box(guardJb, tb.imp(guardFalseTerm, restPsi));

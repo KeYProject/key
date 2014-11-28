@@ -8,12 +8,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.PredicateTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.SortedOperator;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
@@ -21,6 +17,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil;
 
 /**
  * The {@link TermLabelRefactoring} used to label predicates with a
@@ -41,7 +38,13 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
     * {@inheritDoc}
     */
    @Override
-   public RefactoringScope defineRefactoringScope(TermServices services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm) {
+   public RefactoringScope defineRefactoringScope(Services services, 
+                                                  PosInOccurrence applicationPosInOccurrence, 
+                                                  Term applicationTerm, 
+                                                  Rule rule, 
+                                                  Goal goal, 
+                                                  Object hint, 
+                                                  Term tacletTerm) {
       if (shouldRefactor(goal, hint)) {
          return RefactoringScope.APPLICATION_CHILDREN_AND_GRANDCHILDREN_SUBTREE;
       }
@@ -93,30 +96,14 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
                                Term term, 
                                List<TermLabel> labels) {
       if (shouldRefactor(goal, hint)) {
-         if (isPredicate(term)) {
+         if (PredicateEvaluationUtil.isPredicate(term)) {
             TermLabel existingLabel = term.getLabel(PredicateTermLabel.NAME);
             if (existingLabel == null) {
                int labelID = services.getCounter(PredicateTermLabel.PROOF_COUNTER_NAME).getCountPlusPlus();
-               labels.add(new PredicateTermLabel(labelID));
+               int labelSubID = services.getCounter(PredicateTermLabel.PROOF_COUNTER_SUB_PREFIX + labelID).getCountPlusPlus();
+               labels.add(new PredicateTermLabel(labelID, labelSubID));
             }
          }
-      }
-   }
-   
-   /**
-    * Checks if the given {@link Term} is a predicate.
-    * @param term The {@link Term} to check.
-    * @return {@code true} is predicate, {@code false} is something else.
-    */
-   protected boolean isPredicate(Term term) {
-      if (term.op() instanceof Junctor) {
-         return term.op() == Junctor.TRUE || term.op() == Junctor.FALSE;
-      }
-      if (term.op() instanceof SortedOperator) {
-         return ((SortedOperator) term.op()).sort() == Sort.FORMULA;
-      }
-      else {
-         return false;
       }
    }
 }

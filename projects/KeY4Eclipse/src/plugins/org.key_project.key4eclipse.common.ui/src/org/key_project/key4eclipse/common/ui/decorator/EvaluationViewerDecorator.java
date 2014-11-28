@@ -21,7 +21,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.PredicateTermLabel;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PositionTable;
@@ -173,10 +173,10 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
                                  Map<Term, PredicateValue> termValueMap,
                                  ImmutableList<Integer> path,
                                  List<StyleRange> styleRanges) {
-      TermLabel label = branchResult.getPredicateLabel(term);
+      PredicateTermLabel label = branchResult.getPredicateLabel(term);
       if (label != null) {
          // The BranchResult knows the result of the current Term.
-         PredicateResult predicateResult = branchResult.getResult(label);
+         PredicateResult predicateResult = branchResult.evaluate(label);
          PredicateValue value = predicateResult != null ? predicateResult.getValue() : PredicateValue.UNKNOWN;
          Color color = getColor(value);
          Range range = positionTable.rangeForPath(path, textLength);

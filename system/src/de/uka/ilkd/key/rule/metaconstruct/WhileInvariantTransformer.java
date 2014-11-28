@@ -273,7 +273,7 @@ public final class WhileInvariantTransformer {
         return services.getTermBuilder().prog(loopBodyModality, 
                                    mainJavaBlock, 
                                    result,
-                                   computeLoopBodyModalityLabels(services, applicationPos, rule, goal, loopBodyModality, result, mainJavaBlock, applicationSequent)); 
+                                   computeLoopBodyModalityLabels(services, applicationPos, rule, goal, loopBodyModality, result, mainJavaBlock, applicationSequent, initialPost.getLabels())); 
     }
     
     /**
@@ -316,8 +316,9 @@ public final class WhileInvariantTransformer {
                                                                      Operator loopBodyModality, 
                                                                      Term result, 
                                                                      JavaBlock mainJavaBlock, 
-                                                                     Sequent applicationSequent) {
-       return TermLabelManager.instantiateLabels(services, applicationPos, rule, goal, "LoopBodyModality", null, loopBodyModality, new ImmutableArray<Term>(result), null, mainJavaBlock);
+                                                                     Sequent applicationSequent,
+                                                                     ImmutableArray<TermLabel> newTermOriginalLabels) {
+       return TermLabelManager.instantiateLabels(services, applicationPos, rule, goal, "LoopBodyModality", null, loopBodyModality, new ImmutableArray<Term>(result), null, mainJavaBlock, newTermOriginalLabels);
     }
 
     /**
@@ -419,7 +420,7 @@ public final class WhileInvariantTransformer {
         Term executeReturn = services.getTermBuilder().prog(modality, 
                                                  returnJavaBlock, 
                                                  post,
-                                                 TermLabelManager.instantiateLabels(services, applicationPos, rule, goal, "ReturnCaseModality", null, modality, new ImmutableArray<Term>(post), null, returnJavaBlock));
+                                                 TermLabelManager.instantiateLabels(services, applicationPos, rule, goal, "ReturnCaseModality", null, modality, new ImmutableArray<Term>(post), null, returnJavaBlock, post.getLabels()));
         
         return services.getTermBuilder().imp(services.getTermBuilder().equals(typeConv.convertToLogicElement(returnFlag), typeConv.getBooleanLDT().getTrueTerm()),
                                   executeReturn);
@@ -449,7 +450,7 @@ public final class WhileInvariantTransformer {
         Term executeBreak = services.getTermBuilder().prog(modality, 
                                                 executeJavaBlock, 
                                                 post,
-                                                TermLabelManager.instantiateLabels(services, applicationPos, rule, goal, "BreakCaseModality", null, modality, new ImmutableArray<Term>(post), null, executeJavaBlock));
+                                                TermLabelManager.instantiateLabels(services, applicationPos, rule, goal, "BreakCaseModality", null, modality, new ImmutableArray<Term>(post), null, executeJavaBlock, post.getLabels()));
         return services.getTermBuilder().imp(services.getTermBuilder().equals(typeConv.convertToLogicElement(breakFlag), 
                                 typeConv.getBooleanLDT().getTrueTerm()), 
                                 executeBreak); 
@@ -517,7 +518,7 @@ public final class WhileInvariantTransformer {
                                                                        Operator operator, 
                                                                        ImmutableArray<Term> subs, 
                                                                        Sequent applicationSequent) {
-       return TermLabelManager.instantiateLabels(services, applicationPos, rule, goal, "LoopBodyImplication", null, operator, subs, null, null);
+       return TermLabelManager.instantiateLabels(services, applicationPos, rule, goal, "LoopBodyImplication", null, operator, subs, null, null, post.getLabels());
     }
     
 
@@ -533,7 +534,7 @@ public final class WhileInvariantTransformer {
         Term throwException = TB.prog(modality, 
                                                   throwJavaBlock, 
                                                   post,
-                                                  TermLabelManager.instantiateLabels(services, applicationPos, rule, goal, "ThrowCaseModality", null, modality, new ImmutableArray<Term>(post), null, throwJavaBlock));
+                                                  TermLabelManager.instantiateLabels(services, applicationPos, rule, goal, "ThrowCaseModality", null, modality, new ImmutableArray<Term>(post), null, throwJavaBlock, post.getLabels()));
         return TB.imp( 
               TB.equals(typeConv.convertToLogicElement(excFlag), 
         	       typeConv.getBooleanLDT().getTrueTerm()), 
