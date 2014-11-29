@@ -87,4 +87,9 @@ public class BasicTask extends DefaultMutableTreeNode implements TaskTreeNode{
     public void decoupleFromEnv() {
        getProofEnv().removeProofList(proof);
     }
+
+    @Override
+    public TaskTreeNode[] getChildren() {
+        return NO_CHILDREN;
+    }
 }
