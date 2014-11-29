@@ -15,7 +15,6 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
-import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.ui.extension.JMLLocator;
 import org.key_project.util.jmlediting.JMLUtil;
@@ -54,7 +53,7 @@ public class JMLCompletionProposalComputer implements IJavaCompletionProposalCom
 		      int proposalOffset = context.getInvocationOffset() - prefix.length();
 		      
 		      //Iterate through the supported behaviors defined in JMLProfile
-		      for (IJMLBehaviorKeyword behavior: currentJMLProfile.getSupportedBehaviors()) {
+		      for (IKeyword behavior: currentJMLProfile.getSupportedKeywords()) {
 		         Set<String> keywords = behavior.getKeywords();
 		         //check for all spellings
 		         for (String keyword: keywords) {
@@ -62,14 +61,6 @@ public class JMLCompletionProposalComputer implements IJavaCompletionProposalCom
 		            if (keyword.startsWith(prefix)) {
 		               result.add(new CompletionProposal(keyword, proposalOffset, prefixLength, keyword.length()));
 		            }
-		         }
-		      }
-		      //Iterate through all generic keywords defined in JMLProfile
-		      for (IKeyword generic: currentJMLProfile.getSupportedKeywords()) {
-		         String keyword = generic.getKeywords();
-		         //ignore not possible suggestions
-		         if (keyword.startsWith(prefix)) {
-		            result.add(new CompletionProposal(keyword, proposalOffset, prefixLength, keyword.length()));
 		         }
 		      }
 		      //Iterate through all JML-Profile independent keywords, like "also"
