@@ -319,7 +319,7 @@ public class FileChooser extends JPanel{
         
         private JDialog getHelpWindow(){
               if(helpWindow == null){
-                      helpWindow = dialog != null ?new JDialog(dialog) : new JDialog();
+            helpWindow = dialog != null ? new JDialog(dialog) : new JDialog();
                       
                       JTextArea textArea = new JTextArea(HELP_TEXT);
                       textArea.setWrapStyleWord(true);
