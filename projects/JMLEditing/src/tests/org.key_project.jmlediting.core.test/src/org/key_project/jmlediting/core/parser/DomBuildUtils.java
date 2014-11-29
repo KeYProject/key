@@ -2,9 +2,6 @@ package org.key_project.jmlediting.core.parser;
 
 import static org.junit.Assert.fail;
 
-import java.beans.Visibility;
-import java.util.Arrays;
-
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
@@ -12,17 +9,18 @@ import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 
 public class DomBuildUtils {
 
-   static IASTNode buildKeywordSequence(int start, int end, IASTNode... nodes) {
+   static IASTNode buildKeywordSequence(final int start, final int end,
+         final IASTNode... nodes) {
       return Nodes.createNode(start, end, NodeTypes.NODE, nodes);
    }
 
-   static IASTNode buildKeywordSpec(String keyword, String content) {
+   static IASTNode buildKeywordSpec(final String keyword, final String content) {
       return buildKeywordSpec(keyword, 0, 0, content);
    }
 
-   static IASTNode buildKeywordSpec(String keyword, int start) {
+   static IASTNode buildKeywordSpec(final String keyword, final int start) {
       IKeyword sKeyword = null;
-      for (IKeyword k : ProfileWrapper.testProfile.getSupportedKeywords()) {
+      for (final IKeyword k : ProfileWrapper.testProfile.getSupportedKeywords()) {
          if (k.getKeywords().contains(keyword)) {
             sKeyword = k;
             break;
@@ -36,10 +34,10 @@ public class DomBuildUtils {
 
    }
 
-   static IASTNode buildKeywordSpec(String keyword, int start, int end,
-         String content) {
+   static IASTNode buildKeywordSpec(final String keyword, final int start,
+         final int end, final String content) {
       IKeyword sKeyword = null;
-      for (IKeyword k : ProfileWrapper.testProfile.getSupportedKeywords()) {
+      for (final IKeyword k : ProfileWrapper.testProfile.getSupportedKeywords()) {
          if (k.getKeywords().contains(keyword)) {
             sKeyword = k;
             break;
@@ -50,6 +48,7 @@ public class DomBuildUtils {
       }
       return Nodes.createNode(start, end, NodeTypes.KEYWORD_APPL, Nodes
             .createKeyword(start, start + keyword.length(), sKeyword, keyword),
-            Nodes.createNode(NodeTypes.NODE,Nodes.createString(start + keyword.length() + 1, end, content)));
+            Nodes.createNode(NodeTypes.NODE, Nodes.createString(
+                  start + keyword.length() + 1, end, content)));
    }
 }

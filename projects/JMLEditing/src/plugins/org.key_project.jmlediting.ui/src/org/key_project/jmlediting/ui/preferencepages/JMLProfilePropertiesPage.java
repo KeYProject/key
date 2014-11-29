@@ -27,7 +27,7 @@ import org.key_project.jmlediting.core.profile.JMLProfileManagement;
  * page to show in project settings or global preferences. The page allows the
  * user to select a JML profile from available ones as project specific or
  * global default.
- * 
+ *
  * @author Moritz Lichter
  *
  */
@@ -66,7 +66,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
    }
 
    @Override
-   public void setVisible(boolean visible) {
+   public void setVisible(final boolean visible) {
       // Register the preference listener if the dialog is visible
       // do not generate memory leaks, listener are removed in
       // performOK and performCancel, here is too late
@@ -76,7 +76,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
                   @Override
                   public void preferenceChange(final PreferenceChangeEvent event) {
-                     updateSelection();
+                     JMLProfilePropertiesPage.this.updateSelection();
                   }
                });
       }
@@ -96,7 +96,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
       data = new GridData();
       data.horizontalSpan = 2;
-      Label label = new Label(myComposite, SWT.NONE);
+      final Label label = new Label(myComposite, SWT.NONE);
       label.setText("Choose active JML Profile from available ones:");
       label.setLayoutData(data);
 
@@ -127,38 +127,43 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       // Get all profiles and set them to the list
       this.allProfiles = JMLProfileManagement
             .getAvailableProfilesSortedByName();
-      TableColumn nameColumn = new TableColumn(this.profilesList, SWT.LEFT);
+      final TableColumn nameColumn = new TableColumn(this.profilesList,
+            SWT.LEFT);
       nameColumn.setMoveable(false);
       nameColumn.setWidth(300);
       nameColumn.setText("Profile Name");
-      for (IJMLProfile profile : this.allProfiles) {
-         TableItem item = new TableItem(this.profilesList, 0);
+      for (final IJMLProfile profile : this.allProfiles) {
+         final TableItem item = new TableItem(this.profilesList, 0);
          item.setText(new String[] { profile.getName() });
       }
 
       // Make sure that only one profile is available at a single time
       this.profilesList.addListener(SWT.Selection, new Listener() {
-         public void handleEvent(Event event) {
+         @Override
+         public void handleEvent(final Event event) {
             if (event.detail == SWT.CHECK) {
-               TableItem item = (TableItem) event.item;
+               final TableItem item = (TableItem) event.item;
                if (item.getChecked()) {
-                  for (TableItem item2 : profilesList.getItems()) {
+                  for (final TableItem item2 : JMLProfilePropertiesPage.this.profilesList
+                        .getItems()) {
                      if (item != item2) {
                         item2.setChecked(false);
                      }
                   }
-                  setErrorMessage(null);
+                  JMLProfilePropertiesPage.this.setErrorMessage(null);
                }
                else {
                   boolean nothingChecked = true;
-                  for (TableItem item2 : profilesList.getItems()) {
+                  for (final TableItem item2 : JMLProfilePropertiesPage.this.profilesList
+                        .getItems()) {
                      if (item2.getChecked()) {
                         nothingChecked = false;
                         break;
                      }
                   }
                   if (nothingChecked) {
-                     setErrorMessage("Please select an active profile");
+                     JMLProfilePropertiesPage.this
+                           .setErrorMessage("Please select an active profile");
                   }
                }
             }
@@ -179,11 +184,11 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
    /**
     * Sets the list of profiles enabled or not.
-    * 
+    *
     * @param enabled
     *           whether to enable the list or not
     */
-   private void setListEnabled(boolean enabled) {
+   private void setListEnabled(final boolean enabled) {
       this.profilesList.setEnabled(enabled);
 
       // Please dont ask me why I need this call here
@@ -201,7 +206,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
    @Override
    protected void enableProjectSpecificSettings(
-         boolean useProjectSpecificSettings) {
+         final boolean useProjectSpecificSettings) {
       super.enableProjectSpecificSettings(useProjectSpecificSettings);
       if (!useProjectSpecificSettings) {
          // Reset selection to default if no project settings
@@ -242,7 +247,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
          try {
             currentProfile = JMLPreferencesHelper.getDefaultJMLProfile();
          }
-         catch (NoSuchElementException e) {
+         catch (final NoSuchElementException e) {
             this.setErrorMessage("No JML Profile available");
             return;
          }
@@ -251,11 +256,11 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
       System.out.println("Final profile: " + currentProfile);
 
       // Select profile in the list
-      for (TableItem item : this.profilesList.getItems()) {
+      for (final TableItem item : this.profilesList.getItems()) {
          item.setChecked(false);
       }
       if (currentProfile != null) {
-         int index = this.allProfiles.indexOf(currentProfile);
+         final int index = this.allProfiles.indexOf(currentProfile);
          if (index != -1) {
             this.profilesList.getItem(index).setChecked(true);
          }
@@ -270,12 +275,12 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
    private void removePreferencesListener() {
       JMLPreferencesHelper
-            .removeDefaultProfilePreferencesListener(this.currentPreferenceListener);
+      .removeDefaultProfilePreferencesListener(this.currentPreferenceListener);
    }
 
    @Override
    public boolean performCancel() {
-      boolean cancel = super.performCancel();
+      final boolean cancel = super.performCancel();
       if (cancel) {
          // Remove preferences listener
          this.removePreferencesListener();
@@ -304,7 +309,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
       if (this.isProjectPreferencePage()) {
          // Project preferences
-         IProject project = this.getProject();
+         final IProject project = this.getProject();
          try {
             if (this.useProjectSettings()) {
                // Only write into properties if a selection is available (user
@@ -322,7 +327,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
                JMLPreferencesHelper.setProjectJMLProfile(project, null);
             }
          }
-         catch (CoreException e) {
+         catch (final CoreException e) {
             return false;
          }
       }
@@ -330,7 +335,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
          JMLPreferencesHelper.setDefaultJMLProfile(selectedProfile);
       }
 
-      boolean ok = super.performOk();
+      final boolean ok = super.performOk();
       if (ok) {
          // Window is closed, remove listener
          this.removePreferencesListener();

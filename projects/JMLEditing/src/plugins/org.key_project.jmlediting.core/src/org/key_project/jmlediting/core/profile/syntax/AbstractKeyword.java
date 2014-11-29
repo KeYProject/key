@@ -5,11 +5,29 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * An {@link AbstractKeyword} does some default implementation for an
+ * {@link IKeyword}.
+ *
+ * @author Moritz Lichter
+ *
+ */
 public abstract class AbstractKeyword implements IKeyword {
 
+   /**
+    * A set of all supported keywords.
+    */
    private final Set<String> keywords;
 
-   public AbstractKeyword(String... keywords) {
+   /**
+    * Creates a new {@link AbstractKeyword}. The list of supported keywords is
+    * converted to a set, but for easier code the varargs are used in the
+    * constructor,
+    *
+    * @param keywords
+    *           all supported keywords
+    */
+   public AbstractKeyword(final String... keywords) {
       super();
       switch (keywords.length) {
       case 0:

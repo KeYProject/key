@@ -1,34 +1,45 @@
 package org.key_project.jmlediting.core.dom.internal;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
 
-public class ASTNode extends AbstractASTNode{
-   
+/**
+ * An ASTNode implements a default AST node.
+ *
+ * @author Moritz Lichter
+ *
+ */
+public class ASTNode extends AbstractASTNode {
+
+   /**
+    * The type of the node.
+    */
    private final int type;
-   private final int startOffset;
-   private final int endOffset;
-   private List<IASTNode> children;
-   
-   public ASTNode(int startOffset, int endOffset, int type, List<IASTNode> children) {
-      super();
-      this.startOffset = startOffset;
-      this.endOffset = endOffset;
+   /**
+    * The list of all children.
+    */
+   private final List<IASTNode> children;
+
+   /**
+    * Creates a new {@link ASTNode}. The start offset needs to be less than the
+    * end offset.
+    *
+    * @param startOffset
+    *           the start offset
+    * @param endOffset
+    *           the end offset
+    * @param type
+    *           the type of the node
+    * @param children
+    *           the list of children of the node, may be null
+    */
+   public ASTNode(final int startOffset, final int endOffset, final int type,
+         final List<IASTNode> children) {
+      super(startOffset, endOffset);
       this.type = type;
       this.children = children;
-   }
-   
-   @Override
-   public int getStartOffset() {
-      return this.startOffset;
-   }
-   
-   @Override
-   public int getEndOffset() {
-      return this.endOffset;
    }
 
    @Override
@@ -38,20 +49,13 @@ public class ASTNode extends AbstractASTNode{
 
    @Override
    public List<IASTNode> getChildren() {
+      // We need to return a non null list in any case
       if (this.children == null) {
          return Collections.emptyList();
-      } else {
+      }
+      else {
          return Collections.unmodifiableList(this.children);
       }
    }
-   
-   public void addChildren(IASTNode node) {
-      if (this.children == null) {
-         this.children = new ArrayList<IASTNode>(2);
-      }
-      this.children.add(node);
-   }
-   
-   
 
 }

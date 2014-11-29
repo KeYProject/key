@@ -7,41 +7,41 @@ import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.INodeSearcher;
 import org.key_project.jmlediting.core.dom.INodeTraverser;
 
+/**
+ * Implements a {@link PrimitiveNode} without any children.
+ *
+ * @author Moritz Lichter
+ *
+ */
 public abstract class PrimitiveNode extends AbstractASTNode {
 
-   private final int startOffset;
-   private final int endOffset;
-
-   public PrimitiveNode(int startOffset, int endOffset) {
-      super();
-      this.startOffset = startOffset;
-      this.endOffset = endOffset;
-   }
-
-   @Override
-   public int getStartOffset() {
-      return this.startOffset;
-   }
-
-   @Override
-   public int getEndOffset() {
-      return this.endOffset;
+   /**
+    * Creates a new {@link PrimitiveNode}. StartOffset needs to be less than
+    * endOffset.
+    *
+    * @param startOffset
+    *           the start offset of the node
+    * @param endOffset
+    *           the end offset of the node
+    */
+   public PrimitiveNode(final int startOffset, final int endOffset) {
+      super(startOffset, endOffset);
    }
 
    @Override
    public List<IASTNode> getChildren() {
       return Collections.emptyList();
    }
-   
+
    // Overrides for performance
 
    @Override
-   public <T> T serach(INodeSearcher<T> searcher) {
+   public <T> T serach(final INodeSearcher<T> searcher) {
       return searcher.searchNode(this);
    };
-   
+
    @Override
-   public <T> T traverse(INodeTraverser<T> traverser, T init) {
+   public <T> T traverse(final INodeTraverser<T> traverser, final T init) {
       return traverser.traverse(this, init);
    }
 }
