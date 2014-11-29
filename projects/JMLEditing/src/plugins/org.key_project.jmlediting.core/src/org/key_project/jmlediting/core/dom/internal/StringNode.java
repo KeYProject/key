@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.core.parser.internal;
+package org.key_project.jmlediting.core.dom.internal;
 
 import org.key_project.jmlediting.core.dom.IStringNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;

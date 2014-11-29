@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.core.parser.internal;
+package org.key_project.jmlediting.core.dom.internal;
 
 import java.util.ArrayList;
 import java.util.Collections;

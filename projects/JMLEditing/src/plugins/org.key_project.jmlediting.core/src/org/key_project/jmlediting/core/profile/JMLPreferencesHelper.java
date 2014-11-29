@@ -13,9 +13,9 @@ import org.key_project.jmlediting.core.Activator;
 import org.key_project.jmlediting.core.PropertyNames;
 
 /**
- * 
+ *
  * The {@link JMLPreferencesHelper} helps to set preferences and properties.
- * 
+ *
  * @author Moritz Lichter
  *
  */
@@ -33,12 +33,12 @@ public final class JMLPreferencesHelper {
     * set for the workspace, this methods tries to set the JML Reference
     * profile, if not found, it takes the first one. If there is no profile
     * available, it throws an {@link NoSuchElementException}.
-    * 
+    *
     * @return the default profile
     */
    public static IJMLProfile getDefaultJMLProfile() {
       String currentProfileIdentifier;
-      IEclipsePreferences preferences = InstanceScope.INSTANCE
+      final IEclipsePreferences preferences = InstanceScope.INSTANCE
             .getNode(Activator.PLUGIN_ID);
       currentProfileIdentifier = preferences.get(
             PropertyNames.DEFAULT_JML_PROFILE, null);
@@ -47,13 +47,13 @@ public final class JMLPreferencesHelper {
          // Try to find the reference profile, it is not required to be
          // installed
          IJMLProfile profile = null;
-         List<IJMLProfile> allProfiles = JMLProfileManagement
+         final List<IJMLProfile> allProfiles = JMLProfileManagement
                .getAvailableProfilesSortedByName();
          if (allProfiles.isEmpty()) {
 
             throw new NoSuchElementException("No JML Profile installed!");
          }
-         for (IJMLProfile p : allProfiles) {
+         for (final IJMLProfile p : allProfiles) {
             if (p.getIdentifier().equals(
                   "org.key_project.jmlediting.profile.jmlref")) {
                profile = p;
@@ -73,7 +73,7 @@ public final class JMLPreferencesHelper {
 
    /**
     * Sets the default profile for the eclipse workspace.
-    * 
+    *
     * @param profile
     *           the profile to set
     */
@@ -81,7 +81,7 @@ public final class JMLPreferencesHelper {
       if (profile == null) {
          throw new NullPointerException("Cannot set a null default profile");
       }
-      IEclipsePreferences preferences = InstanceScope.INSTANCE
+      final IEclipsePreferences preferences = InstanceScope.INSTANCE
             .getNode(Activator.PLUGIN_ID);
       // global properties
       preferences.put(PropertyNames.DEFAULT_JML_PROFILE,
@@ -92,7 +92,7 @@ public final class JMLPreferencesHelper {
     * Returns the JML profile which has been set to the project as project
     * specific profile. It a specific profile is not set, this method returns
     * null.
-    * 
+    *
     * @param project
     *           the project to get the profile for
     * @return the project specific profile or null
@@ -103,7 +103,7 @@ public final class JMLPreferencesHelper {
          currentProfileName = project
                .getPersistentProperty(PropertyNames.PROFILE);
       }
-      catch (CoreException e) {
+      catch (final CoreException e) {
          return null;
       }
       return JMLProfileManagement.getProfileFromIdentifier(currentProfileName);
@@ -111,7 +111,7 @@ public final class JMLPreferencesHelper {
 
    /**
     * Returns whether the given profile has a project specific JML profile set.
-    * 
+    *
     * @param project
     *           the project to ask for
     * @return true iff the project contains a project specific JML profile
@@ -123,7 +123,7 @@ public final class JMLPreferencesHelper {
    /**
     * Sets the given JML profile as project specific for the given project. Set
     * a null profile to remove project specific settings.
-    * 
+    *
     * @param project
     *           the project to set for
     * @param profile
@@ -140,40 +140,60 @@ public final class JMLPreferencesHelper {
       project.setPersistentProperty(PropertyNames.PROFILE, profileIdentifier);
    }
 
+   /**
+    * Creates a {@link IPreferenceChangeListener} which is added to the correct
+    * namespace to listen to changes of the default profile. The given listener
+    * is wrapped and the created one returned. The returned one needs to be
+    * removed with the
+    * {@link #removeDefaultProfilePreferencesListener(IPreferenceChangeListener)}
+    * method.
+    *
+    * @param listener
+    *           the listener to add
+    * @return the created listener
+    */
    public static IPreferenceChangeListener buildDefaultProfilePreferencesListener(
          final IPreferenceChangeListener listener) {
-      IPreferenceChangeListener filteredlistener = new IPreferenceChangeListener() {
+      final IPreferenceChangeListener filteredlistener = new IPreferenceChangeListener() {
 
          @Override
-         public void preferenceChange(PreferenceChangeEvent event) {
+         public void preferenceChange(final PreferenceChangeEvent event) {
             if (event.getKey().equals(PropertyNames.DEFAULT_JML_PROFILE)) {
                listener.preferenceChange(event);
             }
          }
       };
       InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID)
-            .addPreferenceChangeListener(filteredlistener);
+      .addPreferenceChangeListener(filteredlistener);
 
       return listener;
    }
-   
+
+   /**
+    * Removes the given listener which listens to changes of the default
+    * profile.
+    *
+    * @param listener
+    *           the listener to remove
+    */
    public static void removeDefaultProfilePreferencesListener(
          final IPreferenceChangeListener listener) {
-      InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).removePreferenceChangeListener(listener);
+      InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID)
+      .removePreferenceChangeListener(listener);
    }
 
    /**
     * Returns the JML profile which has been set to the project as project
     * specific profile. It a specific profile is not set, this method returns
     * the default one.
-    * 
+    *
     * @param project
     *           the project to get the profile for
     * @return the project specific profile or the default
     */
-   public static IJMLProfile getProjectActiveJMLProfile(IProject project) {
+   public static IJMLProfile getProjectActiveJMLProfile(final IProject project) {
       IJMLProfile result = getProjectJMLProfile(project);
-      
+
       if (result == null) {
          result = getDefaultJMLProfile();
       }

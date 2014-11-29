@@ -1,10 +1,11 @@
-package org.key_project.jmlediting.core.parser.internal;
+package org.key_project.jmlediting.core.dom.internal;
 
 import java.util.Collections;
 import java.util.List;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.INodeSearcher;
+import org.key_project.jmlediting.core.dom.INodeTraverser;
 
 public abstract class PrimitiveNode extends AbstractASTNode {
 
@@ -31,8 +32,16 @@ public abstract class PrimitiveNode extends AbstractASTNode {
    public List<IASTNode> getChildren() {
       return Collections.emptyList();
    }
+   
+   // Overrides for performance
 
+   @Override
    public <T> T serach(INodeSearcher<T> searcher) {
       return searcher.searchNode(this);
    };
+   
+   @Override
+   public <T> T traverse(INodeTraverser<T> traverser, T init) {
+      return traverser.traverse(this, init);
+   }
 }
