@@ -31,7 +31,7 @@
     (   j_5 &lt; i &amp; 0 &lt;= j_5 &amp; inInt(j_5)
      -&gt; self.passwords[j_5] &gt;= 0);
 variant: javaSubInt(self.passwords.length, i)
-mod: empty
+mod: {}
 mod[savedHeap]: allLocs" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
             <variable name="self" isArrayIndex="false">
                <value name="self" typeString="EnoughInfoReturn" valueString="self" isValueAnObject="true" isValueUnknown="false">
