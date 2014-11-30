@@ -55,37 +55,47 @@ public class ProofMetaReferencesComparator {
 
 
    private boolean axiomChanged() {
-      ProofMetaReferenceAxiom axiom = references.getAxiom();
-      if(axiom != null){
-         KeYJavaType kjt = env.getJavaInfo().getKeYJavaType(axiom.getKjt());
-         if(kjt != null){
-            ImmutableSet<ClassAxiom> classAxioms = env.getSpecificationRepository().getClassAxioms(kjt);
-            for(ClassAxiom classAxiom : classAxioms) {
-               if(classAxiom instanceof RepresentsAxiom && classAxiom.getName().equals(axiom.getName())) {
-                  RepresentsAxiom repAxiom = (RepresentsAxiom) classAxiom;
-                  return !axiom.getOriginalRep().equals(repAxiom.toString());
+      List<ProofMetaReferenceAxiom> axioms = references.getAxioms();
+      for(ProofMetaReferenceAxiom axiom : axioms){
+         if(axiom != null){
+            KeYJavaType kjt = env.getJavaInfo().getKeYJavaType(axiom.getKjt());
+            if(kjt != null){
+               ImmutableSet<ClassAxiom> classAxioms = env.getSpecificationRepository().getClassAxioms(kjt);
+               for(ClassAxiom classAxiom : classAxioms) {
+                  if(classAxiom instanceof RepresentsAxiom && classAxiom.getName().equals(axiom.getName())) {
+                     RepresentsAxiom repAxiom = (RepresentsAxiom) classAxiom;
+                     if(!axiom.getOriginalRep().equals(repAxiom.toString())){
+                        return true;
+                     }
+                  }
                }
             }
+            else {
+               return true;
+            }
          }
-         return true;
       }
       return false;
    }
 
 
    private boolean invariantChanged() {
-      ProofMetaReferenceInvariant invariant = references.getInvariant();
-      if (invariant != null) {
-         KeYJavaType kjt = env.getJavaInfo().getKeYJavaType(invariant.getKjt());
-         if (kjt != null) {
-            ImmutableSet<ClassInvariant> classInvariants = env.getSpecificationRepository().getClassInvariants(kjt);
-            for(ClassInvariant classInvariant : classInvariants) {
-               if(classInvariant.getName().equals(invariant.getName()) && invariant.getOriginalInv().equals(classInvariant.getOriginalInv().toString())) {
-                  return false;
+      List<ProofMetaReferenceInvariant> invariants = references.getInvariants();
+      for(ProofMetaReferenceInvariant invariant : invariants){
+         if (invariant != null) {
+            KeYJavaType kjt = env.getJavaInfo().getKeYJavaType(invariant.getKjt());
+            if (kjt != null) {
+               ImmutableSet<ClassInvariant> classInvariants = env.getSpecificationRepository().getClassInvariants(kjt);
+               for(ClassInvariant classInvariant : classInvariants) {
+                  if(classInvariant.getName().equals(invariant.getName()) && !invariant.getOriginalInv().equals(classInvariant.getOriginalInv().toString())) {
+                     return true;
+                  }
                }
             }
+            else {
+               return true;
+            }
          }
-         return true;
       }
       return false;
    }

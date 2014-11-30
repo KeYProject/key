@@ -172,22 +172,36 @@ public class ProofMetaFileReader {
             references.setContract(getRep(attributes));
             parentStack.addFirst(ProofMetaFileWriter.TAG_REFERENCES);
          }
-         else if (ProofMetaFileWriter.TAG_AXIOM_REFERENCE.equals(qName)){
+         else if (ProofMetaFileWriter.TAG_AXIOM_REFERENCES.equals(qName)){
             Object parent = parentStack.peekFirst();
             if (!ProofMetaFileWriter.TAG_REFERENCES.equals(parent)) {
-               throw new SAXException(ProofMetaFileWriter.TAG_AXIOM_REFERENCE  + " has to be a child of " + ProofMetaFileWriter.TAG_REFERENCES + ".");
+               throw new SAXException(ProofMetaFileWriter.TAG_AXIOM_REFERENCES  + " has to be a child of " + ProofMetaFileWriter.TAG_REFERENCES + ".");
+            }
+            parentStack.addFirst(ProofMetaFileWriter.TAG_AXIOM_REFERENCES);
+         }
+         else if (ProofMetaFileWriter.TAG_AXIOM_REFERENCE.equals(qName)){
+            Object parent = parentStack.peekFirst();
+            if (!ProofMetaFileWriter.TAG_AXIOM_REFERENCES.equals(parent)) {
+               throw new SAXException(ProofMetaFileWriter.TAG_AXIOM_REFERENCE  + " has to be a child of " + ProofMetaFileWriter.TAG_AXIOM_REFERENCES + ".");
             }
             ProofMetaReferenceAxiom axiom = new ProofMetaReferenceAxiom(getKJT(attributes), getName(attributes), getRep(attributes));
-            references.setAxiom(axiom);
+            references.addAxiom(axiom);
             parentStack.addFirst(ProofMetaFileWriter.TAG_AXIOM_REFERENCE);
+         }
+         else if (ProofMetaFileWriter.TAG_INVARIANT_REFERENCES.equals(qName)){
+            Object parent = parentStack.peekFirst();
+            if (!ProofMetaFileWriter.TAG_REFERENCES.equals(parent)) {
+               throw new SAXException(ProofMetaFileWriter.TAG_INVARIANT_REFERENCES  + " has to be a child of " + ProofMetaFileWriter.TAG_REFERENCES + ".");
+            }
+            parentStack.addFirst(ProofMetaFileWriter.TAG_INVARIANT_REFERENCES);
          }
          else if (ProofMetaFileWriter.TAG_INVARIANT_REFERENCE.equals(qName)){
             Object parent = parentStack.peekFirst();
-            if (!ProofMetaFileWriter.TAG_REFERENCES.equals(parent)) {
-               throw new SAXException(ProofMetaFileWriter.TAG_INVARIANT_REFERENCE  + " has to be a child of " + ProofMetaFileWriter.TAG_REFERENCES + ".");
+            if (!ProofMetaFileWriter.TAG_INVARIANT_REFERENCES.equals(parent)) {
+               throw new SAXException(ProofMetaFileWriter.TAG_INVARIANT_REFERENCE  + " has to be a child of " + ProofMetaFileWriter.TAG_INVARIANT_REFERENCES + ".");
             }
             ProofMetaReferenceInvariant invariant = new ProofMetaReferenceInvariant(getKJT(attributes), getName(attributes), getRep(attributes));
-            references.setInvariant(invariant);
+            references.addInvariant(invariant);
             parentStack.addFirst(ProofMetaFileWriter.TAG_INVARIANT_REFERENCE);
          }
          else if (ProofMetaFileWriter.TAG_ACCESS_REFERENCES.equals(qName)) {

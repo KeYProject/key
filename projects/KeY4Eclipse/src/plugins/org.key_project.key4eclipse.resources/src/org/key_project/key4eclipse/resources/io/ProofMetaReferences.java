@@ -32,8 +32,8 @@ import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 public class ProofMetaReferences {
 
    private String contract;
-   private ProofMetaReferenceAxiom axiom;
-   private ProofMetaReferenceInvariant invariant;
+   private List<ProofMetaReferenceAxiom> axioms;
+   private List<ProofMetaReferenceInvariant> invariants;
    private List<ProofMetaReferenceAccess> accesses;
    private List<ProofMetaReferenceCallMethod> callMethods;
    private List<ProofMetaReferenceMethod> inlineMethods;
@@ -41,8 +41,8 @@ public class ProofMetaReferences {
    
    public ProofMetaReferences(){
       this.contract = null;
-      this.axiom = null;
-      this.invariant = null;
+      this.axioms = new LinkedList<ProofMetaReferenceAxiom>();
+      this.invariants = new LinkedList<ProofMetaReferenceInvariant>();
       this.accesses = new LinkedList<ProofMetaReferenceAccess>();
       this.callMethods = new LinkedList<ProofMetaReferenceCallMethod>();
       this.inlineMethods = new LinkedList<ProofMetaReferenceMethod>();
@@ -58,13 +58,13 @@ public class ProofMetaReferences {
             if(classAxiom instanceof RepresentsAxiom){
                RepresentsAxiom repAxiom = (RepresentsAxiom) classAxiom;
                KeYJavaType kjt = repAxiom.getKJT();
-               axiom = new ProofMetaReferenceAxiom(kjt.getFullName(), repAxiom.getName(), repAxiom.toString());
+               axioms.add(new ProofMetaReferenceAxiom(kjt.getFullName(), repAxiom.getName(), repAxiom.toString()));
             }
          }
          else if(IProofReference.USE_INVARIANT.equals(proofRef.getKind())){
             ClassInvariant classInvariant = (ClassInvariant) proofRef.getTarget();
             KeYJavaType kjt = classInvariant.getKJT();
-            invariant = new ProofMetaReferenceInvariant(kjt.getFullName(), classInvariant.getName(), classInvariant.getOriginalInv().toString());
+            invariants.add(new ProofMetaReferenceInvariant(kjt.getFullName(), classInvariant.getName(), classInvariant.getOriginalInv().toString()));
          }
          else if(IProofReference.ACCESS.equals(proofRef.getKind())){
             IProgramVariable v = (IProgramVariable) proofRef.getTarget();
@@ -254,18 +254,18 @@ public class ProofMetaReferences {
       this.contract = contract;
    }
 
-   public ProofMetaReferenceAxiom getAxiom() {
-      return axiom;
+   public List<ProofMetaReferenceAxiom> getAxioms() {
+      return axioms;
    }
-   public void setAxiom(ProofMetaReferenceAxiom axiom){
-      this.axiom = axiom;
+   public void addAxiom(ProofMetaReferenceAxiom axiom){
+      axioms.add(axiom);
    }
 
-   public ProofMetaReferenceInvariant getInvariant() {
-      return invariant;
+   public List<ProofMetaReferenceInvariant> getInvariants() {
+      return invariants;
    }
-   public void setInvariant(ProofMetaReferenceInvariant invariant){
-      this.invariant = invariant;
+   public void addInvariant(ProofMetaReferenceInvariant invariant){
+      invariants.add(invariant);
    }
 
    public List<ProofMetaReferenceAccess> getAccesses() {

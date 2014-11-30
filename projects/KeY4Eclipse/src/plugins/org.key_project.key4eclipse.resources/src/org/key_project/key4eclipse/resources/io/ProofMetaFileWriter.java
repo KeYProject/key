@@ -60,7 +60,9 @@ public class ProofMetaFileWriter {
    public static final String TAG_CALLED_METHODS = "calledMethods";
    public static final String TAG_CALLED_METHOD = "calledMethod";
    public static final String TAG_REFERENCES = "references";
+   public static final String TAG_AXIOM_REFERENCES = "axiomReferences";
    public static final String TAG_AXIOM_REFERENCE = "axiomReference";
+   public static final String TAG_INVARIANT_REFERENCES = "invariantReferences";
    public static final String TAG_INVARIANT_REFERENCE = "invariantReference";
    public static final String TAG_ACCESS_REFERENCES = "accessReferences";
    public static final String TAG_ACCESS_REFERENCE = "accessReference";
@@ -112,7 +114,7 @@ public class ProofMetaFileWriter {
                metaIFile.create(new ByteArrayInputStream(bytes), true, null);
             }
             else {
-               // Make sure that file is not read-only for compatibility with older relases. But do not set read-only flag because it requires admin rights on Mac OS to delete it.
+               //TODO Make sure that file is not read-only for compatibility with older releases. But do not set read-only flag because it requires admin rights on Mac OS to delete it.
                if (metaIFile.isReadOnly()) {
                   ResourceAttributes resAttr = metaIFile.getResourceAttributes();
                   resAttr.setReadOnly(false);
@@ -269,39 +271,61 @@ public class ProofMetaFileWriter {
    
    
    private static void appendReferences(ProofMetaReferences references, int level, StringBuffer sb){
-      String contract = references.getContract();
-      ProofMetaReferenceAxiom axiom = references.getAxiom();
-      ProofMetaReferenceInvariant invariant = references.getInvariant();
-      List<ProofMetaReferenceAccess> accesses = references.getAccesses();
-      List<ProofMetaReferenceCallMethod> callMethods = references.getCallMethods();
-      List<ProofMetaReferenceMethod> inlineMethods = references.getInlineMethods();
-      List<ProofMetaReferenceContract> contracts = references.getContracts();
-      if(contract != null){
-         Map<String, String> attributeValues = new LinkedHashMap<String, String>();
-         attributeValues.put(ATTRIBUTE_REP, contract);
-         XMLUtil.appendStartTag(level, TAG_REFERENCES, attributeValues, sb);
+      if(references != null){
+         String contract = references.getContract();
+         List<ProofMetaReferenceAxiom> axioms = references.getAxioms();
+         List<ProofMetaReferenceInvariant> invariants = references.getInvariants();
+         List<ProofMetaReferenceAccess> accesses = references.getAccesses();
+         List<ProofMetaReferenceCallMethod> callMethods = references.getCallMethods();
+         List<ProofMetaReferenceMethod> inlineMethods = references.getInlineMethods();
+         List<ProofMetaReferenceContract> contracts = references.getContracts();
+         if(contract != null){
+            Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+            attributeValues.put(ATTRIBUTE_REP, contract);
+            XMLUtil.appendStartTag(level, TAG_REFERENCES, attributeValues, sb);
+               appendAxiomReferences(axioms, level + 1, sb);
+               appendInvariantReferences(invariants, level + 1, sb);
+               appendAccessReferences(accesses, level + 1, sb);
+               appendCallMethodReferences(callMethods, level + 1, sb);
+               appendInlineMethodReferences(inlineMethods, level + 1, sb);
+               appendContractReferences(contracts, level + 1, sb);
+            XMLUtil.appendEndTag(level, TAG_REFERENCES, sb);
+         }
+      }
+   }
+   
+   private static void appendAxiomReferences(List<ProofMetaReferenceAxiom> axioms, int level, StringBuffer sb) {
+      if(!axioms.isEmpty()){
+         XMLUtil.appendStartTag(level, TAG_AXIOM_REFERENCES, null, sb);
+         for(ProofMetaReferenceAxiom axiom : axioms){
             if(axiom != null){
-               attributeValues = new LinkedHashMap<String, String>();
+               Map<String, String> attributeValues = new LinkedHashMap<String, String>();
                attributeValues.put(ATTRIBUTE_KJT, axiom.getKjt());
                attributeValues.put(ATTRIBUTE_NAME, axiom.getName());
                attributeValues.put(ATTRIBUTE_REP, axiom.getOriginalRep());
                XMLUtil.appendEmptyTag(level + 1, TAG_AXIOM_REFERENCE, attributeValues, sb);
             }
+         }
+         XMLUtil.appendEndTag(level, TAG_AXIOM_REFERENCES, sb);
+      }
+   }
+
+   private static void appendInvariantReferences(List<ProofMetaReferenceInvariant> invariants, int level, StringBuffer sb) {
+      if(!invariants.isEmpty()){
+         XMLUtil.appendStartTag(level, TAG_INVARIANT_REFERENCES, null, sb);
+         for(ProofMetaReferenceInvariant invariant : invariants){
             if(invariant != null){
-               attributeValues = new LinkedHashMap<String, String>();
+               Map<String, String> attributeValues = new LinkedHashMap<String, String>();
                attributeValues.put(ATTRIBUTE_KJT, invariant.getKjt());
                attributeValues.put(ATTRIBUTE_NAME, invariant.getName());
                attributeValues.put(ATTRIBUTE_REP, invariant.getOriginalInv());
                XMLUtil.appendEmptyTag(level + 1, TAG_INVARIANT_REFERENCE, attributeValues, sb);
             }
-            appendAccessReferences(accesses, level + 1, sb);
-            appendCallMethodReferences(callMethods, level + 1, sb);
-            appendInlineMethodReferences(inlineMethods, level + 1, sb);
-            appendContractReferences(contracts, level + 1, sb);
-         XMLUtil.appendEndTag(level, TAG_REFERENCES, sb);
+         }
+         XMLUtil.appendEndTag(level, TAG_INVARIANT_REFERENCES, sb);
       }
    }
-   
+
    private static void appendAccessReferences(List<ProofMetaReferenceAccess> accesses, int level, StringBuffer sb){
       if(!accesses.isEmpty()){
          XMLUtil.appendStartTag(level, TAG_ACCESS_REFERENCES, null, sb);
