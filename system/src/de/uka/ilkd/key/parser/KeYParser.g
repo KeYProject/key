@@ -2698,7 +2698,7 @@ term110 returns [Term _term110 = null]
         (
             result = braces_term |
             result = accessterm
-        ) 
+        )
         {
 	/*
             if (result.sort() == Sort.FORMULA) {
@@ -3074,8 +3074,6 @@ atom returns [Term _atom = null]
     |   LPAREN a = term RPAREN
     |   TRUE  { a = getTermFactory().createTerm(Junctor.TRUE); }
     |   FALSE { a = getTermFactory().createTerm(Junctor.FALSE); }
-    |   LBRACE LPAREN obj=equivalence_term COMMA field=equivalence_term RPAREN RBRACE
-            { a = getServices().getTermBuilder().singleton(obj, field); }
     |   a = ifThenElseTerm
     |   a = ifExThenElseTerm
     |   literal=STRING_LITERAL
