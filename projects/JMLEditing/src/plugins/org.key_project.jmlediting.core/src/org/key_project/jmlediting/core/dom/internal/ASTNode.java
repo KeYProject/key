@@ -23,8 +23,8 @@ public class ASTNode extends AbstractASTNode {
    private final List<IASTNode> children;
 
    /**
-    * Creates a new {@link ASTNode}. The start offset needs to be less than the
-    * end offset.
+    * Creates a new {@link ASTNode}. The start offset needs to be less than or
+    * equal to the end offset.
     *
     * @param startOffset
     *           the start offset

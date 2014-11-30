@@ -26,7 +26,7 @@ public abstract class AbstractASTNode implements IASTNode {
 
    /**
     * Creates a new {@link AbstractASTNode}. StartOffset needs to be less than
-    * endOffset.
+    * or equal endOffset.
     *
     * @param startOffset
     *           the start offset of the node
@@ -35,7 +35,7 @@ public abstract class AbstractASTNode implements IASTNode {
     */
    public AbstractASTNode(final int startOffset, final int endOffset) {
       super();
-      if (startOffset >= endOffset) {
+      if (startOffset > endOffset) {
          throw new IllegalArgumentException("Offsets are invalid");
       }
       this.startOffset = startOffset;
@@ -64,7 +64,7 @@ public abstract class AbstractASTNode implements IASTNode {
       T value = init;
       // Traverse children von left to right
       for (final IASTNode node : this.getChildren()) {
-         value = traverser.traverse(node, value);
+         value = node.traverse(traverser, value);
       }
       // Traverse me
       value = traverser.traverse(this, value);

@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.core.parser;
+package org.key_project.jmlediting.core.test.parser;
 
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 

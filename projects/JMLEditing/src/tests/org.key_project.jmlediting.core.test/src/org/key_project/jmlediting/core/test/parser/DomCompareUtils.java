@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.core.parser;
+package org.key_project.jmlediting.core.test.parser;
 
 import static org.junit.Assert.assertEquals;
 
