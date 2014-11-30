@@ -96,19 +96,9 @@ public class ProofMetaFileContentExceptionTests extends AbstractResourceTest {
       long proofFileModStamp = proofFile.getLocalTimeStamp();
       long metaFileModStamp = metaFile.getLocalTimeStamp();
       
-      metaFile.refreshLocal(IResource.DEPTH_ZERO, null);
-      ResourceAttributes resAttr = metaFile.getResourceAttributes();
-      resAttr.setReadOnly(false);
-      metaFile.setResourceAttributes(resAttr);
-      
       InputStream is = BundleUtil.openInputStream(Activator.PLUGIN_ID, newContentPathInBundle);
       metaFile.setContents(is, IResource.FORCE, null);
       is.close();
-      
-      metaFile.refreshLocal(IResource.DEPTH_ZERO, null);
-      resAttr = metaFile.getResourceAttributes();
-      resAttr.setReadOnly(true);
-      metaFile.setResourceAttributes(resAttr);
       
       assertTrue(metaFile.getLocalTimeStamp() != metaFileModStamp);
       metaFileModStamp = metaFile.getLocalTimeStamp();

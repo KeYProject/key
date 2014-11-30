@@ -143,7 +143,7 @@ public class KeYResourcesUtil {
       KeYJavaType kjt = null;
       Object target = proofRef.getTarget();
       if(IProofReference.ACCESS.equals(proofRef.getKind())){
-         if(target instanceof IProgramVariable){//TODO: analyseDependencies von Martin benutzt auch diese Methode. Soll dort wirklich der typ der Variable zurück gegeben werden oder auch der container?
+         if(target instanceof IProgramVariable){
             IProgramVariable progVar = (IProgramVariable) target;
             if (progVar instanceof LocationVariable) {
                kjt = ((LocationVariable) progVar).getContainerType();
