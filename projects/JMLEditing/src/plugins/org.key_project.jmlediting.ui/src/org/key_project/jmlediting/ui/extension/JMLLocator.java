@@ -5,12 +5,12 @@ import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+
 /**
  * 
- * @author David Giessing
- * Class for finding JML Comments in a given String.
- * This class does not take care of changes to the String!
- * If the String changes a new Instance of the JMLLocator is needed
+ * @author David Giessing Class for finding JML Comments in a given String. This
+ *         class does not take care of changes to the String! If the String
+ *         changes a new Instance of the JMLLocator is needed
  */
 public class JMLLocator {
 
@@ -42,8 +42,8 @@ public class JMLLocator {
 
    /**
     * Uses an Automata to search All Kind of Valid Comments in the given String
-    * afterwards it creates the returned ArrayList by only Adding Comments with an @ as 3rd character
-    * which is when the comment is a JMLComment
+    * afterwards it creates the returned ArrayList by only Adding Comments with
+    * an @ as 3rd character which is when the comment is a JMLComment
     * 
     * @return An ArrayList with Type Comment that consists of all valid
     *         JMLComments in the Document
@@ -66,16 +66,17 @@ public class JMLLocator {
                state = ScannerState.IN_STRING;
                position += 1;
                break;
-            case'\'':
+            case '\'':
                state = ScannerState.IN_CHAR;
-               position +=1;
+               position += 1;
                break;
             case '/':
                if (position < content.length - 1) {
                   char c2 = content[position + 1];
                   switch (c2) {
                   case '/':
-                     int end = text.indexOf(System.getProperty("line.separator"), position);
+                     int end = text.indexOf(
+                           System.getProperty("line.separator"), position);
                      int commentEnd = end;
                      if (end == -1) {
                         commentEnd = content.length - 1;
@@ -99,11 +100,12 @@ public class JMLLocator {
                      break;
                   }
                }
-               else break mainloop;
+               else
+                  break mainloop;
                break;
-               default:
-                  position+=1;
-                  break;
+            default:
+               position += 1;
+               break;
             }
             break;
          case IN_COMMENT:
@@ -122,7 +124,8 @@ public class JMLLocator {
                      break;
                   }
                }
-               else break mainloop;
+               else
+                  break mainloop;
                break;
             default:
                position += 1;
@@ -136,7 +139,7 @@ public class JMLLocator {
                position += 1;
                break;
             case '\\':
-               position+=2;
+               position += 2;
                break;
             default:
                position += 1;
@@ -144,16 +147,16 @@ public class JMLLocator {
             }
             break;
          case IN_CHAR:
-            switch(c){
+            switch (c) {
             case '\\':
-               position+=2;
+               position += 2;
                break;
             case '\'':
-               state=ScannerState.DEFAULT;
-               position+=1;
+               state = ScannerState.DEFAULT;
+               position += 1;
                break;
             default:
-               position+=1;
+               position += 1;
                break;
             }
             break;
@@ -165,7 +168,8 @@ public class JMLLocator {
       for (Comment c : comments)
          // filter for jml comments, a comment is a JML comment if the 3rd sign
          // is an @
-         if ((text.length()-1>=c.offset+2)&&text.charAt(c.offset + 2) == '@')
+         if ((text.length() - 1 >= c.offset + 2)
+               && text.charAt(c.offset + 2) == '@')
             jmlcomments.add(c);
 
       return jmlcomments;

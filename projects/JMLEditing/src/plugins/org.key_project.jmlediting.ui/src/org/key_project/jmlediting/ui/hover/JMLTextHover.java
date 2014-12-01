@@ -7,29 +7,30 @@ import org.eclipse.ui.IEditorPart;
 
 /**
  * An {@link IJavaEditorTextHover} to support JML.
+ * 
  * @author Martin Hentschel
  */
 public class JMLTextHover implements IJavaEditorTextHover {
    /**
     * {@inheritDoc}
     */
-	@Override
-	public String getHoverInfo(ITextViewer textViewer, IRegion hoverRegion) {
-		return "List of modifiable locations";
-	}
+   @Override
+   public String getHoverInfo(ITextViewer textViewer, IRegion hoverRegion) {
+      return "List of modifiable locations";
+   }
 
    /**
     * {@inheritDoc}
     */
-	@Override
-	public IRegion getHoverRegion(ITextViewer textViewer, int offset) {
-		return null;
-	}
+   @Override
+   public IRegion getHoverRegion(ITextViewer textViewer, int offset) {
+      return null;
+   }
 
    /**
     * {@inheritDoc}
     */
-	@Override
-	public void setEditor(IEditorPart editor) {
-	}
+   @Override
+   public void setEditor(IEditorPart editor) {
+   }
 }

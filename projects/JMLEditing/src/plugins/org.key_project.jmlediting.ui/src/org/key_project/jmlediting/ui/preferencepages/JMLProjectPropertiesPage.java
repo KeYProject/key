@@ -6,9 +6,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 
-public class JMLProjectPropertiesPage extends PropertyAndPreferencePage implements
-      IWorkbenchPropertyPage {
- 
+public class JMLProjectPropertiesPage extends PropertyAndPreferencePage
+      implements IWorkbenchPropertyPage {
 
    public JMLProjectPropertiesPage() {
       // TODO Auto-generated constructor stub

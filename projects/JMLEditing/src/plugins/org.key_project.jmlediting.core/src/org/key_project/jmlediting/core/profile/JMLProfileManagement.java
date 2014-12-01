@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.Platform;
 
 /**
  * This class helps managing the available JML profiles.
- * 
+ *
  * @author Moritz Lichter
  *
  */
@@ -36,18 +36,18 @@ public final class JMLProfileManagement {
     * objects exists for an identifier.
     */
    private static Map<String, IJMLProfile> profileCache = new HashMap<String, IJMLProfile>();
-  
+
    /**
     * Returns a set of all JML profiles which are available. The set may be
     * empty.
-    * 
+    *
     * @return a unmodifiable set of the current JML profiles
     */
    public static Set<IJMLProfile> getAvailableProfiles() {
-      Set<IJMLProfile> availableProfiles = new HashSet<IJMLProfile>();
+      final Set<IJMLProfile> availableProfiles = new HashSet<IJMLProfile>();
 
       // Get the extension point
-      IExtensionPoint extensionPoint = Platform.getExtensionRegistry()
+      final IExtensionPoint extensionPoint = Platform.getExtensionRegistry()
             .getExtensionPoint("org.key_project.jmlediting.core.profiles");
 
       if (extensionPoint == null) {
@@ -55,12 +55,13 @@ public final class JMLProfileManagement {
       }
 
       // Now check all provided extension points
-      for (IExtension extension : extensionPoint.getExtensions()) {
-         for (IConfigurationElement elem : extension.getConfigurationElements()) {
+      for (final IExtension extension : extensionPoint.getExtensions()) {
+         for (final IConfigurationElement elem : extension
+               .getConfigurationElements()) {
             try {
-               Object profileO = elem.createExecutableExtension("class");
+               final Object profileO = elem.createExecutableExtension("class");
                if (profileO instanceof IJMLProfile) {
-                  IJMLProfile profile = (IJMLProfile) profileO;
+                  final IJMLProfile profile = (IJMLProfile) profileO;
                   if (!profileCache.containsKey(profile.getIdentifier())) {
                      profileCache.put(profile.getIdentifier(), profile);
                      availableProfiles.add(profile);
@@ -74,7 +75,7 @@ public final class JMLProfileManagement {
                }
 
             }
-            catch (CoreException e) {
+            catch (final CoreException e) {
                // Invalid class of the extension object
                e.printStackTrace();
                throw new RuntimeException("Got invalid extension object ");
@@ -88,11 +89,11 @@ public final class JMLProfileManagement {
 
    /**
     * Returns all available JML profiles sorted by their names.
-    * 
+    *
     * @return the sorted list of profiles
     */
    public static List<IJMLProfile> getAvailableProfilesSortedByName() {
-      List<IJMLProfile> profiles = new ArrayList<IJMLProfile>(
+      final List<IJMLProfile> profiles = new ArrayList<IJMLProfile>(
             getAvailableProfiles());
       Collections.sort(profiles, new Comparator<IJMLProfile>() {
 
@@ -107,7 +108,7 @@ public final class JMLProfileManagement {
    /**
     * Returns the IJMLProfile for the given identifier or null if no profile is
     * found for the identifier.
-    * 
+    *
     * @param identifier
     *           the identifer of the profile
     * @return the profile or null

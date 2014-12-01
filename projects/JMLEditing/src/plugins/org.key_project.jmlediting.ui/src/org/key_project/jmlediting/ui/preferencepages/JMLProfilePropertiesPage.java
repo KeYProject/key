@@ -275,7 +275,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
    private void removePreferencesListener() {
       JMLPreferencesHelper
-      .removeDefaultProfilePreferencesListener(this.currentPreferenceListener);
+            .removeDefaultProfilePreferencesListener(this.currentPreferenceListener);
    }
 
    @Override
