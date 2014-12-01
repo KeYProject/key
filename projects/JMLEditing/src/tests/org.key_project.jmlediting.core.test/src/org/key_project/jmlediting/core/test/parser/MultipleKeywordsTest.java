@@ -8,7 +8,7 @@ public class MultipleKeywordsTest {
 
    @Test
    public void parseMultipleKeywordsTest1() throws ParserException {
-      final String content = "behavior \n @ assignable x;";
+      final String content = "behavior\n\t @ assignable x;";
       final IASTNode expectedResult = DomBuildUtils.buildKeywordSequence(0, 25,
             DomBuildUtils.buildKeywordSpec("behavior", 0),
             DomBuildUtils.buildKeywordSpec("assignable", 13, 25, "x"));

@@ -40,6 +40,19 @@ public class ASTNode extends AbstractASTNode {
       super(startOffset, endOffset);
       this.type = type;
       this.children = children;
+      // Validate children
+      int begin = startOffset - 1;
+      for (final IASTNode child : children) {
+         if (child.getStartOffset() <= begin) {
+            throw new IllegalArgumentException(
+                  "Start offset off child is invalid");
+         }
+         begin = child.getEndOffset();
+      }
+      if (begin > endOffset) {
+         throw new IllegalArgumentException(
+               "End offset of last child exceed node");
+      }
    }
 
    @Override
