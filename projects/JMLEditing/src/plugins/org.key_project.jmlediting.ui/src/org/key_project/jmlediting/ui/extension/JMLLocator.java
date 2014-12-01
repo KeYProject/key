@@ -41,21 +41,14 @@ public class JMLLocator {
       return null;
    }
 
-   private static enum ScannerState {
-      IN_STRING, IN_COMMENT, IN_CHAR, DEFAULT
-   }
-
    /**
     * Uses an Automata to search All Kind of Valid Comments in the given String
-    * afterwards it creates the returned ArrayList by only Adding Comments with
-    * an @ as 3rd character which is when the comment is a JMLComment
     *
-    * @return An ArrayList with Type Comment that consists of all valid
-    *         JMLComments in the Document
+    * @return An ArrayList with Type Comment that consists of all valid Comments
+    *         in the Document
     */
-   public List<Comment> findJMLComments() {
+   public List<Comment> findComments() {
       final List<Comment> comments = new ArrayList<Comment>();
-      final List<Comment> jmlcomments = new ArrayList<Comment>();
 
       final char[] content = this.text.toCharArray();
       int position = 0;
@@ -173,6 +166,22 @@ public class JMLLocator {
             throw new AssertionError("Invalid Enum State");
          }
       }
+      return comments;
+   }
+
+   private static enum ScannerState {
+      IN_STRING, IN_COMMENT, IN_CHAR, DEFAULT
+   }
+
+   /**
+    * Filters a List of Comments for JMLComments
+    *
+    * @return An ArrayList with Type Comment that consists of all valid
+    *         JMLComments in the Document
+    */
+   public List<Comment> findJMLComments() {
+      final List<Comment> comments = this.findComments();
+      final List<Comment> jmlcomments = new ArrayList<Comment>();
 
       for (final Comment c : comments) {
          // filter for jml comments, a comment is a JML comment if the 3rd sign
@@ -184,5 +193,24 @@ public class JMLLocator {
       }
 
       return jmlcomments;
+   }
+
+   /**
+    * Seeks for a valid Comment that surrounds the given Offset and returns it
+    *
+    * @param offset
+    *           The Offset to be inside the returned Comment
+    * @return A Comment Object that is a Comment that surrounds the given
+    *         offset, null if no comment is found around this offset
+    */
+   public Comment getCommentOfOffset(final int offset) {
+      final List<Comment> jmlcomments = this.findComments();
+      for (final Comment c : jmlcomments) {
+         if (c.getOffset() <= offset && offset <= c.getEnd()) {
+            return c;
+         }
+
+      }
+      return null;
    }
 }
