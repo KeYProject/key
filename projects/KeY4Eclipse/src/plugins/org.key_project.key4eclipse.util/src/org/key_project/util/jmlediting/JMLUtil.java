@@ -9,33 +9,46 @@ import org.eclipse.ui.PlatformUI;
 
 /**
  * UtilClass to provide general utility-Methods in the jmlEditing-Project
- * 
+ *
  * @author Thomas Glaser
  *
  */
 public class JMLUtil {
-   
+
    /**
     * prevent Instantiations
     */
-   private JMLUtil() {}
-   
+   private JMLUtil() {
+   }
+
    /**
-    * Get the current active IProject 
-    * 
-    * @return IProject
-    *             the current active IProject
+    * Get the current active IProject
+    *
+    * @return IProject the current active IProject
     */
    public static IProject getCurrentProject() {
-      IProject project = null;
-      
-      IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-      IWorkbenchPage activePage = window.getActivePage();
-      IEditorPart editorPart = activePage.getActiveEditor();
-      IResource resource = (IResource) editorPart.getEditorInput().getAdapter(IResource.class);
-      if (resource != null) {
-         project = resource.getProject();
+      final IWorkbenchWindow window = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow();
+      if (window == null) {
+         return null;
       }
-      return project;
+      final IWorkbenchPage activePage = window.getActivePage();
+      if (activePage == null) {
+         return null;
+      }
+      final IEditorPart editorPart = activePage.getActiveEditor();
+      return getCurrentProject(editorPart);
+   }
+
+   public static IProject getCurrentProject(final IEditorPart editorPart) {
+      if (editorPart == null) {
+         return null;
+      }
+      final IResource resource = (IResource) editorPart.getEditorInput()
+            .getAdapter(IResource.class);
+      if (resource != null) {
+         return resource.getProject();
+      }
+      return null;
    }
 }
