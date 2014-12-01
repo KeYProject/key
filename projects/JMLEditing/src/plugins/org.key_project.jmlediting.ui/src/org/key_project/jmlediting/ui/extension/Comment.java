@@ -2,19 +2,26 @@ package org.key_project.jmlediting.ui.extension;
 
 public class Comment {
 
-   int offset;
-   int end;
+   private final int offset;
+   private final int end;
 
-   public Comment(int offset, int length) {
+   private final int contentOffset;
+   private final int contentEndOffset;
+
+   public Comment(final int offset, final int end, final int contentOffset,
+         final int contentEndOffset) {
+      super();
       this.offset = offset;
-      this.end = length;
+      this.end = end;
+      this.contentOffset = contentOffset;
+      this.contentEndOffset = contentEndOffset;
    }
 
-   public int getLength() {
-      return end;
+   public int getEnd() {
+      return this.end;
    }
 
    public int getOffset() {
-      return end;
+      return this.offset;
    }
 }

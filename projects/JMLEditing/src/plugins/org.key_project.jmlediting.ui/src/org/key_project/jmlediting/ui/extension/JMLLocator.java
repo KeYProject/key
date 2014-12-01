@@ -4,36 +4,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.IDocument;
 
 /**
- * 
+ *
  * @author David Giessing Class for finding JML Comments in a given String. This
  *         class does not take care of changes to the String! If the String
  *         changes a new Instance of the JMLLocator is needed
  */
 public class JMLLocator {
 
-   private String text;
+   private final String text;
 
-   public JMLLocator(String text) {
+   public JMLLocator(final String text) {
       this.text = text;
    }
 
    /**
     * isInJMLcomment checks whether an offset position is inside a JMLComment
-    * 
+    *
     * @param offset
     *           The offset to check whether it is in a JML Comment
     * @return true if offset is in a JML Comment, false if not
     * @throws BadLocationException
     */
-   public boolean isInJMLcomment(int offset) throws BadLocationException {
-      List<Comment> jmlcomments = findJMLComments();
-      for (Comment c : jmlcomments)
-         if (c.offset <= offset && offset <= c.end)
-            return true;
-      return false;
+   public boolean isInJMLcomment(final int offset) {
+      return this.getJMLComment(offset) != null;
+   }
+
+   public Comment getJMLComment(final int offset) {
+      final List<Comment> jmlcomments = this.findJMLComments();
+      for (final Comment c : jmlcomments) {
+         if (c.getOffset() <= offset && offset <= c.getEnd()) {
+            return c;
+         }
+      }
+      return null;
    }
 
    private static enum ScannerState {
@@ -44,21 +49,21 @@ public class JMLLocator {
     * Uses an Automata to search All Kind of Valid Comments in the given String
     * afterwards it creates the returned ArrayList by only Adding Comments with
     * an @ as 3rd character which is when the comment is a JMLComment
-    * 
+    *
     * @return An ArrayList with Type Comment that consists of all valid
     *         JMLComments in the Document
     */
    public List<Comment> findJMLComments() {
-      List<Comment> comments = new ArrayList<Comment>();
-      List<Comment> jmlcomments = new ArrayList<Comment>();
+      final List<Comment> comments = new ArrayList<Comment>();
+      final List<Comment> jmlcomments = new ArrayList<Comment>();
 
-      char[] content = text.toCharArray();
+      final char[] content = this.text.toCharArray();
       int position = 0;
       int begin = 0;
       ScannerState state = ScannerState.DEFAULT;
 
       mainloop: while (position < content.length) {
-         char c = content[position];
+         final char c = content[position];
          switch (state) {
          case DEFAULT:
             switch (c) {
@@ -72,16 +77,17 @@ public class JMLLocator {
                break;
             case '/':
                if (position < content.length - 1) {
-                  char c2 = content[position + 1];
+                  final char c2 = content[position + 1];
                   switch (c2) {
                   case '/':
-                     int end = text.indexOf(
+                     final int end = this.text.indexOf(
                            System.getProperty("line.separator"), position);
                      int commentEnd = end;
                      if (end == -1) {
                         commentEnd = content.length - 1;
                      }
-                     comments.add(new Comment(position, commentEnd));
+                     comments.add(new Comment(position, commentEnd,
+                           position + 2, commentEnd));
                      if (end == -1) {
                         break mainloop;
                      }
@@ -100,8 +106,9 @@ public class JMLLocator {
                      break;
                   }
                }
-               else
+               else {
                   break mainloop;
+               }
                break;
             default:
                position += 1;
@@ -112,10 +119,11 @@ public class JMLLocator {
             switch (c) {
             case '*':
                if (position < content.length - 1) {
-                  char c2 = content[position + 1];
+                  final char c2 = content[position + 1];
                   switch (c2) {
                   case '/':
-                     comments.add(new Comment(begin, position + 1));
+                     comments.add(new Comment(begin, position + 1, begin + 3,
+                           position - 1));
                      state = ScannerState.DEFAULT;
                      position += 2;
                      break;
@@ -124,8 +132,9 @@ public class JMLLocator {
                      break;
                   }
                }
-               else
+               else {
                   break mainloop;
+               }
                break;
             default:
                position += 1;
@@ -165,12 +174,14 @@ public class JMLLocator {
          }
       }
 
-      for (Comment c : comments)
+      for (final Comment c : comments) {
          // filter for jml comments, a comment is a JML comment if the 3rd sign
          // is an @
-         if ((text.length() - 1 >= c.offset + 2)
-               && text.charAt(c.offset + 2) == '@')
+         if ((this.text.length() - 1 >= c.getOffset() + 2)
+               && this.text.charAt(c.getOffset() + 2) == '@') {
             jmlcomments.add(c);
+         }
+      }
 
       return jmlcomments;
    }
