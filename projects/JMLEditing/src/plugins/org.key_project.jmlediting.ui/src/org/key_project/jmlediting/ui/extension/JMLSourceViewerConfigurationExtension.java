@@ -11,12 +11,12 @@ import org.key_project.javaeditor.extension.IJavaSourceViewerConfigurationExtens
 
 /**
  * An {@link IJavaSourceViewerConfigurationExtension} to support JML.
- * 
+ *
  * @author Martin Hentschel, David Giessing
  */
 
 public class JMLSourceViewerConfigurationExtension extends
-      DefaultJavaSourceViewerConfigurationExtension {
+DefaultJavaSourceViewerConfigurationExtension {
 
    IDocument document;
 
@@ -28,15 +28,17 @@ public class JMLSourceViewerConfigurationExtension extends
     * {@inheritDoc}
     */
    @Override
-   public int getTabWidth(ISourceViewer sourceViewer, int currentResult) {
+   public int getTabWidth(final ISourceViewer sourceViewer,
+         final int currentResult) {
       this.document = sourceViewer.getDocument();
       return currentResult * 2;
    }
 
    @Override
    public IPresentationReconciler getPresentationReconciler(
-         ISourceViewer sourceViewer, IPresentationReconciler currentResult) {
-      PresentationReconciler reconciler = (PresentationReconciler) currentResult;
+         final ISourceViewer sourceViewer,
+         final IPresentationReconciler currentResult) {
+      final PresentationReconciler reconciler = (PresentationReconciler) currentResult;
       // Replace DefaultDamagerRepairer in currentResult to support JML
       DefaultDamagerRepairer dr = (DefaultDamagerRepairer) reconciler
             .getDamager(IJavaPartitions.JAVA_MULTI_LINE_COMMENT);
@@ -60,8 +62,8 @@ public class JMLSourceViewerConfigurationExtension extends
     *         by the previously defined content Types
     */
    @Override
-   public String[] getConfiguredContentTypes(ISourceViewer sourceViewer,
-         String[] currentResult) {
+   public String[] getConfiguredContentTypes(final ISourceViewer sourceViewer,
+         final String[] currentResult) {
       return currentResult;
    }
 }

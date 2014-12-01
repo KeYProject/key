@@ -42,8 +42,8 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * <li>"exception" &lt- the two keywords "exceptional_behavior" and
  * "exceptional_behaviour" fit</li>
  * </ul>
- * 
- * 
+ *
+ *
  * @author Thomas Glaser
  *
  */
@@ -83,14 +83,16 @@ public class JMLCompletionProposalComputerTest {
     */
    @BeforeClass
    public static void initProject() throws CoreException, InterruptedException {
-      IJavaProject project = TestUtilsUtil.createJavaProject(PROJECT_NAME);
-      IFolder srcFolder = project.getProject().getFolder("src");
-      IFolder testFolder = TestUtilsUtil.createFolder(srcFolder, PACKAGE_NAME);
+      final IJavaProject project = TestUtilsUtil
+            .createJavaProject(PROJECT_NAME);
+      final IFolder srcFolder = project.getProject().getFolder("src");
+      final IFolder testFolder = TestUtilsUtil.createFolder(srcFolder,
+            PACKAGE_NAME);
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID,
             "data/template", testFolder);
       bot.tree().getTreeItem(PROJECT_NAME).select().expand().getNode("src")
-            .select().expand().getNode(PACKAGE_NAME).select().expand()
-            .getNode(CLASS_NAME + ".java").select().doubleClick();
+      .select().expand().getNode(PACKAGE_NAME).select().expand()
+      .getNode(CLASS_NAME + ".java").select().doubleClick();
       bot.sleep(1000);
    }
 
@@ -99,26 +101,28 @@ public class JMLCompletionProposalComputerTest {
     */
    @Before
    public void initEditor() {
-      editor = bot.activeEditor().toTextEditor();
+      this.editor = bot.activeEditor().toTextEditor();
    }
 
    /*
     * removes the text with given length at Position pos
     */
-   private void removeText(Position pos, int length) {
-      editor.selectRange(pos.line, pos.column, length);
+   private void removeText(final Position pos, final int length) {
+      this.editor.selectRange(pos.line, pos.column, length);
       bot.sleep(100);
-      editor.pressShortcut(Keystrokes.DELETE);
+      this.editor.pressShortcut(Keystrokes.DELETE);
    }
 
    /*
     * asks for AutoComplete and deletes insertText afterwards
     */
-   private List<String> getCompletion(Position pos, String insertText) {
-      editor.navigateTo(pos);
-      List<String> proposals = editor.getAutoCompleteProposals(insertText);
+   private List<String> getCompletion(final Position pos,
+         final String insertText) {
+      this.editor.navigateTo(pos);
+      final List<String> proposals = this.editor
+            .getAutoCompleteProposals(insertText);
       if (!insertText.isEmpty()) {
-         removeText(pos, insertText.length());
+         this.removeText(pos, insertText.length());
       }
 
       return proposals;
@@ -127,24 +131,24 @@ public class JMLCompletionProposalComputerTest {
    /*
     * Should lead to a TimeoutException not solved via expected, because
     * inputText must be deleted from caller after this method
-    * 
+    *
     * Also can have one Proposal containing "No Default Proposals"
     */
-   private void testWithTimeout(Position pos, String insertText) {
+   private void testWithTimeout(final Position pos, final String insertText) {
       Boolean gotTimeout = false;
       Boolean gotProposalNoDefaultProposals = false;
-      String nodefaultproposals = "No Default Proposals";
+      final String nodefaultproposals = "No Default Proposals";
       try {
-         List<String> proposals = getCompletion(pos, insertText);
+         final List<String> proposals = this.getCompletion(pos, insertText);
          if (proposals.size() == 1) {
             gotProposalNoDefaultProposals = proposals
                   .contains(nodefaultproposals);
          }
       }
-      catch (TimeoutException toe) {
+      catch (final TimeoutException toe) {
          gotTimeout = true;
       }
-      catch (Exception e) {
+      catch (final Exception e) {
          // nothing ToDo here, so assertion fails
       }
       finally {
@@ -155,7 +159,8 @@ public class JMLCompletionProposalComputerTest {
 
    @Test
    public void testCompletionJMLCommentSingleAll() {
-      List<String> proposals = getCompletion(PosJMLCommentSingle, "");
+      final List<String> proposals = this
+            .getCompletion(PosJMLCommentSingle, "");
       assertTrue(
             "Not the correct amount of proposals in JML-single-line-comment get all proposals",
             proposals.size() == Max_Keywords + 4); // +4 for default
@@ -166,7 +171,7 @@ public class JMLCompletionProposalComputerTest {
 
    @Test
    public void testCompletionJMLCommentSingleBehavior() {
-      List<String> proposals = getCompletion(PosJMLCommentSingle,
+      final List<String> proposals = this.getCompletion(PosJMLCommentSingle,
             INSERTTEXT_EXCEPTIONAL_BEHAVIOR);
       assertTrue(
             "Not the correct amount of proposals in JML-single-line-comment get exceptional_behavio(u)r proposals",
@@ -179,57 +184,57 @@ public class JMLCompletionProposalComputerTest {
     */
    @Test
    public void testCompletionJMLCommentSingleEnsures() {
-      testWithTimeout(PosJMLCommentSingle, INSERTTEXT_ENSURES);
+      this.testWithTimeout(PosJMLCommentSingle, INSERTTEXT_ENSURES);
       assertTrue(
             "Not the correct amount of proposals in JML-single-line-comment get ensures proposal",
-            editor.getTextOnCurrentLine().contains(KEYWORD_ENSURES));
-      removeText(PosJMLCommentSingle, KEYWORD_ENSURES.length());
+            this.editor.getTextOnCurrentLine().contains(KEYWORD_ENSURES));
+      this.removeText(PosJMLCommentSingle, KEYWORD_ENSURES.length());
    }
 
    @Test
    public void testCompletionJMLCommentSingleNoProposalNoKeyWord() {
-      testWithTimeout(PosJMLCommentSingle, INSERTTEXT_NOKEYWORD);
-      removeText(PosJMLCommentSingle, INSERTTEXT_NOKEYWORD.length());
+      this.testWithTimeout(PosJMLCommentSingle, INSERTTEXT_NOKEYWORD);
+      this.removeText(PosJMLCommentSingle, INSERTTEXT_NOKEYWORD.length());
    }
 
    @Test
    public void testCompletionJMLCommentMultiAll() {
-      List<String> proposals = getCompletion(PosJMLCommentMulti, "");
+      final List<String> proposals = this.getCompletion(PosJMLCommentMulti, "");
       assertTrue("Not the correct amount of Proposals: " + proposals.size(),
             proposals.size() == Max_Keywords);
    }
 
    @Test
    public void testCompletionJMLCommentMultiBehavior() {
-      List<String> proposals = getCompletion(PosJMLCommentMulti,
+      final List<String> proposals = this.getCompletion(PosJMLCommentMulti,
             INSERTTEXT_EXCEPTIONAL_BEHAVIOR);
       assertTrue("Not the correct amount of Proposals", proposals.size() == 2);
    }
 
    @Test
    public void testCompletionJMLCommentMultiEnsures() {
-      testWithTimeout(PosJMLCommentMulti, INSERTTEXT_ENSURES);
-      assertTrue("Not the correct amount of Proposals", editor
+      this.testWithTimeout(PosJMLCommentMulti, INSERTTEXT_ENSURES);
+      assertTrue("Not the correct amount of Proposals", this.editor
             .getTextOnCurrentLine().contains(KEYWORD_ENSURES));
-      removeText(PosJMLCommentMulti, KEYWORD_ENSURES.length());
+      this.removeText(PosJMLCommentMulti, KEYWORD_ENSURES.length());
    }
 
    @Test
    public void testCompletionJMLCommentMultiNoProposalsNoKeyWord() {
-      testWithTimeout(PosJMLCommentMulti, INSERTTEXT_NOKEYWORD);
-      removeText(PosJMLCommentMulti, INSERTTEXT_NOKEYWORD.length());
+      this.testWithTimeout(PosJMLCommentMulti, INSERTTEXT_NOKEYWORD);
+      this.removeText(PosJMLCommentMulti, INSERTTEXT_NOKEYWORD.length());
    }
 
    @Test
    public void testCompletionJDocCommentNoJMLProposalsAll() {
-      List<String> proposals = getCompletion(PosJDocComment, "");
+      final List<String> proposals = this.getCompletion(PosJDocComment, "");
       assertFalse("Found JML proposals in JDoc comment",
             proposals.contains(KEYWORD_ENSURES));
    }
 
    @Test
    public void testCompletionJDocCommentNoJMLProposalsBehavior() {
-      List<String> proposals = getCompletion(PosJDocComment,
+      final List<String> proposals = this.getCompletion(PosJDocComment,
             INSERTTEXT_EXCEPTIONAL_BEHAVIOR);
       assertFalse("Found JML proposals in JDoc comment",
             proposals.contains(KEYWORD_EXCEPTIONAL_BEHAVIOR));
@@ -237,90 +242,92 @@ public class JMLCompletionProposalComputerTest {
 
    @Test
    public void testCompletionJDocCommentNoJMLProposalsEnsures() {
-      testWithTimeout(PosJDocComment, INSERTTEXT_ENSURES);
-      removeText(PosJDocComment, INSERTTEXT_ENSURES.length());
+      this.testWithTimeout(PosJDocComment, INSERTTEXT_ENSURES);
+      this.removeText(PosJDocComment, INSERTTEXT_ENSURES.length());
    }
 
    @Test
    public void testCompletionJDocCommentNoJMLProposalsNoKeyWord() {
-      testWithTimeout(PosJDocComment, INSERTTEXT_NOKEYWORD);
-      removeText(PosJDocComment, INSERTTEXT_NOKEYWORD.length());
+      this.testWithTimeout(PosJDocComment, INSERTTEXT_NOKEYWORD);
+      this.removeText(PosJDocComment, INSERTTEXT_NOKEYWORD.length());
    }
 
    @Test
    public void testCompletionJCommentMultiNoJMLProposalsAll() {
-      testWithTimeout(PosJCommentMulti, "");
+      this.testWithTimeout(PosJCommentMulti, "");
    }
 
    @Test
    public void testCompletionJCommentMultiNoJMLPoposalsBehavior() {
-      testWithTimeout(PosJCommentMulti, INSERTTEXT_EXCEPTIONAL_BEHAVIOR);
-      removeText(PosJCommentMulti, INSERTTEXT_EXCEPTIONAL_BEHAVIOR.length());
+      this.testWithTimeout(PosJCommentMulti, INSERTTEXT_EXCEPTIONAL_BEHAVIOR);
+      this.removeText(PosJCommentMulti,
+            INSERTTEXT_EXCEPTIONAL_BEHAVIOR.length());
    }
 
    @Test
    public void testCompletionJCommentMultiNoJMLProposalsEnsures() {
-      testWithTimeout(PosJCommentMulti, INSERTTEXT_ENSURES);
-      removeText(PosJCommentMulti, INSERTTEXT_ENSURES.length());
+      this.testWithTimeout(PosJCommentMulti, INSERTTEXT_ENSURES);
+      this.removeText(PosJCommentMulti, INSERTTEXT_ENSURES.length());
    }
 
    @Test
    public void testCompletionJCommentMultiNoJMLProposalsNoKeyWord() {
-      testWithTimeout(PosJCommentMulti, INSERTTEXT_NOKEYWORD);
-      removeText(PosJCommentMulti, INSERTTEXT_NOKEYWORD.length());
+      this.testWithTimeout(PosJCommentMulti, INSERTTEXT_NOKEYWORD);
+      this.removeText(PosJCommentMulti, INSERTTEXT_NOKEYWORD.length());
    }
 
    @Test
    public void testCompletionJCommentSingleNoJMLProposalsAll() {
-      List<String> proposals = getCompletion(PosJCommentSingle, "");
+      final List<String> proposals = this.getCompletion(PosJCommentSingle, "");
       assertFalse("Found JML proposals in Java-single-line-comment",
             proposals.contains(KEYWORD_ENSURES));
    }
 
    @Test
    public void testCompletionJCommentSingleNoJMLProposalsBehavior() {
-      testWithTimeout(PosJCommentSingle, INSERTTEXT_EXCEPTIONAL_BEHAVIOR);
-      removeText(PosJCommentSingle, INSERTTEXT_EXCEPTIONAL_BEHAVIOR.length());
+      this.testWithTimeout(PosJCommentSingle, INSERTTEXT_EXCEPTIONAL_BEHAVIOR);
+      this.removeText(PosJCommentSingle,
+            INSERTTEXT_EXCEPTIONAL_BEHAVIOR.length());
    }
 
    @Test
    public void testCompletionJCommentSingleNoJMLProposalsEnsures() {
-      testWithTimeout(PosJCommentSingle, INSERTTEXT_ENSURES);
-      removeText(PosJCommentSingle, INSERTTEXT_ENSURES.length());
+      this.testWithTimeout(PosJCommentSingle, INSERTTEXT_ENSURES);
+      this.removeText(PosJCommentSingle, INSERTTEXT_ENSURES.length());
    }
 
    @Test
    public void testCompletionJCommentSingleNoJMLProposalsNoKeyWord() {
-      testWithTimeout(PosJCommentSingle, INSERTTEXT_NOKEYWORD);
-      removeText(PosJCommentSingle, INSERTTEXT_NOKEYWORD.length());
+      this.testWithTimeout(PosJCommentSingle, INSERTTEXT_NOKEYWORD);
+      this.removeText(PosJCommentSingle, INSERTTEXT_NOKEYWORD.length());
    }
 
    @Test
    public void testCompletionInStringNoJMLProposalsAll() {
-      testWithTimeout(PosInString, "");
+      this.testWithTimeout(PosInString, "");
    }
 
    @Test
    public void testCompletionInStringNoJMLProposalsBehavior() {
-      testWithTimeout(PosInString, INSERTTEXT_EXCEPTIONAL_BEHAVIOR);
-      removeText(PosInString, INSERTTEXT_EXCEPTIONAL_BEHAVIOR.length());
+      this.testWithTimeout(PosInString, INSERTTEXT_EXCEPTIONAL_BEHAVIOR);
+      this.removeText(PosInString, INSERTTEXT_EXCEPTIONAL_BEHAVIOR.length());
    }
 
    @Test
    public void testCompletionInStringNoJMLProposalsEnsures() {
-      testWithTimeout(PosInString, INSERTTEXT_ENSURES);
-      removeText(PosInString, INSERTTEXT_ENSURES.length());
+      this.testWithTimeout(PosInString, INSERTTEXT_ENSURES);
+      this.removeText(PosInString, INSERTTEXT_ENSURES.length());
    }
 
    @Test
    public void testCompletionInStringNoJMLProposalsNoKeyWord() {
-      testWithTimeout(PosInString, INSERTTEXT_NOKEYWORD);
-      removeText(PosInString, INSERTTEXT_NOKEYWORD.length());
+      this.testWithTimeout(PosInString, INSERTTEXT_NOKEYWORD);
+      this.removeText(PosInString, INSERTTEXT_NOKEYWORD.length());
    }
 
    @Test
    public void testCompletionInMethodNoJMLProposalsAll() {
-      List<String> proposals = getCompletion(PosInMethod, "");
+      final List<String> proposals = this.getCompletion(PosInMethod, "");
       assertFalse("Found JML proposals in Java-code",
             proposals.contains(KEYWORD_ENSURES));
    }
@@ -330,7 +337,7 @@ public class JMLCompletionProposalComputerTest {
     */
    @Test
    public void testCompletionInMethodNoJMLProposalsBehavior() {
-      List<String> proposals = getCompletion(PosInMethod,
+      final List<String> proposals = this.getCompletion(PosInMethod,
             INSERTTEXT_EXCEPTIONAL_BEHAVIOR);
       assertFalse("Found JML proposals in Java-code",
             proposals.contains(KEYWORD_EXCEPTIONAL_BEHAVIOR));
@@ -338,51 +345,51 @@ public class JMLCompletionProposalComputerTest {
 
    @Test
    public void testCompletionInMethodNoJMLProposalsEnsures() {
-      testWithTimeout(PosInMethod, INSERTTEXT_ENSURES);
-      removeText(PosInMethod, INSERTTEXT_ENSURES.length());
+      this.testWithTimeout(PosInMethod, INSERTTEXT_ENSURES);
+      this.removeText(PosInMethod, INSERTTEXT_ENSURES.length());
    }
 
    @Test
    public void testCompletionInMethodNoJMLProposalsNoKeyWord() {
-      testWithTimeout(PosInMethod, INSERTTEXT_NOKEYWORD);
-      removeText(PosInMethod, INSERTTEXT_NOKEYWORD.length());
+      this.testWithTimeout(PosInMethod, INSERTTEXT_NOKEYWORD);
+      this.removeText(PosInMethod, INSERTTEXT_NOKEYWORD.length());
    }
 
    @Test
    public void testCompletionOutOfClassNoJMLProposalsAll() {
-      List<String> proposals = getCompletion(PosOutOfClass, "");
+      final List<String> proposals = this.getCompletion(PosOutOfClass, "");
       assertFalse("Found JML proposals out of class",
             proposals.contains(KEYWORD_ENSURES));
    }
 
    @Test
    public void testCompletionOutOfClassNoJMLProposalsBehavior() {
-      testWithTimeout(PosOutOfClass, INSERTTEXT_EXCEPTIONAL_BEHAVIOR);
-      removeText(PosOutOfClass, INSERTTEXT_EXCEPTIONAL_BEHAVIOR.length());
+      this.testWithTimeout(PosOutOfClass, INSERTTEXT_EXCEPTIONAL_BEHAVIOR);
+      this.removeText(PosOutOfClass, INSERTTEXT_EXCEPTIONAL_BEHAVIOR.length());
    }
 
    @Test
    public void testCompletionOutOfClassNoJMLProposalsEnsures() {
-      testWithTimeout(PosOutOfClass, INSERTTEXT_ENSURES);
-      removeText(PosOutOfClass, INSERTTEXT_ENSURES.length());
+      this.testWithTimeout(PosOutOfClass, INSERTTEXT_ENSURES);
+      this.removeText(PosOutOfClass, INSERTTEXT_ENSURES.length());
    }
 
    @Test
    public void testCompletionOutOfClassNoJMLProposalsNoKeyWord() {
-      testWithTimeout(PosOutOfClass, INSERTTEXT_NOKEYWORD);
-      removeText(PosOutOfClass, INSERTTEXT_NOKEYWORD.length());
+      this.testWithTimeout(PosOutOfClass, INSERTTEXT_NOKEYWORD);
+      this.removeText(PosOutOfClass, INSERTTEXT_NOKEYWORD.length());
    }
 
    @Test
    public void testCompletionInClassNoJMLProposalsAll() {
-      List<String> proposals = getCompletion(PosInClass, "");
+      final List<String> proposals = this.getCompletion(PosInClass, "");
       assertFalse("Found JML proposals in class",
             proposals.contains(KEYWORD_ENSURES));
    }
 
    @Test
    public void testCompletionInClassNoJMLProposalsBehavior() {
-      List<String> proposals = getCompletion(PosInClass,
+      final List<String> proposals = this.getCompletion(PosInClass,
             INSERTTEXT_EXCEPTIONAL_BEHAVIOR);
       assertFalse("Found JML proposals in class",
             proposals.contains(KEYWORD_EXCEPTIONAL_BEHAVIOR));
@@ -393,7 +400,8 @@ public class JMLCompletionProposalComputerTest {
     */
    @Test
    public void testCompletionInClassNoJMLProposalsEnsures() {
-      List<String> proposals = getCompletion(PosInClass, INSERTTEXT_ENSURES);
+      final List<String> proposals = this.getCompletion(PosInClass,
+            INSERTTEXT_ENSURES);
       assertFalse("Found JML proposals in class",
             proposals.contains(KEYWORD_ENSURES));
    }
@@ -403,10 +411,11 @@ public class JMLCompletionProposalComputerTest {
     */
    @Test
    public void testCompletionInClassNoJMLProposalsNoKeyWord() {
-      List<String> proposals = getCompletion(PosInClass, INSERTTEXT_NOKEYWORD);
+      final List<String> proposals = this.getCompletion(PosInClass,
+            INSERTTEXT_NOKEYWORD);
       assertFalse(
             "Found JML proposals in class",
             proposals.contains(KEYWORD_ENSURES)
-                  || proposals.contains(KEYWORD_EXCEPTIONAL_BEHAVIOR));
+            || proposals.contains(KEYWORD_EXCEPTIONAL_BEHAVIOR));
    }
 }
