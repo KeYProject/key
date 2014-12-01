@@ -1,5 +1,6 @@
 package org.key_project.jmlediting.ui.extension;
 
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -31,9 +32,26 @@ IPresentationRepairer {
          final ITypedRegion damage) {
       boolean jml = false;
       final JMLLocator locator = new JMLLocator(this.doc.get());
+      final Comment comment = locator.getCommentOfOffset(damage.getOffset());
+      try {
+         if (comment != null
+               && this.doc.getLineOfOffset(damage.getOffset()) == this.doc
+                     .getLineOfOffset(comment.getOffset())) {
+            System.out.println("LineOffsets matched");
+            for (int i = this.doc.getLineOfOffset(damage.getOffset()) + 1; i <= this.doc
+                  .getLineOfOffset(comment.getEnd()); i++) {
+               final String firstSign = this.doc.get(this.doc.getLineOffset(i),
+                     1);
+               this.doc.replace(this.doc.getLineOffset(i), 1, firstSign);
+            }
+         }
 
+      }
+      catch (final BadLocationException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
       jml = locator.isInJMLcomment(damage.getOffset());
-
       if (jml) {
          final TextAttribute ta = new TextAttribute(new Color(
                Display.getDefault(), 255, 0, 0));
