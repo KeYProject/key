@@ -27,8 +27,10 @@ import org.key_project.util.jmlediting.JMLUtil;
  */
 public class JMLCompletionProposalComputer implements
 IJavaCompletionProposalComputer {
-   private static final List<String> CUSTOM_PROPOSALS = Arrays
-         .asList(new String[] { "also" });
+	
+    // not needed atm, but functionality may be needed sometimes
+    private static final List<String> CUSTOM_PROPOSALS = Arrays
+          .asList(new String[0]);
 
    @Override
    public void sessionStarted() {
