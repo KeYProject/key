@@ -6,10 +6,11 @@ import java.util.List;
 import org.eclipse.jface.text.BadLocationException;
 
 /**
- *
- * @author David Giessing Class for finding JML Comments in a given String. This
- *         class does not take care of changes to the String! If the String
- *         changes a new Instance of the JMLLocator is needed
+ * Class for finding JML Comments in a given String. This class does not take
+ * care of changes to the String! If the String changes a new Instance of the
+ * JMLLocator is needed
+ * 
+ * @author David Giessing
  */
 public class JMLLocator {
 
