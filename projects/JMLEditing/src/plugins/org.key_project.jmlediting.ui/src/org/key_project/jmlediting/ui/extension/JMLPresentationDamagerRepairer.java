@@ -5,6 +5,7 @@ import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITypedRegion;
+import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.TextPresentation;
 import org.eclipse.jface.text.presentation.IPresentationDamager;
@@ -16,7 +17,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 
 public class JMLPresentationDamagerRepairer implements IPresentationDamager,
-IPresentationRepairer {
+      IPresentationRepairer {
    private final DefaultDamagerRepairer wrappedInstance;
 
    IDocument doc;
@@ -32,25 +33,6 @@ IPresentationRepairer {
          final ITypedRegion damage) {
       boolean jml = false;
       final JMLLocator locator = new JMLLocator(this.doc.get());
-      final Comment comment = locator.getCommentOfOffset(damage.getOffset());
-      try {
-         if (comment != null
-               && this.doc.getLineOfOffset(damage.getOffset()) == this.doc
-                     .getLineOfOffset(comment.getOffset())) {
-            System.out.println("LineOffsets matched");
-            for (int i = this.doc.getLineOfOffset(damage.getOffset()) + 1; i <= this.doc
-                  .getLineOfOffset(comment.getEnd()); i++) {
-               final String firstSign = this.doc.get(this.doc.getLineOffset(i),
-                     1);
-               this.doc.replace(this.doc.getLineOffset(i), 1, firstSign);
-            }
-         }
-
-      }
-      catch (final BadLocationException e) {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
-      }
       jml = locator.isInJMLcomment(damage.getOffset());
       if (jml) {
          final TextAttribute ta = new TextAttribute(new Color(
@@ -69,11 +51,38 @@ IPresentationRepairer {
       this.wrappedInstance.setDocument(document);
    }
 
+   /**
+    * @return the original DamageRegion when the DamageOffset is not done in the
+    *         First Line of a Comment if the Damage Offset is in the first Line
+    *         of a Comment the whole Comment has to be Redisplayed which results
+    *         in an extension of the Damage Region to the whole Comment
+    */
    @Override
    public IRegion getDamageRegion(final ITypedRegion partition,
          final DocumentEvent event, final boolean documentPartitioningChanged) {
-      return this.wrappedInstance.getDamageRegion(partition, event,
-            documentPartitioningChanged);
+      final IRegion damage = this.wrappedInstance.getDamageRegion(partition,
+            event, documentPartitioningChanged);
+      final JMLLocator locator = new JMLLocator(this.doc.get());
+      final Comment surComment = locator.getCommentOfOffset(event.getOffset());
+      if (surComment == null) {
+         return damage;
+      }
+      int eventLine = 0;
+      int commentLine = 0;
+      try {
+         eventLine = this.doc.getLineOfOffset(event.getOffset());
+         commentLine = this.doc.getLineOfOffset(surComment.getOffset());
+      }
+      catch (final BadLocationException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
+      if (eventLine == commentLine) {
+         return new Region(surComment.getOffset(), surComment.getEnd()
+               - surComment.getOffset() + 1);
+      }
+
+      return null;
    }
 
    /**
