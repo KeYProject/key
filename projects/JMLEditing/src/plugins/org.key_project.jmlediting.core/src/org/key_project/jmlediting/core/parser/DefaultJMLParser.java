@@ -11,6 +11,7 @@ import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 
@@ -96,18 +97,11 @@ public class DefaultJMLParser implements IJMLParser {
       final String keyword = text.substring(keywordStart, keywordEnd);
 
       // Find the corresponding IKeyword instance from the profile
-      IKeyword foundKeyword = null;
-      for (final IKeyword availableKeyword : this.profile
-            .getSupportedKeywords()) {
-         if (availableKeyword.getKeywords().contains(keyword)) {
-            foundKeyword = availableKeyword;
-            break;
-         }
-      }
+      final IKeyword foundKeyword = JMLProfileHelper.findKeyword(this.profile, keyword);
       if (foundKeyword == null) {
          throw new ParserException(
                "Not a supported specification statement keyword: \"" + keyword
-               + "\"", text, keywordEnd);
+                     + "\"", text, keywordEnd);
       }
       final IASTNode keywordNode = Nodes.createKeyword(keywordStart,
             keywordEnd - 1, foundKeyword, keyword);

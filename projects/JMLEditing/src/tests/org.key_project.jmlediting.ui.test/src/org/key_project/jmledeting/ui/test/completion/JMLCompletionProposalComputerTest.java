@@ -16,7 +16,9 @@ import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.ui.test.Activator;
+import org.key_project.jmlediting.ui.test.TestUtils;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -91,9 +93,11 @@ public class JMLCompletionProposalComputerTest {
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID,
             "data/template", testFolder);
       bot.tree().getTreeItem(PROJECT_NAME).select().expand().getNode("src")
-      .select().expand().getNode(PACKAGE_NAME).select().expand()
-      .getNode(CLASS_NAME + ".java").select().doubleClick();
+            .select().expand().getNode(PACKAGE_NAME).select().expand()
+            .getNode(CLASS_NAME + ".java").select().doubleClick();
       bot.sleep(1000);
+      JMLPreferencesHelper.setProjectJMLProfile(project.getProject(),
+            TestUtils.findReferenceProfile());
    }
 
    /*
@@ -131,7 +135,7 @@ public class JMLCompletionProposalComputerTest {
    /*
     * Should lead to a TimeoutException not solved via expected, because
     * inputText must be deleted from caller after this method
-    *
+    * 
     * Also can have one Proposal containing "No Default Proposals"
     */
    private void testWithTimeout(final Position pos, final String insertText) {
@@ -416,6 +420,6 @@ public class JMLCompletionProposalComputerTest {
       assertFalse(
             "Found JML proposals in class",
             proposals.contains(KEYWORD_ENSURES)
-            || proposals.contains(KEYWORD_EXCEPTIONAL_BEHAVIOR));
+                  || proposals.contains(KEYWORD_EXCEPTIONAL_BEHAVIOR));
    }
 }
