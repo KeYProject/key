@@ -16,22 +16,12 @@ import org.key_project.javaeditor.extension.IJavaSourceViewerConfigurationExtens
  */
 
 public class JMLSourceViewerConfigurationExtension extends
-DefaultJavaSourceViewerConfigurationExtension {
+      DefaultJavaSourceViewerConfigurationExtension {
 
    IDocument document;
 
    public JMLSourceViewerConfigurationExtension() {
 
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public int getTabWidth(final ISourceViewer sourceViewer,
-         final int currentResult) {
-      this.document = sourceViewer.getDocument();
-      return currentResult * 2;
    }
 
    @Override
