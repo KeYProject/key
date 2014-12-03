@@ -37,22 +37,17 @@ import org.eclipse.graphiti.features.context.impl.UpdateContext;
 import org.eclipse.graphiti.features.impl.AbstractUpdateFeature;
 import org.eclipse.graphiti.features.impl.Reason;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
-import org.eclipse.graphiti.mm.algorithms.Image;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
-
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.model.ISEDBranchCondition;
-import org.key_project.sed.core.model.ISEDBranchStatement;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDGroupable;
-import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
@@ -240,9 +235,15 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     * @throws DebugException Occurred Exception.
     */
    protected boolean isNameUpdateNeeded(PictogramElement pictogramElement) throws DebugException {
-      String pictogramName = getPictogramName(pictogramElement);
-      String businessName = getBusinessName(pictogramElement);
-      return !StringUtil.equalIgnoreWhiteSpace(businessName, pictogramName);
+      Text text = findNameText(pictogramElement);
+      if (text != null) {
+         String pictogramName = text.getValue();
+         String businessName = getBusinessName(pictogramElement);
+         return !StringUtil.equalIgnoreWhiteSpace(businessName, pictogramName);
+      }
+      else {
+         return false;
+      }
    }
    
    /**
@@ -306,21 +307,6 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    }
    
    /**
-    * Returns the name defined in the {@link PictogramElement}.
-    * @param pictogramElement The {@link PictogramElement} for that the shown name is needed.
-    * @return The name in the {@link PictogramElement}.
-    */
-   protected String getPictogramName(PictogramElement pictogramElement) {
-      Text text = findNameText(pictogramElement);
-      if (text != null) {
-         return text.getValue();
-      }
-      else {
-         return null;
-      }
-   }
-   
-   /**
     * Returns the name defined by the business object of the given {@link PictogramElement}
     * which is {@link ISEDDebugNode#getName()}.
     * @param pictogramElement The {@link PictogramElement} for that the business name is needed.
@@ -376,9 +362,11 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             IProgressMonitor monitor = GraphitiUtil.getProgressMonitor(context);
             // Update name
             PictogramElement pictogramElement = context.getPictogramElement();
-            
-//            if(!(pictogramElement instanceof Diagram) && !(pictogramElement.getGraphicsAlgorithm() instanceof RoundedRectangle)) {
-//               pictogramElement = getPictogramElementForBusinessObject(getBusinessObjectForPictogramElement(pictogramElement));
+System.out.println(context.getPictogramElement() + " of " + getBusinessObjectForPictogramElement(pictogramElement));
+//            Object b = getBusinessObjectForPictogramElement(pictogramElement);
+//            if(!(pictogramElement instanceof Diagram) && !(pictogramElement.getGraphicsAlgorithm() instanceof RoundedRectangle) &&
+//                  NodeUtil.canBeGrouped(b)) {
+//               pictogramElement = getPictogramElementForBusinessObject(b);
 //            }
 
             monitor.beginTask("Update element: " + pictogramElement, 3);
