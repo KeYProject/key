@@ -6,7 +6,7 @@ import org.eclipse.debug.core.DebugException;
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDGroupable;
-import org.key_project.sed.core.model.ISEDLoopCondition;
+import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.util.java.ArrayUtil;
 
 public final class NodeUtil {
@@ -41,7 +41,7 @@ public final class NodeUtil {
    }
    
    public static ISEDDebugNode[] getChildren(ISEDDebugNode node, boolean sorted) throws DebugException {
-      if(node instanceof ISEDGroupable) {
+      if(canBeGrouped(node)) {
          ISEDGroupable groupStart = (ISEDGroupable) node;
          if(groupStart.isCollapsed()) {
             return sorted ? getSortedBCs(groupStart) : groupStart.getGroupEndConditions();
@@ -89,7 +89,7 @@ public final class NodeUtil {
       
       ISEDDebugNode parent = getParent(node);
       while(parent != null) {
-         if(parent instanceof ISEDGroupable) {
+         if(canBeGrouped(parent)) {
             currentPosition++;
          }
          else if(!ArrayUtil.isEmpty(parent.getGroupStartConditions())) {
@@ -110,9 +110,7 @@ public final class NodeUtil {
    }
    
    public static boolean canBeGrouped(Object node) {
-//      if(node instanceof ISEDLoopCondition)
-//         System.out.println("Node: " + node + ", ?: " + ((ISEDGroupable) node).isGroupable());
-      return node instanceof ISEDGroupable && ((ISEDGroupable) node).isGroupable();
+      return node instanceof ISEDGroupable && ((ISEDGroupable) node).isGroupable();// && node instanceof ISEDMethodCall;
    }
    
    private static ISEDDebugNode determineNextNode(ISEDDebugNode node, ISEDDebugNode start, boolean methodReturnReached) throws DebugException {

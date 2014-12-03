@@ -115,7 +115,6 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
                GraphicsAlgorithm nodeGA = pes[1].getGraphicsAlgorithm();
 
                int mostLeftInParent = uf.findMostLeftXOfBranchInParents((ISEDDebugNode) groupStart);
-               
                nodeGA.setX(mostLeftInParent < rectGA.getX() ? mostLeftInParent + uf.METOFF : rectGA.getX() + uf.METOFF);
                
                groupStart.setCollapsed(false);
@@ -155,35 +154,6 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
       GraphicsAlgorithm nodeGA = uf.getPictogramElementForBusinessObject(groupStart).getGraphicsAlgorithm();
       
       ISEDBranchCondition[] bcs = NodeUtil.getSortedBCs(groupStart);
-      
-//      int mostRightXInPrev = findMostRightXInPreviousBranch(mc);
-//      int mostLeftX = findMostLeftXInMethod(mc);
-//      int biggestWidthAbove = findBiggestWidthInPartTreeAbove(mc);
-//      
-//      if(biggestWidthAbove < rectGA.getWidth() && computeSubTreeWidth(mc) < rectGA.getWidth()) {
-//         if(mostRightXInPrev == -1) {
-//            int toMove = 0;
-//            if(!ArrayUtil.isEmpty(mc.getCallStack())) {
-//               GraphicsAlgorithm parentMC = getPictogramElementForBusinessObject(mc.getCallStack()[0], 0).getGraphicsAlgorithm();
-//               toMove = parentMC.getX() + 2 * METOFF - mostLeftX;
-//            }
-//            
-//            moveRightAndAbove(mc, toMove, monitor);
-//            moveSubTreeHorizontal(mc, toMove, true, monitor);
-//         }
-//         else {
-//            int toMove = 0;
-//            if(!ArrayUtil.isEmpty(mc.getCallStack())) {
-//               GraphicsAlgorithm parentMC = getPictogramElementForBusinessObject(mc.getCallStack()[0], 0).getGraphicsAlgorithm();
-//               toMove = parentMC.getX() + 2 * METOFF - mostLeftX;
-//            }
-//            if (mostLeftX > mostRightXInPrev + OFFSET)  {
-//               toMove = mostRightXInPrev + METOFF + OFFSET - mostLeftX;
-//               moveRightAndAbove(mc, toMove, monitor);
-//               moveSubTreeHorizontal(mc, toMove, true, monitor);
-//            }
-//         }
-//      }
 
       int maxX = rectGA.getX();
       Set<ISEDDebugNode> leafs = new HashSet<ISEDDebugNode>();
@@ -215,6 +185,7 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
          PictogramElement groupEndPE = getFeatureProvider().getPictogramElementForBusinessObject(groupEnd);
          GraphicsAlgorithm groupEndGA = groupEndPE.getGraphicsAlgorithm();
          
+         //TODO fraglich ob nötig -> maxX nur beim ersten nötig
          // if the BC is to far left move it to rect.x + METOFF (only matters is the most left BC)
          if(maxX == rectGA.getX() && bcGA.getX() < maxX + uf.METOFF) {
             bcGA.setX(maxX + uf.METOFF);
@@ -234,18 +205,18 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
 //            mrGA.setX(mrGA.getX() - METOFF);
          }
          else {
-//            if(!hasBiggerChild(mr, mrGA.getWidth()) || recenterMR) {
+//            int subtreeWidth = uf.computeSubTreeWidth((ISEDDebugNode)groupStart);
+//            if(subtreeWidth < rectGA.getWidth()) {
                int hMove = bcGA.getX() - groupEndGA.getX() + (bcGA.getWidth() - groupEndGA.getWidth()) / 2;
-   //            System.out.println(hMove);
                uf.moveSubTreeHorizontal(groupEnd, hMove, true, new SubProgressMonitor(monitor, 1));
                // TODO vll sparen wenn hMove < 0
                int mostLeft = uf.findMostLeftXInSubtree(bc);
                if(mostLeft < bcGA.getX()) {
-                  uf.moveSubTreeHorizontal(bc, bcGA.getX() - mostLeft, true, new SubProgressMonitor(monitor, 1));
-   //               System.out.println(bc);
+                  int mostRightXInPrev = uf.findMostRightXInPreviousBranch(bc);
+                  uf.moveSubTreeHorizontal(bc, mostRightXInPrev + uf.OFFSET - mostLeft, true, new SubProgressMonitor(monitor, 1));
+//                  uf.moveSubTreeHorizontal(bc, bcGA.getX() - mostLeft, true, new SubProgressMonitor(monitor, 1));
                }
 //            }
-//            leafs.add((bcGA.getWidth() > mrGA.getWidth() ? bc : mr));
          }
          
          maxX = uf.findMostRightXInSubtree(bc) + uf.OFFSET;
@@ -255,8 +226,10 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
          leafs.add((bcGA.getWidth() > groupEndGA.getWidth() ? bc : groupEnd));
       }
 
-      shrinkRectHeights(groupStart, uf);
-      uf.centerChildren((ISEDDebugNode) groupStart, new HashSet<ISEDDebugNode>(leafs), new SubProgressMonitor(monitor, 1));
+      uf.shrinkRectHeights(groupStart);
+      uf.centerChildren(new HashSet<ISEDDebugNode>(leafs), new SubProgressMonitor(monitor, 1));
+      uf.adjustSubtreeIfSmaller((ISEDDebugNode) groupStart, new SubProgressMonitor(monitor, 1));
+      uf.adjustRects((ISEDDebugNode) groupStart, new SubProgressMonitor(monitor, 1));
       monitor.worked(1);
       
 //      resizeRectsIfNeeded(mc, monitor);
@@ -289,7 +262,7 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
 
       rectGA.setWidth(uf.findMostRightXInGroup(groupStart, (ISEDDebugNode) groupStart) + uf.METOFF - rectGA.getX());
       
-      
+      // TODO maybe doch nur resize :?
 //      uf.resizeRectsIfNeeded(groupStart, monitor);
 
       uf.updateParents(uf.getPictogramElementForBusinessObject(groupStart), uf.OFFSET, new SubProgressMonitor(monitor, 1));
@@ -297,79 +270,77 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
       /**
        * Adjust Space between the left/right side of the group
        */
-      int mostRightXInPrev = uf.findMostRightXInPreviousBranch((ISEDDebugNode) groupStart);
-      int mostLeftXInSubtree = uf.findMostLeftXInSubtree((ISEDDebugNode) groupStart);
-      int mostLeftXAbove = uf.findMostLeftXOfBranchAbove((ISEDDebugNode) groupStart);
-      int mostLeftX = mostLeftXAbove < mostLeftXInSubtree ? mostLeftXAbove : mostLeftXInSubtree; 
-//      int mostLeftX = findMostLeftXInMethod(mc);
-//      int biggestWidthAbove = findBiggestWidthInPartTreeAbove(mc);
-//      System.out.println(mostLeftXAbove < mostLeftXInSubtree);
-//      if(biggestWidthAbove < rectGA.getWidth() && computeSubTreeWidth(mc) < rectGA.getWidth()) {
-      int toMove = 0;
-      ISEDGroupable outerGroup = NodeUtil.getGroupStartNode((ISEDDebugNode) groupStart);
+      int subtreeWidth = uf.computeSubTreeWidth((ISEDDebugNode)groupStart);
       
-      if(outerGroup != null) {
-//         System.out.println(outerGroup + ",  GS: " + groupStart);
-         GraphicsAlgorithm parentMC = uf.getPictogramElementForBusinessObject(outerGroup, 0).getGraphicsAlgorithm();
-         toMove = parentMC.getX() + uf.METOFF - mostLeftX;
-//         System.out.println("2M: " + toMove);
-      }
-
-      if(mostRightXInPrev > -1 && mostLeftX > mostRightXInPrev + uf.OFFSET) {
-         toMove = mostRightXInPrev + uf.OFFSET - mostLeftX;
-      }
+      if(subtreeWidth < rectGA.getWidth()) {
+         int mostRightXInPrev = uf.findMostRightXInPreviousBranch((ISEDDebugNode) groupStart);
+         int mostLeftXInSubtree = uf.findMostLeftXInSubtree((ISEDDebugNode) groupStart);
+         int mostLeftXAbove = uf.findMostLeftXOfBranchAbove((ISEDDebugNode) groupStart);
+         int mostLeftX = mostLeftXAbove < mostLeftXInSubtree ? mostLeftXAbove : mostLeftXInSubtree; 
+   //      int mostLeftX = findMostLeftXInMethod(mc);
+   //      int biggestWidthAbove = findBiggestWidthInPartTreeAbove(mc);
+   //      System.out.println(mostLeftXAbove < mostLeftXInSubtree);
+   //      if(biggestWidthAbove < rectGA.getWidth() && computeSubTreeWidth(mc) < rectGA.getWidth()) {
+         int toMove = 0;
+         ISEDGroupable outerGroup = NodeUtil.getGroupStartNode((ISEDDebugNode) groupStart);
+         
+         if(outerGroup != null) {
+            GraphicsAlgorithm outerGA = uf.getPictogramElementForBusinessObject(outerGroup, 0).getGraphicsAlgorithm();
+            
+            // Either no prev branch or its more left then the outer rect
+            if(mostRightXInPrev == -1 || mostRightXInPrev + uf.OFFSET <= outerGA.getX()) {
+               toMove = outerGA.getX() + uf.METOFF - mostLeftX;
+               System.out.println("A");
+            }
+            else {
+               toMove = mostRightXInPrev + uf.OFFSET - mostLeftX;
+               System.out.println("B");
+            }
+         }
+         else if(mostRightXInPrev > -1 && mostLeftX > mostRightXInPrev + uf.OFFSET) {
+            toMove = mostRightXInPrev + uf.OFFSET - mostLeftX;
+            System.out.println("C");
+         }
+         System.out.println(toMove);
+         
+   //      if(mostRightXInPrev > -1 && mostLeftX > mostRightXInPrev + uf.OFFSET) {
+   //         toMove = mostRightXInPrev + uf.OFFSET - mostLeftX;
+   //         System.out.println("feff");
+   //      }
+   //      else if(outerGroup != null) {
+   ////       System.out.println(outerGroup + ",  GS: " + groupStart);
+   //       GraphicsAlgorithm parentMC = uf.getPictogramElementForBusinessObject(outerGroup, 0).getGraphicsAlgorithm();
+   //       toMove = parentMC.getX() + uf.METOFF - mostLeftX;
+   ////       System.out.println("2M: " + toMove);
+   //      }
       
-      uf.moveRightAndAbove((ISEDDebugNode) groupStart, toMove, monitor);
-      uf.moveSubTreeHorizontal((ISEDDebugNode) groupStart, toMove, true, monitor);
+   
+         
+   //      if(outerGroup != null) {
+   ////         System.out.println(outerGroup + ",  GS: " + groupStart);
+   //         GraphicsAlgorithm parentMC = uf.getPictogramElementForBusinessObject(outerGroup, 0).getGraphicsAlgorithm();
+   //         toMove = parentMC.getX() + uf.METOFF - mostLeftX;
+   ////         System.out.println("2M: " + toMove);
+   //      }
+   //
+   //      if(mostRightXInPrev > -1 && mostLeftX > mostRightXInPrev + uf.OFFSET) {
+   //         toMove = mostRightXInPrev + uf.OFFSET - mostLeftX;
+   //      }
+   
+         if(toMove != 0) {
+            uf.moveRightAndAbove((ISEDDebugNode) groupStart, toMove, monitor);
+            uf.moveSubTreeHorizontal((ISEDDebugNode) groupStart, toMove, true, monitor);
+         }
+      }
       
       uf.resizeRectsIfNeeded(groupStart, monitor);
    }
    
-   protected void shrinkRectHeights(ISEDGroupable groupStart, AbstractDebugNodeUpdateFeature uf) throws DebugException {
-      GraphicsAlgorithm rectGA = null;
-      do
-      {
-         ISEDBranchCondition[] bcs = groupStart.getGroupEndConditions();
-         rectGA = uf.getPictogramElementForBusinessObject(groupStart, 0).getGraphicsAlgorithm();
-         
-         int height = 0;
-         for(ISEDBranchCondition bc : bcs) {
-            ISEDDebugNode groupEnd = bc.getChildren()[0];
-            PictogramElement groupEndPE = uf.getPictogramElementForBusinessObject(groupEnd);
-                             
-            if(groupEndPE != null && groupEndPE.getGraphicsAlgorithm().getHeight() > height) {
-               height = groupEndPE.getGraphicsAlgorithm().getHeight();
-            }
-         }
-         
-         int diff = rectGA.getY() + rectGA.getHeight() - uf.findDeepestYInGroup(groupStart) - uf.OFFSET - height / 2;
-
-         if(diff != 0)
-         {
-            rectGA.setHeight(rectGA.getHeight() - diff);
-   
-            for(int i = 0; i < bcs.length; i++) {
-               ISEDDebugNode groupEnd = bcs[i].getChildren()[0];
-               
-               // If groupEnd ends another (more outside) group too then ignore it
-               if(groupEnd.getGroupStartCondition((ISEDDebugNode) NodeUtil.getGroupStartNode((ISEDDebugNode) groupStart)) != null) {
-                  continue;
-               }
-               
-               PictogramElement groupEndPE = uf.getPictogramElementForBusinessObject(groupEnd);
-                                
-               if(groupEndPE != null) {
-                  ISEDGroupable outerGroup = NodeUtil.getGroupStartNode((ISEDDebugNode) groupStart);
-                  uf.moveSubTreeBetweenMRVertical(outerGroup, groupEnd, -diff);
-               }
-            }
-         }
-         groupStart = NodeUtil.getGroupStartNode((ISEDDebugNode) groupStart);
-      } while(groupStart != null);
-   }
-   
    /**
-    * TODO
+    * Creates an Arrowconnection between the the {@link AnchorContainer} startAC and
+    * the {@link AnchorContainer} endAC
+    * @param AnchorContainer startAC The AnchorContainer where the connections starts
+    * @param AnchorContainer endAC The AnchorContainer where the connectons ends
     */
    protected void createConnection(AnchorContainer startAC, AnchorContainer endAC) {
       IPeCreateService peCreateService = Graphiti.getPeCreateService();
@@ -387,15 +358,10 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
       polyline.setStyle(ExecutionTreeStyleUtil.getStyleForParentConnection(getDiagram()));
    }
    
-   //protected abstract void createConnection(AnchorContainer startAC, AnchorContainer endAC);
-   
    /**
-    * TODO
-    * This function removes all children and connections of the given node, until
-    * there are no more children or either {@link ISEDMethodReturn} is reached for
-    * {@link ISEDMethodCall} or the last {@link ISEDLoopCondition} for
-    * {@link ISEDLoopStatement}.
-    * @param ISEDDebugNode node The current node
+    * This function removes all children and connections inside the given group
+    * It will remove the connections of the start- and endnodes but not the nodes itself
+    * @param ISEDGroupable groupStart The start node of the Group
     * @throws DebugException
     */
    protected void removeChildren(ISEDGroupable groupStart) throws DebugException {
@@ -403,10 +369,6 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
       ISEDIterator iter = new SEDGroupPreorderIterator(groupStart);
       while (iter.hasNext()) {
          ISEDDebugElement next = iter.next();
-        
-//         if(next == (ISEDDebugNode)groupStart) {
-//            continue;
-//         }
         
          if(next instanceof ISEDDebugNode)
          {
@@ -417,19 +379,6 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
                 continue;
             }
             
-//            if(pes == null || nextNode.getGroupStartCondition((ISEDDebugNode) groupStart) != null ||
-//                  NodeUtil.getGroupStartNode(nextNode) == null) {
-//                continue;
-//            }
-//            if(pes == null || !ArrayUtil.isEmpty(nextNode.getGroupStartConditions()) && NodeUtil.getGroupStartNode(nextNode) == groupStart ||
-//                  !(nextNode instanceof ISEDBranchCondition) && ArrayUtil.isEmpty(nextNode.getCallStack())) {
-//                continue;
-//            }
-//            if(pes == null || nextNode instanceof ISEDBaseMethodReturn && nextNode.getCallStack()[0] == groupStart ||
-//                 !(nextNode instanceof ISEDBranchCondition) && ArrayUtil.isEmpty(nextNode.getCallStack())) {
-//               continue;
-//            }
-            
             removeConnections((NodeUtil.canBeGrouped(nextNode) ? pes[1] : pes[0]), drf);
             
             if(nextNode != (ISEDDebugNode) groupStart) {
@@ -439,27 +388,14 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
                   drf.remove(new RemoveContext(pes[1]));
                }
             }
-//
-//            for(PictogramElement pe : pes)
-//            {
-//               if(!NodeUtil.canBeGrouped(nextNode)) {
-//                  removeConnections(pe, drf);
-//               }
-//               drf.remove(new RemoveContext(pe));
-//            }
          }
       }
    }
-   
-   /*
-    * TODO
-    */
-   protected void removeConnections(PictogramElement pe) {
-      removeConnections(pe, new DefaultRemoveFeature(getFeatureProvider()));
-   }
 
-   /*
-    * TODO
+   /**
+    * Gathers all outgoing connections of the PictogramElement and removes them
+    * @param PictogramElement pe The PictogramElement whose connections should be removed
+    * @param DefaultRemoveFeature drf The DefaultRemoveFeature
     */
    protected void removeConnections(PictogramElement pe, DefaultRemoveFeature drf) {
       List<Connection> cons = Graphiti.getPeService().getOutgoingConnections((AnchorContainer) pe);
