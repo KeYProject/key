@@ -27,14 +27,65 @@ import de.uka.ilkd.key.ui.CustomUserInterface;
  */
 public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests example: examples/_testcase/set/predicateIfThenElseIntegerTest
+    */
+   public void testIfThenElseInteger() throws Exception {
+      // Create expected results
+      ExpectedPredicateEvaluationResult thenResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult elseResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE)));
+      // Perform test
+      doPredicateEvaluationTest("examples/_testcase/set/predicateIfThenElseIntegerTest/test/IfThenElseIntegerTest.java", 
+                                "IfThenElseIntegerTest[IfThenElseIntegerTest::magic(int,int)].JML normal_behavior operation contract.0", 
+                                "examples/_testcase/set/predicateIfThenElseIntegerTest/oracle/IfThenElseIntegerTest.xml",
+                                false,
+                                false,
+                                thenResult,
+                                elseResult);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/predicateIfThenElseNotFormulaTest
+    */
+   public void testIfThenElseNotFormula() throws Exception {
+      // Create expected results
+      ExpectedPredicateEvaluationResult thenResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult elseResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE)));
+      // Perform test
+      doPredicateEvaluationTest("examples/_testcase/set/predicateIfThenElseNotFormulaTest/test/IfThenElseNotFormulaTest.java", 
+                                "IfThenElseNotFormulaTest[IfThenElseNotFormulaTest::magic(int,int)].JML normal_behavior operation contract.0", 
+                                "examples/_testcase/set/predicateIfThenElseNotFormulaTest/oracle/IfThenElseNotFormulaTest.xml",
+                                false,
+                                false,
+                                thenResult,
+                                elseResult);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/predicateIfThenElseFormulaTest
+    */
+   public void testIfThenElseFormula() throws Exception {
+      // Create expected results
+      ExpectedPredicateEvaluationResult thenResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("3.0", PredicateValue.TRUE), new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult elseResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("3.0", PredicateValue.TRUE), new ExpectedPredicateResult("0.0", PredicateValue.FALSE), new ExpectedPredicateResult("2.0", PredicateValue.TRUE)));
+      // Perform test
+      doPredicateEvaluationTest("examples/_testcase/set/predicateIfThenElseFormulaTest/test/IfThenElseFormulaTest.java", 
+                                "IfThenElseFormulaTest[IfThenElseFormulaTest::magic(int,int)].JML normal_behavior operation contract.0", 
+                                "examples/_testcase/set/predicateIfThenElseFormulaTest/oracle/IfThenElseFormulaTest.xml",
+                                false,
+                                false,
+                                thenResult,
+                                elseResult);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/predicateNotLastEvaluationGivesTruthValue
     */
    public void testNotLastEvaluationGivesTruthValue() throws Exception {
       // Create expected results
-      ExpectedBranchResult goal53 = new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.10", PredicateValue.FALSE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.11", PredicateValue.TRUE), new ExpectedPredicateResult("2.0", PredicateValue.TRUE));
+      ExpectedBranchResult goal53 = new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.13", PredicateValue.FALSE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.14", PredicateValue.TRUE), new ExpectedPredicateResult("2.0", PredicateValue.TRUE));
       ExpectedBranchResult goal41 = new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.UNKNOWN), new ExpectedPredicateResult("2.0", PredicateValue.TRUE));
       ExpectedBranchResult goal39 = new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.UNKNOWN), new ExpectedPredicateResult("2.0", PredicateValue.TRUE));
-      ExpectedBranchResult goal55 = new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.9", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE), new ExpectedPredicateResult("2.0", PredicateValue.TRUE));
+      ExpectedBranchResult goal55 = new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.11", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE), new ExpectedPredicateResult("2.0", PredicateValue.TRUE));
       ExpectedPredicateEvaluationResult result = new ExpectedPredicateEvaluationResult(goal53, goal41, goal39, goal55);
       // Perform test
       doPredicateEvaluationTest("examples/_testcase/set/predicateNotLastEvaluationGivesTruthValue/test/NotLastEvaluationGivesTruthValue.proof", 

@@ -208,6 +208,7 @@ public abstract class AbstractPredicateComposite implements IDisposable {
                                                                                       PredicateTermLabel.NAME,
                                                                                       settings.isUseUnicode(),
                                                                                       settings.isUsePrettyPrinting());
+System.out.println(result);
             if (!root.isDisposed()) {
                root.getDisplay().syncExec(new Runnable() {
                   @Override

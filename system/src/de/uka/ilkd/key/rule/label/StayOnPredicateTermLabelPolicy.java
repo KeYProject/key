@@ -76,7 +76,7 @@ public class StayOnPredicateTermLabelPolicy implements TermLabelPolicy {
          }
          return label;
       }
-      else if (PredicateEvaluationUtil.isLogicOperator(newTermOp)) {
+      else if (PredicateEvaluationUtil.isLogicOperator(newTermOp, newTermSubs)) {
          if (hint instanceof TacletLabelHint) {
             PredicateTermLabel pLabel = (PredicateTermLabel) label;
             int labelSubID = services.getCounter(PredicateTermLabel.PROOF_COUNTER_SUB_PREFIX + pLabel.getMajorId()).getCountPlusPlus();

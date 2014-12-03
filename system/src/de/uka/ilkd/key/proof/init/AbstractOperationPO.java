@@ -739,7 +739,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
    protected Term labelPostTerm(Services services, Term term) {
       if (term != null) {
          final TermFactory tf = services.getTermFactory();
-         if (PredicateEvaluationUtil.isLogicOperator(term.op())) {
+         if (PredicateEvaluationUtil.isLogicOperator(term)) {
             Term[] newSubs = new Term[term.arity()];
             boolean subsChanged = false;
             for (int i = 0; i < newSubs.length; i++) {

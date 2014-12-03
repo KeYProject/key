@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -21,6 +23,7 @@ import de.uka.ilkd.key.logic.label.PredicateTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortedOperator;
@@ -97,11 +100,26 @@ public final class PredicateEvaluationUtil {
    }
    
    /**
-    * Checks if the given {@link Operator} is a {@link Junctor}.
-    * @param operator The {@link Operator} to check.
-    * @return {@code true} is {@link Junctor}, {@code false} is something else.
+    * Checks if the given {@link Term} is a logical operator
+    * @param operator The {@link Term} to check.
+    * @return {@code true} is logical operator, {@code false} is something else.
     */
-   public static boolean isLogicOperator(Operator operator) {
+   public static boolean isLogicOperator(Term term) {
+      if (term != null) {
+         return isLogicOperator(term.op(), term.subs());
+      }
+      else {
+         return false;
+      }
+   }
+   
+   /**
+    * Checks if the given {@link Operator} and its sub {@link Term}s specify a logical operator.
+    * @param operator The {@link Operator}.
+    * @param subs The sub {@link Term}s.
+    * @return {@code true} is logical operator, {@code false} is something else.
+    */
+   public static boolean isLogicOperator(Operator operator, ImmutableArray<Term> subs) {
       // TODO: Quantors
       if (operator instanceof Junctor) {
          return operator != Junctor.TRUE && operator != Junctor.FALSE;
@@ -109,11 +127,44 @@ public final class PredicateEvaluationUtil {
       else if (operator == Equality.EQV) {
          return true;
       }
+      else if (isIfThenElseFormula(operator, subs)) {
+         return true;
+      }
       else {
          return false;
       }
    }
-   
+
+   /**
+    * Checks if the given {@link Term} is an if-then-else formula.
+    * @param term The {@link Term} to check.
+    * @return {@code true} is if-then-else formula, {@code false} is something else.
+    */
+   public static boolean isIfThenElseFormula(Term term) {
+      if (term != null) {
+         return isIfThenElseFormula(term.op(), term.subs());
+      }
+      else {
+         return false;
+      }
+   }
+
+   /**
+    * Checks if the given {@link Operator} and its sub {@link Term}s specify an if-then-else formula.
+    * @param operator The {@link Operator}.
+    * @param subs The sub {@link Term}s.
+    * @return {@code true} is if-then-else formula, {@code false} is something else.
+    */
+   public static boolean isIfThenElseFormula(Operator operator, ImmutableArray<Term> subs) {
+      if (operator == IfThenElse.IF_THEN_ELSE) {
+         Sort sort = operator.sort(subs);
+         return sort == Sort.FORMULA;
+      }
+      else {
+         return false;
+      }
+   }
+
    /**
     * Evaluates the truth values in the subtree of the given {@link Node}
     * for predicates labeled with the given {@link TermLabel} name.
@@ -131,7 +182,7 @@ public final class PredicateEvaluationUtil {
       PredicateEvaluationResult result = new PredicateEvaluationResult();
       Deque<Map<String, IPredicateInstruction>> evaluationStack = new LinkedList<Map<String, IPredicateInstruction>>();
       evaluationStack.addFirst(new HashMap<String, IPredicateInstruction>());
-      evaluateNode(node, useUnicode, usePrettyPrinting, node, termLabelName, evaluationStack, result);
+      evaluateNode(node, useUnicode, usePrettyPrinting, node, termLabelName, evaluationStack, result, node.proof().getServices());
       return result;
    }
 
@@ -143,6 +194,7 @@ public final class PredicateEvaluationUtil {
     * @param termLabelName The {@link Name} of the {@link TermLabel} to consider.
     * @param evaluationStack The not empty stack with evaluation results.
     * @param result The {@link PredicateEvaluationResult} to fill with leaf nodes.
+    * @param services The {@link Services} to use.
     * @throws ProofInputException Occurred Exception
     */
    private static void evaluateNode(final Node evaluationNode,
@@ -151,9 +203,12 @@ public final class PredicateEvaluationUtil {
                                     final Node node, 
                                     final Name termLabelName, 
                                     final Deque<Map<String, IPredicateInstruction>> evaluationStack, 
-                                    final PredicateEvaluationResult result) throws ProofInputException {
+                                    final PredicateEvaluationResult result,
+                                    final Services services) throws ProofInputException {
       // Create new stack entry
       final Map<String, IPredicateInstruction> currentResults = evaluationStack.getFirst();
+      // Check for new minor ids created by parent rule application
+      updatePredicateResultBasedOnNewMinorIds(node, termLabelName, services.getTermBuilder(), currentResults);
       // Analyze applied rule
       boolean childrenAlreadyTreated = false;
       if (node.getAppliedRuleApp() instanceof TacletApp) {
@@ -162,6 +217,7 @@ public final class PredicateEvaluationUtil {
          if (pio != null) {
             Term term = pio.subTerm();
             if (term != null) {
+               // Check for evaluated truth values
                TermLabel label = term.getLabel(termLabelName);
                if (label instanceof PredicateTermLabel) {
                   Taclet taclet = ((TacletApp) tacletApp).taclet();
@@ -170,10 +226,10 @@ public final class PredicateEvaluationUtil {
                      int i = 0;
                      for (TacletGoalTemplate tacletGoal : taclet.goalTemplates()) {
                         Map<String, IPredicateInstruction> childResults = new HashMap<String, IPredicateInstruction>(currentResults);
-                        analyzeTacletGoal(node, node.child(i), tacletApp, tacletGoal, (PredicateTermLabel) label, childResults);
+                        analyzeTacletGoal(node, node.child(i), tacletApp, tacletGoal, (PredicateTermLabel) label, services, childResults);
                         // Evaluate children with branch specific Taclet result
                         evaluationStack.addFirst(childResults);
-                        evaluateNode(evaluationNode, useUnicode, usePrettyPrinting, node.child(i), termLabelName, evaluationStack, result);
+                        evaluateNode(evaluationNode, useUnicode, usePrettyPrinting, node.child(i), termLabelName, evaluationStack, result, services);
                         evaluationStack.removeFirst();
                         i++;
                      }
@@ -194,12 +250,13 @@ public final class PredicateEvaluationUtil {
          OneStepSimplifierRuleApp app = (OneStepSimplifierRuleApp) node.getAppliedRuleApp();
          for (RuleApp protocolApp : app.getProtocol()) {
             if (protocolApp instanceof TacletApp && protocolApp.posInOccurrence() != null) {
-               TermLabel label = protocolApp.posInOccurrence().subTerm().getLabel(termLabelName);
+               Term applicationTerm = protocolApp.posInOccurrence().subTerm();
+               TermLabel label = applicationTerm.getLabel(termLabelName);
                if (label instanceof PredicateTermLabel) {
                   TacletApp tacletApp = (TacletApp) protocolApp;
                   Taclet taclet = tacletApp.taclet();
                   assert taclet.goalTemplates().size() == 1;
-                  analyzeTacletGoal(node, null, tacletApp, taclet.goalTemplates().head(), (PredicateTermLabel) label, currentResults);
+                  analyzeTacletGoal(node, null, tacletApp, taclet.goalTemplates().head(), (PredicateTermLabel) label, services, currentResults);
                }
             }
          }
@@ -208,14 +265,14 @@ public final class PredicateEvaluationUtil {
       int childCount = node.childrenCount();
       if (childCount == 0) {
          Term condition = SymbolicExecutionUtil.computePathCondition(evaluationNode, node, true);
-         String conditionString = SymbolicExecutionUtil.formatTerm(condition, node.proof().getServices(), useUnicode, usePrettyPrinting);
+         String conditionString = SymbolicExecutionUtil.formatTerm(condition, services, useUnicode, usePrettyPrinting);
          result.addBranchResult(new BranchResult(node, currentResults, condition, conditionString, termLabelName));
       }
       else if (!childrenAlreadyTreated) {
          // Evaluate children in case that branch specific Taclet results are not available and thus not evaluated yet.
          for (int i = 0; i < childCount; i++) {
             evaluationStack.addFirst(new HashMap<String, IPredicateInstruction>(currentResults));
-            evaluateNode(evaluationNode, useUnicode, usePrettyPrinting, node.child(i), termLabelName, evaluationStack, result);
+            evaluateNode(evaluationNode, useUnicode, usePrettyPrinting, node.child(i), termLabelName, evaluationStack, result, services);
             evaluationStack.removeFirst();
          }
       }
@@ -228,6 +285,7 @@ public final class PredicateEvaluationUtil {
     * @param tacletApp The {@link TacletApp}.
     * @param tacletGoal The {@link TacletGoalTemplate}.
     * @param label The {@link PredicateTermLabel}.
+    * @param servies The {@link Services} to use.
     * @param results The {@link Map} with all available {@link PredicateResult}s.
     */
    private static void analyzeTacletGoal(Node parent, 
@@ -235,27 +293,40 @@ public final class PredicateEvaluationUtil {
                                          TacletApp tacletApp, 
                                          TacletGoalTemplate tacletGoal, 
                                          PredicateTermLabel label, 
+                                         Services services,
                                          Map<String, IPredicateInstruction> results) {
-      boolean truthValueEvaluationRequired = true;
-      if (child != null) {
-         Term replacement = checkForNewMinorIds(child.sequent(), label, tacletApp.posInOccurrence().isInAntec(), child.proof().getServices().getTermBuilder());
-         if (replacement != null) {
-            updatePredicateResult(label, new TermPredicateInstruction(replacement), results);
-            truthValueEvaluationRequired = false;
+      Object replaceObject = tacletGoal.replaceWithExpressionAsObject();
+      if (replaceObject instanceof Term) {
+         Term replaceTerm = SymbolicExecutionUtil.instantiateTerm((Term) replaceObject, tacletApp, services);
+         // Check for true/false terms
+         if (replaceTerm.op() == Junctor.TRUE) {
+            updatePredicateResult(label, new PredicateResult(PredicateValue.TRUE, parent), results);
+         }
+         else if (replaceTerm.op() == Junctor.FALSE) {
+            updatePredicateResult(label, new PredicateResult(PredicateValue.FALSE, parent), results);
          }
       }
-      if (truthValueEvaluationRequired) {
-         Object replaceObject = tacletGoal.replaceWithExpressionAsObject();
-         if (replaceObject instanceof Term) {
-            Term replaceTerm = SymbolicExecutionUtil.instantiateTerm((Term) replaceObject, tacletApp, parent.proof().getServices());
-            // Check for true/false terms
-            if (replaceTerm.op() == Junctor.TRUE) {
-               updatePredicateResult(label, new PredicateResult(PredicateValue.TRUE, parent), results);
+   }
+   
+   protected static void updatePredicateResultBasedOnNewMinorIds(final Node childNode,
+                                                                 final Name termLabelName,
+                                                                 final TermBuilder tb,
+                                                                 final Map<String, IPredicateInstruction> results) {
+      Node parentNode = childNode.parent();
+      final PosInOccurrence pio = parentNode.getAppliedRuleApp().posInOccurrence();
+      if (pio != null) {
+         pio.subTerm().execPreOrder(new DefaultVisitor() {
+            @Override
+            public void visit(Term visited) {
+               TermLabel label = visited.getLabel(termLabelName);
+               if (label instanceof PredicateTermLabel) {
+                  Term replacement = checkForNewMinorIds(childNode.sequent(), (PredicateTermLabel) label, pio.isInAntec(), tb);
+                  if (replacement != null) {
+                     updatePredicateResult((PredicateTermLabel) label, new TermPredicateInstruction(replacement), results);
+                  }
+               }
             }
-            else if (replaceTerm.op() == Junctor.FALSE) {
-               updatePredicateResult(label, new PredicateResult(PredicateValue.FALSE, parent), results);
-            }
-         }
+         });
       }
    }
 
@@ -845,6 +916,27 @@ public final class PredicateEvaluationUtil {
        */
       public static PredicateValue eqv(PredicateValue left, PredicateValue right) {
          return or(and(left, right), and(not(left), not(right)));
+      }
+
+      /**
+       * Computes the {@code if-then-else} value.
+       * @param conditionValue The condition value.
+       * @param thenValue The then value.
+       * @param elseValue The else value.
+       * @return The computed {@code if-then-else} value.
+       */
+      public static PredicateValue ifThenElse(PredicateValue conditionValue,
+                                              PredicateValue thenValue, 
+                                              PredicateValue elseValue) {
+         if (TRUE.equals(conditionValue)) {
+            return thenValue;
+         }
+         else if (FALSE.equals(conditionValue)) {
+            return elseValue;
+         }
+         else {
+            return UNKNOWN;
+         }
       }
    }
 }
