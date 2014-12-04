@@ -17,6 +17,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
+import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.ui.test.Activator;
 import org.key_project.jmlediting.ui.test.TestUtils;
 import org.key_project.util.eclipse.BundleUtil;
@@ -77,7 +78,7 @@ public class JMLCompletionProposalComputerTest {
    private static final String INSERTTEXT_EXCEPTIONAL_BEHAVIOR = "exception";
    private static final String INSERTTEXT_ENSURES = "ensu";
 
-   private static final int Max_Keywords = 10;
+   private static final int MAX_KEYWORDS = countKeywords();
 
    /*
     * Initialize a new Project and load the template class from data/template
@@ -98,6 +99,21 @@ public class JMLCompletionProposalComputerTest {
       bot.sleep(1000);
       JMLPreferencesHelper.setProjectJMLProfile(project.getProject(),
             TestUtils.findReferenceProfile());
+   }
+
+   private static int countKeywords() {
+      int result = 0;
+
+      for (IKeyword keywords : TestUtils.findReferenceProfile()
+            .getSupportedKeywords()) {
+         for (String keyword : keywords.getKeywords()) {
+            if (keyword != null) {
+               result++;
+            }
+         }
+      }
+
+      return result;
    }
 
    /*
@@ -167,7 +183,7 @@ public class JMLCompletionProposalComputerTest {
             .getCompletion(PosJMLCommentSingle, "");
       assertTrue(
             "Not the correct amount of proposals in JML-single-line-comment get all proposals",
-            proposals.size() == Max_Keywords + 4); // +4 for default
+            proposals.size() == MAX_KEYWORDS + 4); // +4 for default
       // single-line-comment-proposals
       // in java-editor (new, nls,
       // runnable, toarray)
@@ -205,7 +221,7 @@ public class JMLCompletionProposalComputerTest {
    public void testCompletionJMLCommentMultiAll() {
       final List<String> proposals = this.getCompletion(PosJMLCommentMulti, "");
       assertTrue("Not the correct amount of Proposals: " + proposals.size(),
-            proposals.size() == Max_Keywords);
+            proposals.size() == MAX_KEYWORDS);
    }
 
    @Test
