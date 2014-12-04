@@ -17,7 +17,7 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.ui.extension.JMLLocator;
-import org.key_project.util.jmlediting.JMLUtil;
+import org.key_project.util.eclipse.WorkbenchUtil;
 
 /**
  * An {@link IJavaCompletionProposalComputer} to support JML.
@@ -26,11 +26,11 @@ import org.key_project.util.jmlediting.JMLUtil;
  * @author Thomas Glaser
  */
 public class JMLCompletionProposalComputer implements
-IJavaCompletionProposalComputer {
-	
-    // not needed atm, but functionality may be needed sometimes
-    private static final List<String> CUSTOM_PROPOSALS = Arrays
-          .asList(new String[0]);
+      IJavaCompletionProposalComputer {
+
+   // not needed atm, but functionality may be needed sometimes
+   private static final List<String> CUSTOM_PROPOSALS = Arrays
+         .asList(new String[0]);
 
    @Override
    public void sessionStarted() {
@@ -47,7 +47,7 @@ IJavaCompletionProposalComputer {
          if (locator.isInJMLcomment(context.getInvocationOffset())) {
 
             // getCurrentProject
-            final IProject currentProject = JMLUtil.getCurrentProject();
+            final IProject currentProject = WorkbenchUtil.getCurrentProject();
 
             // Load the specific JMLProfile for the current Project.
             final IJMLProfile currentJMLProfile = JMLPreferencesHelper
