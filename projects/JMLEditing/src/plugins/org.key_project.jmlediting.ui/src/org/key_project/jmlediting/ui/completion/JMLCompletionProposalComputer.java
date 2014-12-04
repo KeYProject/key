@@ -10,6 +10,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
+import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
@@ -47,7 +48,14 @@ public class JMLCompletionProposalComputer implements
          if (locator.isInJMLcomment(context.getInvocationOffset())) {
 
             // getCurrentProject
-            final IProject currentProject = WorkbenchUtil.getCurrentProject();
+            IProject currentProject;
+            if (context instanceof JavaContentAssistInvocationContext) {
+               JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
+               currentProject = javaContext.getProject().getProject();
+            }
+            else {
+               currentProject = WorkbenchUtil.getCurrentProject();
+            }
 
             // Load the specific JMLProfile for the current Project.
             final IJMLProfile currentJMLProfile = JMLPreferencesHelper
