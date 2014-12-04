@@ -22,7 +22,7 @@ import org.key_project.jmlediting.ui.Activator;
  * The {@link JMLProfilePropertiesPage} implements a properties and preferences
  * page to show in project settings or global preferences. The page allows the
  * user to select the colours
- * 
+ *
  * @author Lisa Eisenhardt
  *
  */
@@ -36,8 +36,7 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
    /**
     * The ID of the page when acting as properties page.
     */
-   public static final String JML_COLOUR_PROP_ID =
-         "org.key_project.jmlediting.ui.propertypages.colour";
+   public static final String JML_COLOUR_PROP_ID = "org.key_project.jmlediting.ui.propertypages.colour";
 
    /**
     * The name of the JML profile property of a project.
@@ -50,12 +49,14 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
     */
    public static final RGB DEFAULT_JML_COMMENT_COLOR = new RGB(0, 255, 0);
 
+   public static final String TEST_KEY = "CommentColor";
+
    /**
     * The {@link IPreferenceChangeListener} which listens to changes of the
     * profile property for properties. This is used to change the selection in
     * the properies page when global settings are used and they change.
     */
-   private IPreferenceChangeListener currentPreferenceListener;
+   private final IPreferenceChangeListener currentPreferenceListener;
 
    /**
     * A {@link ColorSelector} which selects the Color for the JML-Comments
@@ -69,8 +70,8 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
       this.currentPreferenceListener = new IPreferenceChangeListener() {
 
          @Override
-         public void preferenceChange(PreferenceChangeEvent event) {
-            updateValues();
+         public void preferenceChange(final PreferenceChangeEvent event) {
+            JMLColorPropertyPreferencePage.this.updateValues();
 
          }
 
@@ -78,43 +79,44 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
    }
 
    @Override
-   public void setVisible(boolean visible) {
+   public void setVisible(final boolean visible) {
       // Register the preference listener if the dialog is visible
       // do not generate memory leaks, listener are removed in
       // performOK and performCancel, here is too late
       if (visible) {
-         IEclipsePreferences preferences = InstanceScope.INSTANCE
+         final IEclipsePreferences preferences = InstanceScope.INSTANCE
                .getNode(Activator.PLUGIN_ID);
          preferences
-               .addPreferenceChangeListener(this.currentPreferenceListener);
+         .addPreferenceChangeListener(this.currentPreferenceListener);
       }
       super.setVisible(visible);
    }
 
    @Override
-   protected Control createPreferenceContent(Composite parent) {
+   protected Control createPreferenceContent(final Composite parent) {
       // Initialize the UI
 
       final Composite myComposite = new Composite(parent, SWT.NONE);
 
       final GridLayout layout = new GridLayout();
       layout.numColumns = 2;
-      
+
       myComposite.setLayout(layout);
 
       GridData data;
 
       data = new GridData();
-      Label label = new Label(myComposite, SWT.NONE);
+      final Label label = new Label(myComposite, SWT.NONE);
       label.setText("Choose JML comment color:");
       label.setLayoutData(data);
 
-      commentColor = new ColorSelector(myComposite);
+      this.commentColor = new ColorSelector(myComposite);
+      this.commentColor.getButton().setData(TEST_KEY, "CommentColor");
 
-      IEclipsePreferences preferences = InstanceScope.INSTANCE
+      final IEclipsePreferences preferences = InstanceScope.INSTANCE
             .getNode(Activator.PLUGIN_ID);
       if (preferences.get(COMMENT_COLOR.getLocalName(), null) == null) {
-         initializeDefaults();
+         this.initializeDefaults();
       }
       this.updateValues();
 
@@ -127,7 +129,7 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
     */
    private void initializeDefaults() {
       // set default Values:
-      IEclipsePreferences preferences = InstanceScope.INSTANCE
+      final IEclipsePreferences preferences = InstanceScope.INSTANCE
             .getNode(Activator.PLUGIN_ID);
       preferences.put(COMMENT_COLOR.getLocalName(),
             DEFAULT_JML_COMMENT_COLOR.toString());
@@ -139,7 +141,7 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
     * the pane is used for preferences or properties).
     */
    private void updateValues() {
-      IEclipsePreferences preferences = InstanceScope.INSTANCE
+      final IEclipsePreferences preferences = InstanceScope.INSTANCE
             .getNode(Activator.PLUGIN_ID);
 
       String color = null;
@@ -148,8 +150,8 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
          // project specific settings are enabled
          try {
             color = this.getProject().getPersistentProperty(COMMENT_COLOR);
-             }
-         catch (CoreException e) {
+         }
+         catch (final CoreException e) {
             color = null;
          }
       }
@@ -159,7 +161,7 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
          color = preferences.get(COMMENT_COLOR.getLocalName(), null);
       }
 
-      commentColor.setColorValue(StringtoRGB(color));
+      this.commentColor.setColorValue(this.StringtoRGB(color));
    }
 
    @Override
@@ -168,14 +170,14 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
       try {
          return project.getPersistentProperty(COMMENT_COLOR) != null;
       }
-      catch (CoreException e) {
+      catch (final CoreException e) {
          return false;
       }
    }
 
    @Override
    protected void enableProjectSpecificSettings(
-         boolean useProjectSpecificSettings) {
+         final boolean useProjectSpecificSettings) {
       if (!useProjectSpecificSettings) {
          // Reset selection to default if no project settings
          this.updateValues();
@@ -197,30 +199,29 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
    /**
     * Changes the String col in a RGB-representation of a color. The format of
     * the string is the outcome of the method RGB.toString()
-    * 
+    *
     * @param col
     *           the string should have the format RGB {x, y, z}
     * @return the RGB representation
     */
 
-   private RGB StringtoRGB(String col) {
+   private RGB StringtoRGB(final String col) {
 
-      String[] colors = col.substring(5, col.length() - 1).split(", ");
-      RGB color = new RGB(Integer.parseInt(colors[0].trim()),
+      final String[] colors = col.substring(5, col.length() - 1).split(", ");
+      final RGB color = new RGB(Integer.parseInt(colors[0].trim()),
             Integer.parseInt(colors[1].trim()), Integer.parseInt(colors[2]
                   .trim()));
 
       return color;
    }
 
-   public void getColor(){
-      
+   public void getColor() {
+
    }
-   
-   
+
    @Override
    public void performDefaults() {
-      commentColor.setColorValue(DEFAULT_JML_COMMENT_COLOR);
+      this.commentColor.setColorValue(DEFAULT_JML_COMMENT_COLOR);
       super.performDefaults();
 
    }
@@ -228,27 +229,27 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
    @Override
    public boolean performCancel() {
       // Remove preferences listener
-      IEclipsePreferences preferences = InstanceScope.INSTANCE
+      final IEclipsePreferences preferences = InstanceScope.INSTANCE
             .getNode(Activator.PLUGIN_ID);
       preferences
-            .removePreferenceChangeListener(this.currentPreferenceListener);
+      .removePreferenceChangeListener(this.currentPreferenceListener);
       return super.performCancel();
    }
 
    @Override
    public void performApply() {
-      IEclipsePreferences preferences = InstanceScope.INSTANCE
+      final IEclipsePreferences preferences = InstanceScope.INSTANCE
             .getNode(Activator.PLUGIN_ID);
 
       if (this.isProjectPreferencePage()) {
          // Project preferences
 
-         IProject project = this.getProject();
+         final IProject project = this.getProject();
 
          try {
             if (this.useProjectSettings()) {
                // Set property
-               project.setPersistentProperty(COMMENT_COLOR, commentColor
+               project.setPersistentProperty(COMMENT_COLOR, this.commentColor
                      .getColorValue().toString());
 
             }
@@ -257,13 +258,13 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
                project.setPersistentProperty(COMMENT_COLOR, null);
             }
          }
-         catch (CoreException e) {
+         catch (final CoreException e) {
 
          }
       }
       else {
          // global properties
-         preferences.put(COMMENT_COLOR.getLocalName(), commentColor
+         preferences.put(COMMENT_COLOR.getLocalName(), this.commentColor
                .getColorValue().toString());
 
       }
@@ -275,20 +276,20 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
    public boolean performOk() {
       // Remove preference listener
 
-      IEclipsePreferences preferences = InstanceScope.INSTANCE
+      final IEclipsePreferences preferences = InstanceScope.INSTANCE
             .getNode(Activator.PLUGIN_ID);
       preferences
-            .removePreferenceChangeListener(this.currentPreferenceListener);
+      .removePreferenceChangeListener(this.currentPreferenceListener);
 
       if (this.isProjectPreferencePage()) {
          // Project preferences
 
-         IProject project = this.getProject();
+         final IProject project = this.getProject();
 
          try {
             if (this.useProjectSettings()) {
                // Set property
-               project.setPersistentProperty(COMMENT_COLOR, commentColor
+               project.setPersistentProperty(COMMENT_COLOR, this.commentColor
                      .getColorValue().toString());
 
             }
@@ -297,13 +298,13 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
                project.setPersistentProperty(COMMENT_COLOR, null);
             }
          }
-         catch (CoreException e) {
+         catch (final CoreException e) {
             return false;
          }
       }
       else {
          // global properties
-         preferences.put(COMMENT_COLOR.getLocalName(), commentColor
+         preferences.put(COMMENT_COLOR.getLocalName(), this.commentColor
                .getColorValue().toString());
 
       }
