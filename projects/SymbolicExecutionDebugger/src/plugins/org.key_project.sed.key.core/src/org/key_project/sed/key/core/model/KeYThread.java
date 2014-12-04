@@ -44,6 +44,7 @@ import de.uka.ilkd.key.proof.TermProgramVariableCollectorKeepUpdatesForBreakpoin
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
+import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder.SymbolicExecutionCompletions;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
@@ -295,12 +296,40 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * by calling {@link SymbolicExecutionTreeBuilder#analyse()}.
     * </p>
     * @param builder The {@link SymbolicExecutionTreeBuilder} to update.
+    * @throws DebugException Occurred Exception.
     */
-   protected void updateExecutionTree(SymbolicExecutionTreeBuilder builder) {
+   protected void updateExecutionTree(SymbolicExecutionTreeBuilder builder) throws DebugException {
       if (getProof() != null) {
          // Update the symbolic execution tree, debug model is updated lazily via getters
-         getBuilder().analyse();
+         SymbolicExecutionCompletions completions = getBuilder().analyse();
+         handleCompletions(completions);
       }
+   }
+   
+   /**
+    * This methods handles all completions, e.g. by collapsing their debug node representations.
+    * @param completions The detected {@link SymbolicExecutionCompletions}.
+    * @throws DebugException Occurred Exception.
+    */
+   protected void handleCompletions(SymbolicExecutionCompletions completions) throws DebugException {
+// TODO: This methods does currently nothing until collapsing is supported by the SED.
+//      // Collapse all completed blocks
+//      for (IExecutionNode<?> blockCompletion : completions.getBlockCompletions()) {
+//         for (IExecutionNode<?> completedBlock : blockCompletion.getCompletedBlocks()) {
+//            IKeYSEDDebugNode<?> keyNode = getDebugTarget().ensureDebugNodeIsCreated(completedBlock);
+//            if (keyNode instanceof ISEDGroupable) {
+//               ((ISEDGroupable) keyNode).setCollapsed(true);
+//            }
+//         }
+//      }
+//      // Collapse all returned methods
+//      for (IExecutionBaseMethodReturn<?> methodReturn : completions.getMethodReturns()) {
+//         IExecutionMethodCall methodCall = methodReturn.getMethodCall();
+//         IKeYSEDDebugNode<?> keyNode = getDebugTarget().ensureDebugNodeIsCreated(methodCall);
+//         if (keyNode instanceof ISEDGroupable) {
+//            ((ISEDGroupable) keyNode).setCollapsed(true);
+//         }
+//      }
    }
 
    /**

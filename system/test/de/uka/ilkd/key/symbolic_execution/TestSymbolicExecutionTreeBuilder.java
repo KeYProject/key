@@ -14,12 +14,15 @@
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.io.File;
+import java.util.HashMap;
 
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder.SymbolicExecutionCompletions;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
@@ -42,6 +45,77 @@ import de.uka.ilkd.key.ui.CustomUserInterface;
  * @author Martin Hentschel
  */
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
+   /**
+    * Tests example: examples/_testcase/set/symbolicExecutionCompletionsTest
+    */
+   public void testSymbolicExecutionCompletionsTest() throws Exception {
+      SymbolicExecutionEnvironment<CustomUserInterface> env = null;
+      HashMap<String, String> originalTacletOptions = null;
+      boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
+      try {
+         String javaPathInBaseDir = "examples/_testcase/set/symbolicExecutionCompletionsTest/test/SymbolicExecutionCompletionsTest.java";
+         String containerTypeName = "SymbolicExecutionCompletionsTest";
+         String methodFullName = "magic";
+         // Make sure that the correct taclet options are defined.
+         originalTacletOptions = setDefaultTacletOptions(keyRepDirectory, javaPathInBaseDir, containerTypeName, methodFullName);
+         setOneStepSimplificationEnabled(null, true);
+         // Create proof environment for symbolic execution
+         env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInBaseDir, containerTypeName, methodFullName, null, false, false, false, false, false, false, false, false);
+         IExecutionStart start = env.getBuilder().getStartNode();
+         // Perform step into
+         SymbolicExecutionCompletions completions = stepInto(env.getUi(), env.getBuilder(), "examples/_testcase/set/symbolicExecutionCompletionsTest/oracle/SymbolicExecutionCompletionsTest", 1, ".xml", keyRepDirectory);
+         assertNotNull(completions);
+         IExecutionNode<?> call = start.getChildren()[0];
+         assertEquals(0, completions.getBlockCompletions().length);
+         assertEquals(0, completions.getMethodReturns().length);
+         // Perform step into
+         completions = stepInto(env.getUi(), env.getBuilder(), "examples/_testcase/set/symbolicExecutionCompletionsTest/oracle/SymbolicExecutionCompletionsTest", 2, ".xml", keyRepDirectory);
+         assertNotNull(completions);
+         IExecutionNode<?> ifStatement = call.getChildren()[0];
+         assertEquals(0, completions.getBlockCompletions().length);
+         assertEquals(0, completions.getMethodReturns().length);
+         // Perform step into
+         completions = stepInto(env.getUi(), env.getBuilder(), "examples/_testcase/set/symbolicExecutionCompletionsTest/oracle/SymbolicExecutionCompletionsTest", 3, ".xml", keyRepDirectory);
+         assertNotNull(completions);
+         IExecutionNode<?> leftBC = ifStatement.getChildren()[0];
+         IExecutionNode<?> rightBC = ifStatement.getChildren()[1];
+         IExecutionNode<?> leftReturnStatement = leftBC.getChildren()[0];
+         IExecutionNode<?> rightIncrement = rightBC.getChildren()[0];
+         assertEquals(1, completions.getBlockCompletions().length);
+         assertSame(leftReturnStatement, completions.getBlockCompletions()[0]);
+         assertEquals(0, completions.getMethodReturns().length);
+         // Perform step into
+         completions = stepInto(env.getUi(), env.getBuilder(), "examples/_testcase/set/symbolicExecutionCompletionsTest/oracle/SymbolicExecutionCompletionsTest", 4, ".xml", keyRepDirectory);
+         assertNotNull(completions);
+         IExecutionNode<?> leftReturn = leftReturnStatement.getChildren()[0];
+         IExecutionNode<?> rightReturnStatement = rightIncrement.getChildren()[0];
+         assertEquals(1, completions.getBlockCompletions().length);
+         assertSame(rightReturnStatement, completions.getBlockCompletions()[0]);
+         assertEquals(1, completions.getMethodReturns().length);
+         assertSame(leftReturn, completions.getMethodReturns()[0]);
+         // Perform step into
+         completions = stepInto(env.getUi(), env.getBuilder(), "examples/_testcase/set/symbolicExecutionCompletionsTest/oracle/SymbolicExecutionCompletionsTest", 5, ".xml", keyRepDirectory);
+         assertNotNull(completions);
+         IExecutionNode<?> rightReturn = rightReturnStatement.getChildren()[0];
+         assertEquals(0, completions.getBlockCompletions().length);
+         assertEquals(1, completions.getMethodReturns().length);
+         assertSame(rightReturn, completions.getMethodReturns()[0]);
+         // Perform step into
+         completions = stepInto(env.getUi(), env.getBuilder(), "examples/_testcase/set/symbolicExecutionCompletionsTest/oracle/SymbolicExecutionCompletionsTest", 6, ".xml", keyRepDirectory);
+         assertNotNull(completions);
+         assertEquals(0, completions.getBlockCompletions().length);
+         assertEquals(0, completions.getMethodReturns().length);
+      }
+      finally {
+         // Restore original options
+         setOneStepSimplificationEnabled(null, originalOneStepSimplification);
+         restoreTacletOptions(originalTacletOptions);
+         if (env != null) {
+            env.dispose();
+         }
+      }
+   }
+   
    /**
     * Tests example: examples/_testcase/set/allNodeTypesTest in the Java Profile
     */
