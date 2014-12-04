@@ -1,5 +1,6 @@
 package org.key_project.jmlediting.ui.test.preferencepages;
 
+import static org.eclipse.swtbot.swt.finder.waits.Conditions.shellCloses;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.core.resources.IProject;
@@ -7,6 +8,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.junit.Test;
 import org.key_project.jmlediting.ui.preferencepages.JMLColorPropertyPreferencePage;
 import org.key_project.jmlediting.ui.test.TestUtils;
@@ -56,24 +58,22 @@ public class TestJMLColorPropertyPreferencePage {
 
       // TODO: Select a new Color
 
-      /*
-       * bot.sleep(1000); //CommentColor.click(); // bot.sleep(1000);
-       *
-       * //SWTBotShell colorShell = bot.activeShell();
-       *
-       * // System.out.println("The Name of the Color Shell is: " +
-       * colorShell.getText());
-       *
-       * //System.out.println("The ID of a Button is: " +
-       * colorShell.bot().button().getId());
-       * //System.out.println("The ID of another Button is: " +
-       * colorShell.bot().button().getId());
-       *
-       * // bot.activeShell(); bot.sleep(1000); bot.button("OK").click(); //
-       * bot.waitUntil(shellCloses(colorShell));
-       *
-       * bot.sleep(1000);
-       */
+      bot.sleep(1000); // CommentColor.click(); // bot.sleep(1000);
+
+      final SWTBotShell colorShell = bot.activeShell();
+
+      System.out.println("The Name of the Color Shell is: "
+            + colorShell.getText());
+
+      System.out.println("The ID of a Button is: "
+            + colorShell.bot().button().getId());
+      System.out.println("The ID of another Button is: "
+            + colorShell.bot().button().getId());
+
+      // bot.activeShell(); bot.sleep(1000); bot.button("OK").click(); //
+      bot.waitUntil(shellCloses(colorShell));
+
+      bot.sleep(1000);
 
       // Apply the properties
 
@@ -109,7 +109,7 @@ public class TestJMLColorPropertyPreferencePage {
        * equals(JMLColorPropertyPreferencePage.DEFAULT_JML_COMMENT_COLOR.toString
        * ())); System.out.println("The Default Color is ok"); } catch
        * (CoreException e) {
-       *
+       * 
        * }
        */
 

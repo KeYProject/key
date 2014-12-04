@@ -21,7 +21,7 @@ import org.key_project.jmlediting.ui.Activator;
 /**
  * The {@link JMLProfilePropertiesPage} implements a properties and preferences
  * page to show in project settings or global preferences. The page allows the
- * user to select the colours
+ * user to select the colors
  *
  * @author Lisa Eisenhardt
  *
