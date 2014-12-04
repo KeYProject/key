@@ -19,23 +19,17 @@
                               <completedBlockEntry path="/0/0/0/0/0/0/0/0" conditionString="true"/>
                            </statement>
                            <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0"/>
-                           <blockCompletionEntry path="/0/0/0/0/0/0/0"/>
                         </loopCondition>
                         <completedBlockEntry path="/0/0/0/0/0/0" conditionString="true"/>
-                        <completedBlockEntry path="/0/0/0/0/0/0/0/0" conditionString="true"/>
                      </statement>
                      <blockCompletionEntry path="/0/0/0/0/0/0/0"/>
-                     <blockCompletionEntry path="/0/0/0/0/0"/>
                   </loopCondition>
                   <completedBlockEntry path="/0/0/0/0" conditionString="true"/>
-                  <completedBlockEntry path="/0/0/0/0/0/0" conditionString="true"/>
                </statement>
                <blockCompletionEntry path="/0/0/0/0/0"/>
-               <blockCompletionEntry path="/0/0"/>
             </loopCondition>
             <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0"/>
          </loopStatement>
-         <completedBlockEntry path="/0/0/0/0" conditionString="true"/>
       </statement>
       <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
    </methodCall>

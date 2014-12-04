@@ -43,17 +43,14 @@
                                           </branchStatement>
                                        </statement>
                                        <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
-                                       <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
                                     </loopCondition>
                                     <completedBlockEntry path="/0/0/0/0/0/0/0/0/0" conditionString="true"/>
-                                    <completedBlockEntry path="/0/0/0/0/0/0/0/0/0/0/0/0" conditionString="and(not(equals(l,null)),not(equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content))))"/>
                                  </branchStatement>
                               </statement>
                               <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
                            </loopCondition>
                            <completedBlockEntry path="/0/0/0/0" conditionString="not(equals(l,null))"/>
                            <completedBlockEntry path="/0/0/0/0/0/0" conditionString="not(equals(l,null))"/>
-                           <completedBlockEntry path="/0/0/0/0/0/0/0/0/0" conditionString="not(equals(l,null))"/>
                         </branchCondition>
                         <branchCondition name="equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content))" pathCondition="and(not(equals(l,null)),equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content)))" pathConditionChanged="true" branchCondition="equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content))" mergedBranchCondition="false" isBranchConditionComputed="true">
                            <callStackEntry path="/0"/>
@@ -84,17 +81,14 @@
                                           </branchStatement>
                                        </statement>
                                        <blockCompletionEntry path="/0/0/0/0/0/0/0/1/0/0/0/0/0/0/0"/>
-                                       <blockCompletionEntry path="/0/0/0/0/0/0/0/1/0/0/0"/>
                                     </loopCondition>
                                     <completedBlockEntry path="/0/0/0/0/0/0/0/1/0" conditionString="true"/>
-                                    <completedBlockEntry path="/0/0/0/0/0/0/0/1/0/0/0/0" conditionString="and(not(equals(l,null)),equals(int::select(heap,self,Loop::$content),int::select(heap,l,Loop::$content)))"/>
                                  </branchStatement>
                               </statement>
                               <blockCompletionEntry path="/0/0/0/0/0/0/0/1/0/0/0"/>
                            </loopCondition>
                            <completedBlockEntry path="/0/0/0/0" conditionString="not(equals(l,null))"/>
                            <completedBlockEntry path="/0/0/0/0/0/0" conditionString="not(equals(l,null))"/>
-                           <completedBlockEntry path="/0/0/0/0/0/0/0/1/0" conditionString="not(equals(l,null))"/>
                         </branchCondition>
                      </branchCondition>
                      <branchCondition name="equals(l,null)" pathCondition="equals(l,null)" pathConditionChanged="true" branchCondition="equals(l,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
@@ -116,13 +110,11 @@
                <blockCompletionEntry path="/0/0/0/0/0/0/0/0"/>
                <blockCompletionEntry path="/0/0/0/0/0/0/0/1"/>
                <blockCompletionEntry path="/0/0/0/0/0/0/1"/>
-               <blockCompletionEntry path="/0/0"/>
             </loopCondition>
             <blockCompletionEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
             <blockCompletionEntry path="/0/0/0/0/0/0/0/1/0/0/0/0/0/0/0/0"/>
             <blockCompletionEntry path="/0/0/0/0/0/0/1/0"/>
          </loopStatement>
-         <completedBlockEntry path="/0/0/0/0" conditionString="true"/>
       </statement>
       <methodReturnEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
       <methodReturnEntry path="/0/0/0/0/0/0/0/1/0/0/0/0/0/0/0/0"/>

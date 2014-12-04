@@ -44,6 +44,7 @@ import org.eclipse.graphiti.util.ColorConstant;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDGroupable;
+import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.util.NodeUtil;
 import org.key_project.sed.core.util.SEDGroupPreorderIterator;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeStyleUtil;
@@ -106,38 +107,35 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
       IGaService gaService = Graphiti.getGaService();
       
       Diagram targetDiagram = (Diagram) context.getTargetContainer();
-
-      if(addedNode instanceof ISEDGroupable) {
-         ISEDGroupable groupStart = (ISEDGroupable) addedNode;
-         if(groupStart.isGroupable()) {
-            ContainerShape container = peCreateService.createContainerShape(targetDiagram, true);
-   
-            Rectangle rect = gaService.createRectangle(container);
-            
-            ColorConstant color = new ColorConstant(102, 80, 180);
-            if(groupStart.isCollapsed()) {
-               SEDGroupPreorderIterator iter = new SEDGroupPreorderIterator(groupStart);
-               try {
-                  color = iter.allBranchesFinished() ? new ColorConstant(102, 180, 0) : new ColorConstant(255, 102, 0);
-               }
-               catch (DebugException e) {
-                  LogUtil.getLogger().logError(e);
-               }
-            }
-            
-            rect.setForeground(manageColor(color));
-            rect.setLineWidth(2);
-            rect.setFilled(false);
-            link(container, addedNode);
-            
-            GraphicsAlgorithm ga = createNode(context).getGraphicsAlgorithm();
-   
-            gaService.setLocationAndSize(rect, context.getX(), context.getY() + ga.getHeight() / 2, ga.getWidth(), ga.getHeight());
-   
-            return container;
-         }
-      }
       
+      if(NodeUtil.canBeGrouped(addedNode)) {
+         ISEDGroupable groupStart = (ISEDGroupable) addedNode;
+         ContainerShape container = peCreateService.createContainerShape(targetDiagram, true);
+         Rectangle rect = gaService.createRectangle(container);
+         
+         ColorConstant color = new ColorConstant(102, 80, 180);
+         if(groupStart.isCollapsed()) {
+            SEDGroupPreorderIterator iter = new SEDGroupPreorderIterator(groupStart);
+            try {
+               color = iter.allBranchesFinished() ? new ColorConstant(102, 180, 0) : new ColorConstant(255, 102, 0);
+            }
+            catch (DebugException e) {
+               LogUtil.getLogger().logError(e);
+            }
+         }
+         
+         rect.setForeground(manageColor(color));
+         rect.setLineWidth(2);
+         rect.setFilled(false);
+         link(container, addedNode);
+         
+         GraphicsAlgorithm ga = createNode(context).getGraphicsAlgorithm();
+
+         gaService.setLocationAndSize(rect, context.getX(), context.getY() + ga.getHeight() / 2, ga.getWidth(), ga.getHeight());
+
+         return container;
+      }
+
       return createNode(context);
    }
    
@@ -217,7 +215,8 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
       ISEDDebugNode parentNode = NodeUtil.getParent((ISEDDebugNode) getBusinessObjectForPictogramElement(nodeContainer));
       if(parentNode != null)
       {
-         PictogramElement pe = parentNode instanceof ISEDGroupable && ((ISEDGroupable)parentNode).isGroupable() ? 
+         PictogramElement pe = NodeUtil.canBeGrouped(parentNode) ?
+//         PictogramElement pe = parentNode instanceof ISEDGroupable && ((ISEDGroupable)parentNode).isGroupable() ? 
                getFeatureProvider().getAllPictogramElementsForBusinessObject(parentNode)[1] :
                getFeatureProvider().getPictogramElementForBusinessObject(parentNode);
             

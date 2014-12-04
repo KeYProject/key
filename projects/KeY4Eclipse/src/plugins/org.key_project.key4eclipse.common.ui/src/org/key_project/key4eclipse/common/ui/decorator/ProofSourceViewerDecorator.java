@@ -142,13 +142,21 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     */
    public void showNode(Node node, KeYMediator mediator) {
       this.node = node;
-      filter = new IdentitySequentPrintFilter(node.sequent());
-      printer = new LogicPrinter(new ProgramPrinter(null), 
-                                 mediator.getNotationInfo(), 
-                                 node.proof().getServices());
-      String str = computeText(mediator, node, filter, printer);
+      String str;
+      if (node != null) {
+         filter = new IdentitySequentPrintFilter(node.sequent());
+         printer = new LogicPrinter(new ProgramPrinter(null), 
+                                    mediator.getNotationInfo(), 
+                                    node.proof().getServices());
+         str = computeText(mediator, node, filter, printer);
+      }
+      else {
+         filter = null;
+         printer = null;
+         str = "";
+      }
       viewer.setDocument(new Document(str));
-      if (node.getAppliedRuleApp() != null) {
+      if (node != null && node.getAppliedRuleApp() != null) {
          PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
          setGreenBackground(pio);
       }
@@ -235,23 +243,25 @@ public class ProofSourceViewerDecorator extends Bean implements IDisposable {
     * @param e The event.
     */
    protected void handleMouseMoved(MouseEvent e) {
-      // Update selected PosInSequent
-      PosInSequent oldPos = selectedPosInSequent;
-      int textOffset = JFaceTextUtil.getOffsetForCursorLocation(viewer);
-      if (textOffset >= 0) {
-         selectedPosInSequent = printer.getPositionTable().getPosInSequent(textOffset, filter);
-      }
-      else {
-         selectedPosInSequent = null;
-      }
-      // Update shown highlighting if PosInSequent has changed
-      if (!ObjectUtil.equals(oldPos, selectedPosInSequent)) {
-         // Update highlighting only on goals.
-         if (node.getAppliedRuleApp() == null){
-            setBackgroundColorForHover();
+      if (node != null) {
+         // Update selected PosInSequent
+         PosInSequent oldPos = selectedPosInSequent;
+         int textOffset = JFaceTextUtil.getOffsetForCursorLocation(viewer);
+         if (textOffset >= 0) {
+            selectedPosInSequent = printer.getPositionTable().getPosInSequent(textOffset, filter);
          }
-         // Inform listener
-         firePropertyChange(PROP_SELECTED_POS_IN_SEQUENT, oldPos, selectedPosInSequent);
+         else {
+            selectedPosInSequent = null;
+         }
+         // Update shown highlighting if PosInSequent has changed
+         if (!ObjectUtil.equals(oldPos, selectedPosInSequent)) {
+            // Update highlighting only on goals.
+            if (node.getAppliedRuleApp() == null){
+               setBackgroundColorForHover();
+            }
+            // Inform listener
+            firePropertyChange(PROP_SELECTED_POS_IN_SEQUENT, oldPos, selectedPosInSequent);
+         }
       }
    }
 

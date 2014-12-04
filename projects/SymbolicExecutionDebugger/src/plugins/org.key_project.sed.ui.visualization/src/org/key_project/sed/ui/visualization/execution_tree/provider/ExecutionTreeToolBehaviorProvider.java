@@ -171,20 +171,23 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
       List<IContextMenuEntry> result = new LinkedList<IContextMenuEntry>();
       CollectionUtil.addAll(result, menuEntries);
       if (isReadOnly()) {
-         ISEDDebugNode node = (ISEDDebugNode) getFeatureProvider().getBusinessObjectForPictogramElement(context.getPictogramElements()[0]);
-         if(node instanceof ISEDGroupable) {
-            ISEDGroupable groupStart = (ISEDGroupable) node;
-            if(groupStart.isCollapsed()) {
-               result.add(createCustomContextMenuEntry(new DebugNodeCollapseFeature(getFeatureProvider()), context, "Expand", null, IPlatformImageConstants.IMG_EDIT_EXPAND));
-            }
-            else {
-               try {
-                  if(groupStart.getGroupEndConditions().length > 0){
-                     result.add(createCustomContextMenuEntry(new DebugNodeCollapseFeature(getFeatureProvider()), context, "Collapse", null, IPlatformImageConstants.IMG_EDIT_COLLAPSE));
-                  }
+         Object bo = getFeatureProvider().getBusinessObjectForPictogramElement(context.getPictogramElements()[0]);
+         if(bo instanceof ISEDDebugNode) {
+            ISEDDebugNode node = (ISEDDebugNode) bo;
+            if(node instanceof ISEDGroupable) {
+               ISEDGroupable groupStart = (ISEDGroupable) node;
+               if(groupStart.isCollapsed()) {
+                  result.add(createCustomContextMenuEntry(new DebugNodeCollapseFeature(getFeatureProvider()), context, "Expand", null, IPlatformImageConstants.IMG_EDIT_EXPAND));
                }
-               catch (DebugException e) {
-                  LogUtil.getLogger().logError(e);
+               else {
+                  try {
+                     if(groupStart.getGroupEndConditions().length > 0){
+                        result.add(createCustomContextMenuEntry(new DebugNodeCollapseFeature(getFeatureProvider()), context, "Collapse", null, IPlatformImageConstants.IMG_EDIT_COLLAPSE));
+                     }
+                  }
+                  catch (DebugException e) {
+                     LogUtil.getLogger().logError(e);
+                  }
                }
             }
          }

@@ -121,7 +121,7 @@ public final class TestSEDKeyCoreUtil {
          return configs.get(0);
       }
       else {
-         return KeySEDUtil.createConfiguration(file);
+         return KeySEDUtil.createConfiguration(file, null);
       }
    }
    
