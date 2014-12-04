@@ -14,7 +14,7 @@ import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.ui.extension.Comment;
 import org.key_project.jmlediting.ui.extension.JMLLocator;
-import org.key_project.util.jmlediting.JMLUtil;
+import org.key_project.util.eclipse.WorkbenchUtil;
 
 /**
  * An {@link IJavaEditorTextHover} to support JML.
@@ -39,7 +39,7 @@ public class JMLTextHover implements IJavaEditorTextHover {
          return null;
       }
       System.out.println("Got " + hoverRegion);
-      final IProject activeProject = JMLUtil.getCurrentProject(this.editorPart);
+      final IProject activeProject = WorkbenchUtil.getProject(this.editorPart);
       if (activeProject == null) {
          return null;
       }
@@ -48,7 +48,7 @@ public class JMLTextHover implements IJavaEditorTextHover {
       try {
          final IASTNode result = parser.parse(textViewer.getDocument().get(),
                hoverRegion.getOffset() + 3, hoverRegion.getOffset()
-               + hoverRegion.getLength() - 2);
+                     + hoverRegion.getLength() - 2);
          final IASTNode selectedNode = Nodes.getDepthMostNodeWithPosition(
                offset, result);
          if (selectedNode != null && Nodes.isKeyword(selectedNode)) {
