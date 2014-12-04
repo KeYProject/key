@@ -1,17 +1,19 @@
 package org.key_project.jmlediting.ui.test.preferencepages;
 
-import static org.eclipse.swtbot.swt.finder.waits.Conditions.shellCloses;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.preference.ColorSelector;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.junit.Test;
 import org.key_project.jmlediting.ui.preferencepages.JMLColorPropertyPreferencePage;
 import org.key_project.jmlediting.ui.test.TestUtils;
+import org.key_project.jmlediting.ui.util.JML_UIPreferencesHelper;
 
 public class TestJMLColorPropertyPreferencePage {
 
@@ -35,7 +37,7 @@ public class TestJMLColorPropertyPreferencePage {
       bot.tree().getTreeItem("JML").expand().getNode("Color").select();
 
       final SWTBotCheckBox enableProjectSettingsBox = bot.checkBox();
-      final SWTBotButton CommentColor = bot.buttonWithId(
+      final SWTBotButton commentColor = bot.buttonWithId(
             JMLColorPropertyPreferencePage.TEST_KEY, "CommentColor");
 
       bot.sleep(100);
@@ -50,7 +52,7 @@ public class TestJMLColorPropertyPreferencePage {
       // Enable project specific settings
       enableProjectSettingsBox.select();
       assertTrue("Cannot select profiles with project specific settings",
-            CommentColor.isEnabled());
+            commentColor.isEnabled());
 
       // System.out.println("The Name of the Properties Shell is: " +
       // bot.activeShell().getText());
@@ -58,22 +60,22 @@ public class TestJMLColorPropertyPreferencePage {
 
       // TODO: Select a new Color
 
-      bot.sleep(1000); // CommentColor.click(); // bot.sleep(1000);
+      final RGB testColor = new RGB(0, 255, 255);
 
-      final SWTBotShell colorShell = bot.activeShell();
+      Display.getDefault().syncExec(new Runnable() {
 
-      System.out.println("The Name of the Color Shell is: "
-            + colorShell.getText());
+         @Override
+         public void run() {
+            final Object oSelector = commentColor.widget.getData();
+            assertTrue(oSelector instanceof ColorSelector);
+            final ColorSelector selector = (ColorSelector) oSelector;
+            selector.setColorValue(testColor);
 
-      System.out.println("The ID of a Button is: "
-            + colorShell.bot().button().getId());
-      System.out.println("The ID of another Button is: "
-            + colorShell.bot().button().getId());
+         }
 
-      // bot.activeShell(); bot.sleep(1000); bot.button("OK").click(); //
-      bot.waitUntil(shellCloses(colorShell));
+      });
 
-      bot.sleep(1000);
+      bot.sleep(5000);
 
       // Apply the properties
 
@@ -81,18 +83,9 @@ public class TestJMLColorPropertyPreferencePage {
 
       // Now check that this is ok
 
-      try {
-         final String color = project
-               .getPersistentProperty(JMLColorPropertyPreferencePage.COMMENT_COLOR);
-         assertTrue(
-               "Selected Wrong Color",
-               color.equals(JMLColorPropertyPreferencePage.DEFAULT_JML_COMMENT_COLOR
-                     .toString()));
-         System.out.println("Selected Right Color");
-      }
-      catch (final CoreException e) {
+      final RGB color = JML_UIPreferencesHelper.getProjectJMLColor(project);
 
-      }
+      assertEquals("Got wrong project color", testColor, color);
 
       // Reset Defaults
       bot.button("Restore Defaults").click();
@@ -109,7 +102,7 @@ public class TestJMLColorPropertyPreferencePage {
        * equals(JMLColorPropertyPreferencePage.DEFAULT_JML_COMMENT_COLOR.toString
        * ())); System.out.println("The Default Color is ok"); } catch
        * (CoreException e) {
-       * 
+       *
        * }
        */
 
