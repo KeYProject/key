@@ -4,13 +4,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorKeyword;
-import org.key_project.jmlediting.core.profile.syntax.ISpecificationStatementKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 
 /**
- * Implements a basic {@link AbstractJMLProfile}. It is not configurable but this is not
- * an invariant of this class. Subclasses may be able to be configured.
- * 
+ * Implements a basic {@link AbstractJMLProfile}. It is not configurable but
+ * this is not an invariant of this class. Subclasses may be able to be
+ * configured.
+ *
  * @author Moritz Lichter
  *
  */
@@ -19,37 +19,30 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
    /**
     * The name of the profile.
     */
-   protected String name;
+   private final String name;
    /**
     * The identifier of the profile.
     */
-   protected final String identifier;
+   private final String identifier;
    /**
-    * The set of supported behaviors.
+    * The set of supported keywords.
     */
-   protected final Set<IJMLBehaviorKeyword> supportedBehaviors;
-   /**
-    * The set of supported generics.
-    */
-   protected final Set<ISpecificationStatementKeyword> supportedGenerics;
+   private final Set<IKeyword> supportedKeywords;
 
    /**
-    * Creates a new {@link AbstractJMLProfile} with given name and identifier and
-    * supported specifications. The specifications will be copied, so the sets
-    * cannot be modified from outside.
-    * 
+    * Creates a new {@link AbstractJMLProfile} with given name and identifier
+    * and supported specifications. The specifications will be copied, so the
+    * sets cannot be modified from outside.
+    *
     * @param name
     *           the name of the profile, not allowed to be null
     * @param identifier
     *           the unique identifier of this profile. not allowed to be null
-    * @param supportedBehaviorSpecs
-    *           the supported behavior specifications, not allowed to be null
     * @param supportedGenericSpecs
     *           the supported generic specifications
     */
    public AbstractJMLProfile(final String name, final String identifier,
-         Set<IJMLBehaviorKeyword> supportedBehaviorSpecs,
-         Set<ISpecificationStatementKeyword> supportedGenericSpecs) {
+         final Set<IKeyword> supportedGenericSpecs) {
       super();
       if (identifier == null) {
          throw new NullPointerException(
@@ -60,14 +53,20 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
       }
       this.name = name;
       this.identifier = identifier;
-      this.supportedBehaviors = new HashSet<IJMLBehaviorKeyword>(
-            supportedBehaviorSpecs);
-      this.supportedGenerics = new HashSet<ISpecificationStatementKeyword>(
-            supportedGenericSpecs);
+      this.supportedKeywords = new HashSet<IKeyword>(supportedGenericSpecs);
    }
-   
+
+   /**
+    * Creates an {@link AbstractJMLProfile} without supported keywords. Mainly
+    * useful for testing.
+    *
+    * @param name
+    *           the name of the profile
+    * @param identifier
+    *           the identifier
+    */
    public AbstractJMLProfile(final String name, final String identifier) {
-      this(name, identifier, Collections.<IJMLBehaviorKeyword>emptySet(),Collections.<ISpecificationStatementKeyword>emptySet());
+      this(name, identifier, Collections.<IKeyword> emptySet());
    }
 
    @Override
@@ -81,13 +80,8 @@ public abstract class AbstractJMLProfile implements IJMLProfile {
    }
 
    @Override
-   public Set<IJMLBehaviorKeyword> getSupportedBehaviors() {
-      return Collections.unmodifiableSet(this.supportedBehaviors);
-   }
-
-   @Override
-   public Set<ISpecificationStatementKeyword> getSupportedSpecificationStatementKeywords() {
-      return Collections.unmodifiableSet(this.supportedGenerics);
+   public Set<IKeyword> getSupportedKeywords() {
+      return Collections.unmodifiableSet(this.supportedKeywords);
    }
 
 }

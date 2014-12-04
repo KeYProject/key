@@ -1,326 +1,123 @@
 package org.key_project.jmlediting.core.parser;
 
+import static org.key_project.jmlediting.core.parser.LexicalHelper.getIdentifier;
+import static org.key_project.jmlediting.core.parser.LexicalHelper.skipWhiteSpacesOrAt;
+import static org.key_project.jmlediting.core.parser.ParserUtils.validatePositions;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.key_project.jmlediting.core.dom.IBehaviorSpecification;
-import org.key_project.jmlediting.core.dom.ILightweightSpecification;
-import org.key_project.jmlediting.core.dom.IMethodSpecification;
-import org.key_project.jmlediting.core.dom.ISpecificationCase;
-import org.key_project.jmlediting.core.dom.ISpecificationStatement;
-import org.key_project.jmlediting.core.dom.Visibility;
-import org.key_project.jmlediting.core.parser.internal.BehaviorSpecification;
-import org.key_project.jmlediting.core.parser.internal.LightweightSpecification;
-import org.key_project.jmlediting.core.parser.internal.MethodSpecification;
-import org.key_project.jmlediting.core.parser.internal.SpecificationStatement;
+import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.core.dom.NodeTypes;
+import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorKeyword;
-import org.key_project.jmlediting.core.profile.syntax.ISpecificationStatementKeyword;
+import org.key_project.jmlediting.core.profile.JMLProfileHelper;
+import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 
+/**
+ * The default implementation for an JML Parser with respect to the keywords
+ * supported in an {@link IJMLProfile}. This parser searches for a keyword, then
+ * calls the parser for the keyword to continue parsing. Then the parser
+ * continues with searching for an keyword.
+ *
+ * @author Moritz Lichter
+ *
+ */
 public class DefaultJMLParser implements IJMLParser {
 
-   private IJMLProfile profile;
+   /**
+    * The profile to use to parse.
+    */
+   private final IJMLProfile profile;
 
-   public DefaultJMLParser(IJMLProfile profile) {
+   /**
+    * Creates an new {@link DefaultJMLParser} for the given profile.
+    *
+    * @param profile
+    *           the profile with the supported keywords, not allowed to be null
+    */
+   public DefaultJMLParser(final IJMLProfile profile) {
       if (profile == null) {
          throw new IllegalArgumentException("Cannot pass a null profile");
       }
       this.profile = profile;
    }
 
-   private void validatePositions(String text, int start, int end)
+   @Override
+   public IASTNode parse(final String text, final int start, final int end)
          throws ParserException {
-      if (start < 0) {
-         throw new ParserException("Given start index is out of bounds: "
-               + start + " < 0", text, start);
+      ParserUtils.validatePositions(text, start, end);
+
+      // A list to put the nodes for each keyword into
+      final List<IASTNode> allKeywords = new ArrayList<IASTNode>();
+
+      int position = skipWhiteSpacesOrAt(text, start, end);
+      // Search for keyword as long text is available
+      while (position < end) {
+         // Parse the keyword
+         final IASTNode keywordNode = this.parseKeyword(text, position, end);
+         allKeywords.add(keywordNode);
+         // Skip whites
+         position = keywordNode.getEndOffset() + 1;
+         if (position < end) {
+            position = skipWhiteSpacesOrAt(text, position, end);
+         }
       }
-      if (start > text.length()) {
-         throw new ParserException("Given start index is out of bounds: "
-               + start + " >= " + text.length(), text, start);
+
+      // It is required to find at least something
+      if (allKeywords.size() == 0) {
+         throw new ParserException("Nothing specified", text, start);
       }
-      if (end < start) {
-         throw new ParserException("start < end", text, start);
-      }
-      if (end > text.length()) {
-         throw new ParserException("Given end index is out of bounds: " + end
-               + " >= " + text.length(), text, end);
-      }
+
+      return Nodes.createNode(NodeTypes.NODE, allKeywords);
    }
 
-   @Override
-   public IMethodSpecification parseMethodSpecification(String text, int start,
-         int end) throws ParserException{
-      // Temporary implementation, does not support redundant specs
-      int alsoStart = skipWhiteSpacesOrAt(text, start, end);
-      int alsoEnd = getIdentifier(text, alsoStart, end);
-      String keyword = text.substring(alsoStart, alsoEnd);
-      boolean isExtendingSpecification = false;
-      int position = start;
-      int begin = alsoStart;
-      if (keyword.equals("also")) {
-         isExtendingSpecification = true;
-         position = alsoEnd;
-      }
-      List<ISpecificationCase> specCaseList = new ArrayList<ISpecificationCase>();
-      ISpecificationCase specCase = this.parseSpecificationCase(text, position, end);
-      specCaseList.add(specCase);
-      position = specCase.getEndOffset() +1;
-      
-      while (true) {
-         try {
-            alsoStart = skipWhiteSpacesOrAt(text, position, end);
-            alsoEnd = getIdentifier(text, alsoStart, end);
-            keyword = text.substring(alsoStart, alsoEnd);
-            if (!keyword.equals("also")) {
-               throw new ParserException("Expected also", text, alsoStart);
-            }
-            specCase = this.parseSpecificationCase(text, alsoEnd, end);
-            specCaseList.add(specCase);
-            position = specCase.getEndOffset() + 1;
-         } catch (ParserException e) {
-            break;
-         }
-      }
-      if (!isExtendingSpecification) {
-         begin = specCaseList.get(0).getStartOffset();
-      }
-      
-      return new MethodSpecification(begin, specCaseList.get(specCaseList.size()-1).getEndOffset() , isExtendingSpecification, specCaseList);
-   }
-   
+   /**
+    * Parses the a single keyword and the rest specified by the parser of the
+    * keyword.
+    *
+    * @param text
+    *           the text to parse in
+    * @param start
+    *           the start position (the position for the next keywords)
+    * @param end
+    *           the maximum position (exclusive)
+    * @return an IAST node for the keyword
+    * @throws ParserException
+    *            when parsing in not successful
+    */
+   private IASTNode parseKeyword(final String text, final int start,
+         final int end) throws ParserException {
+      validatePositions(text, start, end);
 
-   @Override
-   public ISpecificationCase parseSpecificationCase(String text, int start,
-         int end) throws ParserException {
-      try {
-         IBehaviorSpecification bSpec = parseBehaviorSpecification(text, start,
-               end);
-         return bSpec;
-      }
-      catch (ParserException e) {
-         try {
-            ILightweightSpecification lSpec = parseLightweightSpecification(
-                  text, start, end);
-            return lSpec;
-         }
-         catch (ParserException e2) {
-            throw new ParserException("Unable to parse a specification case",
-                  text, start);
-         }
-      }
-   }
+      // Find keyword in text
+      final int keywordStart = skipWhiteSpacesOrAt(text, start, end);
+      final int keywordEnd = getIdentifier(text, keywordStart, end);
+      final String keyword = text.substring(keywordStart, keywordEnd);
 
-   private ILightweightSpecification parseLightweightSpecification(String text,
-         int start, int end) throws ParserException {
-      List<ISpecificationStatement> statements = new ArrayList<ISpecificationStatement>();
-      // We need to parse at least one statement
-      ISpecificationStatement spec = parseSpecificationStatement(text, start,
-            end);
-      int position = spec.getEndOffset() +1;
-      statements.add(spec);
-      while (true) {
-         try {
-            spec = parseSpecificationStatement(text, position, end);
-            position = spec.getEndOffset() +1;
-            statements.add(spec);
-         }
-         catch (ParserException e) {
-            break;
-         }
-      }
-      return new LightweightSpecification(statements.get(0).getStartOffset(),
-            statements.get(statements.size() - 1).getEndOffset(), statements);
-   }
-
-   @Override
-   public IBehaviorSpecification parseBehaviorSpecification(String text,
-         int start, int end) throws ParserException {
-      this.validatePositions(text, start, end);
-      start = skipWhiteSpacesOrAt(text, start, end);
-      ParseResult<Visibility> visibility = parseVisibility(text, start, end);
-      int keywordStart = skipWhiteSpacesOrAt(text, visibility.end, end);
-      int keywordEnd = getIdentifier(text, keywordStart, end);
-      String keyword = text.substring(keywordStart, keywordEnd);
-      IJMLBehaviorKeyword usedKeyword = null;
-      for (IJMLBehaviorKeyword availableKeyword : this.profile
-            .getSupportedBehaviors()) {
-         if (availableKeyword.getKeywords().contains(keyword)) {
-            usedKeyword = availableKeyword;
-            break;
-         }
-      }
-      if (usedKeyword == null) {
-         throw new ParserException(
-               "Expected an keyword for an behavior but got: \"" + keyword
-                     + "\"", text, keywordStart);
-      }
-      // Parse specification statements
-      List<ISpecificationStatement> statements = new ArrayList<ISpecificationStatement>();
-      int position = keywordEnd + 1;
-      while (true) {
-         try {
-            ISpecificationStatement statement = parseSpecificationStatement(
-                  text, position, end);
-            statements.add(statement);
-            position = statement.getEndOffset() + 1;
-         }
-         catch (ParserException e) {
-            break;
-         }
-      }
-      int endOffset = keywordEnd - 1;
-      if (statements.size() > 0) {
-         endOffset = statements.get(statements.size() - 1).getEndOffset();
-      }
-      return new BehaviorSpecification(start, endOffset, visibility.t,
-            usedKeyword, statements);
-   }
-
-   private ParseResult<Visibility> parseVisibility(String text, int start,
-         int end) throws ParserException {
-      int identifierStart = this.skipWhiteSpacesOrAt(text, start, end);
-      int identifierEnd = this.getIdentifier(text, identifierStart, end);
-      String keyword = text.substring(identifierStart, identifierEnd);
-      Visibility v = null;
-      if (keyword.equals("public")) {
-         v = Visibility.PUBLIC;
-      }
-      else if (keyword.equals("protected")) {
-         v = Visibility.PROTECTED;
-      }
-      else if (keyword.equals("private")) {
-         v = Visibility.PRIVATE;
-      }
-      if (v != null) {
-         return new ParseResult<Visibility>(v, identifierEnd);
-      }
-      else {
-         return new ParseResult<Visibility>(Visibility.DEFAULT, start);
-      }
-   }
-
-   @Override
-   public ISpecificationStatement parseSpecificationStatement(String text,
-         int start, int end) throws ParserException {
-      this.validatePositions(text, start, end);
-      int keywordStart = skipWhiteSpacesOrAt(text, start, end);
-      if (keywordStart == end) {
-         throw new ParserException(
-               "Requires a specification statement keyword", text, end);
-      }
-      int keywordEnd = getIdentifier(text, keywordStart, end);
-      String keyword = text.substring(keywordStart, keywordEnd);
-      ISpecificationStatementKeyword foundKeyword = null;
-      for (ISpecificationStatementKeyword availableKeyword : this.profile
-            .getSupportedSpecificationStatementKeywords()) {
-         if (keyword.equals(availableKeyword.getKeyword())) {
-            foundKeyword = availableKeyword;
-            break;
-         }
-      }
+      // Find the corresponding IKeyword instance from the profile
+      final IKeyword foundKeyword = JMLProfileHelper.findKeyword(this.profile, keyword);
       if (foundKeyword == null) {
          throw new ParserException(
                "Not a supported specification statement keyword: \"" + keyword
                      + "\"", text, keywordEnd);
       }
+      final IASTNode keywordNode = Nodes.createKeyword(keywordStart,
+            keywordEnd - 1, foundKeyword, keyword);
 
-      int closingSemicolon = scanForClosingSemicolon(text, keywordEnd, end);
-      // Content without semicolon
-      String content = text.substring(keywordEnd + 1, closingSemicolon);
+      // Now parse according to the keywword
+      final IKeywordParser keywordParser = foundKeyword.createParser();
+      final IASTNode keywordResult = keywordParser.parse(text, keywordEnd, end);
 
-      return new SpecificationStatement(keywordStart, closingSemicolon,
-            foundKeyword, content);
-   }
-
-   private int scanForClosingSemicolon(String text, int start, int end)
-         throws ParserException {
-      boolean isStringOrChar = false;
-      char quoteChar = ' ';
-      int position = start;
-      while (position < end) {
-         char c = text.charAt(position);
-         boolean isQuoteChar = c == '\'' || c == '\"';
-         if (isQuoteChar && !isStringOrChar) {
-            isStringOrChar = true;
-            quoteChar = c;
-         }
-         else if (isStringOrChar) {
-            if (c == '\\') {
-               // now escaping a character in a string
-               // this is not a ; to search for
-               position = position + 2;
-               // dont look at the next one
-               continue;
-            }
-            else {
-               if (c == quoteChar) {
-                  // close string or char
-                  isStringOrChar = false;
-                  quoteChar = ' ';
-               }
-            }
-         }
-         if (!isStringOrChar) {
-            if (c == ';') {
-               break;
-            }
-         }
-         position++;
+      // Build the result
+      if (keywordResult == null) {
+         return keywordNode;
       }
-      if (position >= end) {
-         throw new ParserException("No closing semicolon found", text, end);
+      else {
+         return Nodes.createNode(NodeTypes.KEYWORD_APPL, keywordNode,
+               keywordResult);
       }
-      return position;
-
-   }
-
-   private int getIdentifier(String text, int start, int end)
-         throws ParserException {
-      validatePositions(text, start, end);
-      int position = start;
-      if (start == end) {
-         throw new ParserException("Expected an identifier", text, start);
-      }
-      if (!Character.isJavaIdentifierStart(text.charAt(position))) {
-         throw new ParserException("Not a valid Java identifier", text,
-               position);
-      }
-      position++;
-      while (position < end
-            && Character.isJavaIdentifierPart(text.charAt(position))) {
-         position++;
-      }
-      return position;
-   }
-
-   private int skipWhiteSpacesOrAt(String text, int start, int end)
-         throws ParserException {
-      validatePositions(text, start, end);
-      int position = start;
-      while (position < end
-            && ((text.charAt(position) == '@') || isWhitespace(text
-                  .charAt(position)))) {
-         position++;
-      }
-      return position;
-   }
-
-   private int skipWhiteSpaces(String text, int start, int end)
-         throws ParserException {
-      validatePositions(text, start, end);
-      int position = start;
-      while (position < end && isWhitespace(text.charAt(position))) {
-         position++;
-      }
-      return position;
-   }
-
-   private boolean isWhitespace(char c) {
-      return isWhitespaceWithoutNewLine(c) || c == '\n' || c == '\r';
-   }
-
-   private boolean isWhitespaceWithoutNewLine(int c) {
-      return c == ' ' || c == '\t';
    }
 
 }

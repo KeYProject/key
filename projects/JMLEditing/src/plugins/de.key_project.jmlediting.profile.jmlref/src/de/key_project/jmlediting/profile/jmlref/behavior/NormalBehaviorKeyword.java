@@ -1,19 +1,14 @@
 package de.key_project.jmlediting.profile.jmlref.behavior;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+public class NormalBehaviorKeyword extends AbstractBehaviorKeyword {
 
-import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorKeyword;
-
-public class NormalBehaviorKeyword implements IJMLBehaviorKeyword {
-   
-   private static final Set<String> KEYWORDS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList("normal_behavior", "normal_behaviour")));
+   public NormalBehaviorKeyword() {
+      super("normal_behavior", "normal_behaviour");
+   }
 
    @Override
-   public Set<String> getKeywords() {
-      return KEYWORDS;
+   public String getDescription() {
+      return "A normal_behavior specification case is just syntactic sugar for a behavior specification case with an implicit signals clause \"signals (java.lang.Exception) false;\" ruling out abrupt termination, i.e., the throwing of any exception.";
    }
 
 }

@@ -1,19 +1,14 @@
 package de.key_project.jmlediting.profile.jmlref.behavior;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+public class BehaviorKeyword extends AbstractBehaviorKeyword {
 
-import org.key_project.jmlediting.core.profile.syntax.IJMLBehaviorKeyword;
+   public BehaviorKeyword() {
+      super("behavior", "behaviour");
+   }
 
-public class BehaviorKeyword implements IJMLBehaviorKeyword {
-
-   private static final Set<String> KEYWORDS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList("behavior", "behaviour")));
-   
    @Override
-   public Set<String> getKeywords() {
-      return KEYWORDS;
+   public String getDescription() {
+      return "The behavior specification case is the most general form of specification case. All other forms of specification cases simply provide some syntactic sugar for special kinds of behavior specification cases.";
    }
 
 }
