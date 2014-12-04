@@ -76,4 +76,11 @@ public interface IExecutionVariable extends IExecutionElement {
     * @return The possible values of this {@link IExecutionVariable}.
     */
    public IExecutionValue[] getValues() throws ProofInputException;
+   
+   /**
+    * Creates recursive a term which can be used to determine the value
+    * of {@link #getProgramVariable()}.
+    * @return The created term.
+    */
+   public Term createSelectTerm();
 }

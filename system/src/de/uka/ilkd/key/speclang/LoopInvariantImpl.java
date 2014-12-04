@@ -136,7 +136,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
         // date by the ProgVarReplaceVisitor
 
         if(atPres != null) {
-          for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
+          for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
              if(atPres.get(h) != null && originalAtPres.get(h) != null) {
                  assert originalAtPres.get(h).sort().equals(atPres.get(h).sort());
                  result.put(originalAtPres.get(h), atPres.get(h));
@@ -424,7 +424,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
        final LocationVariable baseHeap = heapLDT.getHeap();
        
        String mods = "";
-       for (LocationVariable h : heapLDT.getAllHeaps(services)) {
+       for (LocationVariable h : heapLDT.getAllHeaps()) {
            if (originalModifies.get(h) != null) {
                String printMods = LogicPrinter.quickPrintTerm(originalModifies.get(h), services, usePrettyPrinting, useUnicodeSymbols);
                mods = mods
@@ -437,7 +437,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
        }
        
        String invariants = "";
-       for (LocationVariable h : heapLDT.getAllHeaps(services)) {
+       for (LocationVariable h : heapLDT.getAllHeaps()) {
            if (originalInvariants.get(h) != null) {
                String printPosts = LogicPrinter.quickPrintTerm(originalInvariants.get(h), services, usePrettyPrinting, useUnicodeSymbols);
                invariants = invariants

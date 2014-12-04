@@ -16,6 +16,7 @@ import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.gui.nodeviews.SequentViewInputListener;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
@@ -54,6 +55,10 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 
 	@Override
 	public Void doInBackground() {
+		
+		getMediator().setInteractive(false);
+		getMediator().startInterface(false);
+		SequentViewInputListener.setRefresh(false);
 
 		TestGenerationSettings settings =
 		        ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings();
@@ -169,6 +174,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 		getMediator().setInteractive(true);
 		getMediator().startInterface(true);
 		getMediator().removeInterruptedListener(this);
+		SequentViewInputListener.setRefresh(true);
 		originalProof = null;
 	}
 

@@ -31,6 +31,7 @@ import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.util.Debug;
 
 
 public final class ProofCorrectnessMgt {
@@ -241,7 +242,7 @@ public final class ProofCorrectnessMgt {
     public void ruleApplied(RuleApp r) {
 	RuleJustification rj = getJustification(r);
 	if(rj==null) {
-	    System.err.println("No justification found for rule " 
+	    Debug.out("No justification found for rule " 
 		               + r.rule().name());
 	    return;
 	}

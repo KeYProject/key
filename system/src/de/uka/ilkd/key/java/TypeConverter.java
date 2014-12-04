@@ -242,7 +242,7 @@ public final class TypeConverter {
     	  ImmutableArray<? extends Expression> args = mr.getArguments();
     	  Term[] argTerms = new Term[args.size()+2]; // heap, self, 
     	  int index = 0;
-    	  for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps(services)) {
+    	  for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
     		  if(h == services.getTypeConverter().getHeapLDT().getSavedHeap()) {
     			  continue;
     		  }

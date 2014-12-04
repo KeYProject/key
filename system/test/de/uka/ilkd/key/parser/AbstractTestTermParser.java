@@ -128,7 +128,7 @@ public abstract class AbstractTestTermParser extends TestCase {
             throw new RuntimeException("Exc while Parsing:\n" + sw);
         }
     }
-    
+
     /**
      * Convert a {@link Term} into a {@link String}.
      *
@@ -140,13 +140,83 @@ public abstract class AbstractTestTermParser extends TestCase {
         lp.printTerm(t);
         return lp.toString();
     }
-    
+
     /**
      * Remove whitespaces before executing
      * {@link junit.framework.TestCase#assertEquals(java.lang.String, java.lang.String)}.
      */
     protected void assertEqualsIgnoreWhitespaces(String expected, String actual) {
         assertEquals(expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""));
+    }
+
+    protected void assertEqualsIgnoreWhitespaces(String message, String expected, String actual) {
+        assertEquals(message, expected.replaceAll("\\s+", ""), actual.replaceAll("\\s+", ""));
+    }
+
+    protected void verifyPrettyPrinting(String expectedPrettySyntax, Term expectedParseResult) throws IOException {
+        // check whether pretty-printing the parsed term yields the original pretty syntax again
+        String printedSyntax = printTerm(expectedParseResult);
+        String message = "\nAssertion failed while pretty-printing a term:\n"
+                + expectedParseResult
+                + "\nExpected pretty-syntax is: \"" + expectedPrettySyntax
+                + "\"\nBut pretty-printing resulted in: \"" + printedSyntax
+                + "\"\n(whitespaces are ignored during comparison of the above strings)\n";
+        assertEqualsIgnoreWhitespaces(message, expectedPrettySyntax, printedSyntax);
+    }
+
+    protected void verifyParsing(Term expectedParseResult, String expectedPrettySyntax) {
+        // check whether parsing pretty-syntax produces the correct term
+        Term parsedPrettySyntax = parseTerm(expectedPrettySyntax);
+        String message = "\nAssertion failed while parsing pretty syntax. "
+                + "Parsed string \"" + expectedPrettySyntax + "\", which results in term:\n"
+                + parsedPrettySyntax + "\nBut expected parse result is:\n"
+                + expectedParseResult + "\n";
+        assertEquals(message, expectedParseResult, parsedPrettySyntax);
+    }
+
+    /**
+     * Takes two different String representations for the same term and checks
+     * whether they result in the same {@link Term} after parsing. Subsequently,
+     * the {@link Term} is printed back to a {@link String} and compared with
+     * the first argument. The first argument is expected to be in
+     * pretty-syntax.
+     *
+     * @param prettySyntax {@link Term} representation in pretty-syntax.
+     * @param verboseSyntax {@link Term} in verbose syntax.
+     * @param optionalStringRepresentations Optionally, additional String
+     * representations will be tested for correct parsing.
+     * @throws IOException
+     */
+    protected void comparePrettySyntaxAgainstVerboseSyntax(String prettySyntax, String verboseSyntax,
+            String... optionalStringRepresentations) throws IOException {
+        Term expectedParseResult = parseTerm(verboseSyntax);
+        compareStringRepresentationAgainstTermRepresentation(prettySyntax, expectedParseResult, optionalStringRepresentations);
+    }
+
+    /**
+     * Takes a {@link String} and a {@link Term} and checks whether they can be
+     * transformed into each other by the operations parsing and printing.
+     *
+     * @param prettySyntax Expected result after pretty-printing
+     * {@code expectedParseResult}.
+     * @param expectedParseResult Expected result after parsing
+     * {@code expectedPrettySyntax}.
+     * @param optionalStringRepresentations Optionally, additional String
+     * representations will be tested for correct parsing.
+     * @throws IOException
+     */
+    protected void compareStringRepresentationAgainstTermRepresentation(String prettySyntax, Term expectedParseResult,
+            String... optionalStringRepresentations) throws IOException {
+
+        verifyParsing(expectedParseResult, prettySyntax);
+        verifyPrettyPrinting(prettySyntax, expectedParseResult);
+
+        /*
+         * Optionally, further string representations of the same term will be parsed here.
+         */
+        for (int i = 0; i < optionalStringRepresentations.length; i++) {
+            assertEquals(expectedParseResult, parseTerm(optionalStringRepresentations[i]));
+        }
     }
 
     protected abstract Services getServices();

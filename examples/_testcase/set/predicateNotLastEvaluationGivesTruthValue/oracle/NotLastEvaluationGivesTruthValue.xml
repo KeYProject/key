@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.main()&gt;" pathCondition="true" pathConditionChanged="false">
+      <statement name="this.a=-1;" pathCondition="true" pathConditionChanged="false">
+         <statement name="this.b=1;" pathCondition="true" pathConditionChanged="false">
+            <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
+               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of self.main()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="false">
+                  </termination>
+               </methodReturn>
+            </statement>
+         </statement>
+      </statement>
+      <methodReturnEntry path="/0/0/0/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0"/>
+</start>
