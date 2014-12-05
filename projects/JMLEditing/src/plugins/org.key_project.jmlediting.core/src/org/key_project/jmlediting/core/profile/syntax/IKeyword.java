@@ -20,7 +20,8 @@ public interface IKeyword {
    Set<String> getKeywords();
 
    /**
-    * Returns the description for this keyword.
+    * Returns the description for this keyword. The description may be null to
+    * indicate that no description is available.
     *
     * @return the description for the keyword
     */

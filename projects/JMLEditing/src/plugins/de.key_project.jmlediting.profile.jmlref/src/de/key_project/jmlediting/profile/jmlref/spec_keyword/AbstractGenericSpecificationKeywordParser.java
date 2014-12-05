@@ -1,4 +1,4 @@
-package de.key_project.jmlediting.profile.jmlref.keyword;
+package de.key_project.jmlediting.profile.jmlref.spec_keyword;
 
 import static org.key_project.jmlediting.core.parser.LexicalHelper.scanForClosingSemicolon;
 

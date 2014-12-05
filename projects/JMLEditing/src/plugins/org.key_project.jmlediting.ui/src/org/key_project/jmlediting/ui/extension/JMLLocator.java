@@ -9,7 +9,7 @@ import org.eclipse.jface.text.BadLocationException;
  * Class for finding JML Comments in a given String. This class does not take
  * care of changes to the String! If the String changes a new Instance of the
  * JMLLocator is needed
- * 
+ *
  * @author David Giessing
  */
 public class JMLLocator {
@@ -32,10 +32,10 @@ public class JMLLocator {
       return this.getJMLComment(offset) != null;
    }
 
-   public Comment getJMLComment(final int offset) {
-      final List<Comment> jmlcomments = this.findJMLComments();
-      for (final Comment c : jmlcomments) {
-         if (c.getOffset() <= offset && offset <= c.getEnd()) {
+   public JMLComment getJMLComment(final int offset) {
+      final List<JMLComment> jmlcomments = this.findJMLComments();
+      for (final JMLComment c : jmlcomments) {
+         if (c.getBeginOffset() <= offset && offset <= c.getEndOffset()) {
             return c;
          }
       }
@@ -48,8 +48,8 @@ public class JMLLocator {
     * @return An ArrayList with Type Comment that consists of all valid Comments
     *         in the Document
     */
-   public List<Comment> findComments() {
-      final List<Comment> comments = new ArrayList<Comment>();
+   public List<JMLComment> findComments() {
+      final List<JMLComment> comments = new ArrayList<JMLComment>();
 
       final char[] content = this.text.toCharArray();
       int position = 0;
@@ -76,11 +76,12 @@ public class JMLLocator {
                   case '/':
                      final int end = this.text.indexOf(
                            System.getProperty("line.separator"), position);
-                     int commentEnd = end;
+                     // Comment end is inclusive
+                     int commentEnd = end - 1;
                      if (end == -1) {
                         commentEnd = content.length - 1;
                      }
-                     comments.add(new Comment(position, commentEnd,
+                     comments.add(new JMLComment(position, commentEnd,
                            position + 2, commentEnd));
                      if (end == -1) {
                         break mainloop;
@@ -116,8 +117,8 @@ public class JMLLocator {
                   final char c2 = content[position + 1];
                   switch (c2) {
                   case '/':
-                     comments.add(new Comment(begin, position + 1, begin + 3,
-                           position - 1));
+                     comments.add(new JMLComment(begin, position + 1,
+                           begin + 2, position - 1));
                      state = ScannerState.DEFAULT;
                      position += 2;
                      break;
@@ -180,15 +181,15 @@ public class JMLLocator {
     * @return An ArrayList with Type Comment that consists of all valid
     *         JMLComments in the Document
     */
-   public List<Comment> findJMLComments() {
-      final List<Comment> comments = this.findComments();
-      final List<Comment> jmlcomments = new ArrayList<Comment>();
+   public List<JMLComment> findJMLComments() {
+      final List<JMLComment> comments = this.findComments();
+      final List<JMLComment> jmlcomments = new ArrayList<JMLComment>();
 
-      for (final Comment c : comments) {
+      for (final JMLComment c : comments) {
          // filter for jml comments, a comment is a JML comment if the 3rd sign
          // is an @
-         if ((this.text.length() - 1 >= c.getOffset() + 2)
-               && this.text.charAt(c.getOffset() + 2) == '@') {
+         if ((this.text.length() - 1 >= c.getBeginOffset() + 2)
+               && this.text.charAt(c.getBeginOffset() + 2) == '@') {
             jmlcomments.add(c);
          }
       }
@@ -204,10 +205,10 @@ public class JMLLocator {
     * @return A Comment Object that is a Comment that surrounds the given
     *         offset, null if no comment is found around this offset
     */
-   public Comment getCommentOfOffset(final int offset) {
-      final List<Comment> jmlcomments = this.findComments();
-      for (final Comment c : jmlcomments) {
-         if (c.getOffset() <= offset && offset <= c.getEnd()) {
+   public JMLComment getCommentOfOffset(final int offset) {
+      final List<JMLComment> jmlcomments = this.findComments();
+      for (final JMLComment c : jmlcomments) {
+         if (c.getBeginOffset() <= offset && offset <= c.getEndOffset()) {
             return c;
          }
 

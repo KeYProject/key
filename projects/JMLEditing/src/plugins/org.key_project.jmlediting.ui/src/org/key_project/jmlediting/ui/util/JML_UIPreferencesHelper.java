@@ -24,7 +24,7 @@ public final class JML_UIPreferencesHelper {
          throws CoreException {
       String value = null;
       if (color != null) {
-         value = color.toString();
+         value = rgbToString(color);
       }
       project.setPersistentProperty(COMMENT_COLOR, value);
    }
@@ -37,7 +37,7 @@ public final class JML_UIPreferencesHelper {
             .getNode(Activator.PLUGIN_ID);
       // global properties
       preferences.put(JML_UIPreferencesHelper.COMMENT_COLOR.getLocalName(),
-            color.toString());
+            rgbToString(color));
 
    }
 
@@ -64,15 +64,24 @@ public final class JML_UIPreferencesHelper {
             .getNode(Activator.PLUGIN_ID);
       final String colorString = preferences.get(
             JML_UIPreferencesHelper.COMMENT_COLOR.getLocalName(), null);
-      if (colorString == null) {
+      final RGB color = stringtoRGB(colorString);
+      if (color == null) {
          return getDefaultJMLColor();
       }
-      return stringtoRGB(colorString);
+      return color;
 
    }
 
    public static RGB getDefaultJMLColor() {
-      return new RGB(50, 50, 50);
+      return new RGB(100, 100, 100);
+   }
+
+   public static RGB getActiveJMLColor(final IProject project) {
+      RGB color = getProjectJMLColor(project);
+      if (color == null) {
+         color = getWorkspaceJMLColor();
+      }
+      return color;
    }
 
    /**
@@ -84,14 +93,22 @@ public final class JML_UIPreferencesHelper {
     * @return the RGB representation
     */
 
-   public static RGB stringtoRGB(final String col) {
+   private static RGB stringtoRGB(final String col) {
+      try {
+         final String[] colors = col.split(",");
+         final RGB color = new RGB(Integer.parseInt(colors[0].trim()),
+               Integer.parseInt(colors[1].trim()), Integer.parseInt(colors[2]
+                     .trim()));
 
-      final String[] colors = col.substring(5, col.length() - 1).split(", ");
-      final RGB color = new RGB(Integer.parseInt(colors[0].trim()),
-            Integer.parseInt(colors[1].trim()), Integer.parseInt(colors[2]
-                  .trim()));
+         return color;
+      }
+      catch (final NumberFormatException e) {
+         return null;
+      }
+   }
 
-      return color;
+   private static String rgbToString(final RGB rgb) {
+      return rgb.red + "," + rgb.green + "," + rgb.blue;
    }
 
 }
