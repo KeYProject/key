@@ -113,7 +113,9 @@ public class JMLCommentHighlightingTest {
    @Test
    public void JMLSingleLineTest() {
       this.editor = bot.activeEditor().toTextEditor();
-      // TODO: set Testcolor
+      this.red = 255;
+      this.green = 0;
+      this.blue = 0;
       final StyleRange[] textColors = this.editor.getStyles(
             JMLCommentHighlightingTest.PosJMLCommentSingle.line,
             JMLCommentHighlightingTest.PosJMLCommentSingle.column, 30);
@@ -127,7 +129,9 @@ public class JMLCommentHighlightingTest {
    @Test
    public void JMLMultiLineTest() {
       this.editor = bot.activeEditor().toTextEditor();
-      // TODO: set Testcolor
+      this.red = 255;
+      this.green = 0;
+      this.blue = 0;
       final StyleRange[] textColors = this.editor.getStyles(
             JMLCommentHighlightingTest.PosJMLCommentMulti.line,
             JMLCommentHighlightingTest.PosJMLCommentMulti.column, 39);
@@ -244,7 +248,9 @@ public class JMLCommentHighlightingTest {
       this.editor = bot.activeEditor().toTextEditor();
       this.editor.typeText(JMLCommentHighlightingTest.PosJCommentMulti.line,
             JMLCommentHighlightingTest.PosJCommentMulti.column + 2, "@");
-      // TODO: set Testcolor
+      this.red = 255;
+      this.green = 0;
+      this.blue = 0;
       final StyleRange[] textColors = this.editor.getStyles(
             JMLCommentHighlightingTest.PosJCommentMulti.line,
             JMLCommentHighlightingTest.PosJCommentMulti.column, 50);
@@ -277,7 +283,9 @@ public class JMLCommentHighlightingTest {
       this.editor = bot.activeEditor().toTextEditor();
       this.editor.typeText(JMLCommentHighlightingTest.PosJCommentSingle.line,
             JMLCommentHighlightingTest.PosJCommentSingle.column + 2, "@");
-      // TODO: set Testcolor
+      this.red = 255;
+      this.green = 0;
+      this.blue = 0;
       final StyleRange[] textColors = this.editor.getStyles(
             JMLCommentHighlightingTest.PosJCommentSingle.line,
             JMLCommentHighlightingTest.PosJCommentSingle.column, 28);
@@ -315,7 +323,9 @@ public class JMLCommentHighlightingTest {
             JMLCommentHighlightingTest.PosJDocComment.column + 2), 1);
       this.editor.typeText(JMLCommentHighlightingTest.PosJDocComment.line,
             JMLCommentHighlightingTest.PosJDocComment.column + 2, "*");
-      // TODO: set Testcolor
+      this.red = 255;
+      this.green = 0;
+      this.blue = 0;
       final StyleRange[] textColors = this.editor.getStyles(
             JMLCommentHighlightingTest.PosJDocComment.line,
             JMLCommentHighlightingTest.PosJDocComment.column, 49);
