@@ -46,6 +46,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.PredicateTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Node;
@@ -55,6 +56,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil;
 import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.BranchResult;
 import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.PredicateEvaluationResult;
+import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.PredicateResult;
 import de.uka.ilkd.key.symbolic_execution.PredicateEvaluationUtil.PredicateValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
@@ -201,7 +203,7 @@ public abstract class AbstractPredicateComposite implements IDisposable {
             // Get required information
             final IExecutionNode<?> executionNode = node.getExecutionNode();
             final Node keyNode = computeNodeToShow(node, executionNode);
-            final Term termToShow = computeTermToShow(node, executionNode, keyNode);
+            final Pair<Term, Term> pair = computeTermToShow(node, executionNode, keyNode);
             // Compute result
             ITreeSettings settings = node.getExecutionNode().getSettings();
             final PredicateEvaluationResult result = PredicateEvaluationUtil.evaluate(keyNode, 
@@ -214,7 +216,7 @@ System.out.println(result);
                   @Override
                   public void run() {
                      if (!root.isDisposed()) {
-                        addNewContent(result, termToShow, executionNode);
+                        addNewContent(result, pair.first, pair.second, executionNode);
                      }
                   }
                });
@@ -252,45 +254,100 @@ System.out.println(result);
     * @param node The {@link IKeYSEDDebugNode}.
     * @param executionNode The {@link IExecutionNode}.
     * @param keyNode The {@link Node}.
-    * @return The {@link Term} to show.
+    * @return The {@link Term} to show and optionally the uninterpreted predicate.
     */
-   protected abstract Term computeTermToShow(IKeYSEDDebugNode<?> node, 
-                                             IExecutionNode<?> executionNode, 
-                                             Node keyNode);
+   protected abstract Pair<Term, Term> computeTermToShow(IKeYSEDDebugNode<?> node, 
+                                                         IExecutionNode<?> executionNode, 
+                                                         Node keyNode);
 
    /**
     * Shows the given content.
     * @param result The {@link PredicateEvaluationResult} to consider.
     * @param term The {@link Term} to show.
+    * @param uninterpretedPredicate The optional {@link Term} with the uninterpreted predicate offering the {@link PredicateTermLabel}.
     * @param node The {@link IKeYSEDDebugNode} which provides the new content.
     */
    protected void addNewContent(PredicateEvaluationResult result,
                                 Term term,
+                                Term uninterpretedPredicate,
                                 IExecutionNode<?> executionNode) {
       removeOldContent();
       BranchResult[] branchResults = result.getBranchResults();
       for (BranchResult branchResult : branchResults) {
-         // Create group
-         Group viewerGroup = factory.createGroup(root, branchResult.getConditionString());
-         viewerGroup.setLayout(new FillLayout());
-         viewerGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-         controls.add(viewerGroup);
-         // Create viewer
-         SourceViewer viewer = new SourceViewer(viewerGroup, null, SWT.MULTI | SWT.FULL_SELECTION);
-         viewer.setEditable(false);
-         EvaluationViewerDecorator viewerDecorator = new EvaluationViewerDecorator(viewer);
-         decorators.add(viewerDecorator);
-         // Show term and results
-         PredicateValue value = viewerDecorator.showTerm(term, 
-                                                         executionNode.getServices(), 
-                                                         executionNode.getMediator(), 
-                                                         branchResult);
-         viewerGroup.setBackground(viewerDecorator.getColor(value));
+         if (shouldShowBranchResult(branchResult, uninterpretedPredicate)) {
+            // Create group
+            Group viewerGroup = factory.createGroup(root, branchResult.getLeafNode().serialNr() + ": " + branchResult.getConditionString());
+            viewerGroup.setLayout(new FillLayout());
+            viewerGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            controls.add(viewerGroup);
+            // Create viewer
+            SourceViewer viewer = new SourceViewer(viewerGroup, null, SWT.MULTI | SWT.FULL_SELECTION);
+            viewer.setEditable(false);
+            EvaluationViewerDecorator viewerDecorator = new EvaluationViewerDecorator(viewer);
+            decorators.add(viewerDecorator);
+            // Show term and results
+            PredicateValue value = viewerDecorator.showTerm(term, 
+                                                            executionNode.getServices(), 
+                                                            executionNode.getMediator(), 
+                                                            branchResult);
+            viewerGroup.setBackground(viewerDecorator.getColor(value));
+         }
       }
       // Add legend
       addLegend();
       // Layout root
       updateLayout();
+   }
+
+   /**
+    * Check is the given {@link BranchResult} should be shown.
+    * @param branchResult The {@link BranchResult} to check.
+    * @param uninterpretedPredicate The uninterpreted predicate which provides the {@link PredicateTermLabel}.
+    * @return {@code true} show branch result, {@code false} do not show branch result.
+    */
+   protected boolean shouldShowBranchResult(BranchResult branchResult, Term uninterpretedPredicate) {
+      if (branchResult != null) {
+         if (uninterpretedPredicate != null) {
+            TermLabel label = uninterpretedPredicate.getLabel(PredicateTermLabel.NAME);
+            if (label instanceof PredicateTermLabel) {
+               PredicateResult result = branchResult.evaluate((PredicateTermLabel) label);
+               return result == null || !PredicateValue.FALSE.equals(result.getValue());
+            }
+            else {
+               return true;
+            }
+         }
+         else {
+            return true;
+         }
+      }
+      else {
+         return false;
+      }
+   }
+   
+   /**
+    * Searches the {@link Term} with the uninterpreted predicate.
+    * @param term The {@link Term} to start search at.
+    * @param uninterpretedPredicate The {@link Term} of the proof obligation which specifies the uninterpreted predicate.
+    * @return The found {@link Term} or {@code null} if not available.
+    */
+   protected Term findUninterpretedPredicateTerm(Term term, Term uninterpretedPredicate) {
+      if (term.op() == uninterpretedPredicate.op()) {
+         return term;
+      }
+      else if (term.op() == Junctor.AND) {
+         Term result = null;
+         int i = 0;
+         while (result == null && i < term.arity()) {
+            result = findUninterpretedPredicateTerm(term.sub(i), uninterpretedPredicate);
+            i++;
+         }
+         return result;
+      }
+      else {
+         return null;
+      }
    }
 
    /**
@@ -332,9 +389,7 @@ System.out.println(result);
       if (uninterpretedPredicate.op() == term.op()) {
          return tb.tt();
       }
-      else if (term.op() == Junctor.AND ||
-               term.op() == Junctor.OR ||
-               term.op() == Junctor.IMP) {
+      else if (term.op() == Junctor.AND) { // Only and is supported to ensure correct results
          boolean subsChanged = false;
          Term[] newSubs = new Term[term.arity()];
          for (int i = 0; i < newSubs.length; i++) {
@@ -345,34 +400,8 @@ System.out.println(result);
             }
          }
          if (subsChanged) {
-            Term newTerm;
-            if (term.op() == Junctor.AND) {
-               newTerm = tb.and(newSubs);
-            }
-            else if (term.op() == Junctor.OR) {
-               newTerm = tb.or(newSubs);
-            }
-            else if (term.op() == Junctor.IMP) {
-               newTerm = tb.imp(newSubs[0], newSubs[1]);
-            }
-            else {
-               throw new IllegalStateException("Operator '" + term.op() + "' is not supported.");
-            }
-            if (term.hasLabels()) {
-               newTerm = tb.label(newTerm, term.getLabels());
-            }
-            return newTerm;
-         }
-         else {
-            return term;
-         }
-      }
-      else if (term.op() == Junctor.NOT) {
-         Term sub = term.sub(0);
-         Term newSub = removeUninterpretedPredicate(tb, sub, uninterpretedPredicate);
-         if (sub != newSub) {
-            Term newTerm = tb.not(newSub);
-            if (term.hasLabels()) {
+            Term newTerm = tb.and(newSubs);
+            if (term.hasLabels() && newSubs[0] != newTerm && newSubs[1] != newTerm) { // Label new Term only if all children are still important.
                newTerm = tb.label(newTerm, term.getLabels());
             }
             return newTerm;

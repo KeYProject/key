@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * This composite provides the content shown in {@link PreconditionPropertySection}
@@ -60,9 +61,9 @@ public class PreconditionComposite extends AbstractPredicateComposite {
     * {@inheritDoc}
     */
    @Override
-   protected Term computeTermToShow(IKeYSEDDebugNode<?> node,
-                                    IExecutionNode<?> executionNode, 
-                                    Node keyNode) {
+   protected Pair<Term, Term> computeTermToShow(IKeYSEDDebugNode<?> node,
+                                                IExecutionNode<?> executionNode, 
+                                                Node keyNode) {
       if (node instanceof KeYMethodContract) {
          PosInOccurrence pio = executionNode.getModalityPIO();
          Term term;
@@ -75,7 +76,7 @@ public class PreconditionComposite extends AbstractPredicateComposite {
             term = keyNode.sequent().succedent().get(index).formula();
          }
          term = TermBuilder.goBelowUpdates(term);
-         return term;
+         return new Pair<Term, Term>(term, null);
       }
       else {
          throw new IllegalArgumentException("Unsupported node.");

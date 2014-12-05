@@ -176,18 +176,8 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
                                  ImmutableList<Integer> path,
                                  List<StyleRange> styleRanges) {
       PredicateTermLabel label = branchResult.getPredicateLabel(term);
-      if (label != null) {
-         // The BranchResult knows the result of the current Term.
-         PredicateResult predicateResult = branchResult.evaluate(label);
-         PredicateValue value = predicateResult != null ? predicateResult.getValue() : PredicateValue.UNKNOWN;
-         Color color = getColor(value);
-         Range range = positionTable.rangeForPath(path, textLength);
-         StyleRange styleRange = new StyleRange(range.start(), range.length(), color, null);
-         termValueMap.put(term, value);
-         styleRanges.add(styleRange);
-      }
-      else if (PredicateEvaluationUtil.isIfThenElseFormula(term)) {
-         fillIfThenElse(term, positionTable, branchResult, textLength, termValueMap, path, styleRanges);
+      if (PredicateEvaluationUtil.isIfThenElseFormula(term)) {
+         fillIfThenElse(term, positionTable, branchResult, textLength, termValueMap, path, styleRanges, label);
       }
       else if (term.op() instanceof Junctor || term.op() == Equality.EQV) {
          // Junctors are supported.
@@ -196,14 +186,24 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
             throw new RuntimeException("Junctors with arity > 2 are not supported.");
          }
          else if (operator.arity() == 2) {
-            fillArity2(term, positionTable, branchResult, textLength, termValueMap, path, styleRanges, operator);
+            fillArity2(term, positionTable, branchResult, textLength, termValueMap, path, styleRanges, operator, label);
          }
          else if (operator.arity() == 1) {
-            fillArity1(term, positionTable, branchResult, textLength, termValueMap, path, styleRanges, operator);
+            fillArity1(term, positionTable, branchResult, textLength, termValueMap, path, styleRanges, operator, label);
          }
          else if (operator.arity() == 0) {
             fillArity0(term, positionTable, branchResult, textLength, termValueMap, path, styleRanges, operator);
          }
+      }
+      else if (label != null) {
+         // The BranchResult knows the result of the current Term.
+         PredicateResult predicateResult = branchResult.evaluate(label);
+         PredicateValue value = predicateResult != null ? predicateResult.getValue() : PredicateValue.UNKNOWN;
+         Color color = getColor(value);
+         Range range = positionTable.rangeForPath(path, textLength);
+         StyleRange styleRange = new StyleRange(range.start(), range.length(), color, null);
+         termValueMap.put(term, value);
+         styleRanges.add(styleRange);
       }
    }
    
@@ -217,6 +217,7 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
     * @param termValueMap The already computed {@link PredicateValue}s.
     * @param path The path to the current {@link Term}.
     * @param styleRanges The {@link List} with found {@link StyleRange}s to fill.
+    * @param label The {@link PredicateTermLabel} of the current {@link Term} or {@code null} if {@link Term} is not labeled.
     */
    protected void fillIfThenElse(Term term, 
                                  PositionTable positionTable, 
@@ -224,7 +225,8 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
                                  int textLength,
                                  Map<Term, PredicateValue> termValueMap,
                                  ImmutableList<Integer> path,
-                                 List<StyleRange> styleRanges) {
+                                 List<StyleRange> styleRanges,
+                                 PredicateTermLabel label) {
       Term conditionTerm = term.sub(0);
       Term thenTerm = term.sub(1);
       Term elseTerm = term.sub(2);
@@ -237,7 +239,14 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
       assert conditionValue != null;
       assert thenValue != null;
       assert elseValue != null;
-      PredicateValue operatorResult = PredicateValue.ifThenElse(conditionValue, thenValue, elseValue);
+      PredicateValue operatorResult;
+      if (label != null) {
+         PredicateResult predicateResult = branchResult.evaluate(label);
+         operatorResult = (predicateResult != null ? predicateResult.getValue() : PredicateValue.UNKNOWN);
+      }
+      else {
+         operatorResult = PredicateValue.ifThenElse(conditionValue, thenValue, elseValue);
+      }
       // Style range for if
       Color color = getColor(operatorResult);
       Range termRange = positionTable.rangeForPath(path, textLength);
@@ -283,6 +292,7 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
     * @param path The path to the current {@link Term}.
     * @param styleRanges The {@link List} with found {@link StyleRange}s to fill.
     * @param operator The {@link Operator} of the current {@link Term}.
+    * @param label The {@link PredicateTermLabel} of the current {@link Term} or {@code null} if {@link Term} is not labeled.
     */
    protected void fillArity2(Term term, 
                              PositionTable positionTable, 
@@ -291,7 +301,8 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
                              Map<Term, PredicateValue> termValueMap,
                              ImmutableList<Integer> path,
                              List<StyleRange> styleRanges,
-                             Operator operator) {
+                             Operator operator,
+                             PredicateTermLabel label) {
       Term sub0 = term.sub(0);
       Term sub1 = term.sub(1);
       fillTermRanges(sub0, positionTable, branchResult, textLength, termValueMap, path.append(0), styleRanges);
@@ -301,20 +312,26 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
       assert leftValue != null;
       assert rightValue != null;
       PredicateValue operatorResult;
-      if (operator == Junctor.AND) {
-         operatorResult = PredicateValue.and(leftValue, rightValue);
-      }
-      else if (operator == Junctor.IMP) {
-         operatorResult = PredicateValue.imp(leftValue, rightValue);
-      }
-      else if (operator == Junctor.OR) {
-         operatorResult = PredicateValue.or(leftValue, rightValue);
-      }
-      else if (operator == Equality.EQV) {
-         operatorResult = PredicateValue.eqv(leftValue, rightValue);
+      if (label != null) {
+         PredicateResult predicateResult = branchResult.evaluate(label);
+         operatorResult = (predicateResult != null ? predicateResult.getValue() : PredicateValue.UNKNOWN);
       }
       else {
-         throw new RuntimeException("Operator '" + operator + "' is not supported.");
+         if (operator == Junctor.AND) {
+            operatorResult = PredicateValue.and(leftValue, rightValue);
+         }
+         else if (operator == Junctor.IMP) {
+            operatorResult = PredicateValue.imp(leftValue, rightValue);
+         }
+         else if (operator == Junctor.OR) {
+            operatorResult = PredicateValue.or(leftValue, rightValue);
+         }
+         else if (operator == Equality.EQV) {
+            operatorResult = PredicateValue.eqv(leftValue, rightValue);
+         }
+         else {
+            throw new RuntimeException("Operator '" + operator + "' is not supported.");
+         }
       }
       // Style range for operator
       Color color = getColor(operatorResult);
@@ -356,6 +373,7 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
     * @param path The path to the current {@link Term}.
     * @param styleRanges The {@link List} with found {@link StyleRange}s to fill.
     * @param operator The {@link Operator} of the current {@link Term}.
+    * @param label The {@link PredicateTermLabel} of the current {@link Term} or {@code null} if {@link Term} is not labeled.
     */
    protected void fillArity1(Term term, 
                              PositionTable positionTable, 
@@ -364,17 +382,24 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
                              Map<Term, PredicateValue> termValueMap,
                              ImmutableList<Integer> path,
                              List<StyleRange> styleRanges,
-                             Operator operator) {
+                             Operator operator,
+                             PredicateTermLabel label) {
       Term sub = term.sub(0);
       fillTermRanges(sub, positionTable, branchResult, textLength, termValueMap, path.append(0), styleRanges);
       PredicateValue childValue = termValueMap.get(sub);
       assert childValue != null;
       PredicateValue junctorResult;
-      if (operator == Junctor.NOT) {
-         junctorResult = PredicateValue.not(childValue);
+      if (label != null) {
+         PredicateResult predicateResult = branchResult.evaluate(label);
+         junctorResult = (predicateResult != null ? predicateResult.getValue() : PredicateValue.UNKNOWN);
       }
       else {
-         throw new RuntimeException("Junctor '" + operator + "' is not supported.");
+         if (operator == Junctor.NOT) {
+            junctorResult = PredicateValue.not(childValue);
+         }
+         else {
+            throw new RuntimeException("Junctor '" + operator + "' is not supported.");
+         }
       }
       Color color = getColor(junctorResult);
       Range range = positionTable.rangeForPath(path, textLength);

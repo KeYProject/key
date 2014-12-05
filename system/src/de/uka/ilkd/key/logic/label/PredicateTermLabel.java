@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.logic.label;
 
+import java.util.Collection;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
@@ -39,12 +41,17 @@ public class PredicateTermLabel implements TermLabel {
    public static final String PROOF_COUNTER_SUB_PREFIX = "P_LABEL_SUB_COUNTER_";
    
    /**
+    * Separator between multiple before IDs.
+    */
+   public static final String BEFORE_ID_SEPARATOR = ";";
+   
+   /**
     * The unique ID of this term label in the {@link Sequent}.
     */
    private final String id;
    
    /**
-    * The optional previous ID of the label this one is derived from.
+    * The optional previous IDs of the label this one is derived from separated by {@value #BEFORE_ID_SEPARATOR}.
     */
    private final String beforeId;
    
@@ -63,9 +70,27 @@ public class PredicateTermLabel implements TermLabel {
     * @param minorId The minor part of the unique ID.
     * @param beforeId The optional previous ID of the label this one is derived from.
     */
-   public PredicateTermLabel(int majorId, int minorId, String beforeId) {
+   public PredicateTermLabel(int majorId, int minorId, Collection<String> beforeIds) {
        this.id = majorId + "." + minorId;
-       this.beforeId = beforeId;
+       if (beforeIds != null) {
+          StringBuffer sb = new StringBuffer();
+          boolean afterFirst = false;
+          for (String id : beforeIds) {
+             if (id != null) {
+                if (afterFirst) {
+                   sb.append(BEFORE_ID_SEPARATOR);
+                }
+                else {
+                   afterFirst = true;
+                }
+                sb.append(id);
+             }
+          }
+          this.beforeId = sb.toString();
+       }
+       else {
+          this.beforeId = null;
+       }
    }
 
    /**
@@ -81,7 +106,7 @@ public class PredicateTermLabel implements TermLabel {
    public String toString() {
        return NAME.toString() + 
               "(" + 
-             getId() + 
+             id + 
              (beforeId != null ? ", " + beforeId : "") +
              ")";
    }
@@ -92,8 +117,8 @@ public class PredicateTermLabel implements TermLabel {
    @Override
    public Object getChild(int i) {
 	   switch (i) {
-	      case 0 : return getId();
-	      case 1 : return getBeforeId();
+	      case 0 : return id;
+	      case 1 : return beforeId;
   	      default : return null;
 	   }
    }
@@ -138,11 +163,11 @@ public class PredicateTermLabel implements TermLabel {
    }
 
    /**
-    * Returns the optional previous ID of the label this one is derived from.
-    * @return The optional previous ID of the label this one is derived from.
+    * Returns the optional previous IDs of the label this one is derived from.
+    * @return The optional previous IDs of the label this one is derived from.
     */
-   public String getBeforeId() {
-      return beforeId;
+   public String[] getBeforeIds() {
+      return beforeId != null ? beforeId.split(BEFORE_ID_SEPARATOR) : new String[0];
    }
 
    /**

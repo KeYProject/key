@@ -413,7 +413,9 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
         PosInOccurrence applicatinPIO = new PosInOccurrence(new SequentFormula(formula), 
                                                             PosInTerm.getTopLevel(), // TODO: This should be the precise sub term
                                                             inAntecedent); // It is required to create a new PosInOccurrence because formula and pio.constrainedFormula().formula() are only equals module renamings and term labels
-        TacletApp ta = PosTacletApp.createPosTacletApp(taclet, svi, applicatinPIO, lastProof.getServices());
+        ImmutableList<IfFormulaInstantiation> ifInst = ImmutableSLList.nil();
+        ifInst = ifInst.append(new IfFormulaInstDirect(pio.constrainedFormula()));
+        TacletApp ta = PosTacletApp.createPosTacletApp(taclet, svi, ifInst, applicatinPIO, lastProof.getServices());
         return ta;
     }
 

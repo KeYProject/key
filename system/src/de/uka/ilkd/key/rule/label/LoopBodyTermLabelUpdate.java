@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.rule.label;
 
-import java.util.List;
+import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -62,7 +62,7 @@ public class LoopBodyTermLabelUpdate implements TermLabelUpdate {
                             ImmutableArray<Term> newTermSubs,
                             ImmutableArray<QuantifiableVariable> newTermBoundVars,
                             JavaBlock newTermJavaBlock,
-                            List<TermLabel> labels) {
+                            Set<TermLabel> labels) {
       if (rule instanceof WhileInvariantRule &&
           "LoopBodyModality".equals(hint) &&
           SymbolicExecutionUtil.hasSymbolicExecutionLabel(modalityTerm)) {

@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -714,7 +715,7 @@ public class TestTermLabelManager extends TestCase {
       }
 
       @Override
-      public void updateLabels(Services services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm, Rule rule, Goal goal, Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock, List<TermLabel> labels) {
+      public void updateLabels(Services services, PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Term modalityTerm, Rule rule, Goal goal, Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs, ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock, Set<TermLabel> labels) {
          if (!labels.contains(toAdd)) {
             labels.add(toAdd);
          }

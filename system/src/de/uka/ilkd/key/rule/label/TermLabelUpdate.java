@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.rule.label;
 
-import java.util.List;
+import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
@@ -59,7 +59,7 @@ public interface TermLabelUpdate extends RuleSpecificTask {
     * @param newTermSubs The optional children of the {@link Term} to create.
     * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
     * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
-    * @param label The {@link TermLabel} to decide if it should be kept or dropped.
+    * @param labels The {@link Set} of {@link TermLabel}s to modify.
     * @return {@code true} keep {@link TermLabel} and add it to the new {@link Term}. {@code false} drop {@link TermLabel} and do not need it to the new {@link Term}.
     */
    public void updateLabels(Services services,
@@ -74,5 +74,5 @@ public interface TermLabelUpdate extends RuleSpecificTask {
                             ImmutableArray<Term> newTermSubs,
                             ImmutableArray<QuantifiableVariable> newTermBoundVars,
                             JavaBlock newTermJavaBlock,
-                            List<TermLabel> labels);
+                            Set<TermLabel> labels);
 }

@@ -54,7 +54,6 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -739,6 +738,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
    protected Term labelPostTerm(Services services, Term term) {
       if (term != null) {
          final TermFactory tf = services.getTermFactory();
+         // Label children of operator
          if (PredicateEvaluationUtil.isLogicOperator(term)) {
             Term[] newSubs = new Term[term.arity()];
             boolean subsChanged = false;
@@ -749,18 +749,16 @@ public abstract class AbstractOperationPO extends AbstractPO {
                   subsChanged = true;
                }
             }
-            return subsChanged ?
+            term = subsChanged ?
                    tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs), term.boundVars(), term.javaBlock(), term.getLabels()) :
                    term;
          }
-         else {
-            ImmutableArray<TermLabel> oldLabels = term.getLabels();
-            TermLabel[] newLabels = oldLabels.toArray(new TermLabel[oldLabels.size() + 1]);
-            int labelID = services.getCounter(PredicateTermLabel.PROOF_COUNTER_NAME).getCountPlusPlus();
-            int labelSubID = services.getCounter(PredicateTermLabel.PROOF_COUNTER_SUB_PREFIX + labelID).getCountPlusPlus();
-            newLabels[oldLabels.size()] = new PredicateTermLabel(labelID, labelSubID);
-            return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock(), new ImmutableArray<TermLabel>(newLabels));
-         }
+         ImmutableArray<TermLabel> oldLabels = term.getLabels();
+         TermLabel[] newLabels = oldLabels.toArray(new TermLabel[oldLabels.size() + 1]);
+         int labelID = services.getCounter(PredicateTermLabel.PROOF_COUNTER_NAME).getCountPlusPlus();
+         int labelSubID = services.getCounter(PredicateTermLabel.PROOF_COUNTER_SUB_PREFIX + labelID).getCountPlusPlus();
+         newLabels[oldLabels.size()] = new PredicateTermLabel(labelID, labelSubID);
+         return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock(), new ImmutableArray<TermLabel>(newLabels));
       }
       else {
          return null;
