@@ -32,9 +32,16 @@ public class JMLLocator {
       return this.getJMLComment(offset) != null;
    }
 
-   public JMLComment getJMLComment(final int offset) {
-      final List<JMLComment> jmlcomments = this.findJMLComments();
-      for (final JMLComment c : jmlcomments) {
+   /**
+    *
+    * @param offset
+    *           The offset for which to get a Surrounding JMLComment
+    * @return returns a JMLCommentRange if the given offset is in between a
+    *         JMLComment, null if not
+    */
+   public JMLCommentRange getJMLComment(final int offset) {
+      final List<JMLCommentRange> jmlcomments = this.findJMLComments();
+      for (final JMLCommentRange c : jmlcomments) {
          if (c.getBeginOffset() <= offset && offset <= c.getEndOffset()) {
             return c;
          }
@@ -43,14 +50,24 @@ public class JMLLocator {
    }
 
    /**
-    * Uses an Automata to search All Kind of Valid Comments in the given String
+    * States for the Statemachine.
+    *
+    *
+    *
+    */
+   private static enum ScannerState {
+      IN_STRING, IN_COMMENT, IN_CHAR, DEFAULT
+   }
+
+   /**
+    * Uses an Automata to search All Kind of Valid Comments in the given String.
     *
     * @return An ArrayList with Type Comment that consists of all valid Comments
     *         in the Document
     */
-   public List<JMLComment> findComments() {
-      final List<JMLComment> comments = new ArrayList<JMLComment>();
-
+   public List<JMLCommentRange> findJMLComments() {
+      final List<JMLCommentRange> commentRanges = new ArrayList<JMLCommentRange>();
+      final List<JMLCommentRange> jmlCommentRanges = new ArrayList<JMLCommentRange>();
       final char[] content = this.text.toCharArray();
       int position = 0;
       int begin = 0;
@@ -81,8 +98,11 @@ public class JMLLocator {
                      if (end == -1) {
                         commentEnd = content.length - 1;
                      }
-                     comments.add(new JMLComment(position, commentEnd,
-                           position + 2, commentEnd));
+                     if (content.length - 1 >= position + 2
+                           && content[position + 2] == '@') {
+                        commentRanges.add(new JMLCommentRange(position,
+                              commentEnd, position + 2, commentEnd));
+                     }
                      if (end == -1) {
                         break mainloop;
                      }
@@ -117,8 +137,11 @@ public class JMLLocator {
                   final char c2 = content[position + 1];
                   switch (c2) {
                   case '/':
-                     comments.add(new JMLComment(begin, position + 1,
-                           begin + 2, position - 1));
+                     if (content.length - 1 >= position + 2
+                     && content[begin + 2] == '@') {
+                        commentRanges.add(new JMLCommentRange(begin,
+                              position + 1, begin + 2, position - 1));
+                     }
                      state = ScannerState.DEFAULT;
                      position += 2;
                      break;
@@ -168,51 +191,15 @@ public class JMLLocator {
             throw new AssertionError("Invalid Enum State");
          }
       }
-      return comments;
-   }
-
-   private static enum ScannerState {
-      IN_STRING, IN_COMMENT, IN_CHAR, DEFAULT
-   }
-
-   /**
-    * Filters a List of Comments for JMLComments
-    *
-    * @return An ArrayList with Type Comment that consists of all valid
-    *         JMLComments in the Document
-    */
-   public List<JMLComment> findJMLComments() {
-      final List<JMLComment> comments = this.findComments();
-      final List<JMLComment> jmlcomments = new ArrayList<JMLComment>();
-
-      for (final JMLComment c : comments) {
+      for (final JMLCommentRange c : commentRanges) {
          // filter for jml comments, a comment is a JML comment if the 3rd sign
          // is an @
          if ((this.text.length() - 1 >= c.getBeginOffset() + 2)
                && this.text.charAt(c.getBeginOffset() + 2) == '@') {
-            jmlcomments.add(c);
+            jmlCommentRanges.add(c);
          }
       }
 
-      return jmlcomments;
-   }
-
-   /**
-    * Seeks for a valid Comment that surrounds the given Offset and returns it
-    *
-    * @param offset
-    *           The Offset to be inside the returned Comment
-    * @return A Comment Object that is a Comment that surrounds the given
-    *         offset, null if no comment is found around this offset
-    */
-   public JMLComment getCommentOfOffset(final int offset) {
-      final List<JMLComment> jmlcomments = this.findComments();
-      for (final JMLComment c : jmlcomments) {
-         if (c.getBeginOffset() <= offset && offset <= c.getEndOffset()) {
-            return c;
-         }
-
-      }
-      return null;
+      return jmlCommentRanges;
    }
 }
