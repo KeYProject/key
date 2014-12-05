@@ -12,7 +12,7 @@ import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
-import org.key_project.jmlediting.ui.extension.Comment;
+import org.key_project.jmlediting.ui.extension.JMLComment;
 import org.key_project.jmlediting.ui.extension.JMLLocator;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
@@ -29,16 +29,18 @@ public class JMLTextHover implements IJavaEditorTextHover {
     * {@inheritDoc}
     */
    @Override
-   public String getHoverInfo(final ITextViewer textViewer, IRegion hoverRegion) {
-      System.out.println("Got " + hoverRegion);
-      final int offset = hoverRegion.getOffset();
-      // if (hoverRegion.getLength() == 0) {
-      hoverRegion = this.getHoverRegion(textViewer, hoverRegion.getOffset());
-      // }
-      if (hoverRegion == null) {
+   public String getHoverInfo(final ITextViewer textViewer,
+         final IRegion hoverRegion) {
+      // Calculate the hover region, we want to use
+      final int cursorPosition = hoverRegion.getOffset();
+      // That is the complete JML Comment
+      final JMLComment comment = this.getJMLComment(textViewer, cursorPosition);
+      if (comment == null) {
+         // No JML comment, du not provide a hover
          return null;
       }
-      System.out.println("Got " + hoverRegion);
+
+      // Parse the comment according to the gi
       final IProject activeProject = WorkbenchUtil.getProject(this.editorPart);
       if (activeProject == null) {
          return null;
@@ -46,11 +48,13 @@ public class JMLTextHover implements IJavaEditorTextHover {
       final IJMLParser parser = JMLPreferencesHelper
             .getProjectActiveJMLProfile(activeProject).createParser();
       try {
+         // Parse the text
+         // End index of comment is inclusive, but input end for parser
+         // exclusive
          final IASTNode result = parser.parse(textViewer.getDocument().get(),
-               hoverRegion.getOffset() + 3, hoverRegion.getOffset()
-                     + hoverRegion.getLength() - 2);
+               comment.getBeginOffset(), comment.getEndOffset() + 1);
          final IASTNode selectedNode = Nodes.getDepthMostNodeWithPosition(
-               offset, result);
+               cursorPosition, result);
          if (selectedNode != null && Nodes.isKeyword(selectedNode)) {
             final IKeywordNode selectedKNode = (IKeywordNode) selectedNode;
             return selectedKNode.getKeyword().getDescription();
@@ -64,18 +68,22 @@ public class JMLTextHover implements IJavaEditorTextHover {
       return null;
    }
 
+   private JMLComment getJMLComment(final ITextViewer textViewer,
+         final int offset) {
+      final JMLLocator locator = new JMLLocator(textViewer.getDocument().get());
+      final JMLComment jmlComment = locator.getJMLComment(offset);
+      return jmlComment;
+   }
+
    /**
     * {@inheritDoc}
     */
    @Override
    public IRegion getHoverRegion(final ITextViewer textViewer, final int offset) {
-      final JMLLocator locator = new JMLLocator(textViewer.getDocument().get());
-      final Comment jmlComment = locator.getJMLComment(offset);
+      final JMLComment jmlComment = this.getJMLComment(textViewer, offset);
       if (jmlComment != null) {
-         System.out.println("Comment:" + jmlComment.getOffset() + " "
-               + jmlComment.getEnd());
-         return new Region(jmlComment.getOffset(), jmlComment.getEnd()
-               - jmlComment.getOffset());
+         return new Region(jmlComment.getContentBeginOffset(),
+               jmlComment.getContentLength());
       }
       return null;
    }

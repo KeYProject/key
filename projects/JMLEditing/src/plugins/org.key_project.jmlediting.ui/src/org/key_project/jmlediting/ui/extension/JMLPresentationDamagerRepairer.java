@@ -63,7 +63,7 @@ IPresentationRepairer {
       final IRegion damage = this.wrappedInstance.getDamageRegion(partition,
             event, documentPartitioningChanged);
       final JMLLocator locator = new JMLLocator(this.doc.get());
-      final Comment surComment = locator.getCommentOfOffset(event.getOffset());
+      final JMLComment surComment = locator.getCommentOfOffset(event.getOffset());
       if (surComment == null) {
          return damage;
       }
@@ -71,15 +71,15 @@ IPresentationRepairer {
       int commentLine = 0;
       try {
          eventLine = this.doc.getLineOfOffset(event.getOffset());
-         commentLine = this.doc.getLineOfOffset(surComment.getOffset());
+         commentLine = this.doc.getLineOfOffset(surComment.getBeginOffset());
       }
       catch (final BadLocationException e) {
          // TODO Auto-generated catch block
          e.printStackTrace();
       }
       if (eventLine == commentLine) {
-         return new Region(surComment.getOffset(), surComment.getEnd()
-               - surComment.getOffset() + 1);
+         return new Region(surComment.getBeginOffset(), surComment.getEndOffset()
+               - surComment.getBeginOffset() + 1);
       }
 
       return damage;
