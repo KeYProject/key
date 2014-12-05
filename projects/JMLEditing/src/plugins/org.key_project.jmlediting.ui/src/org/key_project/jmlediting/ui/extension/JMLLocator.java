@@ -118,7 +118,7 @@ public class JMLLocator {
                   switch (c2) {
                   case '/':
                      comments.add(new JMLComment(begin, position + 1,
-                           begin + 3, position - 1));
+                           begin + 2, position - 1));
                      state = ScannerState.DEFAULT;
                      position += 2;
                      break;

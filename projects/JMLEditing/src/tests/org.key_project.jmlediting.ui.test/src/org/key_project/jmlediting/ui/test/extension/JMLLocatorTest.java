@@ -145,7 +145,7 @@ public class JMLLocatorTest {
       assertTrue(EDITOR_TEXT.indexOf("//", 187) == comments.get(2)
             .getBeginOffset()
             && EDITOR_TEXT.indexOf(eol, 188) - 1 == comments.get(2)
-            .getEndOffset());
+                  .getEndOffset());
       assertTrue(EDITOR_TEXT.indexOf("//", 208) == comments.get(3)
             .getBeginOffset()
             && EDITOR_TEXT.length() - 1 == comments.get(3).getEndOffset());
