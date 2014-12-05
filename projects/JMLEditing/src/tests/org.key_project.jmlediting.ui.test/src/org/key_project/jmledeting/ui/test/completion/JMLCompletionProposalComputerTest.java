@@ -104,13 +104,9 @@ public class JMLCompletionProposalComputerTest {
    private static int countKeywords() {
       int result = 0;
 
-      for (IKeyword keywords : TestUtils.findReferenceProfile()
+      for (final IKeyword keywords : TestUtils.findReferenceProfile()
             .getSupportedKeywords()) {
-         for (String keyword : keywords.getKeywords()) {
-            if (keyword != null) {
-               result++;
-            }
-         }
+         result += keywords.getKeywords().size();
       }
 
       return result;

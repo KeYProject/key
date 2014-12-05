@@ -49,7 +49,7 @@ public class JMLCompletionProposalComputer implements
                "platform:/plugin/org.key_project.jmlediting.ui/icons/jml.png")
                .openStream())[0]);
       }
-      catch (IOException ioe) {
+      catch (final IOException ioe) {
          return null;
       }
    }
@@ -72,11 +72,14 @@ public class JMLCompletionProposalComputer implements
             // getCurrentProject
             IProject currentProject;
             if (context instanceof JavaContentAssistInvocationContext) {
-               JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
+               final JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
                currentProject = javaContext.getProject().getProject();
             }
             else {
                currentProject = WorkbenchUtil.getCurrentProject();
+               if (currentProject == null) {
+                  return result;
+               }
             }
 
             // Load the specific JMLProfile for the current Project.
