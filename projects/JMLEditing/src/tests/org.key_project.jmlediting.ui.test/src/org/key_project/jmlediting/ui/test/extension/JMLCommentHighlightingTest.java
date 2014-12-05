@@ -218,7 +218,7 @@ public class JMLCommentHighlightingTest {
       // TODO: set Testcolor
       final StyleRange[] textColors = this.editor.getStyles(
             JMLCommentHighlightingTest.PosInChar.line,
-            JMLCommentHighlightingTest.PosInChar.column, 5);
+            JMLCommentHighlightingTest.PosInChar.column, 3);
       for (final StyleRange r : textColors) {
          assertTrue(r.foreground.getBlue() == this.blue
                && r.foreground.getRed() == this.red

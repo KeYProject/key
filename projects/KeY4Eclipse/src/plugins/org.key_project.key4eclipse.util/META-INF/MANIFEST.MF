@@ -29,5 +29,4 @@ Export-Package: org.key_project.util.bean,
  org.key_project.util.eclipse.view.editorInView,
  org.key_project.util.java,
  org.key_project.util.java.thread,
- org.key_project.util.jdt,
- org.key_project.util.jmlediting
+ org.key_project.util.jdt

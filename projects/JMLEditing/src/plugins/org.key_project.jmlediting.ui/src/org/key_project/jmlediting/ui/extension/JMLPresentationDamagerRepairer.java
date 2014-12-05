@@ -17,7 +17,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 
 public class JMLPresentationDamagerRepairer implements IPresentationDamager,
-      IPresentationRepairer {
+IPresentationRepairer {
    private final DefaultDamagerRepairer wrappedInstance;
 
    IDocument doc;
@@ -82,7 +82,7 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
                - surComment.getOffset() + 1);
       }
 
-      return null;
+      return damage;
    }
 
    /**
