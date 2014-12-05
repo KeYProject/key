@@ -63,8 +63,6 @@ public class JMLTextHover implements IJavaEditorTextHover {
          }
       }
       catch (final ParserException e) {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
          return "Unable to parse JML";
       }
       return null;
