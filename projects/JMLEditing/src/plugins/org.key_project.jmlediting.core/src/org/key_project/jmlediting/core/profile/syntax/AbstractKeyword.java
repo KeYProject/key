@@ -27,19 +27,18 @@ public abstract class AbstractKeyword implements IKeyword {
     * @param keywords
     *           all supported keywords
     */
-   public AbstractKeyword(final String... keywords) {
+   public AbstractKeyword(final String keyword, final String... keywords) {
       super();
       switch (keywords.length) {
       case 0:
-         throw new IllegalArgumentException("Define at least one keyword");
-      case 1:
          // Do some performance optimizations for the regular case that we have
          // only one keyword
-         this.keywords = Collections.singleton(keywords[0]);
+         this.keywords = Collections.singleton(keyword);
          break;
       default:
-         this.keywords = Collections.unmodifiableSet(new HashSet<String>(Arrays
-               .asList(keywords)));
+         final HashSet<String> k = new HashSet<String>(Arrays.asList(keywords));
+         k.add(keyword);
+         this.keywords = Collections.unmodifiableSet(k);
       }
    }
 

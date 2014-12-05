@@ -1,4 +1,4 @@
-package de.key_project.jmlediting.profile.jmlref.keyword;
+package de.key_project.jmlediting.profile.jmlref.spec_keyword;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;

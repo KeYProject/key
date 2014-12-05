@@ -1,5 +1,6 @@
 package de.key_project.jmlediting.profile.jmlref;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,22 +13,32 @@ import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import de.key_project.jmlediting.profile.jmlref.behavior.BehaviorKeyword;
 import de.key_project.jmlediting.profile.jmlref.behavior.ExceptionalBehaviorKeyword;
 import de.key_project.jmlediting.profile.jmlref.behavior.NormalBehaviorKeyword;
-import de.key_project.jmlediting.profile.jmlref.keyword.AssignableKeyword;
-import de.key_project.jmlediting.profile.jmlref.keyword.EnsuresKeyword;
-import de.key_project.jmlediting.profile.jmlref.keyword.RequiresKeyword;
+import de.key_project.jmlediting.profile.jmlref.other.AlsoKeyword;
+import de.key_project.jmlediting.profile.jmlref.other.HelperKeyword;
+import de.key_project.jmlediting.profile.jmlref.other.PureKeyword;
+import de.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
+import de.key_project.jmlediting.profile.jmlref.spec_keyword.EnsuresKeyword;
+import de.key_project.jmlediting.profile.jmlref.spec_keyword.RequiresKeyword;
+import de.key_project.jmlediting.profile.jmlref.visibility.PrivateKeyword;
+import de.key_project.jmlediting.profile.jmlref.visibility.ProtectedKeyword;
+import de.key_project.jmlediting.profile.jmlref.visibility.PublicKeyword;
+import de.key_project.jmlediting.profile.jmlref.visibility.SpecProtectedKeyword;
+import de.key_project.jmlediting.profile.jmlref.visibility.SpecPublicKeyword;
 
 public class JMLReferenceProfile implements IJMLProfile {
 
    private static final Set<IKeyword> SUPPORTED_KEYWORDS;
 
    static {
-      Set<IKeyword> supportedKeywords = new HashSet<IKeyword>();
-      supportedKeywords.add(new AssignableKeyword());
-      supportedKeywords.add(new EnsuresKeyword());
-      supportedKeywords.add(new RequiresKeyword());
-      supportedKeywords.add(new BehaviorKeyword());
-      supportedKeywords.add(new ExceptionalBehaviorKeyword());
-      supportedKeywords.add(new NormalBehaviorKeyword());
+      final Set<IKeyword> supportedKeywords = new HashSet<IKeyword>(
+            Arrays.asList(new AssignableKeyword(), new EnsuresKeyword(),
+                  new RequiresKeyword(), new BehaviorKeyword(),
+                  new ExceptionalBehaviorKeyword(),
+                  new NormalBehaviorKeyword(), new AlsoKeyword(),
+                  new HelperKeyword(), new PureKeyword(), new PrivateKeyword(),
+                  new ProtectedKeyword(), new PublicKeyword(),
+                  new SpecProtectedKeyword(), new SpecPublicKeyword()));
+
       SUPPORTED_KEYWORDS = Collections.unmodifiableSet(supportedKeywords);
    }
 
