@@ -52,7 +52,7 @@ public class DefaultJMLParser implements IJMLParser {
       // A list to put the nodes for each keyword into
       final List<IASTNode> allKeywords = new ArrayList<IASTNode>();
 
-      int position = skipWhiteSpacesOrAt(text, start, end);
+      int position = skipWhiteSpacesOrAt(text, start, end, true);
       // Search for keyword as long text is available
       while (position < end) {
          // Parse the keyword
@@ -61,7 +61,7 @@ public class DefaultJMLParser implements IJMLParser {
          // Skip whites
          position = keywordNode.getEndOffset() + 1;
          if (position < end) {
-            position = skipWhiteSpacesOrAt(text, position, end);
+            position = skipWhiteSpacesOrAt(text, position, end, false);
          }
       }
 
@@ -92,16 +92,17 @@ public class DefaultJMLParser implements IJMLParser {
       validatePositions(text, start, end);
 
       // Find keyword in text
-      final int keywordStart = skipWhiteSpacesOrAt(text, start, end);
+      final int keywordStart = skipWhiteSpacesOrAt(text, start, end, false);
       final int keywordEnd = getIdentifier(text, keywordStart, end);
       final String keyword = text.substring(keywordStart, keywordEnd);
 
       // Find the corresponding IKeyword instance from the profile
-      final IKeyword foundKeyword = JMLProfileHelper.findKeyword(this.profile, keyword);
+      final IKeyword foundKeyword = JMLProfileHelper.findKeyword(this.profile,
+            keyword);
       if (foundKeyword == null) {
          throw new ParserException(
                "Not a supported specification statement keyword: \"" + keyword
-                     + "\"", text, keywordEnd);
+               + "\"", text, keywordEnd);
       }
       final IASTNode keywordNode = Nodes.createKeyword(keywordStart,
             keywordEnd - 1, foundKeyword, keyword);

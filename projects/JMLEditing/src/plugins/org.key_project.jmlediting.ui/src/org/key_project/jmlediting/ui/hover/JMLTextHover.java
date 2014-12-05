@@ -17,9 +17,10 @@ import org.key_project.jmlediting.ui.extension.JMLLocator;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 /**
- * An {@link IJavaEditorTextHover} to support JML.
+ * An {@link IJavaEditorTextHover} to support JML. Currently it shows
+ * description hovers for keywords.
  *
- * @author Martin Hentschel
+ * @author Martin Hentschel, Moritz Lichter
  */
 public class JMLTextHover implements IJavaEditorTextHover {
 
@@ -52,7 +53,8 @@ public class JMLTextHover implements IJavaEditorTextHover {
          // End index of comment is inclusive, but input end for parser
          // exclusive
          final IASTNode result = parser.parse(textViewer.getDocument().get(),
-               comment.getBeginOffset(), comment.getEndOffset() + 1);
+               comment.getContentBeginOffset(),
+               comment.getContentEndOffset() + 1);
          final IASTNode selectedNode = Nodes.getDepthMostNodeWithPosition(
                cursorPosition, result);
          if (selectedNode != null && Nodes.isKeyword(selectedNode)) {

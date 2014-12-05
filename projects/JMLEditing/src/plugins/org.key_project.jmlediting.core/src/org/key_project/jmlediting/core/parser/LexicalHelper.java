@@ -119,10 +119,10 @@ public final class LexicalHelper {
     *            invalid indices
     */
    public static int skipWhiteSpacesOrAt(final String text, final int start,
-         final int end) throws ParserException {
+         final int end, final boolean beginAtNewLine) throws ParserException {
       validatePositions(text, start, end);
       int position = start;
-      boolean inNewLine = false;
+      boolean inNewLine = beginAtNewLine;
       while (position < end
             && ((inNewLine && text.charAt(position) == '@') || Character
                   .isWhitespace(text.charAt(position)))) {
