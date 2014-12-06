@@ -119,6 +119,11 @@ public final class LexicalHelper {
     *            invalid indices
     */
    public static int skipWhiteSpacesOrAt(final String text, final int start,
+         final int end) throws ParserException {
+      return skipWhiteSpacesOrAt(text, start, end, false);
+   }
+
+   public static int skipWhiteSpacesOrAt(final String text, final int start,
          final int end, final boolean beginAtNewLine) throws ParserException {
       validatePositions(text, start, end);
       int position = start;
