@@ -44,16 +44,4 @@ public class JMLSourceViewerConfigurationExtension extends
       reconciler.setRepairer(newDR, IJavaPartitions.JAVA_SINGLE_LINE_COMMENT);
       return currentResult;
    }
-
-   /**
-    * @return extendedContentTypes A List of the previously defined
-    *         ContentTypes, with JMLMultiLine content at first position in the
-    *         array, and JMLSingleLine content on the second position followed
-    *         by the previously defined content Types
-    */
-   @Override
-   public String[] getConfiguredContentTypes(final ISourceViewer sourceViewer,
-         final String[] currentResult) {
-      return currentResult;
-   }
 }
