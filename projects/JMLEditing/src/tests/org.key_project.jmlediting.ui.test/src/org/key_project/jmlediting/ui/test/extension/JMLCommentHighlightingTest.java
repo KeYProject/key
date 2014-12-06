@@ -32,10 +32,10 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * <li>Strings</li>
  * <li>Chars</li>
  * <li>JavaCode</li>
- * <li>null in Comment</li>
- * <li>null in JavaDoc</li>
- * <li>null in Javacode</li>
- * <li>null in JML</li>
+ * <li>public in Comment</li>
+ * <li>public in JavaDoc</li>
+ * <li>public in Javacode</li>
+ * <li>public in JML</li>
  * </ul>
  * after changes:</br>
  * <ul>
@@ -45,10 +45,10 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * <li>change from JML Multiline Comment to JavaDoc</li>
  * <li>change from JavaDoc Comment to Java Multiline Comment</li>
  * <li>change from Java Multiline Comment to JavaDoc Comment</li>
- * <li>null in Comment</li>
- * <li>null in JavaDoc</li>
- * <li>null in Javacode</li>
- * <li>null in JML</li>
+ * <li>public in Comment</li>
+ * <li>public in JavaDoc</li>
+ * <li>public in Javacode</li>
+ * <li>public in JML</li>
  * </ul>
  *
  * @author David Giessing
@@ -62,20 +62,21 @@ public class JMLCommentHighlightingTest {
 
    private static final String PROJECT_NAME = "TestCompletion";
    private static final String PACKAGE_NAME = "test";
-   private static final String CLASS_NAME = "TestClass";
+   private static final String CLASS_NAME = "HighlightingTestClass";
 
    // SWTBot uses strange offsets... according to JavaClass
    // data/template/TestClass.java
-   private static final Position PosOutOfClass = new Position(2, 1);
    private static final Position PosJDocComment = new Position(4, 0);
    private static final Position PosJCommentMulti = new Position(10, 3);
    private static final Position PosJMLCommentMulti = new Position(13, 3);
-   private static final Position PosInClass = new Position(16, 3);
    private static final Position PosInString = new Position(20, 25);
    private static final Position PosJCommentSingle = new Position(19, 6);
    private static final Position PosInMethod = new Position(20, 6);
    private static final Position PosJMLCommentSingle = new Position(23, 6);
    private static final Position PosInChar = new Position(24, 14);
+   private static final Position PublicJML = new Position(28, 6);
+   private static final Position PublicJavaComment = new Position(34, 6);
+   private static final Position PublicJavaDoc = new Position(31, 6);
 
    private final RGB javaComment = new RGB(63, 127, 95);
    private final RGB javaDoc = new RGB(63, 95, 191);
@@ -99,8 +100,8 @@ public class JMLCommentHighlightingTest {
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID,
             "data/template", testFolder);
       bot.tree().getTreeItem(PROJECT_NAME).select().expand().getNode("src")
-            .select().expand().getNode(PACKAGE_NAME).select().expand()
-            .getNode(CLASS_NAME + ".java").select().doubleClick();
+      .select().expand().getNode(PACKAGE_NAME).select().expand()
+      .getNode(CLASS_NAME + ".java").select().doubleClick();
       JMLPreferencesHelper.setProjectJMLProfile(project.getProject(),
             TestUtils.findReferenceProfile());
    }
@@ -149,7 +150,7 @@ public class JMLCommentHighlightingTest {
    public void JavaSingleLineTest() {
       final StyleRange[] textColors = this.editor.getStyles(
             JMLCommentHighlightingTest.PosJCommentSingle.line,
-            JMLCommentHighlightingTest.PosJCommentSingle.column, 29);
+            JMLCommentHighlightingTest.PosJCommentSingle.column, 27);
       for (final StyleRange r : textColors) {
          assertEquals("Color did not Match JavaCommentColor",
                r.foreground.getRGB(), this.javaComment);
@@ -245,7 +246,6 @@ public class JMLCommentHighlightingTest {
 
    @Test
    public void changeJMLSLineToJavaSLineTest() {
-      bot.sleep(4000);
       this.removeText(new Position(
             JMLCommentHighlightingTest.PosJMLCommentSingle.line,
             JMLCommentHighlightingTest.PosJMLCommentSingle.column + 2), 1);
@@ -256,7 +256,6 @@ public class JMLCommentHighlightingTest {
          assertEquals("Color did not Match JavaCommentColor",
                r.foreground.getRGB(), this.javaComment);
       }
-      bot.sleep(4000);
       this.editor.insertText(PosJMLCommentSingle.line,
             PosJMLCommentSingle.column + 2, "@");
    }
@@ -268,7 +267,7 @@ public class JMLCommentHighlightingTest {
             PosJCommentSingle.column + 2, "@");
       final StyleRange[] textColors = this.editor.getStyles(
             JMLCommentHighlightingTest.PosJCommentSingle.line,
-            JMLCommentHighlightingTest.PosJCommentSingle.column, 30);
+            JMLCommentHighlightingTest.PosJCommentSingle.column, 28);
       for (final StyleRange r : textColors) {
          assertEquals("Color did not Match JMLCommentColor",
                r.foreground.getRGB(), this.jmlComment);
@@ -352,5 +351,28 @@ public class JMLCommentHighlightingTest {
       this.editor.insertText(PosJDocComment.line, PosJDocComment.column + 2,
             "*");
    }
+
+   @Test
+   public void keyWordTestBeforeChanges() {
+      StyleRange[] textColors = this.editor.getStyles(PublicJavaComment.line,
+            PublicJavaComment.column + 2, 6);
+      for (final StyleRange r : textColors) {
+         assertEquals("Color did not Match JavaCommentColor",
+               r.foreground.getRGB(), this.javaComment);
+      }
+      textColors = this.editor.getStyles(PublicJavaDoc.line,
+            PublicJavaDoc.column + 2, 6);
+      for (final StyleRange r : textColors) {
+         assertEquals("Color did not Match JavaDocColor",
+               r.foreground.getRGB(), this.javaDoc);
+      }
+      textColors = this.editor.getStyles(PublicJML.line, PublicJML.column + 2,
+            6);
+      for (final StyleRange r : textColors) {
+         assertEquals("Color did not Match JMLCommentColor",
+               r.foreground.getRGB(), this.jmlComment);
+      }
+   }
+   // TODO: add Tests after Changes
 
 }
