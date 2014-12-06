@@ -7,9 +7,8 @@ import java.util.Set;
 import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.profile.jmlref.JMLReferenceProfile;
 import org.key_project.jmlediting.profile.key.other.StrictlyPureKeyword;
-
-import de.key_project.jmlediting.profile.jmlref.JMLReferenceProfile;
 
 public class KeyProfile extends JMLReferenceProfile {
 

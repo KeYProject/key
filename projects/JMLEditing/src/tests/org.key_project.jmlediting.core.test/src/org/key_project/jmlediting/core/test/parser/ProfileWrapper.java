@@ -1,8 +1,7 @@
 package org.key_project.jmlediting.core.test.parser;
 
 import org.key_project.jmlediting.core.profile.IJMLProfile;
-
-import de.key_project.jmlediting.profile.jmlref.JMLReferenceProfile;
+import org.key_project.jmlediting.profile.jmlref.JMLReferenceProfile;
 
 public class ProfileWrapper {
 
