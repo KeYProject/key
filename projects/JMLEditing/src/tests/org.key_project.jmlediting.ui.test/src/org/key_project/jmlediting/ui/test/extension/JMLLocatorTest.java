@@ -9,8 +9,8 @@ import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.junit.Test;
-import org.key_project.jmlediting.ui.extension.JMLComment;
-import org.key_project.jmlediting.ui.extension.JMLLocator;
+import org.key_project.jmlediting.ui.extension.CommentRange;
+import org.key_project.jmlediting.ui.extension.CommentLocator;
 
 public class JMLLocatorTest {
 
@@ -45,20 +45,20 @@ public class JMLLocatorTest {
          + "String temp=\"//@ ensures \\ \" ;" + eol + "//@ requires blabla"
          + eol + "\t\tSystem.out.println(\"Hello World\");" + eol + "\t}" + eol
          + "}" + eol + "/*   *";
-   private JMLLocator locator = new JMLLocator(EDITOR_TEXT);
+   private CommentLocator locator = new CommentLocator(EDITOR_TEXT);
 
    @Test
    public void findCommentsTest() {
-      assertFalse(this.locator.findJMLComments().isEmpty());
-      this.locator = new JMLLocator(TEXT2);
-      assertFalse(this.locator.findJMLComments().isEmpty());
-      this.locator = new JMLLocator(TEXT3);
-      assertFalse(this.locator.findJMLComments().isEmpty());
+      assertFalse(this.locator.findJMLCommentRanges().isEmpty());
+      this.locator = new CommentLocator(TEXT2);
+      assertFalse(this.locator.findJMLCommentRanges().isEmpty());
+      this.locator = new CommentLocator(TEXT3);
+      assertFalse(this.locator.findJMLCommentRanges().isEmpty());
    }
 
    @Test
    public void isInJMLTest() throws BadLocationException {
-      this.locator = new JMLLocator(EDITOR_TEXT);
+      this.locator = new CommentLocator(EDITOR_TEXT);
       assertTrue(this.locator.isInJMLcomment(EDITOR_TEXT.indexOf("/*@") + 3)); // Test
       // whether
       // JML
@@ -88,23 +88,23 @@ public class JMLLocatorTest {
 
    @Test
    public void findJMLCommentsTest() {
-      this.locator = new JMLLocator(EDITOR_TEXT);
-      List<JMLComment> comments = this.locator.findJMLComments();
+      this.locator = new CommentLocator(EDITOR_TEXT);
+      List<CommentRange> comments = this.locator.findJMLCommentRanges();
       assertTrue(2 == comments.size());
-      this.locator = new JMLLocator(TEXT2);
-      comments = this.locator.findJMLComments();
+      this.locator = new CommentLocator(TEXT2);
+      comments = this.locator.findJMLCommentRanges();
       assertTrue(2 == comments.size());
-      this.locator = new JMLLocator(TEXT3);
-      comments = this.locator.findJMLComments();
+      this.locator = new CommentLocator(TEXT3);
+      comments = this.locator.findJMLCommentRanges();
       assertTrue(2 == comments.size());
    }
 
    @Test
    public void getCommentOfOffsetTest() {
-      this.locator = new JMLLocator(EDITOR_TEXT);
-      List<JMLComment> comments = this.locator.findJMLComments();
-      JMLComment commentToFind = comments.get(0);
-      JMLComment commentFound = this.locator.getCommentOfOffset(57);
+      this.locator = new CommentLocator(EDITOR_TEXT);
+      List<CommentRange> comments = this.locator.findJMLCommentRanges();
+      CommentRange commentToFind = comments.get(0);
+      CommentRange commentFound = this.locator.getCommentOfOffset(57);
       assertTrue(commentToFind.getBeginOffset() == commentFound
             .getBeginOffset()
             && commentToFind.getEndOffset() == commentFound.getEndOffset());
@@ -119,23 +119,23 @@ public class JMLLocatorTest {
 
    @Test
    public void getJMLCommentTest() {
-      this.locator = new JMLLocator(EDITOR_TEXT);
+      this.locator = new CommentLocator(EDITOR_TEXT);
       assertNull(this.locator.getJMLComment(EDITOR_TEXT.length() - 1));
-      List<JMLComment> comments = this.locator.findComments();
-      final JMLComment commentToFind = comments.get(0);
-      final JMLComment commentFound = this.locator.getJMLComment(57);
+      List<CommentRange> comments = this.locator.findComments();
+      final CommentRange commentToFind = comments.get(0);
+      final CommentRange commentFound = this.locator.getJMLComment(57);
       assertTrue(commentToFind.getBeginOffset() == commentFound
             .getBeginOffset()
             && commentToFind.getEndOffset() == commentFound.getEndOffset());
-      this.locator = new JMLLocator(TEXT2);
+      this.locator = new CommentLocator(TEXT2);
       comments = this.locator.findComments();
       assertNull(this.locator.getJMLComment(78));
    }
 
    @Test
    public void indexTest() {
-      this.locator = new JMLLocator(EDITOR_TEXT);
-      final List<JMLComment> comments = this.locator.findComments();
+      this.locator = new CommentLocator(EDITOR_TEXT);
+      final List<CommentRange> comments = this.locator.findComments();
       assertTrue(EDITOR_TEXT.indexOf("/*@") == comments.get(0).getBeginOffset()
             && EDITOR_TEXT.indexOf("*/") + 1 == comments.get(0).getEndOffset());
       assertEquals("Wrong begin offset for single line comment",

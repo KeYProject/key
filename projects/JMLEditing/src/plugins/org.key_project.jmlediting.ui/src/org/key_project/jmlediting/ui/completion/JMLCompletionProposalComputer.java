@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Display;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
-import org.key_project.jmlediting.ui.extension.JMLLocator;
+import org.key_project.jmlediting.ui.extension.CommentLocator;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 /**
@@ -66,7 +66,7 @@ public class JMLCompletionProposalComputer implements
 
       try {
          // add proposals only if Content Assist is invoked in JML Code
-         final JMLLocator locator = new JMLLocator(context.getDocument().get());
+         final CommentLocator locator = new CommentLocator(context.getDocument().get());
          if (locator.isInJMLcomment(context.getInvocationOffset())) {
 
             // getCurrentProject

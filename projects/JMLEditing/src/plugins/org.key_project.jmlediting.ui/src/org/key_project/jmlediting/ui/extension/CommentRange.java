@@ -1,6 +1,6 @@
 package org.key_project.jmlediting.ui.extension;
 
-public class JMLComment {
+public class CommentRange {
 
    // All offsets are inclusive
 
@@ -10,7 +10,7 @@ public class JMLComment {
    private final int contentBeginOffset;
    private final int contentEndOffset;
 
-   public JMLComment(final int offset, final int end, final int contentOffset,
+   public CommentRange(final int offset, final int end, final int contentOffset,
          final int contentEndOffset) {
       super();
       this.beginOffset = offset;

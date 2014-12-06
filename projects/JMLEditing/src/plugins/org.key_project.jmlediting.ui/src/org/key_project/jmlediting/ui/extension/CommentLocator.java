@@ -12,11 +12,11 @@ import org.eclipse.jface.text.BadLocationException;
  *
  * @author David Giessing
  */
-public class JMLLocator {
+public class CommentLocator {
 
    private final String text;
 
-   public JMLLocator(final String text) {
+   public CommentLocator(final String text) {
       this.text = text;
    }
 
@@ -32,9 +32,9 @@ public class JMLLocator {
       return this.getJMLComment(offset) != null;
    }
 
-   public JMLComment getJMLComment(final int offset) {
-      final List<JMLComment> jmlcomments = this.findJMLComments();
-      for (final JMLComment c : jmlcomments) {
+   public CommentRange getJMLComment(final int offset) {
+      final List<CommentRange> jmlcomments = this.findJMLCommentRanges();
+      for (final CommentRange c : jmlcomments) {
          if (c.getBeginOffset() <= offset && offset <= c.getEndOffset()) {
             return c;
          }
@@ -48,8 +48,8 @@ public class JMLLocator {
     * @return An ArrayList with Type Comment that consists of all valid Comments
     *         in the Document
     */
-   public List<JMLComment> findComments() {
-      final List<JMLComment> comments = new ArrayList<JMLComment>();
+   public List<CommentRange> findComments() {
+      final List<CommentRange> comments = new ArrayList<CommentRange>();
 
       final char[] content = this.text.toCharArray();
       int position = 0;
@@ -81,7 +81,7 @@ public class JMLLocator {
                      if (end == -1) {
                         commentEnd = content.length - 1;
                      }
-                     comments.add(new JMLComment(position, commentEnd,
+                     comments.add(new CommentRange(position, commentEnd,
                            position + 2, commentEnd));
                      if (end == -1) {
                         break mainloop;
@@ -117,7 +117,7 @@ public class JMLLocator {
                   final char c2 = content[position + 1];
                   switch (c2) {
                   case '/':
-                     comments.add(new JMLComment(begin, position + 1,
+                     comments.add(new CommentRange(begin, position + 1,
                            begin + 2, position - 1));
                      state = ScannerState.DEFAULT;
                      position += 2;
@@ -181,11 +181,11 @@ public class JMLLocator {
     * @return An ArrayList with Type Comment that consists of all valid
     *         JMLComments in the Document
     */
-   public List<JMLComment> findJMLComments() {
-      final List<JMLComment> comments = this.findComments();
-      final List<JMLComment> jmlcomments = new ArrayList<JMLComment>();
+   public List<CommentRange> findJMLCommentRanges() {
+      final List<CommentRange> comments = this.findComments();
+      final List<CommentRange> jmlcomments = new ArrayList<CommentRange>();
 
-      for (final JMLComment c : comments) {
+      for (final CommentRange c : comments) {
          // filter for jml comments, a comment is a JML comment if the 3rd sign
          // is an @
          if ((this.text.length() - 1 >= c.getBeginOffset() + 2)
@@ -205,9 +205,9 @@ public class JMLLocator {
     * @return A Comment Object that is a Comment that surrounds the given
     *         offset, null if no comment is found around this offset
     */
-   public JMLComment getCommentOfOffset(final int offset) {
-      final List<JMLComment> jmlcomments = this.findComments();
-      for (final JMLComment c : jmlcomments) {
+   public CommentRange getCommentOfOffset(final int offset) {
+      final List<CommentRange> jmlcomments = this.findComments();
+      for (final CommentRange c : jmlcomments) {
          if (c.getBeginOffset() <= offset && offset <= c.getEndOffset()) {
             return c;
          }

@@ -17,7 +17,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 
 public class JMLPresentationDamagerRepairer implements IPresentationDamager,
-      IPresentationRepairer {
+IPresentationRepairer {
    private final DefaultDamagerRepairer wrappedInstance;
 
    IDocument doc;
@@ -32,7 +32,7 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
    public void createPresentation(final TextPresentation presentation,
          final ITypedRegion damage) {
       boolean jml = false;
-      final JMLLocator locator = new JMLLocator(this.doc.get());
+      final CommentLocator locator = new CommentLocator(this.doc.get());
       jml = locator.isInJMLcomment(damage.getOffset());
       if (jml) {
          final TextAttribute ta = new TextAttribute(new Color(
@@ -62,8 +62,8 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
          final DocumentEvent event, final boolean documentPartitioningChanged) {
       final IRegion damage = this.wrappedInstance.getDamageRegion(partition,
             event, documentPartitioningChanged);
-      final JMLLocator locator = new JMLLocator(this.doc.get());
-      final JMLComment surComment = locator.getCommentOfOffset(event
+      final CommentLocator locator = new CommentLocator(this.doc.get());
+      final CommentRange surComment = locator.getCommentOfOffset(event
             .getOffset());
       if (surComment == null) {
          return damage;
@@ -80,7 +80,7 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
       }
       if (eventLine == commentLine) {
          return new Region(surComment.getBeginOffset(),
-               surComment.getEndOffset() - surComment.getBeginOffset());
+               surComment.getEndOffset() - surComment.getBeginOffset() + 1);
       }
 
       return damage;
