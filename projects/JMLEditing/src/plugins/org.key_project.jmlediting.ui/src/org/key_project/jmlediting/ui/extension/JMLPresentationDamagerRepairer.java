@@ -17,7 +17,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 
 public class JMLPresentationDamagerRepairer implements IPresentationDamager,
-IPresentationRepairer {
+      IPresentationRepairer {
    private final DefaultDamagerRepairer wrappedInstance;
 
    IDocument doc;
@@ -63,7 +63,7 @@ IPresentationRepairer {
       final IRegion damage = this.wrappedInstance.getDamageRegion(partition,
             event, documentPartitioningChanged);
       final JMLLocator locator = new JMLLocator(this.doc.get());
-      final JMLCommentRange surComment = locator.getJMLComment(event
+      final JMLComment surComment = locator.getCommentOfOffset(event
             .getOffset());
       if (surComment == null) {
          return damage;
