@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.core.dom.NodeTypes;
 
 /**
  * An ASTNode implements a default AST node.
@@ -38,14 +39,19 @@ public class ASTNode extends AbstractASTNode {
    public ASTNode(final int startOffset, final int endOffset, final int type,
          final List<IASTNode> children) {
       super(startOffset, endOffset);
+      if (NodeTypes.getTypeName(type) == null) {
+         throw new IllegalArgumentException(
+               "Creates node with unregistered type " + type);
+      }
       this.type = type;
       this.children = children;
       // Validate children
-      int begin = startOffset - 1;
+      int begin = startOffset;
       for (final IASTNode child : children) {
-         if (child.getStartOffset() <= begin) {
+         if (child.getStartOffset() < begin) {
             throw new IllegalArgumentException(
-                  "Start offset off child is invalid");
+                  "Start offset off child is invalid: child begin "
+                        + child.getStartOffset() + " is less than " + begin);
          }
          begin = child.getEndOffset();
       }
@@ -69,6 +75,17 @@ public class ASTNode extends AbstractASTNode {
       else {
          return Collections.unmodifiableList(this.children);
       }
+   }
+
+   @Override
+   public String toString() {
+      String str = NodeTypes.getTypeName(this.getType()) + "["
+            + this.getStartOffset() + "-" + this.getEndOffset() + "](";
+      for (final IASTNode node : this.getChildren()) {
+         str += node.toString() + ",";
+      }
+      str += ")";
+      return str;
    }
 
 }

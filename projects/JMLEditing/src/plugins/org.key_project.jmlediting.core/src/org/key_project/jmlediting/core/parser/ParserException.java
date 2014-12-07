@@ -64,11 +64,15 @@ public class ParserException extends Exception {
             + this.formatString();
    }
 
+   public int getIndex() {
+      return this.index;
+   }
+
    /**
     * Formats the message to show a marker, where the problem occurred. It
     * removes lines breaks in the text to format and adds a new line with the
     * error marker.
-    * 
+    *
     * @return a formatted message text
     */
    private String formatString() {

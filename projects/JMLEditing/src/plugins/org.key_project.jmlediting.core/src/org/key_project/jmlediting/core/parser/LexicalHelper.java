@@ -105,6 +105,84 @@ public final class LexicalHelper {
       return position;
    }
 
+   public static int getIntegerConstant(final String text, final int start,
+         final int end) throws ParserException {
+      validatePositions(text, start, end);
+      if (start == end) {
+         throw new ParserException("Expected an integer contant", text, start);
+      }
+      final char firstChar = text.charAt(start);
+      int position;
+      if (firstChar == '0') {
+         if (start + 1 < end) {
+            final char secondChar = text.charAt(start + 1);
+            if (secondChar == 'x') {
+               // Hex integer
+               position = start + 2;
+               while (position < end) {
+                  final char c = text.charAt(position);
+                  if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F')) {
+                     position++;
+                  }
+                  else {
+                     break;
+                  }
+               }
+               if (position == start + 2) {
+                  // No character after x, invalid
+                  throw new ParserException("Got invalid hexadeicmal constant",
+                        text, position + 3);
+               }
+            }
+            else {
+               // Octal
+               position = start + 1;
+               while (position < end) {
+                  final char c = text.charAt(position);
+                  if ((c >= '0' && c <= '7')) {
+                     position++;
+                  }
+                  else {
+                     break;
+                  }
+               }
+            }
+         }
+         else {
+            // Got a simple literal "0"
+            position = start + 1;
+         }
+      }
+      else {
+         // Decimal integer
+         position = start;
+         while (position < end) {
+            final char c = text.charAt(position);
+            if ((c >= '0' && c <= '9')) {
+               position++;
+            }
+            else {
+               break;
+            }
+         }
+      }
+
+      if (position == start) {
+         throw new ParserException("Expected an integer constant", text, start);
+      }
+
+      // check for type suffix
+      if (position < end) {
+         final char c = text.charAt(position);
+         if (c == 'l' || c == 'L') {
+            position++;
+         }
+      }
+
+      return position;
+
+   }
+
    /**
     * Skips the following whitespaces and @ signs, if a new line is encountered.
     *

@@ -102,10 +102,10 @@ public class DefaultJMLParser implements IJMLParser {
       if (foundKeyword == null) {
          throw new ParserException(
                "Not a supported specification statement keyword: \"" + keyword
-               + "\"", text, keywordEnd);
+                     + "\"", text, keywordEnd);
       }
       final IASTNode keywordNode = Nodes.createKeyword(keywordStart,
-            keywordEnd - 1, foundKeyword, keyword);
+            keywordEnd, foundKeyword, keyword);
 
       // Now parse according to the keywword
       final IKeywordParser keywordParser = foundKeyword.createParser();

@@ -1,45 +1,23 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref;
 
-import static org.key_project.jmlediting.core.parser.ParserUtils.alternative;
-import static org.key_project.jmlediting.core.parser.ParserUtils.constant;
-import static org.key_project.jmlediting.core.parser.ParserUtils.identifier;
-import static org.key_project.jmlediting.core.parser.ParserUtils.parseList;
-import static org.key_project.jmlediting.core.parser.ParserUtils.parseSeparatedNonEmptyList;
-import static org.key_project.jmlediting.core.parser.ParserUtils.separateBy;
-import static org.key_project.jmlediting.core.parser.ParserUtils.seq;
-import static org.key_project.jmlediting.core.parser.ParserUtils.typed;
-import static org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefNodeTypes.STORE_REF_EXPR;
-import static org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefNodeTypes.STORE_REF_NAME_SUFFIX;
+import static org.key_project.jmlediting.core.parser.ParserUtils.*;
+import static org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefNodeTypes.*;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
-import org.key_project.jmlediting.profile.jmlref.spec_keyword.AbstractGenericSpecificationKeywordParser;
 
-public class StoreRefParser extends AbstractGenericSpecificationKeywordParser {
+public class StoreRefParser implements ParseFunction {
 
    @Override
-   protected IASTNode parseToSemicolon(final String text, final int start,
-         final int end) {
-      // TODO Auto-generated method stub
-      return null;
+   public IASTNode parse(final String text, final int start, final int end)
+         throws ParserException {
+      return storeRefList.parse(text, start, end);
    }
 
-   private static final ParseFunction storeRefKeyword = null;
+   private static final ParseFunction storeRefKeyword = notImplemented();
 
-   private static final ParseFunction specExpression = new ParseFunction() {
-      @Override
-      public IASTNode parse(final String text,
-
-      final int start, final int end) throws ParserException {
-         return parseExpression(text, start, end);
-      }
-   };
-
-   private static IASTNode parseExpression(final String text, final int start,
-         final int end) throws ParserException {
-      return null;
-   }
+   private static final ParseFunction specExpression = integerConstant();
 
    /**
     * spec-array-ref-expr ::= spec-expression <br>
@@ -80,14 +58,7 @@ public class StoreRefParser extends AbstractGenericSpecificationKeywordParser {
    private static final ParseFunction storeRefExpr = seq(STORE_REF_EXPR,
          storeRefName, parseList(storeRefNameSuffix));
 
-   private static final ParseFunction informalExpr = new ParseFunction() {
-
-      @Override
-      public IASTNode parse(final String text, final int start, final int end)
-            throws ParserException {
-         throw new ParserException("Not supported", text, start);
-      }
-   };
+   private static final ParseFunction informalExpr = notImplemented();
 
    /**
     * store-ref ::= store-ref-expression <br>

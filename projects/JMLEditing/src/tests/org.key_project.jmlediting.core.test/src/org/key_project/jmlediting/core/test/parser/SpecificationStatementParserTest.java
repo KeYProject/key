@@ -15,31 +15,31 @@ public class SpecificationStatementParserTest {
 
    @Test
    public void testParseSpecificationKeyword1() throws ParserException {
-      testParseSpecification("  ensures x < y; ", "ensures", "x < y", 2, 15);
+      testParseSpecification("  ensures x < y; ", "ensures", "x < y", 2, 16);
    }
 
    @Test
    public void testParseSpecificationKeyword2() throws ParserException {
       testParseSpecification("       assignable   hello ; ", "assignable",
-            "  hello ", 7, 26);
+            "  hello ", 7, 27);
    }
 
    @Test
    public void testParseSpecificationKeyword3() throws ParserException {
       testParseSpecification("ensures \"hello;\" == x;", "ensures",
-            "\"hello;\" == x", 0, 21);
+            "\"hello;\" == x", 0, 22);
    }
 
    @Test
    public void testParseSpecificationKeyword4() throws ParserException {
       testParseSpecification("requires \"he\'llo;\" == \'\";\';", "requires",
-            "\"he\'llo;\" == \'\";\'", 0, 26);
+            "\"he\'llo;\" == \'\";\'", 0, 27);
    }
 
    @Test
    public void testParseSpecificationKeyword5() throws ParserException {
       testParseSpecification("requires \"he\'llo\\;\" == \'\";\';", "requires",
-            "\"he\'llo\\;\" == \'\";\'", 0, 27);
+            "\"he\'llo\\;\" == \'\";\'", 0, 28);
    }
 
    @Test(expected = ParserException.class)

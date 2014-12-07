@@ -1,8 +1,5 @@
 package org.key_project.jmlediting.core.parser;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
@@ -53,45 +50,13 @@ public final class ParserUtils {
       }
    }
 
-   private static List<IASTNode> parseListImpl(final String text,
-         final int start, final int end, final ParseFunction function) {
-      final List<IASTNode> nodes = new ArrayList<IASTNode>();
-
-      while (true) {
-         try {
-            final IASTNode listNode = function.parse(text, start, end);
-            nodes.add(listNode);
-         }
-         catch (final ParserException e) {
-            break;
-         }
-      }
-      return nodes;
-   }
-
-   public static IASTNode parseList(final String text, final int start,
-         final int end, final ParseFunction function) {
-      return Nodes.createNode(NodeTypes.LIST,
-            parseListImpl(text, start, end, function));
-   }
-
-   public static IASTNode parseNonEmptyList(final String text, final int start,
-         final int end, final ParseFunction function,
-         final String missingExceptionText) throws ParserException {
-      final List<IASTNode> nodes = parseListImpl(text, start, end, function);
-      if (nodes.isEmpty()) {
-         throw new ParserException(missingExceptionText, text, start);
-      }
-      return Nodes.createNode(NodeTypes.LIST, nodes);
-   }
-
    public static ParseFunction parseList(final ParseFunction function) {
       return new ParseFunction() {
 
          @Override
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
-            return parseList(text, start, end, function);
+            return ParserUtilsImpl.parseList(text, start, end, function);
          }
       };
    }
@@ -103,8 +68,8 @@ public final class ParserUtils {
          @Override
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
-            return parseNonEmptyList(text, start, end, function,
-                  missingExceptionText);
+            return ParserUtilsImpl.parseNonEmptyList(text, start, end,
+                  function, missingExceptionText);
          }
       };
    }
@@ -116,8 +81,8 @@ public final class ParserUtils {
          @Override
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
-            return parseSeparatedNonEmptyList(sep, text, start, end, function,
-                  missingExceptionText);
+            return ParserUtilsImpl.parseSeparatedNonEmptyList(text, start, end,
+                  sep, function, missingExceptionText);
          }
       };
    }
@@ -131,6 +96,9 @@ public final class ParserUtils {
                throws ParserException {
             final int commaStart = LexicalHelper.skipWhiteSpacesOrAt(text,
                   start, end);
+            if (commaStart >= end) {
+               throw new ParserException("Reached end of text", text, end);
+            }
             if (text.charAt(commaStart) != sep) {
                throw new ParserException("Expected a \"" + sep + "\"", text,
                      commaStart);
@@ -140,56 +108,16 @@ public final class ParserUtils {
       };
    }
 
-   public static IASTNode parseSeparatedList(final char sep, final String text,
-         final int start, final int end, final ParseFunction function) {
-      return parseList(text, start, end, separateBy(sep, function));
-   }
-
-   public static IASTNode parseSeparatedNonEmptyList(final char sep,
-         final String text, final int start, final int end,
-         final ParseFunction function, final String missingExceptionText)
-               throws ParserException {
-      return parseNonEmptyList(text, start, end, separateBy(sep, function),
-            missingExceptionText);
-   }
-
-   public static IASTNode parseAlternative(final String text, final int start,
-         final int end, final ParseFunction... alternatives)
-               throws ParserException {
-      ParserException exception = null;
-      for (final ParseFunction function : alternatives) {
-         try {
-            return function.parse(text, start, end);
-         }
-         catch (final ParserException e) {
-            exception = e;
-         }
-      }
-      throw exception;
-   }
-
    public static ParseFunction alternative(final ParseFunction... alternatives) {
       return new ParseFunction() {
 
          @Override
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
-            return parseAlternative(text, start, end, alternatives);
+            return ParserUtilsImpl.parseAlternative(text, start, end,
+                  alternatives);
          }
       };
-   }
-
-   public static IASTNode parseSeq(final int type, final String text,
-         final int start, final int end, final ParseFunction... seqs)
-               throws ParserException {
-      final List<IASTNode> nodes = new ArrayList<IASTNode>();
-      int startPosition = start;
-      for (final ParseFunction function : seqs) {
-         final IASTNode node = function.parse(text, startPosition, end);
-         nodes.add(node);
-         startPosition = node.getEndOffset() + 1;
-      }
-      return Nodes.createNode(type, nodes);
    }
 
    public static ParseFunction seq(final int type, final ParseFunction... seqs) {
@@ -198,7 +126,7 @@ public final class ParserUtils {
          @Override
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
-            return parseSeq(type, text, start, end, seqs);
+            return ParserUtilsImpl.parseSeq(type, text, start, end, seqs);
          }
       };
 
@@ -218,9 +146,26 @@ public final class ParserUtils {
                   start, end);
             final int identifierEnd = LexicalHelper.getIdentifier(text,
                   identifierStart, end);
-            return Nodes.createString(identifierStart, identifierEnd - 1,
+            return Nodes.createString(identifierStart, identifierEnd,
                   text.substring(identifierStart, identifierEnd));
          }
+      };
+   }
+
+   public static ParseFunction integerConstant() {
+      return new ParseFunction() {
+
+         @Override
+         public IASTNode parse(final String text, final int start, final int end)
+               throws ParserException {
+            final int identifierStart = LexicalHelper.skipWhiteSpacesOrAt(text,
+                  start, end);
+            final int identifierEnd = LexicalHelper.getIntegerConstant(text,
+                  identifierStart, end);
+            return Nodes.createString(identifierStart, identifierEnd,
+                  text.substring(identifierStart, identifierEnd));
+         }
+
       };
    }
 
@@ -232,7 +177,7 @@ public final class ParserUtils {
                throws ParserException {
             final int constantStart = LexicalHelper.skipWhiteSpacesOrAt(text,
                   start, end);
-            if (constantStart + constant.length() < text.length()) {
+            if (constantStart + constant.length() > end) {
                throw new ParserException("Expected a \"" + constant + "\"",
                      text, constantStart);
             }
@@ -243,7 +188,7 @@ public final class ParserUtils {
                }
             }
             return Nodes.createString(constantStart,
-                  constantStart + constant.length() - 1, constant);
+                  constantStart + constant.length(), constant);
          }
       };
    }
@@ -257,6 +202,41 @@ public final class ParserUtils {
                throws ParserException {
             return Nodes.createNode(type, function.parse(text, start, end));
          }
+      };
+   }
+
+   public static ParseFunction notImplemented() {
+      return new ParseFunction() {
+
+         @Override
+         public IASTNode parse(final String text, final int start, final int end)
+               throws ParserException {
+            throw new ParserException("Not implemented", text, start);
+         }
+      };
+   }
+
+   public static ParseFunction requireComplete(final ParseFunction function) {
+      return new ParseFunction() {
+
+         @Override
+         public IASTNode parse(final String text, final int start, final int end)
+               throws ParserException {
+            final IASTNode node = function.parse(text, start, end);
+            final int nodeEnd = node.getEndOffset();
+            if (nodeEnd == end) {
+               return node;
+            }
+            final int whiteEnd = LexicalHelper.skipWhiteSpaces(text, nodeEnd,
+                  end);
+            if (whiteEnd < end) {
+               throw new ParserException(
+                     "requires to parse complete text but stopped", text,
+                     nodeEnd);
+            }
+            return node;
+         }
+
       };
    }
 

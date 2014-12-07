@@ -5,14 +5,17 @@ import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
 
 public class DefaultGenericSpecificationKeywordParser extends
-      AbstractGenericSpecificationKeywordParser {
+AbstractGenericSpecificationKeywordParser {
 
    @Override
-   protected IASTNode parseToSemicolon(String text, int start, int end) {
-   // Content without semicolon
-      String content = text.substring(start, end);
-      return Nodes.createNode(NodeTypes.NODE, Nodes.createString(start, end, content));
-      
+   protected IASTNode parseToSemicolon(final String text, final int start,
+         final int end) {
+      // Content without semicolon
+      final String content = text.substring(start, end);
+      // Cover the semicolon
+      return Nodes.createNode(NodeTypes.NODE,
+            Nodes.createString(start, end + 1, content));
+
    }
 
 }

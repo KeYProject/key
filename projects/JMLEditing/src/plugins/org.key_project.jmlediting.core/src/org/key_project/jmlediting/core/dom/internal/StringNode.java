@@ -42,4 +42,10 @@ public class StringNode extends PrimitiveNode implements IStringNode {
       return this.string;
    }
 
+   @Override
+   public String toString() {
+      return "String[" + this.getStartOffset() + "-" + this.getEndOffset()
+            + "](" + this.string + ")";
+   }
+
 }

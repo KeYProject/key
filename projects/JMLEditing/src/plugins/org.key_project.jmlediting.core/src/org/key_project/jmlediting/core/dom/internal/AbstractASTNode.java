@@ -20,13 +20,14 @@ public abstract class AbstractASTNode implements IASTNode {
     */
    private final int startOffset;
    /**
-    * The end offset (exclusive) of the node.
+    * The end offset (inclusive) of the node.
     */
    private final int endOffset;
 
    /**
     * Creates a new {@link AbstractASTNode}. StartOffset needs to be less than
-    * or equal endOffset.
+    * or equal endOffset. An equal start and end node means that the node does
+    * not cover anything (e.g. an empty list)
     *
     * @param startOffset
     *           the start offset of the node

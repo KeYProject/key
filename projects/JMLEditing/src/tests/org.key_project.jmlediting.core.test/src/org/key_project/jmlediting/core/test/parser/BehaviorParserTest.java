@@ -13,19 +13,19 @@ public class BehaviorParserTest {
    @Test
    public void testParseBehavior1() throws ParserException {
       final String parseText1 = "behavior ensures x = y;";
-      final IASTNode result1 = buildKeywordSequence(0, 22,
+      final IASTNode result1 = buildKeywordSequence(0, 23,
             buildKeywordSpec("behavior", 0),
-            buildKeywordSpec("ensures", 9, 22, "x = y"));
+            buildKeywordSpec("ensures", 9, 23, "x = y"));
       testParseBehaviorSpecification(parseText1, result1);
    }
 
    @Test
    public void testParseBehavior2() throws ParserException {
       final String parseText2 = "normal_behavior ensures true; requires false;  ";
-      final IASTNode result2 = buildKeywordSequence(0, 44,
+      final IASTNode result2 = buildKeywordSequence(0, 45,
             buildKeywordSpec("normal_behavior", 0),
-            buildKeywordSpec("ensures", 16, 28, "true"),
-            buildKeywordSpec("requires", 30, 44, "false"));
+            buildKeywordSpec("ensures", 16, 29, "true"),
+            buildKeywordSpec("requires", 30, 45, "false"));
       testParseBehaviorSpecification(parseText2, result2);
    }
 

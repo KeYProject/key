@@ -9,21 +9,21 @@ public class MultipleKeywordsTest {
    @Test
    public void parseMultipleKeywordsTest1() throws ParserException {
       final String content = "behavior\n\t @ assignable x;";
-      final IASTNode expectedResult = DomBuildUtils.buildKeywordSequence(0, 25,
+      final IASTNode expectedResult = DomBuildUtils.buildKeywordSequence(0, 26,
             DomBuildUtils.buildKeywordSpec("behavior", 0),
-            DomBuildUtils.buildKeywordSpec("assignable", 13, 25, "x"));
+            DomBuildUtils.buildKeywordSpec("assignable", 13, 26, "x"));
       testParseMultipleKeywords(content, expectedResult);
    }
 
    @Test
    public void parseMultipleKeywordsTest2() throws ParserException {
       final String content = "  normal_behavior \n@\t requires   x == 1; \n@\t assignable y; \n@ exceptional_behavior \n@\tensures false;  ";
-      final IASTNode expectedResult = DomBuildUtils.buildKeywordSequence(2, 99,
-            DomBuildUtils.buildKeywordSpec("normal_behavior", 2),
-            DomBuildUtils.buildKeywordSpec("requires", 22, 39, "  x == 1"),
-            DomBuildUtils.buildKeywordSpec("assignable", 45, 57, "y"),
-            DomBuildUtils.buildKeywordSpec("exceptional_behavior", 62),
-            DomBuildUtils.buildKeywordSpec("ensures", 86, 99, "false"));
+      final IASTNode expectedResult = DomBuildUtils.buildKeywordSequence(2,
+            100, DomBuildUtils.buildKeywordSpec("normal_behavior", 2),
+            DomBuildUtils.buildKeywordSpec("requires", 22, 40, "  x == 1"),
+            DomBuildUtils.buildKeywordSpec("assignable", 45, 58, "y"),
+            DomBuildUtils.buildKeywordSpec("exceptional_behavior", 63),
+            DomBuildUtils.buildKeywordSpec("ensures", 86, 100, "false"));
       testParseMultipleKeywords(content, expectedResult);
    }
 
