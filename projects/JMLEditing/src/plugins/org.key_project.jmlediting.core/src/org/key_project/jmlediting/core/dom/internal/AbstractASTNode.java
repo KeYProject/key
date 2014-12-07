@@ -5,6 +5,7 @@ import java.util.List;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.INodeSearcher;
 import org.key_project.jmlediting.core.dom.INodeTraverser;
+import org.key_project.jmlediting.core.dom.NodeTypes;
 
 /**
  * Abstract implementation of the {@link IASTNode} which implements common
@@ -80,6 +81,17 @@ public abstract class AbstractASTNode implements IASTNode {
    @Override
    public int getEndOffset() {
       return this.endOffset;
+   }
+
+   @Override
+   public String toString() {
+      String str = NodeTypes.getTypeName(this.getType()) + "["
+            + this.getStartOffset() + "-" + this.getEndOffset() + "](";
+      for (final IASTNode node : this.getChildren()) {
+         str += node.toString() + ",";
+      }
+      str += ")";
+      return str;
    }
 
 }

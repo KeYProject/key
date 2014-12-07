@@ -77,15 +77,4 @@ public class ASTNode extends AbstractASTNode {
       }
    }
 
-   @Override
-   public String toString() {
-      String str = NodeTypes.getTypeName(this.getType()) + "["
-            + this.getStartOffset() + "-" + this.getEndOffset() + "](";
-      for (final IASTNode node : this.getChildren()) {
-         str += node.toString() + ",";
-      }
-      str += ")";
-      return str;
-   }
-
 }

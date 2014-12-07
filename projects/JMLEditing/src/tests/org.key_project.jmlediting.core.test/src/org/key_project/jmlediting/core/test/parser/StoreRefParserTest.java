@@ -13,6 +13,11 @@ public class StoreRefParserTest {
    }
 
    @Test
+   public void testEverythingKeyword() throws ParserException {
+      testParse("\t \\everything  ");
+   }
+
+   @Test
    public void testParseSimpleIdentifier() throws ParserException {
       testParse(" state ");
    }
@@ -43,7 +48,8 @@ public class StoreRefParserTest {
    }
 
    private static void testParse(final String text) throws ParserException {
-      final StoreRefParser parser = new StoreRefParser();
+      final StoreRefParser parser = new StoreRefParser(
+            ProfileWrapper.testProfile);
       System.out.println(ParserUtils.requireComplete(parser).parse(text, 0,
             text.length()));
    }

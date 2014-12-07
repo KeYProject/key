@@ -105,6 +105,26 @@ public final class LexicalHelper {
       return position;
    }
 
+   public static int getJMLKeywordIdentifier(final String text,
+         final int start, final int end) throws ParserException {
+      validatePositions(text, start, end);
+      int position = start;
+      if (start == end) {
+         throw new ParserException("Expected an identifier", text, start);
+      }
+      if (!(text.charAt(position) == '\\' || Character
+            .isJavaIdentifierStart(text.charAt(position)))) {
+         throw new ParserException("Not a valid JML keyword identifier", text,
+               position);
+      }
+      position++;
+      while (position < end
+            && Character.isJavaIdentifierPart(text.charAt(position))) {
+         position++;
+      }
+      return position;
+   }
+
    public static int getIntegerConstant(final String text, final int start,
          final int end) throws ParserException {
       validatePositions(text, start, end);

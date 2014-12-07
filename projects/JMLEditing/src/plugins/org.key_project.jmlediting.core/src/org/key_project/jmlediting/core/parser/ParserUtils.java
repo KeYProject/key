@@ -3,6 +3,7 @@ package org.key_project.jmlediting.core.parser;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
+import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 
 /**
  * Provides some utility functions for parsing.
@@ -237,6 +238,18 @@ public final class ParserUtils {
             return node;
          }
 
+      };
+   }
+
+   public static ParseFunction parseKeyword(
+         final Iterable<? extends IKeyword> keywords) {
+      return new ParseFunction() {
+
+         @Override
+         public IASTNode parse(final String text, final int start, final int end)
+               throws ParserException {
+            return ParserUtilsImpl.parseKeyword(text, start, end, keywords);
+         }
       };
    }
 

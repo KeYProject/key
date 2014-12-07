@@ -55,4 +55,10 @@ public class KeywordNode extends PrimitiveNode implements IKeywordNode {
       return this.keyword;
    }
 
+   @Override
+   public String toString() {
+      return "Keyword[" + this.getStartOffset() + "-" + this.getEndOffset()
+            + "](" + this.keywordInstance + ")";
+   }
+
 }

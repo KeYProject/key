@@ -1,8 +1,6 @@
 package org.key_project.jmlediting.core.parser;
 
-import static org.key_project.jmlediting.core.parser.LexicalHelper.getIdentifier;
 import static org.key_project.jmlediting.core.parser.LexicalHelper.skipWhiteSpacesOrAt;
-import static org.key_project.jmlediting.core.parser.ParserUtils.validatePositions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,9 +9,6 @@ import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.core.profile.JMLProfileHelper;
-import org.key_project.jmlediting.core.profile.syntax.IKeyword;
-import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 
 /**
  * The default implementation for an JML Parser with respect to the keywords
@@ -56,7 +51,8 @@ public class DefaultJMLParser implements IJMLParser {
       // Search for keyword as long text is available
       while (position < end) {
          // Parse the keyword
-         final IASTNode keywordNode = this.parseKeyword(text, position, end);
+         final IASTNode keywordNode = ParserUtilsImpl.parseKeyword(text,
+               position, end, this.profile.getSupportedKeywords());
          allKeywords.add(keywordNode);
          // Skip whites
          position = keywordNode.getEndOffset() + 1;
@@ -71,54 +67,6 @@ public class DefaultJMLParser implements IJMLParser {
       }
 
       return Nodes.createNode(NodeTypes.NODE, allKeywords);
-   }
-
-   /**
-    * Parses the a single keyword and the rest specified by the parser of the
-    * keyword.
-    *
-    * @param text
-    *           the text to parse in
-    * @param start
-    *           the start position (the position for the next keywords)
-    * @param end
-    *           the maximum position (exclusive)
-    * @return an IAST node for the keyword
-    * @throws ParserException
-    *            when parsing in not successful
-    */
-   private IASTNode parseKeyword(final String text, final int start,
-         final int end) throws ParserException {
-      validatePositions(text, start, end);
-
-      // Find keyword in text
-      final int keywordStart = skipWhiteSpacesOrAt(text, start, end, false);
-      final int keywordEnd = getIdentifier(text, keywordStart, end);
-      final String keyword = text.substring(keywordStart, keywordEnd);
-
-      // Find the corresponding IKeyword instance from the profile
-      final IKeyword foundKeyword = JMLProfileHelper.findKeyword(this.profile,
-            keyword);
-      if (foundKeyword == null) {
-         throw new ParserException(
-               "Not a supported specification statement keyword: \"" + keyword
-                     + "\"", text, keywordEnd);
-      }
-      final IASTNode keywordNode = Nodes.createKeyword(keywordStart,
-            keywordEnd, foundKeyword, keyword);
-
-      // Now parse according to the keywword
-      final IKeywordParser keywordParser = foundKeyword.createParser();
-      final IASTNode keywordResult = keywordParser.parse(text, keywordEnd, end);
-
-      // Build the result
-      if (keywordResult == null) {
-         return keywordNode;
-      }
-      else {
-         return Nodes.createNode(NodeTypes.KEYWORD_APPL, keywordNode,
-               keywordResult);
-      }
    }
 
 }

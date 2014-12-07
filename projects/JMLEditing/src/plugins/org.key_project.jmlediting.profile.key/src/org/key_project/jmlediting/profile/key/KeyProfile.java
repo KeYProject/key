@@ -8,6 +8,7 @@ import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.profile.jmlref.JMLReferenceProfile;
+import org.key_project.jmlediting.profile.key.other.StrictlyNothingKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyPureKeyword;
 
 public class KeyProfile extends JMLReferenceProfile {
@@ -18,6 +19,7 @@ public class KeyProfile extends JMLReferenceProfile {
       final Set<IKeyword> keywords = new HashSet<IKeyword>(
             super.getSupportedKeywords());
       keywords.add(new StrictlyPureKeyword());
+      keywords.add(new StrictlyNothingKeyword());
       this.SUPPORTED_KEYWORDS = Collections.unmodifiableSet(keywords);
    }
 
