@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.ui.test.highlighting;
+package org.key_project.jmlediting.core.test.utilities;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -7,7 +7,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.eclipse.jface.text.BadLocationException;
 import org.junit.Test;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
@@ -57,7 +56,7 @@ public class JMLLocatorTest {
    }
 
    @Test
-   public void isInJMLTest() throws BadLocationException {
+   public void isInJMLTest() {
       this.locator = new CommentLocator(EDITOR_TEXT);
       assertTrue(this.locator.isInJMLcomment(EDITOR_TEXT.indexOf("/*@") + 3)); // Test
       // whether
@@ -145,7 +144,7 @@ public class JMLLocatorTest {
       assertTrue(EDITOR_TEXT.indexOf("//", 187) == comments.get(2)
             .getBeginOffset()
             && EDITOR_TEXT.indexOf(eol, 188) - 1 == comments.get(2)
-                  .getEndOffset());
+            .getEndOffset());
       assertTrue(EDITOR_TEXT.indexOf("//", 208) == comments.get(3)
             .getBeginOffset()
             && EDITOR_TEXT.length() - 1 == comments.get(3).getEndOffset());
