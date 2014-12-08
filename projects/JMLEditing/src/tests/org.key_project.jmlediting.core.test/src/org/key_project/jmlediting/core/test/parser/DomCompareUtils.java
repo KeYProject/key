@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IKeywordNode;
 import org.key_project.jmlediting.core.dom.IStringNode;
+import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
 
 public class DomCompareUtils {
@@ -17,7 +18,10 @@ public class DomCompareUtils {
          assertEquals("End offset not equals", n1.getEndOffset(),
                n2.getEndOffset());
       }
-      assertEquals("Type not equals", n1.getType(), n2.getType());
+      assertEquals(
+            "Type not equals, got " + NodeTypes.getTypeName(n2.getType())
+                  + " but was " + NodeTypes.getTypeName(n1.getType()),
+            n1.getType(), n2.getType());
       assertEquals("Number of children not equals", n1.getChildren().size(), n2
             .getChildren().size());
 

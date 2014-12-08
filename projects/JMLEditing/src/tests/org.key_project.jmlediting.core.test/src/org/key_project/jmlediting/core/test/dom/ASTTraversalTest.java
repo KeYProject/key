@@ -1,6 +1,13 @@
 package org.key_project.jmlediting.core.test.dom;
 
 import static org.junit.Assert.assertEquals;
+import static org.key_project.jmlediting.core.test.dom.ASTTestUtils.T0;
+import static org.key_project.jmlediting.core.test.dom.ASTTestUtils.T1;
+import static org.key_project.jmlediting.core.test.dom.ASTTestUtils.T2;
+import static org.key_project.jmlediting.core.test.dom.ASTTestUtils.T3;
+import static org.key_project.jmlediting.core.test.dom.ASTTestUtils.T4;
+import static org.key_project.jmlediting.core.test.dom.ASTTestUtils.T5;
+import static org.key_project.jmlediting.core.test.dom.ASTTestUtils.T6;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -28,7 +35,7 @@ public class ASTTraversalTest {
             }, new LinkedList<Integer>());
       assertEquals("Traversal missed a node", 7, traversalResult.size());
       assertEquals("Traversal order not correct",
-            Arrays.asList(3, 5, 4, 1, 6, 2, 0), traversalResult);
+            Arrays.asList(T3, T5, T4, T1, T6, T2, T0), traversalResult);
    }
 
    @Test

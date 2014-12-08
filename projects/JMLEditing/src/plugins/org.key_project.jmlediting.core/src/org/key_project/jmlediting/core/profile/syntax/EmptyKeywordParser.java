@@ -2,6 +2,7 @@ package org.key_project.jmlediting.core.profile.syntax;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.ParserException;
+import org.key_project.jmlediting.core.profile.IJMLProfile;
 
 public final class EmptyKeywordParser implements IKeywordParser {
 
@@ -18,6 +19,10 @@ public final class EmptyKeywordParser implements IKeywordParser {
    public IASTNode parse(final String text, final int start, final int end)
          throws ParserException {
       return null;
+   }
+
+   @Override
+   public void setProfile(final IJMLProfile profile) {
    }
 
 }
