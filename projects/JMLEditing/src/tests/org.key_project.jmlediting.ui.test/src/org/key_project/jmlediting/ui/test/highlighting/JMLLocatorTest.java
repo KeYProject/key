@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.ui.test.extension;
+package org.key_project.jmlediting.ui.test.highlighting;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -9,8 +9,8 @@ import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.junit.Test;
-import org.key_project.jmlediting.ui.extension.CommentRange;
-import org.key_project.jmlediting.ui.extension.CommentLocator;
+import org.key_project.jmlediting.ui.highlighting.CommentLocator;
+import org.key_project.jmlediting.ui.highlighting.CommentRange;
 
 public class JMLLocatorTest {
 

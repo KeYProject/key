@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.ui.extension;
+package org.key_project.jmlediting.ui.highlighting;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
@@ -14,10 +14,13 @@ import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
+import org.key_project.jmlediting.ui.util.JML_UIPreferencesHelper;
+import org.key_project.util.eclipse.WorkbenchUtil;
 
 public class JMLPresentationDamagerRepairer implements IPresentationDamager,
-IPresentationRepairer {
+      IPresentationRepairer {
    private final DefaultDamagerRepairer wrappedInstance;
 
    IDocument doc;
@@ -32,11 +35,22 @@ IPresentationRepairer {
    public void createPresentation(final TextPresentation presentation,
          final ITypedRegion damage) {
       boolean jml = false;
+      final RGB jmlColor = JML_UIPreferencesHelper
+            .getActiveJMLColor(WorkbenchUtil.getCurrentProject());
+      final RGB defaultJMLColor = JML_UIPreferencesHelper.getDefaultJMLColor();
       final CommentLocator locator = new CommentLocator(this.doc.get());
       jml = locator.isInJMLcomment(damage.getOffset());
+      final TextAttribute ta;
       if (jml) {
-         final TextAttribute ta = new TextAttribute(new Color(
-               Display.getDefault(), 255, 0, 0));
+         if (jmlColor != null) {
+            ta = new TextAttribute(new Color(Display.getDefault(),
+                  jmlColor.red, jmlColor.green, jmlColor.blue));
+         }
+         else {
+            ta = new TextAttribute(new Color(Display.getDefault(),
+                  defaultJMLColor.red, defaultJMLColor.green,
+                  defaultJMLColor.blue));
+         }
          this.addRange(presentation, damage.getOffset(), damage.getLength(), ta);
       }
       else {

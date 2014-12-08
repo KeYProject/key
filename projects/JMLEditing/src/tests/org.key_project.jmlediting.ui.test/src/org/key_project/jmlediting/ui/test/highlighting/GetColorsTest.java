@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.ui.test.extension;
+package org.key_project.jmlediting.ui.test.highlighting;
 
 import static org.junit.Assert.assertTrue;
 

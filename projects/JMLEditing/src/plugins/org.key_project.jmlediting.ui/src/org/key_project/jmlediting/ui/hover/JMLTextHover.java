@@ -12,8 +12,13 @@ import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
+<<<<<<< HEAD
+import org.key_project.jmlediting.ui.highlighting.CommentLocator;
+import org.key_project.jmlediting.ui.highlighting.CommentRange;
+=======
 import org.key_project.jmlediting.ui.extension.CommentLocator;
 import org.key_project.jmlediting.ui.extension.CommentRange;
+>>>>>>> 13457dd7b196a162e46383ff846ac40b1d98d37b
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 /**
