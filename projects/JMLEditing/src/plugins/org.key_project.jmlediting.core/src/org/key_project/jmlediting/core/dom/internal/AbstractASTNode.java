@@ -1,5 +1,6 @@
 package org.key_project.jmlediting.core.dom.internal;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
@@ -87,8 +88,13 @@ public abstract class AbstractASTNode implements IASTNode {
    public String toString() {
       String str = NodeTypes.getTypeName(this.getType()) + "["
             + this.getStartOffset() + "-" + this.getEndOffset() + "](";
-      for (final IASTNode node : this.getChildren()) {
-         str += node.toString() + ",";
+      final Iterator<IASTNode> childIterator = this.getChildren().iterator();
+      while (childIterator.hasNext()) {
+         final IASTNode node = childIterator.next();
+         str += node.toString();
+         if (childIterator.hasNext()) {
+            str += ",";
+         }
       }
       str += ")";
       return str;

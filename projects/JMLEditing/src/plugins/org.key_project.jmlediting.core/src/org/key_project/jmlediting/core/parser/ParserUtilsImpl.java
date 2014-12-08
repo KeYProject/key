@@ -37,9 +37,11 @@ public class ParserUtilsImpl {
    static IASTNode parseSeparatedList(final String text, final int start,
          final int end, final char sep, final ParseFunction function) {
       final List<IASTNode> nodes = new ArrayList<IASTNode>();
+      int startPosition = start;
       try {
-         final IASTNode node = function.parse(text, start, end);
+         final IASTNode node = function.parse(text, startPosition, end);
          nodes.add(node);
+         startPosition = node.getEndOffset();
       }
       catch (final ParserException e) {
          return Nodes.createNode(start, start, NodeTypes.LIST);
@@ -47,7 +49,9 @@ public class ParserUtilsImpl {
       final ParseFunction sepFunction = ParserUtils.separateBy(sep, function);
       while (true) {
          try {
-            final IASTNode listNode = sepFunction.parse(text, start, end);
+            final IASTNode listNode = sepFunction.parse(text, startPosition,
+                  end);
+            startPosition = listNode.getEndOffset();
             nodes.add(listNode);
          }
          catch (final ParserException e) {
@@ -62,9 +66,11 @@ public class ParserUtilsImpl {
          final ParseFunction function, final String missingExceptionText)
                throws ParserException {
       final List<IASTNode> nodes = new ArrayList<IASTNode>();
+      int startPosition = start;
       try {
-         final IASTNode node = function.parse(text, start, end);
+         final IASTNode node = function.parse(text, startPosition, end);
          nodes.add(node);
+         startPosition = node.getEndOffset();
       }
       catch (final ParserException e) {
          throw new ParserException(missingExceptionText, text, start, e);
@@ -72,7 +78,9 @@ public class ParserUtilsImpl {
       final ParseFunction sepFunction = ParserUtils.separateBy(sep, function);
       while (true) {
          try {
-            final IASTNode listNode = sepFunction.parse(text, start, end);
+            final IASTNode listNode = sepFunction.parse(text, startPosition,
+                  end);
+            startPosition = listNode.getEndOffset();
             nodes.add(listNode);
          }
          catch (final ParserException e) {
