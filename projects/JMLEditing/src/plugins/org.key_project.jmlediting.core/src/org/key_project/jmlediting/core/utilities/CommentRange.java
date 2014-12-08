@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.ui.highlighting;
+package org.key_project.jmlediting.core.utilities;
 
 public class CommentRange {
 

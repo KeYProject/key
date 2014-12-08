@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Display;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
-import org.key_project.jmlediting.ui.highlighting.CommentLocator;
+import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 /**

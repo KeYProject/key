@@ -9,8 +9,8 @@ import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.junit.Test;
-import org.key_project.jmlediting.ui.highlighting.CommentLocator;
-import org.key_project.jmlediting.ui.highlighting.CommentRange;
+import org.key_project.jmlediting.core.utilities.CommentLocator;
+import org.key_project.jmlediting.core.utilities.CommentRange;
 
 public class JMLLocatorTest {
 
