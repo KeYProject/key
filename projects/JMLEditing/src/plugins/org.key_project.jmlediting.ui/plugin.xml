@@ -4,7 +4,7 @@
    <extension
          point="org.key_project.javaeditor.javaConfigurationExtensions">
       <javaConfigurationExtensions
-            class="org.key_project.jmlediting.ui.extension.JMLSourceViewerConfigurationExtension"
+            class="org.key_project.jmlediting.ui.highlighting.JMLSourceViewerConfigurationExtension"
             id="org.key_project.jmlediting.ui.extension.JMLSourceViewerConfigurationExtension"
             name="JML"
             defaultEnabled="true">

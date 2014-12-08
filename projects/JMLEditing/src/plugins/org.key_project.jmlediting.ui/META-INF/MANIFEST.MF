@@ -18,6 +18,6 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: KeY Project
-Export-Package: org.key_project.jmlediting.ui.extension,
+Export-Package: org.key_project.jmlediting.ui.highlighting,
  org.key_project.jmlediting.ui.preferencepages,
  org.key_project.jmlediting.ui.util
