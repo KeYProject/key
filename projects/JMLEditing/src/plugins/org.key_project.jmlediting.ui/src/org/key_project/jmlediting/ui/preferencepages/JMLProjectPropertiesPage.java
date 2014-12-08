@@ -6,38 +6,45 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 
+/**
+ * This class provides the top level entry for JML preferences in properties or
+ * preference windows. Currently it does not contain anything.
+ *
+ * @author Moritz Lichter
+ *
+ */
+@SuppressWarnings("restriction")
 public class JMLProjectPropertiesPage extends PropertyAndPreferencePage
-      implements IWorkbenchPropertyPage {
+implements IWorkbenchPropertyPage {
 
+   /**
+    * Creates a new instance.
+    */
    public JMLProjectPropertiesPage() {
-      // TODO Auto-generated constructor stub
    }
 
    @Override
-   protected Control createContents(Composite parent) {
+   protected Control createContents(final Composite parent) {
       return null;
    }
 
    @Override
-   protected Control createPreferenceContent(Composite composite) {
-      // TODO Auto-generated method stub
+   protected Control createPreferenceContent(final Composite composite) {
       return null;
    }
 
    @Override
-   protected boolean hasProjectSpecificOptions(IProject project) {
+   protected boolean hasProjectSpecificOptions(final IProject project) {
       return false;
    }
 
    @Override
    protected String getPreferencePageID() {
-      // TODO Auto-generated method stub
       return null;
    }
 
    @Override
    protected String getPropertyPageID() {
-      // TODO Auto-generated method stub
       return null;
    }
 

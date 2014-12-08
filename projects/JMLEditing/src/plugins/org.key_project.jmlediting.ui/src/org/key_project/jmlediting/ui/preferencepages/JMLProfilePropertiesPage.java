@@ -190,12 +190,6 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
     */
    private void setListEnabled(final boolean enabled) {
       this.profilesList.setEnabled(enabled);
-
-      // Please dont ask me why I need this call here
-      // But otherwise (at least on mac os) you can not reenable
-      // the list, and, the list stays disables of setEnabled(false)
-      // before
-      this.profilesList.setEnabled(true);
    }
 
    @Override
