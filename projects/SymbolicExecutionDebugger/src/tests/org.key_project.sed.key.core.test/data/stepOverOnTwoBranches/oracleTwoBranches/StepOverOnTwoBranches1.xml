@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_5a240549-f112-4485-bf95-d9d4b8305b24" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_c6617e5b-f612-4e60-aa22-0e474827dd50" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\SymbolicExecutionDebugger\junit-workspace\SWTBotStepOverTest_testStepOverOnTwoBranches\src\StepOverOnTwoBranches.java">
+   <sedTarget xml:id="_b9f5c057-e891-42ae-b6fe-e30aaeb52e97" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_40855cce-7f7d-463f-965a-53644cd8186a" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotStepOverTest_testStepOverOnTwoBranches\src\StepOverOnTwoBranches.java">
       </sedThread>
    </sedTarget>
 </launch>
