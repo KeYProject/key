@@ -15,6 +15,7 @@ import org.key_project.jmlediting.profile.jmlref.behavior.NormalBehaviorKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.AlsoKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.HelperKeyword;
 import org.key_project.jmlediting.profile.jmlref.other.PureKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.AccessibleKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.EnsuresKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.RequiresKeyword;
@@ -34,8 +35,8 @@ public class JMLReferenceProfile implements IJMLProfile {
    public JMLReferenceProfile() {
       final Set<IKeyword> supportedKeywords = new HashSet<IKeyword>(
             Arrays.asList(new EnsuresKeyword(), new AssignableKeyword(),
-                  new RequiresKeyword(), new BehaviorKeyword(),
-                  new ExceptionalBehaviorKeyword(),
+                  new AccessibleKeyword(), new RequiresKeyword(),
+                  new BehaviorKeyword(), new ExceptionalBehaviorKeyword(),
                   new NormalBehaviorKeyword(), new AlsoKeyword(),
                   new HelperKeyword(), new PureKeyword(), new PrivateKeyword(),
                   new ProtectedKeyword(), new PublicKeyword(),
