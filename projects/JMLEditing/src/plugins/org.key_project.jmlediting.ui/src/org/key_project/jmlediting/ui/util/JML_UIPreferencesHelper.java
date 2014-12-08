@@ -64,16 +64,17 @@ public final class JML_UIPreferencesHelper {
             .getNode(Activator.PLUGIN_ID);
       final String colorString = preferences.get(
             JML_UIPreferencesHelper.COMMENT_COLOR.getLocalName(), null);
-      final RGB color = stringtoRGB(colorString);
-      if (color == null) {
+      if (colorString == null) {
          return getDefaultJMLColor();
       }
+      final RGB color = stringtoRGB(colorString);
+
       return color;
 
    }
 
    public static RGB getDefaultJMLColor() {
-      return new RGB(100, 100, 100);
+      return new RGB(64, 0, 128);
    }
 
    public static RGB getActiveJMLColor(final IProject project) {
