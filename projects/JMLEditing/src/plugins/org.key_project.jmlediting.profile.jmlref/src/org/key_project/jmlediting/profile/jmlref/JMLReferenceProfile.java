@@ -30,7 +30,7 @@ import org.key_project.jmlediting.profile.jmlref.visibility.SpecPublicKeyword;
 
 public class JMLReferenceProfile implements IJMLProfile {
 
-   private final Set<IKeyword> SUPPORTED_KEYWORDS;
+   protected final Set<IKeyword> SUPPORTED_KEYWORDS;
 
    public JMLReferenceProfile() {
       final Set<IKeyword> supportedKeywords = new HashSet<IKeyword>(
@@ -44,7 +44,7 @@ public class JMLReferenceProfile implements IJMLProfile {
                   new EverythingKeyword(), new NothingKeyword(),
                   new NotSpecifiedKeyword()));
 
-      this.SUPPORTED_KEYWORDS = Collections.unmodifiableSet(supportedKeywords);
+      this.SUPPORTED_KEYWORDS = supportedKeywords;
    }
 
    @Override
@@ -59,7 +59,7 @@ public class JMLReferenceProfile implements IJMLProfile {
 
    @Override
    public Set<IKeyword> getSupportedKeywords() {
-      return this.SUPPORTED_KEYWORDS;
+      return Collections.unmodifiableSet(this.SUPPORTED_KEYWORDS);
    }
 
    @Override

@@ -15,6 +15,6 @@ public class AccessibleKeyword extends AbstractGenericSpecificationKeyword {
 
    @Override
    public IKeywordParser createParser() {
-      return new StoreRefKeywordContentParser();
+      return new StoreRefKeywordContentParser(true);
    }
 }

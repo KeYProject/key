@@ -1,26 +1,43 @@
 package org.key_project.jmlediting.profile.key;
 
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.profile.jmlref.JMLReferenceProfile;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.AccessibleKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
+import org.key_project.jmlediting.profile.key.other.KeyAccessibleKeyword;
+import org.key_project.jmlediting.profile.key.other.KeyAssignableKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyNothingKeyword;
 import org.key_project.jmlediting.profile.key.other.StrictlyPureKeyword;
 
 public class KeyProfile extends JMLReferenceProfile {
 
-   private final Set<IKeyword> SUPPORTED_KEYWORDS;
-
    public KeyProfile() {
-      final Set<IKeyword> keywords = new HashSet<IKeyword>(
-            super.getSupportedKeywords());
-      keywords.add(new StrictlyPureKeyword());
-      keywords.add(new StrictlyNothingKeyword());
-      this.SUPPORTED_KEYWORDS = Collections.unmodifiableSet(keywords);
+      // Add strictly keywords
+      this.SUPPORTED_KEYWORDS.add(new StrictlyPureKeyword());
+      this.SUPPORTED_KEYWORDS.add(new StrictlyNothingKeyword());
+      // Disable informal descriptions in Assignable/Accessible keywords
+      replace(this.SUPPORTED_KEYWORDS, AssignableKeyword.class,
+            new KeyAssignableKeyword());
+      replace(this.SUPPORTED_KEYWORDS, AccessibleKeyword.class,
+            new KeyAccessibleKeyword());
+   }
+
+   private static void replace(final Set<IKeyword> keywords,
+         final Class<? extends IKeyword> toReplace, final IKeyword keyword) {
+      final Iterator<IKeyword> iter = keywords.iterator();
+      while (iter.hasNext()) {
+         final IKeyword k = iter.next();
+         if (k.getClass().equals(toReplace)) {
+            iter.remove();
+            break;
+         }
+      }
+      keywords.add(keyword);
    }
 
    @Override
@@ -31,11 +48,6 @@ public class KeyProfile extends JMLReferenceProfile {
    @Override
    public String getIdentifier() {
       return "org.key_project.jmlediting.profile.key";
-   }
-
-   @Override
-   public Set<IKeyword> getSupportedKeywords() {
-      return this.SUPPORTED_KEYWORDS;
    }
 
    @Override

@@ -72,6 +72,13 @@ public class StoreRefParserTest {
    }
 
    @Test
+   public void testParseInformalDescription() throws ParserException {
+      testParse(
+            "  (* Mein Name ist Hase *)  ",
+            "StoreRefList[2-26](List[2-26](InformalDescription[2-26](String[4-24]( Mein Name ist Hase ))))");
+   }
+
+   @Test
    public void testParseKeywordAndLocation() {
       testWrongParse("\\nothing, state");
    }
@@ -91,9 +98,19 @@ public class StoreRefParserTest {
       testWrongParse(" this.state. ");
    }
 
+   @Test
+   public void testNoInformalDescription() {
+      testWrongParse(" (* hello *) ", false);
+   }
+
    private static void testWrongParse(final String text) {
+      testWrongParse(text, true);
+   }
+
+   private static void testWrongParse(final String text,
+         final boolean allowInformalDescr) {
       try {
-         testParse(text, "");
+         testParse(text, "", allowInformalDescr);
       }
       catch (final ParserException e) {
          return;
@@ -103,8 +120,13 @@ public class StoreRefParserTest {
 
    private static void testParse(final String text, final String resultTerm)
          throws ParserException {
+      testParse(text, resultTerm, true);
+   }
+
+   private static void testParse(final String text, final String resultTerm,
+         final boolean allowInformalDescr) throws ParserException {
       final StoreRefParser parser = new StoreRefParser(
-            ProfileWrapper.testProfile);
+            ProfileWrapper.testProfile, allowInformalDescr);
       final IASTNode result = ParserUtils.requireComplete(parser).parse(text,
             0, text.length());
       assertEquals(resultTerm, result.toString());

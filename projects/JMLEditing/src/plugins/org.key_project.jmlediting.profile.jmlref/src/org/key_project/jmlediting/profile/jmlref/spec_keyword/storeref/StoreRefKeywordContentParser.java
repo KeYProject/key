@@ -10,10 +10,16 @@ public class StoreRefKeywordContentParser extends
 AbstractGenericSpecificationKeywordParser {
 
    private StoreRefParser parser;
+   private final boolean allowInformalDescription;
+
+   public StoreRefKeywordContentParser(final boolean allowInformalDescription) {
+      super();
+      this.allowInformalDescription = allowInformalDescription;
+   }
 
    @Override
    public void setProfile(final IJMLProfile profile) {
-      this.parser = new StoreRefParser(profile);
+      this.parser = new StoreRefParser(profile, this.allowInformalDescription);
    }
 
    @Override

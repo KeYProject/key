@@ -256,37 +256,16 @@ public final class ParserUtils {
       };
    }
 
-   public static interface Container<T> {
-      T get();
-   }
+   public static ParseFunction allowWhitespace(final ParseFunction function) {
 
-   public static class MutableContainer<T> implements Container {
-      private T t;
-
-      public MutableContainer() {
-
-      }
-
-      public void set(final T t) {
-         this.t = t;
-      }
-
-      @Override
-      public T get() {
-         return this.t;
-      }
-   }
-
-   public static ParseFunction parseKeyword(
-         final Container<Iterable<? extends IKeyword>> keywords,
-         final Container<IJMLProfile> activeProfile) {
       return new ParseFunction() {
 
          @Override
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
-            return ParserUtilsImpl.parseKeyword(text, start, end,
-                  keywords.get(), activeProfile.get());
+            final int startAfterWhitespaces = LexicalHelper
+                  .skipWhiteSpacesOrAt(text, start, end);
+            return function.parse(text, startAfterWhitespaces, end);
          }
       };
    }
