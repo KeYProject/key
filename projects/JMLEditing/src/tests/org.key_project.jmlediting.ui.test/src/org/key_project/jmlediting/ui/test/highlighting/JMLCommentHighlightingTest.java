@@ -100,8 +100,8 @@ public class JMLCommentHighlightingTest {
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID,
             "data/template", testFolder);
       bot.tree().getTreeItem(PROJECT_NAME).select().expand().getNode("src")
-      .select().expand().getNode(PACKAGE_NAME).select().expand()
-      .getNode(CLASS_NAME + ".java").select().doubleClick();
+            .select().expand().getNode(PACKAGE_NAME).select().expand()
+            .getNode(CLASS_NAME + ".java").select().doubleClick();
       JMLPreferencesHelper.setProjectJMLProfile(project.getProject(),
             TestUtils.findReferenceProfile());
    }
@@ -371,6 +371,11 @@ public class JMLCommentHighlightingTest {
       for (final StyleRange r : textColors) {
          assertEquals("Color did not Match JMLCommentColor",
                r.foreground.getRGB(), this.jmlComment);
+      }
+      for (final StyleRange r : textColors) {
+         assertEquals(
+               "Color did not Match color for the \"public\" Java Keyword",
+               r.foreground.getRGB(), this.specialWord);
       }
    }
    // TODO: add Tests after Changes

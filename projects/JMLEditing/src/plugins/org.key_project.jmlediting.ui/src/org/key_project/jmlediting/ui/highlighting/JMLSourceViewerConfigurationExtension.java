@@ -1,29 +1,33 @@
 package org.key_project.jmlediting.ui.highlighting;
 
 import org.eclipse.jdt.ui.text.IJavaPartitions;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.key_project.javaeditor.extension.DefaultJavaSourceViewerConfigurationExtension;
-import org.key_project.javaeditor.extension.IJavaSourceViewerConfigurationExtension;
 
 /**
- * An {@link IJavaSourceViewerConfigurationExtension} to support JML.
+ * An {@link DefaultJavaSourceViewerConfigurationExtension} to support JML.
  *
  * @author Martin Hentschel, David Giessing
  */
 
 public class JMLSourceViewerConfigurationExtension extends
-      DefaultJavaSourceViewerConfigurationExtension {
+DefaultJavaSourceViewerConfigurationExtension {
 
-   IDocument document;
-
-   public JMLSourceViewerConfigurationExtension() {
-
-   }
-
+   /**
+    * Replaces the original PresentationReconcilers Damager and Repairers for
+    * JavaComments so that JML SyntaxColoring is supported.
+    *
+    * @param sourceViewer
+    *           the sourceViewer the PresentationReconciler is used in
+    * @param currentResult
+    *           the original PresentationReconciler
+    * 
+    * @return a JML supporting PresentationReconciler
+    *
+    */
    @Override
    public IPresentationReconciler getPresentationReconciler(
          final ISourceViewer sourceViewer,

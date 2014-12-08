@@ -21,18 +21,47 @@ import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.ui.util.JML_UIPreferencesHelper;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
+/**
+ * A Modified DefaultDamagerRepairer as it is used by the
+ * JavaSourceViewerConiguration. It adapts the results of the original functions
+ * to allow Comment Highlighting for JML
+ *
+ * @author David Giessing
+ */
 public class JMLPresentationDamagerRepairer implements IPresentationDamager,
-      IPresentationRepairer {
+IPresentationRepairer {
+
+   /**
+    * The original instance of DefaultDamagerRepairer currently in use for
+    * JavaComments.
+    */
    private final DefaultDamagerRepairer wrappedInstance;
 
-   IDocument doc;
+   /**
+    * The document that the DamagerRepairer is used on.
+    */
+   private IDocument doc;
 
+   /**
+    * Constructor for JML PresentationDamagerRepairer that stores the
+    * wrappedInstance.
+    *
+    * @param wrappedInstance
+    *           the
+    */
    public JMLPresentationDamagerRepairer(
          final DefaultDamagerRepairer wrappedInstance) {
       super();
       this.wrappedInstance = wrappedInstance;
    }
 
+   /**
+    * {@inheritDoc} Creates the default presentation if the damage is not in a
+    * JML section if the damage is in a JML content Section the Presentation is
+    * displayed in the Global JML Color, which is defined in the Global Property
+    * page. If there are project specific settings, the color in the projects
+    * ColorPage is used.
+    */
    @Override
    public void createPresentation(final TextPresentation presentation,
          final ITypedRegion damage) {
@@ -68,10 +97,12 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
    }
 
    /**
+    * {@inheritDoc}
+    *
     * @return the original DamageRegion when the DamageOffset is not done in the
-    *         First Line of a Comment if the Damage Offset is in the first Line
-    *         of a Comment the whole Comment has to be Redisplayed which results
-    *         in an extension of the Damage Region to the whole Comment
+    *         First Line of a Comment. If the Damage Offset is in the first Line
+    *         of a Comment the whole Comment has to be redisplayed which results
+    *         in an extension of the Damage Region to the whole CommentRange
     */
    @Override
    public IRegion getDamageRegion(final ITypedRegion partition,
@@ -79,24 +110,26 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
       final IRegion damage = this.wrappedInstance.getDamageRegion(partition,
             event, documentPartitioningChanged);
       final CommentLocator locator = new CommentLocator(this.doc.get());
-      final CommentRange surComment = locator.getCommentOfOffset(event
-            .getOffset());
-      if (surComment == null) {
+      final CommentRange surroundingComment = locator.getCommentOfOffset(event
+            .getOffset()); // the Comment surrounding the Offset, null if there
+                           // is no Comment surrounding the offset
+      if (surroundingComment == null) {
          return damage;
       }
-      int eventLine = 0;
-      int commentLine = 0;
+      int eventLine = 0; // Line of the offset from where the Event starts
+      int commentLine = 0; // Line of the offset the surrounding comment starts
       try {
          eventLine = this.doc.getLineOfOffset(event.getOffset());
-         commentLine = this.doc.getLineOfOffset(surComment.getBeginOffset());
+         commentLine = this.doc.getLineOfOffset(surroundingComment
+               .getBeginOffset());
       }
       catch (final BadLocationException e) {
-         // TODO Auto-generated catch block
          e.printStackTrace();
       }
       if (eventLine == commentLine) {
-         return new Region(surComment.getBeginOffset(),
-               surComment.getEndOffset() - surComment.getBeginOffset() + 1);
+         return new Region(surroundingComment.getBeginOffset(),
+               surroundingComment.getEndOffset()
+                     - surroundingComment.getBeginOffset() + 1);
       }
 
       return damage;
@@ -104,7 +137,19 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
 
    /**
     * Copied from {@link DefaultDamagerRepairer}.
+    *
+    * Adds style information to the given text presentation.
+    *
+    * @param presentation
+    *           the text presentation to be extended
+    * @param offset
+    *           the offset of the range to be styled
+    * @param length
+    *           the length of the range to be styled
+    * @param attr
+    *           the attribute describing the style of the range to be styled
     */
+
    protected void addRange(final TextPresentation presentation,
          final int offset, final int length, final TextAttribute attr) {
       if (attr != null) {
