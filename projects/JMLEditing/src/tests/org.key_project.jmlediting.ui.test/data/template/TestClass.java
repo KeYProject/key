@@ -22,6 +22,6 @@ public class TestClass {
       //offset in Method: (23:7)
       
       //@ and a jml comment  (23:29)
-      Char c= 'a';
+      char c= 'a';
    }
 }
