@@ -2,6 +2,12 @@ package org.key_project.jmlediting.core.test.dom;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.key_project.jmlediting.core.test.dom.ASTTestUtils.T0;
+import static org.key_project.jmlediting.core.test.dom.ASTTestUtils.T1;
+import static org.key_project.jmlediting.core.test.dom.ASTTestUtils.T3;
+import static org.key_project.jmlediting.core.test.dom.ASTTestUtils.T4;
+import static org.key_project.jmlediting.core.test.dom.ASTTestUtils.T5;
+import static org.key_project.jmlediting.core.test.dom.ASTTestUtils.T6;
 
 import java.util.List;
 
@@ -19,19 +25,19 @@ public class ASTSearchTest {
             Nodes.getDepthMostNodeWithPosition(-5, mainNode));
       assertNull("Search outside right returns not null",
             Nodes.getDepthMostNodeWithPosition(45, mainNode));
-      assertEquals(0, Nodes.getDepthMostNodeWithPosition(22, mainNode)
+      assertEquals(T0, Nodes.getDepthMostNodeWithPosition(22, mainNode)
             .getType());
-      assertEquals(1, Nodes.getDepthMostNodeWithPosition(20, mainNode)
+      assertEquals(T1, Nodes.getDepthMostNodeWithPosition(20, mainNode)
             .getType());
-      assertEquals(3, Nodes.getDepthMostNodeWithPosition(10, mainNode)
+      assertEquals(T3, Nodes.getDepthMostNodeWithPosition(10, mainNode)
             .getType());
-      assertEquals(3, Nodes.getDepthMostNodeWithPosition(14, mainNode)
+      assertEquals(T3, Nodes.getDepthMostNodeWithPosition(14, mainNode)
             .getType());
-      assertEquals(4, Nodes.getDepthMostNodeWithPosition(17, mainNode)
+      assertEquals(T4, Nodes.getDepthMostNodeWithPosition(17, mainNode)
             .getType());
-      assertEquals(5, Nodes.getDepthMostNodeWithPosition(18, mainNode)
+      assertEquals(T5, Nodes.getDepthMostNodeWithPosition(18, mainNode)
             .getType());
-      assertEquals(6, Nodes.getDepthMostNodeWithPosition(30, mainNode)
+      assertEquals(T6, Nodes.getDepthMostNodeWithPosition(30, mainNode)
             .getType());
    }
 

@@ -12,8 +12,13 @@ import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
+<<<<<<< HEAD
 import org.key_project.jmlediting.ui.highlighting.CommentLocator;
 import org.key_project.jmlediting.ui.highlighting.CommentRange;
+=======
+import org.key_project.jmlediting.ui.extension.CommentLocator;
+import org.key_project.jmlediting.ui.extension.CommentRange;
+>>>>>>> 13457dd7b196a162e46383ff846ac40b1d98d37b
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 /**
@@ -35,7 +40,8 @@ public class JMLTextHover implements IJavaEditorTextHover {
       // Calculate the hover region, we want to use
       final int cursorPosition = hoverRegion.getOffset();
       // That is the complete JML Comment
-      final CommentRange comment = this.getJMLComment(textViewer, cursorPosition);
+      final CommentRange comment = this.getJMLComment(textViewer,
+            cursorPosition);
       if (comment == null) {
          // No JML comment, du not provide a hover
          return null;
@@ -70,7 +76,8 @@ public class JMLTextHover implements IJavaEditorTextHover {
 
    private CommentRange getJMLComment(final ITextViewer textViewer,
          final int offset) {
-      final CommentLocator locator = new CommentLocator(textViewer.getDocument().get());
+      final CommentLocator locator = new CommentLocator(textViewer
+            .getDocument().get());
       final CommentRange jmlComment = locator.getJMLComment(offset);
       return jmlComment;
    }

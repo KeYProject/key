@@ -6,15 +6,23 @@ import org.key_project.jmlediting.core.dom.Nodes;
 
 public class ASTTestUtils {
 
+   public static final int T0 = NodeTypes.getNewType("0");
+   public static final int T1 = NodeTypes.getNewType("1");
+   public static final int T2 = NodeTypes.getNewType("2");
+   public static final int T3 = NodeTypes.getNewType("3");
+   public static final int T4 = NodeTypes.getNewType("4");
+   public static final int T5 = NodeTypes.getNewType("5");
+   public static final int T6 = NodeTypes.getNewType("6");
+
    public static final IASTNode NODE_1 = Nodes.createNode(
          0,
          40,
-         0,
-         Nodes.createNode(10, 20, 1, Nodes.createNode(10, 15, 3),
-               Nodes.createNode(15, 19, 4, Nodes.createNode(18, 18, 5))),
-         Nodes.createNode(25, 40, 2, Nodes.createNode(25, 40, 6)));
+         T0,
+         Nodes.createNode(10, 20, T1, Nodes.createNode(10, 15, T3),
+               Nodes.createNode(15, 19, T4, Nodes.createNode(18, 18, T5))),
+               Nodes.createNode(25, 40, T2, Nodes.createNode(25, 40, T6)));
 
-   public static final IASTNode NODE_2 = Nodes.createNode(0, 0, 10);
+   public static final IASTNode NODE_2 = Nodes.createNode(0, 0, T0);
 
    public static final IASTNode NODE_3 = Nodes
          .createNode(

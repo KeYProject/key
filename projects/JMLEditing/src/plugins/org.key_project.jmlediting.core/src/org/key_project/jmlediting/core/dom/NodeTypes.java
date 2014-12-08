@@ -11,6 +11,7 @@ public final class NodeTypes {
    public static final int STRING = getNewType("String");
    public static final int KEYWORD = getNewType("Keyword");
    public static final int KEYWORD_APPL = getNewType("KeywordAppl");
+   public static final int KEYWORD_CONTENT = getNewType("KeywordContent");
    public static final int NODE = getNewType("Node");
    public static final int LIST = getNewType("List");
    public static final int SEQ = getNewType("Seq");

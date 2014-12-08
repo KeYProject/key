@@ -51,11 +51,12 @@ public class DefaultJMLParser implements IJMLParser {
       // Search for keyword as long text is available
       while (position < end) {
          // Parse the keyword
-         final IASTNode keywordNode = ParserUtilsImpl.parseKeyword(text,
-               position, end, this.profile.getSupportedKeywords());
+         final IASTNode keywordNode = ParserUtilsImpl
+               .parseKeyword(text, position, end,
+                     this.profile.getSupportedKeywords(), this.profile);
          allKeywords.add(keywordNode);
          // Skip whites
-         position = keywordNode.getEndOffset() + 1;
+         position = keywordNode.getEndOffset();
          if (position < end) {
             position = skipWhiteSpacesOrAt(text, position, end, false);
          }

@@ -9,12 +9,21 @@ import java.util.List;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.ParseFunction;
 import org.key_project.jmlediting.core.parser.ParserException;
+import org.key_project.jmlediting.core.parser.ParserUtils.MutableContainer;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 
 public class StoreRefParser implements ParseFunction {
 
-   private final List<IStoreRefKeyword> keywords = new ArrayList<IStoreRefKeyword>();
+   // These two containers are used to bring state into the store ref parser:
+   // the knowledge about the profile and the enabled
+   // StoreRefKeywords in it
+   // Using these containers allows to initialize the parse function inline and
+   // not in the constructor which makes the parser much more
+   // readable
+
+   private final MutableContainer<List<IStoreRefKeyword>> storeRefKeywords = new MutableContainer<List<IStoreRefKeyword>>();
+   private final MutableContainer<IJMLProfile> profile = new MutableContainer<IJMLProfile>();
 
    @Override
    public IASTNode parse(final String text, final int start, final int end)
@@ -23,11 +32,14 @@ public class StoreRefParser implements ParseFunction {
    }
 
    public StoreRefParser(final IJMLProfile profile) {
+      this.profile.set(profile);
+      final List<IStoreRefKeyword> storeRefKeywordsList = new ArrayList<IStoreRefKeyword>();
       for (final IKeyword k : profile.getSupportedKeywords()) {
          if (k instanceof IStoreRefKeyword) {
-            this.keywords.add((IStoreRefKeyword) k);
+            storeRefKeywordsList.add((IStoreRefKeyword) k);
          }
       }
+      this.storeRefKeywords.set(storeRefKeywordsList);
 
    }
 
@@ -37,7 +49,9 @@ public class StoreRefParser implements ParseFunction {
     * store-ref-keyword ::= \nothing | \everything | \not_specified
     *
     */
-   private final ParseFunction storeRefKeyword = parseKeyword(this.keywords);
+   @SuppressWarnings("unchecked")
+   private final ParseFunction storeRefKeyword = parseKeyword(
+         this.storeRefKeywords, this.profile);
 
    private final ParseFunction specExpression = integerConstant();
 

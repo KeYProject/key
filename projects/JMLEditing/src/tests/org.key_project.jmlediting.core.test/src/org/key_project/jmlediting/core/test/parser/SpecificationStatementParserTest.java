@@ -20,8 +20,11 @@ public class SpecificationStatementParserTest {
 
    @Test
    public void testParseSpecificationKeyword2() throws ParserException {
-      testParseSpecification("       assignable   hello ; ", "assignable",
-            "  hello ", 7, 27);
+      testParseSpecification(
+            "       assignable   hello ; ",
+            "assignable",
+            "StoreRefList[20-25](List[20-25](StoreRefExpr[20-25](String[20-25](hello),List[25-25]())))",
+            7, 27);
    }
 
    @Test
@@ -102,15 +105,21 @@ public class SpecificationStatementParserTest {
             .get(0);
       final IASTNode keywordContentNode = statement.getChildren().get(0)
             .getChildren().get(1);
-      final IASTNode stringNode = keywordContentNode.getChildren().get(0);
+      final IASTNode contentNode = keywordContentNode.getChildren().get(0);
 
       assertTrue("Keyword node is not keyword", Nodes.isKeyword(keywordNode));
-      assertTrue("Content is not string", Nodes.isString(stringNode));
+
+      String result;
+      if (Nodes.isString(contentNode)) {
+         result = ((IStringNode) contentNode).getString();
+      }
+      else {
+         result = contentNode.toString();
+      }
 
       assertEquals("Wrong specification keyword parsed", expectedKeyword,
             ((IKeywordNode) keywordNode).getKeywordInstance());
-      assertEquals("Wrong content", expectedContent,
-            ((IStringNode) stringNode).getString());
+      assertEquals("Wrong content", expectedContent, result);
       assertEquals("Wrong start offset", expctedStartOffset,
             statement.getStartOffset());
       assertEquals("Wrong end offset", expectedEndOffset,

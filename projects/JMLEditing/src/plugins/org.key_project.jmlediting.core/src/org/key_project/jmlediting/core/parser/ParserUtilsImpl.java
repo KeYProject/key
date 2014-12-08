@@ -10,6 +10,7 @@ import java.util.List;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
+import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
@@ -64,7 +65,7 @@ public class ParserUtilsImpl {
    static IASTNode parseSeparatedNonEmptyList(final String text,
          final int start, final int end, final char sep,
          final ParseFunction function, final String missingExceptionText)
-               throws ParserException {
+         throws ParserException {
       final List<IASTNode> nodes = new ArrayList<IASTNode>();
       int startPosition = start;
       try {
@@ -113,7 +114,7 @@ public class ParserUtilsImpl {
 
    public static IASTNode parseSeq(final int type, final String text,
          final int start, final int end, final ParseFunction... seqs)
-               throws ParserException {
+         throws ParserException {
       final List<IASTNode> nodes = new ArrayList<IASTNode>();
       int startPosition = start;
       for (final ParseFunction function : seqs) {
@@ -127,7 +128,7 @@ public class ParserUtilsImpl {
 
    public static IASTNode parseAlternative(final String text, final int start,
          final int end, final ParseFunction... alternatives)
-               throws ParserException {
+         throws ParserException {
       ParserException exception = null;
       for (final ParseFunction function : alternatives) {
          try {
@@ -150,15 +151,17 @@ public class ParserUtilsImpl {
     *           the start position (the position for the next keywords)
     * @param end
     *           the maximum position (exclusive)
-    * @param availableKeywords
+    * @param enabledKeywords
     *           all keywords which are available
+    * @param profile
+    *           the current profile we are parsing according to
     * @return an IAST node for the keyword
     * @throws ParserException
     *            when parsing in not successful
     */
    public static IASTNode parseKeyword(final String text, final int start,
-         final int end, final Iterable<? extends IKeyword> availableKeywords)
-               throws ParserException {
+         final int end, final Iterable<? extends IKeyword> enabledKeywords,
+         final IJMLProfile profile) throws ParserException {
       validatePositions(text, start, end);
 
       // Find keyword in text
@@ -168,17 +171,18 @@ public class ParserUtilsImpl {
 
       // Find the corresponding IKeyword instance from the profile
       final IKeyword foundKeyword = JMLProfileHelper.findKeyword(
-            availableKeywords, keyword);
+            enabledKeywords, keyword);
       if (foundKeyword == null) {
          throw new ParserException(
                "Not a supported specification statement keyword: \"" + keyword
-               + "\"", text, keywordEnd);
+                     + "\"", text, keywordEnd);
       }
       final IASTNode keywordNode = Nodes.createKeyword(keywordStart,
             keywordEnd, foundKeyword, keyword);
 
       // Now parse according to the keywword
       final IKeywordParser keywordParser = foundKeyword.createParser();
+      keywordParser.setProfile(profile);
       final IASTNode keywordResult = keywordParser.parse(text, keywordEnd, end);
 
       // Build the result
