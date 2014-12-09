@@ -3,8 +3,6 @@ package org.key_project.jmlediting.core.utilities;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jface.text.BadLocationException;
-
 /**
  * Class for finding JML Comments in a given String. This class does not take
  * care of changes to the String! If the String changes a new Instance of the
@@ -13,15 +11,23 @@ import org.eclipse.jface.text.BadLocationException;
  * @author David Giessing
  */
 public class CommentLocator {
-
+   /**
+    * The text the Locator operates on.
+    */
    private final String text;
 
+   /**
+    * Constructs a CommentLocator that operates on the given String.
+    *
+    * @param text
+    *           the String to operate on
+    */
    public CommentLocator(final String text) {
       this.text = text;
    }
 
    /**
-    * isInJMLcomment checks whether an offset position is inside a JMLComment
+    * isInJMLcomment checks whether an offset position is inside a JMLComment.
     *
     * @param offset
     *           The offset to check whether it is in a JML Comment
@@ -32,6 +38,14 @@ public class CommentLocator {
       return this.getJMLComment(offset) != null;
    }
 
+   /**
+    * Finds a JMLComment containing the given offset.
+    *
+    * @param offset
+    *           the Offset of the offset to search around
+    * @return the CommentRange that contains the given offset or null if no JML
+    *         comment surrounds the given offset
+    */
    public CommentRange getJMLComment(final int offset) {
       final List<CommentRange> jmlcomments = this.findJMLCommentRanges();
       for (final CommentRange c : jmlcomments) {
@@ -43,7 +57,7 @@ public class CommentLocator {
    }
 
    /**
-    * Uses an Automata to search All Kind of Valid Comments in the given String
+    * Uses an Automata to search All Kind of Valid Comments in the given String.
     *
     * @return An ArrayList with Type Comment that consists of all valid Comments
     *         in the Document
@@ -171,12 +185,15 @@ public class CommentLocator {
       return comments;
    }
 
+   /**
+    * The automatas states.
+    */
    private static enum ScannerState {
       IN_STRING, IN_COMMENT, IN_CHAR, DEFAULT
    }
 
    /**
-    * Filters a List of Comments for JMLComments
+    * Filters a List of Comments for JMLComments.
     *
     * @return An ArrayList with Type Comment that consists of all valid
     *         JMLComments in the Document
@@ -198,7 +215,7 @@ public class CommentLocator {
    }
 
    /**
-    * Seeks for a valid Comment that surrounds the given Offset and returns it
+    * Seeks for a valid Comment that surrounds the given Offset and returns it.
     *
     * @param offset
     *           The Offset to be inside the returned Comment
