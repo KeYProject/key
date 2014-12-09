@@ -29,7 +29,7 @@ import org.key_project.util.eclipse.WorkbenchUtil;
  * @author David Giessing
  */
 public class JMLPresentationDamagerRepairer implements IPresentationDamager,
-IPresentationRepairer {
+      IPresentationRepairer {
 
    /**
     * The original instance of DefaultDamagerRepairer currently in use for
@@ -68,20 +68,12 @@ IPresentationRepairer {
       boolean jml = false;
       final RGB jmlColor = JML_UIPreferencesHelper
             .getActiveJMLColor(WorkbenchUtil.getCurrentProject());
-      final RGB defaultJMLColor = JML_UIPreferencesHelper.getDefaultJMLColor();
       final CommentLocator locator = new CommentLocator(this.doc.get());
       jml = locator.isInJMLcomment(damage.getOffset());
       final TextAttribute ta;
       if (jml) {
-         if (jmlColor != null) {
-            ta = new TextAttribute(new Color(Display.getDefault(),
-                  jmlColor.red, jmlColor.green, jmlColor.blue));
-         }
-         else {
-            ta = new TextAttribute(new Color(Display.getDefault(),
-                  defaultJMLColor.red, defaultJMLColor.green,
-                  defaultJMLColor.blue));
-         }
+         ta = new TextAttribute(new Color(Display.getDefault(), jmlColor.red,
+               jmlColor.green, jmlColor.blue));
          this.addRange(presentation, damage.getOffset(), damage.getLength(), ta);
       }
       else {
@@ -112,7 +104,7 @@ IPresentationRepairer {
       final CommentLocator locator = new CommentLocator(this.doc.get());
       final CommentRange surroundingComment = locator.getCommentOfOffset(event
             .getOffset()); // the Comment surrounding the Offset, null if there
-                           // is no Comment surrounding the offset
+      // is no Comment surrounding the offset
       if (surroundingComment == null) {
          return damage;
       }
@@ -129,7 +121,7 @@ IPresentationRepairer {
       if (eventLine == commentLine) {
          return new Region(surroundingComment.getBeginOffset(),
                surroundingComment.getEndOffset()
-                     - surroundingComment.getBeginOffset() + 1);
+               - surroundingComment.getBeginOffset() + 1);
       }
 
       return damage;
