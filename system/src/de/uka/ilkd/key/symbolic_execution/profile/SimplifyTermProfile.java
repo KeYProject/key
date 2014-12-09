@@ -18,11 +18,11 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -79,14 +79,14 @@ public class SimplifyTermProfile extends JavaProfile {
       ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
       ImmutableList<TermLabelPolicy> symExcPolicies = ImmutableSLList.<TermLabelPolicy>nil().prepend(new TermLabelPolicy() {
          @Override
-         public boolean keepLabel(TermServices services,
+         public TermLabel keepLabel(Services services,
                PosInOccurrence applicationPosInOccurrence,
                Term applicationTerm, Rule rule, Goal goal, Object hint,
                Term tacletTerm, Operator newTermOp,
                ImmutableArray<Term> newTermSubs,
                ImmutableArray<QuantifiableVariable> newTermBoundVars,
-               JavaBlock newTermJavaBlock, TermLabel label) {
-            return true;
+               JavaBlock newTermJavaBlock, ImmutableArray<TermLabel> newTermOriginalLabels, TermLabel label) {
+            return label;
          }
        });
        result = result.prepend(new TermLabelConfiguration(ParameterlessTermLabel.RESULT_LABEL_NAME,

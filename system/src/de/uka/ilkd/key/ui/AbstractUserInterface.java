@@ -75,7 +75,7 @@ public abstract class AbstractUserInterface implements UserInterface {
                                              File bootClassPath, KeYMediator mediator) {
         final ProblemLoader pl =
                 new ProblemLoader(file, classPath, bootClassPath,
-                                  AbstractProfile.getDefaultProfile(), mediator, true, null, this);
+                                  AbstractProfile.getDefaultProfile(), false, mediator, true, null, this);
         return pl;
     }
 
@@ -278,11 +278,12 @@ public abstract class AbstractUserInterface implements UserInterface {
                                      File file,
                                      List<File> classPath,
                                      File bootClassPath,
-                                     Properties poPropertiesToForce) throws ProblemLoaderException {
+                                     Properties poPropertiesToForce,
+                                     boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
        AbstractProblemLoader loader = null;
        try {
           getMediator().stopInterface(true);
-          loader = new SingleThreadProblemLoader(file, classPath, bootClassPath, profile,
+          loader = new SingleThreadProblemLoader(file, classPath, bootClassPath, profile, forceNewProfileOfNewProofs,
                                                  getMediator(), false, poPropertiesToForce);
           loader.load();
           return loader;

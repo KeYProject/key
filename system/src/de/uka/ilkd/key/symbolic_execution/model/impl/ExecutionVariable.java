@@ -25,16 +25,14 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
@@ -154,17 +152,21 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     */
    protected ExecutionValue[] lazyComputeValues() throws ProofInputException {
       if (!isDisposed()) {
-         final Services services = getServices();
+         final ProofEnvironment sideProofEnv = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
+         final Services services = sideProofEnv.getServicesForEnvironment();
          final TermBuilder tb = services.getTermBuilder();
          // Start site proof to extract the value of the result variable.
          SiteProofVariableValueInput sequentToProve;
          Term siteProofSelectTerm = null;
-         Term siteProofCondition = parentNode.getPathCondition();
+         Term siteProofCondition;
          if (getAdditionalCondition() != null) {
-            siteProofCondition = tb.and(siteProofCondition, getAdditionalCondition());
+            siteProofCondition = getAdditionalCondition();
+         }
+         else {
+            siteProofCondition = tb.tt();
          }
          if (getParentValue() != null || SymbolicExecutionUtil.isStaticVariable(getProgramVariable())) {
-            siteProofSelectTerm = createSelectTerm(services);
+            siteProofSelectTerm = createSelectTerm();
             if (getParentValue() != null) { // Is null at static variables
                siteProofCondition = tb.and(siteProofCondition, getParentValue().getCondition());
             }
@@ -177,12 +179,12 @@ public class ExecutionVariable extends AbstractExecutionVariable {
             sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(services, getProofNode(), getModalityPIO(), siteProofCondition, getProgramVariable());
          }
          ApplyStrategy.ApplyStrategyInfo info = SideProofUtil.startSideProof(getProof(), 
+                                                                             sideProofEnv,
                                                                              sequentToProve.getSequentToProve(), 
                                                                              StrategyProperties.METHOD_NONE,
                                                                              StrategyProperties.LOOP_NONE,
                                                                              StrategyProperties.QUERY_OFF,
-                                                                             StrategyProperties.SPLITTING_DELAYED,
-                                                                             true);
+                                                                             StrategyProperties.SPLITTING_DELAYED);
          try {
             List<ExecutionValue> result = new ArrayList<ExecutionValue>(info.getProof().openGoals().size());
             // Group values of the branches
@@ -266,10 +268,10 @@ public class ExecutionVariable extends AbstractExecutionVariable {
          boolean unknownValue = false;
          if (siteProofSelectTerm != null) {
             if (SymbolicExecutionUtil.isNullSort(value.sort(), services)) { 
-               unknownValue = SymbolicExecutionUtil.isNull(services, getProofNode(), siteProofCondition, siteProofSelectTerm); // Check if the symbolic value is not null, if it fails the value is treated as unknown
+               unknownValue = SymbolicExecutionUtil.isNull(getProofNode(), siteProofCondition, siteProofSelectTerm); // Check if the symbolic value is not null, if it fails the value is treated as unknown
             }
             else {
-               unknownValue = SymbolicExecutionUtil.isNotNull(services, getProofNode(), siteProofCondition, siteProofSelectTerm); // Check if the symbolic value is not null, if it fails the value is treated as unknown
+               unknownValue = SymbolicExecutionUtil.isNotNull(getProofNode(), siteProofCondition, siteProofSelectTerm); // Check if the symbolic value is not null, if it fails the value is treated as unknown
             }
          }
          // Add to result list
@@ -315,42 +317,11 @@ public class ExecutionVariable extends AbstractExecutionVariable {
    }
    
    /**
-    * Creates recursive a term which can be used to determine the value
-    * of {@link #getProgramVariable()}.
-    * @param services The {@link Services} to use.
-    * @return The created term.
+    * {@inheritDoc}
     */
-   protected Term createSelectTerm(Services services) {
-      if (SymbolicExecutionUtil.isStaticVariable(getProgramVariable())) {
-         // Static field access
-         Function function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)getProgramVariable(), services);
-         return services.getTermBuilder().staticDot(getProgramVariable().sort(), function);
-      }
-      else {
-         if (getParentValue() == null) {
-            // Direct access to a variable, so return it as term
-            return services.getTermBuilder().var((ProgramVariable)getProgramVariable());
-         }
-         else {
-            Term parentTerm = getParentValue().getVariable().createSelectTerm(services);
-            if (getProgramVariable() != null) {
-               if (services.getJavaInfo().getArrayLength() == getProgramVariable()) {
-                  // Special handling for length attribute of arrays
-                  Function function = services.getTypeConverter().getHeapLDT().getLength();
-                  return services.getTermBuilder().func(function, parentTerm);
-               }
-               else {
-                  // Field access on the parent variable
-                  Function function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)getProgramVariable(), services);
-                  return services.getTermBuilder().dot(getProgramVariable().sort(), parentTerm, function);
-               }
-            }
-            else {
-               // Special handling for array indices.
-               return services.getTermBuilder().dotArr(parentTerm, getArrayIndex());
-            }
-         }
-      }
+   @Override
+   public Term createSelectTerm() {
+      return SymbolicExecutionUtil.createSelectTerm(this);
    }
 
    /**

@@ -9,7 +9,7 @@ class B {
 
 	/*@ maintaining 0 <= row && row <= array.length && 0 <= col && col <= array[row].length;
 	  @ decreases \dl_pair(array.length - row, array[row].length - col);
-	  @ assignable \less_than_nothing;
+	  @ assignable \strictly_nothing;
 	  @*/
 	while(row < array.length) {
 	    if(col < array[row].length) {

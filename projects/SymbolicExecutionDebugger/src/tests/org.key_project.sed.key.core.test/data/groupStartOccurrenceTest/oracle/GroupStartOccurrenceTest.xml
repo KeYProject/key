@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_b737fca4-71de-401a-8221-91e5af2f45b6" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_1c9a9725-ad28-4820-8a75-b3a8c55b68e2" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testGroupStartOccurrenceTest\src\GroupStartOccurrenceTest.java">
+         <sedMethodCall xml:id="_3c1c8bcb-5cbf-44b5-a424-27874351f9f8" name="&lt;call GroupStartOccurrenceTest.main(x)&gt;" pathCondition="true" lineNumber="-1" charStart="60" charEnd="64" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testGroupStartOccurrenceTest\src\GroupStartOccurrenceTest.java" groupable="true">
+            <sedBranchStatement xml:id="_bc165671-f198-40de-b4a0-9f61c4d5c760" name="if (isMagic(x))" pathCondition="true" lineNumber="-1" charStart="77" charEnd="93" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testGroupStartOccurrenceTest\src\GroupStartOccurrenceTest.java" groupable="true">
+               <sedMethodCall xml:id="_8dfc3e11-1445-4c7a-a1c9-3a488d275c4d" name="&lt;call GroupStartOccurrenceTest.isMagic(x_3)&gt;" pathCondition="true" lineNumber="-1" charStart="145" charEnd="152" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testGroupStartOccurrenceTest\src\GroupStartOccurrenceTest.java" groupable="true">
+                  <sedStatement xml:id="_aa3dd04c-d2f0-4ac3-a3ce-3bf3c5719650" name="return true;" pathCondition="true" lineNumber="-1" charStart="165" charEnd="177" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testGroupStartOccurrenceTest\src\GroupStartOccurrenceTest.java">
+                     <sedMethodReturn xml:id="_0f491a58-3bca-4dea-b6e3-a9f9bc720f69" name="&lt;return of GroupStartOccurrenceTest.isMagic(x_3)&gt;" pathCondition="true" lineNumber="-1" charStart="145" charEnd="152" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testGroupStartOccurrenceTest\src\GroupStartOccurrenceTest.java" methodReturnConditionRef="_fc414467-5780-4b12-b390-bd264bcf54fa">
+                        <sedStatement xml:id="_4f58256b-b009-418b-930b-29b6dd0477e8" name="return -1;" pathCondition="true" lineNumber="-1" charStart="103" charEnd="113" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testGroupStartOccurrenceTest\src\GroupStartOccurrenceTest.java">
+                           <sedMethodReturn xml:id="_c2981fd3-d420-4222-9e2e-7b5ced56c953" name="&lt;return of GroupStartOccurrenceTest.main(x)&gt;" pathCondition="true" lineNumber="-1" charStart="60" charEnd="64" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testGroupStartOccurrenceTest\src\GroupStartOccurrenceTest.java" methodReturnConditionRef="_19d654ce-d234-49a3-9826-e66345e7a761">
+                              <sedTermination xml:id="_da1dfe6b-4b4d-4efa-a3d9-ec4bdc14a57f" name="&lt;end&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotKeYDebugTargetSuspendResumeTest_testGroupStartOccurrenceTest\src\GroupStartOccurrenceTest.java" verified="true">
+                              </sedTermination>
+                              <sedGroupStartCondition xml:id="_19d654ce-d234-49a3-9826-e66345e7a761" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                                 <sedChildReference nodeIdRef="_c2981fd3-d420-4222-9e2e-7b5ced56c953"/>
+                              </sedGroupStartCondition>
+                           </sedMethodReturn>
+                        </sedStatement>
+                        <sedGroupStartCondition xml:id="_b7dd390d-7527-4a04-a12c-a3244be5200c" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                           <sedChildReference nodeIdRef="_0f491a58-3bca-4dea-b6e3-a9f9bc720f69"/>
+                        </sedGroupStartCondition>
+                        <sedGroupStartCondition xml:id="_fc414467-5780-4b12-b390-bd264bcf54fa" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                           <sedChildReference nodeIdRef="_0f491a58-3bca-4dea-b6e3-a9f9bc720f69"/>
+                        </sedGroupStartCondition>
+                     </sedMethodReturn>
+                  </sedStatement>
+                  <sedMethodCallMethodReturnCondition xml:id="_fc414467-5780-4b12-b390-bd264bcf54fa" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                     <sedChildReference nodeIdRef="_0f491a58-3bca-4dea-b6e3-a9f9bc720f69"/>
+                  </sedMethodCallMethodReturnCondition>
+                  <sedGroupEndReference nodeIdRef="_fc414467-5780-4b12-b390-bd264bcf54fa"/>
+               </sedMethodCall>
+               <sedGroupEndReference nodeIdRef="_b7dd390d-7527-4a04-a12c-a3244be5200c"/>
+            </sedBranchStatement>
+            <sedMethodCallMethodReturnCondition xml:id="_19d654ce-d234-49a3-9826-e66345e7a761" name="true" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+               <sedChildReference nodeIdRef="_c2981fd3-d420-4222-9e2e-7b5ced56c953"/>
+            </sedMethodCallMethodReturnCondition>
+            <sedGroupEndReference nodeIdRef="_19d654ce-d234-49a3-9826-e66345e7a761"/>
+         </sedMethodCall>
+         <sedTerminationEntry nodeIdRef="_da1dfe6b-4b4d-4efa-a3d9-ec4bdc14a57f"/>
+      </sedThread>
+   </sedTarget>
+</launch>

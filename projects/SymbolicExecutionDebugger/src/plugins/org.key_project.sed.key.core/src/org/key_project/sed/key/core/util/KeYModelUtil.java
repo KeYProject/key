@@ -13,6 +13,11 @@
 
 package org.key_project.sed.key.core.util;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
@@ -583,6 +588,41 @@ public final class KeYModelUtil {
          IKeYSEDDebugNode<?> keyCompletion = KeYModelUtil.createNode(node.getDebugTarget(), node.getThread(), null, completion);
          result[i] = keyCompletion.getGroupStartCondition(node);
          i++;
+      }
+      return result;
+   }
+
+   public static void sortyByOccurrence(ISEDDebugNode current, SEDMemoryBranchCondition[] conditions) throws DebugException {
+      final Map<SEDMemoryBranchCondition, Integer> occurrenceOrder = computeOccurrenceOrder(current, conditions);
+      Arrays.sort(conditions, new Comparator<SEDMemoryBranchCondition>() {
+         @Override
+         public int compare(SEDMemoryBranchCondition first, SEDMemoryBranchCondition second) {
+            Integer firstValue = occurrenceOrder.get(first);
+            Integer secondValue = occurrenceOrder.get(second);
+            if (firstValue != null && secondValue != null) {
+               return firstValue - secondValue;
+            }
+            else {
+               return 0; // Something went wrong, can't compare
+            }
+         }
+      });
+   }
+
+   protected static Map<SEDMemoryBranchCondition, Integer> computeOccurrenceOrder(ISEDDebugNode current, SEDMemoryBranchCondition[] conditions) throws DebugException {
+      Map<ISEDDebugNode, SEDMemoryBranchCondition> starts = new HashMap<ISEDDebugNode, SEDMemoryBranchCondition>();
+      for (SEDMemoryBranchCondition condition : conditions) {
+         starts.put(condition.getParent(), condition);
+      }
+      Map<SEDMemoryBranchCondition, Integer> result = new HashMap<SEDMemoryBranchCondition, Integer>();
+      int removedCount = 0;
+      while (current != null && !starts.isEmpty()) {
+         SEDMemoryBranchCondition condition = starts.remove(current);
+         if (condition != null) {
+            result.put(condition, conditions.length - removedCount);
+            removedCount++;
+         }
+         current = current.getParent();
       }
       return result;
    }

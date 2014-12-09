@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.parser;
 
+import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreLexerTokens;
+
 /**
  * This class provides better literals to the tokens in the keyparser.
  *
@@ -44,7 +46,7 @@ package de.uka.ilkd.key.parser;
  *   cd $TMPDIR
  *   java -jar antlr-3.5.1.jar KeYLexerTokensUpdater.g
  *   javac -cp antlr-3.5.1.jar *.java
- *   java -cp antlr-3.5.1.jar:. KeYLexerTokensUpdaterParser < KeYLexer.g
+ *   java -cp antlr-3.5.1.jar:. KeYLexerTokensUpdaterParser "KeYParser" < KeYLexer.g
  * </pre>
  *
  * Paste the output into the method {@link #prepareTokens()}
@@ -55,6 +57,7 @@ package de.uka.ilkd.key.parser;
  * will light up here. Just remove the corresponding line.
  *
  * @author mulbrich
+ * @see KeYJMLPreLexerTokens
  */
 
 public class KeYLexerTokens {

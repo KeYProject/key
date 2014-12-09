@@ -352,6 +352,7 @@ public class TermLabelManager {
     * @param newTermSubs The optional children of the {@link Term} to create.
     * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
     * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
+    * @param newTermOriginalLabels The original {@link TermLabel}s.
     * @return The {@link TermLabel}s to add to the new {@link Term} which should be created.
     */
    public static ImmutableArray<TermLabel> instantiateLabels(Services services,
@@ -363,10 +364,50 @@ public class TermLabelManager {
                                                              Operator newTermOp,
                                                              ImmutableArray<Term> newTermSubs,
                                                              ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                                                             JavaBlock newTermJavaBlock) {
+                                                             JavaBlock newTermJavaBlock,
+                                                             ImmutableArray<TermLabel> newTermOriginalLabels) {
+      Term applicationTerm = applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
+      return instantiateLabels(services, applicationTerm, applicationPosInOccurrence, rule, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, newTermOriginalLabels);
+   }
+
+   /**
+    * <p>
+    * Computes the {@link TermLabel} to add to a new {@link Term} while
+    * a {@link Rule} is currently active. The labels of the new {@link Term}
+    * are computed just before the term is created.
+    * </p>
+    * <p>
+    * This method delegates the request to the {@link TermLabelManager}
+    * of the given {@link Services} if possible. Otherwise no labels are returned.
+    * </p>
+    * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
+    * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
+    * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
+    * @param rule The {@link Rule} which is applied.
+    * @param goal The optional {@link Goal} on which the {@link Term} to create will be used.
+    * @param hint An optional hint passed from the active rule to describe the term which should be created.
+    * @param tacletTerm The optional {@link Term} in the taclet which is responsible to instantiate the new {@link Term} for the new proof node or {@code null} in case of built in rules.
+    * @param newTermOp The new {@link Operator} of the {@link Term} to create.
+    * @param newTermSubs The optional children of the {@link Term} to create.
+    * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
+    * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
+    * @param newTermOriginalLabels The original {@link TermLabel}s.
+    * @return The {@link TermLabel}s to add to the new {@link Term} which should be created.
+    */
+   public static ImmutableArray<TermLabel> instantiateLabels(Services services,
+                                                             Term applicationTerm,
+                                                             PosInOccurrence applicationPosInOccurrence,
+                                                             Rule rule,
+                                                             Goal goal,
+                                                             Object hint,
+                                                             Term tacletTerm,
+                                                             Operator newTermOp,
+                                                             ImmutableArray<Term> newTermSubs,
+                                                             ImmutableArray<QuantifiableVariable> newTermBoundVars,
+                                                             JavaBlock newTermJavaBlock,
+                                                             ImmutableArray<TermLabel> newTermOriginalLabels) {
       TermLabelManager manager = getTermLabelManager(services);
       if (manager != null) {
-         Term applicationTerm = applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
          return manager.instantiateLabels(services,
                                           applicationPosInOccurrence,
                                           applicationTerm,
@@ -377,7 +418,8 @@ public class TermLabelManager {
                                           newTermOp,
                                           newTermSubs,
                                           newTermBoundVars,
-                                          newTermJavaBlock);
+                                          newTermJavaBlock,
+                                          newTermOriginalLabels);
       }
       else {
          return new ImmutableArray<TermLabel>();
@@ -407,6 +449,7 @@ public class TermLabelManager {
     * @param newTermSubs The optional children of the {@link Term} to create.
     * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
     * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
+    * @param newTermOriginalLabels The original {@link TermLabel}s.
     * @return The {@link TermLabel}s to add to the new {@link Term} which should be created.
     */
    public ImmutableArray<TermLabel> instantiateLabels(Services services,
@@ -419,7 +462,8 @@ public class TermLabelManager {
                                                       Operator newTermOp,
                                                       ImmutableArray<Term> newTermSubs,
                                                       ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                                                      JavaBlock newTermJavaBlock) {
+                                                      JavaBlock newTermJavaBlock,
+                                                      ImmutableArray<TermLabel> newTermOriginalLabels) {
       // Compute current rule specific updates
       ImmutableList<TermLabelUpdate> currentRuleSpecificUpdates = rule != null ?
                                                                   ruleSpecificUpdates.get(rule.name()) :
@@ -439,7 +483,7 @@ public class TermLabelManager {
       // Do application term specific stuff
       if (applicationTerm != null) {
          // Re-add exiting application term labels based on application term policies.
-         performTermLabelPolicies(services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, applicationTermPolicyMap, newLabels);
+         performTermLabelPolicies(services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, newTermOriginalLabels, applicationTermPolicyMap, newLabels);
          // Add labels from direct child term policies.
          Map<Name, ChildTermLabelPolicy> activeDirectChildPolicies = computeActiveChildPolicies(services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, ruleSpecificDirectChildTermLabelPolicies, allRulesDirectChildTermLabelPolicies);
          if (!activeDirectChildPolicies.isEmpty()) {
@@ -453,7 +497,7 @@ public class TermLabelManager {
       }
       // Re-add exiting modality term labels based on symbolic execution term policies.
       if (modalityTerm != null) {
-         performTermLabelPolicies(services, applicationPosInOccurrence, modalityTerm, rule, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, modalityTermPolicyMap, newLabels);
+         performTermLabelPolicies(services, applicationPosInOccurrence, modalityTerm, rule, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, newTermOriginalLabels, modalityTermPolicyMap, newLabels);
       }
       // Allow rule specific updater to remove and add labels
       if (currentRuleSpecificUpdates != null) {
@@ -501,10 +545,11 @@ public class TermLabelManager {
     * @param newTermSubs The optional children of the {@link Term} to create.
     * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
     * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
+    * @param newTermOriginalLabels The original {@link TermLabel}s.
     * @param policies The {@link TermLabelPolicy} instances to perform.
     * @param newLabels The result {@link List} with the {@link TermLabel}s of the new {@link Term}.
     */
-   protected void performTermLabelPolicies(TermServices services,
+   protected void performTermLabelPolicies(Services services,
                                            PosInOccurrence applicationPosInOccurrence,
                                            Term applicationTerm,
                                            Rule rule,
@@ -515,13 +560,17 @@ public class TermLabelManager {
                                            ImmutableArray<Term> newTermSubs,
                                            ImmutableArray<QuantifiableVariable> newTermBoundVars,
                                            JavaBlock newTermJavaBlock,
+                                           ImmutableArray<TermLabel> newTermOriginalLabels,
                                            Map<Name, TermLabelPolicy> policies,
                                            List<TermLabel> newLabels) {
       if (applicationTerm.hasLabels() && !policies.isEmpty()) {
          for (TermLabel label : applicationTerm.getLabels()) {
             TermLabelPolicy policy = policies.get(label.name());
-            if (policy != null && policy.keepLabel(services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, label)) {
-               newLabels.add(label);
+            if (policy != null) {
+               label = policy.keepLabel(services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock, newTermOriginalLabels, label);
+               if (label != null) {
+                  newLabels.add(label);
+               }
             }
          }
       }
@@ -874,7 +923,7 @@ public class TermLabelManager {
     * @param tacletTerm The optional taclet {@link Term}.
     * @return The {@link RefactoringsContainer} with the {@link TermLabelRefactoring}s to consider.
     */
-   protected RefactoringsContainer computeRefactorings(TermServices services,
+   protected RefactoringsContainer computeRefactorings(Services services,
                                                        PosInOccurrence applicationPosInOccurrence,
                                                        Term applicationTerm,
                                                        Rule rule,
