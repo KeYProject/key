@@ -88,8 +88,7 @@ public class CommentLocator {
                   final char c2 = content[position + 1];
                   switch (c2) {
                   case '/':
-                     final int end = this.text.indexOf(
-                           System.getProperty("line.separator"), position);
+                     final int end = this.text.indexOf('\n', position);
                      // Comment end is inclusive
                      int commentEnd = end - 1;
                      if (end == -1) {

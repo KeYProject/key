@@ -13,7 +13,7 @@ import org.key_project.jmlediting.core.utilities.CommentRange;
 
 public class JMLLocatorTest {
 
-   private static final String eol = System.getProperty("line.separator");
+   private static final String eol = " \n";
 
    private static final String PROJECT_NAME = "TestCompletion";
    private static final String PACKAGE_NAME = "jml.test";
@@ -150,11 +150,11 @@ public class JMLLocatorTest {
       assertEquals("Wrong begin offset for single line comment",
             EDITOR_TEXT.indexOf("//", 78), comments.get(1).getBeginOffset());
       assertEquals("Wrong end offset for single line comment",
-            EDITOR_TEXT.indexOf(eol, 130) - 1, comments.get(1).getEndOffset());
+            EDITOR_TEXT.indexOf(eol, 130), comments.get(1).getEndOffset());
       assertEquals("Wrong begin offset for single line comment",
             EDITOR_TEXT.indexOf("//", 187), comments.get(2).getBeginOffset());
       assertEquals("Wrong end offset for single line comment",
-            EDITOR_TEXT.indexOf(eol, 188) - 1, comments.get(2).getEndOffset());
+            EDITOR_TEXT.indexOf(eol, 188), comments.get(2).getEndOffset());
       assertEquals("Wrong begin offset for single line comment",
             EDITOR_TEXT.indexOf("//", 208), comments.get(3).getBeginOffset());
       assertEquals("Wrong end offset for single line comment",
@@ -175,13 +175,13 @@ public class JMLLocatorTest {
             EDITOR_TEXT.indexOf("//", 78) + 2, comments.get(1)
                   .getContentBeginOffset());
       assertEquals("Wrong end offset for single line comment",
-            EDITOR_TEXT.indexOf(eol, 130) - 1, comments.get(1)
+            EDITOR_TEXT.indexOf(eol, 130), comments.get(1)
                   .getContentEndOffset());
       assertEquals("Wrong begin offset for single line comment",
             EDITOR_TEXT.indexOf("//", 187) + 2, comments.get(2)
                   .getContentBeginOffset());
       assertEquals("Wrong end offset for single line comment",
-            EDITOR_TEXT.indexOf(eol, 188) - 1, comments.get(2)
+            EDITOR_TEXT.indexOf(eol, 188), comments.get(2)
                   .getContentEndOffset());
       assertEquals("Wrong begin offset for single line comment",
             EDITOR_TEXT.indexOf("//", 208) + 2, comments.get(3)
@@ -197,7 +197,7 @@ public class JMLLocatorTest {
       assertEquals("Wrong length of first JMLComment", comments.get(0)
             .getLength(), 26);
       assertEquals("Wrong length of second JMLComment", comments.get(1)
-            .getLength(), 19);
+            .getLength(), 20);
    }
 
    @Test
@@ -207,6 +207,6 @@ public class JMLLocatorTest {
       assertEquals("Wrong length of first JMLComment content", comments.get(0)
             .getContentLength(), 22);
       assertEquals("Wrong length of second JMLComment content", comments.get(1)
-            .getContentLength(), 17);
+            .getContentLength(), 18);
    }
 }
