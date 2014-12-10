@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <variable name="self" isArrayIndex="false">
-      <value name="self" typeString="VariablesConditionalCycle" valueString="self" isValueAnObject="true" isValueUnknown="false">
+      <value name="self {true}" typeString="VariablesConditionalCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
       </value>
    </variable>
    <methodCall name="&lt;call self.main()&gt;" pathCondition="true" pathConditionChanged="false">
       <variable name="self" isArrayIndex="false">
-         <value name="self" typeString="VariablesConditionalCycle" valueString="self" isValueAnObject="true" isValueUnknown="false">
+         <value name="self {true}" typeString="VariablesConditionalCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
       <statement name="this.next.value=42;" pathCondition="true" pathConditionChanged="false">
          <variable name="self" isArrayIndex="false">
-            <value name="self" typeString="VariablesConditionalCycle" valueString="self" isValueAnObject="true" isValueUnknown="false">
+            <value name="self {true}" typeString="VariablesConditionalCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
          <branchCondition name="not(equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),null))" pathCondition="not(equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),null))" pathConditionChanged="true" branchCondition="not(equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),null))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <variable name="self" isArrayIndex="false">
-               <value name="self" typeString="VariablesConditionalCycle" valueString="self" isValueAnObject="true" isValueUnknown="false">
+               <value name="self {true}" typeString="VariablesConditionalCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="next" isArrayIndex="false">
-                     <value name="next" typeString="VariablesConditionalCycle" valueString="VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next)" isValueAnObject="true" isValueUnknown="false">
+                     <value name="next {true}" typeString="VariablesConditionalCycle" valueString="VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                </value>
             </variable>
             <variable name="v" isArrayIndex="false">
-               <value name="v" typeString="VariablesConditionalCycle" valueString="VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next)" isValueAnObject="true" isValueUnknown="false">
+               <value name="v {true}" typeString="VariablesConditionalCycle" valueString="VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <statement name="return this.value;" pathCondition="not(equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),null))" pathConditionChanged="false">
                <variable name="self" isArrayIndex="false">
-                  <value name="self" typeString="VariablesConditionalCycle" valueString="self" isValueAnObject="true" isValueUnknown="false">
+                  <value name="self {true}" typeString="VariablesConditionalCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="next" isArrayIndex="false">
-                        <value name="next" typeString="VariablesConditionalCycle" valueString="VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next)" isValueAnObject="true" isValueUnknown="false">
+                        <value name="next {true}" typeString="VariablesConditionalCycle" valueString="VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="value" isArrayIndex="false">
-                              <value name="value" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false">
+                              <value name="value {true}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                         </value>
@@ -48,7 +48,7 @@
                            </value>
                            <value name="next {not(equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),self))}" typeString="VariablesConditionalCycle" valueString="VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next)" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),self))">
                               <variable name="value" isArrayIndex="false">
-                                 <value name="value {not(equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),self))}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),self))">
+                                 <value name="value {true}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                            </value>
@@ -69,7 +69,7 @@
                               </value>
                               <value name="next {not(equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),self))}" typeString="VariablesConditionalCycle" valueString="VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next)" isValueAnObject="true" isValueUnknown="false" conditionString="not(equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),self))">
                                  <variable name="value" isArrayIndex="false">
-                                    <value name="value {not(equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),self))}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="not(equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),self))">
+                                    <value name="value {true}" typeString="int" valueString="Z(2(4(#)))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                               </value>
@@ -84,9 +84,9 @@
                      </variable>
                   </termination>
                   <callStateVariable name="self" isArrayIndex="false">
-                     <value name="self" typeString="VariablesConditionalCycle" valueString="self" isValueAnObject="true" isValueUnknown="false">
+                     <value name="self {true}" typeString="VariablesConditionalCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="next" isArrayIndex="false">
-                           <value name="next" typeString="VariablesConditionalCycle" valueString="VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next)" isValueAnObject="true" isValueUnknown="false">
+                           <value name="next {true}" typeString="VariablesConditionalCycle" valueString="VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next)" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
@@ -96,52 +96,52 @@
          </branchCondition>
          <branchCondition name="equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),null)" pathCondition="equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),null)" pathConditionChanged="true" branchCondition="equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),null)" mergedBranchCondition="false" isBranchConditionComputed="true">
             <variable name="self" isArrayIndex="false">
-               <value name="self" typeString="VariablesConditionalCycle" valueString="self" isValueAnObject="true" isValueUnknown="false">
+               <value name="self {true}" typeString="VariablesConditionalCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="next" isArrayIndex="false">
-                     <value name="next" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                     <value name="next {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                </value>
             </variable>
             <variable name="v" isArrayIndex="false">
-               <value name="v" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+               <value name="v {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call self.main()&gt;&gt;" pathCondition="equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),null)" pathConditionChanged="false" methodReturnCondition="equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),null)">
                <variable name="self" isArrayIndex="false">
-                  <value name="self" typeString="VariablesConditionalCycle" valueString="self" isValueAnObject="true" isValueUnknown="false">
+                  <value name="self {true}" typeString="VariablesConditionalCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="next" isArrayIndex="false">
-                        <value name="next" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                        <value name="next {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
                </variable>
                <variable name="n" isArrayIndex="false">
-                  <value name="n" typeString="java.lang.NullPointerException" valueString="n_3" isValueAnObject="false" isValueUnknown="false">
+                  <value name="n {true}" typeString="java.lang.NullPointerException" valueString="n_3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      <variable name="message" isArrayIndex="false">
-                        <value name="message" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                        <value name="message {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <variable name="cause" isArrayIndex="false">
-                        <value name="cause" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                        <value name="cause {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
                </variable>
                <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(VariablesConditionalCycle::select(heap,self,VariablesConditionalCycle::$next),null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                   <variable name="self" isArrayIndex="false">
-                     <value name="self" typeString="VariablesConditionalCycle" valueString="self" isValueAnObject="true" isValueUnknown="false">
+                     <value name="self {true}" typeString="VariablesConditionalCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="next" isArrayIndex="false">
-                           <value name="next" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                           <value name="next {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
                   </variable>
                </termination>
                <callStateVariable name="self" isArrayIndex="false">
-                  <value name="self" typeString="VariablesConditionalCycle" valueString="self" isValueAnObject="true" isValueUnknown="false">
+                  <value name="self {true}" typeString="VariablesConditionalCycle" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="next" isArrayIndex="false">
-                        <value name="next" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                        <value name="next {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <variable name="a" isArrayIndex="false">
-      <value name="a" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false">
+      <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
       </value>
    </variable>
    <methodCall name="&lt;call VariablesArrayTest.arrayTest(a)&gt;" pathCondition="true" pathConditionChanged="false">
@@ -20,95 +20,95 @@
          </variable>
          <branchCondition name="or(lt(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(1(#))))))" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(1(#))))))" pathConditionChanged="true" branchCondition="or(lt(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(1(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <variable name="a" isArrayIndex="false">
-               <value name="a" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false">
+               <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="length" isArrayIndex="false">
-                     <value name="length" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false">
+                     <value name="length {true}" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                </value>
             </variable>
             <statement name="a[20]=4;" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(1(#))))))" pathConditionChanged="false">
                <variable name="a" isArrayIndex="false">
-                  <value name="a" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false">
+                  <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="length" isArrayIndex="false">
-                        <value name="length" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false">
+                        <value name="length {true}" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <variable name="[Z(0(1(#)))]" arrayIndex="Z(0(1(#)))" isArrayIndex="true">
-                        <value name="[Z(0(1(#)))]" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false">
+                        <value name="[Z(0(1(#)))] {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
                </variable>
                <branchCondition name="gt(length(a),Z(0(2(#))))" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(2(#))))))" pathConditionChanged="true" branchCondition="gt(length(a),Z(0(2(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <variable name="a" isArrayIndex="false">
-                     <value name="a" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false">
+                     <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="length" isArrayIndex="false">
-                           <value name="length" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false">
+                           <value name="length {true}" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                         <variable name="[Z(0(1(#)))]" arrayIndex="Z(0(1(#)))" isArrayIndex="true">
-                           <value name="[Z(0(1(#)))]" typeString="int" valueString="int::select(heap,a,arr(Z(0(1(#)))))" isValueAnObject="false" isValueUnknown="false">
+                           <value name="[Z(0(1(#)))] {true}" typeString="int" valueString="int::select(heap,a,arr(Z(0(1(#)))))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
                   </variable>
                   <statement name="return a[10]+a[20];" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(2(#))))))" pathConditionChanged="false">
                      <variable name="a" isArrayIndex="false">
-                        <value name="a" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false">
+                        <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="length" isArrayIndex="false">
-                              <value name="length" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false">
+                              <value name="length {true}" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                            <variable name="[Z(0(2(#)))]" arrayIndex="Z(0(2(#)))" isArrayIndex="true">
-                              <value name="[Z(0(2(#)))]" typeString="int" valueString="Z(4(#))" isValueAnObject="false" isValueUnknown="false">
+                              <value name="[Z(0(2(#)))] {true}" typeString="int" valueString="Z(4(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                            <variable name="[Z(0(1(#)))]" arrayIndex="Z(0(1(#)))" isArrayIndex="true">
-                              <value name="[Z(0(1(#)))]" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false">
+                              <value name="[Z(0(1(#)))] {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                         </value>
                      </variable>
                      <methodReturn name="&lt;return of arrayTest&gt;" signature="&lt;return of VariablesArrayTest.arrayTest(a)&gt;" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(2(#))))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(2(#))))))">
                         <variable name="a" isArrayIndex="false">
-                           <value name="a" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false">
+                           <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               <variable name="length" isArrayIndex="false">
-                                 <value name="length" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false">
+                                 <value name="length {true}" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                               <variable name="[Z(0(2(#)))]" arrayIndex="Z(0(2(#)))" isArrayIndex="true">
-                                 <value name="[Z(0(2(#)))]" typeString="int" valueString="Z(4(#))" isValueAnObject="false" isValueUnknown="false">
+                                 <value name="[Z(0(2(#)))] {true}" typeString="int" valueString="Z(4(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                               <variable name="[Z(0(1(#)))]" arrayIndex="Z(0(1(#)))" isArrayIndex="true">
-                                 <value name="[Z(0(1(#)))]" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false">
+                                 <value name="[Z(0(1(#)))] {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                            </value>
                         </variable>
                         <termination name="&lt;end&gt;" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),geq(length(a),Z(1(2(#))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            <variable name="a" isArrayIndex="false">
-                              <value name="a" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false">
+                              <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  <variable name="length" isArrayIndex="false">
-                                    <value name="length" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false">
+                                    <value name="length {true}" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                                  <variable name="[Z(0(2(#)))]" arrayIndex="Z(0(2(#)))" isArrayIndex="true">
-                                    <value name="[Z(0(2(#)))]" typeString="int" valueString="Z(4(#))" isValueAnObject="false" isValueUnknown="false">
+                                    <value name="[Z(0(2(#)))] {true}" typeString="int" valueString="Z(4(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                                  <variable name="[Z(0(1(#)))]" arrayIndex="Z(0(1(#)))" isArrayIndex="true">
-                                    <value name="[Z(0(1(#)))]" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false">
+                                    <value name="[Z(0(1(#)))] {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                               </value>
                            </variable>
                         </termination>
                         <callStateVariable name="a" isArrayIndex="false">
-                           <value name="a" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false">
+                           <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               <variable name="length" isArrayIndex="false">
-                                 <value name="length" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false">
+                                 <value name="length {true}" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                            </value>
@@ -118,60 +118,60 @@
                </branchCondition>
                <branchCondition name="lt(length(a),Z(1(2(#))))" pathCondition="imp(geq(length(a),Z(0(#))),and(and(not(equals(a,null)),geq(length(a),Z(1(1(#))))),leq(length(a),Z(0(2(#))))))" pathConditionChanged="true" branchCondition="lt(length(a),Z(1(2(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <variable name="a" isArrayIndex="false">
-                     <value name="a" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false">
+                     <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="length" isArrayIndex="false">
-                           <value name="length" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false">
+                           <value name="length {true}" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                         <variable name="[Z(0(1(#)))]" arrayIndex="Z(0(1(#)))" isArrayIndex="true">
-                           <value name="[Z(0(1(#)))]" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false">
+                           <value name="[Z(0(1(#)))] {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
                   </variable>
                   <exceptionalMethodReturn name="&lt;throw java.lang.ArrayIndexOutOfBoundsException&gt;" signature="&lt;exceptional return of &lt;call VariablesArrayTest.arrayTest(a)&gt;&gt;" pathCondition="imp(geq(length(a),Z(0(#))),and(and(not(equals(a,null)),geq(length(a),Z(1(1(#))))),leq(length(a),Z(0(2(#))))))" pathConditionChanged="false" methodReturnCondition="imp(geq(length(a),Z(0(#))),and(and(not(equals(a,null)),geq(length(a),Z(1(1(#))))),leq(length(a),Z(0(2(#))))))">
                      <variable name="a" isArrayIndex="false">
-                        <value name="a" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false">
+                        <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="length" isArrayIndex="false">
-                              <value name="length" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false">
+                              <value name="length {true}" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                            <variable name="[Z(0(1(#)))]" arrayIndex="Z(0(1(#)))" isArrayIndex="true">
-                              <value name="[Z(0(1(#)))]" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false">
+                              <value name="[Z(0(1(#)))] {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                         </value>
                      </variable>
                      <variable name="a_5" isArrayIndex="false">
-                        <value name="a_5" typeString="java.lang.ArrayIndexOutOfBoundsException" valueString="a_8" isValueAnObject="false" isValueUnknown="false">
+                        <value name="a_5 {true}" typeString="java.lang.ArrayIndexOutOfBoundsException" valueString="a_8" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            <variable name="message" isArrayIndex="false">
-                              <value name="message" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                              <value name="message {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                            <variable name="cause" isArrayIndex="false">
-                              <value name="cause" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                              <value name="cause {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                         </value>
                      </variable>
                      <termination name="&lt;uncaught java.lang.ArrayIndexOutOfBoundsException&gt;" pathCondition="imp(geq(length(a),Z(0(#))),and(and(not(equals(a,null)),geq(length(a),Z(1(1(#))))),leq(length(a),Z(0(2(#))))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                         <variable name="a" isArrayIndex="false">
-                           <value name="a" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false">
+                           <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               <variable name="length" isArrayIndex="false">
-                                 <value name="length" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false">
+                                 <value name="length {true}" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                               <variable name="[Z(0(1(#)))]" arrayIndex="Z(0(1(#)))" isArrayIndex="true">
-                                 <value name="[Z(0(1(#)))]" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false">
+                                 <value name="[Z(0(1(#)))] {true}" typeString="int" valueString="Z(2(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                            </value>
                         </variable>
                      </termination>
                      <callStateVariable name="a" isArrayIndex="false">
-                        <value name="a" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false">
+                        <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="length" isArrayIndex="false">
-                              <value name="length" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false">
+                              <value name="length {true}" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                         </value>
@@ -182,82 +182,82 @@
          </branchCondition>
          <branchCondition name="equals(a,null)" pathCondition="equals(a,null)" pathConditionChanged="true" branchCondition="equals(a,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
             <variable name="a" isArrayIndex="false">
-               <value name="a" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+               <value name="a {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call VariablesArrayTest.arrayTest(a)&gt;&gt;" pathCondition="equals(a,null)" pathConditionChanged="false" methodReturnCondition="equals(a,null)">
                <variable name="a" isArrayIndex="false">
-                  <value name="a" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                  <value name="a {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
                <variable name="n" isArrayIndex="false">
-                  <value name="n" typeString="java.lang.NullPointerException" valueString="n_3" isValueAnObject="false" isValueUnknown="false">
+                  <value name="n {true}" typeString="java.lang.NullPointerException" valueString="n_3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      <variable name="message" isArrayIndex="false">
-                        <value name="message" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                        <value name="message {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <variable name="cause" isArrayIndex="false">
-                        <value name="cause" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                        <value name="cause {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
                </variable>
                <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(a,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                   <variable name="a" isArrayIndex="false">
-                     <value name="a" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                     <value name="a {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                </termination>
                <callStateVariable name="a" isArrayIndex="false">
-                  <value name="a" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                  <value name="a {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </callStateVariable>
             </exceptionalMethodReturn>
          </branchCondition>
          <branchCondition name="or(lt(length(a),Z(0(#))),and(not(equals(a,null)),leq(length(a),Z(0(1(#))))))" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),leq(length(a),Z(0(1(#))))))" pathConditionChanged="true" branchCondition="or(lt(length(a),Z(0(#))),and(not(equals(a,null)),leq(length(a),Z(0(1(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true">
             <variable name="a" isArrayIndex="false">
-               <value name="a" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false">
+               <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="length" isArrayIndex="false">
-                     <value name="length" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false">
+                     <value name="length {true}" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                </value>
             </variable>
             <exceptionalMethodReturn name="&lt;throw java.lang.ArrayIndexOutOfBoundsException&gt;" signature="&lt;exceptional return of &lt;call VariablesArrayTest.arrayTest(a)&gt;&gt;" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),leq(length(a),Z(0(1(#))))))" pathConditionChanged="false" methodReturnCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),leq(length(a),Z(0(1(#))))))">
                <variable name="a" isArrayIndex="false">
-                  <value name="a" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false">
+                  <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="length" isArrayIndex="false">
-                        <value name="length" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false">
+                        <value name="length {true}" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
                </variable>
                <variable name="a_1" isArrayIndex="false">
-                  <value name="a_1" typeString="java.lang.ArrayIndexOutOfBoundsException" valueString="a_4" isValueAnObject="false" isValueUnknown="false">
+                  <value name="a_1 {true}" typeString="java.lang.ArrayIndexOutOfBoundsException" valueString="a_4" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      <variable name="message" isArrayIndex="false">
-                        <value name="message" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                        <value name="message {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                      <variable name="cause" isArrayIndex="false">
-                        <value name="cause" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                        <value name="cause {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
                </variable>
                <termination name="&lt;uncaught java.lang.ArrayIndexOutOfBoundsException&gt;" pathCondition="imp(geq(length(a),Z(0(#))),and(not(equals(a,null)),leq(length(a),Z(0(1(#))))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
                   <variable name="a" isArrayIndex="false">
-                     <value name="a" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false">
+                     <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="length" isArrayIndex="false">
-                           <value name="length" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false">
+                           <value name="length {true}" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
                   </variable>
                </termination>
                <callStateVariable name="a" isArrayIndex="false">
-                  <value name="a" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false">
+                  <value name="a {true}" typeString="int[]" valueString="a" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="length" isArrayIndex="false">
-                        <value name="length" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false">
+                        <value name="length {true}" typeString="int" valueString="length(a)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
