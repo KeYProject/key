@@ -7,7 +7,6 @@ package de.uka.ilkd.key.macros;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.ProverTaskListener;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -21,7 +20,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.MethodInfFlowUnfoldTacletBuilder;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
-import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
 /**
@@ -91,14 +89,7 @@ public class FinishAuxiliaryMethodComputationMacro
         // close auxiliary computation proof
         ThreadUtilities.invokeAndWait(new Runnable() {
             public void run() {
-                /*
-                final UserInterface ui = mediator.getUI();
-                if (ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave()
-                        && !proof.name().toString().endsWith(".proof")) {
-                    assert ui.getMediator().getSelectedProof().name().equals(proof.name());
-                    ui.saveProof(proof, ".proof");
-                }
-                */
+                saveSideProof(proof, mediator);
                 // make everyone listen to the proof remove
                 mediator.startInterface(true);
                 initiatingProof.addSideProof(proof);

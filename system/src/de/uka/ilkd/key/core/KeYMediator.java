@@ -28,7 +28,6 @@ import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
 import de.uka.ilkd.key.gui.TacletMatchCompletionDialog;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
@@ -835,6 +834,7 @@ public class KeYMediator {
    class KeYMediatorProofTreeListener extends ProofTreeAdapter {
        private boolean pruningInProcess;
 
+       @Override
        public void proofClosed(ProofTreeEvent e) {
            Proof p = e.getSource();
            assert p.name().equals(getSelectedProof().name());
@@ -846,6 +846,7 @@ public class KeYMediator {
            pruningInProcess = true;
        }
 
+       @Override
        public void proofPruned(final ProofTreeEvent e) {
            SwingUtilities.invokeLater(new Runnable() {
                public void run () {
@@ -856,6 +857,7 @@ public class KeYMediator {
            pruningInProcess = false;
        }
 
+       @Override
        public void proofGoalsAdded(ProofTreeEvent e) {
            ImmutableList<Goal> newGoals = e.getGoals();
            // Check for a closed goal ...
@@ -865,6 +867,7 @@ public class KeYMediator {
            }
        }
 
+       @Override
        public void proofStructureChanged(ProofTreeEvent e) {
            if (isInAutoMode() || pruningInProcess) return;
            Proof p = e.getSource();

@@ -196,7 +196,7 @@ public abstract class AbstractUserInterface implements UserInterface {
        }
        if (!foundValidJavaFiles) {
            throw new IllegalArgumentException(
-                           "Specified file is no valid directory or java-file!");
+                           "Specified file is no valid directory or Java file!");
        }
        return result;
    }
@@ -228,6 +228,7 @@ public abstract class AbstractUserInterface implements UserInterface {
    }
 
    protected static Pair<File, String> fileName(Proof proof, String fileExtension) {
+       // TODO: why do we use GUI components here?
        final KeYFileChooser jFC = GuiUtilities.getFileChooser("Choose filename to save proof");
 
        File selectedFile = null;

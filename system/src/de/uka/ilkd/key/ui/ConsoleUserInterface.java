@@ -28,7 +28,6 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacro;
