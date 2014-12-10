@@ -6,6 +6,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 
 public class AutoSave extends MainWindowAction {
+    // TODO replace with real autosave functionality
 
     /**
      * 
@@ -18,13 +19,13 @@ public class AutoSave extends MainWindowAction {
                    "when they are being left or closed. Be aware that already existing proofs " +
                     "with the same name will be recklessly overwritten!");
         setName("Auto Save Proofs");
-        setSelected(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave());
+//        setSelected(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave());
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         boolean sel = isSelected();
-        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave(sel);
+//        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave(sel);
     }
 
 }

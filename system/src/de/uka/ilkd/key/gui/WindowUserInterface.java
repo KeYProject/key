@@ -326,9 +326,7 @@ public class WindowUserInterface extends AbstractUserInterface {
        final KeYFileChooser jFC = GuiUtilities.getFileChooser("Choose filename to save proof");
 
        Pair<File, String> f = fileName(proof, fileExtension);
-       final Pair<Boolean, File> res = jFC.showSaveDialog(mainWindow, f.second);
-       final boolean saved = res.first;
-       final File newDir = res.second;
+       final boolean saved = jFC.showSaveDialog(mainWindow, f.second);
        File file = null;
        if (saved) {
            file = jFC.getSelectedFile();
@@ -347,9 +345,6 @@ public class WindowUserInterface extends AbstractUserInterface {
               proof.setProofFile(file);
            }
        } else {
-           if (newDir != null && !newDir.delete()) {
-               newDir.deleteOnExit();
-           }
            jFC.resetPath();
        }
        return file;

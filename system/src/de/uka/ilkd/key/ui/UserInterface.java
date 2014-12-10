@@ -89,13 +89,7 @@ public interface UserInterface
      * @param bootClassPath the boot class path to use. 
      */
     void loadProblem(File file, List<File> classPath, File bootClassPath);
-
-    public void noAutoSave();
-
-    public void resetAutoSave();
-
-    public boolean autoSave();
-
+    
     void setSaveOnly(boolean s);
 
     boolean isSaveOnly();

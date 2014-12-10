@@ -28,7 +28,6 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYFileChooser;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -66,8 +65,6 @@ public abstract class AbstractUserInterface implements UserInterface {
 
     private ProofMacro autoMacro = new SkipMacro();
     protected boolean saveOnly = false;
-    private boolean autoSave =
-            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave();
 
     private ProverTaskListener pml = null;
 
@@ -89,20 +86,7 @@ public abstract class AbstractUserInterface implements UserInterface {
     public void setSaveOnly(boolean s) {
         this.saveOnly = s;
     }
-
-    public void noAutoSave() {
-        this.autoSave = false;
-    }
-
-    public void resetAutoSave() {
-        this.autoSave =
-                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave();
-    }
-
-    public boolean autoSave() {
-        return autoSave;
-    }
-
+    
     public boolean isSaveOnly() {
         return this.saveOnly;
     }

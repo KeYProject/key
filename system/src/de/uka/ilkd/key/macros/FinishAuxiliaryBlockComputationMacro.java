@@ -102,12 +102,15 @@ public class FinishAuxiliaryBlockComputationMacro
         // close auxiliary computation proof
         ThreadUtilities.invokeAndWait(new Runnable() {
             public void run() {
+                // TODO use standard saving functionality
+                /*
                 final UserInterface ui = mediator.getUI();
                 if (ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave()
                         && !proof.name().toString().endsWith(".proof")) {
                     assert ui.getMediator().getSelectedProof().name().equals(proof.name());
                     ui.saveProof(proof, ".proof");
                 }
+                */
                 // make everyone listen to the proof remove
                 mediator.startInterface(true);
                 initiatingProof.addSideProof(proof);

@@ -19,9 +19,6 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.util.Pair;
 
 public class KeYFileChooser {
 
@@ -86,32 +83,19 @@ public class KeYFileChooser {
 		                         : JFileChooser.FILES_AND_DIRECTORIES);        
     }
 
-    public Pair<Boolean, File> showSaveDialog(Component parent, String defaultName) {
+    public boolean showSaveDialog(Component parent, String defaultName) {
         File file = fileChooser.getSelectedFile();
         final String recDir = file != null ?
                 file.getParent() : fileChooser.getCurrentDirectory().toString();
         resetFile = (defaultName != null) ? new File(recDir, defaultName): file;
         fileChooser.setSelectedFile(resetFile);
         setSaveDialog(true);
-        boolean proofFolderActive = ProofIndependentSettings.DEFAULT_INSTANCE
-                         .getGeneralSettings().storesInDefaultProofFolder();
         final String poDir =
                 resetFile.getParent().endsWith("src") ?
                         new File(resetFile.getParent()).getParent() : resetFile.getParent();
-        final String proofFolder = ProofSaver.PROOF_SUBDIRECTORY;
-        final String proofDir =
-                (!proofFolderActive || resetFile.getParent().endsWith(proofFolder)) ?
-                resetFile.getParent() : resetFile.getParent().concat(proofFolder);
-        File dir = new File(proofDir);
-        if (proofFolderActive && !dir.exists()) {
-            dir.mkdir();
-        } else {
-            dir = null;
-        }
+        final String proofDir = resetFile.getParent();
         file = new File(defaultName.endsWith(".key") ? poDir : proofDir, resetFile.getName());
-        final boolean res = showSaveDialog(parent, file);
-
-	return new Pair<Boolean, File> (res, dir);
+        return showSaveDialog(parent, file);
     }
 
     public void resetPath() {
@@ -132,8 +116,7 @@ public class KeYFileChooser {
       }
 
       setSaveDialog(true);
-      final boolean autoSave = MainWindow.getInstance().getUserInterface().autoSave();
-      int result = autoSave ? JFileChooser.APPROVE_OPTION : fileChooser.showSaveDialog(parent);
+      int result = fileChooser.showSaveDialog(parent);
       return (result == JFileChooser.APPROVE_OPTION);
    }
 

@@ -839,11 +839,6 @@ public class KeYMediator {
            Proof p = e.getSource();
            assert p.name().equals(getSelectedProof().name());
            assert p.closed();
-           if (ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave()
-                   && !p.name().toString().endsWith(".proof")) {
-               assert ui.getMediator().getSelectedProof().name().equals(p.name());
-               ui.saveProof(p, ".proof");
-           }
            KeYMediator.this.notify(new ProofClosedNotificationEvent(e.getSource()));
        }
 
