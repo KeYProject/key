@@ -68,6 +68,9 @@ public final class JML_UIPreferencesHelper {
          return getDefaultJMLColor();
       }
       final RGB color = stringtoRGB(colorString);
+      if (color == null) {
+         return getDefaultJMLColor();
+      }
 
       return color;
 

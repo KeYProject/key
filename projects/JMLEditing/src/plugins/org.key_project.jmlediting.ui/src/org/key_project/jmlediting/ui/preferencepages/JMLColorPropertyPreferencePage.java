@@ -38,11 +38,6 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
     */
    public static final String JML_COLOUR_PROP_ID = "org.key_project.jmlediting.ui.properties.color";
 
-   /**
-    * The name of the global preference for the default JML profile.
-    */
-   public static final RGB DEFAULT_JML_COMMENT_COLOR = new RGB(0, 255, 0);
-
    public static final String TEST_KEY = "CommentColor";
 
    /**
@@ -127,7 +122,7 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
       final IEclipsePreferences preferences = InstanceScope.INSTANCE
             .getNode(Activator.PLUGIN_ID);
       preferences.put(JML_UIPreferencesHelper.COMMENT_COLOR.getLocalName(),
-            DEFAULT_JML_COMMENT_COLOR.toString());
+            JML_UIPreferencesHelper.getDefaultJMLColor().toString());
 
    }
 
@@ -180,7 +175,8 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
 
    @Override
    public void performDefaults() {
-      this.commentColor.setColorValue(DEFAULT_JML_COMMENT_COLOR);
+      this.commentColor.setColorValue(JML_UIPreferencesHelper
+            .getDefaultJMLColor());
       super.performDefaults();
 
    }
