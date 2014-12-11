@@ -1,14 +1,11 @@
 package de.uka.ilkd.key.rule;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -20,10 +17,10 @@ import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.strategy.Strategy;
 
 /**
  * Rule that joins two sequents based on weakening.
@@ -84,11 +81,6 @@ public class JoinWeaken implements BuiltInRule {
       
       Term newUpdate  = tb.parallel(newElementaryUpdates);
       Term newFormula = tb.apply(newUpdate, termAfterUpdate);
-      
-      // TODO: Check later:
-      // it happened that after applying rule to one of
-      // two top level sequents, one completely vanished
-      // afterward. Fix!
 
       g.changeFormula(
             new SequentFormula(newFormula),
@@ -123,6 +115,14 @@ public class JoinWeaken implements BuiltInRule {
       // and U \<{ ... }\> phi, where U must be an update
       // in normal form, i.e. a parallel update of elementary
       // updates.
+      
+      // At first, we allow only manual application of this rule,
+      // since in early stages of experimenting, it was possible
+      // to perform an infinite chain of applications, which was
+      // done by the automatic strategy.
+      if (goal.isAutomatic()) {
+         return false;
+      }
       
       if (pio != null) {
          
