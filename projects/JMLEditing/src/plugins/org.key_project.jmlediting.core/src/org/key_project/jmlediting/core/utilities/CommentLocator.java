@@ -23,6 +23,9 @@ public class CommentLocator {
     *           the String to operate on
     */
    public CommentLocator(final String text) {
+      if (text == null) {
+         throw new IllegalArgumentException("text must not be null!");
+      }
       this.text = text;
    }
 
@@ -73,20 +76,25 @@ public class CommentLocator {
       mainloop: while (position < content.length) {
          final char c = content[position];
          switch (state) {
+         // DefaultState
          case DEFAULT:
             switch (c) {
+            // String Opener found
             case '"':
                state = ScannerState.IN_STRING;
                position += 1;
                break;
+            // char opener found
             case '\'':
                state = ScannerState.IN_CHAR;
                position += 1;
                break;
+            // comment opener found
             case '/':
                if (position < content.length - 1) {
                   final char c2 = content[position + 1];
                   switch (c2) {
+                  // singleLine Comment found
                   case '/':
                      final int end = this.text.indexOf('\n', position);
                      // Comment end is inclusive
@@ -103,11 +111,14 @@ public class CommentLocator {
                         position = end + 1;
                      }
                      break;
+                  // Multiline Comment Opener found
                   case '*':
                      begin = position;
                      position += 2;
                      state = ScannerState.IN_COMMENT;
                      break;
+                  // wrong combination of signs, ignore because there will be
+                  // compile errors
                   default:
                      position += 1;
                      state = ScannerState.DEFAULT;
@@ -118,6 +129,7 @@ public class CommentLocator {
                   break mainloop;
                }
                break;
+            // no special sign found
             default:
                position += 1;
                break;
@@ -125,16 +137,19 @@ public class CommentLocator {
             break;
          case IN_COMMENT:
             switch (c) {
+            // possible begin of MultilineComment Closer found
             case '*':
                if (position < content.length - 1) {
                   final char c2 = content[position + 1];
                   switch (c2) {
+                  // MultiLine Comment Closer found
                   case '/':
                      comments.add(new CommentRange(begin, position + 1,
                            begin + 2, position - 1));
                      state = ScannerState.DEFAULT;
                      position += 2;
                      break;
+                  // star found, can be ignored because no / was found after
                   default:
                      position += 1;
                      break;
@@ -144,6 +159,7 @@ public class CommentLocator {
                   break mainloop;
                }
                break;
+            // no special sign found
             default:
                position += 1;
                break;
@@ -151,13 +167,16 @@ public class CommentLocator {
             break;
          case IN_STRING:
             switch (c) {
+            // String Closer found
             case '"':
                state = ScannerState.DEFAULT;
                position += 1;
                break;
+            // Escape sign found
             case '\\':
                position += 2;
                break;
+               // no special sign found
             default:
                position += 1;
                break;
@@ -165,18 +184,22 @@ public class CommentLocator {
             break;
          case IN_CHAR:
             switch (c) {
+            // Escape sign found
             case '\\':
                position += 2;
                break;
+            // Char Closer found
             case '\'':
                state = ScannerState.DEFAULT;
                position += 1;
                break;
+            // no specoal sign found
             default:
                position += 1;
                break;
             }
             break;
+         // in unexpected state
          default:
             throw new AssertionError("Invalid Enum State");
          }
