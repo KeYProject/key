@@ -930,7 +930,7 @@ public class TermLabelManager {
       // Refactor application term
       final TermFactory tf = services.getTermFactory();
       Term newApplicationTerm = refactorApplicationTerm(services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, refactorings, tf);
-      if (newApplicationTerm != null) {
+      if (newApplicationTerm != null && !newApplicationTerm.equals(applicationTerm)) {
          // Update goal
          PosInOccurrence pio = applicationPosInOccurrence;
          Term root = newApplicationTerm;
@@ -1098,22 +1098,34 @@ public class TermLabelManager {
          Term newApplicationTerm = applicationTerm;
          // Do direct child refactoring if required
          if (!refactorings.getDirectChildRefactorings().isEmpty()) {
+            boolean changed = false;
             Term[] newSubs = new Term[newApplicationTerm.arity()];
             for (int i = 0; i < newSubs.length; i++) {
                Term sub = newApplicationTerm.sub(i);
                ImmutableArray<TermLabel> newLabels = performRefactoring(services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, sub, refactorings.getDirectChildRefactorings());
                newSubs[i] = tf.createTerm(sub.op(), sub.subs(), sub.boundVars(), sub.javaBlock(), newLabels);
+               if (!newSubs[i].equals(sub)) {
+                  changed = true;
+               }
             }
-            newApplicationTerm = tf.createTerm(newApplicationTerm.op(), newSubs, newApplicationTerm.boundVars(), newApplicationTerm.javaBlock(), newApplicationTerm.getLabels());
+            newApplicationTerm = changed ?
+                                 tf.createTerm(newApplicationTerm.op(), newSubs, newApplicationTerm.boundVars(), newApplicationTerm.javaBlock(), newApplicationTerm.getLabels()) :
+                                 applicationTerm;
          }
          // Do child and grandchild refactoring if required
          if (!refactorings.getChildAndGrandchildRefactorings().isEmpty()) {
+            boolean changed = false;
             Term[] newSubs = new Term[newApplicationTerm.arity()];
             for (int i = 0; i < newSubs.length; i++) {
                Term sub = newApplicationTerm.sub(i);
                newSubs[i] = refactorLabelsRecursive(services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, sub, refactorings.getChildAndGrandchildRefactorings());
+               if (!newSubs[i].equals(sub)) {
+                  changed = true;
+               }
             }
-            newApplicationTerm = tf.createTerm(newApplicationTerm.op(), newSubs, newApplicationTerm.boundVars(), newApplicationTerm.javaBlock(), newApplicationTerm.getLabels());
+            newApplicationTerm = changed ?
+                                 tf.createTerm(newApplicationTerm.op(), newSubs, newApplicationTerm.boundVars(), newApplicationTerm.javaBlock(), newApplicationTerm.getLabels()) :
+                                 applicationTerm;
          }
          return newApplicationTerm;
       }
@@ -1174,12 +1186,19 @@ public class TermLabelManager {
                                           Term tacletTerm,
                                           Term term,
                                           ImmutableList<TermLabelRefactoring> activeRefactorings) {
+      boolean subsChanged = false;
       Term[] newSubs = new Term[term.arity()];
       for (int i = 0; i < newSubs.length; i++) {
-         newSubs[i] = refactorLabelsRecursive(services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, term.sub(i), activeRefactorings);
+         Term oldSub = term.sub(i);
+         newSubs[i] = refactorLabelsRecursive(services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, oldSub, activeRefactorings);
+         if (!newSubs[i].equals(oldSub)) {
+            subsChanged = true;
+         }
       }
       ImmutableArray<TermLabel> newLabels = performRefactoring(services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, term, activeRefactorings);
-      return services.getTermFactory().createTerm(term.op(), newSubs, term.boundVars(), term.javaBlock(), newLabels);
+      return subsChanged || !newLabels.equals(term.getLabels()) ? 
+             services.getTermFactory().createTerm(term.op(), newSubs, term.boundVars(), term.javaBlock(), newLabels) :
+             term;
    }
 
    /**
