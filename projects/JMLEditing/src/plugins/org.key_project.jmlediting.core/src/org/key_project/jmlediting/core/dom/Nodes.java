@@ -35,6 +35,14 @@ public final class Nodes {
       return new StringNode(startOffset, endOffset, content);
    }
 
+   public static IASTNode createList(final IASTNode... children) {
+      return createNode(NodeTypes.LIST, children);
+   }
+
+   public static IASTNode createList(final List<IASTNode> children) {
+      return createNode(NodeTypes.LIST, children);
+   }
+
    public static IASTNode createKeyword(final int startOffset,
          final int endOffset, final IKeyword keyword,
          final String keywordInstance) {

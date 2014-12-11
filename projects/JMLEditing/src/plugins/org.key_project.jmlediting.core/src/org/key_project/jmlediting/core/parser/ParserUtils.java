@@ -8,7 +8,20 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 
 /**
- * Provides some utility functions for parsing.
+ * Provides abstractions to build a parser from given basic element. A parser is
+ * composed by instances of {@link ParseFunction}. This class provides methods
+ * to combine {@link ParseFunction} as building alternatives, sequences or
+ * lists. The result is a {@link ParseFunction} again which can be combined with
+ * others again. <br>
+ * There are several rules for combination: This parser parses greedy, if
+ * something could be parsed it will not be rejected to continue parsing on an
+ * other branch. Take care when using the combinators an this.<br>
+ * Some combinations functions adds support to ignore whitespaces. By general,
+ * any {@link ParseFunction} which does not care about whitespace must be able
+ * to ignore leading whitespaces. <br>
+ * With the functions of this class it is rather easy to write a parser for a
+ * given grammar because the parser can be expressed rather declarative (with
+ * respect to the rules above).
  *
  * @author Moritz Lichter
  *
@@ -80,6 +93,19 @@ public final class ParserUtils {
       };
    }
 
+   /**
+    * Does the same as {@link ParserUtils#parseList(ParseFunction)} but ensures
+    * that at least a single element is contained in the list. If no element
+    * could be parsed, a {@link ParserException} with the given failure test is
+    * thrown.
+    *
+    * @param function
+    *           the {@link ParseFunction} to parse a single list element
+    * @param missingExceptionText
+    *           the exception text to show that an element is missing
+    * @return a {@link ParseFunction} able to parse a non empty list of elements
+    *         parseable by the given function
+    */
    public static ParseFunction parseNonEmptyList(final ParseFunction function,
          final String missingExceptionText) {
       return new ParseFunction() {
@@ -93,6 +119,55 @@ public final class ParserUtils {
       };
    }
 
+   /**
+    * Parses a list of elements separated by a given separation char. This
+    * function builds up a {@link ParseFunction} which is able to parse a list
+    * of elements parseable by the given {@link ParseFunction} which are
+    * separated by a given separation char. Whitespace before the separation
+    * character is allowed. Whitespace before the elements is not implicitly
+    * allowed. This follows the rule that {@link ParseFunction} which ignore
+    * whitespace should ignore all whitespaces in front. No separation character
+    * after the last element is parsed.
+    *
+    * @param sep
+    *           the character to separate the elements
+    * @param function
+    *           a {@link ParseFunction} which is able to parse a single element
+    *           of the list
+    * @return a {@link ParseFunction} which is able to parse a list of elements
+    *         parseable by the given {@link ParseFunction} separated by the
+    *         given separation character.
+    */
+   public static ParseFunction parseSeparatedList(final char sep,
+         final ParseFunction function) {
+      return new ParseFunction() {
+
+         @Override
+         public IASTNode parse(final String text, final int start, final int end)
+               throws ParserException {
+            return ParserUtilsImpl.parseSeparatedList(text, start, end, sep,
+                  function);
+         }
+      };
+   }
+
+   /**
+    * Does the same as
+    * {@link ParserUtils#parseSeparatedList(char, ParseFunction)} but ensures
+    * that at least a single element is parsed. If no element could be parsed, a
+    * {@link ParserException} with the given exception text is thrown.
+    *
+    * @param sep
+    *           the character to separate the elements
+    * @param function
+    *           a {@link ParseFunction} which is able to parse a single element
+    *           of the list
+    * @param missingExceptionText
+    *           the text for an exception when no element could be parsed
+    * @return a {@link ParseFunction} which is able to parse a list of elements
+    *         parseable by the given {@link ParseFunction} separated by the
+    *         given separation character.
+    */
    public static ParseFunction parseSeparatedNonEmptyList(final char sep,
          final ParseFunction function, final String missingExceptionText) {
       return new ParseFunction() {

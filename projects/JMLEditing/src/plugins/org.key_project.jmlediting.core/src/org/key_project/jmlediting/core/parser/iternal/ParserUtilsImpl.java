@@ -20,9 +20,15 @@ import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 
 public class ParserUtilsImpl {
 
-   static List<IASTNode> parseListImpl(final String text, final int start,
-         final int end, final ParseFunction function) {
-      final List<IASTNode> nodes = new ArrayList<IASTNode>();
+   private static List<IASTNode> parseListImpl(final String text,
+         final int start, final int end, final ParseFunction function) {
+      return parseListImpl(text, start, end, function,
+            new ArrayList<IASTNode>());
+   }
+
+   private static List<IASTNode> parseListImpl(final String text,
+         final int start, final int end, final ParseFunction function,
+         final List<IASTNode> nodes) {
 
       int startPosition = start;
       while (true) {
@@ -38,8 +44,9 @@ public class ParserUtilsImpl {
       return nodes;
    }
 
-   static IASTNode parseSeparatedList(final String text, final int start,
-         final int end, final char sep, final ParseFunction function) {
+   public static IASTNode parseSeparatedList(final String text,
+         final int start, final int end, final char sep,
+         final ParseFunction function) {
       final List<IASTNode> nodes = new ArrayList<IASTNode>();
       int startPosition = start;
       try {
@@ -51,24 +58,14 @@ public class ParserUtilsImpl {
          return Nodes.createNode(start, start, NodeTypes.LIST);
       }
       final ParseFunction sepFunction = ParserUtils.separateBy(sep, function);
-      while (true) {
-         try {
-            final IASTNode listNode = sepFunction.parse(text, startPosition,
-                  end);
-            startPosition = listNode.getEndOffset();
-            nodes.add(listNode);
-         }
-         catch (final ParserException e) {
-            break;
-         }
-      }
+      parseListImpl(text, startPosition, end, sepFunction, nodes);
       return Nodes.createNode(NodeTypes.LIST, nodes);
    }
 
    public static IASTNode parseSeparatedNonEmptyList(final String text,
          final int start, final int end, final char sep,
          final ParseFunction function, final String missingExceptionText)
-         throws ParserException {
+               throws ParserException {
       final List<IASTNode> nodes = new ArrayList<IASTNode>();
       int startPosition = start;
       try {
@@ -80,17 +77,7 @@ public class ParserUtilsImpl {
          throw new ParserException(missingExceptionText, text, start, e);
       }
       final ParseFunction sepFunction = ParserUtils.separateBy(sep, function);
-      while (true) {
-         try {
-            final IASTNode listNode = sepFunction.parse(text, startPosition,
-                  end);
-            startPosition = listNode.getEndOffset();
-            nodes.add(listNode);
-         }
-         catch (final ParserException e) {
-            break;
-         }
-      }
+      parseListImpl(text, startPosition, end, sepFunction, nodes);
       return Nodes.createNode(NodeTypes.LIST, nodes);
    }
 
@@ -117,7 +104,7 @@ public class ParserUtilsImpl {
 
    public static IASTNode parseSeq(final int type, final String text,
          final int start, final int end, final ParseFunction... seqs)
-         throws ParserException {
+               throws ParserException {
       final List<IASTNode> nodes = new ArrayList<IASTNode>();
       int startPosition = start;
       for (final ParseFunction function : seqs) {
@@ -131,7 +118,7 @@ public class ParserUtilsImpl {
 
    public static IASTNode parseAlternative(final String text, final int start,
          final int end, final ParseFunction... alternatives)
-         throws ParserException {
+               throws ParserException {
       ParserException exception = null;
       for (final ParseFunction function : alternatives) {
          try {
@@ -178,7 +165,7 @@ public class ParserUtilsImpl {
       if (foundKeyword == null) {
          throw new ParserException(
                "Not a supported specification statement keyword: \"" + keyword
-                     + "\"", text, keywordEnd);
+               + "\"", text, keywordEnd);
       }
       final IASTNode keywordNode = Nodes.createKeyword(keywordStart,
             keywordEnd, foundKeyword, keyword);
