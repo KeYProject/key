@@ -1,7 +1,6 @@
 package org.key_project.jmlediting.core.dom.internal;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.INodeSearcher;
@@ -46,20 +45,20 @@ public abstract class AbstractASTNode implements IASTNode {
    }
 
    @Override
-   public <T> T serach(final INodeSearcher<T> searcher) {
-      final List<IASTNode> children = this.getChildren();
-      // No children -> search this
-      if (children.isEmpty()) {
-         return searcher.searchNode(this);
+   public <T> T search(final INodeSearcher<T> searcher) {
+      final T result = searcher.searchNode(this);
+      if (result != null) {
+         return result;
       }
+
       // Check where to continue
       final IASTNode selectedChild = searcher.selectChild(this.getChildren());
       // Do not continue -> search this
       if (selectedChild == null) {
-         return searcher.searchNode(this);
+         return null;
       }
       // Search in child
-      return selectedChild.serach(searcher);
+      return selectedChild.search(searcher);
    }
 
    @Override

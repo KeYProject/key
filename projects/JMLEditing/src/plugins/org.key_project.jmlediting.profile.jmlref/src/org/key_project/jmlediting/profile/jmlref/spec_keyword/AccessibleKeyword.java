@@ -1,7 +1,7 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword;
 
 
-public class AccessibleKeyword extends StoreRefKeyword {
+public class AccessibleKeyword extends StoreRefContainerKeyword {
    public AccessibleKeyword() {
       super("accessible");
    }

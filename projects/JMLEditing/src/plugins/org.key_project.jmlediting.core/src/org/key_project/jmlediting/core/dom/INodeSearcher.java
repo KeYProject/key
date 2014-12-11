@@ -9,7 +9,7 @@ import java.util.List;
  * 
  * @author Moritz Lichter
  *
- * @see IASTNode#serach(INodeSearcher)
+ * @see IASTNode#search(INodeSearcher)
  * @param <T>
  *           the result type of the search
  */

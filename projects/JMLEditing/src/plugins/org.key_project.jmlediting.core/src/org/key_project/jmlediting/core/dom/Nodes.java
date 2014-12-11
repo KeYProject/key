@@ -51,13 +51,15 @@ public final class Nodes {
 
    public static IASTNode getDepthMostNodeWithPosition(final int position,
          final IASTNode node) {
-      return node.serach(new INodeSearcher<IASTNode>() {
+      return node.search(new INodeSearcher<IASTNode>() {
 
          @Override
          public IASTNode searchNode(final IASTNode node) {
             if (node.getStartOffset() <= position
                   && position <= node.getEndOffset()) {
-               return node;
+               if (node.getChildren().isEmpty()) {
+                  return node;
+               }
             }
             return null;
          }
@@ -66,7 +68,7 @@ public final class Nodes {
          public IASTNode selectChild(final List<IASTNode> children) {
             for (final IASTNode node : children) {
                if (node.getStartOffset() <= position
-                     && position <= node.getEndOffset()) {
+                     && position < node.getEndOffset()) {
                   return node;
                }
             }
@@ -91,25 +93,30 @@ public final class Nodes {
    }
 
    public static IKeyword getKeywordNode(final IASTNode node, final int position) {
-      return node.traverse(new INodeTraverser<IKeyword>() {
+      return node.search(new INodeSearcher<IKeyword>() {
 
          @Override
-         public IKeyword traverse(final IASTNode node, final IKeyword existing) {
-            if (existing != null) {
-               return existing;
-            }
+         public IKeyword searchNode(final IASTNode node) {
             if (node.getType() == NodeTypes.KEYWORD_APPL) {
-               if (node.getStartOffset() >= position
-                     && node.getEndOffset() < position) {
-                  final IASTNode keywordNode = node.getChildren().get(0);
-                  if (Nodes.isKeyword(keywordNode)) {
-                     return ((IKeywordNode) keywordNode).getKeyword();
-                  }
+               final IASTNode keywordNode = node.getChildren().get(0);
+               if (Nodes.isKeyword(keywordNode)) {
+                  return ((IKeywordNode) keywordNode).getKeyword();
                }
             }
             return null;
          }
-      }, null);
+
+         @Override
+         public IASTNode selectChild(final List<IASTNode> children) {
+            for (final IASTNode node : children) {
+               if (node.getStartOffset() <= position
+                     && position < node.getEndOffset()) {
+                  return node;
+               }
+            }
+            return null;
+         }
+      });
    }
 
 }

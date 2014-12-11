@@ -6,12 +6,15 @@ import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.IStoreRefKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefKeywordContentParser;
+import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
 
-public abstract class StoreRefKeyword extends
-AbstractGenericSpecificationKeyword {
+public abstract class StoreRefContainerKeyword extends
+      AbstractGenericSpecificationKeyword {
 
-   public StoreRefKeyword(final String keyword, final String... keywords) {
+   public StoreRefContainerKeyword(final String keyword,
+         final String... keywords) {
       super(keyword, keywords);
    }
 
@@ -23,6 +26,8 @@ AbstractGenericSpecificationKeyword {
    @Override
    public List<ICompletionProposal> createAutoProposals(final IASTNode node,
          final JavaContentAssistInvocationContext context) {
-      return super.createAutoProposals(node, context);
+
+      return JMLCompletionUtil.getStandardProposals(context, null,
+            IStoreRefKeyword.class);
    }
 }

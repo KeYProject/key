@@ -36,7 +36,7 @@ public abstract class PrimitiveNode extends AbstractASTNode {
    // Overrides for performance
 
    @Override
-   public <T> T serach(final INodeSearcher<T> searcher) {
+   public <T> T search(final INodeSearcher<T> searcher) {
       return searcher.searchNode(this);
    };
 

@@ -1,7 +1,7 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword;
 
 
-public class AssignableKeyword extends StoreRefKeyword {
+public class AssignableKeyword extends StoreRefContainerKeyword {
 
    public AssignableKeyword() {
       super("assignable");

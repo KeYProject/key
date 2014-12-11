@@ -44,7 +44,7 @@ public class ASTSearchTest {
    @Test
    public void testFindNothing() {
       final Object result = ASTTestUtils.NODE_3
-            .serach(new INodeSearcher<Object>() {
+            .search(new INodeSearcher<Object>() {
 
                @Override
                public Object searchNode(final IASTNode node) {
