@@ -34,10 +34,8 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
    public static final String JML_COLOUR_PREF_ID = "org.key_project.jmlediting.ui.preferences.color";
 
    /**
-    * The name of the global preference for the default JML profile.
+    * Needed to get the button in SWTBot for testing
     */
-   public static final RGB DEFAULT_JML_COMMENT_COLOR = new RGB(0, 255, 0);
-
    public static final String TEST_KEY = "CommentColor";
 
    /**
@@ -50,7 +48,7 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
    /**
     * A {@link ColorSelector} which selects the Color for the JML-Comments
     */
-   private ColorSelector commentColor;
+   private ColorSelector commentColorSelector;
 
    /**
     * Creates a new {@link JMLProfilePropertiesPage}.
@@ -99,9 +97,9 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
       label.setText("Choose JML comment color:");
       label.setLayoutData(data);
 
-      this.commentColor = new ColorSelector(myComposite);
-      this.commentColor.getButton().setData(TEST_KEY, "CommentColor");
-      this.commentColor.getButton().setData(this.commentColor);
+      this.commentColorSelector = new ColorSelector(myComposite);
+      this.commentColorSelector.getButton().setData(TEST_KEY, "CommentColor");
+      this.commentColorSelector.getButton().setData(this.commentColorSelector);
 
       this.updateValues();
 
@@ -114,13 +112,13 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
     * the pane is used for preferences or properties).
     */
    private void updateValues() {
-      if (this.commentColor.getButton().isDisposed()) {
+      if (this.commentColorSelector.getButton().isDisposed()) {
          return;
       }
 
       final RGB color = JML_UIPreferencesHelper.getWorkspaceJMLColor();
 
-      this.commentColor.setColorValue(color);
+      this.commentColorSelector.setColorValue(color);
    }
 
    @Override
@@ -146,7 +144,8 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
 
    @Override
    public void performDefaults() {
-      this.commentColor.setColorValue(DEFAULT_JML_COMMENT_COLOR);
+      this.commentColorSelector.setColorValue(JML_UIPreferencesHelper
+            .getDefaultJMLColor());
       super.performDefaults();
 
    }
@@ -164,8 +163,7 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
    @Override
    public boolean performOk() {
       // Remove preference listener
-
-      JML_UIPreferencesHelper.setDefaultJMLColor(this.commentColor
+      JML_UIPreferencesHelper.setDefaultJMLColor(this.commentColorSelector
             .getColorValue());
 
       InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID)
