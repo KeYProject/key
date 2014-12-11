@@ -8,6 +8,7 @@ import java.util.List;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
+import org.key_project.jmlediting.core.parser.iternal.ParserUtilsImpl;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 
 /**

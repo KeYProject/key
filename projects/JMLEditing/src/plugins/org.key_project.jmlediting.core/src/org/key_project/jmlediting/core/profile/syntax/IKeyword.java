@@ -1,6 +1,11 @@
 package org.key_project.jmlediting.core.profile.syntax;
 
+import java.util.List;
 import java.util.Set;
+
+import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
+import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.key_project.jmlediting.core.dom.IASTNode;
 
 /**
  * The {@link IKeyword} specifies an JML keyword.
@@ -36,5 +41,8 @@ public interface IKeyword {
     * @return the parser for parsing text after this keyword
     */
    IKeywordParser createParser();
+
+   List<ICompletionProposal> createAutoProposals(IASTNode node,
+         JavaContentAssistInvocationContext context);
 
 }

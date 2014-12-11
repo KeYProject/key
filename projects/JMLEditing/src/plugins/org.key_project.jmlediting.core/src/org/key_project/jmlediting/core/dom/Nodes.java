@@ -90,4 +90,26 @@ public final class Nodes {
       }, new LinkedList<IKeywordNode>());
    }
 
+   public static IKeyword getKeywordNode(final IASTNode node, final int position) {
+      return node.traverse(new INodeTraverser<IKeyword>() {
+
+         @Override
+         public IKeyword traverse(final IASTNode node, final IKeyword existing) {
+            if (existing != null) {
+               return existing;
+            }
+            if (node.getType() == NodeTypes.KEYWORD_APPL) {
+               if (node.getStartOffset() >= position
+                     && node.getEndOffset() < position) {
+                  final IASTNode keywordNode = node.getChildren().get(0);
+                  if (Nodes.isKeyword(keywordNode)) {
+                     return ((IKeywordNode) keywordNode).getKeyword();
+                  }
+               }
+            }
+            return null;
+         }
+      }, null);
+   }
+
 }

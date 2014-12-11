@@ -64,9 +64,49 @@ public class JMLCompletionProposalComputer implements
          final IProgressMonitor monitor) {
       final List<ICompletionProposal> result = new LinkedList<ICompletionProposal>();
 
+      // // Calculate the hover region, we want to use
+      // final int cursorPosition = hoverRegion.getOffset();
+      // // That is the complete JML Comment
+      // final CommentRange comment = this.getJMLComment(textViewer,
+      // cursorPosition);
+      // if (comment == null) {
+      // // No JML comment, du not provide a hover
+      // return null;
+      // }
+      //
+      // // Parse the comment according to the gi
+      // final IProject activeProject =
+      // WorkbenchUtil.getProject(this.editorPart);
+      // if (activeProject == null) {
+      // return null;
+      // }
+      // final IJMLParser parser = JMLPreferencesHelper
+      // .getProjectActiveJMLProfile(activeProject).createParser();
+      // try {
+      // // Parse the text
+      // // End index of comment is inclusive, but input end for parser
+      // // exclusive
+      // final IASTNode parsResult = parser.parse(textViewer.getDocument()
+      // .get(), comment.getContentBeginOffset(), comment
+      // .getContentEndOffset() + 1);
+      // final IKeyword activeKeyword = Nodes.getKeywordNode(parsResult,
+      // cursorPosition);
+      // if (activeKeyword != null) {
+      //
+      // result.addAll(activeKeyword.createAutoProposals(parsResult,
+      // cursorPosition));
+      // }
+      //
+      // }
+      // catch (final ParserException e) {
+      // return "Unable to parse JML";
+      // }
+      // return null;
+
       try {
          // add proposals only if Content Assist is invoked in JML Code
-         final CommentLocator locator = new CommentLocator(context.getDocument().get());
+         final CommentLocator locator = new CommentLocator(context
+               .getDocument().get());
          if (locator.isInJMLcomment(context.getInvocationOffset())) {
 
             // getCurrentProject

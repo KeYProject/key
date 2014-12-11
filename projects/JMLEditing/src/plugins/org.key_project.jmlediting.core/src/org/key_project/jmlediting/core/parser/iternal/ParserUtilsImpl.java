@@ -1,4 +1,4 @@
-package org.key_project.jmlediting.core.parser;
+package org.key_project.jmlediting.core.parser.iternal;
 
 import static org.key_project.jmlediting.core.parser.LexicalHelper.getJMLKeywordIdentifier;
 import static org.key_project.jmlediting.core.parser.LexicalHelper.skipWhiteSpacesOrAt;
@@ -10,6 +10,9 @@ import java.util.List;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
+import org.key_project.jmlediting.core.parser.ParseFunction;
+import org.key_project.jmlediting.core.parser.ParserException;
+import org.key_project.jmlediting.core.parser.ParserUtils;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
@@ -62,7 +65,7 @@ public class ParserUtilsImpl {
       return Nodes.createNode(NodeTypes.LIST, nodes);
    }
 
-   static IASTNode parseSeparatedNonEmptyList(final String text,
+   public static IASTNode parseSeparatedNonEmptyList(final String text,
          final int start, final int end, final char sep,
          final ParseFunction function, final String missingExceptionText)
          throws ParserException {

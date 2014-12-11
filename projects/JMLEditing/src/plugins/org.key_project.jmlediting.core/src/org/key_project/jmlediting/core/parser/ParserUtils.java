@@ -3,6 +3,7 @@ package org.key_project.jmlediting.core.parser;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
+import org.key_project.jmlediting.core.parser.iternal.ParserUtilsImpl;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 
@@ -52,6 +53,22 @@ public final class ParserUtils {
       }
    }
 
+   // With Java 8 Lambda syntax the following would be much more readable, no
+   // anonymous classes, they just wrap the functions implementing the tasks
+
+   /**
+    * Creates a {@link ParseFunction} which is able to parse a list of items
+    * which are parsed by the given function. That means that the generated
+    * ParseFunction tries to parse using the given ParseFunction as often as
+    * possible. If no parse is possible, an empty list is returned.<br>
+    * The returned node is of type {@link NodeTypes#LIST} and contains the
+    * parsed nodes.
+    *
+    * @param function
+    *           the {@link ParseFunction} to parse a single element of the list
+    * @return a {@link ParseFunction} that parses a list of elements parseable
+    *         by the given function.
+    */
    public static ParseFunction parseList(final ParseFunction function) {
       return new ParseFunction() {
 
