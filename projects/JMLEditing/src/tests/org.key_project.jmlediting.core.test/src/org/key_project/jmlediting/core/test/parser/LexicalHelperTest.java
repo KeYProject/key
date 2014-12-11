@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
-import org.key_project.jmlediting.core.parser.LexicalHelper;
+import org.key_project.jmlediting.core.parser.ParserBuilder;
 import org.key_project.jmlediting.core.parser.ParserException;
 
 public class LexicalHelperTest {
@@ -52,8 +52,8 @@ public class LexicalHelperTest {
 
    public static void parseIntegerConstantTest(final String constant,
          final int expectedEnd) throws ParserException {
-      final int end = LexicalHelper.getIntegerConstant(constant, 0,
-            constant.length());
+      final int end = ParserBuilder.integerConstant()
+            .parse(constant, 0, constant.length()).getEndOffset();
       assertEquals("Parse Integer Constant stopped at wrong position",
             expectedEnd, end);
    }

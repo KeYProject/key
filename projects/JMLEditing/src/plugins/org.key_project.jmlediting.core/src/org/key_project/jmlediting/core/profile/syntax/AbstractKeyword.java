@@ -27,10 +27,12 @@ public abstract class AbstractKeyword implements IKeyword {
    /**
     * Creates a new {@link AbstractKeyword}. The list of supported keywords is
     * converted to a set, but for easier code the varargs are used in the
-    * constructor,
+    * constructor.
     *
+    * @param keyword
+    *           the first keyword
     * @param keywords
-    *           all supported keywords
+    *           all other supported keywords
     */
    public AbstractKeyword(final String keyword, final String... keywords) {
       super();

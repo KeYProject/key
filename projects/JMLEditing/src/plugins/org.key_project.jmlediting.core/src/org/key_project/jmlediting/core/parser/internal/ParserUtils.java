@@ -1,8 +1,7 @@
-package org.key_project.jmlediting.core.parser.iternal;
+package org.key_project.jmlediting.core.parser.internal;
 
 import static org.key_project.jmlediting.core.parser.LexicalHelper.getJMLKeywordIdentifier;
 import static org.key_project.jmlediting.core.parser.LexicalHelper.skipWhiteSpacesOrAt;
-import static org.key_project.jmlediting.core.parser.ParserUtils.validatePositions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,14 +10,14 @@ import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.parser.ParseFunction;
+import org.key_project.jmlediting.core.parser.ParserBuilder;
 import org.key_project.jmlediting.core.parser.ParserException;
-import org.key_project.jmlediting.core.parser.ParserUtils;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 
-public class ParserUtilsImpl {
+public class ParserUtils {
 
    private static List<IASTNode> parseListImpl(final String text,
          final int start, final int end, final ParseFunction function) {
@@ -57,7 +56,7 @@ public class ParserUtilsImpl {
       catch (final ParserException e) {
          return Nodes.createNode(start, start, NodeTypes.LIST);
       }
-      final ParseFunction sepFunction = ParserUtils.separateBy(sep, function);
+      final ParseFunction sepFunction = ParserBuilder.separateBy(sep, function);
       parseListImpl(text, startPosition, end, sepFunction, nodes);
       return Nodes.createNode(NodeTypes.LIST, nodes);
    }
@@ -65,7 +64,7 @@ public class ParserUtilsImpl {
    public static IASTNode parseSeparatedNonEmptyList(final String text,
          final int start, final int end, final char sep,
          final ParseFunction function, final String missingExceptionText)
-               throws ParserException {
+         throws ParserException {
       final List<IASTNode> nodes = new ArrayList<IASTNode>();
       int startPosition = start;
       try {
@@ -76,7 +75,7 @@ public class ParserUtilsImpl {
       catch (final ParserException e) {
          throw new ParserException(missingExceptionText, text, start, e);
       }
-      final ParseFunction sepFunction = ParserUtils.separateBy(sep, function);
+      final ParseFunction sepFunction = ParserBuilder.separateBy(sep, function);
       parseListImpl(text, startPosition, end, sepFunction, nodes);
       return Nodes.createNode(NodeTypes.LIST, nodes);
    }
@@ -104,7 +103,7 @@ public class ParserUtilsImpl {
 
    public static IASTNode parseSeq(final int type, final String text,
          final int start, final int end, final ParseFunction... seqs)
-               throws ParserException {
+         throws ParserException {
       final List<IASTNode> nodes = new ArrayList<IASTNode>();
       int startPosition = start;
       for (final ParseFunction function : seqs) {
@@ -118,7 +117,7 @@ public class ParserUtilsImpl {
 
    public static IASTNode parseAlternative(final String text, final int start,
          final int end, final ParseFunction... alternatives)
-               throws ParserException {
+         throws ParserException {
       ParserException exception = null;
       for (final ParseFunction function : alternatives) {
          try {
@@ -152,7 +151,7 @@ public class ParserUtilsImpl {
    public static IASTNode parseKeyword(final String text, final int start,
          final int end, final Iterable<? extends IKeyword> enabledKeywords,
          final IJMLProfile profile) throws ParserException {
-      validatePositions(text, start, end);
+      ParserUtils.validatePositions(text, start, end);
 
       // Find keyword in text
       final int keywordStart = skipWhiteSpacesOrAt(text, start, end, false);
@@ -165,7 +164,7 @@ public class ParserUtilsImpl {
       if (foundKeyword == null) {
          throw new ParserException(
                "Not a supported specification statement keyword: \"" + keyword
-               + "\"", text, keywordEnd);
+                     + "\"", text, keywordEnd);
       }
       final IASTNode keywordNode = Nodes.createKeyword(keywordStart,
             keywordEnd, foundKeyword, keyword);
@@ -182,6 +181,37 @@ public class ParserUtilsImpl {
       else {
          return Nodes.createNode(NodeTypes.KEYWORD_APPL, keywordNode,
                keywordResult);
+      }
+   }
+
+   /**
+    * Validates the start and end position for a given text.
+    *
+    * @param text
+    *           the text
+    * @param start
+    *           the start position (inclusive)
+    * @param end
+    *           the end position (exclusive)
+    * @throws ParserException
+    *            when the positions are invalid
+    */
+   public static void validatePositions(final String text, final int start,
+         final int end) throws ParserException {
+      if (start < 0) {
+         throw new ParserException("Given start index is out of bounds: "
+               + start + " < 0", text, start);
+      }
+      if (start >= text.length()) {
+         throw new ParserException("Given start index is out of bounds: "
+               + start + " >= " + text.length(), text, start);
+      }
+      if (end < start) {
+         throw new ParserException("start < end", text, start);
+      }
+      if (end > text.length()) {
+         throw new ParserException("Given end index is out of bounds: " + end
+               + " >= " + text.length(), text, end);
       }
    }
 

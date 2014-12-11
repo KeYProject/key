@@ -20,7 +20,7 @@ public class ParserException extends Exception {
    /**
     * The index of failure.
     */
-   private final int index;
+   private final int errorOffset;
 
    /**
     * Creates a new {@link ParserException} with the given error message, the
@@ -30,16 +30,16 @@ public class ParserException extends Exception {
     *           the error message
     * @param text
     *           the text unable to parse
-    * @param index
-    *           the error index
+    * @param errorOffset
+    *           the error offset in the text
     * @param t
     *           the problem which caused the exception
     */
    public ParserException(final String message, final String text,
-         final int index, final Throwable t) {
+         final int errorOffset, final Throwable t) {
       super(message, t);
       this.text = text;
-      this.index = index;
+      this.errorOffset = errorOffset;
    }
 
    /**
@@ -50,22 +50,27 @@ public class ParserException extends Exception {
     *           the error message
     * @param text
     *           the text unable to parse
-    * @param index
-    *           the error index
+    * @param errorOffset
+    *           the error offset in the text
     */
    public ParserException(final String message, final String text,
-         final int index) {
-      this(message, text, index, null);
+         final int errorOffset) {
+      this(message, text, errorOffset, null);
    }
 
    @Override
    public String getMessage() {
-      return super.getMessage() + " at " + this.index + "\n"
+      return super.getMessage() + " at " + this.errorOffset + "\n"
             + this.formatString();
    }
 
-   public int getIndex() {
-      return this.index;
+   /**
+    * Returns the offset in the text where the error occurred.
+    * 
+    * @return the error offset
+    */
+   public int getErrorOffset() {
+      return this.errorOffset;
    }
 
    /**
@@ -91,7 +96,7 @@ public class ParserException extends Exception {
             break;
          default:
             outputText += c;
-            if (pos == this.index) {
+            if (pos == this.errorOffset) {
                outputMarker += '^';
             }
             else {

@@ -8,7 +8,7 @@ import java.util.List;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
-import org.key_project.jmlediting.core.parser.iternal.ParserUtilsImpl;
+import org.key_project.jmlediting.core.parser.internal.ParserUtils;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 
 /**
@@ -52,7 +52,7 @@ public class DefaultJMLParser implements IJMLParser {
       // Search for keyword as long text is available
       while (position < end) {
          // Parse the keyword
-         final IASTNode keywordNode = ParserUtilsImpl
+         final IASTNode keywordNode = ParserUtils
                .parseKeyword(text, position, end,
                      this.profile.getSupportedKeywords(), this.profile);
          allKeywords.add(keywordNode);

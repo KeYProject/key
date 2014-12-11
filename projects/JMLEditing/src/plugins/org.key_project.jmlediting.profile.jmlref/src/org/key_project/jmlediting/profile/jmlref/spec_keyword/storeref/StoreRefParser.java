@@ -1,6 +1,6 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref;
 
-import static org.key_project.jmlediting.core.parser.ParserUtils.*;
+import static org.key_project.jmlediting.core.parser.ParserBuilder.*;
 import static org.key_project.jmlediting.profile.jmlref.parseutil.Lexicals.lexInformalDescr;
 import static org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefNodeTypes.*;
 

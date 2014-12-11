@@ -3,7 +3,7 @@ package org.key_project.jmlediting.core.parser;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
-import org.key_project.jmlediting.core.parser.iternal.ParserUtilsImpl;
+import org.key_project.jmlediting.core.parser.internal.ParserUtils;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 
@@ -26,44 +26,13 @@ import org.key_project.jmlediting.core.profile.syntax.IKeyword;
  * @author Moritz Lichter
  *
  */
-public final class ParserUtils {
+public final class ParserBuilder {
 
    /**
     * No instantiations.
     */
-   private ParserUtils() {
+   private ParserBuilder() {
 
-   }
-
-   /**
-    * Validates the start and end position for a given text.
-    *
-    * @param text
-    *           the text
-    * @param start
-    *           the start position (inclusive)
-    * @param end
-    *           the end position (exclusive)
-    * @throws ParserException
-    *            when the positions are invalid
-    */
-   public static void validatePositions(final String text, final int start,
-         final int end) throws ParserException {
-      if (start < 0) {
-         throw new ParserException("Given start index is out of bounds: "
-               + start + " < 0", text, start);
-      }
-      if (start >= text.length()) {
-         throw new ParserException("Given start index is out of bounds: "
-               + start + " >= " + text.length(), text, start);
-      }
-      if (end < start) {
-         throw new ParserException("start < end", text, start);
-      }
-      if (end > text.length()) {
-         throw new ParserException("Given end index is out of bounds: " + end
-               + " >= " + text.length(), text, end);
-      }
    }
 
    // With Java 8 Lambda syntax the following would be much more readable, no
@@ -88,16 +57,16 @@ public final class ParserUtils {
          @Override
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
-            return ParserUtilsImpl.parseList(text, start, end, function);
+            return ParserUtils.parseList(text, start, end, function);
          }
       };
    }
 
    /**
-    * Does the same as {@link ParserUtils#parseList(ParseFunction)} but ensures
-    * that at least a single element is contained in the list. If no element
-    * could be parsed, a {@link ParserException} with the given failure test is
-    * thrown.
+    * Does the same as {@link ParserBuilder#parseList(ParseFunction)} but
+    * ensures that at least a single element is contained in the list. If no
+    * element could be parsed, a {@link ParserException} with the given failure
+    * test is thrown.
     *
     * @param function
     *           the {@link ParseFunction} to parse a single list element
@@ -113,8 +82,8 @@ public final class ParserUtils {
          @Override
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
-            return ParserUtilsImpl.parseNonEmptyList(text, start, end,
-                  function, missingExceptionText);
+            return ParserUtils.parseNonEmptyList(text, start, end, function,
+                  missingExceptionText);
          }
       };
    }
@@ -145,7 +114,7 @@ public final class ParserUtils {
          @Override
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
-            return ParserUtilsImpl.parseSeparatedList(text, start, end, sep,
+            return ParserUtils.parseSeparatedList(text, start, end, sep,
                   function);
          }
       };
@@ -153,7 +122,7 @@ public final class ParserUtils {
 
    /**
     * Does the same as
-    * {@link ParserUtils#parseSeparatedList(char, ParseFunction)} but ensures
+    * {@link ParserBuilder#parseSeparatedList(char, ParseFunction)} but ensures
     * that at least a single element is parsed. If no element could be parsed, a
     * {@link ParserException} with the given exception text is thrown.
     *
@@ -175,7 +144,7 @@ public final class ParserUtils {
          @Override
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
-            return ParserUtilsImpl.parseSeparatedNonEmptyList(text, start, end,
+            return ParserUtils.parseSeparatedNonEmptyList(text, start, end,
                   sep, function, missingExceptionText);
          }
       };
@@ -208,8 +177,7 @@ public final class ParserUtils {
          @Override
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
-            return ParserUtilsImpl.parseAlternative(text, start, end,
-                  alternatives);
+            return ParserUtils.parseAlternative(text, start, end, alternatives);
          }
       };
    }
@@ -220,7 +188,7 @@ public final class ParserUtils {
          @Override
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
-            return ParserUtilsImpl.parseSeq(type, text, start, end, seqs);
+            return ParserUtils.parseSeq(type, text, start, end, seqs);
          }
       };
 
@@ -342,7 +310,7 @@ public final class ParserUtils {
          @Override
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
-            return ParserUtilsImpl.parseKeyword(text, start, end, keywords,
+            return ParserUtils.parseKeyword(text, start, end, keywords,
                   activeProfile);
          }
       };

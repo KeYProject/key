@@ -1,11 +1,11 @@
 package org.key_project.jmlediting.core.test.parser;
 
 import static org.junit.Assert.fail;
-import static org.key_project.jmlediting.core.parser.ParserUtils.parseList;
-import static org.key_project.jmlediting.core.parser.ParserUtils.parseNonEmptyList;
-import static org.key_project.jmlediting.core.parser.ParserUtils.parseSeparatedList;
-import static org.key_project.jmlediting.core.parser.ParserUtils.parseSeparatedNonEmptyList;
-import static org.key_project.jmlediting.core.parser.ParserUtils.requireComplete;
+import static org.key_project.jmlediting.core.parser.ParserBuilder.parseList;
+import static org.key_project.jmlediting.core.parser.ParserBuilder.parseNonEmptyList;
+import static org.key_project.jmlediting.core.parser.ParserBuilder.parseSeparatedList;
+import static org.key_project.jmlediting.core.parser.ParserBuilder.parseSeparatedNonEmptyList;
+import static org.key_project.jmlediting.core.parser.ParserBuilder.requireComplete;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -2,7 +2,7 @@ package org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.ParserException;
-import org.key_project.jmlediting.core.parser.ParserUtils;
+import org.key_project.jmlediting.core.parser.ParserBuilder;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AbstractGenericSpecificationKeywordParser;
 
@@ -25,7 +25,7 @@ AbstractGenericSpecificationKeywordParser {
    @Override
    protected IASTNode parseToSemicolon(final String text, final int start,
          final int end) throws ParserException {
-      return ParserUtils.requireComplete(this.parser).parse(text, start, end);
+      return ParserBuilder.requireComplete(this.parser).parse(text, start, end);
    }
 
 }

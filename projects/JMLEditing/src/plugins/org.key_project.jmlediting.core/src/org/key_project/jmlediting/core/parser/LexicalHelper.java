@@ -1,6 +1,6 @@
 package org.key_project.jmlediting.core.parser;
 
-import static org.key_project.jmlediting.core.parser.ParserUtils.validatePositions;
+import org.key_project.jmlediting.core.parser.internal.ParserUtils;
 
 /**
  * This class provides some utility functions for lexing.
@@ -88,7 +88,7 @@ public final class LexicalHelper {
     */
    public static int getIdentifier(final String text, final int start,
          final int end) throws ParserException {
-      validatePositions(text, start, end);
+      ParserUtils.validatePositions(text, start, end);
       int position = start;
       if (start == end) {
          throw new ParserException("Expected an identifier", text, start);
@@ -107,7 +107,7 @@ public final class LexicalHelper {
 
    public static int getJMLKeywordIdentifier(final String text,
          final int start, final int end) throws ParserException {
-      validatePositions(text, start, end);
+      ParserUtils.validatePositions(text, start, end);
       int position = start;
       if (start == end) {
          throw new ParserException("Expected an identifier", text, start);
@@ -127,7 +127,7 @@ public final class LexicalHelper {
 
    public static int getIntegerConstant(final String text, final int start,
          final int end) throws ParserException {
-      validatePositions(text, start, end);
+      ParserUtils.validatePositions(text, start, end);
       if (start == end) {
          throw new ParserException("Expected an integer contant", text, start);
       }
@@ -223,7 +223,7 @@ public final class LexicalHelper {
 
    public static int skipWhiteSpacesOrAt(final String text, final int start,
          final int end, final boolean beginAtNewLine) throws ParserException {
-      validatePositions(text, start, end);
+      ParserUtils.validatePositions(text, start, end);
       int position = start;
       boolean inNewLine = beginAtNewLine;
       while (position < end
@@ -252,7 +252,7 @@ public final class LexicalHelper {
     */
    public static int skipWhiteSpaces(final String text, final int start,
          final int end) throws ParserException {
-      validatePositions(text, start, end);
+      ParserUtils.validatePositions(text, start, end);
       int position = start;
       while (position < end && Character.isWhitespace(text.charAt(position))) {
          position++;
