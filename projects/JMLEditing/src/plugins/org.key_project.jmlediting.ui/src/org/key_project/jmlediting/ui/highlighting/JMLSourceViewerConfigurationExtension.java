@@ -1,11 +1,17 @@
 package org.key_project.jmlediting.ui.highlighting;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.jdt.ui.text.IColorManager;
 import org.eclipse.jdt.ui.text.IJavaPartitions;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.javaeditor.extension.DefaultJavaSourceViewerConfigurationExtension;
+import org.key_project.jmlediting.ui.util.JML_UIPreferencesHelper;
 
 /**
  * An {@link DefaultJavaSourceViewerConfigurationExtension} to support JML.
@@ -14,7 +20,22 @@ import org.key_project.javaeditor.extension.DefaultJavaSourceViewerConfiguration
  */
 
 public class JMLSourceViewerConfigurationExtension extends
-DefaultJavaSourceViewerConfigurationExtension {
+      DefaultJavaSourceViewerConfigurationExtension {
+
+   @Override
+   public void init(final IColorManager colorManager,
+         final IPreferenceStore preferenceStore, final ITextEditor editor,
+         final String partitioning) {
+      super.init(colorManager, preferenceStore, editor, partitioning);
+      JML_UIPreferencesHelper
+            .addPreferencesListener(new IPreferenceChangeListener() {
+
+               @Override
+               public void preferenceChange(final PreferenceChangeEvent event) {
+                  // editor.g
+               }
+            });
+   }
 
    /**
     * Replaces the original PresentationReconcilers Damager and Repairers for
@@ -24,7 +45,7 @@ DefaultJavaSourceViewerConfigurationExtension {
     *           the sourceViewer the PresentationReconciler is used in
     * @param currentResult
     *           the original PresentationReconciler
-    * 
+    *
     * @return a JML supporting PresentationReconciler
     *
     */

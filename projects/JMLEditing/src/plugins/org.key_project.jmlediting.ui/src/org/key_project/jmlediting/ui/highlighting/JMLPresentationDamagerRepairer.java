@@ -19,7 +19,6 @@ import org.eclipse.swt.widgets.Display;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.ui.util.JML_UIPreferencesHelper;
-import org.key_project.util.eclipse.WorkbenchUtil;
 
 /**
  * A Modified DefaultDamagerRepairer as it is used by the
@@ -29,7 +28,7 @@ import org.key_project.util.eclipse.WorkbenchUtil;
  * @author David Giessing
  */
 public class JMLPresentationDamagerRepairer implements IPresentationDamager,
-      IPresentationRepairer {
+IPresentationRepairer {
 
    /**
     * The original instance of DefaultDamagerRepairer currently in use for
@@ -66,8 +65,7 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
    public void createPresentation(final TextPresentation presentation,
          final ITypedRegion damage) {
       boolean jml = false;
-      final RGB jmlColor = JML_UIPreferencesHelper
-            .getActiveJMLColor(WorkbenchUtil.getCurrentProject());
+      final RGB jmlColor = JML_UIPreferencesHelper.getWorkspaceJMLColor();
       final CommentLocator locator = new CommentLocator(this.doc.get());
       jml = locator.isInJMLcomment(damage.getOffset());
       final TextAttribute ta;
@@ -121,7 +119,7 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
       if (eventLine == commentLine) {
          return new Region(surroundingComment.getBeginOffset(),
                surroundingComment.getEndOffset()
-               - surroundingComment.getBeginOffset() + 1);
+                     - surroundingComment.getBeginOffset() + 1);
       }
 
       return damage;

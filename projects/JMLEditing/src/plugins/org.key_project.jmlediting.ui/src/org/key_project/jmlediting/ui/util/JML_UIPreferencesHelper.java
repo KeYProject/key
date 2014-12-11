@@ -1,9 +1,8 @@
 package org.key_project.jmlediting.ui.util;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.swt.graphics.RGB;
 import org.key_project.jmlediting.ui.Activator;
@@ -13,20 +12,10 @@ public final class JML_UIPreferencesHelper {
    /**
     * The name of the JML profile property of a project.
     */
-   public static final QualifiedName COMMENT_COLOR = new QualifiedName(
-         "org.key_project.jmleiditing.ui", "CommentColor");
+   public static final String JML_COMMENT_COLOR_KEY = "org.key_project.jmleiditing.ui.CommentColor";
 
    private JML_UIPreferencesHelper() {
 
-   }
-
-   public static void setProjectJMLColor(final IProject project, final RGB color)
-         throws CoreException {
-      String value = null;
-      if (color != null) {
-         value = rgbToString(color);
-      }
-      project.setPersistentProperty(COMMENT_COLOR, value);
    }
 
    public static void setDefaultJMLColor(final RGB color) {
@@ -36,38 +25,21 @@ public final class JML_UIPreferencesHelper {
       final IEclipsePreferences preferences = InstanceScope.INSTANCE
             .getNode(Activator.PLUGIN_ID);
       // global properties
-      preferences.put(JML_UIPreferencesHelper.COMMENT_COLOR.getLocalName(),
-            rgbToString(color));
+      preferences.put(JML_COMMENT_COLOR_KEY, rgbToString(color));
 
-   }
-
-   public static RGB getProjectJMLColor(final IProject project) {
-      try {
-         final String colorString = project
-               .getPersistentProperty(JML_UIPreferencesHelper.COMMENT_COLOR);
-         if (colorString == null) {
-            return null;
-         }
-         return stringtoRGB(colorString);
-      }
-      catch (final CoreException e) {
-         return null;
-      }
-   }
-
-   public static boolean hasProjectJMLColor(final IProject project) {
-      return getProjectJMLColor(project) != null;
    }
 
    public static RGB getWorkspaceJMLColor() {
       final IEclipsePreferences preferences = InstanceScope.INSTANCE
             .getNode(Activator.PLUGIN_ID);
-      final String colorString = preferences.get(
-            JML_UIPreferencesHelper.COMMENT_COLOR.getLocalName(), null);
+      final String colorString = preferences.get(JML_COMMENT_COLOR_KEY, null);
       if (colorString == null) {
          return getDefaultJMLColor();
       }
       final RGB color = stringtoRGB(colorString);
+      if (color == null) {
+         return getDefaultJMLColor();
+      }
 
       return color;
 
@@ -75,14 +47,6 @@ public final class JML_UIPreferencesHelper {
 
    public static RGB getDefaultJMLColor() {
       return new RGB(64, 0, 128);
-   }
-
-   public static RGB getActiveJMLColor(final IProject project) {
-      RGB color = getProjectJMLColor(project);
-      if (color == null) {
-         color = getWorkspaceJMLColor();
-      }
-      return color;
    }
 
    /**
@@ -112,4 +76,27 @@ public final class JML_UIPreferencesHelper {
       return rgb.red + "," + rgb.green + "," + rgb.blue;
    }
 
+   public static IPreferenceChangeListener addPreferencesListener(
+         final IPreferenceChangeListener listener) {
+      final IEclipsePreferences preferences = InstanceScope.INSTANCE
+            .getNode(Activator.PLUGIN_ID);
+      final IPreferenceChangeListener newListener = new IPreferenceChangeListener() {
+
+         @Override
+         public void preferenceChange(final PreferenceChangeEvent event) {
+            if (JML_COMMENT_COLOR_KEY.equals(event.getKey())) {
+               listener.preferenceChange(event);
+            }
+         }
+      };
+      preferences.addPreferenceChangeListener(newListener);
+      return newListener;
+
+   }
+
+   public static void removePreferencesListener(
+         final IPreferenceChangeListener listener) {
+      InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID)
+            .removePreferenceChangeListener(listener);
+   }
 }
