@@ -26,7 +26,7 @@ import org.key_project.jmlediting.ui.util.JML_UIPreferencesHelper;
  * @author Thomas Glaser
  *
  */
-public class TestJMLColorPropertyPreferencePage {
+public class JMLColorPreferencePageTest {
    static SWTWorkbenchBot bot = new SWTWorkbenchBot();
 
    private SWTBotButton commentColorButton;
@@ -63,7 +63,7 @@ public class TestJMLColorPropertyPreferencePage {
       Display.getDefault().syncExec(new Runnable() {
          @Override
          public void run() {
-            final Object oSelector = TestJMLColorPropertyPreferencePage.this.commentColorButton.widget
+            final Object oSelector = JMLColorPreferencePageTest.this.commentColorButton.widget
                   .getData();
             assertTrue(oSelector instanceof ColorSelector);
             final ColorSelector selector = (ColorSelector) oSelector;

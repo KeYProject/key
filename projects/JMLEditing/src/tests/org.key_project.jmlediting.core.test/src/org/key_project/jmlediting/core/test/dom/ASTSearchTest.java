@@ -27,17 +27,17 @@ public class ASTSearchTest {
             Nodes.getDepthMostNodeWithPosition(45, mainNode));
       assertEquals(T0, Nodes.getDepthMostNodeWithPosition(22, mainNode)
             .getType());
-      assertEquals(T1, Nodes.getDepthMostNodeWithPosition(20, mainNode)
+      assertEquals(T1, Nodes.getDepthMostNodeWithPosition(19, mainNode)
             .getType());
       assertEquals(T3, Nodes.getDepthMostNodeWithPosition(10, mainNode)
             .getType());
-      assertEquals(T3, Nodes.getDepthMostNodeWithPosition(14, mainNode)
+      assertEquals(T3, Nodes.getDepthMostNodeWithPosition(13, mainNode)
             .getType());
-      assertEquals(T4, Nodes.getDepthMostNodeWithPosition(17, mainNode)
+      assertEquals(T4, Nodes.getDepthMostNodeWithPosition(16, mainNode)
             .getType());
       assertEquals(T5, Nodes.getDepthMostNodeWithPosition(18, mainNode)
             .getType());
-      assertEquals(T6, Nodes.getDepthMostNodeWithPosition(30, mainNode)
+      assertEquals(T6, Nodes.getDepthMostNodeWithPosition(29, mainNode)
             .getType());
    }
 

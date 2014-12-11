@@ -54,14 +54,17 @@ public final class Nodes {
       return node.search(new INodeSearcher<IASTNode>() {
 
          @Override
-         public IASTNode searchNode(final IASTNode node) {
-            if (node.getStartOffset() <= position
-                  && position <= node.getEndOffset()) {
-               if (node.getChildren().isEmpty()) {
-                  return node;
+         public IASTNode searchNode(final IASTNode n) {
+            if (n.getStartOffset() > position || n.getEndOffset() <= position) {
+               return null;
+            }
+            for (final IASTNode node : n.getChildren()) {
+               if (node.getStartOffset() <= position
+                     && position < node.getEndOffset()) {
+                  return null;
                }
             }
-            return null;
+            return n;
          }
 
          @Override

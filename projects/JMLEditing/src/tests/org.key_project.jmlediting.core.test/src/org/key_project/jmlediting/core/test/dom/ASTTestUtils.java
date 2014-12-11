@@ -19,7 +19,7 @@ public class ASTTestUtils {
          40,
          T0,
          Nodes.createNode(10, 20, T1, Nodes.createNode(10, 15, T3),
-               Nodes.createNode(15, 19, T4, Nodes.createNode(18, 18, T5))),
+               Nodes.createNode(15, 19, T4, Nodes.createNode(18, 19, T5))),
                Nodes.createNode(25, 40, T2, Nodes.createNode(25, 40, T6)));
 
    public static final IASTNode NODE_2 = Nodes.createNode(0, 0, T0);
