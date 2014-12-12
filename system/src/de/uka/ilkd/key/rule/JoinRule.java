@@ -54,8 +54,11 @@ public abstract class JoinRule implements BuiltInRule {
             sequentToSETriple(joinPartner.first, joinPartner.second, services);
       
       // Join them!
-      Triple<Term, Term, Term> joinedState =
-            joinStates(thisSEState, partnerSEState);
+      Pair<Term, Term> joinedState = joinStates(
+            new Pair<Term, Term> (thisSEState.first, thisSEState.second),
+            new Pair<Term, Term> (partnerSEState.first, partnerSEState.second),
+            thisSEState.third,
+            services);
       
       // Delete previous sequents      
       clearSemisequent(g, true);
@@ -69,7 +72,7 @@ public abstract class JoinRule implements BuiltInRule {
       
       // Add new succedent (symbolic state & program counter)
       SequentFormula newSuccedent = new SequentFormula(
-            tb.apply(joinedState.first, joinedState.third));
+            tb.apply(joinedState.first, thisSEState.third));
       g.addFormula(
             newSuccedent,
             new PosInOccurrence(newSuccedent, PosInTerm.getTopLevel(), false));
@@ -92,16 +95,20 @@ public abstract class JoinRule implements BuiltInRule {
    }
    
    /**
-    * Joins two SE states (U1,C1,p) and (U2,C2,p).
+    * Joins two SE states (U1,C1,p) and (U2,C2,p). p must
+    * be the same in both states, so it is supplied separately.
     * 
     * @param state1 First SE state.
     * @param state2 Second SE state.
-    * @return A new joined SE state (U*,C*,p) which is
+    * @param services The services object.
+    * @return A new joined SE state (U*,C*) which is
     *   a weakening of both the original states.
     */
-   protected abstract Triple<Term, Term, Term> joinStates(
-         Triple<Term, Term, Term> state1,
-         Triple<Term, Term, Term> state2);
+   protected abstract Pair<Term, Term> joinStates(
+         Pair<Term, Term> state1,
+         Pair<Term, Term> state2,
+         Term programCounter,
+         Services services);
 
    /**
     * We admit top level formulas of the form \&lt;{ ... }\&gt; phi
