@@ -35,7 +35,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Triple;
@@ -114,12 +114,36 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
           services.getNamespaces().programVariables().addSafely(l);
           final Term u = TB.elementary(l, TB.var(heap));
           if(atPreUpdate == null) {
-             atPreUpdate =u;
+             atPreUpdate = u;
           }else{
              atPreUpdate = TB.parallel(atPreUpdate, u);
           }
           atPres.put(heap, TB.var(l));
           atPreVars.put(heap, l);
+        }
+
+        //create atPre for parameters
+        for (LoopStatement loop : loops) {
+            LoopInvariant inv
+               = services.getSpecificationRepository().getLoopInvariant(loop);
+            if(inv != null) {
+                for (LocationVariable var : inv.getInternalAtPres().keySet()) {
+                    if(atPres.containsKey(var)) {
+                        // heaps have already been considered, or more than one loop
+                        continue;
+                    }
+                    final LocationVariable l = TB.heapAtPreVar(var.name()+"Before_" + methodName, var.sort(), true);
+                    services.getNamespaces().programVariables().addSafely(l);
+                    final Term u = TB.elementary(l, TB.var(var));
+                    if(atPreUpdate == null) {
+                        atPreUpdate = u;
+                    } else {
+                        atPreUpdate = TB.parallel(atPreUpdate, u);
+                    }
+                    atPres.put(var, TB.var(l));
+                    atPreVars.put(var, l);
+                }
+            }
         }
 
         //update loop invariants
@@ -151,10 +175,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                   final Term m = inv.getModifies(heap, selfTerm, atPres, services);
                   final ImmutableList<InfFlowSpec> infFlowSpecs =
                                  inv.getInfFlowSpecs(heap, selfTerm, atPres, services);
-                  final Term i = inv.getInvariant(heap, selfTerm, atPres, services);
+                  final Term in = inv.getInvariant(heap, selfTerm, atPres, services);
                   if(m != null) { newMods.put(heap, m); }
                   newInfFlowSpecs.put(heap, infFlowSpecs);
-                  if(i != null) { newInvariants.put(heap, i); }
+                  if(in != null) { newInvariants.put(heap, in); }
                 }
                 ImmutableList<Term> newLocalIns = TB.var(MiscTools.getLocalIns(loop, services));
                 ImmutableList<Term> newLocalOuts = TB.var(MiscTools.getLocalOuts(loop, services));
