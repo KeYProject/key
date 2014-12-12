@@ -24,16 +24,28 @@ public class JMLCompletionUtil {
          .asList(new String[0]);
 
    /**
-    * Fallback Method to display all JML Keyword-Proposals, if Parser fails.
+    * Get all (filtered) JML Keyword-Proposals.
     *
     * @param context
     *           the {@link JavaContentAssistInvocationContext} to get the
     *           standardProposals for
-    * @return the computed standardProposals
+    * @param prefix
+    *           the prefix to compute the proposals for, null for the
+    *           standardProposals
+    * @param proposalImage
+    *           the Image to be displayed in front of the proposal, null for no
+    *           Image
+    * @param filter
+    *           the Class extending {@link IKeyword} to filter the proposals
+    * @return List<{@link ICompletionProposal}> the computed standardProposals
     */
-   public static List<ICompletionProposal> getStandardProposals(
+   public static List<ICompletionProposal> getProposals(
          final JavaContentAssistInvocationContext context,
-         final Image proposalImage, final Class<? extends IKeyword> filter) {
+         final String proposalPrefix, final Image proposalImage,
+         final Class<? extends IKeyword> filter) {
+      if (filter == null) {
+         throw new IllegalArgumentException("filter may not be null!");
+      }
       final List<ICompletionProposal> result = new LinkedList<ICompletionProposal>();
 
       // Load the specific JMLProfile for the current Project.
@@ -41,9 +53,13 @@ public class JMLCompletionUtil {
             .getProjectActiveJMLProfile(context.getProject().getProject());
 
       try {
-         // add proposals only if Content Assist is invoked in JML Code
-         // get the prefix to filter only fitting keywords
-         final String prefix = context.computeIdentifierPrefix().toString();
+         final String prefix;
+         if (proposalPrefix == null) {
+            prefix = context.computeIdentifierPrefix().toString();
+         }
+         else {
+            prefix = proposalPrefix;
+         }
          final int prefixLength = prefix.length();
 
          // compute the offset for replacing the prefix
@@ -81,5 +97,16 @@ public class JMLCompletionUtil {
          e.printStackTrace();
       }
       return result;
+   }
+
+   /**
+    * @see JMLCompletionUtil.getProposals( final
+    *      JavaContentAssistInvocationContext context, final Image
+    *      proposalImage, final Class<? extends IKeyword> filter)
+    */
+   public static List<ICompletionProposal> getStandardProposals(
+         final JavaContentAssistInvocationContext context,
+         final Image proposalImage) {
+      return getProposals(context, null, proposalImage, IKeyword.class);
    }
 }

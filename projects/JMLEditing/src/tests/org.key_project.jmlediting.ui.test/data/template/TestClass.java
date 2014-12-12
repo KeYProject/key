@@ -12,7 +12,7 @@ public class TestClass {
     * some casual Java Comment  (12:32)
     */
    /*@
-    * JML COMMENT  (15:19)
+    @ JML COMMENT  (15:19)
     */
    //offset in Class (18:4)
    

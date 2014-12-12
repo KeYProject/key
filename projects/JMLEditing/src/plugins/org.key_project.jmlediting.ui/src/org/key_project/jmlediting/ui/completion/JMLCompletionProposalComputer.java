@@ -34,7 +34,7 @@ import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
  * @author Thomas Glaser
  */
 public class JMLCompletionProposalComputer implements
-      IJavaCompletionProposalComputer {
+IJavaCompletionProposalComputer {
 
    private static Image img = null;
 
@@ -45,7 +45,7 @@ public class JMLCompletionProposalComputer implements
       try {
          return new Image(Display.getCurrent(), new ImageLoader().load(new URL(
                "platform:/plugin/org.key_project.jmlediting.ui/icons/jml.png")
-               .openStream())[0]);
+         .openStream())[0]);
       }
       catch (final IOException ioe) {
          return null;
@@ -66,8 +66,10 @@ public class JMLCompletionProposalComputer implements
             .get());
       final CommentRange comment = locator.getJMLComment(context
             .getInvocationOffset());
-      if (comment != null) {
 
+      // add proposals only if Content Assist is invoked in JML Code
+      // get the prefix to filter only fitting keywords
+      if (comment != null) {
          IProject currentProject;
          JavaContentAssistInvocationContext javaContext = null;
          if (context instanceof JavaContentAssistInvocationContext) {
@@ -102,7 +104,7 @@ public class JMLCompletionProposalComputer implements
             // Fallback Method to display all JML Keyword-Proposals, if Parser
             // fails.
             return JMLCompletionUtil.getStandardProposals(javaContext,
-                  getJMLImg(), IKeyword.class);
+                  getJMLImg());
          }
       }
       return result;
