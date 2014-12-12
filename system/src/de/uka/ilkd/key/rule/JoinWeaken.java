@@ -42,6 +42,10 @@ public class JoinWeaken implements BuiltInRule {
       final PosInOccurrence pio = ruleApp.posInOccurrence();
       Term selected = pio.subTerm();
       
+      if (findJoinPartner(goal, pio, services) == null) {
+         return null;
+      }
+      
       ImmutableList<Goal> newGoal = goal.split(1);
       Goal g = newGoal.head();
       
@@ -82,8 +86,10 @@ public class JoinWeaken implements BuiltInRule {
                            new LogicVariable(new Name(newName), v.sort()))));
       }
       
+      // Find join partner
       Pair<Goal,PosInOccurrence> joinPartner = findJoinPartner(g, pio, services);
       
+      // Convert sequents to SE states
       Triple<Term, Term, Term> thisSEState =
             sequentToSETriple(g, pio, services);
       Triple<Term, Term, Term> partnerSEState =
@@ -250,7 +256,7 @@ public class JoinWeaken implements BuiltInRule {
     * @param goal Current goal to join.
     * @param pio Position of update-program counter formula in goal.
     * @param services The services object.
-    * @return A suitable join partner.
+    * @return A suitable join partner or null, if there is no such one.
     */
    private Pair<Goal,PosInOccurrence> findJoinPartner(
          Goal goal, PosInOccurrence pio, Services services) {
