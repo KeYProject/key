@@ -9,6 +9,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -20,7 +22,8 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * Rule that joins two sequents based on weakening.
@@ -79,12 +82,47 @@ public class JoinWeaken implements BuiltInRule {
                            new LogicVariable(new Name(newName), v.sort()))));
       }
       
+      Pair<Goal,PosInOccurrence> joinPartner = findJoinPartner(g, pio, services);
+      
+      Triple<Term, Term, Term> thisSEState =
+            sequentToSETriple(g, pio, services);
+      Triple<Term, Term, Term> partnerSEState =
+            sequentToSETriple(joinPartner.first, joinPartner.second, services);
+      
+      // Construct weakened update and modality formula
       Term newUpdate  = tb.parallel(newElementaryUpdates);
       Term newFormula = tb.apply(newUpdate, termAfterUpdate);
-
-      g.changeFormula(
-            new SequentFormula(newFormula),
-            pio);
+      
+      // Delete previous sequents      
+      clearSemisequent(g, true);
+      clearSemisequent(g, false);
+      
+      // Add new antecedent (path condition)
+      SequentFormula newAntecedent = new SequentFormula(services.getTermBuilder()
+            .or(thisSEState.second, partnerSEState.second));
+      g.addFormula(
+            newAntecedent,
+            new PosInOccurrence(newAntecedent, PosInTerm.getTopLevel(), true));
+      
+      // Add new succedent (symbolic state & program counter)
+      SequentFormula newSuccedent = new SequentFormula(newFormula);
+      g.addFormula(
+            newSuccedent,
+            new PosInOccurrence(newSuccedent, PosInTerm.getTopLevel(), false));
+      
+      // Close partner goal
+      ImmutableList<Goal> jpNewGoals = joinPartner.first.split(1);
+      Goal jpNewGoal = jpNewGoals.head();
+      jpNewGoal.setBranchLabel("Joined with node " + goal.node().serialNr());
+      
+      clearSemisequent(jpNewGoal, true);
+      clearSemisequent(jpNewGoal, false);
+      SequentFormula trueSeqForm = new SequentFormula(services.getTermBuilder().tt());
+      jpNewGoal.addFormula(
+            trueSeqForm,
+            new PosInOccurrence(trueSeqForm, PosInTerm.getTopLevel(), false));
+      
+      jpNewGoal.proof().closeGoal(joinPartner.first);
       
       return newGoal;
    }
@@ -111,6 +149,22 @@ public class JoinWeaken implements BuiltInRule {
     */
    @Override
    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+      return isApplicable(goal, pio, true);
+   }
+   
+   /**
+    * We admit top level formulas of the form \&lt;{ ... }\&gt; phi
+    * and U \&lt;{ ... }\&gt; phi, where U must be an update
+    * in normal form, i.e. a parallel update of elementary
+    * updates. When checkAutomatic is set to true, only interactive
+    * goals are admitted.
+    * 
+    * @param goal Current goal.
+    * @param pio Position of selected sequent formula.
+    * @param checkAutomatic if true, only interactive goals are applicable.
+    * @return true iff a suitable top level formula for joining.
+    */
+   public boolean isApplicable(Goal goal, PosInOccurrence pio, boolean checkAutomatic) {
       // We admit top level formulas of the form \<{ ... }\> phi
       // and U \<{ ... }\> phi, where U must be an update
       // in normal form, i.e. a parallel update of elementary
@@ -120,7 +174,7 @@ public class JoinWeaken implements BuiltInRule {
       // since in early stages of experimenting, it was possible
       // to perform an infinite chain of applications, which was
       // done by the automatic strategy.
-      if (goal.isAutomatic()) {
+      if (checkAutomatic && goal.isAutomatic()) {
          return false;
       }
       
@@ -167,6 +221,119 @@ public class JoinWeaken implements BuiltInRule {
    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
       return new DefaultBuiltInRuleApp(this, pos);
    }
+   
+   /**
+    * Deletes all formulae of the succedent / antecedent.
+    * 
+    * @param goal Goal to delete formulae from.
+    * @param antec If true, antecedent formulae are deleted, else
+    *    succedent formulae.
+    */
+   private void clearSemisequent(Goal goal, boolean antec) {
+      Semisequent semiseq = antec ?
+            goal.sequent().antecedent() :
+            goal.sequent().succedent();
+      for (int i = 0; i < semiseq.size(); i++) {
+         SequentFormula f = semiseq.get(i);
+         
+         PosInTerm pit = PosInTerm.getTopLevel();
+         pit.down(i);
+         
+         PosInOccurrence gPio = new PosInOccurrence(f, pit, antec);
+         goal.removeFormula(gPio);
+      }
+   }
+   
+   /**
+    * Finds a suitable join partner.
+    * 
+    * @param goal Current goal to join.
+    * @param pio Position of update-program counter formula in goal.
+    * @param services The services object.
+    * @return A suitable join partner.
+    */
+   private Pair<Goal,PosInOccurrence> findJoinPartner(
+         Goal goal, PosInOccurrence pio, Services services) {
+      ImmutableList<Goal> allGoals =
+            services.getProof().getSubtreeGoals(services.getProof().root());
+      
+      // Find potential partners -- for which isApplicable is true and
+      // they have the same program counter (and post condition).
+      ImmutableList<Pair<Goal,PosInOccurrence>> potentialPartners = ImmutableSLList.nil();
+      for (Goal g : allGoals) {
+         if (!g.equals(goal)) {
+            Semisequent succedent = g.sequent().succedent();
+            for (int i = 0; i < succedent.size(); i++) {
+               SequentFormula f = succedent.get(i);
+               
+               PosInTerm pit = PosInTerm.getTopLevel();
+               pit.down(i);
+               
+               PosInOccurrence gPio = new PosInOccurrence(f, pit, false);
+               if (isApplicable(g, gPio, false)) {
+                  Triple<Term, Term, Term> ownSEState = sequentToSETriple(
+                        goal, pio, services);
+                  Triple<Term, Term, Term> partnerSEState = sequentToSETriple(
+                        g, gPio, services);
+                  
+                  if (ownSEState.third.equals(partnerSEState.third)) {
+                     potentialPartners = potentialPartners.prepend(
+                           new Pair<Goal, PosInOccurrence> (g, gPio));
+                  }
+               }
+            }
+         }
+      }
+      
+      return potentialPartners.head(); // TODO: Add option for choice later (maybe GUI)!
+   }
+   
+   /**
+    * Converts a sequent (given by goal & pos in occurrence) to
+    * an SE state (U,C,p).
+    * 
+    * @param goal Current goal.
+    * @param pio Position of update-program counter formula in goal.
+    * @param services The services object.
+    * @return An SE state (U,C,p).
+    */
+   private Triple<Term, Term, Term> sequentToSETriple(
+         Goal goal, PosInOccurrence pio, Services services) {
+      
+      ImmutableList<SequentFormula> pathConditionSet = ImmutableSLList.nil();
+      pathConditionSet = pathConditionSet.prepend(goal.sequent().antecedent().toList());
+      
+      Term selected = pio.subTerm();
+      
+      for (SequentFormula sf : goal.sequent().succedent()) {
+         if (!sf.formula().equals(selected)) {
+            pathConditionSet = pathConditionSet.prepend(
+                  new SequentFormula(services.getTermBuilder().not(sf.formula())));
+         }
+      }
+      
+      return new Triple<Term, Term, Term>(
+            selected.sub(0),                               // Update
+            joinListToAndTerm(pathConditionSet, services), // Path Condition
+            selected.sub(1));                              // Program Counter and Post Condition
+   }
+   
+   /**
+    * Joins a list of sequent formulae to an and-connected term.
+    * 
+    * @param formulae Formulae to join.
+    * @param services The services object.
+    * @return And-formula connecting the given terms.
+    */
+   private Term joinListToAndTerm(ImmutableList<SequentFormula> formulae, Services services) {
+      if (formulae.size() == 1) {
+         return formulae.head().formula();
+      } else {
+         return services.getTermBuilder().and(
+               formulae.head().formula(),
+               joinListToAndTerm(formulae.tail(), services));
+      }
+   }
 
    /**
     * Checks if an update is of the form { x := v || ... || z := q}.
@@ -188,6 +355,10 @@ public class JoinWeaken implements BuiltInRule {
       }
    }
    
+   /**
+    * @param u The update (in normal form) to extract program locations from.
+    * @return All program locations (left sides) in the given update.
+    */
    private HashSet<LocationVariable> getUpdateLocations(Term u) {
       if (u.op() instanceof ElementaryUpdate) {
          HashSet<LocationVariable> result = new HashSet<LocationVariable>();
@@ -204,6 +375,11 @@ public class JoinWeaken implements BuiltInRule {
       }
    }
    
+   /**
+    * Visitor for collecting program locations in a Java block.
+    * 
+    * @author Dominic Scheurer
+    */
    private class CollectProgramVariablesVisitor extends CreatingASTVisitor {
       private HashSet<LocationVariable> variables =
             new HashSet<LocationVariable>();
@@ -222,6 +398,11 @@ public class JoinWeaken implements BuiltInRule {
          variables.add(x);
       }
       
+      /**
+       * Call start() before calling this method!
+       * 
+       * @return All program locations in the given Java block.
+       */
       public HashSet<LocationVariable> getVariables() {
          return variables;
       }
