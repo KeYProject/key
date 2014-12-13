@@ -103,7 +103,7 @@ public final class Nodes {
          @Override
          public List<IKeywordNode> traverse(final IASTNode node,
                final List<IKeywordNode> existing) {
-            if (node instanceof IKeyword) {
+            if (node instanceof IKeywordNode) {
                existing.add((IKeywordNode) node);
             }
             return existing;
