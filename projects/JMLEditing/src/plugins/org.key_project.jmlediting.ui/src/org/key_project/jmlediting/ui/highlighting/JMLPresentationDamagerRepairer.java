@@ -1,5 +1,8 @@
 package org.key_project.jmlediting.ui.highlighting;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
@@ -16,9 +19,17 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
+import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.core.dom.IKeywordNode;
+import org.key_project.jmlediting.core.dom.Nodes;
+import org.key_project.jmlediting.core.parser.IJMLParser;
+import org.key_project.jmlediting.core.parser.ParserException;
+import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
 import org.key_project.jmlediting.ui.util.JML_UIPreferencesHelper;
+import org.key_project.util.eclipse.WorkbenchUtil;
 
 /**
  * A Modified DefaultDamagerRepairer as it is used by the
@@ -28,7 +39,7 @@ import org.key_project.jmlediting.ui.util.JML_UIPreferencesHelper;
  * @author David Giessing
  */
 public class JMLPresentationDamagerRepairer implements IPresentationDamager,
-IPresentationRepairer {
+      IPresentationRepairer {
 
    /**
     * The original instance of DefaultDamagerRepairer currently in use for
@@ -106,29 +117,19 @@ IPresentationRepairer {
       if (surroundingComment == null) {
          return damage;
       }
-      int eventLine = 0; // Line of the offset from where the Event starts
-      int commentLine = 0; // Line of the offset the surrounding comment starts
-      try {
-         eventLine = this.doc.getLineOfOffset(event.getOffset());
-         commentLine = this.doc.getLineOfOffset(surroundingComment
-               .getBeginOffset());
-      }
-      catch (final BadLocationException e) {
-         e.printStackTrace();
-      }
-      if (eventLine == commentLine) {
+      else {
          return new Region(surroundingComment.getBeginOffset(),
                surroundingComment.getEndOffset()
                      - surroundingComment.getBeginOffset() + 1);
       }
-
-      return damage;
    }
 
    /**
     * Copied from {@link DefaultDamagerRepairer}.
     *
-    * Adds style information to the given text presentation.
+    * Adds style information to the given text presentation. In case of a JML
+    * Comment it provides Syntax Highlighting for JML Keywords. If the parser
+    * can not find a valid Keyword, the normal Highlighting is used.
     *
     * @param presentation
     *           the text presentation to be extended
@@ -138,6 +139,7 @@ IPresentationRepairer {
     *           the length of the range to be styled
     * @param attr
     *           the attribute describing the style of the range to be styled
+    * @throws BadLocationException
     */
 
    protected void addRange(final TextPresentation presentation,
@@ -151,6 +153,54 @@ IPresentationRepairer {
          styleRange.underline = (style & TextAttribute.UNDERLINE) != 0;
          styleRange.font = attr.getFont();
          presentation.addStyleRange(styleRange);
+         // From here it is all about Highlighting for JML Keywords
+         final CommentLocator locator = new CommentLocator(this.doc.get());
+         final CommentRange surroundingComment = locator.getJMLComment(offset);
+         // Only provide advanced SyntaxHighlighting for JML Comments
+         if (locator.isInJMLcomment(offset)) {
+            final IJMLProfile activeProfile = JMLPreferencesHelper
+                  .getProjectActiveJMLProfile(WorkbenchUtil.getCurrentProject());
+            final IJMLParser parser = activeProfile.createParser();
+            try {
+               final IASTNode parseResult = parser.parse(this.doc.get(),
+                     surroundingComment.getContentBeginOffset(),
+                     surroundingComment.getContentEndOffset());
+               final List<IKeywordNode> allKeywords = Nodes
+                     .getAllKeywords(parseResult);
+               int lastEnd = 0;
+               final List<StyleRange> styles = new ArrayList<StyleRange>();
+               for (final IKeywordNode kNode : allKeywords) {
+                  System.out.println("In For Loop building up styleranges");
+                  final int keywordStartOffset = kNode.getStartOffset();
+                  final int keywordEndOffset = kNode.getEndOffset();
+                  // Style between last and current Keyword (or from comment
+                  // begin until the start of first Keyword)
+                  styles.add(new StyleRange(lastEnd, keywordStartOffset
+                        - lastEnd, styleRange.foreground,
+                        styleRange.background, attr.getStyle()));
+                  // Style for the Keyword
+                  styles.add(new StyleRange(keywordStartOffset,
+                        keywordEndOffset - keywordStartOffset + 1,
+                        styleRange.foreground, styleRange.background, SWT.BOLD));
+                  lastEnd = keywordEndOffset + 1;
+               }
+               // Adding Style after last Keyword
+               styles.add(new StyleRange(lastEnd, surroundingComment
+                     .getEndOffset() - lastEnd + 1, styleRange.foreground,
+                     styleRange.background, attr.getStyle()));
+               // Transfer to Array for use in MergeStyle
+               final StyleRange[] highlightedRanges = new StyleRange[styles
+                                                                     .size()];
+               for (int i = 0; i < styles.size(); i++) {
+                  highlightedRanges[i] = styles.get(i);
+               }
+               presentation.mergeStyleRanges(highlightedRanges);
+            }
+            catch (final ParserException e) {
+               // Invalid JML Code, no advanced SyntaxColoring possible
+               System.out.println(e.getMessage());
+            }
+         }
       }
    }
 }
