@@ -3,7 +3,6 @@ package org.key_project.jmlediting.ui.highlighting;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -170,7 +169,6 @@ IPresentationRepairer {
                int lastEnd = offset;
                final List<StyleRange> styles = new ArrayList<StyleRange>();
                for (final IKeywordNode kNode : allKeywords) {
-                  System.out.println("In For Loop building up styleranges");
                   final int keywordStartOffset = kNode.getStartOffset();
                   final int keywordEndOffset = kNode.getEndOffset();
                   // Style between last and current Keyword (or from comment
