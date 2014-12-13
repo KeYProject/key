@@ -9,6 +9,7 @@ import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.javaeditor.extension.DefaultJavaSourceViewerConfigurationExtension;
 import org.key_project.jmlediting.ui.util.JML_UIPreferencesHelper;
@@ -20,19 +21,32 @@ import org.key_project.jmlediting.ui.util.JML_UIPreferencesHelper;
  */
 
 public class JMLSourceViewerConfigurationExtension extends
-      DefaultJavaSourceViewerConfigurationExtension {
+DefaultJavaSourceViewerConfigurationExtension {
 
    @Override
    public void init(final IColorManager colorManager,
          final IPreferenceStore preferenceStore, final ITextEditor editor,
          final String partitioning) {
       super.init(colorManager, preferenceStore, editor, partitioning);
-      JML_UIPreferencesHelper
+
+   }
+
+   private IPreferenceChangeListener listener = null;
+
+   private void configureListener(final ISourceViewer viewer) {
+      if (this.listener != null) {
+         return;
+      }
+      if (!(viewer instanceof SourceViewer)) {
+         return;
+      }
+      final SourceViewer sViewer = (SourceViewer) viewer;
+      this.listener = JML_UIPreferencesHelper
             .addPreferencesListener(new IPreferenceChangeListener() {
 
                @Override
                public void preferenceChange(final PreferenceChangeEvent event) {
-                  // editor.g
+                  sViewer.invalidateTextPresentation();
                }
             });
    }
@@ -53,6 +67,7 @@ public class JMLSourceViewerConfigurationExtension extends
    public IPresentationReconciler getPresentationReconciler(
          final ISourceViewer sourceViewer,
          final IPresentationReconciler currentResult) {
+      this.configureListener(sourceViewer);
       final PresentationReconciler reconciler = (PresentationReconciler) currentResult;
       // Replace DefaultDamagerRepairer in currentResult to support JML
       DefaultDamagerRepairer dr = (DefaultDamagerRepairer) reconciler
