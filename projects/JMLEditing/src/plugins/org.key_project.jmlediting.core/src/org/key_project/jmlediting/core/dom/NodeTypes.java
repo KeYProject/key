@@ -15,6 +15,8 @@ public final class NodeTypes {
    public static final int NODE = getNewType("Node");
    public static final int LIST = getNewType("List");
    public static final int SEQ = getNewType("Seq");
+   public static final int SOME = getNewType("Some");
+   public static final int NONE = getNewType("None");
 
    public static int getNewType(final String name) {
       final int type = newType;

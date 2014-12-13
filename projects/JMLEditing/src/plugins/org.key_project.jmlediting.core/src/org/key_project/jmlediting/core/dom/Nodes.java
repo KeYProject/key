@@ -49,6 +49,15 @@ public final class Nodes {
       return new KeywordNode(startOffset, endOffset, keyword, keywordInstance);
    }
 
+   public static IASTNode createOptional(final IASTNode node, final int nonePos) {
+      if (node == null) {
+         return createNode(nonePos, nonePos, NodeTypes.NONE);
+      }
+      else {
+         return createNode(NodeTypes.SOME, node);
+      }
+   }
+
    public static boolean isString(final IASTNode node) {
       return node.getType() == NodeTypes.STRING;
    }
