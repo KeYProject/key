@@ -120,7 +120,7 @@ IPresentationRepairer {
       else {
          return new Region(surroundingComment.getBeginOffset(),
                surroundingComment.getEndOffset()
-               - surroundingComment.getBeginOffset() + 1);
+                     - surroundingComment.getBeginOffset() + 1);
       }
    }
 
