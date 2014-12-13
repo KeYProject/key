@@ -11,6 +11,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
+import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 
 public class JMLCompletionUtil {
@@ -49,19 +50,20 @@ public class JMLCompletionUtil {
          final int proposalOffset = context.getInvocationOffset()
                - prefix.length();
 
+         // get only the Keywords that match the filter
+         final Set<IKeyword> filteredKeywordList = JMLProfileHelper
+               .filterKeywords(currentJMLProfile, filter);
+
          // Iterate through the supported Keywords defined in JMLProfile
-         for (final IKeyword keywordContainer : currentJMLProfile
-               .getSupportedKeywords()) {
-            if (filter.isAssignableFrom(keywordContainer.getClass())) {
-               final Set<String> keywords = keywordContainer.getKeywords();
-               // check for all spellings
-               for (final String keyword : keywords) {
-                  // ignore not possible suggestions
-                  if (keyword.startsWith(prefix)) {
-                     result.add(new CompletionProposal(keyword, proposalOffset,
-                           prefixLength, keyword.length(), proposalImage, null,
-                           null, null));
-                  }
+         for (final IKeyword keywordContainer : filteredKeywordList) {
+            final Set<String> keywords = keywordContainer.getKeywords();
+            // check for all spellings
+            for (final String keyword : keywords) {
+               // ignore not possible suggestions
+               if (keyword.startsWith(prefix)) {
+                  result.add(new CompletionProposal(keyword, proposalOffset,
+                        prefixLength, keyword.length(), proposalImage, null,
+                        null, null));
                }
             }
          }
