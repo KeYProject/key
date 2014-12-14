@@ -33,12 +33,12 @@ import org.key_project.util.eclipse.WorkbenchUtil;
 /**
  * A Modified DefaultDamagerRepairer as it is used by the
  * JavaSourceViewerConiguration. It adapts the results of the original functions
- * to allow Comment Highlighting for JML
+ * to allow Comment Highlighting for JML and Keyword Highlighting for JML
  *
  * @author David Giessing
  */
 public class JMLPresentationDamagerRepairer implements IPresentationDamager,
-IPresentationRepairer {
+      IPresentationRepairer {
 
    /**
     * The original instance of DefaultDamagerRepairer currently in use for
@@ -119,7 +119,7 @@ IPresentationRepairer {
       else {
          return new Region(surroundingComment.getBeginOffset(),
                surroundingComment.getEndOffset()
-                     - surroundingComment.getBeginOffset() + 1);
+               - surroundingComment.getBeginOffset() + 1);
       }
    }
 
@@ -188,7 +188,7 @@ IPresentationRepairer {
                      styleRange.background, attr.getStyle()));
                // Transfer to Array for use in MergeStyle
                final StyleRange[] highlightedRanges = new StyleRange[styles
-                     .size()];
+                                                                     .size()];
                for (int i = 0; i < styles.size(); i++) {
                   highlightedRanges[i] = styles.get(i);
                }

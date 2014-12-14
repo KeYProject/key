@@ -21,7 +21,7 @@ import org.key_project.jmlediting.ui.util.JML_UIPreferencesHelper;
  */
 
 public class JMLSourceViewerConfigurationExtension extends
-DefaultJavaSourceViewerConfigurationExtension {
+      DefaultJavaSourceViewerConfigurationExtension {
 
    @Override
    public void init(final IColorManager colorManager,
@@ -31,8 +31,18 @@ DefaultJavaSourceViewerConfigurationExtension {
 
    }
 
+   /**
+    * a PreferenceChangeListener to check whether the JML Comment Color has
+    * changed.
+    */
    private IPreferenceChangeListener listener = null;
 
+   /**
+    * A Method for instantiating the listener.
+    * 
+    * @param viewer
+    *           the sourceViewer this Configuration works on
+    */
    private void configureListener(final ISourceViewer viewer) {
       if (this.listener != null) {
          return;
@@ -53,7 +63,8 @@ DefaultJavaSourceViewerConfigurationExtension {
 
    /**
     * Replaces the original PresentationReconcilers Damager and Repairers for
-    * JavaComments so that JML SyntaxColoring is supported.
+    * JavaComments so that JML SyntaxColoring is supported. Also instantiates
+    * the Color Preference listener
     *
     * @param sourceViewer
     *           the sourceViewer the PresentationReconciler is used in
