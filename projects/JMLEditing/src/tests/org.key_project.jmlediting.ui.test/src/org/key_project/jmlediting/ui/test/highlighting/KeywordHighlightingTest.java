@@ -56,12 +56,14 @@ import org.key_project.util.test.util.TestUtilsUtil;
  *         </li>
  *         <li>Keyword ensures after change from JavaSingleLine to JMLSingleLine
  *         </li>
- *         <li>Keyword ensures after change from JMLMultiLine to JavaMultiLine</li>
- *         <li>Keyword ensures after change from JavaMultiLine to JMLMultiLine</li>
- *         <li>Keyword ensures after change from JMLMultiLine to JavaDoc</li>
- *         <li>Keyword ensures after change from JavaDoc to JMLMultiLine</li>
- *         <li>Keyword ensures after change from JavaDoc to JavaMultiLine</li>
- *         <li>Keyword ensures after change from JavaMultiLine to JavaDoc</li>
+ *         <li>Keyword after change from JMLMultiLine to JavaMultiLine</li>
+ *         <li>Keyword after change from JavaMultiLine to JMLMultiLine</li>
+ *         <li>Keyword after change from JMLMultiLine to JavaDoc</li>
+ *         <li>Keyword after change from JavaDoc to JMLMultiLine</li>
+ *         <li>Keyword after change from JavaDoc to JavaMultiLine</li>
+ *         <li>Keyword after change from JavaMultiLine to JavaDoc</li>
+ *         <li>Keyword after change from JavaSingleLine to JMLSingleLine</li>
+ *         <li>Keyword after change from JMLSingleLine to JavaSingleLine</li>
  *         </ul>
  */
 public class KeywordHighlightingTest {
@@ -74,7 +76,7 @@ public class KeywordHighlightingTest {
    private static final String PACKAGE_NAME = "test";
    private static final String CLASS_NAME = "KeywordHighlightingTestClass";
 
-   private static final Position ensuresJavaSLine = new Position(2, 2);
+   private static final Position ensuresJavaSLine = new Position(2, 3);
    private static final Position ensuresJavaDoc = new Position(6, 3);
    private static final Position ensuresJavaMLine = new Position(11, 6);
    private static final Position ensuresJMLMline = new Position(14, 7);
@@ -111,8 +113,8 @@ public class KeywordHighlightingTest {
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID,
             "data/template", testFolder);
       bot.tree().getTreeItem(PROJECT_NAME).select().expand().getNode("src")
-      .select().expand().getNode(PACKAGE_NAME).select().expand()
-      .getNode(CLASS_NAME + ".java").select().doubleClick();
+            .select().expand().getNode(PACKAGE_NAME).select().expand()
+            .getNode(CLASS_NAME + ".java").select().doubleClick();
       JMLPreferencesHelper.setProjectJMLProfile(project.getProject(),
             TestUtils.findReferenceProfile());
    }
@@ -129,8 +131,8 @@ public class KeywordHighlightingTest {
    /*
     * removes the text with given length at Position pos
     */
-   private void removeText(final Position pos, final int length) {
-      this.editor.selectRange(pos.line, pos.column, length);
+   private void removeText(final int line, final int column, final int length) {
+      this.editor.selectRange(line, column, length);
       bot.sleep(100);
       this.editor.pressShortcut(Keystrokes.DELETE);
    }
@@ -185,7 +187,92 @@ public class KeywordHighlightingTest {
 
    @Test
    public void ensuresKeywordAfterChangesTest() {
+      this.changeDocument();
+      assertFalse("ensures keyword was bold but should not have been",
+            this.isBold(ensuresJMLMline.line, ensuresJMLMline.column, 7));
+      assertTrue("ensures keyword was not bold but should have been",
+            this.isBold(ensuresJavaMLine.line, ensuresJavaMLine.column, 7));
+      assertFalse("requires keyword was bold but should not have been",
+            this.isBold(requiresJMLMline.line, requiresJMLMline.column, 8));
+      assertTrue("ensures keyword was not bold but should have been",
+            this.isBold(ensuresJavaDoc.line, ensuresJavaDoc.column, 7));
+      assertFalse("requires keyword was bold but should not have been",
+            this.isBold(requiresJavaDoc.line, requiresJavaDoc.column, 8));
+      assertFalse("requires keyword was bold but should not have been",
+            this.isBold(requiresJavaMLine.line, requiresJavaMLine.column, 8));
+      assertTrue("ensures Keyword was not bold but should have been",
+            this.isBold(ensuresJavaSLine.line, ensuresJavaSLine.column + 1, 7));
+      assertFalse("ensuresKeyword was bold but should not have been",
+            this.isBold(ensuresJMLSLine.line, ensuresJMLSLine.column - 1, 7));
+      this.revertChanges();
+   }
 
+   /**
+    * provides the needed changes for the test
+    */
+   public void changeDocument() {
+      // TODO: implement changes
+      this.removeText(ensuresJMLMline.line - 1, 5, 1);
+
+      this.editor.insertText(ensuresJavaMLine.line - 1, 5, "@");
+      this.removeText(ensuresJavaMLine.line, 4, 1);
+      this.editor.insertText(ensuresJavaMLine.line, 4, "@");
+      this.editor.insertText(ensuresJavaMLine.line + 1, 4, "@");
+
+      this.removeText(requiresJMLMline.line - 1, 8, 1);
+      this.editor.insertText(requiresJMLMline.line - 1, 8, "*");
+
+      this.removeText(ensuresJavaDoc.line - 2, 2, 1);
+      this.editor.insertText(ensuresJavaDoc.line - 2, 2, "@");
+      this.removeText(ensuresJavaDoc.line - 1, 1, 1);
+      this.removeText(ensuresJavaDoc.line, 1, 1);
+      this.removeText(ensuresJavaDoc.line + 1, 1, 1);
+      this.editor.insertText(ensuresJavaDoc.line - 1, 1, "@");
+      this.editor.insertText(ensuresJavaDoc.line, 1, "@");
+      this.editor.insertText(ensuresJavaDoc.line + 1, 1, "@");
+      this.editor.insertText(ensuresJavaDoc.line + 2, 1, "@");
+
+      this.removeText(requiresJavaDoc.line - 1, 8, 1);
+
+      this.editor.insertText(requiresJavaMLine.line - 1, 8, "*");
+
+      this.editor.insertText(ensuresJavaSLine.line,
+            ensuresJavaSLine.column - 1, "@");
+      this.removeText(ensuresJMLSLine.column, ensuresJMLSLine.column - 2, 1);
+   }
+
+   /**
+    * reverts the changes to guarantee the documents integrity for other tests
+    */
+   public void revertChanges() {
+      this.editor.insertText(ensuresJMLMline.line - 1, 5, "@");
+
+      this.removeText(ensuresJavaMLine.line - 1, 5, 1);
+      this.removeText(ensuresJavaMLine.line, 4, 1);
+      this.removeText(ensuresJavaMLine.line + 1, 4, 1);
+      this.editor.insertText(ensuresJavaMLine.line, 4, "*");
+
+      this.removeText(requiresJMLMline.line - 1, 8, 1);
+      this.editor.insertText(requiresJavaMLine.line - 1, 8, "@");
+
+      this.removeText(ensuresJavaDoc.line - 2, 2, 1);
+      this.editor.insertText(ensuresJavaDoc.line - 2, 2, "*");
+      this.removeText(ensuresJavaDoc.line - 1, 1, 1);
+      this.removeText(ensuresJavaDoc.line, 1, 1);
+      this.removeText(ensuresJavaDoc.line + 1, 1, 1);
+      this.editor.insertText(ensuresJavaDoc.line - 1, 1, "*");
+      this.editor.insertText(ensuresJavaDoc.line, 1, "*");
+      this.editor.insertText(ensuresJavaDoc.line + 1, 1, "*");
+      this.removeText(ensuresJavaDoc.line + 2, 1, 1);
+
+      this.editor.insertText(ensuresJavaDoc.line - 1, 8, "*");
+
+      this.removeText(requiresJavaMLine.line - 1, 8, 1);
+
+      this.removeText(ensuresJavaSLine.line, ensuresJavaSLine.column - 1, 1);
+
+      this.editor.insertText(ensuresJMLSLine.column,
+            ensuresJMLSLine.column - 2, "@");
    }
 
    /**

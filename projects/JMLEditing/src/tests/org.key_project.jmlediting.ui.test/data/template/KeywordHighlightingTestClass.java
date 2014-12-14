@@ -1,6 +1,6 @@
 package test;
 
-//ensures true;
+// ensures true;
 
 /**
  * 
