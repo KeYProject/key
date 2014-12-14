@@ -55,6 +55,10 @@ public class JoinIfThenElse extends JoinRule {
       ImmutableList<Term> newElementaryUpdates = ImmutableSLList.nil();
       
       for (LocationVariable v : progVars) {
+         
+         Term rightSide1 = getUpdateRightSideFor(state1.first, v);
+         Term rightSide2 = getUpdateRightSideFor(state2.first, v);
+         
          // Check if location v is set to different value in both states.
          try {
             Term predicateTerm = tb.func(new Function(new Name("P"), Sort.FORMULA, v.sort()), tb.var(v));
@@ -71,13 +75,10 @@ public class JoinIfThenElse extends JoinRule {
                         new Semisequent(new SequentFormula(toProve))), 
                   false);                                               // useSimplifyTermProfile
             
-            Term rightSide1 = getUpdateRightSideFor(state1.first, v);
-            Term rightSide2 = getUpdateRightSideFor(state2.first, v);
-            
             boolean proofClosed = proofResult.getProof().closed();
             
             if (proofClosed && rightSide1 != null) {
-               //TODO: No if-then-else, same value
+               // No if-then-else, same value
                
                newElementaryUpdates = newElementaryUpdates.prepend(
                   tb.elementary(
@@ -85,7 +86,7 @@ public class JoinIfThenElse extends JoinRule {
                         rightSide1));
               
             } else if (!proofClosed) {
-               //TODO: Apply if-then-else construction, different values
+               // Apply if-then-else construction, different values
                
                newElementaryUpdates = newElementaryUpdates.prepend(
                      tb.elementary(
@@ -94,8 +95,15 @@ public class JoinIfThenElse extends JoinRule {
             }
          }
          catch (ProofInputException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            // If proof fails for some reason, just apply
+            // if-then-else construction. We still got absolute
+            // precision and soundness, only a more complicated
+            // resulting sequence.
+            
+            newElementaryUpdates = newElementaryUpdates.prepend(
+                  tb.elementary(
+                        v,
+                        tb.ife(state1.second, rightSide1, rightSide2)));
          }
       }
       
