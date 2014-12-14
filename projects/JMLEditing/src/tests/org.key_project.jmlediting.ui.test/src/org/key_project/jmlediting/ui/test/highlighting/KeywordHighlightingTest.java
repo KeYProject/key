@@ -113,8 +113,8 @@ public class KeywordHighlightingTest {
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID,
             "data/template", testFolder);
       bot.tree().getTreeItem(PROJECT_NAME).select().expand().getNode("src")
-            .select().expand().getNode(PACKAGE_NAME).select().expand()
-            .getNode(CLASS_NAME + ".java").select().doubleClick();
+      .select().expand().getNode(PACKAGE_NAME).select().expand()
+      .getNode(CLASS_NAME + ".java").select().doubleClick();
       JMLPreferencesHelper.setProjectJMLProfile(project.getProject(),
             TestUtils.findReferenceProfile());
    }
@@ -211,7 +211,6 @@ public class KeywordHighlightingTest {
     * provides the needed changes for the test
     */
    public void changeDocument() {
-      // TODO: implement changes
       this.removeText(ensuresJMLMline.line - 1, 5, 1);
 
       this.editor.insertText(ensuresJavaMLine.line - 1, 5, "@");
