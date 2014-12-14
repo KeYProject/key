@@ -26,11 +26,10 @@ import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.CommuteAnd;
+import de.uka.ilkd.key.rule.JoinIfThenElse;
 import de.uka.ilkd.key.rule.JoinWeaken;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.QueryExpand;
-import de.uka.ilkd.key.rule.ReplaceByTrue;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
@@ -120,7 +119,8 @@ public class JavaProfile extends AbstractProfile {
                                    .prepend(getOneStepSimpilifier())
         			   //.prepend(PullOutConditionalsRule.INSTANCE)  // rule at the moment unsound
         			   .prepend(QueryExpand.INSTANCE)
-                  .prepend(JoinWeaken.INSTANCE);
+                  .prepend(JoinWeaken.INSTANCE)
+                  .prepend(JoinIfThenElse.INSTANCE);
   
         //contract insertion rule, ATTENTION: ProofMgt relies on the fact 
         // that Contract insertion rule is the FIRST element of this list!

@@ -24,7 +24,9 @@ import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
 /**
- * Rule that joins two sequents.
+ * Base for implementing join rules. Extend this class,
+ * implement method joinStates(...) and register in
+ * class JavaProfile.
  * 
  * @author Dominic Scheurer
  */
@@ -122,6 +124,10 @@ public abstract class JoinRule implements BuiltInRule {
     */
    @Override
    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+      // Note: If the join rule is applicable for automatic
+      //       rule application, the symbolic execution strategy
+      //       does not seem to work as usual!
+      
       return isApplicable(goal, pio, true);
    }
    
@@ -201,17 +207,23 @@ public abstract class JoinRule implements BuiltInRule {
     */
    protected HashSet<LocationVariable> getUpdateLocations(Term u) {
       if (u.op() instanceof ElementaryUpdate) {
+         
          HashSet<LocationVariable> result = new HashSet<LocationVariable>();
          result.add((LocationVariable) ((ElementaryUpdate) u.op()).lhs());
          return result;
+         
       } else if (u.op() instanceof UpdateJunctor) {
+         
          HashSet<LocationVariable> result = new HashSet<LocationVariable>();
          for (Term sub : u.subs()) {
             result.addAll(getUpdateLocations(sub));
          }
          return result;
+         
       } else {
+         
          throw new IllegalStateException("Update should be in normal form!");
+         
       }
    }
    

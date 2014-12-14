@@ -13,7 +13,9 @@ import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * Rule that joins two sequents based on weakening.
+ * Rule that joins two sequents based on "total" weakening:
+ * Replacement of symbolic state by an update setting every
+ * program variable to a fresh logical variable.
  * 
  * @author Dominic Scheurer
  */
