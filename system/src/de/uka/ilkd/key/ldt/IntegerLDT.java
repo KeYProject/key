@@ -552,11 +552,21 @@ public final class IntegerLDT extends LDT {
         if (lit instanceof IntLiteral) {
             if (literalString.startsWith("0x")) {
                 try {
-                    int i = Integer.parseInt
+                    //the following contortion is necessary to deal with
+                    //valid java programs like int i = 0xffffffff;
+                    //http://stackoverflow.com/questions/4355619/converting-string-to-intger-hex-value-strange-behaviour
+                    long l = Long.parseLong
                         (literalString.substring(2),16);
+                    if (l>4294967295L) throw new 
+                        NumberFormatException("This won't fit into an int");
+                    int i = (int) l;
+                    if (i<0) {
+                        minusFlag = true;
+                        i=-i;
+                    }
                     int_ch=(""+i).toCharArray();
                 }catch(NumberFormatException nfe) {
-                    Debug.fail("Not a hexadecimal constant!");
+                    Debug.fail("Not an int hexadecimal constant! "+literalString);
                 }
             } else {
                 int_ch = literalString.toCharArray();
@@ -573,7 +583,7 @@ public final class IntegerLDT extends LDT {
                          16);
                     int_ch=(""+l).toCharArray();
                 } catch (NumberFormatException nfe) {
-                    Debug.fail("Not a hexadecimal constant!");
+                    Debug.fail("Not a long hexadecimal constant! "+literalString);
                 }
                 length = int_ch.length; 
             } else {
