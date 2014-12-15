@@ -17,34 +17,20 @@ public final class NodeUtil {
    public static ISEDDebugNode getParent(ISEDDebugNode node) throws DebugException {
       if(!ArrayUtil.isEmpty(node.getGroupStartConditions())) {
          ISEDBranchCondition bc = node.getInnerMostVisibleGroupStartCondition();
-         if(((ISEDGroupable)bc.getParent()).isCollapsed()) {
+
+         if(bc.getParent() instanceof ISEDGroupable && ((ISEDGroupable)bc.getParent()).isCollapsed()) {
             return bc;
-         }
-         
+         }  
       }
-//      if(node instanceof ISEDBaseMethodReturn)
-//      {
-//         ISEDBranchCondition bc = ((ISEDBaseMethodReturn)node).getMethodReturnCondition();
-//         
-//         if(bc != null) {
-//            if(((ISEDMethodCall) bc.getParent()).isCollapsed()) {
-//               return bc;
-//            }
-//         }
-//      }
 
       return node.getParent();
    }
    
    public static ISEDDebugNode[] getChildren(ISEDDebugNode node) throws DebugException {
-      return getChildren(node, false);
-   }
-   
-   public static ISEDDebugNode[] getChildren(ISEDDebugNode node, boolean sorted) throws DebugException {
       if(canBeGrouped(node)) {
          ISEDGroupable groupStart = (ISEDGroupable) node;
          if(groupStart.isCollapsed()) {
-            return sorted ? getSortedBCs(groupStart) : groupStart.getGroupEndConditions();
+            return getSortedBCs(groupStart);
          }
       }
 
@@ -57,19 +43,18 @@ public final class NodeUtil {
       ISEDDebugNode next = determineNextNode((ISEDDebugNode) groupStart, (ISEDDebugNode) groupStart, false);
       while (next != null)
       {
-         boolean methodReturnReached = false;
+         boolean groupEndReached = false;
          
-         if(!ArrayUtil.isEmpty(next.getGroupStartConditions())) {
-            ISEDGroupable nodeGroupStart = getGroupStartNode(next);
-            if(nodeGroupStart == groupStart) {
-               orderedBCs.add(next.getGroupStartCondition((ISEDDebugNode) nodeGroupStart));
-               methodReturnReached = true;
-            }
+         ISEDDebugNode bc = next.getGroupStartCondition((ISEDDebugNode) groupStart);
+         
+         if(bc != null) {
+            orderedBCs.add(bc);
+            groupEndReached = true;
          }
          
-         next = determineNextNode(next, (ISEDDebugNode) groupStart, methodReturnReached);
+         next = determineNextNode(next, (ISEDDebugNode) groupStart, groupEndReached);
       }
-      
+   
       return orderedBCs.toArray(new ISEDBranchCondition[orderedBCs.size()]);
    }
    
@@ -78,10 +63,10 @@ public final class NodeUtil {
       if(node == null) {
          return null;
       }
-//      System.out.println("Node: " + node);
+
       if(!ArrayUtil.isEmpty(node.getGroupStartConditions())) {
-//         for(ISEDBranchCondition bc : node.getGroupStartConditions())
-//            System.out.println("Has? " + bc);
+         ISEDDebugNode n = node.getInnerMostVisibleGroupStartCondition();
+         System.out.println("Node: " + node + ", InnerMost: " + n + ", Parent: " + getParent(n) + ", Parent2: " + n.getParent());
          return (ISEDGroupable) getParent(node.getInnerMostVisibleGroupStartCondition());
       }
       
@@ -93,19 +78,16 @@ public final class NodeUtil {
             currentPosition++;
          }
          else if(!ArrayUtil.isEmpty(parent.getGroupStartConditions())) {
-//            for(ISEDBranchCondition bc : parent.getGroupStartConditions())
-//               System.out.println("ParentCond: " + bc);
             currentPosition -= parent.getGroupStartConditions().length;
          }
 
          if(currentPosition == 0) {
-//            System.out.println("Return: " + parent);
             return (ISEDGroupable) parent;
          }
          
          parent = getParent(parent);
       }
-//      System.out.println("Return null");
+
       return null;
    }
    
@@ -113,10 +95,10 @@ public final class NodeUtil {
       return node instanceof ISEDGroupable && ((ISEDGroupable) node).isGroupable();// && node instanceof ISEDMethodCall;
    }
    
-   private static ISEDDebugNode determineNextNode(ISEDDebugNode node, ISEDDebugNode start, boolean methodReturnReached) throws DebugException {
+   private static ISEDDebugNode determineNextNode(ISEDDebugNode node, ISEDDebugNode start, boolean groupEndReached) throws DebugException {
       ISEDDebugNode[] children = node.getChildren();
 
-      if (!ArrayUtil.isEmpty(children) && !methodReturnReached) {
+      if (!ArrayUtil.isEmpty(children) && !groupEndReached) {
          return children[0];
       }
       else {

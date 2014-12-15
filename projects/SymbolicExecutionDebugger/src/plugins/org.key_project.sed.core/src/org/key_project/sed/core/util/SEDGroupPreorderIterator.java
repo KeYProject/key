@@ -110,7 +110,7 @@ public class SEDGroupPreorderIterator implements ISEDIterator {
       ISEDDebugNode newNext = null;
       if (next instanceof ISEDDebugNode) {
          ISEDDebugNode node = (ISEDDebugNode)next;
-         ISEDDebugNode[] children = NodeUtil.getChildren(node, true);
+         ISEDDebugNode[] children = NodeUtil.getChildren(node);
          if (!ArrayUtil.isEmpty(children) && !groupEndReached) {
 //            if(ArrayUtil.isEmpty(children[0].getCallStack()) && !(children[0] instanceof ISEDBranchCondition)) {
 //               newNext = getNextOnParent(node);
@@ -141,7 +141,7 @@ public class SEDGroupPreorderIterator implements ISEDIterator {
       ISEDDebugNode parent = NodeUtil.getParent(node);
       // Search next debug node
       while (parent instanceof ISEDDebugNode) {
-         ISEDDebugNode[] parentChildren = NodeUtil.getChildren(parent, true);
+         ISEDDebugNode[] parentChildren = NodeUtil.getChildren(parent);
          int nodeIndex = ArrayUtil.indexOf(parentChildren, node);
          if (nodeIndex < 0) {
             throw new DebugException(LogUtil.getLogger().createErrorStatus("Parent node \"" + parent + "\" does not contain child \"" + node + "."));

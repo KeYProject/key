@@ -46,7 +46,7 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
     * has changed so that they are outdated.
     * </p>
     */
-   public static final boolean CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY = true;
+   public static final boolean CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY = false;
    
    /**
     * The used temporary oracle directory.

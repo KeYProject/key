@@ -1,374 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
    <sedTarget xml:id="_e6a86c9d-87cc-4179-8f97-59e21696eec6" name="equals(example5.Number2)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_34968466-d4dc-49d6-9f30-543c0df45eff" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_4d763a34-a767-48dc-b7bc-34072606e3c7" name="&lt;call self.equals(n)&gt;" pathCondition="true" lineNumber="-1" charStart="105" charEnd="111" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
-            <sedVariable xml:id="_22717b22-d9c9-4d8d-982f-f914a12a53ec" name="exc" referenceTypeName="Null">
-               <sedValue xml:id="_cb6217e6-ff14-49f4-a8af-44757d5af729" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-               </sedValue>
-            </sedVariable>
-            <sedBranchStatement xml:id="_0f48fbbf-c4d2-4c2d-84f1-04de24391386" name="if (this.content==n.content)" pathCondition="true" lineNumber="-1" charStart="128" charEnd="154" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
-               <sedVariable xml:id="_c7e85e3b-1f1b-451a-9a56-c01276389c2a" name="self" referenceTypeName="example5.Number2">
-                  <sedValue xml:id="_e0867e6b-e59e-4f88-8090-d73fb5977ffd" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                     <sedVariable xml:id="_b1248cbe-a9fd-4f01-9025-51effe5551fb" name="content" referenceTypeName="int">
-                        <sedValue xml:id="_64aacd87-a95a-4546-a78d-2bf0786f393f" referenceTypeName="int" valueString="self.content" allocated="true" multiValued="false">
-                        </sedValue>
-                     </sedVariable>
-                     <sedVariable xml:id="_ef1e0551-5e8b-4383-8797-391a0b6a2ea3" name="cnt" referenceTypeName="int">
-                        <sedValue xml:id="_7d55eb97-fa0c-410b-816c-ee9e3d031eac" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                        </sedValue>
-                     </sedVariable>
-                  </sedValue>
-               </sedVariable>
-               <sedVariable xml:id="_4018e99d-7532-41c0-8797-8d9bbc4a46d7" name="n" referenceTypeName="">
-                  <sedValue xml:id="_a36a172c-b853-4670-8557-fda066abad90" referenceTypeName="" valueString="&lt;conditional values&gt;" allocated="true" multiValued="true">
-                     <sedVariable xml:id="_cc13a658-7624-48b9-8908-434bfc19eae5" name="n {n = null}" referenceTypeName="Null">
-                        <sedValue xml:id="_3977cc77-fe50-4114-bc31-9102b4902319" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                        </sedValue>
-                     </sedVariable>
-                     <sedVariable xml:id="_c7575826-6e19-4ecd-8a5e-1ad7183258c0" name="n {!n = null}" referenceTypeName="example5.Number2">
-                        <sedValue xml:id="_43202df0-046f-4fdf-85a4-a319e98d5522" referenceTypeName="example5.Number2" valueString="n" allocated="true" multiValued="false">
-                           <sedVariable xml:id="_dd318c57-a64d-4499-8880-2b76396e09fa" name="content" referenceTypeName="int">
-                              <sedValue xml:id="_fce541ea-23e1-46bd-a5f4-29fad5bad8de" referenceTypeName="int" valueString="n.content" allocated="true" multiValued="false">
-                              </sedValue>
-                           </sedVariable>
-                           <sedVariable xml:id="_6221fce0-2ddc-4ee6-aff9-71a13d68b5f5" name="cnt" referenceTypeName="int">
-                              <sedValue xml:id="_2ff215b2-a7b6-4078-b7f9-e186511dcafb" referenceTypeName="int" valueString="n.cnt" allocated="true" multiValued="false">
-                              </sedValue>
-                           </sedVariable>
-                        </sedValue>
-                     </sedVariable>
-                  </sedValue>
-               </sedVariable>
-               <sedVariable xml:id="_b6561420-aff2-4b58-8f6d-a88621515c29" name="exc" referenceTypeName="Null">
-                  <sedValue xml:id="_940dd7b1-ee51-4772-9a48-49490265fee9" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                  </sedValue>
-               </sedVariable>
-               <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-               <sedBranchCondition xml:id="_c669d21a-ed20-4677-b8da-8dbd0d08cea0" name="!n = null" pathCondition="!n = null">
-                  <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                  <sedBranchCondition xml:id="_7effbca7-96fb-4a81-962b-dd64f9e28d7b" name="self.content = n.content" pathCondition="!n = null &amp; self.content = n.content">
-                     <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
+      <sedThread xml:id="_34968466-d4dc-49d6-9f30-543c0df45eff" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+         <sedMethodCall xml:id="_4d763a34-a767-48dc-b7bc-34072606e3c7" name="&lt;call self.equals(n)&gt;" pathCondition="true" lineNumber="-1" charStart="105" charEnd="111" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" groupable="false">
+            <sedBranchStatement xml:id="_0f48fbbf-c4d2-4c2d-84f1-04de24391386" name="if (this.content==n.content)" pathCondition="true" lineNumber="-1" charStart="128" charEnd="154" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" groupable="false">
+               <sedBranchCondition xml:id="_c669d21a-ed20-4677-b8da-8dbd0d08cea0" name="!n = null" pathCondition="!n = null" lineNumber="-1" charStart="-1" charEnd="-1">
+                  <sedBranchCondition xml:id="_7effbca7-96fb-4a81-962b-dd64f9e28d7b" name="self.content = n.content" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1">
                      <sedStatement xml:id="_3cf63f0e-05ed-4291-85ea-c0fd7711e3c1" name="return test(true);" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="300" charEnd="318" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
-                        <sedVariable xml:id="_bc286ee1-a765-4555-82b3-b3ec9a0b37b9" name="self" referenceTypeName="example5.Number2">
-                           <sedValue xml:id="_4f08057b-226f-4079-ad89-b528d6ef6da8" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                              <sedVariable xml:id="_7683ca6f-0f94-4812-90df-7494068d786c" name="content" referenceTypeName="int">
-                                 <sedValue xml:id="_e1aa1e1f-2959-4190-bef7-0af48d0102da" referenceTypeName="int" valueString="n.content" allocated="true" multiValued="false">
-                                 </sedValue>
-                              </sedVariable>
-                              <sedVariable xml:id="_83246d01-211b-4fe4-951f-72a3d5dbf59e" name="cnt" referenceTypeName="int">
-                                 <sedValue xml:id="_28d250b6-83ff-446c-987e-7bc645443d59" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                 </sedValue>
-                              </sedVariable>
-                           </sedValue>
-                        </sedVariable>
-                        <sedVariable xml:id="_0f148cc1-b72e-4508-a43d-55a682dc4fab" name="n" referenceTypeName="example5.Number2">
-                           <sedValue xml:id="_f5d0400f-f1ae-4e15-a6cf-58d02d250591" referenceTypeName="example5.Number2" valueString="n" allocated="true" multiValued="false">
-                              <sedVariable xml:id="_57c54cd6-dc23-4160-b1aa-47b34d8cdb1f" name="content" referenceTypeName="int">
-                                 <sedValue xml:id="_c4788644-b474-4f4b-9175-e821f83833ba" referenceTypeName="int" valueString="n.content" allocated="true" multiValued="false">
-                                 </sedValue>
-                              </sedVariable>
-                              <sedVariable xml:id="_a195cdd4-e601-4878-b665-51dde3e29362" name="cnt" referenceTypeName="int">
-                                 <sedValue xml:id="_38a4d2f3-9633-42ac-9fad-71f33e6b8ceb" referenceTypeName="int" valueString="n.cnt" allocated="true" multiValued="false">
-                                 </sedValue>
-                              </sedVariable>
-                           </sedValue>
-                        </sedVariable>
-                        <sedVariable xml:id="_212f9eb7-a81e-41d2-8a27-d93233ad7936" name="exc" referenceTypeName="Null">
-                           <sedValue xml:id="_3df3e2ee-6e2e-422c-9e1b-52ba31af0637" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                           </sedValue>
-                        </sedVariable>
-                        <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                        <sedMethodCall xml:id="_72119afb-250b-4aed-bcdd-1a4b5a5c053b" name="&lt;call self.test(met)&gt;" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="441" charEnd="445" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
-                           <sedVariable xml:id="_9fb8b1b5-6dff-4e35-b70f-b2b0290454a0" name="self" referenceTypeName="example5.Number2">
-                              <sedValue xml:id="_23d4fa1e-e481-489d-81eb-6fa558d490b1" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                 <sedVariable xml:id="_6ba44f03-231f-4992-879c-d7ff1f03ef23" name="content" referenceTypeName="int">
-                                    <sedValue xml:id="_60994893-caa1-4255-b4a2-4a6f5cdba7c6" referenceTypeName="int" valueString="n.content" allocated="true" multiValued="false">
-                                    </sedValue>
-                                 </sedVariable>
-                                 <sedVariable xml:id="_9bad306e-f9cc-4285-977a-fc0d785a5f3d" name="cnt" referenceTypeName="int">
-                                    <sedValue xml:id="_fdcb2edd-3a41-46cf-bcf2-7cf2eaf2a23a" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                    </sedValue>
-                                 </sedVariable>
-                              </sedValue>
-                           </sedVariable>
-                           <sedVariable xml:id="_91be769a-d6eb-48de-8c5c-21bd0a4195e2" name="n" referenceTypeName="example5.Number2">
-                              <sedValue xml:id="_d2b99d9a-50f9-410e-919e-b500a4405e55" referenceTypeName="example5.Number2" valueString="n" allocated="true" multiValued="false">
-                                 <sedVariable xml:id="_3eeec756-5d92-459c-bf95-2c21cd59c936" name="content" referenceTypeName="int">
-                                    <sedValue xml:id="_d7e946f9-1f7f-4b25-901e-c6660cba042b" referenceTypeName="int" valueString="n.content" allocated="true" multiValued="false">
-                                    </sedValue>
-                                 </sedVariable>
-                                 <sedVariable xml:id="_49e22c9a-09bc-4540-ac58-cc993300c45c" name="cnt" referenceTypeName="int">
-                                    <sedValue xml:id="_1277b246-a36c-49fb-81b8-9a7426f4dfbc" referenceTypeName="int" valueString="n.cnt" allocated="true" multiValued="false">
-                                    </sedValue>
-                                 </sedVariable>
-                              </sedValue>
-                           </sedVariable>
-                           <sedVariable xml:id="_52349c0d-9cc4-4087-bdd7-dfa997cf9d98" name="exc" referenceTypeName="Null">
-                              <sedValue xml:id="_1677b3f6-7db1-4eff-afb5-33fd0f5a6450" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                              </sedValue>
-                           </sedVariable>
-                           <sedVariable xml:id="_1be39aec-4f4a-4aff-a085-5d7c6561cfc5" name="met" referenceTypeName="boolean">
-                              <sedValue xml:id="_fbe14295-d82e-48a2-b693-356621fb3b42" referenceTypeName="boolean" valueString="TRUE" allocated="true" multiValued="false">
-                              </sedValue>
-                           </sedVariable>
-                           <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
+                        <sedMethodCall xml:id="_72119afb-250b-4aed-bcdd-1a4b5a5c053b" name="&lt;call self.test(met)&gt;" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="441" charEnd="445" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" groupable="false">
                            <sedStatement xml:id="_663dfb6b-3956-4676-99ce-89151393c8bd" name="int EINWIRKLICHSEHRLANGERNAMEEINWIRKLICHSEHRLANGERNAME2 = this.content;" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="464" charEnd="530" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
-                              <sedVariable xml:id="_ac00bdaf-5428-4a0f-9a44-144ffaa372a9" name="self" referenceTypeName="example5.Number2">
-                                 <sedValue xml:id="_6b071856-3bdb-4877-9ca5-7945de38cf3e" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                    <sedVariable xml:id="_31718bb5-103a-4512-9274-131470a69d5e" name="content" referenceTypeName="int">
-                                       <sedValue xml:id="_6c395d31-e8c7-4406-ab0e-19e8f40fcfad" referenceTypeName="int" valueString="n.content" allocated="true" multiValued="false">
-                                       </sedValue>
-                                    </sedVariable>
-                                    <sedVariable xml:id="_f1406548-a338-4d8f-903a-a6c64c3f2c29" name="cnt" referenceTypeName="int">
-                                       <sedValue xml:id="_b4b8b076-80fa-4999-bedf-8cc072fffcc9" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                       </sedValue>
-                                    </sedVariable>
-                                 </sedValue>
-                              </sedVariable>
-                              <sedVariable xml:id="_1af72bc2-b94a-4c9d-9ef3-095a51bae1ce" name="met" referenceTypeName="boolean">
-                                 <sedValue xml:id="_b248c861-fb0a-4eb9-996b-efd4e5980ac2" referenceTypeName="boolean" valueString="met" allocated="true" multiValued="false">
-                                 </sedValue>
-                              </sedVariable>
-                              <sedVariable xml:id="_3b47ada1-2a77-40f3-aac6-cc8d8980a9d5" name="exc" referenceTypeName="Null">
-                                 <sedValue xml:id="_c3153e39-61a2-4485-9a34-10949aba77b1" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                 </sedValue>
-                              </sedVariable>
-                              <sedCallStackEntry nodeIdRef="_72119afb-250b-4aed-bcdd-1a4b5a5c053b"/>
-                              <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
                               <sedStatement xml:id="_141c6a99-7542-4b10-895b-032bd4d4ca1b" name="boolean b = test2(EINWIRKLICHSEHRLANGERNAMEEINWIRKLICHSEHRLANGERNAME2);" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="534" charEnd="605" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
-                                 <sedVariable xml:id="_9baa8c78-5860-4388-9cea-fb1dc0fe44ac" name="self" referenceTypeName="example5.Number2">
-                                    <sedValue xml:id="_c8737d53-8f97-4d5d-b036-2b41f7c4309c" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                       <sedVariable xml:id="_97a56fc8-7c8a-484e-abb4-1a6c6f94a526" name="content" referenceTypeName="int">
-                                          <sedValue xml:id="_a3e776bb-9621-4f2f-9d5a-4d8e688f4233" referenceTypeName="int" valueString="n.content" allocated="true" multiValued="false">
-                                          </sedValue>
-                                       </sedVariable>
-                                       <sedVariable xml:id="_4dd71676-889c-4b99-b8b7-7651d9bc7cc4" name="cnt" referenceTypeName="int">
-                                          <sedValue xml:id="_b57d2cfc-fa70-4d42-aff5-a92892b37667" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                          </sedValue>
-                                       </sedVariable>
-                                    </sedValue>
-                                 </sedVariable>
-                                 <sedVariable xml:id="_fd0cf2d9-dc75-4c8a-84dc-893060f67e4d" name="met" referenceTypeName="boolean">
-                                    <sedValue xml:id="_aefd9359-9bda-4710-9d5b-de3f76a4baed" referenceTypeName="boolean" valueString="met" allocated="true" multiValued="false">
-                                    </sedValue>
-                                 </sedVariable>
-                                 <sedVariable xml:id="_58ed9f63-67df-4b69-b9e4-dcb023dd4a34" name="exc" referenceTypeName="Null">
-                                    <sedValue xml:id="_4d6c7143-adf5-4c85-a6c6-6fc9df46b78a" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                    </sedValue>
-                                 </sedVariable>
-                                 <sedVariable xml:id="_e0a54adb-3e55-47a1-98e5-5b93e18dc872" name="EINWIRKLICHSEHRLANGERNAMEEINWIRKLICHSEHRLANGERNAME2" referenceTypeName="int">
-                                    <sedValue xml:id="_17a0475f-4b87-4d98-9aef-fc94e8eb1adf" referenceTypeName="int" valueString="n.content" allocated="true" multiValued="false">
-                                    </sedValue>
-                                 </sedVariable>
-                                 <sedCallStackEntry nodeIdRef="_72119afb-250b-4aed-bcdd-1a4b5a5c053b"/>
-                                 <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                 <sedMethodCall xml:id="_b3f6643f-0710-4c04-ba76-8473fe1c7945" name="&lt;call self.test2(x_9)&gt;" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="1015" charEnd="1020" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
-                                    <sedVariable xml:id="_8cd596fe-d9ed-45bd-9b84-d9674b64c3c0" name="self" referenceTypeName="example5.Number2">
-                                       <sedValue xml:id="_6cfe1c63-b402-477d-acea-e5f1a7b685e9" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                          <sedVariable xml:id="_ff48244a-6172-4f5e-b03e-2ba1612100d3" name="content" referenceTypeName="int">
-                                             <sedValue xml:id="_852f51c9-3ce6-46ad-994e-b5db296a01a2" referenceTypeName="int" valueString="n.content" allocated="true" multiValued="false">
-                                             </sedValue>
-                                          </sedVariable>
-                                          <sedVariable xml:id="_ac185f05-14d1-4c47-af2c-54ef238eb518" name="cnt" referenceTypeName="int">
-                                             <sedValue xml:id="_224a5187-c676-4180-92ba-2cf64ab22d7e" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                             </sedValue>
-                                          </sedVariable>
-                                       </sedValue>
-                                    </sedVariable>
-                                    <sedVariable xml:id="_ced3df91-a38f-45a5-af81-d4b53846700e" name="met" referenceTypeName="boolean">
-                                       <sedValue xml:id="_27e6c14a-ea80-4be7-88c8-b10b7d049cce" referenceTypeName="boolean" valueString="met" allocated="true" multiValued="false">
-                                       </sedValue>
-                                    </sedVariable>
-                                    <sedVariable xml:id="_e8e29dee-0be6-4ba7-b0bb-0c1c3f22ab06" name="exc" referenceTypeName="Null">
-                                       <sedValue xml:id="_b77b5bba-93b7-4937-bba0-b59b2ef6b902" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                       </sedValue>
-                                    </sedVariable>
-                                    <sedVariable xml:id="_e52363e7-62ab-44a9-8a25-59f8186a918e" name="x_9" referenceTypeName="int">
-                                       <sedValue xml:id="_deb65469-f582-45b9-9660-4f312efe5c79" referenceTypeName="int" valueString="n.content" allocated="true" multiValued="false">
-                                       </sedValue>
-                                    </sedVariable>
-                                    <sedCallStackEntry nodeIdRef="_72119afb-250b-4aed-bcdd-1a4b5a5c053b"/>
-                                    <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                    <sedBranchStatement xml:id="_53f3f2c1-eb79-4f12-8447-47b2e0531441" name="if (x_9==this.cnt)" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="1033" charEnd="1046" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
-                                       <sedVariable xml:id="_d807ae97-2b3f-43fc-af8e-8d90f35f14d2" name="self" referenceTypeName="example5.Number2">
-                                          <sedValue xml:id="_cdd0eeba-302f-47e2-abe5-371950dbb67e" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                             <sedVariable xml:id="_d9293874-bba4-4a1a-a478-263091ff73c3" name="content" referenceTypeName="int">
-                                                <sedValue xml:id="_fa2a89f6-3184-4c98-a4f9-8f030771ad8f" referenceTypeName="int" valueString="n.content" allocated="true" multiValued="false">
-                                                </sedValue>
-                                             </sedVariable>
-                                             <sedVariable xml:id="_760fb13c-bf8b-49ac-8770-65effbfc3e73" name="cnt" referenceTypeName="int">
-                                                <sedValue xml:id="_e223ce1f-e427-4514-bb33-253903913629" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                </sedValue>
-                                             </sedVariable>
-                                          </sedValue>
-                                       </sedVariable>
-                                       <sedVariable xml:id="_25a7fb25-34b8-4574-96e6-bb5f06141167" name="x_9" referenceTypeName="int">
-                                          <sedValue xml:id="_6e84d499-4163-4bdf-9e4f-37f04e1f6ad4" referenceTypeName="int" valueString="n.content" allocated="true" multiValued="false">
-                                          </sedValue>
-                                       </sedVariable>
-                                       <sedVariable xml:id="_82c6e88f-1ee6-489d-bdc8-694658345cb5" name="exc" referenceTypeName="Null">
-                                          <sedValue xml:id="_9e83ef62-550e-479c-95e2-02980861904c" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                          </sedValue>
-                                       </sedVariable>
-                                       <sedCallStackEntry nodeIdRef="_b3f6643f-0710-4c04-ba76-8473fe1c7945"/>
-                                       <sedCallStackEntry nodeIdRef="_72119afb-250b-4aed-bcdd-1a4b5a5c053b"/>
-                                       <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                       <sedBranchCondition xml:id="_148d04e8-fa3c-4b36-b718-ab33793b06cd" name="n.content = self.cnt" pathCondition="  !n = null
-&amp; n.content = self.cnt
-&amp; self.content = n.content">
-                                          <sedCallStackEntry nodeIdRef="_b3f6643f-0710-4c04-ba76-8473fe1c7945"/>
-                                          <sedCallStackEntry nodeIdRef="_72119afb-250b-4aed-bcdd-1a4b5a5c053b"/>
-                                          <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                          <sedStatement xml:id="_6dd9f75a-fffa-4543-bf12-64e38be9ec7c" name="return true;" pathCondition="  !n = null
-&amp; n.content = self.cnt
-&amp; self.content = n.content" lineNumber="-1" charStart="1122" charEnd="1134" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
-                                             <sedVariable xml:id="_b23a97d5-4828-4a3b-848a-26129fd5f39b" name="self" referenceTypeName="example5.Number2">
-                                                <sedValue xml:id="_8e502bcb-6156-43cf-bdd6-c9f250d16dff" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                                   <sedVariable xml:id="_7906bf73-e7dc-4c49-9e64-b397cfaf41db" name="content" referenceTypeName="int">
-                                                      <sedValue xml:id="_86504c2e-423c-4753-8ffc-373f07a5f33d" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                      </sedValue>
-                                                   </sedVariable>
-                                                   <sedVariable xml:id="_ac17b8cc-bec6-4247-8070-8a02e7f9616b" name="cnt" referenceTypeName="int">
-                                                      <sedValue xml:id="_38f76b1d-45bf-4c5b-8c4c-35d45dce48f4" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                      </sedValue>
-                                                   </sedVariable>
-                                                </sedValue>
-                                             </sedVariable>
-                                             <sedVariable xml:id="_1d8acd24-35ec-40db-a773-c3e3b9f03285" name="x_9" referenceTypeName="int">
-                                                <sedValue xml:id="_1c92a271-26ff-42d1-bf06-46500e98cbee" referenceTypeName="int" valueString="x_9" allocated="true" multiValued="false">
-                                                </sedValue>
-                                             </sedVariable>
-                                             <sedVariable xml:id="_5e0c9775-c2d3-4a30-8bdb-9cf4ffb0f971" name="exc" referenceTypeName="Null">
-                                                <sedValue xml:id="_ec597695-e2c0-4ee8-81ac-17bc16a51e1f" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                                </sedValue>
-                                             </sedVariable>
-                                             <sedCallStackEntry nodeIdRef="_b3f6643f-0710-4c04-ba76-8473fe1c7945"/>
-                                             <sedCallStackEntry nodeIdRef="_72119afb-250b-4aed-bcdd-1a4b5a5c053b"/>
-                                             <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                             <sedMethodReturn xml:id="_e0a4155e-506a-4ef0-9f2b-4a8b489e9b39" name="&lt;return TRUE as result of test2&gt;" pathCondition="  !n = null
-&amp; n.content = self.cnt
-&amp; self.content = n.content" lineNumber="-1" charStart="1015" charEnd="1020" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_3a2348f3-b0d0-4278-8486-ac3d40c70336">
-                                                <sedVariable xml:id="_56c31fd2-c885-48fb-9190-264fe648099b" name="self" referenceTypeName="example5.Number2">
-                                                   <sedValue xml:id="_13a067ee-418f-422b-8613-734168d9292e" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                                      <sedVariable xml:id="_c874c20d-1371-4496-92ad-e1c535637dd2" name="content" referenceTypeName="int">
-                                                         <sedValue xml:id="_aa7123a2-e44a-44ba-9994-1f62d81acc4c" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                         </sedValue>
-                                                      </sedVariable>
-                                                      <sedVariable xml:id="_e99723e1-537e-420f-8797-80894f71f2fd" name="cnt" referenceTypeName="int">
-                                                         <sedValue xml:id="_347380e4-51b2-4fe3-b15c-8b0af462bedb" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                         </sedValue>
-                                                      </sedVariable>
-                                                   </sedValue>
-                                                </sedVariable>
-                                                <sedVariable xml:id="_713cdbb1-37b1-4425-bb45-181f1b8ac21d" name="x_9" referenceTypeName="int">
-                                                   <sedValue xml:id="_55be74c2-1488-441b-bc8b-45858b407988" referenceTypeName="int" valueString="x_9" allocated="true" multiValued="false">
-                                                   </sedValue>
-                                                </sedVariable>
-                                                <sedVariable xml:id="_f4ec2932-3982-4d2b-998d-a377fa0f25bc" name="exc" referenceTypeName="Null">
-                                                   <sedValue xml:id="_7fe45606-0912-47da-b8e0-1df22c539ae0" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                                   </sedValue>
-                                                </sedVariable>
-                                                <sedVariable xml:id="_6995c338-8177-404e-8d95-48a8a22458e3" name="x_8" referenceTypeName="boolean">
-                                                   <sedValue xml:id="_2bb81360-8d02-4925-a195-f5c35b978458" referenceTypeName="boolean" valueString="TRUE" allocated="true" multiValued="false">
-                                                   </sedValue>
-                                                </sedVariable>
-                                                <sedCallStackEntry nodeIdRef="_b3f6643f-0710-4c04-ba76-8473fe1c7945"/>
-                                                <sedCallStackEntry nodeIdRef="_72119afb-250b-4aed-bcdd-1a4b5a5c053b"/>
-                                                <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                                <sedStatement xml:id="_80de6ff5-29d7-4333-b103-274094292bbc" name="return b;" pathCondition="  !n = null
-&amp; n.content = self.cnt
-&amp; self.content = n.content" lineNumber="-1" charStart="702" charEnd="711" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
-                                                   <sedVariable xml:id="_bdba9ebc-4129-4283-b47f-1af29434115f" name="self" referenceTypeName="example5.Number2">
-                                                      <sedValue xml:id="_c7457e60-9415-4e94-8533-419623d4dfcd" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                                         <sedVariable xml:id="_60529e7d-af0f-4a6d-ab8a-4d921399e5c2" name="content" referenceTypeName="int">
-                                                            <sedValue xml:id="_6af2e9b4-f457-4a78-9bbe-27754c414350" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                            </sedValue>
-                                                         </sedVariable>
-                                                         <sedVariable xml:id="_8504384d-4618-4eaa-b9e6-4b0ab846b5a4" name="cnt" referenceTypeName="int">
-                                                            <sedValue xml:id="_fec646ff-b8c5-4760-a46a-1d5e04a9bea6" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                            </sedValue>
-                                                         </sedVariable>
-                                                      </sedValue>
-                                                   </sedVariable>
-                                                   <sedVariable xml:id="_c3663682-be95-48fb-a124-20ee96b2b4eb" name="met" referenceTypeName="boolean">
-                                                      <sedValue xml:id="_e800f9f2-5f24-4ebf-8776-949533a5b767" referenceTypeName="boolean" valueString="met" allocated="true" multiValued="false">
-                                                      </sedValue>
-                                                   </sedVariable>
-                                                   <sedVariable xml:id="_e5ff990c-ac73-4420-b7fe-e845a85eec1a" name="exc" referenceTypeName="Null">
-                                                      <sedValue xml:id="_ee30cc4b-75a4-4e46-9c5f-5d64a82fe859" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                                      </sedValue>
-                                                   </sedVariable>
-                                                   <sedVariable xml:id="_7a0f971c-9f65-47fc-833f-486d7d7b4e16" name="b" referenceTypeName="boolean">
-                                                      <sedValue xml:id="_e10853fc-f44f-4402-8d1b-60b22eb7a9bb" referenceTypeName="boolean" valueString="TRUE" allocated="true" multiValued="false">
-                                                      </sedValue>
-                                                   </sedVariable>
-                                                   <sedCallStackEntry nodeIdRef="_72119afb-250b-4aed-bcdd-1a4b5a5c053b"/>
-                                                   <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                                   <sedMethodReturn xml:id="_5dbb429b-cf3b-4eff-933c-832a2d74d045" name="&lt;return TRUE as result of test&gt;" pathCondition="  !n = null
-&amp; n.content = self.cnt
-&amp; self.content = n.content" lineNumber="-1" charStart="441" charEnd="445" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_c2d009a5-0a21-4dbf-ab77-1baddb3c716e">
-                                                      <sedVariable xml:id="_926810b2-d9a3-4603-9fd6-3dff2113b37c" name="self" referenceTypeName="example5.Number2">
-                                                         <sedValue xml:id="_8a4c9833-f92e-494d-bbc7-ffeed5ee6147" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                                            <sedVariable xml:id="_45e94908-1563-4e3c-93f5-89c66bb75bdb" name="content" referenceTypeName="int">
-                                                               <sedValue xml:id="_69634261-2bc1-4e9b-b2a2-31bd9db42824" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                               </sedValue>
-                                                            </sedVariable>
-                                                            <sedVariable xml:id="_c25331ba-6a24-4330-a2b7-0fd9d57203ed" name="cnt" referenceTypeName="int">
-                                                               <sedValue xml:id="_efac25cf-f74e-4aec-a7c2-f1d427b2b77f" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                               </sedValue>
-                                                            </sedVariable>
-                                                         </sedValue>
-                                                      </sedVariable>
-                                                      <sedVariable xml:id="_db31e583-323e-428b-ade8-4baaa1a22cd3" name="met" referenceTypeName="boolean">
-                                                         <sedValue xml:id="_02fe5e09-59ef-4f28-977c-9a672f139151" referenceTypeName="boolean" valueString="met" allocated="true" multiValued="false">
-                                                         </sedValue>
-                                                      </sedVariable>
-                                                      <sedVariable xml:id="_9d0cb74c-cdbf-42c9-b9e6-d7a7e7648fb8" name="exc" referenceTypeName="Null">
-                                                         <sedValue xml:id="_ade09651-c3a3-476c-8b7c-071662b05d8f" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                                         </sedValue>
-                                                      </sedVariable>
-                                                      <sedVariable xml:id="_d89a8af9-2b4d-4d57-999f-77bba3645f2f" name="x_5" referenceTypeName="boolean">
-                                                         <sedValue xml:id="_f8fc553a-d8d4-495e-9203-883152d0f1f4" referenceTypeName="boolean" valueString="TRUE" allocated="true" multiValued="false">
-                                                         </sedValue>
-                                                      </sedVariable>
-                                                      <sedCallStackEntry nodeIdRef="_72119afb-250b-4aed-bcdd-1a4b5a5c053b"/>
-                                                      <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                                      <sedMethodReturn xml:id="_1ae3a447-74a8-475a-bd5b-1816aea3fe9f" name="&lt;return TRUE as result of equals&gt;" pathCondition="  !n = null
-&amp; n.content = self.cnt
-&amp; self.content = n.content" lineNumber="-1" charStart="105" charEnd="111" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_868add57-bad4-4d6f-bfbc-4119208c8a72">
-                                                         <sedVariable xml:id="_518e5086-df89-44b3-8a13-07e718da9b8d" name="self" referenceTypeName="example5.Number2">
-                                                            <sedValue xml:id="_cef7a296-b502-4f18-946f-ebc70e2b915d" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                                               <sedVariable xml:id="_f98fecd1-cca0-4e10-8dec-a252d85c95e2" name="content" referenceTypeName="int">
-                                                                  <sedValue xml:id="_0c1181c0-388a-4b34-b6e0-d2a160db1550" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                                  </sedValue>
-                                                               </sedVariable>
-                                                               <sedVariable xml:id="_7381927d-f238-49e0-85b2-22ff1411aba5" name="cnt" referenceTypeName="int">
-                                                                  <sedValue xml:id="_27f2d582-f814-4f05-9ff7-418df39a6333" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                                  </sedValue>
-                                                               </sedVariable>
-                                                            </sedValue>
-                                                         </sedVariable>
-                                                         <sedVariable xml:id="_eb44dcf4-e121-4e79-8174-7020398c44ac" name="n" referenceTypeName="example5.Number2">
-                                                            <sedValue xml:id="_ba059056-6cdf-47fb-93f6-fc3212af74a1" referenceTypeName="example5.Number2" valueString="n" allocated="true" multiValued="false">
-                                                               <sedVariable xml:id="_af2322a0-d868-4865-9534-3b479c6f08f2" name="content" referenceTypeName="int">
-                                                                  <sedValue xml:id="_59b31707-a01d-44ec-bd29-15095e5d622a" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                                  </sedValue>
-                                                               </sedVariable>
-                                                               <sedVariable xml:id="_caf36d8d-08f8-4a9e-9406-d057032a6005" name="cnt" referenceTypeName="int">
-                                                                  <sedValue xml:id="_28d3c27e-ab9f-417c-81dd-5a879642642b" referenceTypeName="int" valueString="n.cnt" allocated="true" multiValued="false">
-                                                                  </sedValue>
-                                                               </sedVariable>
-                                                            </sedValue>
-                                                         </sedVariable>
-                                                         <sedVariable xml:id="_c5bef7fa-387f-468f-bb47-a8d572c386e8" name="exc" referenceTypeName="Null">
-                                                            <sedValue xml:id="_951c829b-97ee-4166-b83a-536179fe7980" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                                            </sedValue>
-                                                         </sedVariable>
-                                                         <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                                         <sedTermination xml:id="_643cf257-a1c4-474b-ab5d-850c16926544" name="&lt;end&gt;" pathCondition="  !n = null
-&amp; n.content = self.cnt
-&amp; self.content = n.content" verified="true">
+                                 <sedMethodCall xml:id="_b3f6643f-0710-4c04-ba76-8473fe1c7945" name="&lt;call self.test2(x_9)&gt;" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="1015" charEnd="1020" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" groupable="false">
+                                    <sedBranchStatement xml:id="_53f3f2c1-eb79-4f12-8447-47b2e0531441" name="if (x_9==this.cnt)" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="1033" charEnd="1046" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" groupable="false">
+                                       <sedBranchCondition xml:id="_148d04e8-fa3c-4b36-b718-ab33793b06cd" name="n.content = self.cnt" pathCondition="  !n = null &amp; n.content = self.cnt &amp; self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1">
+                                          <sedStatement xml:id="_6dd9f75a-fffa-4543-bf12-64e38be9ec7c" name="return true;" pathCondition="  !n = null &amp; n.content = self.cnt &amp; self.content = n.content" lineNumber="-1" charStart="1122" charEnd="1134" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
+                                             <sedMethodReturn xml:id="_e0a4155e-506a-4ef0-9f2b-4a8b489e9b39" name="&lt;return TRUE as result of test2&gt;" pathCondition="  !n = null &amp; n.content = self.cnt &amp; self.content = n.content" lineNumber="-1" charStart="1015" charEnd="1020" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_3a2348f3-b0d0-4278-8486-ac3d40c70336">
+                                                <sedStatement xml:id="_80de6ff5-29d7-4333-b103-274094292bbc" name="return b;" pathCondition="  !n = null &amp; n.content = self.cnt &amp; self.content = n.content" lineNumber="-1" charStart="702" charEnd="711" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
+                                                   <sedMethodReturn xml:id="_5dbb429b-cf3b-4eff-933c-832a2d74d045" name="&lt;return TRUE as result of test&gt;" pathCondition="  !n = null &amp; n.content = self.cnt &amp; self.content = n.content" lineNumber="-1" charStart="441" charEnd="445" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_c2d009a5-0a21-4dbf-ab77-1baddb3c716e">
+                                                      <sedMethodReturn xml:id="_1ae3a447-74a8-475a-bd5b-1816aea3fe9f" name="&lt;return TRUE as result of equals&gt;" pathCondition="  !n = null &amp; n.content = self.cnt &amp; self.content = n.content" lineNumber="-1" charStart="105" charEnd="111" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_868add57-bad4-4d6f-bfbc-4119208c8a72">
+                                                         <sedTermination xml:id="_643cf257-a1c4-474b-ab5d-850c16926544" name="&lt;end&gt;" pathCondition="  !n = null &amp; n.content = self.cnt &amp; self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1" verified="true">
                                                          </sedTermination>
                                                       </sedMethodReturn>
                                                    </sedMethodReturn>
@@ -376,161 +26,13 @@
                                              </sedMethodReturn>
                                           </sedStatement>
                                        </sedBranchCondition>
-                                       <sedBranchCondition xml:id="_af391a43-04b4-4c1b-b7f5-0b4d9c5b1e2d" name="!n.content = self.cnt" pathCondition="  !n = null
-&amp; !n.content = self.cnt
-&amp; self.content = n.content">
-                                          <sedCallStackEntry nodeIdRef="_b3f6643f-0710-4c04-ba76-8473fe1c7945"/>
-                                          <sedCallStackEntry nodeIdRef="_72119afb-250b-4aed-bcdd-1a4b5a5c053b"/>
-                                          <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                          <sedStatement xml:id="_eab9e541-38d8-4253-98d1-ab61ae3fd857" name="return false;" pathCondition="  !n = null
-&amp; !n.content = self.cnt
-&amp; self.content = n.content" lineNumber="-1" charStart="1224" charEnd="1237" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
-                                             <sedVariable xml:id="_c3ea79e4-a4f6-4165-ba69-b464527a18c8" name="self" referenceTypeName="example5.Number2">
-                                                <sedValue xml:id="_ea0f8480-2dc8-4e7b-8913-2009f796cabb" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                                   <sedVariable xml:id="_a1a83b71-d946-4d0c-8c8a-66e93492ca3c" name="content" referenceTypeName="int">
-                                                      <sedValue xml:id="_cd02edc3-de07-4142-bbc0-cb4a3df12eb0" referenceTypeName="int" valueString="n.content" allocated="true" multiValued="false">
-                                                      </sedValue>
-                                                   </sedVariable>
-                                                   <sedVariable xml:id="_41f3d6a6-50ff-475d-9978-1523199bb169" name="cnt" referenceTypeName="int">
-                                                      <sedValue xml:id="_188feac8-a301-40f4-a5cd-1eb4fb8336ff" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                      </sedValue>
-                                                   </sedVariable>
-                                                </sedValue>
-                                             </sedVariable>
-                                             <sedVariable xml:id="_2761316f-d975-4b43-879d-0c5c7960792e" name="x_9" referenceTypeName="int">
-                                                <sedValue xml:id="_64ed79ee-fc57-4cfb-8f9c-782541dbc457" referenceTypeName="int" valueString="x_9" allocated="true" multiValued="false">
-                                                </sedValue>
-                                             </sedVariable>
-                                             <sedVariable xml:id="_125aa0e5-12ff-4be4-86a1-24d3c5e62556" name="exc" referenceTypeName="Null">
-                                                <sedValue xml:id="_e2528123-ea2d-42d0-abb7-23c7f55feeec" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                                </sedValue>
-                                             </sedVariable>
-                                             <sedCallStackEntry nodeIdRef="_b3f6643f-0710-4c04-ba76-8473fe1c7945"/>
-                                             <sedCallStackEntry nodeIdRef="_72119afb-250b-4aed-bcdd-1a4b5a5c053b"/>
-                                             <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                             <sedMethodReturn xml:id="_96d90f95-5c53-4641-8f59-c49ce2a14c56" name="&lt;return FALSE as result of test2&gt;" pathCondition="  !n = null
-&amp; !n.content = self.cnt
-&amp; self.content = n.content" lineNumber="-1" charStart="1015" charEnd="1020" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_28dc977d-e4c1-4129-af5b-9a3943b43c12">
-                                                <sedVariable xml:id="_c78af8ad-2b07-4f1e-a94c-537db82a5fff" name="self" referenceTypeName="example5.Number2">
-                                                   <sedValue xml:id="_21ee55e7-623c-4cb5-b288-5ca4ef3c4412" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                                      <sedVariable xml:id="_6adbf207-9d3d-40f7-836d-8eb2ebfc974a" name="content" referenceTypeName="int">
-                                                         <sedValue xml:id="_da638d9d-4d55-48e6-875c-51f62de6cc9f" referenceTypeName="int" valueString="n.content" allocated="true" multiValued="false">
-                                                         </sedValue>
-                                                      </sedVariable>
-                                                      <sedVariable xml:id="_1c304462-da9f-4581-a5a9-4af4a3868bee" name="cnt" referenceTypeName="int">
-                                                         <sedValue xml:id="_90c0129d-667c-4d21-bdea-2ddac4edcd7b" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                         </sedValue>
-                                                      </sedVariable>
-                                                   </sedValue>
-                                                </sedVariable>
-                                                <sedVariable xml:id="_8444f73b-4fc4-494c-b1f0-1d0682a47037" name="x_9" referenceTypeName="int">
-                                                   <sedValue xml:id="_e7fcd6af-574e-4e6f-984b-33852141ee3e" referenceTypeName="int" valueString="x_9" allocated="true" multiValued="false">
-                                                   </sedValue>
-                                                </sedVariable>
-                                                <sedVariable xml:id="_4643aefe-c67a-44b0-9c24-aca521f68603" name="exc" referenceTypeName="Null">
-                                                   <sedValue xml:id="_93b33af0-aad3-45cb-b8b4-9832ddfc6651" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                                   </sedValue>
-                                                </sedVariable>
-                                                <sedVariable xml:id="_b97b4b63-46fb-49cb-9af0-f3af942c0a4f" name="x_8" referenceTypeName="boolean">
-                                                   <sedValue xml:id="_97478ec4-095c-4fce-9294-192f4ff23364" referenceTypeName="boolean" valueString="FALSE" allocated="true" multiValued="false">
-                                                   </sedValue>
-                                                </sedVariable>
-                                                <sedCallStackEntry nodeIdRef="_b3f6643f-0710-4c04-ba76-8473fe1c7945"/>
-                                                <sedCallStackEntry nodeIdRef="_72119afb-250b-4aed-bcdd-1a4b5a5c053b"/>
-                                                <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                                <sedStatement xml:id="_81924662-344e-4237-b2c9-ed008c71b1ec" name="return b;" pathCondition="  !n = null
-&amp; !n.content = self.cnt
-&amp; self.content = n.content" lineNumber="-1" charStart="702" charEnd="711" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
-                                                   <sedVariable xml:id="_6ae21628-2815-43f5-854f-3c2f9fb7ce2a" name="self" referenceTypeName="example5.Number2">
-                                                      <sedValue xml:id="_1cc42045-2447-436a-9bf3-6dbe3191a61b" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                                         <sedVariable xml:id="_3c15177e-a8e1-4214-9a2c-2564f0f9b0e9" name="content" referenceTypeName="int">
-                                                            <sedValue xml:id="_fe193e8c-ed8e-4d94-a7ae-1dce7531c9b0" referenceTypeName="int" valueString="n.content" allocated="true" multiValued="false">
-                                                            </sedValue>
-                                                         </sedVariable>
-                                                         <sedVariable xml:id="_d393ef23-1c3b-4dc5-bf4f-816589a04cbc" name="cnt" referenceTypeName="int">
-                                                            <sedValue xml:id="_92befaf7-b007-4c69-8dce-423062d661bb" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                            </sedValue>
-                                                         </sedVariable>
-                                                      </sedValue>
-                                                   </sedVariable>
-                                                   <sedVariable xml:id="_49307676-101c-4676-8a41-0b168f66931d" name="met" referenceTypeName="boolean">
-                                                      <sedValue xml:id="_d94e2333-5282-4ed6-adf4-cdeae291b7b7" referenceTypeName="boolean" valueString="met" allocated="true" multiValued="false">
-                                                      </sedValue>
-                                                   </sedVariable>
-                                                   <sedVariable xml:id="_412e81e8-419d-4969-92d8-6cd68e61eac9" name="exc" referenceTypeName="Null">
-                                                      <sedValue xml:id="_1167be96-66ab-4c11-a109-dd0ab70efb5b" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                                      </sedValue>
-                                                   </sedVariable>
-                                                   <sedVariable xml:id="_a8df491b-adcb-4c1d-beec-b544950e55bc" name="b" referenceTypeName="boolean">
-                                                      <sedValue xml:id="_b307f08f-c81d-4502-9e7d-d8c8c9fff3b3" referenceTypeName="boolean" valueString="FALSE" allocated="true" multiValued="false">
-                                                      </sedValue>
-                                                   </sedVariable>
-                                                   <sedCallStackEntry nodeIdRef="_72119afb-250b-4aed-bcdd-1a4b5a5c053b"/>
-                                                   <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                                   <sedMethodReturn xml:id="_f5c9015e-a353-4e4e-9d43-4ac324616496" name="&lt;return FALSE as result of test&gt;" pathCondition="  !n = null
-&amp; !n.content = self.cnt
-&amp; self.content = n.content" lineNumber="-1" charStart="441" charEnd="445" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_5b9b65be-b9b2-4901-bcd3-6f53bb193f2b">
-                                                      <sedVariable xml:id="_426b546d-8ff2-45ad-90cf-b0a3948b63f7" name="self" referenceTypeName="example5.Number2">
-                                                         <sedValue xml:id="_78a031e3-3623-4593-b568-a1b060c8bec5" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                                            <sedVariable xml:id="_553f4953-096e-4fde-add1-83ef8a90c890" name="content" referenceTypeName="int">
-                                                               <sedValue xml:id="_86157916-3e41-4410-9bc4-becc08fd19e3" referenceTypeName="int" valueString="n.content" allocated="true" multiValued="false">
-                                                               </sedValue>
-                                                            </sedVariable>
-                                                            <sedVariable xml:id="_982620ff-71b8-401b-8cdd-596561ef2a7a" name="cnt" referenceTypeName="int">
-                                                               <sedValue xml:id="_738a236f-0e98-4651-97ca-bbb8f4c9d4e3" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                               </sedValue>
-                                                            </sedVariable>
-                                                         </sedValue>
-                                                      </sedVariable>
-                                                      <sedVariable xml:id="_56ecf2c4-bdec-4a5d-b3bb-2566d33ca084" name="met" referenceTypeName="boolean">
-                                                         <sedValue xml:id="_330e2b3e-6aef-44f9-9c6e-7b7a310b5d4d" referenceTypeName="boolean" valueString="met" allocated="true" multiValued="false">
-                                                         </sedValue>
-                                                      </sedVariable>
-                                                      <sedVariable xml:id="_35046eea-5dc1-4450-b910-193ca40fd9b9" name="exc" referenceTypeName="Null">
-                                                         <sedValue xml:id="_2eff2ebc-205d-4633-b93e-5559a9e2e65e" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                                         </sedValue>
-                                                      </sedVariable>
-                                                      <sedVariable xml:id="_383ad904-4b1f-4a82-9be7-b1218de33c65" name="x_5" referenceTypeName="boolean">
-                                                         <sedValue xml:id="_6ce0b119-daae-49ea-aedc-3b128e7cd08f" referenceTypeName="boolean" valueString="FALSE" allocated="true" multiValued="false">
-                                                         </sedValue>
-                                                      </sedVariable>
-                                                      <sedCallStackEntry nodeIdRef="_72119afb-250b-4aed-bcdd-1a4b5a5c053b"/>
-                                                      <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                                      <sedMethodReturn xml:id="_5c86b265-0700-4077-8082-ad35de3e884f" name="&lt;return FALSE as result of equals&gt;" pathCondition="  !n = null
-&amp; !n.content = self.cnt
-&amp; self.content = n.content" lineNumber="-1" charStart="105" charEnd="111" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_148cff9f-c487-42e3-9441-533c4d7133e6">
-                                                         <sedVariable xml:id="_9c18861f-0777-4789-85f8-cd34bdaa0abd" name="self" referenceTypeName="example5.Number2">
-                                                            <sedValue xml:id="_eca86256-c402-4286-abda-f764ca73e732" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                                               <sedVariable xml:id="_068e3455-b01c-4463-9a12-8cd2ebb4e841" name="content" referenceTypeName="int">
-                                                                  <sedValue xml:id="_5845d37e-5179-422d-94ee-d061738e2d8f" referenceTypeName="int" valueString="n.content" allocated="true" multiValued="false">
-                                                                  </sedValue>
-                                                               </sedVariable>
-                                                               <sedVariable xml:id="_dd87b65c-022b-4e28-90a8-4841b7bb92c8" name="cnt" referenceTypeName="int">
-                                                                  <sedValue xml:id="_36e4b572-44ac-490a-9100-df19cb852e56" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                                  </sedValue>
-                                                               </sedVariable>
-                                                            </sedValue>
-                                                         </sedVariable>
-                                                         <sedVariable xml:id="_bc9eca2d-dc6b-463f-8104-47b62041d2e1" name="n" referenceTypeName="example5.Number2">
-                                                            <sedValue xml:id="_7dae4a6e-dd7c-4f17-9762-9fab3a010e60" referenceTypeName="example5.Number2" valueString="n" allocated="true" multiValued="false">
-                                                               <sedVariable xml:id="_bb560aea-6989-4e76-81b5-ee152b77acef" name="content" referenceTypeName="int">
-                                                                  <sedValue xml:id="_6e1a506a-cb5e-4cef-8b1a-b04f1515ed82" referenceTypeName="int" valueString="n.content" allocated="true" multiValued="false">
-                                                                  </sedValue>
-                                                               </sedVariable>
-                                                               <sedVariable xml:id="_42d4a8e3-0282-41b1-acb0-ead5243aead7" name="cnt" referenceTypeName="int">
-                                                                  <sedValue xml:id="_a87d4f21-cfe0-4ab0-a47d-8dcb14b0ab31" referenceTypeName="int" valueString="n.cnt" allocated="true" multiValued="false">
-                                                                  </sedValue>
-                                                               </sedVariable>
-                                                            </sedValue>
-                                                         </sedVariable>
-                                                         <sedVariable xml:id="_c21f5cdf-a3cf-4b58-ab78-a0a3f6c3604e" name="exc" referenceTypeName="Null">
-                                                            <sedValue xml:id="_484d7b75-bded-4ba6-96c3-228bf0ba90c6" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                                            </sedValue>
-                                                         </sedVariable>
-                                                         <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                                         <sedTermination xml:id="_be2bebc1-a5f4-41f9-8eff-3842aeaffbb2" name="&lt;end&gt;" pathCondition="  !n = null
-&amp; !n.content = self.cnt
-&amp; self.content = n.content" verified="true">
+                                       <sedBranchCondition xml:id="_af391a43-04b4-4c1b-b7f5-0b4d9c5b1e2d" name="!n.content = self.cnt" pathCondition="  !n = null &amp; !n.content = self.cnt &amp; self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1">
+                                          <sedStatement xml:id="_eab9e541-38d8-4253-98d1-ab61ae3fd857" name="return false;" pathCondition="  !n = null &amp; !n.content = self.cnt &amp; self.content = n.content" lineNumber="-1" charStart="1224" charEnd="1237" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
+                                             <sedMethodReturn xml:id="_96d90f95-5c53-4641-8f59-c49ce2a14c56" name="&lt;return FALSE as result of test2&gt;" pathCondition="  !n = null &amp; !n.content = self.cnt &amp; self.content = n.content" lineNumber="-1" charStart="1015" charEnd="1020" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_28dc977d-e4c1-4129-af5b-9a3943b43c12">
+                                                <sedStatement xml:id="_81924662-344e-4237-b2c9-ed008c71b1ec" name="return b;" pathCondition="  !n = null &amp; !n.content = self.cnt &amp; self.content = n.content" lineNumber="-1" charStart="702" charEnd="711" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
+                                                   <sedMethodReturn xml:id="_f5c9015e-a353-4e4e-9d43-4ac324616496" name="&lt;return FALSE as result of test&gt;" pathCondition="  !n = null &amp; !n.content = self.cnt &amp; self.content = n.content" lineNumber="-1" charStart="441" charEnd="445" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_5b9b65be-b9b2-4901-bcd3-6f53bb193f2b">
+                                                      <sedMethodReturn xml:id="_5c86b265-0700-4077-8082-ad35de3e884f" name="&lt;return FALSE as result of equals&gt;" pathCondition="  !n = null &amp; !n.content = self.cnt &amp; self.content = n.content" lineNumber="-1" charStart="105" charEnd="111" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_148cff9f-c487-42e3-9441-533c4d7133e6">
+                                                         <sedTermination xml:id="_be2bebc1-a5f4-41f9-8eff-3842aeaffbb2" name="&lt;end&gt;" pathCondition="  !n = null &amp; !n.content = self.cnt &amp; self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1" verified="true">
                                                          </sedTermination>
                                                       </sedMethodReturn>
                                                    </sedMethodReturn>
@@ -539,346 +41,38 @@
                                           </sedStatement>
                                        </sedBranchCondition>
                                     </sedBranchStatement>
-                                    <sedMethodCallMethodReturnCondition xml:id="_3a2348f3-b0d0-4278-8486-ac3d40c70336" name="n.content = self.cnt" pathCondition="!n = null &amp; self.content = n.content">
+                                    <sedMethodCallMethodReturnCondition xml:id="_3a2348f3-b0d0-4278-8486-ac3d40c70336" name="n.content = self.cnt" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1">
                                        <sedChildReference nodeIdRef="_e0a4155e-506a-4ef0-9f2b-4a8b489e9b39"/>
                                     </sedMethodCallMethodReturnCondition>
-                                    <sedMethodCallMethodReturnCondition xml:id="_28dc977d-e4c1-4129-af5b-9a3943b43c12" name="!n.content = self.cnt" pathCondition="!n = null &amp; self.content = n.content">
+                                    <sedMethodCallMethodReturnCondition xml:id="_28dc977d-e4c1-4129-af5b-9a3943b43c12" name="!n.content = self.cnt" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1">
                                        <sedChildReference nodeIdRef="_96d90f95-5c53-4641-8f59-c49ce2a14c56"/>
                                     </sedMethodCallMethodReturnCondition>
                                  </sedMethodCall>
                               </sedStatement>
                            </sedStatement>
-                           <sedMethodCallMethodReturnCondition xml:id="_c2d009a5-0a21-4dbf-ab77-1baddb3c716e" name="n.content = self.cnt" pathCondition="!n = null &amp; self.content = n.content">
+                           <sedMethodCallMethodReturnCondition xml:id="_c2d009a5-0a21-4dbf-ab77-1baddb3c716e" name="n.content = self.cnt" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1">
                               <sedChildReference nodeIdRef="_5dbb429b-cf3b-4eff-933c-832a2d74d045"/>
                            </sedMethodCallMethodReturnCondition>
-                           <sedMethodCallMethodReturnCondition xml:id="_5b9b65be-b9b2-4901-bcd3-6f53bb193f2b" name="!n.content = self.cnt" pathCondition="!n = null &amp; self.content = n.content">
+                           <sedMethodCallMethodReturnCondition xml:id="_5b9b65be-b9b2-4901-bcd3-6f53bb193f2b" name="!n.content = self.cnt" pathCondition="!n = null &amp; self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1">
                               <sedChildReference nodeIdRef="_f5c9015e-a353-4e4e-9d43-4ac324616496"/>
                            </sedMethodCallMethodReturnCondition>
                         </sedMethodCall>
                      </sedStatement>
                   </sedBranchCondition>
-                  <sedBranchCondition xml:id="_b9bdcbc8-f724-4f64-9f9f-e970109690bf" name="!self.content = n.content" pathCondition="!n = null &amp; !self.content = n.content">
-                     <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
+                  <sedBranchCondition xml:id="_b9bdcbc8-f724-4f64-9f9f-e970109690bf" name="!self.content = n.content" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1">
                      <sedStatement xml:id="_58a5a342-c27d-43bc-a7d8-4bc9fc0b1ad3" name="return test(false);" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="338" charEnd="357" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
-                        <sedVariable xml:id="_b7b4438b-9779-4d22-9b77-5507265ed555" name="self" referenceTypeName="example5.Number2">
-                           <sedValue xml:id="_516f75e3-900c-48d5-9c46-191ab3c99090" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                              <sedVariable xml:id="_cb2aa9f4-0b46-448c-8dd3-10bf7af688b4" name="content" referenceTypeName="int">
-                                 <sedValue xml:id="_77980727-c823-42c6-ae33-89b4089434e8" referenceTypeName="int" valueString="self.content" allocated="true" multiValued="false">
-                                 </sedValue>
-                              </sedVariable>
-                              <sedVariable xml:id="_14c6f154-a0fa-4d71-8ffd-34829fd00d29" name="cnt" referenceTypeName="int">
-                                 <sedValue xml:id="_57445436-6106-457b-844f-0b2a4a37c45c" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                 </sedValue>
-                              </sedVariable>
-                           </sedValue>
-                        </sedVariable>
-                        <sedVariable xml:id="_d31ea80c-9042-455b-a7d4-161ae3915fe7" name="n" referenceTypeName="example5.Number2">
-                           <sedValue xml:id="_c11dc55e-28b0-4c26-bf24-df1924abf818" referenceTypeName="example5.Number2" valueString="n" allocated="true" multiValued="false">
-                              <sedVariable xml:id="_e96d1293-517d-410f-adcb-6e6b1eba5227" name="content" referenceTypeName="int">
-                                 <sedValue xml:id="_5a6f05c9-27c5-4854-a4db-31c08a16c4ec" referenceTypeName="int" valueString="n.content" allocated="true" multiValued="false">
-                                 </sedValue>
-                              </sedVariable>
-                              <sedVariable xml:id="_1f83a63d-f20b-4600-ab59-1827e093df5d" name="cnt" referenceTypeName="int">
-                                 <sedValue xml:id="_43003723-9f7a-4aba-ab98-cc2ca15ec6bb" referenceTypeName="int" valueString="n.cnt" allocated="true" multiValued="false">
-                                 </sedValue>
-                              </sedVariable>
-                           </sedValue>
-                        </sedVariable>
-                        <sedVariable xml:id="_1178eab7-20f9-4bee-b481-602e63b986b2" name="exc" referenceTypeName="Null">
-                           <sedValue xml:id="_e55fa28d-8be6-4347-ac4f-ca03c68a3980" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                           </sedValue>
-                        </sedVariable>
-                        <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                        <sedMethodCall xml:id="_0826d455-6f55-48bc-8fab-12740c58944b" name="&lt;call self.test(met_1)&gt;" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="441" charEnd="445" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
-                           <sedVariable xml:id="_b453f5b1-46cc-4e00-9435-351911202758" name="self" referenceTypeName="example5.Number2">
-                              <sedValue xml:id="_75bbbab1-1fa9-4cc1-91d2-6f3c438c200a" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                 <sedVariable xml:id="_0fea2449-58cc-4d56-bf7e-c08738dd3ba3" name="content" referenceTypeName="int">
-                                    <sedValue xml:id="_28aa94db-ef9c-4fe3-b4d2-dcd98958e3a8" referenceTypeName="int" valueString="self.content" allocated="true" multiValued="false">
-                                    </sedValue>
-                                 </sedVariable>
-                                 <sedVariable xml:id="_057002a0-b4e6-419e-9806-48e447cf2762" name="cnt" referenceTypeName="int">
-                                    <sedValue xml:id="_83d5de39-fb0a-40ac-adbe-d0b3738b797d" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                    </sedValue>
-                                 </sedVariable>
-                              </sedValue>
-                           </sedVariable>
-                           <sedVariable xml:id="_84f63457-e5ed-4dcb-83d9-1b4f7b5b8776" name="n" referenceTypeName="example5.Number2">
-                              <sedValue xml:id="_9bf56205-0e68-4ebe-82fd-37f767c58db0" referenceTypeName="example5.Number2" valueString="n" allocated="true" multiValued="false">
-                                 <sedVariable xml:id="_8d97c925-7de7-4cdb-976c-260f0c72eaae" name="content" referenceTypeName="int">
-                                    <sedValue xml:id="_5beb9eb6-aef5-4eca-bdc8-b5730e7b8f60" referenceTypeName="int" valueString="n.content" allocated="true" multiValued="false">
-                                    </sedValue>
-                                 </sedVariable>
-                                 <sedVariable xml:id="_f8d37e7f-4ec5-4474-9e56-437557eaa444" name="cnt" referenceTypeName="int">
-                                    <sedValue xml:id="_9fce74e6-d386-4d0b-9664-df7ac09e091e" referenceTypeName="int" valueString="n.cnt" allocated="true" multiValued="false">
-                                    </sedValue>
-                                 </sedVariable>
-                              </sedValue>
-                           </sedVariable>
-                           <sedVariable xml:id="_27b7ee7b-6bcf-42d8-a180-0ef5686b0190" name="exc" referenceTypeName="Null">
-                              <sedValue xml:id="_4cb234f9-e6c5-4dda-8f05-b44a5a982202" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                              </sedValue>
-                           </sedVariable>
-                           <sedVariable xml:id="_5e4b96fe-9420-4e95-b1e0-b12972f7cec6" name="met_1" referenceTypeName="boolean">
-                              <sedValue xml:id="_0f16d5c3-a03a-4971-af92-e4f53d18059b" referenceTypeName="boolean" valueString="FALSE" allocated="true" multiValued="false">
-                              </sedValue>
-                           </sedVariable>
-                           <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
+                        <sedMethodCall xml:id="_0826d455-6f55-48bc-8fab-12740c58944b" name="&lt;call self.test(met_1)&gt;" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="441" charEnd="445" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" groupable="false">
                            <sedStatement xml:id="_cf3a4c8c-3622-468f-9801-30be3b7bd84f" name="int EINWIRKLICHSEHRLANGERNAMEEINWIRKLICHSEHRLANGERNAME2 = this.content;" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="464" charEnd="530" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
-                              <sedVariable xml:id="_7e823075-38bf-4242-bd87-b5f675de8f2b" name="self" referenceTypeName="example5.Number2">
-                                 <sedValue xml:id="_4951d30b-4be1-433e-b915-7b028485b0f1" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                    <sedVariable xml:id="_821958ff-8930-4862-b6be-6883c5a78adb" name="content" referenceTypeName="int">
-                                       <sedValue xml:id="_7d281251-8651-4b3f-a0ea-4d6c2a9c2755" referenceTypeName="int" valueString="self.content" allocated="true" multiValued="false">
-                                       </sedValue>
-                                    </sedVariable>
-                                    <sedVariable xml:id="_74f7fe17-3890-42b2-8b2a-48eb34676f79" name="cnt" referenceTypeName="int">
-                                       <sedValue xml:id="_95615210-ffa9-4f9c-9604-58f521c61c71" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                       </sedValue>
-                                    </sedVariable>
-                                 </sedValue>
-                              </sedVariable>
-                              <sedVariable xml:id="_173625f9-ff8a-452c-9a1e-6b141d6f3dfb" name="met_1" referenceTypeName="boolean">
-                                 <sedValue xml:id="_6d462242-09da-4363-a9ad-7028d0bd9fac" referenceTypeName="boolean" valueString="met_1" allocated="true" multiValued="false">
-                                 </sedValue>
-                              </sedVariable>
-                              <sedVariable xml:id="_687ffe99-af87-496b-8658-da485e24ea74" name="exc" referenceTypeName="Null">
-                                 <sedValue xml:id="_af079433-802b-4093-ae45-feb863bddf22" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                 </sedValue>
-                              </sedVariable>
-                              <sedCallStackEntry nodeIdRef="_0826d455-6f55-48bc-8fab-12740c58944b"/>
-                              <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
                               <sedStatement xml:id="_bd72ac15-be69-48bd-9162-ff9d3cc891ef" name="boolean b = test2(EINWIRKLICHSEHRLANGERNAMEEINWIRKLICHSEHRLANGERNAME2_1);" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="534" charEnd="605" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
-                                 <sedVariable xml:id="_66df9496-0663-4c0a-b239-62fe9d958690" name="self" referenceTypeName="example5.Number2">
-                                    <sedValue xml:id="_94c2ebfc-55eb-4bca-bdb9-1f62fa45d5e5" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                       <sedVariable xml:id="_d17c1c11-d6cf-492e-a0c0-e37fd1c1856b" name="content" referenceTypeName="int">
-                                          <sedValue xml:id="_51012c3f-af50-41cf-8d48-942c3058cb1f" referenceTypeName="int" valueString="self.content" allocated="true" multiValued="false">
-                                          </sedValue>
-                                       </sedVariable>
-                                       <sedVariable xml:id="_fb64f7c5-179e-4042-a45a-835b3117658e" name="cnt" referenceTypeName="int">
-                                          <sedValue xml:id="_8a85207a-79c7-4216-ac06-82156ef0c5d8" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                          </sedValue>
-                                       </sedVariable>
-                                    </sedValue>
-                                 </sedVariable>
-                                 <sedVariable xml:id="_b63dd803-bf01-4da0-835f-1c99a94be33e" name="met_1" referenceTypeName="boolean">
-                                    <sedValue xml:id="_d5f0dfc8-b2ae-4acd-9e33-c447034f10dc" referenceTypeName="boolean" valueString="met_1" allocated="true" multiValued="false">
-                                    </sedValue>
-                                 </sedVariable>
-                                 <sedVariable xml:id="_b293e9a2-1c39-4fca-b127-d97b896d0524" name="exc" referenceTypeName="Null">
-                                    <sedValue xml:id="_f36106a6-6315-4474-9c6b-f2e60adda395" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                    </sedValue>
-                                 </sedVariable>
-                                 <sedVariable xml:id="_8d0aa6ee-bc44-41da-ae8e-7cfde45a3b96" name="EINWIRKLICHSEHRLANGERNAMEEINWIRKLICHSEHRLANGERNAME2_1" referenceTypeName="int">
-                                    <sedValue xml:id="_1d0aec97-21fa-4bac-ae8e-c244f5e89857" referenceTypeName="int" valueString="self.content" allocated="true" multiValued="false">
-                                    </sedValue>
-                                 </sedVariable>
-                                 <sedCallStackEntry nodeIdRef="_0826d455-6f55-48bc-8fab-12740c58944b"/>
-                                 <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                 <sedMethodCall xml:id="_8d1261ab-24fa-440a-af75-4f18a6476ae9" name="&lt;call self.test2(x_11)&gt;" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="1015" charEnd="1020" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
-                                    <sedVariable xml:id="_156b3844-e139-41e6-8421-e4c3d85fc3ee" name="self" referenceTypeName="example5.Number2">
-                                       <sedValue xml:id="_1f174ce3-0c13-44fe-ae43-6e886a841357" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                          <sedVariable xml:id="_826b1e97-f23d-4896-ad95-b9ba36ef4751" name="content" referenceTypeName="int">
-                                             <sedValue xml:id="_3c6ce60a-ea4d-4e5b-9fb9-1d8d28f11218" referenceTypeName="int" valueString="self.content" allocated="true" multiValued="false">
-                                             </sedValue>
-                                          </sedVariable>
-                                          <sedVariable xml:id="_60f2981f-6547-4796-8674-98b952a2fdb0" name="cnt" referenceTypeName="int">
-                                             <sedValue xml:id="_7be288b3-ad09-4177-b7fb-0f147bba1fe1" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                             </sedValue>
-                                          </sedVariable>
-                                       </sedValue>
-                                    </sedVariable>
-                                    <sedVariable xml:id="_5b385c7d-a8f0-4184-88df-1d19d46ae2bb" name="met_1" referenceTypeName="boolean">
-                                       <sedValue xml:id="_bceaffac-2402-41dc-b3cf-e49d8b313ad0" referenceTypeName="boolean" valueString="met_1" allocated="true" multiValued="false">
-                                       </sedValue>
-                                    </sedVariable>
-                                    <sedVariable xml:id="_38b86be8-2589-4b1e-9a33-a329263b5ead" name="exc" referenceTypeName="Null">
-                                       <sedValue xml:id="_74c90c35-721d-49d8-b31d-e2641289feec" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                       </sedValue>
-                                    </sedVariable>
-                                    <sedVariable xml:id="_a282a16f-acce-4ab6-a1ba-f4165f33b979" name="x_11" referenceTypeName="int">
-                                       <sedValue xml:id="_695a53df-6ad1-40bd-b183-771aee466221" referenceTypeName="int" valueString="self.content" allocated="true" multiValued="false">
-                                       </sedValue>
-                                    </sedVariable>
-                                    <sedCallStackEntry nodeIdRef="_0826d455-6f55-48bc-8fab-12740c58944b"/>
-                                    <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                    <sedBranchStatement xml:id="_4c725c1a-7545-4d39-b0bd-af4d335574d1" name="if (x_11==this.cnt)" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="1033" charEnd="1046" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
-                                       <sedVariable xml:id="_bb9e299d-1789-423b-8291-b3a89675de2a" name="self" referenceTypeName="example5.Number2">
-                                          <sedValue xml:id="_5351c8ab-1f6b-4c2b-8b27-460aeb879249" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                             <sedVariable xml:id="_87d7cad3-3de2-44c5-ab8c-424dbd6d965d" name="content" referenceTypeName="int">
-                                                <sedValue xml:id="_a91aa7b8-f882-4f72-b862-3269e9c7a3d0" referenceTypeName="int" valueString="self.content" allocated="true" multiValued="false">
-                                                </sedValue>
-                                             </sedVariable>
-                                             <sedVariable xml:id="_a70b18e3-fd01-4357-b9d7-77ae887ad53c" name="cnt" referenceTypeName="int">
-                                                <sedValue xml:id="_f15cb8a7-ce50-4db7-b496-d5ec348d6a8c" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                </sedValue>
-                                             </sedVariable>
-                                          </sedValue>
-                                       </sedVariable>
-                                       <sedVariable xml:id="_94d69a25-3f8d-42f9-867d-43fdad731472" name="x_11" referenceTypeName="int">
-                                          <sedValue xml:id="_b1e13777-240a-463e-81a4-e8a1f2d35ebd" referenceTypeName="int" valueString="self.content" allocated="true" multiValued="false">
-                                          </sedValue>
-                                       </sedVariable>
-                                       <sedVariable xml:id="_80c25f15-35e0-404c-8ffd-c9e76642f0ff" name="exc" referenceTypeName="Null">
-                                          <sedValue xml:id="_e798246c-37e6-4cc0-9d8f-210dade89b14" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                          </sedValue>
-                                       </sedVariable>
-                                       <sedCallStackEntry nodeIdRef="_8d1261ab-24fa-440a-af75-4f18a6476ae9"/>
-                                       <sedCallStackEntry nodeIdRef="_0826d455-6f55-48bc-8fab-12740c58944b"/>
-                                       <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                       <sedBranchCondition xml:id="_d713024d-e57d-46e1-91b0-98fa7ccb3841" name="self.content = self.cnt" pathCondition="  !n = null
-&amp; self.content = self.cnt
-&amp; !self.content = n.content">
-                                          <sedCallStackEntry nodeIdRef="_8d1261ab-24fa-440a-af75-4f18a6476ae9"/>
-                                          <sedCallStackEntry nodeIdRef="_0826d455-6f55-48bc-8fab-12740c58944b"/>
-                                          <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                          <sedStatement xml:id="_b1b1824f-1723-49e8-a5b3-b90f48cf4f76" name="return true;" pathCondition="  !n = null
-&amp; self.content = self.cnt
-&amp; !self.content = n.content" lineNumber="-1" charStart="1122" charEnd="1134" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
-                                             <sedVariable xml:id="_ec2aaf67-ca2e-470b-bf96-b43454715660" name="self" referenceTypeName="example5.Number2">
-                                                <sedValue xml:id="_2dbac5a1-7745-46ab-b165-db184ef42e00" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                                   <sedVariable xml:id="_8f8b0e32-eab7-49d2-8e06-24085d97cd59" name="content" referenceTypeName="int">
-                                                      <sedValue xml:id="_448cd2e0-c9ad-4f36-b018-c624f7380540" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                      </sedValue>
-                                                   </sedVariable>
-                                                   <sedVariable xml:id="_e92d26f9-373c-4ed9-8e8b-2fe4735fb8d3" name="cnt" referenceTypeName="int">
-                                                      <sedValue xml:id="_beb155d7-f004-4aaa-9c07-33be59ce6b7e" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                      </sedValue>
-                                                   </sedVariable>
-                                                </sedValue>
-                                             </sedVariable>
-                                             <sedVariable xml:id="_8611365f-aafb-49cb-b7a1-b0ef381d3074" name="x_11" referenceTypeName="int">
-                                                <sedValue xml:id="_53c1d91c-c9c8-4416-b46b-cac6a71cf74e" referenceTypeName="int" valueString="x_11" allocated="true" multiValued="false">
-                                                </sedValue>
-                                             </sedVariable>
-                                             <sedVariable xml:id="_f7543474-be6c-4457-8128-4ddeef8095ae" name="exc" referenceTypeName="Null">
-                                                <sedValue xml:id="_5862c17b-a4ee-47d0-b62f-2bc047a112ae" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                                </sedValue>
-                                             </sedVariable>
-                                             <sedCallStackEntry nodeIdRef="_8d1261ab-24fa-440a-af75-4f18a6476ae9"/>
-                                             <sedCallStackEntry nodeIdRef="_0826d455-6f55-48bc-8fab-12740c58944b"/>
-                                             <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                             <sedMethodReturn xml:id="_9c3e9133-e2de-405c-b48d-9158e6d6197f" name="&lt;return TRUE as result of test2&gt;" pathCondition="  !n = null
-&amp; self.content = self.cnt
-&amp; !self.content = n.content" lineNumber="-1" charStart="1015" charEnd="1020" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_7b5b339d-ac96-4c8d-8754-c5a8eaba59de">
-                                                <sedVariable xml:id="_2dff2ca0-a069-4d86-a782-fc9bd6402a67" name="self" referenceTypeName="example5.Number2">
-                                                   <sedValue xml:id="_7f00d183-5fbc-4ffa-b610-fb3f87ac095f" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                                      <sedVariable xml:id="_5837f686-f96d-49db-b492-e17c5f9eca51" name="content" referenceTypeName="int">
-                                                         <sedValue xml:id="_bdad4842-2e55-4fcc-81a4-34fda65fe74c" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                         </sedValue>
-                                                      </sedVariable>
-                                                      <sedVariable xml:id="_790693c4-a6fa-4832-8a98-45f2aaff4df7" name="cnt" referenceTypeName="int">
-                                                         <sedValue xml:id="_4451011d-ad4b-4ddb-8056-8d1c00a7a03a" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                         </sedValue>
-                                                      </sedVariable>
-                                                   </sedValue>
-                                                </sedVariable>
-                                                <sedVariable xml:id="_8ea769bf-28de-4fac-a5a2-5787dcc34cd6" name="x_11" referenceTypeName="int">
-                                                   <sedValue xml:id="_1d1ce9e0-d482-4d35-8cbc-2c27ea1fff32" referenceTypeName="int" valueString="x_11" allocated="true" multiValued="false">
-                                                   </sedValue>
-                                                </sedVariable>
-                                                <sedVariable xml:id="_b822ea14-4e7a-4ba0-a36f-e947830fdc8f" name="exc" referenceTypeName="Null">
-                                                   <sedValue xml:id="_ce9149bf-1a63-46b6-99c2-3b3192df42fa" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                                   </sedValue>
-                                                </sedVariable>
-                                                <sedVariable xml:id="_5c29da05-0ad0-4b1c-9062-e151836358c2" name="x_10" referenceTypeName="boolean">
-                                                   <sedValue xml:id="_9e02ebba-cca2-42e4-8463-c9c1fd99ced1" referenceTypeName="boolean" valueString="TRUE" allocated="true" multiValued="false">
-                                                   </sedValue>
-                                                </sedVariable>
-                                                <sedCallStackEntry nodeIdRef="_8d1261ab-24fa-440a-af75-4f18a6476ae9"/>
-                                                <sedCallStackEntry nodeIdRef="_0826d455-6f55-48bc-8fab-12740c58944b"/>
-                                                <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                                <sedStatement xml:id="_db55143f-3553-495c-96cc-6a5988b2809c" name="return b_1;" pathCondition="  !n = null
-&amp; self.content = self.cnt
-&amp; !self.content = n.content" lineNumber="-1" charStart="702" charEnd="711" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
-                                                   <sedVariable xml:id="_474cae1b-a85d-47c4-9809-fdea5f2ea0dc" name="self" referenceTypeName="example5.Number2">
-                                                      <sedValue xml:id="_fd1b03d5-ac9c-4684-ab47-866534280ea2" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                                         <sedVariable xml:id="_5189f714-c511-4720-b0aa-d75928a52a07" name="content" referenceTypeName="int">
-                                                            <sedValue xml:id="_9c6caf8d-10d8-41a4-83c6-3ffbd243f3b1" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                            </sedValue>
-                                                         </sedVariable>
-                                                         <sedVariable xml:id="_8b39a2f8-a117-4ed3-9c2d-a51c78936510" name="cnt" referenceTypeName="int">
-                                                            <sedValue xml:id="_a3843f46-6c6a-4670-943a-b2a9043c24da" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                            </sedValue>
-                                                         </sedVariable>
-                                                      </sedValue>
-                                                   </sedVariable>
-                                                   <sedVariable xml:id="_4c36d888-e44b-45b8-b548-dc7dca535735" name="met_1" referenceTypeName="boolean">
-                                                      <sedValue xml:id="_bbeb80fc-8aa6-4224-bcc4-a31c6f5516d2" referenceTypeName="boolean" valueString="met_1" allocated="true" multiValued="false">
-                                                      </sedValue>
-                                                   </sedVariable>
-                                                   <sedVariable xml:id="_42ca5346-ba0a-427a-ab93-06f8478b7172" name="exc" referenceTypeName="Null">
-                                                      <sedValue xml:id="_4c897158-d0b8-44a9-a99c-a35c89df84c9" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                                      </sedValue>
-                                                   </sedVariable>
-                                                   <sedVariable xml:id="_7df1175a-9b3b-4083-8856-043a9ec86109" name="b_1" referenceTypeName="boolean">
-                                                      <sedValue xml:id="_46a4f382-00a2-4a3f-a4ad-e36a19b6899b" referenceTypeName="boolean" valueString="TRUE" allocated="true" multiValued="false">
-                                                      </sedValue>
-                                                   </sedVariable>
-                                                   <sedCallStackEntry nodeIdRef="_0826d455-6f55-48bc-8fab-12740c58944b"/>
-                                                   <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                                   <sedMethodReturn xml:id="_56bf96e2-c577-42df-88ce-c84d173825dd" name="&lt;return TRUE as result of test&gt;" pathCondition="  !n = null
-&amp; self.content = self.cnt
-&amp; !self.content = n.content" lineNumber="-1" charStart="441" charEnd="445" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_89197497-e8b0-4642-b8a5-43a74d15bff4">
-                                                      <sedVariable xml:id="_bd25b2cd-3606-4c60-b6e8-8b4e178b3a29" name="self" referenceTypeName="example5.Number2">
-                                                         <sedValue xml:id="_58ff30b3-3d1c-430b-8d91-0b0b6e0fa702" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                                            <sedVariable xml:id="_b8ee51b3-46d7-4dcc-ab96-0b7f0a440a74" name="content" referenceTypeName="int">
-                                                               <sedValue xml:id="_838c90e2-4be5-41be-8c91-6869dcd3c820" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                               </sedValue>
-                                                            </sedVariable>
-                                                            <sedVariable xml:id="_78b5f081-96b7-4766-b39e-bdbf2aa1a96f" name="cnt" referenceTypeName="int">
-                                                               <sedValue xml:id="_16446c77-908f-4861-a1c1-c864c5976a3d" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                               </sedValue>
-                                                            </sedVariable>
-                                                         </sedValue>
-                                                      </sedVariable>
-                                                      <sedVariable xml:id="_06d78bbf-087f-4ff2-b63b-9c9e5aadd254" name="met_1" referenceTypeName="boolean">
-                                                         <sedValue xml:id="_aedab265-37c2-4763-a95f-47a03cafb750" referenceTypeName="boolean" valueString="met_1" allocated="true" multiValued="false">
-                                                         </sedValue>
-                                                      </sedVariable>
-                                                      <sedVariable xml:id="_0a17eb54-0dae-4207-bedc-73fc92a92f93" name="exc" referenceTypeName="Null">
-                                                         <sedValue xml:id="_44f923b4-ac25-443c-bcad-6e0ae6f344f3" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                                         </sedValue>
-                                                      </sedVariable>
-                                                      <sedVariable xml:id="_40fec303-86fa-42b3-9111-cf4b80c78bc6" name="x_7" referenceTypeName="boolean">
-                                                         <sedValue xml:id="_9570e0d9-ae28-4d58-9695-61d1a81eec6d" referenceTypeName="boolean" valueString="TRUE" allocated="true" multiValued="false">
-                                                         </sedValue>
-                                                      </sedVariable>
-                                                      <sedCallStackEntry nodeIdRef="_0826d455-6f55-48bc-8fab-12740c58944b"/>
-                                                      <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                                      <sedMethodReturn xml:id="_cb7ad1a4-94fd-451f-b23f-ac8d546734cf" name="&lt;return TRUE as result of equals&gt;" pathCondition="  !n = null
-&amp; self.content = self.cnt
-&amp; !self.content = n.content" lineNumber="-1" charStart="105" charEnd="111" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_d9e2ab4f-31c4-4d0e-9c0e-983ff092cf46">
-                                                         <sedVariable xml:id="_0072a1e9-f21b-40cb-ad32-2f06f7f1e495" name="self" referenceTypeName="example5.Number2">
-                                                            <sedValue xml:id="_93bb6236-66a5-4f8a-8063-0575bfd8822f" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                                               <sedVariable xml:id="_a326ece3-e0fc-435c-a9eb-820b682c962a" name="content" referenceTypeName="int">
-                                                                  <sedValue xml:id="_f4fa0cee-423f-4d0e-8d76-2c8bf74af6c6" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                                  </sedValue>
-                                                               </sedVariable>
-                                                               <sedVariable xml:id="_a1e86031-e111-47eb-a0cc-b83543935bd8" name="cnt" referenceTypeName="int">
-                                                                  <sedValue xml:id="_ed07c43d-e269-4a39-80d4-606d657f480b" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                                  </sedValue>
-                                                               </sedVariable>
-                                                            </sedValue>
-                                                         </sedVariable>
-                                                         <sedVariable xml:id="_cd36c951-bf66-4d1c-8c4a-62be1eb3fa71" name="n" referenceTypeName="example5.Number2">
-                                                            <sedValue xml:id="_86274029-99a0-460d-8d1b-302847a2d05b" referenceTypeName="example5.Number2" valueString="n" allocated="true" multiValued="false">
-                                                               <sedVariable xml:id="_9723d318-515e-4a80-8c45-6b04b111f15c" name="content" referenceTypeName="int">
-                                                                  <sedValue xml:id="_22b88ca8-dd3b-4ee9-9c5f-8ca4de092945" referenceTypeName="int" valueString="n.content" allocated="true" multiValued="false">
-                                                                  </sedValue>
-                                                               </sedVariable>
-                                                               <sedVariable xml:id="_c15a59ab-8911-44ea-82f3-643f1327c203" name="cnt" referenceTypeName="int">
-                                                                  <sedValue xml:id="_16fc31d8-1350-4cf3-87ab-0ba742655399" referenceTypeName="int" valueString="n.cnt" allocated="true" multiValued="false">
-                                                                  </sedValue>
-                                                               </sedVariable>
-                                                            </sedValue>
-                                                         </sedVariable>
-                                                         <sedVariable xml:id="_0d6dc1dd-594a-439b-bea8-8729de1b70ce" name="exc" referenceTypeName="Null">
-                                                            <sedValue xml:id="_6435fd89-75b3-4d6a-8e26-9a0025ba4501" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                                            </sedValue>
-                                                         </sedVariable>
-                                                         <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                                         <sedTermination xml:id="_8f2d4e25-1b08-473b-ab4b-068ed05f8747" name="&lt;end&gt;" pathCondition="  !n = null
-&amp; self.content = self.cnt
-&amp; !self.content = n.content" verified="true">
+                                 <sedMethodCall xml:id="_8d1261ab-24fa-440a-af75-4f18a6476ae9" name="&lt;call self.test2(x_11)&gt;" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="1015" charEnd="1020" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" groupable="false">
+                                    <sedBranchStatement xml:id="_4c725c1a-7545-4d39-b0bd-af4d335574d1" name="if (x_11==this.cnt)" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="1033" charEnd="1046" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" groupable="false">
+                                       <sedBranchCondition xml:id="_d713024d-e57d-46e1-91b0-98fa7ccb3841" name="self.content = self.cnt" pathCondition="  !n = null &amp; self.content = self.cnt &amp; !self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1">
+                                          <sedStatement xml:id="_b1b1824f-1723-49e8-a5b3-b90f48cf4f76" name="return true;" pathCondition="  !n = null &amp; self.content = self.cnt &amp; !self.content = n.content" lineNumber="-1" charStart="1122" charEnd="1134" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
+                                             <sedMethodReturn xml:id="_9c3e9133-e2de-405c-b48d-9158e6d6197f" name="&lt;return TRUE as result of test2&gt;" pathCondition="  !n = null &amp; self.content = self.cnt &amp; !self.content = n.content" lineNumber="-1" charStart="1015" charEnd="1020" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_7b5b339d-ac96-4c8d-8754-c5a8eaba59de">
+                                                <sedStatement xml:id="_db55143f-3553-495c-96cc-6a5988b2809c" name="return b_1;" pathCondition="  !n = null &amp; self.content = self.cnt &amp; !self.content = n.content" lineNumber="-1" charStart="702" charEnd="711" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
+                                                   <sedMethodReturn xml:id="_56bf96e2-c577-42df-88ce-c84d173825dd" name="&lt;return TRUE as result of test&gt;" pathCondition="  !n = null &amp; self.content = self.cnt &amp; !self.content = n.content" lineNumber="-1" charStart="441" charEnd="445" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_89197497-e8b0-4642-b8a5-43a74d15bff4">
+                                                      <sedMethodReturn xml:id="_cb7ad1a4-94fd-451f-b23f-ac8d546734cf" name="&lt;return TRUE as result of equals&gt;" pathCondition="  !n = null &amp; self.content = self.cnt &amp; !self.content = n.content" lineNumber="-1" charStart="105" charEnd="111" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_d9e2ab4f-31c4-4d0e-9c0e-983ff092cf46">
+                                                         <sedTermination xml:id="_8f2d4e25-1b08-473b-ab4b-068ed05f8747" name="&lt;end&gt;" pathCondition="  !n = null &amp; self.content = self.cnt &amp; !self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1" verified="true">
                                                          </sedTermination>
                                                       </sedMethodReturn>
                                                    </sedMethodReturn>
@@ -886,161 +80,13 @@
                                              </sedMethodReturn>
                                           </sedStatement>
                                        </sedBranchCondition>
-                                       <sedBranchCondition xml:id="_dc514d19-411c-4044-b286-1051152d79d6" name="!self.content = self.cnt" pathCondition="  !n = null
-&amp; !self.content = self.cnt
-&amp; !self.content = n.content">
-                                          <sedCallStackEntry nodeIdRef="_8d1261ab-24fa-440a-af75-4f18a6476ae9"/>
-                                          <sedCallStackEntry nodeIdRef="_0826d455-6f55-48bc-8fab-12740c58944b"/>
-                                          <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                          <sedStatement xml:id="_162cc84d-1fcb-4dec-844b-1314a2028b4a" name="return false;" pathCondition="  !n = null
-&amp; !self.content = self.cnt
-&amp; !self.content = n.content" lineNumber="-1" charStart="1224" charEnd="1237" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
-                                             <sedVariable xml:id="_fd8adffe-c5d9-4fc9-86c9-a371fe9cd72e" name="self" referenceTypeName="example5.Number2">
-                                                <sedValue xml:id="_fe12a7d8-c419-489b-8a7c-5bbfd16a298f" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                                   <sedVariable xml:id="_ff4c7122-c037-440c-802f-21b3b2173712" name="content" referenceTypeName="int">
-                                                      <sedValue xml:id="_e2791eea-c428-4430-bb94-233de85c3703" referenceTypeName="int" valueString="self.content" allocated="true" multiValued="false">
-                                                      </sedValue>
-                                                   </sedVariable>
-                                                   <sedVariable xml:id="_0b095553-cf0d-4fd5-9553-55cae44923e9" name="cnt" referenceTypeName="int">
-                                                      <sedValue xml:id="_e2ef84f2-6fb3-4f03-99b3-c8862d44e714" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                      </sedValue>
-                                                   </sedVariable>
-                                                </sedValue>
-                                             </sedVariable>
-                                             <sedVariable xml:id="_5a8f1488-2bda-4cdc-81c3-a31a580fe633" name="x_11" referenceTypeName="int">
-                                                <sedValue xml:id="_57b8c268-c5c7-47e7-a2da-b56f74daaa73" referenceTypeName="int" valueString="x_11" allocated="true" multiValued="false">
-                                                </sedValue>
-                                             </sedVariable>
-                                             <sedVariable xml:id="_b66e5d38-171a-40d9-880f-e51aeafa1850" name="exc" referenceTypeName="Null">
-                                                <sedValue xml:id="_b91029c8-0ef9-4094-9cb8-f696cc446820" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                                </sedValue>
-                                             </sedVariable>
-                                             <sedCallStackEntry nodeIdRef="_8d1261ab-24fa-440a-af75-4f18a6476ae9"/>
-                                             <sedCallStackEntry nodeIdRef="_0826d455-6f55-48bc-8fab-12740c58944b"/>
-                                             <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                             <sedMethodReturn xml:id="_e75edf91-d914-4f73-965e-5a3f4c7cc23e" name="&lt;return FALSE as result of test2&gt;" pathCondition="  !n = null
-&amp; !self.content = self.cnt
-&amp; !self.content = n.content" lineNumber="-1" charStart="1015" charEnd="1020" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_85c66f05-f4b9-4964-b3b6-53dc884d7014">
-                                                <sedVariable xml:id="_a3dea215-2eb3-4453-87fe-199f7953dd4c" name="self" referenceTypeName="example5.Number2">
-                                                   <sedValue xml:id="_563a32fc-f812-40d0-9a4e-0959417f1c86" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                                      <sedVariable xml:id="_ed2ebb82-9246-4cd6-b341-151474f2f2de" name="content" referenceTypeName="int">
-                                                         <sedValue xml:id="_5ed55586-7486-47cc-a22f-0676413d9901" referenceTypeName="int" valueString="self.content" allocated="true" multiValued="false">
-                                                         </sedValue>
-                                                      </sedVariable>
-                                                      <sedVariable xml:id="_3cf19e05-34d3-4541-a517-07edeebf1eb1" name="cnt" referenceTypeName="int">
-                                                         <sedValue xml:id="_ca9eefeb-3bae-457c-a271-e5e68c7d3ebf" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                         </sedValue>
-                                                      </sedVariable>
-                                                   </sedValue>
-                                                </sedVariable>
-                                                <sedVariable xml:id="_01e964db-7b48-49b9-bab0-1c30cbc9b1ea" name="x_11" referenceTypeName="int">
-                                                   <sedValue xml:id="_6c5f946d-7385-4c5b-8ef5-1cea31d38285" referenceTypeName="int" valueString="x_11" allocated="true" multiValued="false">
-                                                   </sedValue>
-                                                </sedVariable>
-                                                <sedVariable xml:id="_de6304d3-afe8-4bd4-9800-be6a7c11558b" name="exc" referenceTypeName="Null">
-                                                   <sedValue xml:id="_4e3b0cac-329a-4fdf-8e82-3187de3fe905" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                                   </sedValue>
-                                                </sedVariable>
-                                                <sedVariable xml:id="_8937dcba-ff9c-466b-970c-27367e4a688e" name="x_10" referenceTypeName="boolean">
-                                                   <sedValue xml:id="_1dcb8f8f-d34b-4b77-9d20-0c53c49914d3" referenceTypeName="boolean" valueString="FALSE" allocated="true" multiValued="false">
-                                                   </sedValue>
-                                                </sedVariable>
-                                                <sedCallStackEntry nodeIdRef="_8d1261ab-24fa-440a-af75-4f18a6476ae9"/>
-                                                <sedCallStackEntry nodeIdRef="_0826d455-6f55-48bc-8fab-12740c58944b"/>
-                                                <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                                <sedStatement xml:id="_ae30d0ed-4af1-401b-9b75-25d6bfb2df87" name="return b_1;" pathCondition="  !n = null
-&amp; !self.content = self.cnt
-&amp; !self.content = n.content" lineNumber="-1" charStart="702" charEnd="711" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
-                                                   <sedVariable xml:id="_61494e82-5a54-4f2f-bb89-e22c539438b1" name="self" referenceTypeName="example5.Number2">
-                                                      <sedValue xml:id="_23c0453c-3406-43e3-8b79-ee14f3c4300b" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                                         <sedVariable xml:id="_be846518-2502-4377-8729-02214e6c8a59" name="content" referenceTypeName="int">
-                                                            <sedValue xml:id="_48c6babc-feac-42f7-98b7-c4ccfaa893fb" referenceTypeName="int" valueString="self.content" allocated="true" multiValued="false">
-                                                            </sedValue>
-                                                         </sedVariable>
-                                                         <sedVariable xml:id="_4f8cc5e8-1cb6-4920-b448-f60c3ab308ff" name="cnt" referenceTypeName="int">
-                                                            <sedValue xml:id="_69271915-fda0-460b-9357-ca0d6e535f05" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                            </sedValue>
-                                                         </sedVariable>
-                                                      </sedValue>
-                                                   </sedVariable>
-                                                   <sedVariable xml:id="_8249b8a4-273a-48a4-a881-8d77ef0fd8b4" name="met_1" referenceTypeName="boolean">
-                                                      <sedValue xml:id="_188f14d3-9193-462d-b077-77041604695b" referenceTypeName="boolean" valueString="met_1" allocated="true" multiValued="false">
-                                                      </sedValue>
-                                                   </sedVariable>
-                                                   <sedVariable xml:id="_b692cc9e-90ad-4706-b70c-adf82015f18a" name="exc" referenceTypeName="Null">
-                                                      <sedValue xml:id="_da6cf8dd-f82b-4d36-96d1-542ba30228db" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                                      </sedValue>
-                                                   </sedVariable>
-                                                   <sedVariable xml:id="_39b50b87-9aec-40e9-8bda-4099fe0a98d1" name="b_1" referenceTypeName="boolean">
-                                                      <sedValue xml:id="_ed743272-e4c0-43ad-8f3f-bc2a1c79c84a" referenceTypeName="boolean" valueString="FALSE" allocated="true" multiValued="false">
-                                                      </sedValue>
-                                                   </sedVariable>
-                                                   <sedCallStackEntry nodeIdRef="_0826d455-6f55-48bc-8fab-12740c58944b"/>
-                                                   <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                                   <sedMethodReturn xml:id="_80064615-f11e-42cb-8c30-30dd4b152af7" name="&lt;return FALSE as result of test&gt;" pathCondition="  !n = null
-&amp; !self.content = self.cnt
-&amp; !self.content = n.content" lineNumber="-1" charStart="441" charEnd="445" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_a408e28a-5eeb-41e2-8ca2-6b6e65c131b9">
-                                                      <sedVariable xml:id="_7ff14550-7904-44f8-b354-ff660c3e0d15" name="self" referenceTypeName="example5.Number2">
-                                                         <sedValue xml:id="_41adaf95-abf2-42b7-89c0-aee36d1b0ca9" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                                            <sedVariable xml:id="_815a3902-dcee-49da-b28a-36bb737f03f0" name="content" referenceTypeName="int">
-                                                               <sedValue xml:id="_74a7e7e2-76b2-4416-8f6a-bc0c1c57f02b" referenceTypeName="int" valueString="self.content" allocated="true" multiValued="false">
-                                                               </sedValue>
-                                                            </sedVariable>
-                                                            <sedVariable xml:id="_21ce1ff7-efbb-4610-8f7b-561541387d09" name="cnt" referenceTypeName="int">
-                                                               <sedValue xml:id="_9ac868b7-ec48-4fbc-a436-6e2ed8861c14" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                               </sedValue>
-                                                            </sedVariable>
-                                                         </sedValue>
-                                                      </sedVariable>
-                                                      <sedVariable xml:id="_8d6f1077-4740-4e54-8eeb-917a32ada665" name="met_1" referenceTypeName="boolean">
-                                                         <sedValue xml:id="_4d78d1ef-344e-493c-a329-fafaac2b6e0b" referenceTypeName="boolean" valueString="met_1" allocated="true" multiValued="false">
-                                                         </sedValue>
-                                                      </sedVariable>
-                                                      <sedVariable xml:id="_d56d5900-ede2-40da-9fdd-61c09b9fb274" name="exc" referenceTypeName="Null">
-                                                         <sedValue xml:id="_9dbafd8e-1f65-4983-a059-d035b469fc9a" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                                         </sedValue>
-                                                      </sedVariable>
-                                                      <sedVariable xml:id="_9d9b0d24-21e7-4d26-a84a-6406b0489ed7" name="x_7" referenceTypeName="boolean">
-                                                         <sedValue xml:id="_0dc08f2a-fa1d-46aa-8853-b2df3bf4f215" referenceTypeName="boolean" valueString="FALSE" allocated="true" multiValued="false">
-                                                         </sedValue>
-                                                      </sedVariable>
-                                                      <sedCallStackEntry nodeIdRef="_0826d455-6f55-48bc-8fab-12740c58944b"/>
-                                                      <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                                      <sedMethodReturn xml:id="_748525c0-748f-4f18-9ff9-d0549ddbc1d6" name="&lt;return FALSE as result of equals&gt;" pathCondition="  !n = null
-&amp; !self.content = self.cnt
-&amp; !self.content = n.content" lineNumber="-1" charStart="105" charEnd="111" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_8bf9f70c-a633-474c-adb9-4680ccfa244a">
-                                                         <sedVariable xml:id="_112d2099-2cbc-4d3c-bc21-71374f930422" name="self" referenceTypeName="example5.Number2">
-                                                            <sedValue xml:id="_e6c74cba-a6f3-434a-a128-d55c890763ce" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                                                               <sedVariable xml:id="_a4695411-8ef4-4fa2-aa04-60949e19fdb6" name="content" referenceTypeName="int">
-                                                                  <sedValue xml:id="_25b678db-9a7b-4cf5-b2e2-876d78da494b" referenceTypeName="int" valueString="self.content" allocated="true" multiValued="false">
-                                                                  </sedValue>
-                                                               </sedVariable>
-                                                               <sedVariable xml:id="_0b357c89-4dbb-496d-93dd-4fc1cc9078ea" name="cnt" referenceTypeName="int">
-                                                                  <sedValue xml:id="_07ede6af-b12c-43da-84b3-e0e4979e2179" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                                                                  </sedValue>
-                                                               </sedVariable>
-                                                            </sedValue>
-                                                         </sedVariable>
-                                                         <sedVariable xml:id="_cc356c38-4771-4b9f-876a-09dc8ac32fa0" name="n" referenceTypeName="example5.Number2">
-                                                            <sedValue xml:id="_2136f76c-cfb8-4f91-82cc-d630a16771d8" referenceTypeName="example5.Number2" valueString="n" allocated="true" multiValued="false">
-                                                               <sedVariable xml:id="_802cf8b6-04c7-4b6b-a8e9-31722bab9d4e" name="content" referenceTypeName="int">
-                                                                  <sedValue xml:id="_afccdd0f-12e8-4b57-a127-061bee4c70e5" referenceTypeName="int" valueString="n.content" allocated="true" multiValued="false">
-                                                                  </sedValue>
-                                                               </sedVariable>
-                                                               <sedVariable xml:id="_50ad8df1-ac0f-467c-9952-357803c6a597" name="cnt" referenceTypeName="int">
-                                                                  <sedValue xml:id="_df11ebf2-3898-4787-8c3e-be12fa0ba873" referenceTypeName="int" valueString="n.cnt" allocated="true" multiValued="false">
-                                                                  </sedValue>
-                                                               </sedVariable>
-                                                            </sedValue>
-                                                         </sedVariable>
-                                                         <sedVariable xml:id="_377b0f7c-329f-4844-bfa2-c4cba3f03ccf" name="exc" referenceTypeName="Null">
-                                                            <sedValue xml:id="_33b528cf-e144-4ddb-a94a-12499e7d44ff" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                                                            </sedValue>
-                                                         </sedVariable>
-                                                         <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                                                         <sedTermination xml:id="_3a30ec18-c49b-4c98-b563-78c690a30c58" name="&lt;end&gt;" pathCondition="  !n = null
-&amp; !self.content = self.cnt
-&amp; !self.content = n.content" verified="true">
+                                       <sedBranchCondition xml:id="_dc514d19-411c-4044-b286-1051152d79d6" name="!self.content = self.cnt" pathCondition="  !n = null &amp; !self.content = self.cnt &amp; !self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1">
+                                          <sedStatement xml:id="_162cc84d-1fcb-4dec-844b-1314a2028b4a" name="return false;" pathCondition="  !n = null &amp; !self.content = self.cnt &amp; !self.content = n.content" lineNumber="-1" charStart="1224" charEnd="1237" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
+                                             <sedMethodReturn xml:id="_e75edf91-d914-4f73-965e-5a3f4c7cc23e" name="&lt;return FALSE as result of test2&gt;" pathCondition="  !n = null &amp; !self.content = self.cnt &amp; !self.content = n.content" lineNumber="-1" charStart="1015" charEnd="1020" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_85c66f05-f4b9-4964-b3b6-53dc884d7014">
+                                                <sedStatement xml:id="_ae30d0ed-4af1-401b-9b75-25d6bfb2df87" name="return b_1;" pathCondition="  !n = null &amp; !self.content = self.cnt &amp; !self.content = n.content" lineNumber="-1" charStart="702" charEnd="711" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java">
+                                                   <sedMethodReturn xml:id="_80064615-f11e-42cb-8c30-30dd4b152af7" name="&lt;return FALSE as result of test&gt;" pathCondition="  !n = null &amp; !self.content = self.cnt &amp; !self.content = n.content" lineNumber="-1" charStart="441" charEnd="445" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_a408e28a-5eeb-41e2-8ca2-6b6e65c131b9">
+                                                      <sedMethodReturn xml:id="_748525c0-748f-4f18-9ff9-d0549ddbc1d6" name="&lt;return FALSE as result of equals&gt;" pathCondition="  !n = null &amp; !self.content = self.cnt &amp; !self.content = n.content" lineNumber="-1" charStart="105" charEnd="111" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_8bf9f70c-a633-474c-adb9-4680ccfa244a">
+                                                         <sedTermination xml:id="_3a30ec18-c49b-4c98-b563-78c690a30c58" name="&lt;end&gt;" pathCondition="  !n = null &amp; !self.content = self.cnt &amp; !self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1" verified="true">
                                                          </sedTermination>
                                                       </sedMethodReturn>
                                                    </sedMethodReturn>
@@ -1049,87 +95,45 @@
                                           </sedStatement>
                                        </sedBranchCondition>
                                     </sedBranchStatement>
-                                    <sedMethodCallMethodReturnCondition xml:id="_7b5b339d-ac96-4c8d-8754-c5a8eaba59de" name="self.content = self.cnt" pathCondition="!n = null &amp; !self.content = n.content">
+                                    <sedMethodCallMethodReturnCondition xml:id="_7b5b339d-ac96-4c8d-8754-c5a8eaba59de" name="self.content = self.cnt" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1">
                                        <sedChildReference nodeIdRef="_9c3e9133-e2de-405c-b48d-9158e6d6197f"/>
                                     </sedMethodCallMethodReturnCondition>
-                                    <sedMethodCallMethodReturnCondition xml:id="_85c66f05-f4b9-4964-b3b6-53dc884d7014" name="!self.content = self.cnt" pathCondition="!n = null &amp; !self.content = n.content">
+                                    <sedMethodCallMethodReturnCondition xml:id="_85c66f05-f4b9-4964-b3b6-53dc884d7014" name="!self.content = self.cnt" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1">
                                        <sedChildReference nodeIdRef="_e75edf91-d914-4f73-965e-5a3f4c7cc23e"/>
                                     </sedMethodCallMethodReturnCondition>
                                  </sedMethodCall>
                               </sedStatement>
                            </sedStatement>
-                           <sedMethodCallMethodReturnCondition xml:id="_89197497-e8b0-4642-b8a5-43a74d15bff4" name="self.content = self.cnt" pathCondition="!n = null &amp; !self.content = n.content">
+                           <sedMethodCallMethodReturnCondition xml:id="_89197497-e8b0-4642-b8a5-43a74d15bff4" name="self.content = self.cnt" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1">
                               <sedChildReference nodeIdRef="_56bf96e2-c577-42df-88ce-c84d173825dd"/>
                            </sedMethodCallMethodReturnCondition>
-                           <sedMethodCallMethodReturnCondition xml:id="_a408e28a-5eeb-41e2-8ca2-6b6e65c131b9" name="!self.content = self.cnt" pathCondition="!n = null &amp; !self.content = n.content">
+                           <sedMethodCallMethodReturnCondition xml:id="_a408e28a-5eeb-41e2-8ca2-6b6e65c131b9" name="!self.content = self.cnt" pathCondition="!n = null &amp; !self.content = n.content" lineNumber="-1" charStart="-1" charEnd="-1">
                               <sedChildReference nodeIdRef="_80064615-f11e-42cb-8c30-30dd4b152af7"/>
                            </sedMethodCallMethodReturnCondition>
                         </sedMethodCall>
                      </sedStatement>
                   </sedBranchCondition>
                </sedBranchCondition>
-               <sedBranchCondition xml:id="_e5481ed1-63fe-4d94-9b64-3cdd31edcf4c" name="n = null" pathCondition="n = null">
-                  <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
+               <sedBranchCondition xml:id="_e5481ed1-63fe-4d94-9b64-3cdd31edcf4c" name="n = null" pathCondition="n = null" lineNumber="-1" charStart="-1" charEnd="-1">
                   <sedExceptionalMethodReturn xml:id="_13fdeb8d-f089-4720-b968-9d64b3742779" name="&lt;throw java.lang.NullPointerException&gt;" pathCondition="n = null" lineNumber="-1" charStart="105" charEnd="111" sourcePath="D:\BA\Development\KeY\runtime-SymbolicExecutionDebugger.product\SED Examples\src\example5\Number2.java" methodReturnConditionRef="_45e234c8-db31-44bd-9b6f-425ef810114a">
-                     <sedVariable xml:id="_92407ce7-ffc4-4534-87c5-0014fb08d550" name="self" referenceTypeName="example5.Number2">
-                        <sedValue xml:id="_7877c547-ff9d-45b4-b545-3578c3059234" referenceTypeName="example5.Number2" valueString="self" allocated="true" multiValued="false">
-                           <sedVariable xml:id="_f067e08b-d0e4-41a5-88e1-ee0ce1236ba2" name="content" referenceTypeName="int">
-                              <sedValue xml:id="_6e0a6f8c-6fdc-4671-8fe5-8813bd6051dd" referenceTypeName="int" valueString="self.content" allocated="true" multiValued="false">
-                              </sedValue>
-                           </sedVariable>
-                           <sedVariable xml:id="_c039b223-8b94-42fe-86e9-38f0269299f1" name="cnt" referenceTypeName="int">
-                              <sedValue xml:id="_88e33ec5-5907-4e77-9029-4deb8b571333" referenceTypeName="int" valueString="self.cnt" allocated="true" multiValued="false">
-                              </sedValue>
-                           </sedVariable>
-                        </sedValue>
-                     </sedVariable>
-                     <sedVariable xml:id="_fbcf4036-32a8-4d48-bdad-8ecb883d46c4" name="n" referenceTypeName="Null">
-                        <sedValue xml:id="_a16eb722-0f49-46ec-860e-ecda2f3f37a3" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                        </sedValue>
-                     </sedVariable>
-                     <sedVariable xml:id="_d095a77a-5466-4f8a-8c78-eda476a7c764" name="exc" referenceTypeName="Null">
-                        <sedValue xml:id="_95a6c926-d59b-41c0-a7e4-aa0ed51cd481" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
-                        </sedValue>
-                     </sedVariable>
-                     <sedVariable xml:id="_b37f97c9-5bb1-4dd2-887c-ebf800b9940a" name="x_1" referenceTypeName="int">
-                        <sedValue xml:id="_396fe5e2-d81d-4722-beac-fb272364e5ae" referenceTypeName="int" valueString="self.content" allocated="true" multiValued="false">
-                        </sedValue>
-                     </sedVariable>
-                     <sedVariable xml:id="_5f856929-02ea-4445-a0d7-f1efe1c3ae82" name="heap" referenceTypeName="Heap">
-                        <sedValue xml:id="_d4114d2a-1fb7-4552-8cc6-f8859594924a" referenceTypeName="Heap" valueString="heapAfter_NullPointerException" allocated="true" multiValued="false">
-                        </sedValue>
-                     </sedVariable>
-                     <sedVariable xml:id="_3e1a91ff-f3e7-4de6-9215-e5af03b49cbe" name="n_1" referenceTypeName="java.lang.NullPointerException">
-                        <sedValue xml:id="_2ba2188e-c42c-45fd-b809-9a039af1d78f" referenceTypeName="java.lang.NullPointerException" valueString="self_0" allocated="true" multiValued="false">
-                        </sedValue>
-                     </sedVariable>
-                     <sedCallStackEntry nodeIdRef="_4d763a34-a767-48dc-b7bc-34072606e3c7"/>
-                     <sedExceptionalTermination xml:id="_d5e0629e-4732-449c-a48c-51bbb02aeed8" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="n = null" verified="true">
+                     <sedExceptionalTermination xml:id="_d5e0629e-4732-449c-a48c-51bbb02aeed8" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="n = null" lineNumber="-1" charStart="-1" charEnd="-1" verified="true">
                      </sedExceptionalTermination>
                   </sedExceptionalMethodReturn>
                </sedBranchCondition>
             </sedBranchStatement>
-            <sedMethodCallMethodReturnCondition xml:id="_868add57-bad4-4d6f-bfbc-4119208c8a72" name="  !n = null
-&amp; n.content = self.cnt
-&amp; self.content = n.content" pathCondition="true">
+            <sedMethodCallMethodReturnCondition xml:id="_868add57-bad4-4d6f-bfbc-4119208c8a72" name="  !n = null &amp; n.content = self.cnt &amp; self.content = n.content" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
                <sedChildReference nodeIdRef="_1ae3a447-74a8-475a-bd5b-1816aea3fe9f"/>
             </sedMethodCallMethodReturnCondition>
-            <sedMethodCallMethodReturnCondition xml:id="_148cff9f-c487-42e3-9441-533c4d7133e6" name="  !n = null
-&amp; !n.content = self.cnt
-&amp; self.content = n.content" pathCondition="true">
+            <sedMethodCallMethodReturnCondition xml:id="_148cff9f-c487-42e3-9441-533c4d7133e6" name="  !n = null &amp; !n.content = self.cnt &amp; self.content = n.content" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
                <sedChildReference nodeIdRef="_5c86b265-0700-4077-8082-ad35de3e884f"/>
             </sedMethodCallMethodReturnCondition>
-            <sedMethodCallMethodReturnCondition xml:id="_d9e2ab4f-31c4-4d0e-9c0e-983ff092cf46" name="  !n = null
-&amp; self.content = self.cnt
-&amp; !self.content = n.content" pathCondition="true">
+            <sedMethodCallMethodReturnCondition xml:id="_d9e2ab4f-31c4-4d0e-9c0e-983ff092cf46" name="  !n = null &amp; self.content = self.cnt &amp; !self.content = n.content" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
                <sedChildReference nodeIdRef="_cb7ad1a4-94fd-451f-b23f-ac8d546734cf"/>
             </sedMethodCallMethodReturnCondition>
-            <sedMethodCallMethodReturnCondition xml:id="_8bf9f70c-a633-474c-adb9-4680ccfa244a" name="  !n = null
-&amp; !self.content = self.cnt
-&amp; !self.content = n.content" pathCondition="true">
+            <sedMethodCallMethodReturnCondition xml:id="_8bf9f70c-a633-474c-adb9-4680ccfa244a" name="  !n = null &amp; !self.content = self.cnt &amp; !self.content = n.content" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
                <sedChildReference nodeIdRef="_748525c0-748f-4f18-9ff9-d0549ddbc1d6"/>
             </sedMethodCallMethodReturnCondition>
-            <sedMethodCallMethodReturnCondition xml:id="_45e234c8-db31-44bd-9b6f-425ef810114a" name="n = null" pathCondition="true">
+            <sedMethodCallMethodReturnCondition xml:id="_45e234c8-db31-44bd-9b6f-425ef810114a" name="n = null" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
                <sedChildReference nodeIdRef="_13fdeb8d-f089-4720-b968-9d64b3742779"/>
             </sedMethodCallMethodReturnCondition>
          </sedMethodCall>

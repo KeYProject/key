@@ -115,7 +115,10 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
                GraphicsAlgorithm nodeGA = pes[1].getGraphicsAlgorithm();
 
                int mostLeftInParent = uf.findMostLeftXOfBranchInParents((ISEDDebugNode) groupStart);
-               nodeGA.setX(mostLeftInParent < rectGA.getX() ? mostLeftInParent + uf.METOFF : rectGA.getX() + uf.METOFF);
+               int mostLeftInSubtree = uf.findMostLeftXInSubtree((ISEDDebugNode) groupStart);
+               int mostLeft = mostLeftInParent < mostLeftInSubtree ? mostLeftInParent : mostLeftInSubtree;
+               nodeGA.setX(mostLeft < rectGA.getX() ? mostLeft : rectGA.getX());
+//               nodeGA.setX(mostLeftInParent < rectGA.getX() ? mostLeftInParent + uf.METOFF : rectGA.getX() + uf.METOFF);
                
                groupStart.setCollapsed(false);
                
@@ -290,18 +293,14 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
             // Either no prev branch or its more left then the outer rect
             if(mostRightXInPrev == -1 || mostRightXInPrev + uf.OFFSET <= outerGA.getX()) {
                toMove = outerGA.getX() + uf.METOFF - mostLeftX;
-               System.out.println("A");
             }
             else {
                toMove = mostRightXInPrev + uf.OFFSET - mostLeftX;
-               System.out.println("B");
             }
          }
          else if(mostRightXInPrev > -1 && mostLeftX > mostRightXInPrev + uf.OFFSET) {
             toMove = mostRightXInPrev + uf.OFFSET - mostLeftX;
-            System.out.println("C");
          }
-         System.out.println(toMove);
          
    //      if(mostRightXInPrev > -1 && mostLeftX > mostRightXInPrev + uf.OFFSET) {
    //         toMove = mostRightXInPrev + uf.OFFSET - mostLeftX;
