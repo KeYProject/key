@@ -1,3 +1,16 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
 package de.uka.ilkd.key.rule;
 
 import java.util.HashSet;
@@ -33,7 +46,8 @@ import de.uka.ilkd.key.util.Pair;
 public class JoinIfThenElse extends JoinRule {
    
    public static final JoinIfThenElse INSTANCE = new JoinIfThenElse();
-   private static final Name RULE_NAME = new Name("JoinByIfThenElse");
+   private static final String DISPLAY_NAME = "JoinByIfThenElse";
+   private static final Name RULE_NAME = new Name(DISPLAY_NAME);
 
    @Override
    protected Pair<Term, Term> joinStates(
@@ -123,7 +137,7 @@ public class JoinIfThenElse extends JoinRule {
 
    @Override
    public String displayName() {
-      return RULE_NAME.toString();
+      return DISPLAY_NAME;
    }
    
    /**
