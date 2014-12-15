@@ -80,6 +80,13 @@ public abstract class JoinRule implements BuiltInRule {
             new PosInOccurrence(newSuccedent, PosInTerm.getTopLevel(), false));
       
       // Close partner goal
+      // TODO: The procedure here appends a node "==> true" to the partner
+      //       goal and closes it afterward. However, with this technique
+      //       it is not possible anymore to use the "undo last step" function,
+      //       since only this node can be set back anymore -- it is not
+      //       even possible to prune the partner node, because it is a
+      //       closed goal... Can we do something different? Or register
+      //       something with the undo function?
       ImmutableList<Goal> jpNewGoals = joinPartner.first.split(1);
       Goal jpNewGoal = jpNewGoals.head();
       jpNewGoal.setBranchLabel("Joined with node " + goal.node().serialNr());
