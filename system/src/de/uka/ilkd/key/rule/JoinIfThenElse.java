@@ -65,6 +65,7 @@ public class JoinIfThenElse extends JoinRule {
       progVars.addAll(getProgramLocations(programCounter, services));
       // Collect program variables in update
       progVars.addAll(getUpdateLocations(state1.first));
+      progVars.addAll(getUpdateLocations(state2.first));
       
       ImmutableList<Term> newElementaryUpdates = ImmutableSLList.nil();
       
