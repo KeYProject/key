@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Goal;
@@ -299,7 +300,12 @@ public abstract class JoinRule implements BuiltInRule {
 //      Goal jpNewGoal = jpNewGoals.head();
 //      jpNewGoal.setBranchLabel("Joined with node " + thisGoal.node().serialNr());
       
+      joinPartner.setBranchLabel("Joined with node " + thisGoal.node().serialNr());
+      
       Term impForm = tb.imp(joinState.second, tb.apply(joinState.first, pc));
+      for (QuantifiableVariable v : impForm.freeVars()) {
+         impForm = tb.all(v, impForm);
+      }
       joinPartner.addFormula(new SequentFormula(impForm), true, true);
    }
    
