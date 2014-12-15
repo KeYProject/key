@@ -13,7 +13,11 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -41,6 +45,15 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Triple;
 
 public final class IntroAtPreDefsOp extends AbstractTermTransformer {
+
+    private static final Comparator<LocationVariable> LOCVAR_COMPARATOR =
+            new Comparator<LocationVariable>() {
+        @Override
+        public int compare(LocationVariable o1, LocationVariable o2) {
+            return o1.name().compareTo(o2.name());
+        }
+    };
+
 
     public IntroAtPreDefsOp() {
         super(new Name("#introAtPreDefs"), 1);
@@ -127,7 +140,11 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             LoopInvariant inv
                = services.getSpecificationRepository().getLoopInvariant(loop);
             if(inv != null) {
-                for (LocationVariable var : inv.getInternalAtPres().keySet()) {
+                // Nasty bug! The order of these things was not constant! Would fail indeterministically
+                // when reloading. Better sort the variables.
+                List<LocationVariable> keys = new ArrayList<LocationVariable>(inv.getInternalAtPres().keySet());
+                Collections.sort(keys, LOCVAR_COMPARATOR);
+                for (LocationVariable var : keys) {
                     if(atPres.containsKey(var)) {
                         // heaps have already been considered, or more than one loop
                         continue;
