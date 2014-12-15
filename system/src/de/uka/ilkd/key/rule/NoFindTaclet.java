@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.Taclet.TacletLabelHint.TacletOperation;
 import de.uka.ilkd.key.rule.tacletbuilder.NoFindTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
@@ -77,8 +78,8 @@ public class NoFindTaclet extends Taclet {
    protected void applyAdd(Sequent add,
          SequentChangeInfo currentSequent, Services services,
          MatchConditions matchCond) {
-      addToAntec(add.antecedent(), currentSequent, null, services, matchCond, null);
-      addToSucc(add.succedent(), currentSequent, null, services, matchCond, null);
+      addToAntec(add.antecedent(), currentSequent, null, services, matchCond, null, new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add));
+      addToSucc(add.succedent(), currentSequent, null, services, matchCond, null, new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add));
    }    
 
     /**

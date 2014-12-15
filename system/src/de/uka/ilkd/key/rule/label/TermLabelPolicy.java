@@ -19,7 +19,6 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -59,19 +58,21 @@ public interface TermLabelPolicy {
     * @param newTermSubs The optional children of the {@link Term} to create.
     * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
     * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
+    * @param newTermOriginalLabels The original {@link TermLabel}s.
     * @param label The {@link TermLabel} to decide if it should be kept or dropped.
-    * @return {@code true} keep {@link TermLabel} and add it to the new {@link Term}. {@code false} drop {@link TermLabel} and do not need it to the new {@link Term}.
+    * @return The {@link TermLabel} to keep which might be a different one (e.g. with changed parameters) or {@code null} if the {@link TermLabel} should be dropped.
     */
-   public boolean keepLabel(TermServices services,
-                            PosInOccurrence applicationPosInOccurrence,
-                            Term applicationTerm,
-                            Rule rule,
-                            Goal goal,
-                            Object hint,
-                            Term tacletTerm,
-                            Operator newTermOp,
-                            ImmutableArray<Term> newTermSubs,
-                            ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                            JavaBlock newTermJavaBlock,
-                            TermLabel label);
+   public TermLabel keepLabel(Services services,
+                              PosInOccurrence applicationPosInOccurrence,
+                              Term applicationTerm,
+                              Rule rule,
+                              Goal goal,
+                              Object hint,
+                              Term tacletTerm,
+                              Operator newTermOp,
+                              ImmutableArray<Term> newTermSubs,
+                              ImmutableArray<QuantifiableVariable> newTermBoundVars,
+                              JavaBlock newTermJavaBlock,
+                              ImmutableArray<TermLabel> newTermOriginalLabels,
+                              TermLabel label);
 }

@@ -907,7 +907,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                                          services, ruleApp.posInOccurrence(), this,
                                                          postGoal, "PostModality", null, inst.mod,
                                                          new ImmutableArray<Term>(inst.progPost.sub(0)),
-                                                         null, postJavaBlock)
+                                                         null, postJavaBlock, inst.progPost.getLabels())
                                                  ),
                                          null);
         postGoal.addFormula(new SequentFormula(wellFormedAnon),
@@ -934,7 +934,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                                               null, inst.mod,
                                                               new ImmutableArray<Term>(
                                                                       inst.progPost.sub(0)),
-                                                              null, excJavaBlock)), null);
+                                                              null, excJavaBlock, inst.progPost.getLabels())), null);
         final Term excPost = globalDefs==null? originalExcPost: tb.apply(globalDefs, originalExcPost);
         excPostGoal.addFormula(new SequentFormula(wellFormedAnon),
                 	       true,

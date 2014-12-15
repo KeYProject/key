@@ -27,18 +27,24 @@ public class PredicateTermLabelFactory implements TermLabelFactory<PredicateTerm
      */
     @Override
     public PredicateTermLabel parseInstance(List<String> parameters) throws TermLabelException {
-        if (parameters == null || parameters.size() != 1) {
+        if (parameters == null || parameters.size() != 2) {
             throw new TermLabelException("Label " + PredicateTermLabel.NAME +
-                    " requires exactly one Integer-Parameter with its ID.");
+                    " requires exactly two Integer-Parameter with its ID and sub ID.");
         }
-        Integer val;
+        Integer id;
         try {
-            val = Integer.valueOf(parameters.get(0));
+            id = Integer.valueOf(parameters.get(0));
         } catch (NumberFormatException e) {
             throw new TermLabelException("Label " + PredicateTermLabel.NAME +
-                    " requires exactly one Integer-Parameter with its ID.", e);
+                  " requires exactly two Integer-Parameter with its ID and sub ID.", e);
         }
-
-        return new PredicateTermLabel(val);
+        Integer subId;
+        try {
+           subId = Integer.valueOf(parameters.get(1));
+        } catch (NumberFormatException e) {
+            throw new TermLabelException("Label " + PredicateTermLabel.NAME +
+                  " requires exactly two Integer-Parameter with its ID and sub ID.", e);
+        }
+        return new PredicateTermLabel(id, subId);
     }
 }

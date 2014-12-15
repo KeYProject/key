@@ -54,6 +54,9 @@ public class TestTermParserSequence extends AbstractTestTermParser {
         actual = parseTerm(pp);
         assertEquals(expected, actual); // test parsing
         assertEqualsIgnoreWhitespaces(printTerm(parseTerm("int::seqGet(s,i)")), pp); // test pretty-printing
+
+        // test parsing of pretty-printed seqLen
+        comparePrettySyntaxAgainstVerboseSyntax("s.length", "seqLen(s)");
     }
 
 }

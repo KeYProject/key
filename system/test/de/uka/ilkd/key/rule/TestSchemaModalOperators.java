@@ -173,8 +173,8 @@ public class TestSchemaModalOperators extends TestCase {
 	 Debug.out("Find: ", find);
 	 Debug.out("Replace: ", replace);
 	 Debug.out("Goal: ", goal);
-	 Term instreplace = t.syntacticalReplace(replace, services, mc, null);
-	 Term instfind = t.syntacticalReplace(replace, services, mc, null);
+	 Term instreplace = t.syntacticalReplace(replace, services, mc, null, null);
+	 Term instfind = t.syntacticalReplace(replace, services, mc, null, null);
 	 Debug.out("Instantiated replace: ", instreplace);
 	 Debug.out("Instantiated find: ", instfind);
     }

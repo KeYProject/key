@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
    <state name="One Step Simplification resulting in return array[0][0];">
-      <association name="array" programVariable="array" isArrayIndex="false" target="o1"/>
+      <association name="array {true}" programVariable="array" isArrayIndex="false" target="o1" condition="true"/>
    </state>
    <object xml:id="o1" name="array" type="int[][]">
-      <value name="length" programVariable="length" isArrayIndex="false" value="Z(1(#))" type="int"/>
-      <association name="[Z(0(#))]" isArrayIndex="true" arrayIndex="Z(0(#))" target="o2"/>
+      <value name="length {true}" programVariable="length" isArrayIndex="false" value="Z(1(#))" type="int" condition="true"/>
+      <association name="[Z(0(#))] {true}" isArrayIndex="true" arrayIndex="Z(0(#))" target="o2" condition="true"/>
    </object>
    <object xml:id="o2" name="int[]::select(heap,array,arr(Z(0(#))))" type="int[]">
-      <value name="length" programVariable="length" isArrayIndex="false" value="Z(1(#))" type="int"/>
-      <value name="[Z(0(#))]" isArrayIndex="true" arrayIndex="Z(0(#))" value="Z(2(4(#)))" type="int"/>
+      <value name="length {true}" programVariable="length" isArrayIndex="false" value="Z(1(#))" type="int" condition="true"/>
+      <value name="[Z(0(#))] {true}" isArrayIndex="true" arrayIndex="Z(0(#))" value="Z(2(4(#)))" type="int" condition="true"/>
    </object>
 </model>

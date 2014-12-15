@@ -19,7 +19,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.proof.Goal;
@@ -52,7 +51,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
     * @param tacletTerm The optional taclet {@link Term}.
     * @return The required {@link RefactoringScope}.
     */
-   public RefactoringScope defineRefactoringScope(TermServices services,
+   public RefactoringScope defineRefactoringScope(Services services,
                                                   PosInOccurrence applicationPosInOccurrence,
                                                   Term applicationTerm,
                                                   Rule rule,

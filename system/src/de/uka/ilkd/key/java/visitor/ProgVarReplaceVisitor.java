@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.java.visitor;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -358,7 +359,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     public void performActionOnLoopInvariant(LoopStatement oldLoop,
                                              LoopStatement newLoop) {
-        final TermBuilder tb = services.getTermBuilder();        
+        final TermBuilder tb = services.getTermBuilder();
         LoopInvariant inv
             = services.getSpecificationRepository().getLoopInvariant(oldLoop);
         if(inv == null) {
@@ -400,12 +401,18 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
         Term newSelfTerm = replaceVariablesInTerm(selfTerm);
 
-        for(Entry<LocationVariable, Term> h : atPres.entrySet()) {
-           final Term t = h.getValue();
-           if(t == null) continue;
-           atPres.put(h.getKey(), replaceVariablesInTerm(t));
+        Map<LocationVariable, Term> saveCopy = new HashMap<LocationVariable, Term>(atPres);
+        for(Entry<LocationVariable, Term> h : saveCopy.entrySet()) {
+            LocationVariable pv = h.getKey();
+            final Term t = h.getValue();
+            if(t == null) continue;
+            if(replaceMap.containsKey(pv)) {
+                atPres.remove(pv);
+                pv = (LocationVariable) replaceMap.get(pv);
+            }
+            atPres.put(pv, replaceVariablesInTerm(t));
         }
-        
+
         ImmutableList<Term> newLocalIns = tb.var(MiscTools.getLocalIns(newLoop, services));
         ImmutableList<Term> newLocalOuts = tb.var(MiscTools.getLocalOuts(newLoop, services));
 

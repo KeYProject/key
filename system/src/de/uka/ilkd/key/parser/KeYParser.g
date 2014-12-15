@@ -2696,9 +2696,9 @@ term110 returns [Term _term110 = null]
 @after { _term110 = result; }
     :
         (
-            ( LBRACE ~LPAREN ) => result = update_or_substitution |
+            result = braces_term |
             result = accessterm
-        ) 
+        )
         {
 	/*
             if (result.sort() == Sort.FORMULA) {
@@ -2809,8 +2809,9 @@ static_attribute_suffix returns [Term result = null]
 attribute_or_query_suffix[Term prefix] returns [Term _attribute_or_query_suffix = null]
 @after { _attribute_or_query_suffix = result; }
     :
-    DOT memberName = attrid
-    (result = querySuffix[prefix, memberName] {assert result != null;})?
+    DOT ( STAR { result = services.getTermBuilder().allFields(prefix); }
+    | ( memberName = attrid
+    (result = query_suffix[prefix, memberName] {assert result != null;})?
     {
         if(result == null)  {
             if(prefix.sort() == getServices().getTypeConverter().getSeqLDT().targetSort()) {
@@ -2825,7 +2826,7 @@ attribute_or_query_suffix[Term prefix] returns [Term _attribute_or_query_suffix 
                 result = createAttributeTerm(prefix, v);
             }
         }
-    }
+    } ) )
     ;
 catch [TermCreationException ex] {
     raiseException(new KeYSemanticException(input, getSourceName(), ex));
@@ -2841,7 +2842,7 @@ attrid returns [String attr = "";]
         { attr = clss + "::" + id2; }
     ;
     
-querySuffix [Term prefix, String memberName] returns [Term result = null] 
+query_suffix [Term prefix, String memberName] returns [Term result = null] 
 @init{
     String classRef, name;
     boolean brackets = false;
@@ -2849,7 +2850,10 @@ querySuffix [Term prefix, String memberName] returns [Term result = null]
     :
     args = argument_list
     {
-       if(memberName.indexOf("::") == -1) {
+       // true in case class name is not explicitly mentioned as part of memberName
+       boolean implicitClassName = memberName.indexOf("::") == -1;
+       
+       if(implicitClassName) {
           classRef = prefix.sort().name().toString();
           name = memberName;
        } else {
@@ -2862,8 +2866,7 @@ querySuffix [Term prefix, String memberName] returns [Term result = null]
           throw new NotDeclException(input, "Class", classRef);
        classRef = kjt.getFullName();
 
-       result = getServices().getJavaInfo().getProgramMethodTerm
-                (prefix, name, args, classRef);
+       result = getServices().getJavaInfo().getProgramMethodTerm(prefix, name, args, classRef, implicitClassName);
     }
  ;
 catch [TermCreationException ex] {
@@ -2962,7 +2965,7 @@ static_query returns [Term result = null]
        int index = queryRef.indexOf(':');
        String className = queryRef.substring(0, index); 
        String qname = queryRef.substring(index+2); 
-       result = getServices().getJavaInfo().getProgramMethodTerm(null, qname, args, className);
+       result = getServices().getJavaInfo().getStaticProgramMethodTerm(qname, args, className);
        if(result == null && isTermParser()) {
 	  final Sort sort = lookupSort(className);
           if (sort == null) {
@@ -3071,8 +3074,6 @@ atom returns [Term _atom = null]
     |   LPAREN a = term RPAREN
     |   TRUE  { a = getTermFactory().createTerm(Junctor.TRUE); }
     |   FALSE { a = getTermFactory().createTerm(Junctor.FALSE); }
-    |   LBRACE LPAREN obj=equivalence_term COMMA field=equivalence_term RPAREN RBRACE
-            { a = getServices().getTermBuilder().singleton(obj, field); }
     |   a = ifThenElseTerm
     |   a = ifExThenElseTerm
     |   literal=STRING_LITERAL
@@ -3239,13 +3240,30 @@ quantifierterm returns [Term _quantifier_term = null]
         }
 ;
 
-//term120_2
-update_or_substitution returns [Term _update_or_substitution = null]
+/*
+ * A term that is surrounded by braces: {}
+ */
+braces_term returns [Term _update_or_substitution = null]
 @after{ _update_or_substitution = result; }
 :
       (LBRACE SUBST) => result = substitutionterm
+      | (LBRACE (LPAREN | RBRACE)) => result = locset_term
       |  result = updateterm
-    ; 
+    ;
+    
+locset_term returns [Term result = getServices().getTermBuilder().empty()]
+    :
+    LBRACE
+        ( l = location_term { $result = l; }
+        ( COMMA l = location_term { $result = getServices().getTermBuilder().union($result, l); } )* )?
+    RBRACE
+    ;
+    
+location_term returns[Term result]
+    :
+    LPAREN obj=equivalence_term COMMA field=equivalence_term RPAREN
+            { $result = getServices().getTermBuilder().singleton(obj, field); }
+    ;
 
 substitutionterm returns [Term _substitution_term = null] 
 @init{

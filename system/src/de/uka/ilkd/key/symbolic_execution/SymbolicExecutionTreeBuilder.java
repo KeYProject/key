@@ -59,6 +59,7 @@ import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
@@ -478,14 +479,70 @@ public class SymbolicExecutionTreeBuilder {
     * This method must be called programmatically to update the
     * symbolic execution tree. The first call will create the initial tree
     * and further call will update the existing tree.
+    * @return The detected {@link SymbolicExecutionCompletions} during symbolic execution.
     */
-   public void analyse() {
-      AnalyzerProofVisitor visitor = new AnalyzerProofVisitor();
+   public SymbolicExecutionCompletions analyse() {
+      SymbolicExecutionCompletions completions = new SymbolicExecutionCompletions();
+      AnalyzerProofVisitor visitor = new AnalyzerProofVisitor(completions);
       NodePreorderIterator iter = new NodePreorderIterator(proof.root());
       while (iter.hasNext()) {
          visitor.visit(proof, iter.next()); // This visitor pattern must be used because a recursive iteration causes StackOverflowErrors if the proof tree in KeY is to deep (e.g. simple list with 2000 elements during computation of fibonacci(7)
       }
       visitor.completeTree();
+      return completions;
+   }
+   
+   /**
+    * Instances of this class are returned by {@link SymbolicExecutionTreeBuilder#analyse()}
+    * to inform about newly completed blocks and returned methods.
+    * @author Martin Hentschel
+    */
+   public static class SymbolicExecutionCompletions {
+      /**
+       * The newly block completion.
+       */
+      private final List<IExecutionNode<?>> blockCompletions = new LinkedList<IExecutionNode<?>>();
+
+      /**
+       * The newly methods return.
+       */
+      private final List<IExecutionBaseMethodReturn<?>> methodReturns = new LinkedList<IExecutionBaseMethodReturn<?>>();
+      
+      /**
+       * Returns the newly block completion.
+       * @return The newly block completion.
+       */
+      public IExecutionNode<?>[] getBlockCompletions() {
+         return blockCompletions.toArray(new IExecutionNode<?>[blockCompletions.size()]);
+      }
+      
+      /**
+       * Registers the newly completed block.
+       * @param blockCompletion The new block completion.
+       */
+      private void addBlockCompletion(IExecutionNode<?> blockCompletion) {
+         if (blockCompletion != null) {
+            blockCompletions.add(blockCompletion);
+         }
+      }
+      
+      /**
+       * Returns the newly methods return.
+       * @return The newly methods return.
+       */
+      public IExecutionBaseMethodReturn<?>[] getMethodReturns() {
+         return methodReturns.toArray(new IExecutionBaseMethodReturn<?>[methodReturns.size()]);
+      }
+      
+      /**
+       * Registers the newly methods return.
+       * @param methodReturn The method return.
+       */
+      private void addMethodReturn(IExecutionBaseMethodReturn<?> methodReturn) {
+         if (methodReturn != null) {
+            methodReturns.add(methodReturn);
+         }
+      }
    }
    
    /**
@@ -494,6 +551,11 @@ public class SymbolicExecutionTreeBuilder {
     * @author Martin Hentschel
     */
    private class AnalyzerProofVisitor implements ProofVisitor {
+      /**
+       * The {@link SymbolicExecutionCompletions} to update.
+       */
+      private final SymbolicExecutionCompletions completions;
+      
       /**
        * Maps the {@link Node} in KeY's proof tree to the {@link IExecutionNode} of the symbolic execution tree where the {@link Node}s children should be added to.
        */
@@ -504,7 +566,15 @@ public class SymbolicExecutionTreeBuilder {
        * for the given parent node to that elements in the {@link List} should be added.
        */
       private Map<AbstractExecutionNode<?>, List<ExecutionBranchCondition>> parentToBranchConditionMapping = new LinkedHashMap<AbstractExecutionNode<?>, List<ExecutionBranchCondition>>();
-      
+
+      /**
+       * Constructor.
+       * @param completions The {@link SymbolicExecutionCompletions} to update.
+       */
+      public AnalyzerProofVisitor(SymbolicExecutionCompletions completions) {
+         this.completions = completions;
+      }
+
       /**
        * {@inheritDoc}
        */
@@ -522,7 +592,7 @@ public class SymbolicExecutionTreeBuilder {
             }
          }
          // Transform the current proof node into a symbolic execution tree node if possible
-         parentToAddTo = analyzeNode(visitedNode, parentToAddTo);
+         parentToAddTo = analyzeNode(visitedNode, parentToAddTo, completions);
          addToMapping.put(visitedNode, parentToAddTo);
          // Check if the current node has branch conditions which should be added to the execution tree model
          if (!(parentToAddTo instanceof IExecutionStart) && // Ignore branch conditions before starting with code execution
@@ -608,11 +678,12 @@ public class SymbolicExecutionTreeBuilder {
             }
          }
       }
-   }
-   
-   protected void finishBlockCompletion(IExecutionBranchCondition node) {
-      for (IExecutionBlockStartNode<?> start : node.getCompletedBlocks()) {
-         ((AbstractExecutionBlockStartNode<?>) start).addBlockCompletion(node); // BranchConditions are updated when they are added to the SET.
+      
+      protected void finishBlockCompletion(IExecutionBranchCondition node) {
+         for (IExecutionBlockStartNode<?> start : node.getCompletedBlocks()) {
+            ((AbstractExecutionBlockStartNode<?>) start).addBlockCompletion(node); // BranchConditions are updated when they are added to the SET.
+            completions.addBlockCompletion(node);
+         }
       }
    }
    
@@ -631,9 +702,12 @@ public class SymbolicExecutionTreeBuilder {
     * </p>
     * @param node The {@link Node} to analyze.
     * @param parentToAddTo The parent {@link IExecutionNode} to add the created execution tree model representation ({@link IExecutionNode}) of the given {@link Node} to.
+    * @param completions The {@link SymbolicExecutionCompletions} to update.
     * @return The {@link IExecutionNode} to which children of the current {@link Node} should be added. If no execution tree model representation was created the return value is identical to the given one (parentToAddTo).
     */
-   protected AbstractExecutionNode<?> analyzeNode(Node node, AbstractExecutionNode<?> parentToAddTo) {
+   protected AbstractExecutionNode<?> analyzeNode(Node node, 
+                                                  AbstractExecutionNode<?> parentToAddTo, 
+                                                  SymbolicExecutionCompletions completions) {
       // Analyze node
       if (!shouldPrune(node)) { // Prune closed branches because they are invalid
          // Get required information
@@ -660,6 +734,7 @@ public class SymbolicExecutionTreeBuilder {
                            parentToAddTo.addCompletedBlock((AbstractExecutionBlockStartNode<?>) entryNode);
                            if (!(parentToAddTo instanceof IExecutionBranchCondition)) {
                               ((AbstractExecutionBlockStartNode<?>) entryNode).addBlockCompletion(parentToAddTo); // BranchConditions are updated when they are added to the SET.
+                              completions.addBlockCompletion(parentToAddTo);
                            }
                         }
                      }
@@ -674,7 +749,7 @@ public class SymbolicExecutionTreeBuilder {
             executionNode = createExecutionTreeModelRepresentation(parentToAddTo, node, statement);
             parentToAddTo = addNodeToTreeAndUpdateParent(node, parentToAddTo, executionNode);
             // Check if execution node is a method return
-            executionNode = createMehtodReturn(parentToAddTo, node, statement);
+            executionNode = createMehtodReturn(parentToAddTo, node, statement, completions);
             parentToAddTo = addNodeToTreeAndUpdateParent(node, parentToAddTo, executionNode);
          }
          else {
@@ -1113,11 +1188,13 @@ public class SymbolicExecutionTreeBuilder {
     * @param parent The parent {@link AbstractExecutionNode}.
     * @param node The {@link Node} which represents a method return.
     * @param statement The currently active {@link SourceElement}.
+    * @param completions The {@link SymbolicExecutionCompletions} to update.
     * @return The created {@link AbstractExecutionMethodReturn}.
     */
    protected AbstractExecutionMethodReturn<?> createMehtodReturn(AbstractExecutionNode<?> parent,
                                                                  Node node, 
-                                                                 SourceElement statement) {
+                                                                 SourceElement statement,
+                                                                 SymbolicExecutionCompletions completions) {
       AbstractExecutionMethodReturn<?> result = null;
       if (SymbolicExecutionUtil.hasSymbolicExecutionLabel(node.getAppliedRuleApp())) {
          if (statement != null && !SymbolicExecutionUtil.isRuleAppToIgnore(node.getAppliedRuleApp())) {
@@ -1135,9 +1212,11 @@ public class SymbolicExecutionTreeBuilder {
                      if (callSEDNode instanceof ExecutionMethodCall) { // Could be the start node if the initial sequent already contains some method frames.
                         if (methodReturn) {
                            result = new ExecutionMethodReturn(settings, mediator, node, (ExecutionMethodCall)callSEDNode);
+                           completions.addMethodReturn(result);
                         }
                         else {
                            result = new ExecutionExceptionalMethodReturn(settings, mediator, node, (ExecutionMethodCall)callSEDNode);
+                           completions.addMethodReturn(result);
                         }
                      }
                   }
