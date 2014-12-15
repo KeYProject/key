@@ -90,13 +90,6 @@ public abstract class JoinRule implements BuiltInRule {
                services);
          
          // Close partner goals
-         // TODO: The procedure here appends a node "==> true" to the partner
-         //       goals and closes them afterward. However, with this technique
-         //       it is not possible anymore to use the "undo last step" function,
-         //       since only this node can be set back anymore -- it is not
-         //       even possible to prune the partner nodes, because they are
-         //       closed goals... Can we do something different? Or register
-         //       something with the undo function?
          closeJoinPartnerGoal(goal, joinPartner.first, joinedState, thisSEState.third);
       }
       
@@ -295,7 +288,10 @@ public abstract class JoinRule implements BuiltInRule {
       // Splitting the goal leads to an exception (null pointer)
       // in AbstractNonDuplicateAppFeature#sameApplication
       // (line 70); newApp.rule() or ruleCmp.rule() is null for
-      // the node if split like here. 
+      // the node if split like here.
+      // Maybe a special rule invocation is necessary? Could create
+      // a special close rule that is never applicable, but can be
+      // applied by this class.
 //      ImmutableList<Goal> jpNewGoals = joinPartner.split(1);
 //      Goal jpNewGoal = jpNewGoals.head();
 //      jpNewGoal.setBranchLabel("Joined with node " + thisGoal.node().serialNr());
