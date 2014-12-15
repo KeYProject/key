@@ -13,8 +13,19 @@ import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 
+/**
+ * The {@link StoreRefParser} parses the content specified as store-ref-list in
+ * the <a href="URL#value">http://www.eecs.ucf.edu/~leavens/JML/jmlrefman/
+ * jmlrefman_12.html#SEC166>JML reference manual</a>.
+ *
+ * @author Moritz Lichter
+ *
+ */
 public class StoreRefParser implements ParseFunction {
 
+   /**
+    * The {@link ParseFunction} which is used to parse the text
+    */
    private final ParseFunction mainParser;
 
    @Override
@@ -23,8 +34,20 @@ public class StoreRefParser implements ParseFunction {
       return this.mainParser.parse(text, start, end);
    }
 
+   /**
+    * Creates a new {@link StoreRefParser} accepting all keywords which
+    * implements {@link IStoreRefKeyword} as keywords for a storage location.
+    * The user can enable or disable informal descriptions as content.
+    *
+    * @param profile
+    *           the profile which contains the keywords allowed as storage
+    *           location
+    * @param allowInformalDescription
+    *           whether informal descriptions are allows
+    */
    public StoreRefParser(final IJMLProfile profile,
          final boolean allowInformalDescription) {
+      // Determine keywords which are allowed as storage location keywords
       final List<IStoreRefKeyword> storeRefKeywords = new ArrayList<IStoreRefKeyword>();
       for (final IKeyword k : profile.getSupportedKeywords()) {
          if (k instanceof IStoreRefKeyword) {
@@ -37,9 +60,10 @@ public class StoreRefParser implements ParseFunction {
       /*
        * store-ref-keyword ::= \nothing | \everything | \not_specified
        */
-      final ParseFunction storeRefKeyword = keywords(storeRefKeywords,
-            profile);
+      final ParseFunction storeRefKeyword = keywords(storeRefKeywords, profile);
 
+      // Only temporary implementation, this expression can be more complex,
+      // much more
       final ParseFunction specExpression = integerConstant();
 
       /*
@@ -59,8 +83,7 @@ public class StoreRefParser implements ParseFunction {
        */
       final ParseFunction storeRefNameSuffix = typed(
             STORE_REF_NAME_SUFFIX,
-            alt(separateBy('.', identifier()),
-                  separateBy('.', constant("*")),
+            alt(separateBy('.', identifier()), separateBy('.', constant("*")),
                   seq(constant("["), specArrayRefExpression, constant("]"))));
       /*
        * store-ref-name ::= ident | super | this
@@ -97,8 +120,7 @@ public class StoreRefParser implements ParseFunction {
        */
       final ParseFunction storeRefList = typed(
             STORE_REF_LIST,
-            alt(
-                  storeRefKeyword,
+            alt(storeRefKeyword,
                   separatedNonEmptyList(',', storeRef,
                         "Expected at least one storage reference")));
 
