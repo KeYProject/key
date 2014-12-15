@@ -96,7 +96,7 @@ public abstract class JoinRule implements BuiltInRule {
          //       even possible to prune the partner nodes, because they are
          //       closed goals... Can we do something different? Or register
          //       something with the undo function?
-         closeJoinPartnerGoal(goal, joinPartner.first);
+         closeJoinPartnerGoal(goal, joinPartner.first, joinedState, thisSEState.third);
       }
       
       // Delete previous sequents      
@@ -286,21 +286,21 @@ public abstract class JoinRule implements BuiltInRule {
     * @param thisGoal Parent of remaining join node.
     * @param joinPartner Partner goal to close.
     */
-   private void closeJoinPartnerGoal(Goal thisGoal, Goal joinPartner) {
+   private void closeJoinPartnerGoal(
+         Goal thisGoal, Goal joinPartner, Pair<Term, Term> joinState, Term pc) {
       Services services = thisGoal.proof().getServices();
+      TermBuilder tb = services.getTermBuilder();
       
-      ImmutableList<Goal> jpNewGoals = joinPartner.split(1);
-      Goal jpNewGoal = jpNewGoals.head();
-      jpNewGoal.setBranchLabel("Joined with node " + thisGoal.node().serialNr());
+      // Splitting the goal leads to an exception (null pointer)
+      // in AbstractNonDuplicateAppFeature#sameApplication
+      // (line 70); newApp.rule() or ruleCmp.rule() is null for
+      // the node if split like here. 
+//      ImmutableList<Goal> jpNewGoals = joinPartner.split(1);
+//      Goal jpNewGoal = jpNewGoals.head();
+//      jpNewGoal.setBranchLabel("Joined with node " + thisGoal.node().serialNr());
       
-      clearSemisequent(jpNewGoal, true);
-      clearSemisequent(jpNewGoal, false);
-      SequentFormula trueSeqForm = new SequentFormula(services.getTermBuilder().tt());
-      jpNewGoal.addFormula(
-            trueSeqForm,
-            new PosInOccurrence(trueSeqForm, PosInTerm.getTopLevel(), false));
-      
-      jpNewGoal.proof().closeGoal(joinPartner);
+      Term impForm = tb.imp(joinState.second, tb.apply(joinState.first, pc));
+      joinPartner.addFormula(new SequentFormula(impForm), true, true);
    }
    
    /**
