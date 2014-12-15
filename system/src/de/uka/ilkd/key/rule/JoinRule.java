@@ -40,7 +40,7 @@ public abstract class JoinRule implements BuiltInRule {
       final TermBuilder tb = services.getTermBuilder();
       final PosInOccurrence pio = ruleApp.posInOccurrence();
       
-      if (findJoinPartner(goal, pio, services) == null) {
+      if (findPotentialJoinPartners(goal, pio) == null) {
          return null;
       }
       
@@ -48,20 +48,26 @@ public abstract class JoinRule implements BuiltInRule {
       Goal g = newGoal.head();
       
       // Find join partner
-      Pair<Goal,PosInOccurrence> joinPartner = findJoinPartner(g, pio, services);
+      ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = findJoinPartners(g, pio);
       
       // Convert sequents to SE states
       Triple<Term, Term, Term> thisSEState =
             sequentToSETriple(g, pio, services);
-      Triple<Term, Term, Term> partnerSEState =
-            sequentToSETriple(joinPartner.first, joinPartner.second, services);
       
-      // Join them!
-      Pair<Term, Term> joinedState = joinStates(
-            new Pair<Term, Term> (thisSEState.first, thisSEState.second),
-            new Pair<Term, Term> (partnerSEState.first, partnerSEState.second),
-            thisSEState.third,
-            services);
+      Pair<Term, Term> joinedState =
+            new Pair<Term, Term>(thisSEState.first, thisSEState.second);
+      
+      for (Pair<Goal, PosInOccurrence> joinPartner : joinPartners) {
+         Triple<Term, Term, Term> partnerSEState =
+               sequentToSETriple(joinPartner.first, joinPartner.second, services);
+         
+         // Join them!
+         joinedState = joinStates(
+               new Pair<Term, Term> (joinedState.first, joinedState.second),
+               new Pair<Term, Term> (partnerSEState.first, partnerSEState.second),
+               thisSEState.third,
+               services);
+      }
       
       // Delete previous sequents      
       clearSemisequent(g, true);
@@ -80,26 +86,17 @@ public abstract class JoinRule implements BuiltInRule {
             newSuccedent,
             new PosInOccurrence(newSuccedent, PosInTerm.getTopLevel(), false));
       
-      // Close partner goal
+      // Close partner goals
       // TODO: The procedure here appends a node "==> true" to the partner
-      //       goal and closes it afterward. However, with this technique
+      //       goals and closes them afterward. However, with this technique
       //       it is not possible anymore to use the "undo last step" function,
       //       since only this node can be set back anymore -- it is not
-      //       even possible to prune the partner node, because it is a
-      //       closed goal... Can we do something different? Or register
+      //       even possible to prune the partner nodes, because they are
+      //       closed goals... Can we do something different? Or register
       //       something with the undo function?
-      ImmutableList<Goal> jpNewGoals = joinPartner.first.split(1);
-      Goal jpNewGoal = jpNewGoals.head();
-      jpNewGoal.setBranchLabel("Joined with node " + goal.node().serialNr());
-      
-      clearSemisequent(jpNewGoal, true);
-      clearSemisequent(jpNewGoal, false);
-      SequentFormula trueSeqForm = new SequentFormula(services.getTermBuilder().tt());
-      jpNewGoal.addFormula(
-            trueSeqForm,
-            new PosInOccurrence(trueSeqForm, PosInTerm.getTopLevel(), false));
-      
-      jpNewGoal.proof().closeGoal(joinPartner.first);
+      for (Pair<Goal, PosInOccurrence> joinPartner : joinPartners) {
+         closeJoinPartnerGoal(goal, joinPartner.first);
+      }
       
       return newGoal;
    }
@@ -136,7 +133,7 @@ public abstract class JoinRule implements BuiltInRule {
       //       rule application, the symbolic execution strategy
       //       does not seem to work as usual!
       
-      return isApplicable(goal, pio, true);
+      return isApplicable(goal, pio, true, true);
    }
    
    /**
@@ -148,10 +145,12 @@ public abstract class JoinRule implements BuiltInRule {
     * 
     * @param goal Current goal.
     * @param pio Position of selected sequent formula.
-    * @param checkAutomatic if true, only interactive goals are applicable.
+    * @param checkAutomatic If true, only interactive goals are applicable.
+    * @param doJoinPartnerCheck Checks for available join partners iff this flag is set to true.
     * @return true iff a suitable top level formula for joining.
     */
-   public boolean isApplicable(Goal goal, PosInOccurrence pio, boolean checkAutomatic) {
+   public boolean isApplicable(
+         Goal goal, PosInOccurrence pio, boolean checkAutomatic, boolean doJoinPartnerCheck) {
       // We admit top level formulas of the form \<{ ... }\> phi
       // and U \<{ ... }\> phi, where U must be an update
       // in normal form, i.e. a parallel update of elementary
@@ -192,7 +191,7 @@ public abstract class JoinRule implements BuiltInRule {
          }
          
          if (termAfterUpdate.op() instanceof Modality) {
-            return true;
+            return !doJoinPartnerCheck || findPotentialJoinPartners(goal, pio) != null;
          } else {
             return false;
          }
@@ -262,6 +261,23 @@ public abstract class JoinRule implements BuiltInRule {
       return progVars;
    }
    
+   private void closeJoinPartnerGoal(Goal thisGoal, Goal joinPartner) {
+      Services services = thisGoal.proof().getServices();
+      
+      ImmutableList<Goal> jpNewGoals = joinPartner.split(1);
+      Goal jpNewGoal = jpNewGoals.head();
+      jpNewGoal.setBranchLabel("Joined with node " + thisGoal.node().serialNr());
+      
+      clearSemisequent(jpNewGoal, true);
+      clearSemisequent(jpNewGoal, false);
+      SequentFormula trueSeqForm = new SequentFormula(services.getTermBuilder().tt());
+      jpNewGoal.addFormula(
+            trueSeqForm,
+            new PosInOccurrence(trueSeqForm, PosInTerm.getTopLevel(), false));
+      
+      jpNewGoal.proof().closeGoal(joinPartner);
+   }
+   
    /**
     * Deletes all formulae of the succedent / antecedent.
     * 
@@ -285,15 +301,41 @@ public abstract class JoinRule implements BuiltInRule {
    }
    
    /**
-    * Finds a suitable join partner.
+    * Selects among suitable join partners using GUI input.
     * 
     * @param goal Current goal to join.
     * @param pio Position of update-program counter formula in goal.
     * @param services The services object.
-    * @return A suitable join partner or null, if there is no such one.
+    * @return A list of suitable join partners. May be empty if none exist / selected.
     */
-   private Pair<Goal,PosInOccurrence> findJoinPartner(
-         Goal goal, PosInOccurrence pio, Services services) {
+   private ImmutableList<Pair<Goal,PosInOccurrence>> findJoinPartners(
+         Goal goal, PosInOccurrence pio/*, Services services*/) {
+      
+      Services services = goal.proof().getServices();
+      
+      ImmutableList<Pair<Goal,PosInOccurrence>> potentialPartners =
+            findPotentialJoinPartners(goal, pio);
+      
+      JoinPartnerSelectionDialog selectionDialog =
+            new JoinPartnerSelectionDialog(goal, pio, potentialPartners, services);
+      selectionDialog.setVisible(true);
+      
+      return selectionDialog.getChosen();
+   }
+   
+   /**
+    * Finds all suitable join partners.
+    * 
+    * @param goal Current goal to join.
+    * @param pio Position of update-program counter formula in goal.
+    * @param services The services object.
+    * @return A list of suitable join partners. May be empty if none exist.
+    */
+   private ImmutableList<Pair<Goal,PosInOccurrence>> findPotentialJoinPartners(
+         Goal goal, PosInOccurrence pio/*, Services services*/) {
+      
+      Services services = goal.proof().getServices();
+      
       ImmutableList<Goal> allGoals =
             services.getProof().getSubtreeGoals(services.getProof().root());
       
@@ -310,7 +352,7 @@ public abstract class JoinRule implements BuiltInRule {
                pit.down(i);
                
                PosInOccurrence gPio = new PosInOccurrence(f, pit, false);
-               if (isApplicable(g, gPio, false)) {
+               if (isApplicable(g, gPio, false, false)) {
                   Triple<Term, Term, Term> ownSEState = sequentToSETriple(
                         goal, pio, services);
                   Triple<Term, Term, Term> partnerSEState = sequentToSETriple(
@@ -325,11 +367,7 @@ public abstract class JoinRule implements BuiltInRule {
          }
       }
       
-      JoinPartnerSelectionDialog selectionDialog =
-            new JoinPartnerSelectionDialog(goal, pio, potentialPartners, services);
-      selectionDialog.setVisible(true);
-      
-      return potentialPartners.head(); // TODO: Add option for choice later (maybe GUI)!
+      return potentialPartners;
    }
    
    /**
