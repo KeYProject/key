@@ -41,9 +41,9 @@ import de.uka.ilkd.key.util.Pair;
  * 
  * @author Dominic Scheurer
  */
-@SuppressWarnings("serial")
 public class JoinPartnerSelectionDialog extends JDialog {
-
+   private static final long serialVersionUID = -1460097562546341922L;
+   
    private static final String CB_SELECT_CANDIDATE_HINT =
          "Select to add shown state as a join partner.";
    private static final Dimension INITIAL_SIZE =

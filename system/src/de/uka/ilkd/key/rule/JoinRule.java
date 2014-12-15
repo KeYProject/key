@@ -29,6 +29,13 @@ import de.uka.ilkd.key.util.Triple;
  * implement method joinStates(...) and register in
  * class JavaProfile.
  * 
+ * The rule is applicable if the chosen subterm has the
+ * form { x := v || ... } \&lt;{ ... }\&gt; PHI and there
+ * are potential join candidates. In automatic mode, all
+ * candidates are chosen for a merge; in interactive mode
+ * (set selected goal to interactive), a GUI dialog pops
+ * up and asks for a manual selection.
+ * 
  * @author Dominic Scheurer
  */
 public abstract class JoinRule implements BuiltInRule {
@@ -133,7 +140,7 @@ public abstract class JoinRule implements BuiltInRule {
       //       rule application, the symbolic execution strategy
       //       does not seem to work as usual!
       
-      return isApplicable(goal, pio, true, true);
+      return isApplicable(goal, pio, false, true);
    }
    
    /**
@@ -191,7 +198,7 @@ public abstract class JoinRule implements BuiltInRule {
          }
          
          if (termAfterUpdate.op() instanceof Modality) {
-            return !doJoinPartnerCheck || findPotentialJoinPartners(goal, pio) != null;
+            return !doJoinPartnerCheck || findPotentialJoinPartners(goal, pio).size() > 0;
          } else {
             return false;
          }
@@ -316,11 +323,15 @@ public abstract class JoinRule implements BuiltInRule {
       ImmutableList<Pair<Goal,PosInOccurrence>> potentialPartners =
             findPotentialJoinPartners(goal, pio);
       
-      JoinPartnerSelectionDialog selectionDialog =
-            new JoinPartnerSelectionDialog(goal, pio, potentialPartners, services);
-      selectionDialog.setVisible(true);
-      
-      return selectionDialog.getChosen();
+      if (goal.isAutomatic()) {
+         return potentialPartners;
+      } else {
+         JoinPartnerSelectionDialog selectionDialog =
+               new JoinPartnerSelectionDialog(goal, pio, potentialPartners, services);
+         selectionDialog.setVisible(true);
+         
+         return selectionDialog.getChosen();
+      }
    }
    
    /**
