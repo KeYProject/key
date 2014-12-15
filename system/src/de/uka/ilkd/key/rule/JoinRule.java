@@ -4,6 +4,7 @@ import java.util.HashSet;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.gui.joinrule.JoinPartnerSelectionDialog;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
@@ -324,6 +325,10 @@ public abstract class JoinRule implements BuiltInRule {
          }
       }
       
+      JoinPartnerSelectionDialog selectionDialog =
+            new JoinPartnerSelectionDialog(goal, pio, potentialPartners, services);
+      selectionDialog.setVisible(true);
+      
       return potentialPartners.head(); // TODO: Add option for choice later (maybe GUI)!
    }
    
@@ -365,7 +370,9 @@ public abstract class JoinRule implements BuiltInRule {
     * @return And-formula connecting the given terms.
     */
    private Term joinListToAndTerm(ImmutableList<SequentFormula> formulae, Services services) {
-      if (formulae.size() == 1) {
+      if (formulae.size() == 0) {
+         return services.getTermBuilder().tt();
+      } else if (formulae.size() == 1) {
          return formulae.head().formula();
       } else {
          return services.getTermBuilder().and(
