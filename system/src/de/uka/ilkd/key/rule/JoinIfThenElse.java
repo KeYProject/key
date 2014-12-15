@@ -74,6 +74,14 @@ public class JoinIfThenElse extends JoinRule {
          Term rightSide1 = getUpdateRightSideFor(state1.first, v);
          Term rightSide2 = getUpdateRightSideFor(state2.first, v);
          
+         if (rightSide1 == null) {
+            rightSide1 = tb.var(v);
+         }
+         
+         if (rightSide2 == null) {
+            rightSide2 = tb.var(v);
+         }
+         
          // Check if location v is set to different value in both states.
          try {
             Term predicateTerm = tb.func(new Function(new Name("P"), Sort.FORMULA, v.sort()), tb.var(v));
@@ -91,14 +99,6 @@ public class JoinIfThenElse extends JoinRule {
                   false);                                               // useSimplifyTermProfile
             
             boolean proofClosed = proofResult.getProof().closed();
-            
-            if (rightSide1 == null) {
-               rightSide1 = tb.var(v);
-            }
-            
-            if (rightSide2 == null) {
-               rightSide2 = tb.var(v);
-            }
             
             if (proofClosed) {
                

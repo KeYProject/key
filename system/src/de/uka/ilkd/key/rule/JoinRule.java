@@ -87,6 +87,16 @@ public abstract class JoinRule implements BuiltInRule {
                new Pair<Term, Term> (partnerSEState.first, partnerSEState.second),
                thisSEState.third,
                services);
+         
+         // Close partner goals
+         // TODO: The procedure here appends a node "==> true" to the partner
+         //       goals and closes them afterward. However, with this technique
+         //       it is not possible anymore to use the "undo last step" function,
+         //       since only this node can be set back anymore -- it is not
+         //       even possible to prune the partner nodes, because they are
+         //       closed goals... Can we do something different? Or register
+         //       something with the undo function?
+         closeJoinPartnerGoal(goal, joinPartner.first);
       }
       
       // Delete previous sequents      
@@ -105,18 +115,6 @@ public abstract class JoinRule implements BuiltInRule {
       g.addFormula(
             newSuccedent,
             new PosInOccurrence(newSuccedent, PosInTerm.getTopLevel(), false));
-      
-      // Close partner goals
-      // TODO: The procedure here appends a node "==> true" to the partner
-      //       goals and closes them afterward. However, with this technique
-      //       it is not possible anymore to use the "undo last step" function,
-      //       since only this node can be set back anymore -- it is not
-      //       even possible to prune the partner nodes, because they are
-      //       closed goals... Can we do something different? Or register
-      //       something with the undo function?
-      for (Pair<Goal, PosInOccurrence> joinPartner : joinPartners) {
-         closeJoinPartnerGoal(goal, joinPartner.first);
-      }
       
       return newGoal;
    }
