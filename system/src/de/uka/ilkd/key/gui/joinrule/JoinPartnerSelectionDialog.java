@@ -9,6 +9,8 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -238,6 +240,19 @@ public class JoinPartnerSelectionDialog extends JDialog {
       
       txtPartner2.setText(LogicPrinter.quickPrintSequent(
             candidates.head().first.sequent(), services));
+      
+      String subterm = LogicPrinter.quickPrintTerm(candidates.head().second.subTerm(), services);
+      subterm = subterm.replaceAll("\\s", "\\\\s");
+      subterm = subterm.replaceAll("(\\\\s)+", "\\\\E\\\\s*\\\\Q");
+      subterm = "\\Q" + subterm + "\\E";
+      if (subterm.endsWith("\\Q\\E")) {
+         subterm = subterm.substring(0, subterm.length() - 4);
+      }
+      
+      String term = LogicPrinter.quickPrintSequent(candidates.head().first.sequent(), services);
+      Pattern p = Pattern.compile(subterm);
+      Matcher m = p.matcher(term);
+      //TODO Highlighting
    }
    
    public static void main(String[] args) {
