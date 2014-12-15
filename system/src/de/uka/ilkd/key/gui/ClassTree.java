@@ -235,6 +235,27 @@ public class ClassTree extends JTree {
             }
         }
     }
+
+
+    private static void compressLinearPaths(DefaultMutableTreeNode root) {
+
+        int numChildren = root.getChildCount();
+        for(int i = 0; i < numChildren; i++) {
+            DefaultMutableTreeNode child = (DefaultMutableTreeNode)root.getChildAt(i);
+            int numGrandChildren = child.getChildCount();
+            if (numGrandChildren == 1) {
+                DefaultMutableTreeNode grandChild = (DefaultMutableTreeNode)child.getFirstChild();
+                child.removeFromParent();
+                root.add(grandChild);
+                Entry e1 = (Entry) child.getUserObject();
+                Entry e2 = (Entry) grandChild.getUserObject();
+                e2.string = e1.string + "." + e2.string;
+                compressLinearPaths(root);
+            }
+        }
+    }
+
+
     
     /**
      * <p>
@@ -310,6 +331,7 @@ public class ClassTree extends JTree {
             insertIntoTree(rootNode, kjtsarr[i], addContractTargets, services);
         }
         
+        compressLinearPaths(rootNode);
         return rootNode;
     }
     
@@ -401,7 +423,7 @@ public class ClassTree extends JTree {
     //-------------------------------------------------------------------------    
     
     static class Entry {
-        public final String string;
+        public String string;
         public KeYJavaType kjt = null;
         public IObserverFunction target = null;
         public int numMembers = 0;
