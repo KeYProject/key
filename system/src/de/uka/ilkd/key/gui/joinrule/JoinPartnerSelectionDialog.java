@@ -36,24 +36,29 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * JDialog for selecting one of several goals as a partner
- * for a join rule application.
+ * JDialog for selecting a subset of candidate goals as
+ * partners for a join rule application.
  * 
  * @author Dominic Scheurer
  */
 public class JoinPartnerSelectionDialog extends JDialog {
    private static final long serialVersionUID = -1460097562546341922L;
    
+   /** The tooltipo hint for the checkbox. */
    private static final String CB_SELECT_CANDIDATE_HINT =
          "Select to add shown state as a join partner.";
+   /** The initial size of this dialog. */
    private static final Dimension INITIAL_SIZE =
          new Dimension(500, 300);
+   /** The font for the JEditorPanes. Should
+    *  resemble the standard font of KeY for proofs etc. */
    private static final Font TXT_AREA_FONT =
          new Font(Font.MONOSPACED, Font.PLAIN, 14);
    
    private ImmutableList<Pair<Goal, PosInOccurrence>> candidates = null;
    private Services services = null;
    
+   /** The chosen goals. */
    private HashSet<Pair<Goal, PosInOccurrence>> chosen =
          new HashSet<Pair<Goal,PosInOccurrence>>();
    
@@ -203,6 +208,15 @@ public class JoinPartnerSelectionDialog extends JDialog {
       setSize(INITIAL_SIZE);
    }
    
+   /**
+    * Creates a new join partner selection dialog.
+    * 
+    * @param joinNode The first (already chosen) join partner.
+    * @param pio Position of Update-Modality-Postcondition formula in
+    *    the joinNode.
+    * @param candidates Potential join candidates.
+    * @param services The services object.
+    */
    public JoinPartnerSelectionDialog(
          Goal joinNode,
          PosInOccurrence pio,
@@ -218,6 +232,9 @@ public class JoinPartnerSelectionDialog extends JDialog {
       
    }
    
+   /**
+    * @return All chosen join partners.
+    */
    public ImmutableList<Pair<Goal, PosInOccurrence>> getChosen() {
       ImmutableSLList<Pair<Goal, PosInOccurrence>> result = ImmutableSLList.nil();
       
@@ -228,10 +245,19 @@ public class JoinPartnerSelectionDialog extends JDialog {
       }
    }
    
+   /**
+    * @return The candidate chosen at the moment (by the combo box).
+    */
    private Pair<Goal, PosInOccurrence> getSelectedCandidate() {
       return getNthCandidate(cmbCandidates.getSelectedIndex());
    }
    
+   /**
+    * Returns the n-th candidate in the list.
+    * 
+    * @param n Index of the join candidate.
+    * @return The n-th candidate in the list.
+    */
    private Pair<Goal, PosInOccurrence> getNthCandidate(int n) {
       int i = 0;
       for (Pair<Goal, PosInOccurrence> elem : candidates) {
@@ -244,6 +270,10 @@ public class JoinPartnerSelectionDialog extends JDialog {
       return null;
    }
    
+   /**
+    * Loads the join candidates into the combo box, initializes
+    * the partner editor pane with the text of the first candidate.
+    */
    private void loadCandidates() {
       for (Pair<Goal, PosInOccurrence> candidate : candidates) {
          cmbCandidates.addItem("Node " + candidate.first.node().serialNr());
@@ -253,6 +283,14 @@ public class JoinPartnerSelectionDialog extends JDialog {
             candidates.head().first, candidates.head().second, txtPartner2);
    }
    
+   /**
+    * Adds the given goal to the given editor pane, with the portion that
+    * corresponds to the given position highlighted in bold.
+    * 
+    * @param goal Goal to add.
+    * @param pio Position indicating subterm to highlight.
+    * @param area The editor pane to add the highlighted goal to.
+    */
    private void setHighlightedSequentForArea(Goal goal, PosInOccurrence pio, JEditorPane area) {
       
       String subterm = LogicPrinter.quickPrintTerm(pio.subTerm(), services);
@@ -290,11 +328,6 @@ public class JoinPartnerSelectionDialog extends JDialog {
       
       area.setText(newText);
       
-   }
-   
-   public static void main(String[] args) {
-      JoinPartnerSelectionDialog dialog = new JoinPartnerSelectionDialog();
-      dialog.setVisible(true);
    }
    
 }
