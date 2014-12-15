@@ -2,6 +2,7 @@ package de.uka.ilkd.key.gui.joinrule;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -19,10 +20,11 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.html.HTMLDocument;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -46,6 +48,8 @@ public class JoinPartnerSelectionDialog extends JDialog {
          "Select to add shown state as a join partner.";
    private static final Dimension INITIAL_SIZE =
          new Dimension(500, 300);
+   private static final Font TXT_AREA_FONT =
+         new Font(Font.MONOSPACED, Font.PLAIN, 14);
    
    private ImmutableList<Pair<Goal, PosInOccurrence>> candidates = null;
    private Services services = null;
@@ -53,8 +57,8 @@ public class JoinPartnerSelectionDialog extends JDialog {
    private HashSet<Pair<Goal, PosInOccurrence>> chosen =
          new HashSet<Pair<Goal,PosInOccurrence>>();
    
-   private JTextArea txtPartner1 = null;
-   private JTextArea txtPartner2 = null;
+   private JEditorPane txtPartner1 = null;
+   private JEditorPane txtPartner2 = null;
    private JComboBox cmbCandidates = null;
    private JCheckBox cbSelectCandidate = null;
    
@@ -70,10 +74,17 @@ public class JoinPartnerSelectionDialog extends JDialog {
       setLocation(MainWindow.getInstance().getLocation());
       
       // Text areas for goals to join
-      txtPartner1 = new JTextArea("");
-      txtPartner2 = new JTextArea("");
-      txtPartner1.setEditable(false);
-      txtPartner2.setEditable(false);
+      txtPartner1 = new JEditorPane();
+      txtPartner2 = new JEditorPane();
+      for (JEditorPane jep : new JEditorPane[] {txtPartner1, txtPartner2}) {
+         jep.setEditable(false);
+         jep.setContentType("text/html");
+         
+         // Set font
+         String cssRule = "body { font-family: " + TXT_AREA_FONT.getFamily() + "; " +
+               "font-size: " + TXT_AREA_FONT.getSize() + "pt; }";
+         ((HTMLDocument) jep.getDocument()).getStyleSheet().addRule(cssRule);
+      }
       
       scrpPartner1 = new JScrollPane(txtPartner1);
       scrpPartner2 = new JScrollPane(txtPartner2);
@@ -87,8 +98,8 @@ public class JoinPartnerSelectionDialog extends JDialog {
             Pair<Goal, PosInOccurrence> selectedCandidate =
                   getSelectedCandidate();
             
-            txtPartner2.setText(LogicPrinter.quickPrintSequent(
-                  selectedCandidate.first.sequent(), services));
+            setHighlightedSequentForArea(
+                  selectedCandidate.first, selectedCandidate.second, txtPartner2);
             
             if (chosen.contains(selectedCandidate)) {
                cbSelectCandidate.setSelected(true);
@@ -202,7 +213,7 @@ public class JoinPartnerSelectionDialog extends JDialog {
       this.candidates = candidates;
       this.services = services;
       
-      txtPartner1.setText(LogicPrinter.quickPrintSequent(joinNode.sequent(), services));
+      setHighlightedSequentForArea(joinNode, pio, txtPartner1);
       loadCandidates();
       
    }
@@ -238,10 +249,17 @@ public class JoinPartnerSelectionDialog extends JDialog {
          cmbCandidates.addItem("Node " + candidate.first.node().serialNr());
       }
       
-      txtPartner2.setText(LogicPrinter.quickPrintSequent(
-            candidates.head().first.sequent(), services));
+      setHighlightedSequentForArea(
+            candidates.head().first, candidates.head().second, txtPartner2);
+   }
+   
+   private void setHighlightedSequentForArea(Goal goal, PosInOccurrence pio, JEditorPane area) {
       
-      String subterm = LogicPrinter.quickPrintTerm(candidates.head().second.subTerm(), services);
+      String subterm = LogicPrinter.quickPrintTerm(pio.subTerm(), services);
+      
+      // Render subterm to highlight as a regular expression.
+      // Note: Four backslashs in replacement expression will result in
+      //       one backslash in the resulting string.
       subterm = subterm.replaceAll("\\s", "\\\\s");
       subterm = subterm.replaceAll("(\\\\s)+", "\\\\E\\\\s*\\\\Q");
       subterm = "\\Q" + subterm + "\\E";
@@ -249,10 +267,29 @@ public class JoinPartnerSelectionDialog extends JDialog {
          subterm = subterm.substring(0, subterm.length() - 4);
       }
       
-      String term = LogicPrinter.quickPrintSequent(candidates.head().first.sequent(), services);
+      // Find a match
+      String sequent = LogicPrinter.quickPrintSequent(goal.sequent(), services);
       Pattern p = Pattern.compile(subterm);
-      Matcher m = p.matcher(term);
-      //TODO Highlighting
+      Matcher m = p.matcher(sequent);
+      
+      // Original sequent (without highlighted text) as fallback
+      String newText = sequent;
+      
+      if (m.find()) {
+         // Assemble new text
+         String before = sequent.substring(0, m.start() - 1);
+         String main = "<b>" + sequent.substring(m.start(), m.end()) + "</b>";
+         String after = sequent.substring(m.end());
+         
+         newText = before + main + after;
+      }
+      
+      // Treat spaces and newlines: Are ignored in HTML text area
+      newText = newText.replace("\n", "<br>");
+      newText = newText.replace(" ", "&nbsp;");
+      
+      area.setText(newText);
+      
    }
    
    public static void main(String[] args) {
