@@ -9,6 +9,7 @@ import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.javaeditor.extension.DefaultJavaSourceViewerConfigurationExtension;
 import org.key_project.jmlediting.ui.util.JML_UIPreferencesHelper;
@@ -27,19 +28,43 @@ public class JMLSourceViewerConfigurationExtension extends
          final IPreferenceStore preferenceStore, final ITextEditor editor,
          final String partitioning) {
       super.init(colorManager, preferenceStore, editor, partitioning);
-      JML_UIPreferencesHelper
+
+   }
+
+   /**
+    * a PreferenceChangeListener to check whether the JML Comment Color has
+    * changed.
+    */
+   private IPreferenceChangeListener listener = null;
+
+   /**
+    * A Method for instantiating the listener.
+    * 
+    * @param viewer
+    *           the sourceViewer this Configuration works on
+    */
+   private void configureListener(final ISourceViewer viewer) {
+      if (this.listener != null) {
+         return;
+      }
+      if (!(viewer instanceof SourceViewer)) {
+         return;
+      }
+      final SourceViewer sViewer = (SourceViewer) viewer;
+      this.listener = JML_UIPreferencesHelper
             .addPreferencesListener(new IPreferenceChangeListener() {
 
                @Override
                public void preferenceChange(final PreferenceChangeEvent event) {
-                  // editor.g
+                  sViewer.invalidateTextPresentation();
                }
             });
    }
 
    /**
     * Replaces the original PresentationReconcilers Damager and Repairers for
-    * JavaComments so that JML SyntaxColoring is supported.
+    * JavaComments so that JML SyntaxColoring is supported. Also instantiates
+    * the Color Preference listener
     *
     * @param sourceViewer
     *           the sourceViewer the PresentationReconciler is used in
@@ -53,6 +78,7 @@ public class JMLSourceViewerConfigurationExtension extends
    public IPresentationReconciler getPresentationReconciler(
          final ISourceViewer sourceViewer,
          final IPresentationReconciler currentResult) {
+      this.configureListener(sourceViewer);
       final PresentationReconciler reconciler = (PresentationReconciler) currentResult;
       // Replace DefaultDamagerRepairer in currentResult to support JML
       DefaultDamagerRepairer dr = (DefaultDamagerRepairer) reconciler

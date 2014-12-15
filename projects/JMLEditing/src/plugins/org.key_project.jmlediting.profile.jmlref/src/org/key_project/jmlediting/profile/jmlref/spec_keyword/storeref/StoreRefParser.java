@@ -37,7 +37,7 @@ public class StoreRefParser implements ParseFunction {
       /*
        * store-ref-keyword ::= \nothing | \everything | \not_specified
        */
-      final ParseFunction storeRefKeyword = parseKeyword(storeRefKeywords,
+      final ParseFunction storeRefKeyword = keywords(storeRefKeywords,
             profile);
 
       final ParseFunction specExpression = integerConstant();
@@ -49,7 +49,7 @@ public class StoreRefParser implements ParseFunction {
        * Need to try the second case before the first case because otherwise we
        * will never parse it
        */
-      final ParseFunction specArrayRefExpression = alternative(
+      final ParseFunction specArrayRefExpression = alt(
             seq(specExpression, constant(".."), specExpression),
             specExpression, constant("*"));
 
@@ -59,7 +59,7 @@ public class StoreRefParser implements ParseFunction {
        */
       final ParseFunction storeRefNameSuffix = typed(
             STORE_REF_NAME_SUFFIX,
-            alternative(separateBy('.', identifier()),
+            alt(separateBy('.', identifier()),
                   separateBy('.', constant("*")),
                   seq(constant("["), specArrayRefExpression, constant("]"))));
       /*
@@ -74,10 +74,10 @@ public class StoreRefParser implements ParseFunction {
        * store-ref-expression ::= store-ref-name [ store-ref-name-suffix ] ...
        */
       final ParseFunction storeRefExpr = seq(STORE_REF_EXPR, storeRefName,
-            parseList(storeRefNameSuffix));
+            list(storeRefNameSuffix));
 
       // Make lexInformalDesc context free
-      final ParseFunction informalDescr = allowWhitespace(lexInformalDescr);
+      final ParseFunction informalDescr = allowWhitespaces(lexInformalDescr);
 
       /*
        * store-ref ::= store-ref-expression <br> | informal-description <br>
@@ -85,7 +85,7 @@ public class StoreRefParser implements ParseFunction {
        */
       final ParseFunction storeRef;
       if (allowInformalDescription) {
-         storeRef = alternative(storeRefExpr, informalDescr);
+         storeRef = alt(storeRefExpr, informalDescr);
       }
       else {
          storeRef = storeRefExpr;
@@ -97,9 +97,9 @@ public class StoreRefParser implements ParseFunction {
        */
       final ParseFunction storeRefList = typed(
             STORE_REF_LIST,
-            alternative(
+            alt(
                   storeRefKeyword,
-                  parseSeparatedNonEmptyList(',', storeRef,
+                  separatedNonEmptyList(',', storeRef,
                         "Expected at least one storage reference")));
 
       this.mainParser = storeRefList;

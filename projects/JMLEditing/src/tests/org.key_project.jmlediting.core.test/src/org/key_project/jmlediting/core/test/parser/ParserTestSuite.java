@@ -7,7 +7,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({ SpecificationStatementParserTest.class,
       BehaviorParserTest.class, LexicalHelperTest.class,
-   StoreRefParserTest.class, ParserUtilTest.class })
+   StoreRefParserTest.class, ParserBuilderTest.class })
 public class ParserTestSuite {
 
 }
