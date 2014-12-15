@@ -279,6 +279,13 @@ public abstract class JoinRule implements BuiltInRule {
       return progVars;
    }
    
+   /**
+    * Closes the given partner goal, adding a label pointing to
+    * the serial number of the remaining join node.
+    * 
+    * @param thisGoal Parent of remaining join node.
+    * @param joinPartner Partner goal to close.
+    */
    private void closeJoinPartnerGoal(Goal thisGoal, Goal joinPartner) {
       Services services = thisGoal.proof().getServices();
       
