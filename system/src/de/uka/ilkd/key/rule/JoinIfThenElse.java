@@ -91,21 +91,43 @@ public class JoinIfThenElse extends JoinRule {
             
             boolean proofClosed = proofResult.getProof().closed();
             
-            if (proofClosed && rightSide1 != null) {
-               // No if-then-else, same value
+            if (rightSide1 == null && rightSide2 != null) {
                
+               // No if-then-else, same value
+               newElementaryUpdates = newElementaryUpdates.prepend(
+                  tb.elementary(
+                        v,
+                        rightSide2));
+               
+            } else if (rightSide2 == null && rightSide1 != null) {
+               
+               // No if-then-else, same value
                newElementaryUpdates = newElementaryUpdates.prepend(
                   tb.elementary(
                         v,
                         rightSide1));
-              
-            } else if (!proofClosed) {
-               // Apply if-then-else construction, different values
                
+            } else if (rightSide1 == null && rightSide2 == null) {
+               
+               // No need to set the value for v,
+               // since it is not set in either state.
+               
+            } else if (proofClosed) {
+               
+               // Arbitrary choice: Take value of first state
+               newElementaryUpdates = newElementaryUpdates.prepend(
+                     tb.elementary(
+                           v,
+                           rightSide1));
+               
+            } else {
+               
+               // Apply if-then-else construction: Different values
                newElementaryUpdates = newElementaryUpdates.prepend(
                      tb.elementary(
                            v,
                            tb.ife(state1.second, rightSide1, rightSide2)));
+               
             }
          }
          catch (ProofInputException e) {
