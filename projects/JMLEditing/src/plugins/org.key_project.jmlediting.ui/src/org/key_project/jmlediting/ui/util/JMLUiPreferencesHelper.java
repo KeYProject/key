@@ -7,14 +7,14 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.swt.graphics.RGB;
 import org.key_project.jmlediting.ui.Activator;
 
-public final class JML_UIPreferencesHelper {
+public final class JMLUiPreferencesHelper {
 
    /**
     * The name of the JML profile property of a project.
     */
    public static final String JML_COMMENT_COLOR_KEY = "org.key_project.jmleiditing.ui.CommentColor";
 
-   private JML_UIPreferencesHelper() {
+   private JMLUiPreferencesHelper() {
 
    }
 

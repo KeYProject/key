@@ -12,7 +12,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.javaeditor.extension.DefaultJavaSourceViewerConfigurationExtension;
-import org.key_project.jmlediting.ui.util.JML_UIPreferencesHelper;
+import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper;
 
 /**
  * An {@link DefaultJavaSourceViewerConfigurationExtension} to support JML.
@@ -51,7 +51,7 @@ public class JMLSourceViewerConfigurationExtension extends
          return;
       }
       final SourceViewer sViewer = (SourceViewer) viewer;
-      this.listener = JML_UIPreferencesHelper
+      this.listener = JMLUiPreferencesHelper
             .addPreferencesListener(new IPreferenceChangeListener() {
 
                @Override

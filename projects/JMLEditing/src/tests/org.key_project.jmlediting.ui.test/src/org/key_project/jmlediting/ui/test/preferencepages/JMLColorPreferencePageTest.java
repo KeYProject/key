@@ -13,7 +13,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.key_project.jmlediting.ui.preferencepages.JMLColorPropertyPreferencePage;
 import org.key_project.jmlediting.ui.test.TestUtils;
-import org.key_project.jmlediting.ui.util.JML_UIPreferencesHelper;
+import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper;
 
 /**
  * Testingplan:
@@ -80,10 +80,10 @@ public class JMLColorPreferencePageTest {
       final RGB testColor = new RGB(255, 0, 0);
       this.setColor(testColor);
       bot.button("Apply").click();
-      assertEquals(testColor, JML_UIPreferencesHelper.getWorkspaceJMLColor());
+      assertEquals(testColor, JMLUiPreferencesHelper.getWorkspaceJMLColor());
       bot.button("Restore Defaults").click();
       bot.button("OK").click();
-      assertEquals(JML_UIPreferencesHelper.getDefaultJMLColor(),
-            JML_UIPreferencesHelper.getWorkspaceJMLColor());
+      assertEquals(JMLUiPreferencesHelper.getDefaultJMLColor(),
+            JMLUiPreferencesHelper.getWorkspaceJMLColor());
    }
 }

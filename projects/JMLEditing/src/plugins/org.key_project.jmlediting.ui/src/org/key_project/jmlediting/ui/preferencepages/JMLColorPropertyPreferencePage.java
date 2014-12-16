@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.key_project.jmlediting.ui.Activator;
-import org.key_project.jmlediting.ui.util.JML_UIPreferencesHelper;
+import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper;
 
 /**
  * The {@link JMLProfilePropertiesPage} implements a properties and preferences
@@ -116,7 +116,7 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
          return;
       }
 
-      final RGB color = JML_UIPreferencesHelper.getWorkspaceJMLColor();
+      final RGB color = JMLUiPreferencesHelper.getWorkspaceJMLColor();
 
       this.commentColorSelector.setColorValue(color);
    }
@@ -144,7 +144,7 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
 
    @Override
    public void performDefaults() {
-      this.commentColorSelector.setColorValue(JML_UIPreferencesHelper
+      this.commentColorSelector.setColorValue(JMLUiPreferencesHelper
             .getDefaultJMLColor());
       super.performDefaults();
 
@@ -163,7 +163,7 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
    @Override
    public boolean performOk() {
       // Remove preference listener
-      JML_UIPreferencesHelper.setDefaultJMLColor(this.commentColorSelector
+      JMLUiPreferencesHelper.setDefaultJMLColor(this.commentColorSelector
             .getColorValue());
 
       InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID)

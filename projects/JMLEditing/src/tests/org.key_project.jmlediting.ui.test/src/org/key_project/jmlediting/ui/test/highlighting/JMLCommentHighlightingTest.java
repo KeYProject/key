@@ -17,7 +17,7 @@ import org.junit.Test;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.ui.test.Activator;
 import org.key_project.jmlediting.ui.test.TestUtils;
-import org.key_project.jmlediting.ui.util.JML_UIPreferencesHelper;
+import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -86,7 +86,7 @@ public class JMLCommentHighlightingTest {
    private final RGB defaultTextRGB = new RGB(0, 0, 0);
    private final RGB string = new RGB(42, 0, 255);
    private final RGB chararcter = new RGB(42, 0, 255);
-   private final RGB jmlComment = JML_UIPreferencesHelper.getDefaultJMLColor();
+   private final RGB jmlComment = JMLUiPreferencesHelper.getDefaultJMLColor();
 
    /*
     * Initialize a new Project and load the template class from data/template

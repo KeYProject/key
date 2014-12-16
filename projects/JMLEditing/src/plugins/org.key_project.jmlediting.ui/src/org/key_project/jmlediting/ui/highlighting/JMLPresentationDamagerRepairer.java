@@ -27,7 +27,7 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.utilities.CommentLocator;
 import org.key_project.jmlediting.core.utilities.CommentRange;
-import org.key_project.jmlediting.ui.util.JML_UIPreferencesHelper;
+import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 /**
@@ -38,7 +38,7 @@ import org.key_project.util.eclipse.WorkbenchUtil;
  * @author David Giessing
  */
 public class JMLPresentationDamagerRepairer implements IPresentationDamager,
-      IPresentationRepairer {
+IPresentationRepairer {
 
    /**
     * The original instance of DefaultDamagerRepairer currently in use for
@@ -75,7 +75,7 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
    public void createPresentation(final TextPresentation presentation,
          final ITypedRegion damage) {
       boolean jml = false;
-      final RGB jmlColor = JML_UIPreferencesHelper.getWorkspaceJMLColor();
+      final RGB jmlColor = JMLUiPreferencesHelper.getWorkspaceJMLColor();
       final CommentLocator locator = new CommentLocator(this.doc.get());
       jml = locator.isInJMLcomment(damage.getOffset());
       final TextAttribute ta;
@@ -119,7 +119,7 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
       else {
          return new Region(surroundingComment.getBeginOffset(),
                surroundingComment.getEndOffset()
-               - surroundingComment.getBeginOffset() + 1);
+                     - surroundingComment.getBeginOffset() + 1);
       }
    }
 
@@ -151,7 +151,7 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
          styleRange.strikeout = (style & TextAttribute.STRIKETHROUGH) != 0;
          styleRange.underline = (style & TextAttribute.UNDERLINE) != 0;
          styleRange.font = attr.getFont();
-         presentation.addStyleRange(styleRange);
+         // presentation.addStyleRange(styleRange);
          // From here it is all about Highlighting for JML Keywords
          final CommentLocator locator = new CommentLocator(this.doc.get());
          final CommentRange surroundingComment = locator.getJMLComment(offset);
@@ -188,7 +188,7 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
                      styleRange.background, attr.getStyle()));
                // Transfer to Array for use in MergeStyle
                final StyleRange[] highlightedRanges = new StyleRange[styles
-                                                                     .size()];
+                     .size()];
                for (int i = 0; i < styles.size(); i++) {
                   highlightedRanges[i] = styles.get(i);
                }
