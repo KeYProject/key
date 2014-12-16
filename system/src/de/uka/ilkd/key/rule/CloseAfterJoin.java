@@ -54,6 +54,14 @@ public class CloseAfterJoin implements BuiltInRule {
    private static HashMap<Node, HashSet<Node>> JOIN_NODE_TO_PARTNERS_MAP =
          new HashMap<Node, HashSet<Node>>();
    
+   /**
+    * Returns the partner nodes for the given join node. Strictly
+    * speaking, these are the direct children of the partner nodes
+    * that were involved in joining.
+    * 
+    * @param joinNode Join node to get the partner nodes for.
+    * @return The partner nodes for the given join node.
+    */
    public static HashSet<Node> getPartnerNodesFor(Node joinNode) {
       return JOIN_NODE_TO_PARTNERS_MAP.get(joinNode);
    }
