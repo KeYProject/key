@@ -106,18 +106,22 @@ public class CloseAfterJoin implements BuiltInRule {
       
       TermBuilder tb = services.getTermBuilder();
       
-      ImmutableList<Goal> jpNewGoals = goal.split(1);
-      Goal jpNewGoal = jpNewGoals.head();
-      jpNewGoal.setBranchLabel("Joined with node " + joinNode.parent().serialNr());
+      ImmutableList<Goal> jpNewGoals = goal.split(2);
+      
+      Goal linkedGoal = jpNewGoals.head();
+      linkedGoal.setBranchLabel("Joined with node " + joinNode.parent().serialNr());
+      
+      Goal ruleIsWeakeningGoal = jpNewGoals.tail().head();
+      ruleIsWeakeningGoal.setBranchLabel("Joined node is weakening");
             
       Term impForm = tb.imp(joinState.second, tb.apply(joinState.first, pc));
       for (QuantifiableVariable v : impForm.freeVars()) {
          impForm = tb.all(v, impForm);
       }
-      goal.addFormula(new SequentFormula(impForm), true, true);
+      ruleIsWeakeningGoal.addFormula(new SequentFormula(impForm), true, true);
       
       // Register partner nodes
-      JOIN_NODE_TO_PARTNERS_MAP.get(joinNode).add(jpNewGoal.node());
+      JOIN_NODE_TO_PARTNERS_MAP.get(joinNode).add(ruleIsWeakeningGoal.node());
       
       return jpNewGoals;
    }
