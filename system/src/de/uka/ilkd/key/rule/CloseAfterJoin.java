@@ -110,6 +110,9 @@ public class CloseAfterJoin implements BuiltInRule {
       
       Goal linkedGoal = jpNewGoals.head();
       linkedGoal.setBranchLabel("Joined with node " + joinNode.parent().serialNr());
+      // Workaround: Disable linked goal to prevent strategies
+      // from automatically working further on it.
+      linkedGoal.setEnabled(false);
       
       Goal ruleIsWeakeningGoal = jpNewGoals.tail().head();
       ruleIsWeakeningGoal.setBranchLabel("Joined node is weakening");

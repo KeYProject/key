@@ -384,15 +384,11 @@ public abstract class JoinRule implements BuiltInRule {
       ImmutableList<Pair<Goal,PosInOccurrence>> potentialPartners =
             findPotentialJoinPartners(goal, pio);
       
-      if (goal.isAutomatic()) {
-         return potentialPartners;
-      } else {
-         JoinPartnerSelectionDialog selectionDialog =
-               new JoinPartnerSelectionDialog(goal, pio, potentialPartners, services);
-         selectionDialog.setVisible(true);
-         
-         return selectionDialog.getChosen();
-      }
+      JoinPartnerSelectionDialog selectionDialog =
+            new JoinPartnerSelectionDialog(goal, pio, potentialPartners, services);
+      selectionDialog.setVisible(true);
+      
+      return selectionDialog.getChosen();
    }
    
    /**
