@@ -540,20 +540,41 @@ public abstract class JoinRule implements BuiltInRule {
       
    }
    
+   /**
+    * Checks if the given node is contained in the given proof.
+    * 
+    * @param proof Proof to search.
+    * @param node Node to search for.
+    * @return True iff node is contained in proof.
+    */
    private boolean proofContainsNode(Proof proof, Node node) {
       FindNodeVisitor visitor = new FindNodeVisitor(node);
       proof.breadthFirstSearch(proof.root(), visitor);
       return visitor.success();
    }
    
+   /**
+    * Visitor for finding a node in a proof.
+    * 
+    * @author Dominic Scheurer
+    */
    private class FindNodeVisitor implements ProofVisitor {
       private boolean found = false;
       private Node node = null;
       
+      @SuppressWarnings("unused")
+      private FindNodeVisitor() {}
+      
+      /**
+       * @param node The node to find in the proof.
+       */
       public FindNodeVisitor(Node node) {
          this.node = node;
       }
       
+      /**
+       * @return True iff the given node has been found.
+       */
       public boolean success() {
          return found;
       }
