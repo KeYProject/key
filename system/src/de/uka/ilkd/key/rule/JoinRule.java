@@ -60,7 +60,7 @@ import de.uka.ilkd.key.util.Triple;
 public abstract class JoinRule implements BuiltInRule {
 
    @Override
-   public ImmutableList<Goal> apply(Goal goal, Services services,
+   public ImmutableList<Goal> apply(Goal goal, final Services services,
          RuleApp ruleApp) throws RuleAbortException {
       
       final TermBuilder tb = services.getTermBuilder();
@@ -120,11 +120,18 @@ public abstract class JoinRule implements BuiltInRule {
       // Enable simultaneous undo functionality
       final Node newGoalNode = newGoal.node();
       newGoal.proof().addProofTreeListener(new ProofTreeAdapter() {
+         private boolean inProgress = false;
          
          @Override
          public void proofPruned(ProofTreeEvent e) {
-            if (!proofContainsNode(e.getSource(), newGoalNode)) {
-               for (Node partnerNode : CloseAfterJoin.getPartnerNodesFor(newGoalNode)) {
+            if (!inProgress && !proofContainsNode(e.getSource(), newGoalNode)) {
+               inProgress = true;
+               
+               HashSet<Node> partnerNodes = CloseAfterJoin.getPartnerNodesFor(newGoalNode);
+               int i = 0;
+               for (Node partnerNode : partnerNodes) {
+                  i++;
+                  
                   if (partnerNode.parent() != null) {
                      // NOTE: This pruning will fire NullPointerExceptions
                      // in the case that one of the partner goals has already
@@ -142,6 +149,7 @@ public abstract class JoinRule implements BuiltInRule {
                      // thrown at all. Then, the old nodes are still visible, but
                      // get replaced if evaluation proceeds. Ugly, but so
                      // far the best discovered solution.
+//                     boolean fireChanges = i == partnerNodes.size();
                      boolean fireChanges = false;
                      if (newGoal.proof().pruneProof(partnerNode.parent(), fireChanges) == null) {
                         throw new IllegalStateException(
