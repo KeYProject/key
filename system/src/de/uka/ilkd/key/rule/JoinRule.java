@@ -34,6 +34,8 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
@@ -89,14 +91,7 @@ public abstract class JoinRule implements BuiltInRule {
                services);
          
          // Close partner goals
-         // TODO: The procedure here appends a node "==> true" to the partner
-         //       goals and closes them afterward. However, with this technique
-         //       it is not possible anymore to use the "undo last step" function,
-         //       since only this node can be set back anymore -- it is not
-         //       even possible to prune the partner nodes, because they are
-         //       closed goals... Can we do something different? Or register
-         //       something with the undo function?
-         closeJoinPartnerGoal(goal, joinPartner.first);
+         closeJoinPartnerGoal(goal.node().parent(), joinPartner.first, joinedState, thisSEState.third);
       }
       
       // Delete previous sequents      
@@ -280,27 +275,27 @@ public abstract class JoinRule implements BuiltInRule {
    }
    
    /**
-    * Closes the given partner goal, adding a label pointing to
-    * the serial number of the remaining join node.
+    * Closes the given partner goal, using the CloseAfterJoin rule.
     * 
-    * @param thisGoal Parent of remaining join node.
+    * @param joinNodeParent Parent of remaining join node.
     * @param joinPartner Partner goal to close.
     */
-   private void closeJoinPartnerGoal(Goal thisGoal, Goal joinPartner) {
-      Services services = thisGoal.proof().getServices();
+   private void closeJoinPartnerGoal(
+         Node joinNodeParent, Goal joinPartner, Pair<Term, Term> joinState, Term pc) {
       
-      ImmutableList<Goal> jpNewGoals = joinPartner.split(1);
-      Goal jpNewGoal = jpNewGoals.head();
-      jpNewGoal.setBranchLabel("Joined with node " + thisGoal.node().serialNr());
+      Services services = joinNodeParent.proof().getServices();
+      InitConfig initConfig = joinNodeParent.proof().getInitConfig();
       
-      clearSemisequent(jpNewGoal, true);
-      clearSemisequent(jpNewGoal, false);
-      SequentFormula trueSeqForm = new SequentFormula(services.getTermBuilder().tt());
-      jpNewGoal.addFormula(
-            trueSeqForm,
-            new PosInOccurrence(trueSeqForm, PosInTerm.getTopLevel(), false));
+      CloseAfterJoin closeRule = new CloseAfterJoin(joinNodeParent, joinState, pc);
+      RuleApp app = closeRule.createApp(null, services);
       
-      jpNewGoal.proof().closeGoal(joinPartner);
+      // Register rule if not done yet.
+      // This avoids error messages of the form "no justification found for rule...".
+      if (initConfig.getJustifInfo().getJustification(closeRule) == null) {
+         initConfig.registerRuleIntroducedAtNode(app, joinPartner.node(), true);
+      }
+      
+      joinPartner.apply(app);
    }
    
    /**
