@@ -89,9 +89,6 @@ public abstract class JoinRule implements BuiltInRule {
                new Pair<Term, Term> (partnerSEState.first, partnerSEState.second),
                thisSEState.third,
                services);
-         
-         // Close partner goals
-         closeJoinPartnerGoal(goal.node().parent(), joinPartner.first, joinedState, thisSEState.third);
       }
       
       // Delete previous sequents      
@@ -110,6 +107,11 @@ public abstract class JoinRule implements BuiltInRule {
       g.addFormula(
             newSuccedent,
             new PosInOccurrence(newSuccedent, PosInTerm.getTopLevel(), false));
+      
+      // Close partner goals
+      for (Pair<Goal, PosInOccurrence> joinPartner : joinPartners) {
+         closeJoinPartnerGoal(goal.node().parent(), joinPartner.first, joinedState, thisSEState.third);
+      }
       
       return newGoal;
    }
