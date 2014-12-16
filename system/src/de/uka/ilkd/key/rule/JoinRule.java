@@ -36,8 +36,6 @@ import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.util.Pair;
@@ -114,51 +112,6 @@ public abstract class JoinRule implements BuiltInRule {
       for (Pair<Goal, PosInOccurrence> joinPartner : joinPartners) {
          closeJoinPartnerGoal(newGoal.node(), joinPartner.first, joinedState, thisSEState.third);
       }
-      
-      // Enable simultaneous undo functionality
-      final Node newGoalNode = newGoal.node();
-      newGoal.proof().addProofTreeListener(new ProofTreeAdapter() {
-         private boolean inProgress = false;
-         
-         @Override
-         public void proofPruned(ProofTreeEvent e) {
-            if (!inProgress && !proofContainsNode(e.getSource(), newGoalNode)) {
-               inProgress = true;
-               
-               HashSet<Node> partnerNodes = CloseAfterJoin.getPartnerNodesFor(newGoalNode);
-               int i = 0;
-               for (Node partnerNode : partnerNodes) {
-                  i++;
-                  
-                  if (partnerNode.parent() != null) {
-                     // NOTE: This pruning will fire NullPointerExceptions
-                     // in the case that one of the partner goals has already
-                     // been closed. This could be acceptable, since pruning
-                     // the join node is illegal if a partner node cannot be
-                     // pruned; however, it is a bad user experience. Can we
-                     // also prune closed nodes somehow?
-                     
-                     //TODO: This throws a NullPointerException
-                     // if the evaluation of the partner goals OR the joined
-                     // goal has evolved, but is *not* yet closed.
-                     // This is undesirable!
-                     
-                     //TODO: If fireChanges is disabled, no exception are
-                     // thrown at all. Then, the old nodes are still visible, but
-                     // get replaced if evaluation proceeds. Ugly, but so
-                     // far the best discovered solution.
-//                     boolean fireChanges = i == partnerNodes.size();
-                     boolean fireChanges = false;
-                     if (newGoal.proof().pruneProof(partnerNode.parent(), fireChanges) == null) {
-                        throw new IllegalStateException(
-                              "Join node is pruned after partner has already been closed!");
-                     }
-                  }
-               }
-            }
-         }
-         
-      });
       
       return newGoals;
    }
@@ -548,7 +501,10 @@ public abstract class JoinRule implements BuiltInRule {
     * @param node Node to search for.
     * @return True iff node is contained in proof.
     */
+   @SuppressWarnings("unused")
    private boolean proofContainsNode(Proof proof, Node node) {
+      //TODO: Remove this method if not needed at end
+      
       FindNodeVisitor visitor = new FindNodeVisitor(node);
       proof.breadthFirstSearch(proof.root(), visitor);
       return visitor.success();
@@ -560,6 +516,8 @@ public abstract class JoinRule implements BuiltInRule {
     * @author Dominic Scheurer
     */
    private class FindNodeVisitor implements ProofVisitor {
+      //TODO: Remove this class if not needed at end
+      
       private boolean found = false;
       private Node node = null;
       
