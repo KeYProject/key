@@ -51,93 +51,100 @@ public class JoinIfThenElse extends JoinRule {
 
    @Override
    protected Pair<Term, Term> joinStates(
-         Pair<Term, Term> state1,
-         Pair<Term, Term> state2,
+         ImmutableList<Pair<Term, Term>> states,
          Term programCounter,
          Services services) {
       
       final TermBuilder tb = services.getTermBuilder();
       
-      HashSet<LocationVariable> progVars =
-            new HashSet<LocationVariable>();
+      Pair<Term, Term> joinedState = states.head();
+      states = states.tail();
       
-      // Collect program variables in Java block
-      progVars.addAll(getProgramLocations(programCounter, services));
-      // Collect program variables in update
-      progVars.addAll(getUpdateLocations(state1.first));
-      progVars.addAll(getUpdateLocations(state2.first));
-      
-      ImmutableList<Term> newElementaryUpdates = ImmutableSLList.nil();
-      
-      for (LocationVariable v : progVars) {
+      for (Pair<Term,Term> state : states) {
          
-         Term rightSide1 = getUpdateRightSideFor(state1.first, v);
-         Term rightSide2 = getUpdateRightSideFor(state2.first, v);
+         HashSet<LocationVariable> progVars =
+               new HashSet<LocationVariable>();
          
-         if (rightSide1 == null) {
-            rightSide1 = tb.var(v);
-         }
+         // Collect program variables in Java block
+         progVars.addAll(getProgramLocations(programCounter, services));
+         // Collect program variables in update
+         progVars.addAll(getUpdateLocations(joinedState.first));
+         progVars.addAll(getUpdateLocations(state.first));
          
-         if (rightSide2 == null) {
-            rightSide2 = tb.var(v);
-         }
+         ImmutableList<Term> newElementaryUpdates = ImmutableSLList.nil();
          
-         // Check if location v is set to different value in both states.
-         try {
-            Term predicateTerm = tb.func(new Function(new Name("P"), Sort.FORMULA, v.sort()), tb.var(v));
-            Term appl1 = tb.apply(state1.first, predicateTerm);
-            Term appl2 = tb.apply(state2.first, predicateTerm);
-            Term toProve = tb.and(
-                  tb.imp(appl1, appl2),
-                  tb.imp(appl2, appl1));
+         for (LocationVariable v : progVars) {
             
-            ApplyStrategyInfo proofResult = SideProofUtil.startSideProof(
-                  services.getProof(),                                  // Parent proof
-                  Sequent.createSequent(                                // Sequent to proof
-                        Semisequent.EMPTY_SEMISEQUENT,
-                        new Semisequent(new SequentFormula(toProve))), 
-                  false);                                               // useSimplifyTermProfile
+            Term rightSide1 = getUpdateRightSideFor(joinedState.first, v);
+            Term rightSide2 = getUpdateRightSideFor(state.first, v);
             
-            boolean proofClosed = proofResult.getProof().closed();
+            if (rightSide1 == null) {
+               rightSide1 = tb.var(v);
+            }
             
-            if (proofClosed) {
+            if (rightSide2 == null) {
+               rightSide2 = tb.var(v);
+            }
+            
+            // Check if location v is set to different value in both states.
+            try {
+               Term predicateTerm = tb.func(new Function(new Name("P"), Sort.FORMULA, v.sort()), tb.var(v));
+               Term appl1 = tb.apply(joinedState.first, predicateTerm);
+               Term appl2 = tb.apply(state.first, predicateTerm);
+               Term toProve = tb.and(
+                     tb.imp(appl1, appl2),
+                     tb.imp(appl2, appl1));
                
-               // Arbitrary choice: Take value of first state
+               ApplyStrategyInfo proofResult = SideProofUtil.startSideProof(
+                     services.getProof(),                                  // Parent proof
+                     Sequent.createSequent(                                // Sequent to proof
+                           Semisequent.EMPTY_SEMISEQUENT,
+                           new Semisequent(new SequentFormula(toProve))), 
+                     false);                                               // useSimplifyTermProfile
+               
+               boolean proofClosed = proofResult.getProof().closed();
+               
+               if (proofClosed) {
+                  
+                  // Arbitrary choice: Take value of first state
+                  newElementaryUpdates = newElementaryUpdates.prepend(
+                        tb.elementary(
+                              v,
+                              rightSide1));
+                  
+               } else {
+                  
+                  // Apply if-then-else construction: Different values
+                  newElementaryUpdates = newElementaryUpdates.prepend(
+                        tb.elementary(
+                              v,
+                              tb.ife(joinedState.second, rightSide1, rightSide2)));
+                  
+               }
+            }
+            catch (ProofInputException e) {
+               // If proof fails for some reason, just apply
+               // if-then-else construction. We still got absolute
+               // precision and soundness, only a more complicated
+               // resulting sequence.
+               
                newElementaryUpdates = newElementaryUpdates.prepend(
                      tb.elementary(
                            v,
-                           rightSide1));
-               
-            } else {
-               
-               // Apply if-then-else construction: Different values
-               newElementaryUpdates = newElementaryUpdates.prepend(
-                     tb.elementary(
-                           v,
-                           tb.ife(state1.second, rightSide1, rightSide2)));
-               
+                           tb.ife(joinedState.second, rightSide1, rightSide2)));
             }
          }
-         catch (ProofInputException e) {
-            // If proof fails for some reason, just apply
-            // if-then-else construction. We still got absolute
-            // precision and soundness, only a more complicated
-            // resulting sequence.
-            
-            newElementaryUpdates = newElementaryUpdates.prepend(
-                  tb.elementary(
-                        v,
-                        tb.ife(state1.second, rightSide1, rightSide2)));
-         }
+         
+         // Construct weakened symbolic state
+         Term newSymbolicState = tb.parallel(newElementaryUpdates);
+         
+         // Construct path condition as disjunction
+         Term newPathCondition = tb.or(joinedState.second, state.second);
+         
+         joinedState = new Pair<Term, Term>(newSymbolicState, newPathCondition);
       }
       
-      // Construct weakened symbolic state
-      Term newSymbolicState = tb.parallel(newElementaryUpdates);
-      
-      // Construct path condition as disjunction
-      Term newPathCondition = tb.or(state1.second, state2.second);
-      
-      return new Pair<Term, Term>(newSymbolicState, newPathCondition);
+      return joinedState;
    }
 
    @Override

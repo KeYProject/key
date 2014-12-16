@@ -77,23 +77,21 @@ public abstract class JoinRule implements BuiltInRule {
       ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = findJoinPartners(newGoal, pio);
       
       // Convert sequents to SE states
-      Triple<Term, Term, Term> thisSEState =
-            sequentToSETriple(newGoal, pio, services);
-      
-      Pair<Term, Term> joinedState =
-            new Pair<Term, Term>(thisSEState.first, thisSEState.second);
-      
+      ImmutableList<Pair<Term, Term>> joinPartnerStates = ImmutableSLList.nil();      
       for (Pair<Goal, PosInOccurrence> joinPartner : joinPartners) {
          Triple<Term, Term, Term> partnerSEState =
                sequentToSETriple(joinPartner.first, joinPartner.second, services);
          
-         // Join them!
-         joinedState = joinStates(
-               new Pair<Term, Term> (joinedState.first, joinedState.second),
-               new Pair<Term, Term> (partnerSEState.first, partnerSEState.second),
-               thisSEState.third,
-               services);
+         joinPartnerStates = joinPartnerStates.prepend(
+               new Pair<Term, Term>(partnerSEState.first, partnerSEState.second));
       }
+      
+      Triple<Term, Term, Term> thisSEState =
+            sequentToSETriple(newGoal, pio, services);
+      joinPartnerStates = joinPartnerStates.prepend(
+            new Pair<Term, Term>(thisSEState.first, thisSEState.second));
+      
+      Pair<Term, Term> joinedState = joinStates(joinPartnerStates, thisSEState.third, services);
       
       // Delete previous sequents      
       clearSemisequent(newGoal, true);
@@ -176,8 +174,7 @@ public abstract class JoinRule implements BuiltInRule {
     *   a weakening of both the original states.
     */
    protected abstract Pair<Term, Term> joinStates(
-         Pair<Term, Term> state1,
-         Pair<Term, Term> state2,
+         ImmutableList<Pair<Term, Term>> states,
          Term programCounter,
          Services services);
 
