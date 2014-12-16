@@ -31,10 +31,11 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
@@ -90,7 +91,7 @@ public abstract class JoinRule implements BuiltInRule {
                services);
          
          // Close partner goals
-         closeJoinPartnerGoal(goal, joinPartner.first, joinedState, thisSEState.third);
+         closeJoinPartnerGoal(goal.node().parent(), joinPartner.first, joinedState, thisSEState.third);
       }
       
       // Delete previous sequents      
@@ -274,35 +275,27 @@ public abstract class JoinRule implements BuiltInRule {
    }
    
    /**
-    * Closes the given partner goal, adding a label pointing to
-    * the serial number of the remaining join node.
+    * Closes the given partner goal, using the CloseAfterJoin rule.
     * 
-    * @param thisGoal Parent of remaining join node.
+    * @param joinNodeParent Parent of remaining join node.
     * @param joinPartner Partner goal to close.
     */
    private void closeJoinPartnerGoal(
-         Goal thisGoal, Goal joinPartner, Pair<Term, Term> joinState, Term pc) {
-      Services services = thisGoal.proof().getServices();
-      TermBuilder tb = services.getTermBuilder();
+         Node joinNodeParent, Goal joinPartner, Pair<Term, Term> joinState, Term pc) {
       
-      // Splitting the goal leads to an exception (null pointer)
-      // in AbstractNonDuplicateAppFeature#sameApplication
-      // (line 70); newApp.rule() or ruleCmp.rule() is null for
-      // the node if split like here.
-      // Maybe a special rule invocation is necessary? Could create
-      // a special close rule that is never applicable, but can be
-      // applied by this class.
-//      ImmutableList<Goal> jpNewGoals = joinPartner.split(1);
-//      Goal jpNewGoal = jpNewGoals.head();
-//      jpNewGoal.setBranchLabel("Joined with node " + thisGoal.node().serialNr());
+      Services services = joinNodeParent.proof().getServices();
+      InitConfig initConfig = joinNodeParent.proof().getInitConfig();
       
-      joinPartner.setBranchLabel("Joined with node " + thisGoal.node().serialNr());
+      CloseAfterJoin closeRule = new CloseAfterJoin(joinNodeParent, joinState, pc);
+      RuleApp app = closeRule.createApp(null, services);
       
-      Term impForm = tb.imp(joinState.second, tb.apply(joinState.first, pc));
-      for (QuantifiableVariable v : impForm.freeVars()) {
-         impForm = tb.all(v, impForm);
+      // Register rule if not done yet.
+      // This avoids error messages of the form "no justification found for rule...".
+      if (initConfig.getJustifInfo().getJustification(closeRule) == null) {
+         initConfig.registerRuleIntroducedAtNode(app, joinPartner.node(), true);
       }
-      joinPartner.addFormula(new SequentFormula(impForm), true, true);
+      
+      joinPartner.apply(app);
    }
    
    /**
