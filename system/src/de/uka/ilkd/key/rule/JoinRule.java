@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -118,30 +117,38 @@ public abstract class JoinRule implements BuiltInRule {
          closeJoinPartnerGoal(newGoal.node(), joinPartner.first, joinedState, thisSEState.third);
       }
       
+      // Enable simultaneous undo functionality
       final Node newGoalNode = newGoal.node();
       newGoal.proof().addProofTreeListener(new ProofTreeAdapter() {
          
          @Override
          public void proofPruned(ProofTreeEvent e) {
             if (!proofContainsNode(e.getSource(), newGoalNode)) {
-               for (Node n : CloseAfterJoin.getPartnerNodesFor(newGoalNode)) {
-                  if (n.parent() != null) {
-                     // NOTE: This pruning will fire Exceptions like
-                     // java.util.ConcurrentModificationException in the
-                     // case that one of the partner goals has already
+               for (Node partnerNode : CloseAfterJoin.getPartnerNodesFor(newGoalNode)) {
+                  if (partnerNode.parent() != null) {
+                     // NOTE: This pruning will fire NullPointerExceptions
+                     // in the case that one of the partner goals has already
                      // been closed. This could be acceptable, since pruning
                      // the join node is illegal if a partner node cannot be
                      // pruned; however, it is a bad user experience. Can we
                      // also prune closed nodes somehow?
                      
-                     //TODO: This also throws a ConcurrentModificationException
-                     // if the evaluation of the partner goals has evolved, but
-                     // is not yet closed. This is undesirable!
-                     newGoal.proof().pruneProof(n.parent());
+                     //TODO: This throws a NullPointerException
+                     // if the evaluation of the partner goals OR the joined
+                     // goal has evolved, but is *not* yet closed.
+                     // This is undesirable!
+                     
+                     //TODO: If fireChanges is disabled, no exception are
+                     // thrown at all. Then, the old nodes are still visible, but
+                     // get replaced if evaluation proceeds. Ugly, but so
+                     // far the best discovered solution.
+                     boolean fireChanges = false;
+                     if (newGoal.proof().pruneProof(partnerNode.parent(), fireChanges) == null) {
+                        throw new IllegalStateException(
+                              "Join node is pruned after partner has already been closed!");
+                     }
                   }
                }
-               
-               newGoal.proof().removeProofTreeListener(this);
             }
          }
          
