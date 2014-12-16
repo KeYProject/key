@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -35,6 +36,10 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
@@ -66,15 +71,15 @@ public abstract class JoinRule implements BuiltInRule {
          return null;
       }
       
-      ImmutableList<Goal> newGoal = goal.split(1);
-      Goal g = newGoal.head();
+      ImmutableList<Goal> newGoals = goal.split(1);
+      final Goal newGoal = newGoals.head();
       
       // Find join partner
-      ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = findJoinPartners(g, pio);
+      ImmutableList<Pair<Goal, PosInOccurrence>> joinPartners = findJoinPartners(newGoal, pio);
       
       // Convert sequents to SE states
       Triple<Term, Term, Term> thisSEState =
-            sequentToSETriple(g, pio, services);
+            sequentToSETriple(newGoal, pio, services);
       
       Pair<Term, Term> joinedState =
             new Pair<Term, Term>(thisSEState.first, thisSEState.second);
@@ -92,28 +97,57 @@ public abstract class JoinRule implements BuiltInRule {
       }
       
       // Delete previous sequents      
-      clearSemisequent(g, true);
-      clearSemisequent(g, false);
+      clearSemisequent(newGoal, true);
+      clearSemisequent(newGoal, false);
       
       // Add new antecedent (path condition)
       SequentFormula newAntecedent = new SequentFormula(joinedState.second);
-      g.addFormula(
+      newGoal.addFormula(
             newAntecedent,
             new PosInOccurrence(newAntecedent, PosInTerm.getTopLevel(), true));
       
       // Add new succedent (symbolic state & program counter)
       SequentFormula newSuccedent = new SequentFormula(
             tb.apply(joinedState.first, thisSEState.third));
-      g.addFormula(
+      newGoal.addFormula(
             newSuccedent,
             new PosInOccurrence(newSuccedent, PosInTerm.getTopLevel(), false));
       
       // Close partner goals
       for (Pair<Goal, PosInOccurrence> joinPartner : joinPartners) {
-         closeJoinPartnerGoal(goal.node().parent(), joinPartner.first, joinedState, thisSEState.third);
+         closeJoinPartnerGoal(newGoal.node(), joinPartner.first, joinedState, thisSEState.third);
       }
       
-      return newGoal;
+      final Node newGoalNode = newGoal.node();
+      newGoal.proof().addProofTreeListener(new ProofTreeAdapter() {
+         
+         @Override
+         public void proofPruned(ProofTreeEvent e) {
+            if (!proofContainsNode(e.getSource(), newGoalNode)) {
+               for (Node n : CloseAfterJoin.getPartnerNodesFor(newGoalNode)) {
+                  if (n.parent() != null) {
+                     // NOTE: This pruning will fire Exceptions like
+                     // java.util.ConcurrentModificationException in the
+                     // case that one of the partner goals has already
+                     // been closed. This could be acceptable, since pruning
+                     // the join node is illegal if a partner node cannot be
+                     // pruned; however, it is a bad user experience. Can we
+                     // also prune closed nodes somehow?
+                     
+                     //TODO: This also throws a ConcurrentModificationException
+                     // if the evaluation of the partner goals has evolved, but
+                     // is not yet closed. This is undesirable!
+                     newGoal.proof().pruneProof(n.parent());
+                  }
+               }
+               
+               newGoal.proof().removeProofTreeListener(this);
+            }
+         }
+         
+      });
+      
+      return newGoals;
    }
    
    /**
@@ -296,7 +330,7 @@ public abstract class JoinRule implements BuiltInRule {
       if (initConfig.getJustifInfo().getJustification(closeRule) == null) {
          initConfig.registerRuleIntroducedAtNode(app, joinPartner.node(), true);
       }
-      
+
       joinPartner.apply(app);
    }
    
@@ -497,5 +531,31 @@ public abstract class JoinRule implements BuiltInRule {
          return variables;
       }
       
+   }
+   
+   private boolean proofContainsNode(Proof proof, Node node) {
+      FindNodeVisitor visitor = new FindNodeVisitor(node);
+      proof.breadthFirstSearch(proof.root(), visitor);
+      return visitor.success();
+   }
+   
+   private class FindNodeVisitor implements ProofVisitor {
+      private boolean found = false;
+      private Node node = null;
+      
+      public FindNodeVisitor(Node node) {
+         this.node = node;
+      }
+      
+      public boolean success() {
+         return found;
+      }
+      
+      @Override
+      public void visit(Proof proof, Node visitedNode) {
+         if (visitedNode.equals(node)) {
+            found = true;
+         }
+      }
    }
 }

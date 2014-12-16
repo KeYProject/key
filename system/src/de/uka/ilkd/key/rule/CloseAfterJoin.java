@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.HashMap;
+import java.util.HashSet;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -44,9 +47,16 @@ public class CloseAfterJoin implements BuiltInRule {
    private static final String DISPLAY_NAME = "CloseAfterJoin";
    private static final Name RULE_NAME = new Name(DISPLAY_NAME);
    
-   private Node joinNodeParent = null;
+   private Node joinNode = null;
    private Pair<Term, Term> joinState = null;
    private Term pc = null;
+   
+   private static HashMap<Node, HashSet<Node>> JOIN_NODE_TO_PARTNERS_MAP =
+         new HashMap<Node, HashSet<Node>>();
+   
+   public static HashSet<Node> getPartnerNodesFor(Node joinNode) {
+      return JOIN_NODE_TO_PARTNERS_MAP.get(joinNode);
+   }
    
    @SuppressWarnings("unused")
    private CloseAfterJoin() {}
@@ -54,18 +64,22 @@ public class CloseAfterJoin implements BuiltInRule {
    /**
     * Creates a new CloseAfterJoin rule.
     * 
-    * @param joinNodeParent The parent of the join goal. This is needed
-    *    to add a reference to it in the partner goal at the place of
-    *    this rule application.
+    * @param joinNode The node for the join goal. This is needed
+    *    to add a reference to its parent in the partner goal at
+    *    the place of this rule application.
     * @param joinState The join state; needed for adding an implicative
     *    premise ensuring the soundness of join rules.
     * @param pc The program counter (formula of the form U\<{...}\> PHI,
     *    where U is an update in normal form and PHI is a DL formula).
     */
-   public CloseAfterJoin(Node joinNodeParent, Pair<Term, Term> joinState, Term pc) {
-      this.joinNodeParent = joinNodeParent;
+   public CloseAfterJoin(Node joinNode, Pair<Term, Term> joinState, Term pc) {
+      this.joinNode = joinNode;
       this.joinState = joinState;
       this.pc = pc;
+      
+      if (!JOIN_NODE_TO_PARTNERS_MAP.containsKey(joinNode)) {
+         JOIN_NODE_TO_PARTNERS_MAP.put(joinNode, new HashSet<Node>());
+      }
    }
    
    @Override
@@ -86,7 +100,7 @@ public class CloseAfterJoin implements BuiltInRule {
       
       ImmutableList<Goal> jpNewGoals = goal.split(1);
       Goal jpNewGoal = jpNewGoals.head();
-      jpNewGoal.setBranchLabel("Joined with node " + joinNodeParent.serialNr());
+      jpNewGoal.setBranchLabel("Joined with node " + joinNode.parent().serialNr());
             
       Term impForm = tb.imp(joinState.second, tb.apply(joinState.first, pc));
       for (QuantifiableVariable v : impForm.freeVars()) {
@@ -94,12 +108,15 @@ public class CloseAfterJoin implements BuiltInRule {
       }
       goal.addFormula(new SequentFormula(impForm), true, true);
       
+      // Register partner nodes
+      JOIN_NODE_TO_PARTNERS_MAP.get(joinNode).add(jpNewGoal.node());
+      
       return jpNewGoals;
    }
 
    @Override
    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-      return joinNodeParent != null && joinState != null &&  pc != null;
+      return joinNode != null && joinState != null &&  pc != null;
    }
 
    @Override
