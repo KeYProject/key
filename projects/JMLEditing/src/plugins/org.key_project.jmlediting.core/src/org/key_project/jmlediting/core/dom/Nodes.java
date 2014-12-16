@@ -138,11 +138,12 @@ public final class Nodes {
    }
 
    public static IKeyword getKeywordNode(final IASTNode node, final int position) {
-      final IASTNode keywordNode = getNodeAtPosition(node, position,
+      final IASTNode keywordApplNode = getNodeAtPosition(node, position,
             NodeTypes.KEYWORD_APPL);
-      if (keywordNode == null) {
+      if (keywordApplNode == null) {
          return null;
       }
+      final IASTNode keywordNode = keywordApplNode.getChildren().get(0);
       if (Nodes.isKeyword(keywordNode)) {
          return ((IKeywordNode) keywordNode).getKeyword();
       }
