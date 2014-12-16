@@ -112,16 +112,14 @@ public final class Nodes {
       }, new LinkedList<IKeywordNode>());
    }
 
-   public static IKeyword getKeywordNode(final IASTNode node, final int position) {
-      return node.search(new INodeSearcher<IKeyword>() {
+   public static IASTNode getNodeAtPosition(final IASTNode root,
+         final int position, final int type) {
+      return root.search(new INodeSearcher<IASTNode>() {
 
          @Override
-         public IKeyword searchNode(final IASTNode node) {
-            if (node.getType() == NodeTypes.KEYWORD_APPL) {
-               final IASTNode keywordNode = node.getChildren().get(0);
-               if (Nodes.isKeyword(keywordNode)) {
-                  return ((IKeywordNode) keywordNode).getKeyword();
-               }
+         public IASTNode searchNode(final IASTNode node) {
+            if (node.getType() == type) {
+               return node;
             }
             return null;
          }
@@ -137,6 +135,19 @@ public final class Nodes {
             return null;
          }
       });
+   }
+
+   public static IKeyword getKeywordNode(final IASTNode node, final int position) {
+      final IASTNode keywordNode = getNodeAtPosition(node, position,
+            NodeTypes.KEYWORD_APPL);
+      if (keywordNode == null) {
+         return null;
+      }
+      if (Nodes.isKeyword(keywordNode)) {
+         return ((IKeywordNode) keywordNode).getKeyword();
+      }
+      return null;
+
    }
 
 }
