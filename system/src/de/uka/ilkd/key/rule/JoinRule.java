@@ -377,7 +377,7 @@ public abstract class JoinRule implements BuiltInRule {
     * @return A list of suitable join partners. May be empty if none exist / selected.
     */
    private ImmutableList<Pair<Goal,PosInOccurrence>> findJoinPartners(
-         Goal goal, PosInOccurrence pio/*, Services services*/) {
+         Goal goal, PosInOccurrence pio) {
       
       Services services = goal.proof().getServices();
       
