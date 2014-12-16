@@ -3,7 +3,7 @@ package org.key_project.jmlediting.core.utilities;
 /**
  * A Class for containing offsets of Comments. with offsets for comment begin,
  * comment end, content begin, content end
- * 
+ *
  * @author David Giessing
  *
  */
@@ -71,7 +71,7 @@ public class CommentRange {
    /**
     * returns the Comments Content Begin Offset.
     *
-    * @return the Contents begin offset
+    * @return the inclusive Contents begin offset
     */
    public int getContentBeginOffset() {
       return this.contentBeginOffset;
@@ -80,7 +80,7 @@ public class CommentRange {
    /**
     * returns the Comment Contents End offset.
     *
-    * @return the End Offset
+    * @return the inclusive End Offset
     */
    public int getContentEndOffset() {
       return this.contentEndOffset;

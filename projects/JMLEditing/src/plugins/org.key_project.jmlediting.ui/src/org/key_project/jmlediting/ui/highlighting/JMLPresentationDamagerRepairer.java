@@ -163,7 +163,7 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
             try {
                final IASTNode parseResult = parser.parse(this.doc.get(),
                      surroundingComment.getContentBeginOffset(),
-                     surroundingComment.getContentEndOffset());
+                     surroundingComment.getContentEndOffset() + 1);
                final List<IKeywordNode> allKeywords = Nodes
                      .getAllKeywords(parseResult);
                int lastEnd = offset;

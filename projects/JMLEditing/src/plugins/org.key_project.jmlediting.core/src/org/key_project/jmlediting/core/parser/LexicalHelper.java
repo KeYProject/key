@@ -234,6 +234,10 @@ public final class LexicalHelper {
          }
          position++;
       }
+      // Accept an @ at the very last position of the comment
+      if (position < end && text.charAt(position) == '@' && position + 1 == end) {
+         position++;
+      }
       return position;
    }
 
