@@ -63,6 +63,7 @@ public class GoalList extends JList {
     private static final long serialVersionUID = 1632264315383703798L;
     private final static ImageIcon keyIcon = IconFactory.keyHole(20,20);
     private final static Icon disabledGoalIcon = IconFactory.keyHoleInteractive(20, 20);
+    private final static Icon linkedGoalIcon = IconFactory.keyHoleLinked(20, 20);
 
     private KeYMediator mediator;   
 
@@ -819,8 +820,9 @@ public class GoalList extends JList {
 	    if (value instanceof Goal) {
 	        final Sequent seq = ((Goal)value).sequent();
 	        valueStr = seqToString (seq);
-		
-		statusIcon = ((Goal)value).isAutomatic() ? keyIcon : disabledGoalIcon;
+	        
+		statusIcon = ((Goal)value).isLinked() ? linkedGoalIcon :
+		   ((Goal)value).isAutomatic() ? keyIcon : disabledGoalIcon;
 	    } else {
 		valueStr   = ""+value;
                 statusIcon = keyIcon;

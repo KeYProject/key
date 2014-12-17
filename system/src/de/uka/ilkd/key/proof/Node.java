@@ -31,6 +31,8 @@ public class Node  {
 
     private static final String INTERACTIVE_GOAL = "INTERACTIVE GOAL";
 
+    private static final String LINKED_GOAL = "LINKED GOAL";
+
     private static final String OPEN_GOAL = "OPEN GOAL";
 
     private static final String CLOSED_GOAL = "Closed goal";
@@ -490,6 +492,8 @@ public class Node  {
                     return CLOSED_GOAL; // don't cache this
                 else if(goal.isAutomatic())
                     cachedName = OPEN_GOAL;
+                else if(goal.isLinked())
+                   cachedName = LINKED_GOAL;
                 else
                     cachedName = INTERACTIVE_GOAL;
                 return cachedName;
