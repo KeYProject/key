@@ -156,7 +156,7 @@ public class TestCaseGenerator {
 		services = proof.getServices();
 		junitFormat = settings.useJunit();
 		useRFL = settings.useRFL();
-		modDir = services.getJavaModel().getModelDir();
+		modDir = computeProjectSubPath(services.getJavaModel().getModelDir());
 		dontCopy = modDir + File.separator + TestCaseGenerator.DONT_COPY;
 		directory = settings.getOutputFolderPath();
 		sortDummyClass = new HashMap<Sort, StringBuffer>();		
@@ -173,9 +173,28 @@ public class TestCaseGenerator {
 		}
 	}
 	
+	/**
+	 * Computes the project specific sub path of the output directory 
+	 * ({@link #directory}) in which the generated files will be stored.
+	 * @param modelDir The path to the source files of the performed {@link Proof}.
+	 * @return The computed sub path.
+	 */
+	protected String computeProjectSubPath(String modelDir) {
+	   if (modelDir.startsWith("/")) {
+	      return modelDir;
+	   }
+	   else {
+	      int index = modelDir.indexOf(File.separator);
+	      if (index >= 0) {
+	         return modelDir.substring(index); // Remove drive letter, e.g. Microsoft Windows
+	      }
+	      else {
+	         return modelDir;
+	      }
+	   }
+   }
 	
-	
-	private Set<ObjectVal> getPrestateObjects(Model m){ // TODO: Remove unused method or use it
+   private Set<ObjectVal> getPrestateObjects(Model m){ // TODO: Remove unused method or use it
 		
 		Set<ObjectVal> result  =new HashSet<ObjectVal>();
 		
