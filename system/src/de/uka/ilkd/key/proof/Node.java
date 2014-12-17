@@ -490,10 +490,10 @@ public class Node  {
                 Goal goal = proof().getGoal(this);
                 if ( goal == null || this.isClosed() )
                     return CLOSED_GOAL; // don't cache this
-                else if(goal.isAutomatic())
-                    cachedName = OPEN_GOAL;
                 else if(goal.isLinked())
                    cachedName = LINKED_GOAL;
+                else if(goal.isAutomatic())
+                    cachedName = OPEN_GOAL;
                 else
                     cachedName = INTERACTIVE_GOAL;
                 return cachedName;
