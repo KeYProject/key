@@ -56,7 +56,7 @@ public abstract class AbstractCounterExampleGenerator {
          throw new IllegalStateException("Can't find SMT solver " + SolverType.Z3_CE_SOLVER.getName());
       }
       
-      final Proof proof = createProof(mediator, oldProof, oldSequent);
+      final Proof proof = createProof(mediator, oldProof, oldSequent, "Semantics Blasting: " + oldProof.name());
       final SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
       TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
       final ProverTaskListener ptl = mediator.getUI().getListener();
@@ -64,7 +64,7 @@ public abstract class AbstractCounterExampleGenerator {
 
       try {
           synchronized(macro) { // TODO: Useless? No other thread has access to macro wait for macro to terminate
-              info = macro.applyTo(mediator, null, ptl);
+              info = macro.applyTo(proof, mediator, proof.openEnabledGoals(), null, ptl);
           }
       } catch (InterruptedException e) {
           Debug.out("Semantics blasting interrupted");
@@ -77,7 +77,7 @@ public abstract class AbstractCounterExampleGenerator {
       SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
               ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(), proof);
       SolverLauncher launcher = new SolverLauncher(settings);
-      launcher.addListener(createSolverListener(settings));
+      launcher.addListener(createSolverListener(settings, proof));
 
       List<SolverType> solvers = new LinkedList<SolverType>();
       solvers.add(SolverType.Z3_CE_SOLVER);
@@ -94,12 +94,14 @@ public abstract class AbstractCounterExampleGenerator {
     * @param mediator The {@link KeYMediator} to use.
     * @param oldProof The old {@link Proof} used as template to instantiate a new one.
     * @param oldSequent The {@link Sequent} to find a counter example for.
+    * @param proofName The name for the new proof.
     * @return The created {@link Proof}.
     * @throws ProofInputException Ocurred Exception
     */
    protected abstract Proof createProof(KeYMediator mediator, 
                                         Proof oldProof, 
-                                        Sequent oldSequent) throws ProofInputException;
+                                        Sequent oldSequent,
+                                        String proofName) throws ProofInputException;
 
    
    /**
@@ -123,7 +125,8 @@ public abstract class AbstractCounterExampleGenerator {
     * Creates the {@link SolverLauncherListener} which handles the results
     * of the launched SMT solver.
     * @param settings The {@link SMTSettings}.
+    * @param proof The {@link Proof} on which the SMT solver will be performed.
     * @return The {@link SolverLauncherListener} to use.
     */
-   protected abstract SolverLauncherListener createSolverListener(SMTSettings settings);
+   protected abstract SolverLauncherListener createSolverListener(SMTSettings settings, Proof proof);
 }

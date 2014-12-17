@@ -42,11 +42,11 @@ public class FinishAuxiliaryLoopComputationMacro extends
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(final KeYMediator mediator,
+    public ProofMacroFinishedInfo applyTo(final Proof proof,
+                                          final KeYMediator mediator,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) {
-        final Proof proof = mediator.getSelectedProof();
         if (proof == null) {
             return null;
         }

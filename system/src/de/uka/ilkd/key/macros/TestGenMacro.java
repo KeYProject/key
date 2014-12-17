@@ -3,7 +3,6 @@ package de.uka.ilkd.key.macros;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -13,6 +12,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
@@ -132,9 +132,9 @@ public class TestGenMacro extends StrategyProofMacro {
 	}
 
 	@Override
-	protected Strategy createStrategy(KeYMediator mediator,
+	protected Strategy createStrategy(Proof proof,
 	        PosInOccurrence posInOcc) {
-		return new TestGenStrategy(mediator.getInteractiveProver().getProof()
+		return new TestGenStrategy(proof
 		        .getActiveStrategy());
 	}
 

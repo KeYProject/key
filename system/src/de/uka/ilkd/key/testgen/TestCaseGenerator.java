@@ -445,8 +445,16 @@ public class TestCaseGenerator {
      *  as well as object creation functions based on the objenesis library.
     * @throws IOException 
      */
-	protected void createRFLFile() throws IOException{
-		writeToFile(ReflectionClassCreator.NAME_OF_CLASS + ".java", rflCreator.createClass());
+	protected void writeRFLFile() throws IOException{
+		writeToFile(ReflectionClassCreator.NAME_OF_CLASS + ".java", createRFLFileConent());
+	}
+	
+	/**
+	 * Used by the Eclipse integration to creat the content of the RFL file.
+	 * @return The content of the RFL file.
+	 */
+	public StringBuffer createRFLFileConent() {
+	   return rflCreator.createClass();
 	}
 
 	protected void createOpenJMLShellScript() throws IOException {
@@ -503,7 +511,7 @@ public class TestCaseGenerator {
 		exportCodeUnderTest();
 		createDummyClasses();
 		try{
-			if(useRFL)createRFLFile();
+			if(useRFL)writeRFLFile();
 		}catch(Exception ex){
 			logger.writeln("Error: The file RFL.java is either not generated or it has an error.");
 		}
@@ -544,86 +552,91 @@ public class TestCaseGenerator {
 		} else {
 			fileName += "_" + MUTName;
 		}
-		final StringBuffer testSuite = new StringBuffer();
-		testSuite.append(getFilePrefix(fileName) + NEW_LINE);
-		final StringBuffer testMethods = new StringBuffer();
-		int i = 0;
-		for (final SMTSolver solver : problemSolvers) {
-			try {
-				final StringBuffer testMethod = new StringBuffer();
-				final String originalNodeName = solver.getProblem().getGoal()
-				        .proof().name().toString();
-				boolean success = false;
-				if (solver.getSocket().getQuery() != null) {
-					final Model m = solver.getSocket().getQuery().getModel();
-					if (TestCaseGenerator.modelIsOK(m)) {
-						logger.writeln("Generate: " + originalNodeName);
-						testMethod.append("  //" + originalNodeName + NEW_LINE);
-						testMethod.append(getTestMethodSignature(i) + "{" + NEW_LINE);
-						testMethod
-						        .append("   //Test preamble: creating objects and intializing test data"
-						                + generateTestCase(m) + NEW_LINE + NEW_LINE);
-						
-						//info.getCode();
-						if(junitFormat){
-							testMethod.append(TAB+"//Other variables" + NEW_LINE + getOtherVariables(m) + NEW_LINE);
-						}
-						testMethod
-						        .append("   //Calling the method under test   " + NEW_LINE
-						                + info.getCode() + NEW_LINE);
-						
-						
-						if(junitFormat){
-							testMethod.append("   //calling the test oracle" + NEW_LINE+TAB+oracleMethodCall + NEW_LINE);
-						}
-						
-						testMethod.append(" }" + NEW_LINE + NEW_LINE);
-						i++;
-						success = true;
-						testMethods.append(testMethod);
-					}
-				}
-				if (!success) {
-					logger.writeln("A model (test data) was not generated for:"
-					        + originalNodeName);
-				}
-			} catch (final Exception ex) {
-				for(StackTraceElement ste: ex.getStackTrace()){
-					logger.writeln(ste.toString());
-				}
-				logger.writeln("A test case was not generated due to an exception. Continuing test generation...");
-			}
-		}
-		if (i == 0) {
-			logger.writeln("Warning: no test case was generated. Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers.");
-		} else if (i < problemSolvers.size()) {
-			logger.writeln("Warning: SMT solver could not solve all test data constraints. Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers.");
-		}
-		testSuite.append(getMainMethod(fileName, i) + NEW_LINE + NEW_LINE);
-		testSuite.append(testMethods);
-		
-		if(junitFormat){
-			for(OracleMethod m : oracleMethods){
-				testSuite.append(NEW_LINE + NEW_LINE);
-				testSuite.append(m);
-			}
-		}
-		
-		
-		testSuite.append(NEW_LINE + "}");
+		StringBuffer testSuite = createRFLFileConent();
 		writeToFile(fileName + ".java", testSuite);
 		logger.writeln("Writing test file to:" + directory + modDir
 		        + File.separator + fileName + ".java");
 		exportCodeUnderTest();
 		createDummyClasses();
 		try{
-			if(useRFL)createRFLFile();
+			if(useRFL)writeRFLFile();
 		}catch(Exception ex){
 			logger.writeln("Error: The file RFL.java is either not generated or it has an error.");
 		}
 		createOpenJMLShellScript();
 		TestCaseGenerator.fileCounter++;
 		return testSuite.toString();
+	}
+	
+	public StringBuffer createTestCaseCotent(Collection<SMTSolver> problemSolvers) { // TODO: Include package definition (same as type containing the proof obligation)
+	     final StringBuffer testSuite = new StringBuffer();
+	      testSuite.append(getFilePrefix(fileName) + NEW_LINE);
+	      final StringBuffer testMethods = new StringBuffer();
+	      int i = 0;
+	      for (final SMTSolver solver : problemSolvers) {
+	         try {
+	            final StringBuffer testMethod = new StringBuffer();
+	            final String originalNodeName = solver.getProblem().getGoal()
+	                    .proof().name().toString();
+	            boolean success = false;
+	            if (solver.getSocket().getQuery() != null) {
+	               final Model m = solver.getSocket().getQuery().getModel();
+	               if (TestCaseGenerator.modelIsOK(m)) {
+	                  logger.writeln("Generate: " + originalNodeName);
+	                  testMethod.append("  //" + originalNodeName + NEW_LINE);
+	                  testMethod.append(getTestMethodSignature(i) + "{" + NEW_LINE);
+	                  testMethod
+	                          .append("   //Test preamble: creating objects and intializing test data"
+	                                  + generateTestCase(m) + NEW_LINE + NEW_LINE);
+	                  
+	                  //info.getCode();
+	                  if(junitFormat){
+	                     testMethod.append(TAB+"//Other variables" + NEW_LINE + getOtherVariables(m) + NEW_LINE);
+	                  }
+	                  testMethod
+	                          .append("   //Calling the method under test   " + NEW_LINE
+	                                  + info.getCode() + NEW_LINE);
+	                  
+	                  
+	                  if(junitFormat){
+	                     testMethod.append("   //calling the test oracle" + NEW_LINE+TAB+oracleMethodCall + NEW_LINE);
+	                  }
+	                  
+	                  testMethod.append(" }" + NEW_LINE + NEW_LINE);
+	                  i++;
+	                  success = true;
+	                  testMethods.append(testMethod);
+	               }
+	            }
+	            if (!success) {
+	               logger.writeln("A model (test data) was not generated for:"
+	                       + originalNodeName);
+	            }
+	         } catch (final Exception ex) {
+	            for(StackTraceElement ste: ex.getStackTrace()){
+	               logger.writeln(ste.toString());
+	            }
+	            logger.writeln("A test case was not generated due to an exception. Continuing test generation...");
+	         }
+	      }
+	      if (i == 0) {
+	         logger.writeln("Warning: no test case was generated. Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers.");
+	      } else if (i < problemSolvers.size()) {
+	         logger.writeln("Warning: SMT solver could not solve all test data constraints. Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers.");
+	      }
+	      testSuite.append(getMainMethod(fileName, i) + NEW_LINE + NEW_LINE);
+	      testSuite.append(testMethods);
+	      
+	      if(junitFormat){
+	         for(OracleMethod m : oracleMethods){
+	            testSuite.append(NEW_LINE + NEW_LINE);
+	            testSuite.append(m);
+	         }
+	      }
+	      
+	      
+	      testSuite.append(NEW_LINE + "}");
+	      return testSuite;
 	}
 	
 	private String getOtherVariables(Model m) {

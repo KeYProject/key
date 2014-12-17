@@ -1292,7 +1292,7 @@ public final class MainWindow extends JFrame  {
                     SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
                             ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(), proof);
                     SolverLauncher launcher = new SolverLauncher(settings);
-                    launcher.addListener(new SolverListener(settings));
+                    launcher.addListener(new SolverListener(settings, proof));
                     launcher.launch(solverUnion.getTypes(),
                             SMTProblem.createSMTProblems(proof),
                             proof.getServices());

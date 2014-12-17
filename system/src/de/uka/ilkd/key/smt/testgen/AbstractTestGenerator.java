@@ -11,7 +11,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.core.TaskFinishedInfo;
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
@@ -28,8 +27,9 @@ import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.SingleProof;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolver;
@@ -38,8 +38,11 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.model.Model;
+import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.ProofStarter;
 
 /**
  * Implementations of this class are used generate test cases or a given {@link Proof}.
@@ -95,49 +98,47 @@ public abstract class AbstractTestGenerator {
     final Collection<SMTProblem> problems = new LinkedList<SMTProblem>();
     log
     .writeln("Test data generation: appling semantic blasting macro on proofs");
-    for (final Proof proof : proofs) {
-       if (stopRequest != null && stopRequest.shouldStop()) {
-          return;
-       }
-       log.write(".");
-       final ProofAggregate pa = new SingleProof(proof, "XXX");
-       final MainWindow mw = MainWindow.getInstance();
-       mw.addProblem(pa);
-       final SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
-       TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
-       final ProverTaskListener ptl = mediator.getUI().getListener();
-       try {
+    try {
+       for (final Proof proof : proofs) {
           if (stopRequest != null && stopRequest.shouldStop()) {
              return;
           }
-          mediator.setProof(proof);
+          log.write(".");
+          final SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
+          TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
+          final ProverTaskListener ptl = mediator.getUI().getListener();
+          try {
+             if (stopRequest != null && stopRequest.shouldStop()) {
+                return;
+             }
+             selectProof(mediator, proof);
 
-          ptl.taskStarted(macro.getName(), 0);
-          synchronized(macro) {
-                       info = macro.applyTo(mediator, null, ptl);
+             ptl.taskStarted(macro.getName(), 0);
+             synchronized(macro) {
+                          info = macro.applyTo(proof, mediator, proof.openEnabledGoals(), null, ptl);
+             }
+             problems.addAll(SMTProblem.createSMTProblems(proof));
+          } catch (final InterruptedException e) {
+             Debug.out("Semantics blasting interrupted");
+             log
+             .writeln("\n Warning: semantics blasting was interrupted. "
+                      + "A test case will not be generated.");
+          } catch (final Exception e) {
+             log.writeln(e.getLocalizedMessage());
+             System.err.println(e);
+          } finally {
+              ptl.taskFinished(info);
           }
-          problems.addAll(SMTProblem.createSMTProblems(mediator
-                .getSelectedProof()));
-          // mediator.getUI().removeProof(mediator.getSelectedProof());
-       } catch (final InterruptedException e) {
-          Debug.out("Semantics blasting interrupted");
-          log
-          .writeln("\n Warning: semantics blasting was interrupted. "
-                   + "A test case will not be generated.");
-       } catch (final Exception e) {
-          log.writeln(e.getLocalizedMessage());
-          System.err.println(e);
-       } finally {
-           ptl.taskFinished(info);
-           mediator.setInteractive(true);
-           mediator.startInterface(true);
        }
     }
+    finally {
+       handleAllProofsPerformed(mediator);
+    }
     log.writeln("\nDone applying semantic blasting.");
-    mediator.setProof(originalProof);
+    selectProof(mediator, originalProof);
     // getMediator().setInteractive(true);
     // getMediator().startInterface(true);
-    final Proof proof = mediator.getSelectedProof();
+    final Proof proof = originalProof;
 
     //create special smt settings for test case generation
     final ProofIndependentSMTSettings piSettings = ProofIndependentSettings.DEFAULT_INSTANCE
@@ -175,6 +176,24 @@ public abstract class AbstractTestGenerator {
     //    ModelGenerator mg = new ModelGenerator(proofs.get(0).root().sequent(), 3, getMediator());
     //    mg.launch();
     return;
+   }
+
+   protected void handleAllProofsPerformed(KeYMediator mediator) {
+      // Work has only to be done in the MainWindow implementation.
+   }
+
+   /**
+    * Removes all generated proofs.
+    */
+   public void dispose() {
+      for (final Proof p : proofs) {
+         mediator.getUI().removeProof(p);
+         p.dispose();
+      }
+   }
+
+   protected void selectProof(KeYMediator mediator, Proof proof) {
+      // Work has only to be done in the MainWindow implementation.
    }
 
    /**
@@ -245,8 +264,9 @@ public abstract class AbstractTestGenerator {
     * @param node
     * @param otherProofs
     * @return
+    * @throws ProofInputException 
     */
-   private Proof createProofForTesting_noDuplicate(Node node, List<Proof> otherProofs) {
+   private Proof createProofForTesting_noDuplicate(Node node, List<Proof> otherProofs) throws ProofInputException {
       // System.out.println("Create proof for test case from Node:"+node.serialNr());
       final Proof oldProof = node.proof();
       final Sequent oldSequent = node.sequent();
@@ -281,7 +301,17 @@ public abstract class AbstractTestGenerator {
       return createProof(mediator, oldProof, "Test Case for NodeNr: " + node.serialNr(), newSequent);
    }
    
-   protected abstract Proof createProof(KeYMediator mediator, Proof oldProof, String newName, Sequent newSequent);
+   protected Proof createProof(KeYMediator mediator, Proof oldProof, String newName, Sequent newSequent) throws ProofInputException {
+      ProofEnvironment env = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(oldProof, false);
+      ProofStarter starter = SideProofUtil.createSideProof(env, newSequent, newName);
+      Proof proof = starter.getProof();
+      proof.getServices().getSpecificationRepository().registerProof(proof.getServices().getSpecificationRepository().getProofOblInput(oldProof), proof);
+      OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(proof.getServices().getProfile());
+      if (simplifier != null) {
+         simplifier.refresh(proof);
+      }
+      return proof;
+   }
 
    private boolean hasModalities(Term t, boolean checkUpdates) {
       final JavaBlock jb = t.javaBlock();
@@ -308,16 +338,9 @@ public abstract class AbstractTestGenerator {
    protected void handleLauncherStopped(SolverLauncher launcher, Collection<SMTSolver> problemSolvers, TestGenerationLog log) {
       try {
          log.writeln("Finished solving SMT problems: " + problemSolvers.size());
-         final TestCaseGenerator tg = new TestCaseGenerator(originalProof);
-         tg.setLogger(log);
          problemSolvers = filterSolverResultsAndShowSolverStatistics(problemSolvers, log);
          if (problemSolvers.size() > 0) {
-            tg.generateJUnitTestSuite(problemSolvers);
-            if (tg.isJunit()) {
-               log.writeln("Test oracle not yet implemented for JUnit.");
-            } else {
-               log.writeln("Compile and run the file with openjml!");
-            }
+            generateFiles(launcher, problemSolvers, log, originalProof);
          } else {
             log.writeln("No test data was generated.");
          }
@@ -325,6 +348,17 @@ public abstract class AbstractTestGenerator {
       }
       catch (Exception e) {
          log.writeException(e);
+      }
+   }
+   
+   protected void generateFiles(SolverLauncher launcher, Collection<SMTSolver> problemSolvers, TestGenerationLog log, Proof originalProof) throws Exception {
+      final TestCaseGenerator tg = new TestCaseGenerator(originalProof);
+      tg.setLogger(log);
+      tg.generateJUnitTestSuite(problemSolvers);
+      if (tg.isJunit()) {
+         log.writeln("Test oracle not yet implemented for JUnit.");
+      } else {
+         log.writeln("Compile and run the file with openjml!");
       }
    }
 
@@ -385,5 +419,17 @@ public abstract class AbstractTestGenerator {
 
    protected List<Proof> getProofs() {
       return proofs;
+   }
+   
+   protected KeYMediator getMediator() {
+      return mediator;
+   }
+
+   /**
+    * Checks if the required SMT solver is available.
+    * @return {@code true} solver is available, {@code false} solver is not available.
+    */
+   public static boolean isSolverAvailable() {
+      return SolverType.Z3_CE_SOLVER.isInstalled(true);
    }
 }

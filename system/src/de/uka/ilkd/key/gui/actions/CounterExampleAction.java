@@ -136,8 +136,8 @@ public class CounterExampleAction extends MainWindowAction {
         * {@inheritDoc}
         */
        @Override
-       protected SolverLauncherListener createSolverListener(SMTSettings settings) {
-          return new SolverListener(settings);
+       protected SolverLauncherListener createSolverListener(SMTSettings settings, Proof proof) {
+          return new SolverListener(settings, proof);
        }
     }
     
@@ -155,10 +155,10 @@ public class CounterExampleAction extends MainWindowAction {
         * {@inheritDoc}
         */
        @Override
-       protected Proof createProof(KeYMediator mediator, Proof oldProof, Sequent oldSequent) {
+       protected Proof createProof(KeYMediator mediator, Proof oldProof, Sequent oldSequent, String proofName) {
           Sequent newSequent = createNewSequent(oldSequent);
           InitConfig newInitConfig = oldProof.getInitConfig().deepCopy();
-          Proof proof = new Proof("Semantics Blasting: " + oldProof.name(),
+          Proof proof = new Proof(proofName,
                   newSequent, "",
                   newInitConfig.createTacletIndex(),
                   newInitConfig.createBuiltInRuleIndex(),
@@ -194,8 +194,8 @@ public class CounterExampleAction extends MainWindowAction {
         * {@inheritDoc}
         */
        @Override
-       protected SolverLauncherListener createSolverListener(SMTSettings settings) {
-          return new SolverListener(settings);
+       protected SolverLauncherListener createSolverListener(SMTSettings settings, Proof proof) {
+          return new SolverListener(settings, proof);
        }
     }
     
@@ -210,8 +210,8 @@ public class CounterExampleAction extends MainWindowAction {
 
         @Override
         protected Void doInBackground() throws Exception {
-           new MainWindowCounterExampleGenerator().searchCounterExample(getMediator(), oldProof, oldSequent);
-//           new NoMainWindowCounterExampleGenerator().searchCounterExample(getMediator(), oldProof, oldSequent); // If used: Ensure that the SolverListener does not remove the current proof.
+//           new MainWindowCounterExampleGenerator().searchCounterExample(getMediator(), oldProof, oldSequent);
+           new NoMainWindowCounterExampleGenerator().searchCounterExample(getMediator(), oldProof, oldSequent);
            return null;
         }
 
