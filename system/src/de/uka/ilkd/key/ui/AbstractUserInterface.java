@@ -28,7 +28,6 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.KeYFileChooser;
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -229,7 +228,7 @@ public abstract class AbstractUserInterface implements UserInterface {
 
    protected static Pair<File, String> fileName(Proof proof, String fileExtension) {
        // TODO: why do we use GUI components here?
-       final KeYFileChooser jFC = GuiUtilities.getFileChooser("Choose filename to save proof");
+       final KeYFileChooser jFC = KeYFileChooser.getFileChooser("Choose filename to save proof");
 
        File selectedFile = null;
        if (proof != null) {

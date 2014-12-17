@@ -25,7 +25,6 @@ import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 
 public class OpenFileAction extends MainWindowAction {
     
@@ -44,7 +43,7 @@ public class OpenFileAction extends MainWindowAction {
 
     public void actionPerformed(ActionEvent e) {
         KeYFileChooser keYFileChooser = 
-            GuiUtilities.getFileChooser("Select file to load proof or problem");
+            KeYFileChooser.getFileChooser("Select file to load proof or problem");
 
         boolean loaded = keYFileChooser.showOpenDialog(mainWindow);
 

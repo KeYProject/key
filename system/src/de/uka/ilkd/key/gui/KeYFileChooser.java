@@ -18,11 +18,16 @@ import java.io.File;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import de.uka.ilkd.key.core.Main;
 
 
 public class KeYFileChooser {
+    
+    private static KeYFileChooser INSTANCE;
 
     private final JFileChooser fileChooser;
+    
+
 
     private boolean saveDialog;
 
@@ -152,5 +157,31 @@ public class KeYFileChooser {
                         file.getAbsolutePath() + " already exists. Overwrite?",
                         "Save warning", JOptionPane.YES_NO_OPTION,
                         JOptionPane.WARNING_MESSAGE, null, null, null);
+    }
+
+    /**
+     * Gets <b>the</b> file chooser for the prover.
+     * 
+     * The chooser is created lazily when first requested. It points to the
+     * directory of the command line argument (if present), otherwise to the
+     * user's home directory.
+     * 
+     * @param title
+     *            the title of the key file chooser
+     * 
+     * @return the key file chooser
+     */
+    public static KeYFileChooser getFileChooser(String title) {
+        if (INSTANCE == null) {
+            String initDir = Main.getFileNameOnStartUp() == null 
+                             ? System.getProperty("user.dir")
+                             : Main.getFileNameOnStartUp();
+                             
+            INSTANCE = new KeYFileChooser(initDir);
+        }
+        
+        INSTANCE.setDialogTitle(title);
+        INSTANCE.prepare();
+        return INSTANCE;
     }
 }

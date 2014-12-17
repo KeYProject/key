@@ -26,7 +26,6 @@ import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
@@ -323,7 +322,7 @@ public class WindowUserInterface extends AbstractUserInterface {
    @Override
    public File saveProof(Proof proof, String fileExtension) {
        final MainWindow mainWindow = MainWindow.getInstance();
-       final KeYFileChooser jFC = GuiUtilities.getFileChooser("Choose filename to save proof");
+       final KeYFileChooser jFC = KeYFileChooser.getFileChooser("Choose filename to save proof");
 
        Pair<File, String> f = fileName(proof, fileExtension);
        final boolean saved = jFC.showSaveDialog(mainWindow, f.second);
