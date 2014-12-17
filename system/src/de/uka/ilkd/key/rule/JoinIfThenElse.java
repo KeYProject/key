@@ -157,6 +157,11 @@ public class JoinIfThenElse extends JoinRule {
       return DISPLAY_NAME;
    }
    
+   @Override
+   public String toString() {
+      return DISPLAY_NAME;
+   }
+   
    /**
     * Returns the right side for a given location variable in an update
     * (in normal form).

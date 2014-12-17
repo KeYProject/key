@@ -94,4 +94,9 @@ public class JoinWeaken extends JoinRule {
    public String displayName() {
       return DISPLAY_NAME;
    }
+   
+   @Override
+   public String toString() {
+      return DISPLAY_NAME;
+   }
 }
