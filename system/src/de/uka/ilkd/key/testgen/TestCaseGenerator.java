@@ -17,7 +17,6 @@ import java.util.Set;
 
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.testgen.TGInfoDialog;
 import de.uka.ilkd.key.gui.testgen.TestGenerationSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -34,6 +33,7 @@ import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.model.Heap;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.model.ObjectVal;
+import de.uka.ilkd.key.smt.testgen.TestGenerationLog;
 import de.uka.ilkd.key.testgen.oracle.OracleGenerator;
 import de.uka.ilkd.key.testgen.oracle.OracleMethod;
 import de.uka.ilkd.key.testgen.oracle.OracleTermCall;
@@ -76,7 +76,7 @@ public class TestCaseGenerator {
 	private final String dontCopy;
 	protected final String modDir;
 	protected final String directory;
-	private TGInfoDialog logger;
+	private TestGenerationLog logger;
 	private String fileName;
 	private String MUTName;
 	private ProofInfo info;
@@ -1015,7 +1015,7 @@ public class TestCaseGenerator {
 		junitFormat = junit;
 	}
 
-	public void setLogger(TGInfoDialog logger) {
+	public void setLogger(TestGenerationLog logger) {
 		this.logger = logger;
 	}
 
