@@ -33,7 +33,7 @@ public class KeYFileChooser {
 
     private File resetFile = null;
 
-    public KeYFileChooser(String initDir) {
+    private KeYFileChooser(String initDir) {
         fileChooser = new JFileChooser(new File(initDir)) {
             /**
              * 

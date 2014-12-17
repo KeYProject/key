@@ -294,7 +294,7 @@ public class FileChooser extends JPanel{
         private KeYFileChooser getFileChooser(String title) {
            if (fileChooser == null) {
                     String initDir = System.getProperty("user.dir");
-                    fileChooser = new KeYFileChooser(initDir);
+                    fileChooser = KeYFileChooser.getFileChooser(initDir);
                 }
                 fileChooser.setDialogTitle(title);
                 fileChooser.prepare();
