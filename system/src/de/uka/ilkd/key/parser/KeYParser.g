@@ -691,6 +691,10 @@ options {
       problem();
     }
 
+    public Taclet taclet(ImmutableSet<Choice> choices) throws RecognitionException {
+       return taclet(choices, false);
+    }
+
     private void schema_var_decl(String name, 
     				 Sort s, 
     				 boolean makeVariableSV,
