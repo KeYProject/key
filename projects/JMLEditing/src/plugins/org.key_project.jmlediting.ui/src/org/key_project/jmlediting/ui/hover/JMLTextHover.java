@@ -32,6 +32,9 @@ public class JMLTextHover implements IJavaEditorTextHover {
    @Override
    public String getHoverInfo(final ITextViewer textViewer,
          final IRegion hoverRegion) {
+      if (!JMLPreferencesHelper.isAnyProfileAvailable()) {
+         return null;
+      }
       // Calculate the hover region, we want to use
       final int cursorPosition = hoverRegion.getOffset();
       // That is the complete JML Comment

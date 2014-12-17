@@ -29,6 +29,18 @@ public final class JMLPreferencesHelper {
    }
 
    /**
+    * Returns true, if any JML profile is available. Iff this method returns
+    * true, the following methods are guaranteed to return a non null JML
+    * Profile: {@link JMLPreferencesHelper#getDefaultJMLProfile()},
+    * {@link JMLPreferencesHelper#getProjectActiveJMLProfile(IProject)}.
+    *
+    * @return whether any JML Profile is available
+    */
+   public static boolean isAnyProfileAvailable() {
+      return getDefaultJMLProfile() != null;
+   }
+
+   /**
     * Returns the default profile from the eclipse preferences. If no profile is
     * set for the workspace, this methods tries to set the JML Reference
     * profile, if not found, it takes the first one. If there is no profile

@@ -34,7 +34,7 @@ import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
  * @author Thomas Glaser
  */
 public class JMLCompletionProposalComputer implements
-IJavaCompletionProposalComputer {
+      IJavaCompletionProposalComputer {
 
    private static Image img = null;
 
@@ -45,7 +45,7 @@ IJavaCompletionProposalComputer {
       try {
          return new Image(Display.getCurrent(), new ImageLoader().load(new URL(
                "platform:/plugin/org.key_project.jmlediting.ui/icons/jml.png")
-         .openStream())[0]);
+               .openStream())[0]);
       }
       catch (final IOException ioe) {
          return null;
@@ -60,6 +60,11 @@ IJavaCompletionProposalComputer {
    public List<ICompletionProposal> computeCompletionProposals(
          final ContentAssistInvocationContext context,
          final IProgressMonitor monitor) {
+      // Can only provide anything if there is a valid profile
+      if (!JMLPreferencesHelper.isAnyProfileAvailable()) {
+         return Collections.emptyList();
+      }
+
       final List<ICompletionProposal> result = new LinkedList<ICompletionProposal>();
 
       final CommentLocator locator = new CommentLocator(context.getDocument()
@@ -97,6 +102,10 @@ IJavaCompletionProposalComputer {
 
                result.addAll(activeKeyword.createAutoProposals(parseResult,
                      javaContext));
+            }
+            else {
+               return JMLCompletionUtil.getStandardProposals(javaContext,
+                     getJMLImg());
             }
 
          }

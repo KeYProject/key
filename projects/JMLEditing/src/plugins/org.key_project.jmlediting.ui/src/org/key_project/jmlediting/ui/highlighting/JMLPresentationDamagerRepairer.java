@@ -151,52 +151,57 @@ IPresentationRepairer {
          styleRange.strikeout = (style & TextAttribute.STRIKETHROUGH) != 0;
          styleRange.underline = (style & TextAttribute.UNDERLINE) != 0;
          styleRange.font = attr.getFont();
-         // presentation.addStyleRange(styleRange);
-         // From here it is all about Highlighting for JML Keywords
-         final CommentLocator locator = new CommentLocator(this.doc.get());
-         final CommentRange surroundingComment = locator.getJMLComment(offset);
-         // Only provide advanced SyntaxHighlighting for JML Comments
-         if (locator.isInJMLcomment(offset)) {
-            final IJMLProfile activeProfile = JMLPreferencesHelper
-                  .getProjectActiveJMLProfile(WorkbenchUtil.getCurrentProject());
-            final IJMLParser parser = activeProfile.createParser();
-            try {
-               final IASTNode parseResult = parser.parse(this.doc.get(),
-                     surroundingComment.getContentBeginOffset(),
-                     surroundingComment.getContentEndOffset() + 1);
-               final List<IKeywordNode> allKeywords = Nodes
-                     .getAllKeywords(parseResult);
-               int lastEnd = offset;
-               final List<StyleRange> styles = new ArrayList<StyleRange>();
-               for (final IKeywordNode kNode : allKeywords) {
-                  final int keywordStartOffset = kNode.getStartOffset();
-                  final int keywordEndOffset = kNode.getEndOffset();
-                  // Style between last and current Keyword (or from comment
-                  // begin until the start of first Keyword)
-                  styles.add(new StyleRange(lastEnd, keywordStartOffset
-                        - lastEnd, styleRange.foreground,
+         presentation.addStyleRange(styleRange);
+         if (JMLPreferencesHelper.isAnyProfileAvailable()) {
+            // From here it is all about Highlighting for JML Keywords
+            final CommentLocator locator = new CommentLocator(this.doc.get());
+            final CommentRange surroundingComment = locator
+                  .getJMLComment(offset);
+            // Only provide advanced SyntaxHighlighting for JML Comments
+            if (locator.isInJMLcomment(offset)) {
+               final IJMLProfile activeProfile = JMLPreferencesHelper
+                     .getProjectActiveJMLProfile(WorkbenchUtil
+                           .getCurrentProject());
+               final IJMLParser parser = activeProfile.createParser();
+               try {
+                  final IASTNode parseResult = parser.parse(this.doc.get(),
+                        surroundingComment.getContentBeginOffset(),
+                        surroundingComment.getContentEndOffset() + 1);
+                  final List<IKeywordNode> allKeywords = Nodes
+                        .getAllKeywords(parseResult);
+                  int lastEnd = offset;
+                  final List<StyleRange> styles = new ArrayList<StyleRange>();
+                  for (final IKeywordNode kNode : allKeywords) {
+                     final int keywordStartOffset = kNode.getStartOffset();
+                     final int keywordEndOffset = kNode.getEndOffset();
+                     // Style between last and current Keyword (or from comment
+                     // begin until the start of first Keyword)
+                     styles.add(new StyleRange(lastEnd, keywordStartOffset
+                           - lastEnd, styleRange.foreground,
+                           styleRange.background, attr.getStyle()));
+                     // Style for the Keyword
+                     styles.add(new StyleRange(keywordStartOffset,
+                           keywordEndOffset - keywordStartOffset + 1,
+                           styleRange.foreground, styleRange.background,
+                           SWT.BOLD));
+                     lastEnd = keywordEndOffset + 1;
+                  }
+                  // Adding Style after last Keyword
+                  styles.add(new StyleRange(lastEnd, surroundingComment
+                        .getEndOffset() - lastEnd + 1, styleRange.foreground,
                         styleRange.background, attr.getStyle()));
-                  // Style for the Keyword
-                  styles.add(new StyleRange(keywordStartOffset,
-                        keywordEndOffset - keywordStartOffset + 1,
-                        styleRange.foreground, styleRange.background, SWT.BOLD));
-                  lastEnd = keywordEndOffset + 1;
+                  // Transfer to Array for use in MergeStyle
+                  final StyleRange[] highlightedRanges = new StyleRange[styles
+                                                                        .size()];
+                  for (int i = 0; i < styles.size(); i++) {
+                     highlightedRanges[i] = styles.get(i);
+                  }
+                  presentation.mergeStyleRanges(highlightedRanges);
                }
-               // Adding Style after last Keyword
-               styles.add(new StyleRange(lastEnd, surroundingComment
-                     .getEndOffset() - lastEnd + 1, styleRange.foreground,
-                     styleRange.background, attr.getStyle()));
-               // Transfer to Array for use in MergeStyle
-               final StyleRange[] highlightedRanges = new StyleRange[styles
-                     .size()];
-               for (int i = 0; i < styles.size(); i++) {
-                  highlightedRanges[i] = styles.get(i);
+               catch (final ParserException e) {
+                  // Invalid JML Code, no advanced SyntaxColoring possible
+                  // System.out.println(e.getMessage());
                }
-               presentation.mergeStyleRanges(highlightedRanges);
-            }
-            catch (final ParserException e) {
-               // Invalid JML Code, no advanced SyntaxColoring possible
-               System.out.println(e.getMessage());
             }
          }
       }
