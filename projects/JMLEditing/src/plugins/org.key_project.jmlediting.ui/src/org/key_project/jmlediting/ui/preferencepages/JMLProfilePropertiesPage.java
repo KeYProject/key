@@ -136,6 +136,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
          final TableItem item = new TableItem(this.profilesList, 0);
          item.setText(new String[] { profile.getName() });
       }
+      this.updateSelection();
 
       // Make sure that only one profile is available at a single time
       this.profilesList.addListener(SWT.Selection, new Listener() {
@@ -226,14 +227,11 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
     */
    private void updateSelection() {
       IJMLProfile currentProfile = null;
-      System.out.println("Project " + this.isProjectPreferencePage()
-            + " Settings: " + this.useProjectSettings());
       if ((this.isProjectPreferencePage() && this.useProjectSettings())) {
          // Read local project properties if we are in a properties pane and
          // project specific settings are enabled
          currentProfile = JMLPreferencesHelper.getProjectJMLProfile(this
                .getProject());
-         System.out.println("Project profile: " + currentProfile);
       }
       // Read from global preferences if no project specific profile is set
       if (currentProfile == null) {
@@ -247,22 +245,20 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
          }
 
       }
-      System.out.println("Final profile: " + currentProfile);
-
+      assert currentProfile != null;
       // Select profile in the list
       for (final TableItem item : this.profilesList.getItems()) {
          item.setChecked(false);
       }
-      if (currentProfile != null) {
-         final int index = this.allProfiles.indexOf(currentProfile);
-         if (index != -1) {
-            this.profilesList.getItem(index).setChecked(true);
-         }
-         else {
-            this.setErrorMessage("Profile \"" + currentProfile.getName()
-                  + "\" is not available.");
-         }
+      final int index = this.allProfiles.indexOf(currentProfile);
+      if (index != -1) {
+         this.profilesList.getItem(index).setChecked(true);
       }
+      else {
+         this.setErrorMessage("Profile \"" + currentProfile.getName()
+               + "\" is not available.");
+      }
+
       // Redraw the list because selection is otherwise not always cleared
       this.profilesList.redraw();
    }
