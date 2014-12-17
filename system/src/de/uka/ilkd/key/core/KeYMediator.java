@@ -107,7 +107,7 @@ public class KeYMediator {
     /**
      * An optional used {@link AutoSaver}.
      */
-    private AutoSaver autoSaver;
+    private AutoSaver autoSaver = AutoSaver.getDefaultInstance();
 
     
     /**
@@ -128,9 +128,6 @@ public class KeYMediator {
      */
     public KeYMediator(UserInterface ui) {
 	this.ui             = ui;
-	
-	// TODO: changing auto save options in the GUI requires a restart
-	this.autoSaver = AutoSaver.getDefaultInstance();
 
 	notationInfo        = new NotationInfo();
 	proofListener       = new KeYMediatorProofListener();
@@ -236,6 +233,10 @@ public class KeYMediator {
 
     public void setMinimizeInteraction(boolean b) {
        minimizeInteraction = b;
+    }
+    
+    public void setAutoSave(int interval) {
+        autoSaver = interval>0 ? new AutoSaver(interval, true): null;
     }
 
     public boolean ensureProofLoaded() {
