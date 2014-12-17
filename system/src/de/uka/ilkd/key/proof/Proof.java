@@ -534,7 +534,7 @@ public class Proof implements Named {
     private ImmutableList<Goal> filterEnabledGoals(ImmutableList<Goal> goals) {
         ImmutableList<Goal> enabledGoals = ImmutableSLList.<Goal>nil();
         for(Goal g : goals) {
-            if(g.isAutomatic()) {
+            if(g.isAutomatic() && !g.isLinked()) {
                 enabledGoals = enabledGoals.prepend(g);
             }
         }
