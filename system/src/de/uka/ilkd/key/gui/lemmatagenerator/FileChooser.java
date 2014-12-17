@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
-import java.awt.Component;
+import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -43,7 +44,10 @@ import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 
 
-
+/**
+ * @author Benjamin Niedermann
+ * @author M. Ulbrich (revisions)
+ */
 public class FileChooser extends JPanel{
         private static final long serialVersionUID = 1L;
         private static final String HELP_TEXT = 
@@ -72,6 +76,13 @@ public class FileChooser extends JPanel{
         		                                    "In case that the taclets that you want to load are unsound,\n"+
         		                                    "the calculus will become unsound!";
         
+    public enum Mode {
+        /** only prove taclets but do not add them to current proof */
+        PROOF,
+
+        /** load taclets into current proof environment but allow also their proof */
+        LOAD
+    };
         
         private class SingleFileChooser extends Box{
                 private static final long serialVersionUID = 1L;
@@ -80,16 +91,15 @@ public class FileChooser extends JPanel{
                 private JTextField fileField;
                 private String title;
                 
-                
-                
                 public SingleFileChooser(String title, JCheckBox checkbox) {
            
                         super(BoxLayout.Y_AXIS);
                         this.title = title;
                         Box box = Box.createHorizontalBox();
                      
+            if(title != null) {
                         this.setBorder(BorderFactory.createTitledBorder(title));
-                        
+            }
                       
                         box.add(getFileField());
                         box.add(Box.createHorizontalStrut(5));
@@ -154,14 +164,12 @@ public class FileChooser extends JPanel{
         private JButton    removeAxiomFileButton;
         private JButton    helpButton;
         private SingleFileChooser lemmataFileChooser;
-        private SingleFileChooser definitionFileChooser;
         private JPanel     axiomFilePanel;
         private JPanel     buttonPanel;
         private JScrollPane scrollPane;
         private KeYFileChooser fileChooser;
         private JDialog     helpWindow;
 
-        private JDialog        dialog;
         private JButton okayButton;
         private JButton cancelButton;
         
@@ -171,24 +179,38 @@ public class FileChooser extends JPanel{
         private final DefaultListModel listModel = new DefaultListModel();
         private static final Dimension MAX_DIM = new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE);
         private boolean firstTimeAddingAxioms = true;      
-        public FileChooser(){
-             this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+    private final Mode mode;
+    private JDialog dialog;
+    private JPanel justificationPanel;
+    private JPanel cardPanel;
+    public FileChooser(Mode mode){
+
+        this.mode = mode;
              
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
              
-             JLabel label = new JLabel("Please choose the files that should be browsed for..."); 
-             label.setAlignmentX(Component.LEFT_ALIGNMENT);
-             setMaximumWidth(label, Integer.MAX_VALUE);
+        this.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
             
-             this.add(Box.createVerticalStrut(15));
-             this.add(label);
+        //             JLabel label = new JLabel("Please choose the files that should be browsed for...");
+        //             label.setAlignmentX(Component.LEFT_ALIGNMENT);
+        //             setMaximumWidth(label, Integer.MAX_VALUE);
+        //
+        //             this.add(Box.createVerticalStrut(15));
+        //             this.add(label);
              this.add(Box.createVerticalStrut(15));
              this.add(getLemmataFileChooser());
-  
-             this.add(Box.createVerticalStrut(5));
-             this.add(getDefinitionFileChooser());
-             this.add(Box.createVerticalStrut(5));
+        this.add(Box.createVerticalStrut(10));
+        switch(mode) {
+        case LOAD:
+            // with a checkbox and the background to choose.
+            this.add(getJustificationBox());
+            break;
+        case PROOF:
              this.add(getAxiomFilePanel());
+            break;
+        }
              this.add(Box.createVerticalGlue());
+        this.add(Box.createVerticalStrut(5));
         }
         
         public List<File> getFilesForAxioms(){
@@ -202,17 +224,13 @@ public class FileChooser extends JPanel{
                 return files;
         }
         
-        public File getFileForLemmata(){
+    public File getFileForTaclets() {
                 return lemmataFileChooser.getChosenFile();
-        }
-        
-        public File getFileForDefinitions(){
-                return definitionFileChooser.getChosenFile();
         }
         
         private JCheckBox getLemmaCheckBox(){
                 if(lemmaCheckbox == null){
-                        lemmaCheckbox = new JCheckBox("Load taclets as lemmata.");
+            lemmaCheckbox = new JCheckBox("Generate proof obligations for taclets");
                         lemmaCheckbox.setSelected(true);
                         lemmaCheckbox.addActionListener(new ActionListener() {
                                 
@@ -249,6 +267,9 @@ public class FileChooser extends JPanel{
                 getAddAxiomFileButton().setEnabled(val);
                 getRemoveAxiomFileButton().setEnabled(val);
                 getAxiomsList().setEnabled(val);
+
+        CardLayout cl = (CardLayout) getCardPanel().getLayout();
+        cl.show(getCardPanel(), Boolean.toString(val));
         }
         
         private void changedToSelected(){
@@ -298,7 +319,7 @@ public class FileChooser extends JPanel{
         
         private JDialog getHelpWindow(){
               if(helpWindow == null){
-                      helpWindow = dialog != null ?new JDialog(dialog) : new JDialog();
+            helpWindow = dialog != null ? new JDialog(dialog) : new JDialog();
                       
                       JTextArea textArea = new JTextArea(HELP_TEXT);
                       textArea.setWrapStyleWord(true);
@@ -335,16 +356,11 @@ public class FileChooser extends JPanel{
 
         private SingleFileChooser getLemmataFileChooser(){
                 if(lemmataFileChooser == null){
-                        lemmataFileChooser = new SingleFileChooser("User-Defined Taclets",getLemmaCheckBox()){
+            lemmataFileChooser = new SingleFileChooser("File with user-defined taclets", null){
                                 private static final long serialVersionUID = 1L;
                                 protected void fileHasBeenChosen(File file) {
                                         if(okayButton != null){
                                                 okayButton.setEnabled(true);
-                                        }
-                                        if(getDefinitionFileChooser().getChosenFile() == null ||
-                                           getDefinitionFileChooser().getChosenFile() == 
-                                           getLemmataFileChooser().getChosenFile()){
-                                                getDefinitionFileChooser().setChosenFile(file);
                                         }
                                 }
                         };
@@ -353,13 +369,6 @@ public class FileChooser extends JPanel{
                return lemmataFileChooser;
         }
         
-        private SingleFileChooser getDefinitionFileChooser(){
-                if(definitionFileChooser == null){
-                        definitionFileChooser = new SingleFileChooser("Signature",null);
-                }
-               return definitionFileChooser;
-        }
-
         private JButton getAddAxiomFileButton() {
                 if(addAxiomFileButton == null){
                     addAxiomFileButton = new JButton("add"); 
@@ -420,11 +429,51 @@ public class FileChooser extends JPanel{
                         axiomFilePanel.add(getScrollPane());
                         axiomFilePanel.add(Box.createHorizontalStrut(5));
                         axiomFilePanel.add(getButtonPanel());
-                        axiomFilePanel.setBorder(BorderFactory.createTitledBorder("Axioms"));
+            axiomFilePanel.setBorder(BorderFactory.createTitledBorder("Files with declarations and axioms"));
                 }
                 return axiomFilePanel;
         }
         
+    private JPanel getJustificationBox() {
+        if(justificationPanel == null) {
+            justificationPanel = new JPanel();
+            justificationPanel.setLayout(new BoxLayout(justificationPanel, BoxLayout.Y_AXIS));
+            justificationPanel.setBorder(BorderFactory.createTitledBorder("Prove taclets"));
+
+            Box box = Box.createHorizontalBox();
+            box.add(getLemmaCheckBox());
+            box.add(Box.createHorizontalGlue());
+            justificationPanel.add(box);
+            justificationPanel.add(Box.createVerticalStrut(10));
+
+            justificationPanel.add(getCardPanel());
+        }
+        return justificationPanel;
+    }
+
+    private JPanel getCardPanel() {
+        if(cardPanel == null) {
+            cardPanel = new JPanel(new CardLayout());
+            cardPanel.add(getAxiomFilePanel(), "true");
+
+            JPanel warning = new JPanel();
+            warning.setLayout(new BoxLayout(warning, BoxLayout.Y_AXIS));
+            warning.add(Box.createVerticalStrut(10));
+            warning.add(redLabel("Warning!"));
+            warning.add(Box.createVerticalStrut(10));
+            warning.add(redLabel("Loading of unproved taclets may jeopardise"));
+            warning.add(redLabel("the correctness of your own proofs."));
+            cardPanel.add(warning, "false");
+        }
+        return cardPanel;
+    }
+
+    private JLabel redLabel(String label) {
+        JLabel w = new JLabel(label);
+        w.setForeground(Color.red);
+        return w;
+    }
+
         private JPanel getButtonPanel(){
                 if(buttonPanel == null){
                         buttonPanel = new JPanel();
@@ -455,7 +504,14 @@ public class FileChooser extends JPanel{
         private JDialog getDialog(){
                 if(dialog == null){
                         dialog = new JDialog();
-                        dialog.setTitle("Files for Loading User-Defined Taclets...");
+            switch(mode) {
+            case LOAD:
+                dialog.setTitle("Load user-defined taclets into proof");
+                break;
+            case PROOF:
+                dialog.setTitle("Prove user-defined taclets");
+                break;
+            }
                         dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
                         Container pane = dialog.getContentPane();
                 
@@ -471,6 +527,7 @@ public class FileChooser extends JPanel{
                         buttonPane.add(Box.createHorizontalStrut(10));
                         buttonPane.add(getCancelButton());
                         buttonPane.add(Box.createHorizontalStrut(5));
+            buttonPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
                         pane.add(buttonPane);
                         dialog.setLocationByPlatform(true);
                         dialog.pack();
@@ -521,11 +578,14 @@ public class FileChooser extends JPanel{
         }
         
         public static void main(String [] args){
-                FileChooser chooser = new FileChooser();
+        FileChooser chooser = new FileChooser(Mode.LOAD);
+        chooser.showAsDialog();
+
+        chooser = new FileChooser(Mode.PROOF);
                 chooser.showAsDialog();
         }
         
-        public boolean isLoadingAsLemmata(){
+    public boolean isGenerateProofObligations(){
                 return this.getLemmaCheckBox().isSelected();
         }
         

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
    <state name="One Step Simplification resulting in {}">
-      <value name="k" programVariable="k" isArrayIndex="false" value="k" type="int"/>
-      <value name="NextLevel::m" programVariable="NextLevel::m" isArrayIndex="false" value="int::select(heap,null,NextLevel::$m)" type="int"/>
-      <association name="self" programVariable="self" isArrayIndex="false" target="o1"/>
-      <association name="StaticMember::r" programVariable="StaticMember::r" isArrayIndex="false" target="o2"/>
+      <value name="k {true}" programVariable="k" isArrayIndex="false" value="k" type="int" condition="true"/>
+      <value name="NextLevel::m {true}" programVariable="NextLevel::m" isArrayIndex="false" value="int::select(heap,null,NextLevel::$m)" type="int" condition="true"/>
+      <association name="self {true}" programVariable="self" isArrayIndex="false" target="o1" condition="true"/>
+      <association name="StaticMember::r {true}" programVariable="StaticMember::r" isArrayIndex="false" target="o2" condition="true"/>
    </state>
    <object xml:id="o1" name="self" type="StaticMember">
-      <value name="h" programVariable="h" isArrayIndex="false" value="int::select(heap,self,StaticMember::$h)" type="int"/>
+      <value name="h {true}" programVariable="h" isArrayIndex="false" value="int::select(heap,self,StaticMember::$h)" type="int" condition="true"/>
    </object>
    <object xml:id="o2" name="Refer::select(heap,null,StaticMember::$r)" type="Refer">
-      <value name="x" programVariable="x" isArrayIndex="false" value="int::select(heap,Refer::select(heap,null,StaticMember::$r),Refer::$x)" type="int"/>
-      <association name="nl" programVariable="nl" isArrayIndex="false" target="o3"/>
+      <value name="x {true}" programVariable="x" isArrayIndex="false" value="int::select(heap,Refer::select(heap,null,StaticMember::$r),Refer::$x)" type="int" condition="true"/>
+      <association name="nl {true}" programVariable="nl" isArrayIndex="false" target="o3" condition="true"/>
    </object>
    <object xml:id="o3" name="NextLevel::select(heap,Refer::select(heap,null,StaticMember::$r),Refer::$nl)" type="NextLevel">
    </object>

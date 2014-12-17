@@ -229,6 +229,7 @@ public class RewriteTaclet extends FindTaclet {
 
     /**
      * Compute polarity
+     * @see AntecSuccPrefixChecker seems to reimplement this.
      */
     private int polarity(final Operator op, final PIOPathIterator it, int polarity) {
                                                                 // toggle polarity if find term is
