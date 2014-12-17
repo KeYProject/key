@@ -185,14 +185,26 @@ public class JoinPartnerSelectionDialog extends JDialog {
       
       // Lower container: OK / Cancel
       JButton okButton = new JButton("OK");
+      JButton chooseAllButton = new JButton("Choose All");
       JButton cancelButton = new JButton("Cancel");
       
       okButton.setAlignmentX(CENTER_ALIGNMENT);
+      chooseAllButton.setAlignmentX(CENTER_ALIGNMENT);
       cancelButton.setAlignmentX(CENTER_ALIGNMENT);
       
       okButton.addActionListener(new ActionListener() {
          @Override
          public void actionPerformed(ActionEvent e) {
+            setVisible(false);
+         }
+      });
+      
+      chooseAllButton.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent e) {
+            for (Pair<Goal, PosInOccurrence> candidate : candidates) {
+               chosen.add(candidate);
+            }
             setVisible(false);
          }
       });
@@ -210,6 +222,8 @@ public class JoinPartnerSelectionDialog extends JDialog {
       lowerContainer.add(Box.createHorizontalGlue());
       lowerContainer.add(okButton);
       Dimension fillerDim = new Dimension(30, 40);
+      lowerContainer.add(new Box.Filler(fillerDim, fillerDim, fillerDim));
+      lowerContainer.add(chooseAllButton);
       lowerContainer.add(new Box.Filler(fillerDim, fillerDim, fillerDim));
       lowerContainer.add(cancelButton);
       lowerContainer.add(Box.createHorizontalGlue());
