@@ -56,7 +56,7 @@ import org.key_project.util.java.ObjectUtil;
 
 /**
  * Provides static methods
- * 
+ *
  * @author Martin Hentschel
  */
 @SuppressWarnings("restriction")
@@ -75,16 +75,17 @@ public final class WorkbenchUtil {
    /**
     * Opens the perspective with the given ID in the active
     * {@link IWorkbenchPage}.
-    * 
+    *
     * @param perspectiveId
     *           The ID of the perspective to open.
     * @return The opened {@link IPerspectiveDescriptor} or {@code null} if no
     *         {@link IWorkbenchPage} is active.
     */
-   public static IPerspectiveDescriptor openPerspective(String perspectiveId) {
-      IWorkbenchPage page = getActivePage();
+   public static IPerspectiveDescriptor openPerspective(
+         final String perspectiveId) {
+      final IWorkbenchPage page = getActivePage();
       if (page != null) {
-         IPerspectiveDescriptor perspective = PlatformUI.getWorkbench()
+         final IPerspectiveDescriptor perspective = PlatformUI.getWorkbench()
                .getPerspectiveRegistry().findPerspectiveWithId(perspectiveId);
          page.setPerspective(perspective);
          return perspective;
@@ -97,7 +98,7 @@ public final class WorkbenchUtil {
    /**
     * Closes the given {@link IPerspectiveDescriptor} in the active
     * {@link IWorkbenchPage}.
-    * 
+    *
     * @param perspectiveToClose
     *           The {@link IPerspectiveDescriptor} to close.
     * @param saveParts
@@ -106,10 +107,10 @@ public final class WorkbenchUtil {
     *           Close the {@link IWorkbenchPage}?
     */
    public static void closePerspective(
-         IPerspectiveDescriptor perspectiveToClose, boolean saveParts,
-         boolean closePage) {
+         final IPerspectiveDescriptor perspectiveToClose,
+         final boolean saveParts, final boolean closePage) {
       if (perspectiveToClose != null) {
-         IWorkbenchPage page = getActivePage();
+         final IWorkbenchPage page = getActivePage();
          if (page != null) {
             page.closePerspective(perspectiveToClose, saveParts, closePage);
          }
@@ -118,12 +119,12 @@ public final class WorkbenchUtil {
 
    /**
     * Returns the active {@link IWorkbenchWindow} if available.
-    * 
+    *
     * @return The active {@link IWorkbenchWindow} or {@code null} if no one is
     *         available.
     */
    public static IWorkbenchWindow getActiveWorkbenchWindow() {
-      IWorkbench workbench = PlatformUI.getWorkbench();
+      final IWorkbench workbench = PlatformUI.getWorkbench();
       if (workbench != null) {
          return workbench.getActiveWorkbenchWindow();
       }
@@ -134,12 +135,12 @@ public final class WorkbenchUtil {
 
    /**
     * Returns the active {@link IWorkbenchPage} if available.
-    * 
+    *
     * @return The active {@link IWorkbenchPage} or {@code null} if no one is
     *         available.
     */
    public static IWorkbenchPage getActivePage() {
-      IWorkbenchWindow window = getActiveWorkbenchWindow();
+      final IWorkbenchWindow window = getActiveWorkbenchWindow();
       if (window != null) {
          return window.getActivePage();
       }
@@ -150,12 +151,12 @@ public final class WorkbenchUtil {
 
    /**
     * Returns the active {@link IWorkbenchPart} if available.
-    * 
+    *
     * @return The active {@link IWorkbenchPart} or {@code null} if no one is
     *         available.
     */
    public static IWorkbenchPart getActivePart() {
-      IWorkbenchPage page = getActivePage();
+      final IWorkbenchPage page = getActivePage();
       if (page != null) {
          return page.getActivePart();
       }
@@ -166,12 +167,12 @@ public final class WorkbenchUtil {
 
    /**
     * Returns the active {@link IEditorPart} if available.
-    * 
+    *
     * @return The active {@link IEditorPart} or {@code null} if no one is
     *         available.
     */
    public static IEditorPart getActiveEditor() {
-      IWorkbenchPage page = getActivePage();
+      final IWorkbenchPage page = getActivePage();
       if (page != null) {
          return page.getActiveEditor();
       }
@@ -182,11 +183,11 @@ public final class WorkbenchUtil {
 
    /**
     * Returns the active {@link Shell} if available.
-    * 
+    *
     * @return The active {@link Shell} or {@code null} if no one is available.
     */
    public static Shell getActiveShell() {
-      IWorkbenchWindow window = getActiveWorkbenchWindow();
+      final IWorkbenchWindow window = getActiveWorkbenchWindow();
       if (window != null) {
          return window.getShell();
       }
@@ -197,14 +198,14 @@ public final class WorkbenchUtil {
 
    /**
     * Selects and reveals the given {@link IResource}.
-    * 
+    *
     * @param resource
     *           The {@link IResource} to show.
     */
-   public static void selectAndReveal(IResource resource) {
-      IWorkbench workbench = PlatformUI.getWorkbench();
+   public static void selectAndReveal(final IResource resource) {
+      final IWorkbench workbench = PlatformUI.getWorkbench();
       if (workbench != null) {
-         IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+         final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
          if (window != null) {
             BasicNewFolderResourceWizard.selectAndReveal(resource, window);
          }
@@ -213,20 +214,22 @@ public final class WorkbenchUtil {
 
    /**
     * Opens an eclipse editor for the given {@link IFile}.
-    * 
+    *
     * @param file
     *           The {@link IFile} to open.
     * @return The opened eclipse editor.
     * @throws PartInitException
     *            Occurred Exception.
     */
-   public static IEditorPart openEditor(IFile file) throws PartInitException {
+   public static IEditorPart openEditor(final IFile file)
+         throws PartInitException {
       if (file != null) {
-         IWorkbench workbench = PlatformUI.getWorkbench();
+         final IWorkbench workbench = PlatformUI.getWorkbench();
          if (workbench != null) {
-            IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+            final IWorkbenchWindow window = workbench
+                  .getActiveWorkbenchWindow();
             if (window != null) {
-               IWorkbenchPage page = window.getActivePage();
+               final IWorkbenchPage page = window.getActivePage();
                if (page != null) {
                   return IDE.openEditor(page, file);
                }
@@ -251,7 +254,7 @@ public final class WorkbenchUtil {
 
    /**
     * Closes the given eclipse editor.
-    * 
+    *
     * @param editor
     *           The editor to close.
     * @param save
@@ -259,12 +262,13 @@ public final class WorkbenchUtil {
     * @return {@code true} if the editor was successfully closed, and
     *         {@code false} if the editor is still open.
     */
-   public static boolean closeEditor(IEditorPart editor, boolean save) {
+   public static boolean closeEditor(final IEditorPart editor,
+         final boolean save) {
       if (editor != null && editor.getSite().getPage().isPartVisible(editor)) {
          boolean closed = false;
-         IEditorSite site = editor.getEditorSite();
+         final IEditorSite site = editor.getEditorSite();
          if (site != null) {
-            IWorkbenchPage page = site.getPage();
+            final IWorkbenchPage page = site.getPage();
             if (page != null) {
                closed = page.closeEditor(editor, save);
             }
@@ -280,7 +284,7 @@ public final class WorkbenchUtil {
     * Shows the view identified by the given view id in this page and gives it
     * focus. If there is a view identified by the given view id (and with no
     * secondary id) already open in this page, it is given focus.
-    * 
+    *
     * @param viewId
     *           The ID of the view to open.
     * @return The opened or reactivated {@link IViewPart} that has now the
@@ -288,8 +292,9 @@ public final class WorkbenchUtil {
     * @throws PartInitException
     *            Occurred Exception.
     */
-   public static IViewPart openView(String viewId) throws PartInitException {
-      IWorkbenchPage page = getActivePage();
+   public static IViewPart openView(final String viewId)
+         throws PartInitException {
+      final IWorkbenchPage page = getActivePage();
       if (page != null) {
          return page.showView(viewId);
       }
@@ -300,23 +305,23 @@ public final class WorkbenchUtil {
 
    /**
     * Checks if the given {@link IWorkbenchPart} is active.
-    * 
+    *
     * @param part
     *           The {@link IWorkbenchPart} to check.
     * @return {@code true} is active, {@code false} is not active.
     */
-   public static boolean isActive(IWorkbenchPart part) {
+   public static boolean isActive(final IWorkbenchPart part) {
       return part != null && part.getSite().getPage().getActivePart() == part;
    }
 
    /**
     * Activates the given part. The part will be brought to the front and given
     * focus. The part must belong to this page.
-    * 
+    *
     * @param part
     *           Activates the given {@link IWorkbenchPart}.
     */
-   public static void activate(IWorkbenchPart part) {
+   public static void activate(final IWorkbenchPart part) {
       if (part != null) {
          part.getSite().getPage().activate(part);
       }
@@ -324,11 +329,11 @@ public final class WorkbenchUtil {
 
    /**
     * Closes the given {@link IViewPart}.
-    * 
+    *
     * @param part
     *           The {@link IViewPart} to close.
     */
-   public static void closeView(IViewPart view) {
+   public static void closeView(final IViewPart view) {
       if (view != null) {
          view.getSite().getPage().hideView(view);
       }
@@ -337,19 +342,19 @@ public final class WorkbenchUtil {
    /**
     * Searches an {@link IViewPart} with the given ID in the active
     * {@link IWorkbenchPage}.
-    * 
+    *
     * @param viewId
     *           The view ID to search.
     * @return The found {@link IViewPart} or {@code null} if no one was found.
     */
-   public static IViewPart findView(String viewId) {
-      IWorkbenchPage page = getActivePage();
+   public static IViewPart findView(final String viewId) {
+      final IWorkbenchPage page = getActivePage();
       return page != null ? page.findView(viewId) : null;
    }
 
    /**
     * Opens a select folder dialog.
-    * 
+    *
     * @param parent
     *           The parent {@link Shell}.
     * @param title
@@ -365,13 +370,13 @@ public final class WorkbenchUtil {
     * @return The selected {@link IContainer}s or {@code null} if the dialog was
     *         canceled.
     */
-   public static IContainer[] openFolderSelection(Shell parent, String title,
-         String message, boolean allowMultipleSelection,
-         Object[] initialSelection,
-         Collection<? extends ViewerFilter> viewerFilters) {
-      ILabelProvider labelProvider = new WorkbenchLabelProvider();
-      ITreeContentProvider contentProvider = new WorkbenchContentProvider();
-      FolderSelectionDialog dialog = new FolderSelectionDialog(parent,
+   public static IContainer[] openFolderSelection(final Shell parent,
+         final String title, final String message,
+         final boolean allowMultipleSelection, final Object[] initialSelection,
+         final Collection<? extends ViewerFilter> viewerFilters) {
+      final ILabelProvider labelProvider = new WorkbenchLabelProvider();
+      final ITreeContentProvider contentProvider = new WorkbenchContentProvider();
+      final FolderSelectionDialog dialog = new FolderSelectionDialog(parent,
             labelProvider, contentProvider);
       dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
       dialog.setTitle(title);
@@ -380,20 +385,20 @@ public final class WorkbenchUtil {
       if (initialSelection != null) {
          dialog.setInitialSelections(initialSelection);
       }
-      ViewerFilter projectAndFolderFilter = new TypedViewerFilter(new Class[] {
-            IProject.class, IFolder.class });
+      final ViewerFilter projectAndFolderFilter = new TypedViewerFilter(
+            new Class[] { IProject.class, IFolder.class });
       dialog.addFilter(projectAndFolderFilter);
       if (viewerFilters != null) {
-         for (ViewerFilter filter : viewerFilters) {
+         for (final ViewerFilter filter : viewerFilters) {
             dialog.addFilter(filter);
          }
       }
       dialog.setComparator(new ResourceComparator(ResourceComparator.NAME));
       if (dialog.open() == FolderSelectionDialog.OK) {
-         Object[] result = dialog.getResult();
-         List<IContainer> containerResult = new ArrayList<IContainer>(
+         final Object[] result = dialog.getResult();
+         final List<IContainer> containerResult = new ArrayList<IContainer>(
                result.length);
-         for (Object obj : result) {
+         for (final Object obj : result) {
             if (obj instanceof IContainer) {
                containerResult.add((IContainer) obj);
             }
@@ -407,7 +412,7 @@ public final class WorkbenchUtil {
 
    /**
     * Opens a select file dialog.
-    * 
+    *
     * @param parent
     *           The parent {@link Shell}.
     * @param title
@@ -423,13 +428,13 @@ public final class WorkbenchUtil {
     * @return The selected {@link IContainer}s or {@code null} if the dialog was
     *         canceled.
     */
-   public static IFile[] openFileSelection(Shell parent, String title,
-         String message, boolean allowMultipleSelection,
-         Object[] initialSelection,
-         Collection<? extends ViewerFilter> viewerFilters) {
-      ILabelProvider labelProvider = new WorkbenchLabelProvider();
-      ITreeContentProvider contentProvider = new WorkbenchContentProvider();
-      ElementTreeSelectionDialog dialog = new FilteredElementTreeSelectionDialog(
+   public static IFile[] openFileSelection(final Shell parent,
+         final String title, final String message,
+         final boolean allowMultipleSelection, final Object[] initialSelection,
+         final Collection<? extends ViewerFilter> viewerFilters) {
+      final ILabelProvider labelProvider = new WorkbenchLabelProvider();
+      final ITreeContentProvider contentProvider = new WorkbenchContentProvider();
+      final ElementTreeSelectionDialog dialog = new FilteredElementTreeSelectionDialog(
             parent, labelProvider, contentProvider);
       dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
       dialog.setTitle(title);
@@ -439,7 +444,7 @@ public final class WorkbenchUtil {
          dialog.setInitialSelections(initialSelection);
       }
       if (viewerFilters != null) {
-         for (ViewerFilter filter : viewerFilters) {
+         for (final ViewerFilter filter : viewerFilters) {
             dialog.addFilter(filter);
          }
       }
@@ -447,9 +452,9 @@ public final class WorkbenchUtil {
       dialog.setValidator(new FileSelectionValidator(false,
             allowMultipleSelection));
       if (dialog.open() == FolderSelectionDialog.OK) {
-         Object[] result = dialog.getResult();
-         List<IFile> containerResult = new ArrayList<IFile>(result.length);
-         for (Object obj : result) {
+         final Object[] result = dialog.getResult();
+         final List<IFile> containerResult = new ArrayList<IFile>(result.length);
+         for (final Object obj : result) {
             if (obj instanceof IFile) {
                containerResult.add((IFile) obj);
             }
@@ -463,14 +468,14 @@ public final class WorkbenchUtil {
 
    /**
     * Returns the name of the perspective with the given ID.
-    * 
+    *
     * @param perspectiveId
     *           The ID of the perspective.
     * @return The name of the perspective or {@code null} if no perspective is
     *         available with the given ID.
     */
-   public static String getPerspectiveName(String perspectiveId) {
-      IPerspectiveDescriptor perspective = PlatformUI.getWorkbench()
+   public static String getPerspectiveName(final String perspectiveId) {
+      final IPerspectiveDescriptor perspective = PlatformUI.getWorkbench()
             .getPerspectiveRegistry().findPerspectiveWithId(perspectiveId);
       return perspective != null ? perspective.getLabel() : null;
    }
@@ -478,7 +483,7 @@ public final class WorkbenchUtil {
    /**
     * Checks if a perspective with the given ID is currently opened in the given
     * {@link IWorkbenchPage}.
-    * 
+    *
     * @param perspectiveId
     *           The perspective ID to check.
     * @param page
@@ -487,10 +492,10 @@ public final class WorkbenchUtil {
     *         {@link IWorkbenchPage}, {@code false} perspective is not opened in
     *         the given {@link IWorkbenchPage}.
     */
-   public static boolean isPerspectiveOpen(String perspectiveId,
-         IWorkbenchPage page) {
+   public static boolean isPerspectiveOpen(final String perspectiveId,
+         final IWorkbenchPage page) {
       if (page != null) {
-         IPerspectiveDescriptor pd = page.getPerspective();
+         final IPerspectiveDescriptor pd = page.getPerspective();
          if (pd != null) {
             return ObjectUtil.equals(perspectiveId, page.getPerspective()
                   .getId());
@@ -506,7 +511,7 @@ public final class WorkbenchUtil {
 
    /**
     * Re-Evaluates all specified {@code PropertyTester}.
-    * 
+    *
     * @param properties
     *           The properties to re-evaluate.
     */
@@ -515,12 +520,12 @@ public final class WorkbenchUtil {
          Display.getDefault().syncExec(new Runnable() {
             @Override
             public void run() {
-               IWorkbenchWindow window = getActiveWorkbenchWindow();
+               final IWorkbenchWindow window = getActiveWorkbenchWindow();
                if (window != null) {
-                  IEvaluationService service = (IEvaluationService) window
+                  final IEvaluationService service = (IEvaluationService) window
                         .getService(IEvaluationService.class);
                   if (service != null) {
-                     for (String property : properties) {
+                     for (final String property : properties) {
                         service.requestEvaluation(property);
                      }
                   }
@@ -537,9 +542,9 @@ public final class WorkbenchUtil {
       Display.getDefault().syncExec(new Runnable() {
          @Override
          public void run() {
-            IWorkbenchWindow[] windows = PlatformUI.getWorkbench()
+            final IWorkbenchWindow[] windows = PlatformUI.getWorkbench()
                   .getWorkbenchWindows();
-            for (IWorkbenchWindow window : windows) {
+            for (final IWorkbenchWindow window : windows) {
                if (window instanceof WorkbenchWindow) {
                   ((WorkbenchWindow) window).updateActionBars();
                   ((WorkbenchWindow) window).updateActionSets();
@@ -551,7 +556,7 @@ public final class WorkbenchUtil {
 
    /**
     * Searches the {@link IWorkbenchWindow} for the given {@link Shell}.
-    * 
+    *
     * @param shell
     *           The {@link Shell} for which the {@link IWorkbenchWindow} is
     *           requested.
@@ -559,11 +564,11 @@ public final class WorkbenchUtil {
     *         {@code null} if not available.
     */
    public static IWorkbenchWindow findWorkbenchWindow(final Shell shell) {
-      IWorkbenchWindow[] windows = PlatformUI.getWorkbench()
+      final IWorkbenchWindow[] windows = PlatformUI.getWorkbench()
             .getWorkbenchWindows();
       return ArrayUtil.search(windows, new IFilter<IWorkbenchWindow>() {
          @Override
-         public boolean select(IWorkbenchWindow element) {
+         public boolean select(final IWorkbenchWindow element) {
             return element.getShell() == shell;
          }
       });
@@ -571,16 +576,19 @@ public final class WorkbenchUtil {
 
    /**
     * Gets the current active {@link IProject} for a given {@link IEditorPart}
-    * 
+    *
     * @return IProject the current active {@link IProject}
+    * @deprecated use {@link #getProject(IEditorPart)} instead, which is more
+    *             stable to return the correct project
     */
+   @Deprecated
    public static IProject getCurrentProject() {
       return getProject(getActiveEditor());
    }
 
    /**
     * Gets the current active {@link IProject} for a given {@link IEditorPart}
-    * 
+    *
     * @param editorPart
     *           The {@link IEditorPart} for which the {@link IProject} is
     *           requested.

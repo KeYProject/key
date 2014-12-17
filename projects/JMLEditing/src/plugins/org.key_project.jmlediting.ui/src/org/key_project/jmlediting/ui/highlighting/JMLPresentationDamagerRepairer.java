@@ -18,6 +18,7 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IEditorPart;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IKeywordNode;
 import org.key_project.jmlediting.core.dom.Nodes;
@@ -52,16 +53,24 @@ IPresentationRepairer {
    private IDocument doc;
 
    /**
+    * The EditorPart, where this object is used for.
+    */
+   private final IEditorPart editorPart;
+
+   /**
     * Constructor for JML PresentationDamagerRepairer that stores the
     * wrappedInstance.
     *
     * @param wrappedInstance
     *           the
+    * @param part
+    *           the {@link IEditorPart} this object is used for
     */
    public JMLPresentationDamagerRepairer(
-         final DefaultDamagerRepairer wrappedInstance) {
+         final DefaultDamagerRepairer wrappedInstance, final IEditorPart part) {
       super();
       this.wrappedInstance = wrappedInstance;
+      this.editorPart = part;
    }
 
    /**
@@ -161,7 +170,7 @@ IPresentationRepairer {
             if (locator.isInJMLcomment(offset)) {
                final IJMLProfile activeProfile = JMLPreferencesHelper
                      .getProjectActiveJMLProfile(WorkbenchUtil
-                           .getCurrentProject());
+                           .getProject(this.editorPart));
                final IJMLParser parser = activeProfile.createParser();
                try {
                   final IASTNode parseResult = parser.parse(this.doc.get(),
@@ -192,7 +201,7 @@ IPresentationRepairer {
                         styleRange.background, attr.getStyle()));
                   // Transfer to Array for use in MergeStyle
                   final StyleRange[] highlightedRanges = new StyleRange[styles
-                                                                        .size()];
+                        .size()];
                   for (int i = 0; i < styles.size(); i++) {
                      highlightedRanges[i] = styles.get(i);
                   }

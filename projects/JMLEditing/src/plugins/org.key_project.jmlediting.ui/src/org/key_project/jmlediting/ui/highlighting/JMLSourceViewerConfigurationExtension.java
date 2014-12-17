@@ -28,7 +28,6 @@ public class JMLSourceViewerConfigurationExtension extends
          final IPreferenceStore preferenceStore, final ITextEditor editor,
          final String partitioning) {
       super.init(colorManager, preferenceStore, editor, partitioning);
-
    }
 
    /**
@@ -39,7 +38,7 @@ public class JMLSourceViewerConfigurationExtension extends
 
    /**
     * A Method for instantiating the listener.
-    * 
+    *
     * @param viewer
     *           the sourceViewer this Configuration works on
     */
@@ -84,13 +83,13 @@ public class JMLSourceViewerConfigurationExtension extends
       DefaultDamagerRepairer dr = (DefaultDamagerRepairer) reconciler
             .getDamager(IJavaPartitions.JAVA_MULTI_LINE_COMMENT);
       JMLPresentationDamagerRepairer newDR = new JMLPresentationDamagerRepairer(
-            dr);
+            dr, this.getEditor());
       reconciler.setDamager(newDR, IJavaPartitions.JAVA_MULTI_LINE_COMMENT);
       reconciler.setRepairer(newDR, IJavaPartitions.JAVA_MULTI_LINE_COMMENT);
       // Replace DefaultDamagerRepairer in currentResult to support JML
       dr = (DefaultDamagerRepairer) reconciler
             .getDamager(IJavaPartitions.JAVA_SINGLE_LINE_COMMENT);
-      newDR = new JMLPresentationDamagerRepairer(dr);
+      newDR = new JMLPresentationDamagerRepairer(dr, this.getEditor());
       reconciler.setDamager(newDR, IJavaPartitions.JAVA_SINGLE_LINE_COMMENT);
       reconciler.setRepairer(newDR, IJavaPartitions.JAVA_SINGLE_LINE_COMMENT);
       return currentResult;
