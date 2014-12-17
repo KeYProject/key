@@ -93,6 +93,12 @@ public class TGInfoDialog extends JDialog implements TestGenerationLog {
 	}
 
    @Override
+   public void writeException(Throwable t) {
+      t.printStackTrace();
+      textArea.append("Error: " + t.getMessage());
+   }
+
+   @Override
    public void testGenerationCompleted() {
       exitButton.setEnabled(true);
    }

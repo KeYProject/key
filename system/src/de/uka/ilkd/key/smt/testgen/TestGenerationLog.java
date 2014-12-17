@@ -5,5 +5,7 @@ public interface TestGenerationLog {
 
    public void write(String string);
    
+   public void writeException(Throwable t);
+   
    public void testGenerationCompleted();
 }

@@ -306,21 +306,26 @@ public abstract class AbstractTestGenerator {
    }
 
    protected void handleLauncherStopped(SolverLauncher launcher, Collection<SMTSolver> problemSolvers, TestGenerationLog log) {
-      log.writeln("Finished solving SMT problems: " + problemSolvers.size());
-      final TestCaseGenerator tg = new TestCaseGenerator(originalProof);
-      tg.setLogger(log);
-      problemSolvers = filterSolverResultsAndShowSolverStatistics(problemSolvers, log);
-      if (problemSolvers.size() > 0) {
-         tg.generateJUnitTestSuite(problemSolvers);
-         if (tg.isJunit()) {
-            log.writeln("Test oracle not yet implemented for JUnit.");
+      try {
+         log.writeln("Finished solving SMT problems: " + problemSolvers.size());
+         final TestCaseGenerator tg = new TestCaseGenerator(originalProof);
+         tg.setLogger(log);
+         problemSolvers = filterSolverResultsAndShowSolverStatistics(problemSolvers, log);
+         if (problemSolvers.size() > 0) {
+            tg.generateJUnitTestSuite(problemSolvers);
+            if (tg.isJunit()) {
+               log.writeln("Test oracle not yet implemented for JUnit.");
+            } else {
+               log.writeln("Compile and run the file with openjml!");
+            }
          } else {
-            log.writeln("Compile and run the file with openjml!");
+            log.writeln("No test data was generated.");
          }
-      } else {
-         log.writeln("No test data was generated.");
+         log.testGenerationCompleted();
       }
-      log.testGenerationCompleted();
+      catch (Exception e) {
+         log.writeException(e);
+      }
    }
 
    public Collection<SMTSolver> filterSolverResultsAndShowSolverStatistics(Collection<SMTSolver> problemSolvers, TestGenerationLog log) {

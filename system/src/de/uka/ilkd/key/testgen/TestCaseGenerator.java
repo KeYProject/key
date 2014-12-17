@@ -58,7 +58,6 @@ public class TestCaseGenerator {
 	
 	public static final String TAB = "   ";
 	private Services services;
-	private Proof proof;
 	static int fileCounter = 0;
 	boolean junitFormat;
 	private static final String DONT_COPY = "aux"; // Classes of the Java
@@ -154,7 +153,6 @@ public class TestCaseGenerator {
 		super();
 		final TestGenerationSettings settings = ProofIndependentSettings.DEFAULT_INSTANCE
 		        .getTestGenerationSettings();
-		this.proof = proof;
 		services = proof.getServices();
 		junitFormat = settings.useJunit();
 		useRFL = settings.useRFL();
@@ -170,35 +168,23 @@ public class TestCaseGenerator {
 		oracleGenerator  =new OracleGenerator(services,rflCreator, useRFL);
 		if(junitFormat){
 			//System.out.println("Translating oracle");
-			try{
-				oracleMethods = new LinkedList<OracleMethod>();
-				oracleMethodCall = getOracleAssertion(oracleMethods);
-				
-			}catch(Exception e){
-				e.printStackTrace();
-			}
+         oracleMethods = new LinkedList<OracleMethod>();
+         oracleMethodCall = getOracleAssertion(oracleMethods);
 		}
 	}
 	
 	
 	
-	private Set<ObjectVal> getPrestateObjects(Model m){
+	private Set<ObjectVal> getPrestateObjects(Model m){ // TODO: Remove unused method or use it
 		
 		Set<ObjectVal> result  =new HashSet<ObjectVal>();
 		
 		Set<String> refs = oracleGenerator.getPrestateTerms();
-		try{
-			for(String ref : refs){
-				result.addAll(m.getNecessaryPrestateObjects(ref));
-			}
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		
+      for(String ref : refs){
+         result.addAll(m.getNecessaryPrestateObjects(ref));
+      }
 		
 		return result;
-		
-		
 	}
 	
 	
@@ -420,7 +406,7 @@ public class TestCaseGenerator {
 		}
 	}
 
-	protected void createDummyClasses() {
+	protected void createDummyClasses() throws IOException {
 		for (final Sort s : sortDummyClass.keySet()) {
 			final StringBuffer sb = sortDummyClass.get(s);
 			final String file = getDummyClassNameFor(s) + ".java";
@@ -430,12 +416,13 @@ public class TestCaseGenerator {
 	
     /** Creates the RFL.java file, that provides setter and getter methods using the reflection API
      *  as well as object creation functions based on the objenesis library.
+    * @throws IOException 
      */
-	protected void createRFLFile(){
+	protected void createRFLFile() throws IOException{
 		writeToFile(ReflectionClassCreator.NAME_OF_CLASS + ".java", rflCreator.createClass());
 	}
 
-	protected void createOpenJMLShellScript() {
+	protected void createOpenJMLShellScript() throws IOException {
 		StringBuffer sb = new StringBuffer();
 		String filestr = "compileWithOpenJML.sh";
 		File file = new File(directory + modDir + File.separator + filestr);
@@ -452,13 +439,9 @@ public class TestCaseGenerator {
 		}
 	}
 
-	protected void exportCodeUnderTest() {
-		try {
-			// Copy the involved classes without modification
-			copyFiles(modDir, directory + modDir);
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
+	protected void exportCodeUnderTest() throws IOException {
+      // Copy the involved classes without modification
+      copyFiles(modDir, directory + modDir);
 	}
 
 	private boolean filterVal(String s) {
@@ -470,7 +453,7 @@ public class TestCaseGenerator {
 		}
 	}
 
-	public String generateJUnitTestCase(Model m) {
+	public String generateJUnitTestCase(Model m) throws IOException { // TODO: Method is never used, remove
 		fileName = "TestGeneric" + TestCaseGenerator.fileCounter;
 		String mut = getMUTCall();
 		if (mut == null) {
@@ -525,7 +508,7 @@ public class TestCaseGenerator {
 	private Term getPostCondition() {
 		return info.getPostCondition();
 	}
-	public String generateJUnitTestSuite(Collection<SMTSolver> problemSolvers) {
+	public String generateJUnitTestSuite(Collection<SMTSolver> problemSolvers) throws IOException {
 		
 		fileName = "TestGeneric" + TestCaseGenerator.fileCounter;
 		String mut = getMUTCall(); 
@@ -707,7 +690,6 @@ public class TestCaseGenerator {
 				} else {
 					if(useRFL){
 						right = "RFL.new"+ReflectionClassCreator.cleanTypeName(type)+"()";
-						Sort oSort = o.getSort();
 						rflCreator.addSort(type);
 						//rflCreator.addSort(oSort!=null?oSort.name().toString():"Object");
 						//System.out.println("Adding sort (create Object):"+ (oSort!=null?oSort.name().toString():"Object"));
@@ -1031,27 +1013,26 @@ public class TestCaseGenerator {
 		return val;
 	}
 
-	public void writeToFile(String file, StringBuffer sb) {
-		try {
-			final File dir = new File(directory + modDir);
-			if (!dir.exists()) {
-				dir.mkdirs();
-			}
-			final File pcFile = new File(dir, file);
-			System.out.println("Writing file:"+pcFile.toString());
-			final FileWriter fw = new FileWriter(pcFile);
-			final BufferedWriter bw = new BufferedWriter(fw);
-			bw.write(sb.toString());
-			bw.close();
-			// create a temporary file
-			// File logFile=new File("TestGeneric"+fileCounter+".java");
-			// BufferedWriter writer = new BufferedWriter(new
-			// FileWriter(logFile));
-			// writer.write (sb.toString());
-			// Close writer
-			// writer.close();
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
+	public void writeToFile(String file, StringBuffer sb) throws IOException {
+      final File dir = new File(directory + modDir);
+      if (!dir.exists()) {
+         dir.mkdirs();
+      }
+      final File pcFile = new File(dir, file);
+      System.out.println("Writing file:"+pcFile.toString());
+      final BufferedWriter bw = new BufferedWriter(new FileWriter(pcFile));
+      try  {
+         bw.write(sb.toString());
+      }
+      finally {
+         bw.close();
+      }
+      // create a temporary file
+      // File logFile=new File("TestGeneric"+fileCounter+".java");
+      // BufferedWriter writer = new BufferedWriter(new
+      // FileWriter(logFile));
+      // writer.write (sb.toString());
+      // Close writer
+      // writer.close();
 	}
 }
