@@ -12,8 +12,7 @@ public class StrictlyNothingKeyword extends AbstractEmptyKeyword implements
 
    @Override
    public String getDescription() {
-      // TODO Auto-generated method stub
-      return null;
+      return "Specifies that a method cannot assign to any locations.<br> <b> The strictly_nothing disallows the creation of new objects additionally.<br>";
    }
 
 }

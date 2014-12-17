@@ -10,8 +10,7 @@ public class StrictlyPureKeyword extends AbstractEmptyKeyword {
 
    @Override
    public String getDescription() {
-      // TODO Auto-generated method stub
-      return null;
+      return "In general terms, a pure feature is one that has no side effects when executed. In essence pure only applies to methods and constructors. The use of pure for a type declaration is shorthand for applying that modifier to all constructors and instance methods in the type. <br> <b>The strictly_pure keyword also disallows to create new objects.</b>";
    }
 
 }
