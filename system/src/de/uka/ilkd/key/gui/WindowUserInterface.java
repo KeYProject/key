@@ -325,7 +325,7 @@ public class WindowUserInterface extends AbstractUserInterface {
        final KeYFileChooser jFC = KeYFileChooser.getFileChooser("Choose filename to save proof");
 
        Pair<File, String> f = fileName(proof, fileExtension);
-       final boolean saved = jFC.showSaveDialog(mainWindow, f.second);
+       final boolean saved = jFC.showSaveDialog(mainWindow, f.first, f.second);
        File file = null;
        if (saved) {
            file = jFC.getSelectedFile();

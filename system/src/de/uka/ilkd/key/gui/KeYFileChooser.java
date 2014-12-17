@@ -18,11 +18,25 @@ import java.io.File;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
 import de.uka.ilkd.key.core.Main;
 
 
 public class KeYFileChooser {
     
+    private static final FileFilter FILTER = new FileFilter() {
+        public boolean accept(File f) {
+            return 
+                            f.isDirectory()
+                            || f.toString().endsWith(".java")
+                            || f.toString().endsWith(".key") 
+                            || f.toString().endsWith(".proof");
+        }
+
+        public String getDescription() {
+            return "Java files, KeY files and Source Directories";
+        }
+    };
     private static KeYFileChooser INSTANCE;
 
     private final JFileChooser fileChooser;
@@ -35,9 +49,6 @@ public class KeYFileChooser {
 
     private KeYFileChooser(String initDir) {
         fileChooser = new JFileChooser(new File(initDir)) {
-            /**
-             * 
-             */
             private static final long serialVersionUID = -7598570660247063980L;
 
             public void approveSelection() {
@@ -49,19 +60,7 @@ public class KeYFileChooser {
                 super.approveSelection();
             }
         };
-        fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
-            public boolean accept(File f) {
-                return 
-                                f.isDirectory()
-                                || f.toString().endsWith(".java")
-                                || f.toString().endsWith(".key") 
-                                || f.toString().endsWith(".proof");
-            }
-
-            public String getDescription() {
-                return "Java files, KeY files and Source Directories";
-            }
-        });
+        fileChooser.setFileFilter(FILTER);
     }
 
     public void prepare() {
@@ -87,20 +86,42 @@ public class KeYFileChooser {
                         ? JFileChooser.FILES_ONLY 
                                         : JFileChooser.FILES_AND_DIRECTORIES);        
     }
+    
+    public boolean showSaveDialog(Component parent) {
+        return showSaveDialog(parent, null, null);
+    }
 
-    public boolean showSaveDialog(Component parent, String defaultName) {
-        File file = fileChooser.getSelectedFile();
-        final String recDir = file != null ?
-                        file.getParent() : fileChooser.getCurrentDirectory().toString();
-                        resetFile = (defaultName != null) ? new File(recDir, defaultName): file;
-                        fileChooser.setSelectedFile(resetFile);
-                        setSaveDialog(true);
-                        final String poDir =
-                                        resetFile.getParent().endsWith("src") ?
-                                                        new File(resetFile.getParent()).getParent() : resetFile.getParent();
-                                                        final String proofDir = resetFile.getParent();
-                                                        file = new File(defaultName.endsWith(".key") ? poDir : proofDir, resetFile.getName());
-                                                        return showSaveDialog(parent, file);
+    /**
+     * Show a file dialog for saving a file.
+     * The dialog will provide a naming suggestion.
+     * @param parent the main window
+     * @param originalFile the original file to be saved, if it exists and is a proof, this will be the suggestion
+     * @param extension the desired file name extension (usually ".proof")
+     * @return
+     */
+    public boolean showSaveDialog(Component parent, File originalFile, String extension) {
+        final String recDir = originalFile != null ?
+                        originalFile.getParent() : fileChooser.getCurrentDirectory().toString();
+        resetFile = (extension != null) ? new File(recDir, extension): originalFile;
+        fileChooser.setSelectedFile(resetFile);
+        setSaveDialog(true);
+        final String poDir = resetFile.getParent().endsWith("src") ?
+                             new File(resetFile.getParent()).getParent() : resetFile.getParent();
+        final String proofDir = resetFile.getParent();
+        originalFile = new File(extension.endsWith(".key") ? poDir : proofDir, resetFile.getName());
+        return showSaveDialog(parent, originalFile);
+    }
+
+
+    private boolean showSaveDialog(Component parent, File selectedFile) {
+        if (selectedFile != null) {
+            fileChooser.setSelectedFile(selectedFile);
+            fileChooser.updateUI(); // Might prevent empty filename suggestion?
+        }
+
+        setSaveDialog(true);
+        int result = fileChooser.showSaveDialog(parent);
+        return (result == JFileChooser.APPROVE_OPTION);
     }
 
     public void resetPath() {
@@ -113,18 +134,6 @@ public class KeYFileChooser {
     public File getCurrentDirectory() {
         return fileChooser.getCurrentDirectory();
     }
-
-    public boolean showSaveDialog(Component parent, File selectedFile) {
-        if (selectedFile != null) {
-            fileChooser.setSelectedFile(selectedFile);
-            fileChooser.updateUI(); // Might prevent empty filename suggestion?
-        }
-
-        setSaveDialog(true);
-        int result = fileChooser.showSaveDialog(parent);
-        return (result == JFileChooser.APPROVE_OPTION);
-    }
-
     public boolean showOpenDialog(Component component) {
         setSaveDialog(false);
 
