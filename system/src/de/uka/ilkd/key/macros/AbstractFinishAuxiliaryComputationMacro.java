@@ -44,6 +44,12 @@ abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractProofMacr
         return "Finish auxiliary computation.";
     }
     
+    /**
+     * Try to save a side proof.
+     * Saving does not rely on UI features, but failures are reported to the UI.
+     * @param proof
+     * @param mediator
+     */
     protected void saveSideProof(Proof proof, KeYMediator mediator) {
         String proofName = proof.name().toString();
         if (proofName.endsWith(".key")) {

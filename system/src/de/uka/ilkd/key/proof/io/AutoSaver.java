@@ -15,9 +15,12 @@ package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.EventObject;
 
 import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.core.TaskFinishedInfo;
+import de.uka.ilkd.key.gui.configuration.GeneralSettings;
+import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.Debug;
 
@@ -43,6 +46,19 @@ public class AutoSaver implements ProverTaskListener {
     private static int defaultSaveInterval = 0;
     private static boolean defaultSaveClosedProof = false;
     
+    private static AutoSaver DEFAULT_INSTANCE = null;
+    
+    public final static SettingsListener settingsListener =
+                    new SettingsListener(){
+
+                        @Override
+                        public void settingsChanged(EventObject e) {
+                            assert e.getSource() instanceof GeneralSettings;
+                            GeneralSettings settings = (GeneralSettings) e.getSource();
+                            setDefaultValues(settings.autoSavePeriod(), settings.autoSavePeriod()>0);
+                        }
+    };
+    
     /**
      * Set default values.
      * @param saveInterval the interval (= number of proof steps) to periodically save
@@ -51,6 +67,8 @@ public class AutoSaver implements ProverTaskListener {
     public static void setDefaultValues ( int saveInterval, boolean saveClosedProof ) {
        defaultSaveInterval = saveInterval;
        defaultSaveClosedProof = saveClosedProof;
+       if (defaultSaveInterval > 0)
+           DEFAULT_INSTANCE = new AutoSaver();
     }
     
     /**
@@ -59,8 +77,7 @@ public class AutoSaver implements ProverTaskListener {
      * The default values can be set through <code>AutoSaver.setDefaultValues()</code>
      */
     public static AutoSaver getDefaultInstance() {
-        return defaultSaveInterval > 0 || defaultSaveClosedProof?
-                        new AutoSaver(): null;
+        return DEFAULT_INSTANCE;
     }
 
     private AutoSaver () {

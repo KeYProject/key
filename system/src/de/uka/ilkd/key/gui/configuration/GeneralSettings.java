@@ -16,13 +16,9 @@ package de.uka.ilkd.key.gui.configuration;
 import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.Properties;
+import de.uka.ilkd.key.proof.io.AutoSaver;
 
 
-
-/** This class encapsulates the information about the active
- * Heuristics and the maximum amount of heuristics steps before an
- * interactive step is required.
- */
 public class GeneralSettings implements Settings, Cloneable {
 
 
@@ -33,6 +29,7 @@ public class GeneralSettings implements Settings, Cloneable {
         = "[General]OneStepSimplification";
     private static final String USE_JML_KEY = "[General]UseJML";
     private static final String RIGHT_CLICK_MACROS_KEY = "[General]RightClickMacros";
+    private static final String AUTO_SAVE = "[General]AutoSavePeriod";
     
     /** if true then JML specifications are globally disabled 
      * in this run of KeY, regardless of the regular settings 
@@ -53,9 +50,18 @@ public class GeneralSettings implements Settings, Cloneable {
 
     /** JML is active by default */
     private boolean useJML = true;
+    
+    /** auto save is disabled by default.
+     * Positive values indicate save period.
+     */
+    private int autoSave = 0;
 
     private LinkedList<SettingsListener> listenerList = 
         new LinkedList<SettingsListener>();
+    
+    GeneralSettings() {
+        addSettingsListener(AutoSaver.settingsListener);
+    }
 
     // getter
     public boolean tacletFilter() {
@@ -77,6 +83,10 @@ public class GeneralSettings implements Settings, Cloneable {
 
     public boolean useJML() {
         return useJML && !disableSpecs;
+    }
+    
+    public int autoSavePeriod() {
+        return autoSave;
     }
     
 
@@ -119,6 +129,11 @@ public class GeneralSettings implements Settings, Cloneable {
           fireSettingsChanged();
         }
     }
+    
+    public void setAutoSave(int period) {
+        autoSave = period;
+        fireSettingsChanged();
+    }
 
 
 
@@ -151,6 +166,16 @@ public class GeneralSettings implements Settings, Cloneable {
         if (val != null) {
             useJML = Boolean.valueOf(val).booleanValue();
         }
+        
+        val = props.getProperty(AUTO_SAVE);
+        if (val != null) {
+            try {
+                autoSave = Integer.parseInt(val);
+                if (autoSave < 0) autoSave = 0;
+            } catch (NumberFormatException e) {
+                autoSave = 0;
+            }
+        }
     }
 
 
@@ -165,6 +190,7 @@ public class GeneralSettings implements Settings, Cloneable {
         props.setProperty(ONE_STEP_SIMPLIFICATION_KEY, "" + oneStepSimplification);
         props.setProperty(RIGHT_CLICK_MACROS_KEY, "" + rightClickMacros);
         props.setProperty(USE_JML_KEY, "" + useJML);
+        props.setProperty(AUTO_SAVE, ""+ autoSave);
     }
 
     /** sends the message that the state of this setting has been

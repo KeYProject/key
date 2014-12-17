@@ -6,26 +6,23 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 
 public class AutoSave extends MainWindowAction {
-    // TODO replace with real autosave functionality
-
-    /**
-     * 
-     */
+    
     private static final long serialVersionUID = -2598146925208531491L;
+    private static final int DEFAULT_PERIOD = 2000;
 
     public AutoSave(MainWindow mainWindow) {
         super(mainWindow);
-        setTooltip("If ticked, proofs are saved automatically (without save dialog pop up), " +
-                   "when they are being left or closed. Be aware that already existing proofs " +
-                    "with the same name will be recklessly overwritten!");
+        setTooltip("Proofs will be automatically saved to +" + System.getProperty("java.io.tmpdir") +
+        		"periodically and when finished." +
+        		" (Requires Restart)");
         setName("Auto Save Proofs");
-//        setSelected(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave());
+        setSelected(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSavePeriod() > 0);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        boolean sel = isSelected();
-//        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSave(sel);
+        int p = isSelected()? DEFAULT_PERIOD: 0;
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setAutoSave(p);
     }
 
 }

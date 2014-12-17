@@ -128,6 +128,8 @@ public class KeYMediator {
      */
     public KeYMediator(UserInterface ui) {
 	this.ui             = ui;
+	
+	// TODO: changing auto save options in the GUI requires a restart
 	this.autoSaver = AutoSaver.getDefaultInstance();
 
 	notationInfo        = new NotationInfo();
