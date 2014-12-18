@@ -18,7 +18,7 @@ public class ReadWrite {
     /*@ public normal_behavior
           requires \dl_readPermission(\permission(this.val));
           ensures \result == this.val;
-          assignable \nothing;
+          assignable \strictly_nothing;
           assignable<permissions> \strictly_nothing;
       @*/
     private /*@ helper @*/ int read() {
@@ -52,7 +52,7 @@ public class ReadWrite {
           requires !\dl_readPermission(\permission(this.rds));
           ensures !\dl_readPermission(\permission(this.rds));
           assignable<permissions> this.rds, this.val, this.lockedRds;
-          assignable<heap> this.rds, this.lockedRds; @*/
+          assignable<heap> this.rds, this.val, this.lockedRds; @*/
     public /*@ helper @*/ int doRead() {
         lock(); rds++; unlock(); // read lock
         int r = read();
@@ -69,8 +69,7 @@ public class ReadWrite {
           ensures rds >= 0;
           ensures rds == 0 ==>
             \dl_writePermissionObject(this, \old(\permission(this.val)));
-          ensures rds > 0 ==>
-            \dl_readPermissionObject(this, \old(\permission(this.val)));
+          ensures \dl_readPermissionObject(this, \old(\permission(this.val)));
           ensures \permission(this.rds) ==
             \dl_transferPermission(\dl_FALSE(), this, \dl_currentThread(), 0,
               \old(\permission(this.rds)));
@@ -101,7 +100,7 @@ public class ReadWrite {
             \permission(this.val) == \dl_transferPermission(\dl_TRUE(), this, \dl_currentThread(), 0,
               \dl_returnPermission(\dl_currentThread(), this, \old(\permission(this.val))));
           assignable<permissions> this.rds, this.lockedRds, this.val;
-          assignable<heap> this.rds; @*/
+          assignable<heap> this.rds, this.lockedRds, this.val; @*/
     public native void unlock();
 
     private int rds;
