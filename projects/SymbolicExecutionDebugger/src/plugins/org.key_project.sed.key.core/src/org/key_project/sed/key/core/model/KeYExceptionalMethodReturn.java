@@ -458,6 +458,7 @@ public class KeYExceptionalMethodReturn extends AbstractSEDExceptionalMethodRetu
             SEDMemoryBranchCondition[] completedBlockConditions = KeYModelUtil.createCompletedBlocksConditions(this);
             if (returnCondition != null) {
                groupStartConditions = ArrayUtil.insert(completedBlockConditions, returnCondition, 0);
+               KeYModelUtil.sortyByOccurrence(this, groupStartConditions); // Sort conditions to ensure order of occurrence // TODO: To increase performance use binary insertion instead of sorting
             }
             else {
                groupStartConditions = completedBlockConditions;

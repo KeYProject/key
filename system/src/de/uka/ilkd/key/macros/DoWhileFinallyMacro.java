@@ -6,6 +6,7 @@ import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 
 /**
  * The abstract class DoWhileFinallyMacro can be used to create compound macros
@@ -49,7 +50,8 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+    public ProofMacroFinishedInfo applyTo(Proof proof,
+                                          KeYMediator mediator,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {

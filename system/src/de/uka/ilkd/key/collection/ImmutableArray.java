@@ -171,6 +171,19 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 	    throw new UnsupportedOperationException("Illegal modification access on unmodifiable array.");
 	}
     }
-
-   
+    
+    /**
+     * Convert an {@link ImmutableArray} to an {@link ImmutableList}.
+     *
+     * @return This element converted to an {@link ImmutableList}.
+     */
+    public ImmutableList<S> toImmutableList() {
+        ImmutableList<S> ret = ImmutableSLList.<S>nil();
+        Iterator it = iterator();
+        while (it.hasNext()) {
+            ret = ret.prepend((S) it.next());
+        }
+        return ret.reverse();
+    }
+    
 }

@@ -172,6 +172,8 @@ public class DesignTests extends TestCase {
                     allClasses[i].getPackage().getName().contains("key.rule") ||
                     allClasses[i].getPackage().getName().contains("key.logic")  ||
                     allClasses[i].getPackage().getName().contains("key.proof") ||
+                    allClasses[i].getPackage().getName().contains("de.uka.ilkd.key.smt.counterexample") ||
+                    allClasses[i].getPackage().getName().contains("de.uka.ilkd.key.smt.testgen") ||
                     allClasses[i].getPackage().getName().contains("key.java") ||   
                     allClasses[i].getPackage().getName().contains("key.strategy")   
                     ) {

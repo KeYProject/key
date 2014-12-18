@@ -5,23 +5,23 @@
       <term term="InstanceCreationTest::select(heap,self,InstanceCreationTest::$next)"/>
    </equivalenceClass>
    <state name="{}">
-      <association name="self" programVariable="self" isArrayIndex="false" target="o1"/>
-      <association name="InstanceCreationTest::classWrapper" programVariable="InstanceCreationTest::classWrapper" isArrayIndex="false" target="o5"/>
+      <association name="self {true}" programVariable="self" isArrayIndex="false" target="o1" condition="true"/>
+      <association name="InstanceCreationTest::classWrapper {true}" programVariable="InstanceCreationTest::classWrapper" isArrayIndex="false" target="o5" condition="true"/>
    </state>
    <object xml:id="o1" name="self" type="InstanceCreationTest">
-      <association name="next" programVariable="next" isArrayIndex="false" target="o1"/>
-      <association name="instanceWrapper" programVariable="instanceWrapper" isArrayIndex="false" target="o3"/>
+      <association name="next {true}" programVariable="next" isArrayIndex="false" target="o1" condition="true"/>
+      <association name="instanceWrapper {true}" programVariable="instanceWrapper" isArrayIndex="false" target="o3" condition="true"/>
    </object>
    <object xml:id="o2" name="i_17" type="InstanceCreationTestWrapper">
-      <value name="value" programVariable="value" isArrayIndex="false" value="Z(4(#))" type="int"/>
+      <value name="value {true}" programVariable="value" isArrayIndex="false" value="Z(4(#))" type="int" condition="true"/>
    </object>
    <object xml:id="o3" name="i_14" type="InstanceCreationTestWrapper">
-      <value name="value" programVariable="value" isArrayIndex="false" value="Z(3(#))" type="int"/>
+      <value name="value {true}" programVariable="value" isArrayIndex="false" value="Z(3(#))" type="int" condition="true"/>
    </object>
    <object xml:id="o4" name="i_7" type="InstanceCreationTestWrapper">
-      <value name="value" programVariable="value" isArrayIndex="false" value="Z(2(#))" type="int"/>
+      <value name="value {true}" programVariable="value" isArrayIndex="false" value="Z(2(#))" type="int" condition="true"/>
    </object>
    <object xml:id="o5" name="i_2" type="InstanceCreationTestWrapper">
-      <value name="value" programVariable="value" isArrayIndex="false" value="Z(1(#))" type="int"/>
+      <value name="value {true}" programVariable="value" isArrayIndex="false" value="Z(1(#))" type="int" condition="true"/>
    </object>
 </model>

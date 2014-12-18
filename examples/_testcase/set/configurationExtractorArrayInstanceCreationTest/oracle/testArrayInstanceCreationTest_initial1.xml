@@ -5,9 +5,9 @@
       <term term="ArrayInstanceCreationTest::select(heap,self,ArrayInstanceCreationTest::$next)"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in return localArray[0]+localArray[1];">
-      <association name="self" programVariable="self" isArrayIndex="false" target="o1"/>
+      <association name="self {true}" programVariable="self" isArrayIndex="false" target="o1" condition="true"/>
    </state>
    <object xml:id="o1" name="self" type="ArrayInstanceCreationTest">
-      <association name="next" programVariable="next" isArrayIndex="false" target="o1"/>
+      <association name="next {true}" programVariable="next" isArrayIndex="false" target="o1" condition="true"/>
    </object>
 </model>

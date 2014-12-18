@@ -260,7 +260,6 @@ public final class ExampleChooser extends JDialog {
 	exampleList = new JTree();
 	exampleList.setModel(model);
 	exampleList.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-	exampleList.setRootVisible(false);
 	exampleList.addTreeSelectionListener(
 	        new TreeSelectionListener() {
 	            @Override

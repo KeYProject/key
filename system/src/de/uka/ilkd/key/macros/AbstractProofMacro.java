@@ -41,7 +41,7 @@ public abstract class AbstractProofMacro implements ProofMacro {
      * A value of -1 means no changes.
      */
     private int numberSteps = -1;
-
+    
     private static ImmutableList<Goal> getGoals(Node node) {
         if (node == null) {
             // can happen during initialisation
@@ -86,6 +86,13 @@ public abstract class AbstractProofMacro implements ProofMacro {
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws InterruptedException {
         return applyTo(mediator, getGoals(node), posInOcc, listener);
+    }
+    
+    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+                                          ImmutableList<Goal> goals,
+                                          PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) throws InterruptedException {
+       return applyTo(!goals.isEmpty() ? goals.head().proof() : mediator.getInteractiveProver().getProof(), mediator, goals, posInOcc, listener);
     }
 
     @Override

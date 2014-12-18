@@ -1,20 +1,24 @@
 package de.uka.ilkd.key.macros;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.*;
-import de.uka.ilkd.key.strategy.feature.InfFlowContractAppFeature;
+import de.uka.ilkd.key.strategy.NumberRuleAppCost;
+import de.uka.ilkd.key.strategy.RuleAppCost;
+import de.uka.ilkd.key.strategy.RuleAppCostCollector;
+import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.feature.FocusIsSubFormulaOfInfFlowContractAppFeature;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import de.uka.ilkd.key.strategy.feature.InfFlowContractAppFeature;
 
 
 /**
@@ -72,7 +76,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
     @Override
     protected UseInformationFlowContractMacro.PropExpansionStrategy createStrategy(
-            KeYMediator mediator,
+            Proof proof,
             PosInOccurrence posInOcc) {
         return new UseInformationFlowContractMacro.PropExpansionStrategy(getAdmittedRuleNames());
     }

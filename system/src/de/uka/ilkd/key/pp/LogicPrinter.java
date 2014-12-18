@@ -24,6 +24,7 @@ import java.util.StringTokenizer;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -1231,9 +1232,24 @@ public class LogicPrinter {
                     ? HeapLDT.getClassName((Function)t.op()) + "."
                     : "";
             fieldName += HeapLDT.getPrettyFieldName(t.op());
-            layouter.print(fieldName);
 
             if(obs.getNumParams() > 0 || obs instanceof IProgramMethod) {
+                JavaInfo javaInfo = services.getJavaInfo();
+                if (t.arity() > 1) {
+                    // in case arity > 1 we assume fieldName refers to a query (method call)
+                    Term object = t.sub(1);
+                    KeYJavaType keYJavaType = javaInfo.getKeYJavaType(object.sort());
+                    if (obs.isStatic()
+                            || javaInfo.isCanonicalProgramMethod((IProgramMethod) obs, keYJavaType)) {
+                        layouter.print(fieldName);
+                    } else {
+                        layouter.print("(" + t.op() + ")");
+                    }
+                } else {
+                    // in case arity == 1 we assume fieldName refers to an array
+                    layouter.print(fieldName);
+                }
+
                 layouter.print("(").beginC(0);
                 int startIndex = totalHeaps + (obs.isStatic() ? 0 : 1);
                 for (int i = startIndex; i < obs.arity(); i++) {
@@ -1245,6 +1261,8 @@ public class LogicPrinter {
                     markEndSub();
                 }
                 layouter.print(")").end();
+            } else {
+                layouter.print(fieldName);
             }
 
             // must the heap be printed at all: no, if default heap.

@@ -3,8 +3,6 @@ package de.uka.ilkd.key.gui.testgen;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.util.Collection;
-import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -18,17 +16,10 @@ import javax.swing.text.DefaultCaret;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SMTSolver;
-import de.uka.ilkd.key.smt.SMTSolverResult;
-import de.uka.ilkd.key.smt.SolverLauncher;
-import de.uka.ilkd.key.smt.SolverLauncherListener;
-import de.uka.ilkd.key.smt.SolverType;
-import de.uka.ilkd.key.smt.model.Model;
-import de.uka.ilkd.key.testgen.TestCaseGenerator;
+import de.uka.ilkd.key.smt.testgen.TestGenerationLog;
 
 @SuppressWarnings("serial")
-public class TGInfoDialog extends JDialog implements SolverLauncherListener {
+public class TGInfoDialog extends JDialog implements TestGenerationLog {
 	private final JTextArea textArea;
 	private final JButton stopButton;
 	private final JButton exitButton;
@@ -91,83 +82,24 @@ public class TGInfoDialog extends JDialog implements SolverLauncherListener {
 		setVisible(true);
 	}
 
-	public Collection<SMTSolver> filterSolverResultsAndShowSolverStatistics(
-	        Collection<SMTSolver> problemSolvers) {
-		int unknown = 0;
-		int infeasiblePaths = 0;
-		int solvedPaths = 0;
-		int problem = 0;
-		final Vector<SMTSolver> output = new Vector<SMTSolver>();
-		for (final SMTSolver solver : problemSolvers) {
-			try {
-				final SMTSolverResult.ThreeValuedTruth res = solver
-				        .getFinalResult().isValid();
-				if (res == SMTSolverResult.ThreeValuedTruth.UNKNOWN) {
-					unknown++;
-				} else if (res == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE) {
-					solvedPaths++;
-					if (solver.getSocket().getQuery() != null) {
-						final Model m = solver.getSocket().getQuery()
-						        .getModel();
-						if (TestCaseGenerator.modelIsOK(m)) {
-							output.add(solver);
-						} else {
-							problem++;
-						}
-					} else {
-						problem++;
-					}
-				} else if (res == SMTSolverResult.ThreeValuedTruth.VALID) {
-					infeasiblePaths++;
-				}
-			} catch (final Exception ex) {
-				writeln(ex.getMessage());
-			}
-		}
-		writeln("--- SMT Solver Results ---\n" + " solved pathconditions:"
-		        + solvedPaths + "\n" + " invalid pre-/pathconditions:"
-		        + infeasiblePaths + "\n" + " unknown:" + unknown);
-		if (problem > 0) {
-			writeln(" problems             :" + problem);
-		}
-		if (unknown > 0) {
-			writeln(" Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers and restart key.\n Make sure you use Z3 version 4.3.1.");
-		}
-		writeln("----------------------");
-		return output;
-	}
-
-	@Override
-	public void launcherStarted(Collection<SMTProblem> problems,
-	        Collection<SolverType> solverTypes, SolverLauncher launcher) {
-		writeln("Test data generation: solving SMT problems... \n please wait...");
-	}
-
-	@Override
-	public void launcherStopped(SolverLauncher launcher,
-	        Collection<SMTSolver> problemSolvers) {
-		writeln("Finished solving SMT problems: " + problemSolvers.size());
-		final TestCaseGenerator tg = new TestCaseGenerator(worker.getOriginalProof());
-		tg.setLogger(this);
-		problemSolvers = filterSolverResultsAndShowSolverStatistics(problemSolvers);
-		if (problemSolvers.size() > 0) {
-			tg.generateJUnitTestSuite(problemSolvers);
-			if (tg.isJunit()) {
-				writeln("Test oracle not yet implemented for JUnit.");
-			} else {
-				writeln("Compile and run the file with openjml!");
-			}
-		} else {
-			writeln("No test data was generated.");
-		}
-		exitButton.setEnabled(true);
-	}
-
+   @Override
 	public void write(String t) {
 		textArea.append(t);
 	}
 
+   @Override
 	public void writeln(String line) {
 		textArea.append(line + "\n");
 	}
+
+   @Override
+   public void writeException(Throwable t) {
+      t.printStackTrace();
+      textArea.append("Error: " + t.getMessage());
+   }
+
+   @Override
+   public void testGenerationCompleted() {
+      exitButton.setEnabled(true);
+   }
 }

@@ -278,6 +278,7 @@ public final class NotationInfo {
 	tbl.put(setLDT.getSetMinus(), new Notation.Infix("\\setMinus", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
 	tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation());
         tbl.put(setLDT.getSubset(), new Notation.Infix("\\subset", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+        tbl.put(setLDT.getEmpty(), new Notation.Constant("{}", PRIORITY_ATOM));
         tbl.put(setLDT.getAllFields(), new Notation.Postfix(".*"));
 	
 	//string operators
