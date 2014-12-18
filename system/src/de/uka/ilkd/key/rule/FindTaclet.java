@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -180,6 +181,7 @@ public abstract class FindTaclet extends Taclet {
 
     /** CONSTRAINT NOT USED 
      * applies the replacewith part of Taclets
+     * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param gt TacletGoalTemplate used to get the replaceexpression 
      * in the Taclet
      * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
@@ -187,7 +189,7 @@ public abstract class FindTaclet extends Taclet {
      * @param services the Services encapsulating all java information
      * @param matchCond the MatchConditions with all required instantiations 
      */
-    protected abstract void applyReplacewith(TacletGoalTemplate gt, SequentChangeInfo currentSequent,
+    protected abstract void applyReplacewith(TermLabelState termLabelState, TacletGoalTemplate gt, SequentChangeInfo currentSequent,
 					     PosInOccurrence posOfFind,
 					     Services services,
 					     MatchConditions matchCond);
@@ -195,6 +197,7 @@ public abstract class FindTaclet extends Taclet {
 
     /**
      * adds the sequent of the add part of the Taclet to the goal sequent
+     * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param add the Sequent to be added
      * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
      * @param posOfFind the PosInOccurrence describes the place where to add
@@ -202,7 +205,7 @@ public abstract class FindTaclet extends Taclet {
      * @param services the Services encapsulating all java information
      * @param matchCond the MatchConditions with all required instantiations 
      */
-    protected abstract void applyAdd(Sequent add, SequentChangeInfo sequentChangeInfo,
+    protected abstract void applyAdd(TermLabelState termLabelState, Sequent add, SequentChangeInfo sequentChangeInfo,
 				     PosInOccurrence posOfFind,
 				     Services services,
 				     MatchConditions matchCond);
@@ -218,7 +221,7 @@ public abstract class FindTaclet extends Taclet {
     public ImmutableList<Goal> apply(Goal     goal,
 			    Services services,
 			    RuleApp  ruleApp) {
-
+   final TermLabelState termLabelState = new TermLabelState();
 	// Number without the if-goal eventually needed
 	int                          numberOfNewGoals = goalTemplates().size();
 
@@ -245,13 +248,13 @@ public abstract class FindTaclet extends Taclet {
 	    // add first because we want to use pos information that
 	    // is lost applying replacewith
 	    
-	    applyAdd( gt.sequent(),
+	    applyAdd(termLabelState, gt.sequent(),
 			      currentSequent,
 			      tacletApp.posInOccurrence(),
 			      services,
 			      mc );
 
-	    applyReplacewith( gt,
+	    applyReplacewith(termLabelState, gt,
 	             currentSequent,
 	             tacletApp.posInOccurrence(),
 	             services,

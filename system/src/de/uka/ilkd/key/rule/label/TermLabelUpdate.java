@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -60,9 +61,11 @@ public interface TermLabelUpdate extends RuleSpecificTask {
     * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
     * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
     * @param labels The {@link Set} of {@link TermLabel}s to modify.
+    * @param state The {@link TermLabelState} of the current rule application.
     * @return {@code true} keep {@link TermLabel} and add it to the new {@link Term}. {@code false} drop {@link TermLabel} and do not need it to the new {@link Term}.
     */
-   public void updateLabels(Services services,
+   public void updateLabels(TermLabelState state,
+                            Services services,
                             PosInOccurrence applicationPosInOccurrence,
                             Term applicationTerm,
                             Term modalityTerm,

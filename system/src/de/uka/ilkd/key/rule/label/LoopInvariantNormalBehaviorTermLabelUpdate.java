@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -50,7 +51,8 @@ public class LoopInvariantNormalBehaviorTermLabelUpdate implements TermLabelUpda
     * {@inheritDoc}
     */
    @Override
-   public void updateLabels(Services services,
+   public void updateLabels(TermLabelState state,
+                            Services services,
                             PosInOccurrence applicationPosInOccurrence,
                             Term applicationTerm,
                             Term modalityTerm,

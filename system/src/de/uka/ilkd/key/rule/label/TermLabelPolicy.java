@@ -21,6 +21,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -47,6 +48,7 @@ public interface TermLabelPolicy {
     * Decides to keep (add to term which will be created) or to
     * drop (do not add label to new term) the given {@link TermLabel}
     * provided by the application {@link Term}.
+    * @param state The {@link TermLabelState} of the current rule application.
     * @param services The {@link Services} used by the {@link Proof} on which a {@link Rule} is applied right now.
     * @param applicationPosInOccurrence The {@link PosInOccurrence} in the previous {@link Sequent} which defines the {@link Term} that is rewritten.
     * @param applicationTerm The {@link Term} defined by the {@link PosInOccurrence} in the previous {@link Sequent}.
@@ -62,7 +64,8 @@ public interface TermLabelPolicy {
     * @param label The {@link TermLabel} to decide if it should be kept or dropped.
     * @return The {@link TermLabel} to keep which might be a different one (e.g. with changed parameters) or {@code null} if the {@link TermLabel} should be dropped.
     */
-   public TermLabel keepLabel(Services services,
+   public TermLabel keepLabel(TermLabelState state,
+                              Services services,
                               PosInOccurrence applicationPosInOccurrence,
                               Term applicationTerm,
                               Rule rule,

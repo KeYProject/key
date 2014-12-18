@@ -324,6 +324,11 @@ public final class PredicateEvaluationUtil {
       public boolean isInAntecedent() {
          return inAntecedent;
       }
+
+      @Override
+      public String toString() {
+         return label + (inAntecedent ? " in antecedent" : " in succedent");
+      }
    }
 
    /**
@@ -363,33 +368,55 @@ public final class PredicateEvaluationUtil {
       Node parentNode = childNode.parent();
       final PosInOccurrence pio = parentNode.getAppliedRuleApp().posInOccurrence();
       if (pio != null) {
+         // Check application term and all of its children and grand children
          pio.subTerm().execPreOrder(new DefaultVisitor() {
             @Override
             public void visit(Term visited) {
-               TermLabel label = visited.getLabel(termLabelName);
-               if (label instanceof PredicateTermLabel) {
-                  Term replacement = checkForNewMinorIds(childNode.sequent(), (PredicateTermLabel) label, pio.isInAntec(), tb);
-                  if (replacement != null) {
-                     updatePredicateResult((PredicateTermLabel) label, new TermPredicateInstruction(replacement), results);
-                  }
-               }
+               checkForNewMinorIds(childNode, visited, termLabelName, pio, tb, results);
             }
          });
+         // Check application term parents
+         PosInOccurrence currentPio = pio;
+         while (!currentPio.isTopLevel()) {
+            currentPio = currentPio.up();
+            checkForNewMinorIds(childNode, currentPio.subTerm(), termLabelName, pio, tb, results);
+         }
+      }
+   }
+   
+   protected static void checkForNewMinorIds(Node childNode, 
+                                             Term term, 
+                                             Name termLabelName, 
+                                             PosInOccurrence pio, 
+                                             TermBuilder tb, 
+                                             Map<String, IPredicateInstruction> results) {
+      TermLabel label = term.getLabel(termLabelName);
+      if (label instanceof PredicateTermLabel) {
+         Term replacement = checkForNewMinorIds(childNode, (PredicateTermLabel) label, pio.isInAntec(), tb);
+         if (replacement != null) {
+            updatePredicateResult((PredicateTermLabel) label, new TermPredicateInstruction(replacement), results);
+         }
       }
    }
 
-   protected static Term checkForNewMinorIds(Sequent sequent, 
+   protected static Term checkForNewMinorIds(Node childNode, 
                                              PredicateTermLabel label,
                                              boolean antecedentRuleApplication,
                                              TermBuilder tb) {
+      // Search replacements
       List<Term> antecedentReplacements = new LinkedList<Term>();
       List<Term> succedentReplacements = new LinkedList<Term>();
-      for (SequentFormula sf : sequent.antecedent()) {
+      for (SequentFormula sf : childNode.sequent().antecedent()) {
          findLabelReplacements(sf, label.name(), label.getId(), antecedentReplacements);
       }
-      for (SequentFormula sf : sequent.succedent()) {
+      for (SequentFormula sf : childNode.sequent().succedent()) {
          findLabelReplacements(sf, label.name(), label.getId(), succedentReplacements);
       }
+      // Compute term
+      return createSequentTerm(antecedentReplacements, succedentReplacements, antecedentRuleApplication, tb);
+   }
+
+   protected static Term createSequentTerm(List<Term> antecedentReplacements, List<Term> succedentReplacements, boolean antecedentRuleApplication, TermBuilder tb) {
       if (!antecedentReplacements.isEmpty() && !succedentReplacements.isEmpty()) {
          Term left = tb.and(antecedentReplacements);
          Term right = tb.or(succedentReplacements);
@@ -772,6 +799,10 @@ public final class PredicateEvaluationUtil {
 
       @Override
       public PredicateResult evaluate(Name termLabelName, Map<String, IPredicateInstruction> results) {
+         return evaluateTerm(term, termLabelName, results);
+      }
+      
+      public static PredicateResult evaluateTerm(Term term, Name termLabelName, Map<String, IPredicateInstruction> results) {
          TermLabel label = term.getLabel(termLabelName);
          // Return direct label result if available
          if (label instanceof PredicateTermLabel) {
@@ -791,8 +822,8 @@ public final class PredicateEvaluationUtil {
             TermLabel rightLabel = rightTerm.getLabel(termLabelName);
             IPredicateInstruction leftInstruction = leftLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) leftLabel).getId()) : null;
             IPredicateInstruction rightInstruction = rightLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) rightLabel).getId()) : null;
-            PredicateResult leftResult = leftInstruction != null ? leftInstruction.evaluate(termLabelName, results) : null;
-            PredicateResult rightResult = rightInstruction != null ? rightInstruction.evaluate(termLabelName, results) : null;
+            PredicateResult leftResult = leftInstruction != null ? leftInstruction.evaluate(termLabelName, results) : evaluateTerm(leftTerm, termLabelName, results);
+            PredicateResult rightResult = rightInstruction != null ? rightInstruction.evaluate(termLabelName, results) : evaluateTerm(rightTerm, termLabelName, results);
             PredicateValue leftValue = leftResult != null ? leftResult.getValue() : null;
             PredicateValue rightValue = rightResult != null ? rightResult.getValue() : null;
             PredicateValue resultValue;
@@ -819,7 +850,7 @@ public final class PredicateEvaluationUtil {
             Term argumentTerm = TermBuilder.goBelowUpdates(term.sub(0));
             TermLabel argumentLabel = argumentTerm.getLabel(termLabelName);
             IPredicateInstruction argumentInstruction = argumentLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) argumentLabel).getId()) : null;
-            PredicateResult argumentResult = argumentInstruction != null ? argumentInstruction.evaluate(termLabelName, results) : null;
+            PredicateResult argumentResult = argumentInstruction != null ? argumentInstruction.evaluate(termLabelName, results) : evaluateTerm(argumentTerm, termLabelName, results);
             PredicateValue argumentValue = argumentResult != null ? argumentResult.getValue() : null;
             PredicateValue resultValue = PredicateValue.not(argumentValue);
             return new PredicateResult(resultValue, 
@@ -835,9 +866,9 @@ public final class PredicateEvaluationUtil {
             IPredicateInstruction conditionInstruction = conditionLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) conditionLabel).getId()) : null;
             IPredicateInstruction thenInstruction = thenLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) thenLabel).getId()) : null;
             IPredicateInstruction elseInstruction = elseLabel instanceof PredicateTermLabel ? results.get(((PredicateTermLabel) elseLabel).getId()) : null;
-            PredicateResult conditionResult = conditionInstruction != null ? conditionInstruction.evaluate(termLabelName, results) : null;
-            PredicateResult thenResult = thenInstruction != null ? thenInstruction.evaluate(termLabelName, results) : null;
-            PredicateResult elseResult = elseInstruction != null ? elseInstruction.evaluate(termLabelName, results) : null;
+            PredicateResult conditionResult = conditionInstruction != null ? conditionInstruction.evaluate(termLabelName, results) : evaluateTerm(conditionTerm, termLabelName, results);
+            PredicateResult thenResult = thenInstruction != null ? thenInstruction.evaluate(termLabelName, results) : evaluateTerm(thenTerm, termLabelName, results);
+            PredicateResult elseResult = elseInstruction != null ? elseInstruction.evaluate(termLabelName, results) : evaluateTerm(elseTerm, termLabelName, results);
             PredicateValue conditionValue = conditionResult != null ? conditionResult.getValue() : null;
             PredicateValue thenValue = thenResult != null ? thenResult.getValue() : null;
             PredicateValue elseValue = elseResult != null ? elseResult.getValue() : null;

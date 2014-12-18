@@ -46,6 +46,16 @@ public class PredicateTermLabel implements TermLabel {
    public static final String BEFORE_ID_SEPARATOR = ";";
    
    /**
+    * Key used in a {@link TermLabelState} to store the newly created {@link PredicateTermLabel} for the found inner most {@link PredicateTermLabel} in the parent hierarchy.
+    */
+   private static final String NEW_INNER_MOST_LABEL_KEY = "newInnerMostLabel";
+   
+   /**
+    * Key used in a {@link TermLabelState} to store the old {@link PredicateTermLabel} for the found inner most {@link PredicateTermLabel} in the parent hierarchy.
+    */
+   private static final String OLD_INNER_MOST_LABEL_KEY = "oldInnerMostLabel";
+   
+   /**
     * The unique ID of this term label in the {@link Sequent}.
     */
    private final String id;
@@ -176,5 +186,34 @@ public class PredicateTermLabel implements TermLabel {
    @Override
    public Name name() {
       return NAME;
+   }
+   
+   /**
+    * Returns the new inner most {@link PredicateTermLabel} on the parent hierarchy.
+    * @param state The {@link TermLabelState} to read from.
+    * @return The found {@link PredicateTermLabel} or {@code null} if not yet specified.
+    */
+   public static PredicateTermLabel getNewInnerMostLabel(TermLabelState state) {
+      return (PredicateTermLabel)state.getLabelState(NAME).get(NEW_INNER_MOST_LABEL_KEY);
+   }
+   
+   /**
+    * Returns the old inner most {@link PredicateTermLabel} on the parent hierarchy.
+    * @param state The {@link TermLabelState} to read from.
+    * @return The found {@link PredicateTermLabel} or {@code null} if not yet specified.
+    */
+   public static PredicateTermLabel getOldInnerMostLabel(TermLabelState state) {
+      return (PredicateTermLabel)state.getLabelState(NAME).get(OLD_INNER_MOST_LABEL_KEY);
+   }
+
+   /**
+    * Sets the new inner most {@link PredicateTermLabel} on the parent hierarchy.
+    * @param state The {@link TermLabelState} to modify.
+    * @param newLabel The new {@link PredicateTermLabel} to set.
+    * @param oldLabel The old {@link PredicateTermLabel} to set.
+    */
+   public static void setNewInnerMostLabel(TermLabelState state, PredicateTermLabel newLabel, PredicateTermLabel oldLabel) {
+      state.getLabelState(NAME).put(NEW_INNER_MOST_LABEL_KEY, newLabel);
+      state.getLabelState(NAME).put(OLD_INNER_MOST_LABEL_KEY, oldLabel);
    }
 }

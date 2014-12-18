@@ -50,8 +50,14 @@ public class PostconditionComposite extends AbstractPredicateComposite {
       if (term.op() instanceof Modality) {
          term = term.sub(0);
       }
-      Term predicate = findUninterpretedPredicateTerm(term, AbstractOperationPO.getUninterpretedPredicate(executionNode.getProof()));
-      term = removeUninterpretedPredicate(keyNode, term);
-      return new Pair<Term, Term>(term, predicate);
+      Term uninterpretedPredicate = AbstractOperationPO.getUninterpretedPredicate(executionNode.getProof());
+      if (uninterpretedPredicate != null) {
+         Term predicate = findUninterpretedPredicateTerm(term, uninterpretedPredicate);
+         term = removeUninterpretedPredicate(keyNode, term);
+         return new Pair<Term, Term>(term, predicate);
+      }
+      else {
+         return new Pair<Term, Term>(term, null);
+      }
    }
 }

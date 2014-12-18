@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -79,7 +80,7 @@ public class SimplifyTermProfile extends JavaProfile {
       ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
       ImmutableList<TermLabelPolicy> symExcPolicies = ImmutableSLList.<TermLabelPolicy>nil().prepend(new TermLabelPolicy() {
          @Override
-         public TermLabel keepLabel(Services services,
+         public TermLabel keepLabel(TermLabelState state, Services services,
                PosInOccurrence applicationPosInOccurrence,
                Term applicationTerm, Rule rule, Goal goal, Object hint,
                Term tacletTerm, Operator newTermOp,
