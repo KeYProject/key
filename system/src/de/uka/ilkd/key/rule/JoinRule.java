@@ -21,6 +21,7 @@ import de.uka.ilkd.key.gui.joinrule.JoinPartnerSelectionDialog;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -147,15 +148,18 @@ public abstract class JoinRule implements BuiltInRule {
       //       rule application, the symbolic execution strategy
       //       does not seem to work as usual!
       
-      return isApplicable(goal, pio, false, true);
+      return isApplicable(goal, pio,
+            false, // Only permit interactive goals
+            true); // Do the check for partner existence
    }
    
    /**
     * We admit top level formulas of the form \&lt;{ ... }\&gt; phi
     * and U \&lt;{ ... }\&gt; phi, where U must be an update
     * in normal form, i.e. a parallel update of elementary
-    * updates. When checkAutomatic is set to true, only interactive
-    * goals are admitted.
+    * updates. We require that phi does not contain a Java block.
+    * When checkAutomatic is set to true, only interactive goals
+    * are admitted.
     * 
     * @param goal Current goal.
     * @param pio Position of selected sequent formula.
@@ -190,9 +194,8 @@ public abstract class JoinRule implements BuiltInRule {
          
          if (selected.op() instanceof UpdateApplication) {
             Term update = selected.sub(0);
-            isUpdateNormalForm(update);
             
-            if (selected.subs().size() > 1) {
+            if (isUpdateNormalForm(update) && selected.subs().size() > 1) {
                termAfterUpdate = selected.sub(1);
             } else {
                return false;
@@ -204,7 +207,8 @@ public abstract class JoinRule implements BuiltInRule {
             return false;
          }
          
-         if (termAfterUpdate.op() instanceof Modality) {
+         if (termAfterUpdate.op() instanceof Modality &&
+               termAfterUpdate.sub(0).javaBlock().equals(JavaBlock.EMPTY_JAVABLOCK)) {
             return !doJoinPartnerCheck || findPotentialJoinPartners(goal, pio).size() > 0;
          } else {
             return false;
@@ -371,15 +375,15 @@ public abstract class JoinRule implements BuiltInRule {
                
                PosInTerm pit = PosInTerm.getTopLevel();
                pit.down(i);
-               
+
                PosInOccurrence gPio = new PosInOccurrence(f, pit, false);
                if (isApplicable(g, gPio, false, false)) {
                   Triple<Term, Term, Term> ownSEState = sequentToSETriple(
                         goal, pio, services);
                   Triple<Term, Term, Term> partnerSEState = sequentToSETriple(
                         g, gPio, services);
-                  
-                  if (ownSEState.third.equals(partnerSEState.third)) {
+
+                  if (ownSEState.third.equalsModRenaming(partnerSEState.third)) {
                      potentialPartners = potentialPartners.prepend(
                            new Pair<Goal, PosInOccurrence> (g, gPio));
                   }
