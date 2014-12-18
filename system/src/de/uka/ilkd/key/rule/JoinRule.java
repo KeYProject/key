@@ -383,6 +383,13 @@ public abstract class JoinRule implements BuiltInRule {
                   Triple<Term, Term, Term> partnerSEState = sequentToSETriple(
                         g, gPio, services);
 
+                  //TODO: The equality check for the Java blocks can be problematic,
+                  //  since KeY instantiates declared program variables with different
+                  //  identifiers; e.g. {int x = 10; if (x...)} could get {x_1 = 10; if (x_1...)}
+                  //  in one and {x_2 = 10; if (x_2...)} in the other branch. This cannot
+                  //  be circumvented with equalsModRenaming, since at this point, the
+                  //  PVs are already declared... We would have to do a stronger thing here.
+                  
                   if (ownSEState.third.equalsModRenaming(partnerSEState.third)) {
                      potentialPartners = potentialPartners.prepend(
                            new Pair<Goal, PosInOccurrence> (g, gPio));
