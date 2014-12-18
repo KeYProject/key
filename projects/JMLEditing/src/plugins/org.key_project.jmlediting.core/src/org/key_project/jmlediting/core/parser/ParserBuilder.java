@@ -67,10 +67,10 @@ public final class ParserBuilder {
    }
 
    /**
-    * Does the same as {@link ParserBuilder#list(ParseFunction)} but
-    * ensures that at least a single element is contained in the list. If no
-    * element could be parsed, a {@link ParserException} with the given failure
-    * test is thrown.
+    * Does the same as {@link ParserBuilder#list(ParseFunction)} but ensures
+    * that at least a single element is contained in the list. If no element
+    * could be parsed, a {@link ParserException} with the given failure test is
+    * thrown.
     *
     * @param function
     *           the {@link ParseFunction} to parse a single list element
@@ -131,10 +131,10 @@ public final class ParserBuilder {
    }
 
    /**
-    * Does the same as
-    * {@link ParserBuilder#separatedList(char, ParseFunction)} but ensures
-    * that at least a single element is parsed. If no element could be parsed, a
-    * {@link ParserException} with the given exception text is thrown.
+    * Does the same as {@link ParserBuilder#separatedList(char, ParseFunction)}
+    * but ensures that at least a single element is parsed. If no element could
+    * be parsed, a {@link ParserException} with the given exception text is
+    * thrown.
     *
     * @param sep
     *           the character to separate the elements
@@ -488,9 +488,11 @@ public final class ParserBuilder {
             final int whiteEnd = LexicalHelper.skipWhiteSpaces(text, nodeEnd,
                   end);
             if (whiteEnd < end) {
-               throw new ParserException(
-                     "requires to parse complete text but stopped", text,
-                     nodeEnd);
+               final IASTNode errorNode = Nodes.createErrorNode(node, Nodes
+                     .createUnparsedTextNode(text.substring(whiteEnd, end),
+                           whiteEnd, end));
+               throw new ParserException("Unexpected content.", whiteEnd, text,
+                     errorNode);
             }
             return node;
          }

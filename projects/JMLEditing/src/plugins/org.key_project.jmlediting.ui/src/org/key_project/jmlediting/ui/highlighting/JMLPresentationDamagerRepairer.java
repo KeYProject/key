@@ -172,10 +172,18 @@ IPresentationRepairer {
                      .getProjectActiveJMLProfile(WorkbenchUtil
                            .getProject(this.editorPart));
                final IJMLParser parser = activeProfile.createParser();
+               IASTNode parseResult;
                try {
-                  final IASTNode parseResult = parser.parse(this.doc.get(),
+                  parseResult = parser.parse(this.doc.get(),
                         surroundingComment.getContentBeginOffset(),
                         surroundingComment.getContentEndOffset() + 1);
+               }
+               catch (final ParserException e) {
+                  // Invalid JML Code, no advanced SyntaxColoring possible
+                  // System.out.println(e.getMessage());
+                  parseResult = e.getErrorNode();
+               }
+               if (parseResult != null) {
                   final List<IKeywordNode> allKeywords = Nodes
                         .getAllKeywords(parseResult);
                   int lastEnd = offset;
@@ -207,10 +215,7 @@ IPresentationRepairer {
                   }
                   presentation.mergeStyleRanges(highlightedRanges);
                }
-               catch (final ParserException e) {
-                  // Invalid JML Code, no advanced SyntaxColoring possible
-                  // System.out.println(e.getMessage());
-               }
+
             }
          }
       }

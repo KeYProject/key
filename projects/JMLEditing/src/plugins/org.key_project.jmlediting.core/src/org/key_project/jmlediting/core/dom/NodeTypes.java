@@ -18,6 +18,9 @@ public final class NodeTypes {
    public static final int SOME = getNewType("Some");
    public static final int NONE = getNewType("None");
 
+   public static final int ERROR_NODE = getNewType("ErrorNode");
+   public static final int UNPARSED_TEXT = getNewType("UnparsedText");
+
    public static int getNewType(final String name) {
       final int type = newType;
       typeNames.put(type, name);

@@ -7,6 +7,7 @@ import java.util.List;
 import org.key_project.jmlediting.core.dom.internal.ASTNode;
 import org.key_project.jmlediting.core.dom.internal.KeywordNode;
 import org.key_project.jmlediting.core.dom.internal.StringNode;
+import org.key_project.jmlediting.core.dom.internal.UnparsedTextNode;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 
 public final class Nodes {
@@ -56,6 +57,15 @@ public final class Nodes {
       else {
          return createNode(NodeTypes.SOME, node);
       }
+   }
+
+   public static IASTNode createUnparsedTextNode(final String text,
+         final int startPos, final int endPos) {
+      return new UnparsedTextNode(startPos, endPos, text);
+   }
+
+   public static IASTNode createErrorNode(final IASTNode... content) {
+      return createNode(NodeTypes.ERROR_NODE, content);
    }
 
    public static boolean isString(final IASTNode node) {

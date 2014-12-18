@@ -48,13 +48,27 @@ public class DefaultJMLParser implements IJMLParser {
       // A list to put the nodes for each keyword into
       final List<IASTNode> allKeywords = new ArrayList<IASTNode>();
 
+      final List<ParserError> keywordErrors = new ArrayList<ParserError>();
+
       int position = skipWhiteSpacesOrAt(text, start, end, true);
       // Search for keyword as long text is available
       while (position < end) {
          // Parse the keyword
-         final IASTNode keywordNode = ParserUtils
-               .parseKeyword(text, position, end,
-                     this.profile.getSupportedKeywords(), this.profile);
+
+         IASTNode keywordNode;
+
+         try {
+            keywordNode = ParserUtils.parseKeyword(text, position,
+
+                  end, this.profile.getSupportedKeywords(), this.profile);
+         }
+         catch (final ParserException e) {
+            keywordNode = e.getErrorNode();
+            if (keywordNode == null) {
+               throw e;
+            }
+            keywordErrors.addAll(e.getAllErrors());
+         }
          allKeywords.add(keywordNode);
          // Skip whites
          position = keywordNode.getEndOffset();
@@ -68,7 +82,13 @@ public class DefaultJMLParser implements IJMLParser {
          throw new ParserException("Nothing specified", text, start);
       }
 
-      return Nodes.createNode(NodeTypes.NODE, allKeywords);
+      final IASTNode finalNode = Nodes.createNode(NodeTypes.NODE, allKeywords);
+      if (keywordErrors.isEmpty()) {
+         return finalNode;
+      }
+      else {
+         throw new ParserException(null, keywordErrors, text, finalNode, null);
+      }
    }
 
 }

@@ -172,7 +172,18 @@ public class ParserUtils {
       // Now parse according to the keywword
       final IKeywordParser keywordParser = foundKeyword.createParser();
       keywordParser.setProfile(profile);
-      final IASTNode keywordResult = keywordParser.parse(text, keywordEnd, end);
+      IASTNode keywordResult;
+      try {
+         keywordResult = keywordParser.parse(text, keywordEnd, end);
+      }
+      catch (final ParserException e) {
+         keywordResult = e.getErrorNode();
+         if (keywordResult == null) {
+            throw e;
+         }
+         throw new ParserException(e, Nodes.createNode(NodeTypes.KEYWORD_APPL,
+               keywordNode, keywordResult));
+      }
 
       // Build the result
       if (keywordResult == null) {
