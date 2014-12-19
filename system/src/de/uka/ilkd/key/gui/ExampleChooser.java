@@ -52,6 +52,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
+import de.uka.ilkd.key.util.Debug;
 
 
 public final class ExampleChooser extends JDialog {
@@ -406,6 +407,9 @@ public final class ExampleChooser extends JDialog {
                     }
                 }
             }
+        } catch (IOException e) {
+            Debug.out(e);
+            return sb;
         } finally {
             if(r != null) {
                 try { r.close(); }
