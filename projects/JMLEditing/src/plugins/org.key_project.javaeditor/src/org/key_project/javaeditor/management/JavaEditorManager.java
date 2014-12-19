@@ -19,6 +19,7 @@ import java.util.Arrays;
 import javax.naming.OperationNotSupportedException;
 
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
+import org.eclipse.jdt.internal.ui.javaeditor.SemanticHighlightingManager;
 import org.eclipse.jdt.ui.text.IColorManager;
 import org.eclipse.jdt.ui.text.JavaSourceViewerConfiguration;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -274,10 +275,22 @@ public final class JavaEditorManager {
       }
    }
    
-   private void changeConfiguration(JavaEditor javaEditor, SourceViewer viewer, SourceViewerConfiguration newConf) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+   private void changeConfiguration(JavaEditor javaEditor, SourceViewer viewer, SourceViewerConfiguration newConf) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, SecurityException, NoSuchFieldException {
+      // Change configuration in JavaEditor
       viewer.unconfigure();
       viewer.configure(newConf);
       ObjectUtil.invoke(javaEditor, ObjectUtil.findMethod(AbstractTextEditor.class, "setSourceViewerConfiguration", SourceViewerConfiguration.class), newConf);
+      // Change configuration in SemanticHighlightingManager
+      Object semanticManager = ObjectUtil.get(javaEditor, "fSemanticManager");
+      if (semanticManager instanceof SemanticHighlightingManager) {
+         ObjectUtil.invoke(semanticManager, ObjectUtil.findMethod(SemanticHighlightingManager.class, "disable"));
+         ObjectUtil.set(semanticManager, "fConfiguration", newConf);
+         ObjectUtil.set(semanticManager, "fPresentationReconciler", newConf.getPresentationReconciler(viewer));
+         ObjectUtil.invoke(semanticManager, ObjectUtil.findMethod(SemanticHighlightingManager.class, "enable"));
+      }
+      else {
+         LogUtil.getLogger().logWarning("SemanticHighlightingManager no longer available.");
+      }
    }
 
    /**
