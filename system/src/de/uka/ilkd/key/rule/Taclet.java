@@ -44,6 +44,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -881,6 +882,7 @@ public abstract class Taclet implements Rule, Named {
     /** 
      * a new term is created by replacing variables of term whose replacement is
      * found in the given SVInstantiations 
+     * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param term the Term the syntactical replacement is performed on
      * @param services the Services
      * @param mc the {@link MatchConditions} with all instantiations and
@@ -888,13 +890,14 @@ public abstract class Taclet implements Rule, Named {
      * @param labelHint The hint used to maintain {@link TermLabel}s.
      * @return the (partially) instantiated term  
      */
-    protected Term syntacticalReplace(Term term,
+    protected Term syntacticalReplace(TermLabelState termLabelState, Term term,
 				      Services services,
 				      MatchConditions mc,
 				      PosInOccurrence applicationPosInOccurrence,
 				      TacletLabelHint labelHint) {
 	final SyntacticalReplaceVisitor srVisitor =
-	    new SyntacticalReplaceVisitor(services,
+	    new SyntacticalReplaceVisitor(termLabelState, 
+	                                       services,
                                           mc.getInstantiations(),
                                           applicationPosInOccurrence,
                                           this,
@@ -931,6 +934,7 @@ public abstract class Taclet implements Rule, Named {
     /** 
      * the given constrained formula is instantiated and then
      * the result (usually a complete instantiated formula) is returned.
+     * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param schemaFormula the SequentFormula to be instantiated
      * @param services the Services object carrying ja related information
      * @param matchCond the MatchConditions object with the instantiations of
@@ -940,7 +944,7 @@ public abstract class Taclet implements Rule, Named {
      * @return the as far as possible instantiated SequentFormula
      */
     private SequentFormula 
-	instantiateReplacement(SequentFormula schemaFormula,
+	instantiateReplacement(TermLabelState termLabelState, SequentFormula schemaFormula,
 			       Services           services,
 			       MatchConditions    matchCond,
 			       PosInOccurrence applicationPosInOccurrence,
@@ -948,7 +952,7 @@ public abstract class Taclet implements Rule, Named {
 
        final SVInstantiations svInst = matchCond.getInstantiations ();
 
-       Term instantiatedFormula = syntacticalReplace(schemaFormula.formula(), 
+       Term instantiatedFormula = syntacticalReplace(termLabelState, schemaFormula.formula(), 
              services, matchCond, applicationPosInOccurrence, new TacletLabelHint(labelHint, schemaFormula));
 
        if (!svInst.getUpdateContext().isEmpty()) {
@@ -962,6 +966,7 @@ public abstract class Taclet implements Rule, Named {
     /**
      * instantiates the given semisequent with the instantiations found in 
      * Matchconditions
+     * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param semi the Semisequent to be instantiated
      * @param services the Services
      * @param matchCond the MatchConditions including the mapping 
@@ -970,7 +975,7 @@ public abstract class Taclet implements Rule, Named {
      * @param labelHint The hint used to maintain {@link TermLabel}s.
      * @return the instanted formulas of the semisquent as list
      */
-    protected ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi, Services services,
+    protected ImmutableList<SequentFormula> instantiateSemisequent(TermLabelState termLabelState, Semisequent semi, Services services,
             MatchConditions matchCond, PosInOccurrence applicationPosInOccurrence, TacletLabelHint labelHint) {       
         
        // TODO: use mutable list
@@ -978,7 +983,7 @@ public abstract class Taclet implements Rule, Named {
 
         for (SequentFormula sf : semi) {
             replacements = replacements.append
-                (instantiateReplacement(sf, services, matchCond, applicationPosInOccurrence, labelHint));           
+                (instantiateReplacement(termLabelState, sf, services, matchCond, applicationPosInOccurrence, labelHint));           
         }
         
         return replacements;
@@ -990,6 +995,7 @@ public abstract class Taclet implements Rule, Named {
      * replaces the constrained formula at the given position with the first
      * formula in the given semisequent and adds possible other formulas of the
      * semisequent starting at the position
+     * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param semi the Semisequent with the the ConstrainedFormulae to be added
      * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
      * @param pos the PosInOccurrence describing the place in the sequent
@@ -998,13 +1004,14 @@ public abstract class Taclet implements Rule, Named {
      * @param labelHint The hint used to maintain {@link TermLabel}s.
      * the instantiations of the schemavariables
      */   
-    protected void replaceAtPos(Semisequent semi,
+    protected void replaceAtPos(TermLabelState termLabelState, 
+            Semisequent semi,
             SequentChangeInfo currentSequent,
             PosInOccurrence pos,
             Services services, 
             MatchConditions matchCond,
             TacletLabelHint labelHint) {
-       final ImmutableList<SequentFormula> replacements = instantiateSemisequent(semi, services, matchCond, pos, labelHint);
+       final ImmutableList<SequentFormula> replacements = instantiateSemisequent(termLabelState, semi, services, matchCond, pos, labelHint);
        currentSequent.combine(currentSequent.sequent().changeFormula(replacements, pos));
     }
 
@@ -1012,6 +1019,7 @@ public abstract class Taclet implements Rule, Named {
      * instantiates the constrained formulas of semisequent
      *  <code>semi</code> and adds the instantiatied formulas at the specified
      *   position to <code>goal</code>   
+     * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param semi the Semisequent with the the ConstrainedFormulae to be added
      * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
      * @param pos the PosInOccurrence describing the place in the sequent
@@ -1023,7 +1031,7 @@ public abstract class Taclet implements Rule, Named {
      * @param labelHint The hint used to maintain {@link TermLabel}s.
      * the instantiations of the schemavariables
      */
-    private void addToPos ( Semisequent semi,
+    private void addToPos (TermLabelState termLabelState, Semisequent semi,
              SequentChangeInfo currentSequent,         
              PosInOccurrence pos,
              boolean antec,
@@ -1032,7 +1040,7 @@ public abstract class Taclet implements Rule, Named {
              PosInOccurrence applicationPosInOccurrence,
              TacletLabelHint labelHint) {
        final ImmutableList<SequentFormula> replacements = 
-             instantiateSemisequent(semi, services, matchCond, applicationPosInOccurrence, labelHint);
+             instantiateSemisequent(termLabelState, semi, services, matchCond, applicationPosInOccurrence, labelHint);
        
        if (pos != null) {
           currentSequent.combine(currentSequent.sequent().addFormula(replacements, pos));
@@ -1047,6 +1055,7 @@ public abstract class Taclet implements Rule, Named {
      * head of the antecedent). Of course it has to be ensured that
      * the position information describes one occurrence in the
      * antecedent of the sequent.
+     * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param semi the Semisequent with the the ConstrainedFormulae to be added
      * @param currentSequent the Sequent which is the current (intermediate) result of applying the taclet
      * @param pos the PosInOccurrence describing the place in the
@@ -1057,14 +1066,15 @@ public abstract class Taclet implements Rule, Named {
      * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is rewritten
      * @param labelHint The hint used to maintain {@link TermLabel}s.
      */
-    protected void addToAntec(Semisequent semi,
+    protected void addToAntec(TermLabelState termLabelState,
+               Semisequent semi,
 			      SequentChangeInfo currentSequent,
 			      PosInOccurrence pos,
 			      Services services, 
 			      MatchConditions matchCond,
 			      PosInOccurrence applicationPosInOccurrence,
 			      TacletLabelHint labelHint) { 
-	    addToPos(semi, currentSequent, pos, true, services, matchCond, applicationPosInOccurrence, labelHint);
+	    addToPos(termLabelState, semi, currentSequent, pos, true, services, matchCond, applicationPosInOccurrence, labelHint);
     }
 
     /**
@@ -1073,6 +1083,7 @@ public abstract class Taclet implements Rule, Named {
      * head of the succedent). Of course it has to be ensured that
      * the position information describes one occurrence in the
      * succedent of the sequent.
+      * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param semi the Semisequent with the the ConstrainedFormulae to be added
      * @param goal the Goal that knows the node the formulae have to be added
      * @param pos the PosInOccurrence describing the place in the
@@ -1083,14 +1094,15 @@ public abstract class Taclet implements Rule, Named {
      * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is rewritten
      * @param labelHint The hint used to maintain {@link TermLabel}s.
      */
-    protected void addToSucc(Semisequent semi,
+    protected void addToSucc(TermLabelState termLabelState,
+              Semisequent semi,
 			     SequentChangeInfo currentSequent,
 			     PosInOccurrence pos,
 			     Services services, 
 			     MatchConditions matchCond,
 			     PosInOccurrence applicationPosInOccurrence,
 			     TacletLabelHint labelHint) {
-       addToPos(semi, currentSequent, pos, false, services, matchCond, applicationPosInOccurrence, labelHint);
+       addToPos(termLabelState, semi, currentSequent, pos, false, services, matchCond, applicationPosInOccurrence, labelHint);
     }
 
     protected abstract Taclet setName(String s);

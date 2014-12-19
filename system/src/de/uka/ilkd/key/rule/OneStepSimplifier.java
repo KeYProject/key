@@ -36,6 +36,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -243,7 +244,7 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
                 }
             }
             RewriteTaclet taclet = (RewriteTaclet) app.rule();
-            SequentFormula result = taclet.getRewriteResult(services, app);
+            SequentFormula result = taclet.getRewriteResult(new TermLabelState(), services, app);
             if(protocol != null) {
                 protocol.add(app);
             }
@@ -327,7 +328,8 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
                 protocol.add(makeReplaceKnownTacletApp(in, inAntecedent, pos));
             }
             Term result = pos.isInAntec() ? services.getTermBuilder().tt() : services.getTermBuilder().ff();
-            ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(services, 
+            ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(), 
+                                                                                  services, 
                                                                                   in,
                                                                                   pos, // TODO: pos.subTerm() == in should be true which is currently not the case (labels are missing)
                                                                                   this, 
@@ -413,7 +415,9 @@ public final class OneStepSimplifier implements BuiltInRule, KeYSelectionListene
         PosInOccurrence applicatinPIO = new PosInOccurrence(new SequentFormula(formula), 
                                                             PosInTerm.getTopLevel(), // TODO: This should be the precise sub term
                                                             inAntecedent); // It is required to create a new PosInOccurrence because formula and pio.constrainedFormula().formula() are only equals module renamings and term labels
-        TacletApp ta = PosTacletApp.createPosTacletApp(taclet, svi, applicatinPIO, lastProof.getServices());
+        ImmutableList<IfFormulaInstantiation> ifInst = ImmutableSLList.nil();
+        ifInst = ifInst.append(new IfFormulaInstDirect(pio.constrainedFormula()));
+        TacletApp ta = PosTacletApp.createPosTacletApp(taclet, svi, ifInst, applicatinPIO, lastProof.getServices());
         return ta;
     }
 

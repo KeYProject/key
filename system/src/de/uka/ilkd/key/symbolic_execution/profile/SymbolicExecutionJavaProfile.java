@@ -30,6 +30,7 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.label.PredicateTermLabelRefactoring;
+import de.uka.ilkd.key.rule.label.PredicateTermLabelUpdate;
 import de.uka.ilkd.key.rule.label.StayOnPredicateTermLabelPolicy;
 import de.uka.ilkd.key.rule.label.StayOnOperatorTermLabelPolicy;
 import de.uka.ilkd.key.rule.label.RemoveInCheckBranchesTermLabelRefactoring;
@@ -104,6 +105,8 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
       ImmutableList<TermLabelRefactoring> seRefs = ImmutableSLList.<TermLabelRefactoring>nil().prepend(new RemoveInCheckBranchesTermLabelRefactoring(SymbolicExecutionTermLabel.NAME));
       ImmutableList<TermLabelRefactoring> postRefs = ImmutableSLList.<TermLabelRefactoring>nil().prepend(new PredicateTermLabelRefactoring());
 
+      ImmutableList<TermLabelUpdate> postUpdates = ImmutableSLList.<TermLabelUpdate>nil().prepend(new PredicateTermLabelUpdate());
+      
       ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
       result = result.prepend(new TermLabelConfiguration(ParameterlessTermLabel.LOOP_BODY_LABEL_NAME,
                                                          new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.LOOP_BODY_LABEL),
@@ -135,7 +138,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
                                                          postPolicies,
                                                          null,
                                                          null,
-                                                         null,
+                                                         postUpdates,
                                                          postRefs));
       return result;
    }
