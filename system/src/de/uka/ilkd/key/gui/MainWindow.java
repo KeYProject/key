@@ -75,9 +75,6 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.configuration.GeneralSettings;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
 import de.uka.ilkd.key.gui.nodeviews.EmptySequent;
 import de.uka.ilkd.key.gui.nodeviews.InnerNodeView;
@@ -98,6 +95,9 @@ import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
@@ -639,7 +639,7 @@ public final class MainWindow extends JFrame  {
         JMenuItem laf = new JCheckBoxMenuItem("Use system look and feel (experimental)");
         laf.setToolTipText("If checked KeY tries to appear in the look and feel of your "+
                            "window manager, if not in the default Java LaF (aka Metal).");
-        final de.uka.ilkd.key.gui.configuration.ViewSettings vs =
+        final de.uka.ilkd.key.settings.ViewSettings vs =
                 ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         laf.setSelected(vs.useSystemLaF());
         laf.addActionListener(new ActionListener() {

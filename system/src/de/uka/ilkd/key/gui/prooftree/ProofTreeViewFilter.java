@@ -15,7 +15,7 @@ package de.uka.ilkd.key.gui.prooftree;
 
 import javax.swing.tree.TreeNode;
 
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 /**
  * Filters for the proof tree view.

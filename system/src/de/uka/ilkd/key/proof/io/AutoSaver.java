@@ -19,9 +19,9 @@ import java.util.EventObject;
 
 import de.uka.ilkd.key.core.ProverTaskListener;
 import de.uka.ilkd.key.core.TaskFinishedInfo;
-import de.uka.ilkd.key.gui.configuration.GeneralSettings;
-import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.util.Debug;
 
 /**

@@ -31,8 +31,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.testgen.TestGenerationSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.smt.SolverType;
 
 public class SMTSettingsModel extends DefaultTreeModel {

@@ -41,7 +41,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 
 /**
