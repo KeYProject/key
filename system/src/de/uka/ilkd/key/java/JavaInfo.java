@@ -1159,25 +1159,33 @@ public final class JavaInfo {
      * returns the KeYJavaType for class java.lang.Object
      */
     public Sort objectSort() {
-	try {
-	    return getJavaLangObject().getSort();
-	} catch(RuntimeException e) {//XXX
-	    return null;
-	}
+        if (getJavaLangObject() == null) {
+            return (Sort) services.getNamespaces().sorts().lookup("java.lang.Object");
+        } else {
+            return getJavaLangObject().getSort();
+        }
     }
 
     /**
      * returns the KeYJavaType for class java.lang.Cloneable
      */
     public Sort cloneableSort() {
-        return getJavaLangCloneable().getSort();
+        if (getJavaLangCloneable() == null) {
+            return (Sort) services.getNamespaces().sorts().lookup("java.lang.Cloneable");
+        } else {
+            return getJavaLangCloneable().getSort();
+        }
     }
 
     /**
      * returns the KeYJavaType for class java.io.Serializable
      */
     public Sort serializableSort() {
-        return getJavaIoSerializable().getSort();
+        if (getJavaIoSerializable() == null) {
+            return (Sort) services.getNamespaces().sorts().lookup("java.io.Serializable");
+        } else {
+            return getJavaIoSerializable().getSort();
+        }
     }
 
     public Sort nullSort() {
