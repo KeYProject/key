@@ -432,6 +432,9 @@ public abstract class JoinRule implements BuiltInRule {
                   //  since PVs occurring in the post condition should be excluded by the
                   //  doNotMatch set. However, if strange things happen, here *could* be a reason.
                   
+                  //TODO: Case to check: Same post condition, different Java blocks
+                  //  (differing in variables that are NOT in post condition).
+                  
                   JavaProgramElement ownProgramElem     = ownSEState.third.javaBlock().program();
                   JavaProgramElement partnerProgramElem = partnerSEState.third.javaBlock().program();
                   
