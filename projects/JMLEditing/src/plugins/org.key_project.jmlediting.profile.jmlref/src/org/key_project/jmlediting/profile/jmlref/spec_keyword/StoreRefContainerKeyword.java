@@ -1,15 +1,10 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.core.CompilationUnit;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.key_project.jmlediting.core.dom.IASTNode;
@@ -20,7 +15,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefN
 import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
 
 public abstract class StoreRefContainerKeyword extends
-      AbstractGenericSpecificationKeyword {
+AbstractGenericSpecificationKeyword {
 
    public StoreRefContainerKeyword(final String keyword,
          final String... keywords) {
@@ -43,34 +38,26 @@ public abstract class StoreRefContainerKeyword extends
 
       final String prefix = context.getDocument().get().substring(begin, end);
 
-      // We want to use java6
-      @SuppressWarnings("deprecation")
-      final ASTParser parser = ASTParser.newParser(AST.JLS3);
-      parser.setProject(context.getProject());
-      parser.setSource(context.getDocument().get().toCharArray());
-      parser.setKind(ASTParser.K_COMPILATION_UNIT);
-      final Map<String, String> options = JavaCore.getOptions();
-      JavaCore.setComplianceOptions(JavaCore.VERSION_1_6, options);
-      parser.setCompilerOptions(options);
+      final char[] text = context.getDocument().get().toCharArray();
 
-      final CompilationUnit result = (CompilationUnit) parser.createAST(null);
+      final CompilationUnit result = (CompilationUnit) context
+            .getCompilationUnit();
 
-      final List<Integer> variables = new ArrayList<Integer>();
-
-      result.accept(new ASTVisitor() {
-         @Override
-         public boolean visit(final VariableDeclarationFragment node) {
-            System.out.println("found declaration: " + node);
-            variables.add(node.getStartPosition());
-            return super.visit(node);
+      try {
+         for (final IJavaElement element : result.getChildren()) {
+            System.out.println("------");
+            if (element.getElementType() == IJavaElement.TYPE) {
+               // TODO
+            }
+            System.out.println(element.getElementType() + ": " + element);
          }
-      });
-
-      for (final Integer pos : variables) {
-         System.out.println("ElementAt(" + pos + "): ");
+      }
+      catch (final JavaModelException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
       }
 
-      return JMLCompletionUtil.getProposals(context, null, null,
+      return JMLCompletionUtil.getKeywordProposals(context, prefix, null,
             IStoreRefKeyword.class);
    }
 

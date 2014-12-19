@@ -39,7 +39,7 @@ public class JMLCompletionUtil {
     *           the Class extending {@link IKeyword} to filter the proposals
     * @return List<{@link ICompletionProposal}> the computed standardProposals
     */
-   public static List<ICompletionProposal> getProposals(
+   public static List<ICompletionProposal> getKeywordProposals(
          final JavaContentAssistInvocationContext context,
          final String proposalPrefix, final Image proposalImage,
          final Class<? extends IKeyword> filter) {
@@ -104,9 +104,9 @@ public class JMLCompletionUtil {
     *      JavaContentAssistInvocationContext context, final Image
     *      proposalImage, final Class<? extends IKeyword> filter)
     */
-   public static List<ICompletionProposal> getStandardProposals(
+   public static List<ICompletionProposal> getStandardKeywordProposals(
          final JavaContentAssistInvocationContext context,
          final Image proposalImage) {
-      return getProposals(context, null, proposalImage, IKeyword.class);
+      return getKeywordProposals(context, null, proposalImage, IKeyword.class);
    }
 }

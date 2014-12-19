@@ -104,15 +104,17 @@ public class JMLCompletionProposalComputer implements
                      javaContext));
             }
             else {
-               return JMLCompletionUtil.getStandardProposals(javaContext,
-                     getJMLImg());
+               // Fallback Method to display all JML Keyword-Proposals, if
+               // no active Keyword was discovered.
+               return JMLCompletionUtil.getStandardKeywordProposals(
+                     javaContext, getJMLImg());
             }
 
          }
          catch (final ParserException e) {
             // Fallback Method to display all JML Keyword-Proposals, if Parser
             // fails.
-            return JMLCompletionUtil.getStandardProposals(javaContext,
+            return JMLCompletionUtil.getStandardKeywordProposals(javaContext,
                   getJMLImg());
          }
       }
