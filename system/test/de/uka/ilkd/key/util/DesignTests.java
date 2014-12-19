@@ -175,6 +175,8 @@ public class DesignTests extends TestCase {
                     allClasses[i].getPackage().getName().contains("de.uka.ilkd.key.smt.counterexample") ||
                     allClasses[i].getPackage().getName().contains("de.uka.ilkd.key.smt.testgen") ||
                     allClasses[i].getPackage().getName().contains("key.java") ||   
+                    allClasses[i].getPackage().getName().contains("key.core") ||   
+                    allClasses[i].getPackage().getName().contains("key.settings") ||   
                     allClasses[i].getPackage().getName().contains("key.strategy")   
                     ) {
                 for (Field f : allClasses[i].getDeclaredFields()) {
@@ -200,11 +202,11 @@ public class DesignTests extends TestCase {
             }
         }
         if (badClasses.size()>0) {
-            message = "No GUI is allowd in the packages and there sub packages";
-	    message += printBadClasses(badClasses);
+            message = "No GUI is allowed in the packages and there sub packages";
+	        message += printBadClasses(badClasses);
         }
 
-	assertTrue(message, badClasses.size() == 0);
+	    assertTrue(message, badClasses.size() == 0);
     }
 
 
