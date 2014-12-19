@@ -18,8 +18,12 @@ import java.util.HashSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.joinrule.JoinPartnerSelectionDialog;
+import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
+import de.uka.ilkd.key.java.JavaProgramElement;
+import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -29,9 +33,11 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Goal;
@@ -207,6 +213,7 @@ public abstract class JoinRule implements BuiltInRule {
             return false;
          }
          
+         // Check for form "\<{...}\> phi", where phi must not contain a Java block.
          if (termAfterUpdate.op() instanceof Modality &&
                termAfterUpdate.sub(0).javaBlock().equals(JavaBlock.EMPTY_JAVABLOCK)) {
             return !doJoinPartnerCheck || findPotentialJoinPartners(goal, pio).size() > 0;
@@ -251,6 +258,37 @@ public abstract class JoinRule implements BuiltInRule {
          
       }
    }
+   
+   /**
+    * @param term The term to extract program locations from.
+    * @return All program locations in the given term.
+    */
+   protected HashSet<LocationVariable> getTermLocations(Term term) {
+      final HashSet<LocationVariable> result =
+            new HashSet<LocationVariable>();
+      
+      term.execPreOrder(new Visitor() {
+         
+         @Override
+         public void visit(Term visited) {
+            Operator op = visited.op();
+            
+            if (!op.isRigid() &&
+                  op instanceof LocationVariable) {
+               result.add((LocationVariable) op);
+            }
+         }
+         
+         @Override
+         public void subtreeLeft(Term subtreeRoot) {}
+         
+         @Override
+         public void subtreeEntered(Term subtreeRoot) {}
+      });
+      
+      return result;
+   }
+   
    
    /**
     * Returns all used program locations in the given term. The term
@@ -383,16 +421,36 @@ public abstract class JoinRule implements BuiltInRule {
                   Triple<Term, Term, Term> partnerSEState = sequentToSETriple(
                         g, gPio, services);
 
-                  //TODO: The equality check for the Java blocks can be problematic,
+                  //NOTE: The equality check for the Java blocks can be problematic,
                   //  since KeY instantiates declared program variables with different
                   //  identifiers; e.g. {int x = 10; if (x...)} could get {x_1 = 10; if (x_1...)}
                   //  in one and {x_2 = 10; if (x_2...)} in the other branch. This cannot
                   //  be circumvented with equalsModRenaming, since at this point, the
-                  //  PVs are already declared... We would have to do a stronger thing here.
+                  //  PVs are already declared. We therefore use an own method equalsModRenamingStrong.
+                  //  In principle, the method matches all LocationVariable occurrences.
+                  //  This can lead to wrong matches! However, this should NOT be a problem,
+                  //  since PVs occurring in the post condition should be excluded by the
+                  //  doNotMatch set. However, if strange things happen, here *could* be a reason.
                   
-                  if (ownSEState.third.equalsModRenaming(partnerSEState.third)) {
+                  JavaProgramElement ownProgramElem     = ownSEState.third.javaBlock().program();
+                  JavaProgramElement partnerProgramElem = partnerSEState.third.javaBlock().program();
+                  
+                  Term ownPostCond     = ownSEState.third.sub(0);
+                  Term partnerPostCond = partnerSEState.third.sub(0);
+                  
+                  HashSet<LocationVariable> doNotMatch = getTermLocations(ownPostCond);
+                  
+                  // Requirement: Same post condition, matching program parts
+                  if (ownPostCond.equals(partnerPostCond) &&
+                        equalsModRenamingStrong(
+                           ownProgramElem,
+                           partnerProgramElem,
+                           null,
+                           doNotMatch)) {
+                     
                      potentialPartners = potentialPartners.prepend(
                            new Pair<Goal, PosInOccurrence> (g, gPio));
+                     
                   }
                }
             }
@@ -503,6 +561,63 @@ public abstract class JoinRule implements BuiltInRule {
          return variables;
       }
       
+   }
+   
+   /**
+    * An equalsModRenaming that does not only abstract from variable declarations, 
+    * but from *all* LocationVariable occurrences. Usually, this is quite to strong
+    * and can lead to wrong matches. However, when the doNotMatch parameter is wisely
+    * used (LocationVariables of post condition, for example), there *should* not be
+    * a problem here.
+    * 
+    * @see SourceElement#equalsModRenaming(SourceElement, NameAbstractionTable)}
+    * @param se1 First element to check equality (mod renaming) for
+    * @param se2 Second element to check equality (mod renaming) for
+    * @param nat Table for storing name abstractions. May be null at first call.
+    * @param doNotMatch Set of variables that should NOT be matched.
+    * @return true iff source elements can be matched, ignoring variable names.
+    */
+   private static boolean equalsModRenamingStrong(
+         SourceElement se1, SourceElement se2,
+         NameAbstractionTable nat,
+         HashSet<LocationVariable> doNotMatch) {
+      
+      if (nat == null) {
+         nat = new NameAbstractionTable();
+      }
+      
+      // Core part: Match location variables
+      if (se1 instanceof LocationVariable && 
+            se2 instanceof LocationVariable &&
+            !doNotMatch.contains(se1) &&
+            !doNotMatch.contains(se2)) {
+         
+         nat.add(se1, se2);
+         return true;
+         
+      }
+      
+      if (!(se1 instanceof JavaNonTerminalProgramElement) ||
+            !(se2 instanceof JavaNonTerminalProgramElement)) {
+         // No children here, can delegate to normal method.
+         return se1.equalsModRenaming(se2, nat);
+      }
+      
+      final JavaNonTerminalProgramElement jnte1 =
+            (JavaNonTerminalProgramElement) se1;
+      final JavaNonTerminalProgramElement jnte2 =
+            (JavaNonTerminalProgramElement) se2;
+
+      if (jnte1.getChildCount() != jnte2.getChildCount()) {
+         return false;
+      }
+
+      for (int i = 0, cc = jnte1.getChildCount(); i < cc; i++) {
+         if (!equalsModRenamingStrong(jnte1.getChildAt(i), jnte2.getChildAt(i), nat, doNotMatch)) {
+            return false;
+         }
+      }
+      return true;
    }
    
    /**
