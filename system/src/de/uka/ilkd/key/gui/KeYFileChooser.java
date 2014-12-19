@@ -24,6 +24,7 @@ import de.uka.ilkd.key.core.Main;
 
 public class KeYFileChooser {
     
+    private static final File HOME_DIR = new File(System.getProperty("user.home"));
     private static final FileFilter FILTER = new FileFilter() {
         public boolean accept(File f) {
             return 
@@ -69,6 +70,12 @@ public class KeYFileChooser {
             String filename = selFile.getAbsolutePath();    
             if (!filename.endsWith(".proof")) 
                 fileChooser.setSelectedFile(new File(filename+".proof")); 
+        } else if (selFile == null) {
+            fileChooser.setSelectedFile(null);
+            fileChooser.setCurrentDirectory(HOME_DIR);
+        } else { // is directory
+            fileChooser.setSelectedFile(null);
+            fileChooser.setCurrentDirectory(selFile);
         }
     }
 
@@ -101,7 +108,9 @@ public class KeYFileChooser {
      */
     public boolean showSaveDialog(Component parent, File originalFile, String extension) {
         final String recDir = originalFile != null ?
-                        originalFile.getParent() : fileChooser.getCurrentDirectory().toString();
+                        // if directory stay there, otherwise go to parent directory
+                        (originalFile.isDirectory()? originalFile.toString(): originalFile.getParent()) 
+                        : fileChooser.getCurrentDirectory().toString();
         resetFile = (extension != null) ? new File(recDir, extension): originalFile;
         fileChooser.setSelectedFile(resetFile);
         setSaveDialog(true);
@@ -115,8 +124,13 @@ public class KeYFileChooser {
 
     private boolean showSaveDialog(Component parent, File selectedFile) {
         if (selectedFile != null) {
-            fileChooser.setSelectedFile(selectedFile);
-            fileChooser.updateUI(); // Might prevent empty filename suggestion?
+            if (selectedFile.isDirectory()) {
+                fileChooser.setSelectedFile(null);
+                fileChooser.setCurrentDirectory(selectedFile);
+            } else {
+                fileChooser.setSelectedFile(selectedFile);
+                fileChooser.updateUI(); // Might prevent empty filename suggestion?
+            }
         }
 
         setSaveDialog(true);
@@ -126,7 +140,12 @@ public class KeYFileChooser {
 
     public void resetPath() {
         assert resetFile != null;
-        fileChooser.setSelectedFile(resetFile);
+        if (resetFile.isDirectory()) {
+            fileChooser.setSelectedFile(null);
+            fileChooser.setCurrentDirectory(resetFile);
+        } else {
+            fileChooser.setSelectedFile(resetFile);
+        }
         fileChooser.updateUI();
         resetFile = null;
     }
@@ -134,13 +153,19 @@ public class KeYFileChooser {
     public File getCurrentDirectory() {
         return fileChooser.getCurrentDirectory();
     }
+    
     public boolean showOpenDialog(Component component) {
         setSaveDialog(false);
 
         final File file = fileChooser.getSelectedFile() != null ?
                         fileChooser.getSelectedFile() : fileChooser.getCurrentDirectory();
                         resetFile = file;
-                        fileChooser.setSelectedFile(file);
+                        if (file.isDirectory()) {
+                            fileChooser.setSelectedFile(null);
+                            fileChooser.setCurrentDirectory(file);
+                        } else {
+                            fileChooser.setSelectedFile(file);
+                        }
                         fileChooser.updateUI();
 
                         int result = fileChooser.showOpenDialog(component);
