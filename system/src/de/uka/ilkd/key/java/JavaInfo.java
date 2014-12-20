@@ -576,13 +576,22 @@ public final class JavaInfo {
     public IProgramMethod getToplevelPM(KeYJavaType kjt,
 	    			       String methodName,
 	    			       ImmutableList<KeYJavaType> sig) {
+        return findToplevelPM(kjt, methodName, sig, kjt);
+    }
+
+    /* This method has been introduced as bugfix to #1487 */
+    private IProgramMethod findToplevelPM(KeYJavaType kjt,
+            String methodName,
+            ImmutableList<KeYJavaType> sig,
+            KeYJavaType context) {
+
 	for(KeYJavaType sup : getAllSupertypes(kjt).removeAll(kjt)) {
-	    final IProgramMethod result = getToplevelPM(sup, methodName, sig);
+            final IProgramMethod result = findToplevelPM(sup, methodName, sig, context);
 	    if(result != null) {
 		return result;
 	    }
 	}
-	return getProgramMethod(kjt, methodName, sig, kjt);
+        return getProgramMethod(kjt, methodName, sig, context);
     }
 
 
