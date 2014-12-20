@@ -52,22 +52,27 @@ public class JMLTextHover implements IJavaEditorTextHover {
       }
       final IJMLParser parser = JMLPreferencesHelper
             .getProjectActiveJMLProfile(activeProject).createParser();
+      IASTNode result;
       try {
          // Parse the text
          // End index of comment is inclusive, but input end for parser
          // exclusive
-         final IASTNode result = parser.parse(textViewer.getDocument().get(),
+         result = parser.parse(textViewer.getDocument().get(),
                comment.getContentBeginOffset(),
                comment.getContentEndOffset() + 1);
-         final IASTNode selectedNode = Nodes.getDepthMostNodeWithPosition(
-               cursorPosition, result);
-         if (selectedNode != null && Nodes.isKeyword(selectedNode)) {
-            final IKeywordNode selectedKNode = (IKeywordNode) selectedNode;
-            return selectedKNode.getKeyword().getDescription();
-         }
+
       }
       catch (final ParserException e) {
-         return "Unable to parse JML";
+         result = e.getErrorNode();
+         if (result == null) {
+            return "Unable to parse JML";
+         }
+      }
+      final IASTNode selectedNode = Nodes.getDepthMostNodeWithPosition(
+            cursorPosition, result);
+      if (selectedNode != null && Nodes.isKeyword(selectedNode)) {
+         final IKeywordNode selectedKNode = (IKeywordNode) selectedNode;
+         return selectedKNode.getKeyword().getDescription();
       }
       return null;
    }
