@@ -56,7 +56,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     private static StringBuffer MULTSTRING = new StringBuffer("*");
 
     private static StringBuffer DIVSTRING = new StringBuffer("div");
-
+        
     private static StringBuffer LTSTRING = new StringBuffer("<");
 
     private static StringBuffer GTSTRING = new StringBuffer(">");
@@ -363,6 +363,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
         args.add(arg2);
         return buildFunction(DIVSTRING, args);
     }
+    
 
     @Override
     protected StringBuffer translateIntegerGeq(StringBuffer arg1,

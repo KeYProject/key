@@ -308,7 +308,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	    StringBuffer arg2) {
 	return new StringBuffer("unknownOp");
     }
-
+    
     @Override
     protected StringBuffer translateIntegerGeq(StringBuffer arg1,
 	    StringBuffer arg2) {

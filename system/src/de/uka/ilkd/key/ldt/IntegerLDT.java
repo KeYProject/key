@@ -79,6 +79,7 @@ public final class IntegerLDT extends LDT {
     private final Function mul;
     private final Function div;
     private final Function mod;
+    private final Function pow;
     private final Function bsum;
     private final Function bprod;
 //    private final Function min; // handled by the \ifEx operator
@@ -97,12 +98,18 @@ public final class IntegerLDT extends LDT {
     private final Function modJlong;
     private final Function divJint;
     private final Function divJlong;
+    
+    private final Function shiftright;
+    private final Function shiftleft;
     private final Function shiftrightJint;
     private final Function shiftrightJlong;
     private final Function shiftleftJint;
     private final Function shiftleftJlong;
     private final Function unsignedshiftrightJint;
     private final Function unsignedshiftrightJlong;
+    private final Function binaryOr;
+    private final Function binaryXOr;
+    private final Function binaryAnd;
     private final Function orJint;
     private final Function orJlong;
     private final Function andJint;
@@ -183,7 +190,8 @@ public final class IntegerLDT extends LDT {
         bsum                = addFunction(services, "bsum");
         bprod               = addFunction(services, "bprod");
         jdiv                = addFunction(services, "jdiv");
-        jmod                = addFunction(services, "jmod");                  
+        jmod                = addFunction(services, "jmod");    
+        pow                 = addFunction(services, "pow");
         unaryMinusJint      = addFunction(services, "unaryMinusJint");
         unaryMinusJlong     = addFunction(services, "unaryMinusJlong");
         addJint             = addFunction(services, "addJint");
@@ -196,6 +204,9 @@ public final class IntegerLDT extends LDT {
         modJlong            = addFunction(services, "modJlong");
         divJint             = addFunction(services, "divJint");
         divJlong            = addFunction(services, "divJlong");
+
+        shiftright          = addFunction(services, "shiftright");
+        shiftleft           = addFunction(services, "shiftleft");
         shiftrightJint      = addFunction(services, "shiftrightJint");
         shiftrightJlong     = addFunction(services, "shiftrightJlong");
         shiftleftJint       = addFunction(services, "shiftleftJint");
@@ -204,6 +215,9 @@ public final class IntegerLDT extends LDT {
                             = addFunction(services, "unsignedshiftrightJint");
         unsignedshiftrightJlong 
                             = addFunction(services, "unsignedshiftrightJlong");
+        binaryOr            = addFunction(services, "binaryOr");
+        binaryAnd           = addFunction(services, "binaryAnd");
+        binaryXOr           = addFunction(services, "binaryXOr");
         orJint              = addFunction(services, "orJint");
         orJlong             = addFunction(services, "orJlong");
         andJint             = addFunction(services, "andJint");
@@ -335,6 +349,11 @@ public final class IntegerLDT extends LDT {
     
     public Function getMod() {
         return mod;
+    }
+    
+    
+    public Function getPow() {
+    	return pow;
     }
     
     
@@ -733,6 +752,13 @@ public final class IntegerLDT extends LDT {
         return addJint;
     }
     
+    
+    /** 
+     * returns the function symbol representing the bitwise-or for Java int
+     */
+    public Function getBitwiseOrJavaInt() {
+        return orJint;
+    }
    
     /**
      * the function representing the Java operator when one of the
@@ -787,7 +813,7 @@ public final class IntegerLDT extends LDT {
     public Function getJavaBitwiseOrInt() {
         return javaBitwiseOrInt;
     }
-
+    
 
     /**
      * the function representing the Java operator <code>|</code> 
