@@ -1,5 +1,7 @@
 package org.key_project.jmlediting.core.test.parser;
 
+import static org.key_project.jmlediting.core.test.parser.ParserTestUtils.*;
+
 import org.junit.Test;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.ParserException;
@@ -12,7 +14,7 @@ public class MultipleKeywordsTest {
       final IASTNode expectedResult = DomBuildUtils.buildKeywordSequence(0, 26,
             DomBuildUtils.buildKeywordSpec("behavior", 0),
             DomBuildUtils.buildKeywordSpec("assignable", 13, 26, "x"));
-      testParseMultipleKeywords(content, expectedResult);
+      testParse(content, expectedResult);
    }
 
    @Test
@@ -24,33 +26,22 @@ public class MultipleKeywordsTest {
             DomBuildUtils.buildKeywordSpec("assignable", 45, 58, "y"),
             DomBuildUtils.buildKeywordSpec("exceptional_behavior", 63),
             DomBuildUtils.buildKeywordSpec("ensures", 86, 100, "false"));
-      testParseMultipleKeywords(content, expectedResult);
+      testParse(content, expectedResult);
    }
 
-   @Test(expected = ParserException.class)
+   @Test
    public void parseWrongMultipleKeywords1() throws ParserException {
-      testParseMultipleKeywords(" @ normal_behavior");
+      testParseFail(" @ normal_behavior");
    }
 
-   @Test(expected = ParserException.class)
+   @Test
    public void parseWrongMultipleKeywords2() throws ParserException {
-      testParseMultipleKeywords("behavior ensures x normal_behavior");
+      testParseFail("behavior ensures x normal_behavior");
    }
 
-   @Test(expected = ParserException.class)
+   @Test
    public void parseWrongMultipleKeywords3() throws ParserException {
-      testParseMultipleKeywords(" \n @");
+      testParseFail(" \n @");
    }
 
-   private static void testParseMultipleKeywords(final String content)
-         throws ParserException {
-      testParseMultipleKeywords(content, null);
-   }
-
-   private static void testParseMultipleKeywords(final String content,
-         final IASTNode expectedResult) throws ParserException {
-      final IASTNode result = ProfileWrapper.testProfile.createParser().parse(
-            content, 0, content.length());
-      DomCompareUtils.compareIASTNode(expectedResult, result, true);
-   }
 }

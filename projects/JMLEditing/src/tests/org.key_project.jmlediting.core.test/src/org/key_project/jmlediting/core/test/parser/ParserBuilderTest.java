@@ -1,8 +1,8 @@
 package org.key_project.jmlediting.core.test.parser;
 
-import static org.junit.Assert.fail;
 import static org.key_project.jmlediting.core.dom.Nodes.*;
 import static org.key_project.jmlediting.core.parser.ParserBuilder.*;
+import static org.key_project.jmlediting.core.test.parser.ParserTestUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -444,23 +444,6 @@ public class ParserBuilderTest {
    @Test(expected = IllegalArgumentException.class)
    public void testAllowWhitespacesIllegal() {
       allowWhitespaces(null);
-   }
-
-   private static void testParse(final String text, final ParseFunction parser,
-         final IASTNode expectedResult) throws ParserException {
-      final IASTNode parseResult = parser.parse(text, 0, text.length());
-      DomCompareUtils.compareIASTNode(expectedResult, parseResult, true);
-   }
-
-   private static void testParseFail(final String text,
-         final ParseFunction parser) {
-      try {
-         parser.parse(text, 0, text.length());
-      }
-      catch (final ParserException e) {
-         return;
-      }
-      fail("Expected a parsing error");
    }
 
 }

@@ -1,11 +1,10 @@
 package org.key_project.jmlediting.core.test.parser;
 
-import static org.key_project.jmlediting.core.test.parser.DomBuildUtils.buildKeywordSequence;
-import static org.key_project.jmlediting.core.test.parser.DomBuildUtils.buildKeywordSpec;
+import static org.key_project.jmlediting.core.test.parser.DomBuildUtils.*;
+import static org.key_project.jmlediting.core.test.parser.ParserTestUtils.*;
 
 import org.junit.Test;
 import org.key_project.jmlediting.core.dom.IASTNode;
-import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParserException;
 
 public class BehaviorParserTest {
@@ -16,7 +15,7 @@ public class BehaviorParserTest {
       final IASTNode result1 = buildKeywordSequence(0, 23,
             buildKeywordSpec("behavior", 0),
             buildKeywordSpec("ensures", 9, 23, "x = y"));
-      testParseBehaviorSpecification(parseText1, result1);
+      testParse(parseText1, result1);
    }
 
    @Test
@@ -26,34 +25,22 @@ public class BehaviorParserTest {
             buildKeywordSpec("normal_behavior", 0),
             buildKeywordSpec("ensures", 16, 29, "true"),
             buildKeywordSpec("requires", 30, 45, "false"));
-      testParseBehaviorSpecification(parseText2, result2);
+      testParse(parseText2, result2);
    }
 
-   @Test(expected = ParserException.class)
+   @Test
    public void testParseWrongBehaviors1() throws ParserException {
-      testParseBehaviorSpecification("behavior esures true;");
+      testParseFail("behavior esures true;");
    }
 
-   @Test(expected = ParserException.class)
+   @Test
    public void testParseWrongBehaviors2() throws ParserException {
-      testParseBehaviorSpecification("normal_behavir");
+      testParseFail("normal_behavir");
    }
 
-   @Test(expected = ParserException.class)
+   @Test
    public void testParseWrongBehaviors3() throws ParserException {
-      testParseBehaviorSpecification("nor_behavior ensures true;");
-   }
-
-   private static void testParseBehaviorSpecification(final String text)
-         throws ParserException {
-      testParseBehaviorSpecification(text, null);
-   }
-
-   private static void testParseBehaviorSpecification(final String text,
-         final IASTNode result) throws ParserException {
-      final IJMLParser parser = ProfileWrapper.testProfile.createParser();
-      final IASTNode parseResult = parser.parse(text, 0, text.length());
-      DomCompareUtils.compareIASTNode(result, parseResult, false);
+      testParseFail("nor_behavior ensures true;");
    }
 
 }

@@ -1,12 +1,9 @@
 package org.key_project.jmlediting.core.test.parser;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
-import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.parser.ParserException;
-import org.key_project.jmlediting.core.parser.ParserBuilder;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefParser;
 
 public class StoreRefParserTest {
@@ -125,11 +122,8 @@ public class StoreRefParserTest {
 
    private static void testParse(final String text, final String resultTerm,
          final boolean allowInformalDescr) throws ParserException {
-      final StoreRefParser parser = new StoreRefParser(
-            ProfileWrapper.testProfile, allowInformalDescr);
-      final IASTNode result = ParserBuilder.requireComplete(parser).parse(text,
-            0, text.length());
-      assertEquals(resultTerm, result.toString());
+      ParserTestUtils.testParseComplete(text, new StoreRefParser(
+            ProfileWrapper.testProfile, allowInformalDescr), resultTerm);
    }
 
 }

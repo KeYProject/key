@@ -46,12 +46,10 @@ public class DomBuildUtils {
       if (sKeyword == null) {
          fail("Unable to find keyword");
       }
-      return Nodes
-            .createNode(start, end, NodeTypes.KEYWORD_APPL, Nodes
-                  .createKeyword(start, start + keyword.length() - 1, sKeyword,
-                        keyword), Nodes.createNode(
-                              start + keyword.length() + 1, end, NodeTypes.KEYWORD_CONTENT,
-                              Nodes.createString(start + keyword.length() + 1, end - 1,
-                                    content)));
+      return Nodes.createNode(start, end, NodeTypes.KEYWORD_APPL, Nodes
+            .createKeyword(start, start + keyword.length(), sKeyword, keyword),
+            Nodes.createNode(start + keyword.length() + 1, end,
+                  NodeTypes.KEYWORD_CONTENT, Nodes.createString(
+                        start + keyword.length() + 1, end - 1, content)));
    }
 }

@@ -1,7 +1,7 @@
 package org.key_project.jmlediting.core.test.parser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static org.key_project.jmlediting.core.test.parser.ParserTestUtils.testParseFail;
 
 import org.junit.Test;
 import org.key_project.jmlediting.core.dom.IASTNode;
@@ -45,56 +45,56 @@ public class SpecificationStatementParserTest {
             "\"he\'llo\\;\" == \'\";\'", 0, 28);
    }
 
-   @Test(expected = ParserException.class)
+   @Test
    public void testParseWrongSpecificationKeywords1() throws ParserException {
-      testParseWrongSpecification("  ");
+      testParseFail("  ");
    }
 
-   @Test(expected = ParserException.class)
+   @Test
    public void testParseWrongSpecificationKeywords2() throws ParserException {
-      testParseWrongSpecification(" ensures ");
+      testParseFail(" ensures ");
    }
 
-   @Test(expected = ParserException.class)
+   @Test
    public void testParseWrongSpecificationKeywords3() throws ParserException {
-      testParseWrongSpecification(" emsures x;");
+      testParseFail(" emsures x;");
    }
 
-   @Test(expected = ParserException.class)
+   @Test
    public void testParseWrongSpecificationKeywords4() throws ParserException {
-      testParseWrongSpecification("ensuresx == y;");
+      testParseFail("ensuresx == y;");
    }
 
-   @Test(expected = ParserException.class)
+   @Test
    public void testParseWrongSpecificationKeywords5() throws ParserException {
-      testParseWrongSpecification("    \t ");
+      testParseFail("    \t ");
    }
 
-   @Test(expected = ParserException.class)
+   @Test
    public void testParseWrongSpecificationKeywords6() throws ParserException {
-      testParseWrongSpecification("assignable");
+      testParseFail("assignable");
    }
 
-   @Test(expected = ParserException.class)
+   @Test
    public void testParseWrongSpecificationKeywords7() throws ParserException {
-      testParseWrongSpecification("requires x == true");
+      testParseFail("requires x == true");
    }
 
-   @Test(expected = ParserException.class)
+   @Test
    public void testParseWrongSpecificationKeywords8() throws ParserException {
-      testParseWrongSpecification("");
+      testParseFail("");
    }
 
-   @Test(expected = ParserException.class)
+   @Test
    public void testParseWrongSpecificationKeywords9() throws ParserException {
-      testParseWrongSpecification("  2requires true;");
+      testParseFail("  2requires true;");
 
    }
 
    private static void testParseSpecification(final String specText,
          final String expectedKeyword, final String expectedContent,
          final int expctedStartOffset, final int expectedEndOffset)
-               throws ParserException {
+         throws ParserException {
       final IJMLParser parser = ProfileWrapper.testProfile.createParser();
 
       final IASTNode statement = parser.parse(specText, 0, specText.length());
@@ -124,13 +124,5 @@ public class SpecificationStatementParserTest {
             statement.getStartOffset());
       assertEquals("Wrong end offset", expectedEndOffset,
             statement.getEndOffset());
-   }
-
-   private static void testParseWrongSpecification(final String specText)
-         throws ParserException {
-
-      ProfileWrapper.testProfile.createParser().parse(specText, 0,
-            specText.length());
-
    }
 }
