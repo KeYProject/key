@@ -64,10 +64,22 @@ public class DefaultJMLParser implements IJMLParser {
          }
          catch (final ParserException e) {
             keywordNode = e.getErrorNode();
-            if (keywordNode == null) {
-               throw e;
-            }
+            // Collect all errors
             keywordErrors.addAll(e.getAllErrors());
+            if (keywordNode == null) {
+               // Was not able to find any keyword, skip text until next
+               // whitespace because this token is not parseable
+               final int nextPosition = skipWhiteSpacesOrAt(text, position + 1,
+                     end, true);
+               // Ignore this token for a keyword
+               allKeywords.add(Nodes.createErrorNode(Nodes
+                     .createUnparsedTextNode(
+                           text.substring(position, nextPosition), position,
+                           nextPosition)));
+               position = nextPosition;
+               continue;
+            }
+
          }
          allKeywords.add(keywordNode);
          // Skip whites
