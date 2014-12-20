@@ -1,8 +1,10 @@
 package org.key_project.jmlediting.profile.jmlref.other;
 
 import org.key_project.jmlediting.core.profile.syntax.AbstractEmptyKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
 
-public class HelperKeyword extends AbstractEmptyKeyword {
+public class HelperKeyword extends AbstractEmptyKeyword implements
+      IToplevelKeyword {
 
    public HelperKeyword() {
       super("helper");

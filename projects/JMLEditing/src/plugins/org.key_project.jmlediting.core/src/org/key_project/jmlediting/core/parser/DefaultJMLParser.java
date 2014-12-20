@@ -10,6 +10,8 @@ import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.parser.internal.ParserUtils;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
+import org.key_project.jmlediting.core.profile.JMLProfileHelper;
+import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
 
 /**
  * The default implementation for an JML Parser with respect to the keywords
@@ -60,7 +62,8 @@ public class DefaultJMLParser implements IJMLParser {
          try {
             keywordNode = ParserUtils.parseKeyword(text, position,
 
-                  end, this.profile.getSupportedKeywords(), this.profile);
+                  end, JMLProfileHelper.filterKeywords(this.profile,
+                  IToplevelKeyword.class), this.profile);
          }
          catch (final ParserException e) {
             keywordNode = e.getErrorNode();
