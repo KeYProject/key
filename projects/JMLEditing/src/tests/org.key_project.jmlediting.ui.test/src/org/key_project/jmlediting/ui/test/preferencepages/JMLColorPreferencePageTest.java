@@ -3,6 +3,7 @@ package org.key_project.jmlediting.ui.test.preferencepages;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.eclipse.help.ui.internal.ExecuteCommandAction;
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
@@ -38,7 +39,32 @@ public class JMLColorPreferencePageTest {
 
    @Before
    public void openGlobalJMLColorSettings() {
-      bot.menu("Window").menu("Preferences").click();
+      // We need to do something special on mac
+      if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+         // Cannot access the menu item for preferences on mac because it is
+         // located in a native menu, which even prohibits the key shortcut to
+         // work using SWT bot.
+         // Therefore, I use the following action to open the preferences window
+         // which makes use of nun public UI
+         // I took the code from here, where the same problem was solved:
+         // https://code.google.com/p/swordfish-tooling/source/diff?spec=svn843&r=843&format=side&path=/trunk/org.eclipse.swordfish.tooling.systemtest/src/org/eclipse/swordfish/tooling/target/platform/test/ide/MacEclipseIDE.java
+         // This code needs the dependency on help.ui
+         final Thread t = new Thread() {
+            @SuppressWarnings("restriction")
+            @Override
+            public void run() {
+               final ExecuteCommandAction action = new ExecuteCommandAction();
+               action.setInitializationString("org.eclipse.ui.window.preferences");
+               action.run();
+            }
+         };
+         t.start();
+      }
+      else {
+         // On windows and other linux/unix implementations beside mac this
+         // command should work
+         bot.menu("Window").menu("Preferences").click();
+      }
       bot.sleep(100);
       this.navigateToJMLColorSettings();
       this.setCommentColorButton();
