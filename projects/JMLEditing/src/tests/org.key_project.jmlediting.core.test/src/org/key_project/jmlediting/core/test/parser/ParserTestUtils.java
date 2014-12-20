@@ -11,20 +11,12 @@ public class ParserTestUtils {
 
    public static void testParse(final String content,
          final IASTNode expectedResult) throws ParserException {
-      final IASTNode result = ProfileWrapper.testProfile.createParser().parse(
-            content, 0, content.length());
-      DomCompareUtils.compareIASTNode(expectedResult, result, true);
+      testParse(content, ProfileWrapper.testProfile.createParser(),
+            expectedResult);
    }
 
-   public static void testParseFail(final String content)
-         throws ParserException {
-      try {
-         testParse(content, null);
-      }
-      catch (final ParserException e) {
-         return;
-      }
-      fail("Expected a parsing error");
+   public static void testParseFail(final String content) {
+      testParseFail(content, ProfileWrapper.testProfile.createParser());
    }
 
    public static void testParse(final String text, final ParseFunction parser,
@@ -36,7 +28,7 @@ public class ParserTestUtils {
    public static void testParseFail(final String text,
          final ParseFunction parser) {
       try {
-         parser.parse(text, 0, text.length());
+         testParse(text, parser, null);
       }
       catch (final ParserException e) {
          return;
@@ -46,10 +38,46 @@ public class ParserTestUtils {
 
    public static void testParseComplete(final String text,
          final ParseFunction parser, final String resultTerm)
-               throws ParserException {
+         throws ParserException {
       final IASTNode result = ParserBuilder.requireComplete(parser).parse(text,
             0, text.length());
       assertEquals(resultTerm, result.toString());
+   }
+
+   private static void testRecovery(final String text,
+         final ParseFunction parser, final Object expectedErrorNode) {
+      try {
+         parser.parse(text, 0, text.length());
+         fail("Parser was able to parse");
+      }
+      catch (final ParserException e) {
+         final IASTNode errorNode = e.getErrorNode();
+         if (errorNode == null) {
+            fail("Parser was unable to recover");
+         }
+         if (expectedErrorNode instanceof IASTNode) {
+            DomCompareUtils.compareIASTNode((IASTNode) expectedErrorNode,
+                  errorNode, true);
+         }
+         else if (expectedErrorNode instanceof String) {
+            assertEquals(expectedErrorNode.toString(), errorNode.toString());
+         }
+         else {
+            fail("Invalid comparison object");
+         }
+      }
+   }
+
+   public static void testRecovery(final String text,
+         final IASTNode expectedErrorNode) {
+      testRecovery(text, ProfileWrapper.testProfile.createParser(),
+            expectedErrorNode);
+   }
+
+   public static void testRecovery(final String text,
+         final String expectedErrorNode) {
+      testRecovery(text, ProfileWrapper.testProfile.createParser(),
+            expectedErrorNode);
    }
 
 }

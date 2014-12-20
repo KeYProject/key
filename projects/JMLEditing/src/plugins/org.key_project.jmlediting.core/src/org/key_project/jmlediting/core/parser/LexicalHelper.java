@@ -221,6 +221,19 @@ public final class LexicalHelper {
       return skipWhiteSpacesOrAt(text, start, end, false);
    }
 
+   public static int findNextWhitespace(final String text, final int start,
+         final int end) throws ParserException {
+      ParserUtils.validatePositions(text, start, end);
+      int position = start;
+      while (position < end && !Character.isWhitespace(text.charAt(position))) {
+         position++;
+      }
+      if (position == end) {
+         throw new ParserException("No whitespace found", text, end);
+      }
+      return position;
+   }
+
    public static int skipWhiteSpacesOrAt(final String text, final int start,
          final int end, final boolean beginAtNewLine) throws ParserException {
       ParserUtils.validatePositions(text, start, end);

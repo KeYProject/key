@@ -62,8 +62,8 @@ public class DefaultJMLParser implements IJMLParser {
          try {
             keywordNode = ParserUtils.parseKeyword(text, position,
 
-                  end, JMLProfileHelper.filterKeywords(this.profile,
-                  IToplevelKeyword.class), this.profile);
+            end, JMLProfileHelper.filterKeywords(this.profile,
+                        IToplevelKeyword.class), this.profile);
          }
          catch (final ParserException e) {
             keywordNode = e.getErrorNode();
@@ -72,12 +72,23 @@ public class DefaultJMLParser implements IJMLParser {
             if (keywordNode == null) {
                // Was not able to find any keyword, skip text until next
                // whitespace because this token is not parseable
-               final int nextPosition = skipWhiteSpacesOrAt(text, position + 1,
-                     end, true);
-               // Ignore this token for a keyword
+               // This is faster than just removing one char at one
+               // First determine where unparseable keyword starts
+               final int textStart = skipWhiteSpacesOrAt(text, position, end);
+               // Then skip until the next whitespace from there
+               int nextPosition;
+               try {
+                  nextPosition = LexicalHelper.findNextWhitespace(text,
+                        textStart, end);
+               }
+               catch (final ParserException e2) {
+                  // No whitespace anymore, so take rest of the text
+                  nextPosition = end;
+               }
+               // Ignore this token for a keyword and continue with the rest
                allKeywords.add(Nodes.createErrorNode(Nodes
                      .createUnparsedTextNode(
-                           text.substring(position, nextPosition), position,
+                           text.substring(textStart, nextPosition), textStart,
                            nextPosition)));
                position = nextPosition;
                continue;

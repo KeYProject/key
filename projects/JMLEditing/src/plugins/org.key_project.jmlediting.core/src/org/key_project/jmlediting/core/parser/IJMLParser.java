@@ -8,7 +8,7 @@ import org.key_project.jmlediting.core.dom.IASTNode;
  * @author Moritz Lichter
  *
  */
-public interface IJMLParser {
+public interface IJMLParser extends ParseFunction {
 
    /**
     * Parses a JML annotation in the given text from start index (including) to
@@ -24,6 +24,7 @@ public interface IJMLParser {
     * @throws ParserException
     *            if Parsing encountered an error
     */
+   @Override
    IASTNode parse(String text, int start, int end) throws ParserException;
 
 }

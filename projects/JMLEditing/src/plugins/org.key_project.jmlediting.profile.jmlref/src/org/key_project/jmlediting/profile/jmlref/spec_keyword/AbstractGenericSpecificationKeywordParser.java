@@ -10,7 +10,7 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 
 public abstract class AbstractGenericSpecificationKeywordParser implements
-      IKeywordParser {
+IKeywordParser {
 
    @Override
    public IASTNode parse(final String text, final int start, final int end)
@@ -20,20 +20,25 @@ public abstract class AbstractGenericSpecificationKeywordParser implements
       try {
          final IASTNode contentResult = this.parseToSemicolon(text, start + 1,
 
-         closingSemicolon);
+               closingSemicolon);
          return Nodes.createNode(contentResult.getStartOffset(),
                closingSemicolon + 1, NodeTypes.KEYWORD_CONTENT, contentResult);
       }
       catch (final ParserException e) {
          final IASTNode errorNode = e.getErrorNode();
          if (errorNode != null) {
+            // Parser was able to recover, so we do not need to insert an error
+            // node
             throw new ParserException(e, Nodes.createNode(
                   errorNode.getStartOffset(), closingSemicolon + 1,
                   NodeTypes.KEYWORD_CONTENT, errorNode));
          }
-         throw new ParserException(e, Nodes.createUnparsedTextNode(
-               text.substring(start + 1, closingSemicolon + 1), start + 1,
-               closingSemicolon + 1));
+         // There is no result, so we add the complete content as an error node
+         throw new ParserException(e, Nodes.createNode(start + 1,
+               closingSemicolon + 1, NodeTypes.KEYWORD_CONTENT, Nodes
+               .createErrorNode(Nodes.createUnparsedTextNode(
+                     text.substring(start + 1, closingSemicolon),
+                     start + 1, closingSemicolon))));
       }
 
    }

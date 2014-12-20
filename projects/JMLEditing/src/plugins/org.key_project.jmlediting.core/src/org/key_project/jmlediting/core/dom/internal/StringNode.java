@@ -44,8 +44,9 @@ public class StringNode extends PrimitiveNode implements IStringNode {
 
    @Override
    public String toString() {
-      return "String[" + this.getStartOffset() + "-" + this.getEndOffset()
-            + "](" + this.string + ")";
+      return NodeTypes.getTypeName(this.getType()) + "["
+            + this.getStartOffset() + "-" + this.getEndOffset() + "]("
+            + this.string + ")";
    }
 
 }
