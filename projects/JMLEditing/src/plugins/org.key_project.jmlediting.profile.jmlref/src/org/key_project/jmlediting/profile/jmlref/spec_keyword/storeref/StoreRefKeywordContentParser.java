@@ -1,10 +1,11 @@
 package org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref;
 
 import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.core.dom.NodeTypes;
 import org.key_project.jmlediting.core.parser.ParserBuilder;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
-import org.key_project.jmlediting.profile.jmlref.spec_keyword.AbstractGenericSpecificationKeywordParser;
+import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 
 /**
  * Parses the content after a keyword which requires a storage location (or
@@ -13,8 +14,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.AbstractGenericSpe
  * @author Moritz Lichter
  *
  */
-public class StoreRefKeywordContentParser extends
-      AbstractGenericSpecificationKeywordParser {
+public class StoreRefKeywordContentParser implements IKeywordParser {
 
    /**
     * The parser, which is used. The parser depends on the current profile
@@ -44,11 +44,19 @@ public class StoreRefKeywordContentParser extends
       this.parser = new StoreRefParser(profile, this.allowInformalDescription);
    }
 
+   /*
+    * @Override protected IASTNode parseToSemicolon(final String text, final int
+    * start, final int end) throws ParserException { // We require that the the
+    * complete text to the semicolon is parseable return
+    * ParserBuilder.requireComplete(this.parser).parse(text, start, end); }
+    */
+
    @Override
-   protected IASTNode parseToSemicolon(final String text, final int start,
-         final int end) throws ParserException {
-      // We require that the the complete text to the semicolon is parseable
-      return ParserBuilder.requireComplete(this.parser).parse(text, start, end);
+   public IASTNode parse(final String text, final int start, final int end)
+         throws ParserException {
+      return ParserBuilder
+            .closedBy(NodeTypes.KEYWORD_CONTENT, this.parser, ';').parse(text,
+                  start, end);
    }
 
 }

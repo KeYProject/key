@@ -75,6 +75,11 @@ public class ParserTestUtils {
    }
 
    public static void testRecovery(final String text,
+         final ParseFunction function, final IASTNode expectedErrorNode) {
+      testRecovery(text, function, (Object) expectedErrorNode);
+   }
+
+   public static void testRecovery(final String text,
          final String expectedErrorNode) {
       testRecovery(text, ProfileWrapper.testProfile.createParser(),
             expectedErrorNode);

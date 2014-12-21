@@ -15,7 +15,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefN
 import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
 
 public abstract class StoreRefContainerKeyword extends
-AbstractGenericSpecificationKeyword {
+      AbstractGenericSpecificationKeyword {
 
    public StoreRefContainerKeyword(final String keyword,
          final String... keywords) {

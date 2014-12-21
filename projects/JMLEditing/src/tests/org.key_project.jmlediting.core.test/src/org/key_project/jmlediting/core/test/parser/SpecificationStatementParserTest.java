@@ -94,7 +94,7 @@ public class SpecificationStatementParserTest {
    private static void testParseSpecification(final String specText,
          final String expectedKeyword, final String expectedContent,
          final int expctedStartOffset, final int expectedEndOffset)
-         throws ParserException {
+               throws ParserException {
       final IJMLParser parser = ProfileWrapper.testProfile.createParser();
 
       final IASTNode statement = parser.parse(specText, 0, specText.length());

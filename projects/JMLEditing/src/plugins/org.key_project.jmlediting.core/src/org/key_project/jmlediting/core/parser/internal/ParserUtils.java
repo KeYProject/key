@@ -64,7 +64,7 @@ public class ParserUtils {
    public static IASTNode parseSeparatedNonEmptyList(final String text,
          final int start, final int end, final char sep,
          final ParseFunction function, final String missingExceptionText)
-         throws ParserException {
+               throws ParserException {
       final List<IASTNode> nodes = new ArrayList<IASTNode>();
       int startPosition = start;
       try {
@@ -103,7 +103,7 @@ public class ParserUtils {
 
    public static IASTNode parseSeq(final int type, final String text,
          final int start, final int end, final ParseFunction... seqs)
-         throws ParserException {
+               throws ParserException {
       final List<IASTNode> nodes = new ArrayList<IASTNode>();
       int startPosition = start;
       for (final ParseFunction function : seqs) {
@@ -117,7 +117,7 @@ public class ParserUtils {
 
    public static IASTNode parseAlternative(final String text, final int start,
          final int end, final ParseFunction... alternatives)
-         throws ParserException {
+               throws ParserException {
       ParserException exception = null;
       for (final ParseFunction function : alternatives) {
          try {
@@ -164,7 +164,7 @@ public class ParserUtils {
       if (foundKeyword == null) {
          throw new ParserException(
                "Not a supported specification statement keyword: \"" + keyword
-                     + "\"", text, keywordEnd);
+               + "\"", text, keywordEnd);
       }
       final IASTNode keywordNode = Nodes.createKeyword(keywordStart,
             keywordEnd, foundKeyword, keyword);
@@ -179,7 +179,9 @@ public class ParserUtils {
       catch (final ParserException e) {
          keywordResult = e.getErrorNode();
          if (keywordResult == null) {
-            throw e;
+            throw new ParserException(e, Nodes.createNode(
+                  NodeTypes.KEYWORD_APPL, keywordNode,
+                  Nodes.createErrorNode(keywordEnd)));
          }
          throw new ParserException(e, Nodes.createNode(NodeTypes.KEYWORD_APPL,
                keywordNode, keywordResult));

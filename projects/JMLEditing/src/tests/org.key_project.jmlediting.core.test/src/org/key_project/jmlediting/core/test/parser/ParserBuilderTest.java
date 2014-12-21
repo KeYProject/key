@@ -388,6 +388,14 @@ public class ParserBuilderTest {
    }
 
    @Test
+   public void testTypedRecovery() {
+      testRecovery(
+            "A",
+            typed(NodeTypes.SOME, closedBy(NodeTypes.NODE, parseA, ',')),
+            createNode(NodeTypes.SOME, createErrorNode(createString(0, 1, "A"))));
+   }
+
+   @Test
    public void testNotImplemented() {
       testParseFail("A", notImplemented());
    }
@@ -444,6 +452,51 @@ public class ParserBuilderTest {
    @Test(expected = IllegalArgumentException.class)
    public void testAllowWhitespacesIllegal() {
       allowWhitespaces(null);
+   }
+
+   @Test
+   public void testClosedBy() throws ParserException {
+      testParse("A,", closedBy(NodeTypes.NODE, parseA, ','),
+            createNode(0, 2, NodeTypes.NODE, createString(0, 1, "A")));
+   }
+
+   @Test
+   public void testClosedByWithWhitespaces() throws ParserException {
+      testParse("A   ,", closedBy(NodeTypes.NODE, parseA, ','),
+            createNode(0, 5, NodeTypes.NODE, createString(0, 1, "A")));
+   }
+
+   @Test
+   public void testIllegalClosedCharacter() {
+      testParseFail("A;", closedBy(NodeTypes.NODE, parseA, ':'));
+   }
+
+   @Test(expected = IllegalArgumentException.class)
+   public void testIllegalClosedBy1() {
+      closedBy(NodeTypes.NODE, null, ':');
+   }
+
+   @Test(expected = IllegalArgumentException.class)
+   public void testIllegalClosedBy2() {
+      closedBy(NodeTypes.NODE, parseA, ' ');
+   }
+
+   @Test
+   public void testClosedByErrorRecovery1() {
+      testRecovery("A ", closedBy(NodeTypes.NODE, parseA, ','),
+            createErrorNode(createString(0, 1, "A")));
+   }
+
+   @Test
+   public void testClosedByErrorRecovery2() {
+      testRecovery("A B", closedBy(NodeTypes.NODE, parseA, ','),
+            createErrorNode(createString(0, 1, "A")));
+   }
+
+   @Test
+   public void testClosedByErrorRecovery3() {
+      testRecovery("A ", closedBy(NodeTypes.NODE, parseA, ','),
+            createErrorNode(createString(0, 1, "A")));
    }
 
 }

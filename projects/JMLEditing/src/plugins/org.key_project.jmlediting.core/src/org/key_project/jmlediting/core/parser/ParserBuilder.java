@@ -203,6 +203,64 @@ public final class ParserBuilder {
    }
 
    /**
+    * Creates a {@link ParseFunction} which closes a given {@link ParseFunction}
+    * with a given character. The closedBy combinator returns a {@link IASTNode}
+    * of the given type containing the node parsed with the given function. The
+    * additional node is inserted to cover the position of the closing
+    * character. Whitespaces before the separating character is supported. This
+    * combinator implements error recovery when the closing character is missing
+    * but the given function was able to parse.
+    *
+    * @param type
+    *           the type of node for the wrapping node
+    * @param function
+    *           the function to parse the content
+    * @param close
+    *           the separating char which is used to close the content parsed
+    *           with the function
+    * @return a {@link ParseFunction} able to parse content parseable by the
+    *         given function and accepting a character after it.
+    * @throws IllegalArgumentException
+    *            if function is null
+    * @throws IllegalArgumentException
+    *            if close is a whitespace
+    */
+   public static ParseFunction closedBy(final int type,
+         final ParseFunction function, final char close) {
+      if (function == null) {
+         throw new IllegalArgumentException("Provide a non nulll function");
+      }
+      if (Character.isWhitespace(close)) {
+         throw new IllegalArgumentException(
+               "Provide a close character which is not a whitespace");
+      }
+      return new ParseFunction() {
+
+         @Override
+         public IASTNode parse(final String text, final int start, final int end)
+               throws ParserException {
+            // Parse with the given function
+            final IASTNode node = function.parse(text, start, end);
+            // Then scan for the closing semicolon
+            if (node.getEndOffset() == end) {
+               // error, do not scan for whitespaces
+               throw new ParserException("Expected a " + close, end, text,
+                     Nodes.createErrorNode(node));
+            }
+            final int semicolonPos = LexicalHelper.skipWhiteSpacesOrAt(text,
+                  node.getEndOffset(), end);
+            if (semicolonPos >= end || text.charAt(semicolonPos) != close) {
+               // error
+               throw new ParserException("Expected a " + close, semicolonPos,
+                     text, Nodes.createErrorNode(node));
+            }
+            return Nodes.createNode(node.getStartOffset(), semicolonPos + 1,
+                  type, node);
+         }
+      };
+   }
+
+   /**
     * Parses an alternative of {@link ParseFunction}. The given function are
     * tried in order to parse the content. The result of first function, which
     * is able to parse, will be returned. That means, that one needs to take
@@ -421,13 +479,16 @@ public final class ParserBuilder {
    /**
     * Creates a {@link ParseFunction} with takes the result of another parse
     * functions and wraps the result of this function into a new node with a
-    * specific type.
+    * specific type. This combinator implements error recovery. If function
+    * fails but is able to recover, the resulting error node is also wrapped.
     *
     * @param type
     *           the type of the wrapping node
     * @param function
     *           the {@link ParseFunction} to wrap its result
     * @return the wrapping {@link ParseFunction}
+    * @throws IllegalArgumentException
+    *            if function is null
     */
    public static ParseFunction typed(final int type,
          final ParseFunction function) {
@@ -440,7 +501,18 @@ public final class ParserBuilder {
          @Override
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
-            return Nodes.createNode(type, function.parse(text, start, end));
+            try {
+               return Nodes.createNode(type, function.parse(text, start, end));
+            }
+            catch (final ParserException e) {
+               if (e.getErrorNode() == null) {
+                  throw e;
+               }
+               else {
+                  throw new ParserException(e, Nodes.createNode(type,
+                        e.getErrorNode()));
+               }
+            }
          }
       };
    }

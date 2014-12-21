@@ -68,6 +68,10 @@ public final class Nodes {
       return createNode(NodeTypes.ERROR_NODE, content);
    }
 
+   public static IASTNode createErrorNode(final int position) {
+      return createNode(position, position, NodeTypes.ERROR_NODE);
+   }
+
    public static boolean isString(final IASTNode node) {
       return node.getType() == NodeTypes.STRING;
    }

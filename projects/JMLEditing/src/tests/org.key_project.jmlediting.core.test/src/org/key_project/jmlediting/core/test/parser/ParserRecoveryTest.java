@@ -11,7 +11,7 @@ public class ParserRecoveryTest {
    public void testRecoveryFromWrongKeywordContent() throws ParserException {
       testRecovery(
             "assignable 123; also",
-            "Node[0-20](KeywordAppl[0-15](Keyword[0-10](assignable),KeywordContent[11-15](ErrorNode[11-14](UnparsedText[11-14](123)))),Keyword[16-20](also))");
+            "Node[0-20](KeywordAppl[0-10](Keyword[0-10](assignable),ErrorNode[10-10]()),ErrorNode[11-15](UnparsedText[11-15](123;)),Keyword[16-20](also))");
    }
 
    @Test
