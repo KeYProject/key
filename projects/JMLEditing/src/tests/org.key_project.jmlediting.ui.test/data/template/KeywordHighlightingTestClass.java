@@ -28,9 +28,11 @@ public class TestClass {
        * requires ;
        */
       // requires ;
+      int x;
       /*@
         @ requires ; 
         @*/
+      int y;
       //@ requires ;
       requires ;
    }

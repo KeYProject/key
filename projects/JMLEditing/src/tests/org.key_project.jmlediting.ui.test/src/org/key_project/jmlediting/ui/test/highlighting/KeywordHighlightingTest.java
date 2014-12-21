@@ -86,16 +86,16 @@ public class KeywordHighlightingTest {
    private static final Position requiresJavaSLine = new Position(29, 9);
    private static final Position requiresJavaDoc = new Position(24, 9);
    private static final Position requiresJavaMLine = new Position(27, 9);
-   private static final Position requiresJMLMline = new Position(31, 10);
-   private static final Position requiresJavaCode = new Position(34, 6);
-   private static final Position requiresJMLSLine = new Position(33, 10);
+   private static final Position requiresJMLMline = new Position(32, 10);
+   private static final Position requiresJavaCode = new Position(36, 6);
+   private static final Position requiresJMLSLine = new Position(35, 10);
 
-   private static final Position noKWJavaSLine = new Position(43, 9);
-   private static final Position noKWJavaDoc = new Position(38, 9);
-   private static final Position noKWJavaMLine = new Position(41, 9);
+   private static final Position noKWJavaSLine = new Position(45, 9);
+   private static final Position noKWJavaDoc = new Position(40, 9);
+   private static final Position noKWJavaMLine = new Position(43, 9);
    private static final Position noKWJMLMline = new Position(47, 10);
-   private static final Position noKWJavaCode = new Position(48, 6);
-   private static final Position noKWJMLSLine = new Position(47, 10);
+   private static final Position noKWJavaCode = new Position(50, 6);
+   private static final Position noKWJMLSLine = new Position(49, 10);
 
    private static final int fontStyleBoldKeyWord = 1;
 
@@ -113,8 +113,8 @@ public class KeywordHighlightingTest {
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID,
             "data/template", testFolder);
       bot.tree().getTreeItem(PROJECT_NAME).select().expand().getNode("src")
-      .select().expand().getNode(PACKAGE_NAME).select().expand()
-      .getNode(CLASS_NAME + ".java").select().doubleClick();
+            .select().expand().getNode(PACKAGE_NAME).select().expand()
+            .getNode(CLASS_NAME + ".java").select().doubleClick();
       JMLPreferencesHelper.setProjectJMLProfile(project.getProject(),
             TestUtils.findReferenceProfile());
    }

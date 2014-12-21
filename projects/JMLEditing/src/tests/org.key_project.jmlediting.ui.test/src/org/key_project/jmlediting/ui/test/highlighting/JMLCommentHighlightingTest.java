@@ -75,9 +75,9 @@ public class JMLCommentHighlightingTest {
    private static final Position PosInMethod = new Position(20, 6);
    private static final Position PosJMLCommentSingle = new Position(23, 6);
    private static final Position PosInChar = new Position(24, 14);
-   private static final Position PublicJML = new Position(28, 6);
-   private static final Position PublicJavaComment = new Position(34, 6);
-   private static final Position PublicJavaDoc = new Position(31, 6);
+   private static final Position PublicJML = new Position(29, 6);
+   private static final Position PublicJavaComment = new Position(36, 6);
+   private static final Position PublicJavaDoc = new Position(33, 6);
    private static final Position PublicKeyword = new Position(26, 3);
 
    private final RGB javaCommentRGB = new RGB(63, 127, 95);
@@ -102,8 +102,8 @@ public class JMLCommentHighlightingTest {
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID,
             "data/template", testFolder);
       bot.tree().getTreeItem(PROJECT_NAME).select().expand().getNode("src")
-      .select().expand().getNode(PACKAGE_NAME).select().expand()
-      .getNode(CLASS_NAME + ".java").select().doubleClick();
+            .select().expand().getNode(PACKAGE_NAME).select().expand()
+            .getNode(CLASS_NAME + ".java").select().doubleClick();
       JMLPreferencesHelper.setProjectJMLProfile(project.getProject(),
             TestUtils.findReferenceProfile());
    }
