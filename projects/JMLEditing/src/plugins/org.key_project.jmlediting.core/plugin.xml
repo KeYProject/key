@@ -2,5 +2,12 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="org.key_project.jmlediting.core.profiles" name="JML Profiles" schema="schema/org.key_project.jmlediting.core.profiles.exsd"/>
-
+   <extension
+         point="org.eclipse.ltk.core.refactoring.renameParticipants">
+      <renameParticipant
+            class="org.key_project.jmlediting.core.refactoring.JMLRenameFieldProcessor"
+            id="org.key_project.jmlediting.core.refactoring.JMLRenameFieldProcessor"
+            name="JMLRenameFieldProcessor">
+      </renameParticipant>
+   </extension>
 </plugin>

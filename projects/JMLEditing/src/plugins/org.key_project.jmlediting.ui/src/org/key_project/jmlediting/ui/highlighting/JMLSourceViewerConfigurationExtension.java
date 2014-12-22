@@ -21,7 +21,7 @@ import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper;
  */
 
 public class JMLSourceViewerConfigurationExtension extends
-      DefaultJavaSourceViewerConfigurationExtension {
+DefaultJavaSourceViewerConfigurationExtension {
 
    @Override
    public void init(final IColorManager colorManager,
