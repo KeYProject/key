@@ -8,6 +8,13 @@
             class="org.key_project.jmlediting.core.refactoring.JMLRenameFieldParticipant"
             id="org.key_project.jmlediting.core.refactoring.JMLRenameFieldParticipant"
             name="JMLFieldRename">
+            <enablement>
+               <with variable="affectedNatures">
+                  <iterate operator="or">
+                     <equals value="org.eclipse.jdt.core.javanature"/>
+                  </iterate>
+               </with>
+            </enablement>
       </renameParticipant>
    </extension>
 </plugin>
