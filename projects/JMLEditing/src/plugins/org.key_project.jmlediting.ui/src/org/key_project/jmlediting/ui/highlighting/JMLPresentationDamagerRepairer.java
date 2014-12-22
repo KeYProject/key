@@ -86,7 +86,7 @@ IPresentationRepairer {
       boolean jml = false;
       final RGB jmlColor = JMLUiPreferencesHelper.getWorkspaceJMLColor();
       final CommentLocator locator = new CommentLocator(this.doc.get());
-      jml = locator.isInJMLcomment(damage.getOffset());
+      jml = locator.isInJMLComment(damage.getOffset());
       final TextAttribute ta;
       if (jml) {
          ta = new TextAttribute(new Color(Display.getDefault(), jmlColor.red,
@@ -194,7 +194,7 @@ IPresentationRepairer {
       final CommentLocator locator = new CommentLocator(this.doc.get());
       final CommentRange surroundingComment = locator.getJMLComment(offset);
       // Only provide advanced SyntaxHighlighting for JML Comments
-      if (!locator.isInJMLcomment(offset)) {
+      if (!locator.isInJMLComment(offset)) {
          return null;
       }
       final IJMLProfile activeProfile = JMLPreferencesHelper

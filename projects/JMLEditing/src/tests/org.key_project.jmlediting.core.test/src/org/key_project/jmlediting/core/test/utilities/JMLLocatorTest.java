@@ -62,20 +62,20 @@ public class JMLLocatorTest {
       this.locator = new CommentLocator(EDITOR_TEXT);
       // Test in JML Comment
       assertTrue("Offset should be in JML Comment but result was false",
-            this.locator.isInJMLcomment(EDITOR_TEXT.indexOf("/*@") + 3));
+            this.locator.isInJMLComment(EDITOR_TEXT.indexOf("/*@") + 3));
       // Test in normal Comment
       assertFalse("Offset was wrongly recognized as in a JML Comment",
-            this.locator.isInJMLcomment(EDITOR_TEXT.indexOf("//") + 3));
+            this.locator.isInJMLComment(EDITOR_TEXT.indexOf("//") + 3));
       // Test outside a comment
       assertFalse("Offset was wrongly recognized as in a JML Comment",
-            this.locator.isInJMLcomment(0));
+            this.locator.isInJMLComment(0));
       // Test inside a String
       assertFalse("Offset was wrongly recognized as in a JML Comment",
-            this.locator.isInJMLcomment(EDITOR_TEXT.indexOf("//@" + 3)));
+            this.locator.isInJMLComment(EDITOR_TEXT.indexOf("//@" + 3)));
       // Test in JML Singleline
       assertTrue(
             "Offset was wrongly recognized as not in a JML Comment",
-            this.locator.isInJMLcomment(EDITOR_TEXT.indexOf("//@",
+            this.locator.isInJMLComment(EDITOR_TEXT.indexOf("//@",
                   EDITOR_TEXT.indexOf("ensures")) + 1));
 
    }
