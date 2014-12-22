@@ -1,10 +1,15 @@
 package org.key_project.jmlediting.ui.highlighting;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.jdt.internal.ui.text.javadoc.JavaDocAutoIndentStrategy;
 import org.eclipse.jdt.ui.text.IColorManager;
 import org.eclipse.jdt.ui.text.IJavaPartitions;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
@@ -93,5 +98,26 @@ DefaultJavaSourceViewerConfigurationExtension {
       reconciler.setDamager(newDR, IJavaPartitions.JAVA_SINGLE_LINE_COMMENT);
       reconciler.setRepairer(newDR, IJavaPartitions.JAVA_SINGLE_LINE_COMMENT);
       return currentResult;
+   }
+
+   @SuppressWarnings("restriction")
+   @Override
+   public IAutoEditStrategy[] getAutoEditStrategies(
+         final ISourceViewer sourceViewer, final String contentType,
+         final IAutoEditStrategy[] currentResult) {
+      final List<IAutoEditStrategy> newStrategys = new ArrayList<IAutoEditStrategy>(
+            currentResult.length);
+
+      for (final IAutoEditStrategy s : currentResult) {
+         if (s.getClass() != JavaDocAutoIndentStrategy.class) {
+            newStrategys.add(s);
+         }
+         else {
+            newStrategys.add(new JavaJMLMultilineCommentAutoIndentStrategy(this
+                  .getPartitioning()));
+         }
+      }
+
+      return newStrategys.toArray(new IAutoEditStrategy[0]);
    }
 }
