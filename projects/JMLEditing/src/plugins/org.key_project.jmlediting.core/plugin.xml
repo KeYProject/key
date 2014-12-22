@@ -5,9 +5,9 @@
    <extension
          point="org.eclipse.ltk.core.refactoring.renameParticipants">
       <renameParticipant
-            class="org.key_project.jmlediting.core.refactoring.JMLRenameFieldProcessor"
-            id="org.key_project.jmlediting.core.refactoring.JMLRenameFieldProcessor"
-            name="JMLRenameFieldProcessor">
+            class="org.key_project.jmlediting.core.refactoring.JMLRenameFieldParticipant"
+            id="org.key_project.jmlediting.core.refactoring.JMLRenameFieldParticipant"
+            name="JMLFieldRename">
       </renameParticipant>
    </extension>
 </plugin>

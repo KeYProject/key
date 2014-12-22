@@ -14,33 +14,33 @@ import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
  * @author David Giessing
  *
  */
-public class JMLRenameFieldProcessor extends RenameParticipant {
+public class JMLRenameFieldParticipant extends RenameParticipant {
 
    @Override
    protected boolean initialize(final Object element) {
       // TODO Auto-generated method stub
-      return false;
+      System.out.println("Element" + element);
+      return true;
    }
 
    @Override
    public String getName() {
-      // TODO Auto-generated method stub
-      return null;
+      return "JMLRenameFieldParticipant";
    }
 
    @Override
    public RefactoringStatus checkConditions(final IProgressMonitor pm,
          final CheckConditionsContext context)
-         throws OperationCanceledException {
+               throws OperationCanceledException {
       // TODO Auto-generated method stub
       return null;
    }
 
    @Override
    public Change createChange(final IProgressMonitor pm) throws CoreException,
-   OperationCanceledException {
+         OperationCanceledException {
+      System.out.println("Arguments " + this.getArguments());
       // TODO Auto-generated method stub
       return null;
    }
-
 }

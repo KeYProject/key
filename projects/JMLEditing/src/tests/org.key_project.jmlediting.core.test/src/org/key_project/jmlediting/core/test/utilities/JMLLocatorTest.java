@@ -61,20 +61,20 @@ public class JMLLocatorTest {
       this.locator = new CommentLocator(EDITOR_TEXT);
       // Test in JML Comment
       assertTrue("Offset should be in JML Comment but result was false",
-            this.locator.isInJMLcomment(EDITOR_TEXT.indexOf("/*@") + 3));
+            this.locator.isInJMLComment(EDITOR_TEXT.indexOf("/*@") + 3));
       // Test in normal Comment
       assertFalse("Offset was wrongly recognized as in a JML Comment",
-            this.locator.isInJMLcomment(EDITOR_TEXT.indexOf("//") + 3));
+            this.locator.isInJMLComment(EDITOR_TEXT.indexOf("//") + 3));
       // Test outside a comment
       assertFalse("Offset was wrongly recognized as in a JML Comment",
-            this.locator.isInJMLcomment(0));
+            this.locator.isInJMLComment(0));
       // Test inside a String
       assertFalse("Offset was wrongly recognized as in a JML Comment",
-            this.locator.isInJMLcomment(EDITOR_TEXT.indexOf("//@" + 3)));
+            this.locator.isInJMLComment(EDITOR_TEXT.indexOf("//@" + 3)));
       // Test in JML Singleline
       assertTrue(
             "Offset was wrongly recognized as not in a JML Comment",
-            this.locator.isInJMLcomment(EDITOR_TEXT.indexOf("//@",
+            this.locator.isInJMLComment(EDITOR_TEXT.indexOf("//@",
                   EDITOR_TEXT.indexOf("ensures")) + 1));
 
    }
@@ -165,25 +165,25 @@ public class JMLLocatorTest {
       final List<CommentRange> comments = this.locator.findCommentRanges();
       assertEquals("Begin of first Comment did not Match the Expectation",
             EDITOR_TEXT.indexOf("/*@") + 2, comments.get(0)
-            .getContentBeginOffset());
+                  .getContentBeginOffset());
       assertEquals("End of first Comment did not Match the Expectation",
             EDITOR_TEXT.indexOf("*/") - 1, comments.get(0)
-            .getContentEndOffset());
+                  .getContentEndOffset());
       assertEquals("Wrong begin offset for single line comment",
             EDITOR_TEXT.indexOf("//", 78) + 2, comments.get(1)
-            .getContentBeginOffset());
+                  .getContentBeginOffset());
       assertEquals("Wrong end offset for single line comment",
             EDITOR_TEXT.indexOf(eol, 130), comments.get(1)
-            .getContentEndOffset());
+                  .getContentEndOffset());
       assertEquals("Wrong begin offset for single line comment",
             EDITOR_TEXT.indexOf("//", 187) + 2, comments.get(2)
-            .getContentBeginOffset());
+                  .getContentBeginOffset());
       assertEquals("Wrong end offset for single line comment",
             EDITOR_TEXT.indexOf(eol, 188), comments.get(2)
-            .getContentEndOffset());
+                  .getContentEndOffset());
       assertEquals("Wrong begin offset for single line comment",
             EDITOR_TEXT.indexOf("//", 208) + 2, comments.get(3)
-            .getContentBeginOffset());
+                  .getContentBeginOffset());
       assertEquals("Wrong end offset for single line comment",
             EDITOR_TEXT.length() - 1, comments.get(3).getContentEndOffset());
    }
