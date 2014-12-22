@@ -65,7 +65,7 @@ public class CommentLocator {
     * @return An ArrayList with Type Comment that consists of all valid Comments
     *         in the Document
     */
-   public List<CommentRange> findComments() {
+   public List<CommentRange> findCommentRanges() {
       final List<CommentRange> comments = new ArrayList<CommentRange>();
 
       final char[] content = this.text.toCharArray();
@@ -221,7 +221,7 @@ public class CommentLocator {
     *         JMLComments in the Document
     */
    public List<CommentRange> findJMLCommentRanges() {
-      final List<CommentRange> comments = this.findComments();
+      final List<CommentRange> comments = this.findCommentRanges();
       final List<CommentRange> jmlcomments = new ArrayList<CommentRange>();
 
       for (final CommentRange c : comments) {
@@ -245,7 +245,7 @@ public class CommentLocator {
     *         offset, null if no comment is found around this offset
     */
    public CommentRange getCommentOfOffset(final int offset) {
-      final List<CommentRange> jmlcomments = this.findComments();
+      final List<CommentRange> jmlcomments = this.findCommentRanges();
       for (final CommentRange c : jmlcomments) {
          if (c.getBeginOffset() <= offset && offset <= c.getEndOffset()) {
             return c;

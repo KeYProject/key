@@ -1,9 +1,6 @@
 package org.key_project.jmlediting.core.test.utilities;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -44,6 +41,8 @@ public class JMLLocatorTest {
          + "String temp=\"//@ ensures \\ \" ;" + eol + "//@ requires blabla"
          + eol + "\t\tSystem.out.println(\"Hello World\");" + eol + "\t}" + eol
          + "}" + eol + "/*   *";
+   private static final String TEXT4 = "/*@" + eol + eol
+         + "// random testingstuff" + eol + eol + eol;
    private CommentLocator locator = new CommentLocator(EDITOR_TEXT);
 
    @Test
@@ -107,7 +106,7 @@ public class JMLLocatorTest {
             commentToFind.getBeginOffset(), commentFound.getBeginOffset());
       assertEquals("Wrong end offset for surrounding Comment",
             commentToFind.getEndOffset(), commentFound.getEndOffset());
-      comments = this.locator.findComments();
+      comments = this.locator.findCommentRanges();
       commentToFind = comments.get(comments.size() - 1);
       commentFound = this.locator.getCommentOfOffset(EDITOR_TEXT.length() - 1);
       assertEquals("Wrong begin offset for surrounding Comment",
@@ -125,7 +124,7 @@ public class JMLLocatorTest {
       assertNull(
             "Found surrounding JML comment where no JML comment should be",
             this.locator.getJMLComment(EDITOR_TEXT.length() - 1));
-      List<CommentRange> comments = this.locator.findComments();
+      List<CommentRange> comments = this.locator.findCommentRanges();
       final CommentRange commentToFind = comments.get(0);
       final CommentRange commentFound = this.locator.getJMLComment(57);
       assertEquals("Wrong begin offset for surrounding JML Comment",
@@ -133,7 +132,7 @@ public class JMLLocatorTest {
       assertEquals("Wrong end offset for surrounding JML Comment",
             commentToFind.getEndOffset(), commentFound.getEndOffset());
       this.locator = new CommentLocator(TEXT2);
-      comments = this.locator.findComments();
+      comments = this.locator.findCommentRanges();
       assertNull(
             "Found surrounding Comment where no surrounding JML Comment was expected",
             this.locator.getJMLComment(78));
@@ -142,7 +141,7 @@ public class JMLLocatorTest {
    @Test
    public void indexTest() {
       this.locator = new CommentLocator(EDITOR_TEXT);
-      final List<CommentRange> comments = this.locator.findComments();
+      final List<CommentRange> comments = this.locator.findCommentRanges();
       assertEquals("Begin of first Comment did not Match the Expectation",
             EDITOR_TEXT.indexOf("/*@"), comments.get(0).getBeginOffset());
       assertEquals("End of first Comment did not Match the Expectation",
@@ -164,28 +163,28 @@ public class JMLLocatorTest {
    @Test
    public void contentOffsetTest() {
       this.locator = new CommentLocator(EDITOR_TEXT);
-      final List<CommentRange> comments = this.locator.findComments();
+      final List<CommentRange> comments = this.locator.findCommentRanges();
       assertEquals("Begin of first Comment did not Match the Expectation",
             EDITOR_TEXT.indexOf("/*@") + 2, comments.get(0)
-                  .getContentBeginOffset());
+            .getContentBeginOffset());
       assertEquals("End of first Comment did not Match the Expectation",
             EDITOR_TEXT.indexOf("*/") - 1, comments.get(0)
-                  .getContentEndOffset());
+            .getContentEndOffset());
       assertEquals("Wrong begin offset for single line comment",
             EDITOR_TEXT.indexOf("//", 78) + 2, comments.get(1)
-                  .getContentBeginOffset());
+            .getContentBeginOffset());
       assertEquals("Wrong end offset for single line comment",
             EDITOR_TEXT.indexOf(eol, 130), comments.get(1)
-                  .getContentEndOffset());
+            .getContentEndOffset());
       assertEquals("Wrong begin offset for single line comment",
             EDITOR_TEXT.indexOf("//", 187) + 2, comments.get(2)
-                  .getContentBeginOffset());
+            .getContentBeginOffset());
       assertEquals("Wrong end offset for single line comment",
             EDITOR_TEXT.indexOf(eol, 188), comments.get(2)
-                  .getContentEndOffset());
+            .getContentEndOffset());
       assertEquals("Wrong begin offset for single line comment",
             EDITOR_TEXT.indexOf("//", 208) + 2, comments.get(3)
-                  .getContentBeginOffset());
+            .getContentBeginOffset());
       assertEquals("Wrong end offset for single line comment",
             EDITOR_TEXT.length() - 1, comments.get(3).getContentEndOffset());
    }
@@ -208,5 +207,15 @@ public class JMLLocatorTest {
             .getContentLength(), 22);
       assertEquals("Wrong length of second JMLComment content", comments.get(1)
             .getContentLength(), 18);
+   }
+
+   @Test
+   public void openCommentTest() {
+      this.locator = new CommentLocator(TEXT4);
+      final List<CommentRange> comments = this.locator.findCommentRanges();
+      assertEquals("Wrong size of CommentList for OpenComment", 1,
+            comments.size());
+      assertEquals("Wrong length of Open comment", TEXT4.length(), comments
+            .get(0).getLength());
    }
 }
