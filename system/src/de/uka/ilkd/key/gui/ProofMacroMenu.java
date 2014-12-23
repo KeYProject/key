@@ -82,7 +82,7 @@ public class ProofMacroMenu extends JMenu {
             }
         }
 
-        mediator.enableWhenProofLoaded(this);
+        mediator.enableWhenProofLoaded(this.getAction());
         this.numberOfMacros = count;
     }
     
@@ -107,7 +107,7 @@ public class ProofMacroMenu extends JMenu {
             }
         }
 
-        mediator.enableWhenProofLoaded(this);
+        mediator.enableWhenProofLoaded(this.getAction());
         this.numberOfMacros = count;
     }
 

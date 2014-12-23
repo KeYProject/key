@@ -228,7 +228,7 @@ public class DesignTests extends TestCase {
                     meth[i].invoke(this, (Object[])null);
                     System.out.print(message);
                 } catch (Exception e) {
-                    e.printStackTrace();
+//                    e.printStackTrace();
                     System.err.println("Could not invoke method "+meth[i]);
                     failures ++;
                 }
