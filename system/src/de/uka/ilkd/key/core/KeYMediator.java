@@ -940,9 +940,12 @@ public class KeYMediator {
         });
     }
 
-    /*
+    /**
      * Disable certain actions until a proof is loaded.
+     * This is a workaround for a broken proof macro menu in the GUI.
+     * Remove this method as soon as another solution can be found.
      */
+    @Deprecated
     public void enableWhenProofLoaded(final javax.swing.AbstractButton a) {
         a.setEnabled(getSelectedProof() != null);
         addKeYSelectionListener(new KeYSelectionListener() {
