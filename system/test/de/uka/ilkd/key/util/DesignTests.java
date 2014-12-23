@@ -135,7 +135,7 @@ public class DesignTests extends TestCase {
 	if (it.hasNext()) {
 	    sb.append("Bad classes:");
 	    while (it.hasNext()) {	    
-		sb.append("\t"+it.next());
+		sb.append("\n"+it.next());
 	    }	
 	}
 	return sb.toString();
