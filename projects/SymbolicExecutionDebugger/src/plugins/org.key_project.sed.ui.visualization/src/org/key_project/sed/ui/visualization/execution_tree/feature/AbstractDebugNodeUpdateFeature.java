@@ -1021,6 +1021,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             if(mostRightInPrev > outerGA.getX() + METOFF && mostRightInPrev + OFFSET >= groupStartGA.getX()) {
                moveRightAndAbove(node, toMove, monitor);
                moveSubTreeHorizontal(node, toMove, true, monitor);
+               System.out.println("compute: :D");
             }
             else {
                int checkRange = metoffAmount;
@@ -1034,6 +1035,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                // There is enough space to the outer Rect
                if(checkRange > 0) {
                   groupStartGA.setX(groupStartGA.getX() - toMove - checkRange * METOFF);
+                  System.out.println("compute: D:");
                }
                // There is not enough space to the outer Rect (probably affects only the first rect [0]) 
                else {
@@ -1041,48 +1043,53 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                   int diff = groupStartGA.getX() + METOFF - ga.getX();
                   boolean enoughSpace = false;
                   
-                  LinkedList<GraphicsAlgorithm> groups2 = new LinkedList<GraphicsAlgorithm>();
-                  
-                  // At first we need to gather all rects we have to adjust
-                  while(group != null)
-                  {
-                     ISEDGroupable outGroup = NodeUtil.getGroupStartNode((ISEDDebugNode) group);
+                  if(diff > 0) {
+                     LinkedList<GraphicsAlgorithm> groups2 = new LinkedList<GraphicsAlgorithm>();
                      
-                     PictogramElement groupPE = getPictogramElementForBusinessObject(group, 0);
-                     PictogramElement outGroupPE = getPictogramElementForBusinessObject(outGroup, 0);
-                     
-                     //TODO remove
-                     if(NodeUtil.canBeGrouped(group)) {
-                     if(groupPE != null && outGroupPE != null) {
-                        GraphicsAlgorithm groupGA = groupPE.getGraphicsAlgorithm();
-                        GraphicsAlgorithm outGroupGA = outGroupPE.getGraphicsAlgorithm();
-
-                        groups2.addFirst(groupGA);
-                        int mostRight = findMostRightXInPreviousBranch((ISEDDebugNode) group);
-                        // We have enough space to the left
-                        // TODO We have space but not enough for diff
-                        if(outGroupGA.getX() + METOFF <= groupGA.getX() - diff) {
-                           if(mostRight == -1 || mostRight + OFFSET < groupGA.getX() - diff) {
-                              enoughSpace = true;
+                     // At first we need to gather all rects we have to adjust
+                     while(group != null)
+                     {
+                        ISEDGroupable outGroup = NodeUtil.getGroupStartNode((ISEDDebugNode) group);
+                        
+                        PictogramElement groupPE = getPictogramElementForBusinessObject(group, 0);
+                        PictogramElement outGroupPE = getPictogramElementForBusinessObject(outGroup, 0);
+                        
+                        //TODO remove
+                        if(NodeUtil.canBeGrouped(group)) {
+                        if(groupPE != null && outGroupPE != null) {
+                           GraphicsAlgorithm groupGA = groupPE.getGraphicsAlgorithm();
+                           GraphicsAlgorithm outGroupGA = outGroupPE.getGraphicsAlgorithm();
+   
+                           groups2.addFirst(groupGA);
+                           int mostRight = findMostRightXInPreviousBranch((ISEDDebugNode) group);
+                           // We have enough space to the left
+                           // TODO We have space but not enough for diff
+                           if(outGroupGA.getX() + METOFF <= groupGA.getX() - diff) {
+                              if(mostRight == -1 || mostRight + OFFSET < groupGA.getX() - diff) {
+                                 enoughSpace = true;
+                              }
+                              break;
                            }
-                           break;
+                        }
+                        }
+                        
+                        group = outGroup;
+                     }
+                     
+                     if(enoughSpace) {
+                        for(GraphicsAlgorithm groupGA : groups2) {
+                           groupGA.setX(groupGA.getX() - diff);
+                           System.out.println("compute: :? " + diff);
                         }
                      }
-                     }
-                     
-                     group = outGroup;
                   }
                   
-                  if(enoughSpace) {
-                     for(GraphicsAlgorithm groupGA : groups2) {
-                        groupGA.setX(groupGA.getX() - diff);
-                     }
-                  }
-                  else {
+                  if(diff <= 0 || !enoughSpace) {
                      toMove = outerGA.getX() + METOFF - (ga.getX() - METOFF);
                      moveRightAndAbove(node, toMove, monitor);
                      moveSubTreeHorizontal(node, toMove, true, monitor);
                      groupStartGA.setX(outerGA.getX() + METOFF);
+                     System.out.println("compute: :O");
                   }
                }
             }

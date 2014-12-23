@@ -325,7 +325,7 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
 //            }
 //         }
 //      }
-      // Collapse all returned methods
+////       Collapse all returned methods
 //      for (IExecutionBaseMethodReturn<?> methodReturn : completions.getMethodReturns()) {
 //         IExecutionMethodCall methodCall = methodReturn.getMethodCall();
 //         IKeYSEDDebugNode<?> keyNode = getDebugTarget().ensureDebugNodeIsCreated(methodCall);

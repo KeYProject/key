@@ -104,7 +104,7 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
                DefaultRemoveFeature drf = new DefaultRemoveFeature(getFeatureProvider());
                ISEDBranchCondition[] bcs = NodeUtil.getSortedBCs(groupStart);
                for(ISEDBranchCondition bc : bcs) {
-                  PictogramElement bcPE = getFeatureProvider().getPictogramElementForBusinessObject(bc);
+                  PictogramElement bcPE = uf.getPictogramElementForBusinessObject(bc);
                   removeConnections(bcPE, drf);
                   drf.remove(new RemoveContext(bcPE));
                }
@@ -126,8 +126,9 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
 
                for(ISEDBranchCondition bc : bcs) {
                   ISEDDebugNode groupEnd = bc.getChildren()[0];
-                  PictogramElement groupEndPE = getFeatureProvider().getPictogramElementForBusinessObject(groupEnd);
-                  PictogramElement parentPE = getFeatureProvider().getPictogramElementForBusinessObject(NodeUtil.getParent(groupEnd));
+
+                  PictogramElement groupEndPE = uf.getPictogramElementForBusinessObject(groupEnd);
+                  PictogramElement parentPE = uf.getPictogramElementForBusinessObject(NodeUtil.getParent(groupEnd));
                   
                   createConnection((AnchorContainer)parentPE, (AnchorContainer)groupEndPE);
                }
@@ -180,12 +181,12 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
       {
          uf.createGraphicalRepresentationForNode(bc, uf.OFFSET, maxX);
          
-         PictogramElement bcPE = getFeatureProvider().getPictogramElementForBusinessObject(bc);
+         PictogramElement bcPE = uf.getPictogramElementForBusinessObject(bc);
          GraphicsAlgorithm bcGA = bcPE.getGraphicsAlgorithm();
 
          ISEDDebugNode groupEnd = bc.getChildren()[0];
          
-         PictogramElement groupEndPE = getFeatureProvider().getPictogramElementForBusinessObject(groupEnd);
+         PictogramElement groupEndPE = uf.getPictogramElementForBusinessObject(groupEnd);
          GraphicsAlgorithm groupEndGA = groupEndPE.getGraphicsAlgorithm();
          
          //TODO fraglich ob nötig -> maxX nur beim ersten nötig
@@ -232,7 +233,6 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
       uf.shrinkRectHeights(groupStart);
       uf.centerChildren(new HashSet<ISEDDebugNode>(leafs), new SubProgressMonitor(monitor, 1));
       uf.adjustSubtreeIfSmaller((ISEDDebugNode) groupStart, new SubProgressMonitor(monitor, 1));
-      uf.adjustRects((ISEDDebugNode) groupStart, new SubProgressMonitor(monitor, 1));
       monitor.worked(1);
       
 //      resizeRectsIfNeeded(mc, monitor);
@@ -245,7 +245,7 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
                continue;
             }
             
-            PictogramElement leafPE = getFeatureProvider().getPictogramElementForBusinessObject(leaf);
+            PictogramElement leafPE = uf.getPictogramElementForBusinessObject(leaf);
             GraphicsAlgorithm leafGA = leafPE.getGraphicsAlgorithm();
             
             ISEDDebugNode child = NodeUtil.getChildren(leaf)[0];
@@ -254,19 +254,21 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
             int toMove = leafGA.getX() - childGA.getX() + (leafGA.getWidth() - childGA.getWidth()) / 2;
             uf.moveSubTreeHorizontal(child, toMove, true, monitor);
          }
-      }
-      
-
-      int mostLeftXInGroup = uf.findMostLeftXInGroup((ISEDDebugNode) groupStart) - uf.METOFF;
-
-      if(mostLeftXInGroup > rectGA.getX() && NodeUtil.getGroupStartNode((ISEDDebugNode) groupStart) != null) {
-         rectGA.setX(mostLeftXInGroup);
+//         uf.adjustRects((ISEDDebugNode) groupStart, new SubProgressMonitor(monitor, 1));
       }
 
-      rectGA.setWidth(uf.findMostRightXInGroup(groupStart, (ISEDDebugNode) groupStart) + uf.METOFF - rectGA.getX());
+      uf.adjustRects((ISEDDebugNode) groupStart, new SubProgressMonitor(monitor, 1));
+
+//      int mostLeftXInGroup = uf.findMostLeftXInGroup((ISEDDebugNode) groupStart) - uf.METOFF;
+//
+//      if(mostLeftXInGroup > rectGA.getX() && NodeUtil.getGroupStartNode((ISEDDebugNode) groupStart) != null) {
+//         rectGA.setX(mostLeftXInGroup);
+//      }
+//
+//      rectGA.setWidth(uf.findMostRightXInGroup(groupStart, (ISEDDebugNode) groupStart) + uf.METOFF - rectGA.getX());
       
       // TODO maybe doch nur resize :?
-//      uf.resizeRectsIfNeeded(groupStart, monitor);
+      uf.resizeRectsIfNeeded(groupStart, monitor);
 
       uf.updateParents(uf.getPictogramElementForBusinessObject(groupStart), uf.OFFSET, new SubProgressMonitor(monitor, 1));
       

@@ -66,7 +66,7 @@ public final class NodeUtil {
 
       if(!ArrayUtil.isEmpty(node.getGroupStartConditions())) {
          ISEDDebugNode n = node.getInnerMostVisibleGroupStartCondition();
-         System.out.println("Node: " + node + ", InnerMost: " + n + ", Parent: " + getParent(n) + ", Parent2: " + n.getParent());
+//         System.out.println("Node: " + node + ", InnerMost: " + n + ", Parent: " + getParent(n) + ", Parent2: " + n.getParent());
          return (ISEDGroupable) getParent(node.getInnerMostVisibleGroupStartCondition());
       }
       
