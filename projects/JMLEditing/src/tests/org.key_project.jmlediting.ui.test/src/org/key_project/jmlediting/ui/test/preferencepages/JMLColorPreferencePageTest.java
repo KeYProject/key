@@ -24,6 +24,8 @@ import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper;
  * <li>Test setting a new JML Color and check the Method other use to get the
  * JMLColor</li>
  * <li>Test afterwards the RestoreDefault Button and check again</li>
+ * <li>At last test whether a new opening of the Preferences still show the
+ * right color.</li>
  * </ul>
  *
  * @author Thomas Glaser
@@ -126,7 +128,7 @@ public class JMLColorPreferencePageTest {
       // beginning.
       this.checkColor(JMLUiPreferencesHelper.getWorkspaceJMLColor());
 
-      final RGB testColor = new RGB(255, 0, 0);
+      RGB testColor = new RGB(255, 0, 0);
       this.setColor(testColor);
       bot.button("Apply").click();
       assertEquals("Not the right JML-Color was set.", testColor,
@@ -136,5 +138,14 @@ public class JMLColorPreferencePageTest {
       assertEquals("Restore Default JML Color did not work.",
             JMLUiPreferencesHelper.getDefaultJMLColor(),
             JMLUiPreferencesHelper.getWorkspaceJMLColor());
+
+      // final test
+      testColor = new RGB(0, 255, 0);
+      this.setColor(testColor);
+      bot.button("OK").click();
+      bot.sleep(100);
+      this.openGlobalJMLColorSettings();
+      this.checkColor(JMLUiPreferencesHelper.getWorkspaceJMLColor());
+      this.checkColor(testColor);
    }
 }
