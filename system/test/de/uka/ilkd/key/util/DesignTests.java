@@ -214,6 +214,51 @@ public class DesignTests extends TestCase {
 	    assertTrue(message, badClasses.size() == 0);
     }
     
+    private boolean implementsEquals(Class<?> cl) {
+        try {
+            cl.getMethod("equals", Object.class);
+        } catch (NoSuchMethodException e) {
+            return false; // class does not override equals()
+        } catch (SecurityException e) {
+            System.err.println("hashCode test skipped for type "+cl);
+        }
+        return true;
+    }
+    
+    private boolean implementsHashCode(Class<?> cl) {
+        try {
+            cl.getMethod("hashCode");
+        } catch (NoSuchMethodException e) {
+            // class does not override hashCode
+            return false;
+        } catch (SecurityException e) {
+            System.err.println("hashCode test skipped for type "+cl);
+        }
+        return true;
+    }
+
+    /**
+     * Tests that if <code>equals()</code> is overriden,
+     * <code>hashCode()</code> is also overriden.
+     */
+    public void testHashCodeImplemented() {
+        LinkedList<Class<?>> badClasses = new LinkedList<Class<?>>();
+        for (int i = 0; i<allClasses.length; i++) {
+            Class<?> clazz = allClasses[i];
+            if (implementsEquals(clazz) && !implementsHashCode(clazz)) {
+                badClasses.add(clazz);
+            }
+        }
+        if (badClasses.size()>0) {
+            message = "Classes that override equals() must also override hashCode().\n";
+            message += printBadClasses(badClasses);
+        }
+
+        assertTrue(message, badClasses.size() == 0);
+    }
+
+
+
 
     public void runTests() {
         assertNotNull("Environment variable \"key.home\" not set", binaryPath);
@@ -233,6 +278,7 @@ public class DesignTests extends TestCase {
                     System.out.print(message);
                 } catch (Exception e) {
                     System.err.println("Test failed: "+meth[i]);
+                    e.printStackTrace();
                     failures ++;
                 }
             }
