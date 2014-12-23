@@ -26,6 +26,57 @@ import org.key_project.util.java.StringUtil;
  */
 public class StringUtilTest extends TestCase {
    /**
+    * Tests {@link StringUtil#trimRight(String)}.
+    */
+   @Test
+   public void testTrimRight() {
+      // Test empty stuff
+      assertEquals(null, StringUtil.trimRight(null));
+      assertEquals("", StringUtil.trimRight(""));
+      assertEquals("", StringUtil.trimRight(" "));
+      assertEquals("", StringUtil.trimRight("\t"));
+      assertEquals("", StringUtil.trimRight("\n"));
+      assertEquals("", StringUtil.trimRight("\r"));
+      assertEquals("", StringUtil.trimRight("           "));
+      // Test without whitespaces
+      assertEquals("a", StringUtil.trimRight("a"));
+      assertEquals("hello", StringUtil.trimRight("hello"));
+      assertEquals("hello world!", StringUtil.trimRight("hello world!"));
+      // Test leading whitespaces
+      assertEquals("  a", StringUtil.trimRight("  a"));
+      assertEquals("  hello", StringUtil.trimRight("  hello"));
+      assertEquals("  hello world!", StringUtil.trimRight("  hello world!"));
+      // Test right whitespaces
+      assertEquals("a", StringUtil.trimRight("a  "));
+      assertEquals("hello", StringUtil.trimRight("hello  "));
+      assertEquals("hello world!", StringUtil.trimRight("hello world!  "));
+      // Test left and right whitespaces
+      assertEquals("  a", StringUtil.trimRight("  a "));
+      assertEquals("  hello", StringUtil.trimRight("  hello\t"));
+      assertEquals("  hello world!", StringUtil.trimRight("  hello world! \t\n "));
+   }
+   
+   /**
+    * Tests {@link StringUtil#fillString(String, char, int)}.
+    */
+   @Test
+   public void testFillString() {
+      assertEquals("", StringUtil.fillString(null, '#', 0));
+      assertEquals("#", StringUtil.fillString(null, '#', 1));
+      assertEquals("##", StringUtil.fillString(null, '#', 2));
+      assertEquals("##a", StringUtil.fillString("a", '#', 3));
+      assertEquals("#ab", StringUtil.fillString("ab", '#', 3));
+      assertEquals("abc", StringUtil.fillString("abc", '#', 3));
+      try {
+         StringUtil.fillString("abcd", '#', 3);
+         fail();
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Text \"abcd\" with length 4 is longer as 3.", e.getMessage());
+      }
+   }
+   
+   /**
     * Tests {@link StringUtil#equalIgnoreWhiteSpace(String, String)}.
     */
    @Test

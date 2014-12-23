@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<project name="ProjectInfoManagementTest_testPackagesAndTypes">
+   <package name="hello" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello">
+      <type name="ClassInHello" path="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/ClassInHello.java">
+         <method displayName="ClassInHello()" name="ClassInHello" declaringType="hello.ClassInHello" declaringFilePath="/ProjectInfoManagementTest_testPackagesAndTypes/src/hello/ClassInHello.java" parameterTypes="">
+         </method>
+      </type>
+   </package>
+</project>

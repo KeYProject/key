@@ -15,11 +15,21 @@ package org.key_project.sed.ui.visualization.test.suite.swtbot;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiAnnotationLinksTabTest;
+import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiAnnotationsTabTest;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiCallStackTabTest;
+import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiCallStateTabTest;
+import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiConstraintsTabTest;
+import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiGroupEndConditionsTabTest;
+import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiGroupStartConditionsTabTest;
+import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiMethodReturnsTabTest;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiNodeTabTest;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotGraphitiSourceTabTest;
+import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotSaveSetAsTest;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotSetFileLaunchTest;
 import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotSetFileSourceLookupTest;
+import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotSymbolicExecutionTreeLayoutTest;
+import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotSymbolicExecutionTreeStyleTest;
 
 /**
  * Run all contained JUnit 4 test cases that requires SWT Bot.
@@ -27,11 +37,21 @@ import org.key_project.sed.ui.visualization.test.testcase.swtbot.SWTBotSetFileSo
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+   SWTBotGraphitiAnnotationLinksTabTest.class,
+   SWTBotGraphitiAnnotationsTabTest.class,
    SWTBotGraphitiCallStackTabTest.class,
+   SWTBotGraphitiCallStateTabTest.class,
+   SWTBotGraphitiConstraintsTabTest.class,
+   SWTBotGraphitiGroupEndConditionsTabTest.class,
+   SWTBotGraphitiGroupStartConditionsTabTest.class,
+   SWTBotGraphitiMethodReturnsTabTest.class,
    SWTBotGraphitiNodeTabTest.class,
    SWTBotGraphitiSourceTabTest.class,
+   SWTBotSaveSetAsTest.class,
    SWTBotSetFileLaunchTest.class,
-   SWTBotSetFileSourceLookupTest.class
+   SWTBotSetFileSourceLookupTest.class,
+   SWTBotSymbolicExecutionTreeLayoutTest.class,
+   SWTBotSymbolicExecutionTreeStyleTest.class
 })
 public class SWTBotAllSEDUIVisualizationTests {
 }

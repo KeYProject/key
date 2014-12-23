@@ -60,6 +60,7 @@ import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.inst.RigidnessException;
 import de.uka.ilkd.key.rule.inst.SortException;
+import org.antlr.runtime.RecognitionException;
 
 
 public class TacletInstantiationsTableModel extends AbstractTableModel {
@@ -228,18 +229,16 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
      */
     public IdDeclaration parseIdDeclaration ( String s )
         throws ParserException {
+        KeYParserF parser = null;
         try {
-            KeYParserF parser =
-                new KeYParserF (ParserMode.DECLARATION, new KeYLexerF ( s, "",
-                                 services.getExceptionHandler() ),
+            parser =
+                new KeYParserF (ParserMode.DECLARATION, new KeYLexerF ( s, ""),
                                  services,   // should not be needed
                                  nss );
             return parser.id_declaration ();
-        } catch (antlr.RecognitionException re) {
-            throw new ParserException(re.getMessage(),
-                                      new Location(re.getFilename(),
-                                                   re.getLine(),
-                                                   re.getColumn()));
+        } catch (RecognitionException re) {
+            // parser cannot be null
+            throw new ParserException(parser.getErrorMessage(re), new Location(re));
         }
     }
 

@@ -50,7 +50,7 @@ public interface ISymbolicAssociationValueContainer extends ISymbolicElement {
     */
    public ISymbolicAssociation getAssociation(IProgramVariable programVariable, 
                                               boolean isArrayIndex, 
-                                              int arrayIndex,
+                                              Term arrayIndex,
                                               Term condition);
    
    /**
@@ -69,6 +69,6 @@ public interface ISymbolicAssociationValueContainer extends ISymbolicElement {
     */
    public ISymbolicValue getValue(IProgramVariable programVariable, 
                                   boolean isArrayIndex, 
-                                  int arrayIndex,
+                                  Term arrayIndex,
                                   Term condition);
 }

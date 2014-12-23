@@ -13,12 +13,20 @@
 
 package org.key_project.sed.core.model;
 
+import java.util.Map;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.ITerminate;
 import org.eclipse.debug.core.model.IThread;
+import org.key_project.sed.core.annotation.ISEDAnnotation;
+import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.model.event.ISEDAnnotationListener;
 import org.key_project.sed.core.model.impl.AbstractSEDDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
+import org.key_project.sed.core.sourcesummary.ISEDSourceModel;
 
 /**
  * A debug target is a symbolic debuggable execution context. For example, a debug target
@@ -75,4 +83,95 @@ public interface ISEDDebugTarget extends ISEDDebugElement, IDebugTarget {
     * the failure.</li></ul>
     */   
    public ISEDThread[] getSymbolicThreads() throws DebugException;
+   
+   /**
+    * Registers the given {@link ISEDAnnotation} to be used by {@link ISEDDebugNode}s of this target.
+    * @param annotation The {@link ISEDAnnotation} to register.
+    */
+   public void registerAnnotation(ISEDAnnotation annotation);
+   
+   /**
+    * Unregisters the given {@link ISEDAnnotation} not to be used anymore by {@link ISEDDebugNode}s of this target.
+    * @param annotation The {@link ISEDAnnotation} to unregister.
+    */
+   public void unregisterAnnotation(ISEDAnnotation annotation);
+   
+   /**
+    * Moves the given {@link ISEDAnnotation} to the given index.
+    * @param annotation The {@link ISEDAnnotation} to move.
+    * @param newIndex The new index.
+    */
+   public void moveRegisteredAnnotation(ISEDAnnotation annotation, int newIndex);
+   
+   /**
+    * Returns the index of the given {@link ISEDAnnotation}.
+    * @param annotation The {@link ISEDAnnotation} to get its index.
+    * @return The index of the given {@link ISEDAnnotation} or {@code -1} if not available.
+    */
+   public int indexOfRegisteredAnnotation(ISEDAnnotation annotation);
+   
+   /**
+    * Returns the number of registered {@link ISEDAnnotation}.
+    * @return The number of registered {@link ISEDAnnotation}.
+    */
+   public int countRegisteredAnnotations();
+   
+   /**
+    * Returns all registered {@link ISEDAnnotation}s.
+    * @return All registered {@link ISEDAnnotation}s.
+    */
+   public ISEDAnnotation[] getRegisteredAnnotations();
+   
+   /**
+    * Returns all registered {@link ISEDAnnotation}s of the given {@link ISEDAnnotationType}.
+    * @param type The {@link ISEDAnnotationType}.
+    * @return All registered {@link ISEDAnnotation}s of the given {@link ISEDAnnotationType}
+    */
+   public ISEDAnnotation[] getRegisteredAnnotations(ISEDAnnotationType type);
+   
+   /**
+    * Checks if the given {@link ISEDAnnotation} is registered.
+    * @param annotation The {@link ISEDAnnotation} to check.
+    * @return {@code true} the {@link ISEDAnnotation} is registered, {@code false} the {@link ISEDAnnotation} is not registered.
+    */
+   public boolean isRegistered(ISEDAnnotation annotation);
+   
+   /**
+    * Adds the given {@link ISEDAnnotationListener}.
+    * @param l The {@link ISEDAnnotationListener} to add.
+    */
+   public void addAnnotationListener(ISEDAnnotationListener l);
+   
+   /**
+    * Removes the given {@link ISEDAnnotationListener}.
+    * @param l The {@link ISEDAnnotationListener} to remove.
+    */
+   public void removeAnnotationListener(ISEDAnnotationListener l);
+   
+   /**
+    * Computes some statistics of this {@link ISEDDebugTarget}.
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @return The computed statistics.
+    * @throws DebugException Occurred Exception.
+    */
+   public Map<String, String> computeStatistics(IProgressMonitor monitor) throws DebugException;
+   
+   /**
+    * Returns all currently used {@link IBreakpoint}s.
+    * @return The currently used {@link IBreakpoint}s.
+    */
+   public IBreakpoint[] getBreakpoints();
+   
+   /**
+    * Returns all {@link IBreakpoint}s which are fulfilled in the given {@link ISEDDebugNode}.
+    * @param node The {@link ISEDDebugNode} to check.
+    * @return The fulfilled {@link IBreakpoint}s in the given {@link ISEDDebugNode}.
+    */
+   public IBreakpoint[] computeHitBreakpoints(ISEDDebugNode node) throws DebugException;
+   
+   /**
+    * Returns the {@link ISEDSourceModel} which manages the visited source parts
+    * @return The {@link ISEDSourceModel} or {@code null} if not available.
+    */
+   public ISEDSourceModel getSourceModel();
 }

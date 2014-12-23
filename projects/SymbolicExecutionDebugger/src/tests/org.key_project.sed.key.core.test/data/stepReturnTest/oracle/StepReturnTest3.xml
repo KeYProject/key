@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_9d48df54-17e2-42fd-ab3f-b64e16fd4d96" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_bd315037-c2f3-4308-9120-36af965bf636" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_044cecfc-42f7-49d2-b7c2-890aeaa4411f" name="self.main(a);" pathCondition="true" lineNumber="-1" charStart="46" charEnd="50">
-            <sedStatement xml:id="_f36388c3-75a3-4424-b361-b1a7acb9c18b" name="firstLevel(a);" pathCondition="true" lineNumber="-1" charStart="63" charEnd="77">
+   <sedTarget xml:id="_a28785c4-0605-4c87-aa17-57bdbb0e0347" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_012aaffe-2cfa-4f00-91f7-da4d97e418b0" name="&lt;start&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
+         <sedMethodCall xml:id="_c1ed9edf-9290-4f26-a258-983a98ac107d" name="&lt;call self.main(a)&gt;" pathCondition="true" lineNumber="-1" charStart="46" charEnd="50" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java" groupable="true">
+            <sedStatement xml:id="_35c39a2d-a0ad-41f9-8193-85caa13ffcff" name="firstLevel(a);" pathCondition="true" lineNumber="-1" charStart="63" charEnd="77" sourcePath="D:\Forschung\Development\KeY_Master\junit-workspace\SWTBotStepReturnTest_testStepReturn\src\StepReturnTest.java">
             </sedStatement>
          </sedMethodCall>
       </sedThread>

@@ -53,9 +53,24 @@ public class KeYSEDPreferences {
    public static final String MERGE_BRANCH_CONDITIONS = "org.key_project.sed.key.core.preference.mergeBranchConditions";
 
    /**
+    * Preference key to define that unicode characters are used or not.
+    */
+   public static final String USE_UNICODE = "org.key_project.sed.key.core.preference.useUnicode";
+
+   /**
     * Preference key to define that pretty printing is used or not.
     */
    public static final String USE_PRETTY_PRINTING = "org.key_project.sed.key.core.preference.usePrettyPrinting";
+
+   /**
+    * Preference key to define that the full signature will be shown on method return nodes.
+    */
+   public static final String SHOW_SIGNATURE_ON_METHOD_RETURN_NODES = "org.key_project.sed.key.core.preference.showSignatureOnMethodReturnNodes";
+
+   /**
+    * Preference key to define how variables are computed.
+    */
+   public static final String VARIABLES_ARE_COMPUTED_FROM_UPDATES = "org.key_project.sed.key.core.preference.variablesAreOnlyComputedFromUpdates";
    
    /**
     * Returns the managed {@link IPreferenceStore}.
@@ -229,6 +244,38 @@ public class KeYSEDPreferences {
     * Checks if pretty printing is used or not.
     * @return Use pretty printing?
     */
+   public static boolean isUseUnicode() {
+      return getStore().getBoolean(USE_UNICODE);
+   }
+   
+   /**
+    * Checks if pretty printing is used or not by default.
+    * @return Use pretty printing?
+    */
+   public static boolean isDefaultUseUnicode() {
+      return getStore().getDefaultBoolean(USE_UNICODE);
+   }
+   
+   /**
+    * Sets if pretty printing is used or not.
+    * @param value Use pretty printing?
+    */
+   public static void setUseUnicode(boolean value) {
+      getStore().setValue(USE_UNICODE, value);
+   }
+   
+   /**
+    * Sets if pretty printing is used or not by default.
+    * @param defaultValue Use pretty printing?
+    */
+   public static void setDefaultUseUnicode(boolean defaultValue) {
+      getStore().setDefault(USE_UNICODE, defaultValue);
+   }
+   
+   /**
+    * Checks if pretty printing is used or not.
+    * @return Use pretty printing?
+    */
    public static boolean isUsePrettyPrinting() {
       return getStore().getBoolean(USE_PRETTY_PRINTING);
    }
@@ -255,5 +302,69 @@ public class KeYSEDPreferences {
     */
    public static void setDefaultUsePrettyPrinting(boolean defaultValue) {
       getStore().setDefault(USE_PRETTY_PRINTING, defaultValue);
+   }
+   
+   /**
+    * Checks if the full signature will be shown or not.
+    * @return Use pretty printing?
+    */
+   public static boolean isShowSignatureOnMethodReturnNodes() {
+      return getStore().getBoolean(SHOW_SIGNATURE_ON_METHOD_RETURN_NODES);
+   }
+   
+   /**
+    * Checks if the full signature will be shown or not by default.
+    * @return Use pretty printing?
+    */
+   public static boolean isDefaultShowSignatureOnMethodReturnNodes() {
+      return getStore().getDefaultBoolean(SHOW_SIGNATURE_ON_METHOD_RETURN_NODES);
+   }
+   
+   /**
+    * Sets if the full signature will be shown or not.
+    * @param value Use pretty printing?
+    */
+   public static void setShowSignatureOnMethodReturnNodes(boolean value) {
+      getStore().setValue(SHOW_SIGNATURE_ON_METHOD_RETURN_NODES, value);
+   }
+   
+   /**
+    * Sets the full signature will be shown or not by default.
+    * @param defaultValue Use pretty printing?
+    */
+   public static void setDefaultShowSignatureOnMethodReturnNodes(boolean defaultValue) {
+      getStore().setDefault(SHOW_SIGNATURE_ON_METHOD_RETURN_NODES, defaultValue);
+   }
+   
+   /**
+    * Checks if variables are computed from sequent or visible type structure.
+    * @return Use pretty printing?
+    */
+   public static boolean isVariablesAreOnlyComputedFromUpdates() {
+      return getStore().getBoolean(VARIABLES_ARE_COMPUTED_FROM_UPDATES);
+   }
+   
+   /**
+    * Checks if variables are computed from sequent or visible type structure by default.
+    * @return Use pretty printing?
+    */
+   public static boolean isDefaultVariablesAreOnlyComputedFromUpdates() {
+      return getStore().getDefaultBoolean(VARIABLES_ARE_COMPUTED_FROM_UPDATES);
+   }
+   
+   /**
+    * Sets if variables are computed from sequent or visible type structure.
+    * @param value Use pretty printing?
+    */
+   public static void setVariablesAreOnlyComputedFromUpdates(boolean value) {
+      getStore().setValue(VARIABLES_ARE_COMPUTED_FROM_UPDATES, value);
+   }
+   
+   /**
+    * Sets if variables are computed from sequent or visible type structure by default.
+    * @param defaultValue Use pretty printing?
+    */
+   public static void setDefaultVariablesAreOnlyComputedFromUpdates(boolean defaultValue) {
+      getStore().setDefault(VARIABLES_ARE_COMPUTED_FROM_UPDATES, defaultValue);
    }
 }

@@ -31,6 +31,7 @@ import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
 /**
  * Tests the launch configuration default values.
@@ -38,7 +39,85 @@ import de.uka.ilkd.key.gui.MainWindow;
  */
 public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTestCase {
    /**
-    * Tests the launch where branch conditions are merged.
+    * Tests the launch where unicode signs are used.
+    */
+   @Test
+   public void testUseUnicode() throws Exception {
+      doTestUseUnicode("SWTBotLaunchDefaultPreferencesTest_testUseUnicode", true);
+   }
+
+   /**
+    * Tests the launch where unicode signs are not used.
+    */
+   @Test
+   public void testDoNotUseUnicode() throws Exception {
+      doTestUseUnicode("SWTBotLaunchDefaultPreferencesTest_testDoNotUseUnicode", false);
+   }
+   
+   /**
+    * Does the test steps of {@link #testUseUnicode()}
+    * and {@link #testDoNotUseUnicode()}.
+    * @param projectName The project name to use.
+    * @param useUnicode Use unicode signs?
+    * @throws Exception Occurred Exception
+    */
+   protected void doTestUseUnicode(String projectName, 
+                                   final boolean useUnicode) throws Exception {
+      boolean originalUseUnicode = KeYSEDPreferences.isUseUnicode();
+      try {
+         KeYSEDPreferences.setUsePrettyPrinting(true);
+         // Set preference
+         SWTWorkbenchBot bot = new SWTWorkbenchBot();
+         SWTBotShell preferenceShell = TestUtilsUtil.openPreferencePage(bot, "Run/Debug", "Symbolic Execution Debugger (SED)", "KeY Launch Defaults");
+         if (useUnicode) {
+            preferenceShell.bot().checkBox("Use unicode symbols").select();
+         }
+         else {
+            preferenceShell.bot().checkBox("Use unicode symbols").deselect();
+         }
+         preferenceShell.bot().button("OK").click();
+         assertEquals(useUnicode, KeYSEDPreferences.isUseUnicode());
+         // Launch something
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
+            @Override
+            public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+               // Get debug target TreeItem
+               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
+               // Do run
+               resume(bot, item, target);
+               if (useUnicode) {
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/unicodeTest/oracle/UnicodeTest_Enabled.xml", false, false, false);
+               }
+               else {
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/unicodeTest/oracle/UnicodeTest_Disabled.xml", false, false, false);
+               }
+            }
+         };
+         doKeYDebugTargetTest(projectName,
+                              "data/unicodeTest/test",
+                              true,
+                              true,
+                              createMethodSelector("UnicodeTest", "magic", "Z", "Z"),
+                              null,
+                              null,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              null,
+                              Boolean.TRUE,
+                              Boolean.TRUE,
+                              8, executor);
+      }
+      finally {
+         // Restore original value
+         KeYSEDPreferences.setUseUnicode(originalUseUnicode);
+         assertEquals(originalUseUnicode, KeYSEDPreferences.isUseUnicode());
+      }
+   }
+   
+   /**
+    * Tests the launch where pretty printing is used.
     */
    @Test
    public void testUsePrettyPrinting() throws Exception {
@@ -46,7 +125,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
    }
 
    /**
-    * Tests the launch where branch conditions are not merged.
+    * Tests the launch where pretty printing is not used.
     */
    @Test
    public void testDoNotUsePrettyPrinting() throws Exception {
@@ -76,7 +155,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          preferenceShell.bot().button("OK").click();
          assertEquals(usePrettyPrinting, KeYSEDPreferences.isUsePrettyPrinting());
          // Launch something
-         IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                // Get debug target TreeItem
@@ -84,10 +163,10 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Do run
                resume(bot, item, target);
                if (usePrettyPrinting) {
-                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/prettyPrintSimpleTest/oracleUsePrettyPrinting/PrettyPrintSimpleTest.xml", false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/prettyPrintSimpleTest/oracleUsePrettyPrinting/PrettyPrintSimpleTest.xml", false, false, false);
                }
                else {
-                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/prettyPrintSimpleTest/oracleUsePrettyPrinting/NotPrettyPrintedPrettyPrintSimpleTest.xml", false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/prettyPrintSimpleTest/oracleUsePrettyPrinting/NotPrettyPrintedPrettyPrintSimpleTest.xml", false, false, false);
                }
             }
          };
@@ -102,9 +181,10 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.FALSE,
+                              Boolean.FALSE,
                               null,
-                              8,
-                              executor);
+                              Boolean.TRUE,
+                              8, executor);
       }
       finally {
          // Restore original value
@@ -152,7 +232,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          preferenceShell.bot().button("OK").click();
          assertEquals(mergeBranchConditions, KeYSEDPreferences.isMergeBranchConditions());
          // Launch something
-         IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                // Get debug target TreeItem
@@ -160,10 +240,10 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Do run
                resume(bot, item, target);
                if (mergeBranchConditions) {
-                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/switchCaseTest/oracleMergeBranchConditions/MergedSwitchCaseTest.xml", false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/switchCaseTest/oracleMergeBranchConditions/MergedSwitchCaseTest.xml", false, false, false);
                }
                else {
-                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/switchCaseTest/oracleMergeBranchConditions/NotMergedSwitchCaseTest.xml", false, false);
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/switchCaseTest/oracleMergeBranchConditions/NotMergedSwitchCaseTest.xml", false, false, false);
                }
             }
          };
@@ -179,8 +259,9 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               null,
                               Boolean.FALSE,
-                              8,
-                              executor);
+                              Boolean.FALSE,
+                              Boolean.TRUE,
+                              8, executor);
       }
       finally {
          // Restore original value
@@ -228,9 +309,11 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          preferenceShell.bot().button("OK").click();
          assertEquals(showVariableValues, KeYSEDPreferences.isShowVariablesOfSelectedDebugNode());
          // Launch something
-         IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+               // Get variables view
+               SWTBotView variablesView = TestSedCoreUtil.getVariablesView(bot);
                // Get debug target TreeItem
                SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
                // Do run
@@ -238,9 +321,10 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Select statement int result;
                item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1); 
                // Wait for jobs
+               variablesView.show();
+               TestUtilsUtil.sleep(1000); // Give the UI the chance to show variables.
                TestUtilsUtil.waitForJobs();
-               // Get variables view
-               SWTBotView variablesView = TestSedCoreUtil.getVariablesView(bot);
+               // Get variables
                SWTBotTree variablesTree = variablesView.bot().tree();
                SWTBotTreeItem[] items = variablesTree.getAllItems();
                assertEquals(items != null ? "items found: " + items.length : "items are null", showVariableValues, !ArrayUtil.isEmpty(items));
@@ -258,8 +342,9 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.FALSE,
-                              8,
-                              executor);
+                              Boolean.FALSE,
+                              Boolean.TRUE,
+                              8, executor);
       }
       finally {
          // Restore original value
@@ -311,7 +396,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          preferenceShell.bot().button("OK").click();
          assertEquals(showMainWindow, KeYSEDPreferences.isShowKeYMainWindow());
          // Launch something
-         IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                if (showMainWindow) {
@@ -339,8 +424,9 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               null,
                               Boolean.FALSE,
                               Boolean.FALSE,
-                              8,
-                              executor);
+                              Boolean.FALSE,
+                              Boolean.TRUE,
+                              8, executor);
       }
       finally {
          // Restore original value
@@ -353,16 +439,32 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
     * Tests the launch where return values are shown in tree.
     */
    @Test
-   public void testShowMethodReturnValuesInDebugNodes() throws Exception {
-      doTestShowMethodReturnValuesInDebugNodes("SWTBotLaunchDefaultPreferencesTest_testShowMethodReturnValuesInDebugNodes", true);
+   public void testShowMethodReturnValuesInDebugNodes_Signature() throws Exception {
+      doTestShowMethodReturnValuesInDebugNodes("SWTBotLaunchDefaultPreferencesTest_testShowMethodReturnValuesInDebugNodesWithSignature", true, true);
    }
 
    /**
     * Tests the launch where return values are not shown in tree.
     */
    @Test
-   public void testDoNotShowMethodReturnValuesInDebugNodes() throws Exception {
-      doTestShowMethodReturnValuesInDebugNodes("SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes", false);
+   public void testDoNotShowMethodReturnValuesInDebugNodes_Signature() throws Exception {
+      doTestShowMethodReturnValuesInDebugNodes("SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodesWithSignature", false, true);
+   }
+   
+   /**
+    * Tests the launch where return values are shown in tree.
+    */
+   @Test
+   public void testShowMethodReturnValuesInDebugNodes_NameOnly() throws Exception {
+      doTestShowMethodReturnValuesInDebugNodes("SWTBotLaunchDefaultPreferencesTest_testShowMethodReturnValuesInDebugNodes", true, false);
+   }
+
+   /**
+    * Tests the launch where return values are not shown in tree.
+    */
+   @Test
+   public void testDoNotShowMethodReturnValuesInDebugNodes_NameOnly() throws Exception {
+      doTestShowMethodReturnValuesInDebugNodes("SWTBotLaunchDefaultPreferencesTest_testDoNotShowMethodReturnValuesInDebugNodes", false, false);
    }
    
    /**
@@ -373,7 +475,8 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
     * @throws Exception Occurred Exception
     */
    protected void doTestShowMethodReturnValuesInDebugNodes(String projectName, 
-                                                           final boolean showMethodReturnValuesInDebugNodes) throws Exception {
+                                                           final boolean showMethodReturnValuesInDebugNodes,
+                                                           final boolean showSignature) throws Exception {
       boolean originalShowMethodReturnValuesInDebugNodes = KeYSEDPreferences.isShowMethodReturnValuesInDebugNode();
       try {
          // Set preference
@@ -385,18 +488,34 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          else {
             preferenceShell.bot().checkBox("Show method return values in debug nodes").deselect();
          }
+         if (showSignature) {
+            preferenceShell.bot().checkBox("Show signature instead of only the name on method return nodes").select();
+         }
+         else {
+            preferenceShell.bot().checkBox("Show signature instead of only the name on method return nodes").deselect();
+         }
          preferenceShell.bot().button("OK").click();
          assertEquals(showMethodReturnValuesInDebugNodes, KeYSEDPreferences.isShowMethodReturnValuesInDebugNode());
          // Launch something
-         IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                // Get debug target TreeItem
                SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
                // Do resume and test created tree
-               String expectedModelPathInBundle = showMethodReturnValuesInDebugNodes ? "data/simpleIf/oracle/SimpleIf.xml" : "data/simpleIf/oracle_noMethodReturnValues/SimpleIf.xml";
+               String expectedModelPathInBundle;
+               if (showSignature) {
+                  expectedModelPathInBundle = showMethodReturnValuesInDebugNodes ? 
+                                              "data/simpleIf/oracle/SimpleIf.xml" : 
+                                              "data/simpleIf/oracle_noMethodReturnValues/SimpleIf.xml";
+               }
+               else {
+                  expectedModelPathInBundle = showMethodReturnValuesInDebugNodes ? 
+                                              "data/simpleIf/oracle/SimpleIf_NoSignature.xml" : 
+                                              "data/simpleIf/oracle_noMethodReturnValues/SimpleIf_NoSignature.xml";
+               }
                resume(bot, item, target);
-               assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false);
+               assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false, false);
             }
          };
          doKeYDebugTargetTest(projectName,
@@ -411,13 +530,96 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.FALSE,
-                              8,
-                              executor);
+                              Boolean.FALSE,
+                              null,
+                              8, executor);
       }
       finally {
          // Restore original value
          KeYSEDPreferences.setShowMethodReturnValuesInDebugNode(originalShowMethodReturnValuesInDebugNodes);
          assertEquals(originalShowMethodReturnValuesInDebugNodes, KeYSEDPreferences.isShowMethodReturnValuesInDebugNode());
+      }
+   }
+   /**
+    * Tests the launch where variables are based on the sequent.
+    */
+   @Test
+   public void testVariablesBasedOnSequent() throws Exception {
+      doVariablesComputationTest("SWTBotLaunchDefaultPreferencesTest_testVariablesBasedOnSequent", true);
+   }
+
+   /**
+    * Tests the launch where variables are based on the visible type structure.
+    */
+   @Test
+   public void testVariablesBasedOnVisibleTypeStructure() throws Exception {
+      doVariablesComputationTest("SWTBotLaunchDefaultPreferencesTest_testVariablesBasedOnVisibleTypeStructure", false);
+   }
+   
+   /**
+    * Does the test steps of {@link #testVariablesBasedOnSequent()}
+    * and {@link #testVariablesBasedOnVisibleTypeStructure()}.
+    * @param projectName The project name to use.
+    * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
+    * @throws Exception Occurred Exception
+    */
+   protected void doVariablesComputationTest(String projectName, 
+                                             final boolean variablesAreOnlyComputedFromUpdates) throws Exception {
+      boolean originalSetting = KeYSEDPreferences.isVariablesAreOnlyComputedFromUpdates();
+      boolean originalShowVariablesSetting = KeYSEDPreferences.isShowVariablesOfSelectedDebugNode();
+      try {
+         KeYSEDPreferences.setVariablesAreOnlyComputedFromUpdates(false);
+         KeYSEDPreferences.setShowVariablesOfSelectedDebugNode(true);
+         // Set preference
+         SWTWorkbenchBot bot = new SWTWorkbenchBot();
+         SWTBotShell preferenceShell = TestUtilsUtil.openPreferencePage(bot, "Run/Debug", "Symbolic Execution Debugger (SED)", "KeY Launch Defaults");
+         if (variablesAreOnlyComputedFromUpdates) {
+            preferenceShell.bot().comboBox(0).setSelection("Based on sequent");
+         }
+         else {
+            preferenceShell.bot().comboBox(0).setSelection("Based on visible type structure");
+         }
+         preferenceShell.bot().button("OK").click();
+         assertEquals(variablesAreOnlyComputedFromUpdates, KeYSEDPreferences.isVariablesAreOnlyComputedFromUpdates());
+         // Launch something
+         IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
+            @Override
+            public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+               // Get debug target TreeItem
+               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
+               // Do run
+               resume(bot, item, target);
+               if (variablesAreOnlyComputedFromUpdates) {
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/arrayVariables/oracle/ArrayVariablesTest_sequent.xml", true, false, false);
+               }
+               else {
+                  assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, "data/arrayVariables/oracle/ArrayVariablesTest_structure.xml", true, false, false);
+               }
+            }
+         };
+         doKeYDebugTargetTest(projectName,
+                              "data/arrayVariables/test",
+                              true,
+                              true,
+                              createMethodSelector("ArrayVariablesTest", "arrayTest", "[I"),
+                              null,
+                              null,
+                              Boolean.FALSE,
+                              Boolean.TRUE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              8, 
+                              executor);
+      }
+      finally {
+         // Restore original value
+         KeYSEDPreferences.setVariablesAreOnlyComputedFromUpdates(originalSetting);
+         assertEquals(originalSetting, KeYSEDPreferences.isVariablesAreOnlyComputedFromUpdates());
+         KeYSEDPreferences.setShowVariablesOfSelectedDebugNode(originalShowVariablesSetting);
+         assertEquals(originalShowVariablesSetting, KeYSEDPreferences.isShowVariablesOfSelectedDebugNode());
       }
    }
 }

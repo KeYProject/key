@@ -23,7 +23,7 @@ import org.key_project.sed.core.model.ISEDThread;
  * @author Martin Hentschel
  * @see ISEDTermination
  */
-public abstract class AbstractSEDTermination extends AbstractSEDTerminateCompatibleDebugNode implements ISEDTermination {
+public abstract class AbstractSEDTermination extends AbstractSEDStackFrameCompatibleDebugNode implements ISEDTermination {
    /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this termination is contained.

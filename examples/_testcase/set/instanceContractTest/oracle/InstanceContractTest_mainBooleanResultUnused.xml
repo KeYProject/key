@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.mainBooleanResultUnused(x);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call self.mainBooleanResultUnused(x)&gt;" pathCondition="true" pathConditionChanged="false">
       <operationContract name="result_0 = self.booleanResult(x) catch(exc_0)
 pre: self.&lt;inv&gt;
 post: result_0
@@ -8,11 +8,13 @@ post: result_0
 &amp; self.&lt;inv&gt;
 &amp; exc_0 = null
 mod: allLocs
-termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-         <methodReturn name="&lt;return of self.mainBooleanResultUnused(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of self.mainBooleanResultUnused(x);&gt;" isReturnValueComputed="true">
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_0" exceptionTerm="exc_0" selfTerm="self" contractParameters="x" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+         <methodReturn name="&lt;return of mainBooleanResultUnused&gt;" signature="&lt;return of self.mainBooleanResultUnused(x)&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of mainBooleanResultUnused&gt;" signatureIncludingReturnValue="&lt;return of self.mainBooleanResultUnused(x)&gt;" isReturnValueComputed="true" methodReturnCondition="true">
             <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
             </termination>
          </methodReturn>
       </operationContract>
+      <methodReturnEntry path="/0/0/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0"/>
 </start>

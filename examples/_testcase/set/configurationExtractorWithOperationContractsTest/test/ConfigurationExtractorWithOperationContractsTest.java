@@ -8,6 +8,7 @@ public class ConfigurationExtractorWithOperationContractsTest {
 	
 	/*@ normal_behavior
 	  @ ensures \result == x.value + y.value;
+	  @ assignable \strictly_nothing;
 	  @ */
 	public static int sub(IntWrapper x, IntWrapper y) {
 		throw new RuntimeException();

@@ -28,9 +28,13 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYClassPathEntryKind;
+import org.key_project.key4eclipse.starter.core.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.jdt.JDTUtil;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -44,6 +48,11 @@ public final class KeYResourceProperties {
      * Property for the use custom boot class path.
      */
     public static final QualifiedName PROP_USE_BOOT_CLASS_PATH = new QualifiedName("org.key_project.key4eclipse.starter", "useBootClassPath");
+
+    /**
+     * Property for the source class path.
+     */
+    public static final QualifiedName PROP_SOURCE_CLASS_PATH = new QualifiedName("org.key_project.key4eclipse.starter", "sourceClassPath");
 
     /**
      * Property for the custom boot class path.
@@ -104,7 +113,7 @@ public final class KeYResourceProperties {
      * @throws CoreException Occurred Exception.
      */
     public static void setUseBootClassPathKind(IProject project, UseBootClassPathKind kind) throws CoreException {
-        if (project != null) {
+        if (project != null && project.isOpen()) {
             project.setPersistentProperty(PROP_USE_BOOT_CLASS_PATH, kind != null ? kind.toString() : null);
         }
     }
@@ -116,7 +125,7 @@ public final class KeYResourceProperties {
      * @throws CoreException Occurred Exception.
      */    
     public static String getBootClassPath(IProject project) throws CoreException {
-        if (project != null) {
+        if (project != null && project.isOpen()) {
             return project.getPersistentProperty(PROP_BOOT_CLASS_PATH);
         }
         else {
@@ -131,7 +140,7 @@ public final class KeYResourceProperties {
      * @throws CoreException Occurred Exception.
      */
     public static void setBootClassPath(IProject project, String bootClassPath) throws CoreException {
-        if (project != null) {
+        if (project != null && project.isOpen()) {
             project.setPersistentProperty(PROP_BOOT_CLASS_PATH, bootClassPath);
         }
     }
@@ -144,7 +153,7 @@ public final class KeYResourceProperties {
      */
     public static List<KeYClassPathEntry> getClassPathEntries(IProject project) throws CoreException {
         try {
-            if (project != null) {
+            if (project != null && project.isOpen()) {
                 String xml = project.getPersistentProperty(PROP_CLASS_PATH_ENTRIES);
                 final List<KeYClassPathEntry> result = new LinkedList<KeYClassPathEntry>();
                 if (!StringUtil.isEmpty(xml)) {
@@ -186,7 +195,7 @@ public final class KeYResourceProperties {
      * @throws CoreException Occurred Exception.
      */
     public static void setClassPathEntries(IProject project, List<KeYClassPathEntry> entries) throws CoreException {
-        if (project != null) {
+        if (project != null && project.isOpen()) {
             StringBuffer sb = new StringBuffer();
             sb.append("<?xml version=\"1.0\"?>");
             sb.append("<classPathEntries>");
@@ -256,4 +265,93 @@ public final class KeYResourceProperties {
             return null;
         }
     }
+
+    /**
+     * Returns the source class path location in the local file system of the given {@link IProject}.
+     * @param project The {@link IProject}.
+     * @return The source class path location in the local file system or {@code null} if not availale.
+     * @throws CoreException Occurred Exception.
+     */
+    public static File getSourceClassPathLocation(IProject project) throws CoreException {
+       IResource resource = getSourceClassPathResource(project);
+       return ResourceUtil.getLocation(resource);
+    }
+
+    /**
+     * Returns the source class path of the given {@link IProject} as {@link IResource}.
+     * @param project The {@link IProject}.
+     * @return The {@link IResource} or {@code null} if not available.
+     * @throws CoreException Occurred Exception.
+     */
+    public static IResource getSourceClassPathResource(IProject project) throws CoreException {
+       String path = getSourceClassPath(project);
+       if (path != null) {
+          return ResourcesPlugin.getWorkspace().getRoot().findMember(path);
+       }
+       else {
+          return null;
+       }
+    }
+
+    /**
+     * Returns the source class path entry value.
+     * @param project The {@link IProject} to read from.
+     * @return The source class path entry value.
+     * @throws CoreException Occurred Exception.
+     */    
+    public static String getSourceClassPath(IProject project) throws CoreException {
+        if (project != null && project.isOpen()) {
+            String value = project.getPersistentProperty(PROP_SOURCE_CLASS_PATH);
+            if (value == null) {
+               value = getDefaultSourceClassPath(project);
+            }
+            return value;
+        }
+        else {
+            return null;
+        }
+    }
+    
+    /**
+     * Sets the source class path entry.
+     * @param project The {@link IProject} to configure.
+     * @param sourceClassPath The value to save.
+     * @throws CoreException Occurred Exception.
+     */
+    public static void setSourceClassPath(IProject project, String sourceClassPath) throws CoreException {
+        if (project != null && project.isOpen()) {
+            project.setPersistentProperty(PROP_SOURCE_CLASS_PATH, sourceClassPath);
+        }
+    }
+
+   /**
+    * Returns the default source path to use in the given {@link IProject}.
+    * @param project The {@link IProject}.
+    * @return The default source path to use or {@code null} if unknown.
+    */
+   public static String getDefaultSourceClassPath(IProject project) {
+      try {
+         if (project != null && project.isOpen()) {
+            if (JDTUtil.isJavaProject(project)) {
+               List<IResource> sourcePaths = JDTUtil.getSourceResources(project);
+               if (!CollectionUtil.isEmpty(sourcePaths)) {
+                  return sourcePaths.get(0).getFullPath().toString();
+               }
+               else {
+                  return null;
+               }
+            }
+            else {
+               return null;
+            }
+         }
+         else {
+            return null;
+         }
+      }
+      catch (JavaModelException e) {
+         LogUtil.getLogger().logError(e);
+         return null;
+      }
+   }
 }

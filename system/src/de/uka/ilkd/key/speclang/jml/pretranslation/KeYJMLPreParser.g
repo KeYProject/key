@@ -108,7 +108,7 @@ options {
         try {
             return classlevel_comment();
         } catch(RecognitionException e) {
-	    throw excManager.convertException(e);
+	    throw excManager.convertException(getErrorMessage(e, KeYJMLPreLexerTokens.getTokennames()), e);
         }
     }
 
@@ -118,7 +118,7 @@ options {
         try {
             return methodlevel_comment();
         } catch(RecognitionException e) {
-	    throw excManager.convertException(e);
+	    throw excManager.convertException(getErrorMessage(e, KeYJMLPreLexerTokens.getTokennames()), e);
         }
     }
 
@@ -156,6 +156,16 @@ options {
       result = result.prepend(p);
       return result;
     }
+    
+  @Override
+  protected Object recoverFromMismatchedToken(IntStream input, int ttype, BitSet follow) throws RecognitionException {
+    throw new MismatchedTokenException(ttype, input);
+  }
+
+  @Override
+  public Object recoverFromMismatchedSet(IntStream input, RecognitionException e, BitSet follow) throws RecognitionException {
+    throw e;
+  }
 
 }
 
@@ -173,17 +183,19 @@ classlevel_comment
     mods = ImmutableSLList.<String>nil();
 }
 :
+    /* there may be some modifiers after the declarations */
+
+    mods=modifiers
     (
-        options { greedy = false; }
-    	:
-    	mods=modifiers
-    	list=classlevel_element[mods]
-    	{
-	    if(list!=null) {
-		result = result.append(list);
-	    }
-	}
-    )* EOF
+      list=classlevel_element[mods]
+      {
+          if(list!=null) {
+             result = result.append(list);
+          }
+      }
+      mods=modifiers
+    )*
+    EOF
 ;
 
 
@@ -209,7 +221,6 @@ classlevel_element[ImmutableList<String> mods]
     |   result=assert_statement[mods] //RecodeR workaround
     |   result=assume_statement[mods] //RecodeR workaround
     |   result=nowarn_pragma[mods]
-    |   EOF
 ;
 
 
@@ -240,6 +251,7 @@ methodlevel_element[ImmutableList<String> mods]
     |   result=assert_statement[mods]
     |   result=assume_statement[mods]
     |   result=nowarn_pragma[mods]
+    |   result=debug_statement[mods]
     |   result=block_specification[mods]
 ;
 
@@ -528,7 +540,7 @@ generic_spec_case[ImmutableList<String> mods, Behavior b]
     (abbrvs=spec_var_decls)?
     (requires=spec_header
        ( options { greedy = true; }
-	 : result = generic_spec_body[mods, b] )?
+	 : result = generic_spec_body[mods, b, result] )?
         {
 		if (result.isEmpty()) {
 		      result = result.append(new TextualJMLSpecCase(mods, b));
@@ -545,7 +557,7 @@ generic_spec_case[ImmutableList<String> mods, Behavior b]
 			}
 	        }
         }
-    | result = generic_spec_body[mods, b]
+    | result = generic_spec_body[mods, b, result]
     )
 ;
 
@@ -591,12 +603,12 @@ requires_clause
 
 requires_keyword
 :
-    REQUIRES |
-    REQUIRES_RED
+    REQUIRES | REQUIRES_RED | PRE | PRE_RED
+    
 ;
 
 
-generic_spec_body[ImmutableList<String> mods, Behavior b]
+generic_spec_body[ImmutableList<String> mods, Behavior b, ImmutableList<TextualJMLConstruct> specs]
 	returns [ImmutableList<TextualJMLConstruct> r = null]
 	throws SLTranslationException
 @init {
@@ -608,20 +620,29 @@ generic_spec_body[ImmutableList<String> mods, Behavior b]
     result=simple_spec_body[mods, b]
     |
     (
-        NEST_START
-	result=generic_spec_case_seq[mods, b]
-	NEST_END
+      NEST_START
+	    result=generic_spec_case_seq[mods, b, specs]
+	    NEST_END
     )
 ;
 
 
-generic_spec_case_seq[ImmutableList<String> mods, Behavior b]
-	returns [ImmutableList<TextualJMLConstruct> r = null]
+generic_spec_case_seq[ImmutableList<String> mods, Behavior b, ImmutableList<TextualJMLConstruct> specs]
+	returns [ImmutableList<TextualJMLConstruct> r = ImmutableSLList.nil()]
 	throws SLTranslationException
 @init {
     result = r;
 }
-@after { r = result; }
+@after {
+    for (TextualJMLConstruct tc: result)
+        for (TextualJMLConstruct z: specs) {
+            TextualJMLSpecCase a = (TextualJMLSpecCase) tc;
+            TextualJMLSpecCase c = (TextualJMLSpecCase) z;
+            System.out.println("---Contract A:\n"+a);
+            System.out.println("---Contract B:\n"+c);
+            r.append(a.merge(c));
+        }
+}
 :
     result=generic_spec_case[mods, b]
     (
@@ -672,6 +693,8 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=breaks_clause         { sc.addBreaks(ps); }
 	|   ps=continues_clause      { sc.addContinues(ps); }
 	|   ps=returns_clause        { sc.addReturns(ps); }
+        |   ps=separates_clause      { sc.addInfFlowSpecs(ps); }
+        |   ps=determines_clause      { sc.addInfFlowSpecs(ps); }
     )
     {
 	if(b == Behavior.EXCEPTIONAL_BEHAVIOR
@@ -701,6 +724,41 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 //-----------------------------------------------------------------------------
 //simple specification body clauses
 //-----------------------------------------------------------------------------
+
+
+// old information flow annotations
+separates_clause
+	returns [PositionedString r = null]
+	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+    separates_keyword result=expression { result = result.prepend("separates "); }
+;
+
+
+separates_keyword
+:
+        RESPECTS
+    |   SEPARATES
+;
+
+
+determines_clause
+	returns [PositionedString r = null]
+	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+    determines_keyword result=expression { result = result.prepend("determines "); }
+;
+
+
+determines_keyword
+:
+        DETERMINES
+;
+
 
 assignable_clause
 	returns [PositionedString r = null]
@@ -746,6 +804,7 @@ measured_by_clause
 @init { result = r; }
 @after { r = result; }
 :
+// TODO: this is confusing. why not keep 'measured_by'?
     measured_by_keyword result=expression { result = result.prepend("decreases "); }
 ;
 
@@ -769,8 +828,7 @@ ensures_clause
 
 ensures_keyword
 :
-	ENSURES
-    |   ENSURES_RED
+	ENSURES | ENSURES_RED | POST | POST_RED
 ;
 
 
@@ -1004,7 +1062,7 @@ method_declaration[ImmutableList<String> mods, PositionedString type, Token name
           }
           assert bodyString.charAt(0) == '{' && bodyString.charAt(bodyString.length()-1) == '}';
           bodyString = bodyString.substring(1, bodyString.length()-1).trim();
-          assert bodyString.startsWith("return ");
+          assert bodyString.startsWith("return ") : "return expected, instead: " + bodyString;
           bodyString = bodyString.substring(bodyString.indexOf(" ") + 1);
           // TODO Other heaps? There is only one return statement.....
           psDefinition = createPositionedString("<heap> "+name.getText() +
@@ -1054,11 +1112,17 @@ param_decl returns [String s = null]
         )?
         t=IDENT
         {
-            text.append(t.getText() + " ");
+            text.append(t.getText());
         }
+        (
+          ( AXIOM_NAME_BEGIN // That is "["
+            AXION_NAME_END // That is "]"
+          | EMPTYBRACKETS )
+                { text.append("[]"); }
+        )*
         t=IDENT
         {
-            text.append(t.getText());
+            text.append(" " + t.getText());
         }
     ;
 
@@ -1219,6 +1283,17 @@ nowarn_pragma[ImmutableList<String> mods]
 ;
 
 
+debug_statement[ImmutableList<String> mods]
+  returns [ImmutableList<TextualJMLConstruct> result = null]
+  throws SLTranslationException
+:
+    DEBUG ps=expression
+    {
+  raiseNotSupported("debug statements");
+  result = ImmutableSLList.<TextualJMLConstruct>nil();
+    }
+;
+
 
 //-----------------------------------------------------------------------------
 //set statements
@@ -1253,6 +1328,8 @@ loop_specification[ImmutableList<String> mods]
 	options { greedy = true; }
 	:
             ps=loop_invariant       { ls.addInvariant(ps); }
+        |   ps=loop_separates_clause      { ls.addInfFlowSpecs(ps); }
+        |   ps=loop_determines_clause      { ls.addInfFlowSpecs(ps); }
         |   ps=assignable_clause    { ls.addAssignable(ps); }
         |   ps=variant_function     { ls.setVariant(ps); }
     )*
@@ -1289,6 +1366,27 @@ decreasing_keyword
     |   DECREASING_REDUNDANTLY
     |   DECREASES
     |   DECREASES_REDUNDANTLY
+;
+
+
+// old information flow annotations
+loop_separates_clause
+	returns [PositionedString r = null]
+	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+    separates_keyword result=expression { result = result.prepend("loop_separates "); }
+;
+
+
+loop_determines_clause
+	returns [PositionedString r = null]
+	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+    determines_keyword result=expression { result = result.prepend("loop_determines "); }
 ;
 
 
@@ -1373,6 +1471,11 @@ assert_statement[ImmutableList<String> mods]
     assert_keyword ps=expression
     {
 	result = ImmutableSLList.<TextualJMLConstruct>nil().append(TextualJMLSpecCase.assert2blockContract(mods,ps));
+    }
+    |
+    UNREACHABLE SEMICOLON
+    {
+  result = ImmutableSLList.<TextualJMLConstruct>nil().append(TextualJMLSpecCase.assert2blockContract(mods,new PositionedString("false")));
     }
 ;
 

@@ -52,6 +52,54 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
     * Tests the suspend/resume functionality on the {@link IDebugTarget}.
     */
    @Test
+   public void testGroupStartOccurrenceTest() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testGroupStartOccurrenceTest",
+                     "data/groupStartOccurrenceTest/test",
+                     false,
+                     createMethodSelector("GroupStartOccurrenceTest", "main", "I"),
+                     "data/groupStartOccurrenceTest/oracle/GroupStartOccurrenceTest.xml",
+                     false,
+                     14,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false,
+                     false, 
+                     false);
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testConstraintsOfAppliedMethodContract() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testConstraintsOfAppliedMethodContract",
+                     "data/constraintsOfAppliedMethodContract/test",
+                     false,
+                     createMethodSelector("MethodContract", "magic", "I"),
+                     "data/constraintsOfAppliedMethodContract/oracle/MethodContract.xml",
+                     true,
+                     14,
+                     true,
+                     true,
+                     true,
+                     false,
+                     false,
+                     false,
+                     true,
+                     false,
+                     false, 
+                     false);
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
    public void testNonExecutionBranchHidingSimpleIntQuery_branchHidingSideProofs() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testNonExecutionBranchHidingSimpleIntQuery_branchHidingSideProofs",
                      "data/nonExecutionBranchHidingSimpleIntQuery/test",
@@ -65,9 +113,10 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false,
                      true,
                      true,
-                     true,
+                     true, 
                      false);
    }
    
@@ -88,9 +137,10 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
-                     true,
-                     true,
                      false,
+                     true,
+                     true,
+                     false, 
                      false);
    }
    
@@ -114,6 +164,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false, 
                      true);
    }
    
@@ -137,6 +188,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false, 
                      false);
    }
 
@@ -158,8 +210,9 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
-                     true,
                      false,
+                     true,
+                     false, 
                      false);
    }
    
@@ -180,9 +233,10 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false,
                      true,
                      false,
-                     false,
+                     false, 
                      false);
    }
 
@@ -203,9 +257,10 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false,
                      true,
                      false,
-                     false,
+                     false, 
                      false);
    }
 
@@ -226,9 +281,10 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false,
                      true,
                      false,
-                     false,
+                     false, 
                      false);
    }
 
@@ -249,9 +305,10 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false,
                      true,
                      false,
-                     false,
+                     false, 
                      false);
    }
 
@@ -272,9 +329,10 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false,
                      true,
                      false,
-                     false,
+                     false, 
                      false);
    }
 
@@ -295,9 +353,10 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false,
                      true,
                      false,
-                     false,
+                     false, 
                      false);
    }
 
@@ -318,9 +377,10 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false,
                      true,
                      false,
-                     false,
+                     false, 
                      false);
    }
 
@@ -341,9 +401,10 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false,
                      true,
                      false,
-                     false,
+                     false, 
                      false);
    }
 
@@ -364,9 +425,10 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false,
                      true,
                      false,
-                     false,
+                     false, 
                      false);
    }
 
@@ -387,9 +449,10 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false,
                      true,
                      false,
-                     false,
+                     false, 
                      false);
    }
 
@@ -410,9 +473,10 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false,
                      true,
                      false,
-                     false,
+                     false, 
                      false);
    }
    
@@ -460,6 +524,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false, 
                      false);
    }
    
@@ -547,6 +612,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false, 
                      false);
    }
    
@@ -570,6 +636,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false, 
                      false);
    }
    
@@ -593,6 +660,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false, 
                      false);
    }
    
@@ -616,6 +684,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false, 
                      false);
    }
    
@@ -1061,11 +1130,12 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false, 
                      false, 
                      false,
+                     false,
                      true,
                      false,
                      false,
                      false,
-                     false,
+                     false, 
                      false);
    }
    
@@ -1089,6 +1159,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      false,
                      false,
+                     false, 
                      false);
    }
    
@@ -1099,7 +1170,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
     */
    @Test
    public void testSuspendResumeDebugTarget_Resume_Suspend_Resume() throws Exception {
-      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+      IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             // Test launch commands after loading completed
@@ -1181,8 +1252,9 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.FALSE,
-                           6, 
-                           executor);
+                           Boolean.FALSE,
+                           Boolean.TRUE, 
+                           6, executor);
    }
    
    /**
@@ -1225,9 +1297,9 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                                                String expectedModelPathInBundle,
                                                boolean includeCallStack,
                                                boolean mergeBranchConditions) throws Exception {
-      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, false, 8, false, includeCallStack, false, false, mergeBranchConditions, false, false, false, false);
+      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, false, 8, false, includeCallStack, false, false, false, mergeBranchConditions, false, false, false, false);
       if (!FAST_MODE) {
-         assertSEDModel(projectName + "stepInto", pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, false, 8, false, includeCallStack, true, false, mergeBranchConditions, false, false, false, false);
+         assertSEDModel(projectName + "stepInto", pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, false, 8, false, includeCallStack, false, true, false, mergeBranchConditions, false, false, false, false);
       }
    }
    
@@ -1284,7 +1356,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                                  String expectedModelPathInBundle,
                                  boolean showMethodReturnValues,
                                  boolean stepIntoInsteadOfRun) throws Exception {
-      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, showMethodReturnValues, 10, false, false, stepIntoInsteadOfRun, false, false, false, false, false, false);
+      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, showMethodReturnValues, 10, false, false, false, stepIntoInsteadOfRun, false, false, false, false, false, false);
    }
    
    /**
@@ -1306,6 +1378,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param includeVariables Include variables?
     * @param includeCallstack Include call stack?
+    * @param includeConstraints TODO
     * @param stepIntoInsteadOfRun Use step into functionality instead of the run functionality to create the tree?
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
@@ -1313,6 +1386,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
     * @param useLoopInvariants Use loop invariants?
     * @param nonExecutionBranchHidingSideProofs {@code true} hide non execution branch labels by side proofs, {@code false} do not hide execution branch labels. 
     * @param aliasChecks Do alias checks?
+    * @param includeConstraints Include constraints?
     * @throws Exception Occurred Exception.
     */
    protected void assertSEDModel(String projectName,
@@ -1324,14 +1398,15 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                                  int timeoutFactor,
                                  final boolean includeVariables,
                                  final boolean includeCallstack,
+                                 final boolean includeConstraints,
                                  final boolean stepIntoInsteadOfRun,
                                  final boolean showKeYMainWindow,
                                  final boolean mergeBranchConditions,
                                  final boolean useMethodContracts,
                                  final boolean useLoopInvariants,
-                                 final boolean nonExecutionBranchHidingSideProofs,
+                                 final boolean nonExecutionBranchHidingSideProofs, 
                                  final boolean aliasChecks) throws Exception {
-      IKeYDebugTargetTestExecutor executor = createResumeExecutor(clearProofListInKeYBeforeResume, Activator.PLUGIN_ID, expectedModelPathInBundle, includeVariables, includeCallstack, stepIntoInsteadOfRun, mergeBranchConditions, useMethodContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks);
+      IKeYDebugTargetTestExecutor executor = createResumeExecutor(clearProofListInKeYBeforeResume, Activator.PLUGIN_ID, expectedModelPathInBundle, includeVariables, includeCallstack, includeConstraints, stepIntoInsteadOfRun, mergeBranchConditions, useMethodContracts, useLoopInvariants, nonExecutionBranchHidingSideProofs, aliasChecks);
       doKeYDebugTargetTest(projectName, 
                            pathInBundle, 
                            true,
@@ -1344,8 +1419,9 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.valueOf(showKeYMainWindow),
                            Boolean.valueOf(mergeBranchConditions),
                            Boolean.FALSE,
-                           timeoutFactor, 
-                           executor);
+                           Boolean.FALSE,
+                           Boolean.TRUE, 
+                           timeoutFactor, executor);
    }
 
    /**
@@ -1405,7 +1481,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
    protected void doTestSuspendResumeWhileDisconnected(String projectName,
                                                        final boolean clearProofListInKeYBeforeDisconnect,
                                                        final int... pathToElementInDebugTreeWhichProvidesDisconnectMenuItem) throws Exception {
-      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+      IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             // Test launch commands after loading completed
@@ -1421,15 +1497,17 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
             assertFalse(target.isTerminated());
             // Make sure that the debug target is in the initial state.
             TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
-            // Clear proof list in KeY if required
             if (clearProofListInKeYBeforeDisconnect) {
+               // Clear proof list in KeY
                assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
                KeYUtil.clearProofList(MainWindow.getInstance());
                assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
             }
-            // Disconnect
-            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, pathToElementInDebugTreeWhichProvidesDisconnectMenuItem); // Select first debug target
-            item.contextMenu("Disconnect").click();
+            else {
+               // Disconnect
+               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, pathToElementInDebugTreeWhichProvidesDisconnectMenuItem); // Select first debug target
+               item.contextMenu("Disconnect").click();
+            }
             assertTrue(launch instanceof IDisconnect);
             TestSedCoreUtil.waitUntilLaunchIsDisconnected(bot, (IDisconnect)launch);
             assertTrue(launch.canTerminate());
@@ -1448,7 +1526,12 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                KeYUtil.waitWhileMainWindowIsFrozen(MainWindow.getInstance());
             }
             // Test the unmodified execution tree
-            TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
+            if (clearProofListInKeYBeforeDisconnect) {
+               TestSEDKeyCoreUtil.assertDisposedInitialTarget(target, targetName);
+            }
+            else {
+               TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
+            }
          }
       };
       doKeYDebugTargetTest(projectName, 
@@ -1463,8 +1546,9 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.TRUE,
                            Boolean.FALSE,
                            Boolean.FALSE,
-                           8, 
-                           executor);
+                           Boolean.FALSE,
+                           Boolean.TRUE, 
+                           8, executor);
    }
 
    /**
@@ -1512,7 +1596,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
    protected void doTerminationTest(String projectName,
                                     final boolean clearProofListInKeYBeforeTermination,
                                     final int... pathToElementInDebugTreeWhichProvidesTerminateMenuItem) throws Exception {
-      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+      IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             // Test launch commands after loading completed
@@ -1542,7 +1626,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
             assertFalse(target.canResume());
             assertFalse(target.canSuspend());
             assertFalse(target.canTerminate());
-            assertFalse(target.isDisconnected());
+            assertEquals(clearProofListInKeYBeforeTermination, target.isDisconnected());
             assertTrue(target.isSuspended());
             assertTrue(target.isTerminated());
             // Remove terminated launch
@@ -1562,7 +1646,8 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.TRUE,
                            Boolean.FALSE,
                            Boolean.FALSE,
-                           8, 
-                           executor);
+                           Boolean.FALSE,
+                           Boolean.TRUE, 
+                           8, executor);
    }
 }

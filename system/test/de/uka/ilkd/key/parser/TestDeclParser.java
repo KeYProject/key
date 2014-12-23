@@ -31,11 +31,8 @@ import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.AmbigiousDeclException;
-import de.uka.ilkd.key.parser.KeYLexerF;
-import de.uka.ilkd.key.parser.KeYParserF;
-import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import org.antlr.runtime.RecognitionException;
 
 
 public class TestDeclParser extends TestCase {
@@ -54,8 +51,7 @@ public class TestDeclParser extends TestCase {
 	String sorts = "\\sorts{boolean;int;LocSet;}";
 	KeYParserF basicSortsParser = new KeYParserF(ParserMode.DECLARATION,
 		new KeYLexerF(sorts,
-			"No file. Call of parser from logic/TestClashFreeSubst.java",
-			null),
+			"No file. Call of parser from logic/TestClashFreeSubst.java"),
 		serv, nss);
 	try {
 	    basicSortsParser.parseSorts();
@@ -70,8 +66,7 @@ public class TestDeclParser extends TestCase {
     private KeYParserF stringParser(String s) {
 	return new KeYParserF(ParserMode.DECLARATION,
 		new KeYLexerF(s,
-			"No file. Call of parser from parser/TestDeclParser.java",
-			null),
+			"No file. Call of parser from parser/TestDeclParser.java"),
 		serv, nss);
     }
 
@@ -462,10 +457,14 @@ public class TestDeclParser extends TestCase {
 	  fail("Parsed in ambigious declaration");
 	} catch(RuntimeException e){
 	    if(!(e.getCause() instanceof AmbigiousDeclException)){
+	        e.printStackTrace();
 		fail("Unexpected excpetion. Testcase failed." +e);
 	    }
-	} catch(antlr.RecognitionException re) {
-	    fail("Unexpected excpetion. Testcase failed." + re);
+	} catch(RecognitionException re) {
+	    if(!(re instanceof AmbigiousDeclException)) {
+	        re.printStackTrace();
+	        fail("Unexpected recognition excpetion. Testcase failed." + re);
+	    }
 	} 
 	
     }

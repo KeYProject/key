@@ -38,12 +38,11 @@ public class LoopInvariantRuleCompletion implements
         InteractiveRuleApplicationCompletion {
 
     @Override
-    public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal,
-            boolean forced) {
+    public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced) {
         Services services = goal.proof().getServices();
 
-        LoopInvariantBuiltInRuleApp loopApp = (LoopInvariantBuiltInRuleApp) app
-                .tryToInstantiate(goal);
+        LoopInvariantBuiltInRuleApp loopApp =
+                ((LoopInvariantBuiltInRuleApp) app).tryToInstantiate(goal);
 
         // leading update?
         Term progPost = loopApp.programTerm();
@@ -70,7 +69,7 @@ public class LoopInvariantRuleCompletion implements
                 return null;
             }
         } else { // in interactive mode and there is an invariant in the
-                 // repository            
+            // repository            
             boolean requiresVariant = loopApp.variantRequired()
                     && !loopApp.variantAvailable();
             // Check if a variant is required
@@ -95,7 +94,14 @@ public class LoopInvariantRuleCompletion implements
 
     @Override
     public boolean canComplete(IBuiltInRuleApp app) {
-        return app.rule() instanceof WhileInvariantRule;
+        return checkCanComplete(app);
     }
 
+    /**
+     * Checks if the app is supported. 
+     * This functionality is also used by the Eclipse plug-ins like the KeYIDE.
+     */
+    public static boolean checkCanComplete(final IBuiltInRuleApp app) {
+        return app.rule() instanceof WhileInvariantRule;
+   }
 }

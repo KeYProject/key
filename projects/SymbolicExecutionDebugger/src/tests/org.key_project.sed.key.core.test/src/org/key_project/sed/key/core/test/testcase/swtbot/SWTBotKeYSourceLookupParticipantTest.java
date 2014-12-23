@@ -71,7 +71,7 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
             KeYResourceProperties.setClassPathEntries(project, entries);
          }
       };
-      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+      IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             IFolder srcFolder = project.getProject().getFolder("src");
@@ -83,6 +83,7 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
             //IFile cFile = project.getProject().getFolder("boot").getFolder("c").getFile("SameName.java");
             //IFile dFile = project.getProject().getFolder("specs").getFolder("d").getFile("SameName.java");
             List<IFile> expectedResources = new LinkedList<IFile>();
+            expectedResources.add(mainFile);
             expectedResources.add(mainFile);
             expectedResources.add(mainFile);
             expectedResources.add(defaultFile);
@@ -106,6 +107,7 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
             //expectedResources.add(cFile); // API files are not included in symbolic execution tree.
             expectedResources.add(mainFile);
             //expectedResources.add(dFile); // API files are not included in symbolic execution tree.
+            expectedResources.add(mainFile);
             expectedResources.add(mainFile);
             expectedResources.add(mainFile);
             // Configure method contract usage
@@ -144,6 +146,8 @@ public class SWTBotKeYSourceLookupParticipantTest extends AbstractKeYDebugTarget
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.FALSE,
+                           Boolean.FALSE,
+                           Boolean.TRUE,
                            14, 
                            executor);
    }

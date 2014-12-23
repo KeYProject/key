@@ -29,7 +29,7 @@ import java.util.StringTokenizer;
  * </ul>
  * 
  */
-public class PosInTerm {
+public final class PosInTerm {
 
     private static final PosInTerm TOP_LEVEL = new PosInTerm();
 
@@ -269,7 +269,7 @@ public class PosInTerm {
         return "subterm: " + integerList(iterator());
     }
 
-    public static class PiTIterator implements IntIterator {
+    public static final class PiTIterator implements IntIterator {
         private final PosInTerm pit;
         private int pos;
         private final boolean order;

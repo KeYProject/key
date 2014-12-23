@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.ui;
 
-import de.uka.ilkd.key.gui.Main;
+import de.uka.ilkd.key.core.Main;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -40,7 +40,7 @@ public class BatchMode {
 
 
    public void finishedBatchMode (Object result,
-            Proof proof) {
+                                  Proof proof) {
 
         if ( Main.getStatisticsFile() != null )
             printStatistics ( Main.getStatisticsFile(), result.toString(),
@@ -132,7 +132,7 @@ public class BatchMode {
                                      statistics.time + " | " +
                                      statistics.autoModeTime + " | " +
                                      (proofClosed ? 1 : 0) + " | " +
-                                     ((double)statistics.autoModeTime / (double)statistics.totalRuleApps) + " | " +
+                                     statistics.timePerStep + " | " +
                                      memory);
             statPrinter.close();
         } catch ( IOException e ) {

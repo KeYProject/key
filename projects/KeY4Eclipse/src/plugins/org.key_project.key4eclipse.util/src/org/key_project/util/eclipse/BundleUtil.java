@@ -20,6 +20,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -137,6 +139,25 @@ public final class BundleUtil {
    }
    
    /**
+    * Creates the given file with the content provided by the plug-in.
+    * @param file The {@link IFile} to create.
+    * @param bundleId The plug-in which provides the content.
+    * @param pathInBundle The path in the plug-in to the content.
+    * @throws CoreException Occurred Exception.
+    * @throws IOException Occurred Exception.
+    */
+   public static void extractFromBundleToWorkspace(String bundleId, String pathInBundle, IFile file) throws CoreException, IOException {
+      if (file != null) {
+         if (file.exists()) {
+            file.setContents(BundleUtil.openInputStream(bundleId, pathInBundle), true, false, null);
+         }
+         else {
+            file.create(BundleUtil.openInputStream(bundleId, pathInBundle), true, null);
+         }
+      }
+   }
+   
+   /**
     * Extracts or files and folders form the bundle into the workspace target.
     * @param bundleId The ID of the bundle to extract from.
     * @param pathInBundle The path in the bundle.
@@ -200,45 +221,92 @@ public final class BundleUtil {
                  String urlPath = url.getPath();
                  int pathInBundleIndex = urlPath.indexOf(pathInBundle);
                  String pathInTarget = urlPath.substring(pathInBundleIndex + pathInBundle.length());
-                 try {
-                    // Check if it is a file or folder by the content size.
-                    URLConnection connection = url.openConnection();
-                    if (connection.getContentLength() > 0) {
-                       InputStream in = connection.getInputStream();
-                       IFile file = target.getFile(new Path(pathInTarget));
-                       if (file.exists()) {
-                          file.setContents(unifyLineBreaks ? IOUtil.unifyLineBreaks(in) : in, 
-                                           true, 
-                                           true, 
-                                           null);
-                       }
-                       else {
-                          file.create(unifyLineBreaks ? IOUtil.unifyLineBreaks(in) : in, 
-                                      true, 
-                                      null);
-                       }
-                    }
-                    else {
-                       // Handle URL as folder (Happens in product execution)
-                       IFolder folder = target.getFolder(new Path(pathInTarget));
-                       if (!folder.exists()) {
-                          folder.create(true, true, null);
-                       }
-                    }
-                 }
-                 catch (IOException e) {
-                     // Handle URL as folder (This happens in IDE execution)
-                     IFolder folder = target.getFolder(new Path(pathInTarget));
-                     if (!folder.exists()) {
-                        folder.create(true, true, null);
-                     }
-                 }
+                 extractURL(url, pathInTarget, target, unifyLineBreaks);
               }
               else {
                  throw new IllegalArgumentException("Unsupported bundle entry \"" + entry + "\".");
               }
            }
        }
+       else {
+          // Extract entry
+          URL entry = bundle.getEntry(pathInBundle);
+          if (entry != null) {
+             String path = entry.getFile();
+             int fileStart = path.lastIndexOf("/");
+             if (fileStart >= 0) {
+                path = path.substring(fileStart + 1);
+             }
+             extractURL(entry, path, target, unifyLineBreaks);
+          }
+       }
+   }
+   
+   /**
+    * Utility method used by {@link #extractFromBundleToWorkspace(String, String, IContainer, boolean)}.
+    * @param url The URL of a file to extract.
+    * @param pathInTarget The path to the {@link IFile} to create in the given target {@link IContainer}.
+    * @param target The {@link IContainer} to create {@link IFile} in.
+    * @param unifyLineBreaks {@code true} line breaks are unified to {@code \n}, {@code false} original line breaks are kept.
+    * @throws CoreException Occurred Exception.
+    */
+   private static void extractURL(URL url, 
+                                  String pathInTarget, 
+                                  IContainer target, 
+                                  boolean unifyLineBreaks) throws CoreException {
+      try {
+         // Check if it is a file or folder by the content size.
+         URLConnection connection = url.openConnection();
+         if (connection.getContentLength() > 0) {
+            InputStream in = connection.getInputStream();
+            IFile file = target.getFile(new Path(pathInTarget));
+            if (file.exists()) {
+               file.setContents(unifyLineBreaks ? IOUtil.unifyLineBreaks(in) : in, 
+                                true, 
+                                true, 
+                                null);
+            }
+            else {
+               // Make sure that parents exist, this is required in Eclipse 4.4
+               List<IContainer> parents = new LinkedList<IContainer>();
+               IContainer parent = file.getParent();
+               while (parent != null && !parent.exists()) {
+                  parents.add(0, parent);
+                  parent = parent.getParent();
+               }
+               for (IContainer toCreate : parents) {
+                  if (toCreate instanceof IFolder) {
+                     ((IFolder)toCreate).create(true, true, null);
+                  }
+                  else if (toCreate instanceof IProject) {
+                     IProject project = (IProject)toCreate;
+                     project.create(null);
+                     if (!project.isOpen()) {
+                        project.open(null);
+                     }
+                  }
+               }
+               // Create file
+               file.create(unifyLineBreaks ? IOUtil.unifyLineBreaks(in) : in, 
+                           true, 
+                           null);
+            }
+         }
+         else {
+            // Handle URL as folder (Happens in product execution)
+            IFolder folder = target.getFolder(new Path(pathInTarget));
+            if (!folder.exists()) {
+               folder.create(true, true, null);
+            }
+         }
+      }
+      catch (IOException e) {
+          // Handle URL as folder (This happens in IDE execution)
+          IFolder folder = target.getFolder(new Path(pathInTarget));
+          if (!folder.exists()) {
+             folder.create(true, true, null);
+          }
+      }
    }
 
    /**

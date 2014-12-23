@@ -27,7 +27,7 @@ import javax.swing.text.Highlighter.HighlightPainter;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -59,6 +59,10 @@ import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 
 public class InnerNodeView extends SequentView {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = -6542881446084654358L;
     private InitialPositionTable posTable;
     public final JTextArea tacletInfo;
     Node node;
@@ -68,9 +72,9 @@ public class InnerNodeView extends SequentView {
         this.node = node;
         filter = new IdentitySequentPrintFilter(node.sequent());
         setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(),
-                mainWindow.getMediator().getNotationInfo(),
-                mainWindow.getMediator().getServices(),
-                getVisibleTermLabels()));
+                        mainWindow.getMediator().getNotationInfo(),
+                        mainWindow.getMediator().getServices(),
+                        getVisibleTermLabels()));
         setSelectionColor(new Color(10, 180, 50));
         setBackground(INACTIVE_BACKGROUND_COLOR);
 

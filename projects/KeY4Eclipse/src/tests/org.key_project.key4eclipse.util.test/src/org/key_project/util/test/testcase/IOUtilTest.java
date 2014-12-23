@@ -49,6 +49,62 @@ import org.key_project.util.test.util.TestUtilsUtil;
  */
 public class IOUtilTest extends TestCase {
    /**
+    * Tests {@link IOUtil#exists(File)}
+    */
+   @Test
+   public void testExists() throws IOException {
+      assertFalse(IOUtil.exists(null));
+      File tempFile = File.createTempFile("IOUtilTest_", ".testExists");
+      assertTrue(IOUtil.exists(tempFile));
+      tempFile.delete();
+      assertFalse(IOUtil.exists(tempFile));
+      File tempDir = IOUtil.createTempDirectory("IOUtilTest_", ".testExists");
+      assertTrue(IOUtil.exists(tempDir));
+      IOUtil.delete(tempDir);
+      assertFalse(IOUtil.exists(tempDir));
+   }
+   
+   /**
+    * {@link IOUtil#encodeURIPath(String)}.
+    */
+   @Test
+   public void testEncodeURIPath() {
+      // Test null
+      assertEquals(null, IOUtil.encodeURIPath(null));
+      // Test normal URIs
+      assertEquals("A", IOUtil.encodeURIPath("A"));
+      assertEquals("A/B", IOUtil.encodeURIPath("A/B"));
+      assertEquals("/Users/MyName/MyFile.html", IOUtil.encodeURIPath("/Users/MyName/MyFile.html"));
+      assertEquals("C:/Users/MyName/MyFile.html", IOUtil.encodeURIPath("C:\\Users\\MyName\\MyFile.html"));
+      assertEquals("./MyName/MyFile.html", IOUtil.encodeURIPath(".\\MyName\\MyFile.html"));
+      assertEquals("./MyName/MyFile.html", IOUtil.encodeURIPath("./MyName/MyFile.html"));
+      assertEquals("../../MyName/MyFile.html", IOUtil.encodeURIPath("..\\..\\MyName\\MyFile.html"));
+      assertEquals("../../MyName/MyFile.html", IOUtil.encodeURIPath("../../MyName/MyFile.html"));
+      // Test URIs with spaces
+      assertEquals("/Users/My%20Name/My%20File.html", IOUtil.encodeURIPath("/Users/My Name/My File.html"));
+      assertEquals("C:/Users/My%20Name/My%20File.html", IOUtil.encodeURIPath("C:\\Users\\My Name\\My File.html"));
+   }
+   
+   /**
+    * {@link IOUtil#decodeURIPath(String)}.
+    */
+   @Test
+   public void testDecodeURIPath() {
+      // Test null
+      assertEquals(null, IOUtil.decodeURIPath(null));
+      // Test normal URIs
+      assertEquals("A", IOUtil.decodeURIPath("A"));
+      assertEquals("A/B", IOUtil.decodeURIPath("A/B"));
+      assertEquals("/Users/MyName/MyFile.html", IOUtil.decodeURIPath("/Users/MyName/MyFile.html"));
+      assertEquals("C:/Users/MyName/MyFile.html", IOUtil.decodeURIPath("C:/Users/MyName/MyFile.html"));
+      assertEquals("./MyName/MyFile.html", IOUtil.decodeURIPath("./MyName/MyFile.html"));
+      assertEquals("../../MyName/MyFile.html", IOUtil.decodeURIPath("../../MyName/MyFile.html"));
+      // Test URIs with spaces
+      assertEquals("/Users/My Name/My File.html", IOUtil.decodeURIPath("/Users/My%20Name/My%20File.html"));
+      assertEquals("C:/Users/My Name/My File.html", IOUtil.decodeURIPath("C:/Users/My%20Name/My%20File.html"));
+   }
+   
+   /**
     * {@link IOUtil#contains(Iterable, File)}.
     */
    @Test
@@ -794,5 +850,48 @@ public class IOUtilTest extends TestCase {
        assertFalse(subSubDir2.exists());
        assertFalse(subSubSubDir2.exists());
        assertFalse(subSubSubDir2File.exists());
+   }
+   
+   /**
+    * Tests {@link IOUtil#copy(InputStream, java.io.OutputStream)}.
+    */
+   @Test
+   public void testCopy() throws IOException {
+      doTestCopy(null);
+      assertFalse(IOUtil.copy(null, null));
+      assertFalse(IOUtil.copy(new ByteArrayInputStream("NotCopied".getBytes()), null));
+      doTestCopy("One Line");
+      doTestCopy("First Line\n\rSecond Line");
+      doTestCopy("One Line\r");
+      doTestCopy("One Line\n");
+      doTestCopy("One Line\r\n");
+      doTestCopy("One Line\n\r");
+      StringBuffer sb = new StringBuffer();
+      for (int i = 0; i < IOUtil.BUFFER_SIZE * 3; i++) {
+         sb.append("A");
+      }
+      doTestCopy(sb.toString());
+   }
+   
+   /**
+    * Executes the assertions for {@link #testCopy()}.
+    * @param text The text to check.
+    * @throws IOException Occurred Exception.
+    */
+   protected void doTestCopy(String text) throws IOException {
+      if (text != null) {
+         byte[] inBytes = text.getBytes();
+         ByteArrayInputStream in = new ByteArrayInputStream(inBytes);
+         ByteArrayOutputStream out = new ByteArrayOutputStream();
+         assertTrue(IOUtil.copy(in, out));
+         byte[] outBytes = out.toByteArray();
+         assertEquals(inBytes.length, outBytes.length);
+         for (int i = 0; i < inBytes.length; i++) {
+            assertEquals(inBytes[i], outBytes[i]);
+         }
+      }
+      else {
+         assertFalse(IOUtil.copy(null, new ByteArrayOutputStream()));
+      }
    }
 }

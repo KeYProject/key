@@ -43,7 +43,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
  */
 public class SWTBotSetFileSourceLookupTest extends AbstractSWTBotSetFileTest {
    /**
-    * Launches "data/Number/src/Number.set".
+    * Launches "data/Number/test/Number.set".
     */
    @Test
    public void testStatementSourceLocation() throws Exception {
@@ -73,9 +73,9 @@ public class SWTBotSetFileSourceLookupTest extends AbstractSWTBotSetFileTest {
          }
       };
       doSetFileTest("SWTBotSetFileSourceLookupTest_testStatementSourceLocation", 
-                    "data/Number/src", 
+                    "data/Number/test", 
                     "Number.set",
                     steps,
-                    new PathReplacement("D:\\Forschung\\Development\\SymbolicExecutionDebugger\\runtime-SymbolicExecutionDebugger.product\\SED Examples\\src\\Number.java", "Number.java"));
+                    new PathReplacement("D:\\Forschung\\Development\\KeY_Master\\runtime-SymbolicExecutionDebugger.product\\MartinBugs\\src\\Number.java", "Number.java"));
    }
 }

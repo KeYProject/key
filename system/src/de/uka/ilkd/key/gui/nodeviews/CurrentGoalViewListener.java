@@ -29,11 +29,11 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.macros.ProofMacroMenu;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import java.awt.event.MouseListener;
 
 /**
@@ -48,6 +48,7 @@ import java.awt.event.MouseListener;
 class CurrentGoalViewListener
         implements MouseListener, DragGestureListener {
 
+    private static final int POPUP_DELAY = 400;
     private final KeYMediator mediator;
     private final CurrentGoalView currentGoalView;
 
@@ -75,10 +76,9 @@ class CurrentGoalViewListener
         if (!modalDragNDropEnabled()) {
             // if a popup menu is cancelled by a click we do not want to 
             // activate another using the same click event 
-            if (Math.abs(System.currentTimeMillis() - block) >= 400) {
+            if (Math.abs(System.currentTimeMillis() - block) >= POPUP_DELAY) {
                 PosInSequent mousePos = currentGoalView.getPosInSequent(me.getPoint());
                 boolean macroActive = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isRightClickMacro();
-//		boolean macroActive = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().isRightClickMacro();
                 if (mediator != null && mousePos != null) {
                     if (me.isShiftDown()) {
                         if (mediator.getInteractiveProver() != null) {

@@ -48,8 +48,8 @@ public class While extends LoopStatement {
      */
 
     public While(Expression guard, Statement body) {
-		super(guard, body, new ExtList());
-	}
+        super(guard, body, new ExtList());
+    }
 
 	/**
      *      While.

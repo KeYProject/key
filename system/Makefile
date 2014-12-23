@@ -69,7 +69,7 @@ ifneq "$(GIT)" ""
    ifeq "$(KEY_VERSION_SHORT)" "0.0.0" 
      KEY_VERSION_SHORT:=$(shell $(GIT) log --pretty=one | wc -l)
      KEY_VERSION_SHORT:=$(wordlist 1,1,$(KEY_VERSION_SHORT))
-     KEY_VERSION_SHORT:=2.1.$(KEY_VERSION_SHORT)
+     KEY_VERSION_SHORT:=2.3.$(KEY_VERSION_SHORT)
    endif
 endif
 
@@ -176,7 +176,7 @@ dist:	branding all
 	@mkdir -p dist/key/
 	@cp -r $(BINARYPATH)/* dist/key/
 	@cp -r $(RESOURCEPATH)/* dist/key/
-	@jar cMf dist/key/examples.jar -C ../examples/firstTouch .
+	@jar cMf dist/key/examples.jar -C ../examples .
 # for setup.jar
 	@mkdir -p dist/setup/de/uka/ilkd/key/util/
 	@cp -r $(BINARYPATH)/de/uka/ilkd/key/util/* dist/setup/de/uka/ilkd/key/util/

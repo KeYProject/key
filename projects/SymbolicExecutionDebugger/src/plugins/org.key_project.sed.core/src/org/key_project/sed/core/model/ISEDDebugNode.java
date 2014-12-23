@@ -14,7 +14,12 @@
 package org.key_project.sed.core.model;
 
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IStackFrame;
+import org.key_project.sed.core.annotation.ISEDAnnotation;
+import org.key_project.sed.core.annotation.ISEDAnnotationLink;
+import org.key_project.sed.core.annotation.ISEDAnnotationType;
+import org.key_project.sed.core.model.event.ISEDAnnotationLinkListener;
 import org.key_project.sed.core.model.impl.AbstractSEDDebugNode;
 import org.key_project.sed.core.model.impl.AbstractSEDStackFrameCompatibleDebugNode;
 
@@ -54,6 +59,13 @@ public interface ISEDDebugNode extends ISEDDebugElement {
     * the failure.</li>
     */
    public ISEDDebugNode[] getChildren() throws DebugException;
+   
+   /**
+    * Checks if children are available.
+    * @return {@code true} children are available, {@code false} children are not available.
+    * @throws DebugException Occurred Exception
+    */
+   public boolean hasChildren() throws DebugException;
    
    /**
     * Returns the {@link ISEDThread} in that this {@link ISEDDebugNode} is contained 
@@ -115,4 +127,108 @@ public interface ISEDDebugNode extends ISEDDebugElement {
     * the failure.</li>
     */
    public ISEDDebugNode[] getCallStack() throws DebugException;
+   
+   /**
+    * Adds the given {@link ISEDAnnotationLink} to this node.
+    * @param link The {@link ISEDAnnotationLink} to add.
+    */
+   public void addAnnotationLink(ISEDAnnotationLink link);
+   
+   /**
+    * Removes the given {@link ISEDAnnotationLink} from this node.
+    * @param link The {@link ISEDAnnotationLink} to remove.
+    */
+   public void removeAnnotationLink(ISEDAnnotationLink link);
+   
+   /**
+    * Returns all contained {@link ISEDAnnotationLink}s.
+    * @return All contained {@link ISEDAnnotationLink}s.
+    */
+   public ISEDAnnotationLink[] getAnnotationLinks();
+   
+   /**
+    * Returns all contained {@link ISEDAnnotationLink}s of the given {@link ISEDAnnotationType}.
+    * @param type The {@link ISEDAnnotationType}.
+    * @return All contained {@link ISEDAnnotationLink}s of the given {@link ISEDAnnotationType}
+    */
+   public ISEDAnnotationLink[] getAnnotationLinks(ISEDAnnotationType type);
+   
+   /**
+    * Returns all {@link ISEDAnnotation} referenced by {@link ISEDAnnotationLink}s
+    * in the order they are defined in the {@link ISEDDebugTarget}.
+    * @return The used {@link ISEDAnnotation}s.
+    */
+   public ISEDAnnotation[] computeUsedAnnotations();
+   
+   /**
+    * Checks if the given {@link ISEDAnnotationLink} is contained in this node.
+    * @param link The {@link ISEDAnnotationLink} to check.
+    * @return {@code true} the {@link ISEDAnnotationLink} is contained in this node, {@code false} the {@link ISEDAnnotationLink} is not contained.
+    */
+   public boolean containsAnnotationLink(ISEDAnnotationLink link);
+   
+   /**
+    * Adds the given {@link ISEDAnnotationLinkListener}.
+    * @param l The {@link ISEDAnnotationLinkListener} to add.
+    */
+   public void addAnnotationLinkListener(ISEDAnnotationLinkListener l);
+   
+   /**
+    * Removes the given {@link ISEDAnnotationLinkListener}.
+    * @param l The {@link ISEDAnnotationLinkListener} to remove.
+    */
+   public void removeAnnotationLinkListener(ISEDAnnotationLinkListener l);
+   
+   /**
+    * Returns all {@link IBreakpoint}s which are fulfilled in this {@link ISEDDebugNode}.
+    * @return The fulfilled {@link IBreakpoint}s in this {@link ISEDDebugNode}.
+    */
+   public IBreakpoint[] computeHitBreakpoints() throws DebugException;
+   
+   /**
+    * Checks if constraints are considered at this symbolic execution tree node.
+    * @return {@code true} constraints available, {@code false} constraints are not available.
+    * @throws DebugException Occurred Exception.
+    */
+   public boolean hasConstraints() throws DebugException;
+   
+   /**
+    * Returns all constraints which are considered at this symbolic execution tree node.
+    * @return All constraints which are considered at this symbolic execution tree node.
+    * @throws DebugException Occurred Exception.
+    */
+   public ISEDConstraint[] getConstraints() throws DebugException;
+   
+   /**
+    * Returns the conditions under which an {@link ISEDGroupable} {@link ISEDDebugNode} is completed by this {@link ISEDDebugNode}.
+    * <p>
+    * The conditions are ordered by the occurrence in the tree. 
+    * This means that the node at the second index is a parent or grand parent of the node at the first index and so on.
+    * @return The conditions under which an {@link ISEDGroupable} {@link ISEDDebugNode} is completed by this {@link ISEDDebugNode}.
+    * @exception DebugException if this method fails.  Reasons include:
+    * <ul><li>Failure communicating with the VM.  The DebugException's
+    * status code contains the underlying exception responsible for
+    * the failure.</li>
+    */
+   public ISEDBranchCondition[] getGroupStartConditions() throws DebugException;
+   
+   /**
+    * Returns the inner most visible group start condition.
+    * @return The inner most visible group start condition or {@code null} if not available.
+    * @exception DebugException if this method fails.  Reasons include:
+    * <ul><li>Failure communicating with the VM.  The DebugException's
+    * status code contains the underlying exception responsible for
+    * the failure.</li>
+    */
+   public ISEDBranchCondition getInnerMostVisibleGroupStartCondition() throws DebugException;
+   
+   /**
+    * Returns the condition under which the given {@link ISEDDebugNode} is completed by this {@link ISEDDebugNode}.
+    * @return The condition under which the given {@link ISEDDebugNode} is completed by this {@link ISEDDebugNode}.
+    * @exception DebugException if this method fails.  Reasons include:
+    * <ul><li>Failure communicating with the VM.  The DebugException's
+    * status code contains the underlying exception responsible for
+    * the failure.</li>
+    */
+   public ISEDBranchCondition getGroupStartCondition(ISEDDebugNode startNode) throws DebugException;
 }

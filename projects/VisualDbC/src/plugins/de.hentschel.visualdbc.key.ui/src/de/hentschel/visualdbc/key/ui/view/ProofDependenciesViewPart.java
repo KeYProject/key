@@ -36,7 +36,7 @@ import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListene
 import org.key_project.key4eclipse.starter.core.util.event.ProofProviderAdapter;
 import org.key_project.key4eclipse.starter.core.util.event.ProofProviderEvent;
 import org.key_project.util.eclipse.WorkbenchUtil;
-import org.key_project.util.eclipse.job.ObjectchedulingRule;
+import org.key_project.util.eclipse.job.ObjectsSchedulingRule;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.view.editorInView.AbstractEditorInViewView;
 import org.key_project.util.java.ArrayUtil;
@@ -51,7 +51,7 @@ import de.hentschel.visualdbc.key.ui.editor.DbcModelEditorInput;
 import de.hentschel.visualdbc.key.ui.editor.NothingActionBarContributor;
 import de.hentschel.visualdbc.key.ui.util.LogUtil;
 import de.hentschel.visualdbc.key.ui.util.ProofReferenceModelCreator;
-import de.uka.ilkd.key.gui.AutoModeListener;
+import de.uka.ilkd.key.core.AutoModeListener;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -472,7 +472,7 @@ public class ProofDependenciesViewPart extends AbstractEditorInViewView<DbCDiagr
                }
             }
          };
-         activeJob.setRule(new ObjectchedulingRule(this));
+         activeJob.setRule(new ObjectsSchedulingRule(new Object[] {this}));
          activeJob.schedule();
       }
       else {

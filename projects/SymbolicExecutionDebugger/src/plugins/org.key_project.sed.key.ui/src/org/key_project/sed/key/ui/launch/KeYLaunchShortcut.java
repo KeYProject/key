@@ -55,7 +55,7 @@ public class KeYLaunchShortcut implements ILaunchShortcut {
                     launch((IMethod)element, mode, null, null);
                 }
                 else if (element instanceof IFile) {
-                   launch((IFile)element, mode);
+                   launch((IFile)element, null, mode);
                 }
             }
         }
@@ -106,15 +106,17 @@ public class KeYLaunchShortcut implements ILaunchShortcut {
     /**
      * Launches the given {@link IFile}.
      * @param file The {@link IFile} to launch.
+     * @param method The optional {@link IMethod}.
      * @param mode The mode to use.
      * @throws CoreException Occurred Exception.
      */
-    protected void launch(IFile file, 
-                          String mode) throws CoreException {
+    public static void launch(IFile file, 
+                              IMethod method,
+                              String mode) throws CoreException {
         try {
             ILaunchConfiguration config = findLaunchConfiguration(file);
             if (config == null) {
-                config = KeySEDUtil.createConfiguration(file);
+                config = KeySEDUtil.createConfiguration(file, method);
             }
             if (config != null) {
                 DebugUITools.launch(config, mode);
@@ -134,7 +136,7 @@ public class KeYLaunchShortcut implements ILaunchShortcut {
      * @throws CoreException Occurred Exception.
      * @throws OperationCanceledException When the user has canceled the select dialog.
      */
-    protected ILaunchConfiguration findLaunchConfiguration(IFile file) throws CoreException {
+    public static ILaunchConfiguration findLaunchConfiguration(IFile file) throws CoreException {
         List<ILaunchConfiguration> candidateConfigs = KeySEDUtil.searchLaunchConfigurations(file);
         int candidateCount = candidateConfigs.size();
         if (candidateCount == 1) {
@@ -160,10 +162,10 @@ public class KeYLaunchShortcut implements ILaunchShortcut {
      * @param methodEndPosition An optional end position to execute only parts of the method.
      * @throws CoreException Occurred Exception.
      */
-    protected void launch(IMethod method, 
-                          String mode,
-                          Position methodStartPosition,
-                          Position methodEndPosition) throws CoreException {
+    public static void launch(IMethod method, 
+                              String mode,
+                              Position methodStartPosition,
+                              Position methodEndPosition) throws CoreException {
         try {
             ILaunchConfiguration config = findLaunchConfiguration(method, methodStartPosition, methodEndPosition);
             if (config == null) {
@@ -189,9 +191,9 @@ public class KeYLaunchShortcut implements ILaunchShortcut {
      * @throws CoreException Occurred Exception.
      * @throws OperationCanceledException When the user has canceled the select dialog.
      */
-    protected ILaunchConfiguration findLaunchConfiguration(IMethod method,
-                                                           Position methodStartPosition,
-                                                           Position methodEndPosition) throws CoreException {
+    public static ILaunchConfiguration findLaunchConfiguration(IMethod method,
+                                                               Position methodStartPosition,
+                                                               Position methodEndPosition) throws CoreException {
         List<ILaunchConfiguration> candidateConfigs = KeySEDUtil.searchLaunchConfigurations(method, methodStartPosition, methodEndPosition);
         int candidateCount = candidateConfigs.size();
         if (candidateCount == 1) {

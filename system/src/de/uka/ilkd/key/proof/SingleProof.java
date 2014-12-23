@@ -28,6 +28,7 @@ public class SingleProof extends ProofAggregate {
     
     public SingleProof(Proof p, String name) {
         super(name);
+        assert p != null;
         this.proof = p;
     }
     
@@ -35,12 +36,28 @@ public class SingleProof extends ProofAggregate {
     public ProofStatus getStatus() {
         return proof.mgt().getStatus();
     }
-
+    
     @Override
     public Proof[] getProofs() {
         return new Proof[]{proof};
     }
 
+    @Override
+    public boolean equals(Object o) {
+       if (!super.equals(o)) {
+          return false;
+       }
+       final SingleProof other = (SingleProof) o;
+       
+       return proof == other.proof;       
+    }
+    
+    
+    @Override
+    public int hashCode() {
+       return super.hashCode() + proof.hashCode();
+    }
+    
     @Override    
     public int size() {
         return 1;

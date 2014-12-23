@@ -20,7 +20,6 @@ import java.util.List;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.SimpleExceptionDialog;
 import de.uka.ilkd.key.gui.lemmatagenerator.FileChooser;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmaSelectionDialog;
 import de.uka.ilkd.key.java.Services;
@@ -34,7 +33,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletLoader;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 public abstract class LemmaGenerationAction extends MainWindowAction {
     public enum Mode {ProveUserDefinedTaclets,ProveKeYTaclets,ProveAndAddUserDefinedTaclets}
@@ -60,8 +58,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
     abstract protected boolean proofIsRequired();
     
     protected final void handleException(Throwable exception){
-        String desc = exception.getMessage();
-        SimpleExceptionDialog.INSTANCE.showDialog("Error while loading taclets:", desc, exception); 
+        ExceptionDialog.showDialog(mainWindow, exception);
     }
 
     @Override
@@ -119,6 +116,8 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
 
                 TacletLoader tacletLoader = new TacletLoader.KeYsTacletsLoader(mainWindow.getUserInterface(),mainWindow.getUserInterface(),
                                 mainWindow.getMediator().getProfile());
+                
+                
                 LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                         @Override
                         public void stopped(Throwable exception) {
@@ -140,7 +139,9 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                     
                     TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
                                  listener,
-                                new LemmaSelectionDialog(),true,tacletLoader);
+                                new LemmaSelectionDialog(),true, tacletLoader, 
+                                tacletLoader.getProofEnvForTaclets().getInitConfigForEnvironment(), 
+                                true);
                     loader.start();
 
             }
@@ -175,7 +176,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
         @Override
         protected void loadTaclets() {
                 if(chooser == null) {
-                    chooser = new FileChooser();
+                    chooser = new FileChooser(FileChooser.Mode.PROOF);
                 }
 
                 boolean loaded = chooser.showAsDialog();
@@ -184,21 +185,18 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                     return;
                 }
           
-                final File fileForLemmata = chooser.getFileForLemmata();
-                final File fileForDefinitions = chooser.getFileForDefinitions();
-                final boolean loadAsLemmata = chooser.isLoadingAsLemmata();
+                final File fileForLemmata = chooser.getFileForTaclets();
+                final boolean loadAsLemmata = chooser.isGenerateProofObligations();
                 List<File> filesForAxioms = chooser.getFilesForAxioms();
                 Profile profile = mainWindow.getMediator().getProfile();
                 final ProblemInitializer problemInitializer = new ProblemInitializer(mainWindow.getUserInterface(),
-                                new Services(profile,
-                                                new KeYRecoderExcHandler()),
+                                new Services(profile),
                                 mainWindow.getUserInterface());
                 
                 TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(mainWindow.getUserInterface(),
                                                       mainWindow.getUserInterface(),
                                                       problemInitializer,
                                                       profile,
-                                                      fileForDefinitions ,
                                                       fileForLemmata,
                                                       filesForAxioms);
                
@@ -225,7 +223,9 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 
                 TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
                              listener,
-                            new LemmaSelectionDialog(),loadAsLemmata,tacletLoader);
+                            new LemmaSelectionDialog(),loadAsLemmata,tacletLoader,
+                            tacletLoader.getProofEnvForTaclets().getInitConfigForEnvironment(),
+                            true);
                 loader.start();
 
             }
@@ -255,7 +255,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
 
         @Override
         protected void loadTaclets() {
-                FileChooser chooser = new FileChooser();
+                FileChooser chooser = new FileChooser(FileChooser.Mode.LOAD);
 
                 boolean loaded = chooser.showAsDialog();
 
@@ -263,22 +263,19 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                     return;
                 }
                 final Proof proof = getMediator().getSelectedProof();
-                final File fileForLemmata = chooser.getFileForLemmata();
-                final File fileForDefinitions = chooser.getFileForDefinitions();
-                final boolean loadAsLemmata = chooser.isLoadingAsLemmata();
+                final File fileForLemmata = chooser.getFileForTaclets();
+                final boolean loadAsLemmata = chooser.isGenerateProofObligations();
                 List<File> filesForAxioms = chooser.getFilesForAxioms();
                 final ProblemInitializer problemInitializer = new ProblemInitializer(mainWindow.getUserInterface(),
-                                new Services(proof.getServices().getProfile(),
-                                                new KeYRecoderExcHandler()),
+                                new Services(proof.getServices().getProfile()),
                                 mainWindow.getUserInterface());
                 
                 TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(mainWindow.getUserInterface(),
                                                       mainWindow.getUserInterface(),
                                                       problemInitializer,
-                                                      fileForDefinitions ,
                                                       fileForLemmata,
                                                       filesForAxioms,
-                                                      proof.env());
+                                                      proof.getInitConfig().copy());
                
 
                 
@@ -294,24 +291,24 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                                 ImmutableSet<Taclet> taclets, boolean addAxioms) {
                         getMediator().startInterface(true);
                         if (p != null) {
-
                             mainWindow.addProblem(p);
                         }
+
                         if(p != null || addAxioms){
                             // add only the taclets to the goals if
                             // the proof obligations were added successfully.
                             ImmutableSet<Taclet> base =
-                                                        proof.env().getInitConfig()
-                                                                .getTaclets();
+                                    proof.getInitConfig()
+                                    .getTaclets();
                             base = base.union(taclets);
-                            proof.env().getInitConfig().setTaclets(base);
+                            proof.getInitConfig().setTaclets(base);
                             for (Taclet taclet : taclets) {
                                 for (Goal goal : proof.openGoals()) {
                                     goal
-                                                .addTaclet(
-                                                        taclet,
-                                                                   SVInstantiations.EMPTY_SVINSTANTIATIONS,
-                                                        false);
+                                    .addTaclet(
+                                            taclet,
+                                            SVInstantiations.EMPTY_SVINSTANTIATIONS,
+                                            false);
                                 }
                             }
                         }
@@ -321,19 +318,21 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 
                 TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(
                             listener,
-                            new LemmaSelectionDialog(),loadAsLemmata,tacletLoader,proof.env().getInitConfig());
+                            new LemmaSelectionDialog(),
+                            loadAsLemmata,tacletLoader,
+                            proof.getInitConfig(), false);
                 loader.start();
 
             }
 
         @Override
         protected String getTitle() {
-                 return "Load User-Defined Taclets...";
+                 return "Load User-Defined Taclets";
         }
 
         @Override
         protected String getDescription() {
-                return "Loads additional taclets and creates the corresponding proof...";
+                return "Loads additional taclets and creates the corresponding proof.";
         }
 
         @Override

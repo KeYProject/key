@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="EmptyPathConditionAndNoUpdates.compute(obj);" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call EmptyPathConditionAndNoUpdates.compute(obj)&gt;" pathCondition="true" pathConditionChanged="false">
       <statement name="return obj.x;" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="not(equals(obj,null))" pathCondition="not(equals(obj,null))" pathConditionChanged="true" branchCondition="not(equals(obj,null))" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <methodReturn name="&lt;return of EmptyPathConditionAndNoUpdates.compute(obj);&gt;" pathCondition="not(equals(obj,null))" pathConditionChanged="false" isReturnValueComputed="false">
+            <methodReturn name="&lt;return of compute&gt;" signature="&lt;return of EmptyPathConditionAndNoUpdates.compute(obj)&gt;" pathCondition="not(equals(obj,null))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="not(equals(obj,null))">
                <termination name="&lt;end&gt;" pathCondition="not(equals(obj,null))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                </termination>
             </methodReturn>
          </branchCondition>
          <branchCondition name="equals(obj,null)" pathCondition="equals(obj,null)" pathConditionChanged="true" branchCondition="equals(obj,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(obj,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
-            </termination>
+            <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call EmptyPathConditionAndNoUpdates.compute(obj)&gt;&gt;" pathCondition="equals(obj,null)" pathConditionChanged="false" methodReturnCondition="equals(obj,null)">
+               <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="equals(obj,null)" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+               </termination>
+            </exceptionalMethodReturn>
          </branchCondition>
       </statement>
+      <methodReturnEntry path="/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/1/0"/>
    </methodCall>
+   <terminationEntry path="/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/0"/>
 </start>

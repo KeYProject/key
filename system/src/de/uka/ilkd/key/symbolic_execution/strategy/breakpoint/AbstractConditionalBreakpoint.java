@@ -22,7 +22,6 @@ import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.SourceElement;
@@ -51,12 +50,15 @@ import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.util.SideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -195,7 +197,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     * @param inScope
     */
    private void freeVariablesAfterReturn(Node node, RuleApp ruleApp,boolean inScope) {
-      if(SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp)&&inScope){
+      if ((SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp) ||
+           SymbolicExecutionUtil.isExceptionalMethodReturnNode(node, ruleApp)) &&
+          inScope) {
          toKeep.clear();
       }
    }
@@ -344,6 +348,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     * @return true if the condition evaluates to true
     */
    protected boolean conditionMet(RuleApp ruleApp, Proof proof, Node node) {
+      ApplyStrategyInfo info = null;
       try {
          //initialize values
          PosInOccurrence pio = ruleApp.posInOccurrence();
@@ -360,12 +365,22 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
          Term termForSideProof = replacer.replace(condition);
          //start side proof
          Term toProof = getProof().getServices().getTermBuilder().equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
-         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, ruleApp, toProof);
-         ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(proof, sequent, StrategyProperties.SPLITTING_DELAYED);
+         final ProofEnvironment sideProofEnv = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), false); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
+         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, pio, toProof);
+         info = SideProofUtil.startSideProof(proof, 
+                                             sideProofEnv,
+                                             sequent, 
+                                             StrategyProperties.METHOD_CONTRACT,
+                                             StrategyProperties.LOOP_INVARIANT,
+                                             StrategyProperties.QUERY_ON,
+                                             StrategyProperties.SPLITTING_DELAYED);
          return info.getProof().closed();
       }
       catch (ProofInputException e) {
          return false;
+      }
+      finally {
+         SideProofUtil.disposeOrStore("Breakpoint condition computation on node " + node.serialNr() + ".", info);
       }
    }
    

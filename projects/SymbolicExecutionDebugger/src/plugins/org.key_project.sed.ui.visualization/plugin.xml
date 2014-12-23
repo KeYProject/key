@@ -156,14 +156,50 @@
               <propertyTab
                     afterTab="org.key_project.sed.ui.visualization.node.tab"
                     category="Graphiti"
+                    id="org.key_project.sed.ui.visualization.methodReturns.tab"
+                    label="Method Returns">
+              </propertyTab>
+              <propertyTab
+                    afterTab="org.key_project.sed.ui.visualization.node.tab"
+                    category="Graphiti"
                     id="org.key_project.sed.ui.visualization.callStack.tab"
                     label="Call Stack">
               </propertyTab>
               <propertyTab
                     afterTab="org.key_project.sed.ui.visualization.callStack.tab"
                     category="Graphiti"
+                    id="org.key_project.sed.ui.visualization.constraints.tab"
+                    label="Constraints">
+              </propertyTab>
+              <propertyTab
+                    afterTab="org.key_project.sed.ui.visualization.constraints.tab"
+                    category="Graphiti"
                     id="org.key_project.sed.ui.visualization.source.tab"
                     label="Source">
+              </propertyTab>
+              <propertyTab
+                    afterTab="org.key_project.sed.ui.visualization.source.tab"
+                    category="Graphiti"
+                    id="org.key_project.sed.ui.visualization.annotationLinks.tab"
+                    label="Annotation Links">
+              </propertyTab>
+              <propertyTab
+                    afterTab="org.key_project.sed.ui.visualization.annotationLinks.tab"
+                    category="Graphiti"
+                    id="org.key_project.sed.ui.visualization.groupStarts.tab"
+                    label="Group Starts">
+              </propertyTab>
+              <propertyTab
+                    afterTab="org.key_project.sed.ui.visualization.groupStarts.tab"
+                    category="Graphiti"
+                    id="org.key_project.sed.ui.visualization.groupEnds.tab"
+                    label="Group Ends">
+              </propertyTab>
+              <propertyTab
+                    afterTab="org.key_project.sed.ui.visualization.node.tab"
+                    category="Graphiti"
+                    id="org.key_project.sed.ui.visualization.callState.tab"
+                    label="Call State">
               </propertyTab>
           </propertyTabs>
       </extension>
@@ -183,10 +219,46 @@
                     tab="org.key_project.sed.ui.visualization.callStack.tab">
               </propertySection>
               <propertySection
+                    class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiMethodReturnConditionsPropertySection"
+                    filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiReadonlyMethodCallTreeFilter"
+                    id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiMethodReturnConditionsPropertySection"
+                    tab="org.key_project.sed.ui.visualization.methodReturns.tab">
+              </propertySection>
+              <propertySection
                     class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiSourcePropertySection"
                     filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiSourceTreeFilter"
                     id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiSourcePropertySection"
                     tab="org.key_project.sed.ui.visualization.source.tab">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiAnnotationLinkPropertySection"
+                    filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiReadonlyDebugNodeTreeFilter"
+                    id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiAnnotationLinkPropertySection"
+                    tab="org.key_project.sed.ui.visualization.annotationLinks.tab">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiConstraintsPropertySection"
+                    filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiReadonlyDebugNodeTreeFilter"
+                    id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiConstraintsPropertySection"
+                    tab="org.key_project.sed.ui.visualization.constraints.tab">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiGroupEndConditionsPropertySection"
+                    filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiGroupEndTreeFilter"
+                    id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiGroupEndConditionsPropertySection"
+                    tab="org.key_project.sed.ui.visualization.groupEnds.tab">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiGroupStartConditionsPropertySection"
+                    filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiGroupStartTreeFilter"
+                    id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiGroupStartConditionsPropertySection"
+                    tab="org.key_project.sed.ui.visualization.groupStarts.tab">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiCallStatePropertySection"
+                    filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiBaseMethodReturnTreeFilter"
+                    id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiCallStatePropertySection"
+                    tab="org.key_project.sed.ui.visualization.callState.tab">
               </propertySection>
           </propertySections>
       </extension>    
@@ -320,12 +392,22 @@
            id="org.key_project.sed.ui.visualization.visualizeStateCommand"
            name="Visualize State">
      </command>
+     <command
+           categoryId="org.eclipse.debug.ui.category.run"
+           description="Saves the currently selected symbolic exeution tree as *.set file."
+           id="org.key_project.sed.ui.visualization.saveSetAsCommand"
+           name="Save Symbolic Execution Tree as Set File">
+     </command>
   </extension>
   <extension
         point="org.eclipse.ui.commandImages">
      <image
            commandId="org.key_project.sed.ui.visualization.visualizeStateCommand"
            icon="icons/object_diagram.gif">
+     </image>
+     <image
+           commandId="org.key_project.sed.ui.visualization.saveSetAsCommand"
+           icon="icons/saveas_edit.gif">
      </image>
   </extension>
   <extension
@@ -354,6 +436,30 @@
            </iterate>
         </enabledWhen>
      </handler>
+     <handler
+           class="org.key_project.sed.ui.visualization.execution_tree.command.SaveSetAsCommand"
+           commandId="org.key_project.sed.ui.visualization.saveSetAsCommand">
+        <enabledWhen>
+           <iterate
+                 ifEmpty="false"
+                 operator="and">
+              <or>
+                 <instanceof
+                       value="org.key_project.sed.core.model.ISEDDebugTarget">
+                 </instanceof>
+                 <and>
+                    <instanceof
+                          value="org.eclipse.debug.core.ILaunch">
+                    </instanceof>
+                    <test
+                          forcePluginActivation="true"
+                          property="org.key_project.sed.core.hasSEDDebugTarget">
+                    </test>
+                 </and>
+              </or>
+           </iterate>
+        </enabledWhen>
+     </handler>
   </extension>
   <extension
         point="org.eclipse.ui.bindings">
@@ -369,6 +475,32 @@
      <menuContribution
            allPopups="true"
            locationURI="popup:org.eclipse.debug.ui.DebugView?after=additions">
+        <command
+              commandId="org.key_project.sed.ui.visualization.saveSetAsCommand"
+              icon="icons/saveas_edit.gif"
+              style="push">
+           <visibleWhen
+                 checkEnabled="false">
+              <iterate
+                    ifEmpty="false"
+                    operator="and">
+                 <or>
+                    <instanceof
+                          value="org.key_project.sed.core.model.ISEDDebugTarget">
+                    </instanceof>
+                    <and>
+                       <instanceof
+                             value="org.eclipse.debug.core.ILaunch">
+                       </instanceof>
+                       <test
+                             forcePluginActivation="true"
+                             property="org.key_project.sed.core.hasSEDDebugTarget">
+                       </test>
+                    </and>
+                 </or>
+              </iterate>
+           </visibleWhen>
+        </command>
         <command
               commandId="org.key_project.sed.ui.visualization.visualizeStateCommand"
               icon="icons/object_diagram.gif"

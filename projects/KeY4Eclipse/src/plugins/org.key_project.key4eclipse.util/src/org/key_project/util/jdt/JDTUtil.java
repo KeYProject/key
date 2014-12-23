@@ -43,11 +43,13 @@ import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.internal.corext.util.CodeFormatterUtil;
+import org.eclipse.jdt.internal.corext.util.JavaModelUtil;
 import org.eclipse.jdt.internal.ui.javaeditor.ASTProvider;
 import org.eclipse.jdt.internal.ui.viewsupport.JavaElementLabelComposer;
 import org.eclipse.jdt.ui.JavaElementLabels;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 
 /**
@@ -87,6 +89,31 @@ public class JDTUtil {
                   result = methods[j];
                }
                j++;
+            }
+            i++;
+         }
+      }
+      return result;
+   }
+   
+   /**
+    * Searches the {@link IType} as JDT representation which ends
+    * at the given index.
+    * @param cu The {@link ICompilationUnit} to search in.
+    * @param endIndex The index in the file at that the required method ends.
+    * @return The found {@link IType} or {@code null} if the JDT representation is not available.
+    * @throws JavaModelException Occurred Exception.
+    * @throws IOException Occurred Exception.
+    */
+   public static IType findJDTType(ICompilationUnit cu, int endIndex) throws JavaModelException, IOException {
+      IType result = null;
+      if (cu != null) {
+         IType[] types = cu.getAllTypes();
+         int i = 0;
+         while (result == null && i < types.length) {
+            ISourceRange typeRange = types[i].getSourceRange();
+            if (endIndex == typeRange.getOffset() + typeRange.getLength()) {
+               result = types[i];
             }
             i++;
          }
@@ -512,6 +539,103 @@ public class JDTUtil {
    }
    
    /**
+    * Returns the {@link IResource}s in the workspace of all used
+    * source entries in the java build path of the given project.
+    * @param project The given Project.
+    * @return The found source {@link IResource}s in the workspace.
+    * @throws JavaModelException Occurred Exception.
+    */
+   public static List<IResource> getSourceResources(IProject project) throws JavaModelException {
+       return getSourceResources(project, new HashSet<IProject>());
+   }
+   
+   /**
+    * Internal helper method that is used in {@link #getSourceResources(IProject)}
+    * to compute the source path. It is required to solve cycles in project dependencies.
+    * @param project The given Project.
+    * @param alreadyHandledProjects The already handled {@link IProject} that don't need to be analysed again.
+    * @return The found source {@link IResource}s in the workspace.
+    * @throws JavaModelException Occurred Exception.
+    */    
+   private static List<IResource> getSourceResources(IProject project, Set<IProject> alreadyHandledProjects) throws JavaModelException {
+       List<IResource> result = new LinkedList<IResource>();
+       if (project != null) {
+           Assert.isNotNull(alreadyHandledProjects);
+           alreadyHandledProjects.add(project);
+           IJavaProject javaProject = getJavaProject(project);
+           if (javaProject != null && javaProject.exists()) {
+               IClasspathEntry[] entries = javaProject.getRawClasspath();
+               for (IClasspathEntry entry : entries) {
+                   if (entry.getContentKind() == IPackageFragmentRoot.K_SOURCE) {
+                       List<IResource> location = getResourceFor(javaProject, entry, IPackageFragmentRoot.K_SOURCE, alreadyHandledProjects);
+                       if (location != null) {
+                           result.addAll(location);
+                       }
+                   }
+               }
+           }
+       }
+       return result;
+   }
+   
+   /**
+    * Returns the {@link IResource}s of the given {@link IClasspathEntry}.
+    * @param javaProject The actual {@link IJavaProject} that provides the {@link IClasspathEntry}.
+    * @param entry The given {@link IClasspathEntry}.
+    * @param alreadyHandledProjects The already handled {@link IProject} that don't need to be analysed again.
+    * @return The found {@link IResource}s.
+    * @throws JavaModelException 
+    */
+   private static List<IResource> getResourceFor(IJavaProject javaProject, 
+                                                 IClasspathEntry entry,
+                                                 int expectedKind,
+                                                 Set<IProject> alreadyHandledProjects) throws JavaModelException {
+       if (entry != null) {
+           if (entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER ||
+               entry.getEntryKind() == IClasspathEntry.CPE_SOURCE ||
+               entry.getEntryKind() == IClasspathEntry.CPE_LIBRARY ||
+               entry.getEntryKind() == IClasspathEntry.CPE_VARIABLE) {
+               List<IResource> result = new LinkedList<IResource>();
+               IPackageFragmentRoot[] roots = javaProject.findPackageFragmentRoots(entry);
+               for (IPackageFragmentRoot root : roots) {
+                   if (root.getKind() == expectedKind) {
+                       if (root.getResource() != null) {
+                           if (root.getResource().getLocationURI() != null) {
+                               result.add(root.getResource());
+                           }
+                       }
+                       else if (root.getPath() != null) {
+                           IResource resource = ResourcesPlugin.getWorkspace().getRoot().findMember(root.getPath());
+                           if (resource != null && resource.exists()) {
+                               result.add(resource);
+                           }
+                       }
+                   }
+               }
+               return result; // Ignore containers
+           }
+           else if (entry.getEntryKind() == IClasspathEntry.CPE_PROJECT) {
+               Assert.isNotNull(entry.getPath());
+               IResource project = ResourcesPlugin.getWorkspace().getRoot().findMember(entry.getPath());
+               Assert.isTrue(project instanceof IProject);
+               if (!alreadyHandledProjects.contains(project)) {
+                   return getSourceResources((IProject)project, alreadyHandledProjects);
+               }
+               else {
+                   return null; // Project was already analyzed, no need to do it again.
+               }
+           }
+           else {
+               Assert.isTrue(false, "Unknown content kind \"" + entry.getContentKind() + "\" of class path entry \"" + entry + "\".");
+               return null;
+           }
+       }
+       else {
+           return null;
+       }
+   }
+   
+   /**
     * Returns the locations of the given {@link IClasspathEntry}.
     * @param javaProject The actual {@link IJavaProject} that provides the {@link IClasspathEntry}.
     * @param entry The given {@link IClasspathEntry}.
@@ -655,6 +779,76 @@ public class JDTUtil {
        */
       public Block getResult() {
          return result;
+      }
+   }
+
+   /**
+    * Searches the {@link IMethod} with the given name and full qualified parameter types.
+    * @param jdtType The {@link IType} which provides the available methods.
+    * @param name The name of the methods.
+    * @param parameterTypes The full qualified parameter types.
+    * @return The found {@link IMethod} if available or {@code null} otherwise.
+    * @throws JavaModelException Occurred Exception.
+    */
+   public static IMethod findJDTMethod(final IType jdtType, final String name, final String[] parameterTypes) throws JavaModelException {
+      try {
+         if (jdtType != null) {
+            IMethod[] methods = jdtType.getMethods();
+            return ArrayUtil.search(methods, new IFilter<IMethod>() {
+               @Override
+               public boolean select(IMethod element) {
+                  try {
+                     if (ObjectUtil.equals(name, element.getElementName())) {
+                        String[] parameters = element.getParameterTypes();
+                        if (parameters.length == parameterTypes.length) {
+                           boolean parametersMatches = true;
+                           int i = 0;
+                           while (parametersMatches && i < parameters.length) {
+                              String resolvedType = JavaModelUtil.getResolvedTypeName(parameters[i], jdtType);
+                              if (!ObjectUtil.equals(resolvedType, parameterTypes[i])) {
+                                 parametersMatches = false;
+                              }
+                              i++;
+                           }
+                           return parametersMatches;
+                        }
+                        else {
+                           return false;
+                        }
+                     }
+                     else {
+                        return false;
+                     }
+                  }
+                  catch (JavaModelException e) {
+                     throw new RuntimeException(e);
+                  }
+               }
+            });
+         }
+         else {
+            return null;
+         }
+      }
+      catch (RuntimeException e) {
+         throw (JavaModelException)e.getCause();
+      }
+   }
+
+   /**
+    * Returns the full qualified type name of the given {@link IType}.
+    * @param type The {@link IType}.
+    * @return The full qualified {@link IType} or {@code null} if no {@link IType} is defined.
+    */
+   public static String getQualifiedTypeName(IType type) {
+      if (type != null) {
+         StringBuffer sb = new StringBuffer();
+         JavaElementLabelComposerHelper c = new JavaElementLabelComposerHelper(sb, type.getDeclaringType());
+         c.appendTypeLabel(type, JavaElementLabels.T_FULLY_QUALIFIED);
+         return sb.toString();
+      }
+      else {
+         return null;
       }
    }
 }

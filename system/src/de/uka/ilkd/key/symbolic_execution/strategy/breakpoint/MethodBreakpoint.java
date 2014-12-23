@@ -91,7 +91,8 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
    
    @Override
    public boolean isBreakpointHit(SourceElement activeStatement, RuleApp ruleApp, Proof proof, Node node) {
-      return ((isEntry && isMethodCallNode(node, ruleApp)) || (isExit && isMethodReturnNode(node, ruleApp))) && 
+      return !proof.isDisposed() && 
+             ((isEntry && isMethodCallNode(node, ruleApp)) || (isExit && isMethodReturnNode(node, ruleApp))) && 
              (!isConditionEnabled() || conditionMet(ruleApp, proof, node)) && 
              isEnabled() && 
              hitcountExceeded(node);
@@ -130,7 +131,8 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     * @return true if the node represents a method return
     */
    private boolean isMethodReturnNode(Node node, RuleApp ruleApp){
-      if (SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp) && isCorrectMethodReturn(node, ruleApp)) {
+      if ((SymbolicExecutionUtil.isMethodReturnNode(node, ruleApp) || SymbolicExecutionUtil.isExceptionalMethodReturnNode(node, ruleApp)) && 
+          isCorrectMethodReturn(node, ruleApp)) {
          return true;
       } 
       else if(ruleApp instanceof ContractRuleApp) {

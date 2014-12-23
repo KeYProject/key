@@ -16,22 +16,29 @@ package org.key_project.sed.ui.util;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.eclipse.debug.core.model.IThread;
+import org.eclipse.debug.internal.ui.DebugPluginImages;
 import org.eclipse.debug.internal.ui.DebugUIPlugin;
+import org.eclipse.debug.ui.IDebugUIConstants;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
+import org.key_project.sed.core.annotation.ISEDAnnotation;
+import org.key_project.sed.core.annotation.ISEDAnnotationLink;
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchStatement;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDExceptionalMethodReturn;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
 import org.key_project.sed.core.model.ISEDLoopBodyTermination;
 import org.key_project.sed.core.model.ISEDLoopCondition;
+import org.key_project.sed.core.model.ISEDLoopInvariant;
 import org.key_project.sed.core.model.ISEDLoopStatement;
 import org.key_project.sed.core.model.ISEDMethodCall;
+import org.key_project.sed.core.model.ISEDMethodContract;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDTermination;
-import org.key_project.sed.core.model.ISEDLoopInvariant;
-import org.key_project.sed.core.model.ISEDMethodContract;
 import org.key_project.sed.ui.Activator;
 import org.key_project.util.eclipse.BundleUtil;
 
@@ -56,6 +63,11 @@ public final class SEDImages {
      * The key for the image that is used for method return.
      */
     public static final String METHOD_RETURN = "org.key_project.sed.ui.images.methodReturn";
+    
+    /**
+     * The key for the image that is used for exceptional method return.
+     */
+    public static final String EXCEPTIONAL_METHOD_RETURN = "org.key_project.sed.ui.images.exceptionalMethodReturn";
     
     /**
      * The key for the image that is used for termination.
@@ -141,7 +153,47 @@ public final class SEDImages {
      * The key for the image that is used for loop body termination not verified.
      */
     public static final String LOOP_BODY_TERMINATION_NOT_VERIFIED = "org.key_project.sed.ui.images.loopBodyTerminationNotVerified";
+    
+    /**
+     * The key for the image that is used to edit an {@link ISEDAnnotation}.
+     */
+    public static final String ANNOTATION_EDIT = "org.key_project.sed.ui.images.annotation.edit";
+    
+    /**
+     * The key for the image that is used to move an {@link ISEDAnnotation} up.
+     */
+    public static final String ANNOTATION_MOVE_UP = "org.key_project.sed.ui.images.annotation.moveUp";
+    
+    /**
+     * The key for the image that is used to move an {@link ISEDAnnotation} down.
+     */
+    public static final String ANNOTATION_MOVE_DOWN = "org.key_project.sed.ui.images.annotation.moveDown";
+    
+    /**
+     * The key for the image that is used to delete an {@link ISEDAnnotation}.
+     */
+    public static final String ANNOTATION_DELETE = "org.key_project.sed.ui.images.annotation.delete";
 
+    /**
+     * The key for the image that is used to show links of an {@link ISEDAnnotation}.
+     */
+    public static final String ANNOTATION_LINKS = "org.key_project.sed.ui.images.annotation.links";
+
+    /**
+     * The key for the image that is used to follow an {@link ISEDAnnotationLink}.
+     */
+    public static final String ANNOTATION_GO_TO = "org.key_project.sed.ui.images.annotation.goTo";
+
+    /**
+     * The key for the image that is used for symbolic debugging.
+     */
+    public static final String SYMBOLIC_DEBUG = "org.key_project.sed.ui.images.symbolicDebug";
+
+    /**
+     * The key for the image that is used for symbolic debugging.
+     */
+    public static final String SHOW_ALL_CONSTRAINTS = "org.key_project.sed.ui.images.showAllConstraints";
+    
     /**
      * Forbid instances.
      */
@@ -157,7 +209,7 @@ public final class SEDImages {
      * @return The {@link Image} or {@code null} if it was not possible to get it.
      */
     public static Image getImage(String key) {
-        ImageRegistry imageRegistry = Activator.getDefault().getImageRegistry();  
+        ImageRegistry imageRegistry = Activator.getDefault().getImageRegistry();
         Image image = imageRegistry.get(key);
         if (image == null) {
             synchronized (imageRegistry) { // Make sure that the image is created only once
@@ -171,6 +223,27 @@ public final class SEDImages {
             }
         }
         return image;
+    }
+    
+    /**
+     * Returns the {@link ImageDescriptor} for the given key.
+     * @param key The key.
+     * @return The {@link ImageDescriptor} or {@code null} if not available.
+     */
+    public static ImageDescriptor getImageDescriptor(String key) {
+       ImageRegistry imageRegistry = Activator.getDefault().getImageRegistry();
+       ImageDescriptor descriptor = imageRegistry.getDescriptor(key);
+       if (descriptor == null) {
+          synchronized (imageRegistry) { // Make sure that the image is created only once
+             descriptor = imageRegistry.getDescriptor(key); // Make sure that the image is still not available
+             if (descriptor == null) {
+                Image image = createImage(key);
+                imageRegistry.put(key, image);
+                descriptor = imageRegistry.getDescriptor(key);
+             }
+          } 
+       }
+       return descriptor;
     }
 
     /**
@@ -186,6 +259,9 @@ public final class SEDImages {
         }
         else if (METHOD_RETURN.equals(key)) {
            path = "icons/method_return.gif";
+        }
+        else if (EXCEPTIONAL_METHOD_RETURN.equals(key)) {
+           path = "icons/exceptional_method_return.gif";
         }
         else if (TERMINATION.equals(key)) {
            path = "icons/termination.gif";
@@ -237,6 +313,30 @@ public final class SEDImages {
         else if (LOOP_BODY_TERMINATION_NOT_VERIFIED.equals(key)) {
            path = "icons/exceptional_termination_not_verified.gif";
         }
+        else if (ANNOTATION_EDIT.equals(key)) {
+           path = "icons/write_obj.gif";
+        }
+        else if (ANNOTATION_MOVE_UP.equals(key)) {
+           path = "icons/up.gif";
+        }
+        else if (ANNOTATION_MOVE_DOWN.equals(key)) {
+           path = "icons/down.gif";
+        }
+        else if (ANNOTATION_DELETE.equals(key)) {
+           path = "icons/rem_co.gif";
+        }
+        else if (ANNOTATION_LINKS.equals(key)) {
+           path = "icons/links_obj.gif";
+        }
+        else if (ANNOTATION_GO_TO.equals(key)) {
+           path = "icons/follow_annotation_link.gif";
+        }
+        else if (SYMBOLIC_DEBUG.equals(key)) {
+           path = "icons/symbolic_debug.gif";
+        }
+        else if (SHOW_ALL_CONSTRAINTS.equals(key)) {
+           path = "icons/show_all_constraints.gif";
+        }
         // Load image if possible
         if (path != null) {
            InputStream in = null;
@@ -276,21 +376,34 @@ public final class SEDImages {
             @Override
             public void run() {
                ImageRegistry registry = Activator.getDefault().getImageRegistry();
+               registry.remove(ANNOTATION_DELETE);
+               registry.remove(ANNOTATION_EDIT);
+               registry.remove(ANNOTATION_GO_TO);
+               registry.remove(ANNOTATION_LINKS);
+               registry.remove(ANNOTATION_MOVE_DOWN);
+               registry.remove(ANNOTATION_MOVE_UP);
                registry.remove(BRANCH_CONDITION);
                registry.remove(BRANCH_STATEMENT);
+               registry.remove(EXCEPTIONAL_METHOD_RETURN);
                registry.remove(EXCEPTIONAL_TERMINATION);
+               registry.remove(EXCEPTIONAL_TERMINATION_NOT_VERIFIED);
+               registry.remove(KEY_WATCHPOINT);
+               registry.remove(LOOP_BODY_TERMINATION);
+               registry.remove(LOOP_BODY_TERMINATION_NOT_VERIFIED);
                registry.remove(LOOP_CONDITION);
-               registry.remove(LOOP_STATEMENT);
-               registry.remove(METHOD_CALL);
-               registry.remove(METHOD_RETURN);
-               registry.remove(TERMINATION);
                registry.remove(LOOP_INVARIANT);
                registry.remove(LOOP_INVARIANT_INITIALLY_INVALID);
+               registry.remove(LOOP_STATEMENT);
+               registry.remove(METHOD_CALL);
                registry.remove(METHOD_CONTRACT);
                registry.remove(METHOD_CONTRACT_NOT_NPC);
                registry.remove(METHOD_CONTRACT_NOT_PRE);
                registry.remove(METHOD_CONTRACT_NOT_PRE_NOT_NPC);
-               registry.remove(LOOP_BODY_TERMINATION);
+               registry.remove(METHOD_RETURN);
+               registry.remove(SHOW_ALL_CONSTRAINTS);
+               registry.remove(TERMINATION);
+               registry.remove(TERMINATION_NOT_VERIFIED);
+               registry.remove(SYMBOLIC_DEBUG);
             }
          });
        }
@@ -307,6 +420,9 @@ public final class SEDImages {
        }
        else if (element instanceof ISEDMethodReturn) {
           return getImage(SEDImages.METHOD_RETURN);
+       }
+       else if (element instanceof ISEDExceptionalMethodReturn) {
+          return getImage(SEDImages.EXCEPTIONAL_METHOD_RETURN);
        }
        else if (element instanceof ISEDExceptionalTermination) {
           ISEDExceptionalTermination node = (ISEDExceptionalTermination)element;
@@ -373,6 +489,19 @@ public final class SEDImages {
           }
           else {
              return getImage(SEDImages.LOOP_INVARIANT_INITIALLY_INVALID);
+          }
+       }
+       else if (element instanceof IThread) {
+          // Oriented on org.eclipse.debug.internal.ui.DefaultLabelProvider#getImageKey(Object)
+          IThread thread = (IThread) element;
+          if (thread.isSuspended()) {
+             return DebugPluginImages.getImage(IDebugUIConstants.IMG_OBJS_THREAD_SUSPENDED);
+          }
+          else if (thread.isTerminated()) {
+             return DebugPluginImages.getImage(IDebugUIConstants.IMG_OBJS_THREAD_TERMINATED);
+          }
+          else {
+             return DebugPluginImages.getImage(IDebugUIConstants.IMG_OBJS_THREAD_RUNNING);
           }
        }
        else {

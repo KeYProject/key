@@ -13,6 +13,10 @@
 
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -42,10 +46,10 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -111,11 +115,6 @@ public final class StrategySelectionView extends JPanel {
    };
 
    /**
-    * The {@link MainWindow} in which this {@link StrategySelectionView} is shown.
-    */
-   private final MainWindow mainWindow;
-
-   /**
     * The {@link KeYMediator} which provides the active proof.
     */
    private KeYMediator mediator;
@@ -125,9 +124,8 @@ public final class StrategySelectionView extends JPanel {
     */
    private StrategySelectionComponents components;
 
-   public StrategySelectionView(MainWindow mainWindow) {
-      this.mainWindow = mainWindow;
-      layoutPane();
+   public StrategySelectionView(AutoModeAction autoModeAction) {
+      layoutPane(autoModeAction);
       refresh(mediator == null ? null : mediator.getSelectedProof());
       setVisible(true);
       addComponentListener(new java.awt.event.ComponentAdapter() {
@@ -138,7 +136,7 @@ public final class StrategySelectionView extends JPanel {
    }
 
    /** Build everything */
-   private void layoutPane() {
+   private void layoutPane(AutoModeAction autoModeAction) {
       assert components == null : "Content can not be created a second time!";
       components = new StrategySelectionComponents();
 
@@ -160,7 +158,7 @@ public final class StrategySelectionView extends JPanel {
 
       // //////////////////////////////////////////////////////////////////////
 
-      JButton go = new JButton(mainWindow.getAutoModeAction());
+      JButton go = new JButton(autoModeAction);
 
       JPanel timeout = createDefaultPanel(components);
 

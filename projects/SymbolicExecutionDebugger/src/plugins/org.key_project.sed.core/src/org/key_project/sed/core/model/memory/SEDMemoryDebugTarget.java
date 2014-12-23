@@ -18,7 +18,9 @@ import java.util.List;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
+import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDDebugTarget;
@@ -131,5 +133,28 @@ public class SEDMemoryDebugTarget extends AbstractSEDDebugTarget implements ISED
    @Override
    public void setId(String id) {
       super.setId(id);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void initBreakpoint(IBreakpoint breakpoint) throws DebugException {
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IBreakpoint[] getBreakpoints() {
+      return null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected boolean checkBreakpointHit(IBreakpoint breakpoint, ISEDDebugNode node) {
+      return false;
    }
 }

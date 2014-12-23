@@ -56,17 +56,18 @@ import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchStatement;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDExceptionalMethodReturn;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
 import org.key_project.sed.core.model.ISEDLoopBodyTermination;
 import org.key_project.sed.core.model.ISEDLoopCondition;
+import org.key_project.sed.core.model.ISEDLoopInvariant;
 import org.key_project.sed.core.model.ISEDLoopStatement;
 import org.key_project.sed.core.model.ISEDMethodCall;
+import org.key_project.sed.core.model.ISEDMethodContract;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.model.ISEDLoopInvariant;
-import org.key_project.sed.core.model.ISEDMethodContract;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchConditionAddFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchConditionCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchConditionLayoutFeature;
@@ -76,6 +77,10 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.BranchStateme
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchStatementLayoutFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchStatementUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugTargetUpdateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.ExceptionalMethodReturnAddFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.ExceptionalMethodReturnCreateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.ExceptionalMethodReturnLayoutFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.ExceptionalMethodReturnUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ExceptionalTerminationAddFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ExceptionalTerminationCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ExceptionalTerminationLayoutFeature;
@@ -90,6 +95,10 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.LoopCondition
 import org.key_project.sed.ui.visualization.execution_tree.feature.LoopConditionCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.LoopConditionLayoutFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.LoopConditionUpdateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.LoopInvariantAddFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.LoopInvariantCreateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.LoopInvariantLayoutFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.LoopInvariantUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.LoopStatementAddFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.LoopStatementCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.LoopStatementLayoutFeature;
@@ -98,6 +107,10 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.MethodCallAdd
 import org.key_project.sed.ui.visualization.execution_tree.feature.MethodCallCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.MethodCallLayoutFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.MethodCallUpdateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.MethodContractAddFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.MethodContractCreateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.MethodContractLayoutFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.MethodContractUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.MethodReturnAddFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.MethodReturnCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.MethodReturnLayoutFeature;
@@ -114,14 +127,6 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadAddFeat
 import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadLayoutFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadUpdateFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.LoopInvariantAddFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.LoopInvariantCreateFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.LoopInvariantLayoutFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.LoopInvariantUpdateFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.MethodContractAddFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.MethodContractCreateFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.MethodContractLayoutFeature;
-import org.key_project.sed.ui.visualization.execution_tree.feature.MethodContractUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.service.SEDIndependenceSolver;
 
 /**
@@ -165,6 +170,7 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
                                       new LoopStatementCreateFeature(this),
                                       new MethodCallCreateFeature(this),
                                       new MethodReturnCreateFeature(this),
+                                      new ExceptionalMethodReturnCreateFeature(this),
                                       new StatementCreateFeature(this),
                                       new TerminationCreateFeature(this),
                                       new ThreadCreateFeature(this),
@@ -204,6 +210,9 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       }
       else if (context.getNewObject() instanceof ISEDMethodReturn) {
          return new MethodReturnAddFeature(this);
+      }
+      else if (context.getNewObject() instanceof ISEDExceptionalMethodReturn) {
+         return new ExceptionalMethodReturnAddFeature(this);
       }
       else if (context.getNewObject() instanceof ISEDStatement) {
          return new StatementAddFeature(this);
@@ -258,6 +267,9 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       else if (bo instanceof ISEDMethodReturn) {
          return new MethodReturnUpdateFeature(this);
       }
+      else if (bo instanceof ISEDExceptionalMethodReturn) {
+         return new ExceptionalMethodReturnUpdateFeature(this);
+      }
       else if (bo instanceof ISEDStatement) {
          return new StatementUpdateFeature(this);
       }
@@ -308,6 +320,9 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       }
       else if (bo instanceof ISEDMethodReturn) {
          return new MethodReturnLayoutFeature(this);
+      }
+      else if (bo instanceof ISEDExceptionalMethodReturn) {
+         return new ExceptionalMethodReturnLayoutFeature(this);
       }
       else if (bo instanceof ISEDStatement) {
          return new StatementLayoutFeature(this);

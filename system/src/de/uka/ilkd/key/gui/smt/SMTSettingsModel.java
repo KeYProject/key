@@ -31,8 +31,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
-
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.gui.testgen.TestGenerationSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.smt.SolverType;
 
 public class SMTSettingsModel extends DefaultTreeModel {
@@ -44,12 +44,12 @@ public class SMTSettingsModel extends DefaultTreeModel {
 	private final SMTSettings originalSettings;
 	private final SMTSettings temporarySettings;
 
-	public SMTSettingsModel(SMTSettings smtSettings) {
+	public SMTSettingsModel(SMTSettings smtSettings, TestGenerationSettings tgSettings) {
 		super( new DefaultMutableTreeNode("Options"));
 		originalSettings = smtSettings;
 		temporarySettings = new SMTSettings(smtSettings.getPdSettings().clone(),
 				smtSettings.getPiSettings().clone(), smtSettings.getProof());
-		create((DefaultMutableTreeNode)this.getRoot(), temporarySettings);
+		create((DefaultMutableTreeNode)this.getRoot(), temporarySettings,tgSettings);
 
 
 	}
@@ -72,26 +72,28 @@ public class SMTSettingsModel extends DefaultTreeModel {
 	}
 	private static final long serialVersionUID = 1L;
 
-	private DefaultMutableTreeNode create(DefaultMutableTreeNode optionsNode, SMTSettings smtSettings){
-		OptionContentNode generalOptionsNode =  new OptionContentNode("General",
+	private DefaultMutableTreeNode create(DefaultMutableTreeNode optionsNode, SMTSettings smtSettings, TestGenerationSettings tgSettings){
+		OptionContentNode generalOptionsNode =  new OptionContentNode("General SMT Options",
 				new JScrollPane(new GeneralOptions(smtSettings.getPiSettings())));
 
 		OptionContentNode translationOptionsNode =  new OptionContentNode("SMT-Translation",
 				new JScrollPane(new TranslationOptions(smtSettings.getPdSettings())));
-
 		OptionContentNode tacletTranslationOptionsNode =  new OptionContentNode("Taclet Translation",
 				new JScrollPane(new TacletTranslationOptions(smtSettings)));
 		startNode = generalOptionsNode;
 
 		solverOptions.add(new SolverOptions(SolverType.Z3_SOLVER,smtSettings.getPiSettings()));
+      solverOptions.add(new SolverOptions(SolverType.Z3_CE_SOLVER,smtSettings.getPiSettings()));
 		solverOptions.add(new SolverOptions(SolverType.YICES_SOLVER,smtSettings.getPiSettings()));
 		solverOptions.add(new SolverOptions(SolverType.SIMPLIFY_SOLVER,smtSettings.getPiSettings()));
 		solverOptions.add(new SolverOptions(SolverType.CVC3_SOLVER,smtSettings.getPiSettings()));
+        solverOptions.add(new SolverOptions(SolverType.CVC4_SOLVER,smtSettings.getPiSettings()));
 
 
 
 		optionsNode.add(generalOptionsNode);
 		optionsNode.add(translationOptionsNode);
+		
 		tacletTranslationOptionsNode.add(new OptionContentNode("Selection",
 				new JScrollPane((new TacletTranslationSelection(smtSettings)).getSelectionTree())));
 		optionsNode.add(tacletTranslationOptionsNode);
@@ -100,6 +102,7 @@ public class SMTSettingsModel extends DefaultTreeModel {
 			optionsNode.add(new OptionContentNode(options.getName(),
 					new JScrollPane(options)));  
 		}
+		
 
 		return optionsNode;
 
@@ -107,6 +110,7 @@ public class SMTSettingsModel extends DefaultTreeModel {
 	}
 
 }
+
 
 
 
@@ -375,7 +379,7 @@ class SolverOptions extends TablePanel{
 	private JButton    toDefaultButton;
 
 
-	private JButton    checkForSupportButton;
+	//private JButton    checkForSupportButton;
 
 	private final SolverType solverType; 
 	private final ProofIndependentSMTSettings settings;
@@ -428,9 +432,9 @@ class SolverOptions extends TablePanel{
 	@Override
 	protected void updateOptions() {
 		getSolverInstalled().setText(Boolean.toString(solverType.isInstalled(true)));
-		if(checkForSupportButton != null){
-			checkForSupportButton.setEnabled(solverType.isInstalled(false));
-		}
+//		if(checkForSupportButton != null){
+//			checkForSupportButton.setEnabled(solverType.isInstalled(false));
+//		}
 	}
 
 
@@ -463,19 +467,19 @@ class SolverOptions extends TablePanel{
 		});
 
 
-		checkForSupportButton = new JButton("Check for support.");
-		checkForSupportButton.addActionListener(new ActionListener() {
+//		checkForSupportButton = new JButton("Check for support.");
+//		checkForSupportButton.addActionListener(new ActionListener() {
+//
+//			@Override
+//			public void actionPerformed(ActionEvent arg0) {
+//				solverType.checkForSupport();
+//				getSolverSupported().setText(getSolverSupportText());
+//			}
+//		}); 
+//		checkForSupportButton.setEnabled(solverType.isInstalled(false));
 
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				solverType.checkForSupport();
-				getSolverSupported().setText(getSolverSupportText());
-			}
-		}); 
-		checkForSupportButton.setEnabled(solverType.isInstalled(false));
-
-		Box box  = addComponent(null,toDefaultButton,checkForSupportButton);
-
+//		Box box  = addComponent(null,toDefaultButton,checkForSupportButton);
+		Box box  = addComponent(null,toDefaultButton);
 		box.add(Box.createHorizontalGlue());
 
 

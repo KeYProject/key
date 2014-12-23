@@ -15,7 +15,7 @@ package de.uka.ilkd.key.strategy;
 
 import java.util.Set;
 
-import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
+import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
 
 /**

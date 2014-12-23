@@ -16,7 +16,7 @@ package de.uka.ilkd.key.java;
 import java.io.File;
 
 import junit.framework.TestCase;
-import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 public class TestJavaCardDLJavaExtensions extends TestCase {
@@ -44,15 +44,10 @@ public class TestJavaCardDLJavaExtensions extends TestCase {
                 "declared inside package test.");
     }
     
-    public void testMethodFrameRedirectsScope() {        
-        ProofAggregate pa = null;
-        try {
-            pa =
-                helper.parseThrowException(new File(testpath + "typeResolutionInMethodFrame2.key"));
-        } catch (Throwable t) {
-            fail("Something with type resolution in method frames is corrupt. " +
+    public void testMethodFrameRedirectsScope() throws ProofInputException {        
+        helper.parseThrowException(new File(testpath + "typeResolutionInMethodFrame2.key"));
+/*        fail("Something with type resolution in method frames is corrupt. " +
                     "The type Test should be found as the scope to look for " +
                     "is redirected to test.Test");
-        }                  
-    }
+*/    }
 }

@@ -13,120 +13,152 @@
 
 package de.uka.ilkd.key.ui;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
+import static de.uka.ilkd.key.core.Main.Verbosity.DEBUG;
+import static de.uka.ilkd.key.core.Main.Verbosity.HIGH;
+import static de.uka.ilkd.key.core.Main.Verbosity.NORMAL;
+import static de.uka.ilkd.key.core.Main.Verbosity.SILENT;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
-import de.uka.ilkd.key.gui.ApplyStrategy;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.Main;
+import de.uka.ilkd.key.core.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.ApplyTacletDialogModel;
-import de.uka.ilkd.key.gui.KeYMediator;
-import static de.uka.ilkd.key.gui.Main.Verbosity.*;
-import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.proof.ApplyStrategy;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
+import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ProofStarter;
+import de.uka.ilkd.key.util.Pair;
 
 public class ConsoleUserInterface extends AbstractUserInterface {
     private static final int PROGRESS_BAR_STEPS = 50;
     private static final String PROGRESS_MARK = ">";
+    private int numOfInvokedMacros;
 
-    public static final String PROP_AUTO_MODE = "autoMode";
 
-   /**
-    * The used {@link PropertyChangeSupport}.
-    */
-    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    // Substitute for TaskTree (GUI) to facilitate side proofs in console mode
+    private ImmutableList<Proof> proofStack = ImmutableSLList.<Proof>nil();
 
     private final BatchMode batchMode;
     private final byte verbosity;
-	private ProofStarter ps;
-	private KeYMediator mediator;
-	private boolean autoMode;
+    private KeYMediator mediator;
 
-	// for a progress bar
-	private int progressMax = 0;
+    // for a progress bar
+    private int progressMax = 0;
 
-    public boolean isAutoMode() {
-        return autoMode;
-    }
-
-   public ConsoleUserInterface(BatchMode batchMode, byte verbosity) {
-    	this.batchMode = batchMode;
-    	this.verbosity = verbosity;
+    public ConsoleUserInterface(BatchMode batchMode, byte verbosity) {
+        this.batchMode = batchMode;
+        this.verbosity = verbosity;
         this.mediator  = new KeYMediator(this);
+        this.numOfInvokedMacros = 0;
    }
 
    public ConsoleUserInterface(BatchMode batchMode, boolean verbose) {
        this(batchMode, verbose? DEBUG: NORMAL);
    }
 
-    public void taskFinished(TaskFinishedInfo info) {
-        progressMax = 0; // reset progress bar marker
-        final Proof proof = info.getProof();
-        if (proof==null) {
-            if (verbosity > SILENT) System.out.println("Proof loading failed");
-            System.exit(1);
-        }
-        final int openGoals = proof.openGoals().size();
-        final Object result2 = info.getResult();
-        if (info.getSource() instanceof ApplyStrategy) {
-            if (verbosity >= HIGH) {
-                System.out.println("]"); // end progress bar
-            }
-            if (verbosity > SILENT) {
-                System.out.println("[ DONE  ... rule application ]");
-                if (verbosity >= HIGH) {
-                    System.out.println("\n== Proof "+ (openGoals > 0 ? "open": "closed")+ " ==");
-                    final Proof.Statistics stat = info.getProof().statistics();
-                    System.out.println("Proof steps: "+stat.nodes);
-                    System.out.println("Branches: "+stat.branches);
-                    System.out.println("Automode Time: "+stat.autoModeTime+"ms");
-                }
-                System.out.println("Number of goals remaining open: " +
-                        openGoals);
-                System.out.flush();
-            }
-            batchMode.finishedBatchMode ( result2, info.getProof() );
-            Debug.fail ( "Control flow should not reach this point." );
-        } else if (info.getSource() instanceof ProblemLoader) {
-            if (verbosity > SILENT) System.out.println("[ DONE ... loading ]");
-            if (result2 != null) {
-                if (verbosity > SILENT) System.out.println(result2);
-                if (verbosity >= HIGH && result2 instanceof Throwable) {
-                    ((Throwable) result2).printStackTrace();
-                }
-                System.exit(-1);
-            }
-            if(batchMode.isLoadOnly() || openGoals==0) {
-                if (verbosity > SILENT)
-                System.out.println("Number of open goals after loading: " +
-                        openGoals);
-                System.exit(0);
-            }
+   private void finish(Proof proof) {
+       // setInteractive(false) has to be called because the ruleAppIndex
+       // has to be notified that we work in auto mode (CS)
+       mediator.setInteractive(false);
+       startAndWaitForAutoMode(proof);
+       if (verbosity >= HIGH) { // WARNING: Is never executed since application terminates via System.exit() before.
+           System.out.println(proof.statistics());
+       }
+   }
 
-            // setInteractive(false) has to be called because the ruleAppIndex
-            // has to be notified that we work in auto mode (CS)
-            mediator.setInteractive(false);
+   private void finalizeBatchMode(final int openGoals,
+                                  TaskFinishedInfo info,
+                                  final Object result2) {
+       if (verbosity >= HIGH) {
+           System.out.println("]"); // end progress bar
+       }
+       if (verbosity > SILENT) {
+           System.out.println("[ DONE  ... rule application ]");
+           if (verbosity >= HIGH) {
+               System.out.println("\n== Proof "+ (openGoals > 0 ? "open": "closed")+ " ==");
+               final Proof.Statistics stat = info.getProof().statistics();
+               System.out.println("Proof steps: "+stat.nodes);
+               System.out.println("Branches: "+stat.branches);
+               System.out.println("Automode Time: "+stat.autoModeTime+"ms");
+               System.out.println("Time per step: "+stat.timePerStep+"ms");
+           }
+           System.out.println("Number of goals remaining open: " + openGoals);
+           System.out.flush();
+       }
+       // this seems to be a good place to free some memory
+       Runtime.getRuntime().gc();
+       batchMode.finishedBatchMode ( result2, info.getProof() );
+       Debug.fail ( "Control flow should not reach this point." );
+   }
 
-            final Object result = ps.start();
-            if (verbosity >= HIGH) {
-            	System.out.println(result);
-            }
-        }
+   public void taskFinished(TaskFinishedInfo info) {
+       progressMax = 0; // reset progress bar marker
+       final Proof proof = info.getProof();
+       if (proof==null) {
+           if (verbosity > SILENT) {
+               System.out.println("Proof loading failed");
+               final Object error = info.getResult();
+               if (error instanceof Throwable) {
+                   if (verbosity >= HIGH) ((Throwable) error).printStackTrace();
+                   else System.out.println(error);
+               }
+           }
+           System.exit(1);
+       }
+       final int openGoals = proof.openGoals().size();
+       final Object result2 = info.getResult();
+       if (info.getSource() instanceof ApplyStrategy ||
+           info.getSource() instanceof ProofMacro) {
+           if (numOfInvokedMacros == 0) {
+               finalizeBatchMode(openGoals, info, result2);
+           } else if (!macroChosen()) {
+               finish(proof);
+           }
+       } else if (info.getSource() instanceof ProblemLoader) {
+           if (verbosity > SILENT) System.out.println("[ DONE ... loading ]");
+           if (result2 != null) {
+               if (verbosity > SILENT) System.out.println(result2);
+               if (verbosity >= HIGH && result2 instanceof Throwable) {
+                   ((Throwable) result2).printStackTrace();
+               }
+               System.exit(-1);
+           }
+           if(batchMode.isLoadOnly() ||  openGoals==0) {
+               if (verbosity > SILENT)
+                   System.out.println("Number of open goals after loading: " +
+                           openGoals);
+               System.exit(0);
+           }
+           if (macroChosen()) {
+               applyMacro();
+           } else {
+               finish(proof);
+           }
+       }
+   }
+
+    @Override
+    protected void macroFinished(TaskFinishedInfo info) {
+        numOfInvokedMacros--;
     }
 
-   @Override
+    @Override
     public void progressStarted(Object sender) {
         // TODO Implement ProblemInitializerListener.progressStarted
         if(verbosity >= DEBUG) {
@@ -144,11 +176,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     @Override
     public void proofCreated(ProblemInitializer sender,
             ProofAggregate proofAggregate) {
-        // TODO Implement ProblemInitializerListener.proofCreated
-        // XXX WHY AT THE MAINWINDOW?!?!
-    	ps = new ProofStarter(this, mediator.getAutoSaver() != null);
-        ps.init(proofAggregate);
-        mediator.setProof(proofAggregate.getFirstProof());
     }
 
     @Override
@@ -206,6 +233,12 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     }
 
     @Override
+    protected void macroStarted(String message,
+                                int size) {
+        numOfInvokedMacros++;
+    }
+
+    @Override
     public void setMaximum(int maximum) {
         // TODO Implement ProgressMonitor.setMaximum
         if(verbosity >= DEBUG) {
@@ -222,20 +255,6 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     }
 
     @Override
-    public void notifyAutoModeBeingStarted() {
-       boolean oldValue = isAutoMode();
-       autoMode = true;
-       firePropertyChange(PROP_AUTO_MODE, oldValue, isAutoMode());
-    }
-
-    @Override
-    public void notifyAutomodeStopped() {
-       boolean oldValue = isAutoMode();
-       autoMode = false;
-       firePropertyChange(PROP_AUTO_MODE, oldValue, isAutoMode());
-    }
-
-    @Override
     public void notify(NotificationEvent event) {
         if(verbosity >= DEBUG) {
         	System.out.println(event);
@@ -249,30 +268,30 @@ public class ConsoleUserInterface extends AbstractUserInterface {
         }
     }
 
-	@Override
+    @Override
     public boolean confirmTaskRemoval(String string) {
-	    return true;
+        return true;
     }
 
-	@Override
+    @Override
     public void loadProblem(File file) {
-		super.loadProblem(file, null, null, mediator);
-	}
+        super.getProblemLoader(file, null, null, mediator).runSynchronously();
+    }
 
    @Override
    public void loadProblem(File file, List<File> classPath, File bootClassPath) {
-      super.loadProblem(file, classPath, bootClassPath, mediator);
+      super.getProblemLoader(file, classPath, bootClassPath, mediator).runSynchronously();
    }
 
-	@Override
-    public void openExamples() {
-		System.out.println("Open Examples not suported by console UI.");
-    }
+   @Override
+   public void openExamples() {
+       System.out.println("Open Examples not suported by console UI.");
+   }
 
    @Override
    public ProblemInitializer createProblemInitializer(Profile profile) {
       ProblemInitializer pi = new ProblemInitializer(this,
-            new Services(profile, mediator.getExceptionHandler()),
+            new Services(profile),
             this);
       return pi;
    }
@@ -301,127 +320,67 @@ public class ConsoleUserInterface extends AbstractUserInterface {
       return true; // All proofs are supported.
    }
 
-   /**
-    * {@inheritDoc}
-    */
    @Override
-   public void removeProof(Proof proof) {
-      if (proof != null) {
-         proof.dispose();
-      }
+   public File saveProof(Proof proof, String fileExtension) {
+       if (batchMode == null || batchMode.isLoadOnly()) {
+           return null;
+       }
+       final Pair<File, String> f = fileName(proof, fileExtension);
+       File file = f.first;
+       String defaultName = f.second;
+
+       final String recDir = file != null ?
+               file.getParent() : new File(Main.getFileNameOnStartUp()).getParent();
+       file = (defaultName != null) ? new File(recDir, defaultName): file;
+
+       String poDir =
+               file.getParent().endsWith("src") ?
+                       new File(file.getParent()).getParent()
+                       : file.getParent();
+       String proofDir = file.getParent();
+       file = new File(fileExtension.equals(".key") ? poDir : proofDir, file.getName());
+       ProofSaver saver = new ProofSaver(proof, file.getAbsolutePath(), Main.INTERNAL_VERSION);
+       try {
+           saver.save();
+       } catch (IOException e) {
+           e.printStackTrace();
+       } catch (Exception e) {
+           e.printStackTrace();
+       }
+       return file;
    }
 
-   /**
-    * Returns the used {@link PropertyChangeSupport}.
-    * @return the used {@link PropertyChangeSupport}.
-    */
-   protected PropertyChangeSupport getPcs() {
-       return pcs;
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeProof(Proof proof) {
+        if (proof != null) {
+            if (!proofStack.isEmpty()) {
+                Proof p = proofStack.head();
+                proofStack = proofStack.removeAll(p);
+                assert p.name().equals(proof.name());
+                getMediator().setProof(proofStack.head());
+            } else {
+                // proofStack might be empty, though proof != null. This can
+                // happen for symbolic execution tests, if proofCreated was not
+                // called by the test setup.
+            }
+            proof.dispose();
+        }
+    }
 
-   /**
-    * Adds the given listener.
-    * @param listener The listener to add.
-    */
-   public void addPropertyChangeListener(PropertyChangeListener listener) {
-       pcs.addPropertyChangeListener(listener);
-   }
+    @Override
+    public boolean selectProofObligation(InitConfig initConfig) {
+        if(verbosity >= DEBUG) {
+            System.out.println("Proof Obligation selection not supported by console.");
+        }
+        return false;
+    }
 
-   /**
-    * Adds the given listener for the given property only.
-    * @param propertyName The property to observe.
-    * @param listener The listener to add.
-    */
-   public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-       pcs.addPropertyChangeListener(propertyName, listener);
-   }
-
-   /**
-    * Removes the given listener.
-    * @param listener The listener to remove.
-    */
-   public void removePropertyChangeListener(PropertyChangeListener listener) {
-       pcs.removePropertyChangeListener(listener);
-   }
-
-   /**
-    * Removes the given listener from the given property.
-    * @param propertyName The property to no longer observe.
-    * @param listener The listener to remove.
-    */
-   public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-       pcs.removePropertyChangeListener(propertyName, listener);
-   }
-
-   /**
-    * Fires the event to all available listeners.
-    * @param propertyName The property name.
-    * @param index The changed index.
-    * @param oldValue The old value.
-    * @param newValue The new value.
-    */
-   protected void fireIndexedPropertyChange(String propertyName, int index, boolean oldValue, boolean newValue) {
-       pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-   }
-
-   /**
-    * Fires the event to all available listeners.
-    * @param propertyName The property name.
-    * @param index The changed index.
-    * @param oldValue The old value.
-    * @param newValue The new value.
-    */
-   protected void fireIndexedPropertyChange(String propertyName, int index, int oldValue, int newValue) {
-       pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-   }
-
-   /**
-    * Fires the event to all available listeners.
-    * @param propertyName The property name.
-    * @param index The changed index.
-    * @param oldValue The old value.
-    * @param newValue The new value.
-    */
-   protected void fireIndexedPropertyChange(String propertyName, int index, Object oldValue, Object newValue) {
-       pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-   }
-
-   /**
-    * Fires the event to all listeners.
-    * @param evt The event to fire.
-    */
-   protected void firePropertyChange(PropertyChangeEvent evt) {
-       pcs.firePropertyChange(evt);
-   }
-
-   /**
-    * Fires the event to all listeners.
-    * @param propertyName The changed property.
-    * @param oldValue The old value.
-    * @param newValue The new value.
-    */
-   protected void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
-       pcs.firePropertyChange(propertyName, oldValue, newValue);
-   }
-
-   /**
-    * Fires the event to all listeners.
-    * @param propertyName The changed property.
-    * @param oldValue The old value.
-    * @param newValue The new value.
-    */
-   protected void firePropertyChange(String propertyName, int oldValue, int newValue) {
-       pcs.firePropertyChange(propertyName, oldValue, newValue);
-   }
-
-   /**
-    * Fires the event to all listeners.
-    * @param propertyName The changed property.
-    * @param oldValue The old value.
-    * @param newValue The new value.
-    */
-   protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
-       pcs.firePropertyChange(propertyName, oldValue, newValue);
-   }
-
+    @Override
+    public void proofRegistered(ProofEnvironmentEvent event) {
+        mediator.setProof(event.getProofList().getFirstProof());
+        proofStack = proofStack.prepend(event.getProofList().getFirstProof());
+    }
 }

@@ -40,8 +40,6 @@ import javax.swing.WindowConstants;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.GeneralSettings;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaReduxFileCollection;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -57,10 +55,10 @@ import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.AbstractEnvInput;
-import de.uka.ilkd.key.proof.io.KeYFile;
-import de.uka.ilkd.key.proof.io.RuleSource;
+import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
@@ -123,7 +121,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     // TODO : move GUI stuff somewhere else
     
     private void showWarningDialog(ImmutableSet<PositionedString> warnings) {
-        if(!MainWindow.visible) {
+        if(java.awt.GraphicsEnvironment.isHeadless()) {
             return;
         }
                 
@@ -144,8 +142,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         //scrollable warning list
         JScrollPane scrollpane = new JScrollPane();
         scrollpane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        JList list =
-                new JList(warnings.toArray(new PositionedString[warnings.size()]));
+        JList list = new JList(warnings.toArray(new PositionedString[warnings.size()]));
         list.setBorder(BorderFactory.createLoweredBevelBorder());
         scrollpane.setViewportView(list);
         pane.add(scrollpane, BorderLayout.CENTER);
@@ -198,13 +195,13 @@ public final class SLEnvInput extends AbstractEnvInput {
                 //external or internal path?
                 File file = new File(filePath);
                 if(file.isFile()) {
-                	rs = RuleSource.initRuleFile(file);
+                	rs = RuleSourceFactory.initRuleFile(file);
                 } else {
                     URL url = KeYResourceManager.getManager().getResourceFile(
                 				Recoder2KeY.class, 
                 				filePath);
                     if(url != null) {
-                	rs = RuleSource.initRuleFile(url);
+                	rs = RuleSourceFactory.initRuleFile(url);
                     }
                 }
                 
@@ -300,9 +297,9 @@ public final class SLEnvInput extends AbstractEnvInput {
                     = new JavaASTCollector(pm.getBody(), LoopStatement.class);
                 collector.start();
                 for(ProgramElement loop : collector.getNodes()) {
-                    LoopInvariant inv = specExtractor.extractLoopInvariant(
-                	    			pm, 
-                        			(LoopStatement) loop);
+                    LoopInvariant inv =
+                            specExtractor.extractLoopInvariant(pm,
+                        			               (LoopStatement) loop);
                     if(inv != null) {
                         specRepos.addLoopInvariant(inv.setTarget(kjt, pm));
                     }
@@ -372,5 +369,10 @@ public final class SLEnvInput extends AbstractEnvInput {
         if(gs.useJML()) {
             createSpecs(new JMLSpecExtractor(initConfig.getServices()));
         }
+    }
+
+    @Override
+    public File getInitialFile() {
+       return null;
     }
 }

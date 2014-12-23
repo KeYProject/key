@@ -91,14 +91,14 @@ public class SWTBotContractTest extends AbstractKeYDebugTargetTestCase {
                                  boolean useExistingContract,
                                  String preconditionOrExistingContractId,
                                  final String expectedModelPathInBundle) throws Exception {
-      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+      IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             // Get debug target TreeItem
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
             // Do resume and test created tree
             resume(bot, item, target);
-            assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false);
+            assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false, false);
          }
       };
       doKeYDebugTargetTest(projectName, 
@@ -113,7 +113,8 @@ public class SWTBotContractTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.FALSE,
-                           8, 
-                           executor);
+                           Boolean.FALSE,
+                           Boolean.TRUE, 
+                           8, executor);
    }
 }

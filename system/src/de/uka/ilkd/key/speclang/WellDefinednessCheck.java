@@ -20,7 +20,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
@@ -39,6 +38,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.WellDefinednessPO;
@@ -46,6 +46,7 @@ import de.uka.ilkd.key.proof.init.WellDefinednessPO.Variables;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -1200,8 +1201,16 @@ public abstract class WellDefinednessCheck implements Contract {
 
     @Override
     public final ProofOblInput createProofObl(InitConfig initConfig, Contract contract) {
-        assert contract instanceof WellDefinednessCheck;
-        return new WellDefinednessPO(initConfig, (WellDefinednessCheck) contract);
+        return new WellDefinednessPO(initConfig, (WellDefinednessCheck)contract);
+    }
+
+    @Override
+    public final ContractPO createProofObl(InitConfig initConfig) {
+        return (ContractPO)createProofObl(initConfig, this);
+    }
+
+    public final ProofOblInput getProofObl(Services services) {
+        return services.getSpecificationRepository().getPO(this);
     }
 
     @Override

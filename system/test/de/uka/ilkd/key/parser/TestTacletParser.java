@@ -97,8 +97,7 @@ public class TestTacletParser extends TestCase {
     private KeYParserF stringDeclParser(String s) {
 	return new KeYParserF(ParserMode.DECLARATION,
 		new KeYLexerF(s,
-			"No file. parser/TestTacletParser.stringDeclParser(" + s + ")",
-			null),
+			"No file. parser/TestTacletParser.stringDeclParser(" + s + ")"),
 		services, nss);
     }
 
@@ -120,8 +119,7 @@ public class TestTacletParser extends TestCase {
     private KeYParserF stringTacletParser(String s) {
 	return new KeYParserF(ParserMode.TACLET,
 		new KeYLexerF(s,
-			"No file. parser/TestTacletParser.stringTacletParser(" + s + ")",
-			null),
+			"No file. parser/TestTacletParser.stringTacletParser(" + s + ")"),
 		services, nss);
     }
 

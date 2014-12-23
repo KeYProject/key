@@ -20,10 +20,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
-import de.uka.ilkd.key.testgen.TestCaseGenerator;
+import de.uka.ilkd.key.testgen.ProofInfo;
 
 interface SolverListener {
         void processStarted(SMTSolver solver, SMTProblem problem);
@@ -42,6 +41,8 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
  
         private static int IDCounter = 0;
         private final int ID = IDCounter++;
+        
+        private AbstractSolverSocket socket;
         
         private ModelExtractor query;
 
@@ -130,6 +131,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 this.listener = listener;
                 this.services = services;
                 this.type = myType;
+                this.socket = AbstractSolverSocket.createSocket(type, query);
                 processLauncher = new ExternalProcessLauncher<SolverCommunication>(new SolverCommunication(),type.getDelimiters());
 
         }
@@ -258,7 +260,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 
                 // start the external process.
                 try {
-                        processLauncher.launch(commands,type.modifyProblem(problemString),type);
+                        processLauncher.launch(commands,type.modifyProblem(problemString),socket);
                  
                         solverCommunication = processLauncher.getCommunication();
                         if(solverCommunication.exceptionHasOccurred() && 
@@ -342,11 +344,12 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 
 
         	if(getType() == SolverType.Z3_CE_SOLVER){
-        		SMTObjTranslator objTrans = new SMTObjTranslator(smtSettings, services);
+        		ProofInfo info = new ProofInfo(problem.getGoal().proof());
+        		SMTObjTranslator objTrans = new SMTObjTranslator(smtSettings, services,info);
         		problemString = objTrans.translateProblem(term, services, smtSettings).toString();
         		problemTypeInformation = objTrans.getTypes();
         		ModelExtractor query = objTrans.getQuery();
-        		getType().setQuery(query);
+        		getSocket().setQuery(query);
         		tacletTranslation = null;
         		
         		exceptionsForTacletTranslation.addAll(objTrans.getExceptionsOfTacletTranslation());
@@ -421,8 +424,8 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         			
         		}
         		
-        		if(getType().getQuery()!=null){
-        			ModelExtractor mq = getType().getQuery();
+        		if(getSocket().getQuery()!=null){
+        			ModelExtractor mq = getSocket().getQuery();
         			Model m = mq.getModel();
         			if(m!=null){
         				output += "\n\n";
@@ -440,6 +443,12 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         public Collection<Throwable> getExceptionsOfTacletTranslation() {
                 
                 return exceptionsForTacletTranslation;
+        }
+
+		@Override
+        public AbstractSolverSocket getSocket() {
+	        
+	        return socket;
         }
 
 

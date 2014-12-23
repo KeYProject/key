@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.util.LRUCache;
 
 /**
  * Class for analysing and modifying polynomial expressions over the integers
@@ -48,10 +49,11 @@ public class Polynomial {
         new Polynomial ( ImmutableSLList.<Monomial>nil(), BigInteger.ONE );    
 
     public static Polynomial create(Term polyTerm, Services services) {
-        Polynomial res = services.getCaches().getPolynomialCache().get ( polyTerm );
+       final LRUCache<Term, Polynomial> cache = services.getCaches().getPolynomialCache();
+       Polynomial res = cache.get ( polyTerm );
         if ( res == null ) {
             res = createHelp ( polyTerm, services );
-            services.getCaches().getPolynomialCache().put ( polyTerm, res );
+            cache.put ( polyTerm, res );
         }
         return res;
     }

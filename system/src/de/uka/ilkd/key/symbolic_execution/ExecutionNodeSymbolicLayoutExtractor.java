@@ -25,14 +25,17 @@ public class ExecutionNodeSymbolicLayoutExtractor extends SymbolicLayoutExtracto
    /**
     * The {@link IExecutionNode} to extract memory layouts from.
     */
-   private final IExecutionNode executionNode;
+   private final IExecutionNode<?> executionNode;
 
    /**
     * Constructor.
     * @param executionNode The {@link IExecutionNode} to extract memory layouts from.
     */
-   public ExecutionNodeSymbolicLayoutExtractor(IExecutionNode executionNode) {
-      super(executionNode.getProofNode(), executionNode.getSettings().isUsePrettyPrinting());
+   public ExecutionNodeSymbolicLayoutExtractor(IExecutionNode<?> executionNode) {
+      super(executionNode.getProofNode(), 
+            executionNode.getModalityPIO(),
+            executionNode.getSettings().isUseUnicode(), 
+            executionNode.getSettings().isUsePrettyPrinting());
       this.executionNode = executionNode;
    }
 

@@ -30,6 +30,7 @@ import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 /** class tests the tree of proof
@@ -114,7 +115,7 @@ public class TestProofTree extends TestCase {
 		SequentFormula(t_b7)).semisequent(),
 	     Semisequent.EMPTY_SEMISEQUENT); 
 
-	p=new Proof(new Services(AbstractProfile.getDefaultProfile()));
+	p=new Proof("TestProofTree", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
 
 	n1=new Node(p, s1);
 	n2=new Node(p, s2);

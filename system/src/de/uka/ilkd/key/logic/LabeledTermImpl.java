@@ -17,6 +17,8 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.symbolic_execution.util.IFilter;
+import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * The labeled term class is used for terms that have a label 
@@ -66,6 +68,16 @@ class LabeledTermImpl extends TermImpl {
 		return labels;
 	}
 
+   @Override
+   public TermLabel getLabel(final Name termLabelName) {
+      return JavaUtil.search(labels, new IFilter<TermLabel>() {
+         @Override
+         public boolean select(TermLabel element) {
+            return JavaUtil.equals(element.name(), termLabelName);
+         }
+      });
+   }
+
 	/**
 	 * returns true if the given label is attached
 	 * @param label the TermLabel for which to look (must not be null)
@@ -74,8 +86,8 @@ class LabeledTermImpl extends TermImpl {
 	@Override
 	public boolean containsLabel(TermLabel label) {
 		assert label != null : "Label must not be null";
-		for (TermLabel l : labels) {
-			if (label.equals(l)) {
+		for (int i = 0, sz = labels.size(); i<sz; i++) {
+			if (label.equals(labels.get(i))) {
 				return true;
 			}
 		}
@@ -86,16 +98,15 @@ class LabeledTermImpl extends TermImpl {
 	 * {@inheritDoc}
 	 */
 	public boolean equals(Object o) {
-		if (!(o instanceof LabeledTermImpl)) {
-			return false;
-		}
-		final LabeledTermImpl cmp = (LabeledTermImpl) o;
+	   if (!super.equals(o)) {
+	      return false;
+	   }
+		
+	   final LabeledTermImpl cmp = (LabeledTermImpl) o;
 		if (labels.size() == cmp.labels.size()) {
-			if (!super.equals(o)) {
-				return false;
-			}
-			for (TermLabel l : labels) { // this is not optimal, but as long as number of labels limited ok
-				if (!cmp.labels.contains(l)) {
+			for (int i = 0, sz = labels.size(); i<sz; i++) { 
+			   // this is not optimal, but as long as number of labels limited ok
+				if (!cmp.labels.contains(labels.get(i))) {
 					return false;
 				}
 			}

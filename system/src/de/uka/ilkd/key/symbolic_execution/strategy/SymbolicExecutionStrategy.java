@@ -104,11 +104,11 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     * {@inheritDoc}
     */
    @Override
-   protected Feature setupApprovalF(Proof p_proof) {
-      Feature result = super.setupApprovalF(p_proof);
+   protected Feature setupApprovalF() {
+      Feature result = super.setupApprovalF();
       // Make sure that cuts are only applied if the cut term is not already part of the sequent. This check is performed exactly before the rule is applied because the sequent might has changed in the time after the schema variable instantiation was instantiated.
       SetRuleFilter depFilter = new SetRuleFilter();
-      depFilter.addRuleToSet(p_proof.env().getInitConfig().lookupActiveTaclet(new Name("cut")));
+      depFilter.addRuleToSet(getProof().getInitConfig().lookupActiveTaclet(new Name("cut")));
       result = add(result, ConditionalFeature.createConditional(depFilter, new CutHeapObjectsFeature()));
       return result;
    }
@@ -117,8 +117,8 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     * {@inheritDoc}
     */
    @Override
-   protected Feature setupGlobalF(Feature dispatcher, Proof p_proof) {
-       Feature globalF = super.setupGlobalF(dispatcher, p_proof);
+   protected Feature setupGlobalF(Feature dispatcher) {
+       Feature globalF = super.setupGlobalF(dispatcher);
        // Make sure that modalities without symbolic execution label are executed first because they might forbid rule application on modalities with symbolic execution label (see loop body branches)
        globalF = add(globalF, ifZero(not(new BinaryFeature() {
           @Override

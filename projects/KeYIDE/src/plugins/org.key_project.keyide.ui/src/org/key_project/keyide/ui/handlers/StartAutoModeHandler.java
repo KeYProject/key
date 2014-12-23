@@ -44,7 +44,7 @@ public class StartAutoModeHandler extends AbstractSaveExecutionHandler {
          final IProofProvider proofProvider = (IProofProvider)editorPart.getAdapter(IProofProvider.class);
          if (proofProvider != null && 
              proofProvider.getUI().isAutoModeSupported(proofProvider.getCurrentProof()) && 
-             !proofProvider.getMediator().autoMode()) {
+             !proofProvider.getMediator().isInAutoMode()) {
             new AbstractKeYEnvironmentJob("Auto Mode", proofProvider.getEnvironment()) {
                // job that starts the automode in KeY
                @Override

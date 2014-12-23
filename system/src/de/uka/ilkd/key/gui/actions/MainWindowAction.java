@@ -10,47 +10,47 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.Toolkit;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.KeyStroke;
-
-import de.uka.ilkd.key.gui.KeYMediator;
+import javax.swing.*;
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
 
 public abstract class MainWindowAction extends AbstractAction {
 
     /**
-     * This constant holds the typical key to be used for shortcuts
-     * (usually {@link java.awt.Event#CTRL_MASK})
+     *
      */
-    protected static final int SHORTCUT_KEY_MASK = 
-	Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-    
+    private static final long serialVersionUID = -6611537258325987383L;
+
+    /**
+     * This constant holds the typical key to be used for shortcuts (usually
+     * {@link java.awt.Event#CTRL_MASK})
+     */
+    protected static final int SHORTCUT_KEY_MASK
+            = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+
     protected final MainWindow mainWindow;
 
     protected MainWindowAction(MainWindow mainWindow) {
-	assert mainWindow != null;
-	this.mainWindow = mainWindow;
+        assert mainWindow != null;
+        this.mainWindow = mainWindow;
         putValue(ACCELERATOR_KEY, KeyStrokeManager.get(this));
     }
-
+    
     protected KeYMediator getMediator() {
-	return mainWindow.getMediator();
+        return mainWindow.getMediator();
     }
 
     protected void setName(String name) {
         putValue(NAME, name);
     }
-    
+
     protected String getName() {
-        return (String)getValue(NAME);
+        return (String) getValue(NAME);
     }
 
     @Deprecated // add a line in gui.utils.KeyStrokeManager instead
@@ -64,7 +64,7 @@ public abstract class MainWindowAction extends AbstractAction {
     }
 
     protected void setTooltip(String toolTip) {
-        putValue(Action.SHORT_DESCRIPTION, toolTip);	
+        putValue(Action.SHORT_DESCRIPTION, toolTip);
     }
 
     protected void setIcon(Icon icon) {
