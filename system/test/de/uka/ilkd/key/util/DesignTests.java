@@ -31,7 +31,13 @@ public class DesignTests extends TestCase {
 
     private static final File binaryPath = 
 	new File(System.getProperty("key.home")+File.separator+"system"+
-	File.separator+"binary");
+	                File.separator+"binary"+File.separator+"de"+File.separator+"uka"+File.separator+"ilkd"+File.separator+"key");
+    private static final FileFilter FILTER = new FileFilter() {
+        public boolean accept(File fileName) {
+            final String absolutePath = fileName.getAbsolutePath();
+            return absolutePath.endsWith(".class");
+        }
+        };
 
     private Class<?>[] allClasses;
 
@@ -56,12 +62,7 @@ public class DesignTests extends TestCase {
      */
     private static Class<?>[] getClasses(File directory) {
 	System.out.print(".");
-	File[] classFiles = directory.listFiles(new FileFilter() {
-		public boolean accept(File fileName) {
-		    return fileName.getAbsolutePath().indexOf("de/") != -1 &&
-			fileName.getAbsolutePath().endsWith(".class");
-		}
-	    });	
+	File[] classFiles = directory.listFiles(FILTER);	
 
 	Class<?>[] classes = new Class
 	    [(classFiles == null) ? 0 : classFiles.length];
@@ -208,10 +209,10 @@ public class DesignTests extends TestCase {
 
 	    assertTrue(message, badClasses.size() == 0);
     }
-
-
+    
 
     public void runTests() {
+        assertNotNull("Environment variable \"key.home\" not set", binaryPath);
         Method[] meth = getClass().getMethods();
         System.out.println("[Design Conformance Tests]");	
         System.out.println("[Collecting classes. Please wait...]");
