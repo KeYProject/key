@@ -2,20 +2,22 @@ package org.key_project.jmlediting.profile.jmlref.spec_keyword;
 
 import java.util.List;
 
+import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.CompilationUnit;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.IStoreRefKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefKeywordContentParser;
-import org.key_project.jmlediting.profile.jmlref.spec_keyword.storeref.StoreRefNodeTypes;
 import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
 
 public abstract class StoreRefContainerKeyword extends
-      AbstractGenericSpecificationKeyword {
+AbstractGenericSpecificationKeyword {
 
    public StoreRefContainerKeyword(final String keyword,
          final String... keywords) {
@@ -31,25 +33,38 @@ public abstract class StoreRefContainerKeyword extends
    public List<ICompletionProposal> createAutoProposals(final IASTNode node,
          final JavaContentAssistInvocationContext context) {
 
-      final IASTNode tmpNode = this.getNodeForProposal(node);
+      final IASTNode tmpNode = Nodes.getDepthMostNodeWithPosition(
+            context.getInvocationOffset(), node);
 
       final int begin = tmpNode.getStartOffset();
       final int end = context.getInvocationOffset();
 
-      final String prefix = context.getDocument().get().substring(begin, end);
+      System.out.println("Node: " + tmpNode);
+      System.out.println("begin: " + begin + "; end: " + end);
 
-      final char[] text = context.getDocument().get().toCharArray();
+      final String prefix = context.getDocument().get().substring(begin, end);
+      System.out.println("got Prefix: " + prefix);
 
       final CompilationUnit result = (CompilationUnit) context
             .getCompilationUnit();
-
       try {
          for (final IJavaElement element : result.getChildren()) {
-            System.out.println("------");
             if (element.getElementType() == IJavaElement.TYPE) {
-               // TODO
+               final IType typeElement = (IType) element;
+
+               for (final IField field : typeElement.getFields()) {
+                  System.out.println("---");
+                  System.out.println(field);
+                  System.out.println("---");
+                  System.out.println("elementName: " + field.getElementName());
+                  System.out.println("---");
+                  System.out.println("source: " + field.getSource());
+                  System.out.println("---");
+                  System.out.println("isResolved: " + field.isResolved());
+                  System.out.println("---");
+                  System.out.println("path: " + field.getPath());
+               }
             }
-            System.out.println(element.getElementType() + ": " + element);
          }
       }
       catch (final JavaModelException e) {
@@ -59,19 +74,5 @@ public abstract class StoreRefContainerKeyword extends
 
       return JMLCompletionUtil.getKeywordProposals(context, prefix, null,
             IStoreRefKeyword.class);
-   }
-
-   private IASTNode getNodeForProposal(final IASTNode node) {
-      IASTNode result = node;
-      for (final IASTNode child : node.getChildren()) {
-         if (child.getType() == StoreRefNodeTypes.STORE_REF_EXPR) {
-            result = child;
-            break;
-         }
-         else {
-            result = this.getNodeForProposal(child);
-         }
-      }
-      return result;
    }
 }

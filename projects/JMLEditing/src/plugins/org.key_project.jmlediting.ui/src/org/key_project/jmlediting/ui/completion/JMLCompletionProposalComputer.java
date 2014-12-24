@@ -34,7 +34,7 @@ import org.key_project.jmlediting.ui.util.JMLCompletionUtil;
  * @author Thomas Glaser
  */
 public class JMLCompletionProposalComputer implements
-      IJavaCompletionProposalComputer {
+IJavaCompletionProposalComputer {
 
    private static Image img = null;
 
@@ -45,7 +45,7 @@ public class JMLCompletionProposalComputer implements
       try {
          return new Image(Display.getCurrent(), new ImageLoader().load(new URL(
                "platform:/plugin/org.key_project.jmlediting.ui/icons/jml.png")
-               .openStream())[0]);
+         .openStream())[0]);
       }
       catch (final IOException ioe) {
          return null;
@@ -89,31 +89,30 @@ public class JMLCompletionProposalComputer implements
                .getProjectActiveJMLProfile(currentProject);
 
          final IJMLParser parser = currentJMLProfile.createParser();
+         IASTNode parseResult = null;
          try {
             // Parse the text
             // End index of comment is inclusive, but input end for parser
             // exclusive
-            final IASTNode parseResult = parser.parse(context.getDocument()
-                  .get(), comment.getContentBeginOffset(), comment
-                  .getContentEndOffset() + 1);
-            final IKeyword activeKeyword = Nodes.getKeywordNode(parseResult,
-                  context.getInvocationOffset());
-            if (activeKeyword != null) {
-
-               result.addAll(activeKeyword.createAutoProposals(parseResult,
-                     javaContext));
-            }
-            else {
-               // Fallback Method to display all JML Keyword-Proposals, if
-               // no active Keyword was discovered.
-               return JMLCompletionUtil.getStandardKeywordProposals(
-                     javaContext, getJMLImg());
-            }
+            parseResult = parser.parse(context.getDocument().get(),
+                  comment.getContentBeginOffset(),
+                  comment.getContentEndOffset() + 1);
 
          }
          catch (final ParserException e) {
-            // Fallback Method to display all JML Keyword-Proposals, if Parser
-            // fails.
+            System.out.println("parserException: " + e.getMessage());
+            parseResult = e.getErrorNode();
+         }
+
+         final IKeyword activeKeyword = Nodes.getKeywordNode(parseResult,
+               context.getInvocationOffset());
+         if (activeKeyword != null) {
+            result.addAll(activeKeyword.createAutoProposals(parseResult,
+                  javaContext));
+         }
+         else {
+            // Fallback Method to display all JML Keyword-Proposals, if
+            // no active Keyword was discovered.
             return JMLCompletionUtil.getStandardKeywordProposals(javaContext,
                   getJMLImg());
          }
