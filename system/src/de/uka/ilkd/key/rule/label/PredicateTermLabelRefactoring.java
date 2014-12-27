@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.PredicateTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
@@ -30,15 +31,16 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
     */
    @Override
    public ImmutableList<Name> getSupportedRuleNames() {
-      return ImmutableSLList.<Name>nil().append(UseOperationContractRule.INSTANCE.name())
-                                        .append(WhileInvariantRule.INSTANCE.name());
+      return ImmutableSLList.<Name>nil().prepend(UseOperationContractRule.INSTANCE.name())
+                                        .prepend(WhileInvariantRule.INSTANCE.name());
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public RefactoringScope defineRefactoringScope(Services services, 
+   public RefactoringScope defineRefactoringScope(TermLabelState state,
+                                                  Services services, 
                                                   PosInOccurrence applicationPosInOccurrence, 
                                                   Term applicationTerm, 
                                                   Rule rule, 
@@ -86,7 +88,8 @@ public class PredicateTermLabelRefactoring implements TermLabelRefactoring {
     * {@inheritDoc}
     */
    @Override
-   public void refactoreLabels(Services services, 
+   public void refactoreLabels(TermLabelState state,
+                               Services services, 
                                PosInOccurrence applicationPosInOccurrence, 
                                Term applicationTerm, 
                                Rule rule, 

@@ -5,15 +5,15 @@
       <term term="null"/>
    </equivalenceClass>
    <state name="return this.first.value+this.second.value+tempX.value+tempY.value;">
-      <value name="x" programVariable="x" isArrayIndex="false" value="null" type="Null"/>
-      <value name="tempX" programVariable="tempX" isArrayIndex="false" value="null" type="Null"/>
-      <association name="self" programVariable="self" isArrayIndex="false" target="o1"/>
-      <association name="tempY" programVariable="tempY" isArrayIndex="false" target="o2"/>
+      <value name="x {true}" programVariable="x" isArrayIndex="false" value="null" type="Null" condition="true"/>
+      <value name="tempX {true}" programVariable="tempX" isArrayIndex="false" value="null" type="Null" condition="true"/>
+      <association name="self {true}" programVariable="self" isArrayIndex="false" target="o1" condition="true"/>
+      <association name="tempY {true}" programVariable="tempY" isArrayIndex="false" target="o2" condition="true"/>
    </state>
    <object xml:id="o1" name="self" type="OneAssignmentTest">
-      <value name="first" programVariable="first" isArrayIndex="false" value="null" type="Null"/>
-      <association name="y" programVariable="y" isArrayIndex="false" target="o2"/>
-      <association name="second" programVariable="second" isArrayIndex="false" target="o2"/>
+      <value name="first {true}" programVariable="first" isArrayIndex="false" value="null" type="Null" condition="true"/>
+      <association name="y {true}" programVariable="y" isArrayIndex="false" target="o2" condition="true"/>
+      <association name="second {true}" programVariable="second" isArrayIndex="false" target="o2" condition="true"/>
    </object>
    <object xml:id="o2" name="OneAssignmentTestValueWrapper::select(heap,self,OneAssignmentTest::$y)" type="OneAssignmentTestValueWrapper">
    </object>

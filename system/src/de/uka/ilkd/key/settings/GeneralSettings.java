@@ -11,18 +11,14 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.gui.configuration;
+package de.uka.ilkd.key.settings;
 
 import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.Properties;
+import de.uka.ilkd.key.proof.io.AutoSaver;
 
 
-
-/** This class encapsulates the information about the active
- * Heuristics and the maximum amount of heuristics steps before an
- * interactive step is required.
- */
 public class GeneralSettings implements Settings, Cloneable {
 
 
@@ -33,8 +29,7 @@ public class GeneralSettings implements Settings, Cloneable {
         = "[General]OneStepSimplification";
     private static final String USE_JML_KEY = "[General]UseJML";
     private static final String RIGHT_CLICK_MACROS_KEY = "[General]RightClickMacros";
-    private static final String AUTO_SAVE = "[General]AutoSave";
-    private static final String DEFAULT_PROOF_FOLDER = "[General]DefaultProofFolder";
+    private static final String AUTO_SAVE = "[General]AutoSavePeriod";
     
     /** if true then JML specifications are globally disabled 
      * in this run of KeY, regardless of the regular settings 
@@ -53,18 +48,20 @@ public class GeneralSettings implements Settings, Cloneable {
     /** launches the rightclick the macro menu. on by default. */
     private boolean rightClickMacros = true;
 
-    /** proofs are stored in a default proof folder (as a sub directory)). */
-    private boolean defaultProofFolder = false;
-
-    /** side-proofs are stored automatically without a save dialog pop up
-     * when leaving a side-proof. */
-    private boolean autoSave = false;
-
     /** JML is active by default */
     private boolean useJML = true;
+    
+    /** auto save is disabled by default.
+     * Positive values indicate save period.
+     */
+    private int autoSave = 0;
 
     private LinkedList<SettingsListener> listenerList = 
         new LinkedList<SettingsListener>();
+    
+    GeneralSettings() {
+        addSettingsListener(AutoSaver.settingsListener);
+    }
 
     // getter
     public boolean tacletFilter() {
@@ -84,16 +81,12 @@ public class GeneralSettings implements Settings, Cloneable {
         return rightClickMacros;
     }
 
-    public boolean autoSave() {
-        return autoSave;
-    }
-
-    public boolean storesInDefaultProofFolder() {
-        return defaultProofFolder;
-    }
-
     public boolean useJML() {
         return useJML && !disableSpecs;
+    }
+    
+    public int autoSavePeriod() {
+        return autoSave;
     }
     
 
@@ -130,27 +123,16 @@ public class GeneralSettings implements Settings, Cloneable {
     }
 
 
-    public void autoSave(boolean b) {
-        if(this.autoSave != b) {
-            autoSave = b;
-            fireSettingsChanged();
-        }
-    }
-
-
-    public void setSeparateProofFolder(boolean b) {
-        if(this.defaultProofFolder != b) {
-            defaultProofFolder = b;
-            fireSettingsChanged();
-        }
-    }
-
-
     public void setUseJML(boolean b) {
         if (useJML != b) {
             useJML = b;
           fireSettingsChanged();
         }
+    }
+    
+    public void setAutoSave(int period) {
+        autoSave = period;
+        fireSettingsChanged();
     }
 
 
@@ -180,19 +162,19 @@ public class GeneralSettings implements Settings, Cloneable {
             rightClickMacros = Boolean.valueOf(val).booleanValue();
         }
 
-        val = props.getProperty(AUTO_SAVE);
-        if (val != null) {
-            autoSave = Boolean.valueOf(val).booleanValue();
-        }
-
-        val = props.getProperty(DEFAULT_PROOF_FOLDER);
-        if (val != null) {
-            defaultProofFolder = Boolean.valueOf(val).booleanValue();
-        }
-
         val = props.getProperty(USE_JML_KEY);
         if (val != null) {
             useJML = Boolean.valueOf(val).booleanValue();
+        }
+        
+        val = props.getProperty(AUTO_SAVE);
+        if (val != null) {
+            try {
+                autoSave = Integer.parseInt(val);
+                if (autoSave < 0) autoSave = 0;
+            } catch (NumberFormatException e) {
+                autoSave = 0;
+            }
         }
     }
 
@@ -207,9 +189,8 @@ public class GeneralSettings implements Settings, Cloneable {
         props.setProperty(DND_DIRECTION_SENSITIVE_KEY, "" + dndDirectionSensitive);
         props.setProperty(ONE_STEP_SIMPLIFICATION_KEY, "" + oneStepSimplification);
         props.setProperty(RIGHT_CLICK_MACROS_KEY, "" + rightClickMacros);
-        props.setProperty(AUTO_SAVE, "" + autoSave);
-        props.setProperty(DEFAULT_PROOF_FOLDER, "" + defaultProofFolder);
         props.setProperty(USE_JML_KEY, "" + useJML);
+        props.setProperty(AUTO_SAVE, ""+ autoSave);
     }
 
     /** sends the message that the state of this setting has been

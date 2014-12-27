@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
    <state name="return 42;">
-      <association name="array" programVariable="array" isArrayIndex="false" target="o1"/>
-      <association name="self" programVariable="self" isArrayIndex="false" target="o2"/>
+      <association name="array {true}" programVariable="array" isArrayIndex="false" target="o1" condition="true"/>
+      <association name="self {true}" programVariable="self" isArrayIndex="false" target="o2" condition="true"/>
    </state>
    <object xml:id="o1" name="array" type="java.lang.Object[]">
-      <value name="length" programVariable="length" isArrayIndex="false" value="Z(1(#))" type="int"/>
+      <value name="length {true}" programVariable="length" isArrayIndex="false" value="Z(1(#))" type="int" condition="true"/>
    </object>
    <object xml:id="o2" name="self" type="SimpleArrayLength">
    </object>

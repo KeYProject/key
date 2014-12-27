@@ -8,7 +8,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -46,7 +45,6 @@ public class ProofInfo {
 			return (IProgramMethod) f;
 		}
 		else{
-			System.out.println(getMUT().getFullName());
 			return null;
 		}		
 	}

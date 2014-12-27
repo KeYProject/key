@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.rule.label;
 
-import java.util.List;
+import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -59,10 +60,12 @@ public interface TermLabelUpdate extends RuleSpecificTask {
     * @param newTermSubs The optional children of the {@link Term} to create.
     * @param newTermBoundVars The optional {@link QuantifiableVariable}s of the {@link Term} to create.
     * @param newTermJavaBlock The optional {@link JavaBlock} of the {@link Term} to create.
-    * @param label The {@link TermLabel} to decide if it should be kept or dropped.
+    * @param labels The {@link Set} of {@link TermLabel}s to modify.
+    * @param state The {@link TermLabelState} of the current rule application.
     * @return {@code true} keep {@link TermLabel} and add it to the new {@link Term}. {@code false} drop {@link TermLabel} and do not need it to the new {@link Term}.
     */
-   public void updateLabels(Services services,
+   public void updateLabels(TermLabelState state,
+                            Services services,
                             PosInOccurrence applicationPosInOccurrence,
                             Term applicationTerm,
                             Term modalityTerm,
@@ -74,5 +77,5 @@ public interface TermLabelUpdate extends RuleSpecificTask {
                             ImmutableArray<Term> newTermSubs,
                             ImmutableArray<QuantifiableVariable> newTermBoundVars,
                             JavaBlock newTermJavaBlock,
-                            List<TermLabel> labels);
+                            Set<TermLabel> labels);
 }

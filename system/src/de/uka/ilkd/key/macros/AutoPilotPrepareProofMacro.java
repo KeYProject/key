@@ -18,7 +18,6 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -30,6 +29,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -126,8 +126,8 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         private static final Name NAME = new Name("Autopilot filter strategy");
         private final Strategy delegate;
 
-        public AutoPilotStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
-            this.delegate = mediator.getInteractiveProver().getProof().getActiveStrategy();
+        public AutoPilotStrategy(Proof proof, PosInOccurrence posInOcc) {
+            this.delegate = proof.getActiveStrategy();
         }
 
         @Override
@@ -191,7 +191,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
-        return new AutoPilotStrategy(mediator, posInOcc);
+    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+        return new AutoPilotStrategy(proof, posInOcc);
     }
 }

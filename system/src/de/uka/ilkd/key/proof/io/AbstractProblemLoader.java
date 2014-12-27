@@ -26,7 +26,6 @@ import java.util.Properties;
 import org.antlr.runtime.MismatchedTokenException;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.proof.Proof;
@@ -41,6 +40,7 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.ui.UserInterface;

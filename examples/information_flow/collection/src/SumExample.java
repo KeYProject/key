@@ -26,7 +26,7 @@ class SumExample {
           @     0 <= i
           @  && i <= values.length
           @  && sum == (\bsum int j; 0; i; values[j]);
-          @ assignable \less_than_nothing;
+          @ assignable \strictly_nothing;
           @ decreases values.length - i;
           @*/
         for (int i = 0; i < values.length; i++) {

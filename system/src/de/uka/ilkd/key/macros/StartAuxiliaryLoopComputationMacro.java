@@ -81,7 +81,8 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro {
     }
 
     @Override
-    public ProofMacroFinishedInfo applyTo(KeYMediator mediator,
+    public ProofMacroFinishedInfo applyTo(Proof proof,
+                                          KeYMediator mediator,
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) {
@@ -89,7 +90,6 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro {
         if (goals.head().node().parent() == null) {
             return info;
         }
-        final Proof proof = goals.head().proof();
         RuleApp app = goals.head().node().parent().getAppliedRuleApp();
         if (!(app instanceof LoopInvariantBuiltInRuleApp)) {
             return info;

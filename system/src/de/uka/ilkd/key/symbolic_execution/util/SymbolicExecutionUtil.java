@@ -31,8 +31,6 @@ import java.util.Set;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.JavaTools;
@@ -84,6 +82,7 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -120,6 +119,8 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -2250,7 +2251,7 @@ public final class SymbolicExecutionUtil {
                                                 Services services) {
       if (term.op() instanceof TermTransformer) {
          // Replace meta constructs
-         SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(services, tacletApp.instantiations(), tacletApp.posInOccurrence(), tacletApp.taclet(), null);
+         SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(new TermLabelState(), services, tacletApp.instantiations(), tacletApp.posInOccurrence(), tacletApp.taclet(), null);
          term.execPostOrder(visitor);
          return visitor.getTerm();
       }

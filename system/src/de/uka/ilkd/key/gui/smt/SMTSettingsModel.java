@@ -31,8 +31,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.testgen.TestGenerationSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.smt.SolverType;
 
 public class SMTSettingsModel extends DefaultTreeModel {
@@ -83,6 +83,7 @@ public class SMTSettingsModel extends DefaultTreeModel {
 		startNode = generalOptionsNode;
 
 		solverOptions.add(new SolverOptions(SolverType.Z3_SOLVER,smtSettings.getPiSettings()));
+      solverOptions.add(new SolverOptions(SolverType.Z3_CE_SOLVER,smtSettings.getPiSettings()));
 		solverOptions.add(new SolverOptions(SolverType.YICES_SOLVER,smtSettings.getPiSettings()));
 		solverOptions.add(new SolverOptions(SolverType.SIMPLIFY_SOLVER,smtSettings.getPiSettings()));
 		solverOptions.add(new SolverOptions(SolverType.CVC3_SOLVER,smtSettings.getPiSettings()));
