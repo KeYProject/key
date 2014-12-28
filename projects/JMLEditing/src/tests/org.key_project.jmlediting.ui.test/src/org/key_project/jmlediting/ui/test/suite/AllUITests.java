@@ -7,7 +7,8 @@ import org.key_project.jmledeting.ui.test.hover.JMLHoverTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({ CompletionSuite.class, PreferenceSuite.class,
-   JMLHoverTest.class, KeywordHighlightingSuite.class })
+   JMLHoverTest.class, KeywordHighlightingSuite.class,
+   JMLCommentHighlightingSuite.class })
 public class AllUITests {
 
 }
