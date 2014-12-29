@@ -44,7 +44,6 @@ import org.eclipse.graphiti.util.ColorConstant;
 import org.key_project.sed.core.annotation.ISEDAnnotation;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDGroupable;
-import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.util.NodeUtil;
 import org.key_project.sed.core.util.SEDGroupPreorderIterator;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeStyleUtil;
@@ -108,15 +107,19 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
       
       Diagram targetDiagram = (Diagram) context.getTargetContainer();
       
+      // If the new node opens a group, we need to create the rect first
       if(NodeUtil.canBeGrouped(addedNode)) {
          ISEDGroupable groupStart = (ISEDGroupable) addedNode;
          ContainerShape container = peCreateService.createContainerShape(targetDiagram, true);
          Rectangle rect = gaService.createRectangle(container);
          
+         // Base color (blueish)
          ColorConstant color = new ColorConstant(102, 80, 180);
          if(groupStart.isCollapsed()) {
             SEDGroupPreorderIterator iter = new SEDGroupPreorderIterator(groupStart);
             try {
+               // color group complete: greenish
+               // color group not complete: redish
                color = iter.allBranchesFinished() ? new ColorConstant(102, 180, 0) : new ColorConstant(255, 102, 0);
             }
             catch (DebugException e) {
@@ -136,9 +139,15 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
          return container;
       }
 
+      // create the node
       return createNode(context);
    }
    
+   /**
+    * Creates the node with rounded rect, image, text, anchor and connection.
+    * @param context The {@link IAddContext} for this node.
+    * @return The {@link PictogramElement} for this node.
+    */
    private PictogramElement createNode(IAddContext context) {
       ISEDDebugNode addedNode = (ISEDDebugNode) context.getNewObject();
       
@@ -195,7 +204,43 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
 
       try
       {
-         createAnchor(nodeContainer);
+         ChopboxAnchor anchor = peCreateService.createChopboxAnchor(nodeContainer);
+         
+         ISEDDebugNode parentNode = NodeUtil.getParent(addedNode);
+         
+//         ISEDDebugNode parentNode = NodeUtil.getParent((ISEDDebugNode) getBusinessObjectForPictogramElement(nodeContainer));
+         if(parentNode != null)
+         {
+            // Since the first pe of a group startnode is always the rec
+            // we need to get the second pe.
+            PictogramElement pe = getFeatureProvider().getAllPictogramElementsForBusinessObject(parentNode)
+                  [NodeUtil.canBeGrouped(parentNode) ? 1 : 0];
+//            PictogramElement pe = NodeUtil.canBeGrouped(parentNode) ?
+////            PictogramElement pe = parentNode instanceof ISEDGroupable && ((ISEDGroupable)parentNode).isGroupable() ? 
+//                  getFeatureProvider().getAllPictogramElementsForBusinessObject(parentNode)[1] :
+//                  getFeatureProvider().getPictogramElementForBusinessObject(parentNode);
+               
+            if (pe == null) {
+               throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't find PictogramElement for \"" + pe + "\"."));
+            }
+            
+            if (!(pe instanceof AnchorContainer)) {
+               throw new DebugException(LogUtil.getLogger().createErrorStatus("Parent PictogramElement \"" + pe + "\" is no AnchorContainer."));
+            }
+            AnchorContainer anchorContainer = (AnchorContainer)pe;
+            if (anchorContainer.getAnchors() == null || anchorContainer.getAnchors().isEmpty()) {
+               throw new DebugException(LogUtil.getLogger().createErrorStatus("Parent AnchorContainer \"" + pe + "\" has no Anchors."));
+            }
+            Connection connection = peCreateService.createFreeFormConnection(getDiagram());
+            connection.setStart(anchorContainer.getAnchors().get(0));
+            connection.setEnd(anchor);
+            
+            ConnectionDecorator cd = peCreateService.createConnectionDecorator(connection, false, 1.0, true);
+            createArrow(gaService, cd);
+     
+            Polyline polyline = gaService.createPolyline(connection);
+            polyline.setStyle(ExecutionTreeStyleUtil.getStyleForParentConnection(getDiagram()));
+         }
       }
       catch (DebugException e) {
          LogUtil.getLogger().logError(e);
@@ -204,43 +249,6 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
       layoutPictogramElement(nodeContainer);
 
       return nodeContainer;
-   }
-   
-   protected void createAnchor(ContainerShape nodeContainer) throws DebugException {
-      IPeCreateService peCreateService = Graphiti.getPeCreateService();
-      IGaService gaService = Graphiti.getGaService();
-      
-      ChopboxAnchor anchor = peCreateService.createChopboxAnchor(nodeContainer);
-      
-      ISEDDebugNode parentNode = NodeUtil.getParent((ISEDDebugNode) getBusinessObjectForPictogramElement(nodeContainer));
-      if(parentNode != null)
-      {
-         PictogramElement pe = NodeUtil.canBeGrouped(parentNode) ?
-//         PictogramElement pe = parentNode instanceof ISEDGroupable && ((ISEDGroupable)parentNode).isGroupable() ? 
-               getFeatureProvider().getAllPictogramElementsForBusinessObject(parentNode)[1] :
-               getFeatureProvider().getPictogramElementForBusinessObject(parentNode);
-            
-         if (pe == null) {
-            throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't find PictogramElement for \"" + pe + "\"."));
-         }
-         
-         if (!(pe instanceof AnchorContainer)) {
-            throw new DebugException(LogUtil.getLogger().createErrorStatus("Parent PictogramElement \"" + pe + "\" is no AnchorContainer."));
-         }
-         AnchorContainer anchorContainer = (AnchorContainer)pe;
-         if (anchorContainer.getAnchors() == null || anchorContainer.getAnchors().isEmpty()) {
-            throw new DebugException(LogUtil.getLogger().createErrorStatus("Parent AnchorContainer \"" + pe + "\" has no Anchors."));
-         }
-         Connection connection = peCreateService.createFreeFormConnection(getDiagram());
-         connection.setStart(anchorContainer.getAnchors().get(0));
-         connection.setEnd(anchor);
-         
-         ConnectionDecorator cd = peCreateService.createConnectionDecorator(connection, false, 1.0, true);
-         createArrow(gaService, cd);
-  
-         Polyline polyline = gaService.createPolyline(connection);
-         polyline.setStyle(ExecutionTreeStyleUtil.getStyleForParentConnection(getDiagram()));
-      }
    }
    
    /**

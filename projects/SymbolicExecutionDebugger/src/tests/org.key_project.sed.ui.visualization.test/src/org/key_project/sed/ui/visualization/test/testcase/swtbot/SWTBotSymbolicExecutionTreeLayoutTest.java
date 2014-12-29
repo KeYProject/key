@@ -33,7 +33,7 @@ public class SWTBotSymbolicExecutionTreeLayoutTest extends AbstractSymbolicExecu
 //   }
    
    /**
-    * Launches "data/Number2/test/Number2.set" and tests shown diagram.
+    * Launches "data/ThesisExample/test/ThesisExample.set" and tests shown diagram.
     */
    @Test
    public void testThesisExample() throws Exception {
@@ -42,6 +42,127 @@ public class SWTBotSymbolicExecutionTreeLayoutTest extends AbstractSymbolicExecu
                    "ThesisExample.set",
                    "data/ThesisExample/oracle",
                    new PathReplacement("D:\\BA\\git\\key\\projects\\SymbolicExecutionDebugger\\runtime-SymbolicExecutionDebugger.product\\SED Examples\\src\\example5\\ThesisExample.java", "ThesisExample.java"));
+   }
+   
+   /**
+    * Launches "TODO" and tests the collapse function on the most outer group
+    */
+   @Test
+   public void testCollapseOuterGroup() throws Exception {
+      
+   }
+   
+   /**
+    * Launches "TODO" and tests the expand function on the most outer group
+    */
+   @Test
+   public void testExpandOuterGroup() throws Exception {
+      
+   }
+
+   /**
+    * Launches "TODO" and tests the collapse function on a group with
+    * no previous branch
+    */
+   @Test
+   public void testCollapseGroupNoPrev() throws Exception {
+      
+   }
+   
+   /**
+    * Launches "TODO" and tests the expand function on a group with
+    * no previous branch
+    */
+   @Test
+   public void testExpandGroupNoPrev() throws Exception {
+      
+   }
+   
+   /**
+    * Launches "TODO" and tests the collapse function on a group with
+    * a previous branch
+    */
+   @Test
+   public void testCollapseGroupWithPrev() throws Exception {
+      
+   }
+   
+   /**
+    * Launches "TODO" and tests the expand function on a group with
+    * a previous branch
+    */
+   @Test
+   public void testExpandGroupWithPrev() throws Exception {
+      
+   }
+   
+   /**
+    * Launches "TODO" and tests the collapse function on a loop
+    */
+   @Test
+   public void testCollapseLoop() throws Exception {
+      
+   }
+   
+   /**
+    * Launches "TODO" and tests the expand function on a loop
+    */
+   @Test
+   public void testExpandLoop() throws Exception {
+      
+   }
+   
+   /**
+    * Launches "TODO" and tests the collapse function on the iterations
+    * of a loop
+    */
+   @Test
+   public void testCollapseLoopIterations() throws Exception {
+      
+   }
+   
+   /**
+    * Launches "TODO" and tests the expand function on the iterations
+    * of a loop
+    */
+   @Test
+   public void testExpandLoopIterations() throws Exception {
+      
+   }
+   
+   /**
+    * Launches "TODO" and tests the automatic collapse of the diagram
+    */
+   @Test
+   public void testAutoCollapseResume() throws Exception {
+      
+   }
+   
+   /**
+    * Launches "TODO" and tests the automatic collapse of groups
+    * with StepInto-Execution
+    */   
+   @Test
+   public void testAutoCollapseStepInto() throws Exception {
+      
+   }
+   
+   /**
+    * Launches "TODO" and tests the left special case specified in
+    * "Guided Navigations in Symbolic Execution Trees" chapter 5.2.2
+    */
+   @Test
+   public void testBigNodeSmallSubtreeLeft() throws Exception {
+      
+   }
+   
+   /**
+    * Launches "TODO" and tests the right special case specified in
+    * "Guided Navigations in Symbolic Execution Trees" chapter 5.2.2
+    */   
+   @Test
+   public void testBigNodeSmallSubtreeRight() throws Exception {
+      
    }
    
 //   @Test

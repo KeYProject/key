@@ -20,7 +20,7 @@ import org.key_project.util.java.ArrayUtil;
 
 /**
  * <p>
- * Iterates preorder over the whole sub tree of a given {@link ISEDGroupable}.
+ * Iterates preorder over the whole group of a given {@link ISEDGroupable}.
  * </p>
  * <p>
  * Instances of this class should always be used instead of recursive method
@@ -32,7 +32,7 @@ import org.key_project.util.java.ArrayUtil;
  * that elements are left or visited multiple times. For this reason it is forbidden
  * to change the model during iteration. But the developer has to take care about it.
  * </p>
- * @author Martin Hentschel
+ * @author Martin Möller
  * @see ISEDIterator
  */
 public class SEDGroupPreorderIterator implements ISEDIterator {
@@ -48,18 +48,18 @@ public class SEDGroupPreorderIterator implements ISEDIterator {
    private ISEDDebugNode next;
    
    /**
-    * The Group we iterate over
+    * The group to iterate over
     */
    private ISEDGroupable groupStart;
    
    /**
-    * States if all Groupbranches are finished or not
+    * States if all branches of the group are finished or not
     */
    boolean allBranchesFinished = true;
    
    /**
     * Constructor.
-    * @param start The {@link ISEDGroupable} to iterate over its sub tree.
+    * @param start The {@link ISEDGroupable} to iterate over its group.
     */
    public SEDGroupPreorderIterator(ISEDGroupable start) {
       this.start = (ISEDDebugNode) start;
@@ -69,8 +69,8 @@ public class SEDGroupPreorderIterator implements ISEDIterator {
    
    /**
     * Constructor.
-    * @param start The {@link ISEDDebugNode} to iterate over its sub tree.
-    * @param mc The Group in which we iterate
+    * @param start The {@link ISEDDebugNode} to iterate over its group.
+    * @param group The group in which we iterate
     */
    public SEDGroupPreorderIterator(ISEDGroupable group, ISEDDebugNode start) {      
       this.start = start;
@@ -168,12 +168,17 @@ public class SEDGroupPreorderIterator implements ISEDIterator {
       return null;
    }
    
+   /**
+    * Determines if all branches of the group are finished (True) or not (False).
+    * @return True if all branches of the group are finished, False otherwise.
+    * @throws DebugException Occured Exception.
+    */
    public boolean allBranchesFinished() throws DebugException {
       while(hasNext()) {
          next();
          // No need to visit the rest of the group
          if(!allBranchesFinished) {
-            return allBranchesFinished;
+            return false;
          }
       }
       

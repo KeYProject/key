@@ -72,6 +72,9 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
       return NodeUtil.canBeGrouped(businessObject);
    }
    
+   /**
+    * {@inheritDoc}
+    */
    @Override
    public void execute(ICustomContext context) {
       PictogramElement[] pes = context.getPictogramElements();
@@ -94,15 +97,14 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
                color = iter.allBranchesFinished() ? new ColorConstant(102, 180, 0) : new ColorConstant(255, 102, 0);
                
                removeChildren(groupStart);
-//               removeConnections(pes[1]);
-               
                groupStart.setCollapsed(true);
-
                updateCollapse(groupStart, uf, monitor);
             }
             else {
+               // Remove the BranchConditions and their connections
                DefaultRemoveFeature drf = new DefaultRemoveFeature(getFeatureProvider());
                ISEDBranchCondition[] bcs = NodeUtil.getSortedBCs(groupStart);
+               
                for(ISEDBranchCondition bc : bcs) {
                   PictogramElement bcPE = uf.getPictogramElementForBusinessObject(bc);
                   removeConnections(bcPE, drf);
@@ -122,8 +124,10 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
                
                groupStart.setCollapsed(false);
                
+               // Re-add the group nodes
                uf.update(uc);
 
+               // Add connections to the endnodes of the group
                for(ISEDBranchCondition bc : bcs) {
                   ISEDDebugNode groupEnd = bc.getChildren()[0];
 
@@ -133,12 +137,7 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
                   createConnection((AnchorContainer)parentPE, (AnchorContainer)groupEndPE);
                }
 
-//               uf.resizeRectsIfNeeded(groupStart, monitor);
-//               
-//               if(NodeUtil.getGroupStartNode((ISEDDebugNode) groupStart) != null) {
-//                  shrinkRectHeights(groupStart, uf);
-//               }
-               
+               // Reset the color to blue
                color = new ColorConstant(102, 80, 180);
             }
             
@@ -170,12 +169,7 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
          if(above > rectGA.getWidth()) {
             nodeGA.setX(nodeGA.getX() - (above - nodeGA.getWidth()) / 2);
          }
-//         else
-//            nodeGA.setX(maxX);
       }
-//      else {
-//         nodeGA.setX(rectGA.getX());
-//      }
       
       for(ISEDBranchCondition bc : bcs)
       {
@@ -204,6 +198,7 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
             groupEndGA.setX(newX);
          }
 
+         // TODO check if needed
          if(bcGA.getWidth() < groupEndGA.getWidth() && bcs.length == 1) {
             bcGA.setX(groupEndGA.getX() + (groupEndGA.getWidth() - bcGA.getWidth()) / 2);
 //            mrGA.setX(mrGA.getX() - METOFF);
@@ -360,10 +355,9 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
    }
    
    /**
-    * This function removes all children and connections inside the given group
-    * It will remove the connections of the start- and endnodes but not the nodes itself
-    * @param ISEDGroupable groupStart The start node of the Group
-    * @throws DebugException
+    * This function removes all children and connections inside the given group (methodbody).
+    * @param ISEDGroupable groupStart The start node of the group.
+    * @throws DebugException Occured Exception.
     */
    protected void removeChildren(ISEDGroupable groupStart) throws DebugException {
       DefaultRemoveFeature drf = new DefaultRemoveFeature(getFeatureProvider());
@@ -380,11 +374,14 @@ public abstract class AbstractDebugNodeCollapseFeature extends AbstractCustomFea
                 continue;
             }
             
+            // Remove the connections of the node 
             removeConnections((NodeUtil.canBeGrouped(nextNode) ? pes[1] : pes[0]), drf);
             
+            // If its a node of the methodbody we can remove it
             if(nextNode != (ISEDDebugNode) groupStart) {
                drf.remove(new RemoveContext(pes[0]));
                
+               // If the node opens an other group we need to remove the rect too 
                if(NodeUtil.canBeGrouped(nextNode)) {
                   drf.remove(new RemoveContext(pes[1]));
                }
