@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.TacletForTests;
+import org.antlr.runtime.RecognitionException;
 
 public class TestTermParser extends AbstractTestTermParser {
 
@@ -54,7 +55,7 @@ public class TestTermParser extends AbstractTestTermParser {
     }
 
     @Override
-    public void setUp() {	
+    public void setUp() throws RecognitionException {	
         
         /*
          * Setting up only static variables here. It needs to be called only once.

@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.logic.Term;
+import org.antlr.runtime.RecognitionException;
 
 /**
  * Testing pretty-printing and parsing of seqGet terms in this class.
@@ -14,7 +15,7 @@ public class TestTermParserSequence extends AbstractTestTermParser {
     }
 
     @Override
-    public void setUp() {
+    public void setUp() throws RecognitionException {
         parseDecls("\\programVariables {Seq s;}");
         parseDecls("\\programVariables {int i;}");
     }

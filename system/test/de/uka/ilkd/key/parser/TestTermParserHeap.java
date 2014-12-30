@@ -6,6 +6,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import static de.uka.ilkd.key.parser.KeYParserF.NO_HEAP_EXPRESSION_BEFORE_AT_EXCEPTION_MESSAGE;
 import java.io.IOException;
+import org.antlr.runtime.RecognitionException;
 
 /**
  * Parser tests for heap terms.
@@ -25,7 +26,7 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     @Override
-    public void setUp() {
+    public void setUp() throws RecognitionException {
         parseDecls("\\programVariables {Heap h, h2;}");
         parseDecls("\\programVariables {int i;}");
         parseDecls("\\programVariables {testTermParserHeap.A a;}");
