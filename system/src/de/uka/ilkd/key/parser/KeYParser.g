@@ -325,7 +325,7 @@ options {
                                       "No file. KeYParser.parseTaclet(\n" + s + ")\n"),
                               services,
                               services.getNamespaces());
-	    return p.taclet(DefaultImmutableSet.<Choice>nil());
+	    return p.taclet(DefaultImmutableSet.<Choice>nil(), false);
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
 	    PrintWriter pw = new PrintWriter(sw);
@@ -689,6 +689,10 @@ options {
     				   TokenStreamException*/ {
       onlyWith=true;
       problem();
+    }
+
+    public Taclet taclet(ImmutableSet<Choice> choices) throws RecognitionException {
+       return taclet(choices, false);
     }
 
     private void schema_var_decl(String name, 
@@ -3604,20 +3608,40 @@ triggers[TacletBuilder b]
    }
 ;
 
-taclet[ImmutableSet<Choice> choices] returns [Taclet r] 
+taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r] 
 @init{ 
     ifSeq = Sequent.EMPTY_SEQUENT;
     TacletBuilder b = null;
     int applicationRestriction = RewriteTaclet.NONE;
     choices_ = choices;
+    switchToNormalMode();
 }
     : 
-        name=IDENT (choices_=option_list[choices_])? 
-        LBRACE {
-	  //  schema var decls
-	  namespaces().setVariables(new Namespace(variables()));
-        } 
-	( SCHEMAVAR one_schema_var_decl ) *
+      name=IDENT (choices_=option_list[choices_])? 
+      LBRACE 
+      ( (formula RBRACE) => /* check for rbrace needed to distinguish from "label" : goalspec*/ 
+         { if(!axiomMode) { semanticError("formula rules are only permitted for \\axioms"); }           }
+         form=formula { r = null; }
+         { b = createTacletBuilderFor(null, RewriteTaclet.NONE);
+           SequentFormula sform = new SequentFormula(form);
+           Semisequent semi = new Semisequent(sform);
+           Sequent addSeq = Sequent.createAnteSequent(semi);
+           ImmutableList<Taclet> noTaclets = ImmutableSLList.<Taclet>nil();
+           DefaultImmutableSet<SchemaVariable> noSV = DefaultImmutableSet.<SchemaVariable>nil();
+           addGoalTemplate(b, null, null, addSeq, noTaclets, noSV, null);
+           b.setName(new Name(name.getText()));
+           b.setChoices(choices_);
+           r = b.getTaclet(); 
+           taclet2Builder.put(r,b);
+         }
+      |
+
+        {
+           switchToSchemaMode();
+           //  schema var decls
+           namespaces().setVariables(new Namespace(variables()));
+        }
+        ( SCHEMAVAR one_schema_var_decl ) *
         ( ASSUMES LPAREN ifSeq=seq RPAREN ) ?
         ( FIND LPAREN find = termorseq RPAREN 
             (   SAMEUPDATELEVEL { applicationRestriction |= RewriteTaclet.SAME_UPDATE_LEVEL; }
@@ -3634,7 +3658,6 @@ taclet[ImmutableSet<Choice> choices] returns [Taclet r]
         ( VARCOND LPAREN varexplist[b] RPAREN ) ?
         goalspecs[b, find != null]
         modifiers[b]
-        RBRACE
         { 
             b.setChoices(choices_);
             r = b.getTaclet(); 
@@ -3642,6 +3665,8 @@ taclet[ImmutableSet<Choice> choices] returns [Taclet r]
 	  // dump local schema var decls
 	  namespaces().setVariables(variables().parent());
         }
+    )
+    RBRACE
     ;
 
 modifiers[TacletBuilder b]
@@ -4266,7 +4291,7 @@ tacletlist returns [ImmutableList<Taclet> _taclet_list]
 }
 @after{ _taclet_list = lor; }
     :
-        head=taclet[DefaultImmutableSet.<Choice>nil()]   
+        head=taclet[DefaultImmutableSet.<Choice>nil(), false]   
         ( /*empty*/ | COMMA lor=tacletlist) { lor = lor.prepend(head); }
     ;
 
@@ -4408,6 +4433,7 @@ one_invariant[ParsableVariable selfVar]
 
 problem returns [ Term _problem = null ]
 @init {
+    boolean axiomMode = false;
     int beginPos = 0;
     choices=DefaultImmutableSet.<Choice>nil();
     chooseContract = this.chooseContract;
@@ -4441,13 +4467,16 @@ problem returns [ Term _problem = null ]
 	// isn't it?
 	( contracts )*
 	( invariants )*
-        (  RULES (choices = option_list[choices])?
+        (  ( RULES { axiomMode = false;} 
+           | AXIOMS { axiomMode = true;}
+           )
+        ( choices = option_list[choices] )?
 	    LBRACE
             { 
                 switchToSchemaMode(); 
             }
             ( 
-                s = taclet[choices] SEMI
+                s = taclet[choices, axiomMode] SEMI
                 {
                         if (!skip_taclets) {
                             final RuleKey key = new RuleKey(s); 

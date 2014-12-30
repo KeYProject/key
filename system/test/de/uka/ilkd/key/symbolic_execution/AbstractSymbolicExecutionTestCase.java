@@ -40,9 +40,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.core.AutoModeListener;
 import de.uka.ilkd.key.core.Main;
-import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Position;
@@ -68,8 +65,12 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.settings.ChoiceSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder.SymbolicExecutionCompletions;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
@@ -1048,17 +1049,18 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param oracleIndex The index of the current step.
     * @param oracleFileExtension The oracle file extension
     * @param baseDir The base directory for oracles.
+    * @return The found {@link SymbolicExecutionCompletions}.
     * @throws IOException Occurred Exception
     * @throws ProofInputException Occurred Exception
     * @throws ParserConfigurationException Occurred Exception
     * @throws SAXException Occurred Exception
     */
-   protected static void stepInto(CustomUserInterface ui, 
-                                  SymbolicExecutionTreeBuilder builder, 
-                                  String oraclePathInBaseDirFile, 
-                                  int oracleIndex, 
-                                  String oracleFileExtension, 
-                                  File baseDir) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+   protected static SymbolicExecutionCompletions stepInto(CustomUserInterface ui, 
+                                                          SymbolicExecutionTreeBuilder builder, 
+                                                          String oraclePathInBaseDirFile, 
+                                                          int oracleIndex, 
+                                                          String oracleFileExtension, 
+                                                          File baseDir) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
       // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
       Proof proof = builder.getProof();
       ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_FOR_ONE_STEP);
@@ -1066,9 +1068,10 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Run proof
       ui.startAndWaitForAutoMode(proof);
       // Update symbolic execution tree 
-      builder.analyse();
+      SymbolicExecutionCompletions completions = builder.analyse();
       // Test result
       assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, oracleIndex, oracleFileExtension, baseDir);
+      return completions;
    }
    
    /**

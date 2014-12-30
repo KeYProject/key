@@ -73,10 +73,6 @@ public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
     */
    protected void doTestAllExamples(boolean srcDir) throws Exception {
       final Set<String> EXAMPLES_WITH_COMPILER_FAILURES = new HashSet<String>();
-      EXAMPLES_WITH_COMPILER_FAILURES.add("Java 5 Enhanced-for");
-      EXAMPLES_WITH_COMPILER_FAILURES.add("Simple E-Voting");
-      EXAMPLES_WITH_COMPILER_FAILURES.add("List with Sequences");
-      EXAMPLES_WITH_COMPILER_FAILURES.add("Permuted Sum");
 
       final Set<String> BROKEN_PROOF_FILE_PATHES = new HashSet<String>();
       BROKEN_PROOF_FILE_PATHES.add("/SWTBotKeYExampleNewWizardTest_Transaction_project/JML operation contract (id_ 9 - Transaction__Transaction).proof");
@@ -92,6 +88,7 @@ public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
       BROKEN_PROOF_FILE_PATHES.add("/SWTBotKeYExampleNewWizardTest_List with Sequences_project/LinkedList(LinkedList__remove(java.lang.Object)).JML normal_behavior operation contract.1.proof");
       BROKEN_PROOF_FILE_PATHES.add("/SWTBotKeYExampleNewWizardTest_4 - N Queens_project/Queens_search.proof");
       BROKEN_PROOF_FILE_PATHES.add("/SWTBotKeYExampleNewWizardTest_5 - Red-Black Trees_project/project.key");
+      BROKEN_PROOF_FILE_PATHES.add("/SWTBotKeYExampleNewWizardTest_Declassification - Sum_project/project.key");
 
       BROKEN_PROOF_FILE_PATHES.add("/SWTBotKeYExampleNewWizardTest_Transaction_src/JML operation contract (id_ 9 - Transaction__Transaction).proof");
       BROKEN_PROOF_FILE_PATHES.add("/SWTBotKeYExampleNewWizardTest_Transaction_src/JML operation contract (id_ 8 - Transaction__getTotal).proof");
@@ -106,6 +103,7 @@ public class SWTBotKeYExampleNewWizardTest extends AbstractSetupTestCase {
       BROKEN_PROOF_FILE_PATHES.add("/SWTBotKeYExampleNewWizardTest_List with Sequences_src/LinkedList(LinkedList__remove(java.lang.Object)).JML normal_behavior operation contract.1.proof");
       BROKEN_PROOF_FILE_PATHES.add("/SWTBotKeYExampleNewWizardTest_4 - N Queens_src/Queens_search.proof");
       BROKEN_PROOF_FILE_PATHES.add("/SWTBotKeYExampleNewWizardTest_5 - Red-Black Trees_src/project.key");
+      BROKEN_PROOF_FILE_PATHES.add("/SWTBotKeYExampleNewWizardTest_Declassification - Sum_src/project.key");
       
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       // Close welcome view

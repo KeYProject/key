@@ -13,7 +13,11 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -35,12 +39,21 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Triple;
 
 public final class IntroAtPreDefsOp extends AbstractTermTransformer {
+
+    private static final Comparator<LocationVariable> LOCVAR_COMPARATOR =
+            new Comparator<LocationVariable>() {
+        @Override
+        public int compare(LocationVariable o1, LocationVariable o2) {
+            return o1.name().compareTo(o2.name());
+        }
+    };
+
 
     public IntroAtPreDefsOp() {
         super(new Name("#introAtPreDefs"), 1);
@@ -114,12 +127,40 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
           services.getNamespaces().programVariables().addSafely(l);
           final Term u = TB.elementary(l, TB.var(heap));
           if(atPreUpdate == null) {
-             atPreUpdate =u;
+             atPreUpdate = u;
           }else{
              atPreUpdate = TB.parallel(atPreUpdate, u);
           }
           atPres.put(heap, TB.var(l));
           atPreVars.put(heap, l);
+        }
+
+        //create atPre for parameters
+        for (LoopStatement loop : loops) {
+            LoopInvariant inv
+               = services.getSpecificationRepository().getLoopInvariant(loop);
+            if(inv != null) {
+                // Nasty bug! The order of these things was not constant! Would fail indeterministically
+                // when reloading. Better sort the variables.
+                List<LocationVariable> keys = new ArrayList<LocationVariable>(inv.getInternalAtPres().keySet());
+                Collections.sort(keys, LOCVAR_COMPARATOR);
+                for (LocationVariable var : keys) {
+                    if(atPres.containsKey(var)) {
+                        // heaps have already been considered, or more than one loop
+                        continue;
+                    }
+                    final LocationVariable l = TB.heapAtPreVar(var.name()+"Before_" + methodName, var.sort(), true);
+                    services.getNamespaces().programVariables().addSafely(l);
+                    final Term u = TB.elementary(l, TB.var(var));
+                    if(atPreUpdate == null) {
+                        atPreUpdate = u;
+                    } else {
+                        atPreUpdate = TB.parallel(atPreUpdate, u);
+                    }
+                    atPres.put(var, TB.var(l));
+                    atPreVars.put(var, l);
+                }
+            }
         }
 
         //update loop invariants
@@ -151,10 +192,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                   final Term m = inv.getModifies(heap, selfTerm, atPres, services);
                   final ImmutableList<InfFlowSpec> infFlowSpecs =
                                  inv.getInfFlowSpecs(heap, selfTerm, atPres, services);
-                  final Term i = inv.getInvariant(heap, selfTerm, atPres, services);
+                  final Term in = inv.getInvariant(heap, selfTerm, atPres, services);
                   if(m != null) { newMods.put(heap, m); }
                   newInfFlowSpecs.put(heap, infFlowSpecs);
-                  if(i != null) { newInvariants.put(heap, i); }
+                  if(in != null) { newInvariants.put(heap, in); }
                 }
                 ImmutableList<Term> newLocalIns = TB.var(MiscTools.getLocalIns(loop, services));
                 ImmutableList<Term> newLocalOuts = TB.var(MiscTools.getLocalOuts(loop, services));

@@ -17,10 +17,10 @@ import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.Properties;
 
-import de.uka.ilkd.key.gui.configuration.SettingsConverter;
-import de.uka.ilkd.key.gui.configuration.SettingsListener;
+import de.uka.ilkd.key.settings.SettingsConverter;
+import de.uka.ilkd.key.settings.SettingsListener;
 
-public class LemmaGeneratorSettings implements de.uka.ilkd.key.gui.configuration.Settings, Cloneable {
+public class LemmaGeneratorSettings implements de.uka.ilkd.key.settings.Settings, Cloneable {
         private LinkedList<SettingsListener> listeners = new LinkedList<SettingsListener>();
         private boolean showDialogAddingAxioms = true;
         private boolean showDialogUsingAxioms = true;

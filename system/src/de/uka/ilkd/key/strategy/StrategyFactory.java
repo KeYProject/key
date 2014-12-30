@@ -13,9 +13,9 @@
 
 package de.uka.ilkd.key.strategy;
 
-import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 /**
  * Interface for creating Strategy instances.

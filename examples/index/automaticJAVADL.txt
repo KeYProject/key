@@ -182,6 +182,7 @@ provable: ./heap/simple/operation_contracts.key
 provable: ./heap/simple/select_store.key
 provable: ./heap/simple/selection_sort.key
 provable: ./heap/simple/seq.key
+provable: ./heap/simple/oldForParams.key
 provable: ./heap/SmansEtAl/ArrayList_add.key
 provable: ./heap/SmansEtAl/ArrayList_ArrayList.key
 provable: ./heap/SmansEtAl/ArrayList_footprint.key

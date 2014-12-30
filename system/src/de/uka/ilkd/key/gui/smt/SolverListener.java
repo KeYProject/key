@@ -14,8 +14,19 @@
 package de.uka.ilkd.key.gui.smt;
 
 import java.awt.Color;
-import java.io.*;
-import java.util.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
@@ -27,11 +38,17 @@ import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.ProgressDialogListener;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.smt.*;
+import de.uka.ilkd.key.smt.RuleAppSMT;
+import de.uka.ilkd.key.smt.SMTProblem;
+import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
 import de.uka.ilkd.key.smt.SMTSolver.SolverState;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
+import de.uka.ilkd.key.smt.SolverLauncher;
+import de.uka.ilkd.key.smt.SolverLauncherListener;
+import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
 public class SolverListener implements SolverLauncherListener {
@@ -45,6 +62,7 @@ public class SolverListener implements SolverLauncherListener {
         private int         finishedCounter;
         private Timer timer = new Timer();
         private final SMTSettings settings;
+        private final Proof smtProof;
         private final static Color RED = new Color(180, 43, 43);
         private final static Color GREEN = new Color(43, 180, 43);
         private static int FILE_ID = 0;
@@ -135,8 +153,9 @@ public class SolverListener implements SolverLauncherListener {
         }
         
 
-        public SolverListener(SMTSettings settings) {
+        public SolverListener(SMTSettings settings, Proof smtProof) {
                 this.settings = settings;
+                this.smtProof = smtProof;
         }
 
         @Override
@@ -587,10 +606,10 @@ public class SolverListener implements SolverLauncherListener {
             public void discardButtonClicked() {
                     discardEvent(launcher);
                     //remove semantics blasting proof for ce dialog
-                    if(counterexample){
+                    if(counterexample && smtProof != null){
                     	MainWindow mw = MainWindow.getInstance();
                         KeYMediator mediator = mw.getMediator();
-                    	mediator.getUI().removeProof(mediator.getSelectedProof());
+                    	mediator.getUI().removeProof(smtProof);
                     }
                     
             }

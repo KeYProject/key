@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call SymbolicExecutionCompletionsTest.magic(x)&gt;" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (x&gt;=0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+         <branchCondition name="gt(x,Z(neglit(1(#))))" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="true" branchCondition="gt(x,Z(neglit(1(#))))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="return x;" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged="false">
+               <completedBlockEntry path="/0/0" conditionString="gt(x,Z(neglit(1(#))))"/>
+            </statement>
+         </branchCondition>
+         <branchCondition name="lt(x,Z(0(#)))" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="true" branchCondition="lt(x,Z(0(#)))" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="x++;" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false">
+            </statement>
+         </branchCondition>
+         <blockCompletionEntry path="/0/0/0/0"/>
+      </branchStatement>
+   </methodCall>
+</start>

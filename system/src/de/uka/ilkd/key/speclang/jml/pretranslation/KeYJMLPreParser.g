@@ -540,7 +540,7 @@ generic_spec_case[ImmutableList<String> mods, Behavior b]
     (abbrvs=spec_var_decls)?
     (requires=spec_header
        ( options { greedy = true; }
-	 : result = generic_spec_body[mods, b] )?
+	 : result = generic_spec_body[mods, b, result] )?
         {
 		if (result.isEmpty()) {
 		      result = result.append(new TextualJMLSpecCase(mods, b));
@@ -557,7 +557,7 @@ generic_spec_case[ImmutableList<String> mods, Behavior b]
 			}
 	        }
         }
-    | result = generic_spec_body[mods, b]
+    | result = generic_spec_body[mods, b, result]
     )
 ;
 
@@ -608,7 +608,7 @@ requires_keyword
 ;
 
 
-generic_spec_body[ImmutableList<String> mods, Behavior b]
+generic_spec_body[ImmutableList<String> mods, Behavior b, ImmutableList<TextualJMLConstruct> specs]
 	returns [ImmutableList<TextualJMLConstruct> r = null]
 	throws SLTranslationException
 @init {
@@ -620,20 +620,29 @@ generic_spec_body[ImmutableList<String> mods, Behavior b]
     result=simple_spec_body[mods, b]
     |
     (
-        NEST_START
-	result=generic_spec_case_seq[mods, b]
-	NEST_END
+      NEST_START
+	    result=generic_spec_case_seq[mods, b, specs]
+	    NEST_END
     )
 ;
 
 
-generic_spec_case_seq[ImmutableList<String> mods, Behavior b]
-	returns [ImmutableList<TextualJMLConstruct> r = null]
+generic_spec_case_seq[ImmutableList<String> mods, Behavior b, ImmutableList<TextualJMLConstruct> specs]
+	returns [ImmutableList<TextualJMLConstruct> r = ImmutableSLList.nil()]
 	throws SLTranslationException
 @init {
     result = r;
 }
-@after { r = result; }
+@after {
+    for (TextualJMLConstruct tc: result)
+        for (TextualJMLConstruct z: specs) {
+            TextualJMLSpecCase a = (TextualJMLSpecCase) tc;
+            TextualJMLSpecCase c = (TextualJMLSpecCase) z;
+            System.out.println("---Contract A:\n"+a);
+            System.out.println("---Contract B:\n"+c);
+            r.append(a.merge(c));
+        }
+}
 :
     result=generic_spec_case[mods, b]
     (
@@ -1464,7 +1473,7 @@ assert_statement[ImmutableList<String> mods]
 	result = ImmutableSLList.<TextualJMLConstruct>nil().append(TextualJMLSpecCase.assert2blockContract(mods,ps));
     }
     |
-    UNREACHABLE
+    UNREACHABLE SEMICOLON
     {
   result = ImmutableSLList.<TextualJMLConstruct>nil().append(TextualJMLSpecCase.assert2blockContract(mods,new PositionedString("false")));
     }

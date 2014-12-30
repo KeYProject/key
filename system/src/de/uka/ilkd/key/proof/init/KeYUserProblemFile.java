@@ -15,7 +15,6 @@ package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
 
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
@@ -26,6 +25,7 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.io.CountingBufferedReader;
 import de.uka.ilkd.key.proof.io.IProofFileParser;
 import de.uka.ilkd.key.proof.io.KeYFile;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import org.antlr.runtime.RecognitionException;

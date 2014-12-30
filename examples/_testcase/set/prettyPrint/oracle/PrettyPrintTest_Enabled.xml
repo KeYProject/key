@@ -99,6 +99,10 @@ termination: diamond" pathCondition="x &gt;  -1" pathConditionChanged="false" re
                         <value name="savedHeapBefore_main {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </callStateVariable>
+                     <callStateVariable name="xBefore_main" isArrayIndex="false">
+                        <value name="xBefore_main {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </callStateVariable>
                   </methodReturn>
                </operationContract>
                <completedBlockEntry path="/0/0" conditionString="x &gt;  -1"/>
@@ -254,6 +258,10 @@ mod: false" pathCondition="x &lt; 0" pathConditionChanged="false" initiallyValid
                         </callStateVariable>
                         <callStateVariable name="savedHeapBefore_main" isArrayIndex="false">
                            <value name="savedHeapBefore_main {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </callStateVariable>
+                        <callStateVariable name="xBefore_main" isArrayIndex="false">
+                           <value name="xBefore_main {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </callStateVariable>
                      </methodReturn>
