@@ -1,11 +1,6 @@
 package de.uka.ilkd.key.parser;
 
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.util.HelperClassForTests;
-import java.io.File;
-import java.io.IOException;
 
 /**
  * Testing pretty-printing and parsing of seqGet terms in this class.
@@ -19,22 +14,12 @@ public class TestTermParserSequence extends AbstractTestTermParser {
     }
 
     @Override
-    protected Services getServices() {
-        /*
-         * Re-used code from TestTermParserHeap here.
-         */
-        JavaInfo javaInfo = new HelperClassForTests().parse(
-                new File(TestTermParserHeap.javaPath)).getFirstProof().getJavaInfo();
-        return javaInfo.getServices();
-    }
-
-    @Override
     public void setUp() {
         parseDecls("\\programVariables {Seq s;}");
         parseDecls("\\programVariables {int i;}");
     }
 
-    public void testParsePrettySyntax() throws IOException {
+    public void testParsePrettySyntax() throws Exception {
         /*
          * Test any::seqGet(s,i)
          */
