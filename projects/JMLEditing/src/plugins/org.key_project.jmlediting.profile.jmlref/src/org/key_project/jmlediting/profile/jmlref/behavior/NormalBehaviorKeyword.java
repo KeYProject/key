@@ -1,9 +1,11 @@
 package org.key_project.jmlediting.profile.jmlref.behavior;
 
+import org.key_project.jmlediting.profile.jmlref.KeywordLocale;
+
 public class NormalBehaviorKeyword extends AbstractBehaviorKeyword {
 
-   public NormalBehaviorKeyword() {
-      super("normal_behavior", "normal_behaviour");
+   public NormalBehaviorKeyword(final KeywordLocale lang) {
+      super(lang, "normal_behavior", "normal_behaviour");
    }
 
    @Override

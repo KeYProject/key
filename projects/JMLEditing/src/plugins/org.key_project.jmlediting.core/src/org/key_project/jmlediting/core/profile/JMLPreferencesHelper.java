@@ -67,7 +67,7 @@ public final class JMLPreferencesHelper {
          }
          for (final IJMLProfile p : allProfiles) {
             if (p.getIdentifier().equals(
-                  "org.key_project.jmlediting.profile.jmlref")) {
+                  "org.key_project.jmlediting.profile.jmlref.ae")) {
                profile = p;
             }
          }
@@ -176,7 +176,7 @@ public final class JMLPreferencesHelper {
          }
       };
       InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID)
-      .addPreferenceChangeListener(filteredlistener);
+            .addPreferenceChangeListener(filteredlistener);
 
       return listener;
    }
@@ -191,7 +191,7 @@ public final class JMLPreferencesHelper {
    public static void removeDefaultProfilePreferencesListener(
          final IPreferenceChangeListener listener) {
       InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID)
-      .removePreferenceChangeListener(listener);
+            .removePreferenceChangeListener(listener);
    }
 
    /**

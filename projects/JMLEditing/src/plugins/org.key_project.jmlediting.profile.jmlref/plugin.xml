@@ -4,7 +4,10 @@
    <extension
          point="org.key_project.jmlediting.core.profiles">
       <profile
-            class="org.key_project.jmlediting.profile.jmlref.JMLReferenceProfile">
+            class="org.key_project.jmlediting.profile.jmlref.JMLReferenceProfileAE">
+      </profile>
+      <profile
+            class="org.key_project.jmlediting.profile.jmlref.JMLReferenceProfileBE">
       </profile>
    </extension>
 

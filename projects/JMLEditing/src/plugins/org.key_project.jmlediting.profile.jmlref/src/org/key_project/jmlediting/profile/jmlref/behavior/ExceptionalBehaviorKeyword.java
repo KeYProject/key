@@ -1,9 +1,11 @@
 package org.key_project.jmlediting.profile.jmlref.behavior;
 
+import org.key_project.jmlediting.profile.jmlref.KeywordLocale;
+
 public class ExceptionalBehaviorKeyword extends AbstractBehaviorKeyword {
 
-   public ExceptionalBehaviorKeyword() {
-      super("exceptional_behavior", "exceptional_behaviour");
+   public ExceptionalBehaviorKeyword(final KeywordLocale lang) {
+      super(lang, "exceptional_behavior", "exceptional_behaviour");
    }
 
    @Override
