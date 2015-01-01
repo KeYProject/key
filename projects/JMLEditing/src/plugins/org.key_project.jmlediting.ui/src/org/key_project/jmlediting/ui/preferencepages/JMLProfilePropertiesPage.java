@@ -76,7 +76,10 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
                   @Override
                   public void preferenceChange(final PreferenceChangeEvent event) {
-                     JMLProfilePropertiesPage.this.updateSelection();
+                     if (!JMLProfilePropertiesPage.this.profilesList
+                           .isDisposed()) {
+                        JMLProfilePropertiesPage.this.updateSelection();
+                     }
                   }
                });
       }
@@ -164,7 +167,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
                   }
                   if (nothingChecked) {
                      JMLProfilePropertiesPage.this
-                           .setErrorMessage("Please select an active profile");
+                     .setErrorMessage("Please select an active profile");
                   }
                }
             }
@@ -244,6 +247,11 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
             return;
          }
 
+         if (currentProfile == null) {
+            this.setErrorMessage("Default JML Profile not available");
+            return;
+         }
+
       }
       assert currentProfile != null;
       // Select profile in the list
@@ -255,6 +263,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
          this.profilesList.getItem(index).setChecked(true);
       }
       else {
+
          this.setErrorMessage("Profile \"" + currentProfile.getName()
                + "\" is not available.");
       }
@@ -265,7 +274,7 @@ public class JMLProfilePropertiesPage extends PropertyAndPreferencePage {
 
    private void removePreferencesListener() {
       JMLPreferencesHelper
-            .removeDefaultProfilePreferencesListener(this.currentPreferenceListener);
+      .removeDefaultProfilePreferencesListener(this.currentPreferenceListener);
    }
 
    @Override
