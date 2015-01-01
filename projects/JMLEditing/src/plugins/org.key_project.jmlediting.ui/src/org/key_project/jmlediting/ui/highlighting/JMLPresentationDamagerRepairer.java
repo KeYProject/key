@@ -44,7 +44,7 @@ import org.key_project.util.eclipse.WorkbenchUtil;
  * @author David Giessing
  */
 public class JMLPresentationDamagerRepairer implements IPresentationDamager,
-      IPresentationRepairer {
+IPresentationRepairer {
 
    /**
     * The original instance of DefaultDamagerRepairer currently in use for
@@ -90,7 +90,7 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
          final ITypedRegion damage) {
       final RGB jmlColor = JMLUiPreferencesHelper.getWorkspaceJMLColor();
       final CommentLocator locator = new CommentLocator(this.doc.get());
-      final CommentRange surroundingComment = locator.getCommentOfOffset(damage
+      final CommentRange surroundingComment = locator.getJMLComment(damage
             .getOffset());
       final TextAttribute ta;
       if (surroundingComment != null) {
@@ -134,7 +134,7 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
       else {
          return new Region(surroundingComment.getBeginOffset(),
                surroundingComment.getEndOffset()
-                     - surroundingComment.getBeginOffset() + 1);
+               - surroundingComment.getBeginOffset() + 1);
       }
    }
 
@@ -253,7 +253,7 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
          // begin until the start of first Keyword)
          styles.add(new StyleRange(lastEnd, keywordStartOffset - lastEnd,
                defaultStyleRange.foreground, defaultStyleRange.background, attr
-                     .getStyle()));
+               .getStyle()));
          // Style for the Keyword
          styles.add(new StyleRange(keywordStartOffset, keywordEndOffset
                - keywordStartOffset, defaultStyleRange.foreground,

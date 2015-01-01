@@ -1,12 +1,16 @@
 package org.key_project.jmlediting.core.refactoring;
 
+import java.util.HashMap;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.jdt.core.IField;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
+import org.key_project.util.jdt.JDTUtil;
 
 /**
  * Provides extended Rename Refactoring for Local Variables JML Comments.
@@ -16,11 +20,21 @@ import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
  */
 public class JMLRenameFieldParticipant extends RenameParticipant {
 
+   /**
+    * initializes the RenameParticipant with the given element.
+    *
+    * @return true if element implements IField else returns false to not
+    *         further be part of the refactoring
+    */
    @Override
    protected boolean initialize(final Object element) {
-      // TODO Auto-generated method stub
-      System.out.println("Element" + element);
-      return true;
+      System.out.println("Element: " + element + "Type: " + element.getClass());
+      for (final Class<?> c : element.getClass().getInterfaces()) {
+         if (c.equals(IField.class)) {
+            return true;
+         }
+      }
+      return false;
    }
 
    @Override
@@ -33,14 +47,19 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
          final CheckConditionsContext context)
                throws OperationCanceledException {
       // TODO Auto-generated method stub
-      return null;
+      return new RefactoringStatus();
    }
 
    @Override
    public Change createChange(final IProgressMonitor pm) throws CoreException,
          OperationCanceledException {
-      System.out.println("Arguments " + this.getArguments());
+      System.out.println("Arguments: " + this.getArguments());
+      final HashMap changes;
+      final String newName = this.getArguments().getNewName();
+      final ASTNode parseResult = JDTUtil
+            .parse(compilationUnit, offset, length);
       // TODO Auto-generated method stub
       return null;
    }
+
 }
