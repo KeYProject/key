@@ -61,7 +61,7 @@ public class JMLCommentHighlightingTest {
 
    private SWTBotEclipseEditor editor = null;
 
-   private static final String PROJECT_NAME = "TestCompletion";
+   private static final String PROJECT_NAME = "CommentHighlightingProject";
    private static final String PACKAGE_NAME = "test";
    private static final String CLASS_NAME = "HighlightingTestClass";
 
