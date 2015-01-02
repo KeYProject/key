@@ -62,7 +62,7 @@ public class DefaultJMLParser implements IJMLParser {
          try {
             keywordNode = ParserUtils.parseKeyword(text, position,
 
-            end, JMLProfileHelper.filterKeywords(this.profile,
+                  end, JMLProfileHelper.filterKeywords(this.profile,
                         IToplevelKeyword.class), this.profile);
          }
          catch (final ParserException e) {
@@ -80,6 +80,8 @@ public class DefaultJMLParser implements IJMLParser {
                try {
                   nextPosition = LexicalHelper.findNextWhitespace(text,
                         textStart, end);
+                  nextPosition = position = skipWhiteSpacesOrAt(text,
+                        nextPosition, end, false);
                }
                catch (final ParserException e2) {
                   // No whitespace anymore, so take rest of the text

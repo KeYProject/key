@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
@@ -207,13 +208,13 @@ IPresentationRepairer {
                surroundingComment.getContentBeginOffset(),
                surroundingComment.getContentEndOffset() + 1);
          // Remove all error markers, because parsing was successful
-         this.createErrorMarkers(null);
+         this.createErrorMarkers(null, surroundingComment);
       }
       catch (final ParserException e) {
          // Invalid JML Code, no advanced SyntaxColoring possible
          parseResult = e.getErrorNode();
          // Create error markers for the parse errors
-         this.createErrorMarkers(e);
+         this.createErrorMarkers(e, surroundingComment);
       }
       if (parseResult == null) {
          return null;
@@ -273,13 +274,21 @@ IPresentationRepairer {
     *
     * @param exception
     */
-   private void createErrorMarkers(final ParserException exception) {
+   private void createErrorMarkers(final ParserException exception,
+         final CommentRange surroundingComment) {
       final IResource res = ResourceUtil.getResource(this.editorPart
             .getEditorInput());
       final IDocument doc = ((ITextEditor) this.editorPart)
             .getDocumentProvider()
             .getDocument(this.editorPart.getEditorInput());
-      ParseErrorMarkerUpdater.createErrorMarkers(res, doc, exception);
+      try {
+         ParseErrorMarkerUpdater.createErrorMarkers(res, doc, exception,
+               surroundingComment);
+      }
+      catch (final CoreException e) {
+         // Strange
+         throw new RuntimeException(e);
+      }
    }
 
 }
