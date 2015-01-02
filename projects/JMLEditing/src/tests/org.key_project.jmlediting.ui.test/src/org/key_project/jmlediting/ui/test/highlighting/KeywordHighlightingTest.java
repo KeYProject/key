@@ -113,8 +113,8 @@ public class KeywordHighlightingTest {
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID,
             "data/template", testFolder);
       bot.tree().getTreeItem(PROJECT_NAME).select().expand().getNode("src")
-            .select().expand().getNode(PACKAGE_NAME).select().expand()
-            .getNode(CLASS_NAME + ".java").select().doubleClick();
+      .select().expand().getNode(PACKAGE_NAME).select().expand()
+      .getNode(CLASS_NAME + ".java").select().doubleClick();
       JMLPreferencesHelper.setProjectJMLProfile(project.getProject(),
             TestUtils.findReferenceProfile());
    }
@@ -237,7 +237,7 @@ public class KeywordHighlightingTest {
 
       this.editor.insertText(ensuresJavaSLine.line,
             ensuresJavaSLine.column - 1, "@");
-      this.removeText(ensuresJMLSLine.column, ensuresJMLSLine.column - 2, 1);
+      this.removeText(ensuresJMLSLine.line, ensuresJMLSLine.column - 2, 1);
    }
 
    /**
@@ -248,17 +248,18 @@ public class KeywordHighlightingTest {
 
       this.removeText(ensuresJavaMLine.line - 1, 5, 1);
       this.removeText(ensuresJavaMLine.line, 4, 1);
-      this.removeText(ensuresJavaMLine.line + 1, 4, 1);
       this.editor.insertText(ensuresJavaMLine.line, 4, "*");
+      this.removeText(ensuresJavaMLine.line + 1, 4, 1);
 
       this.removeText(requiresJMLMline.line - 1, 8, 1);
-      this.editor.insertText(requiresJavaMLine.line - 1, 8, "@");
+      this.editor.insertText(requiresJMLMline.line - 1, 8, "@");
 
       this.removeText(ensuresJavaDoc.line - 2, 2, 1);
       this.editor.insertText(ensuresJavaDoc.line - 2, 2, "*");
       this.removeText(ensuresJavaDoc.line - 1, 1, 1);
       this.removeText(ensuresJavaDoc.line, 1, 1);
       this.removeText(ensuresJavaDoc.line + 1, 1, 1);
+      this.removeText(ensuresJavaDoc.line + 2, 1, 1);
       this.editor.insertText(ensuresJavaDoc.line - 1, 1, "*");
       this.editor.insertText(ensuresJavaDoc.line, 1, "*");
       this.editor.insertText(ensuresJavaDoc.line + 1, 1, "*");
@@ -270,8 +271,8 @@ public class KeywordHighlightingTest {
 
       this.removeText(ensuresJavaSLine.line, ensuresJavaSLine.column - 1, 1);
 
-      this.editor.insertText(ensuresJMLSLine.column,
-            ensuresJMLSLine.column - 2, "@");
+      this.editor.insertText(ensuresJMLSLine.line, ensuresJMLSLine.column - 2,
+            "@");
    }
 
    /**
