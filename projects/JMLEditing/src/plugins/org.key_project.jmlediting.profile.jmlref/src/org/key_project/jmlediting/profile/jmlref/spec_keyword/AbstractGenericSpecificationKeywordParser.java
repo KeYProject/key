@@ -9,14 +9,23 @@ import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.syntax.IKeywordParser;
 
+/**
+ * A default parser for the content of method specification keyword. It scans
+ * the given text for the closing semicolon and calls a parser for that string.
+ *
+ * @author Moritz Lichter
+ *
+ */
 public abstract class AbstractGenericSpecificationKeywordParser implements
 IKeywordParser {
 
    @Override
    public IASTNode parse(final String text, final int start, final int end)
          throws ParserException {
+      // Scan for the semicolon
       final int closingSemicolon = scanForClosingSemicolon(text, start, end);
 
+      // Now parse that
       try {
          final IASTNode contentResult = this.parseToSemicolon(text, start + 1,
 
@@ -25,6 +34,7 @@ IKeywordParser {
                closingSemicolon + 1, NodeTypes.KEYWORD_CONTENT, contentResult);
       }
       catch (final ParserException e) {
+         // Does not work, do error recovery
          final IASTNode errorNode = e.getErrorNode();
          if (errorNode != null) {
             // Parser was able to recover, so we do not need to insert an error
@@ -49,6 +59,19 @@ IKeywordParser {
       // explicitly
    }
 
+   /**
+    * Parses the content to the closing semicolon.
+    *
+    * @param text
+    *           the text to parse
+    * @param start
+    *           the start index
+    * @param end
+    *           the end index (the semicolon)
+    * @return the result {@link IASTNode}
+    * @throws ParserException
+    *            an exception if parsing was not successful
+    */
    protected abstract IASTNode parseToSemicolon(String text, int start, int end)
          throws ParserException;
 

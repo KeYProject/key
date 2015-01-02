@@ -1,7 +1,16 @@
 package org.key_project.jmlediting.profile.jmlref;
 
+/**
+ * The JML reference profile for British English keywords.
+ *
+ * @author Moritz Lichter
+ *
+ */
 public class JMLReferenceProfileBE extends JMLReferenceProfile {
 
+   /**
+    * Creates a new profile instance.
+    */
    public JMLReferenceProfileBE() {
       super(KeywordLocale.BRITISH);
    }
