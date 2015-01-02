@@ -11,6 +11,7 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.utils.Position;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -88,6 +89,7 @@ public class JMLCommentHighlightingTest {
    private final RGB character = new RGB(42, 0, 255);
    private final RGB jmlComment = JMLUiPreferencesHelper.getDefaultJMLColor();
 
+   private static IFolder testFolder;
    /*
     * Initialize a new Project and load the template class from data/template
     * with all kinds of Comments to test AutoCompletion in and open it.
@@ -97,13 +99,11 @@ public class JMLCommentHighlightingTest {
       final IJavaProject project = TestUtilsUtil
             .createJavaProject(PROJECT_NAME);
       final IFolder srcFolder = project.getProject().getFolder("src");
-      final IFolder testFolder = TestUtilsUtil.createFolder(srcFolder,
+      testFolder = TestUtilsUtil.createFolder(srcFolder,
             PACKAGE_NAME);
       BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID,
             "data/template", testFolder);
-      bot.tree().getTreeItem(PROJECT_NAME).select().expand().getNode("src")
-      .select().expand().getNode(PACKAGE_NAME).select().expand()
-      .getNode(CLASS_NAME + ".java").select().doubleClick();
+
       JMLPreferencesHelper.setProjectJMLProfile(project.getProject(),
             TestUtils.findReferenceProfile());
    }
@@ -113,7 +113,13 @@ public class JMLCommentHighlightingTest {
     * for Testing
     */
    @Before
-   public void initEditor() {
+   public void initEditor() throws CoreException {
+
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID,
+            "data/template", testFolder);
+      bot.tree().getTreeItem(PROJECT_NAME).select().expand().getNode("src")
+      .select().expand().getNode(PACKAGE_NAME).select().expand()
+      .getNode(CLASS_NAME + ".java").select().doubleClick();
       this.editor = bot.activeEditor().toTextEditor();
       /*
        * final JavaColorManager manager = new JavaColorManager(); this.string =
@@ -126,6 +132,12 @@ public class JMLCommentHighlightingTest {
        * = manager.getColor(IJavaColorConstants.JAVADOC_DEFAULT) .getRGB();
        */
 
+   }
+
+   @After
+   public void closeEditor() {
+      this.editor.close();
+      bot.sleep(200);
    }
 
    /*
@@ -145,7 +157,7 @@ public class JMLCommentHighlightingTest {
 
    @Test
    public void JMLMultiLineTest() {
-      this.checkColors(PosJMLCommentMulti.line, PosJMLCommentMulti.column, 39,
+      this.checkColors(PosJMLCommentMulti.line, PosJMLCommentMulti.column, 33,
             this.jmlComment, "Color did not Match JMLCommentColor");
    }
 
@@ -189,7 +201,7 @@ public class JMLCommentHighlightingTest {
    public void changeJMLMLineToJavaMLineTest() {
       this.removeText(new Position(PosJMLCommentMulti.line,
             PosJMLCommentMulti.column + 2), 1);
-      this.checkColors(PosJMLCommentMulti.line, PosJMLCommentMulti.column, 38,
+      this.checkColors(PosJMLCommentMulti.line, PosJMLCommentMulti.column, 33,
             this.javaCommentRGB, "Color did not Match JavaCommentColor");
       this.editor.insertText(PosJMLCommentMulti.line,
             PosJMLCommentMulti.column + 2, "@");
@@ -245,7 +257,7 @@ public class JMLCommentHighlightingTest {
             PosJMLCommentMulti.column + 2), 1);
       this.editor.insertText(PosJMLCommentMulti.line,
             PosJMLCommentMulti.column + 2, "*");
-      this.checkColors(PosJMLCommentMulti.line, PosJMLCommentMulti.column, 39,
+      this.checkColors(PosJMLCommentMulti.line, PosJMLCommentMulti.column, 33,
             this.javaDocRGB, "Color did not Match JavaDocColor");
       this.removeText(new Position(PosJMLCommentMulti.line,
             PosJMLCommentMulti.column + 2), 1);
@@ -257,7 +269,7 @@ public class JMLCommentHighlightingTest {
    public void changeJavaMLineToJavaDocTest() {
       this.editor.insertText(PosJCommentMulti.line,
             PosJCommentMulti.column + 2, "*");
-      this.checkColors(PosJCommentMulti.line, PosJCommentMulti.column, 52,
+      this.checkColors(PosJCommentMulti.line, PosJCommentMulti.column, 29,
             this.javaDocRGB, "Color did not Match JavaDocColor");
       this.removeText(new Position(PosJCommentMulti.line,
             PosJCommentMulti.column + 2), 1);
@@ -337,7 +349,9 @@ public class JMLCommentHighlightingTest {
       final StyleRange[] textColors = this.editor.getStyles(line, column,
             length);
       for (final StyleRange r : textColors) {
-         assertEquals(message, color, r.foreground.getRGB());
+         assertEquals(message + " at " + r.start + " with length " + r.length,
+               color, r.foreground.getRGB());
+
       }
    }
 
