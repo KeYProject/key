@@ -3,6 +3,8 @@ package org.key_project.jmlediting.ui.highlighting;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -19,9 +21,12 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.ide.ResourceUtil;
+import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IKeywordNode;
 import org.key_project.jmlediting.core.dom.Nodes;
+import org.key_project.jmlediting.core.marker.ParseErrorMarkerUpdater;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
@@ -83,15 +88,16 @@ IPresentationRepairer {
    @Override
    public void createPresentation(final TextPresentation presentation,
          final ITypedRegion damage) {
-      boolean jml = false;
       final RGB jmlColor = JMLUiPreferencesHelper.getWorkspaceJMLColor();
       final CommentLocator locator = new CommentLocator(this.doc.get());
-      jml = locator.isInJMLComment(damage.getOffset());
+      final CommentRange surroundingComment = locator.getJMLComment(damage
+            .getOffset());
       final TextAttribute ta;
-      if (jml) {
+      if (surroundingComment != null) {
          ta = new TextAttribute(new Color(Display.getDefault(), jmlColor.red,
                jmlColor.green, jmlColor.blue));
-         this.addRange(presentation, damage.getOffset(), damage.getLength(), ta);
+         this.modifyPresentationForJMLComment(presentation, ta,
+               surroundingComment);
       }
       else {
          // Normal Java Comment
@@ -141,28 +147,30 @@ IPresentationRepairer {
     *
     * @param presentation
     *           the text presentation to be extended
-    * @param offset
-    *           the offset of the range to be styled
-    * @param length
-    *           the length of the range to be styled
     * @param attr
     *           the attribute describing the style of the range to be styled
+    * @param surroundingComment
+    *           the comment to modify the presentation for
+    *
     * @throws BadLocationException
     */
 
-   protected void addRange(final TextPresentation presentation,
-         final int offset, final int length, final TextAttribute attr) {
+   protected void modifyPresentationForJMLComment(
+         final TextPresentation presentation, final TextAttribute attr,
+         final CommentRange surroundingComment) {
       if (attr != null) {
          final int style = attr.getStyle();
          final int fontStyle = style & (SWT.ITALIC | SWT.BOLD | SWT.NORMAL);
-         final StyleRange styleRange = new StyleRange(offset, length,
-               attr.getForeground(), attr.getBackground(), fontStyle);
+         final StyleRange styleRange = new StyleRange(
+               surroundingComment.getBeginOffset(),
+               surroundingComment.getLength(), attr.getForeground(),
+               attr.getBackground(), fontStyle);
          styleRange.strikeout = (style & TextAttribute.STRIKETHROUGH) != 0;
          styleRange.underline = (style & TextAttribute.UNDERLINE) != 0;
          styleRange.font = attr.getFont();
          presentation.addStyleRange(styleRange);
-         final StyleRange[] highlightedRanges = this.doKeywordHighlighting(
-               styleRange, offset, attr);
+         final StyleRange[] highlightedRanges = this.createStylesForJML(
+               styleRange, attr, surroundingComment);
          if (highlightedRanges != null) {
             presentation.mergeStyleRanges(highlightedRanges);
          }
@@ -171,32 +179,24 @@ IPresentationRepairer {
    }
 
    /**
-    * This Method creates StyleRanges for Highlighting JML Keywords.
+    * Creates an array of StyleRanges to add to the presentation for the JML
+    * content.
     *
     * @param defaultStyleRange
-    *           the default Style Range of the Section to process
-    * @param offset
-    *           the offset where the Section starts
+    *           the default style range of the comment
     * @param attr
-    *           the TextAttribute that is used by default
-    * @return a StyleRange Array that has the Styles for all keywords and the
-    *         rest which can be merged by the caller. returns null if no profile
-    *         is active, the offset is not in a JML Comment or the parse Result
-    *         is null
+    *           the text attributes of the comment
+    * @param surroundingComment
+    *           the comment currently working in
+    * @return the array of {@link StyleRange}s, may be null
     */
-   private StyleRange[] doKeywordHighlighting(
-         final StyleRange defaultStyleRange, final int offset,
-         final TextAttribute attr) {
+   private StyleRange[] createStylesForJML(final StyleRange defaultStyleRange,
+         final TextAttribute attr, final CommentRange surroundingComment) {
+      // Can only proceed if a profile is there
       if (!JMLPreferencesHelper.isAnyProfileAvailable()) {
          return null;
       }
-      // From here it is all about Highlighting for JML Keywords
-      final CommentLocator locator = new CommentLocator(this.doc.get());
-      final CommentRange surroundingComment = locator.getJMLComment(offset);
-      // Only provide advanced SyntaxHighlighting for JML Comments
-      if (!locator.isInJMLComment(offset)) {
-         return null;
-      }
+      // Parse the comment
       final IJMLProfile activeProfile = JMLPreferencesHelper
             .getProjectActiveJMLProfile(WorkbenchUtil
                   .getProject(this.editorPart));
@@ -206,16 +206,45 @@ IPresentationRepairer {
          parseResult = parser.parse(this.doc.get(),
                surroundingComment.getContentBeginOffset(),
                surroundingComment.getContentEndOffset() + 1);
+         // Remove all error markers, because parsing was successful
+         this.createErrorMarkers(null);
       }
       catch (final ParserException e) {
          // Invalid JML Code, no advanced SyntaxColoring possible
          parseResult = e.getErrorNode();
+         // Create error markers for the parse errors
+         this.createErrorMarkers(e);
       }
       if (parseResult == null) {
          return null;
       }
+      return this.doKeywordHighlighting(defaultStyleRange, attr, parseResult,
+            surroundingComment);
+   }
+
+   /**
+    * This Method creates StyleRanges for Highlighting JML Keywords.
+    *
+    * @param defaultStyleRange
+    *           the default Style Range of the Section to process
+    * @param attr
+    *           the TextAttribute that is used by default
+    * @param parseResult
+    *           the IASTNode which has been parsed for the JML Comment. The node
+    *           may be a result of parser recovery.
+    * @param surroundingComment
+    *           the comment range we are currently working in
+    * @return a StyleRange Array that has the Styles for all keywords and the
+    *         rest which can be merged by the caller. returns null if no profile
+    *         is active, the offset is not in a JML Comment or the parse Result
+    *         is null
+    */
+   private StyleRange[] doKeywordHighlighting(
+         final StyleRange defaultStyleRange, final TextAttribute attr,
+         final IASTNode parseResult, final CommentRange surroundingComment) {
+
       final List<IKeywordNode> allKeywords = Nodes.getAllKeywords(parseResult);
-      int lastEnd = offset;
+      int lastEnd = surroundingComment.getBeginOffset();
       final List<StyleRange> styles = new ArrayList<StyleRange>();
       for (final IKeywordNode kNode : allKeywords) {
          final int keywordStartOffset = kNode.getStartOffset();
@@ -235,13 +264,22 @@ IPresentationRepairer {
       styles.add(new StyleRange(lastEnd, surroundingComment.getEndOffset()
             - lastEnd + 1, defaultStyleRange.foreground,
             defaultStyleRange.background, attr.getStyle()));
-      // Transfer to Array for use in MergeStyle
-      final StyleRange[] highlightedRanges = new StyleRange[styles.size()];
-      for (int i = 0; i < styles.size(); i++) {
-         highlightedRanges[i] = styles.get(i);
-      }
-      return highlightedRanges;
+      // Transfer to Array
+      return styles.toArray(new StyleRange[styles.size()]);
+   }
 
+   /**
+    * Updates the error markers for the current document
+    *
+    * @param exception
+    */
+   private void createErrorMarkers(final ParserException exception) {
+      final IResource res = ResourceUtil.getResource(this.editorPart
+            .getEditorInput());
+      final IDocument doc = ((ITextEditor) this.editorPart)
+            .getDocumentProvider()
+            .getDocument(this.editorPart.getEditorInput());
+      ParseErrorMarkerUpdater.createErrorMarkers(res, doc, exception);
    }
 
 }

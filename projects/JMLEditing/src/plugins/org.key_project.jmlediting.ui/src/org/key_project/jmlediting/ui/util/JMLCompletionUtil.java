@@ -13,6 +13,7 @@ import org.key_project.jmlediting.core.profile.IJMLProfile;
 import org.key_project.jmlediting.core.profile.JMLPreferencesHelper;
 import org.key_project.jmlediting.core.profile.JMLProfileHelper;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
+import org.key_project.jmlediting.core.profile.syntax.IToplevelKeyword;
 
 public class JMLCompletionUtil {
    private JMLCompletionUtil() {
@@ -107,6 +108,7 @@ public class JMLCompletionUtil {
    public static List<ICompletionProposal> getStandardKeywordProposals(
          final JavaContentAssistInvocationContext context,
          final Image proposalImage) {
-      return getKeywordProposals(context, null, proposalImage, IKeyword.class);
+      return getKeywordProposals(context, null, proposalImage,
+            IToplevelKeyword.class);
    }
 }

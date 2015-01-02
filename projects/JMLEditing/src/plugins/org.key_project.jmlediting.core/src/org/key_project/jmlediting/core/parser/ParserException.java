@@ -167,8 +167,19 @@ public class ParserException extends Exception {
 
    @Override
    public String getMessage() {
-      return super.getMessage() + " at " + this.causedError.getErrorOffset()
-            + "\n" + this.formatString();
+      ParserError error;
+      if (this.causedError != null) {
+         error = this.causedError;
+      }
+      else if (this.getCause() != null) {
+         return this.getCause().getMessage();
+      }
+      else {
+         error = this.allErrors.get(this.allErrors.size() - 1);
+      }
+
+      return super.getMessage() + " at " + error.getErrorOffset() + "\n"
+      + this.formatString(error.getErrorOffset());
    }
 
    /**
@@ -203,7 +214,7 @@ public class ParserException extends Exception {
    /**
     * Returns the {@link ParserError} which caused this exception, it may be
     * null.
-    * 
+    *
     * @return the causing error
     */
    public ParserError getCausedError() {
@@ -215,9 +226,12 @@ public class ParserException extends Exception {
     * removes lines breaks in the text to format and adds a new line with the
     * error marker.
     *
+    * @param errorPos
+    *           the position to mark as the error
+    *
     * @return a formatted message text
     */
-   private String formatString() {
+   private String formatString(final int errorPos) {
       String outputText = "";
       String outputMarker = "";
       int pos = 0;
@@ -233,7 +247,7 @@ public class ParserException extends Exception {
             break;
          default:
             outputText += c;
-            if (pos == this.getErrorOffset()) {
+            if (pos == errorPos) {
                outputMarker += '^';
             }
             else {

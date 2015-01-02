@@ -26,7 +26,7 @@ import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper;
  *
  */
 @SuppressWarnings("restriction")
-public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
+public class JMLColorPreferencePage extends PropertyAndPreferencePage {
 
    /**
     * The ID of the page when acting as preference page.
@@ -53,12 +53,12 @@ public class JMLColorPropertyPreferencePage extends PropertyAndPreferencePage {
    /**
     * Creates a new {@link JMLProfilePropertiesPage}.
     */
-   public JMLColorPropertyPreferencePage() {
+   public JMLColorPreferencePage() {
       this.currentPreferenceListener = new IPreferenceChangeListener() {
 
          @Override
          public void preferenceChange(final PreferenceChangeEvent event) {
-            JMLColorPropertyPreferencePage.this.updateValues();
+            JMLColorPreferencePage.this.updateValues();
 
          }
 

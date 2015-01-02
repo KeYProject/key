@@ -28,37 +28,43 @@ import org.key_project.jmlediting.profile.jmlref.visibility.PublicKeyword;
 import org.key_project.jmlediting.profile.jmlref.visibility.SpecProtectedKeyword;
 import org.key_project.jmlediting.profile.jmlref.visibility.SpecPublicKeyword;
 
-public class JMLReferenceProfile implements IJMLProfile {
+/**
+ * Models JML with respect to the JML reference manual.
+ * http://www.eecs.ucf.edu/~leavens/JML/jmlrefman/.
+ *
+ *
+ * @author Moritz Lichter
+ *
+ */
+public abstract class JMLReferenceProfile implements IJMLProfile {
 
+   /**
+    * A set containing all supported keywords
+    */
    protected final Set<IKeyword> SUPPORTED_KEYWORDS;
 
-   public JMLReferenceProfile() {
+   /**
+    * Creates a new profile instance with the given supported keyword.
+    * 
+    * @param lang
+    */
+   public JMLReferenceProfile(final KeywordLocale lang) {
       final Set<IKeyword> supportedKeywords = new HashSet<IKeyword>(
             Arrays.asList(new EnsuresKeyword(), new AssignableKeyword(),
                   new AccessibleKeyword(), new RequiresKeyword(),
-                  new BehaviorKeyword(), new ExceptionalBehaviorKeyword(),
-                  new NormalBehaviorKeyword(), new AlsoKeyword(),
-                  new HelperKeyword(), new PureKeyword(), new PrivateKeyword(),
-                  new ProtectedKeyword(), new PublicKeyword(),
-                  new SpecProtectedKeyword(), new SpecPublicKeyword(),
-                  new EverythingKeyword(), new NothingKeyword(),
-                  new NotSpecifiedKeyword()));
+                  new BehaviorKeyword(lang), new ExceptionalBehaviorKeyword(
+                        lang), new NormalBehaviorKeyword(lang),
+                  new AlsoKeyword(), new HelperKeyword(), new PureKeyword(),
+                  new PrivateKeyword(), new ProtectedKeyword(),
+                  new PublicKeyword(), new SpecProtectedKeyword(),
+                  new SpecPublicKeyword(), new EverythingKeyword(),
+                  new NothingKeyword(), new NotSpecifiedKeyword()));
 
       this.SUPPORTED_KEYWORDS = supportedKeywords;
    }
 
    @Override
-   public String getName() {
-      return "JML Reference";
-   }
-
-   @Override
-   public String getIdentifier() {
-      return "org.key_project.jmlediting.profile.jmlref";
-   }
-
-   @Override
-   public Set<IKeyword> getSupportedKeywords() {
+   public final Set<IKeyword> getSupportedKeywords() {
       return Collections.unmodifiableSet(this.SUPPORTED_KEYWORDS);
    }
 

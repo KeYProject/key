@@ -7,6 +7,7 @@ import org.key_project.jmlediting.core.parser.DefaultJMLParser;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.profile.syntax.IKeyword;
 import org.key_project.jmlediting.profile.jmlref.JMLReferenceProfile;
+import org.key_project.jmlediting.profile.jmlref.KeywordLocale;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AccessibleKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
 import org.key_project.jmlediting.profile.key.other.KeyAccessibleKeyword;
@@ -17,6 +18,7 @@ import org.key_project.jmlediting.profile.key.other.StrictlyPureKeyword;
 public class KeyProfile extends JMLReferenceProfile {
 
    public KeyProfile() {
+      super(KeywordLocale.AMERICAN);
       // Add strictly keywords
       this.SUPPORTED_KEYWORDS.add(new StrictlyPureKeyword());
       this.SUPPORTED_KEYWORDS.add(new StrictlyNothingKeyword());

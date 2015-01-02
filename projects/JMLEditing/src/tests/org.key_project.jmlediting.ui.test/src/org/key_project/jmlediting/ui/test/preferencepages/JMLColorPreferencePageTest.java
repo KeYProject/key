@@ -12,16 +12,20 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.key_project.jmlediting.ui.preferencepages.JMLColorPropertyPreferencePage;
+import org.key_project.jmlediting.ui.preferencepages.JMLColorPreferencePage;
 import org.key_project.jmlediting.ui.test.TestUtils;
 import org.key_project.jmlediting.ui.util.JMLUiPreferencesHelper;
 
 /**
  * Testingplan:
  * <ul>
+ * <li>First test, whether the color shown in the ColorSelector is the color
+ * from JMLSettings</li>
  * <li>Test setting a new JML Color and check the Method other use to get the
  * JMLColor</li>
- * <li>Test afterward the RestoreDefault Button and check again</li>
+ * <li>Test afterwards the RestoreDefault Button and check again</li>
+ * <li>At last test whether a new opening of the Preferences still show the
+ * right color.</li>
  * </ul>
  *
  * @author Thomas Glaser
@@ -75,7 +79,7 @@ public class JMLColorPreferencePageTest {
     */
    private void setCommentColorButton() {
       this.commentColorButton = bot.buttonWithId(
-            JMLColorPropertyPreferencePage.TEST_KEY, "CommentColor");
+            JMLColorPreferencePage.TEST_KEY, "CommentColor");
    }
 
    private void navigateToJMLColorSettings() {
@@ -99,17 +103,49 @@ public class JMLColorPreferencePageTest {
    }
 
    /*
+    * hack needed, because native Dialogs can't be testet with SWTBot
+    */
+   private void checkColor(final RGB colorToCheck) {
+      Display.getDefault().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            final Object oSelector = JMLColorPreferencePageTest.this.commentColorButton.widget
+                  .getData();
+            assertTrue(oSelector instanceof ColorSelector);
+            final ColorSelector selector = (ColorSelector) oSelector;
+            assertEquals("ColorSelector doesn't show the right color",
+                  colorToCheck, selector.getColorValue());
+         }
+      });
+   }
+
+   /*
     * execute Testingplan
     */
    @Test
    public void testColorSettings() {
-      final RGB testColor = new RGB(255, 0, 0);
+      // first check whether the ColorSelector shows the right color at the
+      // beginning.
+      this.checkColor(JMLUiPreferencesHelper.getWorkspaceJMLColor());
+
+      RGB testColor = new RGB(255, 0, 0);
       this.setColor(testColor);
       bot.button("Apply").click();
-      assertEquals(testColor, JMLUiPreferencesHelper.getWorkspaceJMLColor());
+      assertEquals("Not the right JML-Color was set.", testColor,
+            JMLUiPreferencesHelper.getWorkspaceJMLColor());
       bot.button("Restore Defaults").click();
       bot.button("OK").click();
-      assertEquals(JMLUiPreferencesHelper.getDefaultJMLColor(),
+      assertEquals("Restore Default JML Color did not work.",
+            JMLUiPreferencesHelper.getDefaultJMLColor(),
             JMLUiPreferencesHelper.getWorkspaceJMLColor());
+
+      // final test
+      testColor = new RGB(0, 255, 0);
+      this.setColor(testColor);
+      bot.button("OK").click();
+      bot.sleep(100);
+      this.openGlobalJMLColorSettings();
+      this.checkColor(JMLUiPreferencesHelper.getWorkspaceJMLColor());
+      this.checkColor(testColor);
    }
 }

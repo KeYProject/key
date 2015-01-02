@@ -1,9 +1,17 @@
 package org.key_project.jmlediting.profile.jmlref.behavior;
 
+import org.key_project.jmlediting.profile.jmlref.KeywordLocale;
+
+/**
+ * Class for the default behavior keyword.
+ *
+ * @author Moritz Lichter
+ *
+ */
 public class BehaviorKeyword extends AbstractBehaviorKeyword {
 
-   public BehaviorKeyword() {
-      super("behavior", "behaviour");
+   public BehaviorKeyword(final KeywordLocale lang) {
+      super(lang, "behavior", "behaviour");
    }
 
    @Override

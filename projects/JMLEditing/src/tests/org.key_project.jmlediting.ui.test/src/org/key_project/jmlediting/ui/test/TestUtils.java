@@ -152,7 +152,7 @@ public class TestUtils {
       for (final IJMLProfile profile : JMLProfileManagement
             .getAvailableProfiles()) {
          if (profile.getIdentifier().equals(
-               "org.key_project.jmlediting.profile.jmlref")) {
+               "org.key_project.jmlediting.profile.jmlref.ae")) {
             return profile;
          }
       }
