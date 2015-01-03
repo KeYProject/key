@@ -12,7 +12,7 @@ import org.key_project.jmlediting.core.dom.Nodes;
  *
  */
 public class DefaultGenericSpecificationKeywordParser extends
-AbstractGenericSpecificationKeywordParser {
+      AbstractGenericSpecificationKeywordParser {
 
    @Override
    protected IASTNode parseToSemicolon(final String text, final int start,

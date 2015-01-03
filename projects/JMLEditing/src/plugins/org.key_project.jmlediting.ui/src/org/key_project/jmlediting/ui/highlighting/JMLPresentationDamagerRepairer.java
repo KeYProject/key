@@ -3,8 +3,6 @@ package org.key_project.jmlediting.ui.highlighting;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
@@ -22,12 +20,9 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.ide.ResourceUtil;
-import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.jmlediting.core.dom.IASTNode;
 import org.key_project.jmlediting.core.dom.IKeywordNode;
 import org.key_project.jmlediting.core.dom.Nodes;
-import org.key_project.jmlediting.core.marker.ParseErrorMarkerUpdater;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParserException;
 import org.key_project.jmlediting.core.profile.IJMLProfile;
@@ -45,7 +40,7 @@ import org.key_project.util.eclipse.WorkbenchUtil;
  * @author David Giessing
  */
 public class JMLPresentationDamagerRepairer implements IPresentationDamager,
-IPresentationRepairer {
+      IPresentationRepairer {
 
    /**
     * The original instance of DefaultDamagerRepairer currently in use for
@@ -135,7 +130,7 @@ IPresentationRepairer {
       else {
          return new Region(surroundingComment.getBeginOffset(),
                surroundingComment.getEndOffset()
-               - surroundingComment.getBeginOffset() + 1);
+                     - surroundingComment.getBeginOffset() + 1);
       }
    }
 
@@ -207,14 +202,12 @@ IPresentationRepairer {
          parseResult = parser.parse(this.doc.get(),
                surroundingComment.getContentBeginOffset(),
                surroundingComment.getContentEndOffset() + 1);
-         // Remove all error markers, because parsing was successful
-         this.createErrorMarkers(null, surroundingComment);
+
       }
       catch (final ParserException e) {
          // Invalid JML Code, no advanced SyntaxColoring possible
          parseResult = e.getErrorNode();
-         // Create error markers for the parse errors
-         this.createErrorMarkers(e, surroundingComment);
+
       }
       if (parseResult == null) {
          return null;
@@ -254,7 +247,7 @@ IPresentationRepairer {
          // begin until the start of first Keyword)
          styles.add(new StyleRange(lastEnd, keywordStartOffset - lastEnd,
                defaultStyleRange.foreground, defaultStyleRange.background, attr
-               .getStyle()));
+                     .getStyle()));
          // Style for the Keyword
          styles.add(new StyleRange(keywordStartOffset, keywordEndOffset
                - keywordStartOffset, defaultStyleRange.foreground,
@@ -267,28 +260,6 @@ IPresentationRepairer {
             defaultStyleRange.background, attr.getStyle()));
       // Transfer to Array
       return styles.toArray(new StyleRange[styles.size()]);
-   }
-
-   /**
-    * Updates the error markers for the current document
-    *
-    * @param exception
-    */
-   private void createErrorMarkers(final ParserException exception,
-         final CommentRange surroundingComment) {
-      final IResource res = ResourceUtil.getResource(this.editorPart
-            .getEditorInput());
-      final IDocument doc = ((ITextEditor) this.editorPart)
-            .getDocumentProvider()
-            .getDocument(this.editorPart.getEditorInput());
-      try {
-         ParseErrorMarkerUpdater.createErrorMarkers(res, doc, exception,
-               surroundingComment);
-      }
-      catch (final CoreException e) {
-         // Strange
-         throw new RuntimeException(e);
-      }
    }
 
 }
