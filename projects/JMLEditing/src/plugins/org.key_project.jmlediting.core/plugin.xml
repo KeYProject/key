@@ -26,11 +26,14 @@
       <super
             type="org.eclipse.core.resources.textmarker">
       </super>
+      <persistent
+            value="true">
+      </persistent>
    </extension>
    <extension
          point="org.eclipse.jdt.core.compilationParticipant">
       <compilationParticipant
-            class="org.key_project.jmlediting.core.marker.JMLCompilationParticipant"
+            class="org.key_project.jmlediting.core.compilation.JMLCompilationParticipant"
             id="org.key_project.jmlediting.core.compilationParticipant2"
             modifiesEnvironment="false">
       </compilationParticipant>

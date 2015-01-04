@@ -199,9 +199,7 @@ public class JMLPresentationDamagerRepairer implements IPresentationDamager,
       final IJMLParser parser = activeProfile.createParser();
       IASTNode parseResult;
       try {
-         parseResult = parser.parse(this.doc.get(),
-               surroundingComment.getContentBeginOffset(),
-               surroundingComment.getContentEndOffset() + 1);
+         parseResult = parser.parse(this.doc.get(), surroundingComment);
 
       }
       catch (final ParserException e) {
