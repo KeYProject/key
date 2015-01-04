@@ -10,7 +10,6 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
-import org.key_project.util.jdt.JDTUtil;
 
 /**
  * Provides extended Rename Refactoring for Local Variables JML Comments.
@@ -45,7 +44,7 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
    @Override
    public RefactoringStatus checkConditions(final IProgressMonitor pm,
          final CheckConditionsContext context)
-               throws OperationCanceledException {
+         throws OperationCanceledException {
       // TODO Auto-generated method stub
       return new RefactoringStatus();
    }
@@ -56,8 +55,8 @@ public class JMLRenameFieldParticipant extends RenameParticipant {
       System.out.println("Arguments: " + this.getArguments());
       final HashMap changes;
       final String newName = this.getArguments().getNewName();
-      final ASTNode parseResult = JDTUtil
-            .parse(compilationUnit, offset, length);
+      // final ASTNode parseResult = JDTUtil
+      // .parse(compilationUnit, offset, length);
       // TODO Auto-generated method stub
       return null;
    }
