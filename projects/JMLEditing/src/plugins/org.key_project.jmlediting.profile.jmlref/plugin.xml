@@ -9,6 +9,9 @@
       <profile
             class="org.key_project.jmlediting.profile.jmlref.JMLReferenceProfileBE">
       </profile>
+      <profile
+            class="org.key_project.jmlediting.profile.jmlref.JMLReferenceProfile">
+      </profile>
    </extension>
 
 </plugin>

@@ -36,7 +36,7 @@ import org.key_project.jmlediting.profile.jmlref.visibility.SpecPublicKeyword;
  * @author Moritz Lichter
  *
  */
-public abstract class JMLReferenceProfile implements IJMLProfile {
+public class JMLReferenceProfile implements IJMLProfile {
 
    /**
     * A set containing all supported keywords.
@@ -50,17 +50,35 @@ public abstract class JMLReferenceProfile implements IJMLProfile {
     *           the keyword locale for AE/BE
     */
    public JMLReferenceProfile(final KeywordLocale lang) {
-      this.supportedKeywords = new HashSet<IKeyword>(
-            Arrays.asList(new EnsuresKeyword(), new AssignableKeyword(),
-                  new AccessibleKeyword(), new RequiresKeyword(),
-                  new BehaviorKeyword(lang), new ExceptionalBehaviorKeyword(
-                        lang), new NormalBehaviorKeyword(lang),
-                        new AlsoKeyword(), new HelperKeyword(), new PureKeyword(),
-                        new PrivateKeyword(), new ProtectedKeyword(),
-                        new PublicKeyword(), new SpecProtectedKeyword(),
-                        new SpecPublicKeyword(), new EverythingKeyword(),
-                        new NothingKeyword(), new NotSpecifiedKeyword()));
+      this.supportedKeywords = new HashSet<IKeyword>(Arrays.asList(
+            new EnsuresKeyword(), new AssignableKeyword(),
+            new AccessibleKeyword(), new RequiresKeyword(),
+            new BehaviorKeyword(lang), new ExceptionalBehaviorKeyword(lang),
+            new NormalBehaviorKeyword(lang), new AlsoKeyword(),
+            new HelperKeyword(), new PureKeyword(), new PrivateKeyword(),
+            new ProtectedKeyword(), new PublicKeyword(),
+            new SpecProtectedKeyword(), new SpecPublicKeyword(),
+            new EverythingKeyword(), new NothingKeyword(),
+            new NotSpecifiedKeyword()));
 
+   }
+
+   /**
+    * Creates a {@link JMLReferenceProfile} without a restriction to American
+    * oder British English.
+    */
+   public JMLReferenceProfile() {
+      this(KeywordLocale.BOTH);
+   }
+
+   @Override
+   public String getName() {
+      return "JML Reference";
+   }
+
+   @Override
+   public String getIdentifier() {
+      return "org.key_project.jmlediting.profile.jmlref";
    }
 
    @Override
