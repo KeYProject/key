@@ -27,6 +27,10 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -101,19 +105,46 @@ public class CloseAfterJoin implements BuiltInRule {
    }
 
    @Override
-   public ImmutableList<Goal> apply(Goal goal, Services services,
-         RuleApp ruleApp) throws RuleAbortException {
+   public ImmutableList<Goal> apply(
+         final Goal goal,
+         final Services services,
+         final RuleApp ruleApp) throws RuleAbortException {
       
       TermBuilder tb = services.getTermBuilder();
       
       ImmutableList<Goal> jpNewGoals = goal.split(2);
       
-      Goal linkedGoal = jpNewGoals.head();
+      final Goal linkedGoal = jpNewGoals.head();
       linkedGoal.setBranchLabel("Joined with node " + joinNode.parent().serialNr());
       // Workaround: Disable linked goal to prevent strategies
       // from automatically working further on it.
       linkedGoal.setLinkedNode(joinNode);
       linkedGoal.setEnabled(false);
+      
+      // Add a listener to close this node if the associated join
+      // node has also been closed, and to remove the mark as linked
+      // node if the join node has been pruned.
+      final Node joinNodeF = joinNode;
+      services.getProof().addProofTreeListener(new ProofTreeAdapter() {
+         @Override
+         public void proofGoalsChanged(ProofTreeEvent e) {
+            if (joinNodeF.isClosed()) {
+               // The joined node has been closed; now also close this node.
+               services.getProof().closeGoal(linkedGoal);
+            }
+         }
+         
+         @Override
+         public void proofPruned(ProofTreeEvent e) {
+            if (!proofContainsNode(e.getSource(), joinNodeF)) {
+               // The joined node has been pruned; now mark this node
+               // as not linked and set it to automatic again.
+               linkedGoal.setLinkedNode(null);
+               linkedGoal.setEnabled(true);
+            }
+         }
+         
+      });
       
       Goal ruleIsWeakeningGoal = jpNewGoals.tail().head();
       ruleIsWeakeningGoal.setBranchLabel("Joined node is weakening");
@@ -125,7 +156,7 @@ public class CloseAfterJoin implements BuiltInRule {
       ruleIsWeakeningGoal.addFormula(new SequentFormula(impForm), true, true);
       
       // Register partner nodes
-      JOIN_NODE_TO_PARTNERS_MAP.get(joinNode).add(ruleIsWeakeningGoal.node());
+      JOIN_NODE_TO_PARTNERS_MAP.get(joinNode).add(linkedGoal.node());
       
       return jpNewGoals;
    }
@@ -138,5 +169,56 @@ public class CloseAfterJoin implements BuiltInRule {
    @Override
    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
       return new DefaultBuiltInRuleApp(this, pos);
+   }
+   
+   /**
+    * Checks if the given node is contained in the given proof.
+    * 
+    * @param proof Proof to search.
+    * @param node Node to search for.
+    * @return True iff node is contained in proof.
+    */
+   private static boolean proofContainsNode(Proof proof, Node node) {
+      //TODO: Remove this method if not needed at end
+      
+      FindNodeVisitor visitor = new FindNodeVisitor(node);
+      proof.breadthFirstSearch(proof.root(), visitor);
+      return visitor.success();
+   }
+   
+   /**
+    * Visitor for finding a node in a proof.
+    * 
+    * @author Dominic Scheurer
+    */
+   private static class FindNodeVisitor implements ProofVisitor {
+      //TODO: Remove this class if not needed at end
+      
+      private boolean found = false;
+      private Node node = null;
+      
+      @SuppressWarnings("unused")
+      private FindNodeVisitor() {}
+      
+      /**
+       * @param node The node to find in the proof.
+       */
+      public FindNodeVisitor(Node node) {
+         this.node = node;
+      }
+      
+      /**
+       * @return True iff the given node has been found.
+       */
+      public boolean success() {
+         return found;
+      }
+      
+      @Override
+      public void visit(Proof proof, Node visitedNode) {
+         if (visitedNode.equals(node)) {
+            found = true;
+         }
+      }
    }
 }

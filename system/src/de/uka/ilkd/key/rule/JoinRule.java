@@ -42,11 +42,20 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
+
+//TODO: So far, the rule shall not be applied automatically,
+//      since symbolic execution could be disturbed. In order
+//      to prevent this, it is only applicable for *interactive*
+//      goals, which is not very elegant. There should be a
+//      different way to exclude the join rules from automatic
+//      strategies....
+//TODO: Check associated CloseAfterJoin rule, update if thesis
+//      is updated.
+//TODO: Make something as a progress bar for time consumptive
+//      joins, like the IfThenElse join rule.
 
 /**
  * Base for implementing join rules. Extend this class,
@@ -76,6 +85,7 @@ public abstract class JoinRule implements BuiltInRule {
       }
       
       ImmutableList<Goal> newGoals = goal.split(1);
+      
       final Goal newGoal = newGoals.head();
       
       // Find join partner
@@ -124,14 +134,13 @@ public abstract class JoinRule implements BuiltInRule {
    }
    
    /**
-    * Joins two SE states (U1,C1,p) and (U2,C2,p). p must
+    * Joins a list of SE states (U1,C1,p) and (U2,C2,p). p must
     * be the same in both states, so it is supplied separately.
     * 
-    * @param state1 First SE state.
-    * @param state2 Second SE state.
+    * @param states States to join.
     * @param services The services object.
-    * @return A new joined SE state (U*,C*) which is
-    *   a weakening of both the original states.
+    * @return A new joined SE state (U*,C*) which is a weakening
+    *    of the original states.
     */
    protected abstract Pair<Term, Term> joinStates(
          ImmutableList<Pair<Term, Term>> states,
@@ -155,7 +164,7 @@ public abstract class JoinRule implements BuiltInRule {
       //       does not seem to work as usual!
       
       return isApplicable(goal, pio,
-            false, // Only permit interactive goals
+            true,  // Only permit interactive goals
             true); // Do the check for partner existence
    }
    
@@ -621,57 +630,5 @@ public abstract class JoinRule implements BuiltInRule {
          }
       }
       return true;
-   }
-   
-   /**
-    * Checks if the given node is contained in the given proof.
-    * 
-    * @param proof Proof to search.
-    * @param node Node to search for.
-    * @return True iff node is contained in proof.
-    */
-   @SuppressWarnings("unused")
-   private boolean proofContainsNode(Proof proof, Node node) {
-      //TODO: Remove this method if not needed at end
-      
-      FindNodeVisitor visitor = new FindNodeVisitor(node);
-      proof.breadthFirstSearch(proof.root(), visitor);
-      return visitor.success();
-   }
-   
-   /**
-    * Visitor for finding a node in a proof.
-    * 
-    * @author Dominic Scheurer
-    */
-   private class FindNodeVisitor implements ProofVisitor {
-      //TODO: Remove this class if not needed at end
-      
-      private boolean found = false;
-      private Node node = null;
-      
-      @SuppressWarnings("unused")
-      private FindNodeVisitor() {}
-      
-      /**
-       * @param node The node to find in the proof.
-       */
-      public FindNodeVisitor(Node node) {
-         this.node = node;
-      }
-      
-      /**
-       * @return True iff the given node has been found.
-       */
-      public boolean success() {
-         return found;
-      }
-      
-      @Override
-      public void visit(Proof proof, Node visitedNode) {
-         if (visitedNode.equals(node)) {
-            found = true;
-         }
-      }
    }
 }

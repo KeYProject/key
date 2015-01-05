@@ -355,7 +355,7 @@ public final class Goal  {
      *
      * @param linkedNode The node that this goal is linked to.
      */
-    public void setLinkedNode(Node linkedNode) {
+    public void setLinkedNode(final Node linkedNode) {
         this.linkedNode = linkedNode;
     }
 
