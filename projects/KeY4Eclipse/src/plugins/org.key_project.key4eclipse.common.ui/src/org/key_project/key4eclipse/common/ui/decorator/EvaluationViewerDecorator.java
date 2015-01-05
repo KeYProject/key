@@ -311,12 +311,12 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
       PredicateValue rightValue = termValueMap.get(sub1);
       assert leftValue != null;
       assert rightValue != null;
-      PredicateValue operatorResult;
+      PredicateValue operatorResult = null;
       if (label != null) {
          PredicateResult predicateResult = branchResult.evaluate(label);
-         operatorResult = (predicateResult != null ? predicateResult.getValue() : PredicateValue.UNKNOWN);
+         operatorResult = (predicateResult != null ? predicateResult.getValue() : null); // In case of the unknown predicate the result value will be computed because the operatorResult is set to null.
       }
-      else {
+      if (operatorResult == null) {
          if (operator == Junctor.AND) {
             operatorResult = PredicateValue.and(leftValue, rightValue);
          }
