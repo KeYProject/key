@@ -178,22 +178,21 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
 //                                goal416);
 //   }
    
-   // TODO: Make running by supporting quantors
-//   /**
-//    * Tests example: examples/_testcase/set/predicateSimpleInstanceMethodContractApplication
-//    */
-//   public void testSimpleInstanceMethodContractApplication_NoOneStepSimplification() throws Exception {
-//      // Create expected results
-//      ExpectedPredicateEvaluationResult preResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("12.0", PredicateValue.TRUE), new ExpectedPredicateResult("10.0", PredicateValue.TRUE), new ExpectedPredicateResult("9.0", PredicateValue.TRUE), new ExpectedPredicateResult("11.0", PredicateValue.TRUE), new ExpectedPredicateResult("7.0", PredicateValue.TRUE)));
-//      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE), new ExpectedPredicateResult("5.0", PredicateValue.TRUE)));
-//      // Perform test
-//      doPredicateEvaluationTest("examples/_testcase/set/predicateSimpleInstanceMethodContractApplication/test/SimpleInstanceMethodContractApplication_NoOneStepSimplification.proof", 
-//                                "examples/_testcase/set/predicateSimpleInstanceMethodContractApplication/oracle/SimpleInstanceMethodContractApplication.xml",
-//                                true,
-//                                false,
-//                                preResult,
-//                                terminationResult);
-//   }
+   /**
+    * Tests example: examples/_testcase/set/predicateSimpleInstanceMethodContractApplication
+    */
+   public void testSimpleInstanceMethodContractApplication_NoOneStepSimplification() throws Exception {
+      // Create expected results
+      ExpectedPredicateEvaluationResult preResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("12.0", PredicateValue.TRUE), new ExpectedPredicateResult("10.0", PredicateValue.TRUE), new ExpectedPredicateResult("9.0", PredicateValue.TRUE), new ExpectedPredicateResult("11.0", PredicateValue.TRUE), new ExpectedPredicateResult("7.0", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE), new ExpectedPredicateResult("5.0", PredicateValue.TRUE)));
+      // Perform test
+      doPredicateEvaluationTest("examples/_testcase/set/predicateSimpleInstanceMethodContractApplication/test/SimpleInstanceMethodContractApplication_NoOneStepSimplification.proof", 
+                                "examples/_testcase/set/predicateSimpleInstanceMethodContractApplication/oracle/SimpleInstanceMethodContractApplication.xml",
+                                true,
+                                false,
+                                preResult,
+                                terminationResult);
+   }
    
    /**
     * Tests example: examples/_testcase/set/predicateSimpleInstanceMethodContractApplication
@@ -211,22 +210,21 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
                                 terminationResult);
    }
 
-   // TODO: Make running by supporting quantors
-//   /**
-//    * Tests example: examples/_testcase/set/predicateSimpleMethodContractApplication
-//    */
-//   public void testSimpleMethodContractApplication_NoOneStepSimplification() throws Exception {
-//      // Create expected results
-//      ExpectedPredicateEvaluationResult preResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("10.0", PredicateValue.TRUE), new ExpectedPredicateResult("9.0", PredicateValue.TRUE), new ExpectedPredicateResult("11.0", PredicateValue.TRUE), new ExpectedPredicateResult("7.0", PredicateValue.TRUE)));
-//      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE), new ExpectedPredicateResult("5.0", PredicateValue.TRUE), new ExpectedPredicateResult("6.0", null)));
-//      // Perform test
-//      doPredicateEvaluationTest("examples/_testcase/set/predicateSimpleMethodContractApplication/test/SimpleMethodContractApplication_NoOneStepSimplification.proof", 
-//                                "examples/_testcase/set/predicateSimpleMethodContractApplication/oracle/SimpleMethodContractApplication.xml",
-//                                true,
-//                                false,
-//                                preResult,
-//                                terminationResult);
-//   }
+   /**
+    * Tests example: examples/_testcase/set/predicateSimpleMethodContractApplication
+    */
+   public void testSimpleMethodContractApplication_NoOneStepSimplification() throws Exception {
+      // Create expected results
+      ExpectedPredicateEvaluationResult preResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("10.0", PredicateValue.TRUE), new ExpectedPredicateResult("9.0", PredicateValue.TRUE), new ExpectedPredicateResult("11.0", PredicateValue.TRUE), new ExpectedPredicateResult("7.0", PredicateValue.TRUE)));
+      ExpectedPredicateEvaluationResult terminationResult = new ExpectedPredicateEvaluationResult(new ExpectedBranchResult(new ExpectedPredicateResult("0.0", PredicateValue.TRUE), new ExpectedPredicateResult("1.0", PredicateValue.TRUE), new ExpectedPredicateResult("5.0", PredicateValue.TRUE), new ExpectedPredicateResult("6.0", null)));
+      // Perform test
+      doPredicateEvaluationTest("examples/_testcase/set/predicateSimpleMethodContractApplication/test/SimpleMethodContractApplication_NoOneStepSimplification.proof", 
+                                "examples/_testcase/set/predicateSimpleMethodContractApplication/oracle/SimpleMethodContractApplication.xml",
+                                true,
+                                false,
+                                preResult,
+                                terminationResult);
+   }
    
    /**
     * Tests example: examples/_testcase/set/predicateSimpleMethodContractApplication
@@ -314,6 +312,7 @@ public class TestPredicateEvaluationUtil extends AbstractSymbolicExecutionTestCa
                          false, 
                          false, 
                          false);
+         assertNotNull(env);
          // Evaluate predicates
          doPredicateEvaluationTest(env, expectedResults);
       }

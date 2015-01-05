@@ -73,7 +73,7 @@ public class StayOnPredicateTermLabelPolicy implements TermLabelPolicy {
                   newLabelIdRequired = true;
                }
             }
-            if (mostImportantLabel != pLabel && topLevel) {
+            if (mostImportantLabel != pLabel) { // Without support of quantors '&& topLevel' can be added.
                originalLabelIds.add(pLabel.getId());
             }
          }
