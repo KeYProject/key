@@ -1306,7 +1306,11 @@ public class TermLabelManager {
             ImmutableArray<TermLabel> newLabels = performRefactoring(state, services, applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, pair.second, refactorings.getBelowUpdatesRefactorings());
             if (!newLabels.equals(pair.second.getLabels())) {
                Term newModality = tf.createTerm(pair.second.op(), pair.second.subs(), pair.second.boundVars(), pair.second.javaBlock(), newLabels);
+               ImmutableArray<TermLabel> applicationLabels = newApplicationTerm.getLabels();
                newApplicationTerm = services.getTermBuilder().applyParallel(pair.first, newModality);
+               if (!applicationLabels.isEmpty()) {
+                  newApplicationTerm = services.getTermBuilder().label(newApplicationTerm, applicationLabels);
+               }
             }
          }
          // Do child and grandchild refactoring if required
