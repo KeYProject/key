@@ -404,12 +404,19 @@ public class EvaluationViewerDecorator extends ProofSourceViewerDecorator {
       Color color = getColor(junctorResult);
       Range range = positionTable.rangeForPath(path, textLength);
       Range childRange = positionTable.rangeForPath(path.append(0), textLength);
-      StyleRange styleRange = new StyleRange(range.start(), 
+      StyleRange startStyleRange = new StyleRange(range.start(), 
                                              childRange.start() - range.start(), 
                                              color, 
                                              null);
       termValueMap.put(term, junctorResult);
-      styleRanges.add(styleRange);
+      styleRanges.add(startStyleRange);
+      if (childRange.end() < range.end()) {
+         StyleRange endStyleRange = new StyleRange(childRange.end(), 
+                                                   range.end() - childRange.end(), 
+                                                   color, 
+                                                   null);
+         styleRanges.add(endStyleRange);
+      }
    }
    
    /**
