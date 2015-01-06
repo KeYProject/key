@@ -65,7 +65,7 @@ public class JMLCompletionUtil {
 
          // compute the offset for replacing the prefix
          final int proposalOffset = context.getInvocationOffset()
-               - prefix.length();
+               - prefixLength;
 
          // get only the Keywords that match the filter
          final Set<IKeyword> filteredKeywordList = JMLProfileHelper

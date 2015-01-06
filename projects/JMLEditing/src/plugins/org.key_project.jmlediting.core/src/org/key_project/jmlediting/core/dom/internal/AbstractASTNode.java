@@ -84,6 +84,11 @@ public abstract class AbstractASTNode implements IASTNode {
    }
 
    @Override
+   public boolean containsOffset(final int offset) {
+      return this.getStartOffset() <= offset && offset < this.getEndOffset();
+   }
+
+   @Override
    public String toString() {
       String str = NodeTypes.getTypeName(this.getType()) + "["
             + this.getStartOffset() + "-" + this.getEndOffset() + "](";

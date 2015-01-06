@@ -188,16 +188,28 @@ public final class ParserBuilder {
          @Override
          public IASTNode parse(final String text, final int start, final int end)
                throws ParserException {
-            final int commaStart = LexicalHelper.skipWhiteSpacesOrAt(text,
-                  start, end);
-            if (commaStart >= end) {
+            final int sepStart = LexicalHelper.skipWhiteSpacesOrAt(text, start,
+                  end);
+            if (sepStart >= end) {
                throw new ParserException("Reached end of text", text, end);
             }
-            if (text.charAt(commaStart) != sep) {
+            if (text.charAt(sepStart) != sep) {
                throw new ParserException("Expected a \"" + sep + "\"", text,
-                     commaStart);
+                     sepStart);
             }
-            return function.parse(text, commaStart + 1, end);
+            try {
+               return function.parse(text, sepStart + 1, end);
+            }
+            catch (final ParserException e) {
+               if (e.getErrorNode() != null) {
+                  throw new ParserException(e, Nodes.createErrorNode(sepStart,
+                        e.getErrorNode().getEndOffset(), e.getErrorNode()));
+               }
+               else {
+                  throw new ParserException(e, Nodes.createErrorNode(sepStart,
+                        sepStart + 1));
+               }
+            }
          }
       };
    }
@@ -241,6 +253,7 @@ public final class ParserBuilder {
                throws ParserException {
             // Parse with the given function
             final IASTNode node = function.parse(text, start, end);
+
             // Then scan for the closing semicolon
             if (node.getEndOffset() == end) {
                // error, do not scan for whitespaces

@@ -28,6 +28,8 @@ public interface IASTNode {
     */
    int getEndOffset();
 
+   boolean containsOffset(int offset);
+
    /**
     * Returns the type of the node.
     *
