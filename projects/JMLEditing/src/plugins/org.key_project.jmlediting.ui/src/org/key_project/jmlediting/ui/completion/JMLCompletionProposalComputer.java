@@ -17,6 +17,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Display;
 import org.key_project.jmlediting.core.dom.IASTNode;
+import org.key_project.jmlediting.core.dom.IKeywordNode;
 import org.key_project.jmlediting.core.dom.Nodes;
 import org.key_project.jmlediting.core.parser.IJMLParser;
 import org.key_project.jmlediting.core.parser.ParserException;
@@ -100,12 +101,21 @@ IJavaCompletionProposalComputer {
 
          }
          catch (final ParserException e) {
-            System.out.println("parserException: " + e.getMessage());
             parseResult = e.getErrorNode();
+            System.out.println("errorNode: " + parseResult);
+
+            System.out.println(context.getInvocationOffset());
+            final List<IKeywordNode> list = Nodes.getAllKeywords(parseResult);
+            for (final IKeywordNode iKeywordNode : list) {
+               System.out.println("keyword: " + iKeywordNode);
+               System.out.println("children: "
+                     + iKeywordNode.getChildren().size());
+            }
          }
 
          final IKeyword activeKeyword = Nodes.getKeywordNode(parseResult,
                context.getInvocationOffset());
+         System.out.println("activeKeyword: " + activeKeyword);
          if (activeKeyword != null) {
             result.addAll(activeKeyword.createAutoProposals(parseResult,
                   javaContext));
