@@ -1,4 +1,5 @@
 example.name = Permuted Sum
+example.path = Algorithms
 example.file = perm.key
 example.additionalFile.1 = src/Perm.java
 example.proofFile = perm.proof

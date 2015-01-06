@@ -22,13 +22,13 @@ import java.util.LinkedList;
 import java.util.Properties;
 import java.util.Map.Entry;
 
-import de.uka.ilkd.key.gui.configuration.SettingsConverter;
-import de.uka.ilkd.key.gui.configuration.SettingsListener;
 
+import de.uka.ilkd.key.settings.SettingsConverter;
+import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 
-public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configuration.Settings, Cloneable {
+public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Settings, Cloneable {
 	
         private static final String ACTIVE_SOLVER  = "[SMTSettings]ActiveSolver";
 

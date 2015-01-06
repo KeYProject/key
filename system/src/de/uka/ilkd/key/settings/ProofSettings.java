@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.gui.configuration;
+package de.uka.ilkd.key.settings;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

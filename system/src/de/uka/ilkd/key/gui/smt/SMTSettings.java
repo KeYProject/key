@@ -23,12 +23,12 @@ import java.util.*;
 
 
 
-import de.uka.ilkd.key.gui.configuration.PathConfig;
-import de.uka.ilkd.key.gui.configuration.SettingsListener;
 
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.PathConfig;
+import de.uka.ilkd.key.settings.SettingsListener;
 
 
 

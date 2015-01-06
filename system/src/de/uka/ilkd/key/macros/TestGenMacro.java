@@ -3,7 +3,6 @@ package de.uka.ilkd.key.macros;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -15,6 +14,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.Strategy;

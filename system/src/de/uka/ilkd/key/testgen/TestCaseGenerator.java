@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.core.Main;
-import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.testgen.TestGenerationSettings;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -29,6 +28,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.model.Heap;
 import de.uka.ilkd.key.smt.model.Model;
