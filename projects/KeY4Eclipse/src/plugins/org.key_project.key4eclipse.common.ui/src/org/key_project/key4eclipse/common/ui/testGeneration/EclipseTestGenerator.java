@@ -18,8 +18,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PartInitException;
 import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.jdt.JDTUtil;
 
@@ -131,7 +134,7 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
       IFile readmeFile = libFolder.getFile(LIB_FOLDER_README_NAME);
       ResourceUtil.createFile(readmeFile, createLibFolderReadmeContent(), null);
       // Create test file
-      IFile testFile = sourceContainer.getFile(new Path(tg.getFileName() + TestCaseGenerator.JAVA_FILE_EXTENSION_WITH_DOT));
+      final IFile testFile = sourceContainer.getFile(new Path(tg.getFileName() + TestCaseGenerator.JAVA_FILE_EXTENSION_WITH_DOT));
       StringBuffer testSb = tg.createTestCaseCotent(problemSolvers);
       ResourceUtil.createFile(testFile, new ByteArrayInputStream(testSb.toString().getBytes()), null);
       // Create RFL file (needs to be done after the test file is created)
@@ -144,6 +147,19 @@ public class EclipseTestGenerator extends AbstractTestGenerator {
       IFolder logFolder = ResourceUtil.createFolder(testProject.getProject(), LOG_FOLDER_NAME);
       IFile logFile = logFolder.getFile(tg.getFileName() + LOG_FILE_EXTENSION);
       ResourceUtil.createFile(logFile, new ByteArrayInputStream(log.toString().getBytes()), null);
+      // Select and open generated test file
+      Display.getDefault().asyncExec(new Runnable() {
+         @Override
+         public void run() {
+            try {
+               WorkbenchUtil.selectAndReveal(testFile);
+               WorkbenchUtil.openEditor(testFile);
+            }
+            catch (PartInitException e) {
+               LogUtil.getLogger().openErrorDialog(null, e);
+            }
+         }
+      });
    }
 
    /**
